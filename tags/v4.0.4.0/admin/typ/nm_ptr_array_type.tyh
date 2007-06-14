@@ -1,0 +1,16 @@
+CREATE OR REPLACE type ptr_array_type as 
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_ptr_array_type.tyh	1.1 01/30/06
+--       Module Name      : nm_ptr_array_type.tyh
+--       Date into SCCS   : 06/01/30 12:44:27
+--       Date fetched Out : 07/06/13 17:04:45
+--       SCCS Version     : 1.1
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2006
+-----------------------------------------------------------------------------
+  varray(1048576)  of ptr;
+/

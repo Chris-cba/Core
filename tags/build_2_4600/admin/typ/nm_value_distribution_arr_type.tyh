@@ -1,0 +1,2 @@
+CREATE OR REPLACE TYPE nm_value_distribution_arr_type AS varray(1048576) OF nm_value_distribution
+/
