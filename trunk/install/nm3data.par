@@ -1,0 +1,279 @@
+nm3data1---------------------------------------------------------------------
+nm3data1-- nm3data1.sql
+nm3data1---------------------------------------------------------------------
+nm3data1---- SCCS ID Keyword, do no remove
+nm3data1--define sccsid = '@(#)nm3data.par	1.26 04/29/04'
+nm3data1--
+nm3data1-- This script populates core Highways tables with mandatory data.
+nm3data1--
+nm3data1-- This data must exist in order for certain modules to function.
+nm3data1-- The script must always be run during new installations.
+nm3data1-- The script may also be run during upgrades, to insert records
+nm3data1-- which do not already exist.
+nm3data1--
+nm3data1-- Users may perform limited updates on this data.
+nm3data1-- Descriptions may be amended, however codes should not be amended
+nm3data1-- without consulting Exor Support.
+nm3data1--
+nm3data1-- OWNER=NM3DATA
+nm3data1-- MODE=APPEND
+nm3data1--
+nm3data1-- The following tables will be populated (do NOT amend the sequence) :
+nm3data1--
+nm3data1-->HIG_PRODUCTS
+nm3data1-->NM_ERRORS
+nm3data1-->HIG_DOMAINS
+nm3data1-->HIG_CODES
+nm3data1-->HIG_COLOURS
+nm3data1-->HIG_MODULES
+nm3data1-->HIG_OPTION_LIST
+nm3data1-->HIG_OPTION_VALUES
+nm3data1-->HIG_STATUS_DOMAINS
+nm3data1-->HIG_STATUS_CODES
+nm3data1-->HIG_SEQUENCE_ASSOCIATIONS
+nm3data1-->HIG_CHECK_CONSTRAINT_ASSOCS
+nm3data1---------------------------------------------------------------------
+
+
+
+
+nm3data2---------------------------------------------------------------------
+nm3data2-- nm3data2.sql
+nm3data2---------------------------------------------------------------------
+nm3data2--
+nm3data2-- This script populates core Highways tables with mandatory data.
+nm3data2--
+nm3data2-- This data must exist in order for certain modules to function.
+nm3data2-- The script must always be run during new installations.
+nm3data2-- The script may also be run during upgrades, to refresh existing
+nm3data2-- data with new values.
+nm3data2--
+nm3data2-- Users may NOT update any of this data.
+nm3data2--
+nm3data2-- OWNER=NM3DATA
+nm3data2-- MODE=REFRESH
+nm3data2--
+nm3data2-- The following tables will be populated (do NOT amend the sequence) :
+nm3data2--
+nm3data2-->DOC_GATEWAYS
+nm3data2-->DOC_GATE_SYNS
+nm3data2-->GRI_MODULES
+nm3data2-->GRI_PARAMS
+nm3data2-->GRI_MODULE_PARAMS
+nm3data2-->GRI_PARAM_DEPENDENCIES
+nm3data2-->GRI_PARAM_LOOKUP
+nm3data2-->HIG_ERRORS
+nm3data2-->HIG_STANDARD_FAVOURITES
+nm3data2---------------------------------------------------------------------
+
+
+
+
+nm3data3---------------------------------------------------------------------
+nm3data3-- nm3data3.sql
+nm3data3---------------------------------------------------------------------
+nm3data3--
+nm3data3-- This script populates core Highways tables with mandatory data.
+nm3data3--
+nm3data3-- This data must exist in order for the menu security to function.
+nm3data3-- The script must always be run during new installations.
+nm3data3-- The script may also be run during upgrades, to insert records
+nm3data3-- which do not already exist.
+nm3data3--
+nm3data3-- It is recommended that users adopt this data where possible,
+nm3data3-- in order to simplify implementation and support.
+nm3data3-- Users who wish to define their own roles must amend this script
+nm3data3-- to define whether forms should run normal or query_only.
+nm3data3--
+nm3data3-- OWNER=NM3DATA
+nm3data3-- MODE=APPEND
+nm3data3--
+nm3data3-- The following tables will be populated (do NOT amend the sequence) :
+nm3data3--
+nm3data3-->HIG_ROLES
+nm3data3-->HIG_MODULE_ROLES
+nm3data3-->HIG_MODULE_KEYWORDS
+nm3data3---------------------------------------------------------------------
+
+
+
+
+nm3data4---------------------------------------------------------------------
+nm3data4-- nm3data4.sql
+nm3data4---------------------------------------------------------------------
+nm3data4--
+nm3data4-- This script populates core Highways tables with startup data.
+nm3data4--
+nm3data4-- Users may update this data to customise their own systems.
+nm3data4-- It is recommended that users adopt this data where possible,
+nm3data4-- in order to simplify implementation and support.
+nm3data4-- The script should normally be run during new installations.
+nm3data4-- The script should not be run during upgrades.
+nm3data4--
+nm3data4-- OWNER=NM3DATA
+nm3data4-- MODE=APPEND
+nm3data4--
+nm3data4-- The following tables will be populated (do NOT amend the sequence) :
+nm3data4--
+nm3data4-->DOC_TYPES
+nm3data4--GROUP_TYPES
+nm3data4-->GROUP_TYPE_ROLES
+nm3data4--SECTION_CLASSES
+nm3data4-->INTERVALS
+nm3data4-->HIG_REPORT_STYLES
+nm3data4---------------------------------------------------------------------
+
+
+nm3data5---------------------------------------------------------------------
+nm3data5-- nm3data5.sql
+nm3data5---------------------------------------------------------------------
+nm3data5--
+nm3data5-- This script populates core Highways tables with dummy startup data.
+nm3data5--
+nm3data5-- It is recommended that this script be run during new installations,
+nm3data5-- to simplify the implementation.
+nm3data5-- The script should not normally be run during upgrades.
+nm3data5-- The admin unit and user data is extremely important and should be
+nm3data5-- amended immediately, before the system becomes operational.
+nm3data5--
+nm3data5-- OWNER=NM3DATA
+nm3data5-- MODE=APPEND
+nm3data5--
+nm3data5-- The following tables will be populated (do NOT amend the sequence) :
+nm3data5--
+nm3data5-->DOC_CLASS
+nm3data5-->DOC_MEDIA
+nm3data5-->DOC_LOCATIONS
+nm3data5-->DOC_TEMPLATE_GATEWAYS
+nm3data5-->DOC_TEMPLATE_COLUMNS
+nm3data5-->DOC_ENQUIRY_TYPES
+nm3data5-->HIG_USERS
+nm3data5-->HIG_USER_FAVOURITES
+nm3data5-->HIG_SYSTEM_FAVOURITES
+nm3data5-->NM_LOAD_DESTINATIONS
+nm3data5-->NM_LOAD_DESTINATION_DEFAULTS
+nm3data5-->NM_UPLOAD_FILE_GATEWAYS
+nm3data5-->NM_UPLOAD_FILE_GATEWAY_COLS
+nm3data5---------------------------------------------------------------------
+
+
+
+nm3data6---------------------------------------------------------------------
+nm3data6-- nm3data6.sql
+nm3data6---------------------------------------------------------------------
+nm3data6--
+nm3data6-- This script populates core Highways tables with dummy startup data.
+nm3data6--
+nm3data6-- It is recommended that this script be run during new installations,
+nm3data6-- to simplify the implementation.
+nm3data6-- The script should not normally be run during upgrades.
+nm3data6-- The admin unit and user data is extremely important and should be
+nm3data6-- amended immediately, before the system becomes operational.
+nm3data6--
+nm3data6-- OWNER=NM3DATA
+nm3data6-- MODE=APPEND
+nm3data6--
+nm3data6-- The following tables will be populated (do NOT amend the sequence) :
+nm3data6--
+nm3data6--SQL>delete from hig_web_contxt_hlp;
+nm3data6--SQL>commit;
+nm3data6-->NM_UNIT_DOMAINS
+nm3data6-->NM_UNITS
+nm3data6-->NM_UNIT_CONVERSIONS
+nm3data6-->COLOURS
+nm3data6-- NM_AU_TYPES
+nm3data6-- NM_ADMIN_UNITS
+nm3data6-->NM_ADMIN_GROUPS
+nm3data6-- NM_USER_AUS
+nm3data6-->NM_NODE_TYPES
+nm3data6-->NM_MAIL_GROUPS
+nm3data6-->NM_MAIL_USERS
+nm3data6-- NM_TYPES
+nm3data6-- NM_GROUP_TYPES
+nm3data6-- NM_NT_GROUPINGS
+nm3data6-->NM_EVENT_TYPES
+nm3data6-->NM_INV_CATEGORIES
+nm3data6-->NM_INV_CATEGORY_MODULES
+nm3data6-->NM_FILL_PATTERNS
+nm3data6-->NM_VISUAL_ATTRIBUTES
+nm3data6-->HIG_WEB_CONTXT_HLP
+nm3data6---------------------------------------------------------------------
+
+
+nm3data7---------------------------------------------------------------------
+nm3data7-- nm3data7.sql
+nm3data7---------------------------------------------------------------------
+nm3data7--
+nm3data7-- This script populates core Highways tables with dummy startup data.
+nm3data7--
+nm3data7-- It is recommended that this script be run during new installations,
+nm3data7-- to simplify the implementation.
+nm3data7-- The script should not normally be run during upgrades.
+nm3data7-- The admin unit and user data is extremely important and should be
+nm3data7-- amended immediately, before the system becomes operational.
+nm3data7--
+nm3data7-- OWNER=NM3DATA
+nm3data7-- MODE=REFRESH
+nm3data7--
+nm3data7-- The following tables will be populated (do NOT amend the sequence) :
+nm3data7--
+nm3data7-->NM_ERRORS
+nm3data7-- NM_TYPE_COLUMNS
+nm3data7-- NM_TYPE_SUBCLASS
+nm3data7-- NM_TYPE_INCLUSION
+nm3data7---------------------------------------------------------------------
+
+
+nm3data_patch---------------------------------------------------------------------
+nm3data_patch-- nm3data_patch.sql
+nm3data_patch---------------------------------------------------------------------
+nm3data_patch--
+nm3data_patch-- This script ensures certain core highways tables contain all
+nm3data_patch--   required standard metadata
+nm3data_patch-- This script WILL normally be run during upgrades
+nm3data_patch--
+nm3data_patch-- OWNER=NM3DATA
+nm3data_patch-- MODE=APPEND
+nm3data_patch--
+nm3data_patch-- The following tables will be populated (do NOT amend the sequence) :
+nm3data_patch--
+nm3data_patch-->NM_ERRORS
+nm3data_patch-->HIG_DOMAINS
+nm3data_patch-->HIG_OPTION_LIST
+nm3data_patch-->HIG_MODULES
+nm3data_patch-->NM_LOAD_DESTINATIONS
+nm3data_patch-->NM_LOAD_DESTINATION_DEFAULTS
+nm3data_patch-->HIG_SEQUENCE_ASSOCIATIONS
+nm3data_patch-->HIG_CHECK_CONSTRAINT_ASSOCS
+nm3data_patch---------------------------------------------------------------------
+
+
+nm3data_patch2---------------------------------------------------------------------
+nm3data_patch2-- nm3data_patch2.sql
+nm3data_patch2---------------------------------------------------------------------
+nm3data_patch2--
+nm3data_patch2-- This script populates core Highways tables with mandatory data.
+nm3data_patch2-- This script WILL normally be run during upgrades
+nm3data_patch2--
+nm3data_patch2-- This data must exist in order for certain modules to function.
+nm3data_patch2-- The script must always be run during new installations.
+nm3data_patch2-- The script may also be run during upgrades, to insert records
+nm3data_patch2-- which do not already exist.
+nm3data_patch2--
+nm3data_patch2-- Users may perform limited updates on this data.
+nm3data_patch2-- Descriptions may be amended, however codes should not be amended
+nm3data_patch2-- without consulting Exor Support.
+nm3data_patch2--
+nm3data_patch2-- OWNER=NM3DATA
+nm3data_patch2-- MODE=REFRESH
+nm3data_patch2--
+nm3data_patch2-- The following tables will be populated (do NOT amend the sequence) :
+nm3data_patch2--
+nm3data_patch2--SQL>delete from hig_web_contxt_hlp;
+nm3data_patch2--SQL>commit;
+nm3data_patch2--SQL>delete from hig_standard_favourites;
+nm3data_patch2--SQL>commit;
+nm3data_patch2-->HIG_WEB_CONTXT_HLP
+nm3data_patch2-->HIG_STANDARD_FAVOURITES
+nm3data_patch2---------------------------------------------------------------------
+
