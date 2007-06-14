@@ -1,0 +1,36 @@
+CREATE OR REPLACE type body ptr_array is
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_ptr_array.tyb	1.1 01/30/06
+--       Module Name      : nm_ptr_array.tyb
+--       Date into SCCS   : 06/01/30 12:43:31
+--       Date fetched Out : 07/06/13 17:04:44
+--       SCCS Version     : 1.1
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2006
+-----------------------------------------------------------------------------
+member procedure debug is
+l_ptr_array ptr_array := self;
+begin
+  for i in 1..l_ptr_array.pa.last loop
+    nm_debug.debug( 'Ptr '||to_char(l_ptr_array.pa(i).ptr_id)||','||to_char(l_ptr_array.pa(i).ptr_value));
+  end loop;
+end;
+
+member function get_id ( p_value in integer ) return integer is
+l_ptr_array ptr_array := self;
+retval integer := -1;
+begin
+  for i in 1..l_ptr_array.pa.last loop
+    if l_ptr_array.pa(i).ptr_value = p_value then
+   retval := l_ptr_array.pa(i).ptr_id;
+ end if;
+  end loop;
+  return retval;
+end;
+
+end;
+/

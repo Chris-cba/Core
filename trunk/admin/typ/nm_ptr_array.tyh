@@ -1,0 +1,19 @@
+CREATE OR REPLACE type PTR_ARRAY as 
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_ptr_array.tyh	1.1 01/30/06
+--       Module Name      : nm_ptr_array.tyh
+--       Date into SCCS   : 06/01/30 12:43:52
+--       Date fetched Out : 07/06/13 17:04:44
+--       SCCS Version     : 1.1
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2006
+-----------------------------------------------------------------------------
+  object ( pa ptr_array_type
+         , member procedure debug
+         , member function get_id ( p_value in integer ) return integer
+);
+/
