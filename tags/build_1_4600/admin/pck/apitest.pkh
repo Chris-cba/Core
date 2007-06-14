@@ -1,0 +1,86 @@
+create or replace package apitest is
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/apitest.pkh-arc   2.0   Jun 14 2007 14:59:46   smarshall  $
+--       Module Name      : $Workfile:   apitest.pkh  $
+--       Date into SCCS   : $Date:   Jun 14 2007 14:59:46  $
+--       Date fetched Out : $Modtime:   Jun 14 2007 14:59:00  $
+--       SCCS Version     : $Revision:   2.0  $
+--      SCCS Version     : 1.1
+--
+--
+--   Author : F J Fish
+--
+--   Package for testing PL/SQL APIs. Delivered as a series of HTML forms.
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2005
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  -- Empty array for defaulting
+  g_empty_vc_arr owa_util.vc_arr ;
+  -- maxed out varchar2
+  subtype big_varchar2 is varchar2(32767) ;
+  -- If the called procedure is a function the result is placed here
+  g_function_result big_varchar2 ;
+  -- This is where the passed arguments for the function are placed
+  g_proc_arguments owa_util.vc_arr ;
+  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.0  $"';
+--  g_sccsid is the SCCS ID for the package
+--
+--</GLOBVAR>
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+  
+--<PROC NAME="ask_for_procedure">
+-- Simple HTML form to ask for the procedure to be run
+  procedure ask_for_procedure ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="show_parameters">
+-- Show the parameters for the named procedure
+  procedure show_parameters
+    ( p_package_owner in varchar2
+    , p_package_name  in varchar2
+    , p_proc_name     in varchar2
+    ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="execute_proc">
+-- Run the nominated procedure and show any in/outs or function returns
+  procedure execute_proc
+    ( p_package_owner in varchar2
+    , p_package_name  in varchar2
+    , p_proc_name     in varchar2
+    , p_arg_names     in owa_util.vc_arr default g_empty_vc_arr
+    , p_arg_in_out    in owa_util.vc_arr default g_empty_vc_arr 
+    , p_arg_values    in owa_util.vc_arr default g_empty_vc_arr
+    , p_use_default   in owa_util.vc_arr default g_empty_vc_arr
+    ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="menu">
+-- Simple menu form
+  procedure menu ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+end apitest ;
+/
