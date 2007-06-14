@@ -1,0 +1,61 @@
+create or replace package nm3net_api_gen as
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3net_api_gen.pkh	1.1 09/09/02
+--       Module Name      : nm3net_api_gen.pkh
+--       Date into SCCS   : 02/09/09 10:20:48
+--       Date fetched Out : 07/06/13 14:12:59
+--       SCCS Version     : 1.1
+--
+--
+--   Author : Jonathan Mills
+--
+--   network API generation package
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2002
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3net_api_gen.pkh	1.1 09/09/02"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="build_all">
+PROCEDURE build_all;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="build_one">
+PROCEDURE build_one (p_nt_type nm_types.nt_type%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3net_api_gen;
+/

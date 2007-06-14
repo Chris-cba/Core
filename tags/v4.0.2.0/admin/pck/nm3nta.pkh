@@ -1,0 +1,79 @@
+CREATE OR REPLACE PACKAGE nm3nta AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3nta.pkh	1.1 06/15/05
+--       Module Name      : nm3nta.pkh
+--       Date into SCCS   : 05/06/15 09:57:36
+--       Date fetched Out : 07/06/13 14:13:02
+--       SCCS Version     : 1.1
+--
+--   Author : R.A. Coupe
+--
+--   NM_THEME_ARRAY related code
+-----------------------------------------------------------------------------
+--  Copyright (c) exor corporation ltd, 2004
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+--  g_sccsid is the SCCS ID for the package
+
+  g_sccsid      CONSTANT   VARCHAR2(2000) := '"@(#)nm3nta.pkh	1.1 06/15/05"';
+
+  g_theme_array         nm_theme_array := nm_theme_array( nm_theme_array_type( nm_theme_entry( null)));
+  g_theme_array_flag    BOOLEAN        := FALSE;
+
+  
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_version
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+
+--<PROC NAME="ADD_TO_THEME_ARRAY">
+-- This procedure adds the theme to the global theme array
+
+PROCEDURE add_to_theme_array( p_theme_id in nm_themes_all.nth_theme_id%type );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_THEME_ARRAY">
+-- This function returns the global theme array 
+
+FUNCTION get_theme_array return nm_theme_array;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REMOVE_FROM_THEME_ARRAY">
+-- This procedure removes a theme from the global theme array
+
+PROCEDURE remove_from_theme_array( p_theme_id in nm_themes_all.nth_theme_id%type );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="THEME_IN_ARRAY">
+-- This function returns success if the theme is in the global theme array
+
+FUNCTION  theme_in_array( p_theme_id in nm_themes_all.nth_theme_id%type, p_theme_array in nm_theme_array ) return BOOLEAN;
+
+end nm3nta;
+/
