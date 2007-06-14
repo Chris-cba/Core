@@ -1,0 +1,18 @@
+CREATE OR REPLACE type nm_lref_array_type as
+--   SCCS Identifiers :-
+--
+--       sccsid           : %W% %G%
+--       Module Name      : %M%
+--       Date into SCCS   : %E% %U%
+--       Date fetched Out : %D% %T%
+--       SCCS Version     : %I%
+--
+--   The lref array type.
+--   Author : Rob Coupe
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2002
+-----------------------------------------------------------------------------
+    varray(1048576) OF nm_lref
+/
+
