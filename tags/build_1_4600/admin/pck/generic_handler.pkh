@@ -1,0 +1,155 @@
+/* Formatted on 2004/08/27 14:29 (Formatter Plus v4.8.5) */
+Create Or Replace Package generic_handler
+Is
+  -- This is the Oracle 8 version of this code
+  -- Type for abbreviation
+
+  Subtype big_string Is Varchar (32767);
+
+  Subtype delim_string Is Varchar (20);
+
+  -- This is to remove any dependency on other packages
+  Type vc_arr Is Table Of big_string
+    Index By Binary_integer;
+
+  g_return_values vc_arr ;
+
+  -- Types used in procedures
+  Type name_value Is Record (
+    Name    vc_arr
+  , Value   vc_arr
+  );
+
+  Type table_handler Is Record (
+    table_name          all_tab_columns.table_name%Type
+  , table_owner         all_tab_columns.owner%Type
+  , primary_key_name    vc_arr
+  , primary_key_value   vc_arr
+  , names_values        name_value
+  );
+
+  Type key_list Is Table Of big_string
+    Index By Binary_integer;
+
+  -- This is declared so that it can be used as a default
+  empty_vc_arr   vc_arr;
+  empty_handler  table_handler;
+
+  -- Helper functions
+  Function get_primary_key_name (
+    p_table_name   In   Varchar
+  , p_table_owner  In   Varchar default user  
+  )
+    Return vc_arr ;
+
+  -- gimme a table handler type
+  Function construct_table (
+    p_table_name          In   Varchar
+  , p_primary_key_name    In   vc_arr
+  , p_primary_key_value   In   vc_arr
+  , p_table_owner  In   Varchar default user  
+  )
+    Return table_handler;
+
+  Function construct_table (
+    p_table_name          In   Varchar
+  , p_primary_key_value   In   vc_arr default empty_vc_arr
+  , p_table_owner  In   Varchar default user  
+  )
+    Return table_handler;
+
+  Procedure set_column (
+    p_column_name    In       Varchar
+  , p_column_value   In       Varchar
+  , p_nv_list        In Out   name_value
+  );
+
+  Procedure remove_column (
+    p_column_name   In       Varchar
+  , p_nv_list       In Out   name_value
+  );
+
+  Procedure add_column (
+    p_column_name    In       Varchar
+  , p_column_value   In       Varchar
+  , p_nv_list        In Out   name_value
+  );
+
+  Function get_column (
+    p_column_name   In       Varchar
+  , p_nv_list       In Out   name_value
+  )
+    Return Varchar;
+
+  -- Main functions - convention is that error messages
+  Function get_row (
+    p_table_name   In   Varchar
+  , p_key_name     In   vc_arr
+  , p_key_value    In   vc_arr
+  , p_table_owner  In   Varchar default user  
+  )
+    Return table_handler;
+
+  Function get_row_key_list (
+    p_query_table   In   table_handler
+  )
+    Return key_list;
+
+  Procedure update_row (
+    p_table_handler   In   table_handler
+  );
+
+  Procedure delete_row (
+    p_table_handler   In   table_handler
+  );
+
+  -- Key is returned in the string
+  Function insert_row (
+    p_table_handler   In   table_handler
+  )
+    Return table_handler;
+
+  Function get_next_key (
+    p_table_name   In   Varchar
+  )
+    Return Integer;
+
+  -- Debug procedures
+  Procedure dump_handler (
+    p_table_handler   In   table_handler
+  );
+
+  Procedure dump_key_list (
+    p_key_list   In   key_list
+  );
+
+  -- Web procedures
+  Procedure web_edit_row (
+    p_table_name    In   Varchar
+  , p_primary_key   In   vc_arr
+  );
+
+  Procedure web_show_row (
+    p_table_name    In   Varchar
+  , p_primary_key   In   vc_arr
+  , p_edit          In   Boolean Default False
+  , p_standalone    In   Boolean Default True
+  , p_table_owner   In   varchar
+  , p_table         In   table_handler default empty_handler
+  );
+
+  Procedure web_save_row (
+    p_table_name      In   Varchar
+  , p_column_names    In   vc_arr
+  , p_column_values   In   vc_arr
+  , p_table_owner  In   Varchar default user  
+  );
+
+  Procedure web_browse_rows (
+    p_table_name      In   Varchar Default Null
+  , p_column_names    In   vc_arr Default empty_vc_arr
+  , p_column_values   In   vc_arr Default empty_vc_arr
+  , p_table_owner  In   Varchar default user  
+  );
+End generic_handler;
+/
