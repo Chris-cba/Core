@@ -1,0 +1,80 @@
+create or replace package hig2 is
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)hig2.pkh	1.3 02/22/06
+--       Module Name      : hig2.pkh
+--       Date into SCCS   : 06/02/22 14:14:34
+--       Date fetched Out : 07/06/13 14:10:28
+--       SCCS Version     : 1.3
+--
+--
+--   Author :
+--
+-- This package contains various highways core procedures and functions.
+-- Procedures which are executed frequently should be held in hig.pck.
+-- Procedures which are executed sporadically should be held in hig2.pck.
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2000
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(80) := '"@(#)hig2.pkh	1.3 02/22/06"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="upgrade">
+-- Procedure to keep a log of all installations, upgrades and patches
+-- applied to each product on the system.
+procedure upgrade
+(p_product         in  hig_upgrades.hup_product%type,
+ p_upgrade_script  in  hig_upgrades.upgrade_script%type,
+ p_remarks         in  hig_upgrades.remarks%type,
+ p_to_version      in  hig_upgrades.to_version%type);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="pre_upgrade_check">
+-- This procedure checks to see if the upgrade should be allowed to continue
+--  based on the current version of the product
+--
+PROCEDURE pre_upgrade_check (p_product               hig_products.hpr_product%TYPE
+                            ,p_new_version           hig_products.hpr_version%TYPE
+                            ,p_allowed_old_version_1 hig_products.hpr_version%TYPE
+                            ,p_allowed_old_version_2 hig_products.hpr_version%TYPE DEFAULT NULL
+                            ,p_allowed_old_version_3 hig_products.hpr_version%TYPE DEFAULT NULL
+                            ,p_allowed_old_version_4 hig_products.hpr_version%TYPE DEFAULT NULL
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+PROCEDURE oracle_version_check(pi_min_version IN VARCHAR2);
+
+
+
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+-----------------------------------------------------------------------------
+end hig2;
+/
