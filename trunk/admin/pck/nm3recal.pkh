@@ -1,0 +1,101 @@
+CREATE OR REPLACE PACKAGE nm3recal IS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3recal.pkh	1.4 07/19/01
+--       Module Name      : nm3recal.pkh
+--       Date into SCCS   : 01/07/19 15:21:45
+--       Date fetched Out : 07/06/13 14:13:13
+--       SCCS Version     : 1.4
+--
+--
+--   Author : Jonathan Mills
+--
+--   Recalibration Package
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2000
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(80) := '"@(#)nm3recal.pkh	1.4 07/19/01"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RECALIBRATE_SECTION">
+-- This procedure recalibrates a section from a given point
+PROCEDURE recalibrate_section (pi_ne_id             IN nm_elements.ne_id%TYPE
+                              ,pi_begin_mp          IN nm_members.nm_begin_mp%TYPE
+                              ,pi_new_length_to_end IN nm_elements.ne_length%TYPE
+                              );
+--  pi_ne_id             - The NE_ID of the NM_ELEMENT we are operating upon
+--  pi_begin_mp          - The point on the section from which we are operating
+--  pi_new_length_to_end - The new distance from pi_begin_mp to element end
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GIS_RECALIBRATE_SECTION">
+-- This procedure recalibrates a section from a given point from the GIS
+PROCEDURE gis_recalibrate_section (pi_ne_id             IN nm_elements.ne_id%TYPE
+                                  ,pi_begin_mp          IN nm_members.nm_begin_mp%TYPE
+                                  ,pi_new_length_to_end IN nm_elements.ne_length%TYPE
+                                  );
+--  pi_ne_id             - The NE_ID of the NM_ELEMENT we are operating upon
+--  pi_begin_mp          - The point on the section from which we are operating
+--  pi_new_length_to_end - The new distance from pi_begin_mp to element end
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SHIFT_SECTION">
+-- This procedure shifts a section from a given point
+PROCEDURE shift_section (pi_ne_id          IN nm_elements.ne_id%TYPE
+                        ,pi_begin_mp       IN nm_members.nm_begin_mp%TYPE
+                        ,pi_shift_distance IN nm_elements.ne_length%TYPE
+                        );
+--  pi_ne_id             - The NE_ID of the NM_ELEMENT we are operating upon
+--  pi_begin_mp          - The point on the section from which we are operating
+--  pi_shift_distance    - The distance be which we wish to shift
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GIS_SHIFT_SECTION">
+-- This procedure shifts a section from a given point from the GIS
+PROCEDURE gis_shift_section (pi_ne_id          IN nm_elements.ne_id%TYPE
+                            ,pi_begin_mp       IN nm_members.nm_begin_mp%TYPE
+                            ,pi_shift_distance IN nm_elements.ne_length%TYPE
+                            );
+--  pi_ne_id             - The NE_ID of the NM_ELEMENT we are operating upon
+--  pi_begin_mp          - The point on the section from which we are operating
+--  pi_shift_distance    - The distance be which we wish to shift
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3recal;
+/
