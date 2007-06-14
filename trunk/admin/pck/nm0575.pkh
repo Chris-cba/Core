@@ -1,0 +1,88 @@
+create or replace package nm0575
+AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm0575.pkh	1.2 11/16/06
+--       Module Name      : nm0575.pkh
+--       Date into SCCS   : 06/11/16 15:31:52
+--       Date fetched Out : 07/06/13 14:10:45
+--       SCCS Version     : 1.2
+--
+--
+--   Author : Graeme Johnson
+--
+--    %YourObjectName%
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2006
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '"@(#)nm0575.pkh	1.2 11/16/06"';
+  
+ 
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE set_g_tab_selected_categories(pi_tab_selected_categories IN nm3type.tab_varchar4);
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_current_result_set_id RETURN nm_gaz_query_item_list.NGQI_JOB_ID%TYPE;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE do_query(pi_source_ne_id       IN nm_gaz_query.ngq_source_id%TYPE
+                  ,pi_begin_mp           IN nm_gaz_query.ngq_begin_mp%TYPE
+                  ,pi_end_mp             IN nm_gaz_query.ngq_end_mp%TYPE
+                  ,pi_ambig_sub_class    IN nm_gaz_query.ngq_ambig_sub_class%TYPE);
+--
+-----------------------------------------------------------------------------
+--   
+PROCEDURE process_tab_asset_types(pi_tab_asset_types  IN nm3type.tab_varchar4
+                                 ,pi_action           IN VARCHAR2
+                                 ,pi_process_partial  IN VARCHAR2);
+
+--
+-----------------------------------------------------------------------------
+--  
+PROCEDURE clear_event_log;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE tidy_up;
+--
+-----------------------------------------------------------------------------
+--
+--                 
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm0575;
+/
