@@ -1,0 +1,40 @@
+CREATE OR REPLACE PACKAGE SWR_UTL_FILE_DOWNLOAD AS
+
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)swr_utl_file_download.pkh	1.2 03/30/04
+--       Module Name      : swr_utl_file_download.pkh
+--       Date into SCCS   : 04/03/30 16:38:28
+--       Date fetched Out : 07/06/13 14:14:01
+--       SCCS Version     : 1.2
+--
+-----------------------------------------------------------------------------
+-- Copyright (c) exor corporation ltd, 2004
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '@(#)swr_utl_file_download.pkh	1.2 03/30/04';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="UTL_FILE_TEMP_START">
+--
+PROCEDURE UTL_FILE_TEMP_START(PI_FILEPATH IN VARCHAR2,PI_FILENAME IN VARCHAR2,PI_UTL_CLOSE IN VARCHAR2);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="UTL_FILE_DATA_START">
+--
+PROCEDURE UTL_FILE_DATA_START(PI_FILEPATH IN VARCHAR2,PI_FILENAME IN VARCHAR2,PI_UTL_CLOSE IN VARCHAR2,
+						PI_UTL_START IN 	VARCHAR2,PI_STRDATAITEM IN LONG) ;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+END SWR_UTL_FILE_DOWNLOAD;
+/

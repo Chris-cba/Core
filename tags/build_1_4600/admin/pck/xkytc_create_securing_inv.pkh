@@ -1,0 +1,102 @@
+CREATE OR REPLACE PACKAGE xkytc_create_securing_inv AS
+--<PACKAGE>
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)xkytc_create_securing_inv.pkh	1.1 02/02/04
+--       Module Name      : xkytc_create_securing_inv.pkh
+--       Date into SCCS   : 04/02/02 16:30:25
+--       Date fetched Out : 07/06/13 14:14:07
+--       SCCS Version     : 1.1
+--
+--
+--   Author : Jonathan Mills
+--
+--   Kentucky Create Securing inventory package
+--
+--   This package contains procedures to allow the automatic creation
+--    of inventory items when a new datum element is created
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) exor corporation ltd, 2003
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+   g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)xkytc_create_securing_inv.pkh	1.1 02/02/04"';
+--  g_sccsid is the SCCS ID for the package
+--
+   g_rec_ne        nm_elements_all%ROWTYPE;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="clear_globals">
+-- This procedure clears out the global variables which are used to avoid
+--  mutation of the triggers
+--
+PROCEDURE clear_globals;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="append_to_globals">
+-- This procedure appends the passed details to the globals
+--
+PROCEDURE append_to_globals (p_ne_id         IN nm_elements_all.ne_id%TYPE
+                            ,p_ne_nt_type    IN nm_elements_all.ne_nt_type%TYPE
+                            );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="process_globals">
+-- This procedure processes the entries in the global arrays and creates
+--  the relevent inventory items
+--
+PROCEDURE process_globals;
+--</PROC>
+--
+-----------------------------------------------------------------
+--
+--<PROC NAME="find_corresponding_au">
+FUNCTION find_corresponding_au (p_nau_admin_unit nm_admin_units.nau_admin_unit%TYPE
+                               ,p_nat_admin_type nm_au_types.nat_admin_type%TYPE
+                               ) RETURN nm_admin_units.nau_admin_unit%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------
+--
+--<PROC NAME="end_date_securing_inv">
+PROCEDURE end_date_securing_inv (pi_ne_id          IN nm_elements_all.ne_id%TYPE
+                                ,pi_effective_date IN nm_elements_all.ne_start_date%TYPE
+                                );
+--</PROC>
+--
+-----------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END xkytc_create_securing_inv;
+/
