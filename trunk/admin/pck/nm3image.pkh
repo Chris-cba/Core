@@ -1,0 +1,63 @@
+CREATE OR REPLACE PACKAGE nm3image AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3image.pkh	1.1 10/28/05
+--       Module Name      : nm3image.pkh
+--       Date into SCCS   : 05/10/28 09:10:56
+--       Date fetched Out : 07/06/13 14:11:49
+--       SCCS Version     : 1.1
+--
+--   Author : Ade Edwards
+-----------------------------------------------------------------------------
+--   Copyright (c) exor corporation ltd, 2005
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '@(#)nm3image.pkh	1.1 10/28/05';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<TYPES>
+  TYPE rec_image
+  IS RECORD ( pi_image           BLOB);
+  TYPE rec_image_lr
+  IS RECORD ( pi_image           LONG RAW);
+  
+  TYPE tab_image IS TABLE OF rec_image INDEX BY BINARY_INTEGER;
+  TYPE tab_image_lr IS TABLE OF rec_image_lr INDEX BY BINARY_INTEGER;
+--</TYPES>
+-----------------------------------------------------------------------------
+--
+  PROCEDURE load
+             ( pi_image_name    IN VARCHAR2
+             , pi_img_dir_name  IN VARCHAR2
+             , pi_img_table     IN user_tables.table_name%TYPE
+             , pi_img_column    IN user_tab_columns.column_name%TYPE
+             , pi_img_uk_column IN user_tab_columns.column_name%TYPE
+             , pi_img_uk_value  IN VARCHAR2 );
+
+  PROCEDURE get
+              ( pi_img_table     IN user_tables.table_name%TYPE
+              , pi_img_column    IN user_tab_columns.column_name%TYPE
+              , pi_img_uk_column IN user_tab_columns.column_name%TYPE
+              , pi_img_uk_value  IN VARCHAR2
+              , pi_img_type      IN VARCHAR2 DEFAULT 'bmp'
+         --     , po_image         IN OUT BLOB ) ;
+              , po_image         IN OUT LONG RAW );
+
+  PROCEDURE get_img_tab
+              ( pi_img_table     IN user_tables.table_name%TYPE
+              , pi_img_column    IN user_tab_columns.column_name%TYPE
+              , pi_img_uk_column IN user_tab_columns.column_name%TYPE
+              , pi_img_uk_value  IN VARCHAR2
+              , pi_img_type      IN VARCHAR2 DEFAULT 'bmp'
+              , po_results       IN OUT tab_image_lr ) ;
+--
+-----------------------------------------------------------------------------
+--
+END nm3image;

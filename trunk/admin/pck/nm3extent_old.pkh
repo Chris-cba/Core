@@ -1,0 +1,118 @@
+create or replace force PACKAGE nm3extent IS
+  --<PACKAGE>
+  --   SCCS Identifiers :-
+  --
+  --       sccsid           : @(#)nm3extent_old.pkh	1.1 03/01/01
+  --       Module Name      : nm3extent_old.pkh
+  --       Date into SCCS   : 01/03/01 16:23:20
+  --       Date fetched Out : 07/06/13 14:11:30
+  --       SCCS Version     : 1.1
+  --
+  --
+  --   Author : Kevin Angus
+  --
+  --     nm3extent package - Functions + Procedures for dealing with temporary
+  --                         extents.
+  --
+  -----------------------------------------------------------------------------
+  --    Copyright (c) exor corporation ltd, 2000
+  -----------------------------------------------------------------------------
+  --</PACKAGE>
+  --all global package variables here
+  --<GLOBVAR>
+  g_sccsid      CONSTANT  varchar2(80) := '"@(#)nm3extent_old.pkh	1.1 03/01/01"';
+  --  g_sccsid is the SCCS_ID
+  --</GLOBVAR>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="get_version">
+  -- This function returns the SCCS version information
+  FUNCTION get_version RETURN varchar2;
+  --</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="check_element_nt_types">
+  -- This function returns TRUE if all elements in the extent specified by
+  -- pi_job_id are of a network type allowed in the group pi_group_type.
+  FUNCTION check_element_nt_types(pi_job_id     IN nm_nw_temp_extents.nte_job_id%TYPE
+                                 ,pi_group_type IN nm_group_types.ngt_group_type%TYPE
+                                 ) RETURN boolean;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="is_extent_partial">
+  -- This function returns TRUE if at least one element in the extent specified
+  -- by pi_job_id is partial i.e. has an end point less than its length.
+  FUNCTION is_extent_partial(pi_job_id IN nm_nw_temp_extents.nte_job_id%TYPE
+                            ) RETURN boolean;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="is_extent_exclusive">
+  -- This function returns TRUE if all elements in the extent specified by
+  -- pi_job_id are not already in another group of the type pi_group_type.
+  FUNCTION is_extent_exclusive(pi_job_id IN nm_nw_temp_extents.nte_job_id%TYPE
+                              ,pi_group_type IN nm_group_types.ngt_group_type%TYPE
+                              ) RETURN boolean;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="check_element_dates">
+  -- This function returns TRUE if all elements in the extent specified by
+  -- pi_job_id are start before (or same as) and end after pi_start_date.
+  FUNCTION check_element_dates(pi_job_id IN nm_nw_temp_extents.nte_job_id%TYPE
+                              ,pi_start_date IN DATE
+                              ) RETURN boolean;
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PROC NAME="create_group">
+  -- This procedure creates a group from the temporary extents in job pi_job_id.
+  PROCEDURE create_group(pi_job_id            IN nm_nw_temp_extents.nte_job_id%TYPE
+                        ,pi_ne_unique         IN nm_elements.ne_unique%TYPE
+                        ,pi_ne_type           IN nm_elements.ne_type%TYPE           DEFAULT 'G'
+                        ,pi_ne_nt_type        IN nm_elements.ne_nt_type%TYPE
+                        ,pi_ne_descr          IN nm_elements.ne_descr%TYPE
+                        ,pi_ne_admin_unit     IN nm_elements.ne_admin_unit%TYPE
+                        ,pi_ne_start_date     IN nm_elements.ne_start_date%TYPE
+                        ,pi_ne_gty_group_type IN nm_elements.ne_gty_group_type%TYPE
+                        ,pi_ne_owner          IN nm_elements.ne_owner%TYPE          DEFAULT NULL
+                        ,pi_ne_name_1         IN nm_elements.ne_name_1%TYPE         DEFAULT NULL
+                        ,pi_ne_name_2         IN nm_elements.ne_name_2%TYPE         DEFAULT NULL
+                        ,pi_ne_prefix         IN nm_elements.ne_prefix%TYPE         DEFAULT NULL
+                        ,pi_ne_number         IN nm_elements.ne_number%TYPE         DEFAULT NULL
+                        ,pi_ne_sub_type       IN nm_elements.ne_sub_type%TYPE       DEFAULT NULL
+                        ,pi_ne_group          IN nm_elements.ne_group%TYPE          DEFAULT NULL
+                        ,pi_ne_sub_class      IN nm_elements.ne_sub_class%TYPE      DEFAULT NULL
+                        ,pi_ne_nsg_ref        IN nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
+                        ,pi_ne_version_no     IN nm_elements.ne_version_no%TYPE     DEFAULT NULL
+                        ,pi_offset            IN number                             DEFAULT 0
+                        );
+  --</PROC>
+  --
+  -----------------------------------------------------------------------------
+  --
+  --<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version           , rnds      , wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(get_body_version      , rnds      , wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(check_element_nt_types      , rnps, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(is_extent_partial                 , wnds      );
+  PRAGMA RESTRICT_REFERENCES(is_extent_exclusive         , rnps, wnds, wnps);
+  PRAGMA RESTRICT_REFERENCES(check_element_dates         , rnps, wnds, wnps);
+  --</PRAGMA>
+  --
+END nm3extent;
+/
