@@ -1,0 +1,19 @@
+CREATE OR REPLACE type nm_code_name_meaning_type as object (
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_code_name_meaning_type.tyh	1.1 02/14/06
+--       Module Name      : nm_code_name_meaning_type.tyh
+--       Date into SCCS   : 06/02/14 13:51:46
+--       Date fetched Out : 07/06/13 17:04:31
+--       SCCS Version     : 1.1
+--
+--
+--   Author : Priid Tanava
+--
+--   Generic type
+--
+   CODE varchar2(80)
+  ,NAME varchar2(500)
+  ,MEANING varchar2(500)
+)
+/

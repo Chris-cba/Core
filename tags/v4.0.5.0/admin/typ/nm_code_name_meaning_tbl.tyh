@@ -1,0 +1,16 @@
+CREATE OR REPLACE type nm_code_name_meaning_tbl 
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm_code_name_meaning_tbl.tyh	1.1 02/14/06
+--       Module Name      : nm_code_name_meaning_tbl.tyh
+--       Date into SCCS   : 06/02/14 13:51:32
+--       Date fetched Out : 07/06/13 17:04:30
+--       SCCS Version     : 1.1
+--
+--
+--   Author : Priid Tanava
+--
+--   Generic type
+--
+as table of nm_code_name_meaning_type
+/
