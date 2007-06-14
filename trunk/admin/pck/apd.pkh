@@ -1,0 +1,62 @@
+CREATE OR REPLACE PACKAGE apd IS
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/apd.pkh-arc   2.0   Jun 14 2007 14:59:46   smarshall  $
+--       Module Name      : $Workfile:   apd.pkh  $
+--       Date into SCCS   : $Date:   Jun 14 2007 14:59:46  $
+--       Date fetched Out : $Modtime:   Jun 14 2007 14:59:00  $
+--       SCCS Version     : $Revision:   2.0  $
+--      SCCS Version     : 1.1
+--
+--
+--   Author : Jonathan Mills
+--
+--     apd package. exor Automatic Schema Documentor
+--
+------------------------------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2000
+------------------------------------------------------------------------------------------------
+--</PACKAGE>
+--all global package variables here
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(80) := '"$Revision:   2.0  $"';
+--
+--</GLOBVAR>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+-- This function returns the SCCS version information
+  FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_body_version">
+-- This function returns the SCCS version information for the package body
+  FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pc_write_details">
+-- This is the main procedure for the APD
+PROCEDURE pc_write_details;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="in_production">
+-- Call this procedure to set the APD to run in production mode
+PROCEDURE in_production;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PRAGMA>
+PRAGMA RESTRICT_REFERENCES (get_version, WNDS, WNPS, RNDS );
+PRAGMA RESTRICT_REFERENCES (get_body_version, WNDS, WNPS, RNDS );
+--</PRAGMA>
+END apd;
+/
