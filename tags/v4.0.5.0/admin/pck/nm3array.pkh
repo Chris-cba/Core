@@ -1,0 +1,65 @@
+CREATE OR REPLACE PACKAGE Nm3array AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3array.pkh	1.2 06/12/06
+--       Module Name      : nm3array.pkh
+--       Date into SCCS   : 06/06/12 12:47:08
+--       Date fetched Out : 07/06/13 14:11:00
+--       SCCS Version     : 1.2
+--
+--   Author : Rob Coupe
+--
+--   Package devoted to serving up initialised object types
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2006
+-----------------------------------------------------------------------------
+--
+--</PACKAGE>
+--all global package variables here
+--<GLOBVAR>
+-- g_sccsid is the SCCS_ID
+-- Constants
+  g_sccsid           CONSTANT VARCHAR2(80) := '@(#)nm3array.pkh	1.2 06/12/06';
+-- Anchored
+-- Numeric
+-- Booleans
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version
+    RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+FUNCTION INIT_INT_ARRAY            RETURN INT_ARRAY;
+FUNCTION INIT_NM_GEOM_ARRAY        RETURN NM_GEOM_ARRAY;
+FUNCTION INIT_NM_LREF_ARRAY 	   RETURN NM_LREF_ARRAY;
+FUNCTION INIT_NM_PLACEMENT_ARRAY   RETURN NM_PLACEMENT_ARRAY;
+FUNCTION INIT_NM_THEME_ARRAY       RETURN NM_THEME_ARRAY;
+FUNCTION INIT_NUM_ARRAY            RETURN NUM_ARRAY;
+FUNCTION INIT_PTR_ARRAY            RETURN PTR_ARRAY;
+FUNCTION INIT_PTR_NUM_ARRAY        RETURN PTR_NUM_ARRAY;
+FUNCTION INIT_PTR_VC_ARRAY         RETURN PTR_VC_ARRAY;
+FUNCTION INIT_NM_THEME_LIST        RETURN NM_THEME_LIST;
+
+FUNCTION INIT_INT_ARRAY( p_num_tab IN Nm3type.tab_number ) RETURN int_array;
+-----------------------------------------------------------------------------
+--
+END;
+/
+
+

@@ -1,0 +1,99 @@
+CREATE OR REPLACE PACKAGE nm3_msv_xml AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3_msv_xml.pkh	1.1 02/15/06
+--       Module Name      : nm3_msv_xml.pkh
+--       Date into SCCS   : 06/02/15 16:52:29
+--       Date fetched Out : 07/06/13 14:10:49
+--       SCCS Version     : 1.1
+--
+--   Author : Francis Fish
+--
+--    nm3_msv_xml
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2006
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT varchar2(2000) := '"@(#)nm3_msv_xml.pkh	1.1 02/15/06"';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="update_def_xml">
+-- 
+-- search node is the name of the node, e.g. theme
+-- attrib is name
+-- attrib value, e.g. ACCIDENTS
+--
+ function update_def_xml
+  ( p_xml                  in varchar2
+  , p_search_Node          in varchar2
+  , p_search_Attrib_Name   in varchar2
+  , p_search_Attrib_Value  in varchar2
+  , p_change_attrib_Name   in varchar2
+  , p_new_Value            in varchar2   
+  ) return varchar2 ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="update_styling_rules">
+-- use search_ to find the node you want to update
+-- pass the update_ values in to update it
+-- designed for use in a trigger with :old and :new
+  function  update_styling_rules
+  ( p_xml                        in varchar2
+  , p_search_rule_column         in varchar2 
+  , p_search_rule_style          in varchar2 
+  , p_search_rule_features       in varchar2 
+  , p_search_rule_label_column   in varchar2 
+  , p_search_rule_label_style    in varchar2 
+  , p_search_rule_label          in varchar2 
+  , p_update_rule_column         in varchar2 
+  , p_update_rule_style          in varchar2 
+  , p_update_rule_features       in varchar2 
+  , p_update_rule_label_column   in varchar2 
+  , p_update_rule_label_style    in varchar2 
+  , p_update_rule_label          in varchar2
+  ) return varchar2 ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="update_styling_rules">
+-- for the given XML and xPath return the first node you find
+  function  test_xpath
+  ( xml    in varchar2
+  , xPath  in varchar2
+  ) return varchar2 ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+END nm3_msv_xml ;
+/
+
