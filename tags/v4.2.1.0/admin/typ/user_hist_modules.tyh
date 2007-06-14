@@ -1,0 +1,2 @@
+CREATE OR REPLACE TYPE user_hist_modules AS varray(10) OF user_hist_module
+/
