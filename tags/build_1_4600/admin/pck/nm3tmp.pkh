@@ -1,0 +1,126 @@
+create or replace package nm3tmp as
+--<PACKAGE>
+-- This package is a temporary package with some functions which belong in <B><I>inv.pck</B></I> and
+-- some funcs/procs which belong in <B><I>mai.pck</B></I>
+--</PACKAGE>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_units">
+-- This function will go into inv.pck - Owner : Tim
+  function get_units( p_unit_id in number ) return varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nt_unique">
+-- This function will go into inv.pck - Owner : Tim
+  function get_nt_unique( p_type in varchar2 ) return varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_nit_descr">
+-- This function will go into inv.pck - Owner : Tim
+  function get_nit_descr( p_type in varchar2 ) return varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_top_item_type">
+-- This function will go into inv.pck - Owner : Tim
+  function get_top_item_type ( p_type in varchar2) return varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_type_icon">
+-- This function will go into inv.pck - Owner : Tim
+  function get_inv_type_icon(p_inv_type in varchar2) return varchar2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="View_Exists">
+-- This function is copied from mai.pck - Owner : Jon
+    Function View_Exists( inv_view_name in nm_inv_types.nit_view_name%type )
+    return boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="View_In_Use">
+-- This function is copied from mai.pck - Owner : Jon
+-- Check if the existing view is in use within the database.
+    Function View_In_Use(p_view_name in nm_inv_types.nit_view_name%type)
+    return boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="Synonym_Exists">
+-- This function is copied from mai.pck - Owner : Jon
+-- When called, this procedure should perform the actual creation of the 
+-- specified inventory view. A return code should be provided if there were any
+-- problems when creating the view object. ( Such as insufficient privileges ).
+    Function Synonym_Exists(synonym in nm_inv_types.nit_view_name%type)
+    return boolean;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="Create_view">
+-- This function is copied from mai.pck - Owner : Jon
+    Procedure Create_view (p_view_name       in nm_inv_types.nit_view_name%type
+                          ,p_inventory_type  in nm_inv_types.nit_inv_type%type
+                          ,p_join_to_network IN BOOLEAN DEFAULT FALSE
+                          );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="Create_inv_view">
+-- This function is copied from mai.pck - Owner : Jon
+Procedure Create_inv_view (p_view_name       in nm_inv_types.nit_view_name%type
+                          ,p_inventory_type  in nm_inv_types.nit_inv_type%type
+                          ,p_join_to_network IN BOOLEAN DEFAULT FALSE
+                          );
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="Create_all_inv_views">
+-- Owner : Jon
+-- This procedure creates views for all INVENTORY TYPES
+    Procedure Create_all_inv_views;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="derive_inv_type_view_name">
+-- Owner : Jon
+-- This function derives the view name for a given INVENTRY TYPE
+FUNCTION derive_inv_type_view_name (pi_inv_type IN nm_inv_types.nit_inv_type%TYPE)
+ RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="derive_nw_inv_type_view_name">
+-- Owner : Jon
+-- This function derives the view name for a given INVENTRY TYPE joined to the network
+FUNCTION derive_nw_inv_type_view_name (pi_inv_type IN nm_inv_types.nit_inv_type%TYPE)
+ RETURN VARCHAR2;
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PRAGMA>
+PRAGMA RESTRICT_REFERENCES (derive_inv_type_view_name, RNDS, WNDS, RNPS, WNPS);
+PRAGMA RESTRICT_REFERENCES (derive_nw_inv_type_view_name, RNDS, WNDS, RNPS, WNPS);
+--</PRAGMA>
+--
+----------------------------------------------------------------------------------------------
+--
+end;
+/
