@@ -1,0 +1,95 @@
+create or replace package nm3datetrack as
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3datetrack.pkh	1.1 03/01/01
+--       Module Name      : nm3datetrack.pkh
+--       Date into SCCS   : 01/03/01 16:23:16
+--       Date fetched Out : 07/06/13 14:11:14
+--       SCCS Version     : 1.1
+--
+--
+--   Author : Jonathan Mills
+--
+--   Datetrack triggers package
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2001
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3datetrack.pkh	1.1 03/01/01"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+--
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+--
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="populate_table">
+-- This procedure populates the EXOR_DATETRACKED_TABLES table
+--
+PROCEDURE populate_table;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="drop_all_triggers">
+-- This procedure drops all triggers created from the EXOR_DATETRACKED_TABLES
+--   table
+--
+PROCEDURE drop_all_triggers;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="build_all_triggers">
+-- This procedure builds all triggers for rows in the EXOR_DATETRACKED_TABLES
+--   table
+--
+PROCEDURE build_all_triggers;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="build_datetrack_views">
+-- This procedure builds datetrack vies for the _ALL tables which have start
+--  date and end_date columns
+--
+PROCEDURE build_datetrack_views;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_datetrack_views">
+-- This procedurechecks that the current datetrack views which are in place
+--  are not missing any columns
+--
+PROCEDURE check_datetrack_views;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3datetrack;
+/

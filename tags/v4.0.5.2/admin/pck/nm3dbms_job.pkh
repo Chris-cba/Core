@@ -1,0 +1,81 @@
+CREATE OR REPLACE PACKAGE nm3dbms_job AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3dbms_job.pkh	1.2 08/30/02
+--       Module Name      : nm3dbms_job.pkh
+--       Date into SCCS   : 02/08/30 10:50:30
+--       Date fetched Out : 07/06/13 14:11:15
+--       SCCS Version     : 1.2
+--
+--
+--   Author : K Angus
+--
+--   Procs/functions for manipulating DBMS jobs.
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2002
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3dbms_job.pkh	1.2 08/30/02"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="processes_available">
+--
+-- This function returns TRUE if there are processes defined in the Oracle
+-- parameters to run DBMS jobs.
+--
+FUNCTION processes_available RETURN boolean;
+--
+-- Errors raised:
+--
+-- -20035 V$PARAMETER record not found.
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="make_sure_processes_available">
+-- This function raises an error (HIG-0136) if processes_available returns FALSE
+--
+PROCEDURE make_sure_processes_available;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="does_job_exist_by_what">
+FUNCTION does_job_exist_by_what (pi_what all_jobs.what%TYPE) RETURN BOOLEAN;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds  , wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version   , rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (processes_available, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3dbms_job;
+/
