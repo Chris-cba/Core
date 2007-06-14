@@ -1,0 +1,125 @@
+create or replace package nm3inv_load as
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3inv_load.pkh	1.4 11/11/04
+--       Module Name      : nm3inv_load.pkh
+--       Date into SCCS   : 04/11/11 23:09:12
+--       Date fetched Out : 07/06/13 14:12:02
+--       SCCS Version     : 1.4
+--
+--
+--   Author : Jonathan Mills
+--
+--   NM3 Inventory Load package
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2002
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3inv_load.pkh	1.4 11/11/04"';
+--  g_sccsid is the SCCS ID for the package
+--
+   g_create_temp_ne_on_validate BOOLEAN := FALSE;
+   g_last_nte_job_id            NUMBER  := -1;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_ele_mp_ambig">
+PROCEDURE load_ele_mp_ambig (p_rec v_load_inv_mem_ele_mp_ambig%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_ele_mp_ambig">
+PROCEDURE validate_ele_mp_ambig (p_rec v_load_inv_mem_ele_mp_ambig%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_ele_mp_true_ambig">
+PROCEDURE load_ele_mp_true_ambig (p_rec v_load_inv_mem_ele_mp_true_amb%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_ele_mp_true_ambig">
+PROCEDURE validate_ele_mp_true_ambig (p_rec v_load_inv_mem_ele_mp_true_amb%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_ele_mp_excl">
+PROCEDURE load_ele_mp_excl (p_rec v_load_inv_mem_ele_mp_excl%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_ele_mp_excl">
+PROCEDURE validate_ele_mp_excl (p_rec v_load_inv_mem_ele_mp_excl%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_ele_mp_true_excl">
+PROCEDURE load_ele_mp_true_excl (p_rec v_load_inv_mem_ele_mp_true_exc%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_ele_mp_true_excl">
+PROCEDURE validate_ele_mp_true_excl (p_rec v_load_inv_mem_ele_mp_true_exc%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_on_element">
+PROCEDURE load_on_element (p_rec v_load_inv_mem_on_element%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_on_element">
+PROCEDURE validate_on_element (p_rec v_load_inv_mem_on_element%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="load_point_on_ele">
+PROCEDURE load_point_on_ele (p_rec v_load_point_inv_mem_on_ele%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="validate_point_on_ele">
+PROCEDURE validate_point_on_ele (p_rec v_load_point_inv_mem_on_ele%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3inv_load;
+/

@@ -1,0 +1,95 @@
+create or replace package nm3inv_sde as
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3inv_sde.pkh	1.4 07/09/02
+--       Module Name      : nm3inv_sde.pkh
+--       Date into SCCS   : 02/07/09 11:01:09
+--       Date fetched Out : 07/06/13 14:12:03
+--       SCCS Version     : 1.4
+--
+--
+--   Author : Jonathan Mills
+--
+--   NM3 Inventory for SDE package
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2001
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3inv_sde.pkh	1.4 07/09/02"';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_all_sde_inv_shp_tables">
+PROCEDURE create_all_sde_inv_shp_tables (p_app_owner_pwd VARCHAR2 DEFAULT USER);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_sde_inv_shape_table">
+PROCEDURE create_sde_inv_shape_table (p_inv_type      nm_inv_types.nit_inv_type%TYPE
+                                     ,p_app_owner_pwd VARCHAR2 DEFAULT USER
+                                     );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_sde_table_name">
+FUNCTION get_inv_sde_table_name (p_inv_type nm_inv_types.nit_inv_type%TYPE
+                                ) RETURN user_tables.table_name%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_sde_view_name">
+FUNCTION get_inv_sde_view_name (p_inv_type nm_inv_types.nit_inv_type%TYPE
+                               ) RETURN user_tables.table_name%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE submit_process_mem_change_job (p_first    DATE     DEFAULT SYSDATE
+                                        ,p_interval VARCHAR2 DEFAULT 'SYSDATE+1'
+                                        );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="process_membership_changes">
+PROCEDURE process_membership_changes;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="change_sde_measures">
+PROCEDURE change_sde_measures;
+--</PROC>
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_inv_sde_table_name, wnds, wnps);
+   PRAGMA RESTRICT_REFERENCES (get_inv_sde_view_name, wnds, wnps);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3inv_sde;
+/
