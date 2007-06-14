@@ -1,0 +1,191 @@
+create or replace package mrgsec as
+--
+------------------------------------------------------------------------------------
+--
+--<PACKAGE>
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/mrgsec.pkh-arc   2.0   Jun 14 2007 09:25:04   smarshall  $
+--       Module Name      : $Workfile:   mrgsec.pkh  $
+--       Date into SCCS   : $Date:   Jun 14 2007 09:25:04  $
+--       Date fetched Out : $Modtime:   Jun 14 2007 09:24:34  $
+--       SCCS Version     : $Revision:   2.0  $
+--       Based on SCCS Version     : 1.6
+--
+--
+--   Author : Jonathan Mills
+--
+--   Package for implementing context-based security for Merge (Slice+Dice) Process
+--
+------------------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2000
+------------------------------------------------------------------------------------
+--</PACKAGE>
+--
+------------------------------------------------------------------------------------
+--
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(80) := '"$Revision:   2.0  $"';
+--  g_sccsid is the SCCS_ID
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+-- This function returns the SCCS ID
+  FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nqt_predicate">
+-- This is the predicate function for NM_MRG_QUERY_TYPES
+  function mrg_nqt_predicate( schema_in varchar2, name_in varchar2) return varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nqt_predicate_read">
+-- This is the predicate function for NM_MRG_QUERY_TYPES
+  function mrg_nqt_predicate_read( schema_in varchar2, name_in varchar2) return varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nmq_predicate_read">
+-- This is the predicate function for NM_MRG_QUERY_TYPES
+  function mrg_nmq_predicate_read( schema_in varchar2, name_in varchar2) return varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nmq_predicate">
+-- This is the predicate function for NM_MRG_QUERY (update or delete)
+  function mrg_nmq_predicate( schema_in varchar2, name_in varchar2) return varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nqr_predicate">
+-- This is the predicate function for NM_MRG_QUERY_RESULTS (delete)
+  function mrg_nqr_predicate( schema_in varchar2, name_in varchar2) return varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nqr_predicate_read">
+-- This is the predicate function for NM_MRG_QUERY_RESULTS (select)
+  function mrg_nqr_predicate_read( schema_in varchar2, name_in varchar2) return varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nqr_predicate_ui">
+-- This is the predicate function for NM_MRG_QUERY_RESULTS (update,insert)
+  function mrg_nqr_predicate_ui( schema_in varchar2, name_in varchar2) return varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nqr_predicate_del">
+-- This is the predicate function for NM_MRG_QUERY_RESULTS (del)
+  function mrg_nqr_predicate_del( schema_in varchar2, name_in varchar2) return varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="execute_query_allowed">
+-- This function returns TRUE if the user is allowed to execute the given merge query
+FUNCTION execute_query_allowed (pi_nmq_id IN nm_mrg_query.nmq_id%TYPE) RETURN BOOLEAN;
+--</PROC>
+
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="execute_query_allowed_string">
+-- This function returns TRUE if the user is allowed to execute the given merge query
+FUNCTION execute_query_allowed_string (pi_nmq_id IN nm_mrg_query.nmq_id%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="is_query_updatable">
+FUNCTION is_query_updatable (p_nmq_id IN nm_mrg_query.nmq_id%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="are_query_results_deletable">
+FUNCTION are_query_results_deletable (p_nmq_id IN nm_mrg_query.nmq_id%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="MRG_NQA_PREDICATE">
+-- This is the predicate function for NM_MRG_QUERY_ATTRIBS (update, insert, delete)
+  function MRG_NQA_PREDICATE( schema_in varchar2, name_in varchar2) return varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_nqa_predicate_read">
+-- This is the predicate function for NM_MRG_QUERY_ATTRIBS (select)
+function mrg_nqa_predicate_read( schema_in varchar2, name_in varchar2) return varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="MRG_NQV_PREDICATE">
+-- This is the predicate function for NM_MRG_QUERY_VALUES (update, insert, delete)
+  function MRG_NQV_PREDICATE( schema_in varchar2, name_in varchar2) return varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="MRG_NQV_PREDICATE_READ">
+-- This is the predicate function for NM_MRG_QUERY_VALUES (select)
+  function MRG_NQV_PREDICATE_READ( schema_in varchar2, name_in varchar2) return varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PROC NAME="mrg_ndq_predicate">
+-- This is the predicate function for NM_MRG_DEFAULT_QUERY_TYPES
+  function mrg_ndq_predicate( schema_in varchar2, name_in varchar2) return varchar2;
+--</PROC>
+--
+------------------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version,WNDS,WNPS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version,WNDS,WNPS);
+   PRAGMA RESTRICT_REFERENCES (mrg_nqt_predicate,WNDS,WNPS);
+   PRAGMA RESTRICT_REFERENCES (mrg_nqt_predicate_read,WNDS,WNPS);
+   PRAGMA RESTRICT_REFERENCES (mrg_nmq_predicate,WNDS,WNPS);
+   PRAGMA RESTRICT_REFERENCES (mrg_nqr_predicate,WNDS,WNPS);
+   PRAGMA RESTRICT_REFERENCES (execute_query_allowed, WNDS, WNPS);
+   PRAGMA RESTRICT_REFERENCES (execute_query_allowed_string, WNDS, WNPS);
+   PRAGMA RESTRICT_REFERENCES (mrg_nmq_predicate_read,WNDS,WNPS);
+   PRAGMA RESTRICT_REFERENCES (mrg_nqr_predicate_read,WNDS,WNPS);
+   PRAGMA RESTRICT_REFERENCES (mrg_nqr_predicate_ui,WNDS,WNPS);
+   PRAGMA RESTRICT_REFERENCES (mrg_nqr_predicate_del,WNDS,WNPS);
+   PRAGMA RESTRICT_REFERENCES (is_query_updatable,WNDS,WNPS);
+   PRAGMA RESTRICT_REFERENCES (MRG_NQA_PREDICATE,WNDS,WNPS);
+   PRAGMA RESTRICT_REFERENCES (mrg_nqa_predicate_read,WNDS,WNPS);
+   PRAGMA RESTRICT_REFERENCES (MRG_NQV_PREDICATE,WNDS,WNPS);
+   PRAGMA RESTRICT_REFERENCES (MRG_NQV_PREDICATE_READ,WNDS,WNPS);
+   PRAGMA RESTRICT_REFERENCES (are_query_results_deletable,WNDS,WNPS);
+   PRAGMA RESTRICT_REFERENCES (mrg_ndq_predicate,WNDS,WNPS);
+--</PRAGMA>
+--
+------------------------------------------------------------------------------------
+--
+END mrgsec;
+/
