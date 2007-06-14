@@ -1,0 +1,172 @@
+CREATE OR REPLACE PACKAGE Pre_Migration_Check AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--   SCCS Identifiers :-
+--
+-- sccsid : @(#)pre_migration_check.pkh	1.15 04/13/07 
+-- Module Name : pre_migration_check.pkh 
+-- Date into SCCS : 07/04/13 14:14:36 
+-- Date fetched Out : 07/06/13 14:09:36 
+-- SCCS Version : 1.15
+
+--
+--
+--   Author : Stuart Marshall/Graeme Johnson
+--
+--    pre_migration_check
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2002
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '"@(#)pre_migration_check.pkh	1.13 01/22/07"';
+
+  c_write_mode       CONSTANT  VARCHAR2(1)    := 'W';
+
+  TYPE tab_varchar32767 IS TABLE OF VARCHAR2(32767) INDEX BY BINARY_INTEGER;
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_COUNT_ISSUES>
+-- Returns the number of issues for a given check
+FUNCTION get_count_issues(pi_pmci_pmc_ref IN PRE_MIGRATION_CHK_ISSUES.pmci_pmc_ref%TYPE) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RUN_CHECK>
+-- The pre-migration checker
+-- This will run pre-migration checks
+-- for all check categories that have a value of 'Y' and create a report of the results
+PROCEDURE run_check( pi_filename         VARCHAR2
+                   , pi_location         VARCHAR2
+                   , pi_max_check_issues NUMBER   DEFAULT 50
+                   , pi_chk_road_network VARCHAR2 DEFAULT 'Y'
+                   , pi_chk_groups       VARCHAR2 DEFAULT 'Y'
+                   , pi_chk_inv          VARCHAR2 DEFAULT 'Y'
+                   , pi_chk_inv_hier     VARCHAR2 DEFAULT 'Y'
+                   , pi_chk_inv_attribs  VARCHAR2 DEFAULT 'Y'
+                   , pi_chk_spatial      VARCHAR2 DEFAULT 'Y'
+                   , pi_chk_doc          VARCHAR2 DEFAULT 'Y'
+                   , pi_chk_misc         VARCHAR2 DEFAULT 'Y'
+                   );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REPORT_FROM_EXISTING_RESULTS>
+-- This will generate a html file from the last results of the checker
+-- Run_check must have completed before this can be run
+PROCEDURE report_from_existing_results( pi_filename         VARCHAR2
+                                      , pi_location         VARCHAR2
+                                      , pi_max_check_issues NUMBER DEFAULT 50);
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION string(pi_string IN VARCHAR2) RETURN VARCHAR2;
+
+  g_filename		VARCHAR2(2000);
+  g_location		VARCHAR2(2000);
+  g_sql			    VARCHAR2(2000);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE pmci_ins(pi_pmci_pmc_ref     IN PRE_MIGRATION_CHK_ISSUES.pmci_pmc_ref%TYPE
+                  ,pi_pmci_issue_label IN PRE_MIGRATION_CHK_ISSUES.pmci_issue_label%TYPE
+                  ,pi_pmci_details     IN PRE_MIGRATION_CHK_ISSUES.pmci_details%TYPE
+                  );
+--
+--
+PROCEDURE check_points;
+PROCEDURE system_start_dates;
+PROCEDURE date_triggers;
+PROCEDURE nodes_FK_points;
+PROCEDURE rse_node_date_check;
+PROCEDURE check_section_class;
+PROCEDURE section_and_group_lengths;
+PROCEDURE check_intervals;
+PROCEDURE check_rse_admin_unit_fk;
+PROCEDURE check_rse_unique_uppercase;
+PROCEDURE groups_members;
+PROCEDURE sections_links_relate;
+PROCEDURE group_exclusivity;
+PROCEDURE point_contiguous;
+PROCEDURE inv_locations;
+PROCEDURE inv_start_end_check;
+PROCEDURE inv_start_end_count;
+PROCEDURE valid_xsp;
+PROCEDURE inv_type_exclusive;
+PROCEDURE inv_uniqueness;
+PROCEDURE inv_type_valid;
+PROCEDURE inventory_hierarchy;
+PROCEDURE hier_inv_dangling;
+PROCEDURE fk_incorrect1;
+PROCEDURE hier_inv_locations;
+PROCEDURE fk_incorrect2;
+PROCEDURE hier_inv_dates;
+PROCEDURE check_roles;
+PROCEDURE check_inv_attr_valid_col;
+PROCEDURE check_inv_attr;
+PROCEDURE check_lookup_varchar;
+PROCEDURE check_inv_min_max;
+PROCEDURE check_reserved_words;
+PROCEDURE domain_lookup_failure;
+PROCEDURE check_attr_range;
+PROCEDURE check_attr_length;
+PROCEDURE check_mandatory_attr;
+PROCEDURE check_shape;
+PROCEDURE check_xsp_sys_flag;
+PROCEDURE admin_unit_hierarchy;
+--PROCEDURE admin_unit_relationships;
+PROCEDURE contact_addresses;
+PROCEDURE missing_docs;
+PROCEDURE check_users;
+PROCEDURE future_items;
+PROCEDURE disabled_constraints;
+PROCEDURE Exor_objects;
+PROCEDURE Extra_objects;
+PROCEDURE section_domain_validity;
+--
+PROCEDURE other_locations;
+PROCEDURE orphan_hig_codes;
+PROCEDURE invalid_load_columns;
+PROCEDURE check_mai_table_columns;
+PROCEDURE check_wo;
+PROCEDURE check_INSP_INITIALS;
+PROCEDURE section_mandatory_values;
+
+
+
+FUNCTION product_licensed(pi_product IN HIG_PRODUCTS.HPR_PRODUCT%TYPE) RETURN BOOLEAN;
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END Pre_Migration_Check;
+/

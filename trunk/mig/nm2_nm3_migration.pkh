@@ -1,0 +1,154 @@
+CREATE OR REPLACE PACKAGE Nm2_Nm3_Migration AS
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--   SCCS Identifiers :-
+--
+-- sccsid : @(#)nm2_nm3_migration.pkh	1.10 01/09/07
+-- Module Name : nm2_nm3_migration.pkh
+-- Date into SCCS : 07/01/09 14:26:09
+-- Date fetched Out : 07/01/09 14:36:16
+-- SCCS Version : 1.10
+--
+--
+--   Author :
+--
+--    nm2_nm3_migration
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2002
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid  CONSTANT VARCHAR2(2000) := '@(#)nm2_nm3_migration.pkh	1.11 01/19/07';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="migrate_cor_doc_gis">
+-- Migrate the core parts of the system (users, admin units etc.)
+-- This is the base step that ALL migrations will have to perform
+PROCEDURE migrate_cor_doc_gis(pi_log_file_location   IN VARCHAR2
+                             ,pi_v2_higowner 		 IN VARCHAR2
+                             ,pi_with_debug          IN BOOLEAN DEFAULT FALSE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="migrate_gis">
+-- Migrate the doc assocs of the system
+--
+PROCEDURE migrate_doc_assocs(pi_log_file_location   IN VARCHAR2
+                             ,pi_with_debug          IN BOOLEAN DEFAULT FALSE);
+--</PROC>
+-------------------------------------------------------------------------------
+--
+--<PROC NAME="migrate_network_and_inventory">
+-- Migrate the network and inventory
+-- This will be performed in 9 steps
+PROCEDURE migrate_network_and_inventory (pi_log_file_location IN VARCHAR2
+                                        ,pi_netw_inv_type     IN VARCHAR2 DEFAULT 'NETW'
+                                        ,pi_step              IN NUMBER
+                                        ,pi_with_debug          IN BOOLEAN DEFAULT FALSE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nm3_inv_code">
+-- return the nm3 inventory code which may be different to the nm2 code
+FUNCTION get_nm3_inv_code(p_nm2_inv_code IN NM_INV_TYPES_ALL.nit_inv_type%TYPE
+                         ,p_nm2_sys_flag IN VARCHAR2)
+                          RETURN  NM_INV_TYPES_ALL.nit_inv_type%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nm2_inv_code">
+-- return the version 2 inventory code which may be different to the nm3 code
+FUNCTION get_nm2_inv_code (p_nm3_inv_code IN NM_INV_TYPES_ALL.nit_inv_type%TYPE)
+                          RETURN  NM_INV_TYPES_ALL.nit_inv_type%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="migrate_failed_inventory">
+-- Migrate the inventory that previously failed
+PROCEDURE migrate_failed_inventory(pi_log_file_location   IN VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="migrate_failed_inventory_loc">
+-- Locate any inventory where it failed to be located previously
+PROCEDURE migrate_failed_inventory_loc(pi_log_file_location   IN VARCHAR2);
+--</PROC>
+--
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+
+---SPATIAL ----
+
+PROCEDURE do_spatial_migration(pi_table_name IN user_tables.table_name%TYPE
+                              ,pi_id_col_name IN user_tab_columns.COLUMN_NAME%TYPE
+                              ,pi_shape_col_name IN user_tab_columns.COLUMN_NAME%TYPE
+							  ,pi_log_file_location   IN VARCHAR2
+                              ,pi_with_debug          IN BOOLEAN DEFAULT FALSE);
+
+
+/*FUNCTION remove_null_ords ( p_geom IN mdsys.sdo_geometry )
+RETURN mdsys.sdo_geometry;
+
+FUNCTION Make_Single_Part( p_geom IN mdsys.sdo_geometry, p_diminfo IN mdsys.sdo_dim_array )
+RETURN mdsys.sdo_geometry;
+
+FUNCTION Ignore_Measure( p_geom mdsys.sdo_geometry )
+RETURN mdsys.sdo_geometry ;
+
+FUNCTION Get_Table_Diminfo( p_table IN VARCHAR2, p_column IN VARCHAR2 DEFAULT NULL )
+RETURN mdsys.sdo_dim_array;
+
+
+FUNCTION Rescale_Geometry ( p_geom IN mdsys.sdo_geometry, p_diminfo IN mdsys.sdo_dim_array,p_length IN NUMBER )
+RETURN mdsys.sdo_geometry;
+
+FUNCTION Remove_Redundant_Pts( p_geom IN mdsys.sdo_geometry )
+RETURN mdsys.sdo_geometry;
+
+FUNCTION Get_No_Parts ( p_geom IN mdsys.sdo_geometry )
+RETURN NUMBER ;
+
+PROCEDURE Spatial_data_fixes;
+
+PROCEDURE Fix_Route_Theme;
+
+--PROCEDURE pc_inv_mig_nm2_nm3_by_id (p_iit_item_id    NM_INV_ITEMS_ALL.iit_ne_id%TYPE) ;
+*/
+END Nm2_Nm3_Migration;
+/
