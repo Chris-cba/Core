@@ -1,5 +1,5 @@
 REM SCCS ID Keyword, do no remove
-define sccsid = '"@(#)higowner.sql	1.29 05/17/07"';
+define sccsid = '"$Revision::   2.1      $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
@@ -579,8 +579,16 @@ DECLARE
           || CHR(10) ||' NUA_NAU_FK FOREIGN KEY '
           || CHR(10) ||'  (NUA_ADMIN_UNIT) REFERENCES '||p_user||'.NM_ADMIN_UNITS_ALL'
           || CHR(10) ||'  (NAU_ADMIN_UNIT)';
+          
+-- GJ 13-JUN-2007
+-- column(s) on an fk constraint must be indexed
+-- so create index for NUA_NAU_FK 
+-- one is not required for NUA_HUS_FK because NUA_USER_ID is indexed already as the leading column in NUA_PK primary key
 --
-     -- NM_USER_AUS_ALL
+     EXECUTE IMMEDIATE 'CREATE INDEX '||p_user||'.NUA_NAU_FK_IND ON '||p_user||'.NM_USER_AUS_ALL(NUA_ADMIN_UNIT)';
+--          
+--
+     -- NM_ADMIN_GROUPS
      EXECUTE IMMEDIATE 'CREATE TABLE '||p_user||'.NM_ADMIN_GROUPS'
      || CHR(10) ||'(NAG_PARENT_ADMIN_UNIT NUMBER(9) NOT NULL'
      || CHR(10) ||' ,NAG_CHILD_ADMIN_UNIT NUMBER(9) NOT NULL'
@@ -600,7 +608,12 @@ DECLARE
      || CHR(10) ||'  (NAG_PARENT_ADMIN_UNIT) REFERENCES '||p_user||'.NM_ADMIN_UNITS_ALL'
      || CHR(10) ||'  (NAU_ADMIN_UNIT)';
 
-
+-- GJ 13-JUN-2007
+-- column(s) on an fk constraint must be indexed
+-- so create index for HAG_FK2_HAU 
+-- one is not required for HAG_FK1_HAU because NAG_PARENT_ADMIN_UNIT is indexed already as the leading column in HAG_PK primary key
+--
+     EXECUTE IMMEDIATE 'CREATE INDEX '||p_user||'.HAG_FK2_HAU_IND ON '||p_user||'.NM_ADMIN_GROUPS(NAG_CHILD_ADMIN_UNIT)';
 --
    END create_tables;
 --
