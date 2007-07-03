@@ -6,7 +6,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-01-JUN-2007 14:52
+03-JUL-2007 10:39
 
 TABLES PROCESSED
 ================
@@ -26,7 +26,7 @@ HIG_USER_OPTION_LIST
 
 TABLE OWNER
 ===========
-NM3DATA
+NM3_METADATA
 
 MODE (A-Append R-Refresh)
 ========================
@@ -34,7 +34,7 @@ A
 
 ***************************************************************************/
 
-define sccsid = '@(#)nm3data1.sql	1.81 06/01/07'
+define sccsid = '"$Revision:   2.1  $"'
 set define off;
 set feedback off;
 
@@ -1501,6 +1501,4460 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'HIG'
                     AND  NER_ID = 50);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,51
+       ,183
+       ,'Unable to Bulk Update Contract. %s1 contract items would have been made negative.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 51);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,52
+       ,184
+       ,'Incode must be of format: X9, X99, XX9, XX99, X9X, XX9X (where X is a letter and 9 is a number)'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 52);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,53
+       ,185
+       ,'Outcode must be one number and two letters (9XX)'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 53);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,54
+       ,186
+       ,'This contact is not valid for this type'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 54);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,55
+       ,187
+       ,'Cannot Delete record as associated %s1 records exist.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 55);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,56
+       ,188
+       ,'This contact is not current, check start and end dates.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 56);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,57
+       ,189
+       ,'A Surname must be entered.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 57);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,58
+       ,190
+       ,'An Organisation Name must be entered.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 58);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,59
+       ,342
+       ,'You cannot enter a date in the future'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 59);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,60
+       ,639
+       ,'A value for one of these fields MUST be entered'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 60);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,61
+       ,9608
+       ,'You must enter either %s1 or %s2'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 61);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,62
+       ,null
+       ,'A domain required for this screen is not present which may cause it to function incorrectly or not at all.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 62);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,63
+       ,null
+       ,'GIS is not available.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 63);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,64
+       ,null
+       ,'Value already exists.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 64);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,65
+       ,null
+       ,'GIS shape in place, network editing function not allowed.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 65);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,66
+       ,null
+       ,'Unable to find GIS route theme.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 66);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,67
+       ,null
+       ,'Record not found'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 67);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,68
+       ,null
+       ,'Cannot find GIS theme.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 68);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,69
+       ,null
+       ,'Value entered is too long.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 69);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,70
+       ,null
+       ,'Value is of invalid format.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 70);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,71
+       ,null
+       ,'Cannot delete another user''s record.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 71);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,72
+       ,null
+       ,'Public synonyms not available, you must create private synonyms for this user.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 72);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,73
+       ,null
+       ,'Some shapes are not available for the area you wish to display.'||CHR(10)||''||CHR(10)||'This may give misleading results in the GIS.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 73);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,74
+       ,null
+       ,'There are no shapes available for the object you wish to view in the GIS.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 74);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,75
+       ,null
+       ,'No GIS objects selected.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 75);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,76
+       ,null
+       ,'Value cannot be less than '
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 76);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,77
+       ,null
+       ,'Value cannot be greater than '
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 77);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,78
+       ,null
+       ,'Value cannot be greater than '
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 78);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,79
+       ,null
+       ,'Cannot create synonym - object does not exist in schema.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 79);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,80
+       ,null
+       ,'User does not exist in HIG_USERS.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 80);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,81
+       ,null
+       ,'User does not have permission to create synonym.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 81);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,82
+       ,null
+       ,'Application configured to run using PUBLIC synonyms - not creating PRIVATE synonyms.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 82);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,83
+       ,null
+       ,'Error occurred executing sql'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 83);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,84
+       ,null
+       ,'Function name not found in function text'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 84);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,85
+       ,null
+       ,'Update not allowed.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 85);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,86
+       ,null
+       ,'You do not have permission to perform this action.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 86);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,87
+       ,null
+       ,'Would you like to save changes?'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 87);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,88
+       ,null
+       ,'Invalid admin unit.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 88);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,89
+       ,null
+       ,'The passwords you have entered are different.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 89);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,90
+       ,null
+       ,'Password changed successfully.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 90);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,91
+       ,null
+       ,'Arrays supplied have different numbers of values.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 91);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,92
+       ,null
+       ,'All old and new values specified are the same.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 92);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,93
+       ,null
+       ,' items updated.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 93);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,94
+       ,null
+       ,'This operation involves a commit, are you sure you wish to continue?'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 94);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,95
+       ,null
+       ,'Operation completed successfully.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 95);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,96
+       ,null
+       ,'Save Changes before continuing'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 96);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,97
+       ,null
+       ,'If you continue the results may be incorrect.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 97);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,98
+       ,null
+       ,'Open queries are not allowed in this block.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 98);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,99
+       ,null
+       ,'Unique not specified.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 99);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,100
+       ,null
+       ,'No length supplied.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 100);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,101
+       ,null
+       ,'Start date must be effective date.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 101);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,102
+       ,null
+       ,'No changes made.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 102);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,103
+       ,null
+       ,'Invalid parameter data from GIS for session'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 103);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,104
+       ,null
+       ,'Cannot edit when called from GIS.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 104);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,105
+       ,null
+       ,'Point Asset Items can only be placed at point locations, not linear'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 105);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,106
+       ,null
+       ,'Cannot locate Asset records which are in a Child AT relationship'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 106);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,107
+       ,null
+       ,'Mandatory column is NULL'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 107);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,108
+       ,null
+       ,'Column is too long'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 108);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,109
+       ,null
+       ,'Value is invalid for domain'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 109);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,110
+       ,null
+       ,'Invalid parameter'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 110);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,111
+       ,null
+       ,'Numeric value is invalid.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 111);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,112
+       ,null
+       ,'Invalid number of values specified.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 112);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,113
+       ,null
+       ,'Parse error in query'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 113);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,114
+       ,null
+       ,'You have selected an item of the wrong type.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 114);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,115
+       ,null
+       ,'Error number already exists.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 115);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,116
+       ,null
+       ,'You are creating a role as a  user that is not the highways owner.'||CHR(10)||''||CHR(10)||'The new role has been granted to the highways owner with admin privileges.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 116);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,117
+       ,null
+       ,'You must requery any currently displayed data to see unit changes.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 117);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,118
+       ,null
+       ,'Folder already exists.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 118);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,119
+       ,null
+       ,'You cannot rename the favourites folder.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 119);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,120
+       ,null
+       ,'Alert not found.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 120);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,121
+       ,null
+       ,'OK to delete folder and its contents?'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 121);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,122
+       ,null
+       ,'OK to delete module?'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 122);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,123
+       ,null
+       ,'You cannot delete the favourites folder.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 123);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,124
+       ,null
+       ,'You cannot create an item at this level.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 124);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,125
+       ,null
+       ,'Module already exists in this folder.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 125);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,126
+       ,null
+       ,'You do not have privileges to perform this action'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 126);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,127
+       ,null
+       ,'Discoverer run mode not defined in system options.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 127);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,128
+       ,null
+       ,'Client server Discoverer cannot be run from highways in web mode.'||CHR(10)||''||CHR(10)||'Check user and system options.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 128);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,129
+       ,null
+       ,'Discoverer web path not defined correctly in system options.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 129);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,130
+       ,null
+       ,'Discoverer executable not defined.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 130);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,131
+       ,null
+       ,'Append'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 131);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,132
+       ,null
+       ,'Replace'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 132);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,133
+       ,null
+       ,'The data you have chosen has been changed by another user, please reselect.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 133);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,134
+       ,null
+       ,'No themes available for current module.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 134);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,135
+       ,null
+       ,'Status transition not allowed'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 135);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,136
+       ,null
+       ,'No DBMS job processes defined - contact the system administrator.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 136);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,137
+       ,null
+       ,'Effective Date is format is invalid.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 137);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,139
+       ,null
+       ,'Message is enqueued and will be delivered in due course'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 139);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,140
+       ,null
+       ,'If you change your password you will be logged out of highways.'||CHR(10)||''||CHR(10)||'OK to continue?'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 140);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,141
+       ,null
+       ,'Error populating group'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 141);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,142
+       ,null
+       ,'Job not online'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 142);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,143
+       ,null
+       ,'More than one instance of this job exists'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 143);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,144
+       ,null
+       ,'Function cannot be performed here'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 144);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,145
+       ,null
+       ,'You have entered a duplicate primary key'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 145);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,146
+       ,null
+       ,'You do not have the required privileges to create a user'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 146);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,147
+       ,null
+       ,'Column, Table combination does not exist.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 147);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,148
+       ,null
+       ,'Date format is invalid'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 148);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,149
+       ,null
+       ,'GIS theme data contains invalid table name(s)'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 149);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,150
+       ,null
+       ,'GIS Theme data is invalid'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 150);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,151
+       ,null
+       ,'Item location cannot be modified from GIS'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 151);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,152
+       ,null
+       ,'Item location may not be modified from GIS for this product'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 152);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,153
+       ,null
+       ,'The password entered is incorrect for this user.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 153);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,154
+       ,null
+       ,'This will exit and lose the connection to the GIS'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 154);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,155
+       ,null
+       ,'Unit Converter'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 155);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,156
+       ,null
+       ,'Cannot add a value as it would exceed the maximum allowed for the condition'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 156);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,157
+       ,null
+       ,'Cannot update domain when values exist'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 157);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,158
+       ,null
+       ,'Field cannot be updated'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 158);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,159
+       ,null
+       ,'Mixed case values not permitted'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 159);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,160
+       ,null
+       ,'Datatype cannot be updated when values exist'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 160);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,161
+       ,null
+       ,'Case sensitivity cannot be updated - this would result in invalid data'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 161);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,162
+       ,null
+       ,'Standard visual attribute not found'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 162);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,163
+       ,null
+       ,'Product Option is not set'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 163);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,164
+       ,null
+       ,'Are you sure you wish to create/recreate the holding table? Any data will be lost'||CHR(10)||'This operation also involves a COMMIT.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 164);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,165
+       ,null
+       ,'Continue'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 165);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,166
+       ,null
+       ,'Name is not unique across NM_LOAD_FILES.NLF_UNIQUE and NM_LOAD_DESTINATIONS.NLD_TABLE_SHORT_NAME'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 166);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,167
+       ,null
+       ,'Form must be called in NORMAL mode'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 167);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,168
+       ,null
+       ,'Date cannot have a time associated'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 168);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,169
+       ,null
+       ,'Database constraint violated'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 169);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,170
+       ,null
+       ,'Allowable values are "NORMAL" and "READONLY"'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 170);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,171
+       ,null
+       ,'Allowable values are "VARCHAR2","NUMBER" and "DATE"'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 171);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,172
+       ,null
+       ,'Only whole numbers may be specified'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 172);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,173
+       ,null
+       ,'Only positive whole numbers may be specified'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 173);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,174
+       ,null
+       ,'Negative values are not permitted'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 174);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,175
+       ,null
+       ,'Definition of query bracketing is invalid'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 175);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,176
+       ,null
+       ,'Specified Job Status is invalid'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 176);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,177
+       ,null
+       ,'Invalid operator specified'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 177);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,178
+       ,null
+       ,'File uploaded successfully'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 178);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,179
+       ,null
+       ,'File upload failed'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 179);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,180
+       ,null
+       ,'File browser not available when running via the web'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 180);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,181
+       ,null
+       ,'INSERT not permitted into this view'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 181);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,182
+       ,null
+       ,'User not instantiated correctly.'||CHR(10)||'Probable missing INSTANTIATE_USER trigger.'||CHR(10)||'Contact exor support for assistance.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 182);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,183
+       ,null
+       ,'Date format mask only permitted for DATE fields'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 183);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,184
+       ,null
+       ,'Account not valid'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 184);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,185
+       ,null
+       ,'Generating report...'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 185);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,186
+       ,null
+       ,'Cannot load from server. No server file path specified'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 186);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,187
+       ,null
+       ,'Are you sure you wish to continue?'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 187);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,188
+       ,null
+       ,'User Created. Do you want to view this user?'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 188);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,189
+       ,null
+       ,'SDE data not present - cloning is not possible'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 189);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,190
+       ,null
+       ,'SDE Layer generator failure'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 190);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,191
+       ,null
+       ,'SDE Table registration id generator failure'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 191);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,192
+       ,null
+       ,'Theme is not related to a network'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 192);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,193
+       ,null
+       ,'Point location data not found - clone is not possible'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 193);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,194
+       ,null
+       ,'No base theme is available'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 194);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,195
+       ,null
+       ,'No datum theme found'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 195);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,196
+       ,null
+       ,'Layer table not found'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 196);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,197
+       ,null
+       ,'SDO Metadata for layer  not found'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 197);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,198
+       ,null
+       ,'Geometry not found - '
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 198);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,199
+       ,null
+       ,'Element shapes not connected'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 199);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,201
+       ,null
+       ,'Only one element has shape - merge prevented'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 201);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,202
+       ,null
+       ,'points are the same - no distance between them'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 202);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,203
+       ,null
+       ,'points are not on same network element'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 203);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,204
+       ,null
+       ,'Lengths of element and shape are inconsistent'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 204);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,205
+       ,null
+       ,'Single part asset shapes are not supported yet'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 205);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,206
+       ,null
+       ,'Load Aborted. Metadata changes have been made since the edif file was generated.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 206);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,207
+       ,null
+       ,'Load Aborted. Error found during MapCapture Load.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 207);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,208
+       ,null
+       ,'Asset Update conflict. Changes have been made to the asset in the database.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 208);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,209
+       ,null
+       ,'The file containing exor product version numbers could not be found.  Please check the ''EXOR_VERSION'' registry setting'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 209);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,210
+       ,null
+       ,'Switch Route Theme ?'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 210);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,211
+       ,null
+       ,'Switch Route Theme to Current Theme?'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 211);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,212
+       ,null
+       ,'Theme must be of type SDE/SDO to be Route Theme'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 212);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,213
+       ,null
+       ,'Assertion failed'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 213);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,214
+       ,null
+       ,'Value cannot be NULL'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 214);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,215
+       ,null
+       ,'XML does not allow lists of more than one column. '||CHR(10)||''||CHR(10)||'Either select one column or use a table alias.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 215);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,216
+       ,null
+       ,'Close'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 216);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,217
+       ,null
+       ,'Select All'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 217);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,218
+       ,null
+       ,'Inverse Selection'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 218);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,219
+       ,null
+       ,'Refresh'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 219);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,220
+       ,null
+       ,'You can only send email as your own user'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 220);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,221
+       ,null
+       ,'All mail messages should have at least 1 "TO" recipient'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 221);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,222
+       ,null
+       ,'Favourite cannot have the name as parent folder'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 222);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,230
+       ,null
+       ,'Inconsistency detected between licenced product versions on the database and in the Exor Product Version Numbers File.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 230);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,231
+       ,null
+       ,'Detail'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 231);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,232
+       ,null
+       ,'Points are not on same network element'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 232);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,233
+       ,null
+       ,'No theme data available to determine gtype'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 233);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,234
+       ,null
+       ,'No suitable PK column for SDE registration'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 234);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,235
+       ,null
+       ,'Theme must be consistent for the same session'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 235);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,236
+       ,null
+       ,'Unknown geometry'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 236);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,237
+       ,null
+       ,'Dimension not available'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 237);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,238
+       ,null
+       ,'Invalid dimension - must be between 2 and 4'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 238);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,239
+       ,null
+       ,'No data to base diminfo calculation'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 239);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,240
+       ,null
+       ,'The SRID does not match - please reset the current SRID or use the correct value'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 240);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,241
+       ,null
+       ,'No Index on the table and column'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 241);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,242
+       ,null
+       ,'Already registered in SDO Metadata'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 242);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,243
+       ,null
+       ,'Needs a Feature table'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 243);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,244
+       ,null
+       ,'Needs a Feature table spatial column'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 244);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,245
+       ,null
+       ,'Needs a base theme to dyn-seg from'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 245);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,246
+       ,null
+       ,'Not enough info on the theme'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 246);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,247
+       ,null
+       ,'Tolerance cannot be found from point data'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 247);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,248
+       ,null
+       ,'Dimension information is incomopatible with operation'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 248);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,249
+       ,null
+       ,'FT and theme do not match'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 249);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,250
+       ,null
+       ,'Asset type is not a foreign table'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 250);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,251
+       ,null
+       ,'SRID generator failure'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 251);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,252
+       ,null
+       ,'Table is not registered or SDE schema cannot see it'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 252);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,253
+       ,null
+       ,'No sde layer for theme'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 253);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,254
+       ,null
+       ,'Layer not found in SDE metadata'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 254);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,255
+       ,null
+       ,'Failure in SDE date conversion'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 255);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,256
+       ,null
+       ,'Failure in date conversion to SDE'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 256);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,257
+       ,null
+       ,'Object does not exist'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 257);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,259
+       ,null
+       ,'Invalid Geometry Type'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 259);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,260
+       ,null
+       ,'Runtime Library missing from working directory/path'
+       ,'A required file is missing from your working directory/path' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 260);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,261
+       ,null
+       ,'Gaps/Overlaps are not permitted'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 261);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,262
+       ,null
+       ,'Element cannot be linked to a record of the given type'
+       ,'Associated Data rules are not in place to support linking this network element to this asset type' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 262);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,263
+       ,null
+       ,'Read Permission not granted on directory'
+       ,'You are not permitted to read data from the specified directory' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 263);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,264
+       ,null
+       ,'Write Permission not granted on directory'
+       ,'You are not permitted to write data to the specified directory' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 264);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,265
+       ,null
+       ,'Wildcards (%) are not permitted'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 265);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,266
+       ,null
+       ,'No base themes for this route type'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 266);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,267
+       ,null
+       ,'No themes for linear type'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 267);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,268
+       ,null
+       ,'Cannot derive Gtype from base theme'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 268);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,269
+       ,null
+       ,'Duplicate Theme or Theme Name Found'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 269);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,270
+       ,null
+       ,'Theme is already registered'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 270);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,271
+       ,null
+       ,'Error associating Geometry Type with Theme'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 271);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,272
+       ,null
+       ,'No themes for linear type '
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 272);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,273
+       ,null
+       ,'Error creating spatial sequence'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 273);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,274
+       ,null
+       ,'Theme is not a datum layer'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 274);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,275
+       ,null
+       ,'Table already exists - please specify another'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 275);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,276
+       ,null
+       ,'No subordinate users to process!'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 276);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,277
+       ,null
+       ,'Creation of view(s) not neccessary - no layers use SRIDS'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 277);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,278
+       ,null
+       ,'Error dropping private synonym'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 278);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,279
+       ,null
+       ,'No USGM data to process!'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 279);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,280
+       ,null
+       ,'Inconsistent base srids'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 280);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,281
+       ,null
+       ,'There are no known themes, populate the input array arguments'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 281);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,282
+       ,null
+       ,'Fatal error in dynamic segmentation on'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 282);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,283
+       ,null
+       ,'You may not project a geometry in a local cordinate system'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 283);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,284
+       ,null
+       ,'Mid point must apply to a line'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 284);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,285
+       ,null
+       ,'Invalid dimension for mid-point function'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 285);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,286
+       ,null
+       ,'No snaps at this position'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 286);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,287
+       ,null
+       ,'Unknown geometry type - must be a point, line or polygon'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 287);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,288
+       ,null
+       ,'Not a point geometry'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 288);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,289
+       ,null
+       ,'Use sdo_point'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 289);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,290
+       ,null
+       ,'Not a single part'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 290);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,291
+       ,null
+       ,'Theme is not a linear referencing layer - cannot return projections'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 291);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,292
+       ,null
+       ,'Cannot find position to project from'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 292);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,293
+       ,null
+       ,'No NT datums for ne_id'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 293);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,294
+       ,null
+       ,'No NT type for nlt id'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 294);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,295
+       ,null
+       ,'No geometry column on the table'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 295);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,296
+       ,null
+       ,'More than one geometry column, need to choose one'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 296);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,297
+       ,null
+       ,'Dyn seg error - mismatch in length of datum and shape'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 297);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,298
+       ,null
+       ,'Dyn seg error - measures are out of bounds of datum lengths'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 298);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,434
+       ,null
+       ,'NSG Node Theme is not present'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 434);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,435
+       ,null
+       ,'NSG ESU theme is not present'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 435);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,436
+       ,null
+       ,'User is not permitted to operate on the selected network element'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 436);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,437
+       ,null
+       ,'User is not permitted to operate on the selected asset'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 437);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,438
+       ,null
+       ,'Please Close Locator Before Using It As A Co-ordinate LOV.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 438);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,442
+       ,null
+       ,'No Interval Exists For Given Interval Code. Please Use HIG1220 To Enter An Iterval For Interval Code'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 442);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,443
+       ,null
+       ,'User Creation Failed!'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 443);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,500
+       ,null
+       ,'This module is not available when the application is run on the web.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 500);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'MRWA'
+       ,1
+       ,null
+       ,'Current status of processing is invalid for this action'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'MRWA'
+                    AND  NER_ID = 1);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,1
+       ,7
+       ,'Unable to create SECTION_CLASSES record.'
+       ,'ACTION: This is an internal error message and should not normally be'||CHR(10)||'issued. Contact your ORACLE Customer Support Representative.'||CHR(10)||'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 1);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,2
+       ,139
+       ,'Cannot delete record as associated records exist.'
+       ,'ACTION: All associated records should be deleted before the record that'||CHR(10)||'you are trying to delete can be deleted.'||CHR(10)||'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 2);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,3
+       ,341
+       ,'You cannot duplicate records in this block'
+       ,'ACTION: Records cannot be duplicated in this block.'||CHR(10)||'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 3);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,4
+       ,null
+       ,'Use the tree to create hierarchical items.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 4);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,5
+       ,null
+       ,'Cannot change network type when groups exist with this group type.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 5);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,6
+       ,null
+       ,'You cannot insert or update data when the effective date is not today.'||CHR(10)||''||CHR(10)||'Use Preferences to set the effective date.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 6);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,7
+       ,null
+       ,'Network Type must have same admin unit type as parent.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 7);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,8
+       ,null
+       ,'Parent is exclusive and object is already a child of another parent of the same type.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 8);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,9
+       ,null
+       ,'Would you like to save changes before the effective date is changed?'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 9);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,10
+       ,null
+       ,'Start date cannot be updated.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 10);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,11
+       ,null
+       ,'Start date is out of range of parent.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 11);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,12
+       ,null
+       ,'End date is out of range of parent.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 12);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,13
+       ,null
+       ,'Record has children outside its date range.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 13);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,14
+       ,null
+       ,'End date cannot be before start date.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 14);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,15
+       ,null
+       ,'Linear reference cannot be less than zero.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 15);
 --
 INSERT INTO NM_ERRORS
        (NER_APPL
@@ -5471,1978 +9925,6 @@ INSERT INTO NM_ERRORS
        ,NER_CAUSE
        )
 SELECT 
-        'HIG'
-       ,51
-       ,183
-       ,'Unable to Bulk Update Contract. %s1 contract items would have been made negative.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 51);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,52
-       ,184
-       ,'Incode must be of format: X9, X99, XX9, XX99, X9X, XX9X (where X is a letter and 9 is a number)'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 52);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,53
-       ,185
-       ,'Outcode must be one number and two letters (9XX)'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 53);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,54
-       ,186
-       ,'This contact is not valid for this type'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 54);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,55
-       ,187
-       ,'Cannot Delete record as associated %s1 records exist.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 55);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,56
-       ,188
-       ,'This contact is not current, check start and end dates.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 56);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,57
-       ,189
-       ,'A Surname must be entered.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 57);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,58
-       ,190
-       ,'An Organisation Name must be entered.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 58);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,59
-       ,342
-       ,'You cannot enter a date in the future'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 59);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,60
-       ,639
-       ,'A value for one of these fields MUST be entered'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 60);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,61
-       ,9608
-       ,'You must enter either %s1 or %s2'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 61);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,62
-       ,null
-       ,'A domain required for this screen is not present which may cause it to function incorrectly or not at all.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 62);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,63
-       ,null
-       ,'GIS is not available.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 63);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,64
-       ,null
-       ,'Value already exists.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 64);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,65
-       ,null
-       ,'GIS shape in place, network editing function not allowed.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 65);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,66
-       ,null
-       ,'Unable to find GIS route theme.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 66);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,67
-       ,null
-       ,'Record not found'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 67);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,68
-       ,null
-       ,'Cannot find GIS theme.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 68);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,69
-       ,null
-       ,'Value entered is too long.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 69);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,70
-       ,null
-       ,'Value is of invalid format.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 70);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,71
-       ,null
-       ,'Cannot delete another user''s record.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 71);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,72
-       ,null
-       ,'Public synonyms not available, you must create private synonyms for this user.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 72);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,73
-       ,null
-       ,'Some shapes are not available for the area you wish to display.'||CHR(10)||''||CHR(10)||'This may give misleading results in the GIS.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 73);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,74
-       ,null
-       ,'There are no shapes available for the object you wish to view in the GIS.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 74);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,75
-       ,null
-       ,'No GIS objects selected.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 75);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,76
-       ,null
-       ,'Value cannot be less than '
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 76);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,77
-       ,null
-       ,'Value cannot be greater than '
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 77);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,78
-       ,null
-       ,'Value cannot be greater than '
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 78);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,79
-       ,null
-       ,'Cannot create synonym - object does not exist in schema.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 79);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,80
-       ,null
-       ,'User does not exist in HIG_USERS.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 80);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,81
-       ,null
-       ,'User does not have permission to create synonym.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 81);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,82
-       ,null
-       ,'Application configured to run using PUBLIC synonyms - not creating PRIVATE synonyms.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 82);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,83
-       ,null
-       ,'Error occurred executing sql'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 83);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,84
-       ,null
-       ,'Function name not found in function text'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 84);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,85
-       ,null
-       ,'Update not allowed.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 85);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,86
-       ,null
-       ,'You do not have permission to perform this action.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 86);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,87
-       ,null
-       ,'Would you like to save changes?'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 87);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,88
-       ,null
-       ,'Invalid admin unit.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 88);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,89
-       ,null
-       ,'The passwords you have entered are different.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 89);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,90
-       ,null
-       ,'Password changed successfully.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 90);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,91
-       ,null
-       ,'Arrays supplied have different numbers of values.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 91);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,92
-       ,null
-       ,'All old and new values specified are the same.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 92);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,93
-       ,null
-       ,' items updated.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 93);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,94
-       ,null
-       ,'This operation involves a commit, are you sure you wish to continue?'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 94);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,95
-       ,null
-       ,'Operation completed successfully.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 95);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,96
-       ,null
-       ,'Save Changes before continuing'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 96);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,97
-       ,null
-       ,'If you continue the results may be incorrect.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 97);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,98
-       ,null
-       ,'Open queries are not allowed in this block.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 98);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,99
-       ,null
-       ,'Unique not specified.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 99);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,100
-       ,null
-       ,'No length supplied.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 100);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,101
-       ,null
-       ,'Start date must be effective date.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 101);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,102
-       ,null
-       ,'No changes made.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 102);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,103
-       ,null
-       ,'Invalid parameter data from GIS for session'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 103);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,104
-       ,null
-       ,'Cannot edit when called from GIS.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 104);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,105
-       ,null
-       ,'Point Asset Items can only be placed at point locations, not linear'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 105);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,106
-       ,null
-       ,'Cannot locate Asset records which are in a Child AT relationship'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 106);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,107
-       ,null
-       ,'Mandatory column is NULL'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 107);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,108
-       ,null
-       ,'Column is too long'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 108);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,109
-       ,null
-       ,'Value is invalid for domain'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 109);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,110
-       ,null
-       ,'Invalid parameter'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 110);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,111
-       ,null
-       ,'Numeric value is invalid.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 111);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,112
-       ,null
-       ,'Invalid number of values specified.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 112);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,113
-       ,null
-       ,'Parse error in query'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 113);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,114
-       ,null
-       ,'You have selected an item of the wrong type.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 114);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,115
-       ,null
-       ,'Error number already exists.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 115);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,116
-       ,null
-       ,'You are creating a role as a  user that is not the highways owner.'||CHR(10)||''||CHR(10)||'The new role has been granted to the highways owner with admin privileges.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 116);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,117
-       ,null
-       ,'You must requery any currently displayed data to see unit changes.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 117);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,118
-       ,null
-       ,'Folder already exists.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 118);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,119
-       ,null
-       ,'You cannot rename the favourites folder.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 119);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,120
-       ,null
-       ,'Alert not found.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 120);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,121
-       ,null
-       ,'OK to delete folder and its contents?'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 121);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,122
-       ,null
-       ,'OK to delete module?'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 122);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,123
-       ,null
-       ,'You cannot delete the favourites folder.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 123);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,124
-       ,null
-       ,'You cannot create an item at this level.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 124);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,125
-       ,null
-       ,'Module already exists in this folder.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 125);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,126
-       ,null
-       ,'You do not have privileges to perform this action'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 126);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,127
-       ,null
-       ,'Discoverer run mode not defined in system options.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 127);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,128
-       ,null
-       ,'Client server Discoverer cannot be run from highways in web mode.'||CHR(10)||''||CHR(10)||'Check user and system options.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 128);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,129
-       ,null
-       ,'Discoverer web path not defined correctly in system options.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 129);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,130
-       ,null
-       ,'Discoverer executable not defined.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 130);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,131
-       ,null
-       ,'Append'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 131);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,132
-       ,null
-       ,'Replace'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 132);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,133
-       ,null
-       ,'The data you have chosen has been changed by another user, please reselect.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 133);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,134
-       ,null
-       ,'No themes available for current module.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 134);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,135
-       ,null
-       ,'Status transition not allowed'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 135);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,136
-       ,null
-       ,'No DBMS job processes defined - contact the system administrator.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 136);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,137
-       ,null
-       ,'Effective Date is format is invalid.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 137);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,139
-       ,null
-       ,'Message is enqueued and will be delivered in due course'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 139);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,140
-       ,null
-       ,'If you change your password you will be logged out of highways.'||CHR(10)||''||CHR(10)||'OK to continue?'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 140);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,141
-       ,null
-       ,'Error populating group'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 141);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,142
-       ,null
-       ,'Job not online'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 142);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,143
-       ,null
-       ,'More than one instance of this job exists'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 143);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,144
-       ,null
-       ,'Function cannot be performed here'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 144);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,145
-       ,null
-       ,'You have entered a duplicate primary key'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 145);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,146
-       ,null
-       ,'You do not have the required privileges to create a user'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 146);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,147
-       ,null
-       ,'Column, Table combination does not exist.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 147);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,148
-       ,null
-       ,'Date format is invalid'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 148);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,149
-       ,null
-       ,'GIS theme data contains invalid table name(s)'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 149);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,150
-       ,null
-       ,'GIS Theme data is invalid'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 150);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,151
-       ,null
-       ,'Item location cannot be modified from GIS'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 151);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,152
-       ,null
-       ,'Item location may not be modified from GIS for this product'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 152);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,153
-       ,null
-       ,'The password entered is incorrect for this user.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 153);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,154
-       ,null
-       ,'This will exit and lose the connection to the GIS'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 154);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,155
-       ,null
-       ,'Unit Converter'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 155);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,156
-       ,null
-       ,'Cannot add a value as it would exceed the maximum allowed for the condition'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 156);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,157
-       ,null
-       ,'Cannot update domain when values exist'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 157);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,158
-       ,null
-       ,'Field cannot be updated'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 158);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,159
-       ,null
-       ,'Mixed case values not permitted'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 159);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,160
-       ,null
-       ,'Datatype cannot be updated when values exist'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 160);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,161
-       ,null
-       ,'Case sensitivity cannot be updated - this would result in invalid data'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 161);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,162
-       ,null
-       ,'Standard visual attribute not found'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 162);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,163
-       ,null
-       ,'Product Option is not set'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 163);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,164
-       ,null
-       ,'Are you sure you wish to create/recreate the holding table? Any data will be lost'||CHR(10)||'This operation also involves a COMMIT.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 164);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,165
-       ,null
-       ,'Continue'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 165);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,166
-       ,null
-       ,'Name is not unique across NM_LOAD_FILES.NLF_UNIQUE and NM_LOAD_DESTINATIONS.NLD_TABLE_SHORT_NAME'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 166);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,167
-       ,null
-       ,'Form must be called in NORMAL mode'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 167);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
         'NET'
        ,249
        ,null
@@ -10716,2488 +13198,6 @@ SELECT
                    WHERE NER_APPL = 'NET'
                     AND  NER_ID = 450);
 --
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,168
-       ,null
-       ,'Date cannot have a time associated'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 168);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,169
-       ,null
-       ,'Database constraint violated'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 169);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,170
-       ,null
-       ,'Allowable values are "NORMAL" and "READONLY"'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 170);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,171
-       ,null
-       ,'Allowable values are "VARCHAR2","NUMBER" and "DATE"'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 171);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,172
-       ,null
-       ,'Only whole numbers may be specified'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 172);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,173
-       ,null
-       ,'Only positive whole numbers may be specified'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 173);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,174
-       ,null
-       ,'Negative values are not permitted'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 174);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,175
-       ,null
-       ,'Definition of query bracketing is invalid'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 175);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,176
-       ,null
-       ,'Specified Job Status is invalid'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 176);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,177
-       ,null
-       ,'Invalid operator specified'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 177);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,178
-       ,null
-       ,'File uploaded successfully'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 178);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,179
-       ,null
-       ,'File upload failed'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 179);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,180
-       ,null
-       ,'File browser not available when running via the web'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 180);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,181
-       ,null
-       ,'INSERT not permitted into this view'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 181);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,182
-       ,null
-       ,'User not instantiated correctly.'||CHR(10)||'Probable missing INSTANTIATE_USER trigger.'||CHR(10)||'Contact exor support for assistance.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 182);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,183
-       ,null
-       ,'Date format mask only permitted for DATE fields'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 183);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,184
-       ,null
-       ,'Account not valid'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 184);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,185
-       ,null
-       ,'Generating report...'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 185);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,186
-       ,null
-       ,'Cannot load from server. No server file path specified'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 186);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,187
-       ,null
-       ,'Are you sure you wish to continue?'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 187);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,188
-       ,null
-       ,'User Created. Do you want to view this user?'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 188);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,189
-       ,null
-       ,'SDE data not present - cloning is not possible'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 189);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,190
-       ,null
-       ,'SDE Layer generator failure'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 190);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,191
-       ,null
-       ,'SDE Table registration id generator failure'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 191);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,192
-       ,null
-       ,'Theme is not related to a network'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 192);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,193
-       ,null
-       ,'Point location data not found - clone is not possible'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 193);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,194
-       ,null
-       ,'No base theme is available'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 194);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,195
-       ,null
-       ,'No datum theme found'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 195);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,196
-       ,null
-       ,'Layer table not found'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 196);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,197
-       ,null
-       ,'SDO Metadata for layer  not found'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 197);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,198
-       ,null
-       ,'Geometry not found - '
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 198);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,199
-       ,null
-       ,'Element shapes not connected'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 199);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,201
-       ,null
-       ,'Only one element has shape - merge prevented'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 201);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,202
-       ,null
-       ,'points are the same - no distance between them'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 202);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,203
-       ,null
-       ,'points are not on same network element'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 203);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,204
-       ,null
-       ,'Lengths of element and shape are inconsistent'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 204);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,205
-       ,null
-       ,'Single part asset shapes are not supported yet'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 205);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,206
-       ,null
-       ,'Load Aborted. Metadata changes have been made since the edif file was generated.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 206);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,207
-       ,null
-       ,'Load Aborted. Error found during MapCapture Load.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 207);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,208
-       ,null
-       ,'Asset Update conflict. Changes have been made to the asset in the database.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 208);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,209
-       ,null
-       ,'The file containing exor product version numbers could not be found.  Please check the ''EXOR_VERSION'' registry setting'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 209);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,210
-       ,null
-       ,'Switch Route Theme ?'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 210);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,211
-       ,null
-       ,'Switch Route Theme to Current Theme?'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 211);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,212
-       ,null
-       ,'Theme must be of type SDE/SDO to be Route Theme'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 212);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,213
-       ,null
-       ,'Assertion failed'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 213);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,214
-       ,null
-       ,'Value cannot be NULL'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 214);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,215
-       ,null
-       ,'XML does not allow lists of more than one column. '||CHR(10)||''||CHR(10)||'Either select one column or use a table alias.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 215);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,216
-       ,null
-       ,'Close'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 216);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,217
-       ,null
-       ,'Select All'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 217);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,218
-       ,null
-       ,'Inverse Selection'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 218);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,219
-       ,null
-       ,'Refresh'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 219);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,220
-       ,null
-       ,'You can only send email as your own user'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 220);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,221
-       ,null
-       ,'All mail messages should have at least 1 "TO" recipient'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 221);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,222
-       ,null
-       ,'Favourite cannot have the name as parent folder'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 222);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,230
-       ,null
-       ,'Inconsistency detected between licenced product versions on the database and in the Exor Product Version Numbers File.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 230);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,231
-       ,null
-       ,'Detail'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 231);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,232
-       ,null
-       ,'Points are not on same network element'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 232);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,233
-       ,null
-       ,'No theme data available to determine gtype'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 233);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,234
-       ,null
-       ,'No suitable PK column for SDE registration'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 234);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,235
-       ,null
-       ,'Theme must be consistent for the same session'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 235);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,236
-       ,null
-       ,'Unknown geometry'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 236);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,237
-       ,null
-       ,'Dimension not available'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 237);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,238
-       ,null
-       ,'Invalid dimension - must be between 2 and 4'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 238);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,239
-       ,null
-       ,'No data to base diminfo calculation'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 239);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,240
-       ,null
-       ,'The SRID does not match - please reset the current SRID or use the correct value'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 240);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,241
-       ,null
-       ,'No Index on the table and column'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 241);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,242
-       ,null
-       ,'Already registered in SDO Metadata'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 242);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,243
-       ,null
-       ,'Needs a Feature table'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 243);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,244
-       ,null
-       ,'Needs a Feature table spatial column'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 244);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,245
-       ,null
-       ,'Needs a base theme to dyn-seg from'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 245);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,246
-       ,null
-       ,'Not enough info on the theme'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 246);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,247
-       ,null
-       ,'Tolerance cannot be found from point data'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 247);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,248
-       ,null
-       ,'Dimension information is incomopatible with operation'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 248);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,249
-       ,null
-       ,'FT and theme do not match'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 249);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,250
-       ,null
-       ,'Asset type is not a foreign table'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 250);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,251
-       ,null
-       ,'SRID generator failure'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 251);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,252
-       ,null
-       ,'Table is not registered or SDE schema cannot see it'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 252);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,253
-       ,null
-       ,'No sde layer for theme'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 253);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,254
-       ,null
-       ,'Layer not found in SDE metadata'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 254);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,255
-       ,null
-       ,'Failure in SDE date conversion'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 255);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,256
-       ,null
-       ,'Failure in date conversion to SDE'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 256);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,257
-       ,null
-       ,'Object does not exist'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 257);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,259
-       ,null
-       ,'Invalid Geometry Type'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 259);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,260
-       ,null
-       ,'Runtime Library missing from working directory/path'
-       ,'A required file is missing from your working directory/path' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 260);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,261
-       ,null
-       ,'Gaps/Overlaps are not permitted'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 261);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,262
-       ,null
-       ,'Element cannot be linked to a record of the given type'
-       ,'Associated Data rules are not in place to support linking this network element to this asset type' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 262);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,263
-       ,null
-       ,'Read Permission not granted on directory'
-       ,'You are not permitted to read data from the specified directory' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 263);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,264
-       ,null
-       ,'Write Permission not granted on directory'
-       ,'You are not permitted to write data to the specified directory' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 264);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,265
-       ,null
-       ,'Wildcards (%) are not permitted'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 265);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,266
-       ,null
-       ,'No base themes for this route type'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 266);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,267
-       ,null
-       ,'No themes for linear type'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 267);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,268
-       ,null
-       ,'Cannot derive Gtype from base theme'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 268);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,269
-       ,null
-       ,'Duplicate Theme or Theme Name Found'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 269);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,270
-       ,null
-       ,'Theme is already registered'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 270);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,271
-       ,null
-       ,'Error associating Geometry Type with Theme'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 271);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,272
-       ,null
-       ,'No themes for linear type '
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 272);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,273
-       ,null
-       ,'Error creating spatial sequence'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 273);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,274
-       ,null
-       ,'Theme is not a datum layer'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 274);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,275
-       ,null
-       ,'Table already exists - please specify another'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 275);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,276
-       ,null
-       ,'No subordinate users to process!'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 276);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,277
-       ,null
-       ,'Creation of view(s) not neccessary - no layers use SRIDS'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 277);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,278
-       ,null
-       ,'Error dropping private synonym'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 278);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,279
-       ,null
-       ,'No USGM data to process!'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 279);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,280
-       ,null
-       ,'Inconsistent base srids'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 280);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,281
-       ,null
-       ,'There are no known themes, populate the input array arguments'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 281);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,282
-       ,null
-       ,'Fatal error in dynamic segmentation on'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 282);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,283
-       ,null
-       ,'You may not project a geometry in a local cordinate system'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 283);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,284
-       ,null
-       ,'Mid point must apply to a line'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 284);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,285
-       ,null
-       ,'Invalid dimension for mid-point function'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 285);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,286
-       ,null
-       ,'No snaps at this position'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 286);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,287
-       ,null
-       ,'Unknown geometry type - must be a point, line or polygon'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 287);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,288
-       ,null
-       ,'Not a point geometry'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 288);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,289
-       ,null
-       ,'Use sdo_point'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 289);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,290
-       ,null
-       ,'Not a single part'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 290);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,291
-       ,null
-       ,'Theme is not a linear referencing layer - cannot return projections'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 291);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,292
-       ,null
-       ,'Cannot find position to project from'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 292);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,293
-       ,null
-       ,'No NT datums for ne_id'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 293);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,294
-       ,null
-       ,'No NT type for nlt id'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 294);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,295
-       ,null
-       ,'No geometry column on the table'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 295);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,296
-       ,null
-       ,'More than one geometry column, need to choose one'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 296);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,297
-       ,null
-       ,'Dyn seg error - mismatch in length of datum and shape'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 297);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,298
-       ,null
-       ,'Dyn seg error - measures are out of bounds of datum lengths'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 298);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,434
-       ,null
-       ,'NSG Node Theme is not present'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 434);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,435
-       ,null
-       ,'NSG ESU theme is not present'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 435);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,436
-       ,null
-       ,'User is not permitted to operate on the selected network element'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 436);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,437
-       ,null
-       ,'User is not permitted to operate on the selected asset'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 437);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,438
-       ,null
-       ,'Please Close Locator Before Using It As A Co-ordinate LOV.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 438);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,442
-       ,null
-       ,'No Interval Exists For Given Interval Code. Please Use HIG1220 To Enter An Iterval For Interval Code'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 442);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,443
-       ,null
-       ,'User Creation Failed!'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 443);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,500
-       ,null
-       ,'This module is not available when the application is run on the web.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'HIG'
-                    AND  NER_ID = 500);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'MRWA'
-       ,1
-       ,null
-       ,'Current status of processing is invalid for this action'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'MRWA'
-                    AND  NER_ID = 1);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,1
-       ,7
-       ,'Unable to create SECTION_CLASSES record.'
-       ,'ACTION: This is an internal error message and should not normally be'||CHR(10)||'issued. Contact your ORACLE Customer Support Representative.'||CHR(10)||'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                    AND  NER_ID = 1);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,2
-       ,139
-       ,'Cannot delete record as associated records exist.'
-       ,'ACTION: All associated records should be deleted before the record that'||CHR(10)||'you are trying to delete can be deleted.'||CHR(10)||'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                    AND  NER_ID = 2);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,3
-       ,341
-       ,'You cannot duplicate records in this block'
-       ,'ACTION: Records cannot be duplicated in this block.'||CHR(10)||'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                    AND  NER_ID = 3);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,4
-       ,null
-       ,'Use the tree to create hierarchical items.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                    AND  NER_ID = 4);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,5
-       ,null
-       ,'Cannot change network type when groups exist with this group type.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                    AND  NER_ID = 5);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,6
-       ,null
-       ,'You cannot insert or update data when the effective date is not today.'||CHR(10)||''||CHR(10)||'Use Preferences to set the effective date.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                    AND  NER_ID = 6);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,7
-       ,null
-       ,'Network Type must have same admin unit type as parent.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                    AND  NER_ID = 7);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,8
-       ,null
-       ,'Parent is exclusive and object is already a child of another parent of the same type.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                    AND  NER_ID = 8);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,9
-       ,null
-       ,'Would you like to save changes before the effective date is changed?'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                    AND  NER_ID = 9);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,10
-       ,null
-       ,'Start date cannot be updated.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                    AND  NER_ID = 10);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,11
-       ,null
-       ,'Start date is out of range of parent.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                    AND  NER_ID = 11);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,12
-       ,null
-       ,'End date is out of range of parent.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                    AND  NER_ID = 12);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,13
-       ,null
-       ,'Record has children outside its date range.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                    AND  NER_ID = 13);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,14
-       ,null
-       ,'End date cannot be before start date.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                    AND  NER_ID = 14);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,15
-       ,null
-       ,'Linear reference cannot be less than zero.'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                    AND  NER_ID = 15);
---
 --
 --********** HIG_DOMAINS **********--
 SET TERM ON
@@ -14327,8 +14327,8 @@ SET TERM OFF
 --
 -- Columns
 -- HCO_DOMAIN                     NOT NULL VARCHAR2(20)
---   HCO_FK_HDO (Pos 1)
 --   HCO_PK (Pos 1)
+--   HCO_FK_HDO (Pos 1)
 -- HCO_CODE                       NOT NULL VARCHAR2(20)
 --   HCO_PK (Pos 2)
 -- HCO_MEANING                    NOT NULL VARCHAR2(52)
@@ -16374,6 +16374,3534 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
                    WHERE HCO_DOMAIN = 'EXTEND_ROUTE_ST_DATE'
                     AND  HCO_CODE = '4');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'FOOTWAY_CATEGORY'
+       ,'1'
+       ,'Main Shopping Areas'
+       ,'Y'
+       ,129
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'FOOTWAY_CATEGORY'
+                    AND  HCO_CODE = '1');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'FOOTWAY_CATEGORY'
+       ,'2'
+       ,'Busy Urban Areas'
+       ,'Y'
+       ,130
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'FOOTWAY_CATEGORY'
+                    AND  HCO_CODE = '2');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'FOOTWAY_CATEGORY'
+       ,'3'
+       ,'Less used Urban and Busy Rural'
+       ,'Y'
+       ,131
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'FOOTWAY_CATEGORY'
+                    AND  HCO_CODE = '3');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'FOOTWAY_CATEGORY'
+       ,'4'
+       ,'Little used Rural'
+       ,'Y'
+       ,132
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'FOOTWAY_CATEGORY'
+                    AND  HCO_CODE = '4');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'FOOTWAY_CATEGORY'
+       ,'5'
+       ,'Alleyways'
+       ,'Y'
+       ,133
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'FOOTWAY_CATEGORY'
+                    AND  HCO_CODE = '5');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZMODE'
+       ,'ADVANCED'
+       ,'Start Gazetteer in Advanced mode'
+       ,'N'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZMODE'
+                    AND  HCO_CODE = 'ADVANCED');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZMODE'
+       ,'STANDARD'
+       ,'Start Gazetteer in Standard mode'
+       ,'N'
+       ,1
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZMODE'
+                    AND  HCO_CODE = 'STANDARD');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_E'
+       ,'NE_ADMIN_UNIT'
+       ,'Admin Unit'
+       ,'Y'
+       ,1004
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
+                    AND  HCO_CODE = 'NE_ADMIN_UNIT');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_E'
+       ,'NE_CREATED_BY'
+       ,'Created By'
+       ,'Y'
+       ,1099
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
+                    AND  HCO_CODE = 'NE_CREATED_BY');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_E'
+       ,'NE_DATE_CREATED'
+       ,'Date Created'
+       ,'Y'
+       ,1096
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
+                    AND  HCO_CODE = 'NE_DATE_CREATED');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_E'
+       ,'NE_DATE_MODIFIED'
+       ,'Date Modified'
+       ,'Y'
+       ,1097
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
+                    AND  HCO_CODE = 'NE_DATE_MODIFIED');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_E'
+       ,'NE_DESCR'
+       ,'Description'
+       ,'Y'
+       ,1000
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
+                    AND  HCO_CODE = 'NE_DESCR');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_E'
+       ,'NE_END_DATE'
+       ,'End Date'
+       ,'Y'
+       ,1006
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
+                    AND  HCO_CODE = 'NE_END_DATE');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_E'
+       ,'NE_LENGTH'
+       ,'Element Length'
+       ,'Y'
+       ,1003
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
+                    AND  HCO_CODE = 'NE_LENGTH');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_E'
+       ,'NE_MODIFIED_BY'
+       ,'Modified By'
+       ,'Y'
+       ,1098
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
+                    AND  HCO_CODE = 'NE_MODIFIED_BY');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_E'
+       ,'NE_NO_END'
+       ,'End Node'
+       ,'Y'
+       ,1008
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
+                    AND  HCO_CODE = 'NE_NO_END');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_E'
+       ,'NE_NO_START'
+       ,'Start Node'
+       ,'Y'
+       ,1007
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
+                    AND  HCO_CODE = 'NE_NO_START');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_E'
+       ,'NE_START_DATE'
+       ,'Start Date'
+       ,'Y'
+       ,1005
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
+                    AND  HCO_CODE = 'NE_START_DATE');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_E'
+       ,'NE_TYPE'
+       ,'Element Type'
+       ,'Y'
+       ,1002
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
+                    AND  HCO_CODE = 'NE_TYPE');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_E'
+       ,'NE_UNIQUE'
+       ,'Unique Reference'
+       ,'Y'
+       ,1001
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
+                    AND  HCO_CODE = 'NE_UNIQUE');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_I'
+       ,'IIT_ADMIN_UNIT'
+       ,'Admin Unit'
+       ,'Y'
+       ,1002
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
+                    AND  HCO_CODE = 'IIT_ADMIN_UNIT');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_I'
+       ,'IIT_CREATED_BY'
+       ,'Created By'
+       ,'Y'
+       ,1099
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
+                    AND  HCO_CODE = 'IIT_CREATED_BY');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_I'
+       ,'IIT_DATE_CREATED'
+       ,'Date Created'
+       ,'Y'
+       ,1096
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
+                    AND  HCO_CODE = 'IIT_DATE_CREATED');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_I'
+       ,'IIT_DATE_MODIFIED'
+       ,'Date Modified'
+       ,'Y'
+       ,1097
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
+                    AND  HCO_CODE = 'IIT_DATE_MODIFIED');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_I'
+       ,'IIT_DESCR'
+       ,'Description'
+       ,'Y'
+       ,1120
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
+                    AND  HCO_CODE = 'IIT_DESCR');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_I'
+       ,'IIT_END_DATE'
+       ,'End Date'
+       ,'Y'
+       ,1004
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
+                    AND  HCO_CODE = 'IIT_END_DATE');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_I'
+       ,'IIT_MODIFIED_BY'
+       ,'Modified By'
+       ,'Y'
+       ,1098
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
+                    AND  HCO_CODE = 'IIT_MODIFIED_BY');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_I'
+       ,'IIT_NOTE'
+       ,'Note'
+       ,'Y'
+       ,1110
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
+                    AND  HCO_CODE = 'IIT_NOTE');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_I'
+       ,'IIT_PEO_INVENT_BY_ID'
+       ,'Inspected By'
+       ,'Y'
+       ,1007
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
+                    AND  HCO_CODE = 'IIT_PEO_INVENT_BY_ID');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_I'
+       ,'IIT_PRIMARY_KEY'
+       ,'Primary Key'
+       ,'Y'
+       ,1100
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
+                    AND  HCO_CODE = 'IIT_PRIMARY_KEY');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_I'
+       ,'IIT_START_DATE'
+       ,'Start Date'
+       ,'Y'
+       ,1003
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
+                    AND  HCO_CODE = 'IIT_START_DATE');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_FIXED_COLS_I'
+       ,'IIT_X_SECT'
+       ,'XSP'
+       ,'Y'
+       ,1001
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
+                    AND  HCO_CODE = 'IIT_X_SECT');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_L_BRACKETS'
+       ,'('
+       ,'('
+       ,'Y'
+       ,1
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_L_BRACKETS'
+                    AND  HCO_CODE = '(');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_L_BRACKETS'
+       ,'(('
+       ,'(('
+       ,'Y'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_L_BRACKETS'
+                    AND  HCO_CODE = '((');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_L_BRACKETS'
+       ,'((('
+       ,'((('
+       ,'Y'
+       ,3
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_L_BRACKETS'
+                    AND  HCO_CODE = '(((');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_L_BRACKETS'
+       ,'(((('
+       ,'(((('
+       ,'Y'
+       ,4
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_L_BRACKETS'
+                    AND  HCO_CODE = '((((');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_L_BRACKETS'
+       ,'((((('
+       ,'((((('
+       ,'Y'
+       ,5
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_L_BRACKETS'
+                    AND  HCO_CODE = '(((((');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_OPERATORS'
+       ,'AND'
+       ,'AND'
+       ,'Y'
+       ,1
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_OPERATORS'
+                    AND  HCO_CODE = 'AND');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_OPERATORS'
+       ,'OR'
+       ,'OR'
+       ,'Y'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_OPERATORS'
+                    AND  HCO_CODE = 'OR');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_R_BRACKETS'
+       ,')'
+       ,')'
+       ,'Y'
+       ,1
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_R_BRACKETS'
+                    AND  HCO_CODE = ')');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_R_BRACKETS'
+       ,'))'
+       ,'))'
+       ,'Y'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_R_BRACKETS'
+                    AND  HCO_CODE = '))');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_R_BRACKETS'
+       ,')))'
+       ,')))'
+       ,'Y'
+       ,3
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_R_BRACKETS'
+                    AND  HCO_CODE = ')))');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_R_BRACKETS'
+       ,'))))'
+       ,'))))'
+       ,'Y'
+       ,4
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_R_BRACKETS'
+                    AND  HCO_CODE = '))))');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_R_BRACKETS'
+       ,')))))'
+       ,')))))'
+       ,'Y'
+       ,5
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_R_BRACKETS'
+                    AND  HCO_CODE = ')))))');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_TYPE_TYPES'
+       ,'E'
+       ,'Element'
+       ,'Y'
+       ,1
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_TYPE_TYPES'
+                    AND  HCO_CODE = 'E');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GAZ_QRY_TYPE_TYPES'
+       ,'I'
+       ,'Inventory'
+       ,'Y'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GAZ_QRY_TYPE_TYPES'
+                    AND  HCO_CODE = 'I');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'2001'
+       ,'2D Point'
+       ,'Y'
+       ,1
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '2001');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'2002'
+       ,'2D Line'
+       ,'Y'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '2002');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'2003'
+       ,'2D Polygon'
+       ,'Y'
+       ,3
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '2003');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'2004'
+       ,'2D Collection'
+       ,'Y'
+       ,4
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '2004');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'2005'
+       ,'2D Multi-point'
+       ,'Y'
+       ,5
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '2005');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'2006'
+       ,'2D Multi-line'
+       ,'Y'
+       ,6
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '2006');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'2007'
+       ,'2D Multi-polygon'
+       ,'Y'
+       ,7
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '2007');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'3001'
+       ,'3D Point'
+       ,'Y'
+       ,8
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '3001');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'3002'
+       ,'3D Line'
+       ,'Y'
+       ,9
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '3002');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'3003'
+       ,'3D Polygon'
+       ,'Y'
+       ,10
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '3003');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'3004'
+       ,'3D Collection'
+       ,'Y'
+       ,11
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '3004');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'3005'
+       ,'3D Multi-point'
+       ,'Y'
+       ,12
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '3005');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'3006'
+       ,'3D Multi-line'
+       ,'Y'
+       ,13
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '3006');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'3007'
+       ,'3D Multi-polygon'
+       ,'Y'
+       ,14
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '3007');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GIS_TYPES'
+       ,'DDE'
+       ,'DDE'
+       ,'Y'
+       ,1
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GIS_TYPES'
+                    AND  HCO_CODE = 'DDE');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GIS_TYPES'
+       ,'NONE'
+       ,'None'
+       ,'Y'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GIS_TYPES'
+                    AND  HCO_CODE = 'NONE');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GIS_TYPES'
+       ,'OTHER'
+       ,'Other'
+       ,'Y'
+       ,4
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GIS_TYPES'
+                    AND  HCO_CODE = 'OTHER');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GRI_GAZ_RESTRICTIONS'
+       ,'EXTENT'
+       ,'Saved Network Extents'
+       ,'Y'
+       ,4
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GRI_GAZ_RESTRICTIONS'
+                    AND  HCO_CODE = 'EXTENT');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GRI_GAZ_RESTRICTIONS'
+       ,'NW_ALL'
+       ,'Any Network Element'
+       ,'Y'
+       ,1
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GRI_GAZ_RESTRICTIONS'
+                    AND  HCO_CODE = 'NW_ALL');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GRI_GAZ_RESTRICTIONS'
+       ,'NW_DAT'
+       ,'Datums Only'
+       ,'Y'
+       ,3
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GRI_GAZ_RESTRICTIONS'
+                    AND  HCO_CODE = 'NW_DAT');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GRI_GAZ_RESTRICTIONS'
+       ,'NW_GRP'
+       ,'Groups Only'
+       ,'Y'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GRI_GAZ_RESTRICTIONS'
+                    AND  HCO_CODE = 'NW_GRP');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'HDN_JOIN_TYPES'
+       ,'TABLE'
+       ,'HDN Table Join'
+       ,'Y'
+       ,null
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'HDN_JOIN_TYPES'
+                    AND  HCO_CODE = 'TABLE');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'HISTORY_OPERATION'
+       ,'B'
+       ,'Recalibrate'
+       ,'Y'
+       ,7
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'HISTORY_OPERATION'
+                    AND  HCO_CODE = 'B');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'HISTORY_OPERATION'
+       ,'C'
+       ,'Close'
+       ,'Y'
+       ,1
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'HISTORY_OPERATION'
+                    AND  HCO_CODE = 'C');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'HISTORY_OPERATION'
+       ,'E'
+       ,'Manual Edit'
+       ,'Y'
+       ,9
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'HISTORY_OPERATION'
+                    AND  HCO_CODE = 'E');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'HISTORY_OPERATION'
+       ,'H'
+       ,'Shift'
+       ,'Y'
+       ,8
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'HISTORY_OPERATION'
+                    AND  HCO_CODE = 'H');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'HISTORY_OPERATION'
+       ,'L'
+       ,'Rescale'
+       ,'Y'
+       ,5
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'HISTORY_OPERATION'
+                    AND  HCO_CODE = 'L');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'HISTORY_OPERATION'
+       ,'M'
+       ,'Merge'
+       ,'Y'
+       ,3
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'HISTORY_OPERATION'
+                    AND  HCO_CODE = 'M');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'HISTORY_OPERATION'
+       ,'N'
+       ,'Reclass'
+       ,'Y'
+       ,6
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'HISTORY_OPERATION'
+                    AND  HCO_CODE = 'N');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'HISTORY_OPERATION'
+       ,'R'
+       ,'Replace'
+       ,'Y'
+       ,4
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'HISTORY_OPERATION'
+                    AND  HCO_CODE = 'R');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'HISTORY_OPERATION'
+       ,'S'
+       ,'Split'
+       ,'Y'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'HISTORY_OPERATION'
+                    AND  HCO_CODE = 'S');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'HISTORY_OPERATION'
+       ,'V'
+       ,'Reverse'
+       ,'Y'
+       ,10
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'HISTORY_OPERATION'
+                    AND  HCO_CODE = 'V');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'IMAGE_TYPES'
+       ,'BMP'
+       ,'Windows Bitmap File'
+       ,'N'
+       ,3
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'IMAGE_TYPES'
+                    AND  HCO_CODE = 'BMP');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'IMAGE_TYPES'
+       ,'CALS'
+       ,'CALS File'
+       ,'N'
+       ,7
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'IMAGE_TYPES'
+                    AND  HCO_CODE = 'CALS');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'IMAGE_TYPES'
+       ,'GIF'
+       ,'GIF File'
+       ,'N'
+       ,6
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'IMAGE_TYPES'
+                    AND  HCO_CODE = 'GIF');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'IMAGE_TYPES'
+       ,'JFIF'
+       ,'JFIF File'
+       ,'N'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'IMAGE_TYPES'
+                    AND  HCO_CODE = 'JFIF');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'IMAGE_TYPES'
+       ,'PCX'
+       ,'PCX File'
+       ,'N'
+       ,4
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'IMAGE_TYPES'
+                    AND  HCO_CODE = 'PCX');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'IMAGE_TYPES'
+       ,'PICT'
+       ,'Pict File'
+       ,'N'
+       ,5
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'IMAGE_TYPES'
+                    AND  HCO_CODE = 'PICT');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'IMAGE_TYPES'
+       ,'RAS'
+       ,'Raster Image'
+       ,'N'
+       ,8
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'IMAGE_TYPES'
+                    AND  HCO_CODE = 'RAS');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'IMAGE_TYPES'
+       ,'TIFF'
+       ,'TIFF File'
+       ,'N'
+       ,1
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'IMAGE_TYPES'
+                    AND  HCO_CODE = 'TIFF');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'INV_CATEGORY'
+       ,'C'
+       ,'Condition'
+       ,'Y'
+       ,1
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'INV_CATEGORY'
+                    AND  HCO_CODE = 'C');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'INV_CATEGORY'
+       ,'F'
+       ,'Foreign Table'
+       ,'Y'
+       ,5
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'INV_CATEGORY'
+                    AND  HCO_CODE = 'F');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'INV_CATEGORY'
+       ,'I'
+       ,'General Inventory'
+       ,'Y'
+       ,4
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'INV_CATEGORY'
+                    AND  HCO_CODE = 'I');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'INV_CATEGORY'
+       ,'R'
+       ,'Road Construction'
+       ,'Y'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'INV_CATEGORY'
+                    AND  HCO_CODE = 'R');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'INV_CATEGORY'
+       ,'X'
+       ,'Generated Exclusive Inventory Type'
+       ,'Y'
+       ,3
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'INV_CATEGORY'
+                    AND  HCO_CODE = 'X');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'INV_RELATION'
+       ,'AT'
+       ,'Child exists at the same location as the parent'
+       ,'N'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'INV_RELATION'
+                    AND  HCO_CODE = 'AT');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'INV_RELATION'
+       ,'DERIVED'
+       ,'The parent is derived by location'
+       ,'N'
+       ,5
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'INV_RELATION'
+                    AND  HCO_CODE = 'DERIVED');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'INV_RELATION'
+       ,'IN'
+       ,'Child must exist within the parent'
+       ,'N'
+       ,1
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'INV_RELATION'
+                    AND  HCO_CODE = 'IN');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'INV_RELATION'
+       ,'NONE'
+       ,'No location relationship is enforced'
+       ,'N'
+       ,3
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'INV_RELATION'
+                    AND  HCO_CODE = 'NONE');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'INV_RELATION'
+       ,'RELATIVE'
+       ,'Child must exist within the parent but its location'
+       ,'N'
+       ,4
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'INV_RELATION'
+                    AND  HCO_CODE = 'RELATIVE');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'JOB_STATUS'
+       ,'COMPLETE'
+       ,'Complete'
+       ,'Y'
+       ,3
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'JOB_STATUS'
+                    AND  HCO_CODE = 'COMPLETE');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'JOB_STATUS'
+       ,'ERROR'
+       ,'In Error'
+       ,'Y'
+       ,4
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'JOB_STATUS'
+                    AND  HCO_CODE = 'ERROR');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'JOB_STATUS'
+       ,'IN_PROGRESS'
+       ,'In Progress'
+       ,'Y'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'JOB_STATUS'
+                    AND  HCO_CODE = 'IN_PROGRESS');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'JOB_STATUS'
+       ,'NOT_STARTED'
+       ,'Not Started'
+       ,'Y'
+       ,1
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'JOB_STATUS'
+                    AND  HCO_CODE = 'NOT_STARTED');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'JPRIVLEVEL'
+       ,'B'
+       ,'Both Role And User Level'
+       ,'Y'
+       ,3
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'JPRIVLEVEL'
+                    AND  HCO_CODE = 'B');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'JPRIVLEVEL'
+       ,'R'
+       ,'Role Level'
+       ,'Y'
+       ,1
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'JPRIVLEVEL'
+                    AND  HCO_CODE = 'R');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'JPRIVLEVEL'
+       ,'U'
+       ,'User Level'
+       ,'Y'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'JPRIVLEVEL'
+                    AND  HCO_CODE = 'U');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LAUNCHPAD_MODE'
+       ,'LAUNCHPAD'
+       ,'Launchpad'
+       ,'Y'
+       ,1
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LAUNCHPAD_MODE'
+                    AND  HCO_CODE = 'LAUNCHPAD');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LAUNCHPAD_MODE'
+       ,'SYSTEM'
+       ,'System'
+       ,'Y'
+       ,3
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LAUNCHPAD_MODE'
+                    AND  HCO_CODE = 'SYSTEM');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LAUNCHPAD_MODE'
+       ,'USER'
+       ,'User'
+       ,'Y'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LAUNCHPAD_MODE'
+                    AND  HCO_CODE = 'USER');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LEG_NUMBERS'
+       ,'1'
+       ,'North'
+       ,'N'
+       ,1
+       ,to_date('20001113000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
+                    AND  HCO_CODE = '1');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LEG_NUMBERS'
+       ,'2'
+       ,'North-East'
+       ,'N'
+       ,2
+       ,to_date('20001113000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
+                    AND  HCO_CODE = '2');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LEG_NUMBERS'
+       ,'3'
+       ,'East'
+       ,'N'
+       ,3
+       ,to_date('20001113000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
+                    AND  HCO_CODE = '3');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LEG_NUMBERS'
+       ,'4'
+       ,'South-East'
+       ,'N'
+       ,4
+       ,to_date('20001113000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
+                    AND  HCO_CODE = '4');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LEG_NUMBERS'
+       ,'5'
+       ,'South'
+       ,'N'
+       ,5
+       ,to_date('20001113000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
+                    AND  HCO_CODE = '5');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LEG_NUMBERS'
+       ,'6'
+       ,'South-West'
+       ,'N'
+       ,6
+       ,to_date('20001113000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
+                    AND  HCO_CODE = '6');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LEG_NUMBERS'
+       ,'7'
+       ,'West'
+       ,'N'
+       ,7
+       ,to_date('20001113000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
+                    AND  HCO_CODE = '7');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LEG_NUMBERS'
+       ,'8'
+       ,'North-West'
+       ,'N'
+       ,8
+       ,to_date('20001113000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
+                    AND  HCO_CODE = '8');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LEG_NUMBERS'
+       ,'9'
+       ,'Unknown'
+       ,'N'
+       ,9
+       ,to_date('20001113000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
+                    AND  HCO_CODE = '9');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'001'
+       ,'Broome'
+       ,'N'
+       ,14
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '001');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'002'
+       ,'Halls Creek'
+       ,'N'
+       ,68
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '002');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'003'
+       ,'Derby-West Kimberley'
+       ,'N'
+       ,50
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '003');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'004'
+       ,'Wyndham-East Kimberley'
+       ,'N'
+       ,171
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '004');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'005'
+       ,'Christmas Island'
+       ,'N'
+       ,30
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '005');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'006'
+       ,'Cocos Island'
+       ,'N'
+       ,35
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '006');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'010'
+       ,'Northern Territory'
+       ,'N'
+       ,120
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '010');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'101'
+       ,'Armadale City'
+       ,'N'
+       ,2
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '101');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'102'
+       ,'Kalamunda'
+       ,'N'
+       ,74
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '102');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'103'
+       ,'Cockburn City'
+       ,'N'
+       ,34
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '103');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'104'
+       ,'Gosnells City'
+       ,'N'
+       ,66
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '104');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'105'
+       ,'Kwinana Town'
+       ,'N'
+       ,86
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '105');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'106'
+       ,'Mundaring'
+       ,'N'
+       ,107
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '106');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'107'
+       ,'Rockingham'
+       ,'N'
+       ,178
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '107');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'108'
+       ,'Serpentine-jarrahdale'
+       ,'N'
+       ,134
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '108');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'109'
+       ,'Swan City'
+       ,'N'
+       ,31
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '109');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'110'
+       ,'Wanneroo City'
+       ,'N'
+       ,32
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '110');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'111'
+       ,'Bassendean Town'
+       ,'N'
+       ,6
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '111');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'112'
+       ,'Bayswater City'
+       ,'N'
+       ,7
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '112');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'113'
+       ,'Belmont City'
+       ,'N'
+       ,8
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '113');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'114'
+       ,'Canning City'
+       ,'N'
+       ,21
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '114');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'115'
+       ,'Claremont Town'
+       ,'N'
+       ,33
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '115');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'116'
+       ,'Cottesloe Town'
+       ,'N'
+       ,40
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '116');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'117'
+       ,'East Fremantle Town'
+       ,'N'
+       ,55
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '117');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'118'
+       ,'Fremantle City'
+       ,'N'
+       ,60
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '118');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'119'
+       ,'Melville City'
+       ,'N'
+       ,94
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '119');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'121'
+       ,'Mosman Park Town'
+       ,'N'
+       ,101
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '121');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'122'
+       ,'Nedlands City'
+       ,'N'
+       ,115
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '122');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'123'
+       ,'Peppermint Grove'
+       ,'N'
+       ,123
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '123');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'124'
+       ,'Perth City'
+       ,'N'
+       ,177
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '124');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'125'
+       ,'Stirling City'
+       ,'N'
+       ,136
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '125');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'126'
+       ,'South Perth City'
+       ,'N'
+       ,135
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '126');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'127'
+       ,'Subiaco City'
+       ,'N'
+       ,139
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '127');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'128'
+       ,'Cambridge Town'
+       ,'N'
+       ,20
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '128');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'129'
+       ,'Victoria Park Town'
+       ,'N'
+       ,152
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '129');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'130'
+       ,'Vincent Town'
+       ,'N'
+       ,154
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '130');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'131'
+       ,'Joondalup City'
+       ,'N'
+       ,73
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '131');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'150'
+       ,'King''s Park'
+       ,'N'
+       ,81
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '150');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'155'
+       ,'Rottnest Island'
+       ,'N'
+       ,131
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '155');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'201'
+       ,'Augusta-Margaret River'
+       ,'N'
+       ,4
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '201');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'203'
+       ,'Bridgetown-Greenbushes'
+       ,'N'
+       ,12
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '203');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'204'
+       ,'Bunbury City'
+       ,'N'
+       ,17
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '204');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'205'
+       ,'Busselton'
+       ,'N'
+       ,19
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '205');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'206'
+       ,'Capel'
+       ,'N'
+       ,25
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '206');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'207'
+       ,'Collie'
+       ,'N'
+       ,36
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '207');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'208'
+       ,'Dardanup'
+       ,'N'
+       ,48
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '208');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'209'
+       ,'Waroona'
+       ,'N'
+       ,158
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '209');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'211'
+       ,'Harvey'
+       ,'N'
+       ,69
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '211');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'212'
+       ,'Mandurah City'
+       ,'N'
+       ,91
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '212');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'213'
+       ,'Manjimup'
+       ,'N'
+       ,92
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '213');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'214'
+       ,'Boddington'
+       ,'N'
+       ,10
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '214');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'215'
+       ,'Murray'
+       ,'N'
+       ,109
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '215');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'LGAS'
+       ,'216'
+       ,'Nannup'
+       ,'N'
+       ,111
+       ,to_date('20000101000000','YYYYMMDDHH24MISS')
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'LGAS'
+                    AND  HCO_CODE = '216');
 --
 INSERT INTO HIG_CODES
        (HCO_DOMAIN
@@ -21698,3450 +25226,6 @@ INSERT INTO HIG_CODES
        ,HCO_END_DATE
        )
 SELECT 
-        'IMAGE_TYPES'
-       ,'BMP'
-       ,'Windows Bitmap File'
-       ,'N'
-       ,3
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'IMAGE_TYPES'
-                    AND  HCO_CODE = 'BMP');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'IMAGE_TYPES'
-       ,'CALS'
-       ,'CALS File'
-       ,'N'
-       ,7
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'IMAGE_TYPES'
-                    AND  HCO_CODE = 'CALS');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'IMAGE_TYPES'
-       ,'GIF'
-       ,'GIF File'
-       ,'N'
-       ,6
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'IMAGE_TYPES'
-                    AND  HCO_CODE = 'GIF');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'IMAGE_TYPES'
-       ,'JFIF'
-       ,'JFIF File'
-       ,'N'
-       ,2
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'IMAGE_TYPES'
-                    AND  HCO_CODE = 'JFIF');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'IMAGE_TYPES'
-       ,'PCX'
-       ,'PCX File'
-       ,'N'
-       ,4
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'IMAGE_TYPES'
-                    AND  HCO_CODE = 'PCX');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'IMAGE_TYPES'
-       ,'PICT'
-       ,'Pict File'
-       ,'N'
-       ,5
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'IMAGE_TYPES'
-                    AND  HCO_CODE = 'PICT');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'IMAGE_TYPES'
-       ,'RAS'
-       ,'Raster Image'
-       ,'N'
-       ,8
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'IMAGE_TYPES'
-                    AND  HCO_CODE = 'RAS');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'IMAGE_TYPES'
-       ,'TIFF'
-       ,'TIFF File'
-       ,'N'
-       ,1
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'IMAGE_TYPES'
-                    AND  HCO_CODE = 'TIFF');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'INV_CATEGORY'
-       ,'C'
-       ,'Condition'
-       ,'Y'
-       ,1
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'INV_CATEGORY'
-                    AND  HCO_CODE = 'C');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'INV_CATEGORY'
-       ,'F'
-       ,'Foreign Table'
-       ,'Y'
-       ,5
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'INV_CATEGORY'
-                    AND  HCO_CODE = 'F');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'INV_CATEGORY'
-       ,'I'
-       ,'General Inventory'
-       ,'Y'
-       ,4
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'INV_CATEGORY'
-                    AND  HCO_CODE = 'I');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'INV_CATEGORY'
-       ,'R'
-       ,'Road Construction'
-       ,'Y'
-       ,2
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'INV_CATEGORY'
-                    AND  HCO_CODE = 'R');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'INV_CATEGORY'
-       ,'X'
-       ,'Generated Exclusive Inventory Type'
-       ,'Y'
-       ,3
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'INV_CATEGORY'
-                    AND  HCO_CODE = 'X');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'INV_RELATION'
-       ,'AT'
-       ,'Child exists at the same location as the parent'
-       ,'N'
-       ,2
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'INV_RELATION'
-                    AND  HCO_CODE = 'AT');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'INV_RELATION'
-       ,'DERIVED'
-       ,'The parent is derived by location'
-       ,'N'
-       ,5
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'INV_RELATION'
-                    AND  HCO_CODE = 'DERIVED');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'INV_RELATION'
-       ,'IN'
-       ,'Child must exist within the parent'
-       ,'N'
-       ,1
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'INV_RELATION'
-                    AND  HCO_CODE = 'IN');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'INV_RELATION'
-       ,'NONE'
-       ,'No location relationship is enforced'
-       ,'N'
-       ,3
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'INV_RELATION'
-                    AND  HCO_CODE = 'NONE');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'INV_RELATION'
-       ,'RELATIVE'
-       ,'Child must exist within the parent but its location'
-       ,'N'
-       ,4
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'INV_RELATION'
-                    AND  HCO_CODE = 'RELATIVE');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'JOB_STATUS'
-       ,'COMPLETE'
-       ,'Complete'
-       ,'Y'
-       ,3
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'JOB_STATUS'
-                    AND  HCO_CODE = 'COMPLETE');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'JOB_STATUS'
-       ,'ERROR'
-       ,'In Error'
-       ,'Y'
-       ,4
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'JOB_STATUS'
-                    AND  HCO_CODE = 'ERROR');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'JOB_STATUS'
-       ,'IN_PROGRESS'
-       ,'In Progress'
-       ,'Y'
-       ,2
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'JOB_STATUS'
-                    AND  HCO_CODE = 'IN_PROGRESS');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'JOB_STATUS'
-       ,'NOT_STARTED'
-       ,'Not Started'
-       ,'Y'
-       ,1
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'JOB_STATUS'
-                    AND  HCO_CODE = 'NOT_STARTED');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'JPRIVLEVEL'
-       ,'B'
-       ,'Both Role And User Level'
-       ,'Y'
-       ,3
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'JPRIVLEVEL'
-                    AND  HCO_CODE = 'B');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'JPRIVLEVEL'
-       ,'R'
-       ,'Role Level'
-       ,'Y'
-       ,1
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'JPRIVLEVEL'
-                    AND  HCO_CODE = 'R');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'JPRIVLEVEL'
-       ,'U'
-       ,'User Level'
-       ,'Y'
-       ,2
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'JPRIVLEVEL'
-                    AND  HCO_CODE = 'U');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LAUNCHPAD_MODE'
-       ,'LAUNCHPAD'
-       ,'Launchpad'
-       ,'Y'
-       ,1
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LAUNCHPAD_MODE'
-                    AND  HCO_CODE = 'LAUNCHPAD');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LAUNCHPAD_MODE'
-       ,'SYSTEM'
-       ,'System'
-       ,'Y'
-       ,3
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LAUNCHPAD_MODE'
-                    AND  HCO_CODE = 'SYSTEM');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LAUNCHPAD_MODE'
-       ,'USER'
-       ,'User'
-       ,'Y'
-       ,2
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LAUNCHPAD_MODE'
-                    AND  HCO_CODE = 'USER');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LEG_NUMBERS'
-       ,'1'
-       ,'North'
-       ,'N'
-       ,1
-       ,to_date('20001113000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
-                    AND  HCO_CODE = '1');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LEG_NUMBERS'
-       ,'2'
-       ,'North-East'
-       ,'N'
-       ,2
-       ,to_date('20001113000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
-                    AND  HCO_CODE = '2');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LEG_NUMBERS'
-       ,'3'
-       ,'East'
-       ,'N'
-       ,3
-       ,to_date('20001113000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
-                    AND  HCO_CODE = '3');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LEG_NUMBERS'
-       ,'4'
-       ,'South-East'
-       ,'N'
-       ,4
-       ,to_date('20001113000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
-                    AND  HCO_CODE = '4');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LEG_NUMBERS'
-       ,'5'
-       ,'South'
-       ,'N'
-       ,5
-       ,to_date('20001113000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
-                    AND  HCO_CODE = '5');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LEG_NUMBERS'
-       ,'6'
-       ,'South-West'
-       ,'N'
-       ,6
-       ,to_date('20001113000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
-                    AND  HCO_CODE = '6');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LEG_NUMBERS'
-       ,'7'
-       ,'West'
-       ,'N'
-       ,7
-       ,to_date('20001113000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
-                    AND  HCO_CODE = '7');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LEG_NUMBERS'
-       ,'8'
-       ,'North-West'
-       ,'N'
-       ,8
-       ,to_date('20001113000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
-                    AND  HCO_CODE = '8');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LEG_NUMBERS'
-       ,'9'
-       ,'Unknown'
-       ,'N'
-       ,9
-       ,to_date('20001113000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LEG_NUMBERS'
-                    AND  HCO_CODE = '9');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'001'
-       ,'Broome'
-       ,'N'
-       ,14
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '001');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'002'
-       ,'Halls Creek'
-       ,'N'
-       ,68
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '002');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'003'
-       ,'Derby-West Kimberley'
-       ,'N'
-       ,50
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '003');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'004'
-       ,'Wyndham-East Kimberley'
-       ,'N'
-       ,171
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '004');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'005'
-       ,'Christmas Island'
-       ,'N'
-       ,30
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '005');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'006'
-       ,'Cocos Island'
-       ,'N'
-       ,35
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '006');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'010'
-       ,'Northern Territory'
-       ,'N'
-       ,120
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '010');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'101'
-       ,'Armadale City'
-       ,'N'
-       ,2
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '101');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'102'
-       ,'Kalamunda'
-       ,'N'
-       ,74
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '102');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'103'
-       ,'Cockburn City'
-       ,'N'
-       ,34
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '103');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'104'
-       ,'Gosnells City'
-       ,'N'
-       ,66
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '104');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'105'
-       ,'Kwinana Town'
-       ,'N'
-       ,86
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '105');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'106'
-       ,'Mundaring'
-       ,'N'
-       ,107
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '106');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'107'
-       ,'Rockingham'
-       ,'N'
-       ,178
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '107');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'108'
-       ,'Serpentine-jarrahdale'
-       ,'N'
-       ,134
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '108');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'109'
-       ,'Swan City'
-       ,'N'
-       ,31
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '109');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'110'
-       ,'Wanneroo City'
-       ,'N'
-       ,32
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '110');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'111'
-       ,'Bassendean Town'
-       ,'N'
-       ,6
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '111');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'112'
-       ,'Bayswater City'
-       ,'N'
-       ,7
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '112');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'113'
-       ,'Belmont City'
-       ,'N'
-       ,8
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '113');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'114'
-       ,'Canning City'
-       ,'N'
-       ,21
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '114');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'115'
-       ,'Claremont Town'
-       ,'N'
-       ,33
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '115');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'116'
-       ,'Cottesloe Town'
-       ,'N'
-       ,40
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '116');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'117'
-       ,'East Fremantle Town'
-       ,'N'
-       ,55
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '117');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'118'
-       ,'Fremantle City'
-       ,'N'
-       ,60
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '118');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'119'
-       ,'Melville City'
-       ,'N'
-       ,94
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '119');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'121'
-       ,'Mosman Park Town'
-       ,'N'
-       ,101
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '121');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'122'
-       ,'Nedlands City'
-       ,'N'
-       ,115
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '122');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'123'
-       ,'Peppermint Grove'
-       ,'N'
-       ,123
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '123');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'124'
-       ,'Perth City'
-       ,'N'
-       ,177
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '124');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'125'
-       ,'Stirling City'
-       ,'N'
-       ,136
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '125');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'126'
-       ,'South Perth City'
-       ,'N'
-       ,135
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '126');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'127'
-       ,'Subiaco City'
-       ,'N'
-       ,139
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '127');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'128'
-       ,'Cambridge Town'
-       ,'N'
-       ,20
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '128');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'129'
-       ,'Victoria Park Town'
-       ,'N'
-       ,152
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '129');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'130'
-       ,'Vincent Town'
-       ,'N'
-       ,154
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '130');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'131'
-       ,'Joondalup City'
-       ,'N'
-       ,73
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '131');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'150'
-       ,'King''s Park'
-       ,'N'
-       ,81
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '150');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'155'
-       ,'Rottnest Island'
-       ,'N'
-       ,131
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '155');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'201'
-       ,'Augusta-Margaret River'
-       ,'N'
-       ,4
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '201');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'203'
-       ,'Bridgetown-Greenbushes'
-       ,'N'
-       ,12
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '203');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'204'
-       ,'Bunbury City'
-       ,'N'
-       ,17
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '204');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'205'
-       ,'Busselton'
-       ,'N'
-       ,19
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '205');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'206'
-       ,'Capel'
-       ,'N'
-       ,25
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '206');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'207'
-       ,'Collie'
-       ,'N'
-       ,36
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '207');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'208'
-       ,'Dardanup'
-       ,'N'
-       ,48
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '208');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'209'
-       ,'Waroona'
-       ,'N'
-       ,158
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '209');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'211'
-       ,'Harvey'
-       ,'N'
-       ,69
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '211');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'212'
-       ,'Mandurah City'
-       ,'N'
-       ,91
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '212');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'213'
-       ,'Manjimup'
-       ,'N'
-       ,92
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '213');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'214'
-       ,'Boddington'
-       ,'N'
-       ,10
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '214');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'215'
-       ,'Murray'
-       ,'N'
-       ,109
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '215');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'LGAS'
-       ,'216'
-       ,'Nannup'
-       ,'N'
-       ,111
-       ,to_date('20000101000000','YYYYMMDDHH24MISS')
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'LGAS'
-                    AND  HCO_CODE = '216');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'FOOTWAY_CATEGORY'
-       ,'1'
-       ,'Main Shopping Areas'
-       ,'Y'
-       ,129
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'FOOTWAY_CATEGORY'
-                    AND  HCO_CODE = '1');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'FOOTWAY_CATEGORY'
-       ,'2'
-       ,'Busy Urban Areas'
-       ,'Y'
-       ,130
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'FOOTWAY_CATEGORY'
-                    AND  HCO_CODE = '2');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'FOOTWAY_CATEGORY'
-       ,'3'
-       ,'Less used Urban and Busy Rural'
-       ,'Y'
-       ,131
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'FOOTWAY_CATEGORY'
-                    AND  HCO_CODE = '3');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'FOOTWAY_CATEGORY'
-       ,'4'
-       ,'Little used Rural'
-       ,'Y'
-       ,132
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'FOOTWAY_CATEGORY'
-                    AND  HCO_CODE = '4');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'FOOTWAY_CATEGORY'
-       ,'5'
-       ,'Alleyways'
-       ,'Y'
-       ,133
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'FOOTWAY_CATEGORY'
-                    AND  HCO_CODE = '5');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZMODE'
-       ,'ADVANCED'
-       ,'Start Gazetteer in Advanced mode'
-       ,'N'
-       ,2
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZMODE'
-                    AND  HCO_CODE = 'ADVANCED');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZMODE'
-       ,'STANDARD'
-       ,'Start Gazetteer in Standard mode'
-       ,'N'
-       ,1
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZMODE'
-                    AND  HCO_CODE = 'STANDARD');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_E'
-       ,'NE_ADMIN_UNIT'
-       ,'Admin Unit'
-       ,'Y'
-       ,1004
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
-                    AND  HCO_CODE = 'NE_ADMIN_UNIT');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_E'
-       ,'NE_CREATED_BY'
-       ,'Created By'
-       ,'Y'
-       ,1099
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
-                    AND  HCO_CODE = 'NE_CREATED_BY');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_E'
-       ,'NE_DATE_CREATED'
-       ,'Date Created'
-       ,'Y'
-       ,1096
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
-                    AND  HCO_CODE = 'NE_DATE_CREATED');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_E'
-       ,'NE_DATE_MODIFIED'
-       ,'Date Modified'
-       ,'Y'
-       ,1097
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
-                    AND  HCO_CODE = 'NE_DATE_MODIFIED');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_E'
-       ,'NE_DESCR'
-       ,'Description'
-       ,'Y'
-       ,1000
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
-                    AND  HCO_CODE = 'NE_DESCR');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_E'
-       ,'NE_END_DATE'
-       ,'End Date'
-       ,'Y'
-       ,1006
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
-                    AND  HCO_CODE = 'NE_END_DATE');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_E'
-       ,'NE_LENGTH'
-       ,'Element Length'
-       ,'Y'
-       ,1003
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
-                    AND  HCO_CODE = 'NE_LENGTH');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_E'
-       ,'NE_MODIFIED_BY'
-       ,'Modified By'
-       ,'Y'
-       ,1098
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
-                    AND  HCO_CODE = 'NE_MODIFIED_BY');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_E'
-       ,'NE_NO_END'
-       ,'End Node'
-       ,'Y'
-       ,1008
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
-                    AND  HCO_CODE = 'NE_NO_END');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_E'
-       ,'NE_NO_START'
-       ,'Start Node'
-       ,'Y'
-       ,1007
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
-                    AND  HCO_CODE = 'NE_NO_START');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_E'
-       ,'NE_START_DATE'
-       ,'Start Date'
-       ,'Y'
-       ,1005
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
-                    AND  HCO_CODE = 'NE_START_DATE');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_E'
-       ,'NE_TYPE'
-       ,'Element Type'
-       ,'Y'
-       ,1002
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
-                    AND  HCO_CODE = 'NE_TYPE');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_E'
-       ,'NE_UNIQUE'
-       ,'Unique Reference'
-       ,'Y'
-       ,1001
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_E'
-                    AND  HCO_CODE = 'NE_UNIQUE');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_I'
-       ,'IIT_ADMIN_UNIT'
-       ,'Admin Unit'
-       ,'Y'
-       ,1002
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
-                    AND  HCO_CODE = 'IIT_ADMIN_UNIT');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_I'
-       ,'IIT_CREATED_BY'
-       ,'Created By'
-       ,'Y'
-       ,1099
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
-                    AND  HCO_CODE = 'IIT_CREATED_BY');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_I'
-       ,'IIT_DATE_CREATED'
-       ,'Date Created'
-       ,'Y'
-       ,1096
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
-                    AND  HCO_CODE = 'IIT_DATE_CREATED');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_I'
-       ,'IIT_DATE_MODIFIED'
-       ,'Date Modified'
-       ,'Y'
-       ,1097
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
-                    AND  HCO_CODE = 'IIT_DATE_MODIFIED');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_I'
-       ,'IIT_DESCR'
-       ,'Description'
-       ,'Y'
-       ,1120
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
-                    AND  HCO_CODE = 'IIT_DESCR');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_I'
-       ,'IIT_END_DATE'
-       ,'End Date'
-       ,'Y'
-       ,1004
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
-                    AND  HCO_CODE = 'IIT_END_DATE');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_I'
-       ,'IIT_MODIFIED_BY'
-       ,'Modified By'
-       ,'Y'
-       ,1098
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
-                    AND  HCO_CODE = 'IIT_MODIFIED_BY');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_I'
-       ,'IIT_NOTE'
-       ,'Note'
-       ,'Y'
-       ,1110
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
-                    AND  HCO_CODE = 'IIT_NOTE');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_I'
-       ,'IIT_PEO_INVENT_BY_ID'
-       ,'Inspected By'
-       ,'Y'
-       ,1007
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
-                    AND  HCO_CODE = 'IIT_PEO_INVENT_BY_ID');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_I'
-       ,'IIT_PRIMARY_KEY'
-       ,'Primary Key'
-       ,'Y'
-       ,1100
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
-                    AND  HCO_CODE = 'IIT_PRIMARY_KEY');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_I'
-       ,'IIT_START_DATE'
-       ,'Start Date'
-       ,'Y'
-       ,1003
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
-                    AND  HCO_CODE = 'IIT_START_DATE');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_FIXED_COLS_I'
-       ,'IIT_X_SECT'
-       ,'XSP'
-       ,'Y'
-       ,1001
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_FIXED_COLS_I'
-                    AND  HCO_CODE = 'IIT_X_SECT');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_L_BRACKETS'
-       ,'('
-       ,'('
-       ,'Y'
-       ,1
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_L_BRACKETS'
-                    AND  HCO_CODE = '(');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_L_BRACKETS'
-       ,'(('
-       ,'(('
-       ,'Y'
-       ,2
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_L_BRACKETS'
-                    AND  HCO_CODE = '((');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_L_BRACKETS'
-       ,'((('
-       ,'((('
-       ,'Y'
-       ,3
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_L_BRACKETS'
-                    AND  HCO_CODE = '(((');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_L_BRACKETS'
-       ,'(((('
-       ,'(((('
-       ,'Y'
-       ,4
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_L_BRACKETS'
-                    AND  HCO_CODE = '((((');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_L_BRACKETS'
-       ,'((((('
-       ,'((((('
-       ,'Y'
-       ,5
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_L_BRACKETS'
-                    AND  HCO_CODE = '(((((');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_OPERATORS'
-       ,'AND'
-       ,'AND'
-       ,'Y'
-       ,1
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_OPERATORS'
-                    AND  HCO_CODE = 'AND');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_OPERATORS'
-       ,'OR'
-       ,'OR'
-       ,'Y'
-       ,2
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_OPERATORS'
-                    AND  HCO_CODE = 'OR');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_R_BRACKETS'
-       ,')'
-       ,')'
-       ,'Y'
-       ,1
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_R_BRACKETS'
-                    AND  HCO_CODE = ')');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_R_BRACKETS'
-       ,'))'
-       ,'))'
-       ,'Y'
-       ,2
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_R_BRACKETS'
-                    AND  HCO_CODE = '))');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_R_BRACKETS'
-       ,')))'
-       ,')))'
-       ,'Y'
-       ,3
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_R_BRACKETS'
-                    AND  HCO_CODE = ')))');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_R_BRACKETS'
-       ,'))))'
-       ,'))))'
-       ,'Y'
-       ,4
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_R_BRACKETS'
-                    AND  HCO_CODE = '))))');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_R_BRACKETS'
-       ,')))))'
-       ,')))))'
-       ,'Y'
-       ,5
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_R_BRACKETS'
-                    AND  HCO_CODE = ')))))');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_TYPE_TYPES'
-       ,'E'
-       ,'Element'
-       ,'Y'
-       ,1
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_TYPE_TYPES'
-                    AND  HCO_CODE = 'E');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GAZ_QRY_TYPE_TYPES'
-       ,'I'
-       ,'Inventory'
-       ,'Y'
-       ,2
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GAZ_QRY_TYPE_TYPES'
-                    AND  HCO_CODE = 'I');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GEOMETRY_TYPE'
-       ,'2001'
-       ,'2D Point'
-       ,'Y'
-       ,1
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
-                    AND  HCO_CODE = '2001');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GEOMETRY_TYPE'
-       ,'2002'
-       ,'2D Line'
-       ,'Y'
-       ,2
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
-                    AND  HCO_CODE = '2002');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GEOMETRY_TYPE'
-       ,'2003'
-       ,'2D Polygon'
-       ,'Y'
-       ,3
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
-                    AND  HCO_CODE = '2003');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GEOMETRY_TYPE'
-       ,'2004'
-       ,'2D Collection'
-       ,'Y'
-       ,4
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
-                    AND  HCO_CODE = '2004');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GEOMETRY_TYPE'
-       ,'2005'
-       ,'2D Multi-point'
-       ,'Y'
-       ,5
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
-                    AND  HCO_CODE = '2005');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GEOMETRY_TYPE'
-       ,'2006'
-       ,'2D Multi-line'
-       ,'Y'
-       ,6
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
-                    AND  HCO_CODE = '2006');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GEOMETRY_TYPE'
-       ,'2007'
-       ,'2D Multi-polygon'
-       ,'Y'
-       ,7
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
-                    AND  HCO_CODE = '2007');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GEOMETRY_TYPE'
-       ,'3001'
-       ,'3D Point'
-       ,'Y'
-       ,8
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
-                    AND  HCO_CODE = '3001');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GEOMETRY_TYPE'
-       ,'3002'
-       ,'3D Line'
-       ,'Y'
-       ,9
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
-                    AND  HCO_CODE = '3002');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GEOMETRY_TYPE'
-       ,'3003'
-       ,'3D Polygon'
-       ,'Y'
-       ,10
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
-                    AND  HCO_CODE = '3003');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GEOMETRY_TYPE'
-       ,'3004'
-       ,'3D Collection'
-       ,'Y'
-       ,11
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
-                    AND  HCO_CODE = '3004');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GEOMETRY_TYPE'
-       ,'3005'
-       ,'3D Multi-point'
-       ,'Y'
-       ,12
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
-                    AND  HCO_CODE = '3005');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GEOMETRY_TYPE'
-       ,'3006'
-       ,'3D Multi-line'
-       ,'Y'
-       ,13
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
-                    AND  HCO_CODE = '3006');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GEOMETRY_TYPE'
-       ,'3007'
-       ,'3D Multi-polygon'
-       ,'Y'
-       ,14
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
-                    AND  HCO_CODE = '3007');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GIS_TYPES'
-       ,'DDE'
-       ,'DDE'
-       ,'Y'
-       ,1
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GIS_TYPES'
-                    AND  HCO_CODE = 'DDE');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GIS_TYPES'
-       ,'NONE'
-       ,'None'
-       ,'Y'
-       ,2
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GIS_TYPES'
-                    AND  HCO_CODE = 'NONE');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GIS_TYPES'
-       ,'OTHER'
-       ,'Other'
-       ,'Y'
-       ,4
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GIS_TYPES'
-                    AND  HCO_CODE = 'OTHER');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GRI_GAZ_RESTRICTIONS'
-       ,'EXTENT'
-       ,'Saved Network Extents'
-       ,'Y'
-       ,4
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GRI_GAZ_RESTRICTIONS'
-                    AND  HCO_CODE = 'EXTENT');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GRI_GAZ_RESTRICTIONS'
-       ,'NW_ALL'
-       ,'Any Network Element'
-       ,'Y'
-       ,1
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GRI_GAZ_RESTRICTIONS'
-                    AND  HCO_CODE = 'NW_ALL');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GRI_GAZ_RESTRICTIONS'
-       ,'NW_DAT'
-       ,'Datums Only'
-       ,'Y'
-       ,3
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GRI_GAZ_RESTRICTIONS'
-                    AND  HCO_CODE = 'NW_DAT');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'GRI_GAZ_RESTRICTIONS'
-       ,'NW_GRP'
-       ,'Groups Only'
-       ,'Y'
-       ,2
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'GRI_GAZ_RESTRICTIONS'
-                    AND  HCO_CODE = 'NW_GRP');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'HDN_JOIN_TYPES'
-       ,'TABLE'
-       ,'HDN Table Join'
-       ,'Y'
-       ,null
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'HDN_JOIN_TYPES'
-                    AND  HCO_CODE = 'TABLE');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'HISTORY_OPERATION'
-       ,'C'
-       ,'Close'
-       ,'Y'
-       ,1
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'HISTORY_OPERATION'
-                    AND  HCO_CODE = 'C');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'HISTORY_OPERATION'
-       ,'L'
-       ,'Rescale'
-       ,'Y'
-       ,5
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'HISTORY_OPERATION'
-                    AND  HCO_CODE = 'L');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'HISTORY_OPERATION'
-       ,'M'
-       ,'Merge'
-       ,'Y'
-       ,3
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'HISTORY_OPERATION'
-                    AND  HCO_CODE = 'M');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'HISTORY_OPERATION'
-       ,'N'
-       ,'Reclass'
-       ,'Y'
-       ,6
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'HISTORY_OPERATION'
-                    AND  HCO_CODE = 'N');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'HISTORY_OPERATION'
-       ,'R'
-       ,'Replace'
-       ,'Y'
-       ,4
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'HISTORY_OPERATION'
-                    AND  HCO_CODE = 'R');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'HISTORY_OPERATION'
-       ,'S'
-       ,'Split'
-       ,'Y'
-       ,2
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'HISTORY_OPERATION'
-                    AND  HCO_CODE = 'S');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
         'WEATHER_CONDITION'
        ,'FINE'
        ,'Fine'
@@ -30242,6 +30326,468 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
+        'WEEKEND'
+       ,'HIG'
+       ,'Weekend Day Numbers'
+       ,'This option must contain a list of numeric values in the range 1 to 7.'||CHR(10)||'They define the days of the week which constitute the weekend in a particular country, for use in working day calculations.  The following convention must be adopted:'||CHR(10)||'1=Sunday 2=Monday ... 7=Saturday.'||CHR(10)||'Therefore in the UK this option will contain the value 1,7'||CHR(10)||'In the Inspection Loader (MAI2200), when repairs are loaded a repair due date calculation takes place. This may be based on working days or calendar days as indicated by the defect priority rules.'||CHR(10)||'In Maintain Defects (MAI3806) a similar calculation takes place when a repair is created.'
+       ,''
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'WEEKEND');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'RMMSFLAG'
+       ,'HIG'
+       ,'RMMS Network Type Flag'
+       ,'1=RMMS, 3=MMGR, 4=Welsh Office'||CHR(10)||'This flag identifies the type of road network.'||CHR(10)||'It affects the validation and display of certain road section attributes, such as linkcode and section number.'
+       ,''
+       ,'NUMBER'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'RMMSFLAG');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'HIGGISAVLB'
+       ,'HIG'
+       ,'GIS Availability Flag'
+       ,'This option must be set to Y or N.  When set to Y, the GIS button is enabled on the launchpad'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'HIGGISAVLB');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'DEFREPTYPE'
+       ,'HIG'
+       ,'Word Template Default Rep Type'
+       ,'Default Document manager report type used inside the OLE generation of documents in MS Word'
+       ,''
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'DEFREPTYPE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'DIRREPSTRN'
+       ,'HIG'
+       ,'Directory Separator'
+       ,'Separator used in assembling file paths etc'
+       ,'DIRECTORY_SEPERATOR'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'DIRREPSTRN');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'GRILSTNAME'
+       ,'HIG'
+       ,'GRI Listener Name'
+       ,'The pipe identifier string - A string which is used to uniquely identify all jobs associated with the particular highways schema.'
+       ,''
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'GRILSTNAME');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'HIGGISTYPE'
+       ,'HIG'
+       ,'GIS Type'
+       ,'A means of flagging the type of GIS which is interfaced to Highways - Either DDE, NONE or OTHER '
+       ,'GIS_TYPES'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'HIGGISTYPE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'GRIDATE'
+       ,'HIG'
+       ,'GRI Format Mask'
+       ,'Used in conjunction with the date property class to provide a flexible data format mask'
+       ,'DATE_FORMAT_MASK'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'GRIDATE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'HTMLHLPST'
+       ,'HIG'
+       ,'WebHelp HTML Entry Point'
+       ,'Entry Point for HTML help'
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'HTMLHLPST');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'SDMREGULYR'
+       ,'HIG'
+       ,'Register user layers for SDM'
+       ,'When set to Y the system will maintain a set of SDO/SDE metadata for all users'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'SDMREGULYR');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'SMTPAUDTIT'
+       ,'HIG'
+       ,'Audit info in mail titles'
+       ,'If set to "Y" information about the sender will be included in the mail message title for any mails sent by the system'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'SMTPAUDTIT');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'WMSSERVER'
+       ,'HIG'
+       ,'WMS Server URL'
+       ,'URL to specify the WMS Data Source'
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'WMSSERVER');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'WMSLAYERS'
+       ,'HIG'
+       ,'WMS Layers'
+       ,'Layers to be retrieved from WMS Data Source'
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'WMSLAYERS');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'WMSLYRNAME'
+       ,'HIG'
+       ,'WMS Layer Name'
+       ,'Display name for WMS Layer in Layer Control Tool'
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'WMSLYRNAME');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'WMSSVCNAME'
+       ,'HIG'
+       ,'WMS Service Name'
+       ,'Service Name to use for WMS Connector.'
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'WMSSVCNAME');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'WMSIMGFMT'
+       ,'HIG'
+       ,'WMS Image Format'
+       ,'Image format for WMS Connector'
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'WMSIMGFMT');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'HTML_BASE'
+       ,'HIG'
+       ,'WebHelp HTML Base'
+       ,'Base URL for HTML help'
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'HTML_BASE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'SDOSURKEY'
+       ,'HIG'
+       ,'SDO Surrogate Key'
+       ,'Register SDO layers with a surrogate primary key'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'SDOSURKEY');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'HIG_ST_CSS'
+       ,'HIG'
+       ,'URL for static CSS'
+       ,'If the organisation has a static style sheet (i.e. not accessed from within the oracle server) then set this option so that it is used (for example in mail messages)'
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'HIG_ST_CSS');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'FAVMODE'
+       ,'HIG'
+       ,'Favourite Mode'
+       ,'Determines the default starting tab for the user'
+       ,'LAUNCHPAD_MODE'
+       ,'VARCHAR2'
+       ,'N'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'FAVMODE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'FAVURL'
+       ,'HIG'
+       ,'URL displayed in HIG1807'
+       ,'URL displayed in HIG1807'
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'FAVURL');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
         'WEBMAINIMG'
        ,'HIG'
        ,'Image for main menu'
@@ -30308,28 +30854,6 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'DCDEXPATH'
-       ,'NET'
-       ,'DCD download directory'
-       ,'Directory where DCD downloads are created'
-       ,''
-       ,'VARCHAR2'
-       ,'Y'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'DCDEXPATH');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
         'SDESERVER'
        ,'HIG'
        ,'SDE Server'
@@ -30374,28 +30898,6 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'WEBMAPSERV'
-       ,'WMP'
-       ,'Web Map Server'
-       ,'The URL for the web map server'
-       ,''
-       ,'VARCHAR2'
-       ,'Y'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'WEBMAPSERV');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
         'DEBUGAUTON'
        ,'HIG'
        ,'Use Autonomous Debug'
@@ -30406,72 +30908,6 @@ SELECT
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'DEBUGAUTON');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'DEFAORDPI'
-       ,'NET'
-       ,'Default AOR Dist Point Int'
-       ,'Default Assets on a Route Distance Point Interval'
-       ,''
-       ,'NUMBER'
-       ,'N'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'DEFAORDPI');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'AOREXTDINV'
-       ,'NET'
-       ,'AoR do not truncate inventory'
-       ,'If this is "Y", then when running Assets on a Route on a part of a linear route any continuous inventory which was truncated by virtue of the beginning or end of the specified extent will be returned with the location of that item extended to the end of the current segment.'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'AOREXTDINV');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'AORSTRMAP'
-       ,'NET'
-       ,'AoR strip map'
-       ,'If this is "Y", then the strip map is switched on by default on the Assets On a Route results form.'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'AORSTRMAP');
 --
 INSERT INTO HIG_OPTION_LIST
        (HOL_ID
@@ -30550,28 +30986,6 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'ATTRLSTSEP'
-       ,'NET'
-       ,'Inv Attribute List Separator'
-       ,'The string that will separate attributes when they are viewed in a list.'
-       ,''
-       ,'VARCHAR2'
-       ,'Y'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'ATTRLSTSEP');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
         'WEBDOCPATH'
        ,'HIG'
        ,'Document Access Path'
@@ -30582,28 +30996,6 @@ SELECT
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'WEBDOCPATH');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'EXTRTEDATE'
-       ,'NET'
-       ,'Ele Start Date on extend route'
-       ,'Default Start Date when extending a route.  1 - Leave as Null, 2 - Inherit from previous Element, 3 - Effective Date, 4 - Previous Element membership'
-       ,'EXTEND_ROUTE_ST_DATE'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'EXTRTEDATE');
 --
 INSERT INTO HIG_OPTION_LIST
        (HOL_ID
@@ -30990,50 +31382,6 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'MULTINVRTE'
-       ,'NET'
-       ,'Inventory On Multiple Routes'
-       ,'When set to "Y" this flag allows inventory to be located across multiple routes'||CHR(10)||'If auto-inclusion is not being used then this MUST be set to "Y" if inventory is to be located across >1 datum element'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'MULTINVRTE');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'XMLCRENODE'
-       ,'NET'
-       ,'Create node from XML Datums'
-       ,'Should the system automaticall created nodes when datums are loaded via the XMl Datums loader.'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'XMLCRENODE');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
         'NM3WEBCSS'
        ,'HIG'
        ,'NM3 Path to CSS'
@@ -31044,28 +31392,6 @@ SELECT
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'NM3WEBCSS');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'INVRTETAB'
-       ,'NET'
-       ,'Show Route Tab in Inv Form'
-       ,'If set to Y the default tab in the Inventory form will be Route.'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'INVRTETAB');
 --
 INSERT INTO HIG_OPTION_LIST
        (HOL_ID
@@ -31100,160 +31426,6 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'SHOWINVPK'
-       ,'NET'
-       ,'Show Primary Key in Inv Form'
-       ,'If set to Y the primary key will always be visible on the Inventory form, if N then the PK will only be visible if it is a flexible attribute.'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'SHOWINVPK');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'REVLEGNO'
-       ,'NET'
-       ,'Reverse Leg Nos on Route Rev'
-       ,'Reverse Leg Nos on node usage records when reversing a route Reverse Leg Nos on node usage records when reversing a route. "Y" means that the Leg Number is reversed, otherwise it will be left as is'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'REVLEGNO');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'INVAPIPACK'
-       ,'NET'
-       ,'Create API pack. for inv type'
-       ,'If this is "Y", then when the inventory views are recreated for a particular inventory type, then there will be a package called nm3api_inv_xxxx created which will have API calls in as wrappers to the nm3api_inv procedures'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'INVAPIPACK');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'INVROUTEVW'
-       ,'NET'
-       ,'Create inv on route views'
-       ,'If this is "Y", then when the inventory views are recreated for a particular inventory type, then there will be a view created called v_nm_xxxx_on_route created which will show inventory relative to a temporary network extent'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'INVROUTEVW');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'SDERUNLE'
-       ,'NET'
-       ,'Run Loadevents from server.'
-       ,'If this is "Y", then when the create_sde_inv_shape_table and the process_membership_changes (nm3inv_sde) procedures are executed the SDE loadevents program will be run from the server. No batch files will be created'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'SDERUNLE');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'MRGAUTYPE'
-       ,'NET'
-       ,'AU Type for Merge Security'
-       ,'This is the AU Type which is used for Merge Results Security'
-       ,''
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'MRGAUTYPE');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'SDEBATDIR'
-       ,'NET'
-       ,'Create loadevents batch files.'
-       ,'Indicates the directory in which to create  The loadevents batch files'
-       ,''
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'SDEBATDIR');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
         'BROWSERPTH'
        ,'HIG'
        ,'Path to Internet Explorer'
@@ -31276,50 +31448,6 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'PREFLRM'
-       ,'NET'
-       ,'Preferred LRM'
-       ,'This is the group type of the preferred linear referencing method; this only takes effect if you have more than one LRM'
-       ,''
-       ,'VARCHAR2'
-       ,'N'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'PREFLRM');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'DISPWDVIS'
-       ,'NET'
-       ,'Discoverer Password Visible'
-       ,'If this is "Y", then the password will be visible when calling Discoverer on the web.'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'DISPWDVIS');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
         'PCOMMIT'
        ,'HIG'
        ,'Commit on count = set value'
@@ -31330,94 +31458,6 @@ SELECT
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'PCOMMIT');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'USEINVXSP'
-       ,'NET'
-       ,'Use Inventory XSP'
-       ,'Y - YES N - NO'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'USEINVXSP');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'MRGPOE'
-       ,'NET'
-       ,'Split Merge Results at POE'
-       ,'A value of "Y" means that merge query results will be split at any discontinuities (POEs) on the route'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'MRGPOE');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'MRGROUTE'
-       ,'NET'
-       ,'Split Merge Results by route'
-       ,'A value of "Y" means that merge query results will be split at any change of route'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'MRGROUTE');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'CHECKROUTE'
-       ,'NET'
-       ,'Use route checks'
-       ,'Check network connectivity when new elements are created.'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'CHECKROUTE');
 --
 INSERT INTO HIG_OPTION_LIST
        (HOL_ID
@@ -31474,28 +31514,6 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'UTLFILEDIR'
-       ,'NET'
-       ,'UTL File Directory'
-       ,'Directory where PL/SQL will read/write flat files'
-       ,''
-       ,'VARCHAR2'
-       ,'Y'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'UTLFILEDIR');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
         'DBWINTITLE'
        ,'HIG'
        ,'DB Info in Window Titles'
@@ -31518,28 +31536,6 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'PBIPOE'
-       ,'NET'
-       ,'Split PBI Results at POE'
-       ,'A value of "Y" means that PBI query results will be split at any discontinuities (POEs) on the route'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'PBIPOE');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
         'INVVIEWSLK'
        ,'HIG'
        ,'Show SLK On Inventory Views'
@@ -31550,28 +31546,6 @@ SELECT
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'INVVIEWSLK');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'MAPCAPTURE'
-       ,'NET'
-       ,'Is MapCapture Used'
-       ,'Set this option to "Y" if this system uses MapCapture'||CHR(10)||'This will enable the inventory views required for MapCapture to be generated whenever the normal inventory views are created'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'MAPCAPTURE');
 --
 INSERT INTO HIG_OPTION_LIST
        (HOL_ID
@@ -31738,72 +31712,6 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'SHOWRTEDIR'
-       ,'NET'
-       ,'Show Route Direction'
-       ,'Determines whether route direction is displayed.'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'SHOWRTEDIR');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'DEFITEMTYP'
-       ,'NET'
-       ,'Default Reference Item Type'
-       ,'Default reference item type for Assets on a Route.'
-       ,''
-       ,'VARCHAR2'
-       ,'N'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'DEFITEMTYP');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'INH_PAR_AU'
-       ,'NET'
-       ,'Inherit AU in reclassify'
-       ,'If this is set to "Y" then upon reclassification of a route, the admin unit of the datum elements in that route inherit the AU of the parent'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'INH_PAR_AU');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
         'GRIJOBPRM'
        ,'HIG'
        ,'Name of GRI job id param.'
@@ -31836,50 +31744,6 @@ SELECT
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'SMTPSERVER');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'SDOCLIPTYP'
-       ,'WMP'
-       ,'Clipping Algorithm'
-       ,'Clipping Algorithm - set to SDO by default'
-       ,''
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'SDOCLIPTYP');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'DISAMBIGSC'
-       ,'NET'
-       ,'Display Ambig Sub Class'
-       ,'Should Ambig sub class be displayed'
-       ,''
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'DISAMBIGSC');
 --
 INSERT INTO HIG_OPTION_LIST
        (HOL_ID
@@ -31980,28 +31844,6 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'WEBMAPPRDS'
-       ,'WMP'
-       ,'Preferred Data Source'
-       ,'Preferred Data Source'
-       ,''
-       ,'VARCHAR2'
-       ,'N'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'WEBMAPPRDS');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
         'ALLOWDEBUG'
        ,'HIG'
        ,'Allow debug'
@@ -32056,28 +31898,6 @@ SELECT
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'HIGPUBSYN');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'GISGRPTYPE'
-       ,'NET'
-       ,'GIS Road Group Type'
-       ,'The type of road group created by the GIS'
-       ,''
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'GISGRPTYPE');
 --
 INSERT INTO HIG_OPTION_LIST
        (HOL_ID
@@ -32266,204 +32086,6 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'WEEKEND'
-       ,'HIG'
-       ,'Weekend Day Numbers'
-       ,'This option must contain a list of numeric values in the range 1 to 7.'||CHR(10)||'They define the days of the week which constitute the weekend in a particular country, for use in working day calculations.  The following convention must be adopted:'||CHR(10)||'1=Sunday 2=Monday ... 7=Saturday.'||CHR(10)||'Therefore in the UK this option will contain the value 1,7'||CHR(10)||'In the Inspection Loader (MAI2200), when repairs are loaded a repair due date calculation takes place. This may be based on working days or calendar days as indicated by the defect priority rules.'||CHR(10)||'In Maintain Defects (MAI3806) a similar calculation takes place when a repair is created.'
-       ,''
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'WEEKEND');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'RMMSFLAG'
-       ,'HIG'
-       ,'RMMS Network Type Flag'
-       ,'1=RMMS, 3=MMGR, 4=Welsh Office'||CHR(10)||'This flag identifies the type of road network.'||CHR(10)||'It affects the validation and display of certain road section attributes, such as linkcode and section number.'
-       ,''
-       ,'NUMBER'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'RMMSFLAG');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'HIGGISAVLB'
-       ,'HIG'
-       ,'GIS Availability Flag'
-       ,'This option must be set to Y or N.  When set to Y, the GIS button is enabled on the launchpad'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'HIGGISAVLB');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'DEFREPTYPE'
-       ,'HIG'
-       ,'Word Template Default Rep Type'
-       ,'Default Document manager report type used inside the OLE generation of documents in MS Word'
-       ,''
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'DEFREPTYPE');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'DIRREPSTRN'
-       ,'HIG'
-       ,'Directory Separator'
-       ,'Separator used in assembling file paths etc'
-       ,'DIRECTORY_SEPERATOR'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'DIRREPSTRN');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'GRILSTNAME'
-       ,'HIG'
-       ,'GRI Listener Name'
-       ,'The pipe identifier string - A string which is used to uniquely identify all jobs associated with the particular highways schema.'
-       ,''
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'GRILSTNAME');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'HIGGISTYPE'
-       ,'HIG'
-       ,'GIS Type'
-       ,'A means of flagging the type of GIS which is interfaced to Highways - Either DDE, NONE or OTHER '
-       ,'GIS_TYPES'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'HIGGISTYPE');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'GRIDATE'
-       ,'HIG'
-       ,'GRI Format Mask'
-       ,'Used in conjunction with the date property class to provide a flexible data format mask'
-       ,'DATE_FORMAT_MASK'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'GRIDATE');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'HTMLHLPST'
-       ,'HIG'
-       ,'WebHelp HTML Entry Point'
-       ,'Entry Point for HTML help'
-       ,''
-       ,'VARCHAR2'
-       ,'Y'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'HTMLHLPST');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
         'GAZMODE'
        ,'NET'
        ,'Gazetteer Mode'
@@ -32508,16 +32130,60 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'SDMREGULYR'
-       ,'HIG'
-       ,'Register user layers for SDM'
-       ,'When set to Y the system will maintain a set of SDO/SDE metadata for all users'
+        'SAV_FORMAT'
+       ,'NET'
+       ,'Export Format'
+       ,'Default export format'
+       ,'SAV_FORMAT'
+       ,'VARCHAR2'
+       ,'N'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'SAV_FORMAT');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'DEFASSTYPE'
+       ,'NET'
+       ,'Default Asset Search'
+       ,'Default asset type to search for'
+       ,''
+       ,'VARCHAR2'
+       ,'N'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'DEFASSTYPE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'MRGVIEWTRU'
+       ,'NET'
+       ,'Merge Views Include True'
+       ,'If this is set to "Y" then the TRUE distance along the OFFSET_NE_ID for the start and end of each merge chunk will be included on the merge views'
        ,'Y_OR_N'
        ,'VARCHAR2'
        ,'N'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'SDMREGULYR');
+                   WHERE HOL_ID = 'MRGVIEWTRU');
 --
 INSERT INTO HIG_OPTION_LIST
        (HOL_ID
@@ -32530,16 +32196,60 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'SMTPAUDTIT'
-       ,'HIG'
-       ,'Audit info in mail titles'
-       ,'If set to "Y" information about the sender will be included in the mail message title for any mails sent by the system'
+        'DCDEXPATH'
+       ,'NET'
+       ,'DCD download directory'
+       ,'Directory where DCD downloads are created'
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'DCDEXPATH');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'DEFAORDPI'
+       ,'NET'
+       ,'Default AOR Dist Point Int'
+       ,'Default Assets on a Route Distance Point Interval'
+       ,''
+       ,'NUMBER'
+       ,'N'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'DEFAORDPI');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'AOREXTDINV'
+       ,'NET'
+       ,'AoR do not truncate inventory'
+       ,'If this is "Y", then when running Assets on a Route on a part of a linear route any continuous inventory which was truncated by virtue of the beginning or end of the specified extent will be returned with the location of that item extended to the end of the current segment.'
        ,'Y_OR_N'
        ,'VARCHAR2'
        ,'N'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'SMTPAUDTIT');
+                   WHERE HOL_ID = 'AOREXTDINV');
 --
 INSERT INTO HIG_OPTION_LIST
        (HOL_ID
@@ -32552,16 +32262,16 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'WMSSERVER'
-       ,'HIG'
-       ,'WMS Server URL'
-       ,'URL to specify the WMS Data Source'
-       ,''
+        'AORSTRMAP'
+       ,'NET'
+       ,'AoR strip map'
+       ,'If this is "Y", then the strip map is switched on by default on the Assets On a Route results form.'
+       ,'Y_OR_N'
        ,'VARCHAR2'
-       ,'Y'
+       ,'N'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'WMSSERVER');
+                   WHERE HOL_ID = 'AORSTRMAP');
 --
 INSERT INTO HIG_OPTION_LIST
        (HOL_ID
@@ -32574,104 +32284,16 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'WMSLAYERS'
-       ,'HIG'
-       ,'WMS Layers'
-       ,'Layers to be retrieved from WMS Data Source'
-       ,''
-       ,'VARCHAR2'
-       ,'Y'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'WMSLAYERS');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'WMSLYRNAME'
-       ,'HIG'
-       ,'WMS Layer Name'
-       ,'Display name for WMS Layer in Layer Control Tool'
-       ,''
-       ,'VARCHAR2'
-       ,'Y'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'WMSLYRNAME');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'WMSSVCNAME'
-       ,'HIG'
-       ,'WMS Service Name'
-       ,'Service Name to use for WMS Connector.'
-       ,''
-       ,'VARCHAR2'
-       ,'Y'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'WMSSVCNAME');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'WMSIMGFMT'
-       ,'HIG'
-       ,'WMS Image Format'
-       ,'Image format for WMS Connector'
-       ,''
-       ,'VARCHAR2'
-       ,'Y'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'WMSIMGFMT');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'HTML_BASE'
-       ,'HIG'
-       ,'WebHelp HTML Base'
-       ,'Base URL for HTML help'
+        'ATTRLSTSEP'
+       ,'NET'
+       ,'Inv Attribute List Separator'
+       ,'The string that will separate attributes when they are viewed in a list.'
        ,''
        ,'VARCHAR2'
        ,'Y'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'HTML_BASE');
+                   WHERE HOL_ID = 'ATTRLSTSEP');
 --
 INSERT INTO HIG_OPTION_LIST
        (HOL_ID
@@ -32684,16 +32306,544 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'SDOSURKEY'
-       ,'HIG'
-       ,'SDO Surrogate Key'
-       ,'Register SDO layers with a surrogate primary key'
+        'EXTRTEDATE'
+       ,'NET'
+       ,'Ele Start Date on extend route'
+       ,'Default Start Date when extending a route.  1 - Leave as Null, 2 - Inherit from previous Element, 3 - Effective Date, 4 - Previous Element membership'
+       ,'EXTEND_ROUTE_ST_DATE'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'EXTRTEDATE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'MULTINVRTE'
+       ,'NET'
+       ,'Inventory On Multiple Routes'
+       ,'When set to "Y" this flag allows inventory to be located across multiple routes'||CHR(10)||'If auto-inclusion is not being used then this MUST be set to "Y" if inventory is to be located across >1 datum element'
        ,'Y_OR_N'
        ,'VARCHAR2'
        ,'N'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'SDOSURKEY');
+                   WHERE HOL_ID = 'MULTINVRTE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'XMLCRENODE'
+       ,'NET'
+       ,'Create node from XML Datums'
+       ,'Should the system automaticall created nodes when datums are loaded via the XMl Datums loader.'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'XMLCRENODE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'INVRTETAB'
+       ,'NET'
+       ,'Show Route Tab in Inv Form'
+       ,'If set to Y the default tab in the Inventory form will be Route.'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'INVRTETAB');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'SHOWINVPK'
+       ,'NET'
+       ,'Show Primary Key in Inv Form'
+       ,'If set to Y the primary key will always be visible on the Inventory form, if N then the PK will only be visible if it is a flexible attribute.'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'SHOWINVPK');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'REVLEGNO'
+       ,'NET'
+       ,'Reverse Leg Nos on Route Rev'
+       ,'Reverse Leg Nos on node usage records when reversing a route Reverse Leg Nos on node usage records when reversing a route. "Y" means that the Leg Number is reversed, otherwise it will be left as is'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'REVLEGNO');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'INVAPIPACK'
+       ,'NET'
+       ,'Create API pack. for inv type'
+       ,'If this is "Y", then when the inventory views are recreated for a particular inventory type, then there will be a package called nm3api_inv_xxxx created which will have API calls in as wrappers to the nm3api_inv procedures'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'INVAPIPACK');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'INVROUTEVW'
+       ,'NET'
+       ,'Create inv on route views'
+       ,'If this is "Y", then when the inventory views are recreated for a particular inventory type, then there will be a view created called v_nm_xxxx_on_route created which will show inventory relative to a temporary network extent'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'INVROUTEVW');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'SDERUNLE'
+       ,'NET'
+       ,'Run Loadevents from server.'
+       ,'If this is "Y", then when the create_sde_inv_shape_table and the process_membership_changes (nm3inv_sde) procedures are executed the SDE loadevents program will be run from the server. No batch files will be created'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'SDERUNLE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'MRGAUTYPE'
+       ,'NET'
+       ,'AU Type for Merge Security'
+       ,'This is the AU Type which is used for Merge Results Security'
+       ,''
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'MRGAUTYPE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'SDEBATDIR'
+       ,'NET'
+       ,'Create loadevents batch files.'
+       ,'Indicates the directory in which to create  The loadevents batch files'
+       ,''
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'SDEBATDIR');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'PREFLRM'
+       ,'NET'
+       ,'Preferred LRM'
+       ,'This is the group type of the preferred linear referencing method; this only takes effect if you have more than one LRM'
+       ,''
+       ,'VARCHAR2'
+       ,'N'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'PREFLRM');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'DISPWDVIS'
+       ,'NET'
+       ,'Discoverer Password Visible'
+       ,'If this is "Y", then the password will be visible when calling Discoverer on the web.'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'DISPWDVIS');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'USEINVXSP'
+       ,'NET'
+       ,'Use Inventory XSP'
+       ,'Y - YES N - NO'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'USEINVXSP');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'MRGPOE'
+       ,'NET'
+       ,'Split Merge Results at POE'
+       ,'A value of "Y" means that merge query results will be split at any discontinuities (POEs) on the route'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'MRGPOE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'MRGROUTE'
+       ,'NET'
+       ,'Split Merge Results by route'
+       ,'A value of "Y" means that merge query results will be split at any change of route'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'MRGROUTE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'CHECKROUTE'
+       ,'NET'
+       ,'Use route checks'
+       ,'Check network connectivity when new elements are created.'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'CHECKROUTE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'UTLFILEDIR'
+       ,'NET'
+       ,'UTL File Directory'
+       ,'Directory where PL/SQL will read/write flat files'
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'UTLFILEDIR');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'PBIPOE'
+       ,'NET'
+       ,'Split PBI Results at POE'
+       ,'A value of "Y" means that PBI query results will be split at any discontinuities (POEs) on the route'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'PBIPOE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'MAPCAPTURE'
+       ,'NET'
+       ,'Is MapCapture Used'
+       ,'Set this option to "Y" if this system uses MapCapture'||CHR(10)||'This will enable the inventory views required for MapCapture to be generated whenever the normal inventory views are created'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'MAPCAPTURE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'SHOWRTEDIR'
+       ,'NET'
+       ,'Show Route Direction'
+       ,'Determines whether route direction is displayed.'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'SHOWRTEDIR');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'DEFITEMTYP'
+       ,'NET'
+       ,'Default Reference Item Type'
+       ,'Default reference item type for Assets on a Route.'
+       ,''
+       ,'VARCHAR2'
+       ,'N'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'DEFITEMTYP');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'INH_PAR_AU'
+       ,'NET'
+       ,'Inherit AU in reclassify'
+       ,'If this is set to "Y" then upon reclassification of a route, the admin unit of the datum elements in that route inherit the AU of the parent'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'INH_PAR_AU');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'DISAMBIGSC'
+       ,'NET'
+       ,'Display Ambig Sub Class'
+       ,'Should Ambig sub class be displayed'
+       ,''
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'DISAMBIGSC');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'GISGRPTYPE'
+       ,'NET'
+       ,'GIS Road Group Type'
+       ,'The type of road group created by the GIS'
+       ,''
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'GISGRPTYPE');
 --
 INSERT INTO HIG_OPTION_LIST
        (HOL_ID
@@ -32970,72 +33120,6 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'HIG_ST_CSS'
-       ,'HIG'
-       ,'URL for static CSS'
-       ,'If the organisation has a static style sheet (i.e. not accessed from within the oracle server) then set this option so that it is used (for example in mail messages)'
-       ,''
-       ,'VARCHAR2'
-       ,'Y'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'HIG_ST_CSS');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'SAV_FORMAT'
-       ,'NET'
-       ,'Export Format'
-       ,'Default export format'
-       ,'SAV_FORMAT'
-       ,'VARCHAR2'
-       ,'N'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'SAV_FORMAT');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'DEFASSTYPE'
-       ,'NET'
-       ,'Default Asset Search'
-       ,'Default asset type to search for'
-       ,''
-       ,'VARCHAR2'
-       ,'N'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'DEFASSTYPE');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
         'SDODEFNTH'
        ,'WMP'
        ,'SDO DEFECT Theme ID'
@@ -33080,50 +33164,6 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
-        'FAVMODE'
-       ,'HIG'
-       ,'Favourite Mode'
-       ,'Determines the default starting tab for the user'
-       ,'LAUNCHPAD_MODE'
-       ,'VARCHAR2'
-       ,'N'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'FAVMODE');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'MRGVIEWTRU'
-       ,'NET'
-       ,'Merge Views Include True'
-       ,'If this is set to "Y" then the TRUE distance along the OFFSET_NE_ID for the start and end of each merge chunk will be included on the merge views'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'MRGVIEWTRU');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
         'WEBMAPBUFR'
        ,'WMP'
        ,'MSV Buffer Colour'
@@ -33134,28 +33174,6 @@ SELECT
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'WEBMAPBUFR');
---
-INSERT INTO HIG_OPTION_LIST
-       (HOL_ID
-       ,HOL_PRODUCT
-       ,HOL_NAME
-       ,HOL_REMARKS
-       ,HOL_DOMAIN
-       ,HOL_DATATYPE
-       ,HOL_MIXED_CASE
-       ,HOL_USER_OPTION
-       )
-SELECT 
-        'FAVURL'
-       ,'HIG'
-       ,'URL displayed in HIG1807'
-       ,'URL displayed in HIG1807'
-       ,''
-       ,'VARCHAR2'
-       ,'Y'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'FAVURL');
 --
 INSERT INTO HIG_OPTION_LIST
        (HOL_ID
@@ -33179,6 +33197,72 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'SDOFETBUFF');
 --
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'WEBMAPSERV'
+       ,'WMP'
+       ,'Web Map Server'
+       ,'The URL for the web map server'
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'WEBMAPSERV');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'SDOCLIPTYP'
+       ,'WMP'
+       ,'Clipping Algorithm'
+       ,'Clipping Algorithm - set to SDO by default'
+       ,''
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'SDOCLIPTYP');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'WEBMAPPRDS'
+       ,'WMP'
+       ,'Preferred Data Source'
+       ,'Preferred Data Source'
+       ,''
+       ,'VARCHAR2'
+       ,'N'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'WEBMAPPRDS');
+--
 --
 --********** HIG_OPTION_VALUES **********--
 SET TERM ON
@@ -33187,270 +33271,10 @@ SET TERM OFF
 --
 -- Columns
 -- HOV_ID                         NOT NULL VARCHAR2(10)
---   HOV_HOL_FK (Pos 1)
 --   HOV_PK (Pos 1)
+--   HOV_HOL_FK (Pos 1)
 -- HOV_VALUE                      NOT NULL VARCHAR2(100)
 --
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'USRPROFILE'
-       ,'DEFAULT' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'USRPROFILE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'USRQUOTA'
-       ,'10M' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'USRQUOTA');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'WEEKEND'
-       ,'1,7' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'WEEKEND');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'RMMSFLAG'
-       ,'3' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'RMMSFLAG');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'HIGGISAVLB'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'HIGGISAVLB');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DEFREPTYPE'
-       ,'REPT' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DEFREPTYPE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DIRREPSTRN'
-       ,'/' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DIRREPSTRN');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'GRILSTNAME'
-       ,'LSTNER' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'GRILSTNAME');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'HIGGISTYPE'
-       ,'DDE' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'HIGGISTYPE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'GRIDATE'
-       ,'DD-MON-YYYY' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'GRIDATE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'HIGPUBSYN'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'HIGPUBSYN');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'GISGRPTYPE'
-       ,'GIS' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'GISGRPTYPE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'HIGUSEIMAG'
-       ,'FALSE' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'HIGUSEIMAG');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'BATMAXPRN'
-       ,'50' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'BATMAXPRN');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'NETINVCODE'
-       ,'RD' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'NETINVCODE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'NETUSELRS'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'NETUSELRS');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DEFUNITID'
-       ,'1' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DEFUNITID');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'JPRIVLEVEL'
-       ,'R' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'JPRIVLEVEL');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'FAVURL'
-       ,'http://www.exorcorp.com' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'FAVURL');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'SDOFETBUFF'
-       ,'200' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SDOFETBUFF');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'SDOCLIPTYP'
-       ,'SDO' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SDOCLIPTYP');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DISAMBIGSC'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DISAMBIGSC');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'SDODEFTOL'
-       ,'0.005' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SDODEFTOL');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'REPURL'
-       ,'javascript:message("Product option REPURL not set, please contact your system admin");' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'REPURL');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'NOT_6I_REP'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'NOT_6I_REP');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'UPDRDONLY'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'UPDRDONLY');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
@@ -33461,326 +33285,6 @@ SELECT
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
                    WHERE HOV_ID = 'ALLOWDEBUG');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'PCOMMIT'
-       ,'1000' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'PCOMMIT');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'USEINVXSP'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'USEINVXSP');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'MRGPOE'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'MRGPOE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'MRGROUTE'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'MRGROUTE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'CHECKROUTE'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'CHECKROUTE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'SHAPE_TAB'
-       ,'SHAPES' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SHAPE_TAB');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'SQLLDR_EXE'
-       ,'sqlldr' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SQLLDR_EXE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'REVLEGNO'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'REVLEGNO');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'UTLFILEDIR'
-       ,'C:\' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'UTLFILEDIR');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DBWINTITLE'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DBWINTITLE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'PBIPOE'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'PBIPOE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'INVVIEWSLK'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'INVVIEWSLK');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'MAPCAPTURE'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'MAPCAPTURE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DISWEBHOST'
-       ,'http://www.<host_not_set>.com/' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DISWEBHOST');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DISWEBPATH'
-       ,'infomgr/Discwb33/html/english/ms_ie/start_ie.htm' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DISWEBPATH');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DISBRNDIMG'
-       ,'http://www.<host_not_set>.com/logo.gif' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DISBRNDIMG');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DISCO_MODE'
-       ,'WEB' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DISCO_MODE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DISFRMSTYL'
-       ,'separate' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DISFRMSTYL');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DISWINWDTH'
-       ,'1026' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DISWINWDTH');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DISWINHGHT'
-       ,'764' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DISWINHGHT');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'SHOWRTEDIR'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SHOWRTEDIR');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DEFAORDPI'
-       ,'100' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DEFAORDPI');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'INH_PAR_AU'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'INH_PAR_AU');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'GRIJOBPRM'
-       ,'GRP_JOB_ID' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'GRIJOBPRM');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'SMTPSERVER'
-       ,'###enter your SMTP Server###' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SMTPSERVER');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'SMTPDOMAIN'
-       ,'###enter your Domain###' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SMTPDOMAIN');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'SMTPPORT'
-       ,'25' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SMTPPORT');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'NM3WEBHOST'
-       ,'http://www.<host_not_set>.com/' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'NM3WEBHOST');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'NM3WEBPATH'
-       ,'pls/<DAD name not set>' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'NM3WEBPATH');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'MULTINVRTE'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'MULTINVRTE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'XMLCRENODE'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'XMLCRENODE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'NM3WEBCSS'
-       ,'nm3web.process_download?pi_name=exor.css' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'NM3WEBCSS');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
@@ -33807,16 +33311,6 @@ INSERT INTO HIG_OPTION_VALUES
        ,HOV_VALUE
        )
 SELECT 
-        'IDWINTITLE'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'IDWINTITLE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
         'ATTRLSTSEP'
        ,', ' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33827,30 +33321,360 @@ INSERT INTO HIG_OPTION_VALUES
        ,HOV_VALUE
        )
 SELECT 
-        'INVRTETAB'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'INVRTETAB');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'SQLLDR_ERR'
+        'BATMAXPRN'
        ,'50' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SQLLDR_ERR');
+                   WHERE HOV_ID = 'BATMAXPRN');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
 SELECT 
-        'SHOWINVPK'
+        'BROWSERPTH'
+       ,'"C:\Program Files\Internet Explorer\IEXPLORE.EXE"' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'BROWSERPTH');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'CHECKROUTE'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SHOWINVPK');
+                   WHERE HOV_ID = 'CHECKROUTE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DBWINTITLE'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DBWINTITLE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DCDEXPATH'
+       ,'E:\UTL_FILE\' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DCDEXPATH');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DEBUGAUTON'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DEBUGAUTON');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DEFAORDPI'
+       ,'100' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DEFAORDPI');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DEFREPTYPE'
+       ,'REPT' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DEFREPTYPE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DEFUNITID'
+       ,'1' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DEFUNITID');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DIRREPSTRN'
+       ,'/' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DIRREPSTRN');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DISAMBIGSC'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DISAMBIGSC');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DISBRNDIMG'
+       ,'http://www.<host_not_set>.com/logo.gif' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DISBRNDIMG');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DISCO_MODE'
+       ,'WEB' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DISCO_MODE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DISCO_VERS'
+       ,'4' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DISCO_VERS');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DISFRMSTYL'
+       ,'separate' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DISFRMSTYL');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DISPWDVIS'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DISPWDVIS');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DISWEBHOST'
+       ,'http://www.<host_not_set>.com/' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DISWEBHOST');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DISWEBPATH'
+       ,'infomgr/Discwb33/html/english/ms_ie/start_ie.htm' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DISWEBPATH');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DISWINHGHT'
+       ,'764' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DISWINHGHT');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DISWINWDTH'
+       ,'1026' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DISWINWDTH');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'EXTRTEDATE'
+       ,'3' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'EXTRTEDATE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'FAVURL'
+       ,'http://www.exorcorp.com' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'FAVURL');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'GAZMODE'
+       ,'STANDARD' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'GAZMODE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'GISGRPTYPE'
+       ,'GIS' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'GISGRPTYPE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'GRIDATE'
+       ,'DD-MON-YYYY' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'GRIDATE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'GRIJOBPRM'
+       ,'GRP_JOB_ID' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'GRIJOBPRM');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'GRILSTNAME'
+       ,'LSTNER' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'GRILSTNAME');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'HIGGISAVLB'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'HIGGISAVLB');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'HIGGISTYPE'
+       ,'DDE' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'HIGGISTYPE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'HIGPUBSYN'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'HIGPUBSYN');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'HIGUSEIMAG'
+       ,'FALSE' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'HIGUSEIMAG');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'HIGWINTITL'
+       ,'ADMIN INSTANCE' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'HIGWINTITL');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'HTMLHLPST'
+       ,'/hig/webhelp/hig.htm' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'HTMLHLPST');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'HTML_BASE'
+       ,'http://www.<host_not_set>.com/webhelp' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'HTML_BASE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'IDWINTITLE'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'IDWINTITLE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'INH_PAR_AU'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'INH_PAR_AU');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
@@ -33877,90 +33701,30 @@ INSERT INTO HIG_OPTION_VALUES
        ,HOV_VALUE
        )
 SELECT 
-        'SDERUNLE'
-       ,'Y' FROM DUAL
+        'INVRTETAB'
+       ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SDERUNLE');
+                   WHERE HOV_ID = 'INVRTETAB');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
 SELECT 
-        'SDEBATDIR'
-       ,'Y' FROM DUAL
+        'INVVIEWSLK'
+       ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SDEBATDIR');
+                   WHERE HOV_ID = 'INVVIEWSLK');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
 SELECT 
-        'BROWSERPTH'
-       ,'"C:\Program Files\Internet Explorer\IEXPLORE.EXE"' FROM DUAL
+        'JPRIVLEVEL'
+       ,'R' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'BROWSERPTH');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DISCO_VERS'
-       ,'4' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DISCO_VERS');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DISPWDVIS'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DISPWDVIS');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'WEBDOCPATH'
-       ,'docs' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'WEBDOCPATH');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DEBUGAUTON'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DEBUGAUTON');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'EXTRTEDATE'
-       ,'3' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'EXTRTEDATE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'RPRTSTYLE'
-       ,'EXOR_DEFAULT' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'RPRTSTYLE');
+                   WHERE HOV_ID = 'JPRIVLEVEL');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
@@ -33977,40 +33741,10 @@ INSERT INTO HIG_OPTION_VALUES
        ,HOV_VALUE
        )
 SELECT 
-        'SDOSINGSHP'
+        'MAPCAPTURE'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SDOSINGSHP');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'SDODATEVW'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SDODATEVW');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'REGSDELAY'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'REGSDELAY');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'HIGWINTITL'
-       ,'ADMIN INSTANCE' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'HIGWINTITL');
+                   WHERE HOV_ID = 'MAPCAPTURE');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
@@ -34027,20 +33761,430 @@ INSERT INTO HIG_OPTION_VALUES
        ,HOV_VALUE
        )
 SELECT 
-        'WEBMENUMOD'
-       ,'NMWEB0000' FROM DUAL
+        'MRGPOE'
+       ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'WEBMENUMOD');
+                   WHERE HOV_ID = 'MRGPOE');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
 SELECT 
-        'WEBTOPIMG'
-       ,'docs/exor_small.gif' FROM DUAL
+        'MRGROUTE'
+       ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'WEBTOPIMG');
+                   WHERE HOV_ID = 'MRGROUTE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'MRGVIEWTRU'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'MRGVIEWTRU');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'MULTINVRTE'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'MULTINVRTE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'NETINVCODE'
+       ,'RD' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'NETINVCODE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'NETUSELRS'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'NETUSELRS');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'NM3WEBCSS'
+       ,'nm3web.process_download?pi_name=exor.css' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'NM3WEBCSS');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'NM3WEBHOST'
+       ,'http://www.<host_not_set>.com/' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'NM3WEBHOST');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'NM3WEBPATH'
+       ,'pls/<DAD name not set>' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'NM3WEBPATH');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'NOT_6I_REP'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'NOT_6I_REP');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'NSGDATA'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'NSGDATA');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'PBIPOE'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'PBIPOE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'PCOMMIT'
+       ,'1000' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'PCOMMIT');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'REGSDELAY'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'REGSDELAY');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'REPURL'
+       ,'javascript:message("Product option REPURL not set, please contact your system admin");' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'REPURL');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'REVLEGNO'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'REVLEGNO');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'RMMSFLAG'
+       ,'3' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'RMMSFLAG');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'RPRTSTYLE'
+       ,'EXOR_DEFAULT' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'RPRTSTYLE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SDEBATDIR'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SDEBATDIR');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SDERUNLE'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SDERUNLE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SDMREGULYR'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SDMREGULYR');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SDOCLIPTYP'
+       ,'SDO' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SDOCLIPTYP');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SDODATEVW'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SDODATEVW');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SDODEFTOL'
+       ,'0.005' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SDODEFTOL');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SDOFETBUFF'
+       ,'200' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SDOFETBUFF');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SDOSINGSHP'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SDOSINGSHP');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SDOSURKEY'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SDOSURKEY');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SHAPE_TAB'
+       ,'SHAPES' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SHAPE_TAB');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SHOWINVPK'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SHOWINVPK');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SHOWRTEDIR'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SHOWRTEDIR');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SMTPAUDTIT'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SMTPAUDTIT');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SMTPDOMAIN'
+       ,'###enter your Domain###' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SMTPDOMAIN');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SMTPPORT'
+       ,'25' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SMTPPORT');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SMTPSERVER'
+       ,'###enter your SMTP Server###' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SMTPSERVER');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SQLLDR_ERR'
+       ,'50' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SQLLDR_ERR');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SQLLDR_EXE'
+       ,'sqlldr' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SQLLDR_EXE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'UPDRDONLY'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'UPDRDONLY');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'USEINVXSP'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'USEINVXSP');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'USRPROFILE'
+       ,'DEFAULT' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'USRPROFILE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'USRQUOTA'
+       ,'10M' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'USRQUOTA');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'USRTBLSPCE'
+       ,'HIGHWAYS' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'USRTBLSPCE');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'UTLFILEDIR'
+       ,'C:\' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'UTLFILEDIR');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'WEBDOCPATH'
+       ,'docs' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'WEBDOCPATH');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
@@ -34067,100 +34211,40 @@ INSERT INTO HIG_OPTION_VALUES
        ,HOV_VALUE
        )
 SELECT 
-        'NSGDATA'
+        'WEBMENUMOD'
+       ,'NMWEB0000' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'WEBMENUMOD');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'WEBTOPIMG'
+       ,'docs/exor_small.gif' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'WEBTOPIMG');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'WEEKEND'
+       ,'1,7' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'WEEKEND');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'XMLCRENODE'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'NSGDATA');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'DCDEXPATH'
-       ,'E:\UTL_FILE\' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'DCDEXPATH');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'HTML_BASE'
-       ,'http://www.<host_not_set>.com/webhelp' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'HTML_BASE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'HTMLHLPST'
-       ,'/hig/webhelp/hig.htm' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'HTMLHLPST');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'GAZMODE'
-       ,'STANDARD' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'GAZMODE');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'MRGVIEWTRU'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'MRGVIEWTRU');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'SDMREGULYR'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SDMREGULYR');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'SMTPAUDTIT'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SMTPAUDTIT');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'SDOSURKEY'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'SDOSURKEY');
---
-INSERT INTO HIG_OPTION_VALUES
-       (HOV_ID
-       ,HOV_VALUE
-       )
-SELECT 
-        'USRTBLSPCE'
-       ,'HIGHWAYS' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
-                   WHERE HOV_ID = 'USRTBLSPCE');
+                   WHERE HOV_ID = 'XMLCRENODE');
 --
 --
 --********** HIG_STATUS_DOMAINS **********--
@@ -34253,9 +34337,9 @@ SET TERM OFF
 --
 -- Columns
 -- HSC_DOMAIN_CODE                NOT NULL VARCHAR2(30)
---   HSC_FK_HSD (Pos 1)
 --   HSC_PK (Pos 1)
 --   HSC_UK1 (Pos 1)
+--   HSC_FK_HSD (Pos 1)
 -- HSC_STATUS_CODE                NOT NULL VARCHAR2(10)
 --   HSC_PK (Pos 2)
 -- HSC_STATUS_NAME                NOT NULL VARCHAR2(30)
@@ -34780,13 +34864,13 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_LAST_REBUILD_DATE
        )
 SELECT 
-        'DOC_ACTIONS'
-       ,'DAC_ID'
-       ,'DAC_ID_SEQ'
+        'DOCS'
+       ,'DOC_ID'
+       ,'DOC_ID_SEQ'
        ,null FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'DOC_ACTIONS'
-                    AND  HSA_COLUMN_NAME = 'DAC_ID');
+                   WHERE HSA_TABLE_NAME = 'DOCS'
+                    AND  HSA_COLUMN_NAME = 'DOC_ID');
 --
 INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        (HSA_TABLE_NAME
@@ -34795,13 +34879,13 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_LAST_REBUILD_DATE
        )
 SELECT 
-        'DOC_DAMAGE_COSTS'
-       ,'DDC_ID'
-       ,'DDC_ID_SEQ'
+        'DOC_ACTIONS'
+       ,'DAC_ID'
+       ,'DAC_ID_SEQ'
        ,null FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'DOC_DAMAGE_COSTS'
-                    AND  HSA_COLUMN_NAME = 'DDC_ID');
+                   WHERE HSA_TABLE_NAME = 'DOC_ACTIONS'
+                    AND  HSA_COLUMN_NAME = 'DAC_ID');
 --
 INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        (HSA_TABLE_NAME
@@ -34825,13 +34909,13 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_LAST_REBUILD_DATE
        )
 SELECT 
-        'DOC_LOCATIONS'
-       ,'DLC_ID'
-       ,'DLC_ID_SEQ'
+        'DOC_DAMAGE_COSTS'
+       ,'DDC_ID'
+       ,'DDC_ID_SEQ'
        ,null FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'DOC_LOCATIONS'
-                    AND  HSA_COLUMN_NAME = 'DLC_ID');
+                   WHERE HSA_TABLE_NAME = 'DOC_DAMAGE_COSTS'
+                    AND  HSA_COLUMN_NAME = 'DDC_ID');
 --
 INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        (HSA_TABLE_NAME
@@ -34840,13 +34924,13 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_LAST_REBUILD_DATE
        )
 SELECT 
-        'DOCS'
-       ,'DOC_ID'
-       ,'DOC_ID_SEQ'
+        'DOC_LOCATIONS'
+       ,'DLC_ID'
+       ,'DLC_ID_SEQ'
        ,null FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'DOCS'
-                    AND  HSA_COLUMN_NAME = 'DOC_ID');
+                   WHERE HSA_TABLE_NAME = 'DOC_LOCATIONS'
+                    AND  HSA_COLUMN_NAME = 'DLC_ID');
 --
 INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        (HSA_TABLE_NAME
@@ -34930,36 +35014,6 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_LAST_REBUILD_DATE
        )
 SELECT 
-        'NM_INV_TYPE_ATTRIB_BANDINGS'
-       ,'ITB_BANDING_ID'
-       ,'ITB_BANDING_ID_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_INV_TYPE_ATTRIB_BANDINGS'
-                    AND  HSA_COLUMN_NAME = 'ITB_BANDING_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
-        'NM_INV_TYPE_ATTRIB_BAND_DETS'
-       ,'ITD_BAND_SEQ'
-       ,'ITD_BAND_SEQ_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_INV_TYPE_ATTRIB_BAND_DETS'
-                    AND  HSA_COLUMN_NAME = 'ITD_BAND_SEQ');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
         'NM_ADMIN_UNITS_ALL'
        ,'NAU_ADMIN_UNIT'
        ,'NAU_ADMIN_UNIT_SEQ'
@@ -34967,6 +35021,51 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
                    WHERE HSA_TABLE_NAME = 'NM_ADMIN_UNITS_ALL'
                     AND  HSA_COLUMN_NAME = 'NAU_ADMIN_UNIT');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
+        'NM_AREA_LOCK'
+       ,'NAL_ID'
+       ,'NAL_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'NM_AREA_LOCK'
+                    AND  HSA_COLUMN_NAME = 'NAL_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
+        'NM_AUDIT_WHEN'
+       ,'NAW_ID'
+       ,'NAW_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'NM_AUDIT_WHEN'
+                    AND  HSA_COLUMN_NAME = 'NAW_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
+        'NM_AU_SUB_TYPES'
+       ,'NSTY_ID'
+       ,'NSTY_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'NM_AU_SUB_TYPES'
+                    AND  HSA_COLUMN_NAME = 'NSTY_ID');
 --
 INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        (HSA_TABLE_NAME
@@ -34990,21 +35089,6 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_LAST_REBUILD_DATE
        )
 SELECT 
-        'NM_EVENT_LOG'
-       ,'NEL_ID'
-       ,'NEL_ID_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_EVENT_LOG'
-                    AND  HSA_COLUMN_NAME = 'NEL_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
         'NM_ELEMENTS_ALL'
        ,'NE_ID'
        ,'NE_ID_SEQ'
@@ -35020,6 +35104,21 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_LAST_REBUILD_DATE
        )
 SELECT 
+        'NM_EVENT_LOG'
+       ,'NEL_ID'
+       ,'NEL_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'NM_EVENT_LOG'
+                    AND  HSA_COLUMN_NAME = 'NEL_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
         'NM_INV_ITEMS_ALL'
        ,'IIT_NE_ID'
        ,'NE_ID_SEQ'
@@ -35027,6 +35126,36 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
                    WHERE HSA_TABLE_NAME = 'NM_INV_ITEMS_ALL'
                     AND  HSA_COLUMN_NAME = 'IIT_NE_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
+        'NM_INV_TYPE_ATTRIB_BANDINGS'
+       ,'ITB_BANDING_ID'
+       ,'ITB_BANDING_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'NM_INV_TYPE_ATTRIB_BANDINGS'
+                    AND  HSA_COLUMN_NAME = 'ITB_BANDING_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
+        'NM_INV_TYPE_ATTRIB_BAND_DETS'
+       ,'ITD_BAND_SEQ'
+       ,'ITD_BAND_SEQ_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'NM_INV_TYPE_ATTRIB_BAND_DETS'
+                    AND  HSA_COLUMN_NAME = 'ITD_BAND_SEQ');
 --
 INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        (HSA_TABLE_NAME
@@ -35065,6 +35194,36 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_LAST_REBUILD_DATE
        )
 SELECT 
+        'NM_LAYERS'
+       ,'NL_LAYER_ID'
+       ,'NL_LAYER_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'NM_LAYERS'
+                    AND  HSA_COLUMN_NAME = 'NL_LAYER_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
+        'NM_LAYER_SETS'
+       ,'NLS_SET_ID'
+       ,'NLS_SET_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'NM_LAYER_SETS'
+                    AND  HSA_COLUMN_NAME = 'NLS_SET_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
         'NM_LOAD_DESTINATIONS'
        ,'NLD_ID'
        ,'NLD_ID_SEQ'
@@ -35095,51 +35254,6 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_LAST_REBUILD_DATE
        )
 SELECT 
-        'NM_LAYER_SETS'
-       ,'NLS_SET_ID'
-       ,'NLS_SET_ID_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_LAYER_SETS'
-                    AND  HSA_COLUMN_NAME = 'NLS_SET_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
-        'NM_LAYERS'
-       ,'NL_LAYER_ID'
-       ,'NL_LAYER_ID_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_LAYERS'
-                    AND  HSA_COLUMN_NAME = 'NL_LAYER_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
-        'NM_MRG_OUTPUT_FILE'
-       ,'NMF_ID'
-       ,'NMF_ID_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_MRG_OUTPUT_FILE'
-                    AND  HSA_COLUMN_NAME = 'NMF_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
         'NM_MAIL_GROUPS'
        ,'NMG_ID'
        ,'NMG_ID_SEQ'
@@ -35147,21 +35261,6 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
                    WHERE HSA_TABLE_NAME = 'NM_MAIL_GROUPS'
                     AND  HSA_COLUMN_NAME = 'NMG_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
-        'NM_MAIL_MESSAGE_TEXT'
-       ,'NMMT_LINE_ID'
-       ,'NMMT_LINE_ID_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_MAIL_MESSAGE_TEXT'
-                    AND  HSA_COLUMN_NAME = 'NMMT_LINE_ID');
 --
 INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        (HSA_TABLE_NAME
@@ -35185,13 +35284,13 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_LAST_REBUILD_DATE
        )
 SELECT 
-        'NM_MRG_QUERY_ALL'
-       ,'NMQ_ID'
-       ,'NMQ_ID_SEQ'
+        'NM_MAIL_MESSAGE_TEXT'
+       ,'NMMT_LINE_ID'
+       ,'NMMT_LINE_ID_SEQ'
        ,null FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_MRG_QUERY_ALL'
-                    AND  HSA_COLUMN_NAME = 'NMQ_ID');
+                   WHERE HSA_TABLE_NAME = 'NM_MAIL_MESSAGE_TEXT'
+                    AND  HSA_COLUMN_NAME = 'NMMT_LINE_ID');
 --
 INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        (HSA_TABLE_NAME
@@ -35215,51 +35314,6 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_LAST_REBUILD_DATE
        )
 SELECT 
-        'NM_NODES_ALL'
-       ,'NO_NODE_ID'
-       ,'NO_NODE_ID_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_NODES_ALL'
-                    AND  HSA_COLUMN_NAME = 'NO_NODE_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
-        'NM_PBI_QUERY'
-       ,'NPQ_ID'
-       ,'NPQ_ID_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_PBI_QUERY'
-                    AND  HSA_COLUMN_NAME = 'NPQ_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
-        'NM_POINTS'
-       ,'NP_ID'
-       ,'NP_ID_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_POINTS'
-                    AND  HSA_COLUMN_NAME = 'NP_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
         'NM_MRG_CLASSES'
        ,'NQC_ID'
        ,'NQC_ID_SEQ'
@@ -35267,6 +35321,36 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
                    WHERE HSA_TABLE_NAME = 'NM_MRG_CLASSES'
                     AND  HSA_COLUMN_NAME = 'NQC_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
+        'NM_MRG_OUTPUT_FILE'
+       ,'NMF_ID'
+       ,'NMF_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'NM_MRG_OUTPUT_FILE'
+                    AND  HSA_COLUMN_NAME = 'NMF_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
+        'NM_MRG_QUERY_ALL'
+       ,'NMQ_ID'
+       ,'NMQ_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'NM_MRG_QUERY_ALL'
+                    AND  HSA_COLUMN_NAME = 'NMQ_ID');
 --
 INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        (HSA_TABLE_NAME
@@ -35290,6 +35374,51 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_LAST_REBUILD_DATE
        )
 SELECT 
+        'NM_NODES_ALL'
+       ,'NO_NODE_ID'
+       ,'NO_NODE_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'NM_NODES_ALL'
+                    AND  HSA_COLUMN_NAME = 'NO_NODE_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
+        'NM_NSG_EXPORT'
+       ,'NXP_ID'
+       ,'NXP_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'NM_NSG_EXPORT'
+                    AND  HSA_COLUMN_NAME = 'NXP_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
+        'NM_PBI_QUERY'
+       ,'NPQ_ID'
+       ,'NPQ_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'NM_PBI_QUERY'
+                    AND  HSA_COLUMN_NAME = 'NPQ_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
         'NM_PBI_QUERY_TYPES'
        ,'NQT_SEQ_NO'
        ,'NQT_SEQ_NO_SEQ'
@@ -35297,6 +35426,36 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
                    WHERE HSA_TABLE_NAME = 'NM_PBI_QUERY_TYPES'
                     AND  HSA_COLUMN_NAME = 'NQT_SEQ_NO');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
+        'NM_POINTS'
+       ,'NP_ID'
+       ,'NP_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'NM_POINTS'
+                    AND  HSA_COLUMN_NAME = 'NP_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
+        'NM_PROGRESS'
+       ,'PRG_PROGRESS_ID'
+       ,'PRG_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'NM_PROGRESS'
+                    AND  HSA_COLUMN_NAME = 'PRG_PROGRESS_ID');
 --
 INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        (HSA_TABLE_NAME
@@ -35335,13 +35494,13 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_LAST_REBUILD_DATE
        )
 SELECT 
-        'NM_X_INV_CONDITIONS'
-       ,'NXIC_ID'
-       ,'NXIC_ID_SEQ'
+        'NM_UNITS'
+       ,'UN_UNIT_ID'
+       ,'UN_UNIT_ID_SEQ'
        ,null FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_X_INV_CONDITIONS'
-                    AND  HSA_COLUMN_NAME = 'NXIC_ID');
+                   WHERE HSA_TABLE_NAME = 'NM_UNITS'
+                    AND  HSA_COLUMN_NAME = 'UN_UNIT_ID');
 --
 INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        (HSA_TABLE_NAME
@@ -35365,88 +35524,13 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_LAST_REBUILD_DATE
        )
 SELECT 
-        'NM_UNITS'
-       ,'UN_UNIT_ID'
-       ,'UN_UNIT_ID_SEQ'
+        'NM_X_INV_CONDITIONS'
+       ,'NXIC_ID'
+       ,'NXIC_ID_SEQ'
        ,null FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_UNITS'
-                    AND  HSA_COLUMN_NAME = 'UN_UNIT_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
-        'NM_AREA_LOCK'
-       ,'NAL_ID'
-       ,'NAL_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_AREA_LOCK'
-                    AND  HSA_COLUMN_NAME = 'NAL_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
-        'NM_PROGRESS'
-       ,'PRG_PROGRESS_ID'
-       ,'PRG_ID_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_PROGRESS'
-                    AND  HSA_COLUMN_NAME = 'PRG_PROGRESS_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
-        'NM_NSG_EXPORT'
-       ,'NXP_ID'
-       ,'NXP_ID_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_NSG_EXPORT'
-                    AND  HSA_COLUMN_NAME = 'NXP_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
-        'NM_AU_SUB_TYPES'
-       ,'NSTY_ID'
-       ,'NSTY_ID_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_AU_SUB_TYPES'
-                    AND  HSA_COLUMN_NAME = 'NSTY_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
-        'NM_AUDIT_WHEN'
-       ,'NAW_ID'
-       ,'NAW_ID_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'NM_AUDIT_WHEN'
-                    AND  HSA_COLUMN_NAME = 'NAW_ID');
+                   WHERE HSA_TABLE_NAME = 'NM_X_INV_CONDITIONS'
+                    AND  HSA_COLUMN_NAME = 'NXIC_ID');
 --
 --
 --********** HIG_CHECK_CONSTRAINT_ASSOCS **********--
@@ -35465,1182 +35549,6 @@ SET TERM OFF
 -- HCCA_NER_ID                    NOT NULL NUMBER(4)
 --   HCCA_NER_FK (Pos 2)
 --
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'DCL_END_DATE_TCHK'
-       ,'DOC_CLASS'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'DCL_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'DCL_START_DATE_TCHK'
-       ,'DOC_CLASS'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'DCL_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'DGT_END_DATE_TCHK'
-       ,'DOC_GATEWAYS'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'DGT_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'DGT_START_DATE_TCHK'
-       ,'DOC_GATEWAYS'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'DGT_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'DLC_END_DATE_TCHK'
-       ,'DOC_LOCATIONS'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'DLC_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'DLC_START_DATE_TCHK'
-       ,'DOC_LOCATIONS'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'DLC_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'DMD_END_DATE_TCHK'
-       ,'DOC_MEDIA'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'DMD_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'DMD_START_DATE_TCHK'
-       ,'DOC_MEDIA'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'DMD_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'DTP_END_DATE_TCHK'
-       ,'DOC_TYPES'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'DTP_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'DTP_START_DATE_TCHK'
-       ,'DOC_TYPES'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'DTP_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'HCCA_UPPERCASE_CHK'
-       ,'HIG_CHECK_CONSTRAINT_ASSOCS'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'HCCA_UPPERCASE_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'HCO_END_DATE_TCHK'
-       ,'HIG_CODES'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'HCO_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'HCO_START_DATE_TCHK'
-       ,'HIG_CODES'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'HCO_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'HCT_END_DATE_TCHK'
-       ,'HIG_CONTACTS'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'HCT_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'HCT_START_DATE_TCHK'
-       ,'HIG_CONTACTS'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'HCT_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'HSA_UPPERCASE_CHK'
-       ,'HIG_SEQUENCE_ASSOCIATIONS'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'HSA_UPPERCASE_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'HSC_END_DATE_TCHK'
-       ,'HIG_STATUS_CODES'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'HSC_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'HSC_START_DATE_TCHK'
-       ,'HIG_STATUS_CODES'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'HSC_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'HUS_END_DATE_TCHK'
-       ,'HIG_USERS'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'HUS_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'HUS_START_DATE_TCHK'
-       ,'HIG_USERS'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'HUS_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'HUR_START_DATE_TCHK'
-       ,'HIG_USER_ROLES'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'HUR_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NAU_END_DATE_TCHK'
-       ,'NM_ADMIN_UNITS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NAU_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NAU_START_DATE_TCHK'
-       ,'NM_ADMIN_UNITS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NAU_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NE_END_DATE_TCHK'
-       ,'NM_ELEMENTS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NE_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NE_START_DATE_TCHK'
-       ,'NM_ELEMENTS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NE_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NE_UNIQUE_UPPER_CHK'
-       ,'NM_ELEMENTS_ALL'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NE_UNIQUE_UPPER_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NET_UNIQUE_CHK'
-       ,'NM_EVENT_TYPES'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NET_UNIQUE_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NFP_ID_CHK'
-       ,'NM_FILL_PATTERNS'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NFP_ID_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NGR_END_DATE_TCHK'
-       ,'NM_GROUP_RELATIONS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NGR_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NGR_START_DATE_TCHK'
-       ,'NM_GROUP_RELATIONS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NGR_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NGT_END_DATE_TCHK'
-       ,'NM_GROUP_TYPES_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NGT_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NGT_GROUP_TYPE_UPPER_CHK'
-       ,'NM_GROUP_TYPES_ALL'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NGT_GROUP_TYPE_UPPER_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NGT_START_DATE_TCHK'
-       ,'NM_GROUP_TYPES_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NGT_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'IAL_END_DATE_TCHK'
-       ,'NM_INV_ATTRI_LOOKUP_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'IAL_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'IAL_START_DATE_TCHK'
-       ,'NM_INV_ATTRI_LOOKUP_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'IAL_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'ID_END_DATE_TCHK'
-       ,'NM_INV_DOMAINS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'ID_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'ID_START_DATE_TCHK'
-       ,'NM_INV_DOMAINS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'ID_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'IIT_END_DATE_TCHK'
-       ,'NM_INV_ITEMS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'IIT_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'IIT_START_DATE_TCHK'
-       ,'NM_INV_ITEMS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'IIT_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'IIG_END_DATE_TCHK'
-       ,'NM_INV_ITEM_GROUPINGS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'IIG_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'IIG_START_DATE_TCHK'
-       ,'NM_INV_ITEM_GROUPINGS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'IIG_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NIN_END_DATE_TCHK'
-       ,'NM_INV_NW_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NIN_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NIN_START_DATE_TCHK'
-       ,'NM_INV_NW_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NIN_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NIT_END_DATE_TCHK'
-       ,'NM_INV_TYPES_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NIT_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NIT_INV_TYPE_UPPER_CHK'
-       ,'NM_INV_TYPES_ALL'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NIT_INV_TYPE_UPPER_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NIT_START_DATE_TCHK'
-       ,'NM_INV_TYPES_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NIT_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'ITA_END_DATE_TCHK'
-       ,'NM_INV_TYPE_ATTRIBS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'ITA_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'ITA_START_DATE_TCHK'
-       ,'NM_INV_TYPE_ATTRIBS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'ITA_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'ITG_END_DATE_TCHK'
-       ,'NM_INV_TYPE_GROUPINGS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'ITG_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'ITG_START_DATE_TCHK'
-       ,'NM_INV_TYPE_GROUPINGS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'ITG_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NJC_UNIQUE_CHK'
-       ,'NM_JOB_CONTROL'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NJC_UNIQUE_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLD_TABLE_NAME_CHK'
-       ,'NM_LOAD_DESTINATIONS'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLD_TABLE_NAME_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLD_TABLE_SHORT_NAME_CHK'
-       ,'NM_LOAD_DESTINATIONS'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLD_TABLE_SHORT_NAME_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLDD_COLUMN_NAME_CHK'
-       ,'NM_LOAD_DESTINATION_DEFAULTS'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLDD_COLUMN_NAME_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLF_UNIQUE_CHK'
-       ,'NM_LOAD_FILES'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLF_UNIQUE_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLFC_HOLDING_COL_CHK'
-       ,'NM_LOAD_FILE_COLS'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLFC_HOLDING_COL_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NM_END_DATE_TCHK'
-       ,'NM_MEMBERS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NM_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NM_START_DATE_TCHK'
-       ,'NM_MEMBERS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NM_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMST_END_DATE_TCHK'
-       ,'NM_MEMBERS_SDE_TEMP'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMST_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMST_START_DATE_TCHK'
-       ,'NM_MEMBERS_SDE_TEMP'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMST_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMH_NM_END_DATE_TCHK'
-       ,'NM_MEMBER_HISTORY'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMH_NM_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMH_NM_START_DATE_TCHK'
-       ,'NM_MEMBER_HISTORY'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMH_NM_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NQC_NAME_CHK'
-       ,'NM_MRG_CLASSES'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NQC_NAME_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMC_VIEW_COL_NAME_CHK'
-       ,'NM_MRG_OUTPUT_COLS'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMC_VIEW_COL_NAME_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NO_END_DATE_TCHK'
-       ,'NM_NODES_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NO_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NO_START_DATE_TCHK'
-       ,'NM_NODES_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NO_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NNU_END_DATE_TCHK'
-       ,'NM_NODE_USAGES_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NNU_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NNU_START_DATE_TCHK'
-       ,'NM_NODE_USAGES_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NNU_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NNG_END_DATE_TCHK'
-       ,'NM_NT_GROUPINGS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NNG_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NNG_START_DATE_TCHK'
-       ,'NM_NT_GROUPINGS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NNG_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NS_END_DATE_TCHK'
-       ,'NM_SHAPES_1'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NS_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NS_START_DATE_TCHK'
-       ,'NM_SHAPES_1'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NS_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'TII_END_DATE_TCHK'
-       ,'NM_TEMP_INV_ITEMS'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'TII_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'TII_START_DATE_TCHK'
-       ,'NM_TEMP_INV_ITEMS'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'TII_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'TIM_END_DATE_TCHK'
-       ,'NM_TEMP_INV_MEMBERS'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'TIM_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'TIM_START_DATE_TCHK'
-       ,'NM_TEMP_INV_MEMBERS'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'TIM_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NT_TYPE_UPPER_CHK'
-       ,'NM_TYPES'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NT_TYPE_UPPER_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NTL_END_DATE_TCHK'
-       ,'NM_TYPE_LAYERS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NTL_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NTL_START_DATE_TCHK'
-       ,'NM_TYPE_LAYERS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NTL_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NSC_SUB_CLASS_UPPER_CHK'
-       ,'NM_TYPE_SUBCLASS'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NSC_SUB_CLASS_UPPER_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NUA_END_DATE_TCHK'
-       ,'NM_USER_AUS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NUA_END_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NUA_START_DATE_TCHK'
-       ,'NM_USER_AUS_ALL'
-       ,'HIG'
-       ,168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NUA_START_DATE_TCHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NVA_ID_CHK'
-       ,'NM_VISUAL_ATTRIBUTES'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NVA_ID_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NWX_X_SECT_UPPER_CHK'
-       ,'NM_XSP'
-       ,'HIG'
-       ,159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NWX_X_SECT_UPPER_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -37447,12 +36355,54 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'AVCON_3631_ITR_M_000'
+        'ITD_PK'
+       ,'NM_INV_TYPE_ATTRIB_BAND_DETS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'ITD_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NM_INV_TYPE_COLOURS_PK'
+       ,'NM_INV_TYPE_COLOURS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NM_INV_TYPE_COLOURS_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'ITG_PK'
+       ,'NM_INV_TYPE_GROUPINGS_ALL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'ITG_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'ITR_PK'
        ,'NM_INV_TYPE_ROLES'
        ,'HIG'
-       ,170 FROM DUAL
+       ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'AVCON_3631_ITR_M_000');
+                   WHERE HCCA_CONSTRAINT_NAME = 'ITR_PK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -37461,12 +36411,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'AVCON_3717_NUA_M_000'
-       ,'NM_USER_AUS_ALL'
+        'NJC_PK'
+       ,'NM_JOB_CONTROL'
        ,'HIG'
-       ,170 FROM DUAL
+       ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'AVCON_3717_NUA_M_000');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NJC_PK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -37475,12 +36425,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'HOL_DATATYPE_CHK'
-       ,'HIG_OPTION_LIST'
+        'NM_JOB_CONTROL_UK'
+       ,'NM_JOB_CONTROL'
        ,'HIG'
-       ,171 FROM DUAL
+       ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'HOL_DATATYPE_CHK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NM_JOB_CONTROL_UK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -37489,194 +36439,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'ID_DATATYPE_CHK'
-       ,'NM_INV_DOMAINS_ALL'
-       ,'HIG'
-       ,171 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'ID_DATATYPE_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'ITA_FORMAT_CHK'
-       ,'NM_INV_TYPE_ATTRIBS_ALL'
-       ,'HIG'
-       ,171 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'ITA_FORMAT_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLFC_DATATYPE_CHK'
-       ,'NM_LOAD_FILE_COLS'
-       ,'HIG'
-       ,171 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLFC_DATATYPE_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMC_DATA_TYPE_CHK'
-       ,'NM_MRG_OUTPUT_COLS'
-       ,'HIG'
-       ,171 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMC_DATA_TYPE_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NOD_DATA_TYPE_CHK'
-       ,'NM_OPERATION_DATA'
-       ,'HIG'
-       ,171 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NOD_DATA_TYPE_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLFC_VARCHAR_SIZE_CHK2'
-       ,'NM_LOAD_FILE_COLS'
-       ,'NET'
-       ,29 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLFC_VARCHAR_SIZE_CHK2');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NVA_BG_BLUE_CHK'
-       ,'NM_VISUAL_ATTRIBUTES'
-       ,'NET'
-       ,29 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NVA_BG_BLUE_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NVA_BG_GREEN_CHK'
-       ,'NM_VISUAL_ATTRIBUTES'
-       ,'NET'
-       ,29 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NVA_BG_GREEN_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NVA_BG_RED_CHK'
-       ,'NM_VISUAL_ATTRIBUTES'
-       ,'NET'
-       ,29 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NVA_BG_RED_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NVA_FG_BLUE_CHK'
-       ,'NM_VISUAL_ATTRIBUTES'
-       ,'NET'
-       ,29 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NVA_FG_BLUE_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NVA_FG_GREEN_CHK'
-       ,'NM_VISUAL_ATTRIBUTES'
-       ,'NET'
-       ,29 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NVA_FG_GREEN_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NVA_FG_RED_CHK'
-       ,'NM_VISUAL_ATTRIBUTES'
-       ,'NET'
-       ,29 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NVA_FG_RED_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NAC_COL_ID_INTEGER'
-       ,'NM_AUDIT_COLUMNS'
-       ,'HIG'
-       ,172 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NAC_COL_ID_INTEGER');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NJO_SEQ_CHK'
+        'NJO_PK'
        ,'NM_JOB_OPERATIONS'
        ,'HIG'
-       ,172 FROM DUAL
+       ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NJO_SEQ_CHK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NJO_PK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -37685,96 +36453,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NMC_DEC_PLACES_CHK4'
-       ,'NM_MRG_OUTPUT_COLS'
-       ,'HIG'
-       ,172 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMC_DEC_PLACES_CHK4');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NOD_SEQ_CHK'
-       ,'NM_OPERATION_DATA'
-       ,'HIG'
-       ,172 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NOD_SEQ_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMC_LENGTH_CHK'
-       ,'NM_MRG_OUTPUT_COLS'
-       ,'HIG'
-       ,173 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMC_LENGTH_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMC_SEQ_NO_CHK'
-       ,'NM_MRG_OUTPUT_COLS'
-       ,'HIG'
-       ,173 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMC_SEQ_NO_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NEA_SEVERITY_CHK'
-       ,'NM_EVENT_ALERT_MAILS'
-       ,'HIG'
-       ,174 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NEA_SEVERITY_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NEL_SEVERITY_CHK'
-       ,'NM_EVENT_LOG'
-       ,'HIG'
-       ,174 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NEL_SEVERITY_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NJO_BEGIN_MP_CHK'
+        'NJO_UK'
        ,'NM_JOB_OPERATIONS'
        ,'HIG'
-       ,174 FROM DUAL
+       ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NJO_BEGIN_MP_CHK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NJO_UK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -37783,12 +36467,194 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NLFC_SEQ_NO_CHK'
+        'NJV_PK'
+       ,'NM_JOB_OPERATION_DATA_VALUES'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NJV_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NJT_PK'
+       ,'NM_JOB_TYPES'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NJT_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'JTO_PK'
+       ,'NM_JOB_TYPES_OPERATIONS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'JTO_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NL_PK'
+       ,'NM_LAYERS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NL_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLS_PK'
+       ,'NM_LAYER_SETS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLS_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLB_PK'
+       ,'NM_LOAD_BATCHES'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLB_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLBS_PK'
+       ,'NM_LOAD_BATCH_STATUS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLBS_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLD_PK'
+       ,'NM_LOAD_DESTINATIONS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLD_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLD_UK1'
+       ,'NM_LOAD_DESTINATIONS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLD_UK1');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLD_UK2'
+       ,'NM_LOAD_DESTINATIONS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLD_UK2');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLDD_PK'
+       ,'NM_LOAD_DESTINATION_DEFAULTS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLDD_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLF_PK'
+       ,'NM_LOAD_FILES'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLF_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLF_UK'
+       ,'NM_LOAD_FILES'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLF_UK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLFC_PK'
        ,'NM_LOAD_FILE_COLS'
        ,'HIG'
-       ,174 FROM DUAL
+       ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLFC_SEQ_NO_CHK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLFC_PK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -37797,12 +36663,264 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NMC_DEC_PLACES_CHK3'
+        'NLFC_UK'
+       ,'NM_LOAD_FILE_COLS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLFC_UK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLCD_PK'
+       ,'NM_LOAD_FILE_COL_DESTINATIONS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLCD_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLCD_UK'
+       ,'NM_LOAD_FILE_COL_DESTINATIONS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLCD_UK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLFD_PK'
+       ,'NM_LOAD_FILE_DESTINATIONS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLFD_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLFD_UK'
+       ,'NM_LOAD_FILE_DESTINATIONS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLFD_UK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMG_PK'
+       ,'NM_MAIL_GROUPS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMG_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMGM_PK'
+       ,'NM_MAIL_GROUP_MEMBERSHIP'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMGM_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMM_PK'
+       ,'NM_MAIL_MESSAGE'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMM_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMMR_PK'
+       ,'NM_MAIL_MESSAGE_RECIPIENTS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMMR_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMMT_PK'
+       ,'NM_MAIL_MESSAGE_TEXT'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMMT_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMU_PK'
+       ,'NM_MAIL_USERS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMU_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NM_PK'
+       ,'NM_MEMBERS_ALL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NM_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMST_PK'
+       ,'NM_MEMBERS_SDE_TEMP'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMST_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMH_PK'
+       ,'NM_MEMBER_HISTORY'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMH_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NDQA_PK'
+       ,'NM_MRG_DEFAULT_QUERY_ATTRIBS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NDQA_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NDQT_PK'
+       ,'NM_MRG_DEFAULT_QUERY_TYPES_ALL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NDQT_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMID_PK'
+       ,'NM_MRG_INV_DERIVATION'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMID_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMM2_UK'
+       ,'NM_MRG_MEMBERS2'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMM2_UK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMC_PK'
        ,'NM_MRG_OUTPUT_COLS'
        ,'HIG'
-       ,174 FROM DUAL
+       ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMC_DEC_PLACES_CHK3');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMC_PK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -37811,12 +36929,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NGQA_BRACKET_CHK'
-       ,'NM_GAZ_QUERY_ATTRIBS'
+        'NMC_UK'
+       ,'NM_MRG_OUTPUT_COLS'
        ,'HIG'
-       ,175 FROM DUAL
+       ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NGQA_BRACKET_CHK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMC_UK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -37825,12 +36943,390 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NQA_BRACKET_CHK'
+        'NMCD_PK'
+       ,'NM_MRG_OUTPUT_COL_DECODE'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMCD_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMF_PK'
+       ,'NM_MRG_OUTPUT_FILE'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMF_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMF_UK'
+       ,'NM_MRG_OUTPUT_FILE'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMF_UK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMQ_PK'
+       ,'NM_MRG_QUERY_ALL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMQ_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMQ_UK'
+       ,'NM_MRG_QUERY_ALL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMQ_UK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMQA_PK'
+       ,'NM_MRG_QUERY_ATTRIBS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMQA_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMQR_PK'
+       ,'NM_MRG_QUERY_RESULTS_ALL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMQR_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMQRT2_PK'
+       ,'NM_MRG_QUERY_RESULTS_TEMP2'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMQRT2_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NQRO_PK'
+       ,'NM_MRG_QUERY_ROLES'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NQRO_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMQT_PK'
+       ,'NM_MRG_QUERY_TYPES_ALL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMQT_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NQU_PK'
+       ,'NM_MRG_QUERY_USERS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NQU_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMQV_PK'
+       ,'NM_MRG_QUERY_VALUES'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMQV_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMS_PK'
+       ,'NM_MRG_SECTIONS_ALL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMS_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMSIV_PK'
+       ,'NM_MRG_SECTION_INV_VALUES_ALL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMSIV_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMSM_PK'
+       ,'NM_MRG_SECTION_MEMBERS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMSM_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NN_PK'
+       ,'NM_NODES_ALL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NN_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NN_UK'
+       ,'NM_NODES_ALL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NN_UK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NNT_PK'
+       ,'NM_NODE_TYPES'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NNT_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NNU_PK'
+       ,'NM_NODE_USAGES_ALL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NNU_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NNG_PK'
+       ,'NM_NT_GROUPINGS_ALL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NNG_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NPE_PK'
+       ,'NM_NW_PERSISTENT_EXTENTS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NPE_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMO_PK'
+       ,'NM_OPERATIONS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMO_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NOD_PK'
+       ,'NM_OPERATION_DATA'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NOD_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NOD_UK'
+       ,'NM_OPERATION_DATA'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NOD_UK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NOD_SCRN_TEXT_UK'
+       ,'NM_OPERATION_DATA'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NOD_SCRN_TEXT_UK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NPQ_PK'
+       ,'NM_PBI_QUERY'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NPQ_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NPQ_UK'
+       ,'NM_PBI_QUERY'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NPQ_UK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NQA_PK'
        ,'NM_PBI_QUERY_ATTRIBS'
        ,'HIG'
-       ,175 FROM DUAL
+       ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NQA_BRACKET_CHK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NQA_PK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -37839,12 +37335,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NJC_NPE_JOB_ID_CHK'
-       ,'NM_JOB_CONTROL'
+        'NQR_PK'
+       ,'NM_PBI_QUERY_RESULTS'
        ,'HIG'
-       ,176 FROM DUAL
+       ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NJC_NPE_JOB_ID_CHK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NQR_PK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -37853,12 +37349,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NJC_STATUS_CHK'
-       ,'NM_JOB_CONTROL'
+        'NQT_PK'
+       ,'NM_PBI_QUERY_TYPES'
        ,'HIG'
-       ,176 FROM DUAL
+       ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NJC_STATUS_CHK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NQT_PK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -37867,12 +37363,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NJO_STATUS_CHK'
-       ,'NM_JOB_OPERATIONS'
+        'NQV_PK'
+       ,'NM_PBI_QUERY_VALUES'
        ,'HIG'
-       ,176 FROM DUAL
+       ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NJO_STATUS_CHK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NQV_PK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -37881,12 +37377,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'ITA_EXCL_MAND_CHECK'
-       ,'NM_INV_TYPE_ATTRIBS_ALL'
-       ,'NET'
-       ,332 FROM DUAL
+        'NPS_PK'
+       ,'NM_PBI_SECTIONS'
+       ,'HIG'
+       ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'ITA_EXCL_MAND_CHECK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NPS_PK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -37895,12 +37391,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'ITA_EXCL_TYPE_CHK'
-       ,'NM_INV_TYPE_ATTRIBS_ALL'
-       ,'NET'
-       ,333 FROM DUAL
+        'NPM_PK'
+       ,'NM_PBI_SECTION_MEMBERS'
+       ,'HIG'
+       ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'ITA_EXCL_TYPE_CHK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NPM_PK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -37909,54 +37405,264 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NT_DATUM_NODE_CHK'
+        'NP_PK'
+       ,'NM_POINTS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NP_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NRD_UK'
+       ,'NM_RECLASS_DETAILS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NRD_UK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NRD_PK'
+       ,'NM_RECLASS_DETAILS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NRD_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NRT_PK'
+       ,'NM_RESCALE_SEG_TREE'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NRT_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NRT_UK'
+       ,'NM_RESCALE_SEG_TREE'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NRT_UK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMR_PK'
+       ,'NM_REVERSAL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMR_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NSE_PK'
+       ,'NM_SAVED_EXTENTS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NSE_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NSE_UK'
+       ,'NM_SAVED_EXTENTS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NSE_UK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NSM_PK'
+       ,'NM_SAVED_EXTENT_MEMBERS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NSM_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NSD_PK'
+       ,'NM_SAVED_EXTENT_MEMBER_DATUMS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NSD_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMTR_PK'
+       ,'NM_SDE_TEMP_RESCALE'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMTR_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NS_PK'
+       ,'NM_SHAPES_1'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NS_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'TII_PK'
+       ,'NM_TEMP_INV_ITEMS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'TII_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'TIL_PK'
+       ,'NM_TEMP_INV_ITEMS_LIST'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'TIL_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'TII_TEMP_PK'
+       ,'NM_TEMP_INV_ITEMS_TEMP'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'TII_TEMP_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'TIM_PK'
+       ,'NM_TEMP_INV_MEMBERS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'TIM_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'TIM_TEMP_PK'
+       ,'NM_TEMP_INV_MEMBERS_TEMP'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'TIM_TEMP_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NM_TEMP_NODES_PK'
+       ,'NM_TEMP_NODES'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NM_TEMP_NODES_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NT_PK'
        ,'NM_TYPES'
-       ,'NET'
-       ,207 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NT_DATUM_NODE_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NTC_DISPLAYED_MANDATORY_CHK'
-       ,'NM_TYPE_COLUMNS'
-       ,'NET'
-       ,334 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NTC_DISPLAYED_MANDATORY_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NTC_DOMAIN_COL_TYPE_CHK'
-       ,'NM_TYPE_COLUMNS'
-       ,'NET'
-       ,335 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NTC_DOMAIN_COL_TYPE_CHK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLFC_DATE_FORMAT_MASK_CHK'
-       ,'NM_LOAD_FILE_COLS'
        ,'HIG'
-       ,183 FROM DUAL
+       ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLFC_DATE_FORMAT_MASK_CHK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NT_PK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -37965,12 +37671,362 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NTC_UNIQUE_SEQ_MAND_CHK'
-       ,'NM_TYPE_COLUMNS'
-       ,'NET'
-       ,346 FROM DUAL
+        'NT_UK'
+       ,'NM_TYPES'
+       ,'HIG'
+       ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NTC_UNIQUE_SEQ_MAND_CHK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NT_UK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NTC_PK'
+       ,'NM_TYPE_COLUMNS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NTC_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NTI_PK'
+       ,'NM_TYPE_INCLUSION'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NTI_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NTI_UK'
+       ,'NM_TYPE_INCLUSION'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NTI_UK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NTL_PK'
+       ,'NM_TYPE_LAYERS_ALL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NTL_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NSC_PK'
+       ,'NM_TYPE_SUBCLASS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NSC_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NSR_PK'
+       ,'NM_TYPE_SUBCLASS_RESTRICTIONS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NSR_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'UN_PK'
+       ,'NM_UNITS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'UN_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'UC_PK'
+       ,'NM_UNIT_CONVERSIONS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'UC_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'UK_PK'
+       ,'NM_UNIT_DOMAINS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'UK_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NUF_PK'
+       ,'NM_UPLOAD_FILES'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NUF_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NUA_PK'
+       ,'NM_USER_AUS_ALL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NUA_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NVA_PK'
+       ,'NM_VISUAL_ATTRIBUTES'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NVA_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NM_XML_FILES_PK'
+       ,'NM_XML_FILES'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NM_XML_FILES_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NM_XML_BATCHES_PK'
+       ,'NM_XML_LOAD_BATCHES'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NM_XML_BATCHES_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NM_XML_LOAD_ERRORS_PK'
+       ,'NM_XML_LOAD_ERRORS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NM_XML_LOAD_ERRORS_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NWX_PK'
+       ,'NM_XSP'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NWX_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NXD_PK'
+       ,'NM_X_DRIVING_CONDITIONS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NXD_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NXE_PK'
+       ,'NM_X_ERRORS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NXE_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NXIC_PK'
+       ,'NM_X_INV_CONDITIONS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NXIC_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NXL_PK'
+       ,'NM_X_LOCATION_RULES'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NXL_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NXN_PK'
+       ,'NM_X_NW_RULES'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NXN_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'PK_NM_X_RULES'
+       ,'NM_X_RULES'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'PK_NM_X_RULES');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NXV_PK'
+       ,'NM_X_VAL_CONDITIONS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NXV_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'XSR_PK'
+       ,'XSP_RESTRAINTS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'XSR_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'XRV_PK'
+       ,'XSP_REVERSAL'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'XRV_PK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -40093,12 +40149,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'ITD_PK'
-       ,'NM_INV_TYPE_ATTRIB_BAND_DETS'
+        'HCCA_UPPERCASE_CHK'
+       ,'HIG_CHECK_CONSTRAINT_ASSOCS'
        ,'HIG'
-       ,64 FROM DUAL
+       ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'ITD_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'HCCA_UPPERCASE_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -40107,12 +40163,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NM_INV_TYPE_COLOURS_PK'
-       ,'NM_INV_TYPE_COLOURS'
+        'HSA_UPPERCASE_CHK'
+       ,'HIG_SEQUENCE_ASSOCIATIONS'
        ,'HIG'
-       ,64 FROM DUAL
+       ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NM_INV_TYPE_COLOURS_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'HSA_UPPERCASE_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -40121,12 +40177,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'ITG_PK'
-       ,'NM_INV_TYPE_GROUPINGS_ALL'
+        'NE_UNIQUE_UPPER_CHK'
+       ,'NM_ELEMENTS_ALL'
        ,'HIG'
-       ,64 FROM DUAL
+       ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'ITG_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NE_UNIQUE_UPPER_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -40135,12 +40191,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'ITR_PK'
-       ,'NM_INV_TYPE_ROLES'
+        'NET_UNIQUE_CHK'
+       ,'NM_EVENT_TYPES'
        ,'HIG'
-       ,64 FROM DUAL
+       ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'ITR_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NET_UNIQUE_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -40149,12 +40205,54 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NJC_PK'
+        'NFP_ID_CHK'
+       ,'NM_FILL_PATTERNS'
+       ,'HIG'
+       ,159 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NFP_ID_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NGT_GROUP_TYPE_UPPER_CHK'
+       ,'NM_GROUP_TYPES_ALL'
+       ,'HIG'
+       ,159 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NGT_GROUP_TYPE_UPPER_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NIT_INV_TYPE_UPPER_CHK'
+       ,'NM_INV_TYPES_ALL'
+       ,'HIG'
+       ,159 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NIT_INV_TYPE_UPPER_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NJC_UNIQUE_CHK'
        ,'NM_JOB_CONTROL'
        ,'HIG'
-       ,64 FROM DUAL
+       ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NJC_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NJC_UNIQUE_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -40163,152 +40261,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NM_JOB_CONTROL_UK'
-       ,'NM_JOB_CONTROL'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NM_JOB_CONTROL_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NJO_PK'
-       ,'NM_JOB_OPERATIONS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NJO_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NJO_UK'
-       ,'NM_JOB_OPERATIONS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NJO_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NJV_PK'
-       ,'NM_JOB_OPERATION_DATA_VALUES'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NJV_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NJT_PK'
-       ,'NM_JOB_TYPES'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NJT_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'JTO_PK'
-       ,'NM_JOB_TYPES_OPERATIONS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'JTO_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NL_PK'
-       ,'NM_LAYERS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NL_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLS_PK'
-       ,'NM_LAYER_SETS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLS_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLB_PK'
-       ,'NM_LOAD_BATCHES'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLB_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLBS_PK'
-       ,'NM_LOAD_BATCH_STATUS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLBS_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLD_PK'
+        'NLD_TABLE_NAME_CHK'
        ,'NM_LOAD_DESTINATIONS'
        ,'HIG'
-       ,64 FROM DUAL
+       ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLD_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLD_TABLE_NAME_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -40317,12 +40275,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NLD_UK1'
+        'NLD_TABLE_SHORT_NAME_CHK'
        ,'NM_LOAD_DESTINATIONS'
        ,'HIG'
-       ,64 FROM DUAL
+       ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLD_UK1');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLD_TABLE_SHORT_NAME_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -40331,26 +40289,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NLD_UK2'
-       ,'NM_LOAD_DESTINATIONS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLD_UK2');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLDD_PK'
+        'NLDD_COLUMN_NAME_CHK'
        ,'NM_LOAD_DESTINATION_DEFAULTS'
        ,'HIG'
-       ,64 FROM DUAL
+       ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLDD_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLDD_COLUMN_NAME_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -40359,12 +40303,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NLF_PK'
+        'NLF_UNIQUE_CHK'
        ,'NM_LOAD_FILES'
        ,'HIG'
-       ,64 FROM DUAL
+       ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLF_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLF_UNIQUE_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -40373,26 +40317,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NLF_UK'
-       ,'NM_LOAD_FILES'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLF_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLFC_PK'
+        'NLFC_HOLDING_COL_CHK'
        ,'NM_LOAD_FILE_COLS'
        ,'HIG'
-       ,64 FROM DUAL
+       ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLFC_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLFC_HOLDING_COL_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -40401,12 +40331,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NLFC_UK'
-       ,'NM_LOAD_FILE_COLS'
+        'NQC_NAME_CHK'
+       ,'NM_MRG_CLASSES'
        ,'HIG'
-       ,64 FROM DUAL
+       ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLFC_UK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NQC_NAME_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -40415,250 +40345,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NLCD_PK'
-       ,'NM_LOAD_FILE_COL_DESTINATIONS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLCD_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLCD_UK'
-       ,'NM_LOAD_FILE_COL_DESTINATIONS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLCD_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLFD_PK'
-       ,'NM_LOAD_FILE_DESTINATIONS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLFD_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NLFD_UK'
-       ,'NM_LOAD_FILE_DESTINATIONS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NLFD_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMG_PK'
-       ,'NM_MAIL_GROUPS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMG_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMGM_PK'
-       ,'NM_MAIL_GROUP_MEMBERSHIP'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMGM_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMM_PK'
-       ,'NM_MAIL_MESSAGE'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMM_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMMR_PK'
-       ,'NM_MAIL_MESSAGE_RECIPIENTS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMMR_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMMT_PK'
-       ,'NM_MAIL_MESSAGE_TEXT'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMMT_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMU_PK'
-       ,'NM_MAIL_USERS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMU_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NM_PK'
-       ,'NM_MEMBERS_ALL'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NM_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMST_PK'
-       ,'NM_MEMBERS_SDE_TEMP'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMST_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMH_PK'
-       ,'NM_MEMBER_HISTORY'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMH_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NDQA_PK'
-       ,'NM_MRG_DEFAULT_QUERY_ATTRIBS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NDQA_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NDQT_PK'
-       ,'NM_MRG_DEFAULT_QUERY_TYPES_ALL'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NDQT_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMID_PK'
-       ,'NM_MRG_INV_DERIVATION'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMID_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMM2_UK'
-       ,'NM_MRG_MEMBERS2'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMM2_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMC_PK'
+        'NMC_VIEW_COL_NAME_CHK'
        ,'NM_MRG_OUTPUT_COLS'
        ,'HIG'
-       ,64 FROM DUAL
+       ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMC_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMC_VIEW_COL_NAME_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -40667,740 +40359,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NMC_UK'
-       ,'NM_MRG_OUTPUT_COLS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMC_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMCD_PK'
-       ,'NM_MRG_OUTPUT_COL_DECODE'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMCD_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMF_PK'
-       ,'NM_MRG_OUTPUT_FILE'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMF_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMF_UK'
-       ,'NM_MRG_OUTPUT_FILE'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMF_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMQ_PK'
-       ,'NM_MRG_QUERY_ALL'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMQ_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMQ_UK'
-       ,'NM_MRG_QUERY_ALL'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMQ_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMQA_PK'
-       ,'NM_MRG_QUERY_ATTRIBS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMQA_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMQR_PK'
-       ,'NM_MRG_QUERY_RESULTS_ALL'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMQR_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMQRT2_PK'
-       ,'NM_MRG_QUERY_RESULTS_TEMP2'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMQRT2_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NQRO_PK'
-       ,'NM_MRG_QUERY_ROLES'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NQRO_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMQT_PK'
-       ,'NM_MRG_QUERY_TYPES_ALL'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMQT_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NQU_PK'
-       ,'NM_MRG_QUERY_USERS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NQU_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMQV_PK'
-       ,'NM_MRG_QUERY_VALUES'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMQV_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMS_PK'
-       ,'NM_MRG_SECTIONS_ALL'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMS_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMSIV_PK'
-       ,'NM_MRG_SECTION_INV_VALUES_ALL'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMSIV_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMSM_PK'
-       ,'NM_MRG_SECTION_MEMBERS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMSM_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NN_PK'
-       ,'NM_NODES_ALL'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NN_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NN_UK'
-       ,'NM_NODES_ALL'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NN_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NNT_PK'
-       ,'NM_NODE_TYPES'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NNT_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NNU_PK'
-       ,'NM_NODE_USAGES_ALL'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NNU_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NNG_PK'
-       ,'NM_NT_GROUPINGS_ALL'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NNG_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NPE_PK'
-       ,'NM_NW_PERSISTENT_EXTENTS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NPE_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMO_PK'
-       ,'NM_OPERATIONS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMO_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NOD_PK'
-       ,'NM_OPERATION_DATA'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NOD_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NOD_UK'
-       ,'NM_OPERATION_DATA'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NOD_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NOD_SCRN_TEXT_UK'
-       ,'NM_OPERATION_DATA'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NOD_SCRN_TEXT_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NPQ_PK'
-       ,'NM_PBI_QUERY'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NPQ_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NPQ_UK'
-       ,'NM_PBI_QUERY'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NPQ_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NQA_PK'
-       ,'NM_PBI_QUERY_ATTRIBS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NQA_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NQR_PK'
-       ,'NM_PBI_QUERY_RESULTS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NQR_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NQT_PK'
-       ,'NM_PBI_QUERY_TYPES'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NQT_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NQV_PK'
-       ,'NM_PBI_QUERY_VALUES'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NQV_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NPS_PK'
-       ,'NM_PBI_SECTIONS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NPS_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NPM_PK'
-       ,'NM_PBI_SECTION_MEMBERS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NPM_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NP_PK'
-       ,'NM_POINTS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NP_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NRD_UK'
-       ,'NM_RECLASS_DETAILS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NRD_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NRD_PK'
-       ,'NM_RECLASS_DETAILS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NRD_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NRT_PK'
-       ,'NM_RESCALE_SEG_TREE'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NRT_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NRT_UK'
-       ,'NM_RESCALE_SEG_TREE'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NRT_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMR_PK'
-       ,'NM_REVERSAL'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMR_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NSE_PK'
-       ,'NM_SAVED_EXTENTS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NSE_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NSE_UK'
-       ,'NM_SAVED_EXTENTS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NSE_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NSM_PK'
-       ,'NM_SAVED_EXTENT_MEMBERS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NSM_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NSD_PK'
-       ,'NM_SAVED_EXTENT_MEMBER_DATUMS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NSD_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NMTR_PK'
-       ,'NM_SDE_TEMP_RESCALE'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NMTR_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NS_PK'
-       ,'NM_SHAPES_1'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NS_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'TII_PK'
-       ,'NM_TEMP_INV_ITEMS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'TII_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'TIL_PK'
-       ,'NM_TEMP_INV_ITEMS_LIST'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'TIL_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'TII_TEMP_PK'
-       ,'NM_TEMP_INV_ITEMS_TEMP'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'TII_TEMP_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'TIM_PK'
-       ,'NM_TEMP_INV_MEMBERS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'TIM_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'TIM_TEMP_PK'
-       ,'NM_TEMP_INV_MEMBERS_TEMP'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'TIM_TEMP_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NM_TEMP_NODES_PK'
-       ,'NM_TEMP_NODES'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NM_TEMP_NODES_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NT_PK'
+        'NT_TYPE_UPPER_CHK'
        ,'NM_TYPES'
        ,'HIG'
-       ,64 FROM DUAL
+       ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NT_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NT_TYPE_UPPER_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -41409,82 +40373,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NT_UK'
-       ,'NM_TYPES'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NT_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NTC_PK'
-       ,'NM_TYPE_COLUMNS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NTC_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NTI_PK'
-       ,'NM_TYPE_INCLUSION'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NTI_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NTI_UK'
-       ,'NM_TYPE_INCLUSION'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NTI_UK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NTL_PK'
-       ,'NM_TYPE_LAYERS_ALL'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NTL_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NSC_PK'
+        'NSC_SUB_CLASS_UPPER_CHK'
        ,'NM_TYPE_SUBCLASS'
        ,'HIG'
-       ,64 FROM DUAL
+       ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NSC_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NSC_SUB_CLASS_UPPER_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -41493,96 +40387,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NSR_PK'
-       ,'NM_TYPE_SUBCLASS_RESTRICTIONS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NSR_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'UN_PK'
-       ,'NM_UNITS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'UN_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'UC_PK'
-       ,'NM_UNIT_CONVERSIONS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'UC_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'UK_PK'
-       ,'NM_UNIT_DOMAINS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'UK_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NUF_PK'
-       ,'NM_UPLOAD_FILES'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NUF_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NUA_PK'
-       ,'NM_USER_AUS_ALL'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NUA_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NVA_PK'
+        'NVA_ID_CHK'
        ,'NM_VISUAL_ATTRIBUTES'
        ,'HIG'
-       ,64 FROM DUAL
+       ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NVA_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NVA_ID_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -41591,54 +40401,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NM_XML_FILES_PK'
-       ,'NM_XML_FILES'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NM_XML_FILES_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NM_XML_BATCHES_PK'
-       ,'NM_XML_LOAD_BATCHES'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NM_XML_BATCHES_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NM_XML_LOAD_ERRORS_PK'
-       ,'NM_XML_LOAD_ERRORS'
-       ,'HIG'
-       ,64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NM_XML_LOAD_ERRORS_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'NWX_PK'
+        'NWX_X_SECT_UPPER_CHK'
        ,'NM_XSP'
        ,'HIG'
-       ,64 FROM DUAL
+       ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NWX_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'NWX_X_SECT_UPPER_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -41647,12 +40415,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NXD_PK'
-       ,'NM_X_DRIVING_CONDITIONS'
+        'DCL_END_DATE_TCHK'
+       ,'DOC_CLASS'
        ,'HIG'
-       ,64 FROM DUAL
+       ,168 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NXD_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'DCL_END_DATE_TCHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -41661,12 +40429,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NXE_PK'
-       ,'NM_X_ERRORS'
+        'DCL_START_DATE_TCHK'
+       ,'DOC_CLASS'
        ,'HIG'
-       ,64 FROM DUAL
+       ,168 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NXE_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'DCL_START_DATE_TCHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -41675,12 +40443,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NXIC_PK'
-       ,'NM_X_INV_CONDITIONS'
+        'DGT_END_DATE_TCHK'
+       ,'DOC_GATEWAYS'
        ,'HIG'
-       ,64 FROM DUAL
+       ,168 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NXIC_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'DGT_END_DATE_TCHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -41689,12 +40457,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NXL_PK'
-       ,'NM_X_LOCATION_RULES'
+        'DGT_START_DATE_TCHK'
+       ,'DOC_GATEWAYS'
        ,'HIG'
-       ,64 FROM DUAL
+       ,168 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NXL_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'DGT_START_DATE_TCHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -41703,12 +40471,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NXN_PK'
-       ,'NM_X_NW_RULES'
+        'DLC_END_DATE_TCHK'
+       ,'DOC_LOCATIONS'
        ,'HIG'
-       ,64 FROM DUAL
+       ,168 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NXN_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'DLC_END_DATE_TCHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -41717,12 +40485,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'PK_NM_X_RULES'
-       ,'NM_X_RULES'
+        'DLC_START_DATE_TCHK'
+       ,'DOC_LOCATIONS'
        ,'HIG'
-       ,64 FROM DUAL
+       ,168 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'PK_NM_X_RULES');
+                   WHERE HCCA_CONSTRAINT_NAME = 'DLC_START_DATE_TCHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -41731,12 +40499,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NXV_PK'
-       ,'NM_X_VAL_CONDITIONS'
+        'DMD_END_DATE_TCHK'
+       ,'DOC_MEDIA'
        ,'HIG'
-       ,64 FROM DUAL
+       ,168 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NXV_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'DMD_END_DATE_TCHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -41745,12 +40513,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'XSR_PK'
-       ,'XSP_RESTRAINTS'
+        'DMD_START_DATE_TCHK'
+       ,'DOC_MEDIA'
        ,'HIG'
-       ,64 FROM DUAL
+       ,168 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'XSR_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'DMD_START_DATE_TCHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -41759,12 +40527,12 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'XRV_PK'
-       ,'XSP_REVERSAL'
+        'DTP_END_DATE_TCHK'
+       ,'DOC_TYPES'
        ,'HIG'
-       ,64 FROM DUAL
+       ,168 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'XRV_PK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'DTP_END_DATE_TCHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -41773,12 +40541,1132 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
-        'NTC_UNIQUE_FORMAT_CHK'
-       ,'NM_TYPE_COLUMNS'
-       ,'NET'
-       ,352 FROM DUAL
+        'DTP_START_DATE_TCHK'
+       ,'DOC_TYPES'
+       ,'HIG'
+       ,168 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'NTC_UNIQUE_FORMAT_CHK');
+                   WHERE HCCA_CONSTRAINT_NAME = 'DTP_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'HCO_END_DATE_TCHK'
+       ,'HIG_CODES'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'HCO_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'HCO_START_DATE_TCHK'
+       ,'HIG_CODES'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'HCO_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'HCT_END_DATE_TCHK'
+       ,'HIG_CONTACTS'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'HCT_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'HCT_START_DATE_TCHK'
+       ,'HIG_CONTACTS'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'HCT_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'HSC_END_DATE_TCHK'
+       ,'HIG_STATUS_CODES'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'HSC_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'HSC_START_DATE_TCHK'
+       ,'HIG_STATUS_CODES'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'HSC_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'HUS_END_DATE_TCHK'
+       ,'HIG_USERS'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'HUS_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'HUS_START_DATE_TCHK'
+       ,'HIG_USERS'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'HUS_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'HUR_START_DATE_TCHK'
+       ,'HIG_USER_ROLES'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'HUR_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NAU_END_DATE_TCHK'
+       ,'NM_ADMIN_UNITS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NAU_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NAU_START_DATE_TCHK'
+       ,'NM_ADMIN_UNITS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NAU_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NE_END_DATE_TCHK'
+       ,'NM_ELEMENTS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NE_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NE_START_DATE_TCHK'
+       ,'NM_ELEMENTS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NE_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NGR_END_DATE_TCHK'
+       ,'NM_GROUP_RELATIONS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NGR_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NGR_START_DATE_TCHK'
+       ,'NM_GROUP_RELATIONS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NGR_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NGT_END_DATE_TCHK'
+       ,'NM_GROUP_TYPES_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NGT_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NGT_START_DATE_TCHK'
+       ,'NM_GROUP_TYPES_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NGT_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'IAL_END_DATE_TCHK'
+       ,'NM_INV_ATTRI_LOOKUP_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'IAL_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'IAL_START_DATE_TCHK'
+       ,'NM_INV_ATTRI_LOOKUP_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'IAL_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'ID_END_DATE_TCHK'
+       ,'NM_INV_DOMAINS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'ID_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'ID_START_DATE_TCHK'
+       ,'NM_INV_DOMAINS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'ID_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'IIT_END_DATE_TCHK'
+       ,'NM_INV_ITEMS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'IIT_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'IIT_START_DATE_TCHK'
+       ,'NM_INV_ITEMS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'IIT_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'IIG_END_DATE_TCHK'
+       ,'NM_INV_ITEM_GROUPINGS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'IIG_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'IIG_START_DATE_TCHK'
+       ,'NM_INV_ITEM_GROUPINGS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'IIG_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NIN_END_DATE_TCHK'
+       ,'NM_INV_NW_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NIN_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NIN_START_DATE_TCHK'
+       ,'NM_INV_NW_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NIN_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NIT_END_DATE_TCHK'
+       ,'NM_INV_TYPES_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NIT_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NIT_START_DATE_TCHK'
+       ,'NM_INV_TYPES_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NIT_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'ITA_END_DATE_TCHK'
+       ,'NM_INV_TYPE_ATTRIBS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'ITA_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'ITA_START_DATE_TCHK'
+       ,'NM_INV_TYPE_ATTRIBS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'ITA_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'ITG_END_DATE_TCHK'
+       ,'NM_INV_TYPE_GROUPINGS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'ITG_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'ITG_START_DATE_TCHK'
+       ,'NM_INV_TYPE_GROUPINGS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'ITG_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NM_END_DATE_TCHK'
+       ,'NM_MEMBERS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NM_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NM_START_DATE_TCHK'
+       ,'NM_MEMBERS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NM_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMST_END_DATE_TCHK'
+       ,'NM_MEMBERS_SDE_TEMP'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMST_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMST_START_DATE_TCHK'
+       ,'NM_MEMBERS_SDE_TEMP'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMST_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMH_NM_END_DATE_TCHK'
+       ,'NM_MEMBER_HISTORY'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMH_NM_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMH_NM_START_DATE_TCHK'
+       ,'NM_MEMBER_HISTORY'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMH_NM_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NO_END_DATE_TCHK'
+       ,'NM_NODES_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NO_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NO_START_DATE_TCHK'
+       ,'NM_NODES_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NO_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NNU_END_DATE_TCHK'
+       ,'NM_NODE_USAGES_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NNU_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NNU_START_DATE_TCHK'
+       ,'NM_NODE_USAGES_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NNU_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NNG_END_DATE_TCHK'
+       ,'NM_NT_GROUPINGS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NNG_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NNG_START_DATE_TCHK'
+       ,'NM_NT_GROUPINGS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NNG_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NS_END_DATE_TCHK'
+       ,'NM_SHAPES_1'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NS_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NS_START_DATE_TCHK'
+       ,'NM_SHAPES_1'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NS_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'TII_END_DATE_TCHK'
+       ,'NM_TEMP_INV_ITEMS'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'TII_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'TII_START_DATE_TCHK'
+       ,'NM_TEMP_INV_ITEMS'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'TII_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'TIM_END_DATE_TCHK'
+       ,'NM_TEMP_INV_MEMBERS'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'TIM_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'TIM_START_DATE_TCHK'
+       ,'NM_TEMP_INV_MEMBERS'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'TIM_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NTL_END_DATE_TCHK'
+       ,'NM_TYPE_LAYERS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NTL_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NTL_START_DATE_TCHK'
+       ,'NM_TYPE_LAYERS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NTL_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NUA_END_DATE_TCHK'
+       ,'NM_USER_AUS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NUA_END_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NUA_START_DATE_TCHK'
+       ,'NM_USER_AUS_ALL'
+       ,'HIG'
+       ,168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NUA_START_DATE_TCHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'AVCON_3631_ITR_M_000'
+       ,'NM_INV_TYPE_ROLES'
+       ,'HIG'
+       ,170 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'AVCON_3631_ITR_M_000');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'AVCON_3717_NUA_M_000'
+       ,'NM_USER_AUS_ALL'
+       ,'HIG'
+       ,170 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'AVCON_3717_NUA_M_000');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'HOL_DATATYPE_CHK'
+       ,'HIG_OPTION_LIST'
+       ,'HIG'
+       ,171 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'HOL_DATATYPE_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'ID_DATATYPE_CHK'
+       ,'NM_INV_DOMAINS_ALL'
+       ,'HIG'
+       ,171 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'ID_DATATYPE_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'ITA_FORMAT_CHK'
+       ,'NM_INV_TYPE_ATTRIBS_ALL'
+       ,'HIG'
+       ,171 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'ITA_FORMAT_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLFC_DATATYPE_CHK'
+       ,'NM_LOAD_FILE_COLS'
+       ,'HIG'
+       ,171 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLFC_DATATYPE_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMC_DATA_TYPE_CHK'
+       ,'NM_MRG_OUTPUT_COLS'
+       ,'HIG'
+       ,171 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMC_DATA_TYPE_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NOD_DATA_TYPE_CHK'
+       ,'NM_OPERATION_DATA'
+       ,'HIG'
+       ,171 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NOD_DATA_TYPE_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NAC_COL_ID_INTEGER'
+       ,'NM_AUDIT_COLUMNS'
+       ,'HIG'
+       ,172 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NAC_COL_ID_INTEGER');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NJO_SEQ_CHK'
+       ,'NM_JOB_OPERATIONS'
+       ,'HIG'
+       ,172 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NJO_SEQ_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMC_DEC_PLACES_CHK4'
+       ,'NM_MRG_OUTPUT_COLS'
+       ,'HIG'
+       ,172 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMC_DEC_PLACES_CHK4');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NOD_SEQ_CHK'
+       ,'NM_OPERATION_DATA'
+       ,'HIG'
+       ,172 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NOD_SEQ_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMC_LENGTH_CHK'
+       ,'NM_MRG_OUTPUT_COLS'
+       ,'HIG'
+       ,173 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMC_LENGTH_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMC_SEQ_NO_CHK'
+       ,'NM_MRG_OUTPUT_COLS'
+       ,'HIG'
+       ,173 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMC_SEQ_NO_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NEA_SEVERITY_CHK'
+       ,'NM_EVENT_ALERT_MAILS'
+       ,'HIG'
+       ,174 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NEA_SEVERITY_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NEL_SEVERITY_CHK'
+       ,'NM_EVENT_LOG'
+       ,'HIG'
+       ,174 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NEL_SEVERITY_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NJO_BEGIN_MP_CHK'
+       ,'NM_JOB_OPERATIONS'
+       ,'HIG'
+       ,174 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NJO_BEGIN_MP_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLFC_SEQ_NO_CHK'
+       ,'NM_LOAD_FILE_COLS'
+       ,'HIG'
+       ,174 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLFC_SEQ_NO_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NMC_DEC_PLACES_CHK3'
+       ,'NM_MRG_OUTPUT_COLS'
+       ,'HIG'
+       ,174 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NMC_DEC_PLACES_CHK3');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NGQA_BRACKET_CHK'
+       ,'NM_GAZ_QUERY_ATTRIBS'
+       ,'HIG'
+       ,175 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NGQA_BRACKET_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NQA_BRACKET_CHK'
+       ,'NM_PBI_QUERY_ATTRIBS'
+       ,'HIG'
+       ,175 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NQA_BRACKET_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NJC_NPE_JOB_ID_CHK'
+       ,'NM_JOB_CONTROL'
+       ,'HIG'
+       ,176 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NJC_NPE_JOB_ID_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NJC_STATUS_CHK'
+       ,'NM_JOB_CONTROL'
+       ,'HIG'
+       ,176 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NJC_STATUS_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NJO_STATUS_CHK'
+       ,'NM_JOB_OPERATIONS'
+       ,'HIG'
+       ,176 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NJO_STATUS_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLFC_DATE_FORMAT_MASK_CHK'
+       ,'NM_LOAD_FILE_COLS'
+       ,'HIG'
+       ,183 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLFC_DATE_FORMAT_MASK_CHK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
@@ -41822,6 +41710,202 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
                    WHERE HCCA_CONSTRAINT_NAME = 'HUF_CONNECT_LOOP_CHK');
 --
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NLFC_VARCHAR_SIZE_CHK2'
+       ,'NM_LOAD_FILE_COLS'
+       ,'NET'
+       ,29 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NLFC_VARCHAR_SIZE_CHK2');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NVA_BG_BLUE_CHK'
+       ,'NM_VISUAL_ATTRIBUTES'
+       ,'NET'
+       ,29 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NVA_BG_BLUE_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NVA_BG_GREEN_CHK'
+       ,'NM_VISUAL_ATTRIBUTES'
+       ,'NET'
+       ,29 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NVA_BG_GREEN_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NVA_BG_RED_CHK'
+       ,'NM_VISUAL_ATTRIBUTES'
+       ,'NET'
+       ,29 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NVA_BG_RED_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NVA_FG_BLUE_CHK'
+       ,'NM_VISUAL_ATTRIBUTES'
+       ,'NET'
+       ,29 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NVA_FG_BLUE_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NVA_FG_GREEN_CHK'
+       ,'NM_VISUAL_ATTRIBUTES'
+       ,'NET'
+       ,29 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NVA_FG_GREEN_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NVA_FG_RED_CHK'
+       ,'NM_VISUAL_ATTRIBUTES'
+       ,'NET'
+       ,29 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NVA_FG_RED_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NT_DATUM_NODE_CHK'
+       ,'NM_TYPES'
+       ,'NET'
+       ,207 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NT_DATUM_NODE_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'ITA_EXCL_MAND_CHECK'
+       ,'NM_INV_TYPE_ATTRIBS_ALL'
+       ,'NET'
+       ,332 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'ITA_EXCL_MAND_CHECK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'ITA_EXCL_TYPE_CHK'
+       ,'NM_INV_TYPE_ATTRIBS_ALL'
+       ,'NET'
+       ,333 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'ITA_EXCL_TYPE_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NTC_DISPLAYED_MANDATORY_CHK'
+       ,'NM_TYPE_COLUMNS'
+       ,'NET'
+       ,334 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NTC_DISPLAYED_MANDATORY_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NTC_DOMAIN_COL_TYPE_CHK'
+       ,'NM_TYPE_COLUMNS'
+       ,'NET'
+       ,335 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NTC_DOMAIN_COL_TYPE_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NTC_UNIQUE_SEQ_MAND_CHK'
+       ,'NM_TYPE_COLUMNS'
+       ,'NET'
+       ,346 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NTC_UNIQUE_SEQ_MAND_CHK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NTC_UNIQUE_FORMAT_CHK'
+       ,'NM_TYPE_COLUMNS'
+       ,'NET'
+       ,352 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NTC_UNIQUE_FORMAT_CHK');
+--
 --
 --********** HIG_USER_OPTION_LIST **********--
 SET TERM ON
@@ -41839,6 +41923,46 @@ SET TERM OFF
 -- HUOL_DATATYPE                  NOT NULL VARCHAR2(8)
 -- HUOL_MIXED_CASE                NOT NULL VARCHAR2(1)
 --
+--
+INSERT INTO HIG_USER_OPTION_LIST
+       (HUOL_ID
+       ,HUOL_PRODUCT
+       ,HUOL_NAME
+       ,HUOL_REMARKS
+       ,HUOL_DOMAIN
+       ,HUOL_DATATYPE
+       ,HUOL_MIXED_CASE
+       )
+SELECT 
+        'DEFAORPBI'
+       ,'AST'
+       ,'PBI query used in AOR'
+       ,'PBI query used in AOR'
+       ,''
+       ,'VARCHAR2'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_USER_OPTION_LIST
+                   WHERE HUOL_ID = 'DEFAORPBI');
+--
+INSERT INTO HIG_USER_OPTION_LIST
+       (HUOL_ID
+       ,HUOL_PRODUCT
+       ,HUOL_NAME
+       ,HUOL_REMARKS
+       ,HUOL_DOMAIN
+       ,HUOL_DATATYPE
+       ,HUOL_MIXED_CASE
+       )
+SELECT 
+        'DEFATTRSET'
+       ,'AST'
+       ,'Default Attribute Set'
+       ,'Default Attribute Set'
+       ,''
+       ,'VARCHAR2'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_USER_OPTION_LIST
+                   WHERE HUOL_ID = 'DEFATTRSET');
 --
 INSERT INTO HIG_USER_OPTION_LIST
        (HUOL_ID
@@ -42050,6 +42174,26 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_MIXED_CASE
        )
 SELECT 
+        'STARTGIS'
+       ,'HIG'
+       ,'Auto-start GIS'
+       ,'Auto-start GIS'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_USER_OPTION_LIST
+                   WHERE HUOL_ID = 'STARTGIS');
+--
+INSERT INTO HIG_USER_OPTION_LIST
+       (HUOL_ID
+       ,HUOL_PRODUCT
+       ,HUOL_NAME
+       ,HUOL_REMARKS
+       ,HUOL_DOMAIN
+       ,HUOL_DATATYPE
+       ,HUOL_MIXED_CASE
+       )
+SELECT 
         'WEBAPDRAD'
        ,'NET'
        ,'Use Radio Buttons to select'
@@ -42079,66 +42223,6 @@ SELECT
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_USER_OPTION_LIST
                    WHERE HUOL_ID = 'WEBAPDDEP');
---
-INSERT INTO HIG_USER_OPTION_LIST
-       (HUOL_ID
-       ,HUOL_PRODUCT
-       ,HUOL_NAME
-       ,HUOL_REMARKS
-       ,HUOL_DOMAIN
-       ,HUOL_DATATYPE
-       ,HUOL_MIXED_CASE
-       )
-SELECT 
-        'DEFAORPBI'
-       ,'AST'
-       ,'PBI query used in AOR'
-       ,'PBI query used in AOR'
-       ,''
-       ,'VARCHAR2'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_USER_OPTION_LIST
-                   WHERE HUOL_ID = 'DEFAORPBI');
---
-INSERT INTO HIG_USER_OPTION_LIST
-       (HUOL_ID
-       ,HUOL_PRODUCT
-       ,HUOL_NAME
-       ,HUOL_REMARKS
-       ,HUOL_DOMAIN
-       ,HUOL_DATATYPE
-       ,HUOL_MIXED_CASE
-       )
-SELECT 
-        'DEFATTRSET'
-       ,'AST'
-       ,'Default Attribute Set'
-       ,'Default Attribute Set'
-       ,''
-       ,'VARCHAR2'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_USER_OPTION_LIST
-                   WHERE HUOL_ID = 'DEFATTRSET');
---
-INSERT INTO HIG_USER_OPTION_LIST
-       (HUOL_ID
-       ,HUOL_PRODUCT
-       ,HUOL_NAME
-       ,HUOL_REMARKS
-       ,HUOL_DOMAIN
-       ,HUOL_DATATYPE
-       ,HUOL_MIXED_CASE
-       )
-SELECT 
-        'STARTGIS'
-       ,'HIG'
-       ,'Auto-start GIS'
-       ,'Auto-start GIS'
-       ,'Y_OR_N'
-       ,'VARCHAR2'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_USER_OPTION_LIST
-                   WHERE HUOL_ID = 'STARTGIS');
 --
 INSERT INTO HIG_USER_OPTION_LIST
        (HUOL_ID
