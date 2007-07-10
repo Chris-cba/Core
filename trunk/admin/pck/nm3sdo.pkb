@@ -1,14 +1,14 @@
-CREATE OR REPLACE PACKAGE BODY Nm3sdo AS
+CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3sdo.pkb	1.66 05/09/07
---       Module Name      : nm3sdo.pkb
---       Date into SCCS   : 07/05/09 17:42:08
---       Date fetched Out : 07/06/13 14:13:29
---       SCCS Version     : 1.66
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.1   Jul 10 2007 08:37:52   aedwards  $
+--       Module Name      : $Workfile:   nm3sdo.pkb  $
+--       Date into SCCS   : $Date:   Jul 10 2007 08:37:52  $
+--       Date fetched Out : $Modtime:   Jul 10 2007 08:36:34  $
+--       SCCS Version     : $Revision:   2.1  $
 --
 --   Author : Rob Coupe
 --
@@ -17,21 +17,15 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo AS
 -------------------------------------------------------------------------------
 --	Copyright (c) RAC
 -----------------------------------------------------------------------------
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '@(#)nm3sdo.pkb	1.66 05/09/07';
-
-   g_batch_size      INTEGER := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
-
-   g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDO';
-
-   g_clip_type       VARCHAR2(30) := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+   g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
+   g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
+   g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
 --
-
    SUBTYPE rec_usgm IS user_sdo_geom_metadata%ROWTYPE;
    SUBTYPE rec_nth  IS NM_THEMES_ALL%ROWTYPE;
-
    g_usgm            rec_usgm;
    g_nth             rec_nth;
-
 --  g_body_sccsid is the SCCS ID for the package body
 --
   FUNCTION hypot
@@ -75,7 +69,7 @@ FUNCTION get_idx_from_id    ( p_ptr IN ptr_num_array, p_id IN INTEGER ) RETURN I
 FUNCTION get_idx            ( p_ga IN nm_geom_array, p_id IN INTEGER )  RETURN INTEGER;
 
 
-FUNCTION Locate_Pt (  p_geom IN mdsys.sdo_geometry, p_st IN NUMBER ) RETURN mdsys.sdo_geometry;
+FUNCTION locate_pt (  p_geom IN mdsys.sdo_geometry, p_st IN NUMBER ) RETURN mdsys.sdo_geometry;
 
 PROCEDURE add_dyn_seg_exception( p_ner          IN INTEGER,
                                  p_job_id       IN INTEGER,
@@ -93,8 +87,9 @@ FUNCTION join_ntl_array( p_nth IN NM_THEMES_ALL%ROWTYPE, p_ntl IN nm_theme_list 
 
 FUNCTION Get_Parts ( p_shape IN mdsys.sdo_geometry ) RETURN nm_geom_array;
 
-FUNCTION Compare_Pt ( p_geom1 mdsys.sdo_geometry, p_geom2 mdsys.sdo_geometry, tol IN NUMBER ) RETURN VARCHAR2;
+FUNCTION compare_pt ( p_geom1 mdsys.sdo_geometry, p_geom2 mdsys.sdo_geometry, tol IN NUMBER ) RETURN VARCHAR2;
 
+function local_join_ptr_array( p_pa in ptr_array, p_table in varchar2, p_key in varchar2 ) return ptr_array;
 --
 -----------------------------------------------------------------------------
 --
@@ -396,7 +391,7 @@ BEGIN
 */
 
 
-      l_pt := sdo_lrs.Locate_Pt( l_geom, p_diminfo, p_st );
+      l_pt := sdo_lrs.locate_pt( l_geom, p_diminfo, p_st );
 
 	  x_start := l_pt.sdo_ordinates(1);
 	  y_start := l_pt.sdo_ordinates(2);
@@ -408,7 +403,7 @@ BEGIN
 
 		end_id  := k+3;
 
-        l_pt := sdo_lrs.Locate_Pt( l_geom, p_diminfo, p_end );
+        l_pt := sdo_lrs.locate_pt( l_geom, p_diminfo, p_end );
 
 	    x_end := l_pt.sdo_ordinates(1);
 	    y_end := l_pt.sdo_ordinates(2);
@@ -439,7 +434,7 @@ BEGIN
 					   to_char( p_geom.sdo_ordinates(k+6)));
 */
 
-      l_pt := sdo_lrs.Locate_Pt( l_geom, p_diminfo, p_end );
+      l_pt := sdo_lrs.locate_pt( l_geom, p_diminfo, p_end );
 
       x_end := l_pt.sdo_ordinates(1);
       y_end := l_pt.sdo_ordinates(2);
@@ -489,7 +484,7 @@ END;
 --
 --------------------------------------------------------------------------------------------------------------------
 --
-FUNCTION Locate_Pt (  p_geom IN OUT NOCOPY mdsys.sdo_geometry, p_diminfo IN mdsys.sdo_dim_array,  p_st IN NUMBER )
+FUNCTION locate_pt (  p_geom IN OUT NOCOPY mdsys.sdo_geometry, p_diminfo IN mdsys.sdo_dim_array,  p_st IN NUMBER )
 RETURN mdsys.sdo_geometry IS
 k      INTEGER;
 last1  INTEGER := p_geom.sdo_ordinates.LAST;
@@ -498,7 +493,7 @@ l_geom mdsys.sdo_geometry;
 BEGIN
 
   IF Hig.get_sysopt('SDOCLIPTYP') = 'SDO' THEN
-    retval := sdo_lrs.Locate_Pt( p_geom, p_diminfo, p_st, 0);
+    retval := sdo_lrs.locate_pt( p_geom, p_diminfo, p_st, 0);
   ELSE
 --nm_debug.debug_on;
 
@@ -525,7 +520,7 @@ BEGIN
   					   to_char( p_geom.sdo_ordinates(k+6)));
   */
 
-          retval := sdo_lrs.Locate_Pt( l_geom, p_diminfo, p_st );
+          retval := sdo_lrs.locate_pt( l_geom, p_diminfo, p_st );
 
         EXIT;
 
@@ -692,7 +687,7 @@ END;
 
 	l_geom := Get_Layer_Element_Geometry( p_layer, p_ne_id );
 
-	retval := Locate_Pt( l_geom, g_usgm.diminfo, p_measure);
+	retval := locate_pt( l_geom, g_usgm.diminfo, p_measure);
 
 --	cur_string :=  'select sdo_lrs.locate_pt( '||g_usgm.column_name||', :diminfo, :measure, 0 ) '||
 -- 	cur_string :=  'select locate_pt( '||g_usgm.column_name||', :diminfo, :measure ) '||
@@ -1426,7 +1421,11 @@ BEGIN
 
   l_pt   :=  Get_Batch_Of_Base_Nn( p_theme => p_theme, p_x => p_x, p_y => p_y);
 
-  RETURN l_pt.pa(1).ptr_value;
+  if l_pt.pa.last is null then
+    raise no_data_found;
+  else
+    RETURN l_pt.pa(1).ptr_value;
+  end if;
 
 END;
 
@@ -1828,7 +1827,7 @@ BEGIN
 
 --  need to breal the shape and redefine measures, possibly with new vertices.
 
-    l_pt := Locate_Pt( p_geom, g_usgm.diminfo, p_measure);
+    l_pt := locate_pt( p_geom, g_usgm.diminfo, p_measure);
 
     l_insert_pt := FALSE;
 
@@ -2583,7 +2582,7 @@ BEGIN
   l_geom := Get_Layer_Element_Geometry( p_layer, p_ne_id_of);
 
   IF l_geom IS NOT NULL THEN
-    retval := Locate_Pt( l_geom, g_usgm.diminfo, p_measure );
+    retval := locate_pt( l_geom, g_usgm.diminfo, p_measure );
 
     retval := get_2d_pt( retval );
   ELSE
@@ -2599,7 +2598,7 @@ END;
 --
 
 
-PROCEDURE Create_Inv_Data ( p_table_name  IN VARCHAR2,
+PROCEDURE create_inv_data ( p_table_name  IN VARCHAR2,
                             p_inv_type    IN nm_inv_types.nit_inv_type%TYPE,
                             p_seq_name    IN VARCHAR2,
 							p_pnt_or_cont IN VARCHAR2,
@@ -2899,7 +2898,7 @@ BEGIN
 					  		            l_usgm.diminfo );
                         ELSE
  
-                          l_geom :=  Locate_Pt( l_ge.nga(l_g_p).ng_geometry,
+                          l_geom :=  locate_pt( l_ge.nga(l_g_p).ng_geometry,
                                         l_usgm.diminfo,
 		                                v_pl.npa_placement_array(j).pl_start );
 
@@ -3977,7 +3976,7 @@ END;
 -----------------------------------------------------------------------------
 --
 
-FUNCTION Rescale_Geometry( p_layer IN NUMBER,
+FUNCTION rescale_geometry( p_layer IN NUMBER,
                            p_ne_id IN nm_elements.ne_id%TYPE,
    					       p_geom  IN mdsys.sdo_geometry ) RETURN mdsys.sdo_geometry IS
 
@@ -4078,15 +4077,6 @@ ldis NUMBER;
 l_geom mdsys.sdo_geometry;
 retval mdsys.sdo_geometry;
 
-FUNCTION local_midpoint ( p_geom IN mdsys.sdo_geometry ) RETURN NUMBER IS
-retval NUMBER;
-BEGIN
-  retval := sdo_lrs.geom_segment_start_measure(p_geom) + (sdo_lrs.geom_segment_end_measure(p_geom) - sdo_lrs.geom_segment_start_measure(p_geom))/2;
-  RETURN retval;
-EXCEPTION
-  WHEN OTHERS THEN RETURN sdo_lrs.geom_segment_start_measure(p_geom);
-END; 
-  
 BEGIN
   IF Nm3sdo.get_type_from_gtype( p_geom.sdo_gtype ) != 2 THEN
       Hig.raise_ner(pi_appl                => Nm3type.c_hig
@@ -4104,14 +4094,12 @@ BEGIN
 --  how do we know its an lrs? - we don't!
 
 	IF ldim = 3 THEN
-      ldis :=  local_midpoint(p_geom);
-      Nm_Debug.debug_on;
-      Nm_Debug.DEBUG(TO_CHAR(ldis));
-      retval := Locate_Pt( p_geom, ldis );
+      ldis := sdo_lrs.geom_segment_end_measure(p_geom)/2;
+      retval := locate_pt( p_geom, ldis );
 	ELSIF ldim = 2 THEN
 	  l_geom := sdo_lrs.convert_to_lrs_geom( p_geom );
-      ldis := local_midpoint(p_geom);
-      retval := Locate_Pt( l_geom, ldis );
+      ldis   := sdo_lrs.geom_segment_end_measure(l_geom)/2;
+      retval := locate_pt( l_geom, ldis );
 	ELSE
       Hig.raise_ner(pi_appl                => Nm3type.c_hig
                     ,pi_id                 => 285
@@ -4243,7 +4231,7 @@ BEGIN
 --    prevent rounding errors - last point should be on the geometry
 --
       IF p_interval*irec <= l_end THEN
-  	    l_pt_geom := Locate_Pt( l_geometry, g_usgm.diminfo, p_interval*irec);
+  	    l_pt_geom := locate_pt( l_geometry, g_usgm.diminfo, p_interval*irec);
 
 	    --   nm_debug.debug('Pt Geom - ('||to_char(l_pt_geom.sdo_ordinates(1))||','||
         --                            to_char(l_pt_geom.sdo_ordinates(2))||')');
@@ -4918,7 +4906,7 @@ END;
 
         IF irec.nit_pnt_or_cont = 'P' THEN
 
-          l_geom := Locate_Pt( p_geom, g_usgm.diminfo, irec.nm_begin_mp );
+          l_geom := locate_pt( p_geom, g_usgm.diminfo, irec.nm_begin_mp );
           l_geom := mdsys.sdo_geometry( 2001, l_geom.sdo_srid,
                            mdsys.sdo_point_type( l_geom.sdo_ordinates(1),
                                                  l_geom.sdo_ordinates(2), NULL), NULL, NULL);
@@ -5255,7 +5243,7 @@ END;
   FUNCTION get_aggr_mbr( p_layer IN NUMBER, p_ne_id IN nm_elements.ne_id%TYPE ) RETURN mdsys.sdo_geometry IS
 
   BEGIN
-    RETURN get_placement_aggr_mbr( p_layer, Nm3pla.Get_Placement_From_Ne( p_ne_id ));
+    RETURN get_placement_aggr_mbr( p_layer, Nm3pla.get_placement_from_ne( p_ne_id ));
   END;
 
 --
@@ -5295,7 +5283,7 @@ END;
 
 -- performance probs in an Oracle version led to this being coded. Use base spatial function.
 
-FUNCTION Locate_Pt (  p_geom IN mdsys.sdo_geometry, p_st IN NUMBER )
+FUNCTION locate_pt (  p_geom IN mdsys.sdo_geometry, p_st IN NUMBER )
 RETURN mdsys.sdo_geometry IS
 k      INTEGER;
 last1  INTEGER := p_geom.sdo_ordinates.LAST;
@@ -5304,7 +5292,7 @@ l_geom mdsys.sdo_geometry := p_geom;
 BEGIN
 
   IF Hig.get_sysopt('SDOCLIPTYP') = 'SDO' THEN
-    retval := sdo_lrs.Locate_Pt( p_geom, p_st, 0);
+    retval := sdo_lrs.locate_pt( p_geom, p_st, 0);
   ELSE
 --nm_debug.debug_on;
 
@@ -5331,7 +5319,7 @@ BEGIN
   					   to_char( p_geom.sdo_ordinates(k+6)));
   */
 
-          retval := sdo_lrs.Locate_Pt( l_geom, p_st );
+          retval := sdo_lrs.locate_pt( l_geom, p_st );
 
         EXIT;
 
@@ -8632,7 +8620,7 @@ BEGIN
 
   Nm_Debug.debug_on;
   
-  l_ga := Get_Parts( p_geom );
+  l_ga := get_parts( p_geom );
 
   lp := l_ga.nga.LAST;
     
@@ -8662,7 +8650,7 @@ BEGIN
 
         Nm_Debug.DEBUG('Part '||TO_CHAR(i)||' is unused');
       
-        IF Compare_Pt( Nm3sdo.get_2d_pt(sdo_lrs.geom_segment_end_pt( retval )), Nm3sdo.get_2d_pt(sdo_lrs.geom_segment_start_pt( l_ga.nga(i).ng_geometry)) , l_tol ) = 'TRUE' THEN
+        IF compare_pt( Nm3sdo.get_2d_pt(sdo_lrs.geom_segment_end_pt( retval )), Nm3sdo.get_2d_pt(sdo_lrs.geom_segment_start_pt( l_ga.nga(i).ng_geometry)) , l_tol ) = 'TRUE' THEN
     
           Nm_Debug.DEBUG('Part '||TO_CHAR(i)||' is connected');
 
@@ -8671,7 +8659,7 @@ BEGIN
           l_used.ia(l_used.ia.LAST) := i;
           EXIT;
 
-        ELSIF Compare_Pt( Nm3sdo.get_2d_pt(sdo_lrs.geom_segment_end_pt( retval )), Nm3sdo.get_2d_pt(sdo_lrs.geom_segment_end_pt( l_ga.nga(i).ng_geometry)), l_tol ) = 'TRUE' THEN
+        ELSIF compare_pt( Nm3sdo.get_2d_pt(sdo_lrs.geom_segment_end_pt( retval )), Nm3sdo.get_2d_pt(sdo_lrs.geom_segment_end_pt( l_ga.nga(i).ng_geometry)), l_tol ) = 'TRUE' THEN
     
           Nm_Debug.DEBUG('Part '||TO_CHAR(i)||' is connected after reverse');
 
@@ -9479,6 +9467,8 @@ BEGIN
   curstr := 'select ptr( t.ptr_id, t.ptr_value ) from table ( :pa.pa ) t, '||p_nth.nth_feature_table||
             ' where t.ptr_value = '||p_nth.nth_feature_pk_column||' order by t.ptr_id';
 
+  nm_debug.debug_on;
+  nm_debug.debug(curstr);
   EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.pa USING p_pa;
 
   RETURN retval;
@@ -9516,18 +9506,28 @@ BEGIN
                 'SDO_BATCH_SIZE='||TO_CHAR(g_batch_size)||''''||') = '||''''||'TRUE'||''''||
                 ' and rownum <= :g_batch_size';
                 
+
+  /*
   IF nthrow.nth_feature_table != nthrow.nth_table_name THEN
     
     cur_string := cur_string ||
                   ' and exists ( select 1 from '||nthrow.nth_table_name||' t '||
                   ' where ft.'||NVL( nthrow.nth_feature_fk_column, nthrow.nth_feature_pk_column )||' = t.'||nthrow.nth_pk_column||')';
   END IF;
+*/
+
                                    
 
 --  Nm_Debug.debug_on;
 --  Nm_Debug.DEBUG( cur_string );
 
   EXECUTE IMMEDIATE cur_string BULK COLLECT INTO retval.pa USING p_geom, g_batch_size;
+
+  IF nthrow.nth_feature_table != nthrow.nth_table_name THEN
+  
+    retval := local_join_ptr_array(retval, nthrow.nth_feature_table, nthrow.nth_feature_pk_column );
+    
+  END IF;    
 
   IF nthbas.nth_base_table_theme IS NOT NULL THEN
 
@@ -10196,7 +10196,7 @@ END;
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --
 
-FUNCTION Compare_Pt ( p_geom1 mdsys.sdo_geometry, p_geom2 mdsys.sdo_geometry, tol IN NUMBER ) RETURN VARCHAR2 IS
+FUNCTION compare_pt ( p_geom1 mdsys.sdo_geometry, p_geom2 mdsys.sdo_geometry, tol IN NUMBER ) RETURN VARCHAR2 IS
 retval VARCHAR2(10) := 'FALSE';
 l_tol NUMBER := 0.5;
 BEGIN
@@ -10209,8 +10209,26 @@ BEGIN
   END IF;
   RETURN retval;
 END;
-
-
+--
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+FUNCTION local_join_ptr_array
+           ( p_pa    IN ptr_array
+           , p_table IN VARCHAR2
+           , p_key   IN VARCHAR2 )
+RETURN ptr_array
+IS
+  curstr   VARCHAR2(2000);
+  retval   ptr_array := Nm3array.init_ptr_array;
+BEGIN
+  curstr := 'select ptr( t.ptr_id, t.ptr_value ) from table ( :pa.pa ) t, '||p_table||
+            ' where t.ptr_value = '||p_key||' order by t.ptr_id';
+  EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.pa USING p_pa;
+  RETURN retval;
+END;
+--
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
 --
 END Nm3sdo;
 /
