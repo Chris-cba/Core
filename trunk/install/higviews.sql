@@ -4,8 +4,16 @@ REM 	Currently it is maintained manually and cannot be generated from CASE.
 REM **************************************************************************
 
 REM SCCS ID Keyword, do no remove
-define sccsid = '@(#)higviews.sql	1.9 10/27/06';
 
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/higviews.sql-arc   2.2   Jul 13 2007 16:29:46   jwadsworth  $
+--       Module Name      : $Workfile:   higviews.sql  $
+--       Date into SCCS   : $Date:   Jul 13 2007 16:29:46  $
+--       Date fetched Out : $Modtime:   Jul 13 2007 15:40:22  $
+--       SCCS Version     : $Revision:   2.2  $
+--       Based on 
+--
 rem   ------------------------------------------------------------------------------
 rem   Create the road_segments_all view first, to satisfy subsequent references.
 rem
