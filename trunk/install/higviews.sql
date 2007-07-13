@@ -220,12 +220,14 @@ AS SELECT DISTINCT doc_id
 ,doc_compl_claim
 ,doc_compl_east
 ,doc_compl_north
-FROM   docs, doc_enquiry_contacts, hig_contacts, hig_contact_address, hig_address
-WHERE  doc_id = dec_doc_id (+)
-AND    dec_hct_id = hct_id (+)
-AND    hct_id = hca_hct_id (+)
-AND    hca_had_id = had_id (+)
-AND    dec_contact (+) = 'Y'
+from   HIG_ADDRESS, HIG_CONTACT_ADDRESS, HIG_CONTACTS,DOC_ENQUIRY_CONTACTS, DOCS, DOC_TYPES
+WHERE hca_had_id = had_id (+)
+and    hct_id = hca_hct_id (+)
+and    dec_hct_id = hct_id (+)
+and    dec_contact (+) = 'Y'
+and    doc_id = dec_doc_id (+)
+and    doc_dtp_code = dtp_code
+and    dtp_allow_complaints = 'Y'
 /
 
 prompt creating VIEW network_node
