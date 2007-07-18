@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3trg.sql	1.81 03/19/07
---       Module Name      : nm3trg.sql
---       Date into SCCS   : 07/03/19 10:58:23
---       Date fetched Out : 07/06/13 17:03:45
---       SCCS Version     : 1.81
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.1   Jul 18 2007 15:30:20   smarshall  $
+--       Module Name      : $Workfile:   nm3trg.sql  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:30:20  $
+--       Date fetched Out : $Modtime:   Jul 18 2007 14:10:20  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : Graeme Johnson
@@ -14,7 +14,7 @@
 --   Product install/upgrade script
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+--	Copyright (c) exor corporation ltd, 2007
 -----------------------------------------------------------------------------
 
 
@@ -1709,6 +1709,28 @@ PROMPT nm_nw_ad_link_all_bu_trg.trg
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_nw_ad_link_all_bu_trg.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm_element_history_a_del.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_element_history_a_del.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm_members_all_nw_edit_audit.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_members_all_nw_edit_audit.trg' run_file 
 FROM dual 
 / 
 start '&run_file' 
