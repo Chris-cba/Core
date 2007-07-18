@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY nm3rvrs AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3rvrs.pkb	1.38 09/19/06
---       Module Name      : nm3rvrs.pkb
---       Date into SCCS   : 06/09/19 17:04:36
---       Date fetched Out : 07/06/13 14:13:23
---       SCCS Version     : 1.38
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rvrs.pkb-arc   2.1   Jul 18 2007 15:23:44   smarshall  $
+--       Module Name      : $Workfile:   nm3rvrs.pkb  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:23:44  $
+--       Date fetched Out : $Modtime:   Jul 02 2007 17:11:22  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : R.A. Coupe
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rvrs AS
 --	Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3rvrs.pkb	1.38 09/19/06"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'NM3RVRS';
@@ -578,6 +578,11 @@ BEGIN
 --         RAISE g_rvrs_exception;
 --      END IF;
 --
+
+     --turn member auditing off for subsequent rescale of new elements
+     nm_debug.debug('swiching off auditing_member_edits');
+     nm3net_history.set_auditing_member_edits(pi_setting => FALSE);
+
      INSERT INTO NM_REVERSAL
            (ne_id
            ,ne_unique
@@ -768,6 +773,8 @@ BEGIN
 
 --   Create new elements - give new sequence numbers
 
+     nm_debug.debug('creating elements');
+     nm_debug.debug_sql_string('SELECT ne_new_id    ,ne_type           ,ne_nt_type           ,ne_descr           ,ne_length           ,ne_admin_unit           ,sysdate           ,ne_owner           ,ne_name_1           ,ne_name_2           ,ne_prefix           ,' || l_group_number || ' + 1 - ROWNUM           ,ne_sub_type           ,ne_group           ,ne_no_start           ,ne_no_end           ,ne_sub_class           ,ne_nsg_ref           ,ne_version_no	   ,ne_type	    FROM NM_REVERSAL');     
      INSERT INTO nm_elements
            (ne_id
            ,ne_type
@@ -815,6 +822,8 @@ BEGIN
 	          )
      FROM NM_REVERSAL;
   
+    nm_debug.debug('done insert');
+
      reverse_shapes;
 
 --   recreate the locational data of all other objects
@@ -887,7 +896,25 @@ BEGIN
       l_tab_x_sect.DELETE;
       l_tab_iit_ne_id_done.DELETE;
    --
-   
+    --record the element history
+    insert into
+      nm_element_history(neh_id
+                        ,neh_ne_id_old
+                        ,neh_ne_id_new
+                        ,neh_operation
+                        ,neh_effective_date
+                        ,neh_old_ne_length
+                        ,neh_new_ne_length)
+    select
+      nm3seq.next_neh_id_seq,
+      nmr.ne_id,
+      nmr.ne_new_id,
+      nm3net_history.c_neh_op_reverse,
+      pi_effective_date,
+      nmr.ne_length,
+      nmr.ne_length
+    from
+      nm_reversal nmr;
 
 --
   ELSE
@@ -935,6 +962,7 @@ BEGIN
 --A full rescale cannot be performed since it will violate the members PK.
 --It needs to be done from the rescale tables.
 --
+   --turn off member auditing during this
 
    DECLARE
       circroute EXCEPTION;
@@ -947,6 +975,9 @@ BEGIN
    END;
 --nm3rsc.rescale_route( pi_ne_id, pi_effective_date, 0, NULL, 'N' );
 --
+
+  nm3net_history.set_auditing_member_edits(pi_setting => TRUE);
+
   -- reverse for other products
   reverse_other_products ( pi_effective_date => pi_effective_date );
 --
