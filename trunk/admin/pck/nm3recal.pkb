@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3recal.pkb	1.23 01/16/06
---       Module Name      : nm3recal.pkb
---       Date into SCCS   : 06/01/16 16:26:43
---       Date fetched Out : 07/06/13 14:13:13
---       SCCS Version     : 1.23
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.1   Jul 18 2007 15:23:06   smarshall  $
+--       Module Name      : $Workfile:   nm3recal.pkb  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:23:06  $
+--       Date fetched Out : $Modtime:   Jun 29 2007 14:55:36  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : Jonathan Mills
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3recal.pkb	1.23 01/16/06"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30) := 'nm3recal';
@@ -137,6 +137,8 @@ PROCEDURE recalibrate_section (pi_ne_id             IN nm_elements.ne_id%TYPE
    l_new_length        number;
    l_old_length_to_end number;
    l_begin_mp          number := NVL(pi_begin_mp,0);
+   
+   l_neh_rec nm_element_history%rowtype;
 --
 BEGIN
 --
@@ -243,6 +245,19 @@ BEGIN
                               ,pi_new_datum_length  => l_new_length
                               );
 --
+   --create history record
+   l_neh_rec.neh_id             := nm3seq.next_neh_id_seq;
+   l_neh_rec.neh_ne_id_old      := pi_ne_id;
+   l_neh_rec.neh_ne_id_new      := pi_ne_id;
+   l_neh_rec.neh_operation      := nm3net_history.c_neh_op_recalibrate;
+   l_neh_rec.neh_effective_date := nm3user.get_effective_date;
+   l_neh_rec.neh_old_ne_length  := g_element_length;
+   l_neh_rec.neh_new_ne_length  := l_new_length;
+   l_neh_rec.neh_param_1        := pi_begin_mp;
+   l_neh_rec.neh_param_2        := pi_new_length_to_end;
+   
+   nm3ins.ins_neh(p_rec_neh => l_neh_rec);
+   
    reset_for_return;
 --
    nm_debug.proc_end(g_package_name,'recalibrate_section');
@@ -414,6 +429,8 @@ PROCEDURE shift_section (pi_ne_id          IN nm_elements.ne_id%TYPE
 --
    v_errors            NUMBER;
    v_err_text          VARCHAR2(10000);
+   
+   l_neh_rec nm_element_history%rowtype;
 --
 
 BEGIN
@@ -484,6 +501,19 @@ BEGIN
                         ,pi_shift_distance => pi_shift_distance
                         );
 --
+   --create history record
+   l_neh_rec.neh_id             := nm3seq.next_neh_id_seq;
+   l_neh_rec.neh_ne_id_old      := pi_ne_id;
+   l_neh_rec.neh_ne_id_new      := pi_ne_id;
+   l_neh_rec.neh_operation      := nm3net_history.c_neh_op_shift;
+   l_neh_rec.neh_effective_date := nm3user.get_effective_date;
+   l_neh_rec.neh_old_ne_length  := g_element_length;
+   l_neh_rec.neh_new_ne_length  := g_element_length;
+   l_neh_rec.neh_param_1        := pi_begin_mp;
+   l_neh_rec.neh_param_2        := pi_shift_distance;
+   
+   nm3ins.ins_neh(p_rec_neh => l_neh_rec);
+   
    reset_for_return;
 --
    nm_debug.proc_end(g_package_name,'shift_section');
@@ -763,6 +793,86 @@ BEGIN
    nm3merge.set_nw_operation_in_progress(FALSE);
 
 END reset_for_return;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_mp_translation_recal(pi_mp                  IN nm_members.nm_begin_mp%TYPE
+                                 ,pi_orig_element_length IN nm_elements.ne_length%TYPE
+                                 ,pi_begin_mp            IN nm_members.nm_begin_mp%TYPE
+                                 ,pi_new_length_to_end   IN nm_elements.ne_length%TYPE
+                                 ) RETURN nm_members.nm_begin_mp%TYPE IS
+
+  l_new_length   nm_elements.ne_length%TYPE;
+  l_length_ratio number;
+  
+  l_retval       nm_members.nm_begin_mp%TYPE;
+
+BEGIN
+  nm_debug.proc_start(p_package_name   => g_package_name
+                     ,p_procedure_name => 'get_mp_translation_recal');
+
+  if pi_mp <= pi_begin_mp
+  then
+    --mp is before recalibrate start point so not affected
+    l_retval := pi_mp;
+  else
+    --mp is within recalibrated portion so work out new position
+    l_new_length := pi_begin_mp + pi_new_length_to_end;
+    
+    l_length_ratio := l_new_length / pi_orig_element_length;
+    
+    l_retval := pi_begin_mp + ((pi_mp - pi_begin_mp) * l_length_ratio);
+  end if;
+
+  nm_debug.proc_end(p_package_name   => g_package_name
+                   ,p_procedure_name => 'get_mp_translation_recal');
+
+  RETURN l_retval;
+
+END get_mp_translation_recal;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_mp_translation_shift(pi_mp             IN nm_members.nm_begin_mp%TYPE
+                                 ,pi_element_length IN nm_elements.ne_length%TYPE
+                                 ,pi_begin_mp       IN nm_members.nm_begin_mp%TYPE
+                                 ,pi_shift_distance IN nm_elements.ne_length%TYPE
+                                 ) RETURN nm_members.nm_begin_mp%TYPE IS
+
+  l_shift_distance number;
+  
+  l_retval nm_members.nm_begin_mp%TYPE := pi_mp;
+
+BEGIN
+  nm_debug.proc_start(p_package_name   => g_package_name
+                     ,p_procedure_name => 'get_mp_translation_shift');
+
+  IF pi_mp > pi_begin_mp
+    AND not pi_mp = pi_element_length
+  then
+    l_retval := l_retval + pi_shift_distance;
+  END IF;
+  
+  IF l_retval < 0
+  THEN
+    --overhang at beginning
+    hig.raise_ner(pi_appl => nm3type.c_net
+                 ,pi_id   => 449);
+   end if;
+      
+   IF l_retval > pi_element_length
+   THEN
+     --overhang at end
+     hig.raise_ner(pi_appl => nm3type.c_net
+                  ,pi_id   => 450);
+   END IF;
+
+  nm_debug.proc_end(p_package_name   => g_package_name
+                   ,p_procedure_name => 'get_mp_translation_shift');
+
+  RETURN l_retval;
+
+END get_mp_translation_shift;
 --
 -----------------------------------------------------------------------------
 --
