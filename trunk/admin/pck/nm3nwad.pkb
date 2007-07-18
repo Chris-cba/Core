@@ -1,13 +1,13 @@
 CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3nwad.pkb	1.23 11/29/06
---       Module Name      : nm3nwad.pkb
---       Date into SCCS   : 06/11/29 16:28:36
---       Date fetched Out : 07/06/13 14:13:02
---       SCCS Version     : 1.23
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.1   Jul 18 2007 15:21:58   smarshall  $
+--       Module Name      : $Workfile:   nm3nwad.pkb  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:21:58  $
+--       Date fetched Out : $Modtime:   Jun 29 2007 14:53:24  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -36,7 +36,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '@(#)nm3nwad.pkb	1.23 11/29/06';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.1  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'nm3nwad';
 
@@ -1739,8 +1739,9 @@ PROCEDURE do_ad_unreplace
               ( pi_old_ne_id  IN NM_ELEMENTS.ne_id%TYPE ) IS
 
    CURSOR get_old IS
-   SELECT * FROM V_NM_ELEMENT_HISTORY
-   WHERE new_ne_id = pi_old_ne_id;
+   SELECT * FROM V_NM_ELEMENT_HISTORY vneh
+   WHERE new_ne_id = pi_old_ne_id
+   and   vneh.neh_operation = nm3net_history.c_neh_op_replace;
 
    l_rec_element_hist V_NM_ELEMENT_HISTORY%ROWTYPE;
    l_rec_nadl_non_prim   NM_NW_AD_LINK%ROWTYPE;
