@@ -1,12 +1,12 @@
 CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3merge.pkb	1.51 01/23/07
---       Module Name      : nm3merge.pkb
---       Date into SCCS   : 07/01/23 15:53:52
---       Date fetched Out : 07/06/13 14:12:40
---       SCCS Version     : 1.51
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.1   Jul 18 2007 15:17:06   smarshall  $
+--       Module Name      : $Workfile:   nm3merge.pkb  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:17:06  $
+--       Date fetched Out : $Modtime:   Jul 09 2007 19:28:38  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --   Author : ITurnbull
 --
@@ -16,11 +16,12 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '@(#)nm3merge.pkb	1.51 01/23/07';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
    g_new_element_length    nm_elements.ne_length%TYPE;
+   g_starting_ne_id        nm_elements.ne_id%type;
 --
    g_rec_nit               nm_inv_types%ROWTYPE;
    g_nw_operation_in_progress boolean := FALSE;
@@ -252,7 +253,70 @@ END set_leg_numbers;
 --
 ------------------------------------------------------------------------------------------------
 --
-   -- merge the elements
+PROCEDURE audit_element_history(pi_ne_id_new     in nm_elements.ne_id%type
+                               ,pi_ne_id_1       in nm_elements.ne_id%type
+                               ,pi_length_1      in nm_elements.ne_length%type
+                               ,pi_ne_id_2       in nm_elements.ne_id%type
+                               ,pi_length_2      in nm_elements.ne_length%type
+                               ,pi_effective_date in date 
+                               ) IS
+
+  l_rec_neh nm_element_history%ROWTYPE;
+      
+  l_ne_id_1  nm_elements.ne_id%type;
+  l_length_1 nm_elements.ne_length%type;
+      
+  l_ne_id_2  nm_elements.ne_id%type;
+  l_length_2 nm_elements.ne_length%type;
+
+BEGIN
+  nm_debug.proc_start(p_package_name   => g_package_name
+                     ,p_procedure_name => 'audit_element_history');
+
+ --ensure we audit the old elements in the correct order
+  IF g_starting_ne_id = pi_ne_id_1
+  THEN
+    l_ne_id_1  := pi_ne_id_1;
+    l_length_1 := pi_length_1;
+       
+    l_ne_id_2  := pi_ne_id_2;
+    l_length_2 := pi_length_2;
+  else
+    l_ne_id_1  := pi_ne_id_2;
+    l_length_1 := pi_length_2;
+       
+    l_ne_id_2  := pi_ne_id_1;
+    l_length_2 := pi_length_1;
+  end if;
+   
+  l_rec_neh.neh_id             := nm3seq.next_neh_id_seq;
+  l_rec_neh.neh_ne_id_old      := l_ne_id_1;
+  l_rec_neh.neh_ne_id_new      := pi_ne_id_new;
+  l_rec_neh.neh_operation      := 'M';
+  l_rec_neh.neh_effective_date := pi_effective_date;
+  l_rec_neh.neh_old_ne_length  := l_length_1;
+  l_rec_neh.neh_new_ne_length  := l_length_1 + l_length_2;
+  --note this is the first merged element
+  l_rec_neh.neh_param_1        := 1;
+  l_rec_neh.neh_param_2        := NULL;
+      
+  ins_neh (l_rec_neh);
+      
+  l_rec_neh.neh_id             := nm3seq.next_neh_id_seq;
+  l_rec_neh.neh_ne_id_old      := l_ne_id_2;
+  l_rec_neh.neh_old_ne_length  := l_length_2;
+  --note this is the second merged element
+  l_rec_neh.neh_param_1        := 2;
+
+  ins_neh (l_rec_neh);
+
+  nm_debug.proc_end(p_package_name   => g_package_name
+                   ,p_procedure_name => 'audit_element_history');
+
+END audit_element_history;
+--
+------------------------------------------------------------------------------------------------
+--   -- merge the elements
 PROCEDURE merge_elements (p_ne_id_1               IN     nm_elements.ne_id%TYPE
                          ,p_ne_id_2               IN     nm_elements.ne_id%TYPE
                          ,p_ne_id_new             IN OUT nm_elements.ne_id%TYPE
@@ -466,23 +530,13 @@ nm_debug.debug('done calling insert element');
 --
    set_leg_numbers( p_ne_id_1, p_ne_id_2, p_ne_id_new );
 --
-   -- update element history
-   -- update the element history
-   DECLARE
-      l_rec_neh nm_element_history%ROWTYPE;
-   BEGIN
-      l_rec_neh.neh_ne_id_old      := p_ne_id_1;
-      l_rec_neh.neh_ne_id_new      := p_ne_id_new;
-      l_rec_neh.neh_operation      := 'M';
-      l_rec_neh.neh_effective_date := p_effective_date;
-      -- Put this into a simple loop as not to duplicate call to ins_neh
-      FOR i IN 1..2
-       LOOP
-         ins_neh (l_rec_neh);
-         l_rec_neh.neh_ne_id_old   := p_ne_id_2;
-      END LOOP;
-   END;
---
+  audit_element_history(pi_ne_id_new      => p_ne_id_new
+                       ,pi_ne_id_1        => p_ne_id_1
+                       ,pi_length_1       => g_ne_1_datum_length
+                       ,pi_ne_id_2        => p_ne_id_2
+                       ,pi_length_2       => g_ne_2_datum_length
+                       ,pi_effective_date => p_effective_date);
+
    nm_debug.proc_end(g_package_name , 'merge_elements');
 --
 END merge_elements;
@@ -863,6 +917,8 @@ BEGIN
 
    g_ne_1_datum_length := nm3net.get_datum_element_length(p_ne_id_1);
    g_ne_2_datum_length := nm3net.get_datum_element_length(p_ne_id_2);
+   
+   g_starting_ne_id := l_starting_ne_id;
 --
    merge_elements (p_ne_id_1               => p_ne_id_1
                   ,p_ne_id_2               => p_ne_id_2
@@ -1102,20 +1158,35 @@ END elements_on_same_route;
 --
 PROCEDURE ins_neh (p_rec_neh IN OUT nm_element_history%ROWTYPE) IS
 BEGIN
+   IF p_rec_neh.neh_id is null
+   then
+     p_rec_neh.neh_id := nm3seq.next_neh_id_seq; 
+   end if;
+   
    INSERT INTO nm_element_history
-          (neh_ne_id_old
+          (neh_id
+          ,neh_ne_id_old
           ,neh_ne_id_new
           ,neh_operation
           ,neh_effective_date
           ,neh_actioned_date
           ,neh_actioned_by
+          ,neh_old_ne_length
+          ,neh_new_ne_length
+          ,neh_param_1
+          ,neh_param_2
           )
-   VALUES (p_rec_neh.neh_ne_id_old
+   VALUES (p_rec_neh.neh_id
+          ,p_rec_neh.neh_ne_id_old
           ,p_rec_neh.neh_ne_id_new
           ,p_rec_neh.neh_operation
           ,p_rec_neh.neh_effective_date
           ,NVL(p_rec_neh.neh_actioned_date,TRUNC(SYSDATE))
           ,NVL(p_rec_neh.neh_actioned_by,USER)
+          ,p_rec_neh.neh_old_ne_length
+          ,p_rec_neh.neh_new_ne_length
+          ,p_rec_neh.neh_param_1
+          ,p_rec_neh.neh_param_2
           )
    RETURNING neh_actioned_date,neh_actioned_by
    INTO      p_rec_neh.neh_actioned_date, p_rec_neh.neh_actioned_by;
@@ -1946,6 +2017,8 @@ END get_nodes_and_cardinality;
 PROCEDURE merge_group_elements (pi_route_ne_rec_1        IN     nm_elements%ROWTYPE
                                ,pi_route_ne_rec_2        IN     nm_elements%ROWTYPE
                                ,po_route_ne_id_new       IN OUT nm_elements.ne_id%TYPE
+                               ,pi_length_1              in     nm_elements.ne_length%type
+                               ,pi_length_2              in     nm_elements.ne_length%type
                                ,pi_effective_date        IN     DATE                               DEFAULT nm3user.get_effective_date
                                ,pi_ne_unique_new         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
                                ,pi_ne_owner_new          IN     nm_elements.ne_owner%TYPE          DEFAULT NULL
@@ -2018,22 +2091,12 @@ PROCEDURE merge_group_elements (pi_route_ne_rec_1        IN     nm_elements%ROWT
                             ,p_auto_include      => 'N'
                             );
 
-     -- update element history
-       -- update the element history
-      DECLARE
-         l_rec_neh nm_element_history%ROWTYPE;
-      BEGIN
-         l_rec_neh.neh_ne_id_old      := pi_route_ne_rec_1.ne_id;
-         l_rec_neh.neh_ne_id_new      := po_route_ne_id_new;
-         l_rec_neh.neh_operation      := 'M';
-         l_rec_neh.neh_effective_date := pi_effective_date;
-         -- Put this into a simple loop as not to duplicate call to ins_neh
-         FOR i IN 1..2
-         LOOP
-           ins_neh (l_rec_neh);
-           l_rec_neh.neh_ne_id_old   := pi_route_ne_rec_2.ne_id;
-        END LOOP;
-     END;
+   audit_element_history(pi_ne_id_new      => po_route_ne_id_new
+                        ,pi_ne_id_1        => pi_route_ne_rec_1.ne_id
+                        ,pi_length_1       => pi_length_1
+                        ,pi_ne_id_2        => pi_route_ne_rec_2.ne_id
+                        ,pi_length_2       => pi_length_2
+                        ,pi_effective_date => pi_effective_date);
 
 END merge_group_elements;
 --
@@ -2295,6 +2358,8 @@ BEGIN
    merge_group_elements (pi_route_ne_rec_1        => l_ne_rec_1
                         ,pi_route_ne_rec_2        => l_ne_rec_2
                         ,po_route_ne_id_new       => po_route_ne_id_new
+                        ,pi_length_1              => l_length_1
+                        ,pi_length_2              => l_length_2
                         ,pi_effective_date        => pi_effective_date
                         ,pi_ne_unique_new         => pi_ne_unique
                         ,pi_ne_owner_new          => pi_ne_owner
