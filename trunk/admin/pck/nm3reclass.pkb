@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3reclass.pkb	1.61 12/18/06
---       Module Name      : nm3reclass.pkb
---       Date into SCCS   : 06/12/18 17:12:46
---       Date fetched Out : 07/06/13 14:13:14
---       SCCS Version     : 1.61
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.1   Jul 18 2007 15:20:12   smarshall  $
+--       Module Name      : $Workfile:   nm3reclass.pkb  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:20:12  $
+--       Date fetched Out : $Modtime:   Jun 29 2007 14:41:28  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : R.A. Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3reclass.pkb	1.61 12/18/06"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';
@@ -744,6 +744,8 @@ BEGIN
     g_rec_neh.neh_ne_id_new      := p_new_ne_id;
     g_rec_neh.neh_operation      := c_neh_operation;
     g_rec_neh.neh_effective_date := new_ne.ne_start_date;
+    g_rec_neh.neh_old_ne_length  := old_ne.ne_length;
+    g_rec_neh.neh_new_ne_length  := new_ne.ne_length;
     Nm3merge.ins_neh (g_rec_neh);
 --
 --
@@ -1430,6 +1432,8 @@ BEGIN
        g_rec_neh.neh_ne_id_new      := l_rec_new_ne.ne_id;
        g_rec_neh.neh_operation      := c_neh_operation;
        g_rec_neh.neh_effective_date := l_rec_new_ne.ne_start_date;
+       g_rec_neh.neh_old_ne_length  := p_old_ne.ne_length;
+       g_rec_neh.neh_new_ne_length  := l_rec_new_ne.ne_length;
        Nm3merge.ins_neh (g_rec_neh);
       --nm_debug.debug('new group ne_id= ' ||  l_rec_new_ne.ne_id);
 
