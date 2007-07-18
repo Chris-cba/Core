@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY nm3get_gen AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3get_gen.pkb	1.50 02/01/06
---       Module Name      : nm3get_gen.pkb
---       Date into SCCS   : 06/02/01 12:45:14
---       Date fetched Out : 07/06/13 14:11:40
---       SCCS Version     : 1.50
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get_gen.pkb-arc   2.1   Jul 18 2007 15:19:10   smarshall  $
+--       Module Name      : $Workfile:   nm3get_gen.pkb  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:19:10  $
+--       Date fetched Out : $Modtime:   Jun 29 2007 16:03:52  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : Jonathan Mills
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3get_gen AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3get_gen.pkb	1.50 02/01/06"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3get_gen';
@@ -460,6 +460,7 @@ BEGIN
    add_seq ('NSTY_ID_SEQ');   
    add_seq ('ND_ID_SEQ');
    --add_seq ('NEAT_ID_SEQ');
+   add_seq ('NEH_ID_SEQ');
    add_seq ('NEL_ID_SEQ');
    add_seq ('NE_ID_SEQ');
    add_seq ('NGQ_ID_SEQ');
@@ -597,16 +598,16 @@ PROCEDURE generate_from_globals IS
 --
    l_filename      varchar2(80);
 --
-   PROCEDURE sccs_tags IS
+   PROCEDURE pvcs_tags IS
    BEGIN
       seperator;
-      append('--   SCCS Identifiers :-');
+      append('--   PVCS Identifiers :-');
       append('--');
-      append('--       sccsid           : '||CHR(37)||'W'||CHR(37)||' '||CHR(37)||'G'||CHR(37));
-      append('--       Module Name      : '||CHR(37)||'M'||CHR(37));
-      append('--       Date into SCCS   : '||CHR(37)||'E'||CHR(37)||' '||CHR(37)||'U'||CHR(37));
-      append('--       Date fetched Out : '||CHR(37)||'D'||CHR(37)||' '||CHR(37)||'T'||CHR(37));
-      append('--       SCCS Version     : '||CHR(37)||'I'||CHR(37));
+      append('--       pvcsid           : ' || chr(36) || 'Header:' || chr(36) || '');
+      append('--       Module Name      : ' || chr(36) || 'Workfile:' || chr(36) || '');
+      append('--       Date into PVCS   : ' || chr(36) || 'Date:' || chr(36) || '');
+      append('--       Date fetched Out : ' || chr(36) || 'Modtime:' || chr(36) || '');
+      append('--       PVCS Version     : ' || chr(36) || 'Revision:' || chr(36) || '');
       append('--');
       append('--');
       append('--   Author : Jonathan Mills');
@@ -618,7 +619,7 @@ PROCEDURE generate_from_globals IS
       seperator;
       append('--	Copyright (c) exor corporation ltd, 2005');
       seperator;
-   END sccs_tags;
+   END pvcs_tags;
 --
    PROCEDURE build_top_of_package_header (p_package_name IN     varchar2
                                          ,p_tab_vc       IN OUT tab_varchar32767
@@ -626,10 +627,10 @@ PROCEDURE generate_from_globals IS
    BEGIN
       append ('CREATE OR REPLACE PACKAGE '||p_package_name||' IS');
       append ('--<PACKAGE>');
-      sccs_tags;
+      pvcs_tags;
       append('--</PACKAGE>');
       append('--<GLOBVAR>');
-      append('   g_sccsid          CONSTANT  VARCHAR2(2000) := '||string('"'||CHR(37)||'W'||CHR(37)||' '||CHR(37)||'G'||CHR(37)||'"')||';');
+      append('   g_sccsid          CONSTANT  VARCHAR2(2000) := '||string('"' || chr(36) || 'Revision:' || chr(36) || '"')||';');
       append('--  g_sccsid is the SCCS ID for the package');
       append('--');
       append('--</GLOBVAR>');
@@ -654,8 +655,8 @@ PROCEDURE generate_from_globals IS
                                        ) IS
    BEGIN
       append ('CREATE OR REPLACE PACKAGE BODY '||p_package_name||' IS');
-      sccs_tags;
-      append('   g_body_sccsid CONSTANT  VARCHAR2(2000) := '||string('"'||CHR(37)||'W'||CHR(37)||' '||CHR(37)||'G'||CHR(37)||'"')||';');
+      pvcs_tags;
+      append('   g_body_sccsid CONSTANT  VARCHAR2(2000) := '||string('"' || chr(36) || 'Revision:' || chr(36) || '"')||';');
       append('--  g_body_sccsid is the SCCS ID for the package body');
       append('--');
       append('   g_package_name    CONSTANT  varchar2(30)   := '||string(p_package_name)||';');
