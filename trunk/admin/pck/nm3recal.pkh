@@ -1,12 +1,13 @@
 CREATE OR REPLACE PACKAGE nm3recal IS
 --<PACKAGE>
---   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm3recal.pkh	1.4 07/19/01
---       Module Name      : nm3recal.pkh
---       Date into SCCS   : 01/07/19 15:21:45
---       Date fetched Out : 07/06/13 14:13:13
---       SCCS Version     : 1.4
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkh-arc   2.1   Jul 18 2007 15:22:34   smarshall  $
+--       Module Name      : $Workfile:   nm3recal.pkh  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:22:34  $
+--       Date fetched Out : $Modtime:   Jun 29 2007 15:23:42  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : Jonathan Mills
@@ -18,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3recal IS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(80) := '"@(#)nm3recal.pkh	1.4 07/19/01"';
+  g_sccsid      CONSTANT  VARCHAR2(80) := '"$Revision:   2.1  $"';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
@@ -86,6 +87,37 @@ PROCEDURE gis_shift_section (pi_ne_id          IN nm_elements.ne_id%TYPE
 --  pi_ne_id             - The NE_ID of the NM_ELEMENT we are operating upon
 --  pi_begin_mp          - The point on the section from which we are operating
 --  pi_shift_distance    - The distance be which we wish to shift
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_mp_translation_recal">
+--
+-- This function return the new position of the supplied point following a
+-- recalibrate operaton with the specified parameters.
+--
+FUNCTION get_mp_translation_recal(pi_mp                  IN nm_members.nm_begin_mp%TYPE
+                                 ,pi_orig_element_length IN nm_elements.ne_length%TYPE
+                                 ,pi_begin_mp            IN nm_members.nm_begin_mp%TYPE
+                                 ,pi_new_length_to_end   IN nm_elements.ne_length%TYPE
+                                 ) RETURN nm_members.nm_begin_mp%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_mp_translation_shift">
+--
+-- This function return the new position of the supplied point following a
+-- shift operaton with the specified parameters.
+--
+-- Raises: NET 449 - new position would overhang the beginning of the element
+--         NET 450 - new position would overhang the end of the element
+--
+FUNCTION get_mp_translation_shift(pi_mp             IN nm_members.nm_begin_mp%TYPE
+                                 ,pi_element_length IN nm_elements.ne_length%TYPE
+                                 ,pi_begin_mp       IN nm_members.nm_begin_mp%TYPE
+                                 ,pi_shift_distance IN nm_elements.ne_length%TYPE
+                                 ) RETURN nm_members.nm_begin_mp%TYPE;
 --</PROC>
 --
 -----------------------------------------------------------------------------
