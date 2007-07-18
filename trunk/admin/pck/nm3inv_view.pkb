@@ -2,13 +2,14 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3inv_view.pkb	1.56 02/16/07
---       Module Name      : nm3inv_view.pkb
---       Date into SCCS   : 07/02/16 09:02:47
---       Date fetched Out : 07/06/13 14:12:08
---       SCCS Version     : 1.56
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.2   Jul 18 2007 16:37:58   sscanlon  $
+--       Module Name      	: $Workfile:   nm3inv_view.pkb  $
+--       Date into PVCS   	: $Date:   Jul 18 2007 16:37:58  $
+--       Date fetched Out 	: $Modtime:   Jul 18 2007 15:47:50  $
+--       PVCS Version     	: $Revision:   2.2  $
+--       Based on SCCS version 	: 1.56
 --
 --
 --   Author : Jonathan Mills
@@ -19,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --      Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '"@(#)nm3inv_view.pkb	1.56 02/16/07"';
+   g_body_sccsid     CONSTANT  varchar2(80) := "$Revision::   2.2      $";
 --  g_body_sccsid is the SCCS ID for the package body
 --
 --all global package variables here
@@ -1241,11 +1242,11 @@ PROCEDURE create_ft_inv_for_nt_type (pi_nt_type                  IN varchar2
       l_rec_ita.ita_format_mask     := NULL;
       l_rec_ita.ita_exclusive       := 'N';
       l_rec_ita.ita_exclusive       := 'N';
-      --SSCANLON FIX LOG 709536 17JUL2007 
+      --SSCANLON FIX LOG 709536 17JUL2007
       --force all columns to be displayed and default the width to 1, advised by GJohnson
       l_rec_ita.ITA_DISPLAYED       := 'Y';
       l_rec_ita.ITA_DISP_WIDTH      := 1;
-      --END OF SSCANLON FIX LOG 709536 17JUL2007 
+      --END OF SSCANLON FIX LOG 709536 17JUL2007
       l_tab_nita (l_tab_nita.COUNT+1) := l_rec_ita;
 --
    END add_data;
@@ -1459,14 +1460,14 @@ PROCEDURE create_view_for_nt_type (pi_nt_type  IN varchar2 ) IS
    SELECT MIN(nau_start_date)
     FROM  nm_admin_units
    WHERE  nau_admin_type = c_nat_admin_type;
--- 
+--
    CURSOR chk_for_primary IS
    SELECT 'Y' FROM nm_nw_ad_types
    WHERE nad_nt_type = pi_nt_type
    AND nad_primary_ad = 'Y';
- 
 
--- 
+
+--
    l_exists_already   boolean;
    l_dummy            pls_integer;
 --
@@ -1492,7 +1493,7 @@ PROCEDURE create_view_for_nt_type (pi_nt_type  IN varchar2 ) IS
 --
    l_primary VARCHAR2(1);
 --
-   
+
    PROCEDURE add_data (p_col_name   varchar2
                       ,p_alias      varchar2
                       ,p_static_col boolean DEFAULT TRUE
@@ -1531,7 +1532,7 @@ PROCEDURE create_view_for_nt_type (pi_nt_type  IN varchar2 ) IS
       FETCH cs_atc INTO l_rec_atc;
       CLOSE cs_atc;
       --
-  
+
 --    l_tab_nita (l_tab_nita.COUNT+1) := l_rec_ita;
 --
    END add_data;
@@ -1578,7 +1579,7 @@ BEGIN
          l_exists      boolean;
       BEGIN
          --
-         l_temp_column := 'a.'||cs_rec.ntc_column_name;  
+         l_temp_column := 'a.'||cs_rec.ntc_column_name;
          l_temp_alias := SUBSTR(UPPER(REPLACE(cs_rec.ntc_prompt,' ','_')),1,30);
          IF NOT nm3flx.is_string_valid_for_object (l_temp_alias)
           OR nm3flx.is_reserved_word (l_temp_alias)
@@ -1618,8 +1619,8 @@ BEGIN
          --
       END;
    END LOOP;
-   
-   
+
+
    OPEN chk_for_primary;
    FETCH chk_for_primary INTO l_primary;
    IF chk_for_primary%NOTFOUND THEN
@@ -1629,9 +1630,9 @@ BEGIN
       CLOSE chk_for_primary;
       NULL;
    END IF;
-   
+
    IF l_primary = 'Y' THEN
-    --  Now add the extra attribute columns 
+    --  Now add the extra attribute columns
       FOR cs_rec IN ( SELECT * FROM nm_inv_type_attribs_all
                       WHERE ita_inv_type = (SELECT nad_inv_type FROM nm_nw_ad_types
                                             WHERE nad_nt_type = pi_nt_type
@@ -1639,18 +1640,18 @@ BEGIN
                                             AND nad_primary_ad = 'Y')
                       ORDER BY ita_disp_seq_no
                     )
-                
-                
+
+
       LOOP
 
          l_rec_ntc2 := cs_rec;
-       
+
          DECLARE
             l_temp_column varchar2(30);
             l_temp_alias  varchar2(30);
             l_exists      boolean;
          BEGIN
-         -- 
+         --
             l_temp_column := 'c.'||cs_rec.ita_attrib_name;
             l_temp_alias := SUBSTR(UPPER(REPLACE(cs_rec.ita_view_col_name,' ','_')),1,30);
             IF NOT nm3flx.is_string_valid_for_object (l_temp_alias)
@@ -1658,17 +1659,17 @@ BEGIN
             THEN
                l_temp_alias := NULL;
             END IF;
-         -- 
-         -- Check to make sure we dont already have this alias 
-         -- 
+         --
+         -- Check to make sure we dont already have this alias
+         --
             l_exists := FALSE;
-         -- 
+         --
             FOR i IN 1..l_tab_alias.COUNT
             LOOP
                l_exists := l_tab_alias(i) = l_temp_alias;
                EXIT WHEN l_exists;
             END LOOP;
-         -- 
+         --
             IF l_exists
             THEN
                l_temp_alias := NULL;
@@ -1683,23 +1684,23 @@ BEGIN
                   l_temp_column  := NULL;
                END IF;
             END IF;
-         -- 
+         --
             IF l_temp_column IS NOT NULL
             THEN
                add_data (l_temp_column, l_temp_alias, FALSE);
             END IF;
-         -- 
- 
+         --
+
          END;
       END LOOP;
 
    END IF;
-   -- 
+   --
    IF l_rec_nt.nt_datum = 'Y' THEN
       add_data ('NE_NO_START',NULL);
       add_data ('NE_NO_END',NULL);
    END IF;
--- 
+--
    nm_debug.debug('CREATE OR REPLACE VIEW '||c_owner||'.'||'V_NM_'||pi_nt_type||'_NT');
    l_tab_vc.DELETE;
    nm3ddl.append_tab_varchar(l_tab_vc,'CREATE OR REPLACE VIEW '||c_owner||'.'||'V_NM_'||pi_nt_type||'_NT'||' AS',FALSE);
@@ -1727,23 +1728,23 @@ BEGIN
    nm3ddl.append_tab_varchar(l_tab_vc,'--');
    FOR i IN 1..l_tab_alias.COUNT
     LOOP
- 
+
       nm3ddl.append_tab_varchar(l_tab_vc,l_line_begin||l_tab_column(i)||' '||l_tab_alias(i));
       l_line_begin := '      ,';
-       
+
    END LOOP;
-  
-   IF l_primary = 'N' THEN   
-      
+
+   IF l_primary = 'N' THEN
+
       nm3ddl.append_tab_varchar(l_tab_vc,' FROM nm_elements a');
       nm3ddl.append_tab_varchar(l_tab_vc,' WHERE a.ne_nt_type = '||nm3flx.string(pi_nt_type));
       -- nm3ddl.append_tab_varchar(l_tab_vc,' AND  ne_type    = '||nm3flx.string('S'));
       nm3ddl.append_tab_varchar(l_tab_vc,' WITH READ ONLY');
       nm3ddl.create_object_and_syns ('V_NM_'||pi_nt_type||'_NT',l_tab_vc);
       l_tab_vc.DELETE;
-   
+
    ELSE
-  
+
       nm3ddl.append_tab_varchar(l_tab_vc, ' FROM  nm_elements a '||
                                           ' LEFT OUTER JOIN nm_nw_ad_link b '||
                                           ' ON b.nad_ne_id = a.ne_id '||
@@ -1755,20 +1756,20 @@ BEGIN
                                           ' LEFT OUTER JOIN nm_inv_items_all c '||
                                           ' ON  b.nad_iit_ne_id = c.iit_ne_id ');
       nm3ddl.append_tab_varchar(l_tab_vc, ' WHERE a.ne_nt_type = '||nm3flx.string(pi_nt_type)||
-                                          ' AND a.ne_gty_group_type IS NULL ');                            
+                                          ' AND a.ne_gty_group_type IS NULL ');
       nm3ddl.append_tab_varchar(l_tab_vc, ' WITH READ ONLY');
       nm3ddl.create_object_and_syns ('V_NM_'||pi_nt_type||'_NT',l_tab_vc);
       l_tab_vc.DELETE;
-   
+
    END IF;
-   -- 
+   --
    COMMIT;
-   
--- 
+
+--
    nm_debug.proc_end(g_package_name, 'create_ft_inv_for_nt_type');
--- 
+--
 END create_view_for_nt_type;
--- 
+--
 ----------------------------------------------------------------------------------------------------
 --
 PROCEDURE create_view_for_nt_type (pi_nt_type  IN varchar2,
@@ -1817,7 +1818,7 @@ PROCEDURE create_view_for_nt_type (pi_nt_type  IN varchar2,
 --
    l_primary          varchar2(1);
 --
-   
+
    PROCEDURE add_data (p_col_name   varchar2
                       ,p_alias      varchar2
                       ,p_static_col boolean DEFAULT TRUE
@@ -1899,7 +1900,7 @@ BEGIN
          l_exists      boolean;
       BEGIN
          --
-         l_temp_column := 'a.'||cs_rec.ntc_column_name;  
+         l_temp_column := 'a.'||cs_rec.ntc_column_name;
          l_temp_alias := SUBSTR(UPPER(REPLACE(cs_rec.ntc_prompt,' ','_')),1,30);
          IF NOT nm3flx.is_string_valid_for_object (l_temp_alias)
           OR nm3flx.is_reserved_word (l_temp_alias)
@@ -1939,9 +1940,9 @@ BEGIN
          --
       END;
    END LOOP;
- 
-   
-   
+
+
+
    OPEN chk_for_primary;
    FETCH chk_for_primary INTO l_primary;
    IF chk_for_primary%NOTFOUND THEN
@@ -1952,7 +1953,7 @@ BEGIN
       NULL;
    END IF;
 
-  --  Now add the flexible attribute columns 
+  --  Now add the flexible attribute columns
    FOR cs_rec IN (SELECT * FROM nm_inv_type_attribs_all
                   WHERE ita_inv_type = (SELECT nad_inv_type FROM nm_nw_ad_types
                                         WHERE nad_nt_type = pi_nt_type
@@ -1960,7 +1961,7 @@ BEGIN
                                         AND nad_primary_ad = 'Y')
                   ORDER BY ita_disp_seq_no
                 )
-                             
+
     LOOP
 
       l_rec_ntc2 := cs_rec;
@@ -1970,7 +1971,7 @@ BEGIN
          l_temp_alias  varchar2(30);
          l_exists      boolean;
       BEGIN
-         -- 
+         --
          l_temp_column := 'c.'||cs_rec.ita_attrib_name;
          l_temp_alias := SUBSTR(UPPER(REPLACE(cs_rec.ita_view_col_name,' ','_')),1,30);
          IF NOT nm3flx.is_string_valid_for_object (l_temp_alias)
@@ -1978,17 +1979,17 @@ BEGIN
           THEN
             l_temp_alias := NULL;
          END IF;
-         -- 
-         -- Check to make sure we dont already have this alias 
-         -- 
+         --
+         -- Check to make sure we dont already have this alias
+         --
          l_exists := FALSE;
-         -- 
+         --
          FOR i IN 1..l_tab_alias.COUNT
           LOOP
             l_exists := l_tab_alias(i) = l_temp_alias;
             EXIT WHEN l_exists;
          END LOOP;
-         -- 
+         --
          IF l_exists
           THEN
             l_temp_alias := NULL;
@@ -2003,13 +2004,13 @@ BEGIN
                l_temp_column  := NULL;
             END IF;
          END IF;
-         -- 
+         --
          IF l_temp_column IS NOT NULL
           THEN
             add_data (l_temp_column, l_temp_alias, FALSE);
          END IF;
-         -- 
- 
+         --
+
       END;
    END LOOP;
 
@@ -2017,7 +2018,7 @@ BEGIN
       add_data ('NE_NO_START',NULL);
       add_data ('NE_NO_END',NULL);
    END IF;
--- 
+--
    --nm_debug.debug('CREATE OR REPLACE VIEW '||c_owner||'.'||'V_NM_'||pi_nt_type||'_'||pi_gty_type||'_NT');
    l_tab_vc.DELETE;
    nm3ddl.append_tab_varchar(l_tab_vc,'CREATE OR REPLACE VIEW '||c_owner||'.'||'V_NM_'||pi_nt_type||'_'||pi_gty_type||'_NT AS ',FALSE);
@@ -2050,7 +2051,7 @@ BEGIN
     LOOP
       nm3ddl.append_tab_varchar(l_tab_vc,l_line_begin||l_tab_column(i)||' '||l_tab_alias(i));
       l_line_begin := '      ,';
- 
+
    END LOOP;
 
 --
@@ -2089,42 +2090,42 @@ BEGIN
   END LOOP;
 --
   nm3ddl.create_object_and_syns ('V_NM_'||pi_nt_type||'_'||pi_gty_type||'_NT',l_tab_vc);
-  l_tab_vc.DELETE;                          
-  -- 
+  l_tab_vc.DELETE;
+  --
   COMMIT;
--- 
+--
   nm_debug.proc_end(g_package_name, 'create_ft_inv_for_nt_type');
--- 
+--
 END create_view_for_nt_type;
--- 
+--
 ----------------------------------------------------------------------------------------------------
--- 
+--
 FUNCTION get_nt_view_name (pi_nt_type  IN VARCHAR2,
                            pi_gty_type IN VARCHAR2 DEFAULT NULL
                           )  RETURN VARCHAR2 IS
-    
-   -- 
+
+   --
    CURSOR check_obj_exists (p_owner VARCHAR2,
                             p_object VARCHAR2) IS
    SELECT 'x'
    FROM  all_objects
    WHERE  owner       = p_owner
    AND   object_name = p_object;
-   
-   --    
+
+   --
    g_application_owner user_users.username%TYPE := Hig.get_application_owner;
 
    lc_view_name all_objects.object_name%TYPE;
-   
+
    l_dummy VARCHAR2(1);
-   
+
    view_not_exist EXCEPTION;
-   --    
-                            
+   --
+
 BEGIN
-   -- 
-   IF pi_gty_type IS NULL THEN  
-   
+   --
+   IF pi_gty_type IS NULL THEN
+
       lc_view_name := 'V_NM_'||pi_nt_type||'_NT';
 
    ELSE
@@ -2132,7 +2133,7 @@ BEGIN
       lc_view_name := 'V_NM_'||pi_nt_type||'_'||pi_gty_type||'_NT';
 
    END IF;
-   -- 
+   --
    OPEN  check_obj_exists(g_application_owner, lc_view_name);
    FETCH check_obj_exists INTO l_dummy;
    IF check_obj_exists%NOTFOUND THEN
@@ -2140,21 +2141,21 @@ BEGIN
       RAISE view_not_exist;
    END IF;
    CLOSE check_obj_exists;
-   -- 
+   --
    RETURN lc_view_name;
-   -- 
+   --
 
-EXCEPTION 
+EXCEPTION
 
    WHEN view_not_exist THEN
-     
+
       hig.raise_ner(pi_appl => nm3type.c_net
                    ,pi_id       => 256 );
 
-END;                          
--- 
+END;
+--
 ----------------------------------------------------------------------------------------------------
---                                                                                      
+--
 PROCEDURE create_inv_nw_trigger( pi_inv_type    varchar2
                                 ,pi_attr_prefix varchar2 DEFAULT NULL
                                )
