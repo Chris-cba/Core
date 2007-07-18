@@ -1,3 +1,21 @@
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.2   Jul 18 2007 15:29:50   smarshall  $
+--       Module Name      : $Workfile:   nm3data1.sql  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:29:50  $
+--       Date fetched Out : $Modtime:   Jul 18 2007 14:15:34  $
+--       Version          : $Revision:   2.2  $
+--
+--   Product metadata script
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2007
+-----------------------------------------------------------------------------
+--
+--
 /***************************************************************************
 
 INFO
@@ -6,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-03-JUL-2007 10:39
+18-JUL-2007 14:15
 
 TABLES PROCESSED
 ================
@@ -34,7 +52,6 @@ A
 
 ***************************************************************************/
 
-define sccsid = '"$Revision:   2.1  $"'
 set define off;
 set feedback off;
 
@@ -13197,6 +13214,40 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'NET'
                     AND  NER_ID = 450);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,451
+       ,null
+       ,'Cannot locate asset on this network as its measures have been modified'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 451);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,452
+       ,null
+       ,'Cannot locate asset on this network as it has been edited.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 452);
 --
 --
 --********** HIG_DOMAINS **********--
@@ -35096,6 +35147,21 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
                    WHERE HSA_TABLE_NAME = 'NM_ELEMENTS_ALL'
                     AND  HSA_COLUMN_NAME = 'NE_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
+        'NM_ELEMENT_HISTORY'
+       ,'NEH_ID'
+       ,'NEH_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'NM_ELEMENT_HISTORY'
+                    AND  HSA_COLUMN_NAME = 'NEH_ID');
 --
 INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        (HSA_TABLE_NAME
