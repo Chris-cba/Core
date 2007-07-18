@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_load AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3inv_load.pkb	1.8 11/11/04
---       Module Name      : nm3inv_load.pkb
---       Date into SCCS   : 04/11/11 23:09:12
---       Date fetched Out : 07/06/13 14:12:02
---       SCCS Version     : 1.8
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.1   Jul 18 2007 15:29:12   smarshall  $
+--       Module Name      : $Workfile:   nm3inv_load.pkb  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:29:12  $
+--       Date fetched Out : $Modtime:   Jul 17 2007 16:24:40  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : Jonathan Mills
@@ -21,10 +21,13 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_load AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3inv_load.pkb	1.8 11/11/04"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_load';
+   
+   --c_hist_loc_enabled_opt CONSTANT hig_option_list.hol_id%TYPE := 'HISTINVLOC';
+   --c_hist_loc_enabled     constant boolean := NVL(hig.get_sysopt(p_option_id => c_hist_loc_enabled_opt), 'N') = 'Y';
 --
 -----------------------------------------------------------------------------
 --
@@ -177,6 +180,8 @@ PROCEDURE load_or_val_ele_mp_ambig (p_rec           v_load_inv_mem_ele_mp_ambig%
                                    ,p_use_true      BOOLEAN DEFAULT FALSE
                                    ) IS
 --
+   c_init_effective_date CONSTANT date := nm3user.get_effective_date;
+
    l_nte_job_id   nm_nw_temp_extents.nte_job_id%TYPE;
 --
    l_route_ne_id  nm_elements.ne_id%TYPE;
@@ -202,6 +207,8 @@ BEGIN
     THEN
       RAISE nothing_to_do;
    END IF;
+   
+   nm3homo.historic_locate_init(pi_effective_date => p_rec.nm_start_date);
 --
    l_route_ne_id := nm3net.get_ne_id (p_rec.ne_unique,p_rec.ne_nt_type);
 --
@@ -249,6 +256,10 @@ BEGIN
       g_last_nte_job_id := l_nte_job_id;
    END IF;
 --
+   nm3homo.historic_locate_validation(pi_nte_job_id   => l_nte_job_id
+                                     ,pi_user_ne_id   => l_route_ne_id
+                                     ,pi_user_ne_type => nm3net.get_ne(pi_ne_id => l_route_ne_id).ne_type);
+
    IF NOT p_validate_only
     THEN
       nm3homo.homo_update (p_temp_ne_id_in  => l_nte_job_id
@@ -256,6 +267,8 @@ BEGIN
                           ,p_effective_date => p_rec.nm_start_date
                           );
    END IF;
+   
+   nm3homo.historic_locate_post(pi_init_effective_date => c_init_effective_date);
 --nm_debug.debug_off;
 --
 EXCEPTION
@@ -266,6 +279,7 @@ EXCEPTION
    WHEN others
     THEN
       ROLLBACK TO top_of_load;
+      nm3homo.historic_locate_post(pi_init_effective_date => c_init_effective_date);
       RAISE;
 --
 END load_or_val_ele_mp_ambig;
@@ -361,6 +375,8 @@ PROCEDURE load_or_val_ele_mp_excl (p_rec           v_load_inv_mem_ele_mp_excl%RO
                                   ,p_use_true      BOOLEAN DEFAULT FALSE
                                   ) IS
 --
+   c_init_effective_date CONSTANT date := nm3user.get_effective_date;
+   
    l_nte_job_id   nm_nw_temp_extents.nte_job_id%TYPE;
 --
    l_route_ne_id  nm_elements.ne_id%TYPE;
@@ -385,6 +401,8 @@ BEGIN
       RAISE nothing_to_do;
    END IF;
 --
+   nm3homo.historic_locate_init(pi_effective_date => p_rec.nm_start_date);
+   
    l_route_ne_id := nm3net.get_ne_id (p_rec.ne_unique,p_rec.ne_nt_type);
 --
    get_datum_lref (pi_route_ne_id  => l_route_ne_id
@@ -431,6 +449,10 @@ BEGIN
       g_last_nte_job_id := l_nte_job_id;
    END IF;
 --
+   nm3homo.historic_locate_validation(pi_nte_job_id   => l_nte_job_id
+                                     ,pi_user_ne_id   => l_route_ne_id
+                                     ,pi_user_ne_type => nm3net.get_ne(pi_ne_id => l_route_ne_id).ne_type);
+
    IF NOT p_validate_only
     THEN
       nm3homo.homo_update (p_temp_ne_id_in  => l_nte_job_id
@@ -438,6 +460,8 @@ BEGIN
                           ,p_effective_date => p_rec.nm_start_date
                           );
    END IF;
+   
+   nm3homo.historic_locate_post(pi_init_effective_date => c_init_effective_date);
 --
 EXCEPTION
 --
@@ -447,6 +471,7 @@ EXCEPTION
    WHEN others
     THEN
       ROLLBACK TO top_of_load;
+      nm3homo.historic_locate_post(pi_init_effective_date => c_init_effective_date);
       RAISE;
 --
 END load_or_val_ele_mp_excl;
@@ -487,6 +512,8 @@ PROCEDURE load_or_val_on_element (p_rec           v_load_inv_mem_on_element%ROWT
                                  ,p_validate_only BOOLEAN
                                  ) IS
 --
+   c_init_effective_date constant date := nm3user.get_effective_date;
+   
    l_rec_ne       nm_elements%ROWTYPE;
 --
    nothing_to_do  EXCEPTION;
@@ -506,6 +533,8 @@ BEGIN
       RAISE nothing_to_do;
    END IF;
 --
+   nm3homo.historic_locate_init(pi_effective_date => p_rec.nm_start_date);
+
    l_rec_ne := nm3get.get_ne (pi_ne_id  => nm3net.get_ne_id (p_rec.ne_unique,p_rec.ne_nt_type));
 --
    IF   NVL(p_rec.begin_mp,0)            = 0
@@ -530,7 +559,11 @@ BEGIN
    nm3homo.check_temp_ne_for_pnt_or_cont (pi_nte_job_id  => l_nte_job_id
                                          ,pi_pnt_or_cont => nm3get.get_nit (pi_nit_inv_type=>p_rec.iit_inv_type).nit_pnt_or_cont
                                          );
---
+
+   nm3homo.historic_locate_validation(pi_nte_job_id   => l_nte_job_id
+                                     ,pi_user_ne_id   => l_rec_ne.ne_id
+                                     ,pi_user_ne_type => l_rec_ne.ne_type);
+   
    IF p_validate_only
     THEN
       IF NOT g_create_temp_ne_on_validate
@@ -546,15 +579,19 @@ BEGIN
    END IF;
 --
    g_last_nte_job_id := l_nte_job_id;
+   
+   nm3homo.historic_locate_post(pi_init_effective_date => c_init_effective_date);
 --
 EXCEPTION
 --
    WHEN nothing_to_do
     THEN
       Null;
+
    WHEN others
     THEN
       ROLLBACK TO top_of_load;
+      nm3homo.historic_locate_post(pi_init_effective_date => c_init_effective_date);
       RAISE;
 --
 END load_or_val_on_element;
@@ -718,11 +755,15 @@ PROCEDURE load_or_validate_point_on_ele (p_rec           v_load_point_inv_mem_on
                                         ,p_validate_only BOOLEAN
                                         ) IS
 --
+   c_init_effective_date constant date := nm3user.get_effective_date; 
+   
    l_rec_ne   nm_elements%ROWTYPE;
    l_rec_nte  nm_nw_temp_extents%ROWTYPE;
 --
 BEGIN
 --
+   nm3homo.historic_locate_init(pi_effective_date => p_rec.nm_start_date);
+
    l_rec_ne := nm3get.get_ne (pi_ne_unique  => p_rec.ne_unique
                              ,pi_ne_nt_type => p_rec.ne_nt_type
                              );
@@ -746,11 +787,18 @@ BEGIN
       l_rec_nte.nte_seq_no      := 1;
       l_rec_nte.nte_route_ne_id := l_rec_ne.ne_id;
       nm3extent.ins_nte   (l_rec_nte);
+      
+      nm3homo.historic_locate_validation(pi_nte_job_id   => l_rec_nte.nte_job_id
+                                        ,pi_user_ne_id   => l_rec_ne.ne_id
+                                        ,pi_user_ne_type => l_rec_ne.ne_type);
+      
       nm3homo.homo_update (p_temp_ne_id_in  => l_rec_nte.nte_job_id
                           ,p_iit_ne_id      => p_rec.iit_ne_id
                           ,p_effective_date => p_rec.nm_start_date
                           );
    END IF;
+   
+   nm3homo.historic_locate_post(pi_init_effective_date => c_init_effective_date);
 --
 END load_or_validate_point_on_ele;
 --
