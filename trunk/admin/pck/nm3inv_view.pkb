@@ -1240,7 +1240,12 @@ PROCEDURE create_ft_inv_for_nt_type (pi_nt_type                  IN varchar2
       l_rec_ita.ita_units           := NULL;
       l_rec_ita.ita_format_mask     := NULL;
       l_rec_ita.ita_exclusive       := 'N';
-      --
+      l_rec_ita.ita_exclusive       := 'N';
+      --SSCANLON FIX LOG 709536 17JUL2007 
+      --force all columns to be displayed and default the width to 1, advised by GJohnson
+      l_rec_ita.ITA_DISPLAYED       := 'Y';
+      l_rec_ita.ITA_DISP_WIDTH      := 1;
+      --END OF SSCANLON FIX LOG 709536 17JUL2007 
       l_tab_nita (l_tab_nita.COUNT+1) := l_rec_ita;
 --
    END add_data;
