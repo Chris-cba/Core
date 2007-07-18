@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3pkh.sql	1.125 02/02/07
---       Module Name      : nm3pkh.sql
---       Date into SCCS   : 07/02/02 09:50:55
---       Date fetched Out : 07/06/13 14:13:09
---       SCCS Version     : 1.125
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.1   Jul 18 2007 15:30:48   smarshall  $
+--       Module Name      : $Workfile:   nm3pkh.sql  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:30:48  $
+--       Date fetched Out : $Modtime:   Jul 18 2007 14:12:28  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : Graeme Johnson
@@ -14,7 +14,7 @@
 --   Run on product install/upgrade
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+--	Copyright (c) exor corporation ltd, 2007
 -----------------------------------------------------------------------------
 
 
@@ -2026,8 +2026,20 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&term
 FROM dual 
 / 
 start '&run_file'
-
-
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm3net_history.pkh
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3net_history.pkh' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
 
 
 --
