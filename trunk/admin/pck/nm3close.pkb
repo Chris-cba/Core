@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3close.pkb	1.36 07/18/06
---       Module Name      : nm3close.pkb
---       Date into SCCS   : 06/07/18 15:47:13
---       Date fetched Out : 07/06/13 14:11:11
---       SCCS Version     : 1.36
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.1   Jul 18 2007 15:20:36   smarshall  $
+--       Module Name      : $Workfile:   nm3close.pkb  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:20:36  $
+--       Date fetched Out : $Modtime:   Jun 29 2007 14:44:14  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3close.pkb	1.36 07/18/06"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -87,14 +87,16 @@ BEGIN
    nm_debug.proc_start(g_package_name , 'insert_nm_element_history');
 --
       INSERT INTO  NM_ELEMENT_HISTORY
-         (neh_ne_id_old,
+         (neh_id,
+          neh_ne_id_old,
           neh_ne_id_new,
           neh_operation,
           neh_effective_date,
           neh_actioned_date,
           neh_actioned_by
          )
-      VALUES ( p_ne_id
+      VALUES ( nm3seq.next_neh_id_seq 
+              ,p_ne_id
               ,p_ne_id
               ,'C'
               ,p_effective_date
