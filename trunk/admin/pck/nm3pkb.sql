@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3pkb.sql	1.120 02/02/07
---       Module Name      : nm3pkb.sql
---       Date into SCCS   : 07/02/02 09:51:55
---       Date fetched Out : 07/06/13 14:13:08
---       SCCS Version     : 1.120
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.1   Jul 18 2007 15:31:12   smarshall  $
+--       Module Name      : $Workfile:   nm3pkb.sql  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:31:12  $
+--       Date fetched Out : $Modtime:   Jul 18 2007 14:12:54  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : Graeme Johnson
@@ -14,7 +14,7 @@
 --   Run on product install/upgrade
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+--	Copyright (c) exor corporation ltd, 2007
 -----------------------------------------------------------------------------
 
 SET echo OFF
@@ -1829,6 +1829,17 @@ PROMPT nm3analytic_connectivity.pkw
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3analytic_connectivity.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm3analytic_connectivity.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3net_history.pkw' run_file
 FROM dual 
 / 
 start '&run_file'
