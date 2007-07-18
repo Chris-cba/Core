@@ -1,11 +1,12 @@
 CREATE OR REPLACE PACKAGE BODY nm3replace IS
---   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm3replace.pkb	1.13 01/26/07
---       Module Name      : nm3replace.pkb
---       Date into SCCS   : 07/01/26 15:32:29
---       Date fetched Out : 07/06/13 14:13:15
---       SCCS Version     : 1.13
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.1   Jul 18 2007 15:19:48   smarshall  $
+--       Module Name      : $Workfile:   nm3replace.pkb  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:19:48  $
+--       Date fetched Out : $Modtime:   Jun 29 2007 14:39:32  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : ITurnbull
@@ -16,7 +17,7 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3replace.pkb	1.13 01/26/07"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3replace';
 ------------------------------------------------------------------------------------------------
@@ -124,6 +125,8 @@ END get_body_version;
    v_ne_sub_class nm_elements.ne_sub_class%TYPE := p_ne_sub_class;
    v_ne_nsg_ref nm_elements.ne_nsg_ref%TYPE := p_ne_nsg_ref;
    v_ne_version_no nm_elements.ne_version_no%TYPE := p_ne_version_no;
+   
+   l_orig_ne_length nm_elements.ne_length%type;
 
    BEGIN
       IF p_ne_id_new IS NULL THEN
@@ -166,8 +169,10 @@ END get_body_version;
             END IF;
         END LOOP;
 
+        l_orig_ne_length := c1rec.ne_length;
+        
         IF v_ne_length IS NULL THEN
-           v_ne_length := c1rec.ne_length;
+           v_ne_length := l_orig_ne_length;
         END IF;
         IF v_ne_no_start IS NULL THEN
            v_ne_no_start := c1rec.ne_no_start;
@@ -225,6 +230,8 @@ END get_body_version;
          l_rec_neh.neh_ne_id_new      := p_ne_id_new;
          l_rec_neh.neh_operation      := 'R';
          l_rec_neh.neh_effective_date := p_effective_date;
+         l_rec_neh.neh_old_ne_length  := l_orig_ne_length;
+         l_rec_neh.neh_new_ne_length  := v_ne_length;
          nm3merge.ins_neh(l_rec_neh);
       END;
    END;
