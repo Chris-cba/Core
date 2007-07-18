@@ -1,12 +1,13 @@
 CREATE OR REPLACE PACKAGE nm3homo AS
 --<PACKAGE>
---   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm3homo.pkh	1.18 01/30/06
---       Module Name      : nm3homo.pkh
---       Date into SCCS   : 06/01/30 15:58:12
---       Date fetched Out : 07/06/13 14:11:44
---       SCCS Version     : 1.18
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkh-arc   2.1   Jul 18 2007 15:27:56   smarshall  $
+--       Module Name      : $Workfile:   nm3homo.pkh  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:27:56  $
+--       Date fetched Out : $Modtime:   Jul 18 2007 11:27:38  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : Jonathan Mills
@@ -18,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3homo AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3homo.pkh	1.18 01/30/06"';
+   g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
 --  g_sccsid is the SCCS ID for the package
 --
    c_contiguous_warning_code CONSTANT VARCHAR2(20) := 'CONTIGUOUS';
@@ -229,6 +230,40 @@ PROCEDURE check_temp_ne_for_pnt_or_cont (pi_nte_job_id  NM_NW_TEMP_EXTENTS.nte_j
                                         );
 --</PROC>
 --
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="historic_locate_init">
+--
+-- This procedure should be called before initiating an asset location at a
+-- historic date.
+--
+PROCEDURE historic_locate_init(pi_effective_date IN date
+                              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="historic_locate_validation">
+--
+-- This procedure should be called before calling homo_update to validate
+-- the intended location for historic loading
+--
+PROCEDURE historic_locate_validation(pi_nte_job_id   IN nm_nw_temp_extents.nte_job_id%TYPE
+                                    ,pi_user_ne_id   IN nm_elements.ne_id%TYPE DEFAULT NULL
+                                    ,pi_user_ne_type IN nm_elements.ne_type%TYPE DEFAULT NULL
+                                    );
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="historic_locate_post">
+--
+-- This procedure should be called after calling homo_update to do any
+-- post location checks or cleanup. 
+--
+PROCEDURE historic_locate_post(pi_init_effective_date IN date
+                              );
 -----------------------------------------------------------------------------
 --
 --<PRAGMA>
