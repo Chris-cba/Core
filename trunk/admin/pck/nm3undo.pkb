@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY Nm3undo
 IS
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3undo.pkb	1.43 01/24/07
---       Module Name      : nm3undo.pkb
---       Date into SCCS   : 07/01/24 15:32:28
---       Date fetched Out : 07/06/13 14:13:41
---       SCCS Version     : 1.43
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.1   Jul 18 2007 15:21:30   smarshall  $
+--       Module Name      : $Workfile:   nm3undo.pkb  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:21:30  $
+--       Date fetched Out : $Modtime:   Jun 29 2007 14:48:32  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '@(#)nm3undo.pkb	1.43 01/24/07';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -708,8 +708,14 @@ END undo_scheme;
       CURSOR c2 (c_ne_id nm_elements.ne_id%TYPE)
       IS
          SELECT 1
-           FROM NM_ELEMENT_HISTORY
-          WHERE neh_ne_id_old = c_ne_id;
+           FROM NM_ELEMENT_HISTORY neh
+          WHERE neh_ne_id_old = c_ne_id
+            and neh.neh_operation IN (nm3net_history.c_neh_op_split
+                                     ,nm3net_history.c_neh_op_merge
+                                     ,nm3net_history.c_neh_op_replace
+                                     ,nm3net_history.c_neh_op_close
+                                     ,nm3net_history.c_neh_op_reclassify
+                                     ,nm3net_history.c_neh_op_reverse);
 
       v_found   NUMBER;
       retval    BOOLEAN := FALSE;
@@ -762,7 +768,24 @@ END undo_scheme;
 
       Nm_Debug.proc_end (g_package_name, 'delete_element_history');
    END delete_element_history;
+--
+------------------------------------------------------------------------------------------------
+--
+  PROCEDURE delete_element_history_for_new(pi_ne_id_new nm_element_history.neh_ne_id_new%type
+                                          ) IS
+  BEGIN
+    nm_debug.proc_start(p_package_name   => g_package_name
+                       ,p_procedure_name => 'delete_element_history_for_new');
 
+  delete
+    nm_element_history neh
+  where
+    neh.neh_ne_id_old = pi_ne_id_new;
+
+    nm_debug.proc_end(p_package_name   => g_package_name
+                     ,p_procedure_name => 'delete_element_history_for_new');
+
+  END delete_element_history_for_new;
 --
 ------------------------------------------------------------------------------------------------
 --
@@ -966,7 +989,12 @@ END undo_scheme;
 
          -- delete the history
          delete_element_history (pi_ne_id, c_split);
+         
+         delete_element_history_for_new(pi_ne_id_new => pi_ne_id_1);
+         delete_element_history_for_new(pi_ne_id_new => pi_ne_id_2);
+         
          error_loc := 12 ;
+         
          -- delete the new elements
          delete_element (pi_ne_id_1, pi_ne_id_2);
          error_loc := 13 ;
@@ -1029,6 +1057,10 @@ END undo_scheme;
 
          -- delete the history
          delete_element_history (pi_ne_id, c_split);
+         
+         delete_element_history_for_new(pi_ne_id_new => pi_ne_id_1);
+         delete_element_history_for_new(pi_ne_id_new => pi_ne_id_2);
+         
          error_loc := 26 ;
          undo_other_products (p_ne_id_1        => pi_ne_id        -- old ne_id
                                                           ,
@@ -1352,6 +1384,9 @@ END undo_scheme;
             error_loc := 110 ;
             -- delete the history
             delete_element_history (pi_ne_id_2, c_merge);
+            
+            delete_element_history_for_new(pi_ne_id_new => pi_ne_id);
+            
             error_loc := 111 ;
             -- delete nm_elements for v_ne_id
             delete_element (pi_ne_id);
@@ -1418,6 +1453,9 @@ END undo_scheme;
          error_loc := 126 ;
          delete_element_history (pi_ne_id_2, c_merge);
          error_loc := 127 ;
+         
+         delete_element_history_for_new(pi_ne_id_new => pi_ne_id);
+         
          undo_other_products (p_ne_id_1        => pi_ne_id_1,
                               p_ne_id_2        => pi_ne_id_2,
                               p_ne_id_3        => pi_ne_id        -- new ne_id
@@ -1664,6 +1702,9 @@ END undo_scheme;
 --                           AND iit_inv_type = nm_obj_type);
             -- delete the history
             delete_element_history (p_ne_id, c_replace);
+            
+            delete_element_history_for_new(pi_ne_id_new => v_ne_id);
+            
             -- delete nm_elements v_ne_id
             delete_element (v_ne_id);
 
