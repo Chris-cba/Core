@@ -1,12 +1,12 @@
 CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3split.pkb	1.42 01/19/07
---       Module Name      : nm3split.pkb
---       Date into SCCS   : 07/01/19 11:45:15
---       Date fetched Out : 07/06/13 14:13:35
---       SCCS Version     : 1.42
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.1   Jul 18 2007 15:21:04   smarshall  $
+--       Module Name      : $Workfile:   nm3split.pkb  $
+--       Date into PVCS   : $Date:   Jul 18 2007 15:21:04  $
+--       Date fetched Out : $Modtime:   Jul 09 2007 20:06:12  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : ITurnbull
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --   Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3split.pkb	1.42 01/19/07"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -323,6 +323,8 @@ PROCEDURE split_element (p_ne_id               IN     nm_elements.ne_id%TYPE    
                         ) IS
    --
 --
+  c_orig_ne_length CONSTANT number := p_ne_length_1 + p_ne_length_2;
+
    PROCEDURE do_inheritance IS
       -- flexible attributes (columns) to inherit
       CURSOR cs_inherit (c_nt_type NM_TYPE_COLUMNS.ntc_nt_type%TYPE) IS
@@ -514,15 +516,26 @@ BEGIN
    DECLARE
       l_rec_neh NM_ELEMENT_HISTORY%ROWTYPE;
    BEGIN
-      l_rec_neh.neh_ne_id_old          := p_ne_id;
-      l_rec_neh.neh_ne_id_new          := p_ne_id_1;
-      l_rec_neh.neh_operation          := 'S';
-      l_rec_neh.neh_effective_date     := p_effective_date;
-      FOR i IN 1..2
-       LOOP
-         Nm3merge.ins_neh (l_rec_neh);
-         l_rec_neh.neh_ne_id_new       := p_ne_id_2;
-      END LOOP;
+      l_rec_neh.neh_id             := nm3seq.next_neh_id_seq;
+      l_rec_neh.neh_ne_id_old      := p_ne_id;
+      l_rec_neh.neh_ne_id_new      := p_ne_id_1;
+      l_rec_neh.neh_operation      := 'S';
+      l_rec_neh.neh_effective_date := p_effective_date;
+      l_rec_neh.neh_old_ne_length  := c_orig_ne_length;
+      l_rec_neh.neh_new_ne_length  := p_ne_length_1;
+      l_rec_neh.neh_param_1        := 1;
+      l_rec_neh.neh_param_2        := NULL;
+      
+      --insert history for first new element
+      Nm3merge.ins_neh (l_rec_neh);
+      
+      l_rec_neh.neh_id             := nm3seq.next_neh_id_seq;
+      l_rec_neh.neh_ne_id_new      := p_ne_id_2;
+      l_rec_neh.neh_new_ne_length  := p_ne_length_2;
+      l_rec_neh.neh_param_1        := 2;
+      
+      --insert history for second new element
+      Nm3merge.ins_neh (l_rec_neh);
    END;
 --
    Nm_Debug.proc_end(g_package_name,'split_element');
@@ -1135,9 +1148,7 @@ BEGIN
                                 p_ne_id_1 => p_ne_id_1,
                                 p_ne_id_2 => p_ne_id_2,
                                 p_x => l_grid_east,
-                                p_y => l_grid_north);
-
-                                
+                                p_y => l_grid_north);                        
 --
    split_members (p_ne_id          => p_ne_id
                  ,p_ne_id_1        => p_ne_id_1
@@ -1145,7 +1156,6 @@ BEGIN
                  ,p_split_measure  => p_split_measure
                  ,p_effective_date => p_effective_date
                  );
-
 --                                
    split_other_products (p_ne_id          => p_ne_id
                         ,p_ne_id_1        => p_ne_id_1
@@ -2277,9 +2287,7 @@ PROCEDURE do_split_datum_or_group ( pi_ne_id                  IN     nm_elements
  l_effective_date DATE := TRUNC(pi_effective_date);
 
 BEGIN
-
-
- Nm_Debug.proc_start(g_package_name,'do_split_datum_or_group');
+  Nm_Debug.proc_start(g_package_name,'do_split_datum_or_group');
 --
    check_element_can_be_split(pi_effective_date => pi_effective_date);
 --
