@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3debug.pkb	1.51 03/22/07
---       Module Name      : nm3debug.pkb
---       Date into SCCS   : 07/03/22 14:11:26
---       Date fetched Out : 07/06/13 14:11:19
---       SCCS Version     : 1.51
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.1   Jul 19 2007 12:05:18   smarshall  $
+--       Module Name      : $Workfile:   nm3debug.pkb  $
+--       Date into PVCS   : $Date:   Jul 19 2007 12:05:18  $
+--       Date fetched Out : $Modtime:   Jul 19 2007 10:59:28  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "@(#)nm3get_gen.pkb	1.50 02/01/06"
+--   nm3get_gen body   : "$Revision:   2.1  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"@(#)nm3debug.pkb	1.51 03/22/07"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3debug';
@@ -109,8 +109,6 @@ BEGIN
    nm_debug.debug('doc_compl_insurance_claim    : '||pi_rec_doc.doc_compl_insurance_claim,p_level);
    nm_debug.debug('doc_compl_summons_received   : '||pi_rec_doc.doc_compl_summons_received,p_level);
    nm_debug.debug('doc_compl_user_type          : '||pi_rec_doc.doc_compl_user_type,p_level);
-   nm_debug.debug('doc_date_time_arrived        : '||pi_rec_doc.doc_date_time_arrived,p_level);
-   nm_debug.debug('doc_reason_for_later_arrival : '||pi_rec_doc.doc_reason_for_later_arrival,p_level);
 --
    nm_debug.proc_end(g_package_name,'debug_doc');
 --
@@ -2303,12 +2301,17 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'debug_neh');
 --
+   nm_debug.debug('neh_id             : '||pi_rec_neh.neh_id,p_level);
    nm_debug.debug('neh_ne_id_old      : '||pi_rec_neh.neh_ne_id_old,p_level);
    nm_debug.debug('neh_ne_id_new      : '||pi_rec_neh.neh_ne_id_new,p_level);
    nm_debug.debug('neh_operation      : '||pi_rec_neh.neh_operation,p_level);
    nm_debug.debug('neh_effective_date : '||pi_rec_neh.neh_effective_date,p_level);
    nm_debug.debug('neh_actioned_date  : '||pi_rec_neh.neh_actioned_date,p_level);
    nm_debug.debug('neh_actioned_by    : '||pi_rec_neh.neh_actioned_by,p_level);
+   nm_debug.debug('neh_old_ne_length  : '||pi_rec_neh.neh_old_ne_length,p_level);
+   nm_debug.debug('neh_new_ne_length  : '||pi_rec_neh.neh_new_ne_length,p_level);
+   nm_debug.debug('neh_param_1        : '||pi_rec_neh.neh_param_1,p_level);
+   nm_debug.debug('neh_param_2        : '||pi_rec_neh.neh_param_2,p_level);
 --
    nm_debug.proc_end(g_package_name,'debug_neh');
 --
@@ -3614,8 +3617,6 @@ BEGIN
 --
    nm_debug.debug('batch_no                  : '||pi_rec_nlm.batch_no,p_level);
    nm_debug.debug('record_no                 : '||pi_rec_nlm.record_no,p_level);
-   nm_debug.debug('nlm_error_status          : '||pi_rec_nlm.nlm_error_status,p_level);
-   nm_debug.debug('nlm_action_code           : '||pi_rec_nlm.nlm_action_code,p_level);
    nm_debug.debug('iit_ne_id                 : '||pi_rec_nlm.iit_ne_id,p_level);
    nm_debug.debug('iit_inv_type              : '||pi_rec_nlm.iit_inv_type,p_level);
    nm_debug.debug('iit_primary_key           : '||pi_rec_nlm.iit_primary_key,p_level);
@@ -3790,6 +3791,8 @@ BEGIN
    nm_debug.debug('iit_num_attrib113         : '||pi_rec_nlm.iit_num_attrib113,p_level);
    nm_debug.debug('iit_num_attrib114         : '||pi_rec_nlm.iit_num_attrib114,p_level);
    nm_debug.debug('iit_num_attrib115         : '||pi_rec_nlm.iit_num_attrib115,p_level);
+   nm_debug.debug('nlm_error_status          : '||pi_rec_nlm.nlm_error_status,p_level);
+   nm_debug.debug('nlm_action_code           : '||pi_rec_nlm.nlm_action_code,p_level);
    nm_debug.debug('nlm_x_sect                : '||pi_rec_nlm.nlm_x_sect,p_level);
    nm_debug.debug('nlm_invent_date           : '||pi_rec_nlm.nlm_invent_date,p_level);
    nm_debug.debug('nlm_primary_key           : '||pi_rec_nlm.nlm_primary_key,p_level);
