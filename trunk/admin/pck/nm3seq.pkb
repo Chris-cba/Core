@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY nm3seq IS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3seq.pkb	1.49 03/22/07
---       Module Name      : nm3seq.pkb
---       Date into SCCS   : 07/03/22 14:11:30
---       Date fetched Out : 07/06/13 14:13:33
---       SCCS Version     : 1.49
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3seq.pkb-arc   2.1   Jul 19 2007 12:05:22   smarshall  $
+--       Module Name      : $Workfile:   nm3seq.pkb  $
+--       Date into PVCS   : $Date:   Jul 19 2007 12:05:22  $
+--       Date fetched Out : $Modtime:   Jul 19 2007 10:59:28  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3seq IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "@(#)nm3get_gen.pkb	1.50 02/01/06"
+--   nm3get_gen body   : "$Revision:   2.1  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3seq IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"@(#)nm3seq.pkb	1.49 03/22/07"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3seq';
@@ -498,6 +498,30 @@ BEGIN
     FROM  dual;
    RETURN l_retval;
 END curr_nd_id_seq;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION next_neh_id_seq RETURN PLS_INTEGER IS
+-- Get NEH_ID_SEQ.NEXTVAL
+   l_retval PLS_INTEGER;
+BEGIN
+   SELECT NEH_ID_SEQ.NEXTVAL
+    INTO  l_retval
+    FROM  dual;
+   RETURN l_retval;
+END next_neh_id_seq;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION curr_neh_id_seq RETURN PLS_INTEGER IS
+-- Get NEH_ID_SEQ.CURRVAL
+   l_retval PLS_INTEGER;
+BEGIN
+   SELECT NEH_ID_SEQ.CURRVAL
+    INTO  l_retval
+    FROM  dual;
+   RETURN l_retval;
+END curr_neh_id_seq;
 --
 -----------------------------------------------------------------------------
 --

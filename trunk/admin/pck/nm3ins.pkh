@@ -3,13 +3,13 @@ CREATE OR REPLACE PACKAGE nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3ins.pkh	1.50 03/22/07
---       Module Name      : nm3ins.pkh
---       Date into SCCS   : 07/03/22 14:10:51
---       Date fetched Out : 07/06/13 14:11:52
---       SCCS Version     : 1.50
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkh-arc   2.1   Jul 19 2007 12:05:22   smarshall  $
+--       Module Name      : $Workfile:   nm3ins.pkh  $
+--       Date into PVCS   : $Date:   Jul 19 2007 12:05:22  $
+--       Date fetched Out : $Modtime:   Jul 19 2007 10:59:26  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : Jonathan Mills
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "@(#)nm3get_gen.pkb	1.50 02/01/06"
+--   nm3get_gen body   : "$Revision:   2.1  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE nm3ins IS
 --
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid          CONSTANT  VARCHAR2(2000) := '"@(#)nm3ins.pkh	1.50 03/22/07"';
+   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
 --  g_sccsid is the SCCS ID for the package
 --
 --</GLOBVAR>
