@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3ins.pkb	1.51 03/22/07
---       Module Name      : nm3ins.pkb
---       Date into SCCS   : 07/03/22 14:11:19
---       Date fetched Out : 07/06/13 14:11:51
---       SCCS Version     : 1.51
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.1   Jul 19 2007 12:05:20   smarshall  $
+--       Module Name      : $Workfile:   nm3ins.pkb  $
+--       Date into PVCS   : $Date:   Jul 19 2007 12:05:20  $
+--       Date fetched Out : $Modtime:   Jul 19 2007 10:59:28  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "@(#)nm3get_gen.pkb	1.50 02/01/06"
+--   nm3get_gen body   : "$Revision:   2.1  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"@(#)nm3ins.pkb	1.51 03/22/07"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
@@ -111,8 +111,6 @@ BEGIN
             ,doc_compl_insurance_claim
             ,doc_compl_summons_received
             ,doc_compl_user_type
-            ,doc_date_time_arrived
-            ,doc_reason_for_later_arrival
             )
      VALUES (p_rec_doc.doc_id
             ,p_rec_doc.doc_title
@@ -173,8 +171,6 @@ BEGIN
             ,p_rec_doc.doc_compl_insurance_claim
             ,p_rec_doc.doc_compl_summons_received
             ,p_rec_doc.doc_compl_user_type
-            ,p_rec_doc.doc_date_time_arrived
-            ,p_rec_doc.doc_reason_for_later_arrival
             )
    RETURNING doc_id
             ,doc_title
@@ -235,8 +231,6 @@ BEGIN
             ,doc_compl_insurance_claim
             ,doc_compl_summons_received
             ,doc_compl_user_type
-            ,doc_date_time_arrived
-            ,doc_reason_for_later_arrival
       INTO   p_rec_doc.doc_id
             ,p_rec_doc.doc_title
             ,p_rec_doc.doc_dcl_code
@@ -295,9 +289,7 @@ BEGIN
             ,p_rec_doc.doc_compl_follow_up3
             ,p_rec_doc.doc_compl_insurance_claim
             ,p_rec_doc.doc_compl_summons_received
-            ,p_rec_doc.doc_compl_user_type
-            ,p_rec_doc.doc_date_time_arrived
-            ,p_rec_doc.doc_reason_for_later_arrival;
+            ,p_rec_doc.doc_compl_user_type;
 --
    nm_debug.proc_end(g_package_name,'ins_doc');
 --
@@ -1542,7 +1534,8 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'ins_gmp');
 --
-   p_rec_gmp.gmp_allow_partial              := NVL(p_rec_gmp.gmp_allow_partial,'N' );
+   p_rec_gmp.gmp_allow_partial              := NVL(p_rec_gmp.gmp_allow_partial,'N'
+ );
 --
    INSERT INTO gri_module_params
             (gmp_module
@@ -2439,7 +2432,7 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'ins_hhl');
 --
-   p_rec_hhl.hhl_outer_join                 := NVL(p_rec_hhl.hhl_outer_join,'N' );
+   p_rec_hhl.hhl_outer_join                 := NVL(p_rec_hhl.hhl_outer_join,'N'      );
 --
    INSERT INTO hig_hd_lookup_join_defs
             (hhl_hhu_hhm_module
@@ -2508,7 +2501,7 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'ins_hhu');
 --
-   p_rec_hhu.hhu_load_data                  := NVL(p_rec_hhu.hhu_load_data,'N' );
+   p_rec_hhu.hhu_load_data                  := NVL(p_rec_hhu.hhu_load_data,'N'  );
 --
    INSERT INTO hig_hd_mod_uses
             (hhu_hhm_module
@@ -2561,8 +2554,8 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'ins_hhc');
 --
-   p_rec_hhc.hhc_summary_view               := NVL(p_rec_hhc.hhc_summary_view,'Y' );
-   p_rec_hhc.hhc_displayed                  := NVL(p_rec_hhc.hhc_displayed,'Y' );
+   p_rec_hhc.hhc_summary_view               := NVL(p_rec_hhc.hhc_summary_view,'Y'    );
+   p_rec_hhc.hhc_displayed                  := NVL(p_rec_hhc.hhc_displayed,'Y'    );
 --
    INSERT INTO hig_hd_selected_cols
             (hhc_hhu_hhm_module
@@ -5371,6 +5364,7 @@ BEGIN
    nm_debug.proc_start(g_package_name,'ins_ne');
 --
    p_rec_ne.ne_start_date                  := NVL(p_rec_ne.ne_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_ne.ne_sub_class                   := NVL(p_rec_ne.ne_sub_class,NULL);
 --
    INSERT INTO nm_elements
             (ne_id
@@ -5445,6 +5439,7 @@ BEGIN
    nm_debug.proc_start(g_package_name,'ins_ne_all');
 --
    p_rec_ne_all.ne_start_date                  := NVL(p_rec_ne_all.ne_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_ne_all.ne_sub_class                   := NVL(p_rec_ne_all.ne_sub_class,NULL);
 --
    INSERT INTO nm_elements_all
             (ne_id
@@ -5565,34 +5560,56 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'ins_neh');
 --
+   p_rec_neh.neh_actioned_date              := NVL(p_rec_neh.neh_actioned_date,trunc(sysdate));
+   p_rec_neh.neh_actioned_by                := NVL(p_rec_neh.neh_actioned_by,user);
 --
    INSERT INTO nm_element_history
-            (neh_ne_id_old
+            (neh_id
+            ,neh_ne_id_old
             ,neh_ne_id_new
             ,neh_operation
             ,neh_effective_date
             ,neh_actioned_date
             ,neh_actioned_by
+            ,neh_old_ne_length
+            ,neh_new_ne_length
+            ,neh_param_1
+            ,neh_param_2
             )
-     VALUES (p_rec_neh.neh_ne_id_old
+     VALUES (p_rec_neh.neh_id
+            ,p_rec_neh.neh_ne_id_old
             ,p_rec_neh.neh_ne_id_new
             ,p_rec_neh.neh_operation
             ,p_rec_neh.neh_effective_date
             ,p_rec_neh.neh_actioned_date
             ,p_rec_neh.neh_actioned_by
+            ,p_rec_neh.neh_old_ne_length
+            ,p_rec_neh.neh_new_ne_length
+            ,p_rec_neh.neh_param_1
+            ,p_rec_neh.neh_param_2
             )
-   RETURNING neh_ne_id_old
+   RETURNING neh_id
+            ,neh_ne_id_old
             ,neh_ne_id_new
             ,neh_operation
             ,neh_effective_date
             ,neh_actioned_date
             ,neh_actioned_by
-      INTO   p_rec_neh.neh_ne_id_old
+            ,neh_old_ne_length
+            ,neh_new_ne_length
+            ,neh_param_1
+            ,neh_param_2
+      INTO   p_rec_neh.neh_id
+            ,p_rec_neh.neh_ne_id_old
             ,p_rec_neh.neh_ne_id_new
             ,p_rec_neh.neh_operation
             ,p_rec_neh.neh_effective_date
             ,p_rec_neh.neh_actioned_date
-            ,p_rec_neh.neh_actioned_by;
+            ,p_rec_neh.neh_actioned_by
+            ,p_rec_neh.neh_old_ne_length
+            ,p_rec_neh.neh_new_ne_length
+            ,p_rec_neh.neh_param_1
+            ,p_rec_neh.neh_param_2;
 --
    nm_debug.proc_end(g_package_name,'ins_neh');
 --
@@ -5678,7 +5695,7 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'ins_nel');
 --
-   p_rec_nel.nel_timestamp                  := NVL(p_rec_nel.nel_timestamp,sysdate );
+   p_rec_nel.nel_timestamp                  := NVL(p_rec_nel.nel_timestamp,SYSDATE );
    p_rec_nel.nel_session                    := NVL(p_rec_nel.nel_session,sys_context('USERENV', 'SESSIONID') );
    p_rec_nel.nel_severity                   := NVL(p_rec_nel.nel_severity,3 );
 --
@@ -5781,9 +5798,9 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'ins_ngq');
 --
-   p_rec_ngq.ngq_open_or_closed             := NVL(p_rec_ngq.ngq_open_or_closed,'C' );
-   p_rec_ngq.ngq_items_or_area              := NVL(p_rec_ngq.ngq_items_or_area,'A' );
-   p_rec_ngq.ngq_query_all_items            := NVL(p_rec_ngq.ngq_query_all_items,'N' );
+   p_rec_ngq.ngq_open_or_closed             := NVL(p_rec_ngq.ngq_open_or_closed,'C'   );
+   p_rec_ngq.ngq_items_or_area              := NVL(p_rec_ngq.ngq_items_or_area,'A'   );
+   p_rec_ngq.ngq_query_all_items            := NVL(p_rec_ngq.ngq_query_all_items,'N'   );
 --
    INSERT INTO nm_gaz_query
             (ngq_id
@@ -7970,8 +7987,9 @@ BEGIN
 --
    p_rec_ita.ita_start_date                 := NVL(p_rec_ita.ita_start_date,TO_DATE('05111605','DDMMYYYY') );
    p_rec_ita.ita_queryable                  := NVL(p_rec_ita.ita_queryable,'N' );
+   p_rec_ita.ita_exclusive                  := NVL(p_rec_ita.ita_exclusive,'N' );
    p_rec_ita.ita_keep_history_yn            := NVL(p_rec_ita.ita_keep_history_yn,'N' );
-   p_rec_ita.ita_displayed                  := NVL(p_rec_ita.ita_displayed,'Y' );
+   p_rec_ita.ita_displayed                  := NVL(p_rec_ita.ita_displayed,'Y');
 --
    INSERT INTO nm_inv_type_attribs
             (ita_inv_type
@@ -8058,8 +8076,9 @@ BEGIN
 --
    p_rec_ita_all.ita_start_date                 := NVL(p_rec_ita_all.ita_start_date,TO_DATE('05111605','DDMMYYYY') );
    p_rec_ita_all.ita_queryable                  := NVL(p_rec_ita_all.ita_queryable,'N' );
+   p_rec_ita_all.ita_exclusive                  := NVL(p_rec_ita_all.ita_exclusive,'N' );
    p_rec_ita_all.ita_keep_history_yn            := NVL(p_rec_ita_all.ita_keep_history_yn,'N' );
-   p_rec_ita_all.ita_displayed                  := NVL(p_rec_ita_all.ita_displayed,'Y' );
+   p_rec_ita_all.ita_displayed                  := NVL(p_rec_ita_all.ita_displayed,'Y');
 --
    INSERT INTO nm_inv_type_attribs_all
             (ita_inv_type
@@ -8809,8 +8828,6 @@ BEGIN
    INSERT INTO nm_ld_mc_all_inv_tmp
             (batch_no
             ,record_no
-            ,nlm_error_status
-            ,nlm_action_code
             ,iit_ne_id
             ,iit_inv_type
             ,iit_primary_key
@@ -8985,14 +9002,14 @@ BEGIN
             ,iit_num_attrib113
             ,iit_num_attrib114
             ,iit_num_attrib115
+            ,nlm_error_status
+            ,nlm_action_code
             ,nlm_x_sect
             ,nlm_invent_date
             ,nlm_primary_key
             )
      VALUES (p_rec_nlm.batch_no
             ,p_rec_nlm.record_no
-            ,p_rec_nlm.nlm_error_status
-            ,p_rec_nlm.nlm_action_code
             ,p_rec_nlm.iit_ne_id
             ,p_rec_nlm.iit_inv_type
             ,p_rec_nlm.iit_primary_key
@@ -9167,14 +9184,14 @@ BEGIN
             ,p_rec_nlm.iit_num_attrib113
             ,p_rec_nlm.iit_num_attrib114
             ,p_rec_nlm.iit_num_attrib115
+            ,p_rec_nlm.nlm_error_status
+            ,p_rec_nlm.nlm_action_code
             ,p_rec_nlm.nlm_x_sect
             ,p_rec_nlm.nlm_invent_date
             ,p_rec_nlm.nlm_primary_key
             )
    RETURNING batch_no
             ,record_no
-            ,nlm_error_status
-            ,nlm_action_code
             ,iit_ne_id
             ,iit_inv_type
             ,iit_primary_key
@@ -9349,13 +9366,13 @@ BEGIN
             ,iit_num_attrib113
             ,iit_num_attrib114
             ,iit_num_attrib115
+            ,nlm_error_status
+            ,nlm_action_code
             ,nlm_x_sect
             ,nlm_invent_date
             ,nlm_primary_key
       INTO   p_rec_nlm.batch_no
             ,p_rec_nlm.record_no
-            ,p_rec_nlm.nlm_error_status
-            ,p_rec_nlm.nlm_action_code
             ,p_rec_nlm.iit_ne_id
             ,p_rec_nlm.iit_inv_type
             ,p_rec_nlm.iit_primary_key
@@ -9530,6 +9547,8 @@ BEGIN
             ,p_rec_nlm.iit_num_attrib113
             ,p_rec_nlm.iit_num_attrib114
             ,p_rec_nlm.iit_num_attrib115
+            ,p_rec_nlm.nlm_error_status
+            ,p_rec_nlm.nlm_action_code
             ,p_rec_nlm.nlm_x_sect
             ,p_rec_nlm.nlm_invent_date
             ,p_rec_nlm.nlm_primary_key;
@@ -10101,6 +10120,7 @@ BEGIN
 --
    p_rec_nm.nm_begin_mp                    := NVL(p_rec_nm.nm_begin_mp,0 );
    p_rec_nm.nm_start_date                  := NVL(p_rec_nm.nm_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_nm.nm_end_mp                      := NVL(p_rec_nm.nm_end_mp,Null);
    p_rec_nm.nm_cardinality                 := NVL(p_rec_nm.nm_cardinality,1
  );
 --
@@ -10169,6 +10189,7 @@ BEGIN
 --
    p_rec_nm_all.nm_begin_mp                    := NVL(p_rec_nm_all.nm_begin_mp,0 );
    p_rec_nm_all.nm_start_date                  := NVL(p_rec_nm_all.nm_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_nm_all.nm_end_mp                      := NVL(p_rec_nm_all.nm_end_mp,Null);
    p_rec_nm_all.nm_cardinality                 := NVL(p_rec_nm_all.nm_cardinality,1
  );
 --
@@ -10575,6 +10596,8 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'ins_nmf');
 --
+   p_rec_nmf.nmf_varchar_rpad               := NVL(p_rec_nmf.nmf_varchar_rpad,' '
+);
    p_rec_nmf.nmf_number_lpad                := NVL(p_rec_nmf.nmf_number_lpad,'0' );
    p_rec_nmf.nmf_date_format                := NVL(p_rec_nmf.nmf_date_format,'YYYYMMDD' );
    p_rec_nmf.nmf_template                   := NVL(p_rec_nmf.nmf_template,'N' );
@@ -17033,10 +17056,6 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'ins_timt');
 --
-   p_rec_timt.tim_ne_id_in_new               := NVL(p_rec_timt.tim_ne_id_in_new,-1 );
-   p_rec_timt.tim_start_date                 := NVL(p_rec_timt.tim_start_date,TO_DATE('05111605','DDMMYYYY') );
-   p_rec_timt.tim_cardinality                := NVL(p_rec_timt.tim_cardinality,1
- );
 --
    INSERT INTO nm_temp_inv_members_temp
             (tim_njc_job_id
@@ -17176,15 +17195,18 @@ BEGIN
    p_rec_nth.nth_feature_shape_column       := NVL(p_rec_nth.nth_feature_shape_column,'SHAPE'
  );
    p_rec_nth.nth_hpr_product                := NVL(p_rec_nth.nth_hpr_product,'NET' );
+   p_rec_nth.nth_location_updatable         := NVL(p_rec_nth.nth_location_updatable,'N' );
    p_rec_nth.nth_theme_type                 := NVL(p_rec_nth.nth_theme_type,'LOCL'
  );
    p_rec_nth.nth_dependency                 := NVL(p_rec_nth.nth_dependency,'D' );
    p_rec_nth.nth_storage                    := NVL(p_rec_nth.nth_storage,'D' );
    p_rec_nth.nth_update_on_edit             := NVL(p_rec_nth.nth_update_on_edit,'N' );
+   p_rec_nth.nth_use_history                := NVL(p_rec_nth.nth_use_history,'N' );
    p_rec_nth.nth_snap_to_theme              := NVL(p_rec_nth.nth_snap_to_theme,'N' );
+   p_rec_nth.nth_lref_mandatory             := NVL(p_rec_nth.nth_lref_mandatory,'N' );
    p_rec_nth.nth_tolerance                  := NVL(p_rec_nth.nth_tolerance,10 );
    p_rec_nth.nth_tol_units                  := NVL(p_rec_nth.nth_tol_units,1 );
-   p_rec_nth.nth_dynamic_theme              := NVL(p_rec_nth.nth_dynamic_theme,'N' );
+   p_rec_nth.nth_dynamic_theme              := NVL(p_rec_nth.nth_dynamic_theme,'N');
 --
    INSERT INTO nm_themes_all
             (nth_theme_id

@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3del.pkb	1.50 03/22/07
---       Module Name      : nm3del.pkb
---       Date into SCCS   : 07/03/22 14:11:01
---       Date fetched Out : 07/06/13 14:11:21
---       SCCS Version     : 1.50
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3del.pkb-arc   2.1   Jul 19 2007 12:05:20   smarshall  $
+--       Module Name      : $Workfile:   nm3del.pkb  $
+--       Date into PVCS   : $Date:   Jul 19 2007 12:05:20  $
+--       Date fetched Out : $Modtime:   Jul 19 2007 10:59:26  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "@(#)nm3get_gen.pkb	1.50 02/01/06"
+--   nm3get_gen body   : "$Revision:   2.1  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"@(#)nm3del.pkb	1.50 03/22/07"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3del';
@@ -322,9 +322,9 @@ END del_ddc;
 --
 --   Procedure to del using DEC_PK constraint
 --
-PROCEDURE del_dec (pi_dec_hct_id        doc_enquiry_contacts.dec_hct_id%TYPE
-                  ,pi_dec_doc_id        doc_enquiry_contacts.dec_doc_id%TYPE
+PROCEDURE del_dec (pi_dec_doc_id        doc_enquiry_contacts.dec_doc_id%TYPE
                   ,pi_dec_type          doc_enquiry_contacts.dec_type%TYPE
+                  ,pi_dec_hct_id        doc_enquiry_contacts.dec_hct_id%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -336,9 +336,9 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_dec
-                   (pi_dec_hct_id        => pi_dec_hct_id
-                   ,pi_dec_doc_id        => pi_dec_doc_id
+                   (pi_dec_doc_id        => pi_dec_doc_id
                    ,pi_dec_type          => pi_dec_type
+                   ,pi_dec_hct_id        => pi_dec_hct_id
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
@@ -3194,8 +3194,8 @@ END del_narsh;
 --
 --   Procedure to del using NARST_PK constraint
 --
-PROCEDURE del_narst (pi_narst_inv_type    nm_assets_on_route_store_total.narst_inv_type%TYPE
-                    ,pi_narst_job_id      nm_assets_on_route_store_total.narst_job_id%TYPE
+PROCEDURE del_narst (pi_narst_job_id      nm_assets_on_route_store_total.narst_job_id%TYPE
+                    ,pi_narst_inv_type    nm_assets_on_route_store_total.narst_inv_type%TYPE
                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                     ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -3207,8 +3207,8 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_narst
-                   (pi_narst_inv_type    => pi_narst_inv_type
-                   ,pi_narst_job_id      => pi_narst_job_id
+                   (pi_narst_job_id      => pi_narst_job_id
+                   ,pi_narst_inv_type    => pi_narst_inv_type
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
@@ -3740,8 +3740,7 @@ END del_ne_all;
 --
 --   Procedure to del using NEH_PK constraint
 --
-PROCEDURE del_neh (pi_neh_ne_id_old     nm_element_history.neh_ne_id_old%TYPE
-                  ,pi_neh_ne_id_new     nm_element_history.neh_ne_id_new%TYPE
+PROCEDURE del_neh (pi_neh_id            nm_element_history.neh_id%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -3753,8 +3752,7 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_neh
-                   (pi_neh_ne_id_old     => pi_neh_ne_id_old
-                   ,pi_neh_ne_id_new     => pi_neh_ne_id_new
+                   (pi_neh_id            => pi_neh_id
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
@@ -5583,9 +5581,9 @@ END del_nsit;
 --
 --   Procedure to del using NSIA_PK constraint
 --
-PROCEDURE del_nsia (pi_nsia_nsit_nit_inv_type nm_inv_attribute_set_inv_attr.nsia_nsit_nit_inv_type%TYPE
+PROCEDURE del_nsia (pi_nsia_nsit_nias_id      nm_inv_attribute_set_inv_attr.nsia_nsit_nias_id%TYPE
+                   ,pi_nsia_nsit_nit_inv_type nm_inv_attribute_set_inv_attr.nsia_nsit_nit_inv_type%TYPE
                    ,pi_nsia_ita_attrib_name   nm_inv_attribute_set_inv_attr.nsia_ita_attrib_name%TYPE
-                   ,pi_nsia_nsit_nias_id      nm_inv_attribute_set_inv_attr.nsia_nsit_nias_id%TYPE
                    ,pi_raise_not_found        BOOLEAN     DEFAULT TRUE
                    ,pi_not_found_sqlcode      PLS_INTEGER DEFAULT -20000
                    ,pi_locked_sqlcode         PLS_INTEGER DEFAULT -20000
@@ -5597,9 +5595,9 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_nsia
-                   (pi_nsia_nsit_nit_inv_type => pi_nsia_nsit_nit_inv_type
+                   (pi_nsia_nsit_nias_id      => pi_nsia_nsit_nias_id
+                   ,pi_nsia_nsit_nit_inv_type => pi_nsia_nsit_nit_inv_type
                    ,pi_nsia_ita_attrib_name   => pi_nsia_ita_attrib_name
-                   ,pi_nsia_nsit_nias_id      => pi_nsia_nsit_nias_id
                    ,pi_raise_not_found        => pi_raise_not_found
                    ,pi_not_found_sqlcode      => pi_not_found_sqlcode
                    ,pi_locked_sqlcode         => pi_locked_sqlcode
@@ -6411,8 +6409,8 @@ END del_nlf;
 --
 --   Procedure to del using NLFC_PK constraint
 --
-PROCEDURE del_nlfc (pi_nlfc_nlf_id       nm_load_file_cols.nlfc_nlf_id%TYPE
-                   ,pi_nlfc_seq_no       nm_load_file_cols.nlfc_seq_no%TYPE
+PROCEDURE del_nlfc (pi_nlfc_seq_no       nm_load_file_cols.nlfc_seq_no%TYPE
+                   ,pi_nlfc_nlf_id       nm_load_file_cols.nlfc_nlf_id%TYPE
                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                    ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -6424,8 +6422,8 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_nlfc
-                   (pi_nlfc_nlf_id       => pi_nlfc_nlf_id
-                   ,pi_nlfc_seq_no       => pi_nlfc_seq_no
+                   (pi_nlfc_seq_no       => pi_nlfc_seq_no
+                   ,pi_nlfc_nlf_id       => pi_nlfc_nlf_id
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
@@ -6555,8 +6553,8 @@ END del_nlcd;
 --
 --   Procedure to del using NLFD_PK constraint
 --
-PROCEDURE del_nlfd (pi_nlfd_nlf_id       nm_load_file_destinations.nlfd_nlf_id%TYPE
-                   ,pi_nlfd_nld_id       nm_load_file_destinations.nlfd_nld_id%TYPE
+PROCEDURE del_nlfd (pi_nlfd_nld_id       nm_load_file_destinations.nlfd_nld_id%TYPE
+                   ,pi_nlfd_nlf_id       nm_load_file_destinations.nlfd_nlf_id%TYPE
                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                    ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -6568,8 +6566,8 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_nlfd
-                   (pi_nlfd_nlf_id       => pi_nlfd_nlf_id
-                   ,pi_nlfd_nld_id       => pi_nlfd_nld_id
+                   (pi_nlfd_nld_id       => pi_nlfd_nld_id
+                   ,pi_nlfd_nlf_id       => pi_nlfd_nlf_id
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
@@ -8622,10 +8620,10 @@ END del_npqt;
 --
 --   Procedure to del using NQV_PK constraint
 --
-PROCEDURE del_npqv (pi_nqv_sequence      nm_pbi_query_values.nqv_sequence%TYPE
-                   ,pi_nqv_npq_id        nm_pbi_query_values.nqv_npq_id%TYPE
+PROCEDURE del_npqv (pi_nqv_npq_id        nm_pbi_query_values.nqv_npq_id%TYPE
                    ,pi_nqv_nqt_seq_no    nm_pbi_query_values.nqv_nqt_seq_no%TYPE
                    ,pi_nqv_nqa_seq_no    nm_pbi_query_values.nqv_nqa_seq_no%TYPE
+                   ,pi_nqv_sequence      nm_pbi_query_values.nqv_sequence%TYPE
                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                    ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -8637,10 +8635,10 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_npqv
-                   (pi_nqv_sequence      => pi_nqv_sequence
-                   ,pi_nqv_npq_id        => pi_nqv_npq_id
+                   (pi_nqv_npq_id        => pi_nqv_npq_id
                    ,pi_nqv_nqt_seq_no    => pi_nqv_nqt_seq_no
                    ,pi_nqv_nqa_seq_no    => pi_nqv_nqa_seq_no
+                   ,pi_nqv_sequence      => pi_nqv_sequence
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
