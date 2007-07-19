@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.1   Jul 18 2007 15:31:12   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.2   Jul 19 2007 15:12:44   smarshall  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:31:12  $
---       Date fetched Out : $Modtime:   Jul 18 2007 14:12:54  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 19 2007 15:12:44  $
+--       Date fetched Out : $Modtime:   Jul 19 2007 14:21:44  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --   Author : Graeme Johnson
@@ -1836,7 +1836,7 @@ start '&run_file'
 ----------------------------------------------------------------------------------------- 
 --
 SET TERM ON 
-PROMPT nm3analytic_connectivity.pkw
+PROMPT nm3net_history.pkw
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3net_history.pkw' run_file
