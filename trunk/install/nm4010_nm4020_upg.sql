@@ -72,7 +72,7 @@ SET FEEDBACK OFF
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||
-        '&terminator'||'type'||'&terminator'||'nm3typ.sql' run_file
+        '&terminator'||'typ'||'&terminator'||'nm3typ.sql' run_file
 FROM dual
 /
 SET FEEDBACK ON
@@ -154,7 +154,7 @@ SET TERM ON
 PROMPT Triggers...
 SET TERM OFF
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||
-        '&terminator'||'trg'||'&terminator'nm3trg.sql' run_file
+        '&terminator'||'trg'||'&terminator'||nm3trg.sql' run_file
 FROM dual
 /
 SET FEEDBACK ON
