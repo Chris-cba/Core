@@ -2,13 +2,14 @@ CREATE OR REPLACE PACKAGE BODY nm3web_load AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3web_load.pkb	1.10 03/08/05
---       Module Name      : nm3web_load.pkb
---       Date into SCCS   : 05/03/08 02:27:46
---       Date fetched Out : 07/06/13 14:13:51
---       SCCS Version     : 1.10
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_load.pkb-arc   2.1   Jul 20 2007 15:27:54   aedwards  $
+--       Module Name      : $Workfile:   nm3web_load.pkb  $
+--       Date into PVCS   : $Date:   Jul 20 2007 15:27:54  $
+--       Date fetched Out : $Modtime:   Jul 20 2007 14:36:48  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on SCCS version : 
 --
 --
 --   Author : Jonathan Mills
@@ -21,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_load AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3web_load.pkb	1.10 03/08/05"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_load';
@@ -45,6 +46,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_load AS
    c_validate_subtype      CONSTANT  VARCHAR2(1)  := 'V';
    c_load_subtype          CONSTANT  VARCHAR2(1)  := 'L';
    c_log_files_subtype     CONSTANT  VARCHAR2(1)  := 'F';
+   c_process_line_subtype  CONSTANT  VARCHAR2(1)  := 'Z';
 --
    g_checked                         varchar2(8);
    c_checked  CONSTANT               varchar2(8)  := ' CHECKED';
@@ -91,7 +93,7 @@ BEGIN
    htp.p('--       sccsid           : @(#)nm3web_load.pkb	1.10 03/08/05');
    htp.p('--       Module Name      : nm3web_load.pkb');
    htp.p('--       Date into SCCS   : 05/03/08 02:27:46');
-   htp.p('--       Date fetched Out : 07/06/13 14:13:51');
+   htp.p('--       Date fetched Out : 06/03/28 12:06:03');
    htp.p('--       SCCS Version     : 1.10');
    htp.p('--');
    htp.p('--');
@@ -129,6 +131,7 @@ PROCEDURE main IS
          ,nlf_unique
          ,nlf_descr
     FROM  nm_load_files
+   WHERE nlf_unique not like '%_LINE'
    ORDER  BY nlf_unique;
 --
 BEGIN
@@ -648,7 +651,28 @@ PROCEDURE process_existing (p_nlb_batch_no    nm_load_batches.nlb_batch_no%TYPE
                            ,p_submit_mode     varchar2 DEFAULT 'I'
                            ) IS
 --
-   l_rec_nlb nm_load_batches%ROWTYPE;
+   l_rec_nlb     nm_load_batches%ROWTYPE;
+   l_new_nlf_id  nm_load_files.nlf_id%TYPE;
+   l_new_nlb_id  nm_load_batches.nlb_batch_no%TYPE;
+--
+  p_join_column  VARCHAR2(30);
+--
+   CURSOR c_tab_cols (cp_table_name IN VARCHAR2)
+   IS
+    SELECT * 
+    FROM   user_tab_columns
+    WHERE  table_name = cp_table_name
+    ORDER BY 1;
+--
+   FUNCTION get_asset_type (pi_nlf_id IN nm_load_files.nlf_id%TYPE)
+     RETURN nm_inv_types.nit_inv_type%TYPE
+   IS
+     retval nm_inv_types.nit_inv_type%TYPE;
+     l_rec_nlf  nm_load_files%ROWTYPE;
+   BEGIN
+     l_rec_nlf := nm3get.get_nlf(pi_nlf_id=>pi_nlf_id);
+     RETURN  substr(l_rec_nlf.nlf_unique,0,instr(l_rec_nlf.nlf_unique,'_')-1);
+   END get_asset_type;
 --
 BEGIN
 --
@@ -670,7 +694,7 @@ BEGIN
                     ,pi_id                 => 282
                     ,pi_supplementary_info => 'p_process_subtype'
                     );
-   ELSIF p_process_subtype NOT IN (c_validate_subtype,c_load_subtype,c_log_files_subtype)
+   ELSIF p_process_subtype NOT IN (c_validate_subtype,c_load_subtype,c_log_files_subtype,c_process_line_subtype)
     THEN
       hig.raise_ner (pi_appl               => nm3type.c_net
                     ,pi_id                 => 283
@@ -727,9 +751,66 @@ BEGIN
          htp.formopen(g_package_name||'.main');
          htp.formsubmit (cvalue=>c_continue);
          nm3load.load_batch(p_nlb_batch_no);
+
+      ELSIF p_process_subtype = c_process_line_subtype
+       THEN
+
+         htp.tableopen;
+
+           htp.tablerowopen;
+           htp.tableheader('Pre-Process Line Data');
+           htp.tablerowclose;
+         --
+           htp.formopen(g_package_name||'.process_lines');
+         --
+           htp.formhidden (cname  => 'pi_asset_type'
+                          ,cvalue => get_asset_type(l_rec_nlb.nlb_nlf_id));
+         --
+           htp.formhidden (cname  => 'pi_load_file_unique'
+                          ,cvalue => nm3get.get_nlf(pi_nlf_id=>l_rec_nlb.nlb_nlf_id).nlf_unique);
+--
+           htp.formhidden (cname  => 'pi_batch_no'
+                          ,cvalue => p_nlb_batch_no);
+         --
+ 
+           htp.tabledata ('Join Column');
+           htp.p('<TD>');
+           htp.formselectopen (cname => 'pi_join_column');
+
+           FOR i IN c_tab_cols ('NM_LD_'||nm3get.get_nlf(pi_nlf_id=>l_rec_nlb.nlb_nlf_id).nlf_unique||'_TMP')
+           LOOP
+             --htp.p('<OPTION VALUE="'||i.column_name||'"</OPTION>');
+             htp.p('<OPTION VALUE="'||i.column_name||'">'||i.column_name||'</OPTION>');
+           END LOOP;
+
+           htp.formselectclose;
+           htp.p('</TD>');
+           htp.tablerowclose;
+
+           htp.tabledata ('Start/End Identifier Column');
+           htp.p('<TD>');
+           htp.formselectopen (cname => 'pi_locate_ref_column');
+
+           FOR i IN c_tab_cols ('NM_LD_'||nm3get.get_nlf(pi_nlf_id=>l_rec_nlb.nlb_nlf_id).nlf_unique||'_TMP')
+           LOOP
+             --htp.p('<OPTION VALUE="'||i.column_name||'"</OPTION>');
+             htp.p('<OPTION VALUE="'||i.column_name||'">'||i.column_name||'</OPTION>');
+           END LOOP;
+
+           htp.formselectclose;
+           htp.p('</TD>');
+           htp.tablerowclose;
+
+         htp.tableclose;
+
+         htp.formsubmit (cvalue=>c_continue);
+
       END IF;
 --
-      show_log_files (p_nlb_batch_no => p_nlb_batch_no);
+      IF p_process_subtype != c_process_line_subtype
+      THEN
+        show_log_files (p_nlb_batch_no => p_nlb_batch_no);
+      END IF;
 --
    ELSE
       IF    p_process_subtype = c_validate_subtype
@@ -758,6 +839,40 @@ EXCEPTION
       nm3web.failure(SQLERRM);
 --
 END process_existing;
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE process_lines
+        ( pi_asset_type         IN nm_inv_types.nit_inv_type%TYPE
+        , pi_load_file_unique   IN nm_load_files.nlf_unique%TYPE
+        , pi_batch_no           IN nm_load_batches.nlb_batch_no%TYPE
+        , pi_join_column        IN VARCHAR2 DEFAULT 'LFK'
+        , pi_locate_ref_column  IN VARCHAR2 DEFAULT 'LOCATEREF')
+  IS
+    l_nlf_id nm_load_files.nlf_id%TYPE;
+    l_nlb_id nm_load_batches.nlb_batch_no%TYPE;
+  BEGIN
+    nm3inv_load.process_line_data
+        ( pi_asset_type         => pi_asset_type
+        , pi_load_file_unique   => pi_load_file_unique
+        , pi_batch_no           => pi_batch_no
+        , pi_join_column        => pi_join_column
+        , pi_locate_ref_column  => pi_locate_ref_column
+        , po_nlf_id             => l_nlf_id
+        , po_nlb_batch_no       => l_nlb_id);
+
+----    nm_debug.debug('Done process lines data');
+----    
+--    htp.formopen(g_package_name||'.process');
+--    htp.formhidden (cname  => 'p_nlf_id'
+--                   ,cvalue => l_nlf_id);
+--    htp.formhidden (cname  => 'p_process_type'
+--                   ,cvalue => 'P' );
+--    htp.formhidden (cname  => 'p_nlb_id'
+--                   ,cvalue => l_nlb_id);
+    nm3web_load.process(p_nlf_id=>l_nlf_id, p_process_type=>'P',p_nlb_id=>l_nlb_id);
+--    nm_debug.debug('built new call');
+  END process_lines;
 --
 -----------------------------------------------------------------------------
 --
@@ -1085,7 +1200,7 @@ BEGIN
    RETURN l_retval;
 END get_full_download_url;
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 --
 END nm3web_load;
 /
