@@ -1,12 +1,30 @@
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.1   Jul 20 2007 14:23:08   sscanlon  $
+--       Module Name      : $Workfile:   nm3data2.sql  $
+--       Date into PVCS   : $Date:   Jul 20 2007 14:23:08  $
+--       Date fetched Out : $Modtime:   Jul 20 2007 11:30:34  $
+--       Version          : $Revision:   2.1  $
+--
+--   Product metadata script
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2007
+-----------------------------------------------------------------------------
+--
+--
 /***************************************************************************
 
 INFO
 ====
-As at Release 4.0.1.0
+As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-11-MAY-2007 10:42
+20-JUL-2007 11:30
 
 TABLES PROCESSED
 ================
@@ -22,7 +40,7 @@ HIG_STANDARD_FAVOURITES
 
 TABLE OWNER
 ===========
-NM3DATA
+NM3_METADATA
 
 MODE (A-Append R-Refresh)
 ========================
@@ -30,7 +48,6 @@ A
 
 ***************************************************************************/
 
-define sccsid = '@(#)nm3data2.sql	1.56 05/11/07'
 set define off;
 set feedback off;
 
@@ -306,8 +323,8 @@ SET TERM OFF
 --
 -- Columns
 -- DGS_DGT_TABLE_NAME             NOT NULL VARCHAR2(30)
---   DGS_FK_DGT (Pos 1)
 --   DGS_PK (Pos 1)
+--   DGS_FK_DGT (Pos 1)
 -- DGS_TABLE_SYN                  NOT NULL VARCHAR2(30)
 --   DGS_PK (Pos 2)
 --
@@ -441,8 +458,8 @@ SET TERM OFF
 --
 -- Columns
 -- GRM_MODULE                     NOT NULL VARCHAR2(30)
---   GRM_FK_HMO (Pos 1)
 --   GRM_PK (Pos 1)
+--   GRM_FK_HMO (Pos 1)
 -- GRM_MODULE_TYPE                NOT NULL VARCHAR2(3)
 -- GRM_MODULE_PATH                NOT NULL VARCHAR2(240)
 -- GRM_FILE_TYPE                  NOT NULL VARCHAR2(3)
@@ -2696,11 +2713,11 @@ SET TERM OFF
 --
 -- Columns
 -- GMP_MODULE                     NOT NULL VARCHAR2(30)
---   GMP_FK_GRM (Pos 1)
 --   GMP_PK (Pos 1)
+--   GMP_FK_GRM (Pos 1)
 -- GMP_PARAM                      NOT NULL VARCHAR2(30)
---   GMP_FK_GP (Pos 1)
 --   GMP_PK (Pos 2)
+--   GMP_FK_GP (Pos 1)
 -- GMP_SEQ                        NOT NULL NUMBER(4)
 -- GMP_PARAM_DESCR                NOT NULL VARCHAR2(100)
 -- GMP_MANDATORY                  NOT NULL VARCHAR2(1)
@@ -5230,15 +5247,15 @@ SET TERM OFF
 --
 -- Columns
 -- GPD_MODULE                     NOT NULL VARCHAR2(30)
---   GPD_FK_GMP1 (Pos 1)
---   GPD_FK_GMP2 (Pos 1)
 --   GPD_PK (Pos 1)
+--   GPD_FK_GMP2 (Pos 1)
+--   GPD_FK_GMP1 (Pos 1)
 -- GPD_DEP_PARAM                  NOT NULL VARCHAR2(30)
---   GPD_FK_GMP1 (Pos 2)
 --   GPD_PK (Pos 2)
+--   GPD_FK_GMP1 (Pos 2)
 -- GPD_INDEP_PARAM                NOT NULL VARCHAR2(30)
---   GPD_FK_GMP2 (Pos 2)
 --   GPD_PK (Pos 3)
+--   GPD_FK_GMP2 (Pos 2)
 --
 --
 INSERT INTO GRI_PARAM_DEPENDENCIES
@@ -5333,8 +5350,8 @@ SET TERM OFF
 --
 -- Columns
 -- GPL_PARAM                      NOT NULL VARCHAR2(30)
---   GPL_FK_GP (Pos 1)
 --   GPL_PK (Pos 1)
+--   GPL_FK_GP (Pos 1)
 -- GPL_VALUE                      NOT NULL VARCHAR2(100)
 --   GPL_PK (Pos 2)
 -- GPL_DESCR                               VARCHAR2(100)
@@ -5595,8 +5612,8 @@ SET TERM OFF
 --
 -- Columns
 -- HER_APPL                       NOT NULL VARCHAR2(6)
---   HER_FK_HPR (Pos 1)
 --   HER_PK (Pos 1)
+--   HER_FK_HPR (Pos 1)
 -- HER_NO                         NOT NULL NUMBER(4)
 --   HER_PK (Pos 2)
 -- HER_TYPE                       NOT NULL VARCHAR2(1)
@@ -80351,11 +80368,11 @@ SET TERM OFF
 --
 -- Columns
 -- HSTF_PARENT                    NOT NULL VARCHAR2(30)
---   HSTF_CONNECT_LOOP_CHK
 --   HSTF_PK (Pos 1)
--- HSTF_CHILD                     NOT NULL VARCHAR2(30)
 --   HSTF_CONNECT_LOOP_CHK
+-- HSTF_CHILD                     NOT NULL VARCHAR2(30)
 --   HSTF_PK (Pos 2)
+--   HSTF_CONNECT_LOOP_CHK
 -- HSTF_DESCR                     NOT NULL VARCHAR2(80)
 -- HSTF_TYPE                      NOT NULL VARCHAR2(1)
 -- HSTF_ORDER                              NUMBER(22)
@@ -80369,14 +80386,82 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'PROW_OPERATIONS'
-       ,'PROW6012'
-       ,'Enquiry Summary'
+        'ACC'
+       ,'ACC_ANALYSIS'
+       ,'Analysis'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC'
+                    AND  HSTF_CHILD = 'ACC_ANALYSIS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC'
+       ,'ACC_IO'
+       ,'Data i/o'
+       ,'F'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC'
+                    AND  HSTF_CHILD = 'ACC_IO');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC'
+       ,'ACC_MANAGEMENT'
+       ,'Management'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC'
+                    AND  HSTF_CHILD = 'ACC_MANAGEMENT');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC'
+       ,'ACC_REF'
+       ,'Reference'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC'
+                    AND  HSTF_CHILD = 'ACC_REF');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_ANALYSIS'
+       ,'ACC7045'
+       ,'Queries'
        ,'M'
        ,2 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
-                    AND  HSTF_CHILD = 'PROW6012');
+                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
+                    AND  HSTF_CHILD = 'ACC7045');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -80386,371 +80471,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'SWR_WORKS_REPORTS'
-       ,'SWR1650'
-       ,'Section 74 Charges Invoice'
-       ,'M'
-       ,140 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1650');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_OPERATIONS'
-       ,'DOC0150'
-       ,'Enquiries'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
-                    AND  HSTF_CHILD = 'DOC0150');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_OPERATIONS'
-       ,'PROW6022'
-       ,'Contacts'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
-                    AND  HSTF_CHILD = 'PROW6022');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_OPERATIONS'
-       ,'NM0510'
-       ,'Asset Items'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
-                    AND  HSTF_CHILD = 'NM0510');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_ADMIN_REF'
-       ,'SWR1640'
-       ,'Maintain Section 74 Charging Profile'
-       ,'M'
-       ,80 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1640');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_OPERATIONS'
-       ,'PROW6021'
-       ,'Land Ownership Summary'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
-                    AND  HSTF_CHILD = 'PROW6021');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_ADMIN'
-       ,'SWR1630'
-       ,'Maintain Section 74 Charges'
-       ,'M'
-       ,40 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1630');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_OPERATIONS'
-       ,'PROW6020'
-       ,'Land Ownership'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
-                    AND  HSTF_CHILD = 'PROW6020');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_OPERATIONS'
-       ,'PROW6030'
-       ,'Access Land'
-       ,'M'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
-                    AND  HSTF_CHILD = 'PROW6030');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_OPERATIONS'
-       ,'PROW6050'
-       ,'Access Land History'
-       ,'M'
-       ,9 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
-                    AND  HSTF_CHILD = 'PROW6050');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_OPERATIONS'
-       ,'PROW6222'
-       ,'Enforcement Summary'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
-                    AND  HSTF_CHILD = 'PROW6222');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_OPERATIONS'
-       ,'PROW6220'
-       ,'Enforcements'
-       ,'M'
-       ,11 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
-                    AND  HSTF_CHILD = 'PROW6220');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_OPERATIONS'
-       ,'PROW6230'
-       ,'Prosecutions'
-       ,'M'
-       ,12 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
-                    AND  HSTF_CHILD = 'PROW6230');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_REPORTS'
-       ,'SWR1225'
-       ,'Generic Works Report'
-       ,'M'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1225');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_COMMENTS_ADMIN'
-       ,'SWR1112'
-       ,'Comments Sent/Received'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_COMMENTS_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1112');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_BATCH_ADMIN_REF'
-       ,'SWR1620'
-       ,'Maintain Batch Messages'
-       ,'M'
-       ,40 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_BATCH_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1620');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_REPORTS'
-       ,'SWR1305'
-       ,'Inspection History'
-       ,'M'
-       ,40 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1305');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_REPORTS'
-       ,'SWR1230'
-       ,'Generic Inspections Report'
-       ,'M'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1230');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_OPERATIONS'
-       ,'PROW6210'
-       ,'Vehicle Use Licences'
-       ,'M'
-       ,13 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
-                    AND  HSTF_CHILD = 'PROW6210');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_ADMIN'
-       ,'SWR1770'
-       ,'View Inspection Defects'
-       ,'M'
-       ,40 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1770');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_OPERATIONS'
-       ,'PROW6060'
-       ,'Path History'
-       ,'M'
-       ,14 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
-                    AND  HSTF_CHILD = 'PROW6060');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_DEFINITIVE'
-       ,'PROW6000'
-       ,'Worktray'
+        'ACC_ANALYSIS'
+       ,'ACC8800'
+       ,'Identify Sites'
        ,'M'
        ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
-                    AND  HSTF_CHILD = 'PROW6000');
+                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
+                    AND  HSTF_CHILD = 'ACC8800');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -80760,82 +80488,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'PROW_DEFINITIVE'
-       ,'PROW6012'
-       ,'Enquiry Summary'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
-                    AND  HSTF_CHILD = 'PROW6012');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_DEFINITIVE'
-       ,'DOC0150'
-       ,'Enquiries'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
-                    AND  HSTF_CHILD = 'DOC0150');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_DEFINITIVE'
-       ,'PROW6022'
-       ,'Contacts'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
-                    AND  HSTF_CHILD = 'PROW6022');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_DEFINITIVE'
-       ,'PROW6240'
-       ,'Depositions'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
-                    AND  HSTF_CHILD = 'PROW6240');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_DEFINITIVE'
-       ,'PROW6250'
-       ,'Definitive Statement'
+        'ACC_ANALYSIS'
+       ,'ACC8810'
+       ,'Factor Grid'
        ,'M'
        ,6 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
-                    AND  HSTF_CHILD = 'PROW6250');
+                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
+                    AND  HSTF_CHILD = 'ACC8810');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -80845,14 +80505,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'PROW_DEFINITIVE'
-       ,'PROW6261'
-       ,'Public Path Order Summary'
+        'ACC_ANALYSIS'
+       ,'ACC8812'
+       ,'Statistical Summary'
        ,'M'
        ,7 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
-                    AND  HSTF_CHILD = 'PROW6261');
+                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
+                    AND  HSTF_CHILD = 'ACC8812');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -80862,14 +80522,31 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'PROW_DEFINITIVE'
-       ,'PROW6260'
-       ,'Public Path Orders'
+        'ACC_ANALYSIS'
+       ,'ACC8825'
+       ,'Accident Groups'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
+                    AND  HSTF_CHILD = 'ACC8825');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_ANALYSIS'
+       ,'ACC8827'
+       ,'Group Removal'
        ,'M'
        ,8 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
-                    AND  HSTF_CHILD = 'PROW6260');
+                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
+                    AND  HSTF_CHILD = 'ACC8827');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -80879,14 +80556,48 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'PROW_DEFINITIVE'
-       ,'PROW6271'
-       ,'Modification Order Summary'
+        'ACC_ANALYSIS'
+       ,'ACC8830'
+       ,'Create Accident Groups'
        ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
+                    AND  HSTF_CHILD = 'ACC8830');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_ANALYSIS'
+       ,'ACC8835'
+       ,'Accident Group Hieracrchies'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
+                    AND  HSTF_CHILD = 'ACC8835');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_ANALYSIS'
+       ,'ACC_ANALYSIS_REPORTS'
+       ,'Reports'
+       ,'F'
        ,9 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
-                    AND  HSTF_CHILD = 'PROW6271');
+                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
+                    AND  HSTF_CHILD = 'ACC_ANALYSIS_REPORTS');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -80896,14 +80607,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'PROW_DEFINITIVE'
-       ,'PROW6270'
-       ,'Modification Orders'
+        'ACC_ANALYSIS_REPORTS'
+       ,'ACC8001'
+       ,'Profile Report'
        ,'M'
-       ,10 FROM DUAL
+       ,2 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
-                    AND  HSTF_CHILD = 'PROW6270');
+                   WHERE HSTF_PARENT = 'ACC_ANALYSIS_REPORTS'
+                    AND  HSTF_CHILD = 'ACC8001');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -80913,14 +80624,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'PROW_DEFINITIVE'
-       ,'PROW6281'
-       ,'Path Closure Summary'
+        'ACC_ANALYSIS_REPORTS'
+       ,'ACC8811'
+       ,'Factor Grid Report'
        ,'M'
-       ,11 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
-                    AND  HSTF_CHILD = 'PROW6281');
+                   WHERE HSTF_PARENT = 'ACC_ANALYSIS_REPORTS'
+                    AND  HSTF_CHILD = 'ACC8811');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -80930,14 +80641,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'PROW_DEFINITIVE'
-       ,'PROW6280'
-       ,'Path Closures'
+        'ACC_ANALYSIS_REPORTS'
+       ,'ACC8840'
+       ,'Hotspot Report'
        ,'M'
-       ,12 FROM DUAL
+       ,4 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
-                    AND  HSTF_CHILD = 'PROW6280');
+                   WHERE HSTF_PARENT = 'ACC_ANALYSIS_REPORTS'
+                    AND  HSTF_CHILD = 'ACC8840');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -80947,14 +80658,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'PROW_DEFINITIVE'
-       ,'PROW6060'
-       ,'Path History'
+        'ACC_ANALYSIS_REPORTS'
+       ,'ACC8842'
+       ,'Accident Group Refresh Utility'
        ,'M'
-       ,13 FROM DUAL
+       ,3 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
-                    AND  HSTF_CHILD = 'PROW6060');
+                   WHERE HSTF_PARENT = 'ACC_ANALYSIS_REPORTS'
+                    AND  HSTF_CHILD = 'ACC8842');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -80964,14 +80675,320 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'PROW_REFERENCE'
-       ,'PROW9120'
+        'ACC_IO'
+       ,'ACC8890'
+       ,'Load Accidents'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_IO'
+                    AND  HSTF_CHILD = 'ACC8890');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_IO'
+       ,'ACC8891'
+       ,'Accident File Load Rules'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_IO'
+                    AND  HSTF_CHILD = 'ACC8891');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_IO'
+       ,'ACC_IO_LOAD_REPORTS'
+       ,'Load Reports'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_IO'
+                    AND  HSTF_CHILD = 'ACC_IO_LOAD_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_IO_LOAD_REPORTS'
+       ,'ACC8892'
+       ,'External File Description'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_IO_LOAD_REPORTS'
+                    AND  HSTF_CHILD = 'ACC8892');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_MANAGEMENT'
+       ,'ACC3020'
+       ,'Accidents v2'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_MANAGEMENT'
+                    AND  HSTF_CHILD = 'ACC3020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_MANAGEMENT'
+       ,'ACC3021'
+       ,'Accidents'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_MANAGEMENT'
+                    AND  HSTF_CHILD = 'ACC3021');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_MANAGEMENT'
+       ,'ACC_MANAGEMENT_ATTRIB'
+       ,'Attribute'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_MANAGEMENT'
+                    AND  HSTF_CHILD = 'ACC_MANAGEMENT_ATTRIB');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_MANAGEMENT'
+       ,'ACC_MANAGEMENT_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_MANAGEMENT'
+                    AND  HSTF_CHILD = 'ACC_MANAGEMENT_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_MANAGEMENT_ATTRIB'
+       ,'ACC3040'
+       ,'Bulk Initialisation'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_MANAGEMENT_ATTRIB'
+                    AND  HSTF_CHILD = 'ACC3040');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_MANAGEMENT_ATTRIB'
+       ,'ACC3050'
+       ,'Bulk Maintenance'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_MANAGEMENT_ATTRIB'
+                    AND  HSTF_CHILD = 'ACC3050');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_MANAGEMENT_REPORTS'
+       ,'ACC8001'
+       ,'Profile Report'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_MANAGEMENT_REPORTS'
+                    AND  HSTF_CHILD = 'ACC8001');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_REF'
+       ,'ACC2050'
+       ,'Cross Attribute Validation Rules'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_REF'
+                    AND  HSTF_CHILD = 'ACC2050');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_REF'
+       ,'ACC2060'
+       ,'Hotspot Dates'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_REF'
+                    AND  HSTF_CHILD = 'ACC2060');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_REF'
+       ,'ACC2070'
+       ,'Accident Images'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_REF'
+                    AND  HSTF_CHILD = 'ACC2070');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_REF'
+       ,'ACC2080'
+       ,'Discoverer Interface'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_REF'
+                    AND  HSTF_CHILD = 'ACC2080');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_REF'
+       ,'ACC8820'
+       ,'Site Parameters'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_REF'
+                    AND  HSTF_CHILD = 'ACC8820');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_REF'
+       ,'ACC_REF_ITEM_ATTRIB'
+       ,'Item/Attribute'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_REF'
+                    AND  HSTF_CHILD = 'ACC_REF_ITEM_ATTRIB');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_REF'
+       ,'ACC_REF_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_REF'
+                    AND  HSTF_CHILD = 'ACC_REF_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_REF_ITEM_ATTRIB'
+       ,'ACC2010'
        ,'Domains'
        ,'M'
-       ,1 FROM DUAL
+       ,2 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_REFERENCE'
-                    AND  HSTF_CHILD = 'PROW9120');
+                   WHERE HSTF_PARENT = 'ACC_REF_ITEM_ATTRIB'
+                    AND  HSTF_CHILD = 'ACC2010');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -80981,13 +80998,285 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'PROW_REFERENCE'
+        'ACC_REF_ITEM_ATTRIB'
+       ,'ACC2020'
+       ,'Attributes'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_REF_ITEM_ATTRIB'
+                    AND  HSTF_CHILD = 'ACC2020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_REF_ITEM_ATTRIB'
+       ,'ACC2024'
+       ,'Attribute Group'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_REF_ITEM_ATTRIB'
+                    AND  HSTF_CHILD = 'ACC2024');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_REF_ITEM_ATTRIB'
+       ,'ACC2030'
+       ,'Item Control Data'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_REF_ITEM_ATTRIB'
+                    AND  HSTF_CHILD = 'ACC2030');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_REF_ITEM_ATTRIB'
+       ,'ACC2090'
+       ,'Accident Attribute Bands'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_REF_ITEM_ATTRIB'
+                    AND  HSTF_CHILD = 'ACC2090');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_REF_REPORTS'
+       ,'ACC8004'
+       ,'List of Attribute Domains'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_REF_REPORTS'
+                    AND  HSTF_CHILD = 'ACC8004');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_REF_REPORTS'
+       ,'ACC8005'
+       ,'List of Attribute Types'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_REF_REPORTS'
+                    AND  HSTF_CHILD = 'ACC8005');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_REF_REPORTS'
+       ,'ACC8006'
+       ,'List of Item Types'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_REF_REPORTS'
+                    AND  HSTF_CHILD = 'ACC8006');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_REF_REPORTS'
+       ,'ACC8007'
+       ,'List of Attribute Groups'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_REF_REPORTS'
+                    AND  HSTF_CHILD = 'ACC8007');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ACC_REF_REPORTS'
+       ,'ACC8008'
+       ,'List of Valid Items and Attributes'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ACC_REF_REPORTS'
+                    AND  HSTF_CHILD = 'ACC8008');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'AST'
+       ,'AST_REF'
+       ,'Asset Reference Data'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'AST'
+                    AND  HSTF_CHILD = 'AST_REF');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'AST'
+       ,'AST_SL'
+       ,'Street Lighting'
+       ,'F'
+       ,100 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'AST'
+                    AND  HSTF_CHILD = 'AST_SL');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'AST'
+       ,'NET_INVENTORY'
+       ,'Asset Management'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'AST'
+                    AND  HSTF_CHILD = 'NET_INVENTORY');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'AST'
+       ,'NET_QUERIES'
+       ,'Asset Queries'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'AST'
+                    AND  HSTF_CHILD = 'NET_QUERIES');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'AST_REF'
+       ,'NM0301'
+       ,'Asset Domains'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'AST_REF'
+                    AND  HSTF_CHILD = 'NM0301');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'AST_REF'
+       ,'NM0305'
+       ,'XSP and Reversal Rules'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'AST_REF'
+                    AND  HSTF_CHILD = 'NM0305');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'AST_REF'
+       ,'NM0306'
+       ,'Asset XSPs'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'AST_REF'
+                    AND  HSTF_CHILD = 'NM0306');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'AST_REF'
        ,'NM0410'
        ,'Asset Metamodel'
        ,'M'
        ,2 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_REFERENCE'
+                   WHERE HSTF_PARENT = 'AST_REF'
                     AND  HSTF_CHILD = 'NM0410');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
@@ -80998,31 +81287,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'SWR_INSP_ADMIN'
-       ,'SWR1760'
-       ,'View Inspections History'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1760');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_REFERENCE'
-       ,'PROW6002'
-       ,'Worktray Blocks'
+        'AST_REF'
+       ,'NM0411'
+       ,'Asset Exclusive View Creation'
        ,'M'
        ,3 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_REFERENCE'
-                    AND  HSTF_CHILD = 'PROW6002');
+                   WHERE HSTF_PARENT = 'AST_REF'
+                    AND  HSTF_CHILD = 'NM0411');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -81032,14 +81304,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'PROW_REFERENCE'
-       ,'PROW6292'
-       ,'Audit Options'
+        'AST_REF'
+       ,'NM0415'
+       ,'Asset Attribute Sets'
        ,'M'
        ,4 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_REFERENCE'
-                    AND  HSTF_CHILD = 'PROW6292');
+                   WHERE HSTF_PARENT = 'AST_REF'
+                    AND  HSTF_CHILD = 'NM0415');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -81049,14 +81321,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'SWR_INSP_ADMIN'
-       ,'SWR1750'
-       ,'Inspections Sent / Received'
+        'AST_REF'
+       ,'NM0420'
+       ,'Derived Asset Setup'
        ,'M'
-       ,30 FROM DUAL
+       ,9 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1750');
+                   WHERE HSTF_PARENT = 'AST_REF'
+                    AND  HSTF_CHILD = 'NM0420');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -81066,14 +81338,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'SWR_INSP_ADMIN_REF'
-       ,'SWR1720'
-       ,'Maintain Allowable Inspection Items'
+        'AST_REF'
+       ,'NM0550'
+       ,'Cross Attribute Validation Setup'
        ,'M'
-       ,50 FROM DUAL
+       ,7 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1720');
+                   WHERE HSTF_PARENT = 'AST_REF'
+                    AND  HSTF_CHILD = 'NM0550');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -81083,14 +81355,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'SWR_WORKS_ADMIN'
-       ,'SWR1380'
-       ,'Non Works Activity'
+        'AST_REF'
+       ,'NM0551'
+       ,'Cross Item Validation Setup'
        ,'M'
-       ,30 FROM DUAL
+       ,8 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1380');
+                   WHERE HSTF_PARENT = 'AST_REF'
+                    AND  HSTF_CHILD = 'NM0551');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -81100,286 +81372,7035 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'SWR_WORKS_QUERY'
-       ,'SWR1390'
-       ,'View Non Works Activity'
-       ,'M'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_QUERY'
-                    AND  HSTF_CHILD = 'SWR1390');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_ADMIN'
-       ,'SWR1400'
-       ,'Allocate Provisional Works'
-       ,'M'
-       ,60 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1400');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_ADMIN_REF'
-       ,'SWR1401'
-       ,'Maintain Work Types'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1401');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_ADMIN_REF'
-       ,'SWR1403'
-       ,'Maintain Notice Types'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1403');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_ORGS_ADMIN'
-       ,'SWR1450'
-       ,'SWA Organisations'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_ORGS_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1450');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_ORG_REPORTS'
-       ,'SWR1451'
-       ,'Organisation Data Report'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_ORG_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1451');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_ORGS_ADMIN'
-       ,'SWR1461'
-       ,'Maintain District Hierarchy'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_ORGS_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1461');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_ORGS_ADMIN'
-       ,'SWR1471'
-       ,'Contact List'
-       ,'M'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_ORGS_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1471');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_ORGS_ADMIN'
-       ,'SWR1480'
-       ,'Coordination Groups'
-       ,'M'
-       ,40 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_ORGS_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1480');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_ORGS_ADMIN_REF'
-       ,'SWR1490'
-       ,'Standard Text'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_ORGS_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1490');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_REF_ADMIN'
-       ,'SWR1500'
-       ,'Reference Data'
-       ,'M'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_REF_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1500');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_REF_REPORTS'
-       ,'SWR1501'
-       ,'Reference Data Report'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_REF_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1501');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_COMMENTS'
-       ,'SWR_COMMENTS_ADMIN'
-       ,'Admin'
-       ,'F'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_COMMENTS'
-                    AND  HSTF_CHILD = 'SWR_COMMENTS_ADMIN');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_ORGS'
-       ,'SWR_ORGS_ADMIN'
-       ,'Admin'
-       ,'F'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_ORGS'
-                    AND  HSTF_CHILD = 'SWR_ORGS_ADMIN');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_GAZ'
-       ,'SWR_GAZ_ADMIN'
-       ,'Admin'
-       ,'F'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_GAZ'
-                    AND  HSTF_CHILD = 'SWR_GAZ_ADMIN');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_GAZ'
-       ,'SWR_GAZ_REPORTS'
+        'AST_SL'
+       ,'AST_SL_REPORTS'
        ,'Reports'
-       ,'F'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_GAZ'
-                    AND  HSTF_CHILD = 'SWR_GAZ_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET'
-       ,'NET_NET_MANAGEMENT'
-       ,'Network Management'
        ,'F'
        ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET'
-                    AND  HSTF_CHILD = 'NET_NET_MANAGEMENT');
+                   WHERE HSTF_PARENT = 'AST_SL'
+                    AND  HSTF_CHILD = 'AST_SL_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'AST_SL_REPORTS'
+       ,'NMSLEQ0010'
+       ,'Atkins Odlin Energy Procurement'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'AST_SL_REPORTS'
+                    AND  HSTF_CHILD = 'NMSLEQ0010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM'
+       ,'CLM_ADMIN'
+       ,'Administration'
+       ,'F'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM'
+                    AND  HSTF_CHILD = 'CLM_ADMIN');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM'
+       ,'CLM_ENERGY'
+       ,'Energy'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM'
+                    AND  HSTF_CHILD = 'CLM_ENERGY');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM'
+       ,'CLM_FAULTS'
+       ,'Faults'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM'
+                    AND  HSTF_CHILD = 'CLM_FAULTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM'
+       ,'CLM_INSP'
+       ,'Inspections'
+       ,'F'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM'
+                    AND  HSTF_CHILD = 'CLM_INSP');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM'
+       ,'CLM_INV'
+       ,'Inventory'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM'
+                    AND  HSTF_CHILD = 'CLM_INV');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM'
+       ,'CLM_REF'
+       ,'Reference'
+       ,'F'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM'
+                    AND  HSTF_CHILD = 'CLM_REF');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM'
+       ,'CLM_SUPER'
+       ,'Super'
+       ,'F'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM'
+                    AND  HSTF_CHILD = 'CLM_SUPER');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM'
+       ,'CLM_WO'
+       ,'Works Order'
+       ,'F'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM'
+                    AND  HSTF_CHILD = 'CLM_WO');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_ADMIN'
+       ,'CLM0003'
+       ,'System Definitions'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_ADMIN'
+                    AND  HSTF_CHILD = 'CLM0003');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_ENERGY'
+       ,'CLM1000'
+       ,'Energy Rental Charges'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_ENERGY'
+                    AND  HSTF_CHILD = 'CLM1000');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_ENERGY'
+       ,'CLM1090'
+       ,'Inventory Summary'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_ENERGY'
+                    AND  HSTF_CHILD = 'CLM1090');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_ENERGY'
+       ,'CLM2050'
+       ,'Energy Extract'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_ENERGY'
+                    AND  HSTF_CHILD = 'CLM2050');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_ENERGY'
+       ,'CLM_ENERGY_REPORTS'
+       ,'Energy Reports'
+       ,'F'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_ENERGY'
+                    AND  HSTF_CHILD = 'CLM_ENERGY_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_ENERGY_REPORTS'
+       ,'CLM1010'
+       ,'Energy Account By Parish Report'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_ENERGY_REPORTS'
+                    AND  HSTF_CHILD = 'CLM1010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_ENERGY_REPORTS'
+       ,'CLM1091'
+       ,'Inventory Summary Report'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_ENERGY_REPORTS'
+                    AND  HSTF_CHILD = 'CLM1091');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_ENERGY_REPORTS'
+       ,'CLM1150'
+       ,'Energy Budget Recharge Report'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_ENERGY_REPORTS'
+                    AND  HSTF_CHILD = 'CLM1150');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_ENERGY_REPORTS'
+       ,'CLM1602'
+       ,'Invalid Energy Budget Codes Report'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_ENERGY_REPORTS'
+                    AND  HSTF_CHILD = 'CLM1602');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_FAULTS'
+       ,'CLM1040'
+       ,'Record Faults'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_FAULTS'
+                    AND  HSTF_CHILD = 'CLM1040');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_FAULTS'
+       ,'CLM1058'
+       ,'Reset Faults'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_FAULTS'
+                    AND  HSTF_CHILD = 'CLM1058');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_FAULTS'
+       ,'CLM1282'
+       ,'View Unit History'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_FAULTS'
+                    AND  HSTF_CHILD = 'CLM1282');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_FAULTS'
+       ,'CLM1360'
+       ,'Fault Repairs'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_FAULTS'
+                    AND  HSTF_CHILD = 'CLM1360');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_FAULTS'
+       ,'CLM1604'
+       ,'Inspection Fault Input'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_FAULTS'
+                    AND  HSTF_CHILD = 'CLM1604');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_FAULTS'
+       ,'CLM_FAULTS_REP'
+       ,'Fault Reports'
+       ,'F'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_FAULTS'
+                    AND  HSTF_CHILD = 'CLM_FAULTS_REP');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_FAULTS_REP'
+       ,'CLM1052'
+       ,'Report and Status Change'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_FAULTS_REP'
+                    AND  HSTF_CHILD = 'CLM1052');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_FAULTS_REP'
+       ,'CLM1053'
+       ,'List Completed/Outstanding Faults'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_FAULTS_REP'
+                    AND  HSTF_CHILD = 'CLM1053');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_FAULTS_REP'
+       ,'CLM1054'
+       ,'Outstanding Fault Statistics'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_FAULTS_REP'
+                    AND  HSTF_CHILD = 'CLM1054');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_FAULTS_REP'
+       ,'CLM1057'
+       ,'Summary of Faults to Maintenance Contractor'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_FAULTS_REP'
+                    AND  HSTF_CHILD = 'CLM1057');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INSP'
+       ,'CLM2010'
+       ,'Inspection Domains'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INSP'
+                    AND  HSTF_CHILD = 'CLM2010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INSP'
+       ,'CLM2020'
+       ,'Inspectable Components'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INSP'
+                    AND  HSTF_CHILD = 'CLM2020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INSP'
+       ,'CLM2030'
+       ,'Inspections'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INSP'
+                    AND  HSTF_CHILD = 'CLM2030');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INV'
+       ,'CLM1030'
+       ,'Create Lighting Schemes'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INV'
+                    AND  HSTF_CHILD = 'CLM1030');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INV'
+       ,'CLM1100'
+       ,'Locate Units'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INV'
+                    AND  HSTF_CHILD = 'CLM1100');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INV'
+       ,'CLM1130'
+       ,'Contractor Modifications'
+       ,'M'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INV'
+                    AND  HSTF_CHILD = 'CLM1130');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INV'
+       ,'CLM1180'
+       ,'Unit Details'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INV'
+                    AND  HSTF_CHILD = 'CLM1180');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INV'
+       ,'CLM1201'
+       ,'View End Dated Units'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INV'
+                    AND  HSTF_CHILD = 'CLM1201');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INV'
+       ,'CLM1592'
+       ,'Wayleave'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INV'
+                    AND  HSTF_CHILD = 'CLM1592');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INV'
+       ,'CLM1597'
+       ,'Update Maintenance Contractor'
+       ,'M'
+       ,9 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INV'
+                    AND  HSTF_CHILD = 'CLM1597');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INV'
+       ,'CLM1603'
+       ,'Defect Report'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INV'
+                    AND  HSTF_CHILD = 'CLM1603');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INV'
+       ,'CLM1605'
+       ,'Move Units Facility'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INV'
+                    AND  HSTF_CHILD = 'CLM1605');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INV'
+       ,'CLM_INV_REP'
+       ,'Inventory Reports'
+       ,'F'
+       ,11 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INV'
+                    AND  HSTF_CHILD = 'CLM_INV_REP');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INV_REP'
+       ,'CLM1080'
+       ,'Inventory Report'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INV_REP'
+                    AND  HSTF_CHILD = 'CLM1080');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INV_REP'
+       ,'CLM1110'
+       ,'Lamp Types Report'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INV_REP'
+                    AND  HSTF_CHILD = 'CLM1110');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INV_REP'
+       ,'CLM1120'
+       ,'Group Control Report'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INV_REP'
+                    AND  HSTF_CHILD = 'CLM1120');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_INV_REP'
+       ,'CLM1190'
+       ,'Scheme Details'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_INV_REP'
+                    AND  HSTF_CHILD = 'CLM1190');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF'
+       ,'CLM_REF_CTR'
+       ,'Contracts'
+       ,'F'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF'
+                    AND  HSTF_CHILD = 'CLM_REF_CTR');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF'
+       ,'CLM_REF_FIN'
+       ,'Financial'
+       ,'F'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF'
+                    AND  HSTF_CHILD = 'CLM_REF_FIN');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF'
+       ,'CLM_REF_ORGS'
+       ,'Organisations'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF'
+                    AND  HSTF_CHILD = 'CLM_REF_ORGS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF'
+       ,'CLM_REF_REP'
+       ,'Reference Reports'
+       ,'F'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF'
+                    AND  HSTF_CHILD = 'CLM_REF_REP');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF'
+       ,'CLM_REF_STATIC'
+       ,'Static Data'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF'
+                    AND  HSTF_CHILD = 'CLM_REF_STATIC');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF'
+       ,'CLM_REF_STREETS'
+       ,'Streets'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF'
+                    AND  HSTF_CHILD = 'CLM_REF_STREETS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_CTR'
+       ,'CLM1300'
+       ,'Contract Sub Section'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_CTR'
+                    AND  HSTF_CHILD = 'CLM1300');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_CTR'
+       ,'CLM1330'
+       ,'Contract Items'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_CTR'
+                    AND  HSTF_CHILD = 'CLM1330');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_CTR'
+       ,'CLM1340'
+       ,'Contract Item Rates'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_CTR'
+                    AND  HSTF_CHILD = 'CLM1340');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_CTR'
+       ,'CLM1350'
+       ,'Repair Codes'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_CTR'
+                    AND  HSTF_CHILD = 'CLM1350');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_CTR'
+       ,'CLM1370'
+       ,'Activity Codes'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_CTR'
+                    AND  HSTF_CHILD = 'CLM1370');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_CTR'
+       ,'CLM1385'
+       ,'Contract Priorities'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_CTR'
+                    AND  HSTF_CHILD = 'CLM1385');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_FIN'
+       ,'CLM1593'
+       ,'Financial Years'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_FIN'
+                    AND  HSTF_CHILD = 'CLM1593');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_FIN'
+       ,'CLM1594'
+       ,'Budgets'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_FIN'
+                    AND  HSTF_CHILD = 'CLM1594');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_FIN'
+       ,'CLM1595'
+       ,'Budget Status Definitions'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_FIN'
+                    AND  HSTF_CHILD = 'CLM1595');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_FIN'
+       ,'CLM1598'
+       ,'Fault Committment Amounts'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_FIN'
+                    AND  HSTF_CHILD = 'CLM1598');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_FIN'
+       ,'CLM1599'
+       ,'Fault Budget Template Codes'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_FIN'
+                    AND  HSTF_CHILD = 'CLM1599');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_FIN'
+       ,'CLM1600'
+       ,'Payment Run'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_FIN'
+                    AND  HSTF_CHILD = 'CLM1600');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_FIN'
+       ,'CLM_REF_FIN_REP'
+       ,'Budget Reporting'
+       ,'F'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_FIN'
+                    AND  HSTF_CHILD = 'CLM_REF_FIN_REP');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_FIN_REP'
+       ,'CLM1601'
+       ,'Budget Status Report'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_FIN_REP'
+                    AND  HSTF_CHILD = 'CLM1601');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_ORGS'
+       ,'CLM1500'
+       ,'Organisation Details'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_ORGS'
+                    AND  HSTF_CHILD = 'CLM1500');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_ORGS'
+       ,'CLM1505'
+       ,'Contractors'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_ORGS'
+                    AND  HSTF_CHILD = 'CLM1505');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_ORGS'
+       ,'CLM1510'
+       ,'Persons'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_ORGS'
+                    AND  HSTF_CHILD = 'CLM1510');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_ORGS'
+       ,'CLM1515'
+       ,'Contractor Users'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_ORGS'
+                    AND  HSTF_CHILD = 'CLM1515');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_ORGS'
+       ,'CLM1540'
+       ,'Unit Managers'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_ORGS'
+                    AND  HSTF_CHILD = 'CLM1540');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_REP'
+       ,'CLM1210'
+       ,'Valid Codes'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_REP'
+                    AND  HSTF_CHILD = 'CLM1210');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_STATIC'
+       ,'CLM1140'
+       ,'Static Data'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_STATIC'
+                    AND  HSTF_CHILD = 'CLM1140');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_STREETS'
+       ,'CLM1132'
+       ,'Parishes'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_STREETS'
+                    AND  HSTF_CHILD = 'CLM1132');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_STREETS'
+       ,'CLM1220'
+       ,'Street Gazetteer'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_STREETS'
+                    AND  HSTF_CHILD = 'CLM1220');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_STREETS'
+       ,'CLM1221'
+       ,'Street Routes'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_STREETS'
+                    AND  HSTF_CHILD = 'CLM1221');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_STREETS'
+       ,'CLM1222'
+       ,'Street Sensitivities'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_STREETS'
+                    AND  HSTF_CHILD = 'CLM1222');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_STREETS'
+       ,'CLM1230'
+       ,'Street Divisions'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_STREETS'
+                    AND  HSTF_CHILD = 'CLM1230');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_REF_STREETS'
+       ,'CLM1240'
+       ,'Street Aliases'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_REF_STREETS'
+                    AND  HSTF_CHILD = 'CLM1240');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_SUPER'
+       ,'CLM1170'
+       ,'Supervisor Unit Update'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_SUPER'
+                    AND  HSTF_CHILD = 'CLM1170');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_WO'
+       ,'CLM1260'
+       ,'Print Work Order Detail'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_WO'
+                    AND  HSTF_CHILD = 'CLM1260');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_WO'
+       ,'CLM1261'
+       ,'Work Order Lamp Summary'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_WO'
+                    AND  HSTF_CHILD = 'CLM1261');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_WO'
+       ,'CLM1262'
+       ,'Print Work Order Summary'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_WO'
+                    AND  HSTF_CHILD = 'CLM1262');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_WO'
+       ,'CLM1265'
+       ,'Print Error Codes'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_WO'
+                    AND  HSTF_CHILD = 'CLM1265');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_WO'
+       ,'CLM1279'
+       ,'Maintainence Schedule Calendar'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_WO'
+                    AND  HSTF_CHILD = 'CLM1279');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_WO'
+       ,'CLM1280'
+       ,'Maintenance Scheduler'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_WO'
+                    AND  HSTF_CHILD = 'CLM1280');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'CLM_WO'
+       ,'CLM1281'
+       ,'Work Orders'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'CLM_WO'
+                    AND  HSTF_CHILD = 'CLM1281');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'DOC'
+       ,'DOC_DOCUMENTS'
+       ,'Documents'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'DOC'
+                    AND  HSTF_CHILD = 'DOC_DOCUMENTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'DOC'
+       ,'DOC_REF'
+       ,'Reference Data'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'DOC'
+                    AND  HSTF_CHILD = 'DOC_REF');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'DOC_DOCUMENTS'
+       ,'DOC0100'
+       ,'Documents'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'DOC_DOCUMENTS'
+                    AND  HSTF_CHILD = 'DOC0100');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'DOC_DOCUMENTS'
+       ,'DOC0114'
+       ,'Circulation by Person'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'DOC_DOCUMENTS'
+                    AND  HSTF_CHILD = 'DOC0114');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'DOC_DOCUMENTS'
+       ,'DOC0115'
+       ,'Circulation by Document'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'DOC_DOCUMENTS'
+                    AND  HSTF_CHILD = 'DOC0115');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'DOC_REF'
+       ,'DOC0110'
+       ,'Document Types/Classes/Enquiry Types'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'DOC_REF'
+                    AND  HSTF_CHILD = 'DOC0110');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'DOC_REF'
+       ,'DOC0116'
+       ,'Keywords'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'DOC_REF'
+                    AND  HSTF_CHILD = 'DOC0116');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'DOC_REF'
+       ,'DOC0118'
+       ,'Media/Locations'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'DOC_REF'
+                    AND  HSTF_CHILD = 'DOC0118');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'DOC_REF'
+       ,'DOC0130'
+       ,'Document Gateways'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'DOC_REF'
+                    AND  HSTF_CHILD = 'DOC0130');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'DOC_REF'
+       ,'DOC_REF_TEMPLATES'
+       ,'Templates'
+       ,'F'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'DOC_REF'
+                    AND  HSTF_CHILD = 'DOC_REF_TEMPLATES');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'DOC_REF_TEMPLATES'
+       ,'DOC0201'
+       ,'Templates'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'DOC_REF_TEMPLATES'
+                    AND  HSTF_CHILD = 'DOC0201');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'DOC_REF_TEMPLATES'
+       ,'DOC0202'
+       ,'Template Users'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'DOC_REF_TEMPLATES'
+                    AND  HSTF_CHILD = 'DOC0202');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ENQ'
+       ,'PEM_ENQ'
+       ,'Public Enquiries'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ENQ'
+                    AND  HSTF_CHILD = 'PEM_ENQ');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ENQ'
+       ,'PEM_REF'
+       ,'Reference Data'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ENQ'
+                    AND  HSTF_CHILD = 'PEM_REF');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'ACC'
+       ,'Accidents Manager'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'ACC');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'AST'
+       ,'Asset Manager'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'AST');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'CLM'
+       ,'Street Lighting Manager'
+       ,'F'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'CLM');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'DOC'
+       ,'Document Manager'
+       ,'F'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'DOC');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'ENQ'
+       ,'Public Enquiry Manager'
+       ,'F'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'ENQ');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'HIG'
+       ,'exor'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'HIG');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'HIG1806'
+       ,'Fastpath'
+       ,'M'
+       ,51 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'HIG1806');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'HIG1808'
+       ,'Search'
+       ,'M'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'HIG1808');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'HIG1833'
+       ,'Change Password'
+       ,'M'
+       ,52 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'HIG1833');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'MAI'
+       ,'Maintenance Manager'
+       ,'F'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'MAI');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'MRWA'
+       ,'MRWA Specifics'
+       ,'F'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'MRWA');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'NET'
+       ,'Network Manager'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'NET');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'NSG'
+       ,'Street Gazetteer Manager'
+       ,'F'
+       ,14 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'NSG');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'PROW'
+       ,'Public Rights Of Way Manager'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'PROW');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'STP'
+       ,'Schemes'
+       ,'F'
+       ,11 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'STP');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'STR'
+       ,'Structures Manager'
+       ,'F'
+       ,12 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'STR');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'SWR'
+       ,'Street Works Manager'
+       ,'F'
+       ,9 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'SWR');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'TM'
+       ,'Traffic Manager'
+       ,'F'
+       ,13 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'TM');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'UKP'
+       ,'UKPMS'
+       ,'F'
+       ,15 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'UKP');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG'
+       ,'HIG_CSV'
+       ,'CSV Loader'
+       ,'F'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG'
+                    AND  HSTF_CHILD = 'HIG_CSV');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG'
+       ,'HIG_DIRECTORIES'
+       ,'Directory Management'
+       ,'F'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG'
+                    AND  HSTF_CHILD = 'HIG_DIRECTORIES');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG'
+       ,'HIG_GIS'
+       ,'GIS Data'
+       ,'F'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG'
+                    AND  HSTF_CHILD = 'HIG_GIS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG'
+       ,'HIG_GRI'
+       ,'GRI Data'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG'
+                    AND  HSTF_CHILD = 'HIG_GRI');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG'
+       ,'HIG_JOBS'
+       ,'Jobs'
+       ,'F'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG'
+                    AND  HSTF_CHILD = 'HIG_JOBS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG'
+       ,'HIG_REFERENCE'
+       ,'Reference Data'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG'
+                    AND  HSTF_CHILD = 'HIG_REFERENCE');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG'
+       ,'HIG_SECURITY'
+       ,'Security'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG'
+                    AND  HSTF_CHILD = 'HIG_SECURITY');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_CSV'
+       ,'HIG2010'
+       ,'CSV Loader Destination Tables'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_CSV'
+                    AND  HSTF_CHILD = 'HIG2010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_CSV'
+       ,'HIG2020'
+       ,'CSV Loader File Definitions Tables'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_CSV'
+                    AND  HSTF_CHILD = 'HIG2020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_CSV'
+       ,'HIGWEB2030'
+       ,'CSV File Upload'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_CSV'
+                    AND  HSTF_CHILD = 'HIGWEB2030');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_DIRECTORIES'
+       ,'HIG1895'
+       ,'Directories'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_DIRECTORIES'
+                    AND  HSTF_CHILD = 'HIG1895');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_DIRECTORIES'
+       ,'NMWEB0043'
+       ,'Upload file to Oracle Directory'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_DIRECTORIES'
+                    AND  HSTF_CHILD = 'NMWEB0043');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_DIRECTORIES'
+       ,'NMWEB0044'
+       ,'Download from Oracle Directory'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_DIRECTORIES'
+                    AND  HSTF_CHILD = 'NMWEB0044');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_GIS'
+       ,'GIS0005'
+       ,'GIS Projects'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_GIS'
+                    AND  HSTF_CHILD = 'GIS0005');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_GIS'
+       ,'GIS0010'
+       ,'GIS Themes'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_GIS'
+                    AND  HSTF_CHILD = 'GIS0010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_GIS'
+       ,'GIS0020'
+       ,'GIS Layer Tool'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_GIS'
+                    AND  HSTF_CHILD = 'GIS0020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_GRI'
+       ,'GRI0220'
+       ,'GRI Modules'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_GRI'
+                    AND  HSTF_CHILD = 'GRI0220');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_GRI'
+       ,'GRI0230'
+       ,'GRI Parameters'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_GRI'
+                    AND  HSTF_CHILD = 'GRI0230');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_GRI'
+       ,'GRI0240'
+       ,'GRI Module Parameters'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_GRI'
+                    AND  HSTF_CHILD = 'GRI0240');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_GRI'
+       ,'GRI0250'
+       ,'GRI Parameter Dependencies'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_GRI'
+                    AND  HSTF_CHILD = 'GRI0250');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_GRI'
+       ,'GRI0260'
+       ,'GRI Saved Parameters'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_GRI'
+                    AND  HSTF_CHILD = 'GRI0260');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_GRI'
+       ,'HIG1850'
+       ,'Report Styles'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_GRI'
+                    AND  HSTF_CHILD = 'HIG1850');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_GRI'
+       ,'HIG1950'
+       ,'Discoverer API Definition'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_GRI'
+                    AND  HSTF_CHILD = 'HIG1950');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_JOBS'
+       ,'NM3010'
+       ,'Job Operations'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_JOBS'
+                    AND  HSTF_CHILD = 'NM3010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_JOBS'
+       ,'NM3020'
+       ,'Job Types'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_JOBS'
+                    AND  HSTF_CHILD = 'NM3020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG1220'
+       ,'Intervals'
+       ,'M'
+       ,15 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG1220');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG1820'
+       ,'Units and Conversions'
+       ,'M'
+       ,16 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG1820');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG1837'
+       ,'User Option Administration'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG1837');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG1839'
+       ,'Module Keywords'
+       ,'M'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG1839');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG1881'
+       ,'Module Usages'
+       ,'M'
+       ,9 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG1881');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG1885'
+       ,'Maintain URL Modules'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG1885');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG3664'
+       ,'Financial Years'
+       ,'M'
+       ,17 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG3664');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG5000'
+       ,'Maintain Entry Points'
+       ,'M'
+       ,11 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG5000');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG9110'
+       ,'Status Codes'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG9110');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG9120'
+       ,'Domains'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG9120');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG9130'
+       ,'Product Options'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG9130');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG9135'
+       ,'Product and User Option List'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG9135');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG9170'
+       ,'Holidays'
+       ,'M'
+       ,12 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG9170');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG9180'
+       ,'v2 Errors'
+       ,'M'
+       ,13 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG9180');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG9185'
+       ,'v3 Errors'
+       ,'M'
+       ,14 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG9185');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG_REFERENCE_MAIL'
+       ,'Mail'
+       ,'F'
+       ,18 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG_REFERENCE_MAIL');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG_REFERENCE_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,19 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG_REFERENCE_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE_MAIL'
+       ,'HIG1900'
+       ,'Mail Users'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE_MAIL'
+                    AND  HSTF_CHILD = 'HIG1900');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE_MAIL'
+       ,'HIG1901'
+       ,'Mail Groups'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE_MAIL'
+                    AND  HSTF_CHILD = 'HIG1901');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE_MAIL'
+       ,'HIG1903'
+       ,'Mail Message Administration'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE_MAIL'
+                    AND  HSTF_CHILD = 'HIG1903');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE_MAIL'
+       ,'HIG1910'
+       ,'POP3 Mail Server Definition'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE_MAIL'
+                    AND  HSTF_CHILD = 'HIG1910');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE_MAIL'
+       ,'HIG1911'
+       ,'POP3 Mail Message View'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE_MAIL'
+                    AND  HSTF_CHILD = 'HIG1911');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE_MAIL'
+       ,'HIG1912'
+       ,'POP3 Mail Processing Rules'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE_MAIL'
+                    AND  HSTF_CHILD = 'HIG1912');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE_MAIL'
+       ,'HIGWEB1902'
+       ,'Mail'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE_MAIL'
+                    AND  HSTF_CHILD = 'HIGWEB1902');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE_REPORTS'
+       ,'HIG9115'
+       ,'List of Status Codes'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE_REPORTS'
+                    AND  HSTF_CHILD = 'HIG9115');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE_REPORTS'
+       ,'HIG9125'
+       ,'List of Static Reference Data'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE_REPORTS'
+                    AND  HSTF_CHILD = 'HIG9125');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_SECURITY'
+       ,'HIG1832'
+       ,'Users'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_SECURITY'
+                    AND  HSTF_CHILD = 'HIG1832');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_SECURITY'
+       ,'HIG1836'
+       ,'Roles'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_SECURITY'
+                    AND  HSTF_CHILD = 'HIG1836');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_SECURITY'
+       ,'HIG1860'
+       ,'Admin Units'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_SECURITY'
+                    AND  HSTF_CHILD = 'HIG1860');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_SECURITY'
+       ,'HIG1880'
+       ,'Modules'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_SECURITY'
+                    AND  HSTF_CHILD = 'HIG1880');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_SECURITY'
+       ,'HIG1890'
+       ,'Products'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_SECURITY'
+                    AND  HSTF_CHILD = 'HIG1890');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_SECURITY'
+       ,'HIG_SECURITY_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_SECURITY'
+                    AND  HSTF_CHILD = 'HIG_SECURITY_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_SECURITY_REPORTS'
+       ,'HIG1802'
+       ,'Menu Options for a User'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_SECURITY_REPORTS'
+                    AND  HSTF_CHILD = 'HIG1802');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_SECURITY_REPORTS'
+       ,'HIG1804'
+       ,'Menu Options for a Role'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_SECURITY_REPORTS'
+                    AND  HSTF_CHILD = 'HIG1804');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_SECURITY_REPORTS'
+       ,'HIG1862'
+       ,'Admin Units'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_SECURITY_REPORTS'
+                    AND  HSTF_CHILD = 'HIG1862');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_SECURITY_REPORTS'
+       ,'HIG1864'
+       ,'Users Report'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_SECURITY_REPORTS'
+                    AND  HSTF_CHILD = 'HIG1864');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_SECURITY_REPORTS'
+       ,'HIG1866'
+       ,'Users By Admin Unit'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_SECURITY_REPORTS'
+                    AND  HSTF_CHILD = 'HIG1866');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_SECURITY_REPORTS'
+       ,'HIG1868'
+       ,'User Roles'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_SECURITY_REPORTS'
+                    AND  HSTF_CHILD = 'HIG1868');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_SECURITY_REPORTS'
+       ,'HIG2100'
+       ,'Produce Database Healthcheck File'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_SECURITY_REPORTS'
+                    AND  HSTF_CHILD = 'HIG2100');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI'
+       ,'MAI8000'
+       ,'Batch Works Order Printing'
+       ,'M'
+       ,21 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI'
+                    AND  HSTF_CHILD = 'MAI8000');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI'
+       ,'MAI_CONTRACTS'
+       ,'Contracts'
+       ,'F'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI'
+                    AND  HSTF_CHILD = 'MAI_CONTRACTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI'
+       ,'MAI_FINANCIAL'
+       ,'Financial'
+       ,'F'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI'
+                    AND  HSTF_CHILD = 'MAI_FINANCIAL');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI'
+       ,'MAI_INSP'
+       ,'Inspections'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI'
+                    AND  HSTF_CHILD = 'MAI_INSP');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI'
+       ,'MAI_INTERFACES'
+       ,'Interfaces'
+       ,'F'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI'
+                    AND  HSTF_CHILD = 'MAI_INTERFACES');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI'
+       ,'MAI_INV'
+       ,'Inventory'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI'
+                    AND  HSTF_CHILD = 'MAI_INV');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI'
+       ,'MAI_LOADERS'
+       ,'Loaders'
+       ,'F'
+       ,9 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI'
+                    AND  HSTF_CHILD = 'MAI_LOADERS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI'
+       ,'MAI_REF'
+       ,'Reference'
+       ,'F'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI'
+                    AND  HSTF_CHILD = 'MAI_REF');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI'
+       ,'MAI_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI'
+                    AND  HSTF_CHILD = 'MAI_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI'
+       ,'MAI_WORKS'
+       ,'Works'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI'
+                    AND  HSTF_CHILD = 'MAI_WORKS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS'
+       ,'MAI3624'
+       ,'Discount Groups'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS'
+                    AND  HSTF_CHILD = 'MAI3624');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS'
+       ,'MAI3880'
+       ,'Contracts'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS'
+                    AND  HSTF_CHILD = 'MAI3880');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS'
+       ,'MAI3881'
+       ,'Contractors'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS'
+                    AND  HSTF_CHILD = 'MAI3881');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS'
+       ,'MAI3882'
+       ,'Copy a Contract'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS'
+                    AND  HSTF_CHILD = 'MAI3882');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS'
+       ,'MAI3884'
+       ,'Bulk Update of Contract Items'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS'
+                    AND  HSTF_CHILD = 'MAI3884');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS'
+       ,'MAI3886'
+       ,'Standard Item Sections and Sub-Sections'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS'
+                    AND  HSTF_CHILD = 'MAI3886');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS'
+       ,'MAI3888'
+       ,'Standard Items'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS'
+                    AND  HSTF_CHILD = 'MAI3888');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS'
+       ,'MAI_CONTRACTS_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS'
+                    AND  HSTF_CHILD = 'MAI_CONTRACTS_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS_REPORTS'
+       ,'MAI3932'
+       ,'Summary of Work Instructed by Standard Item'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3932');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS_REPORTS'
+       ,'MAI3934'
+       ,'Summary of Work Volumes by Standard Item'
+       ,'M'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3934');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS_REPORTS'
+       ,'MAI3948'
+       ,'Summary of Expenditure by Contract'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3948');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS_REPORTS'
+       ,'MAI3954'
+       ,'Contractor Performance Report'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3954');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS_REPORTS'
+       ,'MAI3980'
+       ,'Contract Details Report'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3980');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS_REPORTS'
+       ,'MAI3981'
+       ,'List of Contractors'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3981');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS_REPORTS'
+       ,'MAI3982'
+       ,'List of Contract Liabilities'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3982');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS_REPORTS'
+       ,'MAI3984'
+       ,'List of Contract Rates'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3984');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS_REPORTS'
+       ,'MAI3986'
+       ,'List of Standard Item Sections and Sub-Sections'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3986');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_CONTRACTS_REPORTS'
+       ,'MAI3988'
+       ,'List of Standard Items'
+       ,'M'
+       ,9 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3988');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_FINANCIAL'
+       ,'MAI1930'
+       ,'IHMS Allocated Amounts'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_FINANCIAL'
+                    AND  HSTF_CHILD = 'MAI1930');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_FINANCIAL'
+       ,'MAI3660'
+       ,'Budgets'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_FINANCIAL'
+                    AND  HSTF_CHILD = 'MAI3660');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_FINANCIAL'
+       ,'MAI3662'
+       ,'Generate Budgets for Next Year'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_FINANCIAL'
+                    AND  HSTF_CHILD = 'MAI3662');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_FINANCIAL'
+       ,'MAI3840'
+       ,'Payment Run'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_FINANCIAL'
+                    AND  HSTF_CHILD = 'MAI3840');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_FINANCIAL'
+       ,'MAI3842'
+       ,'Deselect Items for Payment'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_FINANCIAL'
+                    AND  HSTF_CHILD = 'MAI3842');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_FINANCIAL'
+       ,'MAI3940'
+       ,'Query Payment Run Details'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_FINANCIAL'
+                    AND  HSTF_CHILD = 'MAI3940');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_FINANCIAL'
+       ,'MAI_FINANCIAL_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_FINANCIAL'
+                    AND  HSTF_CHILD = 'MAI_FINANCIAL_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_FINANCIAL_REPORTS'
+       ,'MAI3690'
+       ,'Print Budget Exceptions Report'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_FINANCIAL_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3690');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_FINANCIAL_REPORTS'
+       ,'MAI3692'
+       ,'Print Cost Code Exceptions Report'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_FINANCIAL_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3692');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_FINANCIAL_REPORTS'
+       ,'MAI3841'
+       ,'Payment Run Report'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_FINANCIAL_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3841');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_FINANCIAL_REPORTS'
+       ,'MAI3942'
+       ,'List of Items for Payment'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_FINANCIAL_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3942');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_FINANCIAL_REPORTS'
+       ,'MAI3944'
+       ,'List of Completed Rechargeable Defects'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_FINANCIAL_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3944');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_GMIS_LOADERS'
+       ,'MAI2530'
+       ,'Create Route and Defect Files for GMIS Inspections'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_GMIS_LOADERS'
+                    AND  HSTF_CHILD = 'MAI2530');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_GMIS_LOADERS'
+       ,'MAI2550'
+       ,'Correct GMIS Load File Errors'
+       ,'M'
+       ,12 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_GMIS_LOADERS'
+                    AND  HSTF_CHILD = 'MAI2550');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_GMIS_LOADERS'
+       ,'MAIWEB2540'
+       ,'GMIS Survey File Loader'
+       ,'M'
+       ,11 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_GMIS_LOADERS'
+                    AND  HSTF_CHILD = 'MAIWEB2540');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP'
+       ,'MAI2470'
+       ,'Delete Inspections'
+       ,'M'
+       ,90 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP'
+                    AND  HSTF_CHILD = 'MAI2470');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP'
+       ,'MAI2730'
+       ,'Match Duplicate Defects'
+       ,'M'
+       ,70 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP'
+                    AND  HSTF_CHILD = 'MAI2730');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP'
+       ,'MAI2760'
+       ,'Unmatch Duplicate Defects'
+       ,'M'
+       ,80 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP'
+                    AND  HSTF_CHILD = 'MAI2760');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP'
+       ,'MAI2775'
+       ,'Batch Setting of Repair Dates'
+       ,'M'
+       ,100 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP'
+                    AND  HSTF_CHILD = 'MAI2775');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP'
+       ,'MAI3806'
+       ,'Defects'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP'
+                    AND  HSTF_CHILD = 'MAI3806');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP'
+       ,'MAI3808'
+       ,'Inspections'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP'
+                    AND  HSTF_CHILD = 'MAI3808');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP'
+       ,'MAI3810'
+       ,'View Defects'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP'
+                    AND  HSTF_CHILD = 'MAI3810');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP'
+       ,'MAI3816'
+       ,'Responses to Notices'
+       ,'M'
+       ,60 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP'
+                    AND  HSTF_CHILD = 'MAI3816');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP'
+       ,'MAI3899'
+       ,'Inspections by Group'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP'
+                    AND  HSTF_CHILD = 'MAI3899');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP'
+       ,'MAI_INSP_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,110 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP'
+                    AND  HSTF_CHILD = 'MAI_INSP_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP_REPORTS'
+       ,'MAI2210'
+       ,'Print Defective Advisory Roadstuds Report'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'MAI2210');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP_REPORTS'
+       ,'MAI2790'
+       ,'Insurance Claims Reporting'
+       ,'M'
+       ,12 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'MAI2790');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP_REPORTS'
+       ,'MAI3100'
+       ,'Print Inspection Schedules'
+       ,'M'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3100');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP_REPORTS'
+       ,'MAI3470'
+       ,'Print Defect Details ( Work Orders )'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3470');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP_REPORTS'
+       ,'MAI3900'
+       ,'Print Inspection Report'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3900');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP_REPORTS'
+       ,'MAI3902'
+       ,'Print Defect Details'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3902');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP_REPORTS'
+       ,'MAI3904'
+       ,'Print Defect Notices'
+       ,'M'
+       ,13 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3904');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP_REPORTS'
+       ,'MAI3905'
+       ,'Print Roadstud Defects not Set to Mandatory or Advisory'
+       ,'M'
+       ,11 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3905');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP_REPORTS'
+       ,'MAI3910'
+       ,'List of Defects by Inspection Date'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3910');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP_REPORTS'
+       ,'MAI3912'
+       ,'List of Notifiable Defects'
+       ,'M'
+       ,14 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3912');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP_REPORTS'
+       ,'MAI3916'
+       ,'Summary of Notifiable/Rechargeable Defects'
+       ,'M'
+       ,15 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3916');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP_REPORTS'
+       ,'MAI5025'
+       ,'Detailed Inspection Work Done'
+       ,'M'
+       ,9 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5025');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP_REPORTS'
+       ,'MAI5027'
+       ,'Print Defects by Defect Type'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5027');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP_REPORTS'
+       ,'MAI5100'
+       ,'Print Defect Details (At-a-Glance)'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5100');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INSP_REPORTS'
+       ,'MAI5125'
+       ,'Print Defect Details (Strip Plan)'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5125');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INTERFACES'
+       ,'MAI3830'
+       ,'Works Order File Extract'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INTERFACES'
+                    AND  HSTF_CHILD = 'MAI3830');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INTERFACES'
+       ,'MAI3834'
+       ,'Financial Commitment File'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INTERFACES'
+                    AND  HSTF_CHILD = 'MAI3834');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INTERFACES'
+       ,'MAI3850'
+       ,'Completions file'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INTERFACES'
+                    AND  HSTF_CHILD = 'MAI3850');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INTERFACES'
+       ,'MAI3852'
+       ,'Invoice file'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INTERFACES'
+                    AND  HSTF_CHILD = 'MAI3852');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INTERFACES'
+       ,'MAI3854'
+       ,'Invoice Verification form'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INTERFACES'
+                    AND  HSTF_CHILD = 'MAI3854');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INTERFACES'
+       ,'MAI3856'
+       ,'Payment Approval form'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INTERFACES'
+                    AND  HSTF_CHILD = 'MAI3856');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INTERFACES'
+       ,'MAI3858'
+       ,'Payment Transaction file'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INTERFACES'
+                    AND  HSTF_CHILD = 'MAI3858');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV'
+       ,'MAI2140'
+       ,'Query Network/Inventory Data'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV'
+                    AND  HSTF_CHILD = 'MAI2140');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV'
+       ,'MAI2310'
+       ,'Inventory Items'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV'
+                    AND  HSTF_CHILD = 'MAI2310');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV'
+       ,'MAI_INV_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV'
+                    AND  HSTF_CHILD = 'MAI_INV_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI2115'
+       ,'Print Potential Inventory Duplicates'
+       ,'M'
+       ,9 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI2115');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI2315'
+       ,'Print Inventory Items (matrix format)'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI2315');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI2320'
+       ,'Print Inventory Map'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI2320');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI2325'
+       ,'Print Inventory Summary'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI2325');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI2330'
+       ,'Print Summary of Inventory Changes'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI2330');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI30060'
+       ,'Print Historical Inventory Data'
+       ,'M'
+       ,12 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI30060');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI5001'
+       ,'Inventory Item Details'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5001');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI5010'
+       ,'Print Road Markings - Hatched Type Area'
+       ,'M'
+       ,17 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI5011'
+       ,'Print Road Markings - Longitudinal'
+       ,'M'
+       ,16 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5011');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI5015'
+       ,'Print Road Markings - Transverse and Special'
+       ,'M'
+       ,15 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5015');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI5018'
+       ,'Print Sign Areas'
+       ,'M'
+       ,14 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5018');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI5021'
+       ,'Print Inventory Areas - Trapezium Rule'
+       ,'M'
+       ,13 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5021');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI5022'
+       ,'Print Inspectors Pocket Book'
+       ,'M'
+       ,19 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5022');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI5031'
+       ,'Print Electrical Inventory'
+       ,'M'
+       ,18 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5031');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI5075'
+       ,'Print Inventory Item Report'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5075');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI6100'
+       ,'Print Inventory Statistics'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI6100');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI6110'
+       ,'Print Inventory Lengths'
+       ,'M'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI6110');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI9010'
+       ,'Detect Inventory Gap/Overlap'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI9010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_INV_REPORTS'
+       ,'MAI9020'
+       ,'Print Inventory Gap/Overlap'
+       ,'M'
+       ,11 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
+                    AND  HSTF_CHILD = 'MAI9020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS'
+       ,'MAI_GMIS_LOADERS'
+       ,'GMIS Interface'
+       ,'F'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS'
+                    AND  HSTF_CHILD = 'MAI_GMIS_LOADERS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS'
+       ,'MAI_LOADERS_INSPECTIONS'
+       ,'Inspections'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS'
+                    AND  HSTF_CHILD = 'MAI_LOADERS_INSPECTIONS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS'
+       ,'MAI_LOADERS_INVENTORY'
+       ,'Inventory'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS'
+                    AND  HSTF_CHILD = 'MAI_LOADERS_INVENTORY');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS_INSPECTIONS'
+       ,'MAI2200C'
+       ,'Inspection Loader (Part 1)'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI2200C');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS_INSPECTIONS'
+       ,'MAI2200D'
+       ,'Inspection Loader (Part 2)'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI2200D');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS_INSPECTIONS'
+       ,'MAI2200R'
+       ,'Bulk Inspection Load - Stage 2 Report'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI2200R');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS_INSPECTIONS'
+       ,'MAI2220'
+       ,'Download Static Ref Data for DCD Inspections'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI2220');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS_INSPECTIONS'
+       ,'MAI2222'
+       ,'Download Standard Item Data for DCD Inspections'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI2222');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS_INSPECTIONS'
+       ,'MAI2224'
+       ,'Download Network Data for DCD Inspections'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI2224');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS_INSPECTIONS'
+       ,'MAI2250'
+       ,'Correct Inspection Load Errors'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI2250');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS_INSPECTIONS'
+       ,'MAI3863'
+       ,'Download Inspection by Assets'
+       ,'M'
+       ,9 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI3863');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS_INSPECTIONS'
+       ,'MAI5091'
+       ,'Remove Phase 1 Inspection Batches'
+       ,'M'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI5091');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS_INVENTORY'
+       ,'MAI2100C'
+       ,'Inventory Loader (Part 1)'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS_INVENTORY'
+                    AND  HSTF_CHILD = 'MAI2100C');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS_INVENTORY'
+       ,'MAI2105C'
+       ,'Reformat Road Group Inventory Data'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS_INVENTORY'
+                    AND  HSTF_CHILD = 'MAI2105C');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS_INVENTORY'
+       ,'MAI2110C'
+       ,'Inventory Loader (Part 2)'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS_INVENTORY'
+                    AND  HSTF_CHILD = 'MAI2110C');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS_INVENTORY'
+       ,'MAI2120'
+       ,'Correct Inventory Load Errors'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS_INVENTORY'
+                    AND  HSTF_CHILD = 'MAI2120');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS_INVENTORY'
+       ,'MAI2500'
+       ,'Download Data for Inventory Survey on DCD'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS_INVENTORY'
+                    AND  HSTF_CHILD = 'MAI2500');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS_INVENTORY'
+       ,'MAI5065'
+       ,'Print Batch with Downloaded Inventory Items'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS_INVENTORY'
+                    AND  HSTF_CHILD = 'MAI5065');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_LOADERS_INVENTORY'
+       ,'MAI5090'
+       ,'Remove Successfully Loaded Inventory Batches'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_LOADERS_INVENTORY'
+                    AND  HSTF_CHILD = 'MAI5090');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF'
+       ,'MAI_REF_FINANCIAL'
+       ,'Financial'
+       ,'F'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF'
+                    AND  HSTF_CHILD = 'MAI_REF_FINANCIAL');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF'
+       ,'MAI_REF_INSPECTIONS'
+       ,'Inspections'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF'
+                    AND  HSTF_CHILD = 'MAI_REF_INSPECTIONS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF'
+       ,'MAI_REF_INVENTORY'
+       ,'Inventory'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF'
+                    AND  HSTF_CHILD = 'MAI_REF_INVENTORY');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF'
+       ,'MAI_REF_MAINTENANCE'
+       ,'Maintenance'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF'
+                    AND  HSTF_CHILD = 'MAI_REF_MAINTENANCE');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_FINANCIAL'
+       ,'MAI1940'
+       ,'Item Code Breakdowns'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_FINANCIAL'
+                    AND  HSTF_CHILD = 'MAI1940');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_FINANCIAL'
+       ,'MAI3664'
+       ,'Financial Years'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_FINANCIAL'
+                    AND  HSTF_CHILD = 'MAI3664');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_FINANCIAL'
+       ,'MAI3666'
+       ,'Job Size Codes'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_FINANCIAL'
+                    AND  HSTF_CHILD = 'MAI3666');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_FINANCIAL'
+       ,'MAI3844'
+       ,'Cost Centre Codes'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_FINANCIAL'
+                    AND  HSTF_CHILD = 'MAI3844');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_FINANCIAL'
+       ,'MAI3846'
+       ,'VAT Rates'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_FINANCIAL'
+                    AND  HSTF_CHILD = 'MAI3846');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_FINANCIAL'
+       ,'MAI_REF_FINANCIAL_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_FINANCIAL'
+                    AND  HSTF_CHILD = 'MAI_REF_FINANCIAL_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_FINANCIAL_REPORTS'
+       ,'MAI2780'
+       ,'Print Item Code Breakdowns'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_FINANCIAL_REPORTS'
+                    AND  HSTF_CHILD = 'MAI2780');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_FINANCIAL_REPORTS'
+       ,'MAI3946'
+       ,'List of VAT Rates'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_FINANCIAL_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3946');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS'
+       ,'MAI1300'
+       ,'Defect Control Data'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI1300');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS'
+       ,'MAI1315'
+       ,'Treatment Data'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI1315');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS'
+       ,'MAI1320'
+       ,'Enquiry/Treatment Types'
+       ,'M'
+       ,9 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI1320');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS'
+       ,'MAI1325'
+       ,'Enquiry/Defect Priorities'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI1325');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS'
+       ,'MAI1830'
+       ,'People'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI1830');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS'
+       ,'MAI1870'
+       ,'Organisations'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI1870');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS'
+       ,'MAI3150'
+       ,'Default Treatments'
+       ,'M'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI3150');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS'
+       ,'MAI3812'
+       ,'Defect Priorities'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI3812');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS'
+       ,'MAI3813'
+       ,'Maintain Automatic Defect Prioritisation'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI3813');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS'
+       ,'MAI3814'
+       ,'Treatment Models'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI3814');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS'
+       ,'MAI_REF_INSPECTIONS_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,11 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
+                    AND  HSTF_CHILD = 'MAI_REF_INSPECTIONS_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS_REPORTS'
+       ,'MAI1808'
+       ,'List of Organisations'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI1808');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS_REPORTS'
+       ,'MAI1840'
+       ,'List of People'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI1840');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS_REPORTS'
+       ,'MAI3250'
+       ,'Print Defect Movements'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3250');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS_REPORTS'
+       ,'MAI5220'
+       ,'Print Valid Defect Types'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5220');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS_REPORTS'
+       ,'MAI5235'
+       ,'Print Defect Item Types'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5235');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INSPECTIONS_REPORTS'
+       ,'MAI5240'
+       ,'Print Treatment Codes'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5240');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INVENTORY'
+       ,'MAI1400'
+       ,'v2 Asset Type Translations'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY'
+                    AND  HSTF_CHILD = 'MAI1400');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INVENTORY'
+       ,'MAI1430'
+       ,'Lamp Configurations'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY'
+                    AND  HSTF_CHILD = 'MAI1430');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INVENTORY'
+       ,'MAI1440'
+       ,'Inventory Colour Map'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY'
+                    AND  HSTF_CHILD = 'MAI1440');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INVENTORY'
+       ,'MAI1910'
+       ,'XSP Values'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY'
+                    AND  HSTF_CHILD = 'MAI1910');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INVENTORY'
+       ,'MAI1920'
+       ,'Inventory XSPs'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY'
+                    AND  HSTF_CHILD = 'MAI1920');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INVENTORY'
+       ,'MAI_REF_INVENTORY_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY'
+                    AND  HSTF_CHILD = 'MAI_REF_INVENTORY_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INVENTORY_REPORTS'
+       ,'MAI5050'
+       ,'Print List of Inventory Item Types, Attributes and Values'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5050');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INVENTORY_REPORTS'
+       ,'MAI5200'
+       ,'Print Lamp Configurations'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5200');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_INVENTORY_REPORTS'
+       ,'MAI5210'
+       ,'Print Electricity Boards'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5210');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE'
+       ,'MAI0132'
+       ,'Work Order Priorities'
+       ,'M'
+       ,12 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
+                    AND  HSTF_CHILD = 'MAI0132');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE'
+       ,'MAI1200'
+       ,'Activities'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
+                    AND  HSTF_CHILD = 'MAI1200');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE'
+       ,'MAI1205'
+       ,'Activity Groups'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
+                    AND  HSTF_CHILD = 'MAI1205');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE'
+       ,'MAI1210'
+       ,'Local Activity Frequencies'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
+                    AND  HSTF_CHILD = 'MAI1210');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE'
+       ,'MAI1230'
+       ,'Default Section Intervals Calculation'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
+                    AND  HSTF_CHILD = 'MAI1230');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE'
+       ,'MAI1240'
+       ,'Default Section Intervals'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
+                    AND  HSTF_CHILD = 'MAI1240');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE'
+       ,'MAI3440'
+       ,'Valid For Maintenance Rules'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
+                    AND  HSTF_CHILD = 'MAI3440');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE'
+       ,'MAI3626'
+       ,'Cyclic Maintenance Inventory Rules'
+       ,'M'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
+                    AND  HSTF_CHILD = 'MAI3626');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE'
+       ,'MAI3628'
+       ,'Related Maintenance Activities'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
+                    AND  HSTF_CHILD = 'MAI3628');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE'
+       ,'MAI3630'
+       ,'Budget Allocations'
+       ,'M'
+       ,11 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
+                    AND  HSTF_CHILD = 'MAI3630');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE'
+       ,'MAI3632'
+       ,'Asset Activities'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
+                    AND  HSTF_CHILD = 'MAI3632');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE'
+       ,'MAI3803'
+       ,'Work Order Auditing Maintenance'
+       ,'M'
+       ,9 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
+                    AND  HSTF_CHILD = 'MAI3803');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE'
+       ,'MAI_REF_MAINTENANCE_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,14 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
+                    AND  HSTF_CHILD = 'MAI_REF_MAINTENANCE_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE_REPORTS'
+       ,'MAI5024'
+       ,'Print Local Frequencies and Intervals'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5024');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE_REPORTS'
+       ,'MAI5030'
+       ,'Print Default Intervals and Frequencies'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5030');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE_REPORTS'
+       ,'MAI5205'
+       ,'Print Activity Frequencies'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5205');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE_REPORTS'
+       ,'MAI5215'
+       ,'Print Interval Codes'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5215');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REF_MAINTENANCE_REPORTS'
+       ,'MAI5225'
+       ,'Print Activities'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5225');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS'
+       ,'MAI7040'
+       ,'Parameter Based Inquiry (PBI)'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS'
+                    AND  HSTF_CHILD = 'MAI7040');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS'
+       ,'MAI_REPORTS_AUDIT'
+       ,'Audit'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS'
+                    AND  HSTF_CHILD = 'MAI_REPORTS_AUDIT');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS'
+       ,'MAI_REPORTS_HIST'
+       ,'Historical'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS'
+                    AND  HSTF_CHILD = 'MAI_REPORTS_HIST');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS_AUDIT'
+       ,'MAI2501'
+       ,'Inventory Interface'
+       ,'M'
+       ,12 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
+                    AND  HSTF_CHILD = 'MAI2501');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS_AUDIT'
+       ,'MAI5027'
+       ,'Print Defects by Defect Type'
+       ,'M'
+       ,11 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
+                    AND  HSTF_CHILD = 'MAI5027');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS_AUDIT'
+       ,'MAI5034A'
+       ,'Print A Audit - Defects by Type, Activity and Time'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
+                    AND  HSTF_CHILD = 'MAI5034A');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS_AUDIT'
+       ,'MAI5034B'
+       ,'Print B Audit - Defects by Activity,Type and Time'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
+                    AND  HSTF_CHILD = 'MAI5034B');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS_AUDIT'
+       ,'MAI5035A'
+       ,'Print C Audit - Actions by Activity Area'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
+                    AND  HSTF_CHILD = 'MAI5035A');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS_AUDIT'
+       ,'MAI5035B'
+       ,'Print D Audit - Actions by Defect Type'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
+                    AND  HSTF_CHILD = 'MAI5035B');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS_AUDIT'
+       ,'MAI5037'
+       ,'Print E Audit - Electrical Report by Ownership'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
+                    AND  HSTF_CHILD = 'MAI5037');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS_AUDIT'
+       ,'MAI5037A'
+       ,'Print E Audit - Electrical Report by Link'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
+                    AND  HSTF_CHILD = 'MAI5037A');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS_AUDIT'
+       ,'MAI5038'
+       ,'Print T Audit - Audit Of Costs'
+       ,'M'
+       ,9 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
+                    AND  HSTF_CHILD = 'MAI5038');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS_AUDIT'
+       ,'MAI5060'
+       ,'Print F Audit - Defect for Point and Cont. Inv Items'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
+                    AND  HSTF_CHILD = 'MAI5060');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS_AUDIT'
+       ,'MAI5070'
+       ,'Print M Audit - Analysis of Cyclic Maintenance Activities'
+       ,'M'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
+                    AND  HSTF_CHILD = 'MAI5070');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS_AUDIT'
+       ,'MAI5080'
+       ,'Print I Audit - 7 and 28 day Safety Inspection Statistics'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
+                    AND  HSTF_CHILD = 'MAI5080');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS_HIST'
+       ,'MAI3992'
+       ,'Road Section Historical Report'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS_HIST'
+                    AND  HSTF_CHILD = 'MAI3992');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_REPORTS_HIST'
+       ,'MAI3994'
+       ,'Road Section Historical Statistics'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_REPORTS_HIST'
+                    AND  HSTF_CHILD = 'MAI3994');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS'
+       ,'MAI1280'
+       ,'External Activities'
+       ,'M'
+       ,130 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS'
+                    AND  HSTF_CHILD = 'MAI1280');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS'
+       ,'MAI3610'
+       ,'Cancel Work Orders'
+       ,'M'
+       ,110 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS'
+                    AND  HSTF_CHILD = 'MAI3610');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS'
+       ,'MAI3800'
+       ,'Works Orders (Defects)'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS'
+                    AND  HSTF_CHILD = 'MAI3800');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS'
+       ,'MAI3800A'
+       ,'Works Orders (Cyclic)'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS'
+                    AND  HSTF_CHILD = 'MAI3800A');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS'
+       ,'MAI3802'
+       ,'Maintain Work Orders - Contractor Interface'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS'
+                    AND  HSTF_CHILD = 'MAI3802');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS'
+       ,'MAI3804'
+       ,'View Cyclic Maintenance Work'
+       ,'M'
+       ,70 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS'
+                    AND  HSTF_CHILD = 'MAI3804');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS'
+       ,'MAI3805'
+       ,'Gang/Crew Allocation'
+       ,'M'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS'
+                    AND  HSTF_CHILD = 'MAI3805');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS'
+       ,'MAI3820'
+       ,'Quality Inspection Results'
+       ,'M'
+       ,120 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS'
+                    AND  HSTF_CHILD = 'MAI3820');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS'
+       ,'MAI3825'
+       ,'Maintenance Report'
+       ,'M'
+       ,100 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS'
+                    AND  HSTF_CHILD = 'MAI3825');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS'
+       ,'MAI3848'
+       ,'Work Orders Authorisation'
+       ,'M'
+       ,60 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS'
+                    AND  HSTF_CHILD = 'MAI3848');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS'
+       ,'MAI3860'
+       ,'Cyclic Maintenance Schedules'
+       ,'M'
+       ,80 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS'
+                    AND  HSTF_CHILD = 'MAI3860');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS'
+       ,'MAI3862'
+       ,'Cyclic Maintenance Schedules by Road Section'
+       ,'M'
+       ,90 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS'
+                    AND  HSTF_CHILD = 'MAI3862');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS'
+       ,'MAI_WORKS_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,140 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS'
+                    AND  HSTF_CHILD = 'MAI_WORKS_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3105'
+       ,'Print: Cyclic Maintenance Activities'
+       ,'M'
+       ,14 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3105');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3480'
+       ,'Print Works Order (Priced)'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3480');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3485'
+       ,'Print Works Order (Unpriced)'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3485');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3490'
+       ,'Review Raised Works Orders'
+       ,'M'
+       ,12 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3490');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3500'
+       ,'Print Works Orders Detail'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3500');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3505'
+       ,'Print Works Orders (Summary)'
+       ,'M'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3505');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3906'
+       ,'Print BOQ Work Order (Defects)'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3906');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3907'
+       ,'Print BOQ Work Order (Cyclic)'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3907');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3909'
+       ,'Print Works Order (NMA)'
+       ,'M'
+       ,9 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3909');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3918'
+       ,'Works Orders (Enhanced Format)'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3918');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3919'
+       ,'Print Works Order (Enhanced)'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3919');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3920'
+       ,'Summary of Defects Not Yet Instructed'
+       ,'M'
+       ,17 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3920');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3922'
+       ,'List of Defects Not Yet Instructed'
+       ,'M'
+       ,16 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3922');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3924'
+       ,'List of Instructed Work by Status'
+       ,'M'
+       ,18 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3924');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3926'
+       ,'List of Instructed Defects due for Completion'
+       ,'M'
+       ,19 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3926');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3930'
+       ,'List of Inventory Updates'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3930');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3950'
+       ,'List of Work for Quality Inspection'
+       ,'M'
+       ,21 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3950');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3952'
+       ,'Quality Inspection Performance Report'
+       ,'M'
+       ,22 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3952');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3956'
+       ,'Admin Unit Performance Report'
+       ,'M'
+       ,23 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3956');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI3960'
+       ,'Print Cyclic Maintenance Schedules'
+       ,'M'
+       ,15 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3960');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI5032'
+       ,'Print Cyclic Maintenance Done'
+       ,'M'
+       ,13 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5032');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
+       ,'MAI5130'
+       ,'Print Works Orders (Strip Plan)'
+       ,'M'
+       ,11 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI5130');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MRWA'
+       ,'MRWA_NETWORK_EXTRACTS'
+       ,'Network Extracts'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MRWA'
+                    AND  HSTF_CHILD = 'MRWA_NETWORK_EXTRACTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MRWA'
+       ,'MRWA_ROMAN'
+       ,'ROMAN Interface'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MRWA'
+                    AND  HSTF_CHILD = 'MRWA_ROMAN');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MRWA_NETWORK_EXTRACTS'
+       ,'CLASS0010'
+       ,'Classified Roads Extract'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MRWA_NETWORK_EXTRACTS'
+                    AND  HSTF_CHILD = 'CLASS0010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MRWA_ROMAN'
+       ,'PCUIS0010'
+       ,'File Import'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MRWA_ROMAN'
+                    AND  HSTF_CHILD = 'PCUIS0010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MRWA_ROMAN'
+       ,'PCUIS0020'
+       ,'Network Integrity Check'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MRWA_ROMAN'
+                    AND  HSTF_CHILD = 'PCUIS0020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MRWA_ROMAN'
+       ,'PCUIS0030'
+       ,'Inventory Replace and File Output'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MRWA_ROMAN'
+                    AND  HSTF_CHILD = 'PCUIS0030');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -81407,6 +88428,23 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'NET'
+       ,'NET_NET_MANAGEMENT'
+       ,'Network Management'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET'
+                    AND  HSTF_CHILD = 'NET_NET_MANAGEMENT');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET'
        ,'NET_REF'
        ,'Reference Data'
        ,'F'
@@ -81423,14 +88461,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'NET_REF'
-       ,'NM0001'
-       ,'Node Types'
-       ,'M'
-       ,1 FROM DUAL
+        'NET_INVENTORY'
+       ,'NET_INVENTORY_MAPCAP'
+       ,'MapCapture Asset Loader'
+       ,'F'
+       ,100 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_REF'
-                    AND  HSTF_CHILD = 'NM0001');
+                   WHERE HSTF_PARENT = 'NET_INVENTORY'
+                    AND  HSTF_CHILD = 'NET_INVENTORY_MAPCAP');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -81440,14 +88478,167 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'NET_REF'
-       ,'NM0002'
-       ,'Network Types'
+        'NET_INVENTORY'
+       ,'NET_INVENTORY_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,90 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_INVENTORY'
+                    AND  HSTF_CHILD = 'NET_INVENTORY_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_INVENTORY'
+       ,'NM0510'
+       ,'Asset Items'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_INVENTORY'
+                    AND  HSTF_CHILD = 'NM0510');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_INVENTORY'
+       ,'NM0530'
+       ,'Global Asset Update'
+       ,'M'
+       ,60 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_INVENTORY'
+                    AND  HSTF_CHILD = 'NM0530');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_INVENTORY'
+       ,'NM0560'
+       ,'Assets On A Route'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_INVENTORY'
+                    AND  HSTF_CHILD = 'NM0560');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_INVENTORY'
+       ,'NM0570'
+       ,'Find Assets'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_INVENTORY'
+                    AND  HSTF_CHILD = 'NM0570');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_INVENTORY'
+       ,'NM0572'
+       ,'EXOR Locator'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_INVENTORY'
+                    AND  HSTF_CHILD = 'NM0572');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_INVENTORY'
+       ,'NM0575'
+       ,'Delete Global Assets'
+       ,'M'
+       ,70 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_INVENTORY'
+                    AND  HSTF_CHILD = 'NM0575');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_INVENTORY'
+       ,'NM0590'
+       ,'Asset Maintenance'
+       ,'M'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_INVENTORY'
+                    AND  HSTF_CHILD = 'NM0590');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_INVENTORY'
+       ,'NM1861'
+       ,'Inventory Admin Unit Security Maintenance'
+       ,'M'
+       ,80 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_INVENTORY'
+                    AND  HSTF_CHILD = 'NM1861');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_INVENTORY_MAPCAP'
+       ,'NM0511'
+       ,'Reconcile MapCapture Load Errors'
        ,'M'
        ,2 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_REF'
-                    AND  HSTF_CHILD = 'NM0002');
+                   WHERE HSTF_PARENT = 'NET_INVENTORY_MAPCAP'
+                    AND  HSTF_CHILD = 'NM0511');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -81457,31 +88648,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'NET_REF'
-       ,'NM0004'
-       ,'Group Types'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_REF'
-                    AND  HSTF_CHILD = 'NM0004');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_NET_MANAGEMENT'
-       ,'NM0101'
-       ,'Nodes'
+        'NET_INVENTORY_MAPCAP'
+       ,'NM0580'
+       ,'Create MapCapture Metadata File'
        ,'M'
        ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_NET_MANAGEMENT'
-                    AND  HSTF_CHILD = 'NM0101');
+                   WHERE HSTF_PARENT = 'NET_INVENTORY_MAPCAP'
+                    AND  HSTF_CHILD = 'NM0580');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -81491,48 +88665,31 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'NET_NET_MANAGEMENT'
-       ,'NM0105'
-       ,'Elements'
+        'NET_INVENTORY_REPORTS'
+       ,'NM0562'
+       ,'Assets On Route Report - By Offset'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_INVENTORY_REPORTS'
+                    AND  HSTF_CHILD = 'NM0562');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_INVENTORY_REPORTS'
+       ,'NM0563'
+       ,'Assets On Route Report- By Type and Offset'
        ,'M'
        ,2 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_NET_MANAGEMENT'
-                    AND  HSTF_CHILD = 'NM0105');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_NET_MANAGEMENT'
-       ,'NM0110'
-       ,'Groups of Sections'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_NET_MANAGEMENT'
-                    AND  HSTF_CHILD = 'NM0110');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_NET_MANAGEMENT'
-       ,'NM0115'
-       ,'Groups of Groups'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_NET_MANAGEMENT'
-                    AND  HSTF_CHILD = 'NM0115');
+                   WHERE HSTF_PARENT = 'NET_INVENTORY_REPORTS'
+                    AND  HSTF_CHILD = 'NM0563');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -81729,48 +88886,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'NET_INVENTORY'
-       ,'NM0510'
-       ,'Asset Items'
+        'NET_NETWORK'
+       ,'NM1100'
+       ,'Gazetteer'
        ,'M'
-       ,10 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_INVENTORY'
-                    AND  HSTF_CHILD = 'NM0510');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_INVENTORY'
-       ,'NM0530'
-       ,'Global Asset Update'
-       ,'M'
-       ,60 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_INVENTORY'
-                    AND  HSTF_CHILD = 'NM0530');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_INVENTORY'
-       ,'NM0560'
-       ,'Assets On A Route'
-       ,'M'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_INVENTORY'
-                    AND  HSTF_CHILD = 'NM0560');
+                   WHERE HSTF_PARENT = 'NET_NETWORK'
+                    AND  HSTF_CHILD = 'NM1100');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -81798,6 +88921,23 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'NET_NETWORK'
+       ,'NM1201'
+       ,'Offset Calculator'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_NETWORK'
+                    AND  HSTF_CHILD = 'NM1201');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_NETWORK'
        ,'NM2000'
        ,'Recalibrate Element'
        ,'M'
@@ -81805,6 +88945,193 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'NET_NETWORK'
                     AND  HSTF_CHILD = 'NM2000');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_NET_MANAGEMENT'
+       ,'NET_NET_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_NET_MANAGEMENT'
+                    AND  HSTF_CHILD = 'NET_NET_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_NET_MANAGEMENT'
+       ,'NM0101'
+       ,'Nodes'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_NET_MANAGEMENT'
+                    AND  HSTF_CHILD = 'NM0101');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_NET_MANAGEMENT'
+       ,'NM0105'
+       ,'Elements'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_NET_MANAGEMENT'
+                    AND  HSTF_CHILD = 'NM0105');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_NET_MANAGEMENT'
+       ,'NM0110'
+       ,'Groups of Sections'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_NET_MANAGEMENT'
+                    AND  HSTF_CHILD = 'NM0110');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_NET_MANAGEMENT'
+       ,'NM0115'
+       ,'Groups of Groups'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_NET_MANAGEMENT'
+                    AND  HSTF_CHILD = 'NM0115');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_NET_REPORTS'
+       ,'NM0150'
+       ,'Network Nodes Report'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_NET_REPORTS'
+                    AND  HSTF_CHILD = 'NM0150');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_NET_REPORTS'
+       ,'NM0151'
+       ,'Node Usage Report'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_NET_REPORTS'
+                    AND  HSTF_CHILD = 'NM0151');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_NET_REPORTS'
+       ,'NM0153'
+       ,'Group of Sections Membership Report'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_NET_REPORTS'
+                    AND  HSTF_CHILD = 'NM0153');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_NET_REPORTS'
+       ,'NM0154'
+       ,'Route Log Report'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_NET_REPORTS'
+                    AND  HSTF_CHILD = 'NM0154');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_NET_REPORTS'
+       ,'NM0155'
+       ,'Group Hierarchy Report'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_NET_REPORTS'
+                    AND  HSTF_CHILD = 'NM0155');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_QUERIES'
+       ,'NM0120'
+       ,'Create Network Extent'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_QUERIES'
+                    AND  HSTF_CHILD = 'NM0120');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -81933,23 +89260,6 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'NET_NETWORK'
-       ,'NM1201'
-       ,'Offset Calculator'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_NETWORK'
-                    AND  HSTF_CHILD = 'NM1201');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
         'NET_QUERIES'
        ,'NMWEB0020'
        ,'Engineering Dynamic Segmentation'
@@ -81967,541 +89277,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'NET_INVENTORY'
-       ,'NM1861'
-       ,'Inventory Admin Unit Security Maintenance'
-       ,'M'
-       ,80 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_INVENTORY'
-                    AND  HSTF_CHILD = 'NM1861');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_REF_ADMIN'
-       ,'SWR1510'
-       ,'Maintain Interface Mappings'
-       ,'M'
-       ,40 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_REF_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1510');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_ADMIN_REF'
-       ,'SWR1512'
-       ,'Maintain Works Rules'
-       ,'M'
-       ,40 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1512');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_ADMIN_REF'
-       ,'SWR1513'
-       ,'Maintain Site Rules'
-       ,'M'
-       ,50 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1513');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_ADMIN_REF'
-       ,'SWR1514'
-       ,'Maintain Sample Inspection Category Items'
-       ,'M'
-       ,40 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1514');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_ADMIN'
-       ,'SWR1517'
-       ,'Maintain Defect Inspection Schedule'
-       ,'M'
-       ,70 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1517');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_ADMIN'
-       ,'SWR1290'
-       ,'Schedule Inspections'
-       ,'M'
-       ,50 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1290');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_REPORTS'
-       ,'SWR1292'
-       ,'Works Inspection Report'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1292');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_REPORTS'
-       ,'SWR1294'
-       ,'Prospective Inspections Report'
-       ,'M'
-       ,50 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1294');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_REPORTS'
-       ,'SWR1325'
-       ,'Sample Inspections Invoice Report'
-       ,'M'
-       ,90 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1325');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_REPORTS'
-       ,'SWR1326'
-       ,'Inspections Invoice'
-       ,'M'
-       ,100 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1326');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_REPORTS'
-       ,'SWR1328'
-       ,'Chargeable Notices Invoice'
-       ,'M'
-       ,130 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1328');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_GAZ_ADMIN'
-       ,'SWR1336'
-       ,'Maintain Street Naming Authorities'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_GAZ_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1336');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_REPORTS'
-       ,'SWR1209'
-       ,'Expiring Reinstatement Guarantees'
-       ,'M'
-       ,100 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1209');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_REPORTS'
-       ,'SWR1212'
-       ,'Interim Reinstatements > 6 Months Old'
-       ,'M'
-       ,90 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1212');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_ADMIN'
-       ,'SWR1240'
-       ,'Maintain Annual Inspection Profiles'
-       ,'M'
-       ,60 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1240');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_ADMIN'
-       ,'SWR1250'
-       ,'Maintain Inspection Details'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1250');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_REPORTS'
-       ,'SWR1255'
-       ,'Annual Inspection Profiles'
-       ,'M'
-       ,80 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1255');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_REPORTS'
-       ,'SWR1256'
-       ,'Sample Inspection Quotas Report'
-       ,'M'
-       ,60 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1256');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_REPORTS'
-       ,'SWR1257'
-       ,'Inspection Performance'
-       ,'M'
-       ,70 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1257');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_REF_ADMIN'
-       ,'SWR1060'
-       ,'System Definitions'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_REF_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1060');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_QUERY'
-       ,'SWR1070'
-       ,'Query Works/Sites'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_QUERY'
-                    AND  HSTF_CHILD = 'SWR1070');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_COMMENTS_ADMIN'
-       ,'SWR1111'
-       ,'Maintain Works Comments'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_COMMENTS_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1111');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_ADMIN'
-       ,'SWR1120'
-       ,'Notices Sent/Received'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1120');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_REF_ADMIN'
-       ,'SWR1051'
-       ,'Maintain User Definitions'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_REF_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1051');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_REPORTS'
-       ,'SWR1156'
-       ,'Works History'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1156');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_ADMIN'
-       ,'SWR1180'
-       ,'Merge Unattributable Works'
-       ,'M'
-       ,50 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1180');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_QUERY'
-       ,'SWR1189'
-       ,'Query Works History'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_QUERY'
-                    AND  HSTF_CHILD = 'SWR1189');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_ADMIN'
-       ,'SWR1190'
-       ,'Maintain Works / Reinstatement Details'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1190');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_REPORTS'
-       ,'SWR1195'
-       ,'Notice Analysis Report'
-       ,'M'
-       ,120 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1195');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_COORD_REPORTS'
-       ,'SWR1197'
-       ,'Coordination Planning'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_COORD_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1197');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_INVENTORY_REPORTS'
-       ,'NM0562'
-       ,'Assets On Route Report - By Offset'
+        'NET_REF'
+       ,'NM0001'
+       ,'Node Types'
        ,'M'
        ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_INVENTORY_REPORTS'
-                    AND  HSTF_CHILD = 'NM0562');
+                   WHERE HSTF_PARENT = 'NET_REF'
+                    AND  HSTF_CHILD = 'NM0001');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -82511,14 +89294,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'NET_INVENTORY_REPORTS'
-       ,'NM0563'
-       ,'Assets On Route Report- By Type and Offset'
+        'NET_REF'
+       ,'NM0002'
+       ,'Network Types'
        ,'M'
        ,2 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_INVENTORY_REPORTS'
-                    AND  HSTF_CHILD = 'NM0563');
+                   WHERE HSTF_PARENT = 'NET_REF'
+                    AND  HSTF_CHILD = 'NM0002');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -82528,166 +89311,421 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'NET_INVENTORY_MAPCAP'
-       ,'NM0511'
-       ,'Reconcile MapCapture Load Errors'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_INVENTORY_MAPCAP'
-                    AND  HSTF_CHILD = 'NM0511');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_NETWORK'
-       ,'NM1100'
-       ,'Gazetteer'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_NETWORK'
-                    AND  HSTF_CHILD = 'NM1100');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_INVENTORY'
-       ,'NET_INVENTORY_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,90 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_INVENTORY'
-                    AND  HSTF_CHILD = 'NET_INVENTORY_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_INVENTORY'
-       ,'NET_INVENTORY_MAPCAP'
-       ,'MapCapture Asset Loader'
-       ,'F'
-       ,100 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_INVENTORY'
-                    AND  HSTF_CHILD = 'NET_INVENTORY_MAPCAP');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_INVENTORY_MAPCAP'
-       ,'NM0580'
-       ,'Create MapCapture Metadata File'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_INVENTORY_MAPCAP'
-                    AND  HSTF_CHILD = 'NM0580');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_QUERIES'
-       ,'NM0120'
-       ,'Create Network Extent'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_QUERIES'
-                    AND  HSTF_CHILD = 'NM0120');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'DOC'
-       ,'DOC_DOCUMENTS'
-       ,'Documents'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'DOC'
-                    AND  HSTF_CHILD = 'DOC_DOCUMENTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'DOC'
-       ,'DOC_REF'
-       ,'Reference Data'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'DOC'
-                    AND  HSTF_CHILD = 'DOC_REF');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'DOC_DOCUMENTS'
-       ,'DOC0100'
-       ,'Documents'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'DOC_DOCUMENTS'
-                    AND  HSTF_CHILD = 'DOC0100');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'DOC_REF'
-       ,'DOC0110'
-       ,'Document Types/Classes/Enquiry Types'
+        'NET_REF'
+       ,'NM0004'
+       ,'Group Types'
        ,'M'
        ,3 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'DOC_REF'
+                   WHERE HSTF_PARENT = 'NET_REF'
+                    AND  HSTF_CHILD = 'NM0004');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_REF'
+       ,'NM0005'
+       ,'Network Cross Reference Rules'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_REF'
+                    AND  HSTF_CHILD = 'NM0005');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NET_REF'
+       ,'NM0700'
+       ,'Maintain AD Types'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_REF'
+                    AND  HSTF_CHILD = 'NM0700');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NSG'
+       ,'NSG_DATA'
+       ,'Data'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NSG'
+                    AND  HSTF_CHILD = 'NSG_DATA');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NSG'
+       ,'NSG_IMPORT_EXPORT'
+       ,'Import/Export'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NSG'
+                    AND  HSTF_CHILD = 'NSG_IMPORT_EXPORT');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NSG_DATA'
+       ,'NSG0010'
+       ,'NSG Gazetteer'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NSG_DATA'
+                    AND  HSTF_CHILD = 'NSG0010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NSG_DATA'
+       ,'NSG0060'
+       ,'Locations'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NSG_DATA'
+                    AND  HSTF_CHILD = 'NSG0060');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NSG_DATA'
+       ,'NSG0070'
+       ,'Highways Authorities'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NSG_DATA'
+                    AND  HSTF_CHILD = 'NSG0070');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NSG_DATA'
+       ,'NSG0080'
+       ,'Naming Authorities'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NSG_DATA'
+                    AND  HSTF_CHILD = 'NSG0080');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NSG_DATA'
+       ,'NSG_DATA_ADMIN'
+       ,'Administration'
+       ,'F'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NSG_DATA'
+                    AND  HSTF_CHILD = 'NSG_DATA_ADMIN');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NSG_DATA_ADMIN'
+       ,'NSG0015'
+       ,'Reset Street Coordinates'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NSG_DATA_ADMIN'
+                    AND  HSTF_CHILD = 'NSG0015');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NSG_DATA_ADMIN'
+       ,'NSG0025'
+       ,'Generate ASD Placements'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NSG_DATA_ADMIN'
+                    AND  HSTF_CHILD = 'NSG0025');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NSG_IMPORT_EXPORT'
+       ,'NSG0020'
+       ,'Export'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NSG_IMPORT_EXPORT'
+                    AND  HSTF_CHILD = 'NSG0020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NSG_IMPORT_EXPORT'
+       ,'NSG0040'
+       ,'NSG File Manager'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NSG_IMPORT_EXPORT'
+                    AND  HSTF_CHILD = 'NSG0040');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PEM_ENQ'
+       ,'DOC0150'
+       ,'Public Enquiries'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PEM_ENQ'
+                    AND  HSTF_CHILD = 'DOC0150');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PEM_ENQ'
+       ,'PEM_ENQ_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PEM_ENQ'
+                    AND  HSTF_CHILD = 'PEM_ENQ_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PEM_ENQ_REPORTS'
+       ,'DOC0160'
+       ,'Enquiry Details'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PEM_ENQ_REPORTS'
+                    AND  HSTF_CHILD = 'DOC0160');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PEM_ENQ_REPORTS'
+       ,'DOC0162'
+       ,'Enquiry Acknowledgements'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PEM_ENQ_REPORTS'
+                    AND  HSTF_CHILD = 'DOC0162');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PEM_ENQ_REPORTS'
+       ,'DOC0164'
+       ,'Summary of Enquiries by Status'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PEM_ENQ_REPORTS'
+                    AND  HSTF_CHILD = 'DOC0164');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PEM_ENQ_REPORTS'
+       ,'DOC0165'
+       ,'Summary of Complaints by Type'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PEM_ENQ_REPORTS'
+                    AND  HSTF_CHILD = 'DOC0165');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PEM_ENQ_REPORTS'
+       ,'DOC0166'
+       ,'List of Enquiries'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PEM_ENQ_REPORTS'
+                    AND  HSTF_CHILD = 'DOC0166');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PEM_ENQ_REPORTS'
+       ,'DOC0167'
+       ,'Enquiry Actions'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PEM_ENQ_REPORTS'
+                    AND  HSTF_CHILD = 'DOC0167');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PEM_ENQ_REPORTS'
+       ,'DOC0168'
+       ,'Enquiry Damage'
+       ,'M'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PEM_ENQ_REPORTS'
+                    AND  HSTF_CHILD = 'DOC0168');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PEM_ENQ_REPORTS'
+       ,'DOC0205'
+       ,'Batch Complaint Printing'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PEM_ENQ_REPORTS'
+                    AND  HSTF_CHILD = 'DOC0205');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PEM_REF'
+       ,'DOC0110'
+       ,'Document Types/Classes/Enquiry Types'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PEM_REF'
                     AND  HSTF_CHILD = 'DOC0110');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
@@ -82698,31 +89736,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'DOC_DOCUMENTS'
-       ,'DOC0114'
-       ,'Circulation by Person'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'DOC_DOCUMENTS'
-                    AND  HSTF_CHILD = 'DOC0114');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'DOC_DOCUMENTS'
-       ,'DOC0115'
-       ,'Circulation by Document'
+        'PEM_REF'
+       ,'DOC0132'
+       ,'Enquiry Priorities'
        ,'M'
        ,3 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'DOC_DOCUMENTS'
-                    AND  HSTF_CHILD = 'DOC0115');
+                   WHERE HSTF_PARENT = 'PEM_REF'
+                    AND  HSTF_CHILD = 'DOC0132');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -82732,82 +89753,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'DOC_REF'
-       ,'DOC0116'
-       ,'Keywords'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'DOC_REF'
-                    AND  HSTF_CHILD = 'DOC0116');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'DOC_REF'
-       ,'DOC0118'
-       ,'Media/Locations'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'DOC_REF'
-                    AND  HSTF_CHILD = 'DOC0118');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS'
-       ,'MAI_LOADERS_INSPECTIONS'
-       ,'Inspections'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS'
-                    AND  HSTF_CHILD = 'MAI_LOADERS_INSPECTIONS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REPORTS'
-       ,'MAI_REPORTS_AUDIT'
-       ,'Audit'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS'
-                    AND  HSTF_CHILD = 'MAI_REPORTS_AUDIT');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'DOC_REF'
-       ,'DOC0130'
-       ,'Document Gateways'
+        'PEM_REF'
+       ,'DOC0155'
+       ,'Standard Actions'
        ,'M'
        ,4 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'DOC_REF'
-                    AND  HSTF_CHILD = 'DOC0130');
+                   WHERE HSTF_PARENT = 'PEM_REF'
+                    AND  HSTF_CHILD = 'DOC0155');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -82817,150 +89770,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'MAI_REPORTS'
-       ,'MAI_REPORTS_HIST'
-       ,'Historical'
-       ,'F'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS'
-                    AND  HSTF_CHILD = 'MAI_REPORTS_HIST');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'DOC_REF_TEMPLATES'
-       ,'DOC0201'
-       ,'Templates'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'DOC_REF_TEMPLATES'
-                    AND  HSTF_CHILD = 'DOC0201');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'DOC_REF_TEMPLATES'
-       ,'DOC0202'
-       ,'Template Users'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'DOC_REF_TEMPLATES'
-                    AND  HSTF_CHILD = 'DOC0202');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_FINANCIAL'
-       ,'MAI_FINANCIAL_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_FINANCIAL'
-                    AND  HSTF_CHILD = 'MAI_FINANCIAL_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS'
-       ,'MAI_CONTRACTS_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS'
-                    AND  HSTF_CHILD = 'MAI_CONTRACTS_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV'
-       ,'MAI_INV_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV'
-                    AND  HSTF_CHILD = 'MAI_INV_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS'
-       ,'MAI1830'
-       ,'People'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI1830');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS'
-       ,'MAI1870'
-       ,'Organisations'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI1870');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_FINANCIAL'
-       ,'MAI3664'
-       ,'Financial Years'
+        'PEM_REF'
+       ,'DOC0156'
+       ,'Standard Costs'
        ,'M'
        ,5 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_FINANCIAL'
-                    AND  HSTF_CHILD = 'MAI3664');
+                   WHERE HSTF_PARENT = 'PEM_REF'
+                    AND  HSTF_CHILD = 'DOC0156');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -82970,14 +89787,31 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'MAI_FINANCIAL'
-       ,'MAI1930'
-       ,'IHMS Allocated Amounts'
+        'PEM_REF'
+       ,'DOC0157'
+       ,'Enquiry Redirection'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PEM_REF'
+                    AND  HSTF_CHILD = 'DOC0157');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PEM_REF'
+       ,'HIG1815'
+       ,'Contacts'
        ,'M'
        ,6 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_FINANCIAL'
-                    AND  HSTF_CHILD = 'MAI1930');
+                   WHERE HSTF_PARENT = 'PEM_REF'
+                    AND  HSTF_CHILD = 'HIG1815');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -82987,65 +89821,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI5032'
-       ,'Print Cyclic Maintenance Done'
-       ,'M'
-       ,13 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5032');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'DOC_REF'
-       ,'DOC_REF_TEMPLATES'
-       ,'Templates'
-       ,'F'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'DOC_REF'
-                    AND  HSTF_CHILD = 'DOC_REF_TEMPLATES');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI'
-       ,'MAI_INV'
-       ,'Inventory'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI'
-                    AND  HSTF_CHILD = 'MAI_INV');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI'
-       ,'MAI_INSP'
-       ,'Inspections'
+        'PROW'
+       ,'PROW_DEFINITIVE'
+       ,'Definitive Map'
        ,'F'
        ,2 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI'
-                    AND  HSTF_CHILD = 'MAI_INSP');
+                   WHERE HSTF_PARENT = 'PROW'
+                    AND  HSTF_CHILD = 'PROW_DEFINITIVE');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -83055,133 +89838,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'MAI'
-       ,'MAI_WORKS'
-       ,'Works'
-       ,'F'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI'
-                    AND  HSTF_CHILD = 'MAI_WORKS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI'
-       ,'MAI_CONTRACTS'
-       ,'Contracts'
-       ,'F'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI'
-                    AND  HSTF_CHILD = 'MAI_CONTRACTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI'
-       ,'MAI_INTERFACES'
-       ,'Interfaces'
-       ,'F'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI'
-                    AND  HSTF_CHILD = 'MAI_INTERFACES');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI'
-       ,'MAI_FINANCIAL'
-       ,'Financial'
-       ,'F'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI'
-                    AND  HSTF_CHILD = 'MAI_FINANCIAL');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI'
-       ,'MAI_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI'
-                    AND  HSTF_CHILD = 'MAI_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI'
-       ,'MAI_REF'
-       ,'Reference'
-       ,'F'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI'
-                    AND  HSTF_CHILD = 'MAI_REF');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI'
-       ,'MAI_LOADERS'
-       ,'Loaders'
-       ,'F'
-       ,9 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI'
-                    AND  HSTF_CHILD = 'MAI_LOADERS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF'
-       ,'MAI_REF_INVENTORY'
-       ,'Inventory'
+        'PROW'
+       ,'PROW_OPERATIONS'
+       ,'Operations'
        ,'F'
        ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF'
-                    AND  HSTF_CHILD = 'MAI_REF_INVENTORY');
+                   WHERE HSTF_PARENT = 'PROW'
+                    AND  HSTF_CHILD = 'PROW_OPERATIONS');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -83191,3499 +89855,915 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'MAI_REF'
-       ,'MAI_REF_INSPECTIONS'
-       ,'Inspections'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF'
-                    AND  HSTF_CHILD = 'MAI_REF_INSPECTIONS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF'
-       ,'MAI_REF_MAINTENANCE'
-       ,'Maintenance'
-       ,'F'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF'
-                    AND  HSTF_CHILD = 'MAI_REF_MAINTENANCE');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF'
-       ,'MAI_REF_FINANCIAL'
-       ,'Financial'
-       ,'F'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF'
-                    AND  HSTF_CHILD = 'MAI_REF_FINANCIAL');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_FINANCIAL'
-       ,'MAI_REF_FINANCIAL_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_FINANCIAL'
-                    AND  HSTF_CHILD = 'MAI_REF_FINANCIAL_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE'
-       ,'MAI_REF_MAINTENANCE_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,14 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
-                    AND  HSTF_CHILD = 'MAI_REF_MAINTENANCE_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS'
-       ,'MAI_REF_INSPECTIONS_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,11 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI_REF_INSPECTIONS_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INVENTORY'
-       ,'MAI_REF_INVENTORY_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY'
-                    AND  HSTF_CHILD = 'MAI_REF_INVENTORY_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS'
-       ,'MAI_LOADERS_INVENTORY'
-       ,'Inventory'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS'
-                    AND  HSTF_CHILD = 'MAI_LOADERS_INVENTORY');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE'
-       ,'MAI3626'
-       ,'Cyclic Maintenance Inventory Rules'
-       ,'M'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
-                    AND  HSTF_CHILD = 'MAI3626');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE_REPORTS'
-       ,'MAI5024'
-       ,'Print Local Frequencies and Intervals'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5024');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_FINANCIAL'
-       ,'MAI3842'
-       ,'Deselect Items for Payment'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_FINANCIAL'
-                    AND  HSTF_CHILD = 'MAI3842');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_FINANCIAL'
-       ,'MAI3940'
-       ,'Query Payment Run Details'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_FINANCIAL'
-                    AND  HSTF_CHILD = 'MAI3940');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_FINANCIAL'
-       ,'MAI3660'
-       ,'Budgets'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_FINANCIAL'
-                    AND  HSTF_CHILD = 'MAI3660');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_FINANCIAL'
-       ,'MAI3662'
-       ,'Generate Budgets for Next Year'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_FINANCIAL'
-                    AND  HSTF_CHILD = 'MAI3662');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_FINANCIAL_REPORTS'
-       ,'MAI3942'
-       ,'List of Items for Payment'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_FINANCIAL_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3942');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_FINANCIAL_REPORTS'
-       ,'MAI3944'
-       ,'List of Completed Rechargeable Defects'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_FINANCIAL_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3944');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_FINANCIAL_REPORTS'
-       ,'MAI3690'
-       ,'Print Budget Exceptions Report'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_FINANCIAL_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3690');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_FINANCIAL'
-       ,'MAI3666'
-       ,'Job Size Codes'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_FINANCIAL'
-                    AND  HSTF_CHILD = 'MAI3666');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS_REPORTS'
-       ,'MAI3948'
-       ,'Summary of Expenditure by Contract'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3948');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_FINANCIAL'
-       ,'MAI3844'
-       ,'Cost Centre Codes'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_FINANCIAL'
-                    AND  HSTF_CHILD = 'MAI3844');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_FINANCIAL'
-       ,'MAI3846'
-       ,'VAT Rates'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_FINANCIAL'
-                    AND  HSTF_CHILD = 'MAI3846');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_FINANCIAL_REPORTS'
-       ,'MAI3946'
-       ,'List of VAT Rates'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_FINANCIAL_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3946');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI5022'
-       ,'Print Inspectors Pocket Book'
-       ,'M'
-       ,19 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5022');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI5011'
-       ,'Print Road Markings - Longitudinal'
-       ,'M'
-       ,16 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5011');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI5015'
-       ,'Print Road Markings - Transverse and Special'
-       ,'M'
-       ,15 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5015');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI5018'
-       ,'Print Sign Areas'
-       ,'M'
-       ,14 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5018');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI30060'
-       ,'Print Historical Inventory Data'
-       ,'M'
-       ,12 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI30060');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INVENTORY'
-       ,'MAI1430'
-       ,'Lamp Configurations'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY'
-                    AND  HSTF_CHILD = 'MAI1430');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INVENTORY'
-       ,'MAI1920'
-       ,'Inventory XSPs'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY'
-                    AND  HSTF_CHILD = 'MAI1920');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE'
-       ,'MAI1240'
-       ,'Default Section Intervals'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
-                    AND  HSTF_CHILD = 'MAI1240');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE'
-       ,'MAI1210'
-       ,'Local Activity Frequencies'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
-                    AND  HSTF_CHILD = 'MAI1210');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE'
-       ,'MAI1205'
-       ,'Activity Groups'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
-                    AND  HSTF_CHILD = 'MAI1205');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE'
-       ,'MAI3440'
-       ,'Valid For Maintenance Rules'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
-                    AND  HSTF_CHILD = 'MAI3440');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE'
-       ,'MAI3628'
-       ,'Related Maintenance Activities'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
-                    AND  HSTF_CHILD = 'MAI3628');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI5031'
-       ,'Print Electrical Inventory'
-       ,'M'
-       ,18 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5031');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV'
-       ,'MAI2310'
-       ,'Inventory Items'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV'
-                    AND  HSTF_CHILD = 'MAI2310');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV'
-       ,'MAI2140'
-       ,'Query Network/Inventory Data'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV'
-                    AND  HSTF_CHILD = 'MAI2140');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REPORTS_AUDIT'
-       ,'MAI5035A'
-       ,'Print C Audit - Actions by Activity Area'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
-                    AND  HSTF_CHILD = 'MAI5035A');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REPORTS_AUDIT'
-       ,'MAI5034B'
-       ,'Print B Audit - Defects by Activity,Type and Time'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
-                    AND  HSTF_CHILD = 'MAI5034B');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REPORTS_AUDIT'
-       ,'MAI5035B'
-       ,'Print D Audit - Actions by Defect Type'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
-                    AND  HSTF_CHILD = 'MAI5035B');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI2315'
-       ,'Print Inventory Items (matrix format)'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI2315');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REPORTS_AUDIT'
-       ,'MAI5060'
-       ,'Print F Audit - Defect for Point and Cont. Inv Items'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
-                    AND  HSTF_CHILD = 'MAI5060');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3490'
-       ,'Review Raised Works Orders'
-       ,'M'
-       ,12 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3490');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REPORTS_AUDIT'
-       ,'MAI5070'
-       ,'Print M Audit - Analysis of Cyclic Maintenance Activities'
-       ,'M'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
-                    AND  HSTF_CHILD = 'MAI5070');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI6110'
-       ,'Print Inventory Lengths'
-       ,'M'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI6110');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP_REPORTS'
-       ,'MAI3905'
-       ,'Print Roadstud Defects not Set to Mandatory or Advisory'
-       ,'M'
-       ,11 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3905');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REPORTS_AUDIT'
-       ,'MAI5037A'
-       ,'Print E Audit - Electrical Report by Link'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
-                    AND  HSTF_CHILD = 'MAI5037A');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI2325'
-       ,'Print Inventory Summary'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI2325');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI5010'
-       ,'Print Road Markings - Hatched Type Area'
-       ,'M'
-       ,17 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5010');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS_INSPECTIONS'
-       ,'MAI2224'
-       ,'Download Network Data for DCD Inspections'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI2224');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP_REPORTS'
-       ,'MAI5100'
-       ,'Print Defect Details (At-a-Glance)'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5100');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REPORTS_AUDIT'
-       ,'MAI5038'
-       ,'Print T Audit - Audit Of Costs'
-       ,'M'
-       ,9 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
-                    AND  HSTF_CHILD = 'MAI5038');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3960'
-       ,'Print Cyclic Maintenance Schedules'
-       ,'M'
-       ,15 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3960');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP_REPORTS'
-       ,'MAI2790'
-       ,'Insurance Claims Reporting'
-       ,'M'
-       ,12 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'MAI2790');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP_REPORTS'
-       ,'MAI3900'
-       ,'Print Inspection Report'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3900');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP_REPORTS'
-       ,'MAI3904'
-       ,'Print Defect Notices'
-       ,'M'
-       ,13 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3904');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP_REPORTS'
-       ,'MAI3910'
-       ,'List of Defects by Inspection Date'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3910');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP_REPORTS'
-       ,'MAI3912'
-       ,'List of Notifiable Defects'
-       ,'M'
-       ,14 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3912');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP_REPORTS'
-       ,'MAI3916'
-       ,'Summary of Notifiable/Rechargeable Defects'
-       ,'M'
-       ,15 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3916');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS'
-       ,'MAI1300'
-       ,'Defect Control Data'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI1300');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS'
-       ,'MAI1315'
-       ,'Treatment Data'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI1315');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS'
-       ,'MAI3150'
-       ,'Default Treatments'
-       ,'M'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI3150');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS'
-       ,'MAI3814'
-       ,'Treatment Models'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI3814');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS_REPORTS'
-       ,'MAI3988'
-       ,'List of Standard Items'
-       ,'M'
-       ,9 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3988');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS_REPORTS'
-       ,'MAI3986'
-       ,'List of Standard Item Sections and Sub-Sections'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3986');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS_REPORTS'
-       ,'MAI3954'
-       ,'Contractor Performance Report'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3954');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS_REPORTS'
-       ,'MAI3932'
-       ,'Summary of Work Instructed by Standard Item'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3932');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS_REPORTS'
-       ,'MAI3934'
-       ,'Summary of Work Volumes by Standard Item'
-       ,'M'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3934');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS_INSPECTIONS'
-       ,'MAI2220'
-       ,'Download Static Ref Data for DCD Inspections'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI2220');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS_INSPECTIONS'
-       ,'MAI2222'
-       ,'Download Standard Item Data for DCD Inspections'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI2222');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS_REPORTS'
-       ,'MAI3981'
-       ,'List of Contractors'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3981');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS'
-       ,'MAI3888'
-       ,'Standard Items'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS'
-                    AND  HSTF_CHILD = 'MAI3888');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS'
-       ,'MAI3886'
-       ,'Standard Item Sections and Sub-Sections'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS'
-                    AND  HSTF_CHILD = 'MAI3886');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS'
-       ,'MAI3881'
-       ,'Contractors'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS'
-                    AND  HSTF_CHILD = 'MAI3881');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS'
-       ,'MAI3880'
-       ,'Contracts'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS'
-                    AND  HSTF_CHILD = 'MAI3880');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS'
-       ,'MAI3882'
-       ,'Copy a Contract'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS'
-                    AND  HSTF_CHILD = 'MAI3882');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS'
-       ,'MAI3884'
-       ,'Bulk Update of Contract Items'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS'
-                    AND  HSTF_CHILD = 'MAI3884');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS'
-       ,'MAI3624'
-       ,'Discount Groups'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS'
-                    AND  HSTF_CHILD = 'MAI3624');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS_REPORTS'
-       ,'MAI3980'
-       ,'Contract Details Report'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3980');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS_REPORTS'
-       ,'MAI3984'
-       ,'List of Contract Rates'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3984');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_CONTRACTS_REPORTS'
-       ,'MAI3982'
-       ,'List of Contract Liabilities'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_CONTRACTS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3982');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3906'
-       ,'Print BOQ Work Order (Defects)'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3906');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3922'
-       ,'List of Defects Not Yet Instructed'
-       ,'M'
-       ,16 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3922');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3924'
-       ,'List of Instructed Work by Status'
-       ,'M'
-       ,18 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3924');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3926'
-       ,'List of Instructed Defects due for Completion'
-       ,'M'
-       ,19 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3926');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3950'
-       ,'List of Work for Quality Inspection'
-       ,'M'
-       ,21 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3950');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3930'
-       ,'List of Inventory Updates'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3930');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3920'
-       ,'Summary of Defects Not Yet Instructed'
-       ,'M'
-       ,17 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3920');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3956'
-       ,'Admin Unit Performance Report'
-       ,'M'
-       ,23 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3956');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3952'
-       ,'Quality Inspection Performance Report'
-       ,'M'
-       ,22 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3952');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_FINANCIAL'
-       ,'MAI3840'
-       ,'Payment Run'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_FINANCIAL'
-                    AND  HSTF_CHILD = 'MAI3840');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS_REPORTS'
-       ,'MAI3250'
-       ,'Print Defect Movements'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3250');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP_REPORTS'
-       ,'MAI3470'
-       ,'Print Defect Details ( Work Orders )'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3470');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_REF'
-       ,'ACC_REF_ITEM_ATTRIB'
-       ,'Item/Attribute'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF'
-                    AND  HSTF_CHILD = 'ACC_REF_ITEM_ATTRIB');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS_INVENTORY'
-       ,'MAI2500'
-       ,'Download Data for Inventory Survey on DCD'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS_INVENTORY'
-                    AND  HSTF_CHILD = 'MAI2500');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REPORTS_AUDIT'
-       ,'MAI2501'
-       ,'Inventory Interface'
-       ,'M'
-       ,12 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
-                    AND  HSTF_CHILD = 'MAI2501');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS_INSPECTIONS'
-       ,'MAI2200C'
-       ,'Inspection Loader (Part 1)'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI2200C');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS_INSPECTIONS'
-       ,'MAI2200D'
-       ,'Inspection Loader (Part 2)'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI2200D');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INVENTORY'
-       ,'MAI1910'
-       ,'XSP Values'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY'
-                    AND  HSTF_CHILD = 'MAI1910');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS_REPORTS'
-       ,'MAI1840'
-       ,'List of People'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI1840');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI2115'
-       ,'Print Potential Inventory Duplicates'
-       ,'M'
-       ,9 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI2115');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS_INVENTORY'
-       ,'MAI5065'
-       ,'Print Batch with Downloaded Inventory Items'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS_INVENTORY'
-                    AND  HSTF_CHILD = 'MAI5065');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INVENTORY_REPORTS'
-       ,'MAI5200'
-       ,'Print Lamp Configurations'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5200');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE_REPORTS'
-       ,'MAI5205'
-       ,'Print Activity Frequencies'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5205');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INVENTORY_REPORTS'
-       ,'MAI5210'
-       ,'Print Electricity Boards'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5210');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE_REPORTS'
-       ,'MAI5215'
-       ,'Print Interval Codes'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5215');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS_REPORTS'
-       ,'MAI5220'
-       ,'Print Valid Defect Types'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5220');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE_REPORTS'
-       ,'MAI5225'
-       ,'Print Activities'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5225');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS_REPORTS'
-       ,'MAI5235'
-       ,'Print Defect Item Types'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5235');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS_REPORTS'
-       ,'MAI5240'
-       ,'Print Treatment Codes'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5240');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI9020'
-       ,'Print Inventory Gap/Overlap'
-       ,'M'
-       ,11 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI9020');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_FINANCIAL_REPORTS'
-       ,'MAI2780'
-       ,'Print Item Code Breakdowns'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_FINANCIAL_REPORTS'
-                    AND  HSTF_CHILD = 'MAI2780');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP_REPORTS'
-       ,'MAI5125'
-       ,'Print Defect Details (Strip Plan)'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5125');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP_REPORTS'
-       ,'MAI2210'
-       ,'Print Defective Advisory Roadstuds Report'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'MAI2210');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_REF'
-       ,'ACC_REF_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF'
-                    AND  HSTF_CHILD = 'ACC_REF_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS_INVENTORY'
-       ,'MAI2105C'
-       ,'Reformat Road Group Inventory Data'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS_INVENTORY'
-                    AND  HSTF_CHILD = 'MAI2105C');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INVENTORY_REPORTS'
-       ,'MAI5050'
-       ,'Print List of Inventory Item Types, Attributes and Values'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5050');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI5075'
-       ,'Print Inventory Item Report'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5075');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI2330'
-       ,'Print Summary of Inventory Changes'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI2330');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI9010'
-       ,'Detect Inventory Gap/Overlap'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI9010');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI2320'
-       ,'Print Inventory Map'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI2320');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3480'
-       ,'Print Works Order (Priced)'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3480');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3500'
-       ,'Print Works Orders Detail'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3500');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3505'
-       ,'Print Works Orders (Summary)'
-       ,'M'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3505');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3485'
-       ,'Print Works Order (Unpriced)'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3485');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI5130'
-       ,'Print Works Orders (Strip Plan)'
-       ,'M'
-       ,11 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5130');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS_INSPECTIONS'
-       ,'MAI2200R'
-       ,'Bulk Inspection Load - Stage 2 Report'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI2200R');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REPORTS_AUDIT'
-       ,'MAI5034A'
-       ,'Print A Audit - Defects by Type, Activity and Time'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
-                    AND  HSTF_CHILD = 'MAI5034A');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP_REPORTS'
-       ,'MAI5027'
-       ,'Print Defects by Defect Type'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5027');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3907'
-       ,'Print BOQ Work Order (Cyclic)'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3907');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3909'
-       ,'Print Works Order (NMA)'
-       ,'M'
-       ,9 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3909');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REPORTS_AUDIT'
-       ,'MAI5080'
-       ,'Print I Audit - 7 and 28 day Safety Inspection Statistics'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
-                    AND  HSTF_CHILD = 'MAI5080');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS_INVENTORY'
-       ,'MAI2100C'
-       ,'Inventory Loader (Part 1)'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS_INVENTORY'
-                    AND  HSTF_CHILD = 'MAI2100C');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS_INVENTORY'
-       ,'MAI2110C'
-       ,'Inventory Loader (Part 2)'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS_INVENTORY'
-                    AND  HSTF_CHILD = 'MAI2110C');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INTERFACES'
-       ,'MAI3830'
-       ,'Works Order File Extract'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INTERFACES'
-                    AND  HSTF_CHILD = 'MAI3830');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INTERFACES'
-       ,'MAI3834'
-       ,'Financial Commitment File'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INTERFACES'
-                    AND  HSTF_CHILD = 'MAI3834');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INTERFACES'
-       ,'MAI3856'
-       ,'Payment Approval form'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INTERFACES'
-                    AND  HSTF_CHILD = 'MAI3856');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INTERFACES'
-       ,'MAI3854'
-       ,'Invoice Verification form'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INTERFACES'
-                    AND  HSTF_CHILD = 'MAI3854');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INTERFACES'
-       ,'MAI3850'
-       ,'Completions file'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INTERFACES'
-                    AND  HSTF_CHILD = 'MAI3850');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INTERFACES'
-       ,'MAI3852'
-       ,'Invoice file'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INTERFACES'
-                    AND  HSTF_CHILD = 'MAI3852');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INTERFACES'
-       ,'MAI3858'
-       ,'Payment Transaction file'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INTERFACES'
-                    AND  HSTF_CHILD = 'MAI3858');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS'
-       ,'MAI1320'
-       ,'Enquiry/Treatment Types'
-       ,'M'
-       ,9 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI1320');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS'
-       ,'MAI1325'
-       ,'Enquiry/Defect Priorities'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI1325');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_ANALYSIS'
-       ,'ACC_ANALYSIS_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,9 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
-                    AND  HSTF_CHILD = 'ACC_ANALYSIS_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_IO'
-       ,'ACC_IO_LOAD_REPORTS'
-       ,'Load Reports'
-       ,'F'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_IO'
-                    AND  HSTF_CHILD = 'ACC_IO_LOAD_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS_INVENTORY'
-       ,'MAI5090'
-       ,'Remove Successfully Loaded Inventory Batches'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS_INVENTORY'
-                    AND  HSTF_CHILD = 'MAI5090');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS_INSPECTIONS'
-       ,'MAI5091'
-       ,'Remove Phase 1 Inspection Batches'
-       ,'M'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI5091');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INVENTORY'
-       ,'MAI1440'
-       ,'Inventory Colour Map'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY'
-                    AND  HSTF_CHILD = 'MAI1440');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3105'
-       ,'Print: Cyclic Maintenance Activities'
-       ,'M'
-       ,14 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3105');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS_INSPECTIONS'
-       ,'MAI3863'
-       ,'Download Inspection by Assets'
-       ,'M'
-       ,9 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI3863');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI5021'
-       ,'Print Inventory Areas - Trapezium Rule'
-       ,'M'
-       ,13 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5021');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP_REPORTS'
-       ,'MAI3100'
-       ,'Print Inspection Schedules'
-       ,'M'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3100');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP_REPORTS'
-       ,'MAI3902'
-       ,'Print Defect Details'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3902');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_REF_ITEM_ATTRIB'
-       ,'ACC2010'
-       ,'Domains'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF_ITEM_ATTRIB'
-                    AND  HSTF_CHILD = 'ACC2010');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE'
-       ,'MAI3803'
-       ,'Work Order Auditing Maintenance'
-       ,'M'
-       ,9 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
-                    AND  HSTF_CHILD = 'MAI3803');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI5001'
-       ,'Inventory Item Details'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5001');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_REF_ITEM_ATTRIB'
-       ,'ACC2020'
-       ,'Attributes'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF_ITEM_ATTRIB'
-                    AND  HSTF_CHILD = 'ACC2020');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_REF'
-       ,'ACC2070'
-       ,'Accident Images'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF'
-                    AND  HSTF_CHILD = 'ACC2070');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3919'
-       ,'Print Works Order (Enhanced)'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3919');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_MANAGEMENT'
-       ,'ACC3020'
-       ,'Accidents v2'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_MANAGEMENT'
-                    AND  HSTF_CHILD = 'ACC3020');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_MANAGEMENT'
-       ,'ACC3021'
-       ,'Accidents'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_MANAGEMENT'
-                    AND  HSTF_CHILD = 'ACC3021');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_MANAGEMENT_ATTRIB'
-       ,'ACC3040'
-       ,'Bulk Initialisation'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_MANAGEMENT_ATTRIB'
-                    AND  HSTF_CHILD = 'ACC3040');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_MANAGEMENT_ATTRIB'
-       ,'ACC3050'
-       ,'Bulk Maintenance'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_MANAGEMENT_ATTRIB'
-                    AND  HSTF_CHILD = 'ACC3050');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS'
-       ,'MAI3813'
-       ,'Maintain Automatic Defect Prioritisation'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI3813');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_ANALYSIS'
-       ,'ACC7045'
-       ,'Queries'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
-                    AND  HSTF_CHILD = 'ACC7045');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_MANAGEMENT_REPORTS'
-       ,'ACC8001'
-       ,'Profile Report'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_MANAGEMENT_REPORTS'
-                    AND  HSTF_CHILD = 'ACC8001');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_REF_REPORTS'
-       ,'ACC8004'
-       ,'List of Attribute Domains'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF_REPORTS'
-                    AND  HSTF_CHILD = 'ACC8004');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI'
-       ,'MAI8000'
-       ,'Batch Works Order Printing'
-       ,'M'
-       ,21 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI'
-                    AND  HSTF_CHILD = 'MAI8000');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_FINANCIAL_REPORTS'
-       ,'MAI3692'
-       ,'Print Cost Code Exceptions Report'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_FINANCIAL_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3692');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REPORTS'
-       ,'MAI7040'
-       ,'Parameter Based Inquiry (PBI)'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS'
-                    AND  HSTF_CHILD = 'MAI7040');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REPORTS_AUDIT'
-       ,'MAI5037'
-       ,'Print E Audit - Electrical Report by Ownership'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
-                    AND  HSTF_CHILD = 'MAI5037');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REPORTS_AUDIT'
-       ,'MAI5027'
-       ,'Print Defects by Defect Type'
-       ,'M'
-       ,11 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS_AUDIT'
-                    AND  HSTF_CHILD = 'MAI5027');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INVENTORY'
-       ,'MAI1400'
-       ,'v2 Asset Type Translations'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY'
-                    AND  HSTF_CHILD = 'MAI1400');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS'
-       ,'MAI3812'
-       ,'Defect Priorities'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI3812');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INSPECTIONS_REPORTS'
-       ,'MAI1808'
-       ,'List of Organisations'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INSPECTIONS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI1808');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE'
-       ,'MAI1200'
-       ,'Activities'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
-                    AND  HSTF_CHILD = 'MAI1200');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE'
-       ,'MAI1230'
-       ,'Default Section Intervals Calculation'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
-                    AND  HSTF_CHILD = 'MAI1230');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE_REPORTS'
-       ,'MAI5030'
-       ,'Print Default Intervals and Frequencies'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5030');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_FINANCIAL'
-       ,'MAI1940'
-       ,'Item Code Breakdowns'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_FINANCIAL'
-                    AND  HSTF_CHILD = 'MAI1940');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS_INVENTORY'
-       ,'MAI2120'
-       ,'Correct Inventory Load Errors'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS_INVENTORY'
-                    AND  HSTF_CHILD = 'MAI2120');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS_INSPECTIONS'
-       ,'MAI2250'
-       ,'Correct Inspection Load Errors'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS_INSPECTIONS'
-                    AND  HSTF_CHILD = 'MAI2250');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC'
-       ,'ACC_MANAGEMENT'
-       ,'Management'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC'
-                    AND  HSTF_CHILD = 'ACC_MANAGEMENT');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC'
-       ,'ACC_REF'
-       ,'Reference'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC'
-                    AND  HSTF_CHILD = 'ACC_REF');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC'
-       ,'ACC_ANALYSIS'
-       ,'Analysis'
-       ,'F'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC'
-                    AND  HSTF_CHILD = 'ACC_ANALYSIS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC'
-       ,'ACC_IO'
-       ,'Data i/o'
-       ,'F'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC'
-                    AND  HSTF_CHILD = 'ACC_IO');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_MANAGEMENT'
-       ,'ACC_MANAGEMENT_ATTRIB'
-       ,'Attribute'
-       ,'F'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_MANAGEMENT'
-                    AND  HSTF_CHILD = 'ACC_MANAGEMENT_ATTRIB');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_MANAGEMENT'
-       ,'ACC_MANAGEMENT_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_MANAGEMENT'
-                    AND  HSTF_CHILD = 'ACC_MANAGEMENT_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_REF_REPORTS'
-       ,'ACC8005'
-       ,'List of Attribute Types'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF_REPORTS'
-                    AND  HSTF_CHILD = 'ACC8005');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_REF_REPORTS'
-       ,'ACC8006'
-       ,'List of Item Types'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF_REPORTS'
-                    AND  HSTF_CHILD = 'ACC8006');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_REF_REPORTS'
-       ,'ACC8007'
-       ,'List of Attribute Groups'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF_REPORTS'
-                    AND  HSTF_CHILD = 'ACC8007');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_REF_REPORTS'
-       ,'ACC8008'
-       ,'List of Valid Items and Attributes'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF_REPORTS'
-                    AND  HSTF_CHILD = 'ACC8008');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_ANALYSIS'
-       ,'ACC8800'
-       ,'Identify Sites'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
-                    AND  HSTF_CHILD = 'ACC8800');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_ANALYSIS'
-       ,'ACC8810'
-       ,'Factor Grid'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
-                    AND  HSTF_CHILD = 'ACC8810');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_ANALYSIS_REPORTS'
-       ,'ACC8811'
-       ,'Factor Grid Report'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_ANALYSIS_REPORTS'
-                    AND  HSTF_CHILD = 'ACC8811');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_ANALYSIS'
-       ,'ACC8812'
-       ,'Statistical Summary'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
-                    AND  HSTF_CHILD = 'ACC8812');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_REF'
-       ,'ACC8820'
-       ,'Site Parameters'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF'
-                    AND  HSTF_CHILD = 'ACC8820');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_ANALYSIS'
-       ,'ACC8825'
-       ,'Accident Groups'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
-                    AND  HSTF_CHILD = 'ACC8825');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_ANALYSIS'
-       ,'ACC8830'
-       ,'Create Accident Groups'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
-                    AND  HSTF_CHILD = 'ACC8830');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_ANALYSIS'
-       ,'ACC8835'
-       ,'Accident Group Hieracrchies'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
-                    AND  HSTF_CHILD = 'ACC8835');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_ANALYSIS_REPORTS'
-       ,'ACC8840'
-       ,'Hotspot Report'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_ANALYSIS_REPORTS'
-                    AND  HSTF_CHILD = 'ACC8840');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STR'
-       ,'STR_INSPECTIONS'
-       ,'Inspections'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR'
-                    AND  HSTF_CHILD = 'STR_INSPECTIONS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_ANALYSIS_REPORTS'
-       ,'ACC8842'
-       ,'Accident Group Refresh Utility'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_ANALYSIS_REPORTS'
-                    AND  HSTF_CHILD = 'ACC8842');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_IO'
-       ,'ACC8890'
-       ,'Load Accidents'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_IO'
-                    AND  HSTF_CHILD = 'ACC8890');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_IO'
-       ,'ACC8891'
-       ,'Accident File Load Rules'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_IO'
-                    AND  HSTF_CHILD = 'ACC8891');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_IO_LOAD_REPORTS'
-       ,'ACC8892'
-       ,'External File Description'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_IO_LOAD_REPORTS'
-                    AND  HSTF_CHILD = 'ACC8892');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STR'
-       ,'STR_REFERENCE'
+        'PROW'
+       ,'PROW_REFERENCE'
        ,'Reference Data'
        ,'F'
        ,3 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR'
-                    AND  HSTF_CHILD = 'STR_REFERENCE');
+                   WHERE HSTF_PARENT = 'PROW'
+                    AND  HSTF_CHILD = 'PROW_REFERENCE');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_DEFINITIVE'
+       ,'DOC0150'
+       ,'Enquiries'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
+                    AND  HSTF_CHILD = 'DOC0150');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_DEFINITIVE'
+       ,'PROW6000'
+       ,'Worktray'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
+                    AND  HSTF_CHILD = 'PROW6000');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_DEFINITIVE'
+       ,'PROW6012'
+       ,'Enquiry Summary'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
+                    AND  HSTF_CHILD = 'PROW6012');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_DEFINITIVE'
+       ,'PROW6022'
+       ,'Contacts'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
+                    AND  HSTF_CHILD = 'PROW6022');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_DEFINITIVE'
+       ,'PROW6060'
+       ,'Path History'
+       ,'M'
+       ,13 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
+                    AND  HSTF_CHILD = 'PROW6060');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_DEFINITIVE'
+       ,'PROW6240'
+       ,'Depositions'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
+                    AND  HSTF_CHILD = 'PROW6240');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_DEFINITIVE'
+       ,'PROW6250'
+       ,'Definitive Statement'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
+                    AND  HSTF_CHILD = 'PROW6250');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_DEFINITIVE'
+       ,'PROW6260'
+       ,'Public Path Orders'
+       ,'M'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
+                    AND  HSTF_CHILD = 'PROW6260');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_DEFINITIVE'
+       ,'PROW6261'
+       ,'Public Path Order Summary'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
+                    AND  HSTF_CHILD = 'PROW6261');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_DEFINITIVE'
+       ,'PROW6270'
+       ,'Modification Orders'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
+                    AND  HSTF_CHILD = 'PROW6270');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_DEFINITIVE'
+       ,'PROW6271'
+       ,'Modification Order Summary'
+       ,'M'
+       ,9 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
+                    AND  HSTF_CHILD = 'PROW6271');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_DEFINITIVE'
+       ,'PROW6280'
+       ,'Path Closures'
+       ,'M'
+       ,12 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
+                    AND  HSTF_CHILD = 'PROW6280');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_DEFINITIVE'
+       ,'PROW6281'
+       ,'Path Closure Summary'
+       ,'M'
+       ,11 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_DEFINITIVE'
+                    AND  HSTF_CHILD = 'PROW6281');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_OPERATIONS'
+       ,'DOC0150'
+       ,'Enquiries'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
+                    AND  HSTF_CHILD = 'DOC0150');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_OPERATIONS'
+       ,'MAI3800'
+       ,'Work Orders (Defects)'
+       ,'M'
+       ,3.4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
+                    AND  HSTF_CHILD = 'MAI3800');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_OPERATIONS'
+       ,'NM0510'
+       ,'Asset Items'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
+                    AND  HSTF_CHILD = 'NM0510');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_OPERATIONS'
+       ,'PROW6000'
+       ,'Worktray'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
+                    AND  HSTF_CHILD = 'PROW6000');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_OPERATIONS'
+       ,'PROW6012'
+       ,'Enquiry Summary'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
+                    AND  HSTF_CHILD = 'PROW6012');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_OPERATIONS'
+       ,'PROW6014'
+       ,'Work Order Summary'
+       ,'M'
+       ,3.2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
+                    AND  HSTF_CHILD = 'PROW6014');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_OPERATIONS'
+       ,'PROW6020'
+       ,'Land Ownership'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
+                    AND  HSTF_CHILD = 'PROW6020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_OPERATIONS'
+       ,'PROW6021'
+       ,'Land Ownership Summary'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
+                    AND  HSTF_CHILD = 'PROW6021');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_OPERATIONS'
+       ,'PROW6022'
+       ,'Contacts'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
+                    AND  HSTF_CHILD = 'PROW6022');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_OPERATIONS'
+       ,'PROW6030'
+       ,'Access Land'
+       ,'M'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
+                    AND  HSTF_CHILD = 'PROW6030');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_OPERATIONS'
+       ,'PROW6050'
+       ,'Access Land History'
+       ,'M'
+       ,9 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
+                    AND  HSTF_CHILD = 'PROW6050');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_OPERATIONS'
+       ,'PROW6060'
+       ,'Path History'
+       ,'M'
+       ,14 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
+                    AND  HSTF_CHILD = 'PROW6060');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_OPERATIONS'
+       ,'PROW6210'
+       ,'Vehicle Use Licences'
+       ,'M'
+       ,13 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
+                    AND  HSTF_CHILD = 'PROW6210');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_OPERATIONS'
+       ,'PROW6220'
+       ,'Enforcements'
+       ,'M'
+       ,11 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
+                    AND  HSTF_CHILD = 'PROW6220');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_OPERATIONS'
+       ,'PROW6222'
+       ,'Enforcement Summary'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
+                    AND  HSTF_CHILD = 'PROW6222');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_OPERATIONS'
+       ,'PROW6230'
+       ,'Prosecutions'
+       ,'M'
+       ,12 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
+                    AND  HSTF_CHILD = 'PROW6230');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_REFERENCE'
+       ,'NM0410'
+       ,'Asset Metamodel'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_REFERENCE'
+                    AND  HSTF_CHILD = 'NM0410');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_REFERENCE'
+       ,'PROW6002'
+       ,'Worktray Blocks'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_REFERENCE'
+                    AND  HSTF_CHILD = 'PROW6002');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_REFERENCE'
+       ,'PROW6292'
+       ,'Audit Options'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_REFERENCE'
+                    AND  HSTF_CHILD = 'PROW6292');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_REFERENCE'
+       ,'PROW9120'
+       ,'Domains'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_REFERENCE'
+                    AND  HSTF_CHILD = 'PROW9120');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'ROOT'
+       ,'FAVOURITES'
+       ,'Launchpad'
+       ,'F'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'ROOT'
+                    AND  HSTF_CHILD = 'FAVOURITES');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP'
+       ,'STP_RCON'
+       ,'Road Construction'
+       ,'F'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP'
+                    AND  HSTF_CHILD = 'STP_RCON');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP'
+       ,'STP_REFERENCE'
+       ,'Reference Data'
+       ,'F'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP'
+                    AND  HSTF_CHILD = 'STP_REFERENCE');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP'
+       ,'STP_ROAD'
+       ,'Schemes'
+       ,'F'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP'
+                    AND  HSTF_CHILD = 'STP_ROAD');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP_RCON'
+       ,'STP1000'
+       ,'Road Construction Data'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP_RCON'
+                    AND  HSTF_CHILD = 'STP1000');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP_REFERENCE'
+       ,'NM7050'
+       ,'Merge Queries'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP_REFERENCE'
+                    AND  HSTF_CHILD = 'NM7050');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP_REFERENCE'
+       ,'STP0010'
+       ,'Road Construction Attributes'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP_REFERENCE'
+                    AND  HSTF_CHILD = 'STP0010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP_REFERENCE'
+       ,'STP_REFERENCE_INVENTORY'
+       ,'Inventory'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP_REFERENCE'
+                    AND  HSTF_CHILD = 'STP_REFERENCE_INVENTORY');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP_REFERENCE'
+       ,'STP_REFERENCE_JOB'
+       ,'Job Metadata'
+       ,'F'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP_REFERENCE'
+                    AND  HSTF_CHILD = 'STP_REFERENCE_JOB');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP_REFERENCE_INVENTORY'
+       ,'NM0301'
+       ,'Asset Domains'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP_REFERENCE_INVENTORY'
+                    AND  HSTF_CHILD = 'NM0301');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP_REFERENCE_INVENTORY'
+       ,'NM0305'
+       ,'XSP and Reversal Rules'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP_REFERENCE_INVENTORY'
+                    AND  HSTF_CHILD = 'NM0305');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP_REFERENCE_INVENTORY'
+       ,'NM0306'
+       ,'Asset XSPs'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP_REFERENCE_INVENTORY'
+                    AND  HSTF_CHILD = 'NM0306');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP_REFERENCE_INVENTORY'
+       ,'NM0410'
+       ,'Inventory Metamodel'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP_REFERENCE_INVENTORY'
+                    AND  HSTF_CHILD = 'NM0410');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP_REFERENCE_INVENTORY'
+       ,'NM0411'
+       ,'Inventory Exclusive View Creation'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP_REFERENCE_INVENTORY'
+                    AND  HSTF_CHILD = 'NM0411');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP_REFERENCE_INVENTORY'
+       ,'NM0550'
+       ,'Cross Attribute Validation Setup'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP_REFERENCE_INVENTORY'
+                    AND  HSTF_CHILD = 'NM0550');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP_REFERENCE_INVENTORY'
+       ,'NM0551'
+       ,'Cross Item Validation Setup'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP_REFERENCE_INVENTORY'
+                    AND  HSTF_CHILD = 'NM0551');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP_REFERENCE_JOB'
+       ,'NM3010'
+       ,'Job Operations'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP_REFERENCE_JOB'
+                    AND  HSTF_CHILD = 'NM3010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP_REFERENCE_JOB'
+       ,'NM3020'
+       ,'Job Types'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP_REFERENCE_JOB'
+                    AND  HSTF_CHILD = 'NM3020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP_ROAD'
+       ,'STP4400'
+       ,'Maintain Schemes'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP_ROAD'
+                    AND  HSTF_CHILD = 'STP4400');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STP_ROAD'
+       ,'STP4401'
+       ,'Scheme Priorities'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STP_ROAD'
+                    AND  HSTF_CHILD = 'STP4401');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -86727,6 +90807,125 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
+        'STR'
+       ,'STR_INSPECTIONS'
+       ,'Inspections'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR'
+                    AND  HSTF_CHILD = 'STR_INSPECTIONS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR'
+       ,'STR_INVENTORY'
+       ,'Inventory'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR'
+                    AND  HSTF_CHILD = 'STR_INVENTORY');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR'
+       ,'STR_REFERENCE'
+       ,'Reference Data'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR'
+                    AND  HSTF_CHILD = 'STR_REFERENCE');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR_BULK'
+       ,'STR1001'
+       ,'Download Control Data into DCD File'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_BULK'
+                    AND  HSTF_CHILD = 'STR1001');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR_BULK'
+       ,'STR1002'
+       ,'Download Inspection Parameters into DCD File'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_BULK'
+                    AND  HSTF_CHILD = 'STR1002');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR_BULK'
+       ,'STR1003'
+       ,'Upload Inspection Records from DCD File'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_BULK'
+                    AND  HSTF_CHILD = 'STR1003');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR_BULK'
+       ,'STR1004'
+       ,'Load Structures Inventory onto Database'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_BULK'
+                    AND  HSTF_CHILD = 'STR1004');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
         'STR_DART'
        ,'STR7045'
        ,'Dynamic Attribute Reporting Tool'
@@ -86735,6 +90934,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'STR_DART'
                     AND  HSTF_CHILD = 'STR7045');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR_INSPECTIONS'
+       ,'STR3001'
+       ,'Calculate Bridge Condition Indicators'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_INSPECTIONS'
+                    AND  HSTF_CHILD = 'STR3001');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -86795,57 +91011,6 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'ACC_REF'
-       ,'ACC2080'
-       ,'Discoverer Interface'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF'
-                    AND  HSTF_CHILD = 'ACC2080');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_REF_ITEM_ATTRIB'
-       ,'ACC2090'
-       ,'Accident Attribute Bands'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF_ITEM_ATTRIB'
-                    AND  HSTF_CHILD = 'ACC2090');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_ANALYSIS'
-       ,'ACC8827'
-       ,'Group Removal'
-       ,'M'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_ANALYSIS'
-                    AND  HSTF_CHILD = 'ACC8827');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
         'STR_INSPECTIONS'
        ,'STR3080'
        ,'Inspection Batches'
@@ -86863,14 +91028,48 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'ACC_ANALYSIS_REPORTS'
-       ,'ACC8001'
-       ,'Profile Report'
+        'STR_INSPECTIONS'
+       ,'STR3086'
+       ,'Inspection Records for a Structure'
        ,'M'
-       ,2 FROM DUAL
+       ,5 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_ANALYSIS_REPORTS'
-                    AND  HSTF_CHILD = 'ACC8001');
+                   WHERE HSTF_PARENT = 'STR_INSPECTIONS'
+                    AND  HSTF_CHILD = 'STR3086');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR_INSPECTIONS'
+       ,'STR_INSPECTIONS_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_INSPECTIONS'
+                    AND  HSTF_CHILD = 'STR_INSPECTIONS_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR_INSPECTIONS_REPORTS'
+       ,'STR5015'
+       ,'Profile of an Inspection'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_INSPECTIONS_REPORTS'
+                    AND  HSTF_CHILD = 'STR5015');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87034,6 +91233,23 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'STR_INVENTORY'
+       ,'STR3010'
+       ,'Create Structures from a Template'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_INVENTORY'
+                    AND  HSTF_CHILD = 'STR3010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR_INVENTORY'
        ,'STR3020'
        ,'Structure Hierarchies and Attributes'
        ,'M'
@@ -87058,57 +91274,6 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'STR_INVENTORY'
                     AND  HSTF_CHILD = 'STR3024');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STP_REFERENCE'
-       ,'NM7050'
-       ,'Merge Queries'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP_REFERENCE'
-                    AND  HSTF_CHILD = 'NM7050');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STR_INVENTORY'
-       ,'STR3060'
-       ,'Resequence Structure Hierarchies'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_INVENTORY'
-                    AND  HSTF_CHILD = 'STR3060');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STR_INVENTORY'
-       ,'STR3010'
-       ,'Create Structures from a Template'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_INVENTORY'
-                    AND  HSTF_CHILD = 'STR3010');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87169,6 +91334,40 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
+        'STR_INVENTORY'
+       ,'STR3060'
+       ,'Resequence Structure Hierarchies'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_INVENTORY'
+                    AND  HSTF_CHILD = 'STR3060');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR_INVENTORY'
+       ,'STR_INVENTORY_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_INVENTORY'
+                    AND  HSTF_CHILD = 'STR_INVENTORY_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
         'STR_INVENTORY_REPORTS'
        ,'STR5010'
        ,'Profile of a Structure'
@@ -87177,40 +91376,6 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'STR_INVENTORY_REPORTS'
                     AND  HSTF_CHILD = 'STR5010');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STR_INVENTORY_REPORTS'
-       ,'STR5050'
-       ,'List of Structures on a Route'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_INVENTORY_REPORTS'
-                    AND  HSTF_CHILD = 'STR5050');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STR_INVENTORY_REPORTS'
-       ,'STR5040'
-       ,'List of Structures with Named Attributes'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_INVENTORY_REPORTS'
-                    AND  HSTF_CHILD = 'STR5040');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87245,6 +91410,40 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'STR_INVENTORY_REPORTS'
                     AND  HSTF_CHILD = 'STR5030');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR_INVENTORY_REPORTS'
+       ,'STR5040'
+       ,'List of Structures with Named Attributes'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_INVENTORY_REPORTS'
+                    AND  HSTF_CHILD = 'STR5040');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR_INVENTORY_REPORTS'
+       ,'STR5050'
+       ,'List of Structures on a Route'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_INVENTORY_REPORTS'
+                    AND  HSTF_CHILD = 'STR5050');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87357,23 +91556,6 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'STR_REFERENCE'
-       ,'STR2068'
-       ,'Inspection Sets'
-       ,'M'
-       ,9 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_REFERENCE'
-                    AND  HSTF_CHILD = 'STR2068');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STR_REFERENCE'
        ,'STR2060'
        ,'Inspection Types'
        ,'M'
@@ -87415,6 +91597,91 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'STR_REFERENCE'
                     AND  HSTF_CHILD = 'STR2064');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR_REFERENCE'
+       ,'STR2068'
+       ,'Inspection Sets'
+       ,'M'
+       ,9 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_REFERENCE'
+                    AND  HSTF_CHILD = 'STR2068');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR_REFERENCE'
+       ,'STR2070'
+       ,'Organisations'
+       ,'M'
+       ,13 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_REFERENCE'
+                    AND  HSTF_CHILD = 'STR2070');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR_REFERENCE'
+       ,'STR3002'
+       ,'Bridge Condition Reference Data'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_REFERENCE'
+                    AND  HSTF_CHILD = 'STR3002');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR_REFERENCE'
+       ,'STR3003'
+       ,'Defect Code Maintenance'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_REFERENCE'
+                    AND  HSTF_CHILD = 'STR3003');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'STR_REFERENCE'
+       ,'STR_REFERENCE_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,14 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'STR_REFERENCE'
+                    AND  HSTF_CHILD = 'STR_REFERENCE_REPORTS');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87526,14 +91793,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'STR_BULK'
-       ,'STR1001'
-       ,'Download Control Data into DCD File'
-       ,'M'
-       ,1 FROM DUAL
+        'SWR'
+       ,'SWR_BATCH'
+       ,'Batch Processing'
+       ,'F'
+       ,70 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_BULK'
-                    AND  HSTF_CHILD = 'STR1001');
+                   WHERE HSTF_PARENT = 'SWR'
+                    AND  HSTF_CHILD = 'SWR_BATCH');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87543,14 +91810,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'STR_BULK'
-       ,'STR1002'
-       ,'Download Inspection Parameters into DCD File'
-       ,'M'
-       ,2 FROM DUAL
+        'SWR'
+       ,'SWR_COMMENTS'
+       ,'Comments'
+       ,'F'
+       ,30 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_BULK'
-                    AND  HSTF_CHILD = 'STR1002');
+                   WHERE HSTF_PARENT = 'SWR'
+                    AND  HSTF_CHILD = 'SWR_COMMENTS');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87560,14 +91827,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'STR_BULK'
-       ,'STR1003'
-       ,'Upload Inspection Records from DCD File'
-       ,'M'
-       ,3 FROM DUAL
+        'SWR'
+       ,'SWR_COORD'
+       ,'Co-ordination'
+       ,'F'
+       ,60 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_BULK'
-                    AND  HSTF_CHILD = 'STR1003');
+                   WHERE HSTF_PARENT = 'SWR'
+                    AND  HSTF_CHILD = 'SWR_COORD');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87577,14 +91844,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'STR_BULK'
-       ,'STR1004'
-       ,'Load Structures Inventory onto Database'
-       ,'M'
-       ,4 FROM DUAL
+        'SWR'
+       ,'SWR_GAZ'
+       ,'Gazetteer'
+       ,'F'
+       ,50 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_BULK'
-                    AND  HSTF_CHILD = 'STR1004');
+                   WHERE HSTF_PARENT = 'SWR'
+                    AND  HSTF_CHILD = 'SWR_GAZ');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87594,31 +91861,31 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'STR_REFERENCE'
-       ,'STR2070'
+        'SWR'
+       ,'SWR_INSP'
+       ,'Inspections'
+       ,'F'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR'
+                    AND  HSTF_CHILD = 'SWR_INSP');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR'
+       ,'SWR_ORGS'
        ,'Organisations'
-       ,'M'
-       ,13 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_REFERENCE'
-                    AND  HSTF_CHILD = 'STR2070');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STP_REFERENCE'
-       ,'STP_REFERENCE_INVENTORY'
-       ,'Inventory'
        ,'F'
-       ,3 FROM DUAL
+       ,10 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP_REFERENCE'
-                    AND  HSTF_CHILD = 'STP_REFERENCE_INVENTORY');
+                   WHERE HSTF_PARENT = 'SWR'
+                    AND  HSTF_CHILD = 'SWR_ORGS');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87628,14 +91895,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'STR_INSPECTIONS'
-       ,'STR3001'
-       ,'Calculate Bridge Condition Indicators'
-       ,'M'
-       ,1 FROM DUAL
+        'SWR'
+       ,'SWR_REF'
+       ,'Reference Data'
+       ,'F'
+       ,80 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_INSPECTIONS'
-                    AND  HSTF_CHILD = 'STR3001');
+                   WHERE HSTF_PARENT = 'SWR'
+                    AND  HSTF_CHILD = 'SWR_REF');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87645,14 +91912,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'STR_REFERENCE'
-       ,'STR3002'
-       ,'Bridge Condition Reference Data'
-       ,'M'
-       ,1 FROM DUAL
+        'SWR'
+       ,'SWR_WORKS'
+       ,'Works'
+       ,'F'
+       ,20 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_REFERENCE'
-                    AND  HSTF_CHILD = 'STR3002');
+                   WHERE HSTF_PARENT = 'SWR'
+                    AND  HSTF_CHILD = 'SWR_WORKS');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87662,14 +91929,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'STR_REFERENCE'
-       ,'STR3003'
-       ,'Defect Code Maintenance'
-       ,'M'
-       ,2 FROM DUAL
+        'SWR_BATCH'
+       ,'SWR_BATCH_ADMIN'
+       ,'Admin'
+       ,'F'
+       ,10 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_REFERENCE'
-                    AND  HSTF_CHILD = 'STR3003');
+                   WHERE HSTF_PARENT = 'SWR_BATCH'
+                    AND  HSTF_CHILD = 'SWR_BATCH_ADMIN');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87679,14 +91946,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'STR_INVENTORY'
-       ,'STR_INVENTORY_REPORTS'
+        'SWR_BATCH'
+       ,'SWR_BATCH_REPORTS'
        ,'Reports'
        ,'F'
-       ,8 FROM DUAL
+       ,20 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_INVENTORY'
-                    AND  HSTF_CHILD = 'STR_INVENTORY_REPORTS');
+                   WHERE HSTF_PARENT = 'SWR_BATCH'
+                    AND  HSTF_CHILD = 'SWR_BATCH_REPORTS');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87696,14 +91963,235 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'STR_INSPECTIONS'
-       ,'STR_INSPECTIONS_REPORTS'
+        'SWR_BATCH_ADMIN'
+       ,'SWR1600'
+       ,'Upload/Download Utility'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_BATCH_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1600');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_BATCH_ADMIN'
+       ,'SWR1601'
+       ,'Automatic Upload/Download Utility'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_BATCH_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1601');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_BATCH_ADMIN'
+       ,'SWR1605'
+       ,'Monitor Batch File Status'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_BATCH_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1605');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_BATCH_ADMIN'
+       ,'SWR_BATCH_ADMIN_REF'
+       ,'Reference Data'
+       ,'F'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_BATCH_ADMIN'
+                    AND  HSTF_CHILD = 'SWR_BATCH_ADMIN_REF');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_BATCH_ADMIN_REF'
+       ,'SWR1602'
+       ,'Maintain Automatic Batch Processes'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_BATCH_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1602');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_BATCH_ADMIN_REF'
+       ,'SWR1603'
+       ,'Maintain Automatic Batch Rules'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_BATCH_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1603');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_BATCH_ADMIN_REF'
+       ,'SWR1604'
+       ,'Maintain Automatic Batch Operations'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_BATCH_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1604');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_BATCH_ADMIN_REF'
+       ,'SWR1620'
+       ,'Maintain Batch Messages'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_BATCH_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1620');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_BATCH_REPORTS'
+       ,'SWR1610'
+       ,'Batch Files Processed'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_BATCH_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1610');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_BATCH_REPORTS'
+       ,'SWR1780'
+       ,'Batch File Listing'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_BATCH_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1780');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_COMMENTS'
+       ,'SWR_COMMENTS_ADMIN'
+       ,'Admin'
+       ,'F'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_COMMENTS'
+                    AND  HSTF_CHILD = 'SWR_COMMENTS_ADMIN');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_COMMENTS_ADMIN'
+       ,'SWR1111'
+       ,'Maintain Works Comments'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_COMMENTS_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1111');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_COMMENTS_ADMIN'
+       ,'SWR1112'
+       ,'Comments Sent/Received'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_COMMENTS_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1112');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_COORD'
+       ,'SWR_COORD_REPORTS'
        ,'Reports'
        ,'F'
-       ,7 FROM DUAL
+       ,10 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_INSPECTIONS'
-                    AND  HSTF_CHILD = 'STR_INSPECTIONS_REPORTS');
+                   WHERE HSTF_PARENT = 'SWR_COORD'
+                    AND  HSTF_CHILD = 'SWR_COORD_REPORTS');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87713,14 +92201,65 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'STR_REFERENCE'
-       ,'STR_REFERENCE_REPORTS'
+        'SWR_COORD_REPORTS'
+       ,'SWR1197'
+       ,'Coordination Planning'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_COORD_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1197');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_COORD_REPORTS'
+       ,'SWR1198'
+       ,'Conflicting Works'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_COORD_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1198');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_GAZ'
+       ,'SWR_GAZ_ADMIN'
+       ,'Admin'
+       ,'F'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_GAZ'
+                    AND  HSTF_CHILD = 'SWR_GAZ_ADMIN');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_GAZ'
+       ,'SWR_GAZ_REPORTS'
        ,'Reports'
        ,'F'
-       ,14 FROM DUAL
+       ,20 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_REFERENCE'
-                    AND  HSTF_CHILD = 'STR_REFERENCE_REPORTS');
+                   WHERE HSTF_PARENT = 'SWR_GAZ'
+                    AND  HSTF_CHILD = 'SWR_GAZ_REPORTS');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87730,14 +92269,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'STP_REFERENCE'
-       ,'STP0010'
-       ,'Road Construction Attributes'
+        'SWR_GAZ_ADMIN'
+       ,'SWR1336'
+       ,'Maintain Street Naming Authorities'
        ,'M'
-       ,1 FROM DUAL
+       ,10 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP_REFERENCE'
-                    AND  HSTF_CHILD = 'STP0010');
+                   WHERE HSTF_PARENT = 'SWR_GAZ_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1336');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87747,14 +92286,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'STP_REFERENCE_INVENTORY'
-       ,'NM0411'
-       ,'Inventory Exclusive View Creation'
+        'SWR_GAZ_ADMIN'
+       ,'SWR1530'
+       ,'Streets of Interest'
        ,'M'
-       ,3 FROM DUAL
+       ,20 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP_REFERENCE_INVENTORY'
-                    AND  HSTF_CHILD = 'NM0411');
+                   WHERE HSTF_PARENT = 'SWR_GAZ_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1530');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87764,82 +92303,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'STP_REFERENCE_INVENTORY'
-       ,'NM0305'
-       ,'XSP and Reversal Rules'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP_REFERENCE_INVENTORY'
-                    AND  HSTF_CHILD = 'NM0305');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STP_REFERENCE_INVENTORY'
-       ,'NM0306'
-       ,'Asset XSPs'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP_REFERENCE_INVENTORY'
-                    AND  HSTF_CHILD = 'NM0306');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STP_REFERENCE_INVENTORY'
-       ,'NM0550'
-       ,'Cross Attribute Validation Setup'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP_REFERENCE_INVENTORY'
-                    AND  HSTF_CHILD = 'NM0550');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STP_REFERENCE_INVENTORY'
-       ,'NM0551'
-       ,'Cross Item Validation Setup'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP_REFERENCE_INVENTORY'
-                    AND  HSTF_CHILD = 'NM0551');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STP_REFERENCE'
-       ,'STP_REFERENCE_JOB'
-       ,'Job Metadata'
+        'SWR_GAZ_ADMIN'
+       ,'SWR_GAZ_ADMIN_REF'
+       ,'Reference Data'
        ,'F'
-       ,4 FROM DUAL
+       ,30 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP_REFERENCE'
-                    AND  HSTF_CHILD = 'STP_REFERENCE_JOB');
+                   WHERE HSTF_PARENT = 'SWR_GAZ_ADMIN'
+                    AND  HSTF_CHILD = 'SWR_GAZ_ADMIN_REF');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87849,14 +92320,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'STP_REFERENCE_JOB'
-       ,'NM3020'
-       ,'Job Types'
+        'SWR_GAZ_REPORTS'
+       ,'SWR1550'
+       ,'SOI Gazetteer Data Report'
        ,'M'
-       ,1 FROM DUAL
+       ,10 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP_REFERENCE_JOB'
-                    AND  HSTF_CHILD = 'NM3020');
+                   WHERE HSTF_PARENT = 'SWR_GAZ_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1550');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87866,14 +92337,1374 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'STP_REFERENCE_JOB'
-       ,'NM3010'
-       ,'Job Operations'
+        'SWR_GAZ_REPORTS'
+       ,'SWR1551'
+       ,'Authority Gazetteer Data Report'
        ,'M'
-       ,1 FROM DUAL
+       ,20 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP_REFERENCE_JOB'
-                    AND  HSTF_CHILD = 'NM3010');
+                   WHERE HSTF_PARENT = 'SWR_GAZ_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1551');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP'
+       ,'SWR_INSP_ADMIN'
+       ,'Admin'
+       ,'F'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP'
+                    AND  HSTF_CHILD = 'SWR_INSP_ADMIN');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP'
+       ,'SWR_INSP_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP'
+                    AND  HSTF_CHILD = 'SWR_INSP_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_ADMIN'
+       ,'SWR1240'
+       ,'Maintain Annual Inspection Profiles'
+       ,'M'
+       ,60 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1240');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_ADMIN'
+       ,'SWR1250'
+       ,'Maintain Inspection Details'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1250');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_ADMIN'
+       ,'SWR1290'
+       ,'Schedule Inspections'
+       ,'M'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1290');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_ADMIN'
+       ,'SWR1517'
+       ,'Maintain Defect Inspection Schedule'
+       ,'M'
+       ,70 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1517');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_ADMIN'
+       ,'SWR1750'
+       ,'Inspections Sent / Received'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1750');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_ADMIN'
+       ,'SWR1760'
+       ,'View Inspections History'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1760');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_ADMIN'
+       ,'SWR1770'
+       ,'View Inspection Defects'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1770');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_ADMIN'
+       ,'SWR_INSP_ADMIN_REF'
+       ,'Reference Data'
+       ,'F'
+       ,80 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN'
+                    AND  HSTF_CHILD = 'SWR_INSP_ADMIN_REF');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_ADMIN_REF'
+       ,'SWR1514'
+       ,'Maintain Sample Inspection Category Items'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1514');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_ADMIN_REF'
+       ,'SWR1660'
+       ,'Maintain Inspection Categories'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1660');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_ADMIN_REF'
+       ,'SWR1670'
+       ,'Maintain Sample Inspection Categories'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1670');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_ADMIN_REF'
+       ,'SWR1680'
+       ,'Maintain Inspection Types'
+       ,'M'
+       ,60 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1680');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_ADMIN_REF'
+       ,'SWR1690'
+       ,'Maintain Inspection Outcomes'
+       ,'M'
+       ,70 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1690');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_ADMIN_REF'
+       ,'SWR1700'
+       ,'Maintain Defect Notice Messages'
+       ,'M'
+       ,80 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1700');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_ADMIN_REF'
+       ,'SWR1710'
+       ,'Maintain Inspection Item Status Codes'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1710');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_ADMIN_REF'
+       ,'SWR1720'
+       ,'Maintain Allowable Inspection Items'
+       ,'M'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1720');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_REPORTS'
+       ,'SWR1230'
+       ,'Generic Inspections Report'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1230');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_REPORTS'
+       ,'SWR1255'
+       ,'Annual Inspection Profiles'
+       ,'M'
+       ,80 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1255');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_REPORTS'
+       ,'SWR1256'
+       ,'Sample Inspection Quotas Report'
+       ,'M'
+       ,60 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1256');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_REPORTS'
+       ,'SWR1257'
+       ,'Inspection Performance'
+       ,'M'
+       ,70 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1257');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_REPORTS'
+       ,'SWR1259'
+       ,'Inspection Performance Hierarchy'
+       ,'M'
+       ,75 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1259');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_REPORTS'
+       ,'SWR1292'
+       ,'Works Inspection Report'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1292');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_REPORTS'
+       ,'SWR1294'
+       ,'Prospective Inspections Report'
+       ,'M'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1294');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_REPORTS'
+       ,'SWR1305'
+       ,'Inspection History'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1305');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_REPORTS'
+       ,'SWR1325'
+       ,'Sample Inspections Invoice Report'
+       ,'M'
+       ,90 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1325');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_INSP_REPORTS'
+       ,'SWR1326'
+       ,'Inspections Invoice'
+       ,'M'
+       ,100 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1326');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_ORGS'
+       ,'SWR_ORGS_ADMIN'
+       ,'Admin'
+       ,'F'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_ORGS'
+                    AND  HSTF_CHILD = 'SWR_ORGS_ADMIN');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_ORGS'
+       ,'SWR_ORG_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_ORGS'
+                    AND  HSTF_CHILD = 'SWR_ORG_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_ORGS_ADMIN'
+       ,'SWR1450'
+       ,'SWA Organisations'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_ORGS_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1450');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_ORGS_ADMIN'
+       ,'SWR1461'
+       ,'Maintain District Hierarchy'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_ORGS_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1461');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_ORGS_ADMIN'
+       ,'SWR1471'
+       ,'Contact List'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_ORGS_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1471');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_ORGS_ADMIN'
+       ,'SWR1480'
+       ,'Coordination Groups'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_ORGS_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1480');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_ORGS_ADMIN'
+       ,'SWR_ORGS_ADMIN_REF'
+       ,'Reference Data'
+       ,'F'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_ORGS_ADMIN'
+                    AND  HSTF_CHILD = 'SWR_ORGS_ADMIN_REF');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_ORGS_ADMIN_REF'
+       ,'SWR1490'
+       ,'Standard Text'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_ORGS_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1490');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_ORG_REPORTS'
+       ,'SWR1451'
+       ,'Organisation Data Report'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_ORG_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1451');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_REF'
+       ,'SWR_REF_ADMIN'
+       ,'Admin'
+       ,'F'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_REF'
+                    AND  HSTF_CHILD = 'SWR_REF_ADMIN');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_REF'
+       ,'SWR_REF_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_REF'
+                    AND  HSTF_CHILD = 'SWR_REF_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_REF_ADMIN'
+       ,'SWR1051'
+       ,'Maintain User Definitions'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_REF_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1051');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_REF_ADMIN'
+       ,'SWR1060'
+       ,'System Definitions'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_REF_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1060');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_REF_ADMIN'
+       ,'SWR1500'
+       ,'Reference Data'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_REF_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1500');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_REF_ADMIN'
+       ,'SWR1510'
+       ,'Maintain Interface Mappings'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_REF_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1510');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_REF_REPORTS'
+       ,'SWR1501'
+       ,'Reference Data Report'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_REF_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1501');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS'
+       ,'SWR_WORKS_ADMIN'
+       ,'Admin'
+       ,'F'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS'
+                    AND  HSTF_CHILD = 'SWR_WORKS_ADMIN');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS'
+       ,'SWR_WORKS_QUERY'
+       ,'Query'
+       ,'F'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS'
+                    AND  HSTF_CHILD = 'SWR_WORKS_QUERY');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS'
+       ,'SWR_WORKS_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS'
+                    AND  HSTF_CHILD = 'SWR_WORKS_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_ADMIN'
+       ,'SWR1120'
+       ,'Notices Sent/Received'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1120');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_ADMIN'
+       ,'SWR1180'
+       ,'Merge Unattributable Works'
+       ,'M'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1180');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_ADMIN'
+       ,'SWR1190'
+       ,'Maintain Works / Reinstatement Details'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1190');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_ADMIN'
+       ,'SWR1380'
+       ,'Non Works Activity'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1380');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_ADMIN'
+       ,'SWR1400'
+       ,'Allocate Provisional Works'
+       ,'M'
+       ,60 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1400');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_ADMIN'
+       ,'SWR1630'
+       ,'Maintain Section 74 Charges'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN'
+                    AND  HSTF_CHILD = 'SWR1630');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_ADMIN'
+       ,'SWR_WORKS_ADMIN_REF'
+       ,'Reference Data'
+       ,'F'
+       ,70 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN'
+                    AND  HSTF_CHILD = 'SWR_WORKS_ADMIN_REF');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_ADMIN_REF'
+       ,'SWR1401'
+       ,'Maintain Work Types'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1401');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_ADMIN_REF'
+       ,'SWR1403'
+       ,'Maintain Notice Types'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1403');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_ADMIN_REF'
+       ,'SWR1512'
+       ,'Maintain Works Rules'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1512');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_ADMIN_REF'
+       ,'SWR1513'
+       ,'Maintain Site Rules'
+       ,'M'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1513');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_ADMIN_REF'
+       ,'SWR1519'
+       ,'Maintain Notice Charges'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1519');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_ADMIN_REF'
+       ,'SWR1560'
+       ,'Maintain Allowable Site Updates'
+       ,'M'
+       ,60 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1560');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_ADMIN_REF'
+       ,'SWR1570'
+       ,'Maintain Works/Sites Combinations'
+       ,'M'
+       ,70 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1570');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_ADMIN_REF'
+       ,'SWR1640'
+       ,'Maintain Section 74 Charging Profile'
+       ,'M'
+       ,80 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN_REF'
+                    AND  HSTF_CHILD = 'SWR1640');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_QUERY'
+       ,'SWR1070'
+       ,'Query Works/Sites'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_QUERY'
+                    AND  HSTF_CHILD = 'SWR1070');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_QUERY'
+       ,'SWR1189'
+       ,'Query Works History'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_QUERY'
+                    AND  HSTF_CHILD = 'SWR1189');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_QUERY'
+       ,'SWR1390'
+       ,'View Non Works Activity'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_QUERY'
+                    AND  HSTF_CHILD = 'SWR1390');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_REPORTS'
+       ,'SWR1156'
+       ,'Works History'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1156');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_REPORTS'
+       ,'SWR1157'
+       ,'Works Due to Complete'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1157');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_REPORTS'
+       ,'SWR1158'
+       ,'Works Due a Section 74 Start'
+       ,'M'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1158');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_REPORTS'
+       ,'SWR1159'
+       ,'Works with a Section 74 Duration Challenge'
+       ,'M'
+       ,60 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1159');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_REPORTS'
+       ,'SWR1160'
+       ,'Closed Works without a S74 Closed Notice'
+       ,'M'
+       ,70 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1160');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_REPORTS'
+       ,'SWR1161'
+       ,'Works With S74 Charge'
+       ,'M'
+       ,80 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1161');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_REPORTS'
+       ,'SWR1193'
+       ,'Works Overdue'
+       ,'M'
+       ,35 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1193');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_REPORTS'
+       ,'SWR1195'
+       ,'Notice Analysis Report'
+       ,'M'
+       ,120 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1195');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_REPORTS'
+       ,'SWR1209'
+       ,'Expiring Reinstatement Guarantees'
+       ,'M'
+       ,100 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1209');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_REPORTS'
+       ,'SWR1210'
+       ,'Check Inspection Units'
+       ,'M'
+       ,110 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1210');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_REPORTS'
+       ,'SWR1212'
+       ,'Interim Reinstatements > 6 Months Old'
+       ,'M'
+       ,90 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1212');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_REPORTS'
+       ,'SWR1220'
+       ,'Print Works Details'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1220');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_REPORTS'
+       ,'SWR1225'
+       ,'Generic Works Report'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1225');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_REPORTS'
+       ,'SWR1328'
+       ,'Chargeable Notices Invoice'
+       ,'M'
+       ,130 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1328');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'SWR_WORKS_REPORTS'
+       ,'SWR1650'
+       ,'Section 74 Charges Invoice'
+       ,'M'
+       ,140 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'SWR1650');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -87934,23 +93765,6 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'FAVOURITES'
-       ,'HIG1808'
-       ,'Search'
-       ,'M'
-       ,50 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'HIG1808');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
         'TM_REFERENCE'
        ,'TM0001'
        ,'Traffic Manager Metadata Maintenance'
@@ -87968,2785 +93782,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'FAVOURITES'
-       ,'HIG1806'
-       ,'Fastpath'
-       ,'M'
-       ,51 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'HIG1806');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'FAVOURITES'
-       ,'HIG1833'
-       ,'Change Password'
-       ,'M'
-       ,52 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'HIG1833');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MRWA'
-       ,'MRWA_ROMAN'
-       ,'ROMAN Interface'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MRWA'
-                    AND  HSTF_CHILD = 'MRWA_ROMAN');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MRWA'
-       ,'MRWA_NETWORK_EXTRACTS'
-       ,'Network Extracts'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MRWA'
-                    AND  HSTF_CHILD = 'MRWA_NETWORK_EXTRACTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MRWA_ROMAN'
-       ,'PCUIS0010'
-       ,'File Import'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MRWA_ROMAN'
-                    AND  HSTF_CHILD = 'PCUIS0010');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MRWA_ROMAN'
-       ,'PCUIS0020'
-       ,'Network Integrity Check'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MRWA_ROMAN'
-                    AND  HSTF_CHILD = 'PCUIS0020');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MRWA_ROMAN'
-       ,'PCUIS0030'
-       ,'Inventory Replace and File Output'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MRWA_ROMAN'
-                    AND  HSTF_CHILD = 'PCUIS0030');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MRWA_NETWORK_EXTRACTS'
-       ,'CLASS0010'
-       ,'Classified Roads Extract'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MRWA_NETWORK_EXTRACTS'
-                    AND  HSTF_CHILD = 'CLASS0010');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ENQ'
-       ,'PEM_ENQ'
-       ,'Public Enquiries'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ENQ'
-                    AND  HSTF_CHILD = 'PEM_ENQ');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PEM_ENQ'
-       ,'PEM_ENQ_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PEM_ENQ'
-                    AND  HSTF_CHILD = 'PEM_ENQ_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ENQ'
-       ,'PEM_REF'
-       ,'Reference Data'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ENQ'
-                    AND  HSTF_CHILD = 'PEM_REF');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PEM_ENQ'
-       ,'DOC0150'
-       ,'Public Enquiries'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PEM_ENQ'
-                    AND  HSTF_CHILD = 'DOC0150');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PEM_ENQ_REPORTS'
-       ,'DOC0166'
-       ,'List of Enquiries'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PEM_ENQ_REPORTS'
-                    AND  HSTF_CHILD = 'DOC0166');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PEM_ENQ_REPORTS'
-       ,'DOC0160'
-       ,'Enquiry Details'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PEM_ENQ_REPORTS'
-                    AND  HSTF_CHILD = 'DOC0160');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PEM_ENQ_REPORTS'
-       ,'DOC0162'
-       ,'Enquiry Acknowledgements'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PEM_ENQ_REPORTS'
-                    AND  HSTF_CHILD = 'DOC0162');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PEM_ENQ_REPORTS'
-       ,'DOC0164'
-       ,'Summary of Enquiries by Status'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PEM_ENQ_REPORTS'
-                    AND  HSTF_CHILD = 'DOC0164');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PEM_ENQ_REPORTS'
-       ,'DOC0165'
-       ,'Summary of Complaints by Type'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PEM_ENQ_REPORTS'
-                    AND  HSTF_CHILD = 'DOC0165');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PEM_ENQ_REPORTS'
-       ,'DOC0205'
-       ,'Batch Complaint Printing'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PEM_ENQ_REPORTS'
-                    AND  HSTF_CHILD = 'DOC0205');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PEM_ENQ_REPORTS'
-       ,'DOC0167'
-       ,'Enquiry Actions'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PEM_ENQ_REPORTS'
-                    AND  HSTF_CHILD = 'DOC0167');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PEM_ENQ_REPORTS'
-       ,'DOC0168'
-       ,'Enquiry Damage'
+        'UKP'
+       ,'UKP0043'
+       ,'Road Condition Indicator Coverage'
        ,'M'
        ,8 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PEM_ENQ_REPORTS'
-                    AND  HSTF_CHILD = 'DOC0168');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PEM_REF'
-       ,'DOC0110'
-       ,'Document Types/Classes/Enquiry Types'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PEM_REF'
-                    AND  HSTF_CHILD = 'DOC0110');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PEM_REF'
-       ,'DOC0157'
-       ,'Enquiry Redirection'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PEM_REF'
-                    AND  HSTF_CHILD = 'DOC0157');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PEM_REF'
-       ,'DOC0132'
-       ,'Enquiry Priorities'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PEM_REF'
-                    AND  HSTF_CHILD = 'DOC0132');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PEM_REF'
-       ,'DOC0155'
-       ,'Standard Actions'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PEM_REF'
-                    AND  HSTF_CHILD = 'DOC0155');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PEM_REF'
-       ,'DOC0156'
-       ,'Standard Costs'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PEM_REF'
-                    AND  HSTF_CHILD = 'DOC0156');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PEM_REF'
-       ,'HIG1815'
-       ,'Contacts'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PEM_REF'
-                    AND  HSTF_CHILD = 'HIG1815');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG'
-       ,'HIG_SECURITY'
-       ,'Security'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG'
-                    AND  HSTF_CHILD = 'HIG_SECURITY');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG'
-       ,'HIG_REFERENCE'
-       ,'Reference Data'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG'
-                    AND  HSTF_CHILD = 'HIG_REFERENCE');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG'
-       ,'HIG_GRI'
-       ,'GRI Data'
-       ,'F'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG'
-                    AND  HSTF_CHILD = 'HIG_GRI');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG'
-       ,'HIG_GIS'
-       ,'GIS Data'
-       ,'F'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG'
-                    AND  HSTF_CHILD = 'HIG_GIS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG'
-       ,'HIG_CSV'
-       ,'CSV Loader'
-       ,'F'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG'
-                    AND  HSTF_CHILD = 'HIG_CSV');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_SECURITY'
-       ,'HIG1860'
-       ,'Admin Units'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_SECURITY'
-                    AND  HSTF_CHILD = 'HIG1860');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_SECURITY'
-       ,'HIG1832'
-       ,'Users'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_SECURITY'
-                    AND  HSTF_CHILD = 'HIG1832');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_SECURITY'
-       ,'HIG1836'
-       ,'Roles'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_SECURITY'
-                    AND  HSTF_CHILD = 'HIG1836');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_SECURITY'
-       ,'HIG1880'
-       ,'Modules'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_SECURITY'
-                    AND  HSTF_CHILD = 'HIG1880');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_SECURITY'
-       ,'HIG1890'
-       ,'Products'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_SECURITY'
-                    AND  HSTF_CHILD = 'HIG1890');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_SECURITY'
-       ,'HIG_SECURITY_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_SECURITY'
-                    AND  HSTF_CHILD = 'HIG_SECURITY_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_SECURITY_REPORTS'
-       ,'HIG1802'
-       ,'Menu Options for a User'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_SECURITY_REPORTS'
-                    AND  HSTF_CHILD = 'HIG1802');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_SECURITY_REPORTS'
-       ,'HIG1804'
-       ,'Menu Options for a Role'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_SECURITY_REPORTS'
-                    AND  HSTF_CHILD = 'HIG1804');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_SECURITY_REPORTS'
-       ,'HIG1864'
-       ,'Users Report'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_SECURITY_REPORTS'
-                    AND  HSTF_CHILD = 'HIG1864');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_SECURITY_REPORTS'
-       ,'HIG1862'
-       ,'Admin Units'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_SECURITY_REPORTS'
-                    AND  HSTF_CHILD = 'HIG1862');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_SECURITY_REPORTS'
-       ,'HIG1866'
-       ,'Users By Admin Unit'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_SECURITY_REPORTS'
-                    AND  HSTF_CHILD = 'HIG1866');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_SECURITY_REPORTS'
-       ,'HIG1868'
-       ,'User Roles'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_SECURITY_REPORTS'
-                    AND  HSTF_CHILD = 'HIG1868');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_SECURITY_REPORTS'
-       ,'HIG2100'
-       ,'Produce Database Healthcheck File'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_SECURITY_REPORTS'
-                    AND  HSTF_CHILD = 'HIG2100');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG9110'
-       ,'Status Codes'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG9110');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG9120'
-       ,'Domains'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG9120');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG9135'
-       ,'Product and User Option List'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG9135');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG9130'
-       ,'Product Options'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG9130');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG1837'
-       ,'User Option Administration'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG1837');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG1839'
-       ,'Module Keywords'
-       ,'M'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG1839');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG1881'
-       ,'Module Usages'
-       ,'M'
-       ,9 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG1881');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG1885'
-       ,'Maintain URL Modules'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG1885');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG5000'
-       ,'Maintain Entry Points'
-       ,'M'
-       ,11 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG5000');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG9170'
-       ,'Holidays'
-       ,'M'
-       ,12 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG9170');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG9180'
-       ,'v2 Errors'
-       ,'M'
-       ,13 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG9180');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG9185'
-       ,'v3 Errors'
-       ,'M'
-       ,14 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG9185');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG1220'
-       ,'Intervals'
-       ,'M'
-       ,15 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG1220');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG1820'
-       ,'Units and Conversions'
-       ,'M'
-       ,16 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG1820');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG_REFERENCE_MAIL'
-       ,'Mail'
-       ,'F'
-       ,18 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG_REFERENCE_MAIL');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG_REFERENCE_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,19 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG_REFERENCE_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE_MAIL'
-       ,'HIG1900'
-       ,'Mail Users'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE_MAIL'
-                    AND  HSTF_CHILD = 'HIG1900');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE_MAIL'
-       ,'HIG1901'
-       ,'Mail Groups'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE_MAIL'
-                    AND  HSTF_CHILD = 'HIG1901');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE_MAIL'
-       ,'HIGWEB1902'
-       ,'Mail'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE_MAIL'
-                    AND  HSTF_CHILD = 'HIGWEB1902');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE_REPORTS'
-       ,'HIG9125'
-       ,'List of Static Reference Data'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE_REPORTS'
-                    AND  HSTF_CHILD = 'HIG9125');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE_REPORTS'
-       ,'HIG9115'
-       ,'List of Status Codes'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE_REPORTS'
-                    AND  HSTF_CHILD = 'HIG9115');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_GRI'
-       ,'GRI0220'
-       ,'GRI Modules'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_GRI'
-                    AND  HSTF_CHILD = 'GRI0220');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_GRI'
-       ,'GRI0230'
-       ,'GRI Parameters'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_GRI'
-                    AND  HSTF_CHILD = 'GRI0230');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_GRI'
-       ,'GRI0240'
-       ,'GRI Module Parameters'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_GRI'
-                    AND  HSTF_CHILD = 'GRI0240');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_GRI'
-       ,'GRI0250'
-       ,'GRI Parameter Dependencies'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_GRI'
-                    AND  HSTF_CHILD = 'GRI0250');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_GRI'
-       ,'HIG1950'
-       ,'Discoverer API Definition'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_GRI'
-                    AND  HSTF_CHILD = 'HIG1950');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_GRI'
-       ,'HIG1850'
-       ,'Report Styles'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_GRI'
-                    AND  HSTF_CHILD = 'HIG1850');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_GIS'
-       ,'GIS0005'
-       ,'GIS Projects'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_GIS'
-                    AND  HSTF_CHILD = 'GIS0005');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_GIS'
-       ,'GIS0010'
-       ,'GIS Themes'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_GIS'
-                    AND  HSTF_CHILD = 'GIS0010');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_CSV'
-       ,'HIG2010'
-       ,'CSV Loader Destination Tables'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_CSV'
-                    AND  HSTF_CHILD = 'HIG2010');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_CSV'
-       ,'HIG2020'
-       ,'CSV Loader File Definitions Tables'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_CSV'
-                    AND  HSTF_CHILD = 'HIG2020');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_CSV'
-       ,'HIGWEB2030'
-       ,'CSV File Upload'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_CSV'
-                    AND  HSTF_CHILD = 'HIGWEB2030');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_LOADERS'
-       ,'MAI_GMIS_LOADERS'
-       ,'GMIS Interface'
-       ,'F'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_LOADERS'
-                    AND  HSTF_CHILD = 'MAI_GMIS_LOADERS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_GMIS_LOADERS'
-       ,'MAI2530'
-       ,'Create Route and Defect Files for GMIS Inspections'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_GMIS_LOADERS'
-                    AND  HSTF_CHILD = 'MAI2530');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_GMIS_LOADERS'
-       ,'MAIWEB2540'
-       ,'GMIS Survey File Loader'
-       ,'M'
-       ,11 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_GMIS_LOADERS'
-                    AND  HSTF_CHILD = 'MAIWEB2540');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_GMIS_LOADERS'
-       ,'MAI2550'
-       ,'Correct GMIS Load File Errors'
-       ,'M'
-       ,12 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_GMIS_LOADERS'
-                    AND  HSTF_CHILD = 'MAI2550');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'FAVOURITES'
-       ,'NSG'
-       ,'Street Gazetteer Manager'
-       ,'F'
-       ,14 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'NSG');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG'
-       ,'NSG_DATA'
-       ,'Data'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG'
-                    AND  HSTF_CHILD = 'NSG_DATA');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG'
-       ,'NSG_IMPORT_EXPORT'
-       ,'Import/Export'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG'
-                    AND  HSTF_CHILD = 'NSG_IMPORT_EXPORT');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_IMPORT_EXPORT'
-       ,'NSG0020'
-       ,'Export'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_IMPORT_EXPORT'
-                    AND  HSTF_CHILD = 'NSG0020');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM'
-       ,'CLM_INV'
-       ,'Inventory'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM'
-                    AND  HSTF_CHILD = 'CLM_INV');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM'
-       ,'CLM_FAULTS'
-       ,'Faults'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM'
-                    AND  HSTF_CHILD = 'CLM_FAULTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM'
-       ,'CLM_ENERGY'
-       ,'Energy'
-       ,'F'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM'
-                    AND  HSTF_CHILD = 'CLM_ENERGY');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM'
-       ,'CLM_SUPER'
-       ,'Super'
-       ,'F'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM'
-                    AND  HSTF_CHILD = 'CLM_SUPER');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM'
-       ,'CLM_WO'
-       ,'Works Order'
-       ,'F'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM'
-                    AND  HSTF_CHILD = 'CLM_WO');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM'
-       ,'CLM_INSP'
-       ,'Inspections'
-       ,'F'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM'
-                    AND  HSTF_CHILD = 'CLM_INSP');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_FAULTS_REP'
-       ,'CLM1052'
-       ,'Report and Status Change'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_FAULTS_REP'
-                    AND  HSTF_CHILD = 'CLM1052');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_FAULTS_REP'
-       ,'CLM1053'
-       ,'List Completed/Outstanding Faults'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_FAULTS_REP'
-                    AND  HSTF_CHILD = 'CLM1053');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_FAULTS_REP'
-       ,'CLM1054'
-       ,'Outstanding Fault Statistics'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_FAULTS_REP'
-                    AND  HSTF_CHILD = 'CLM1054');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_FAULTS_REP'
-       ,'CLM1057'
-       ,'Summary of Faults to Maintenance Contractor'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_FAULTS_REP'
-                    AND  HSTF_CHILD = 'CLM1057');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_FAULTS'
-       ,'CLM1058'
-       ,'Reset Faults'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_FAULTS'
-                    AND  HSTF_CHILD = 'CLM1058');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INV_REP'
-       ,'CLM1080'
-       ,'Inventory Report'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INV_REP'
-                    AND  HSTF_CHILD = 'CLM1080');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_ENERGY'
-       ,'CLM1090'
-       ,'Inventory Summary'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_ENERGY'
-                    AND  HSTF_CHILD = 'CLM1090');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_ENERGY_REPORTS'
-       ,'CLM1091'
-       ,'Inventory Summary Report'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_ENERGY_REPORTS'
-                    AND  HSTF_CHILD = 'CLM1091');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INV'
-       ,'CLM1100'
-       ,'Locate Units'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INV'
-                    AND  HSTF_CHILD = 'CLM1100');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INV_REP'
-       ,'CLM1110'
-       ,'Lamp Types Report'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INV_REP'
-                    AND  HSTF_CHILD = 'CLM1110');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INV_REP'
-       ,'CLM1120'
-       ,'Group Control Report'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INV_REP'
-                    AND  HSTF_CHILD = 'CLM1120');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INV'
-       ,'CLM1130'
-       ,'Contractor Modifications'
-       ,'M'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INV'
-                    AND  HSTF_CHILD = 'CLM1130');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_STREETS'
-       ,'CLM1132'
-       ,'Parishes'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_STREETS'
-                    AND  HSTF_CHILD = 'CLM1132');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_STATIC'
-       ,'CLM1140'
-       ,'Static Data'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_STATIC'
-                    AND  HSTF_CHILD = 'CLM1140');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_ENERGY_REPORTS'
-       ,'CLM1150'
-       ,'Energy Budget Recharge Report'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_ENERGY_REPORTS'
-                    AND  HSTF_CHILD = 'CLM1150');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_SUPER'
-       ,'CLM1170'
-       ,'Supervisor Unit Update'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_SUPER'
-                    AND  HSTF_CHILD = 'CLM1170');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INV'
-       ,'CLM1180'
-       ,'Unit Details'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INV'
-                    AND  HSTF_CHILD = 'CLM1180');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INV_REP'
-       ,'CLM1190'
-       ,'Scheme Details'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INV_REP'
-                    AND  HSTF_CHILD = 'CLM1190');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_REP'
-       ,'CLM1210'
-       ,'Valid Codes'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_REP'
-                    AND  HSTF_CHILD = 'CLM1210');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_STREETS'
-       ,'CLM1220'
-       ,'Street Gazetteer'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_STREETS'
-                    AND  HSTF_CHILD = 'CLM1220');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_STREETS'
-       ,'CLM1221'
-       ,'Street Routes'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_STREETS'
-                    AND  HSTF_CHILD = 'CLM1221');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_STREETS'
-       ,'CLM1222'
-       ,'Street Sensitivities'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_STREETS'
-                    AND  HSTF_CHILD = 'CLM1222');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_STREETS'
-       ,'CLM1230'
-       ,'Street Divisions'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_STREETS'
-                    AND  HSTF_CHILD = 'CLM1230');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_STREETS'
-       ,'CLM1240'
-       ,'Street Aliases'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_STREETS'
-                    AND  HSTF_CHILD = 'CLM1240');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_WO'
-       ,'CLM1260'
-       ,'Print Work Order Detail'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_WO'
-                    AND  HSTF_CHILD = 'CLM1260');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_WO'
-       ,'CLM1261'
-       ,'Work Order Lamp Summary'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_WO'
-                    AND  HSTF_CHILD = 'CLM1261');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_WO'
-       ,'CLM1265'
-       ,'Print Error Codes'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_WO'
-                    AND  HSTF_CHILD = 'CLM1265');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_WO'
-       ,'CLM1280'
-       ,'Maintenance Scheduler'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_WO'
-                    AND  HSTF_CHILD = 'CLM1280');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_WO'
-       ,'CLM1281'
-       ,'Work Orders'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_WO'
-                    AND  HSTF_CHILD = 'CLM1281');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_FAULTS'
-       ,'CLM1282'
-       ,'View Unit History'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_FAULTS'
-                    AND  HSTF_CHILD = 'CLM1282');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_CTR'
-       ,'CLM1300'
-       ,'Contract Sub Section'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_CTR'
-                    AND  HSTF_CHILD = 'CLM1300');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_CTR'
-       ,'CLM1330'
-       ,'Contract Items'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_CTR'
-                    AND  HSTF_CHILD = 'CLM1330');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_CTR'
-       ,'CLM1340'
-       ,'Contract Item Rates'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_CTR'
-                    AND  HSTF_CHILD = 'CLM1340');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_CTR'
-       ,'CLM1350'
-       ,'Repair Codes'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_CTR'
-                    AND  HSTF_CHILD = 'CLM1350');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_FAULTS'
-       ,'CLM1360'
-       ,'Fault Repairs'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_FAULTS'
-                    AND  HSTF_CHILD = 'CLM1360');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_CTR'
-       ,'CLM1370'
-       ,'Activity Codes'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_CTR'
-                    AND  HSTF_CHILD = 'CLM1370');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_CTR'
-       ,'CLM1385'
-       ,'Contract Priorities'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_CTR'
-                    AND  HSTF_CHILD = 'CLM1385');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_ORGS'
-       ,'CLM1500'
-       ,'Organisation Details'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_ORGS'
-                    AND  HSTF_CHILD = 'CLM1500');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_ORGS'
-       ,'CLM1505'
-       ,'Contractors'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_ORGS'
-                    AND  HSTF_CHILD = 'CLM1505');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_ORGS'
-       ,'CLM1510'
-       ,'Persons'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_ORGS'
-                    AND  HSTF_CHILD = 'CLM1510');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_ORGS'
-       ,'CLM1515'
-       ,'Contractor Users'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_ORGS'
-                    AND  HSTF_CHILD = 'CLM1515');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_ORGS'
-       ,'CLM1540'
-       ,'Unit Managers'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_ORGS'
-                    AND  HSTF_CHILD = 'CLM1540');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INV'
-       ,'CLM1592'
-       ,'Wayleave'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INV'
-                    AND  HSTF_CHILD = 'CLM1592');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_FIN'
-       ,'CLM1593'
-       ,'Financial Years'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_FIN'
-                    AND  HSTF_CHILD = 'CLM1593');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_FIN'
-       ,'CLM1594'
-       ,'Budgets'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_FIN'
-                    AND  HSTF_CHILD = 'CLM1594');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INV'
-       ,'CLM1597'
-       ,'Update Maintenance Contractor'
-       ,'M'
-       ,9 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INV'
-                    AND  HSTF_CHILD = 'CLM1597');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INV'
-       ,'CLM1201'
-       ,'View End Dated Units'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INV'
-                    AND  HSTF_CHILD = 'CLM1201');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INSP'
-       ,'CLM2010'
-       ,'Inspection Domains'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INSP'
-                    AND  HSTF_CHILD = 'CLM2010');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INSP'
-       ,'CLM2020'
-       ,'Inspectable Components'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INSP'
-                    AND  HSTF_CHILD = 'CLM2020');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INSP'
-       ,'CLM2030'
-       ,'Inspections'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INSP'
-                    AND  HSTF_CHILD = 'CLM2030');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_WO'
-       ,'CLM1262'
-       ,'Print Work Order Summary'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_WO'
-                    AND  HSTF_CHILD = 'CLM1262');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_WO'
-       ,'CLM1279'
-       ,'Maintainence Schedule Calendar'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_WO'
-                    AND  HSTF_CHILD = 'CLM1279');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_FIN'
-       ,'CLM1595'
-       ,'Budget Status Definitions'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_FIN'
-                    AND  HSTF_CHILD = 'CLM1595');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_FIN'
-       ,'CLM1598'
-       ,'Fault Committment Amounts'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_FIN'
-                    AND  HSTF_CHILD = 'CLM1598');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_FIN'
-       ,'CLM1599'
-       ,'Fault Budget Template Codes'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_FIN'
-                    AND  HSTF_CHILD = 'CLM1599');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_FIN'
-       ,'CLM1600'
-       ,'Payment Run'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_FIN'
-                    AND  HSTF_CHILD = 'CLM1600');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_FIN_REP'
-       ,'CLM1601'
-       ,'Budget Status Report'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_FIN_REP'
-                    AND  HSTF_CHILD = 'CLM1601');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_ENERGY_REPORTS'
-       ,'CLM1602'
-       ,'Invalid Energy Budget Codes Report'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_ENERGY_REPORTS'
-                    AND  HSTF_CHILD = 'CLM1602');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INV'
-       ,'CLM1603'
-       ,'Defect Report'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INV'
-                    AND  HSTF_CHILD = 'CLM1603');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_FAULTS'
-       ,'CLM1604'
-       ,'Inspection Fault Input'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_FAULTS'
-                    AND  HSTF_CHILD = 'CLM1604');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INV'
-       ,'CLM1605'
-       ,'Move Units Facility'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INV'
-                    AND  HSTF_CHILD = 'CLM1605');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_ENERGY'
-       ,'CLM2050'
-       ,'Energy Extract'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_ENERGY'
-                    AND  HSTF_CHILD = 'CLM2050');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INV'
-       ,'CLM_INV_REP'
-       ,'Inventory Reports'
-       ,'F'
-       ,11 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INV'
-                    AND  HSTF_CHILD = 'CLM_INV_REP');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_FAULTS'
-       ,'CLM_FAULTS_REP'
-       ,'Fault Reports'
-       ,'F'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_FAULTS'
-                    AND  HSTF_CHILD = 'CLM_FAULTS_REP');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_ENERGY'
-       ,'CLM_ENERGY_REPORTS'
-       ,'Energy Reports'
-       ,'F'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_ENERGY'
-                    AND  HSTF_CHILD = 'CLM_ENERGY_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF'
-       ,'CLM_REF_STREETS'
-       ,'Streets'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF'
-                    AND  HSTF_CHILD = 'CLM_REF_STREETS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF'
-       ,'CLM_REF_ORGS'
-       ,'Organisations'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF'
-                    AND  HSTF_CHILD = 'CLM_REF_ORGS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF'
-       ,'CLM_REF_FIN'
-       ,'Financial'
-       ,'F'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF'
-                    AND  HSTF_CHILD = 'CLM_REF_FIN');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF'
-       ,'CLM_REF_REP'
-       ,'Reference Reports'
-       ,'F'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF'
-                    AND  HSTF_CHILD = 'CLM_REF_REP');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF_FIN'
-       ,'CLM_REF_FIN_REP'
-       ,'Budget Reporting'
-       ,'F'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF_FIN'
-                    AND  HSTF_CHILD = 'CLM_REF_FIN_REP');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE_MAIL'
-       ,'HIG1903'
-       ,'Mail Message Administration'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE_MAIL'
-                    AND  HSTF_CHILD = 'HIG1903');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS_REPORTS'
-       ,'MAI3918'
-       ,'Works Orders (Enhanced Format)'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3918');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_REF'
-       ,'NM0700'
-       ,'Maintain AD Types'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_REF'
-                    AND  HSTF_CHILD = 'NM0700');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'FAVOURITES'
-       ,'UKP'
-       ,'UKPMS'
-       ,'F'
-       ,15 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'UKP');
+                   WHERE HSTF_PARENT = 'UKP'
+                    AND  HSTF_CHILD = 'UKP0043');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -90824,48 +93867,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'UKP_LOAD_DATA'
-       ,'UKP036'
-       ,'HMDIF TTS/SCANNER and Griptester'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_LOAD_DATA'
-                    AND  HSTF_CHILD = 'UKP036');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_REFERENCE_DATA'
-       ,'UKP0007'
-       ,'Maintain Treatment Composition'
-       ,'M'
-       ,12 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_REFERENCE_DATA'
-                    AND  HSTF_CHILD = 'UKP0007');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_LOAD_DATA'
-       ,'UKP030'
-       ,'UKPMS Inventory HMDIF Preprocessor'
+        'UKP_BUDGET_REPORTS'
+       ,'UKP0012'
+       ,'Detailed Analysis of Budget Heads'
        ,'M'
        ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_LOAD_DATA'
-                    AND  HSTF_CHILD = 'UKP030');
+                   WHERE HSTF_PARENT = 'UKP_BUDGET_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0012');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -90875,31 +93884,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'UKP_LOAD_DATA'
-       ,'UKP032'
-       ,'HMDIF Condition (CVI/DVI) and Rutting (CRUT/DRUT)'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_LOAD_DATA'
-                    AND  HSTF_CHILD = 'UKP032');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_LOAD_DATA'
-       ,'UKP031'
-       ,'UKPMS Deflectograph HMDIF Preprocessor'
+        'UKP_BUDGET_REPORTS'
+       ,'UKP0013'
+       ,'Summary Analysis of Budget Heads'
        ,'M'
        ,3 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_LOAD_DATA'
-                    AND  HSTF_CHILD = 'UKP031');
+                   WHERE HSTF_PARENT = 'UKP_BUDGET_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0013');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -90909,14 +93901,116 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'UKP_LOAD_DATA'
-       ,'UKP034'
-       ,'UKPMS SCRIM/HRM HMDIF Preprocessor'
+        'UKP_BUDGET_REPORTS'
+       ,'UKP0014'
+       ,'Detailed Analysis of Budget Sections'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_BUDGET_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0014');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_BVPI_REPORTS'
+       ,'UKP0016'
+       ,'BVPI96 Principal Roads Condition (CVI/DVI)'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_BVPI_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0016');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_BVPI_REPORTS'
+       ,'UKP0017'
+       ,'BVPI224b/97b Non-Principal Road Condition(CVI/DVI)'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_BVPI_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0017');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_BVPI_REPORTS'
+       ,'UKP0018'
+       ,'BVPI187 Footway Performance Indicator Report'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_BVPI_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0018');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_BVPI_REPORTS'
+       ,'UKP0019'
+       ,'BVPI96 Principal Roads Condition (TTS)'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_BVPI_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0019');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_BVPI_REPORTS'
+       ,'UKP0040'
+       ,'BVPI223 Principal Roads Condition (Scanner RCI)'
        ,'M'
        ,4 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_LOAD_DATA'
-                    AND  HSTF_CHILD = 'UKP034');
+                   WHERE HSTF_PARENT = 'UKP_BVPI_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0040');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_BVPI_REPORTS'
+       ,'UKP0041'
+       ,'BVPI224a Non-Principal Road Condition(Scanner RCI)'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_BVPI_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0041');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -90994,14 +94088,116 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'UKP_MAINTAIN_DATA'
-       ,'MAI2310'
-       ,'Inventory'
+        'UKP_LOAD_DATA'
+       ,'UKP0027'
+       ,'Weighting Set Maintenance'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_LOAD_DATA'
+                    AND  HSTF_CHILD = 'UKP0027');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_LOAD_DATA'
+       ,'UKP030'
+       ,'UKPMS Inventory HMDIF Preprocessor'
        ,'M'
        ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_LOAD_DATA'
+                    AND  HSTF_CHILD = 'UKP030');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_LOAD_DATA'
+       ,'UKP031'
+       ,'UKPMS Deflectograph HMDIF Preprocessor'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_LOAD_DATA'
+                    AND  HSTF_CHILD = 'UKP031');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_LOAD_DATA'
+       ,'UKP032'
+       ,'HMDIF Condition (CVI/DVI) and Rutting (CRUT/DRUT)'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_LOAD_DATA'
+                    AND  HSTF_CHILD = 'UKP032');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_LOAD_DATA'
+       ,'UKP034'
+       ,'UKPMS SCRIM/HRM HMDIF Preprocessor'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_LOAD_DATA'
+                    AND  HSTF_CHILD = 'UKP034');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_LOAD_DATA'
+       ,'UKP036'
+       ,'HMDIF TTS/SCANNER and Griptester'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_LOAD_DATA'
+                    AND  HSTF_CHILD = 'UKP036');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_MAINTAIN_DATA'
+       ,'MAI2130'
+       ,'Delete Global Inventory'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'UKP_MAINTAIN_DATA'
-                    AND  HSTF_CHILD = 'MAI2310');
+                    AND  HSTF_CHILD = 'MAI2130');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -91029,13 +94225,47 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'UKP_MAINTAIN_DATA'
-       ,'MAI2130'
-       ,'Delete Global Inventory'
+       ,'MAI2310'
+       ,'Inventory'
        ,'M'
-       ,4 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'UKP_MAINTAIN_DATA'
-                    AND  HSTF_CHILD = 'MAI2130');
+                    AND  HSTF_CHILD = 'MAI2310');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_MAINTAIN_DATA'
+       ,'MAI2310A'
+       ,'Condition Data'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_MAINTAIN_DATA'
+                    AND  HSTF_CHILD = 'MAI2310A');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_MAINTAIN_DATA'
+       ,'NET1119'
+       ,'Network Selection'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_MAINTAIN_DATA'
+                    AND  HSTF_CHILD = 'NET1119');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -91097,6 +94327,23 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'UKP_PROCESS_DATA'
+       ,'UKP0026'
+       ,'Road Condition Indicator'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_PROCESS_DATA'
+                    AND  HSTF_CHILD = 'UKP0026');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_PROCESS_DATA'
        ,'UKP_PROC_REPORTS'
        ,'Reports'
        ,'F'
@@ -91113,31 +94360,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'UKP_UTILITIES_REPORTS'
-       ,'UKP0011'
-       ,'Condition Indices Report'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_UTILITIES_REPORTS'
-                    AND  HSTF_CHILD = 'UKP0011');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_BVPI_REPORTS'
-       ,'UKP0016'
-       ,'BVPI96 Principal Roads Condition (CVI/DVI)'
-       ,'M'
+        'UKP_PROC_REPORTS'
+       ,'UKP_BUDGET_REPORTS'
+       ,'Budget Reports'
+       ,'F'
        ,2 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_BVPI_REPORTS'
-                    AND  HSTF_CHILD = 'UKP0016');
+                   WHERE HSTF_PARENT = 'UKP_PROC_REPORTS'
+                    AND  HSTF_CHILD = 'UKP_BUDGET_REPORTS');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -91147,65 +94377,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'UKP_BVPI_REPORTS'
-       ,'UKP0017'
-       ,'BVPI224b/97b Non-Principal Road Condition(CVI/DVI)'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_BVPI_REPORTS'
-                    AND  HSTF_CHILD = 'UKP0017');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_BVPI_REPORTS'
-       ,'UKP0018'
-       ,'BVPI187 Footway Performance Indicator Report'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_BVPI_REPORTS'
-                    AND  HSTF_CHILD = 'UKP0018');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_UTILITIES_REPORTS'
-       ,'UKP0015'
-       ,'Defect Lengths Report'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_UTILITIES_REPORTS'
-                    AND  HSTF_CHILD = 'UKP0015');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_BUDGET_REPORTS'
-       ,'UKP0012'
-       ,'Detailed Analysis of Budget Heads'
-       ,'M'
+        'UKP_PROC_REPORTS'
+       ,'UKP_BVPI_REPORTS'
+       ,'BVPI Reports'
+       ,'F'
        ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_BUDGET_REPORTS'
-                    AND  HSTF_CHILD = 'UKP0012');
+                   WHERE HSTF_PARENT = 'UKP_PROC_REPORTS'
+                    AND  HSTF_CHILD = 'UKP_BVPI_REPORTS');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -91215,48 +94394,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'UKP_BUDGET_REPORTS'
-       ,'UKP0013'
-       ,'Summary Analysis of Budget Heads'
-       ,'M'
+        'UKP_PROC_REPORTS'
+       ,'UKP_UTILITIES_REPORTS'
+       ,'Utilities'
+       ,'F'
        ,3 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_BUDGET_REPORTS'
-                    AND  HSTF_CHILD = 'UKP0013');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_BUDGET_REPORTS'
-       ,'UKP0014'
-       ,'Detailed Analysis of Budget Sections'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_BUDGET_REPORTS'
-                    AND  HSTF_CHILD = 'UKP0014');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_UTILITIES_REPORTS'
-       ,'UKP0095'
-       ,'Unsurveyed Network'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_UTILITIES_REPORTS'
-                    AND  HSTF_CHILD = 'UKP0095');
+                   WHERE HSTF_PARENT = 'UKP_PROC_REPORTS'
+                    AND  HSTF_CHILD = 'UKP_UTILITIES_REPORTS');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -91284,23 +94429,6 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'UKP_REFERENCE_DATA'
-       ,'MAI1920'
-       ,'Inventory XSPs'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_REFERENCE_DATA'
-                    AND  HSTF_CHILD = 'MAI1920');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_REFERENCE_DATA'
        ,'MAI1910'
        ,'XSP Values'
        ,'M'
@@ -91318,13 +94446,30 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'UKP_REFERENCE_DATA'
-       ,'UKP0009'
-       ,'RMMS XSP Mapping To UKPMS XSP'
+       ,'MAI1920'
+       ,'Inventory XSPs'
        ,'M'
-       ,6 FROM DUAL
+       ,4 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'UKP_REFERENCE_DATA'
-                    AND  HSTF_CHILD = 'UKP0009');
+                    AND  HSTF_CHILD = 'MAI1920');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_REFERENCE_DATA'
+       ,'UKP0002'
+       ,'Maintain Treatment Composition/SISS'
+       ,'M'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_REFERENCE_DATA'
+                    AND  HSTF_CHILD = 'UKP0002');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -91352,13 +94497,30 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'UKP_REFERENCE_DATA'
-       ,'UKP0002'
-       ,'Maintain Treatment Composition/SISS'
+       ,'UKP0007'
+       ,'Maintain Treatment Composition'
        ,'M'
-       ,8 FROM DUAL
+       ,12 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'UKP_REFERENCE_DATA'
-                    AND  HSTF_CHILD = 'UKP0002');
+                    AND  HSTF_CHILD = 'UKP0007');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_REFERENCE_DATA'
+       ,'UKP0009'
+       ,'RMMS XSP Mapping To UKPMS XSP'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_REFERENCE_DATA'
+                    AND  HSTF_CHILD = 'UKP0009');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -91436,99 +94598,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'UKP_BVPI_REPORTS'
-       ,'UKP0019'
-       ,'BVPI96 Principal Roads Condition (TTS)'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_BVPI_REPORTS'
-                    AND  HSTF_CHILD = 'UKP0019');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE'
-       ,'MAI3630'
-       ,'Budget Allocations'
-       ,'M'
-       ,11 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
-                    AND  HSTF_CHILD = 'MAI3630');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE'
-       ,'MAI3632'
-       ,'Asset Activities'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
-                    AND  HSTF_CHILD = 'MAI3632');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE_MAIL'
-       ,'HIG1910'
-       ,'POP3 Mail Server Definition'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE_MAIL'
-                    AND  HSTF_CHILD = 'HIG1910');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE_MAIL'
-       ,'HIG1911'
-       ,'POP3 Mail Message View'
-       ,'M'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE_MAIL'
-                    AND  HSTF_CHILD = 'HIG1911');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE_MAIL'
-       ,'HIG1912'
-       ,'POP3 Mail Processing Rules'
+        'UKP_UTILITIES_REPORTS'
+       ,'UKP0011'
+       ,'Condition Indices Report'
        ,'M'
        ,7 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE_MAIL'
-                    AND  HSTF_CHILD = 'HIG1912');
+                   WHERE HSTF_PARENT = 'UKP_UTILITIES_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0011');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -91538,65 +94615,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'FAVOURITES'
-       ,'AST'
-       ,'Asset Manager'
-       ,'F'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'AST');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_NET_MANAGEMENT'
-       ,'NET_NET_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_NET_MANAGEMENT'
-                    AND  HSTF_CHILD = 'NET_NET_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_NET_REPORTS'
-       ,'NM0150'
-       ,'Network Nodes Report'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_NET_REPORTS'
-                    AND  HSTF_CHILD = 'NM0150');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_NET_REPORTS'
-       ,'NM0151'
-       ,'Node Usage Report'
+        'UKP_UTILITIES_REPORTS'
+       ,'UKP0015'
+       ,'Defect Lengths Report'
        ,'M'
        ,2 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_NET_REPORTS'
-                    AND  HSTF_CHILD = 'NM0151');
+                   WHERE HSTF_PARENT = 'UKP_UTILITIES_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0015');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -91606,167 +94632,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'NET_NET_REPORTS'
-       ,'NM0153'
-       ,'Group of Sections Membership Report'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_NET_REPORTS'
-                    AND  HSTF_CHILD = 'NM0153');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_NET_REPORTS'
-       ,'NM0154'
-       ,'Route Log Report'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_NET_REPORTS'
-                    AND  HSTF_CHILD = 'NM0154');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_NET_REPORTS'
-       ,'NM0155'
-       ,'Group Hierarchy Report'
+        'UKP_UTILITIES_REPORTS'
+       ,'UKP0024'
+       ,'Automatic Pass Section Details'
        ,'M'
        ,5 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_NET_REPORTS'
-                    AND  HSTF_CHILD = 'NM0155');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA_ADMIN'
-       ,'NSG0015'
-       ,'Reset Street Coordinates'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA_ADMIN'
-                    AND  HSTF_CHILD = 'NSG0015');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_PROCESS_DATA'
-       ,'UKP0026'
-       ,'Road Condition Indicator'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_PROCESS_DATA'
-                    AND  HSTF_CHILD = 'UKP0026');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_PROC_REPORTS'
-       ,'UKP_BVPI_REPORTS'
-       ,'BVPI Reports'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_PROC_REPORTS'
-                    AND  HSTF_CHILD = 'UKP_BVPI_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_PROC_REPORTS'
-       ,'UKP_BUDGET_REPORTS'
-       ,'Budget Reports'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_PROC_REPORTS'
-                    AND  HSTF_CHILD = 'UKP_BUDGET_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_PROC_REPORTS'
-       ,'UKP_UTILITIES_REPORTS'
-       ,'Utilities'
-       ,'F'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_PROC_REPORTS'
-                    AND  HSTF_CHILD = 'UKP_UTILITIES_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_BVPI_REPORTS'
-       ,'UKP0040'
-       ,'BVPI223 Principal Roads Condition (Scanner RCI)'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_BVPI_REPORTS'
-                    AND  HSTF_CHILD = 'UKP0040');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_BVPI_REPORTS'
-       ,'UKP0041'
-       ,'BVPI224a Non-Principal Road Condition(Scanner RCI)'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_BVPI_REPORTS'
-                    AND  HSTF_CHILD = 'UKP0041');
+                   WHERE HSTF_PARENT = 'UKP_UTILITIES_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0024');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -91794,23 +94667,6 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'UKP_UTILITIES_REPORTS'
-       ,'UKP0029'
-       ,'Invalid Survey Data Report'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_UTILITIES_REPORTS'
-                    AND  HSTF_CHILD = 'UKP0029');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_UTILITIES_REPORTS'
        ,'UKP0028'
        ,'Road Condition Indicator Report'
        ,'M'
@@ -91828,13 +94684,13 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'UKP_UTILITIES_REPORTS'
-       ,'UKP0024'
-       ,'Automatic Pass Section Details'
+       ,'UKP0029'
+       ,'Invalid Survey Data Report'
        ,'M'
-       ,5 FROM DUAL
+       ,3 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'UKP_UTILITIES_REPORTS'
-                    AND  HSTF_CHILD = 'UKP0024');
+                    AND  HSTF_CHILD = 'UKP0029');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -91844,2819 +94700,14 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
-        'UKP_MAINTAIN_DATA'
-       ,'NET1119'
-       ,'Network Selection'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_MAINTAIN_DATA'
-                    AND  HSTF_CHILD = 'NET1119');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'FAVOURITES'
-       ,'STP'
-       ,'Schemes'
-       ,'F'
-       ,11 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'STP');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STP'
-       ,'STP_ROAD'
-       ,'Schemes'
-       ,'F'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP'
-                    AND  HSTF_CHILD = 'STP_ROAD');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STP_ROAD'
-       ,'STP4400'
-       ,'Maintain Schemes'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP_ROAD'
-                    AND  HSTF_CHILD = 'STP4400');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STP_ROAD'
-       ,'STP4401'
-       ,'Scheme Priorities'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP_ROAD'
-                    AND  HSTF_CHILD = 'STP4401');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STP'
-       ,'STP_RCON'
-       ,'Road Construction'
-       ,'F'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP'
-                    AND  HSTF_CHILD = 'STP_RCON');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STP_RCON'
-       ,'STP1000'
-       ,'Road Construction Data'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP_RCON'
-                    AND  HSTF_CHILD = 'STP1000');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STP'
-       ,'STP_REFERENCE'
-       ,'Reference Data'
-       ,'F'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP'
-                    AND  HSTF_CHILD = 'STP_REFERENCE');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA_ADMIN'
-       ,'NSG0025'
-       ,'Generate ASD Placements'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA_ADMIN'
-                    AND  HSTF_CHILD = 'NSG0025');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_GIS'
-       ,'GIS0020'
-       ,'GIS Layer Tool'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_GIS'
-                    AND  HSTF_CHILD = 'GIS0020');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_INVENTORY'
-       ,'NM0575'
-       ,'Delete Global Assets'
-       ,'M'
-       ,70 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_INVENTORY'
-                    AND  HSTF_CHILD = 'NM0575');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_REPORTS'
-       ,'SWR1193'
-       ,'Works Overdue'
-       ,'M'
-       ,35 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1193');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_LOAD_DATA'
-       ,'UKP0027'
-       ,'Weighting Set Maintenance'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_LOAD_DATA'
-                    AND  HSTF_CHILD = 'UKP0027');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_REPORTS'
-       ,'SWR1259'
-       ,'Inspection Performance Hierarchy'
-       ,'M'
-       ,75 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1259');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP'
-       ,'UKP0043'
-       ,'Road Condition Indicator Coverage'
-       ,'M'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP'
-                    AND  HSTF_CHILD = 'UKP0043');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_MAINTENANCE'
-       ,'MAI0132'
-       ,'Work Order Priorities'
-       ,'M'
-       ,12 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_MAINTENANCE'
-                    AND  HSTF_CHILD = 'MAI0132');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'FAVOURITES'
-       ,'PROW'
-       ,'Public Rights Of Way Manager'
-       ,'F'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'PROW');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW'
-       ,'PROW_OPERATIONS'
-       ,'Operations'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW'
-                    AND  HSTF_CHILD = 'PROW_OPERATIONS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP'
-       ,'MAI3808'
-       ,'Inspections'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP'
-                    AND  HSTF_CHILD = 'MAI3808');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW'
-       ,'PROW_DEFINITIVE'
-       ,'Definitive Map'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW'
-                    AND  HSTF_CHILD = 'PROW_DEFINITIVE');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW'
-       ,'PROW_REFERENCE'
-       ,'Reference Data'
-       ,'F'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW'
-                    AND  HSTF_CHILD = 'PROW_REFERENCE');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'PROW_OPERATIONS'
-       ,'PROW6000'
-       ,'Worktray'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'PROW_OPERATIONS'
-                    AND  HSTF_CHILD = 'PROW6000');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP'
-       ,'MAI3899'
-       ,'Inspections by Group'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP'
-                    AND  HSTF_CHILD = 'MAI3899');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP'
-       ,'MAI3806'
-       ,'Defects'
-       ,'M'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP'
-                    AND  HSTF_CHILD = 'MAI3806');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP'
-       ,'MAI3810'
-       ,'View Defects'
-       ,'M'
-       ,40 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP'
-                    AND  HSTF_CHILD = 'MAI3810');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP'
-       ,'MAI3816'
-       ,'Responses to Notices'
-       ,'M'
-       ,60 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP'
-                    AND  HSTF_CHILD = 'MAI3816');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP'
-       ,'MAI2730'
-       ,'Match Duplicate Defects'
-       ,'M'
-       ,70 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP'
-                    AND  HSTF_CHILD = 'MAI2730');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP'
-       ,'MAI2760'
-       ,'Unmatch Duplicate Defects'
-       ,'M'
-       ,80 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP'
-                    AND  HSTF_CHILD = 'MAI2760');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP'
-       ,'MAI2470'
-       ,'Delete Inspections'
-       ,'M'
-       ,90 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP'
-                    AND  HSTF_CHILD = 'MAI2470');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP'
-       ,'MAI2775'
-       ,'Batch Setting of Repair Dates'
-       ,'M'
-       ,100 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP'
-                    AND  HSTF_CHILD = 'MAI2775');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP'
-       ,'MAI_INSP_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,110 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP'
-                    AND  HSTF_CHILD = 'MAI_INSP_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS'
-       ,'MAI3800'
-       ,'Works Orders (Defects)'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS'
-                    AND  HSTF_CHILD = 'MAI3800');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS'
-       ,'MAI3800A'
-       ,'Works Orders (Cyclic)'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS'
-                    AND  HSTF_CHILD = 'MAI3800A');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS'
-       ,'MAI3802'
-       ,'Maintain Work Orders - Contractor Interface'
-       ,'M'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS'
-                    AND  HSTF_CHILD = 'MAI3802');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS'
-       ,'MAI3805'
-       ,'Gang/Crew Allocation'
-       ,'M'
-       ,50 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS'
-                    AND  HSTF_CHILD = 'MAI3805');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS'
-       ,'MAI3848'
-       ,'Work Orders Authorisation'
-       ,'M'
-       ,60 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS'
-                    AND  HSTF_CHILD = 'MAI3848');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS'
-       ,'MAI3804'
-       ,'View Cyclic Maintenance Work'
-       ,'M'
-       ,70 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS'
-                    AND  HSTF_CHILD = 'MAI3804');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS'
-       ,'MAI3860'
-       ,'Cyclic Maintenance Schedules'
-       ,'M'
-       ,80 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS'
-                    AND  HSTF_CHILD = 'MAI3860');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS'
-       ,'MAI3862'
-       ,'Cyclic Maintenance Schedules by Road Section'
-       ,'M'
-       ,90 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS'
-                    AND  HSTF_CHILD = 'MAI3862');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS'
-       ,'MAI3825'
-       ,'Maintenance Report'
-       ,'M'
-       ,100 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS'
-                    AND  HSTF_CHILD = 'MAI3825');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS'
-       ,'MAI3610'
-       ,'Cancel Work Orders'
-       ,'M'
-       ,110 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS'
-                    AND  HSTF_CHILD = 'MAI3610');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS'
-       ,'MAI3820'
-       ,'Quality Inspection Results'
-       ,'M'
-       ,120 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS'
-                    AND  HSTF_CHILD = 'MAI3820');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS'
-       ,'MAI1280'
-       ,'External Activities'
-       ,'M'
-       ,130 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS'
-                    AND  HSTF_CHILD = 'MAI1280');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_WORKS'
-       ,'MAI_WORKS_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,140 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_WORKS'
-                    AND  HSTF_CHILD = 'MAI_WORKS_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA'
-       ,'NSG0010'
-       ,'NSG Gazetteer'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA'
-                    AND  HSTF_CHILD = 'NSG0010');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA'
-       ,'NSG0060'
-       ,'Locations'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA'
-                    AND  HSTF_CHILD = 'NSG0060');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA'
-       ,'NSG0070'
-       ,'Highways Authorities'
-       ,'M'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA'
-                    AND  HSTF_CHILD = 'NSG0070');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA'
-       ,'NSG0080'
-       ,'Naming Authorities'
-       ,'M'
-       ,40 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA'
-                    AND  HSTF_CHILD = 'NSG0080');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA'
-       ,'NSG_DATA_ADMIN'
-       ,'Administration'
-       ,'F'
-       ,50 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA'
-                    AND  HSTF_CHILD = 'NSG_DATA_ADMIN');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ROOT'
-       ,'FAVOURITES'
-       ,'Launchpad'
-       ,'F'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ROOT'
-                    AND  HSTF_CHILD = 'FAVOURITES');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'FAVOURITES'
-       ,'MRWA'
-       ,'MRWA Specifics'
-       ,'F'
-       ,6 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'MRWA');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'FAVOURITES'
-       ,'ACC'
-       ,'Accidents Manager'
-       ,'F'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'ACC');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'FAVOURITES'
-       ,'DOC'
-       ,'Document Manager'
-       ,'F'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'DOC');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'FAVOURITES'
-       ,'HIG'
-       ,'exor'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'HIG');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_COORD_REPORTS'
-       ,'SWR1198'
-       ,'Conflicting Works'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_COORD_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1198');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_GAZ_ADMIN'
-       ,'SWR1530'
-       ,'Streets of Interest'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_GAZ_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1530');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_GAZ_REPORTS'
-       ,'SWR1550'
-       ,'SOI Gazetteer Data Report'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_GAZ_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1550');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_GAZ_REPORTS'
-       ,'SWR1551'
-       ,'Authority Gazetteer Data Report'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_GAZ_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1551');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_BATCH_ADMIN'
-       ,'SWR1600'
-       ,'Upload/Download Utility'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_BATCH_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1600');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_BATCH_ADMIN'
-       ,'SWR1601'
-       ,'Automatic Upload/Download Utility'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_BATCH_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1601');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_BATCH_ADMIN_REF'
-       ,'SWR1602'
-       ,'Maintain Automatic Batch Processes'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_BATCH_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1602');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_BATCH_ADMIN_REF'
-       ,'SWR1603'
-       ,'Maintain Automatic Batch Rules'
-       ,'M'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_BATCH_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1603');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_BATCH_ADMIN_REF'
-       ,'SWR1604'
-       ,'Maintain Automatic Batch Operations'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_BATCH_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1604');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_BATCH_ADMIN'
-       ,'SWR1605'
-       ,'Monitor Batch File Status'
-       ,'M'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_BATCH_ADMIN'
-                    AND  HSTF_CHILD = 'SWR1605');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_ADMIN_REF'
-       ,'SWR1519'
-       ,'Maintain Notice Charges'
-       ,'M'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1519');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP'
-       ,'SWR_INSP_ADMIN'
-       ,'Admin'
-       ,'F'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP'
-                    AND  HSTF_CHILD = 'SWR_INSP_ADMIN');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS'
-       ,'SWR_WORKS_ADMIN'
-       ,'Admin'
-       ,'F'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS'
-                    AND  HSTF_CHILD = 'SWR_WORKS_ADMIN');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS'
-       ,'SWR_WORKS_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS'
-                    AND  HSTF_CHILD = 'SWR_WORKS_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP'
-       ,'SWR_INSP_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP'
-                    AND  HSTF_CHILD = 'SWR_INSP_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_COORD'
-       ,'SWR_COORD_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_COORD'
-                    AND  HSTF_CHILD = 'SWR_COORD_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR'
-       ,'SWR_REF'
-       ,'Reference Data'
-       ,'F'
-       ,80 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR'
-                    AND  HSTF_CHILD = 'SWR_REF');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_REF'
-       ,'SWR_REF_ADMIN'
-       ,'Admin'
-       ,'F'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_REF'
-                    AND  HSTF_CHILD = 'SWR_REF_ADMIN');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_ADMIN'
-       ,'SWR_WORKS_ADMIN_REF'
-       ,'Reference Data'
-       ,'F'
-       ,70 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN'
-                    AND  HSTF_CHILD = 'SWR_WORKS_ADMIN_REF');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_ADMIN'
-       ,'SWR_INSP_ADMIN_REF'
-       ,'Reference Data'
-       ,'F'
-       ,80 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN'
-                    AND  HSTF_CHILD = 'SWR_INSP_ADMIN_REF');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_GAZ_ADMIN'
-       ,'SWR_GAZ_ADMIN_REF'
-       ,'Reference Data'
-       ,'F'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_GAZ_ADMIN'
-                    AND  HSTF_CHILD = 'SWR_GAZ_ADMIN_REF');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_BATCH'
-       ,'SWR_BATCH_ADMIN'
-       ,'Admin'
-       ,'F'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_BATCH'
-                    AND  HSTF_CHILD = 'SWR_BATCH_ADMIN');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_BATCH_ADMIN'
-       ,'SWR_BATCH_ADMIN_REF'
-       ,'Reference Data'
-       ,'F'
-       ,40 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_BATCH_ADMIN'
-                    AND  HSTF_CHILD = 'SWR_BATCH_ADMIN_REF');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_BATCH'
-       ,'SWR_BATCH_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_BATCH'
-                    AND  HSTF_CHILD = 'SWR_BATCH_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_ORGS_ADMIN'
-       ,'SWR_ORGS_ADMIN_REF'
-       ,'Reference Data'
-       ,'F'
-       ,50 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_ORGS_ADMIN'
-                    AND  HSTF_CHILD = 'SWR_ORGS_ADMIN_REF');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_REF'
-       ,'SWR_REF_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_REF'
-                    AND  HSTF_CHILD = 'SWR_REF_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_REPORTS'
-       ,'SWR1160'
-       ,'Closed Works without a S74 Closed Notice'
-       ,'M'
-       ,70 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1160');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_REPORTS'
-       ,'SWR1161'
-       ,'Works With S74 Charge'
-       ,'M'
-       ,80 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1161');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_REPORTS'
-       ,'SWR1210'
-       ,'Check Inspection Units'
-       ,'M'
-       ,110 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1210');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR'
-       ,'SWR_ORGS'
-       ,'Organisations'
-       ,'F'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR'
-                    AND  HSTF_CHILD = 'SWR_ORGS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_ORGS'
-       ,'SWR_ORG_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_ORGS'
-                    AND  HSTF_CHILD = 'SWR_ORG_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS'
-       ,'SWR_WORKS_QUERY'
-       ,'Query'
-       ,'F'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS'
-                    AND  HSTF_CHILD = 'SWR_WORKS_QUERY');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR'
-       ,'SWR_WORKS'
-       ,'Works'
-       ,'F'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR'
-                    AND  HSTF_CHILD = 'SWR_WORKS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR'
-       ,'SWR_COMMENTS'
-       ,'Comments'
-       ,'F'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR'
-                    AND  HSTF_CHILD = 'SWR_COMMENTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR'
-       ,'SWR_INSP'
-       ,'Inspections'
-       ,'F'
-       ,40 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR'
-                    AND  HSTF_CHILD = 'SWR_INSP');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR'
-       ,'SWR_GAZ'
-       ,'Gazetteer'
-       ,'F'
-       ,50 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR'
-                    AND  HSTF_CHILD = 'SWR_GAZ');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR'
-       ,'SWR_COORD'
-       ,'Co-ordination'
-       ,'F'
-       ,60 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR'
-                    AND  HSTF_CHILD = 'SWR_COORD');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR'
-       ,'SWR_BATCH'
-       ,'Batch Processing'
-       ,'F'
-       ,70 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR'
-                    AND  HSTF_CHILD = 'SWR_BATCH');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_BATCH_REPORTS'
-       ,'SWR1780'
-       ,'Batch File Listing'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_BATCH_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1780');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_ADMIN_REF'
-       ,'SWR1710'
-       ,'Maintain Inspection Item Status Codes'
-       ,'M'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1710');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_ADMIN_REF'
-       ,'SWR1700'
-       ,'Maintain Defect Notice Messages'
-       ,'M'
-       ,80 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1700');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_ADMIN_REF'
-       ,'SWR1690'
-       ,'Maintain Inspection Outcomes'
-       ,'M'
-       ,70 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1690');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_ADMIN_REF'
-       ,'SWR1680'
-       ,'Maintain Inspection Types'
-       ,'M'
-       ,60 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1680');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_ADMIN_REF'
-       ,'SWR1670'
-       ,'Maintain Sample Inspection Categories'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1670');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'FAVOURITES'
-       ,'MAI'
-       ,'Maintenance Manager'
-       ,'F'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'MAI');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'FAVOURITES'
-       ,'NET'
-       ,'Network Manager'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'NET');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_INSP_ADMIN_REF'
-       ,'SWR1660'
-       ,'Maintain Inspection Categories'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_INSP_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1660');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'FAVOURITES'
-       ,'ENQ'
-       ,'Public Enquiry Manager'
-       ,'F'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'ENQ');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'FAVOURITES'
-       ,'CLM'
-       ,'Street Lighting Manager'
-       ,'F'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'CLM');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'FAVOURITES'
-       ,'SWR'
-       ,'Street Works Manager'
-       ,'F'
-       ,9 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'SWR');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_REPORTS'
-       ,'SWR1220'
-       ,'Print Works Details'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1220');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'FAVOURITES'
-       ,'STR'
-       ,'Structures Manager'
-       ,'F'
-       ,12 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'STR');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'FAVOURITES'
-       ,'TM'
-       ,'Traffic Manager'
-       ,'F'
-       ,13 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'FAVOURITES'
-                    AND  HSTF_CHILD = 'TM');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_ADMIN_REF'
-       ,'SWR1570'
-       ,'Maintain Works/Sites Combinations'
-       ,'M'
-       ,70 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1570');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_ADMIN_REF'
-       ,'SWR1560'
-       ,'Maintain Allowable Site Updates'
-       ,'M'
-       ,60 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_ADMIN_REF'
-                    AND  HSTF_CHILD = 'SWR1560');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_REPORTS'
-       ,'SWR1159'
-       ,'Works with a Section 74 Duration Challenge'
-       ,'M'
-       ,60 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1159');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_REPORTS'
-       ,'SWR1158'
-       ,'Works Due a Section 74 Start'
-       ,'M'
-       ,50 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1158');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_WORKS_REPORTS'
-       ,'SWR1157'
-       ,'Works Due to Complete'
-       ,'M'
-       ,40 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_WORKS_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1157');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'SWR_BATCH_REPORTS'
-       ,'SWR1610'
-       ,'Batch Files Processed'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'SWR_BATCH_REPORTS'
-                    AND  HSTF_CHILD = 'SWR1610');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_INVENTORY'
-       ,'NM0570'
-       ,'Find Assets'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_INVENTORY'
-                    AND  HSTF_CHILD = 'NM0570');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REPORTS_HIST'
-       ,'MAI3992'
-       ,'Road Section Historical Report'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS_HIST'
-                    AND  HSTF_CHILD = 'MAI3992');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REPORTS_HIST'
-       ,'MAI3994'
-       ,'Road Section Historical Statistics'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REPORTS_HIST'
-                    AND  HSTF_CHILD = 'MAI3994');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV_REPORTS'
-       ,'MAI6100'
-       ,'Print Inventory Statistics'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV_REPORTS'
-                    AND  HSTF_CHILD = 'MAI6100');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_REF_ITEM_ATTRIB'
-       ,'ACC2024'
-       ,'Attribute Group'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF_ITEM_ATTRIB'
-                    AND  HSTF_CHILD = 'ACC2024');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_REF_ITEM_ATTRIB'
-       ,'ACC2030'
-       ,'Item Control Data'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF_ITEM_ATTRIB'
-                    AND  HSTF_CHILD = 'ACC2030');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_REF'
-       ,'ACC2050'
-       ,'Cross Attribute Validation Rules'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF'
-                    AND  HSTF_CHILD = 'ACC2050');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'ACC_REF'
-       ,'ACC2060'
-       ,'Hotspot Dates'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'ACC_REF'
-                    AND  HSTF_CHILD = 'ACC2060');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STR'
-       ,'STR_INVENTORY'
-       ,'Inventory'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR'
-                    AND  HSTF_CHILD = 'STR_INVENTORY');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STR_INSPECTIONS'
-       ,'STR3086'
-       ,'Inspection Records for a Structure'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_INSPECTIONS'
-                    AND  HSTF_CHILD = 'STR3086');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STR_INSPECTIONS_REPORTS'
-       ,'STR5015'
-       ,'Profile of an Inspection'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STR_INSPECTIONS_REPORTS'
-                    AND  HSTF_CHILD = 'STR5015');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STP_REFERENCE_INVENTORY'
-       ,'NM0301'
-       ,'Asset Domains'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP_REFERENCE_INVENTORY'
-                    AND  HSTF_CHILD = 'NM0301');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'STP_REFERENCE_INVENTORY'
-       ,'NM0410'
-       ,'Inventory Metamodel'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'STP_REFERENCE_INVENTORY'
-                    AND  HSTF_CHILD = 'NM0410');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM'
-       ,'CLM_REF'
-       ,'Reference'
-       ,'F'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM'
-                    AND  HSTF_CHILD = 'CLM_REF');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM'
-       ,'CLM_ADMIN'
-       ,'Administration'
-       ,'F'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM'
-                    AND  HSTF_CHILD = 'CLM_ADMIN');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_ADMIN'
-       ,'CLM0003'
-       ,'System Definitions'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_ADMIN'
-                    AND  HSTF_CHILD = 'CLM0003');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_ENERGY'
-       ,'CLM1000'
-       ,'Energy Rental Charges'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_ENERGY'
-                    AND  HSTF_CHILD = 'CLM1000');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_ENERGY_REPORTS'
-       ,'CLM1010'
-       ,'Energy Account By Parish Report'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_ENERGY_REPORTS'
-                    AND  HSTF_CHILD = 'CLM1010');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_INV'
-       ,'CLM1030'
-       ,'Create Lighting Schemes'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_INV'
-                    AND  HSTF_CHILD = 'CLM1030');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_FAULTS'
-       ,'CLM1040'
-       ,'Record Faults'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_FAULTS'
-                    AND  HSTF_CHILD = 'CLM1040');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF'
-       ,'CLM_REF_STATIC'
-       ,'Static Data'
-       ,'F'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF'
-                    AND  HSTF_CHILD = 'CLM_REF_STATIC');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'CLM_REF'
-       ,'CLM_REF_CTR'
-       ,'Contracts'
-       ,'F'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'CLM_REF'
-                    AND  HSTF_CHILD = 'CLM_REF_CTR');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'AST'
-       ,'AST_REF'
-       ,'Asset Reference Data'
-       ,'F'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'AST'
-                    AND  HSTF_CHILD = 'AST_REF');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'AST'
-       ,'NET_QUERIES'
-       ,'Asset Queries'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'AST'
-                    AND  HSTF_CHILD = 'NET_QUERIES');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'AST'
-       ,'NET_INVENTORY'
-       ,'Asset Management'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'AST'
-                    AND  HSTF_CHILD = 'NET_INVENTORY');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'AST_REF'
-       ,'NM0415'
-       ,'Asset Attribute Sets'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'AST_REF'
-                    AND  HSTF_CHILD = 'NM0415');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'AST_REF'
-       ,'NM0411'
-       ,'Asset Exclusive View Creation'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'AST_REF'
-                    AND  HSTF_CHILD = 'NM0411');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'AST_REF'
-       ,'NM0551'
-       ,'Cross Item Validation Setup'
-       ,'M'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'AST_REF'
-                    AND  HSTF_CHILD = 'NM0551');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'AST_REF'
-       ,'NM0550'
-       ,'Cross Attribute Validation Setup'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'AST_REF'
-                    AND  HSTF_CHILD = 'NM0550');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'AST_REF'
-       ,'NM0410'
-       ,'Asset Metamodel'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'AST_REF'
-                    AND  HSTF_CHILD = 'NM0410');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'AST_REF'
-       ,'NM0306'
-       ,'Asset XSPs'
+        'UKP_UTILITIES_REPORTS'
+       ,'UKP0095'
+       ,'Unsurveyed Network'
        ,'M'
        ,6 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'AST_REF'
-                    AND  HSTF_CHILD = 'NM0306');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'AST_REF'
-       ,'NM0305'
-       ,'XSP and Reversal Rules'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'AST_REF'
-                    AND  HSTF_CHILD = 'NM0305');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'AST_REF'
-       ,'NM0301'
-       ,'Asset Domains'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'AST_REF'
-                    AND  HSTF_CHILD = 'NM0301');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG'
-       ,'HIG_JOBS'
-       ,'Jobs'
-       ,'F'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG'
-                    AND  HSTF_CHILD = 'HIG_JOBS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_JOBS'
-       ,'NM3010'
-       ,'Job Operations'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_JOBS'
-                    AND  HSTF_CHILD = 'NM3010');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_JOBS'
-       ,'NM3020'
-       ,'Job Types'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_JOBS'
-                    AND  HSTF_CHILD = 'NM3020');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'AST'
-       ,'AST_SL'
-       ,'Street Lighting'
-       ,'F'
-       ,100 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'AST'
-                    AND  HSTF_CHILD = 'AST_SL');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'AST_SL'
-       ,'AST_SL_REPORTS'
-       ,'Reports'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'AST_SL'
-                    AND  HSTF_CHILD = 'AST_SL_REPORTS');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'AST_SL_REPORTS'
-       ,'NMSLEQ0010'
-       ,'Atkins Odlin Energy Procurement'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'AST_SL_REPORTS'
-                    AND  HSTF_CHILD = 'NMSLEQ0010');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_INVENTORY'
-       ,'NM0572'
-       ,'EXOR Locator'
-       ,'M'
-       ,40 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_INVENTORY'
-                    AND  HSTF_CHILD = 'NM0572');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INSP_REPORTS'
-       ,'MAI5025'
-       ,'Detailed Inspection Work Done'
-       ,'M'
-       ,9 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INSP_REPORTS'
-                    AND  HSTF_CHILD = 'MAI5025');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_MAINTAIN_DATA'
-       ,'MAI2310A'
-       ,'Condition Data'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_MAINTAIN_DATA'
-                    AND  HSTF_CHILD = 'MAI2310A');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_FINANCIAL_REPORTS'
-       ,'MAI3841'
-       ,'Payment Run Report'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_FINANCIAL_REPORTS'
-                    AND  HSTF_CHILD = 'MAI3841');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG'
-       ,'HIG_DIRECTORIES'
-       ,'Directory Management'
-       ,'F'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG'
-                    AND  HSTF_CHILD = 'HIG_DIRECTORIES');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_DIRECTORIES'
-       ,'HIG1895'
-       ,'Directories'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_DIRECTORIES'
-                    AND  HSTF_CHILD = 'HIG1895');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_DIRECTORIES'
-       ,'NMWEB0043'
-       ,'Upload file to Oracle Directory'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_DIRECTORIES'
-                    AND  HSTF_CHILD = 'NMWEB0043');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_DIRECTORIES'
-       ,'NMWEB0044'
-       ,'Download from Oracle Directory'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_DIRECTORIES'
-                    AND  HSTF_CHILD = 'NMWEB0044');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_REFERENCE'
-       ,'HIG3664'
-       ,'Financial Years'
-       ,'M'
-       ,17 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
-                    AND  HSTF_CHILD = 'HIG3664');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'AST_REF'
-       ,'NM0420'
-       ,'Derived Asset Setup'
-       ,'M'
-       ,9 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'AST_REF'
-                    AND  HSTF_CHILD = 'NM0420');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_IMPORT_EXPORT'
-       ,'NSG0040'
-       ,'NSG File Manager'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_IMPORT_EXPORT'
-                    AND  HSTF_CHILD = 'NSG0040');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_REF'
-       ,'NM0005'
-       ,'Network Cross Reference Rules'
-       ,'M'
-       ,5 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_REF'
-                    AND  HSTF_CHILD = 'NM0005');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'HIG_GRI'
-       ,'GRI0260'
-       ,'GRI Saved Parameters'
-       ,'M'
-       ,7 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'HIG_GRI'
-                    AND  HSTF_CHILD = 'GRI0260');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NET_INVENTORY'
-       ,'NM0590'
-       ,'Asset Maintenance'
-       ,'M'
-       ,50 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NET_INVENTORY'
-                    AND  HSTF_CHILD = 'NM0590');
+                   WHERE HSTF_PARENT = 'UKP_UTILITIES_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0095');
 --
 --
 COMMIT;
