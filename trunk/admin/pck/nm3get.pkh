@@ -5,11 +5,11 @@ CREATE OR REPLACE PACKAGE nm3get IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkh-arc   2.1   Jul 19 2007 12:05:20   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkh-arc   2.2   Jul 20 2007 14:00:42   gjohnson  $
 --       Module Name      : $Workfile:   nm3get.pkh  $
---       Date into PVCS   : $Date:   Jul 19 2007 12:05:20  $
---       Date fetched Out : $Modtime:   Jul 19 2007 10:59:26  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 20 2007 14:00:42  $
+--       Date fetched Out : $Modtime:   Jul 20 2007 13:54:34  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --   Author : Jonathan Mills
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE nm3get IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.1  $"
+--   nm3get_gen body   : "$Revision:   2.2  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE nm3get IS
 --
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
+   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
 --  g_sccsid is the SCCS ID for the package
 --
 --</GLOBVAR>
@@ -156,9 +156,9 @@ PRAGMA RESTRICT_REFERENCES (get_ddc, WNPS, WNDS);
 --
 --   Function to get using DEC_PK constraint
 --
-FUNCTION get_dec (pi_dec_doc_id        doc_enquiry_contacts.dec_doc_id%TYPE
+FUNCTION get_dec (pi_dec_hct_id        doc_enquiry_contacts.dec_hct_id%TYPE
+                 ,pi_dec_doc_id        doc_enquiry_contacts.dec_doc_id%TYPE
                  ,pi_dec_type          doc_enquiry_contacts.dec_type%TYPE
-                 ,pi_dec_hct_id        doc_enquiry_contacts.dec_hct_id%TYPE
                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                  ) RETURN doc_enquiry_contacts%ROWTYPE;
@@ -1230,8 +1230,8 @@ PRAGMA RESTRICT_REFERENCES (get_narsh, WNPS, WNDS);
 --
 --   Function to get using NARST_PK constraint
 --
-FUNCTION get_narst (pi_narst_job_id      nm_assets_on_route_store_total.narst_job_id%TYPE
-                   ,pi_narst_inv_type    nm_assets_on_route_store_total.narst_inv_type%TYPE
+FUNCTION get_narst (pi_narst_inv_type    nm_assets_on_route_store_total.narst_inv_type%TYPE
+                   ,pi_narst_job_id      nm_assets_on_route_store_total.narst_job_id%TYPE
                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                    ) RETURN nm_assets_on_route_store_total%ROWTYPE;
@@ -2078,9 +2078,9 @@ PRAGMA RESTRICT_REFERENCES (get_nsit, WNPS, WNDS);
 --
 --   Function to get using NSIA_PK constraint
 --
-FUNCTION get_nsia (pi_nsia_nsit_nias_id      nm_inv_attribute_set_inv_attr.nsia_nsit_nias_id%TYPE
-                  ,pi_nsia_nsit_nit_inv_type nm_inv_attribute_set_inv_attr.nsia_nsit_nit_inv_type%TYPE
+FUNCTION get_nsia (pi_nsia_nsit_nit_inv_type nm_inv_attribute_set_inv_attr.nsia_nsit_nit_inv_type%TYPE
                   ,pi_nsia_ita_attrib_name   nm_inv_attribute_set_inv_attr.nsia_ita_attrib_name%TYPE
+                  ,pi_nsia_nsit_nias_id      nm_inv_attribute_set_inv_attr.nsia_nsit_nias_id%TYPE
                   ,pi_raise_not_found        BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode      PLS_INTEGER DEFAULT -20000
                   ) RETURN nm_inv_attribute_set_inv_attr%ROWTYPE;
@@ -2373,8 +2373,8 @@ PRAGMA RESTRICT_REFERENCES (get_nlf, WNPS, WNDS);
 --
 --   Function to get using NLFC_PK constraint
 --
-FUNCTION get_nlfc (pi_nlfc_seq_no       nm_load_file_cols.nlfc_seq_no%TYPE
-                  ,pi_nlfc_nlf_id       nm_load_file_cols.nlfc_nlf_id%TYPE
+FUNCTION get_nlfc (pi_nlfc_nlf_id       nm_load_file_cols.nlfc_nlf_id%TYPE
+                  ,pi_nlfc_seq_no       nm_load_file_cols.nlfc_seq_no%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ) RETURN nm_load_file_cols%ROWTYPE;
@@ -2421,8 +2421,8 @@ PRAGMA RESTRICT_REFERENCES (get_nlcd, WNPS, WNDS);
 --
 --   Function to get using NLFD_PK constraint
 --
-FUNCTION get_nlfd (pi_nlfd_nld_id       nm_load_file_destinations.nlfd_nld_id%TYPE
-                  ,pi_nlfd_nlf_id       nm_load_file_destinations.nlfd_nlf_id%TYPE
+FUNCTION get_nlfd (pi_nlfd_nlf_id       nm_load_file_destinations.nlfd_nlf_id%TYPE
+                  ,pi_nlfd_nld_id       nm_load_file_destinations.nlfd_nld_id%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ) RETURN nm_load_file_destinations%ROWTYPE;
@@ -3179,10 +3179,10 @@ PRAGMA RESTRICT_REFERENCES (get_npqt, WNPS, WNDS);
 --
 --   Function to get using NQV_PK constraint
 --
-FUNCTION get_npqv (pi_nqv_npq_id        nm_pbi_query_values.nqv_npq_id%TYPE
+FUNCTION get_npqv (pi_nqv_sequence      nm_pbi_query_values.nqv_sequence%TYPE
+                  ,pi_nqv_npq_id        nm_pbi_query_values.nqv_npq_id%TYPE
                   ,pi_nqv_nqt_seq_no    nm_pbi_query_values.nqv_nqt_seq_no%TYPE
                   ,pi_nqv_nqa_seq_no    nm_pbi_query_values.nqv_nqa_seq_no%TYPE
-                  ,pi_nqv_sequence      nm_pbi_query_values.nqv_sequence%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ) RETURN nm_pbi_query_values%ROWTYPE;
