@@ -1,12 +1,13 @@
-create or replace package nm3web_load as
+CREATE OR REPLACE package nm3web_load as
 --<PACKAGE>
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3web_load.pkh	1.6 04/13/04
---       Module Name      : nm3web_load.pkh
---       Date into SCCS   : 04/04/13 16:31:38
---       Date fetched Out : 07/06/13 14:13:52
---       SCCS Version     : 1.6
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_load.pkh-arc   2.1   Jul 20 2007 15:27:58   aedwards  $
+--       Module Name      : $Workfile:   nm3web_load.pkh  $
+--       Date into PVCS   : $Date:   Jul 20 2007 15:27:58  $
+--       Date fetched Out : $Modtime:   Jul 20 2007 14:37:16  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on SCCS version : 
 --
 --
 --   Author : Jonathan Mills
@@ -18,7 +19,7 @@ create or replace package nm3web_load as
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3web_load.pkh	1.6 04/13/04"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
 --  g_sccsid is the SCCS ID for the package
    c_continue         CONSTANT  nm_errors.ner_descr%TYPE    := hig.get_ner(nm3type.c_hig,165).ner_descr;
 --</GLOBVAR>
@@ -103,6 +104,13 @@ FUNCTION get_full_download_url (p_filename VARCHAR2) RETURN VARCHAR2;
 --
 -----------------------------------------------------------------------------
 --
+ PROCEDURE process_lines
+        ( pi_asset_type         IN nm_inv_types.nit_inv_type%TYPE
+        , pi_load_file_unique   IN nm_load_files.nlf_unique%TYPE
+        , pi_batch_no           IN nm_load_batches.nlb_batch_no%TYPE
+        , pi_join_column        IN VARCHAR2 DEFAULT 'LFK'
+        , pi_locate_ref_column  IN VARCHAR2 DEFAULT 'LOCATEREF');
+-----------------------------------------------------------------------------
 --<PRAGMA>
    PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
    PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
