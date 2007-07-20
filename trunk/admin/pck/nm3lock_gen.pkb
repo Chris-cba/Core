@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock_gen.pkb-arc   2.1   Jul 19 2007 12:05:22   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock_gen.pkb-arc   2.2   Jul 20 2007 14:00:44   gjohnson  $
 --       Module Name      : $Workfile:   nm3lock_gen.pkb  $
---       Date into PVCS   : $Date:   Jul 19 2007 12:05:22  $
---       Date fetched Out : $Modtime:   Jul 19 2007 10:59:28  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 20 2007 14:00:44  $
+--       Date fetched Out : $Modtime:   Jul 20 2007 13:54:36  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.1  $"
+--   nm3get_gen body   : "$Revision:   2.2  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lock_gen';
@@ -227,7 +227,7 @@ FUNCTION lock_das (pi_das_table_name    doc_assocs.das_table_name%TYPE
                   ) RETURN ROWID IS
 --
    CURSOR cs_das IS
-   SELECT /*+ INDEX (das DAS_PK) */ ROWID
+   SELECT /*+ INDEX (das DAS_IND1) */ ROWID
     FROM  doc_assocs das
    WHERE  das.das_table_name = pi_das_table_name
     AND   das.das_rec_id     = pi_das_rec_id
@@ -758,9 +758,9 @@ END lock_ddc;
 --
 --   Function to lock using DEC_PK constraint
 --
-FUNCTION lock_dec (pi_dec_doc_id        doc_enquiry_contacts.dec_doc_id%TYPE
+FUNCTION lock_dec (pi_dec_hct_id        doc_enquiry_contacts.dec_hct_id%TYPE
+                  ,pi_dec_doc_id        doc_enquiry_contacts.dec_doc_id%TYPE
                   ,pi_dec_type          doc_enquiry_contacts.dec_type%TYPE
-                  ,pi_dec_hct_id        doc_enquiry_contacts.dec_hct_id%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -769,9 +769,9 @@ FUNCTION lock_dec (pi_dec_doc_id        doc_enquiry_contacts.dec_doc_id%TYPE
    CURSOR cs_dec IS
    SELECT /*+ INDEX (dec DEC_IND1) */ ROWID
     FROM  doc_enquiry_contacts dec
-   WHERE  dec.dec_doc_id = pi_dec_doc_id
+   WHERE  dec.dec_hct_id = pi_dec_hct_id
+    AND   dec.dec_doc_id = pi_dec_doc_id
     AND   dec.dec_type   = pi_dec_type
-    AND   dec.dec_hct_id = pi_dec_hct_id
    FOR UPDATE NOWAIT;
 --
    l_found         BOOLEAN;
@@ -794,9 +794,9 @@ BEGIN
                     ,pi_id                 => 67
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'doc_enquiry_contacts (DEC_PK)'
+                                              ||CHR(10)||'dec_hct_id => '||pi_dec_hct_id
                                               ||CHR(10)||'dec_doc_id => '||pi_dec_doc_id
                                               ||CHR(10)||'dec_type   => '||pi_dec_type
-                                              ||CHR(10)||'dec_hct_id => '||pi_dec_hct_id
                     );
    END IF;
 --
@@ -812,9 +812,9 @@ EXCEPTION
                     ,pi_id                 => 33
                     ,pi_sqlcode            => pi_locked_sqlcode
                     ,pi_supplementary_info => 'doc_enquiry_contacts (DEC_PK)'
+                                              ||CHR(10)||'dec_hct_id => '||pi_dec_hct_id
                                               ||CHR(10)||'dec_doc_id => '||pi_dec_doc_id
                                               ||CHR(10)||'dec_type   => '||pi_dec_type
-                                              ||CHR(10)||'dec_hct_id => '||pi_dec_hct_id
                     );
 --
 END lock_dec;
@@ -824,9 +824,9 @@ END lock_dec;
 --
 --   Procedure to lock using DEC_PK constraint
 --
-PROCEDURE lock_dec (pi_dec_doc_id        doc_enquiry_contacts.dec_doc_id%TYPE
+PROCEDURE lock_dec (pi_dec_hct_id        doc_enquiry_contacts.dec_hct_id%TYPE
+                   ,pi_dec_doc_id        doc_enquiry_contacts.dec_doc_id%TYPE
                    ,pi_dec_type          doc_enquiry_contacts.dec_type%TYPE
-                   ,pi_dec_hct_id        doc_enquiry_contacts.dec_hct_id%TYPE
                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                    ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -839,9 +839,9 @@ BEGIN
    nm_debug.proc_start(g_package_name,'lock_dec');
 --
    l_rowid := lock_dec
-                   (pi_dec_doc_id        => pi_dec_doc_id
+                   (pi_dec_hct_id        => pi_dec_hct_id
+                   ,pi_dec_doc_id        => pi_dec_doc_id
                    ,pi_dec_type          => pi_dec_type
-                   ,pi_dec_hct_id        => pi_dec_hct_id
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    );
@@ -6863,7 +6863,7 @@ FUNCTION lock_huh (pi_huh_user_id       hig_user_history.huh_user_id%TYPE
                   ) RETURN ROWID IS
 --
    CURSOR cs_huh IS
-   SELECT /*+ INDEX (huh HUH_PK) */ ROWID
+   SELECT /*+ INDEX (huh HUH_HUS_FK_IND) */ ROWID
     FROM  hig_user_history huh
    WHERE  huh.huh_user_id = pi_huh_user_id
    FOR UPDATE NOWAIT;
@@ -8021,8 +8021,8 @@ END lock_narsh;
 --
 --   Function to lock using NARST_PK constraint
 --
-FUNCTION lock_narst (pi_narst_job_id      nm_assets_on_route_store_total.narst_job_id%TYPE
-                    ,pi_narst_inv_type    nm_assets_on_route_store_total.narst_inv_type%TYPE
+FUNCTION lock_narst (pi_narst_inv_type    nm_assets_on_route_store_total.narst_inv_type%TYPE
+                    ,pi_narst_job_id      nm_assets_on_route_store_total.narst_job_id%TYPE
                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                     ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -8031,8 +8031,8 @@ FUNCTION lock_narst (pi_narst_job_id      nm_assets_on_route_store_total.narst_j
    CURSOR cs_narst IS
    SELECT /*+ INDEX (narst NARST_PK) */ ROWID
     FROM  nm_assets_on_route_store_total narst
-   WHERE  narst.narst_job_id   = pi_narst_job_id
-    AND   narst.narst_inv_type = pi_narst_inv_type
+   WHERE  narst.narst_inv_type = pi_narst_inv_type
+    AND   narst.narst_job_id   = pi_narst_job_id
    FOR UPDATE NOWAIT;
 --
    l_found         BOOLEAN;
@@ -8055,8 +8055,8 @@ BEGIN
                     ,pi_id                 => 67
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'nm_assets_on_route_store_total (NARST_PK)'
-                                              ||CHR(10)||'narst_job_id   => '||pi_narst_job_id
                                               ||CHR(10)||'narst_inv_type => '||pi_narst_inv_type
+                                              ||CHR(10)||'narst_job_id   => '||pi_narst_job_id
                     );
    END IF;
 --
@@ -8072,8 +8072,8 @@ EXCEPTION
                     ,pi_id                 => 33
                     ,pi_sqlcode            => pi_locked_sqlcode
                     ,pi_supplementary_info => 'nm_assets_on_route_store_total (NARST_PK)'
-                                              ||CHR(10)||'narst_job_id   => '||pi_narst_job_id
                                               ||CHR(10)||'narst_inv_type => '||pi_narst_inv_type
+                                              ||CHR(10)||'narst_job_id   => '||pi_narst_job_id
                     );
 --
 END lock_narst;
@@ -8083,8 +8083,8 @@ END lock_narst;
 --
 --   Procedure to lock using NARST_PK constraint
 --
-PROCEDURE lock_narst (pi_narst_job_id      nm_assets_on_route_store_total.narst_job_id%TYPE
-                     ,pi_narst_inv_type    nm_assets_on_route_store_total.narst_inv_type%TYPE
+PROCEDURE lock_narst (pi_narst_inv_type    nm_assets_on_route_store_total.narst_inv_type%TYPE
+                     ,pi_narst_job_id      nm_assets_on_route_store_total.narst_job_id%TYPE
                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                      ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -8097,8 +8097,8 @@ BEGIN
    nm_debug.proc_start(g_package_name,'lock_narst');
 --
    l_rowid := lock_narst
-                   (pi_narst_job_id      => pi_narst_job_id
-                   ,pi_narst_inv_type    => pi_narst_inv_type
+                   (pi_narst_inv_type    => pi_narst_inv_type
+                   ,pi_narst_job_id      => pi_narst_job_id
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    );
@@ -13834,9 +13834,9 @@ END lock_nsit;
 --
 --   Function to lock using NSIA_PK constraint
 --
-FUNCTION lock_nsia (pi_nsia_nsit_nias_id      nm_inv_attribute_set_inv_attr.nsia_nsit_nias_id%TYPE
-                   ,pi_nsia_nsit_nit_inv_type nm_inv_attribute_set_inv_attr.nsia_nsit_nit_inv_type%TYPE
+FUNCTION lock_nsia (pi_nsia_nsit_nit_inv_type nm_inv_attribute_set_inv_attr.nsia_nsit_nit_inv_type%TYPE
                    ,pi_nsia_ita_attrib_name   nm_inv_attribute_set_inv_attr.nsia_ita_attrib_name%TYPE
+                   ,pi_nsia_nsit_nias_id      nm_inv_attribute_set_inv_attr.nsia_nsit_nias_id%TYPE
                    ,pi_raise_not_found        BOOLEAN     DEFAULT TRUE
                    ,pi_not_found_sqlcode      PLS_INTEGER DEFAULT -20000
                    ,pi_locked_sqlcode         PLS_INTEGER DEFAULT -20000
@@ -13845,9 +13845,9 @@ FUNCTION lock_nsia (pi_nsia_nsit_nias_id      nm_inv_attribute_set_inv_attr.nsia
    CURSOR cs_nsia IS
    SELECT /*+ INDEX (nsia NSIA_PK) */ ROWID
     FROM  nm_inv_attribute_set_inv_attr nsia
-   WHERE  nsia.nsia_nsit_nias_id      = pi_nsia_nsit_nias_id
-    AND   nsia.nsia_nsit_nit_inv_type = pi_nsia_nsit_nit_inv_type
+   WHERE  nsia.nsia_nsit_nit_inv_type = pi_nsia_nsit_nit_inv_type
     AND   nsia.nsia_ita_attrib_name   = pi_nsia_ita_attrib_name
+    AND   nsia.nsia_nsit_nias_id      = pi_nsia_nsit_nias_id
    FOR UPDATE NOWAIT;
 --
    l_found         BOOLEAN;
@@ -13870,9 +13870,9 @@ BEGIN
                     ,pi_id                 => 67
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'nm_inv_attribute_set_inv_attr (NSIA_PK)'
-                                              ||CHR(10)||'nsia_nsit_nias_id      => '||pi_nsia_nsit_nias_id
                                               ||CHR(10)||'nsia_nsit_nit_inv_type => '||pi_nsia_nsit_nit_inv_type
                                               ||CHR(10)||'nsia_ita_attrib_name   => '||pi_nsia_ita_attrib_name
+                                              ||CHR(10)||'nsia_nsit_nias_id      => '||pi_nsia_nsit_nias_id
                     );
    END IF;
 --
@@ -13888,9 +13888,9 @@ EXCEPTION
                     ,pi_id                 => 33
                     ,pi_sqlcode            => pi_locked_sqlcode
                     ,pi_supplementary_info => 'nm_inv_attribute_set_inv_attr (NSIA_PK)'
-                                              ||CHR(10)||'nsia_nsit_nias_id      => '||pi_nsia_nsit_nias_id
                                               ||CHR(10)||'nsia_nsit_nit_inv_type => '||pi_nsia_nsit_nit_inv_type
                                               ||CHR(10)||'nsia_ita_attrib_name   => '||pi_nsia_ita_attrib_name
+                                              ||CHR(10)||'nsia_nsit_nias_id      => '||pi_nsia_nsit_nias_id
                     );
 --
 END lock_nsia;
@@ -13900,9 +13900,9 @@ END lock_nsia;
 --
 --   Procedure to lock using NSIA_PK constraint
 --
-PROCEDURE lock_nsia (pi_nsia_nsit_nias_id      nm_inv_attribute_set_inv_attr.nsia_nsit_nias_id%TYPE
-                    ,pi_nsia_nsit_nit_inv_type nm_inv_attribute_set_inv_attr.nsia_nsit_nit_inv_type%TYPE
+PROCEDURE lock_nsia (pi_nsia_nsit_nit_inv_type nm_inv_attribute_set_inv_attr.nsia_nsit_nit_inv_type%TYPE
                     ,pi_nsia_ita_attrib_name   nm_inv_attribute_set_inv_attr.nsia_ita_attrib_name%TYPE
+                    ,pi_nsia_nsit_nias_id      nm_inv_attribute_set_inv_attr.nsia_nsit_nias_id%TYPE
                     ,pi_raise_not_found        BOOLEAN     DEFAULT TRUE
                     ,pi_not_found_sqlcode      PLS_INTEGER DEFAULT -20000
                     ,pi_locked_sqlcode         PLS_INTEGER DEFAULT -20000
@@ -13915,9 +13915,9 @@ BEGIN
    nm_debug.proc_start(g_package_name,'lock_nsia');
 --
    l_rowid := lock_nsia
-                   (pi_nsia_nsit_nias_id      => pi_nsia_nsit_nias_id
-                   ,pi_nsia_nsit_nit_inv_type => pi_nsia_nsit_nit_inv_type
+                   (pi_nsia_nsit_nit_inv_type => pi_nsia_nsit_nit_inv_type
                    ,pi_nsia_ita_attrib_name   => pi_nsia_ita_attrib_name
+                   ,pi_nsia_nsit_nias_id      => pi_nsia_nsit_nias_id
                    ,pi_raise_not_found        => pi_raise_not_found
                    ,pi_not_found_sqlcode      => pi_not_found_sqlcode
                    );
@@ -15982,8 +15982,8 @@ END lock_nlf;
 --
 --   Function to lock using NLFC_PK constraint
 --
-FUNCTION lock_nlfc (pi_nlfc_seq_no       nm_load_file_cols.nlfc_seq_no%TYPE
-                   ,pi_nlfc_nlf_id       nm_load_file_cols.nlfc_nlf_id%TYPE
+FUNCTION lock_nlfc (pi_nlfc_nlf_id       nm_load_file_cols.nlfc_nlf_id%TYPE
+                   ,pi_nlfc_seq_no       nm_load_file_cols.nlfc_seq_no%TYPE
                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                    ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -15992,8 +15992,8 @@ FUNCTION lock_nlfc (pi_nlfc_seq_no       nm_load_file_cols.nlfc_seq_no%TYPE
    CURSOR cs_nlfc IS
    SELECT /*+ INDEX (nlfc NLFC_PK) */ ROWID
     FROM  nm_load_file_cols nlfc
-   WHERE  nlfc.nlfc_seq_no = pi_nlfc_seq_no
-    AND   nlfc.nlfc_nlf_id = pi_nlfc_nlf_id
+   WHERE  nlfc.nlfc_nlf_id = pi_nlfc_nlf_id
+    AND   nlfc.nlfc_seq_no = pi_nlfc_seq_no
    FOR UPDATE NOWAIT;
 --
    l_found         BOOLEAN;
@@ -16016,8 +16016,8 @@ BEGIN
                     ,pi_id                 => 67
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'nm_load_file_cols (NLFC_PK)'
-                                              ||CHR(10)||'nlfc_seq_no => '||pi_nlfc_seq_no
                                               ||CHR(10)||'nlfc_nlf_id => '||pi_nlfc_nlf_id
+                                              ||CHR(10)||'nlfc_seq_no => '||pi_nlfc_seq_no
                     );
    END IF;
 --
@@ -16033,8 +16033,8 @@ EXCEPTION
                     ,pi_id                 => 33
                     ,pi_sqlcode            => pi_locked_sqlcode
                     ,pi_supplementary_info => 'nm_load_file_cols (NLFC_PK)'
-                                              ||CHR(10)||'nlfc_seq_no => '||pi_nlfc_seq_no
                                               ||CHR(10)||'nlfc_nlf_id => '||pi_nlfc_nlf_id
+                                              ||CHR(10)||'nlfc_seq_no => '||pi_nlfc_seq_no
                     );
 --
 END lock_nlfc;
@@ -16044,8 +16044,8 @@ END lock_nlfc;
 --
 --   Procedure to lock using NLFC_PK constraint
 --
-PROCEDURE lock_nlfc (pi_nlfc_seq_no       nm_load_file_cols.nlfc_seq_no%TYPE
-                    ,pi_nlfc_nlf_id       nm_load_file_cols.nlfc_nlf_id%TYPE
+PROCEDURE lock_nlfc (pi_nlfc_nlf_id       nm_load_file_cols.nlfc_nlf_id%TYPE
+                    ,pi_nlfc_seq_no       nm_load_file_cols.nlfc_seq_no%TYPE
                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                     ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -16058,8 +16058,8 @@ BEGIN
    nm_debug.proc_start(g_package_name,'lock_nlfc');
 --
    l_rowid := lock_nlfc
-                   (pi_nlfc_seq_no       => pi_nlfc_seq_no
-                   ,pi_nlfc_nlf_id       => pi_nlfc_nlf_id
+                   (pi_nlfc_nlf_id       => pi_nlfc_nlf_id
+                   ,pi_nlfc_seq_no       => pi_nlfc_seq_no
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    );
@@ -16358,8 +16358,8 @@ END lock_nlcd;
 --
 --   Function to lock using NLFD_PK constraint
 --
-FUNCTION lock_nlfd (pi_nlfd_nld_id       nm_load_file_destinations.nlfd_nld_id%TYPE
-                   ,pi_nlfd_nlf_id       nm_load_file_destinations.nlfd_nlf_id%TYPE
+FUNCTION lock_nlfd (pi_nlfd_nlf_id       nm_load_file_destinations.nlfd_nlf_id%TYPE
+                   ,pi_nlfd_nld_id       nm_load_file_destinations.nlfd_nld_id%TYPE
                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                    ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -16368,8 +16368,8 @@ FUNCTION lock_nlfd (pi_nlfd_nld_id       nm_load_file_destinations.nlfd_nld_id%T
    CURSOR cs_nlfd IS
    SELECT /*+ INDEX (nlfd NLFD_PK) */ ROWID
     FROM  nm_load_file_destinations nlfd
-   WHERE  nlfd.nlfd_nld_id = pi_nlfd_nld_id
-    AND   nlfd.nlfd_nlf_id = pi_nlfd_nlf_id
+   WHERE  nlfd.nlfd_nlf_id = pi_nlfd_nlf_id
+    AND   nlfd.nlfd_nld_id = pi_nlfd_nld_id
    FOR UPDATE NOWAIT;
 --
    l_found         BOOLEAN;
@@ -16392,8 +16392,8 @@ BEGIN
                     ,pi_id                 => 67
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'nm_load_file_destinations (NLFD_PK)'
-                                              ||CHR(10)||'nlfd_nld_id => '||pi_nlfd_nld_id
                                               ||CHR(10)||'nlfd_nlf_id => '||pi_nlfd_nlf_id
+                                              ||CHR(10)||'nlfd_nld_id => '||pi_nlfd_nld_id
                     );
    END IF;
 --
@@ -16409,8 +16409,8 @@ EXCEPTION
                     ,pi_id                 => 33
                     ,pi_sqlcode            => pi_locked_sqlcode
                     ,pi_supplementary_info => 'nm_load_file_destinations (NLFD_PK)'
-                                              ||CHR(10)||'nlfd_nld_id => '||pi_nlfd_nld_id
                                               ||CHR(10)||'nlfd_nlf_id => '||pi_nlfd_nlf_id
+                                              ||CHR(10)||'nlfd_nld_id => '||pi_nlfd_nld_id
                     );
 --
 END lock_nlfd;
@@ -16420,8 +16420,8 @@ END lock_nlfd;
 --
 --   Procedure to lock using NLFD_PK constraint
 --
-PROCEDURE lock_nlfd (pi_nlfd_nld_id       nm_load_file_destinations.nlfd_nld_id%TYPE
-                    ,pi_nlfd_nlf_id       nm_load_file_destinations.nlfd_nlf_id%TYPE
+PROCEDURE lock_nlfd (pi_nlfd_nlf_id       nm_load_file_destinations.nlfd_nlf_id%TYPE
+                    ,pi_nlfd_nld_id       nm_load_file_destinations.nlfd_nld_id%TYPE
                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                     ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -16434,8 +16434,8 @@ BEGIN
    nm_debug.proc_start(g_package_name,'lock_nlfd');
 --
    l_rowid := lock_nlfd
-                   (pi_nlfd_nld_id       => pi_nlfd_nld_id
-                   ,pi_nlfd_nlf_id       => pi_nlfd_nlf_id
+                   (pi_nlfd_nlf_id       => pi_nlfd_nlf_id
+                   ,pi_nlfd_nld_id       => pi_nlfd_nld_id
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    );
@@ -21733,10 +21733,10 @@ END lock_npqt;
 --
 --   Function to lock using NQV_PK constraint
 --
-FUNCTION lock_npqv (pi_nqv_npq_id        nm_pbi_query_values.nqv_npq_id%TYPE
+FUNCTION lock_npqv (pi_nqv_sequence      nm_pbi_query_values.nqv_sequence%TYPE
+                   ,pi_nqv_npq_id        nm_pbi_query_values.nqv_npq_id%TYPE
                    ,pi_nqv_nqt_seq_no    nm_pbi_query_values.nqv_nqt_seq_no%TYPE
                    ,pi_nqv_nqa_seq_no    nm_pbi_query_values.nqv_nqa_seq_no%TYPE
-                   ,pi_nqv_sequence      nm_pbi_query_values.nqv_sequence%TYPE
                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                    ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -21745,10 +21745,10 @@ FUNCTION lock_npqv (pi_nqv_npq_id        nm_pbi_query_values.nqv_npq_id%TYPE
    CURSOR cs_npqv IS
    SELECT /*+ INDEX (npqv NQV_PK) */ ROWID
     FROM  nm_pbi_query_values npqv
-   WHERE  npqv.nqv_npq_id     = pi_nqv_npq_id
+   WHERE  npqv.nqv_sequence   = pi_nqv_sequence
+    AND   npqv.nqv_npq_id     = pi_nqv_npq_id
     AND   npqv.nqv_nqt_seq_no = pi_nqv_nqt_seq_no
     AND   npqv.nqv_nqa_seq_no = pi_nqv_nqa_seq_no
-    AND   npqv.nqv_sequence   = pi_nqv_sequence
    FOR UPDATE NOWAIT;
 --
    l_found         BOOLEAN;
@@ -21771,10 +21771,10 @@ BEGIN
                     ,pi_id                 => 67
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'nm_pbi_query_values (NQV_PK)'
+                                              ||CHR(10)||'nqv_sequence   => '||pi_nqv_sequence
                                               ||CHR(10)||'nqv_npq_id     => '||pi_nqv_npq_id
                                               ||CHR(10)||'nqv_nqt_seq_no => '||pi_nqv_nqt_seq_no
                                               ||CHR(10)||'nqv_nqa_seq_no => '||pi_nqv_nqa_seq_no
-                                              ||CHR(10)||'nqv_sequence   => '||pi_nqv_sequence
                     );
    END IF;
 --
@@ -21790,10 +21790,10 @@ EXCEPTION
                     ,pi_id                 => 33
                     ,pi_sqlcode            => pi_locked_sqlcode
                     ,pi_supplementary_info => 'nm_pbi_query_values (NQV_PK)'
+                                              ||CHR(10)||'nqv_sequence   => '||pi_nqv_sequence
                                               ||CHR(10)||'nqv_npq_id     => '||pi_nqv_npq_id
                                               ||CHR(10)||'nqv_nqt_seq_no => '||pi_nqv_nqt_seq_no
                                               ||CHR(10)||'nqv_nqa_seq_no => '||pi_nqv_nqa_seq_no
-                                              ||CHR(10)||'nqv_sequence   => '||pi_nqv_sequence
                     );
 --
 END lock_npqv;
@@ -21803,10 +21803,10 @@ END lock_npqv;
 --
 --   Procedure to lock using NQV_PK constraint
 --
-PROCEDURE lock_npqv (pi_nqv_npq_id        nm_pbi_query_values.nqv_npq_id%TYPE
+PROCEDURE lock_npqv (pi_nqv_sequence      nm_pbi_query_values.nqv_sequence%TYPE
+                    ,pi_nqv_npq_id        nm_pbi_query_values.nqv_npq_id%TYPE
                     ,pi_nqv_nqt_seq_no    nm_pbi_query_values.nqv_nqt_seq_no%TYPE
                     ,pi_nqv_nqa_seq_no    nm_pbi_query_values.nqv_nqa_seq_no%TYPE
-                    ,pi_nqv_sequence      nm_pbi_query_values.nqv_sequence%TYPE
                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                     ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -21819,10 +21819,10 @@ BEGIN
    nm_debug.proc_start(g_package_name,'lock_npqv');
 --
    l_rowid := lock_npqv
-                   (pi_nqv_npq_id        => pi_nqv_npq_id
+                   (pi_nqv_sequence      => pi_nqv_sequence
+                   ,pi_nqv_npq_id        => pi_nqv_npq_id
                    ,pi_nqv_nqt_seq_no    => pi_nqv_nqt_seq_no
                    ,pi_nqv_nqa_seq_no    => pi_nqv_nqa_seq_no
-                   ,pi_nqv_sequence      => pi_nqv_sequence
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    );
