@@ -1,15 +1,12 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
+--   PVCS Identifiers :-
 --
------------------------------------------------------------------------------
---
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3eng_dynseg.pkb	1.13 06/27/06
---       Module Name      : nm3eng_dynseg.pkb
---       Date into SCCS   : 06/06/27 11:43:29
---       Date fetched Out : 07/06/13 14:11:24
---       SCCS Version     : 1.13
---
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.1   Jul 24 2007 13:06:46   ptanava  $
+--       Module Name      : $Workfile:   nm3eng_dynseg.pkb  $
+--       Date into PVCS   : $Date:   Jul 24 2007 13:06:46  $
+--       Date fetched Out : $Modtime:   Jul 24 2007 12:58:28  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on sccs version : 1.13
 --
 --   Author : Jonathan Mills
 --
@@ -18,10 +15,16 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
+/* History
+    24.07.07 PT modified build_sql() so that the FT placements are now expected to be read from nm_members as for iit_inv_items
+                  and not be included in the veiw
+                this complements the similar FT treatment in the nm3bulk_merge package
+*/
+
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3eng_dynseg.pkb	1.13 06/27/06"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg';
@@ -2132,6 +2135,12 @@ PROCEDURE build_sql (pi_inv_type   IN     VARCHAR2
    l_begin_mp_col user_tab_columns.column_name%TYPE;
    l_end_mp_col   user_tab_columns.column_name%TYPE;
 --
+  -- PT 24.07.07 start
+  l_nin_nw_type       nm_inv_nw_all.nin_nw_type%type;
+  l_inv_table_name    varchar2(30) := 'nm_inv_items';
+  l_inv_ne_id_col     varchar2(30) := 'iit_ne_id';
+  -- PT 24.07.07 end
+  
 BEGIN
 --
    IF g_merge_run
@@ -2196,16 +2205,31 @@ BEGIN
    l_col_name    := l_rec_ita.ita_attrib_name;
    po_dec_places := l_rec_ita.ita_dec_places;
 --
-   IF l_rec_nit.nit_table_name IS NULL
+
+  -- PT 24.07.07 start
+  if l_rec_nit.nit_table_name is not null then
+    select n.nin_nw_type
+    into l_nin_nw_type
+    from nm_inv_nw_all n
+    where n.nin_nit_inv_code = pi_inv_type
+      and rownum = 1;
+    l_inv_table_name  := l_rec_nit.nit_table_name;
+    l_inv_ne_id_col   := l_rec_nit.nit_foreign_pk_column;
+  end if;
+  -- PT 24.07.07 end
+  
+    
+   IF l_rec_nit.nit_table_name IS NULL or l_nin_nw_type is not null
     THEN
-      g_sql :=           'SELECT iit_ne_id'
+    
+      g_sql :=           'SELECT '||l_inv_ne_id_col
               ||CHR(10)||'      ,'||l_nvl_before||'iit.'||l_col_name||l_nvl_after||' '||l_rec_ita.ita_view_col_name
               ||CHR(10)||'      ,GREATEST(nm.nm_begin_mp,nsm.'||l_begin_mp_col||') nm_begin_mp'
               ||CHR(10)||'      ,LEAST(nm.nm_end_mp,nsm.'||l_end_mp_col||') nm_end_mp'
               ||CHR(10)||'      ,nm.nm_cardinality'
               ||CHR(10)||' FROM  '||l_table_name||' nsm'
-              ||CHR(10)||'      ,nm_inv_items           iit'
-              ||CHR(10)||'      ,nm_members             nm';
+              ||CHR(10)||'      ,'||l_inv_table_name||' iit'
+              ||CHR(10)||'      ,nm_members nm';
       IF g_merge_run
        THEN
          g_sql := g_sql
@@ -2220,17 +2244,37 @@ BEGIN
               ||CHR(10)||' AND   nsm.'||l_ne_id_col||'          = nm.nm_ne_id_of'
               ||CHR(10)||' AND   nm.nm_end_mp          > nsm.'||l_begin_mp_col
               ||CHR(10)||' AND   nm.nm_begin_mp        <= nsm.'||l_end_mp_col
-              ||CHR(10)||' AND   nm.nm_ne_id_in         = iit.iit_ne_id'
-              ||CHR(10)||' AND   nm.nm_type             = '||nm3flx.string('I')
-              ||CHR(10)||' AND   nm.nm_obj_type         = :inv_type';
-      IF pi_xsp IS NOT NULL
+              ||CHR(10)||' AND   nm.nm_ne_id_in         = iit.'||l_inv_ne_id_col;
+              --||CHR(10)||' AND   nm.nm_type             = '||nm3flx.string('I')
+              --||CHR(10)||' AND   nm.nm_obj_type         = :inv_type';
+      
+      
+         
+      -- xsp given and not ft asset   
+      IF pi_xsp IS NOT NULL and l_nin_nw_type is null
        THEN
          g_sql := g_sql
               ||CHR(10)||' AND   iit.iit_x_sect         = :xsp';
-      ELSE
+      
+      -- xsp not given     
+      ELSif pi_xsp IS NULL then 
          g_sql := g_sql
               ||CHR(10)||' AND   :xsp IS NULL';
+              
+      -- xsp given and ft asset
+      else
+         g_sql := g_sql
+              ||CHR(10)||' AND   :xsp IS not NULL';
+        
       END IF;
+        
+
+   -- PT 24.07.07
+   -- the original FT select
+   -- this should not be entered at all.
+   -- (I am unclear how the true FT tables are added to our network. They have their own placement info
+   --   that must be translated into our placments in the nm_members. Once this is done the type should
+   --   be marked as palced on the networ in nm_inv_nw_all)
    ELSE
       g_sql :=           'SELECT TRUNC('||l_rec_nit.nit_foreign_pk_column||') '||l_rec_nit.nit_foreign_pk_column
               ||CHR(10)||'      ,'||l_nvl_before||'ft.'||l_col_name||l_nvl_after||' '||l_rec_ita.ita_view_col_name
@@ -2271,7 +2315,8 @@ BEGIN
       g_sql := g_sql
                ||CHR(10)||' ORDER BY nte_seq_no';
    END IF;
---   nm_debug.debug(g_sql);
+   
+   nm_debug.debug(g_sql);
    --
 --
 END build_sql;
