@@ -3,13 +3,12 @@
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm4010_nm4020_upg.sql	1.1 05/14/07
---       Module Name      : nm4010_nm4020_upg.sql
---       Date into SCCS   : 07/05/14 10:43:40
---       Date fetched Out : 07/06/13 13:59:27
---       SCCS Version     : 1.1
---
---   Product upgrade script
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_upg.sql-arc   2.2   Jul 25 2007 09:51:30   jwadsworth  $
+--       Module Name      : $Workfile:   nm4010_nm4020_upg.sql  $
+--       Date into PVCS   : $Date:   Jul 25 2007 09:51:30  $
+--       Date fetched Out : $Modtime:   Jul 25 2007 09:01:32  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on SCCS version : 
 --
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -154,7 +153,7 @@ SET TERM ON
 PROMPT Triggers...
 SET TERM OFF
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||
-        '&terminator'||'trg'||'&terminator'||nm3trg.sql' run_file
+        '&terminator'||'trg'||'&terminator'||'nm3trg.sql' run_file
 FROM dual
 /
 SET FEEDBACK ON
