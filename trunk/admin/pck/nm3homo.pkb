@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.1   Jul 18 2007 15:28:30   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.2   Jul 26 2007 09:10:50   smarshall  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:28:30  $
---       Date fetched Out : $Modtime:   Jul 18 2007 11:50:28  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 26 2007 09:10:50  $
+--       Date fetched Out : $Modtime:   Jul 25 2007 15:22:26  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --   Author : Jonathan Mills
@@ -26,7 +26,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                              ,end_mp   nm_members.nm_end_mp%TYPE); 
    type t_chunk_arr is table of t_chunk_rec index by pls_integer;
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -2023,7 +2023,7 @@ BEGIN
         
         db('  start date= ' || to_char(l_nm_rec.nm_start_date, 'dd/mon/yyyy') || ' end date= ' || TO_CHAR(l_nm_rec.nm_end_date, 'dd/mon/yyyy'));
         
-        if l_nm_rec.nm_start_date <> l_nm_rec.nm_end_date 
+        if l_nm_rec.nm_start_date < l_nm_rec.nm_end_date 
         then
           --get all the bits that haven't already been processed
           l_unprocessed_pl_arr := get_unprocessed_chunks(pi_ne_id     => l_nm_rec.nm_ne_id_of
@@ -3539,9 +3539,14 @@ BEGIN
                            ,pi_new_ne_length    => l_closing_hist_arr(1).neh_new_ne_length
                            ,po_new_pl           => l_new_pl_1);
                      
+            when l_edited_operation_arr(l_element_arr_idx) = nm3net_history.c_neh_op_reverse
+            then
+              l_new_pl_1 := nm3pla.initialise_placement(pi_ne_id => l_closing_hist_arr(1).neh_ne_id_new
+                                                       ,pi_start => l_closing_hist_arr(1).neh_old_ne_length - l_locs_on_element_arr(i).nte_end_mp
+                                                       ,pi_end   => l_closing_hist_arr(1).neh_old_ne_length - l_locs_on_element_arr(i).nte_begin_mp);
+            
             WHEN l_edited_operation_arr(l_element_arr_idx) IN (nm3net_history.c_neh_op_replace
-                                                              ,nm3net_history.c_neh_op_reclassify
-                                                              ,nm3net_history.c_neh_op_reverse)
+                                                              ,nm3net_history.c_neh_op_reclassify)
             THEN
               l_new_pl_1 := nm3pla.initialise_placement(pi_ne_id => l_closing_hist_arr(1).neh_ne_id_new
                                                        ,pi_start => l_locs_on_element_arr(i).nte_begin_mp
@@ -3707,7 +3712,7 @@ PROCEDURE homo_update(p_temp_ne_id_in  IN     number
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'homo_update');
-
+  
   IF c_use_orig_proc
   THEN
     --revert to the original proc
