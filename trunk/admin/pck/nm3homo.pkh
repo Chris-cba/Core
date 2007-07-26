@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkh-arc   2.1   Jul 18 2007 15:27:56   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkh-arc   2.2   Jul 26 2007 16:37:14   gjohnson  $
 --       Module Name      : $Workfile:   nm3homo.pkh  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:27:56  $
---       Date fetched Out : $Modtime:   Jul 18 2007 11:27:38  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 26 2007 16:37:14  $
+--       Date fetched Out : $Modtime:   Jul 26 2007 16:24:50  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --   Author : Jonathan Mills
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3homo AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
+   g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
 --  g_sccsid is the SCCS ID for the package
 --
    c_contiguous_warning_code CONSTANT VARCHAR2(20) := 'CONTIGUOUS';
@@ -264,9 +264,23 @@ PROCEDURE historic_locate_validation(pi_nte_job_id   IN nm_nw_temp_extents.nte_j
 --
 PROCEDURE historic_locate_post(pi_init_effective_date IN date
                               );
+--</PROC>
+--
 -----------------------------------------------------------------------------
 --
---<PRAGMA>
+--<PROC NAME="translate_location_in_time">
+--
+-- This function applies network edits to a location to bring it up to 
+-- the specified target date.
+--
+FUNCTION translate_location_in_time(pi_job_id      IN nm_nw_temp_extents.nte_job_id%TYPE
+                                   ,pi_target_date IN date
+                                   ) RETURN nm_nw_temp_extents.nte_job_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA
    PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
    PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
    PRAGMA RESTRICT_REFERENCES (get_contiguous_warning_const, rnds, wnps, wnds);

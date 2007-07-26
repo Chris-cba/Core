@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.2   Jul 26 2007 09:10:50   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.3   Jul 26 2007 16:37:14   gjohnson  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Jul 26 2007 09:10:50  $
---       Date fetched Out : $Modtime:   Jul 25 2007 15:22:26  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 26 2007 16:37:14  $
+--       Date fetched Out : $Modtime:   Jul 26 2007 16:23:06  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : Jonathan Mills
@@ -26,7 +26,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                              ,end_mp   nm_members.nm_end_mp%TYPE); 
    type t_chunk_arr is table of t_chunk_rec index by pls_integer;
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -4734,6 +4734,273 @@ BEGIN
                    ,p_procedure_name => 'historic_locate_post');
 
 END historic_locate_post;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE remove_element_from_nte(pi_job_id IN nm_nw_temp_extents.nte_job_id%TYPE
+                                 ,pi_ne_id  IN nm_elements.ne_id%TYPE
+                                 ) IS
+BEGIN
+  nm_debug.proc_start(p_package_name   => g_package_name
+                     ,p_procedure_name => 'remove_element_from_nte');
+
+  DELETE
+    nm_nw_temp_extents nte
+  WHERE
+    nte.nte_job_id = pi_job_id
+  AND
+    nte.nte_ne_id_of = pi_ne_id;
+
+  nm_debug.proc_end(p_package_name   => g_package_name
+                   ,p_procedure_name => 'remove_element_from_nte');
+
+END remove_element_from_nte;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION translate_location_in_time(pi_job_id      IN nm_nw_temp_extents.nte_job_id%TYPE
+                                   ,pi_target_date IN date
+                                   ) RETURN nm_nw_temp_extents.nte_job_id%TYPE IS
+
+  c_target_date CONSTANT date := TRUNC(pi_target_date); 
+  
+  l_target_job_id nm_nw_temp_extents.nte_job_id%TYPE := nm3seq.next_nte_id_seq;
+  
+  l_edited_ne_id_arr     nm3net_history.t_neh_ne_id_old_arr;
+  l_edited_operation_arr nm3net_history.t_neh_operation_arr;
+  l_edited_date_arr      nm3net_history.t_neh_effective_date_arr;
+  
+  l_element_arr_idx PLS_INTEGER;
+  
+  l_closing_hist_arr          nm3net_history.t_neh_rec_arr;
+  l_ne_1_closing_hist_arr     nm3net_history.t_neh_rec_arr;
+  l_ne_2_closing_hist_arr     nm3net_history.t_neh_rec_arr;
+  l_ne_1_non_closing_hist_arr nm3net_history.t_neh_rec_arr;
+  l_ne_2_non_closing_hist_arr nm3net_history.t_neh_rec_arr;
+  
+  l_locs_on_element_arr nm3extent.tab_nte;
+  
+  l_new_ne_1_rec nm_elements%ROWTYPE;
+  l_new_ne_2_rec nm_elements%ROWTYPE;
+  
+  l_new_pl_1 nm_placement;
+  l_new_pl_2 nm_placement;
+
+BEGIN
+  nm_debug.proc_start(p_package_name   => g_package_name
+                     ,p_procedure_name => 'translate_location_in_time');
+
+  g_debug_on := TRUE;
+  
+  db('translate_location_in_time');
+  
+  --create copy of temp extent
+  l_target_job_id := create_duplicate_nte(pi_nte_id => pi_job_id);
+  
+  --get list of edited datums in temp extent
+  nm3net_history.get_edited_datums_in_nte(pi_nte_id               => l_target_job_id
+                                         ,po_edited_ne_id_arr     => l_edited_ne_id_arr
+                                         ,po_edited_operation_arr => l_edited_operation_arr
+                                         ,po_edited_date_arr      => l_edited_date_arr);
+  
+  db('l_edited_ne_id_arr.COUNT = ' || l_edited_ne_id_arr.COUNT);
+  
+  IF l_edited_ne_id_arr.COUNT > 0
+  THEN
+    l_element_arr_idx := 1;
+    
+    ---------------------------
+    --process each edited datum
+    ---------------------------
+    WHILE NOT l_element_arr_idx > l_edited_ne_id_arr.COUNT
+    LOOP
+      db('in loop idx ' || l_element_arr_idx);
+      db('element idx ' || l_element_arr_idx 
+         || ' ne_id=' || l_edited_ne_id_arr(l_element_arr_idx)
+         || ' operation=' || l_edited_operation_arr(l_element_arr_idx)
+         || ' date=' || TO_CHAR(l_edited_date_arr(l_element_arr_idx), 'DD-MON-YYYY'));
+         
+      IF l_edited_date_arr(l_element_arr_idx) < c_target_date
+      THEN
+        --edit affects location we are interested in
+        IF l_edited_operation_arr(l_element_arr_idx) <> nm3net_history.c_neh_op_close
+        THEN
+          ---------------------------
+          --get old element details
+          -------------------------
+          db('get old element details');
+          --get details of edit that closed the element
+          l_closing_hist_arr := nm3net_history.get_neh_for_closing_op(pi_ne_id => l_edited_ne_id_arr(l_element_arr_idx));
+          
+          db('l_closing_hist_arr.count = ' || l_closing_hist_arr.COUNT);
+      
+          IF l_closing_hist_arr.COUNT = 0
+          THEN
+               hig.raise_ner(pi_appl               => 'HIG'
+                            ,pi_id                 => 67
+                            ,pi_supplementary_info => 'NM_ELEMENT_HISTORY closing op for ne_id ' || TO_CHAR(l_edited_ne_id_arr(l_element_arr_idx)));
+          END IF;
+          
+          --get all chunks of location on the closed element
+          db('get all chunks of location on the closed element');
+          l_locs_on_element_arr := get_locs_on_element(pi_ne_id      => l_edited_ne_id_arr(l_element_arr_idx)
+                                                      ,pi_nte_job_id => l_target_job_id);
+          
+          db('got ' || l_locs_on_element_arr.COUNT || ' chunks');
+          
+          -------------------------
+          --get new element details
+          -------------------------
+          l_new_ne_1_rec := nm3get.get_ne(pi_ne_id => l_closing_hist_arr(1).neh_ne_id_new);
+          
+          --get non-closing edits to apply on new element
+          db('get non-closing edits to apply on new element');
+          l_ne_1_non_closing_hist_arr := nm3net_history.get_neh_for_non_closing_ops(pi_ne_id => l_closing_hist_arr(1).neh_ne_id_new);
+          
+          --get closing op if they exist
+          l_ne_1_closing_hist_arr := nm3net_history.get_neh_for_closing_op(pi_ne_id => l_closing_hist_arr(1).neh_ne_id_new);
+          
+          IF l_ne_1_closing_hist_arr.COUNT > 0
+          THEN
+            --add to end of element array
+            db('add to end of element array - ' || l_closing_hist_arr(1).neh_ne_id_new);
+            l_edited_ne_id_arr(l_edited_ne_id_arr.COUNT + 1) := l_ne_1_closing_hist_arr(1).neh_ne_id_old;
+            l_edited_operation_arr(l_edited_ne_id_arr.COUNT) := l_ne_1_closing_hist_arr(1).neh_operation;
+            l_edited_date_arr(l_edited_ne_id_arr.COUNT) := l_ne_1_closing_hist_arr(1).neh_effective_date;
+          END IF;
+          
+          IF l_closing_hist_arr(1).neh_operation = nm3net_history.c_neh_op_split
+          THEN
+            db('split so get second new element');
+            l_new_ne_2_rec := nm3get.get_ne(pi_ne_id => l_closing_hist_arr(2).neh_ne_id_new);
+            --get non-closing edits to apply for 2nd element
+            l_ne_2_non_closing_hist_arr := nm3net_history.get_neh_for_non_closing_ops(pi_ne_id => l_closing_hist_arr(2).neh_ne_id_new);
+            
+            --get closing op if they exist
+            l_ne_2_closing_hist_arr := nm3net_history.get_neh_for_closing_op(pi_ne_id => l_closing_hist_arr(2).neh_ne_id_new);
+            
+            IF l_ne_2_closing_hist_arr.COUNT > 0
+            THEN
+              --add to end of element array
+              db('add to end of element array - ' || l_closing_hist_arr(2).neh_ne_id_new);
+              l_edited_ne_id_arr(l_edited_ne_id_arr.COUNT + 1) := l_ne_2_closing_hist_arr(2).neh_ne_id_old;
+              l_edited_operation_arr(l_edited_ne_id_arr.COUNT) := l_ne_2_closing_hist_arr(2).neh_operation;
+              l_edited_date_arr(l_edited_ne_id_arr.COUNT) := l_ne_2_closing_hist_arr(2).neh_effective_date;
+            END IF;
+          END IF;
+          
+          ----------------------
+          --derive new locations
+          ----------------------
+          FOR i IN 1..l_locs_on_element_arr.COUNT
+          LOOP
+            db('processing chunk - ' || l_locs_on_element_arr(i).nte_ne_id_of 
+               || ':' || l_locs_on_element_arr(i).nte_begin_mp
+               || ':' || l_locs_on_element_arr(i).nte_end_mp);
+               
+            --get initial placement(s)
+            CASE 
+              WHEN l_edited_operation_arr(l_element_arr_idx) = nm3net_history.c_neh_op_split
+              THEN
+                process_split(pi_begin_mp           => l_locs_on_element_arr(i).nte_begin_mp
+                             ,pi_end_mp             => l_locs_on_element_arr(i).nte_end_mp
+                             ,pi_new_ne_1_id        => l_closing_hist_arr(1).neh_ne_id_new
+                             ,pi_new_ne_1_length    => l_closing_hist_arr(1).neh_new_ne_length
+                             ,pi_new_ne_2_id        => l_closing_hist_arr(2).neh_ne_id_new
+                             ,pi_new_ne_2_length    => l_closing_hist_arr(2).neh_new_ne_length
+                             ,po_new_pl_1           => l_new_pl_1
+                             ,po_new_pl_2           => l_new_pl_2);
+                       
+              WHEN l_edited_operation_arr(l_element_arr_idx) = nm3net_history.c_neh_op_merge
+              THEN
+                process_merge(pi_begin_mp         => l_locs_on_element_arr(i).nte_begin_mp
+                             ,pi_end_mp           => l_locs_on_element_arr(i).nte_end_mp
+                             ,pi_old_ne_length    => l_closing_hist_arr(1).neh_old_ne_length
+                             ,pi_element_in_merge => l_closing_hist_arr(1).neh_param_1
+                             ,pi_new_ne_id        => l_closing_hist_arr(1).neh_ne_id_new
+                             ,pi_new_ne_length    => l_closing_hist_arr(1).neh_new_ne_length
+                             ,po_new_pl           => l_new_pl_1);
+                       
+              WHEN l_edited_operation_arr(l_element_arr_idx) = nm3net_history.c_neh_op_reverse
+              THEN
+                l_new_pl_1 := nm3pla.initialise_placement(pi_ne_id => l_closing_hist_arr(1).neh_ne_id_new
+                                                         ,pi_start => l_closing_hist_arr(1).neh_old_ne_length - l_locs_on_element_arr(i).nte_end_mp
+                                                         ,pi_end   => l_closing_hist_arr(1).neh_old_ne_length - l_locs_on_element_arr(i).nte_begin_mp);
+              
+              WHEN l_edited_operation_arr(l_element_arr_idx) IN (nm3net_history.c_neh_op_replace
+                                                                ,nm3net_history.c_neh_op_reclassify)
+              THEN
+                l_new_pl_1 := nm3pla.initialise_placement(pi_ne_id => l_closing_hist_arr(1).neh_ne_id_new
+                                                         ,pi_start => l_locs_on_element_arr(i).nte_begin_mp
+                                                         ,pi_end   => l_locs_on_element_arr(i).nte_end_mp);
+              ELSE
+                hig.raise_ner(pi_appl               => nm3type.c_hig
+                             ,pi_id                 => 110
+                             ,pi_supplementary_info => 'nm3homo: closing neh operation "' || l_edited_operation_arr(l_element_arr_idx) || '"');
+            END CASE;
+            
+            db('pl 1 ' || l_new_pl_1.pl_ne_id || ':' || l_new_pl_1.pl_start || ':' || l_new_pl_1.pl_end);
+            db('pl 2 ' || l_new_pl_2.pl_ne_id || ':' || l_new_pl_2.pl_start || ':' || l_new_pl_2.pl_end);
+          
+            -------------------------
+            --apply non-closing edits
+            -------------------------
+            IF l_new_pl_1.pl_ne_id = l_closing_hist_arr(1).neh_ne_id_new
+            THEN
+              --pl 1 is on the first new element
+              db('pl 1 is on the first new element');
+              apply_non_closing_edits(pio_pl                  => l_new_pl_1
+                                     ,pi_non_closing_hist_arr => l_ne_1_non_closing_hist_arr);
+            ELSE
+              --pl 1 is on the second new element
+              db('pl 1 is on the second new element');
+              apply_non_closing_edits(pio_pl                  => l_new_pl_1
+                                     ,pi_non_closing_hist_arr => l_ne_2_non_closing_hist_arr); 
+            END IF;
+            
+            --add new location to temp extent
+            add_pl_to_nte(pi_pl         => l_new_pl_1
+                         ,pi_nte_job_id => l_target_job_id);
+            
+            IF l_new_pl_2.pl_ne_id IS NOT NULL
+            THEN
+              IF l_new_pl_2.pl_ne_id = l_closing_hist_arr(1).neh_ne_id_new
+              THEN
+                --pl 2 is on the first new element
+                db('pl 2 is on the first new element');
+                apply_non_closing_edits(pio_pl                  => l_new_pl_2
+                                       ,pi_non_closing_hist_arr => l_ne_1_non_closing_hist_arr);
+              ELSE
+                --pl 2 is on the second new element
+                db('pl 2 is on the second new element');
+                apply_non_closing_edits(pio_pl                  => l_new_pl_2
+                                       ,pi_non_closing_hist_arr => l_ne_2_non_closing_hist_arr);
+              END IF;
+              
+              --add new location to temp extent
+              add_pl_to_nte(pi_pl         => l_new_pl_2
+                           ,pi_nte_job_id => l_target_job_id);
+            END IF;          
+          END LOOP;
+        END IF;
+        
+        ---------------------------------
+        --remove chunks on edited element
+        ---------------------------------
+        remove_element_from_nte(pi_job_id => l_target_job_id
+                               ,pi_ne_id  => l_edited_ne_id_arr(l_element_arr_idx));
+      END IF;
+      
+      l_element_arr_idx := l_element_arr_idx + 1;
+    END LOOP;
+  END IF;
+
+  nm_debug.proc_end(p_package_name   => g_package_name
+                   ,p_procedure_name => 'translate_location_in_time');
+
+  RETURN l_target_job_id;
+
+END translate_location_in_time;
 --
 -----------------------------------------------------------------------------
 --
