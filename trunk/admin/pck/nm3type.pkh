@@ -1,12 +1,13 @@
 CREATE OR REPLACE PACKAGE nm3type AS
 --<PACKAGE>
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3type.pkh	1.34 11/01/06
---       Module Name      : nm3type.pkh
---       Date into SCCS   : 06/11/01 17:47:28
---       Date fetched Out : 07/06/13 14:13:40
---       SCCS Version     : 1.34
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3type.pkh-arc   2.1   Jul 31 2007 10:33:54   sscanlon  $
+--       Module Name      : $Workfile:   nm3type.pkh  $
+--       Date into PVCS   : $Date:   Jul 31 2007 10:33:54  $
+--       Date fetched Out : $Modtime:   Jul 23 2007 11:02:44  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on SCCS version :  1.34
 --
 --
 --   Author : Jonathan Mills
@@ -24,7 +25,7 @@ CREATE OR REPLACE PACKAGE nm3type AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3type.pkh	1.34 11/01/06"';
+   g_sccsid      CONSTANT  varchar2(2000) :='"$Revision:   2.1  $"';
 --  g_sccsid is the SCCS ID for the package
 --
    SUBTYPE max_varchar2 IS varchar2(32767);
@@ -127,6 +128,7 @@ CREATE OR REPLACE PACKAGE nm3type AS
    c_mai                 CONSTANT hig_products.hpr_product%TYPE := 'MAI';
    c_nsg                 CONSTANT hig_products.hpr_product%TYPE := 'NSG';
    c_pms                 CONSTANT hig_products.hpr_product%TYPE := 'PMS';
+   c_prow                CONSTANT hig_products.hpr_product%TYPE := 'PROW';
    c_stp                 CONSTANT hig_products.hpr_product%TYPE := 'STP';
    c_swr                 CONSTANT hig_products.hpr_product%TYPE := 'SWR';
    c_ukp                 CONSTANT hig_products.hpr_product%TYPE := 'UKP';
