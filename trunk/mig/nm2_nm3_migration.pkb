@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
--- sccsid : @(#)nm2_nm3_migration.pkb	1.37 04/12/07
--- Module Name : nm2_nm3_migration.pkb
--- Date into SCCS : 07/04/12 12:29:48
--- Date fetched Out : 07/06/13 14:09:31
--- SCCS Version : 1.37
+--       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.1   Jul 31 2007 15:38:56   smarshall  $
+--       Module Name      : $Workfile:   nm2_nm3_migration.pkb  $
+--       Date into PVCS   : $Date:   Jul 31 2007 15:38:56  $
+--       Date fetched Out : $Modtime:   Jul 31 2007 14:48:18  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --   Author D.Cope
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '@(#)nm2_nm3_migration.pkb	1.37 04/12/07';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm2_nm3_migration';
   g_proc_name    VARCHAR2(50);
   g_log_file                UTL_FILE.FILE_TYPE;
@@ -4541,12 +4541,19 @@ PROCEDURE create_inventory_metamodel (pi_netw_inv_type IN VARCHAR2 DEFAULT 'NETW
   AND   iad_ita_ity_sys_flag = ita_ity_sys_flag
   AND   ita_iit_inv_code     = ity_inv_code
   AND   ita_ity_sys_flag     = ity_sys_flag;
+
   CURSOR get_v2_inv_attri_domains IS
-  SELECT iad_ita_attrib_name
-       , iad_ita_inv_code
-       , iad_ita_ity_sys_flag
-       , iad_start_date
-       , iad_end_date
+  select iad_ita_attrib_name
+         , iad_ita_inv_code
+         , iad_ita_ity_sys_flag
+		 ,min(nvl(iad_start_Date,g_mig_earliest_date)) iad_start_Date
+		 ,max(iad_end_Date) iad_end_Date
+		 from
+( SELECT iad_ita_attrib_name
+         , iad_ita_inv_code
+         , iad_ita_ity_sys_flag
+         , iad_start_date
+         , iad_end_date
   FROM   v2_inv_attri_domains
         ,v2_inv_type_attribs
         ,v2_inv_item_types
@@ -4562,7 +4569,11 @@ PROCEDURE create_inventory_metamodel (pi_netw_inv_type IN VARCHAR2 DEFAULT 'NETW
          , iad_ita_inv_code
          , iad_ita_ity_sys_flag
          , iad_start_date
-         , iad_end_date;
+         , iad_end_date
+		 )
+		 group by iad_ita_attrib_name
+         , iad_ita_inv_code
+         , iad_ita_ity_sys_flag;
 --
   CURSOR get_hierarchy IS
   SELECT ity_inv_code
@@ -4759,8 +4770,8 @@ BEGIN
     l_nit.nit_descr              := i_rec.ity_descr;
     l_nit.nit_screen_seq         := i_rec.ity_screen_seq;
     l_nit.nit_view_name          := i_rec.ity_view_name;
-    l_nit.nit_start_date         := NVL(i_rec.ity_start_date,g_mig_earliest_date);
-    l_nit.nit_end_date           := i_rec.ity_end_date;
+    l_nit.nit_start_date         := trunc(NVL(i_rec.ity_start_date,g_mig_earliest_date));
+    l_nit.nit_end_date           := trunc(i_rec.ity_end_date);
     l_nit.nit_multiple_allowed   := NVL(i_rec.ity_multi_allowed,'N');
     l_nit.nit_replaceable        := 'Y';
     l_nit.nit_exclusive          := 'N';
@@ -4797,8 +4808,8 @@ BEGIN
     l_nin.nin_nw_type       := i_rec.ity_sys_flag;
     l_nin.nin_nit_inv_code  := l_nit.nit_inv_type;
     l_nin.nin_loc_mandatory := 'Y';
-    l_nin.nin_start_date    := NVL(i_rec.ity_start_date,get_inv_type_start_Date(l_nin.nin_nit_inv_code));
-    l_nin.nin_end_date      := i_rec.ity_end_date;
+    l_nin.nin_start_date    :=trunc( NVL(i_rec.ity_start_date,get_inv_type_start_Date(l_nin.nin_nit_inv_code)));
+    l_nin.nin_end_date      := trunc(i_rec.ity_end_date);
     IF g_debug THEN
       Nm3debug.debug_nin(pi_rec_nin => l_nin);
     END IF;
@@ -4809,8 +4820,8 @@ BEGIN
   FOR irec IN get_v2_inv_attri_domains LOOP
     l_id.id_domain     := get_nm3_inv_code(irec.iad_ita_inv_code, irec.iad_ita_ity_sys_flag)||'_'||irec.iad_ita_attrib_name;
     l_id.id_title      := l_id.id_domain;
-    l_id.id_start_date := NVL(irec.iad_start_date,g_mig_earliest_date);
-    l_id.id_end_date   := irec.iad_end_date;
+    l_id.id_start_date := trunc(NVL(irec.iad_start_date,g_mig_earliest_date));
+    l_id.id_end_date   := trunc(irec.iad_end_date);
     IF g_debug THEN
       Nm3debug.debug_id(pi_rec_id => l_id);
     END IF;
@@ -4836,8 +4847,8 @@ BEGIN
     l_ita.ita_view_attri     := UPPER(v2_attrib.ita_attrib_name);
     l_ita.ita_view_col_name  := REPLACE(NVL(v2_attrib.ita_view_col_name,UPPER(v2_attrib.ita_attrib_name)),' ', '_');
     l_ita.ita_dtp_code       := v2_attrib.ita_dtp_code;
-    l_ita.ita_start_date     := NVL(v2_attrib.ita_start_date,get_inv_type_start_Date(l_ita.ita_inv_type));
-    l_ita.ita_end_date       := v2_attrib.ita_end_date;
+    l_ita.ita_start_date     := trunc(NVL(v2_attrib.ita_start_date,get_inv_type_start_Date(l_ita.ita_inv_type)));
+    l_ita.ita_end_date       := trunc(v2_attrib.ita_end_date);
     l_ita.ita_queryable      := NVL(v2_attrib.ita_queryable,'N');
     l_ita.ita_ukpms_param_no := v2_attrib.ita_ukpms_param_no;
     l_ita.ita_units          := v2_attrib.ita_units;
@@ -4861,8 +4872,8 @@ BEGIN
     l_ial.ial_value      := irec.iad_value;
     l_ial.ial_dtp_code   := irec.iad_dtp_code;
     l_ial.ial_meaning    := irec.iad_meaning;
-    l_ial.ial_start_date := NVL(irec.iad_start_date,get_inv_domain_start_Date(l_ial.ial_domain));
-    l_ial.ial_end_date   := irec.iad_end_date;
+    l_ial.ial_start_date := trunc(NVL(irec.iad_start_date,get_inv_domain_start_Date(l_ial.ial_domain)));
+    l_ial.ial_end_date   := trunc(irec.iad_end_date);
     l_ial.ial_seq        := irec.row_num;
     IF g_debug THEN
       Nm3debug.debug_ial(pi_rec_ial => l_ial);
@@ -4876,8 +4887,8 @@ BEGIN
        l_ial.ial_value      := cs_rec.ial_dtp_code;
        l_ial.ial_dtp_code   := cs_rec.ial_dtp_code;
        l_ial.ial_meaning    := cs_rec.ial_meaning;
-       l_ial.ial_start_date := cs_rec.ial_start_date;
-       l_ial.ial_end_date   := cs_rec.ial_end_date;
+       l_ial.ial_start_date := trunc(cs_rec.ial_start_date);
+       l_ial.ial_end_date   := trunc(cs_rec.ial_end_date);
        l_ial.ial_seq        := cs_rec.ial_seq;
        IF g_debug THEN
          Nm3debug.debug_ial(pi_rec_ial => l_ial);
