@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.1   Jul 18 2007 15:21:04   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.2   Jul 31 2007 10:32:26   sscanlon  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:21:04  $
---       Date fetched Out : $Modtime:   Jul 09 2007 20:06:12  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 31 2007 10:32:26  $
+--       Date fetched Out : $Modtime:   Jul 23 2007 15:47:42  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --   Author : ITurnbull
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --   Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -883,6 +883,22 @@ BEGIN
                ,p_effective_date
                ,p_ne_id_1
                ,p_ne_id_2;
+  END IF;
+  -- Check if PROW is installed and so split
+   IF Hig.is_product_licensed(Nm3type.c_prow)
+    THEN
+      l_block :=            'BEGIN'
+                 ||CHR(10)||'    prowsplit.split_data( p_old_id     => :p_ne_id'
+                 ||CHR(10)||'                         ,p_new_id1    => :p_ne_id_1'
+                 ||CHR(10)||'                         ,p_new_id2    => :p_ne_id_2'
+                 ||CHR(10)||'                         ,p_effective  => :p_effective_date'
+                 ||CHR(10)||'                         );'
+                 ||CHR(10)||'END;';
+      EXECUTE IMMEDIATE l_block
+       USING IN p_ne_id
+               ,p_ne_id_1
+               ,p_ne_id_2
+               ,p_effective_date;
   END IF;
 --
    Nm_Debug.proc_end(g_package_name,'split_other_products');
