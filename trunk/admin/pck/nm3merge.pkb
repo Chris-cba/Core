@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.1   Jul 18 2007 15:17:06   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.2   Jul 31 2007 10:31:38   sscanlon  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:17:06  $
---       Date fetched Out : $Modtime:   Jul 09 2007 19:28:38  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 31 2007 10:31:38  $
+--       Date fetched Out : $Modtime:   Jul 23 2007 15:28:20  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -757,6 +757,23 @@ BEGIN
                 ,p_ne_id_2
                 ,l_new_starting_section
                 ,p_flip_cardinality_of_2
+                ,p_effective_date;
+   END IF;
+   -- Check if PROW is installed and do merge
+   IF hig.is_product_licensed( nm3type.c_prow )
+    THEN
+      -- do merge
+       l_block :=            'BEGIN'
+                  ||CHR(10)||'   prowmerge.merge_data( p_new_id     => :p_ne_id_new'
+                  ||CHR(10)||'                        ,p_old_id1    => :p_ne_id_1'
+                  ||CHR(10)||'                        ,p_old_id2    => :p_ne_id_2'
+                  ||CHR(10)||'                        ,p_effective  => :p_effective_date'
+                  ||CHR(10)||'                        );'
+                  ||CHR(10)||'END;';
+       EXECUTE IMMEDIATE l_block
+        USING IN p_ne_id_new
+                ,p_ne_id_1
+                ,p_ne_id_2
                 ,p_effective_date;
    END IF;
 --
