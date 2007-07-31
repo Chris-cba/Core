@@ -7,7 +7,7 @@ CREATE OR REPLACE PACKAGE BODY Pre_Migration_Check AS
 --       sccsid           : @(#)pre_migration_check.pkb	1.40 06/07/07
 --       Module Name      : pre_migration_check.pkb
 --       Date into SCCS   : 07/06/07 11:49:40
---       Date fetched Out : 07/06/13 14:09:35
+--       Date fetched Out : 07/06/07 11:49:55
 --       SCCS Version     : 1.40
 --
 --
@@ -1133,7 +1133,7 @@ BEGIN
     FOR I IN 1..l_tab_unit_code.COUNT LOOP
 	  IF I>1 THEN
 	   IF l_tab_start_date(I)<l_end_date AND NVL(l_tab_end_date(I),c_big_Date)>l_start_date THEN
-       g_error := c2rec.rse_unique||' is a member of groups with Admin Units '||l_tab_unit_code(I-1)||'('||l_tab_hau_name(I-1)||') and '||l_tab_unit_code(I-1)||'('||l_tab_hau_name(I-1)||')';
+       g_error := c2rec.rse_unique||' is a member of groups with Admin Units '||l_tab_unit_code(I-1)||'('||l_tab_hau_name(I-1)||') and '||l_tab_unit_code(I)||'('||l_tab_hau_name(I)||')';
 
         ----------------------------------------------------------
         -- Insert details of failure into PRE_MIGRATION_CHK_ISSUES
