@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.1   Jul 18 2007 15:21:30   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.2   Jul 31 2007 10:35:10   sscanlon  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:21:30  $
---       Date fetched Out : $Modtime:   Jun 29 2007 14:48:32  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 31 2007 10:35:10  $
+--       Date fetched Out : $Modtime:   Jul 24 2007 08:48:20  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -471,6 +471,40 @@ END undo_scheme;
                  ,p_ne_id_3   => p_ne_id_3
                  ,p_operation => p_operation
                  ,p_op_date   => p_op_date);
+      --
+
+      -- check product install
+      --
+      -- <PROW>
+      --
+      IF Hig.is_product_licensed (Nm3type.c_prow)
+      THEN
+         -- undo the action
+         IF p_operation = c_split
+         THEN -- split
+          -- passes the ne_ids of the 2 new/split elements and the id of the original element
+            EXECUTE IMMEDIATE    ' BEGIN'
+                              || CHR (10)|| '    prowsplit.unsplit_data( p_old_id   => :p_ne_id_1'
+                              || CHR (10)|| '                           ,p_new_id1 => :p_ne_id_2'
+                              || CHR (10)|| '                           ,p_new_id2 => :p_ne_id_3);'
+                              || CHR (10)|| 'END;'
+                        USING IN p_ne_id_1, p_ne_id_2, p_ne_id_3;
+--
+         ELSIF p_operation = c_merge
+         THEN -- merge
+            -- passes the ne_id of the merged element and the id's of the 2 original elements
+            EXECUTE IMMEDIATE    ' BEGIN'
+                              || CHR (10)|| '    prowmerge.unmerge_data( p_new_id => :p_ne_id_1'
+                              || CHR (10)|| '                           ,p_old_id1 => :p_ne_id_2'
+                              || CHR (10)|| '                           ,p_old_id2 => :p_ne_id_3);'
+                              || CHR (10)|| 'END;'
+                        USING IN p_ne_id_1, p_ne_id_2, p_ne_id_3;
+--
+         END IF;
+      END IF;
+
+      --
+      -- </PROW>
       --
       Nm_Debug.proc_end (g_package_name, 'UNDO_OTHER_PRODUCTS');
    END undo_other_products;
