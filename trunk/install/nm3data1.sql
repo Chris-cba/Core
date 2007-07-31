@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.3   Jul 24 2007 16:46:30   smarshall  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.4   Jul 31 2007 17:17:56   jwadsworth  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Jul 24 2007 16:46:30  $
---       Date fetched Out : $Modtime:   Jul 24 2007 16:38:00  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jul 31 2007 17:17:56  $
+--       Date fetched Out : $Modtime:   Jul 31 2007 16:26:40  $
+--       Version          : $Revision:   2.4  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-24-JUL-2007 16:04
+31-JUL-2007 17:05
 
 TABLES PROCESSED
 ================
@@ -14181,6 +14181,20 @@ INSERT INTO HIG_DOMAINS
        ,HDO_CODE_LENGTH
        )
 SELECT 
+        'ROAD_SYS_FLAG'
+       ,'HIG'
+       ,'Road System Flag'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_DOMAINS
+                   WHERE HDO_DOMAIN = 'ROAD_SYS_FLAG');
+--
+INSERT INTO HIG_DOMAINS
+       (HDO_DOMAIN
+       ,HDO_PRODUCT
+       ,HDO_TITLE
+       ,HDO_CODE_LENGTH
+       )
+SELECT 
         'ROAD_TYPE'
        ,'HIG'
        ,'Road Types'
@@ -24668,6 +24682,48 @@ INSERT INTO HIG_CODES
        ,HCO_END_DATE
        )
 SELECT 
+        'ROAD_SYS_FLAG'
+       ,'D'
+       ,'DTP'
+       ,'Y'
+       ,null
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'ROAD_SYS_FLAG'
+                    AND  HCO_CODE = 'D');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'ROAD_SYS_FLAG'
+       ,'L'
+       ,'Local'
+       ,'Y'
+       ,null
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'ROAD_SYS_FLAG'
+                    AND  HCO_CODE = 'L');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
         'ROAD_TYPE'
        ,'AP'
        ,'All Purpose'
@@ -32250,7 +32306,7 @@ SELECT
         'HISTINVLOC'
        ,'NET'
        ,'Enable Historic Asset Location'
-       ,'Set to Y to enable historic loatoin of assets when the network has been edited.'
+       ,'Set to Y to enable historic loation of assets when the network has been edited.'
        ,''
        ,'VARCHAR2'
        ,'N'
