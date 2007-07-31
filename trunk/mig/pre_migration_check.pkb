@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY Pre_Migration_Check AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)pre_migration_check.pkb	1.40 06/07/07
---       Module Name      : pre_migration_check.pkb
---       Date into SCCS   : 07/06/07 11:49:40
---       Date fetched Out : 07/06/07 11:49:55
---       SCCS Version     : 1.40
+--       sccsid           : $Header:   //vm_latest/archives/nm3/mig/pre_migration_check.pkb-arc   2.2   Jul 31 2007 09:47:24   smarshall  $
+--       Module Name      : $Workfile:   pre_migration_check.pkb  $
+--       Date into PVCS   : $Date:   Jul 31 2007 09:47:24  $
+--       Date fetched Out : $Modtime:   Jul 31 2007 08:57:32  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --   Author : Darren Cope/Stuart Marshall/Graeme Johnson
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY Pre_Migration_Check AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"@(#)pre_migration_check.pkb	1.40 06/07/07"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.2  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'pre_migration_check';
 
