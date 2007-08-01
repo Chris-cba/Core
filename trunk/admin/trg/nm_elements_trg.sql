@@ -6,11 +6,12 @@ CREATE OR REPLACE TRIGGER a_ins_nm_elements
 DECLARE
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm_elements_trg.sql	1.11 09/15/06
---       Module Name      : nm_elements_trg.sql
---       Date into SCCS   : 06/09/15 12:23:26
---       Date fetched Out : 07/06/13 17:02:44
---       SCCS Version     : 1.11
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.1   Aug 01 2007 15:18:12   dyounger  $
+--       Module Name      : $Workfile:   nm_elements_trg.sql  $
+--       Date into SCCS   : $Date:   Aug 01 2007 15:18:12  $
+--       Date fetched Out : $Modtime:   Aug 01 2007 14:24:24  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on 1.11
 --
 --      TRIGGER a_ins_nm_elements
 --       AFTER  INSERT
@@ -84,11 +85,12 @@ CREATE OR REPLACE TRIGGER b_upd_nm_elements
 DECLARE
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm_elements_trg.sql	1.11 09/15/06
---       Module Name      : nm_elements_trg.sql
---       Date into SCCS   : 06/09/15 12:23:26
---       Date fetched Out : 07/06/13 17:02:44
---       SCCS Version     : 1.11
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.1   Aug 01 2007 15:18:12   dyounger  $
+--       Module Name      : $Workfile:   nm_elements_trg.sql  $
+--       Date into SCCS   : $Date:   Aug 01 2007 15:18:12  $
+--       Date fetched Out : $Modtime:   Aug 01 2007 14:24:24  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on 1.11
 --
 --     TRIGGER b_upd_nm_elements
 --       BEFORE  UPDATE
@@ -101,7 +103,7 @@ DECLARE
 --
    c_dummy_date CONSTANT date   := TO_DATE('01011801','DDMMYYYY');
    c_dummy_num  CONSTANT number := -1;
-   
+
    l_old_ne_flex_cols_rec nm3nwval.t_ne_flex_cols_rec;
    l_new_ne_flex_cols_rec nm3nwval.t_ne_flex_cols_rec;
 --
@@ -123,7 +125,7 @@ BEGIN
    --
    IF :NEW.ne_no_end IS NOT NULL
     THEN
--- GJ 15-SEP-2006 706006 changed IF statement    
+-- GJ 15-SEP-2006 706006 changed IF statement
 --      IF :NEW.ne_no_end <> NVL(:NEW.ne_no_end,c_dummy_num)
       IF :NEW.ne_no_end <> NVL(:OLD.ne_no_end,c_dummy_num)
        THEN
@@ -154,7 +156,7 @@ BEGIN
    l_old_ne_flex_cols_rec.ne_nsg_ref    := :OLD.ne_nsg_ref;
    l_old_ne_flex_cols_rec.ne_version_no := :OLD.ne_version_no;
    l_old_ne_flex_cols_rec.ne_group      := :OLD.ne_group;
-   
+
    l_new_ne_flex_cols_rec.ne_owner      := :NEW.ne_owner;
    l_new_ne_flex_cols_rec.ne_name_1     := :NEW.ne_name_1;
    l_new_ne_flex_cols_rec.ne_name_2     := :NEW.ne_name_2;
@@ -165,7 +167,7 @@ BEGIN
    l_new_ne_flex_cols_rec.ne_nsg_ref    := :NEW.ne_nsg_ref;
    l_new_ne_flex_cols_rec.ne_version_no := :NEW.ne_version_no;
    l_new_ne_flex_cols_rec.ne_group      := :NEW.ne_group;
-   
+
    nm3nwval.check_ne_flex_cols_updatable(pi_ne_nt_type           => :NEW.ne_nt_type
                                         ,pi_old_ne_flex_cols_rec => l_old_ne_flex_cols_rec
                                         ,pi_new_ne_flex_cols_rec => l_new_ne_flex_cols_rec);
@@ -206,11 +208,12 @@ CREATE OR REPLACE TRIGGER b_ins_nm_elements
 BEGIN
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm_elements_trg.sql	1.11 09/15/06
---       Module Name      : nm_elements_trg.sql
---       Date into SCCS   : 06/09/15 12:23:26
---       Date fetched Out : 07/06/13 17:02:44
---       SCCS Version     : 1.11
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.1   Aug 01 2007 15:18:12   dyounger  $
+--       Module Name      : $Workfile:   nm_elements_trg.sql  $
+--       Date into SCCS   : $Date:   Aug 01 2007 15:18:12  $
+--       Date fetched Out : $Modtime:   Aug 01 2007 14:24:24  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on 1.11
 --
 --   TRIGGER b_ins_nm_elements
 --       BEFORE  INSERT
@@ -255,11 +258,12 @@ CREATE OR REPLACE TRIGGER a_del_nm_elements
 DECLARE
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm_elements_trg.sql	1.11 09/15/06
---       Module Name      : nm_elements_trg.sql
---       Date into SCCS   : 06/09/15 12:23:26
---       Date fetched Out : 07/06/13 17:02:44
---       SCCS Version     : 1.11
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.1   Aug 01 2007 15:18:12   dyounger  $
+--       Module Name      : $Workfile:   nm_elements_trg.sql  $
+--       Date into SCCS   : $Date:   Aug 01 2007 15:18:12  $
+--       Date fetched Out : $Modtime:   Aug 01 2007 14:24:24  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on 1.11
 --
 --     TRIGGER a_del_nm_elements
 --       AFTER   DELETE
@@ -282,25 +286,25 @@ DECLARE
    cursor get_theme ( c_nt_type in nm_elements_all.ne_nt_type%type,
                       c_gt_type in nm_elements_all.ne_gty_group_type%type ) is
      select nth_feature_table,
-            nth_feature_pk_column 
+            nth_feature_pk_column
      from nm_themes_all, nm_nw_themes, nm_linear_types
      where nlt_nt_type = c_nt_type
      and   nvl(nlt_gty_type, nm3type.c_nvl ) = nvl( c_gt_type, nm3type.c_nvl )
      and nlt_g_i_d = 'D'
      and nnth_nlt_id = nlt_id
      and nnth_nth_theme_id = nth_theme_id;
-                      
+
 --
 BEGIN
 --
    if :old.ne_type = 'S'  then
-   
-     for irec in get_theme( :old.ne_nt_type, :old.ne_gty_group_type ) loop 
-   
+
+     for irec in get_theme( :old.ne_nt_type, :old.ne_gty_group_type ) loop
+
        begin
-       
+
          begin
-  
+
            select referenced_name, cc.column_name
            into l_ref_table, l_ref_column
            from user_dependencies, user_sdo_geom_metadata t, user_constraints c, user_cons_columns cc
@@ -311,15 +315,15 @@ BEGIN
            and c.constraint_type = 'P'
            and cc.constraint_name = c.constraint_name
            and cc.table_name = t.table_name;
-         
+
            l_spatial_table  := l_ref_table;
            l_spatial_pk_col := l_ref_column;
-         
+
          exception
            when no_data_found then
              l_spatial_table  := irec.nth_feature_table;
              l_spatial_pk_col := irec.nth_feature_pk_column;
-         end;   
+         end;
 --
          EXECUTE IMMEDIATE 'DELETE FROM '||l_spatial_table||' WHERE '||l_spatial_pk_col||' = :ne_id' USING :OLD.ne_id;
 --
@@ -349,11 +353,12 @@ DECLARE
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm_elements_trg.sql	1.11 09/15/06
---       Module Name      : nm_elements_trg.sql
---       Date into SCCS   : 06/09/15 12:23:26
---       Date fetched Out : 07/06/13 17:02:44
---       SCCS Version     : 1.11
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.1   Aug 01 2007 15:18:12   dyounger  $
+--       Module Name      : $Workfile:   nm_elements_trg.sql  $
+--       Date into SCCS   : $Date:   Aug 01 2007 15:18:12  $
+--       Date fetched Out : $Modtime:   Aug 01 2007 14:24:24  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on 1.11
 --
 --      TRIGGER  b_del_nm_elements
 --       BEFORE  DELETE
@@ -401,7 +406,7 @@ BEGIN
 --
       END IF;
 --
-      l_node_id := :NEW.ne_no_end;
+      l_node_id := :OLD.ne_no_end;
 --
    END LOOP;
 --
