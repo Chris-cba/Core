@@ -8,11 +8,11 @@ DECLARE
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm_themes_all_b_iu_trg.trg	1.5 02/22/07
---       Module Name      : nm_themes_all_b_iu_trg.trg
---       Date into SCCS   : 07/02/22 10:12:45
---       Date fetched Out : 07/06/13 17:03:37
---       SCCS Version     : 1.5
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_themes_all_b_iu_trg.trg-arc   2.1   Aug 06 2007 10:02:34   aedwards  $
+--       Module Name      : $Workfile:   nm_themes_all_b_iu_trg.trg  $
+--       Date into SCCS   : $Date:   Aug 06 2007 10:02:34  $
+--       Date fetched Out : $Modtime:   Aug 06 2007 09:12:34  $
+--       SCCS Version     : $Revision:   2.1  $
 --
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2006
@@ -46,16 +46,6 @@ BEGIN
 --   END IF;
 --
 --
-
--- AE
--- TFL Specific - maintain a theme list for visible themes in locator
-  IF DELETING  
-  THEN 
-    maintain_ntv (:OLD.nth_theme_id,'DELETING');
-  ELSIF INSERTING 
-  THEN 
-    maintain_ntv (:NEW.nth_theme_id,'INSERTING');
-  END IF;
 --
 EXCEPTION
    WHEN OTHERS THEN
