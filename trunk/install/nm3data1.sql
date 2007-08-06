@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.4   Jul 31 2007 17:17:56   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.5   Aug 06 2007 17:39:02   gjohnson  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Jul 31 2007 17:17:56  $
---       Date fetched Out : $Modtime:   Jul 31 2007 16:26:40  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Aug 06 2007 17:39:02  $
+--       Date fetched Out : $Modtime:   Aug 06 2007 17:37:34  $
+--       Version          : $Revision:   2.5  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-31-JUL-2007 17:05
+06-AUG-2007 17:37
 
 TABLES PROCESSED
 ================
@@ -5683,6 +5683,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'HIG'
                     AND  NER_ID = 443);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,444
+       ,null
+       ,'Invalid character(s) detected in string'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 444);
 --
 INSERT INTO NM_ERRORS
        (NER_APPL
