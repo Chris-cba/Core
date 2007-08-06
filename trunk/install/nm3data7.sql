@@ -1,3 +1,21 @@
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.1   Aug 06 2007 17:39:04   gjohnson  $
+--       Module Name      : $Workfile:   nm3data7.sql  $
+--       Date into PVCS   : $Date:   Aug 06 2007 17:39:04  $
+--       Date fetched Out : $Modtime:   Aug 06 2007 17:37:38  $
+--       Version          : $Revision:   2.1  $
+--
+--   Product metadata script
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2007
+-----------------------------------------------------------------------------
+--
+--
 /***************************************************************************
 
 INFO
@@ -6,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-01-JUN-2007 14:53
+06-AUG-2007 17:37
 
 TABLES PROCESSED
 ================
@@ -14,7 +32,7 @@ NM_ERRORS
 
 TABLE OWNER
 ===========
-NM3DATA
+NM3_METADATA
 
 MODE (A-Append R-Refresh)
 ========================
@@ -22,7 +40,6 @@ R
 
 ***************************************************************************/
 
-define sccsid = '@(#)nm3data7.sql	1.41 06/01/07'
 set define off;
 set feedback off;
 
@@ -944,6 +961,4740 @@ SELECT
        ,50
        ,182
        ,'Your site is not licensed to run this product'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 51;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,51
+       ,183
+       ,'Unable to Bulk Update Contract. %s1 contract items would have been made negative.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 52;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,52
+       ,184
+       ,'Incode must be of format: X9, X99, XX9, XX99, X9X, XX9X (where X is a letter and 9 is a number)'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 53;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,53
+       ,185
+       ,'Outcode must be one number and two letters (9XX)'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 54;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,54
+       ,186
+       ,'This contact is not valid for this type'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 55;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,55
+       ,187
+       ,'Cannot Delete record as associated %s1 records exist.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 56;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,56
+       ,188
+       ,'This contact is not current, check start and end dates.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 57;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,57
+       ,189
+       ,'A Surname must be entered.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 58;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,58
+       ,190
+       ,'An Organisation Name must be entered.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 59;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,59
+       ,342
+       ,'You cannot enter a date in the future'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 60;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,60
+       ,639
+       ,'A value for one of these fields MUST be entered'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 61;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,61
+       ,9608
+       ,'You must enter either %s1 or %s2'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 62;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,62
+       ,null
+       ,'A domain required for this screen is not present which may cause it to function incorrectly or not at all.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 63;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,63
+       ,null
+       ,'GIS is not available.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 64;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,64
+       ,null
+       ,'Value already exists.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 65;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,65
+       ,null
+       ,'GIS shape in place, network editing function not allowed.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 66;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,66
+       ,null
+       ,'Unable to find GIS route theme.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 67;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,67
+       ,null
+       ,'Record not found'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 68;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,68
+       ,null
+       ,'Cannot find GIS theme.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 69;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,69
+       ,null
+       ,'Value entered is too long.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 70;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,70
+       ,null
+       ,'Value is of invalid format.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 71;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,71
+       ,null
+       ,'Cannot delete another user''s record.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 72;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,72
+       ,null
+       ,'Public synonyms not available, you must create private synonyms for this user.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 73;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,73
+       ,null
+       ,'Some shapes are not available for the area you wish to display.'||CHR(10)||''||CHR(10)||'This may give misleading results in the GIS.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 74;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,74
+       ,null
+       ,'There are no shapes available for the object you wish to view in the GIS.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 75;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,75
+       ,null
+       ,'No GIS objects selected.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 76;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,76
+       ,null
+       ,'Value cannot be less than '
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 77;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,77
+       ,null
+       ,'Value cannot be greater than '
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 78;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,78
+       ,null
+       ,'Value cannot be greater than '
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 79;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,79
+       ,null
+       ,'Cannot create synonym - object does not exist in schema.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 80;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,80
+       ,null
+       ,'User does not exist in HIG_USERS.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 81;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,81
+       ,null
+       ,'User does not have permission to create synonym.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 82;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,82
+       ,null
+       ,'Application configured to run using PUBLIC synonyms - not creating PRIVATE synonyms.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 83;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,83
+       ,null
+       ,'Error occurred executing sql'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 84;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,84
+       ,null
+       ,'Function name not found in function text'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 85;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,85
+       ,null
+       ,'Update not allowed.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 86;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,86
+       ,null
+       ,'You do not have permission to perform this action.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 87;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,87
+       ,null
+       ,'Would you like to save changes?'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 88;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,88
+       ,null
+       ,'Invalid admin unit.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 89;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,89
+       ,null
+       ,'The passwords you have entered are different.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 90;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,90
+       ,null
+       ,'Password changed successfully.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 91;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,91
+       ,null
+       ,'Arrays supplied have different numbers of values.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 92;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,92
+       ,null
+       ,'All old and new values specified are the same.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 93;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,93
+       ,null
+       ,' items updated.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 94;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,94
+       ,null
+       ,'This operation involves a commit, are you sure you wish to continue?'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 95;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,95
+       ,null
+       ,'Operation completed successfully.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 96;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,96
+       ,null
+       ,'Save Changes before continuing'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 97;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,97
+       ,null
+       ,'If you continue the results may be incorrect.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 98;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,98
+       ,null
+       ,'Open queries are not allowed in this block.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 99;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,99
+       ,null
+       ,'Unique not specified.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 100;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,100
+       ,null
+       ,'No length supplied.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 101;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,101
+       ,null
+       ,'Start date must be effective date.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 102;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,102
+       ,null
+       ,'No changes made.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 103;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,103
+       ,null
+       ,'Invalid parameter data from GIS for session'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 104;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,104
+       ,null
+       ,'Cannot edit when called from GIS.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 105;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,105
+       ,null
+       ,'Point Asset Items can only be placed at point locations, not linear'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 106;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,106
+       ,null
+       ,'Cannot locate Asset records which are in a Child AT relationship'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 107;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,107
+       ,null
+       ,'Mandatory column is NULL'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 108;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,108
+       ,null
+       ,'Column is too long'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 109;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,109
+       ,null
+       ,'Value is invalid for domain'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 110;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,110
+       ,null
+       ,'Invalid parameter'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 111;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,111
+       ,null
+       ,'Numeric value is invalid.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 112;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,112
+       ,null
+       ,'Invalid number of values specified.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 113;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,113
+       ,null
+       ,'Parse error in query'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 114;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,114
+       ,null
+       ,'You have selected an item of the wrong type.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 115;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,115
+       ,null
+       ,'Error number already exists.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 116;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,116
+       ,null
+       ,'You are creating a role as a  user that is not the highways owner.'||CHR(10)||''||CHR(10)||'The new role has been granted to the highways owner with admin privileges.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 117;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,117
+       ,null
+       ,'You must requery any currently displayed data to see unit changes.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 118;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,118
+       ,null
+       ,'Folder already exists.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 119;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,119
+       ,null
+       ,'You cannot rename the favourites folder.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 120;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,120
+       ,null
+       ,'Alert not found.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 121;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,121
+       ,null
+       ,'OK to delete folder and its contents?'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 122;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,122
+       ,null
+       ,'OK to delete module?'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 123;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,123
+       ,null
+       ,'You cannot delete the favourites folder.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 124;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,124
+       ,null
+       ,'You cannot create an item at this level.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 125;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,125
+       ,null
+       ,'Module already exists in this folder.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 126;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,126
+       ,null
+       ,'You do not have privileges to perform this action'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 127;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,127
+       ,null
+       ,'Discoverer run mode not defined in system options.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 128;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,128
+       ,null
+       ,'Client server Discoverer cannot be run from highways in web mode.'||CHR(10)||''||CHR(10)||'Check user and system options.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 129;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,129
+       ,null
+       ,'Discoverer web path not defined correctly in system options.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 130;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,130
+       ,null
+       ,'Discoverer executable not defined.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 131;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,131
+       ,null
+       ,'Append'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 132;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,132
+       ,null
+       ,'Replace'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 133;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,133
+       ,null
+       ,'The data you have chosen has been changed by another user, please reselect.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 134;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,134
+       ,null
+       ,'No themes available for current module.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 135;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,135
+       ,null
+       ,'Status transition not allowed'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 136;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,136
+       ,null
+       ,'No DBMS job processes defined - contact the system administrator.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 137;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,137
+       ,null
+       ,'Effective Date is format is invalid.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 139;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,139
+       ,null
+       ,'Message is enqueued and will be delivered in due course'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 140;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,140
+       ,null
+       ,'If you change your password you will be logged out of highways.'||CHR(10)||''||CHR(10)||'OK to continue?'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 141;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,141
+       ,null
+       ,'Error populating group'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 142;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,142
+       ,null
+       ,'Job not online'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 143;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,143
+       ,null
+       ,'More than one instance of this job exists'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 144;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,144
+       ,null
+       ,'Function cannot be performed here'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 145;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,145
+       ,null
+       ,'You have entered a duplicate primary key'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 146;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,146
+       ,null
+       ,'You do not have the required privileges to create a user'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 147;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,147
+       ,null
+       ,'Column, Table combination does not exist.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 148;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,148
+       ,null
+       ,'Date format is invalid'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 149;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,149
+       ,null
+       ,'GIS theme data contains invalid table name(s)'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 150;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,150
+       ,null
+       ,'GIS Theme data is invalid'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 151;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,151
+       ,null
+       ,'Item location cannot be modified from GIS'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 152;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,152
+       ,null
+       ,'Item location may not be modified from GIS for this product'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 153;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,153
+       ,null
+       ,'The password entered is incorrect for this user.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 154;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,154
+       ,null
+       ,'This will exit and lose the connection to the GIS'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 155;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,155
+       ,null
+       ,'Unit Converter'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 156;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,156
+       ,null
+       ,'Cannot add a value as it would exceed the maximum allowed for the condition'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 157;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,157
+       ,null
+       ,'Cannot update domain when values exist'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 158;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,158
+       ,null
+       ,'Field cannot be updated'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 159;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,159
+       ,null
+       ,'Mixed case values not permitted'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 160;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,160
+       ,null
+       ,'Datatype cannot be updated when values exist'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 161;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,161
+       ,null
+       ,'Case sensitivity cannot be updated - this would result in invalid data'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 162;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,162
+       ,null
+       ,'Standard visual attribute not found'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 163;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,163
+       ,null
+       ,'Product Option is not set'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 164;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,164
+       ,null
+       ,'Are you sure you wish to create/recreate the holding table? Any data will be lost'||CHR(10)||'This operation also involves a COMMIT.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 165;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,165
+       ,null
+       ,'Continue'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 166;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,166
+       ,null
+       ,'Name is not unique across NM_LOAD_FILES.NLF_UNIQUE and NM_LOAD_DESTINATIONS.NLD_TABLE_SHORT_NAME'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 167;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,167
+       ,null
+       ,'Form must be called in NORMAL mode'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 168;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,168
+       ,null
+       ,'Date cannot have a time associated'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 169;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,169
+       ,null
+       ,'Database constraint violated'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 170;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,170
+       ,null
+       ,'Allowable values are "NORMAL" and "READONLY"'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 171;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,171
+       ,null
+       ,'Allowable values are "VARCHAR2","NUMBER" and "DATE"'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 172;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,172
+       ,null
+       ,'Only whole numbers may be specified'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 173;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,173
+       ,null
+       ,'Only positive whole numbers may be specified'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 174;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,174
+       ,null
+       ,'Negative values are not permitted'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 175;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,175
+       ,null
+       ,'Definition of query bracketing is invalid'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 176;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,176
+       ,null
+       ,'Specified Job Status is invalid'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 177;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,177
+       ,null
+       ,'Invalid operator specified'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 178;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,178
+       ,null
+       ,'File uploaded successfully'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 179;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,179
+       ,null
+       ,'File upload failed'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 180;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,180
+       ,null
+       ,'File browser not available when running via the web'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 181;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,181
+       ,null
+       ,'INSERT not permitted into this view'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 182;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,182
+       ,null
+       ,'User not instantiated correctly.'||CHR(10)||'Probable missing INSTANTIATE_USER trigger.'||CHR(10)||'Contact exor support for assistance.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 183;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,183
+       ,null
+       ,'Date format mask only permitted for DATE fields'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 184;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,184
+       ,null
+       ,'Account not valid'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 185;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,185
+       ,null
+       ,'Generating report...'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 186;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,186
+       ,null
+       ,'Cannot load from server. No server file path specified'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 187;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,187
+       ,null
+       ,'Are you sure you wish to continue?'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 188;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,188
+       ,null
+       ,'User Created. Do you want to view this user?'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 189;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,189
+       ,null
+       ,'SDE data not present - cloning is not possible'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 190;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,190
+       ,null
+       ,'SDE Layer generator failure'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 191;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,191
+       ,null
+       ,'SDE Table registration id generator failure'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 192;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,192
+       ,null
+       ,'Theme is not related to a network'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 193;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,193
+       ,null
+       ,'Point location data not found - clone is not possible'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 194;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,194
+       ,null
+       ,'No base theme is available'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 195;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,195
+       ,null
+       ,'No datum theme found'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 196;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,196
+       ,null
+       ,'Layer table not found'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 197;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,197
+       ,null
+       ,'SDO Metadata for layer  not found'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 198;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,198
+       ,null
+       ,'Geometry not found - '
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 199;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,199
+       ,null
+       ,'Element shapes not connected'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 201;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,201
+       ,null
+       ,'Only one element has shape - merge prevented'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 202;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,202
+       ,null
+       ,'points are the same - no distance between them'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 203;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,203
+       ,null
+       ,'points are not on same network element'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 204;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,204
+       ,null
+       ,'Lengths of element and shape are inconsistent'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 205;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,205
+       ,null
+       ,'Single part asset shapes are not supported yet'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 206;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,206
+       ,null
+       ,'Load Aborted. Metadata changes have been made since the edif file was generated.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 207;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,207
+       ,null
+       ,'Load Aborted. Error found during MapCapture Load.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 208;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,208
+       ,null
+       ,'Asset Update conflict. Changes have been made to the asset in the database.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 209;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,209
+       ,null
+       ,'The file containing exor product version numbers could not be found.  Please check the ''EXOR_VERSION'' registry setting'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 210;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,210
+       ,null
+       ,'Switch Route Theme ?'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 211;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,211
+       ,null
+       ,'Switch Route Theme to Current Theme?'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 212;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,212
+       ,null
+       ,'Theme must be of type SDE/SDO to be Route Theme'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 213;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,213
+       ,null
+       ,'Assertion failed'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 214;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,214
+       ,null
+       ,'Value cannot be NULL'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 215;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,215
+       ,null
+       ,'XML does not allow lists of more than one column. '||CHR(10)||''||CHR(10)||'Either select one column or use a table alias.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 216;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,216
+       ,null
+       ,'Close'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 217;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,217
+       ,null
+       ,'Select All'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 218;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,218
+       ,null
+       ,'Inverse Selection'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 219;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,219
+       ,null
+       ,'Refresh'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 220;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,220
+       ,null
+       ,'You can only send email as your own user'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 221;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,221
+       ,null
+       ,'All mail messages should have at least 1 "TO" recipient'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 222;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,222
+       ,null
+       ,'Favourite cannot have the name as parent folder'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 230;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,230
+       ,null
+       ,'Inconsistency detected between licenced product versions on the database and in the Exor Product Version Numbers File.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 231;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,231
+       ,null
+       ,'Detail'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 232;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,232
+       ,null
+       ,'Points are not on same network element'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 233;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,233
+       ,null
+       ,'No theme data available to determine gtype'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 234;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,234
+       ,null
+       ,'No suitable PK column for SDE registration'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 235;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,235
+       ,null
+       ,'Theme must be consistent for the same session'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 236;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,236
+       ,null
+       ,'Unknown geometry'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 237;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,237
+       ,null
+       ,'Dimension not available'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 238;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,238
+       ,null
+       ,'Invalid dimension - must be between 2 and 4'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 239;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,239
+       ,null
+       ,'No data to base diminfo calculation'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 240;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,240
+       ,null
+       ,'The SRID does not match - please reset the current SRID or use the correct value'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 241;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,241
+       ,null
+       ,'No Index on the table and column'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 242;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,242
+       ,null
+       ,'Already registered in SDO Metadata'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 243;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,243
+       ,null
+       ,'Needs a Feature table'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 244;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,244
+       ,null
+       ,'Needs a Feature table spatial column'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 245;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,245
+       ,null
+       ,'Needs a base theme to dyn-seg from'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 246;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,246
+       ,null
+       ,'Not enough info on the theme'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 247;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,247
+       ,null
+       ,'Tolerance cannot be found from point data'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 248;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,248
+       ,null
+       ,'Dimension information is incomopatible with operation'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 249;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,249
+       ,null
+       ,'FT and theme do not match'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 250;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,250
+       ,null
+       ,'Asset type is not a foreign table'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 251;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,251
+       ,null
+       ,'SRID generator failure'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 252;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,252
+       ,null
+       ,'Table is not registered or SDE schema cannot see it'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 253;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,253
+       ,null
+       ,'No sde layer for theme'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 254;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,254
+       ,null
+       ,'Layer not found in SDE metadata'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 255;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,255
+       ,null
+       ,'Failure in SDE date conversion'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 256;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,256
+       ,null
+       ,'Failure in date conversion to SDE'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 257;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,257
+       ,null
+       ,'Object does not exist'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 259;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,259
+       ,null
+       ,'Invalid Geometry Type'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 260;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,260
+       ,null
+       ,'Runtime Library missing from working directory/path'
+       ,'A required file is missing from your working directory/path' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 261;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,261
+       ,null
+       ,'Gaps/Overlaps are not permitted'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 262;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,262
+       ,null
+       ,'Element cannot be linked to a record of the given type'
+       ,'Associated Data rules are not in place to support linking this network element to this asset type' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 263;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,263
+       ,null
+       ,'Read Permission not granted on directory'
+       ,'You are not permitted to read data from the specified directory' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 264;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,264
+       ,null
+       ,'Write Permission not granted on directory'
+       ,'You are not permitted to write data to the specified directory' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 265;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,265
+       ,null
+       ,'Wildcards (%) are not permitted'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 266;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,266
+       ,null
+       ,'No base themes for this route type'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 267;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,267
+       ,null
+       ,'No themes for linear type'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 268;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,268
+       ,null
+       ,'Cannot derive Gtype from base theme'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 269;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,269
+       ,null
+       ,'Duplicate Theme or Theme Name Found'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 270;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,270
+       ,null
+       ,'Theme is already registered'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 271;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,271
+       ,null
+       ,'Error associating Geometry Type with Theme'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 272;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,272
+       ,null
+       ,'No themes for linear type '
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 273;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,273
+       ,null
+       ,'Error creating spatial sequence'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 274;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,274
+       ,null
+       ,'Theme is not a datum layer'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 275;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,275
+       ,null
+       ,'Table already exists - please specify another'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 276;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,276
+       ,null
+       ,'No subordinate users to process!'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 277;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,277
+       ,null
+       ,'Creation of view(s) not neccessary - no layers use SRIDS'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 278;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,278
+       ,null
+       ,'Error dropping private synonym'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 279;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,279
+       ,null
+       ,'No USGM data to process!'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 280;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,280
+       ,null
+       ,'Inconsistent base srids'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 281;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,281
+       ,null
+       ,'There are no known themes, populate the input array arguments'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 282;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,282
+       ,null
+       ,'Fatal error in dynamic segmentation on'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 283;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,283
+       ,null
+       ,'You may not project a geometry in a local cordinate system'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 284;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,284
+       ,null
+       ,'Mid point must apply to a line'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 285;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,285
+       ,null
+       ,'Invalid dimension for mid-point function'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 286;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,286
+       ,null
+       ,'No snaps at this position'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 287;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,287
+       ,null
+       ,'Unknown geometry type - must be a point, line or polygon'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 288;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,288
+       ,null
+       ,'Not a point geometry'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 289;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,289
+       ,null
+       ,'Use sdo_point'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 290;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,290
+       ,null
+       ,'Not a single part'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 291;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,291
+       ,null
+       ,'Theme is not a linear referencing layer - cannot return projections'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 292;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,292
+       ,null
+       ,'Cannot find position to project from'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 293;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,293
+       ,null
+       ,'No NT datums for ne_id'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 294;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,294
+       ,null
+       ,'No NT type for nlt id'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 295;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,295
+       ,null
+       ,'No geometry column on the table'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 296;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,296
+       ,null
+       ,'More than one geometry column, need to choose one'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 297;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,297
+       ,null
+       ,'Dyn seg error - mismatch in length of datum and shape'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 298;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,298
+       ,null
+       ,'Dyn seg error - measures are out of bounds of datum lengths'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 434;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,434
+       ,null
+       ,'NSG Node Theme is not present'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 435;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,435
+       ,null
+       ,'NSG ESU theme is not present'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 436;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,436
+       ,null
+       ,'User is not permitted to operate on the selected network element'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 437;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,437
+       ,null
+       ,'User is not permitted to operate on the selected asset'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 438;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,438
+       ,null
+       ,'Please Close Locator Before Using It As A Co-ordinate LOV.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 442;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,442
+       ,null
+       ,'No Interval Exists For Given Interval Code. Please Use HIG1220 To Enter An Iterval For Interval Code'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 443;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,443
+       ,null
+       ,'User Creation Failed!'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 444;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,444
+       ,null
+       ,'Invalid character(s) detected in string'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 500;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,500
+       ,null
+       ,'This module is not available when the application is run on the web.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'MRWA'
+  AND  NER_ID = 1;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'MRWA'
+       ,1
+       ,null
+       ,'Current status of processing is invalid for this action'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 1;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,1
+       ,7
+       ,'Unable to create SECTION_CLASSES record.'
+       ,'ACTION: This is an internal error message and should not normally be'||CHR(10)||'issued. Contact your ORACLE Customer Support Representative.'||CHR(10)||'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 2;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,2
+       ,139
+       ,'Cannot delete record as associated records exist.'
+       ,'ACTION: All associated records should be deleted before the record that'||CHR(10)||'you are trying to delete can be deleted.'||CHR(10)||'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 3;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,3
+       ,341
+       ,'You cannot duplicate records in this block'
+       ,'ACTION: Records cannot be duplicated in this block.'||CHR(10)||'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 4;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,4
+       ,null
+       ,'Use the tree to create hierarchical items.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 5;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,5
+       ,null
+       ,'Cannot change network type when groups exist with this group type.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 6;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,6
+       ,null
+       ,'You cannot insert or update data when the effective date is not today.'||CHR(10)||''||CHR(10)||'Use Preferences to set the effective date.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 7;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,7
+       ,null
+       ,'Network Type must have same admin unit type as parent.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 8;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,8
+       ,null
+       ,'Parent is exclusive and object is already a child of another parent of the same type.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 9;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,9
+       ,null
+       ,'Would you like to save changes before the effective date is changed?'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 10;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,10
+       ,null
+       ,'Start date cannot be updated.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 11;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,11
+       ,null
+       ,'Start date is out of range of parent.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 12;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,12
+       ,null
+       ,'End date is out of range of parent.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 13;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,13
+       ,null
+       ,'Record has children outside its date range.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 14;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,14
+       ,null
+       ,'End date cannot be before start date.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 15;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,15
+       ,null
+       ,'Linear reference cannot be less than zero.'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
@@ -5141,2094 +9892,6 @@ SELECT
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 51;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,51
-       ,183
-       ,'Unable to Bulk Update Contract. %s1 contract items would have been made negative.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 52;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,52
-       ,184
-       ,'Incode must be of format: X9, X99, XX9, XX99, X9X, XX9X (where X is a letter and 9 is a number)'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 53;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,53
-       ,185
-       ,'Outcode must be one number and two letters (9XX)'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 54;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,54
-       ,186
-       ,'This contact is not valid for this type'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 55;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,55
-       ,187
-       ,'Cannot Delete record as associated %s1 records exist.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 56;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,56
-       ,188
-       ,'This contact is not current, check start and end dates.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 57;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,57
-       ,189
-       ,'A Surname must be entered.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 58;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,58
-       ,190
-       ,'An Organisation Name must be entered.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 59;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,59
-       ,342
-       ,'You cannot enter a date in the future'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 60;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,60
-       ,639
-       ,'A value for one of these fields MUST be entered'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 61;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,61
-       ,9608
-       ,'You must enter either %s1 or %s2'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 62;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,62
-       ,null
-       ,'A domain required for this screen is not present which may cause it to function incorrectly or not at all.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 63;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,63
-       ,null
-       ,'GIS is not available.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 64;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,64
-       ,null
-       ,'Value already exists.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 65;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,65
-       ,null
-       ,'GIS shape in place, network editing function not allowed.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 66;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,66
-       ,null
-       ,'Unable to find GIS route theme.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 67;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,67
-       ,null
-       ,'Record not found'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 68;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,68
-       ,null
-       ,'Cannot find GIS theme.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 69;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,69
-       ,null
-       ,'Value entered is too long.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 70;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,70
-       ,null
-       ,'Value is of invalid format.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 71;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,71
-       ,null
-       ,'Cannot delete another user''s record.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 72;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,72
-       ,null
-       ,'Public synonyms not available, you must create private synonyms for this user.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 73;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,73
-       ,null
-       ,'Some shapes are not available for the area you wish to display.'||CHR(10)||''||CHR(10)||'This may give misleading results in the GIS.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 74;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,74
-       ,null
-       ,'There are no shapes available for the object you wish to view in the GIS.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 75;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,75
-       ,null
-       ,'No GIS objects selected.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 76;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,76
-       ,null
-       ,'Value cannot be less than '
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 77;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,77
-       ,null
-       ,'Value cannot be greater than '
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 78;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,78
-       ,null
-       ,'Value cannot be greater than '
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 79;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,79
-       ,null
-       ,'Cannot create synonym - object does not exist in schema.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 80;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,80
-       ,null
-       ,'User does not exist in HIG_USERS.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 81;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,81
-       ,null
-       ,'User does not have permission to create synonym.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 82;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,82
-       ,null
-       ,'Application configured to run using PUBLIC synonyms - not creating PRIVATE synonyms.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 83;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,83
-       ,null
-       ,'Error occurred executing sql'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 84;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,84
-       ,null
-       ,'Function name not found in function text'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 85;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,85
-       ,null
-       ,'Update not allowed.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 86;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,86
-       ,null
-       ,'You do not have permission to perform this action.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 87;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,87
-       ,null
-       ,'Would you like to save changes?'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 88;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,88
-       ,null
-       ,'Invalid admin unit.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 89;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,89
-       ,null
-       ,'The passwords you have entered are different.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 90;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,90
-       ,null
-       ,'Password changed successfully.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 91;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,91
-       ,null
-       ,'Arrays supplied have different numbers of values.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 92;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,92
-       ,null
-       ,'All old and new values specified are the same.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 93;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,93
-       ,null
-       ,' items updated.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 94;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,94
-       ,null
-       ,'This operation involves a commit, are you sure you wish to continue?'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 95;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,95
-       ,null
-       ,'Operation completed successfully.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 96;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,96
-       ,null
-       ,'Save Changes before continuing'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 97;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,97
-       ,null
-       ,'If you continue the results may be incorrect.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 98;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,98
-       ,null
-       ,'Open queries are not allowed in this block.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 99;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,99
-       ,null
-       ,'Unique not specified.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 100;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,100
-       ,null
-       ,'No length supplied.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 101;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,101
-       ,null
-       ,'Start date must be effective date.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 102;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,102
-       ,null
-       ,'No changes made.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 103;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,103
-       ,null
-       ,'Invalid parameter data from GIS for session'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 104;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,104
-       ,null
-       ,'Cannot edit when called from GIS.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 105;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,105
-       ,null
-       ,'Point Asset Items can only be placed at point locations, not linear'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 106;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,106
-       ,null
-       ,'Cannot locate Asset records which are in a Child AT relationship'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 107;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,107
-       ,null
-       ,'Mandatory column is NULL'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 108;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,108
-       ,null
-       ,'Column is too long'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 109;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,109
-       ,null
-       ,'Value is invalid for domain'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 110;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,110
-       ,null
-       ,'Invalid parameter'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 111;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,111
-       ,null
-       ,'Numeric value is invalid.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 112;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,112
-       ,null
-       ,'Invalid number of values specified.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 113;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,113
-       ,null
-       ,'Parse error in query'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 114;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,114
-       ,null
-       ,'You have selected an item of the wrong type.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 115;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,115
-       ,null
-       ,'Error number already exists.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 116;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,116
-       ,null
-       ,'You are creating a role as a  user that is not the highways owner.'||CHR(10)||''||CHR(10)||'The new role has been granted to the highways owner with admin privileges.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 117;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,117
-       ,null
-       ,'You must requery any currently displayed data to see unit changes.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 118;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,118
-       ,null
-       ,'Folder already exists.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 119;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,119
-       ,null
-       ,'You cannot rename the favourites folder.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 120;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,120
-       ,null
-       ,'Alert not found.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 121;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,121
-       ,null
-       ,'OK to delete folder and its contents?'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 122;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,122
-       ,null
-       ,'OK to delete module?'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 123;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,123
-       ,null
-       ,'You cannot delete the favourites folder.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 124;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,124
-       ,null
-       ,'You cannot create an item at this level.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 125;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,125
-       ,null
-       ,'Module already exists in this folder.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 126;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,126
-       ,null
-       ,'You do not have privileges to perform this action'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 127;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,127
-       ,null
-       ,'Discoverer run mode not defined in system options.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 128;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,128
-       ,null
-       ,'Client server Discoverer cannot be run from highways in web mode.'||CHR(10)||''||CHR(10)||'Check user and system options.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 129;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,129
-       ,null
-       ,'Discoverer web path not defined correctly in system options.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 130;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,130
-       ,null
-       ,'Discoverer executable not defined.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 131;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,131
-       ,null
-       ,'Append'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 132;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,132
-       ,null
-       ,'Replace'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 133;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,133
-       ,null
-       ,'The data you have chosen has been changed by another user, please reselect.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 134;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,134
-       ,null
-       ,'No themes available for current module.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 135;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,135
-       ,null
-       ,'Status transition not allowed'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 136;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,136
-       ,null
-       ,'No DBMS job processes defined - contact the system administrator.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 137;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,137
-       ,null
-       ,'Effective Date is format is invalid.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 139;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,139
-       ,null
-       ,'Message is enqueued and will be delivered in due course'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 140;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,140
-       ,null
-       ,'If you change your password you will be logged out of highways.'||CHR(10)||''||CHR(10)||'OK to continue?'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 141;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,141
-       ,null
-       ,'Error populating group'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 142;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,142
-       ,null
-       ,'Job not online'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 143;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,143
-       ,null
-       ,'More than one instance of this job exists'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 144;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,144
-       ,null
-       ,'Function cannot be performed here'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 145;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,145
-       ,null
-       ,'You have entered a duplicate primary key'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 146;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,146
-       ,null
-       ,'You do not have the required privileges to create a user'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 147;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,147
-       ,null
-       ,'Column, Table combination does not exist.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 148;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,148
-       ,null
-       ,'Date format is invalid'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 149;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,149
-       ,null
-       ,'GIS theme data contains invalid table name(s)'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 150;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,150
-       ,null
-       ,'GIS Theme data is invalid'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 151;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,151
-       ,null
-       ,'Item location cannot be modified from GIS'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 152;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,152
-       ,null
-       ,'Item location may not be modified from GIS for this product'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 153;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,153
-       ,null
-       ,'The password entered is incorrect for this user.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 154;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,154
-       ,null
-       ,'This will exit and lose the connection to the GIS'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 155;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,155
-       ,null
-       ,'Unit Converter'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 156;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,156
-       ,null
-       ,'Cannot add a value as it would exceed the maximum allowed for the condition'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 157;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,157
-       ,null
-       ,'Cannot update domain when values exist'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 158;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,158
-       ,null
-       ,'Field cannot be updated'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 159;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,159
-       ,null
-       ,'Mixed case values not permitted'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 160;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,160
-       ,null
-       ,'Datatype cannot be updated when values exist'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 161;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,161
-       ,null
-       ,'Case sensitivity cannot be updated - this would result in invalid data'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 162;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,162
-       ,null
-       ,'Standard visual attribute not found'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 163;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,163
-       ,null
-       ,'Product Option is not set'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 164;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,164
-       ,null
-       ,'Are you sure you wish to create/recreate the holding table? Any data will be lost'||CHR(10)||'This operation also involves a COMMIT.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 165;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,165
-       ,null
-       ,'Continue'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 166;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,166
-       ,null
-       ,'Name is not unique across NM_LOAD_FILES.NLF_UNIQUE and NM_LOAD_DESTINATIONS.NLD_TABLE_SHORT_NAME'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 167;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,167
-       ,null
-       ,'Form must be called in NORMAL mode'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
  WHERE NER_APPL = 'NET'
   AND  NER_ID = 249;
 --
@@ -10703,2366 +13366,8 @@ SELECT
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 168;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,168
-       ,null
-       ,'Date cannot have a time associated'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 169;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,169
-       ,null
-       ,'Database constraint violated'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 170;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,170
-       ,null
-       ,'Allowable values are "NORMAL" and "READONLY"'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 171;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,171
-       ,null
-       ,'Allowable values are "VARCHAR2","NUMBER" and "DATE"'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 172;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,172
-       ,null
-       ,'Only whole numbers may be specified'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 173;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,173
-       ,null
-       ,'Only positive whole numbers may be specified'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 174;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,174
-       ,null
-       ,'Negative values are not permitted'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 175;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,175
-       ,null
-       ,'Definition of query bracketing is invalid'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 176;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,176
-       ,null
-       ,'Specified Job Status is invalid'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 177;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,177
-       ,null
-       ,'Invalid operator specified'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 178;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,178
-       ,null
-       ,'File uploaded successfully'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 179;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,179
-       ,null
-       ,'File upload failed'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 180;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,180
-       ,null
-       ,'File browser not available when running via the web'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 181;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,181
-       ,null
-       ,'INSERT not permitted into this view'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 182;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,182
-       ,null
-       ,'User not instantiated correctly.'||CHR(10)||'Probable missing INSTANTIATE_USER trigger.'||CHR(10)||'Contact exor support for assistance.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 183;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,183
-       ,null
-       ,'Date format mask only permitted for DATE fields'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 184;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,184
-       ,null
-       ,'Account not valid'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 185;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,185
-       ,null
-       ,'Generating report...'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 186;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,186
-       ,null
-       ,'Cannot load from server. No server file path specified'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 187;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,187
-       ,null
-       ,'Are you sure you wish to continue?'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 188;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,188
-       ,null
-       ,'User Created. Do you want to view this user?'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 189;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,189
-       ,null
-       ,'SDE data not present - cloning is not possible'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 190;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,190
-       ,null
-       ,'SDE Layer generator failure'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 191;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,191
-       ,null
-       ,'SDE Table registration id generator failure'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 192;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,192
-       ,null
-       ,'Theme is not related to a network'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 193;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,193
-       ,null
-       ,'Point location data not found - clone is not possible'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 194;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,194
-       ,null
-       ,'No base theme is available'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 195;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,195
-       ,null
-       ,'No datum theme found'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 196;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,196
-       ,null
-       ,'Layer table not found'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 197;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,197
-       ,null
-       ,'SDO Metadata for layer  not found'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 198;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,198
-       ,null
-       ,'Geometry not found - '
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 199;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,199
-       ,null
-       ,'Element shapes not connected'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 201;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,201
-       ,null
-       ,'Only one element has shape - merge prevented'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 202;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,202
-       ,null
-       ,'points are the same - no distance between them'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 203;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,203
-       ,null
-       ,'points are not on same network element'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 204;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,204
-       ,null
-       ,'Lengths of element and shape are inconsistent'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 205;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,205
-       ,null
-       ,'Single part asset shapes are not supported yet'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 206;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,206
-       ,null
-       ,'Load Aborted. Metadata changes have been made since the edif file was generated.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 207;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,207
-       ,null
-       ,'Load Aborted. Error found during MapCapture Load.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 208;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,208
-       ,null
-       ,'Asset Update conflict. Changes have been made to the asset in the database.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 209;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,209
-       ,null
-       ,'The file containing exor product version numbers could not be found.  Please check the ''EXOR_VERSION'' registry setting'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 210;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,210
-       ,null
-       ,'Switch Route Theme ?'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 211;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,211
-       ,null
-       ,'Switch Route Theme to Current Theme?'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 212;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,212
-       ,null
-       ,'Theme must be of type SDE/SDO to be Route Theme'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 213;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,213
-       ,null
-       ,'Assertion failed'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 214;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,214
-       ,null
-       ,'Value cannot be NULL'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 215;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,215
-       ,null
-       ,'XML does not allow lists of more than one column. '||CHR(10)||''||CHR(10)||'Either select one column or use a table alias.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 216;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,216
-       ,null
-       ,'Close'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 217;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,217
-       ,null
-       ,'Select All'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 218;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,218
-       ,null
-       ,'Inverse Selection'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 219;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,219
-       ,null
-       ,'Refresh'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 220;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,220
-       ,null
-       ,'You can only send email as your own user'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 221;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,221
-       ,null
-       ,'All mail messages should have at least 1 "TO" recipient'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 222;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,222
-       ,null
-       ,'Favourite cannot have the name as parent folder'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 230;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,230
-       ,null
-       ,'Inconsistency detected between licenced product versions on the database and in the Exor Product Version Numbers File.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 231;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,231
-       ,null
-       ,'Detail'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 232;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,232
-       ,null
-       ,'Points are not on same network element'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 233;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,233
-       ,null
-       ,'No theme data available to determine gtype'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 234;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,234
-       ,null
-       ,'No suitable PK column for SDE registration'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 235;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,235
-       ,null
-       ,'Theme must be consistent for the same session'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 236;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,236
-       ,null
-       ,'Unknown geometry'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 237;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,237
-       ,null
-       ,'Dimension not available'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 238;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,238
-       ,null
-       ,'Invalid dimension - must be between 2 and 4'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 239;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,239
-       ,null
-       ,'No data to base diminfo calculation'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 240;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,240
-       ,null
-       ,'The SRID does not match - please reset the current SRID or use the correct value'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 241;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,241
-       ,null
-       ,'No Index on the table and column'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 242;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,242
-       ,null
-       ,'Already registered in SDO Metadata'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 243;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,243
-       ,null
-       ,'Needs a Feature table'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 244;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,244
-       ,null
-       ,'Needs a Feature table spatial column'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 245;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,245
-       ,null
-       ,'Needs a base theme to dyn-seg from'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 246;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,246
-       ,null
-       ,'Not enough info on the theme'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 247;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,247
-       ,null
-       ,'Tolerance cannot be found from point data'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 248;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,248
-       ,null
-       ,'Dimension information is incomopatible with operation'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 249;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,249
-       ,null
-       ,'FT and theme do not match'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 250;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,250
-       ,null
-       ,'Asset type is not a foreign table'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 251;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,251
-       ,null
-       ,'SRID generator failure'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 252;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,252
-       ,null
-       ,'Table is not registered or SDE schema cannot see it'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 253;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,253
-       ,null
-       ,'No sde layer for theme'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 254;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,254
-       ,null
-       ,'Layer not found in SDE metadata'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 255;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,255
-       ,null
-       ,'Failure in SDE date conversion'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 256;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,256
-       ,null
-       ,'Failure in date conversion to SDE'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 257;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,257
-       ,null
-       ,'Object does not exist'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 259;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,259
-       ,null
-       ,'Invalid Geometry Type'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 260;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,260
-       ,null
-       ,'Runtime Library missing from working directory/path'
-       ,'A required file is missing from your working directory/path' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 261;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,261
-       ,null
-       ,'Gaps/Overlaps are not permitted'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 262;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,262
-       ,null
-       ,'Element cannot be linked to a record of the given type'
-       ,'Associated Data rules are not in place to support linking this network element to this asset type' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 263;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,263
-       ,null
-       ,'Read Permission not granted on directory'
-       ,'You are not permitted to read data from the specified directory' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 264;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,264
-       ,null
-       ,'Write Permission not granted on directory'
-       ,'You are not permitted to write data to the specified directory' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 265;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,265
-       ,null
-       ,'Wildcards (%) are not permitted'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 266;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,266
-       ,null
-       ,'No base themes for this route type'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 267;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,267
-       ,null
-       ,'No themes for linear type'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 268;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,268
-       ,null
-       ,'Cannot derive Gtype from base theme'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 269;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,269
-       ,null
-       ,'Duplicate Theme or Theme Name Found'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 270;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,270
-       ,null
-       ,'Theme is already registered'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 271;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,271
-       ,null
-       ,'Error associating Geometry Type with Theme'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 272;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,272
-       ,null
-       ,'No themes for linear type '
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 273;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,273
-       ,null
-       ,'Error creating spatial sequence'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 274;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,274
-       ,null
-       ,'Theme is not a datum layer'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 275;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,275
-       ,null
-       ,'Table already exists - please specify another'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 276;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,276
-       ,null
-       ,'No subordinate users to process!'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 277;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,277
-       ,null
-       ,'Creation of view(s) not neccessary - no layers use SRIDS'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 278;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,278
-       ,null
-       ,'Error dropping private synonym'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 279;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,279
-       ,null
-       ,'No USGM data to process!'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 280;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,280
-       ,null
-       ,'Inconsistent base srids'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 281;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,281
-       ,null
-       ,'There are no known themes, populate the input array arguments'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 282;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,282
-       ,null
-       ,'Fatal error in dynamic segmentation on'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 283;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,283
-       ,null
-       ,'You may not project a geometry in a local cordinate system'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 284;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,284
-       ,null
-       ,'Mid point must apply to a line'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 285;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,285
-       ,null
-       ,'Invalid dimension for mid-point function'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 286;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,286
-       ,null
-       ,'No snaps at this position'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 287;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,287
-       ,null
-       ,'Unknown geometry type - must be a point, line or polygon'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 288;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,288
-       ,null
-       ,'Not a point geometry'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 289;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,289
-       ,null
-       ,'Use sdo_point'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 290;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,290
-       ,null
-       ,'Not a single part'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 291;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,291
-       ,null
-       ,'Theme is not a linear referencing layer - cannot return projections'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 292;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,292
-       ,null
-       ,'Cannot find position to project from'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 293;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,293
-       ,null
-       ,'No NT datums for ne_id'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 294;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,294
-       ,null
-       ,'No NT type for nlt id'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 295;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,295
-       ,null
-       ,'No geometry column on the table'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 296;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,296
-       ,null
-       ,'More than one geometry column, need to choose one'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 297;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,297
-       ,null
-       ,'Dyn seg error - mismatch in length of datum and shape'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 298;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,298
-       ,null
-       ,'Dyn seg error - measures are out of bounds of datum lengths'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 434;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,434
-       ,null
-       ,'NSG Node Theme is not present'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 435;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,435
-       ,null
-       ,'NSG ESU theme is not present'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 436;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,436
-       ,null
-       ,'User is not permitted to operate on the selected network element'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 437;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,437
-       ,null
-       ,'User is not permitted to operate on the selected asset'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 438;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,438
-       ,null
-       ,'Please Close Locator Before Using It As A Co-ordinate LOV.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 442;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,442
-       ,null
-       ,'No Interval Exists For Given Interval Code. Please Use HIG1220 To Enter An Iterval For Interval Code'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 443;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,443
-       ,null
-       ,'User Creation Failed!'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'HIG'
-  AND  NER_ID = 500;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'HIG'
-       ,500
-       ,null
-       ,'This module is not available when the application is run on the web.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'MRWA'
-  AND  NER_ID = 1;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'MRWA'
-       ,1
-       ,null
-       ,'Current status of processing is invalid for this action'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
  WHERE NER_APPL = 'NET'
-  AND  NER_ID = 1;
+  AND  NER_ID = 451;
 --
 INSERT INTO NM_ERRORS
        (NER_APPL
@@ -13073,68 +13378,14 @@ INSERT INTO NM_ERRORS
        )
 SELECT 
         'NET'
-       ,1
-       ,7
-       ,'Unable to create SECTION_CLASSES record.'
-       ,'ACTION: This is an internal error message and should not normally be'||CHR(10)||'issued. Contact your ORACLE Customer Support Representative.'||CHR(10)||'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'NET'
-  AND  NER_ID = 2;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,2
-       ,139
-       ,'Cannot delete record as associated records exist.'
-       ,'ACTION: All associated records should be deleted before the record that'||CHR(10)||'you are trying to delete can be deleted.'||CHR(10)||'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'NET'
-  AND  NER_ID = 3;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,3
-       ,341
-       ,'You cannot duplicate records in this block'
-       ,'ACTION: Records cannot be duplicated in this block.'||CHR(10)||'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'NET'
-  AND  NER_ID = 4;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,4
+       ,451
        ,null
-       ,'Use the tree to create hierarchical items.'
+       ,'Cannot locate asset on this network as its measures have been modified'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
  WHERE NER_APPL = 'NET'
-  AND  NER_ID = 5;
+  AND  NER_ID = 452;
 --
 INSERT INTO NM_ERRORS
        (NER_APPL
@@ -13145,189 +13396,9 @@ INSERT INTO NM_ERRORS
        )
 SELECT 
         'NET'
-       ,5
+       ,452
        ,null
-       ,'Cannot change network type when groups exist with this group type.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'NET'
-  AND  NER_ID = 6;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,6
-       ,null
-       ,'You cannot insert or update data when the effective date is not today.'||CHR(10)||''||CHR(10)||'Use Preferences to set the effective date.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'NET'
-  AND  NER_ID = 7;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,7
-       ,null
-       ,'Network Type must have same admin unit type as parent.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'NET'
-  AND  NER_ID = 8;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,8
-       ,null
-       ,'Parent is exclusive and object is already a child of another parent of the same type.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'NET'
-  AND  NER_ID = 9;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,9
-       ,null
-       ,'Would you like to save changes before the effective date is changed?'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'NET'
-  AND  NER_ID = 10;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,10
-       ,null
-       ,'Start date cannot be updated.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'NET'
-  AND  NER_ID = 11;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,11
-       ,null
-       ,'Start date is out of range of parent.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'NET'
-  AND  NER_ID = 12;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,12
-       ,null
-       ,'End date is out of range of parent.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'NET'
-  AND  NER_ID = 13;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,13
-       ,null
-       ,'Record has children outside its date range.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'NET'
-  AND  NER_ID = 14;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,14
-       ,null
-       ,'End date cannot be before start date.'
-       ,'' FROM DUAL;
---
-DELETE FROM NM_ERRORS
- WHERE NER_APPL = 'NET'
-  AND  NER_ID = 15;
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,15
-       ,null
-       ,'Linear reference cannot be less than zero.'
+       ,'Cannot locate asset on this network as it has been edited.'
        ,'' FROM DUAL;
 --
 --
