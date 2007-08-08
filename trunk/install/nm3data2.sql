@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.1   Jul 20 2007 14:23:08   sscanlon  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.2   Aug 08 2007 09:17:34   malexander  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Jul 20 2007 14:23:08  $
---       Date fetched Out : $Modtime:   Jul 20 2007 11:30:34  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Aug 08 2007 09:17:34  $
+--       Date fetched Out : $Modtime:   Aug 08 2007 08:57:42  $
+--       Version          : $Revision:   2.2  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-20-JUL-2007 11:30
+08-AUG-2007 08:57
 
 TABLES PROCESSED
 ================
@@ -84042,6 +84042,23 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'HIG_REFERENCE'
+       ,'HIG9150'
+       ,'Maintain Character Sets'
+       ,'M'
+       ,18 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG9150');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
        ,'HIG9170'
        ,'Holidays'
        ,'M'
@@ -84096,7 +84113,7 @@ SELECT
        ,'HIG_REFERENCE_MAIL'
        ,'Mail'
        ,'F'
-       ,18 FROM DUAL
+       ,180 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'HIG_REFERENCE'
                     AND  HSTF_CHILD = 'HIG_REFERENCE_MAIL');
@@ -84113,7 +84130,7 @@ SELECT
        ,'HIG_REFERENCE_REPORTS'
        ,'Reports'
        ,'F'
-       ,19 FROM DUAL
+       ,190 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'HIG_REFERENCE'
                     AND  HSTF_CHILD = 'HIG_REFERENCE_REPORTS');
