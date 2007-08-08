@@ -1,12 +1,30 @@
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.1   Aug 08 2007 09:20:56   malexander  $
+--       Module Name      : $Workfile:   nm3data3.sql  $
+--       Date into PVCS   : $Date:   Aug 08 2007 09:20:56  $
+--       Date fetched Out : $Modtime:   Aug 08 2007 08:57:42  $
+--       Version          : $Revision:   2.1  $
+--
+--   Product metadata script
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2007
+-----------------------------------------------------------------------------
+--
+--
 /***************************************************************************
 
 INFO
 ====
-As at Release 4.0
+As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-14-NOV-2006 13:39
+08-AUG-2007 08:57
 
 TABLES PROCESSED
 ================
@@ -16,7 +34,7 @@ HIG_MODULE_KEYWORDS
 
 TABLE OWNER
 ===========
-NM3DATA
+NM3_METADATA
 
 MODE (A-Append R-Refresh)
 ========================
@@ -24,7 +42,6 @@ A
 
 ***************************************************************************/
 
-define sccsid = '@(#)nm3data3.sql	1.23 11/14/06'
 set define off;
 set feedback off;
 
@@ -34,6 +51,9 @@ set feedback off;
 
 --
 --********** HIG_ROLES **********--
+SET TERM ON
+PROMPT hig_roles
+SET TERM OFF
 --
 -- Columns
 -- HRO_ROLE                       NOT NULL VARCHAR2(30)
@@ -213,14 +233,17 @@ SELECT
 --
 --
 --********** HIG_MODULE_ROLES **********--
+SET TERM ON
+PROMPT hig_module_roles
+SET TERM OFF
 --
 -- Columns
 -- HMR_MODULE                     NOT NULL VARCHAR2(30)
---   HMR_HMO_FK (Pos 1)
 --   HMR_PK (Pos 1)
+--   HMR_HMO_FK (Pos 1)
 -- HMR_ROLE                       NOT NULL VARCHAR2(30)
---   HMR_HRO_FK (Pos 1)
 --   HMR_PK (Pos 2)
+--   HMR_HRO_FK (Pos 1)
 -- HMR_MODE                       NOT NULL VARCHAR2(10)
 --
 --
@@ -1340,6 +1363,19 @@ SELECT
        ,'NORMAL' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'HIG9135'
+                    AND  HMR_ROLE = 'HIG_ADMIN');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'HIG9150'
+       ,'HIG_ADMIN'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'HIG9150'
                     AND  HMR_ROLE = 'HIG_ADMIN');
 --
 INSERT INTO HIG_MODULE_ROLES
@@ -2852,11 +2888,14 @@ SELECT
 --
 --
 --********** HIG_MODULE_KEYWORDS **********--
+SET TERM ON
+PROMPT hig_module_keywords
+SET TERM OFF
 --
 -- Columns
 -- HMK_HMO_MODULE                 NOT NULL VARCHAR2(30)
---   HMK_HMO_FK (Pos 1)
 --   HMK_PK (Pos 1)
+--   HMK_HMO_FK (Pos 1)
 -- HMK_KEYWORD                    NOT NULL VARCHAR2(30)
 --   HMK_PK (Pos 2)
 -- HMK_OWNER                      NOT NULL NUMBER(38)
