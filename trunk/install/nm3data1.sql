@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.5   Aug 06 2007 17:39:02   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.6   Aug 08 2007 09:11:26   malexander  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Aug 06 2007 17:39:02  $
---       Date fetched Out : $Modtime:   Aug 06 2007 17:37:34  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Aug 08 2007 09:11:26  $
+--       Date fetched Out : $Modtime:   Aug 08 2007 08:57:34  $
+--       Version          : $Revision:   2.6  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-06-AUG-2007 17:37
+08-AUG-2007 08:57
 
 TABLES PROCESSED
 ================
@@ -41,6 +41,8 @@ HIG_STATUS_CODES
 HIG_SEQUENCE_ASSOCIATIONS
 HIG_CHECK_CONSTRAINT_ASSOCS
 HIG_USER_OPTION_LIST
+NM_CHARACTER_SETS
+NM_CHARACTER_SET_MEMBERS
 
 TABLE OWNER
 ===========
@@ -28096,6 +28098,30 @@ INSERT INTO HIG_MODULES
        ,HMO_MENU
        )
 SELECT 
+        'HIG9150'
+       ,'Maintain Character Sets'
+       ,'hig9150'
+       ,'FMX'
+       ,''
+       ,'N'
+       ,'N'
+       ,'HIG'
+       ,'FORM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
+                   WHERE HMO_MODULE = 'HIG9150');
+--
+INSERT INTO HIG_MODULES
+       (HMO_MODULE
+       ,HMO_TITLE
+       ,HMO_FILENAME
+       ,HMO_MODULE_TYPE
+       ,HMO_FASTPATH_OPTS
+       ,HMO_FASTPATH_INVALID
+       ,HMO_USE_GRI
+       ,HMO_APPLICATION
+       ,HMO_MENU
+       )
+SELECT 
         'HIG9170'
        ,'Holidays'
        ,'hig9170'
@@ -38206,6 +38232,34 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_ID
        )
 SELECT 
+        'NCSM_PK'
+       ,'NM_CHARACTER_SET_MEMBERS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NCSM_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
+        'NCS_PK'
+       ,'NM_CHARACTER_SETS'
+       ,'HIG'
+       ,64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
+                   WHERE HCCA_CONSTRAINT_NAME = 'NCS_PK');
+--
+INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
+       (HCCA_CONSTRAINT_NAME
+       ,HCCA_TABLE_NAME
+       ,HCCA_NER_APPL
+       ,HCCA_NER_ID
+       )
+SELECT 
         'ANALYSE_ALL_TABS_LOG_PK'
        ,'ANALYSE_ALL_TABS_LOG'
        ,'HIG'
@@ -42414,6 +42468,32 @@ SELECT
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_USER_OPTION_LIST
                    WHERE HUOL_ID = 'DEFITEMTYP');
+--
+--
+--********** NM_CHARACTER_SETS **********--
+SET TERM ON
+PROMPT nm_character_sets
+SET TERM OFF
+--
+-- Columns
+-- NCS_CODE                       NOT NULL VARCHAR2(20)
+--   NCS_PK (Pos 1)
+-- NCS_DESCRIPTION                NOT NULL VARCHAR2(100)
+--
+--
+--
+--********** NM_CHARACTER_SET_MEMBERS **********--
+SET TERM ON
+PROMPT nm_character_set_members
+SET TERM OFF
+--
+-- Columns
+-- NCSM_NCS_CODE                  NOT NULL VARCHAR2(20)
+--   NCSM_PK (Pos 1)
+--   NCSM_NCS_FK (Pos 1)
+-- NCSM_ASCII_CHARACTER           NOT NULL NUMBER(3)
+--   NCSM_PK (Pos 2)
+--
 --
 --
 COMMIT;
