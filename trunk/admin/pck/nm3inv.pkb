@@ -2,16 +2,14 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3inv.pkb	1.97 01/12/07
---       Module Name      : nm3inv.pkb
---       Date into SCCS   : 07/01/12 16:38:11
---       Date fetched Out : 07/06/13 14:11:54
---       SCCS Version     : 1.97
---
---
---   Author :
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.1   Aug 08 2007 13:03:42   malexander  $
+--       Module Name      : $Workfile:   nm3inv.pkb  $
+--       Date into SCCS   : $Date:   Aug 08 2007 13:03:42  $
+--       Date fetched Out : $Modtime:   Aug 08 2007 11:46:30  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on --
 --
 --   nm3inv package body
 --
@@ -3453,6 +3451,25 @@ END check_disp_width;
 --
 ----------------------------------------------------------------------------------------------
 --
+PROCEDURE check_ita_view_col_name ( pi_ita_view_col_name IN nm_inv_type_attribs_all.ita_view_col_name%TYPE) IS
+BEGIN
+  --nm_debug.debug_on ;
+  --nm_debug.debug('pi_ita_view_col_name ' || pi_ita_view_col_name);
+  --nm_debug.debug_off ;
+	
+  IF nm3flx.string_contains_special_chars(pi_string => pi_ita_view_col_name)
+  THEN
+      hig.raise_ner( pi_appl               => 'NET'
+		           , pi_id                 => 30
+                   , pi_supplementary_info => pi_ita_view_col_name);
+		           -- Value is invalid. Please use only alphanumeric characters with no spaces. 
+                   --The underscore character "_" can be used for spaces.
+   END IF;
+
+END check_ita_view_col_name;
+--
+----------------------------------------------------------------------------------------------
+--
 PROCEDURE process_g_tab_ita IS
 
 BEGIN
@@ -3475,6 +3492,8 @@ BEGIN
                    , pi_ita_displayed  => g_tab_ita(i).ita_displayed
                    , pi_ita_fld_length => g_tab_ita(i).ita_fld_length
                    ) ;
+
+   check_ita_view_col_name ( pi_ita_view_col_name => g_tab_ita(i).ita_view_col_name );
 
  END LOOP;
 
