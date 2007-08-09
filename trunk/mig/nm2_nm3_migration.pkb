@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.1   Jul 31 2007 15:38:56   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.2   Aug 09 2007 10:21:06   smarshall  $
 --       Module Name      : $Workfile:   nm2_nm3_migration.pkb  $
---       Date into PVCS   : $Date:   Jul 31 2007 15:38:56  $
---       Date fetched Out : $Modtime:   Jul 31 2007 14:48:18  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Aug 09 2007 10:21:06  $
+--       Date fetched Out : $Modtime:   Aug 09 2007 10:17:48  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --   Author D.Cope
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm2_nm3_migration';
   g_proc_name    VARCHAR2(50);
   g_log_file                UTL_FILE.FILE_TYPE;
@@ -3964,7 +3964,11 @@ BEGIN
     l_ntc.ntc_str_length  := 4;
     l_ntc.ntc_mandatory   := 'Y';
     l_ntc.ntc_domain      := NULL;
+if not welsh then
     l_ntc.ntc_query       := 'SELECT AGENCY_CODE, HAU_NAME,HAU_AUTHORITY_CODE FROM V_HIG_AGENCY_CODE';
+else
+    l_ntc.ntc_query       := null;
+end if;
     l_ntc.ntc_inherit     := 'Y';
     l_ntc.ntc_format      := NULL;
     l_ntc.ntc_default     := NULL;
@@ -4065,7 +4069,11 @@ BEGIN
     l_ntc.ntc_query       := NULL;
     l_ntc.ntc_inherit     := 'N';
     l_ntc.ntc_format      := NULL;
+if not welsh then
     l_ntc.ntc_default     := ':NE_OWNER||:NE_SUB_TYPE||RPAD(:NE_NAME_1,5,''_'')';
+else
+    l_ntc.ntc_default     := ':NE_OWNER||RPAD(:NE_NAME_1,5,''_'')';
+end if;
     l_ntc.ntc_prompt      := 'AgencyLinkcode';
     l_ntc.ntc_separator   := NULL;
     l_ntc.ntc_unique_seq  := NULL;
@@ -4156,7 +4164,11 @@ BEGIN
     l_ntc.ntc_str_length  := 4;
     l_ntc.ntc_mandatory   := 'Y';
     l_ntc.ntc_domain      := NULL;
+if not welsh then
     l_ntc.ntc_query       := 'SELECT AGENCY_CODE, HAU_NAME,HAU_AUTHORITY_CODE FROM V_HIG_AGENCY_CODE';
+else
+    l_ntc.ntc_query       := null;
+end if;
     l_ntc.ntc_inherit     := 'Y';
     l_ntc.ntc_format      := NULL;
     l_ntc.ntc_default     := NULL;
@@ -4257,7 +4269,11 @@ BEGIN
     l_ntc.ntc_query       := NULL;
     l_ntc.ntc_inherit     := 'N';
     l_ntc.ntc_format      := NULL;
+if not welsh then
     l_ntc.ntc_default     := ':NE_OWNER||:NE_SUB_TYPE||RPAD(:NE_NAME_1,5,''_'')';
+else
+    l_ntc.ntc_default     := ':NE_OWNER||RPAD(:NE_NAME_1,5,''_'')';
+end if;
     l_ntc.ntc_prompt      := 'AgencyLinkcode';
     l_ntc.ntc_separator   := NULL;
     l_ntc.ntc_unique_seq  := NULL;
@@ -6981,7 +6997,7 @@ END insert_inv_exception;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE update_inventory_fk_vals IS
+/*PROCEDURE update_inventory_fk_vals IS
 BEGIN
   append_log_content('Updating Inventory Document Associations');
   IF NOT Nm3ddl.does_object_exist('IIT_V2_ITEM_ID','INDEX') THEN
@@ -6996,7 +7012,7 @@ BEGIN
               FROM   NM_INV_ITEMS_ALL
               WHERE  das_rec_id = iit_num_attrib115);
 END update_inventory_fk_vals;
---
+*/--
 -----------------------------------------------------------------------------
 --
 PROCEDURE analyse_inventory_tables (p_percent NUMBER DEFAULT 1) IS
@@ -7489,7 +7505,7 @@ BEGIN
    append_log_content('Analysing inventory tables');
    analyse_inventory_tables(100);
    --
-   update_inventory_fk_vals;
+--   update_inventory_fk_vals;
    --
    report_any_errors;
    l_count_errors := 0;
@@ -7718,7 +7734,7 @@ BEGIN
     END;
   END LOOP;
   do_optional_commit;
-  update_inventory_fk_vals;
+--  update_inventory_fk_vals;
   --
   report_any_errors;
   append_mig_end_to_log;
@@ -7884,6 +7900,8 @@ l_start_date DATE;
 l_end_Date DATE;
 l_context_date_on_entry DATE := Nm3user.get_effective_date;
 
+l_das_Rec_id doc_Assocs.das_Rec_id%type;
+
 BEGIN
   initialise(pi_log_file_location  => pi_log_file_location
             ,pi_log_file_name      => 'nm2_nm3_migration_part3_'||TO_CHAR(SYSDATE, 'DDMONYYYY_HH24MISS')||'.log'
@@ -7915,6 +7933,8 @@ BEGIN
                   AND    v3.das_doc_id= v2.das_doc_id)
 	   ) LOOP
       BEGIN
+        l_das_rec_id:=c1rec.das_rec_id;
+		
 	    l_start_Date:=TO_DATE('01-JAN-1670','DD-MON-YYYY');
 		l_end_date:=TO_DATE('31-dec-9999','DD-MON-YYYY');
   	    IF l_das_network THEN
@@ -7924,11 +7944,10 @@ BEGIN
 		  WHERE ne_id=c1rec.das_rec_id;
           Nm3user.set_effective_date(l_start_date);
 	    ELSIF l_das_asset THEN
-
-	      SELECT iit_start_Date,iit_end_Date
-	      INTO l_start_Date, l_end_date
+	      SELECT iit_ne_id,iit_start_Date,iit_end_Date
+	      INTO l_das_rec_id,l_start_Date, l_end_date
 		  FROM NM_INV_ITEMS_ALL
-		  WHERE iit_ne_id=c1rec.das_rec_id;
+		  WHERE iit_num_attrib115=c1rec.das_rec_id;
           Nm3user.set_effective_date(l_start_date);
 	    ELSE
           Nm3user.set_effective_date(l_context_date_on_entry);
@@ -7943,12 +7962,19 @@ BEGIN
           )
           VALUES
           (c1rec.das_table_name
-          ,c1rec.das_rec_id
+          ,l_das_rec_id
           ,c1rec.das_doc_id);
 		ELSE
 		  append_log_content(pi_text => 'Not migrating '||c1rec.das_table_name||' REC_ID '||c1rec.das_rec_id||' DOC_ID '||c1rec.das_doc_id||' as start date matches end date '||l_start_date);
 		END IF;
       EXCEPTION
+	  when dup_val_on_index then
+	    if l_das_rec_id!=c1rec.das_Rec_id then
+		  null; --this is invnetory and has the id changed - ok to attempt to load more than once 
+		else
+		  raise;
+		end if;
+		 
 	  WHEN NO_DATA_FOUND THEN
         --asset/netowrk has not been moigrated - cant find the start date
 		--dont migrate the doc assoc
