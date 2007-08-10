@@ -1,22 +1,18 @@
 CREATE OR REPLACE PACKAGE nm3flx IS
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3flx.pkh	1.30 12/11/06
---       Module Name      : nm3flx.pkh
---       Date into SCCS   : 06/12/11 11:06:25
---       Date fetched Out : 07/06/13 14:11:34
---       SCCS Version     : 1.30
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkh-arc   2.2   Aug 10 2007 16:47:44   gjohnson  $
+--       Module Name      : $Workfile:   nm3flx.pkh  $
+--       Date into PVCS   : $Date:   Aug 10 2007 16:47:44  $
+--       Date fetched Out : $Modtime:   Aug 10 2007 15:57:26  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.30
+-------------------------------------------------------------------------
 --
---
---   Author : Jonathan Mills
---
---     nm3flx package - Functions + Procedures for dealing with flexible
---                       attributes
---
------------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
------------------------------------------------------------------------------
+
+
 --</PACKAGE>
 --all global package variables here
 --<GLOBVAR>
