@@ -25,6 +25,7 @@ CREATE OR REPLACE PACKAGE nm3flx IS
 --
 -- Global TYPE declarations
   TYPE tab_type_columns IS TABLE OF nm_type_columns%ROWTYPE INDEX BY binary_integer;
+  
 --
    g_last_parse_exception_msg  varchar2(32767);
 --
@@ -630,6 +631,46 @@ FUNCTION string_contains_numbers ( pi_string  VARCHAR2) RETURN BOOLEAN;
 -- range 'A'-'Z', 'a'-'z' and '_')
 -- Special characters - select chr(nsc_ascii_character) from nm3_special_chars
 FUNCTION string_contains_special_chars ( pi_string IN VARCHAR2) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_character_set_members">
+-- Return pl/sql table of characters within a set
+FUNCTION get_character_set_members(pi_character_set IN nm_character_sets.ncs_code%TYPE) RETURN nm3type.tab_varchar1;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="string_has_chars_IN_set">
+-- for when you have a character set of all not permitted characters
+-- and you want to check if a string contains any of them
+FUNCTION string_has_chars_IN_set(pi_string                     IN VARCHAR2
+                                ,pi_tab_character_set_members  IN nm3type.tab_varchar1) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="string_has_chars_IN_set_vc">
+-- return varchar TRUE or FALSE
+FUNCTION string_has_chars_IN_set_vc(pi_string                  IN VARCHAR2
+                                   ,pi_tab_character_set_members  IN nm3type.tab_varchar1) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="string_has_chars_NOT_IN_set">
+-- for when you have a character set of all permitted characters
+-- and you want to check if a string contains any additional characters
+FUNCTION string_has_chars_NOT_IN_set(pi_string                  IN VARCHAR2
+                                    ,pi_tab_character_set_members  IN nm3type.tab_varchar1) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="copy_character_set">
+-- Copys contents of one character set to another
+PROCEDURE copy_character_set( pi_from  IN nm_character_sets.ncs_code%TYPE
+                            , pi_to    IN nm_character_sets.ncs_code%TYPE
+                            , pi_descr IN nm_character_sets.ncs_description%TYPE
+                            );
 --</PROC>
 --
 -----------------------------------------------------------------------------
