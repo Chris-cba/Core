@@ -1,26 +1,17 @@
 CREATE OR REPLACE PACKAGE BODY nm3flx IS
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3flx.pkb	1.47 12/11/06
---       Module Name      : nm3flx.pkb
---       Date into SCCS   : 06/12/11 11:06:39
---       Date fetched Out : 07/06/13 14:11:33
---       SCCS Version     : 1.47
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.2   Aug 10 2007 16:47:42   gjohnson  $
+--       Module Name      : $Workfile:   nm3flx.pkb  $
+--       Date into PVCS   : $Date:   Aug 10 2007 16:47:42  $
+--       Date fetched Out : $Modtime:   Aug 10 2007 15:57:30  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.47
+-------------------------------------------------------------------------
 --
---
---   Author : Jonathan Mills
---
---     nm3flx package - Functions + Procedures for dealing with flexible
---                       attributes
---
------------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
------------------------------------------------------------------------------
---
-   g_body_sccsid     CONSTANT  varchar2(80) := '"@(#)nm3flx.pkb	1.47 12/11/06"';
---  g_body_sccsid is the SCCS ID for the package body
------------------------------------------------------------------------------
---
+  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
+
    g_package_name    CONSTANT varchar2(30) := 'nm3flx';
 -- Package variables
 --
