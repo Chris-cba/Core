@@ -2071,32 +2071,155 @@ END string_contains_numbers;
 -----------------------------------------------------------------------------
 -- return true if string contains any special characters (currently outside of the 
 -- range 'A'-'Z', 'a'-'z' and '_')
--- Special characters - select chr(nsc_ascii_character) from nm3_special_chars
+-- Special characters - select chr(ncsm_ascii_character) from nm_character_set_members
 --
 FUNCTION string_contains_special_chars (pi_string IN VARCHAR2)
    RETURN BOOLEAN
 IS
-   CURSOR c_nm_special_chars
-   IS
-      SELECT nsch_ascii_character
-      FROM   nm_special_chars;
 BEGIN
-   FOR r_nm_special_chars IN c_nm_special_chars
-   LOOP
-      IF INSTR (pi_string, CHR (r_nm_special_chars.nsch_ascii_character)) > 0
-      THEN
-         RETURN (TRUE);
-      END IF;
-   END LOOP;
-
-   RETURN (FALSE);
-EXCEPTION
-   WHEN OTHERS
-   THEN
-      RETURN (FALSE);
+  --
+  RETURN(string_has_chars_IN_set( pi_string                    => pi_string
+                                , pi_tab_character_set_members => get_character_set_members(pi_character_set => 'INVALID_FOR_DDL')
+                                ));  
+  --
 END string_contains_special_chars;
 --
 ----------------------------------------------------------------------------------------------
 --
+FUNCTION get_character_set_members(pi_character_set         IN nm_character_sets.ncs_code%TYPE) RETURN nm3type.tab_varchar1 IS
+
+  CURSOR c_ncsm
+   IS
+   SELECT chr(ncsm_ascii_character) char_to_check
+   FROM   nm_character_set_members
+   WHERE  ncsm_ncs_code = UPPER(pi_character_set);
+   
+   l_retval nm3type.tab_varchar1;
+
+BEGIN
+   
+   OPEN c_ncsm;
+   FETCH c_ncsm BULK COLLECT INTO l_retval;
+   CLOSE c_ncsm;
+
+   RETURN(l_retval);
+   
+END get_character_set_members;
+--
+----------------------------------------------------------------------------------------------
+-- 
+FUNCTION string_has_chars_IN_set(pi_string                  IN VARCHAR2
+                                ,pi_tab_character_set_members  IN nm3type.tab_varchar1) RETURN BOOLEAN IS
+--
+-- for when you have a character set of all not permitted characters
+-- and you want to check if a string contains any of them
+--   
+                                    
+BEGIN 
+ 
+   --
+   -- loop thru all characters in the list of exclusion characters
+   -- and make sure that there are no characters in the string that match
+   --
+   FOR i IN 1..pi_tab_character_set_members.COUNT LOOP
+      IF INSTR (pi_string, pi_tab_character_set_members(i)) > 0
+      THEN
+         RETURN (TRUE);
+      END IF;
+   END LOOP;
+   
+
+   RETURN (FALSE);
+
+EXCEPTION
+   WHEN OTHERS
+   THEN
+      RETURN (FALSE);
+END string_has_chars_IN_set;
+--
+----------------------------------------------------------------------------------------------
+--
+FUNCTION string_has_chars_IN_set_vc(pi_string                     IN VARCHAR2
+                                   ,pi_tab_character_set_members  IN nm3type.tab_varchar1) RETURN VARCHAR2 IS
+                                
+BEGIN
+
+ RETURN(
+        nm3flx.boolean_to_char(
+                               p_boolean => string_has_chars_IN_set(
+                                                                    pi_string                    => pi_string
+                                                                   ,pi_tab_character_set_members => pi_tab_character_set_members
+                                                                   )
+                              )
+       );                                                                   
+
+END string_has_chars_IN_set_vc;                                
+--
+----------------------------------------------------------------------------------------------
+--
+FUNCTION string_has_chars_NOT_IN_set(pi_string                     IN VARCHAR2
+                                    ,pi_tab_character_set_members  IN nm3type.tab_varchar1) RETURN BOOLEAN IS
+                                       
+-- for when you have a character set of all permitted characters
+-- and you want to check if a string contains any additional characters
+
+ l_char VARCHAR2(1);
+ l_char_is_ok BOOLEAN;
+                                    
+BEGIN 
+ 
+   --
+   -- loop thru each character in the string and make sure there are 
+   -- no characters that are not in the character set
+   --
+    FOR x IN 1..LENGTH(pi_string) LOOP
+     l_char := SUBSTR(pi_string,x,1);
+     l_char_is_ok := FALSE;
+      FOR i IN 1..pi_tab_character_set_members.COUNT LOOP
+         IF INSTR (l_char, pi_tab_character_set_members(i)) > 0
+         THEN
+            l_char_is_ok := TRUE;
+            EXIT;
+         END IF;
+      END LOOP;
+      IF NOT l_char_is_ok THEN
+        RETURN(TRUE);
+      END IF;        
+
+    END LOOP;     
+
+    RETURN (FALSE);
+
+EXCEPTION
+   WHEN OTHERS
+   THEN
+      RETURN (FALSE);
+END string_has_chars_NOT_IN_SET;
+--
+----------------------------------------------------------------------------------------------
+--
+PROCEDURE copy_character_set( pi_from  IN nm_character_sets.ncs_code%TYPE
+                            , pi_to    IN nm_character_sets.ncs_code%TYPE
+                            , pi_descr IN nm_character_sets.ncs_description%TYPE
+                            ) IS
+BEGIN
+  Insert Into nm_character_sets( ncs_code
+                               , ncs_description
+                               ) 
+                         values( pi_to
+                               , pi_descr
+                               );
+  --
+  Insert Into nm_character_set_members( ncsm_ncs_code
+                                      , ncsm_ascii_character
+                                      )
+                                 Select pi_to
+                                      , ncsm_ascii_character
+                                 From   nm_character_set_members
+                                 Where  ncsm_ncs_code = pi_from; 
+  --
+End copy_character_set;
+--
+----------------------------------------------------------------------------------------------
 END nm3flx;
 /
