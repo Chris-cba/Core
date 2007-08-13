@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.2   Aug 08 2007 09:17:34   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.3   Aug 13 2007 17:14:26   gjohnson  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Aug 08 2007 09:17:34  $
---       Date fetched Out : $Modtime:   Aug 08 2007 08:57:42  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Aug 13 2007 17:14:26  $
+--       Date fetched Out : $Modtime:   Aug 13 2007 17:12:30  $
+--       Version          : $Revision:   2.3  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-08-AUG-2007 08:57
+13-AUG-2007 17:12
 
 TABLES PROCESSED
 ================
@@ -89472,6 +89472,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'NSG_DATA'
                     AND  HSTF_CHILD = 'NSG0080');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NSG_DATA'
+       ,'NSG0090'
+       ,'Configure ASD'
+       ,'M'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NSG_DATA'
+                    AND  HSTF_CHILD = 'NSG0090');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
