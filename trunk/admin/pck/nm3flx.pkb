@@ -2,15 +2,15 @@ CREATE OR REPLACE PACKAGE BODY nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.2   Aug 10 2007 16:47:42   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.3   Aug 14 2007 17:27:02   gjohnson  $
 --       Module Name      : $Workfile:   nm3flx.pkb  $
---       Date into PVCS   : $Date:   Aug 10 2007 16:47:42  $
---       Date fetched Out : $Modtime:   Aug 10 2007 15:57:30  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Aug 14 2007 17:27:02  $
+--       Date fetched Out : $Modtime:   Aug 14 2007 14:40:58  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.47
 -------------------------------------------------------------------------
 --
-  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
+  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.3  $';
 
    g_package_name    CONSTANT varchar2(30) := 'nm3flx';
 -- Package variables
@@ -22,6 +22,10 @@ CREATE OR REPLACE PACKAGE BODY nm3flx IS
 --
    c_ora_8           CONSTANT VARCHAR2(1) := '8';
    c_base_db_version CONSTANT VARCHAR2(1) := NVL(SUBSTR(nm3context.get_context(pi_attribute => 'DB_VERSION'), 1, 1), c_ora_8);
+   
+  c_nvl_string       CONSTANT VARCHAR2(30) := Nm3type.c_nvl;
+  c_nvl_date         CONSTANT DATE         := Nm3type.c_nvl_date;
+  c_nvl_number       CONSTANT NUMBER(1)    := -1;   
 --
 -----------------------------------------------------------------------------
 --
@@ -2212,5 +2216,45 @@ BEGIN
 End copy_character_set;
 --
 ----------------------------------------------------------------------------------------------
+--
+FUNCTION string_is_unchanged(pi_old IN VARCHAR2
+                            ,pi_new IN VARCHAR2) RETURN BOOLEAN IS
+                     
+BEGIN
+ 
+ RETURN(
+        NVL(pi_old,c_nvl_string) = NVL(pi_new, c_nvl_string)
+       );
+       
+END string_is_unchanged;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION date_is_unchanged(pi_old IN DATE
+                          ,pi_new IN DATE) RETURN BOOLEAN IS
+                     
+BEGIN
+ 
+ RETURN(
+        NVL(pi_old,c_nvl_date) = NVL(pi_new, c_nvl_date)
+       );
+       
+END date_is_unchanged;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION number_is_unchanged(pi_old IN NUMBER
+                            ,pi_new IN NUMBER) RETURN BOOLEAN IS
+                     
+BEGIN
+ 
+ RETURN(
+        NVL(pi_old,c_nvl_number) = NVL(pi_new, c_nvl_number)
+       );
+       
+END number_is_unchanged;
+--
+-----------------------------------------------------------------------------
+--
 END nm3flx;
 /

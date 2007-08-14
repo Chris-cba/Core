@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkh-arc   2.2   Aug 10 2007 16:47:44   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkh-arc   2.3   Aug 14 2007 17:27:02   gjohnson  $
 --       Module Name      : $Workfile:   nm3flx.pkh  $
---       Date into PVCS   : $Date:   Aug 10 2007 16:47:44  $
---       Date fetched Out : $Modtime:   Aug 10 2007 15:57:26  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Aug 14 2007 17:27:02  $
+--       Date fetched Out : $Modtime:   Aug 14 2007 14:24:24  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -667,6 +667,23 @@ PROCEDURE copy_character_set( pi_from  IN nm_character_sets.ncs_code%TYPE
                             , pi_to    IN nm_character_sets.ncs_code%TYPE
                             , pi_descr IN nm_character_sets.ncs_description%TYPE
                             );
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="string_is_unchanged">
+FUNCTION string_is_unchanged(pi_old IN VARCHAR2
+                            ,pi_new IN VARCHAR2) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="date_is_unchanged">
+FUNCTION date_is_unchanged(pi_old IN DATE
+                          ,pi_new IN DATE) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="number_is_unchanged">
+FUNCTION number_is_unchanged(pi_old IN NUMBER
+                            ,pi_new IN NUMBER) RETURN BOOLEAN;
 --</PROC>
 --
 -----------------------------------------------------------------------------
