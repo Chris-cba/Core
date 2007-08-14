@@ -3,19 +3,16 @@ BEFORE INSERT OR UPDATE
 ON NM_NW_AD_LINK_ALL
 REFERENCING NEW AS NEW OLD AS OLD
 FOR EACH ROW
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm_nw_ad_link_br.trg	1.6 05/15/06
---       Module Name      : nm_nw_ad_link_br.trg
---       Date into SCCS   : 06/05/15 11:46:32
---       Date fetched Out : 07/06/13 17:03:31
---       SCCS Version     : 1.6
---
------------------------------------------------------------------------------
---Copyright (c) exor corporation ltd, 2004
------------------------------------------------------------------------------
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_nw_ad_link_br.trg-arc   2.1   Aug 14 2007 16:25:38   gjohnson  $
+--       Module Name      : $Workfile:   nm_nw_ad_link_br.trg  $
+--       Date into PVCS   : $Date:   Aug 14 2007 16:25:38  $
+--       Date fetched Out : $Modtime:   Aug 14 2007 15:30:04  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.6
+-------------------------------------------------------------------------
 DECLARE
 
 l_rec_nwad NM_NW_AD_LINK_ALL%ROWTYPE;
@@ -25,14 +22,28 @@ BEGIN
 
    nm3nwad.g_tab_nadl.DELETE;
    
-   l_rec_nadt := nm3get.get_nad(pi_nad_id => :NEW.nad_id
-                               ,pi_raise_not_found => TRUE);
-
-   :NEW.nad_nt_type    := l_rec_nadt.nad_nt_type;
-   :NEW.nad_gty_type   := l_rec_nadt.nad_gty_type;
-   :NEW.nad_inv_type   := l_rec_nadt.nad_inv_type;
-   :NEW.nad_primary_ad := l_rec_nadt.nad_primary_ad;         						   
-							   
+-- GJ - squeeze as much performance as possible.....
+-- there are 4 denormalised columns on the nm_nw_ad_link_all table 
+-- if a value for the first of these is explicitly passed in as part of the insert/update
+-- then assume that all four of the denormalised values have already been determined
+-- so do not bother going to the expense of undertaking an nm3get
+-- 
+-- Note: it's important to ensure that when a nad_id changes the columns are re-evaluated
+--
+   IF :NEW.nad_nt_type IS NULL
+    OR
+      :NEW.nad_id != NVL(:OLD.nad_id,:NEW.nad_id) THEN 
+      
+     l_rec_nadt := nm3get.get_nad(pi_nad_id => :NEW.nad_id
+                                 ,pi_raise_not_found => TRUE);
+                                 
+     :NEW.nad_nt_type    := l_rec_nadt.nad_nt_type;
+     :NEW.nad_gty_type   := l_rec_nadt.nad_gty_type;
+     :NEW.nad_inv_type   := l_rec_nadt.nad_inv_type;
+     :NEW.nad_primary_ad := l_rec_nadt.nad_primary_ad;
+     
+   END IF;              						   
+                            
    l_rec_nwad.nad_id             := :NEW.nad_id;
    l_rec_nwad.nad_iit_ne_id      := :NEW.nad_iit_ne_id;
    l_rec_nwad.nad_ne_id          := :NEW.nad_ne_id;
