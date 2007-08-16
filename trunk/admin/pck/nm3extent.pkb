@@ -1,23 +1,24 @@
 CREATE OR REPLACE PACKAGE BODY Nm3extent IS
-  --
-  --   SCCS Identifiers :-
-  --
-  --       sccsid           : @(#)nm3extent.pkb	1.77 05/02/06
-  --       Module Name      : nm3extent.pkb
-  --       Date into SCCS   : 06/05/02 10:47:54
-  --       Date fetched Out : 07/06/13 14:11:27
-  --       SCCS Version     : 1.77
-  --
-  --
-  --   Author : Kevin Angus
-  --
-  --     nm3extent package - Functions + Procedures for dealing with saved, persistent
-  --                         and temporary extents.
-  --
-  -----------------------------------------------------------------------------
-  --    Copyright (c) exor corporation ltd, 2000
-  -----------------------------------------------------------------------------
-  --
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.1   Aug 16 2007 17:17:42   malexander  $
+--       Module Name      : $Workfile:   nm3extent.pkb  $
+--       Date into SCCS   : $Date:   Aug 16 2007 17:17:42  $
+--       Date fetched Out : $Modtime:   Aug 16 2007 16:02:14  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on 
+--
+--
+--       Author : Kevin Angus
+--
+--       nm3extent package - Functions + Procedures for dealing with saved, persistent
+--                           and temporary extents.
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) exor corporation ltd, 2007
+-----------------------------------------------------------------------------
+--
   g_package_name CONSTANT VARCHAR2(30) := 'nm3extent';
   --
   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3extent.pkb	1.77 05/02/06"';
@@ -3202,7 +3203,8 @@ BEGIN
          ,l_tab_old_nte_route_ne_id
     FROM  NM_NW_TEMP_EXTENTS
    WHERE  nte_job_id = pi_nte_id
-   ORDER BY nte_seq_no, nte_ne_id_of, nte_begin_mp;
+   ORDER BY nte_ne_id_of, nte_begin_mp, nte_end_mp; -- MJA log 701649 16-Aug-07
+   --ORDER BY nte_seq_no, nte_ne_id_of, nte_begin_mp;
 --
    DECLARE
       l_nothing_to_do EXCEPTION;
