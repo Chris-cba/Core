@@ -3,12 +3,12 @@
 --
 --   SCCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_upg.sql-arc   2.2   Jul 25 2007 09:51:30   jwadsworth  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_upg.sql-arc   2.3   Aug 17 2007 09:54:36   dyounger  $
 --       Module Name      : $Workfile:   nm4010_nm4020_upg.sql  $
---       Date into PVCS   : $Date:   Jul 25 2007 09:51:30  $
---       Date fetched Out : $Modtime:   Jul 25 2007 09:01:32  $
---       PVCS Version     : $Revision:   2.2  $
---       Based on SCCS version : 
+--       Date into PVCS   : $Date:   Aug 17 2007 09:54:36  $
+--       Date fetched Out : $Modtime:   Aug 17 2007 09:02:36  $
+--       PVCS Version     : $Revision:   2.3  $
+--       Based on SCCS version :
 --
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -289,6 +289,17 @@ from dual
 SET FEEDBACK ON
 start &&run_file
 SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   CREATE DATE TRACKED DATUM   *******************
+SET FEEDBACK OFF
+SET TERM ON
+PROMPT Create a date tracked Datum theme for each base Network theme....
+SET TERM OFF
+BEGIN
+  nm3sdm.make_all_datum_layers_dt;
+END;
+/
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   VERSION NUMBER   *******************
