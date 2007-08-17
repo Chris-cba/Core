@@ -1,4 +1,4 @@
-define sccsid = '@(#)nm3_install.sql	1.41 03/29/06'
+define sccsid = '$Revision:   2.1  $'
 
 set echo off
 set linesize 120
@@ -38,11 +38,11 @@ WHENEVER SQLERROR EXIT
 DECLARE
   l_version            VARCHAR2(10);
   ex_already_installed EXCEPTION;
-  
+
   TYPE                 refcur IS REF CURSOR;
   rc                   refcur;
   v_sql                VARCHAR2(1000);
-  
+
 BEGIN
 
    v_sql := 'SELECT hpr_version FROM user_tables,hig_products WHERE hpr_product = ''NET'' AND   table_name = ''NM_ELEMENTS_ALL''';
@@ -52,15 +52,15 @@ BEGIN
    CLOSE rc;
 
    IF l_version IS NOT NULL THEN
-       RAISE ex_already_installed;                  
+       RAISE ex_already_installed;
    END IF;
-   
+
 EXCEPTION
 
  WHEN ex_already_installed THEN
     RAISE_APPLICATION_ERROR(-20000,'NM3 version '||l_version||' already installed.');
  WHEN others THEN
-    Null;   
+    Null;
 END;
 /
 WHENEVER SQLERROR CONTINUE
@@ -403,6 +403,16 @@ exec nm3context.initialise_context
 exec nm3unit.build_all_unit_conv_functions
 --
 ---------------------------------------------------------------------------------------------------
+--                  ****************   CREATE DATE TRACKED DATUMS  *******************
+SET TERM ON
+Prompt Create a date tracked Datum theme for each base Network theme....
+SET TERM OFF
+BEGIN
+  nm3sdm.make_all_datum_layers_dt;
+END;
+/
+--
+---------------------------------------------------------------------------------------------------
 --                     ****************   RE-BUILD SEQUENCES  *******************
 SET TERM ON
 Prompt make sure .NEXTVAL on sequences is not less than values in associated tables...
@@ -419,8 +429,8 @@ BEGIN
       hig2.upgrade('HIG','nm3_install.sql','Installed','4.0');
       hig2.upgrade('NET','nm3_install.sql','Installed','4.0');
       hig2.upgrade('DOC','nm3_install.sql','Installed','4.0');
-      hig2.upgrade('AST','nm3_install.sql','Installed','4.0');      
-      hig2.upgrade('WMP','nm3_install.sql','Installed','4.0');      
+      hig2.upgrade('AST','nm3_install.sql','Installed','4.0');
+      hig2.upgrade('WMP','nm3_install.sql','Installed','4.0');
 END;
 /
 COMMIT;
