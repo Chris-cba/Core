@@ -1,25 +1,18 @@
 CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 --<PACKAGE>
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3layer_tool.pkh	1.6 04/04/07
---       Module Name      : nm3layer_tool.pkh
---       Date into SCCS   : 07/04/04 16:10:32
---       Date fetched Out : 07/06/13 14:12:20
---       SCCS Version     : 1.6
---
---  Author : Ade Edwards
---
---  This package is used as an API for GIS0020 Layer form.
---
------------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2005
------------------------------------------------------------------------------
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.1   Aug 20 2007 16:39:44   gjohnson  $
+--       Module Name      : $Workfile:   nm3layer_tool.pkh  $
+--       Date into PVCS   : $Date:   Aug 20 2007 16:39:44  $
+--       Date fetched Out : $Modtime:   Aug 20 2007 14:53:22  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.6
+-------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '@(#)nm3layer_tool.pkh	1.6 04/04/07';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.1  $';
     g_boolean               BOOLEAN        := FALSE;
     g_x_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_X';
     g_y_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_Y';
@@ -656,6 +649,15 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
               , pi_snapping_trig   IN   VARCHAR2 DEFAULT 'TRUE');
 --
 -----------------------------------------------------------------------------
+
+
+/*
+   **************************
+     NSG RELATED FUNCTIONS
+   **************************
+*/
+
+
 --
 --<PROC NAME="CREATE_NSGN_LAYER">
   PROCEDURE create_nsgn_layer
@@ -668,14 +670,45 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
   PROCEDURE create_nsgn_asd_layer
               ( pi_type    IN  nm_inv_types.nit_inv_type%TYPE );
 --</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="england_wales_asd_in_use">
+-- function called from GIS0020 to determined if certain NSG ASD record type should be processed
+FUNCTION england_wales_asd_in_use RETURN BOOLEAN;
+--</PROC>
 --
 -----------------------------------------------------------------------------
+--
+--<PROC NAME="scotland_asd_in_use">
+-- function called from GIS0020 to determined if certain NSG ASD record type should be processed
+FUNCTION scotland_asd_in_use RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+
+
+
+
 --
 /*
    **************************
      GENERAL PROCS/FUNCTIONS
    **************************
 */
+
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_global_boolean">
+  PROCEDURE set_global_boolean
+              ( pi_value IN BOOLEAN);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_global_boolean">
+  FUNCTION get_global_boolean RETURN BOOLEAN;
+--</PROC>
 --
 -----------------------------------------------------------------------------
 --<PROC NAME="IS_KEY_PRESERVED">

@@ -1,26 +1,19 @@
 CREATE OR REPLACE PACKAGE BODY nm3layer_tool
 AS
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3layer_tool.pkb	1.11 04/04/07
---       Module Name      : nm3layer_tool.pkb
---       Date into SCCS   : 07/04/04 16:10:42
---       Date fetched Out : 07/06/13 14:12:19
---       SCCS Version     : 1.11
---
---  Author : Ade Edwards
---
---  This package is used as an API for GIS0020 Layer form.
---
------------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2005
------------------------------------------------------------------------------
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.1   Aug 20 2007 16:39:44   gjohnson  $
+--       Module Name      : $Workfile:   nm3layer_tool.pkb  $
+--       Date into PVCS   : $Date:   Aug 20 2007 16:39:44  $
+--       Date fetched Out : $Modtime:   Aug 20 2007 15:42:46  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.11
+-------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '@(#)nm3layer_tool.pkb	1.11 04/04/07';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -32,7 +25,9 @@ AS
                                   := '<?xml version="1.0" standalone="yes"?>';
    g_user_key                VARCHAR2 (50);
    g_cancel_flag             VARCHAR2 (1)          := 'N';
-
+   
+   g_global_boolean          BOOLEAN;
+   
 --
 -----------------------------------------------------------------------------
 --
@@ -262,6 +257,21 @@ AS
       nm_debug.proc_end (g_package_name, 'get_body_version');
    END get_body_version;
 
+
+  PROCEDURE set_global_boolean ( pi_value IN BOOLEAN) IS
+  BEGIN
+   g_global_boolean := pi_value;
+  END set_global_boolean;
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION get_global_boolean RETURN BOOLEAN IS
+  
+  BEGIN
+  
+    RETURN(g_global_boolean);
+  
+  END get_global_boolean;
 --
 -----------------------------------------------------------------------------
 --
@@ -3343,38 +3353,56 @@ AS
     l_asset_type nm_inv_types.nit_inv_type%TYPE ;
   BEGIN
   --
-    IF hig.is_product_licensed ('NSG')
-    THEN
+  IF hig.is_product_licensed ('NSG') THEN
     --
-      IF pi_type = 'TP21'
-      THEN
-      --
+    
         EXECUTE IMMEDIATE
           'BEGIN '||lf||
-          ' nm3nsgasd.Make_Asd_Spatial_Layer '||lf||
-          '   ( p_inv_type => nm3nsgasd.get_type_21_asset_type );'||lf||
-          'END;';
-      --
-      ELSIF pi_type = 'TP22'
-      THEN
-        EXECUTE IMMEDIATE
-          'BEGIN '||lf||
-          ' nm3nsgasd.Make_Asd_Spatial_Layer '||lf||
-          '   ( p_inv_type => nm3nsgasd.get_type_22_asset_type );'||lf||
-          'END;';
-      --
-      ELSIF pi_type = 'TP23'
-      THEN
-        EXECUTE IMMEDIATE
-          'BEGIN '||lf||
-          ' nm3nsgasd.Make_Asd_Spatial_Layer '||lf||
-          '   ( p_inv_type => nm3nsgasd.get_type_23_asset_type );'||lf||
-          'END;';
-      END IF;
-    --
-    END IF;
-    --
+          ' IF nm3nsgasd.asd_record_type_in_use(pi_type => :pi_type) THEN'||lf||
+          '   nm3nsgasd.Make_Asd_Spatial_Layer (p_inv_type => :pi_type );'||lf||
+          ' END IF;'||lf||
+          'END;' USING pi_type;
+      
+  END IF;
+  
   END create_nsgn_asd_layer;
+--
+-----------------------------------------------------------------------------
+--  
+  FUNCTION england_wales_asd_in_use RETURN BOOLEAN IS
+  
+  BEGIN
+
+  IF hig.is_product_licensed ('NSG') THEN
+    --
+     EXECUTE IMMEDIATE    
+          'BEGIN '||lf||
+          ' nm3layer_tool.set_global_boolean(nm3nsgasd.england_wales_asd_in_use);'||lf||
+          'END;';
+          
+          RETURN(get_global_boolean);
+  END IF;
+  
+  END england_wales_asd_in_use;
+--
+-----------------------------------------------------------------------------
+--  
+  FUNCTION scotland_asd_in_use RETURN BOOLEAN IS
+  
+  BEGIN
+
+  IF hig.is_product_licensed ('NSG') THEN
+    --
+     EXECUTE IMMEDIATE    
+          'BEGIN '||lf||
+          ' nm3layer_tool.set_global_boolean(nm3nsgasd.scotland_asd_in_use);'||lf||
+          'END;';
+          
+          RETURN(get_global_boolean);
+  END IF;
+  
+  END scotland_asd_in_use;
+  
 --
 -----------------------------------------------------------------------------
 --
