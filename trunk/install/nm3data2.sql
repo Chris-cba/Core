@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.3   Aug 13 2007 17:14:26   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.4   Aug 21 2007 10:34:24   gjohnson  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Aug 13 2007 17:14:26  $
---       Date fetched Out : $Modtime:   Aug 13 2007 17:12:30  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Aug 21 2007 10:34:24  $
+--       Date fetched Out : $Modtime:   Aug 21 2007 09:43:20  $
+--       Version          : $Revision:   2.4  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-13-AUG-2007 17:12
+21-AUG-2007 10:24
 
 TABLES PROCESSED
 ================
@@ -94225,27 +94225,10 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'UKP_MAINTAIN_DATA'
-       ,'MAI2130'
-       ,'Delete Global Inventory'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP_MAINTAIN_DATA'
-                    AND  HSTF_CHILD = 'MAI2130');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP_MAINTAIN_DATA'
        ,'MAI2140'
        ,'Query Network/Inventory Data'
        ,'M'
-       ,3 FROM DUAL
+       ,30 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'UKP_MAINTAIN_DATA'
                     AND  HSTF_CHILD = 'MAI2140');
@@ -94262,7 +94245,7 @@ SELECT
        ,'MAI2310'
        ,'Inventory'
        ,'M'
-       ,1 FROM DUAL
+       ,10 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'UKP_MAINTAIN_DATA'
                     AND  HSTF_CHILD = 'MAI2310');
@@ -94279,7 +94262,7 @@ SELECT
        ,'MAI2310A'
        ,'Condition Data'
        ,'M'
-       ,2 FROM DUAL
+       ,20 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'UKP_MAINTAIN_DATA'
                     AND  HSTF_CHILD = 'MAI2310A');
@@ -94296,7 +94279,7 @@ SELECT
        ,'NET1119'
        ,'Network Selection'
        ,'M'
-       ,5 FROM DUAL
+       ,40 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'UKP_MAINTAIN_DATA'
                     AND  HSTF_CHILD = 'NET1119');
