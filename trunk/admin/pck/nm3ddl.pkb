@@ -1023,10 +1023,24 @@ PROCEDURE create_user (p_rec_hus            IN OUT HIG_USERS%ROWTYPE
    SELECT 1
     FROM  ALL_USERS
    WHERE  username = c_username;
+
+   --sscanlon fix 704527 28AUG2007
+   --users could create a user who's user name already exists on the same database
+   --but in a different schema.  This fix will stop this from happening.
+   --see other lines of code added as pasr of this fix by searching for:
+   --	'sscanlon fix 704527 28AUG2007'
+   CURSOR cs_hig_user_exists (c_username VARCHAR2) IS
+   SELECT 1
+     FROM  HIG_USERS
+    WHERE  hus_username = c_username;
+
    l_dummy PLS_INTEGER;
+   l_dummy2 PLS_INTEGER;	--sscanlon fix 704527 28AUG2007, new variable added to be used below
+
 --
-   l_user_already_exists BOOLEAN;
-   l_found               BOOLEAN;
+   l_user_already_exists 	    BOOLEAN;
+   l_hig_user_already_exists 	BOOLEAN;  --sscanlon fix 704527 28AUG2007 new boolean added to be used below
+   l_found               	    BOOLEAN;
 --
    l_tab_vc Nm3type.tab_varchar32767;
 --
@@ -1078,6 +1092,21 @@ BEGIN
    INTO l_dummy;
   l_user_already_exists := cs_user_exists%FOUND;
   CLOSE cs_user_exists;
+  --
+  --sscanlon fix 704527 28AUG2007
+    IF l_user_already_exists THEN
+	  OPEN cs_hig_user_exists (p_rec_hus.hus_username);
+	  FETCH cs_hig_user_exists INTO l_dummy2;
+	  l_hig_user_already_exists := cs_hig_user_exists%FOUND;
+	  CLOSE cs_hig_user_exists;
+	--
+	  IF NOT l_hig_user_already_exists THEN
+	    hig.raise_ner(pi_appl => 'HIG'
+	    , pi_id => 445
+	    , pi_supplementary_info => ' Username: '||p_rec_hus.hus_username);
+	  END IF;
+    END IF;
+  --end of sscanlon fix 704527 28AUG2007
   --
   l_tab_vc.DELETE;
   IF l_user_already_exists
@@ -1627,7 +1656,7 @@ IS
 -- so it is done on post-forms-commit instead
 ---------------------------------------------
   PROCEDURE create_user_sdo_maps IS
-  
+
   BEGIN
 
     --
@@ -1638,8 +1667,8 @@ IS
     EXCEPTION
       WHEN others THEN
         Null;
-    END;      
-      
+    END;
+
 
     EXECUTE IMMEDIATE
       'CREATE OR REPLACE FORCE VIEW '
@@ -1656,7 +1685,7 @@ IS
   --
   --
   PROCEDURE create_user_sdo_themes IS
-  
+
   BEGIN
 
     --
@@ -1667,8 +1696,8 @@ IS
     EXCEPTION
       WHEN others THEN
         Null;
-    END;      
-      
+    END;
+
 
     EXECUTE IMMEDIATE
       'CREATE OR REPLACE FORCE VIEW '
@@ -1686,7 +1715,7 @@ IS
   --
   --
   PROCEDURE create_user_sdo_styles IS
-  
+
   BEGIN
 
     --
@@ -1697,8 +1726,8 @@ IS
     EXCEPTION
       WHEN others THEN
         Null;
-    END;      
-      
+    END;
+
 
     EXECUTE IMMEDIATE
       'CREATE OR REPLACE FORCE VIEW '
@@ -1711,16 +1740,16 @@ IS
   EXCEPTION
     WHEN OTHERS THEN
       raise_application_error(-20001,'Failed to create view USER_SDO_STYLES'||chr(10)||nm3flx.parse_error_message(sqlerrm));
-  END create_user_sdo_styles;  
+  END create_user_sdo_styles;
 
-  
+
 BEGIN
 
   --
   IF Nm3get.get_hus (pi_hus_username => pi_sub_username ).hus_is_hig_owner_flag != 'Y' THEN
 
     create_user_sdo_maps;
- 
+
     create_user_sdo_themes;
 
     create_user_sdo_styles;
