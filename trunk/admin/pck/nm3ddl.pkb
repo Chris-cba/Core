@@ -2,13 +2,14 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3ddl.pkb	1.53 03/29/07
---       Module Name      : nm3ddl.pkb
---       Date into SCCS   : 07/03/29 15:19:31
---       Date fetched Out : 07/06/13 14:11:16
---       SCCS Version     : 1.53
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.2   Aug 28 2007 11:59:18   sscanlon  $
+--       Module Name      	: $Workfile:   nm3ddl.pkb  $
+--       Date into PVCS   	: $Date:   Aug 28 2007 11:59:18  $
+--       Date fetched Out 	: $Modtime:   Aug 28 2007 11:07:42  $
+--       PVCS Version     	: $Revision:   2.2  $
+--       Based on SCCS version 	: 1.53
 --
 --
 --   Author : Jonathan Mills
