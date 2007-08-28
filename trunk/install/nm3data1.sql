@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.7   Aug 08 2007 11:26:26   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.8   Aug 28 2007 11:49:36   sscanlon  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Aug 08 2007 11:26:26  $
---       Date fetched Out : $Modtime:   Aug 08 2007 11:22:10  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Aug 28 2007 11:49:36  $
+--       Date fetched Out : $Modtime:   Aug 28 2007 11:45:00  $
+--       Version          : $Revision:   2.8  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-08-AUG-2007 11:22
+28-AUG-2007 11:44
 
 TABLES PROCESSED
 ================
@@ -5702,6 +5702,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'HIG'
                     AND  NER_ID = 444);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,445
+       ,null
+       ,'This username currently exists on this database, but within another schema.  Either enter an alternate username or contact your System Administrator.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 445);
 --
 INSERT INTO NM_ERRORS
        (NER_APPL
