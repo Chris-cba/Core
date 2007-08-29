@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.1   Aug 20 2007 16:39:44   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.2   Aug 29 2007 18:59:52   gjohnson  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Aug 20 2007 16:39:44  $
---       Date fetched Out : $Modtime:   Aug 20 2007 15:42:46  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Aug 29 2007 18:59:52  $
+--       Date fetched Out : $Modtime:   Aug 29 2007 17:59:36  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.1  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.2  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -3313,9 +3313,46 @@ AS
         SELECT nth_theme_id, 'NSG0010','GIS_SESSION_ID','STREET DETAILS','Y'
           FROM nm_themes_all
          WHERE nth_feature_table = l_theme_ft;
-    --
+     
+        IF pi_gty_type = 'OFFN' THEN    
+                --
+                -- for OFFN layer, allow a Streetworks Works to be created from the map
+                -- if the actual supporting module exists
+                --
+                INSERT INTO nm_theme_functions_all(ntf_nth_theme_id
+                                                 , ntf_hmo_module
+                                                 , ntf_parameter
+                                                 , ntf_menu_option
+                                                 , ntf_seen_in_gis)
+                   SELECT nth_theme_id
+                       ,  hmo_module
+                       , 'GIS_SESSION_ID_STR_NSG_REF'
+                       , 'CREATE WORKS FROM MAP'
+                       , 'Y'
+                     FROM nm_themes_all
+                        , hig_modules
+                    WHERE nth_feature_table = l_theme_ft
+                    AND   hmo_module = 'SWR1190';
+            
+        END IF;
+            
+                --
+        -- Give both SWR and NSG standard roles to the theme 
+        -- 
+        INSERT INTO nm_theme_roles(nthr_theme_id, nthr_role, nthr_mode)
+        SELECT            nth_theme_id
+                         ,hro_role
+                         ,'NORMAL'
+        FROM nm_themes_all
+           , hig_roles -- join to hig_roles to ensure only those roles implemented are used
+        WHERE nth_theme_name = l_theme_name
+        AND  hro_role IN( 'SWR_USER'
+                        , 'SWR_OWNER'
+                        , 'NSG_USER'
+                        , 'NSG_ADMIN');            
+    
     END IF;
-    --
+    
   END update_nsg_themes;
 --
 -----------------------------------------------------------------------------
