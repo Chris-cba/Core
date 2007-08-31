@@ -2,13 +2,14 @@ CREATE OR REPLACE TRIGGER nm_inv_items_all_sdo_b_upd
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm_inv_items_all_sdo_b_upd.trg	1.6 02/28/06
---       Module Name      : nm_inv_items_all_sdo_b_upd.trg
---       Date into SCCS   : 06/02/28 13:49:03
---       Date fetched Out : 07/06/13 17:02:58
---       SCCS Version     : 1.6
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items_all_sdo_b_upd.trg-arc   2.1   Aug 31 2007 17:14:56   malexander  $
+--       Module Name      : $Workfile:   nm_inv_items_all_sdo_b_upd.trg  $
+--       Date into SCCS   : $Date:   Aug 31 2007 17:14:56  $
+--       Date fetched Out : $Modtime:   Aug 31 2007 16:22:24  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on 
 --
 --   Author  : Ade Edwards
 --   Purpose : This trigger is used to grab updates to Asset coordinates
@@ -50,7 +51,11 @@ DECLARE
 --
 BEGIN
 --
-   IF coords_have_changed
+  --MJA add 31-Aug-07
+  --New functionality to allow override
+  If Not nm3inv.bypass_inv_items_all_trgs
+  Then 
+    IF coords_have_changed
     THEN
       l_rec_iit.iit_ne_id                 := :NEW.iit_ne_id;
       l_rec_iit.iit_inv_type              := :NEW.iit_inv_type;
@@ -68,7 +73,8 @@ BEGIN
    --
       nm3sdo_edit.g_tab_inv(nm3sdo_edit.g_tab_inv.COUNT) := l_rec_iit;
    --
-   END IF;
+    End If;
+  END IF;
 EXCEPTION
   WHEN OTHERS
   THEN

@@ -5,13 +5,14 @@ CREATE OR REPLACE TRIGGER nm_inv_items_all_sdo_a_stm
 DECLARE
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm_inv_items_all_sdo_a_stm.trg	1.1 02/28/06
---       Module Name      : nm_inv_items_all_sdo_a_stm.trg
---       Date into SCCS   : 06/02/28 13:57:24
---       Date fetched Out : 07/06/13 17:02:57
---       SCCS Version     : 1.1
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items_all_sdo_a_stm.trg-arc   2.1   Aug 31 2007 17:14:56   malexander  $
+--       Module Name      : $Workfile:   nm_inv_items_all_sdo_a_stm.trg  $
+--       Date into SCCS   : $Date:   Aug 31 2007 17:14:56  $
+--       Date fetched Out : $Modtime:   Aug 31 2007 16:21:40  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on 
 --
 --   Author  : Ade Edwards
 --   Purpose : This trigger is used to action the regeneration of XY driven
@@ -25,10 +26,15 @@ DECLARE
 --
 BEGIN
 --
-  IF nm3sdo_edit.g_tab_inv.COUNT > 0
-  THEN
-    nm3sdo_edit.process_inv_xy_update;
-  END IF;
+  --MJA add 31-Aug-07
+  --New functionality to allow override
+  If Not nm3inv.bypass_inv_items_all_trgs
+  Then 
+    IF nm3sdo_edit.g_tab_inv.COUNT > 0
+    THEN
+      nm3sdo_edit.process_inv_xy_update;
+    END IF;
+  End If;
 --
 END nm_inv_items_all_sdo_a_stm;
 /
