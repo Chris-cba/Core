@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.4   Aug 21 2007 10:34:24   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.5   Aug 31 2007 10:36:58   malexander  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Aug 21 2007 10:34:24  $
---       Date fetched Out : $Modtime:   Aug 21 2007 09:43:20  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Aug 31 2007 10:36:58  $
+--       Date fetched Out : $Modtime:   Aug 31 2007 10:15:46  $
+--       Version          : $Revision:   2.5  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-21-AUG-2007 10:24
+31-AUG-2007 10:15
 
 TABLES PROCESSED
 ================
@@ -89574,6 +89574,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'NSG_IMPORT_EXPORT'
                     AND  HSTF_CHILD = 'NSG0040');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NSG_IMPORT_EXPORT'
+       ,'NSG0100'
+       ,'Loader Log Report'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NSG_IMPORT_EXPORT'
+                    AND  HSTF_CHILD = 'NSG0100');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
