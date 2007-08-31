@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.2   Aug 31 2007 15:58:40   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.3   Aug 31 2007 17:34:32   malexander  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Aug 31 2007 15:58:40  $
---       Date fetched Out : $Modtime:   Aug 31 2007 14:41:18  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Aug 31 2007 17:34:32  $
+--       Date fetched Out : $Modtime:   Aug 31 2007 16:41:44  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on --
 --
 --   nm3inv package body
@@ -3790,7 +3790,7 @@ IS
   --
 Begin
   --
-  Return g_bypass_inv_items_all_trgs;
+  Return nvl(g_bypass_inv_items_all_trgs, FALSE);
   --
 End bypass_inv_items_all_trgs;
 --
