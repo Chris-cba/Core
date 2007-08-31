@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.1   Aug 08 2007 13:03:42   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.2   Aug 31 2007 15:58:40   malexander  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Aug 08 2007 13:03:42  $
---       Date fetched Out : $Modtime:   Aug 08 2007 11:46:30  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Aug 31 2007 15:58:40  $
+--       Date fetched Out : $Modtime:   Aug 31 2007 14:41:18  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on --
 --
 --   nm3inv package body
@@ -3777,7 +3777,39 @@ END check_asset_location;
 --
 -----------------------------------------------------------------------------
 --
-
+-- MJA add 31-Aug-07
+-- Speaks for itself.  If true then bypass triggers.
+-- To be called in NM_INV_ITEMS_ALL_SDO_B_UPD, NM_INV_ITEMS_ALL_SDO_B_STM,
+--  NM_INV_ITEMS_ALL_SDO_A_STM, NM_INV_ITEMS_ALL_ROLE_SEC, NM_INV_ITEMS_ALL_EXCL_A_STM,
+--  NM_INV_ITEMS_ALL_EXCL_B_ROW, NM_INV_ITEMS_ALL_EXCL_B_STM triggers to see if 
+--  bypass required
+--
+FUNCTION bypass_inv_items_all_trgs 
+  RETURN BOOLEAN
+IS
+  --
+Begin
+  --
+  Return g_bypass_inv_items_all_trgs;
+  --
+End bypass_inv_items_all_trgs;
+--
+----------------------------------------------------------------------------------
+--
+-- MJA add 31-Aug-07
+-- Sets global g_bypass_inv_items_all_trgs true or false.
+--
+PROCEDURE bypass_inv_items_all_trgs ( pi_mode IN BOOLEAN )
+IS
+  --
+Begin
+  --
+  g_bypass_inv_items_all_trgs := pi_mode;
+  --
+End bypass_inv_items_all_trgs;
+--
+----------------------------------------------------------------------------------
+--
 --
 --  MAIN
 BEGIN  /* inv - automatic variables */
