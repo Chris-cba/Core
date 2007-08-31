@@ -6,11 +6,11 @@ FOR EACH ROW
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_nw_ad_link_br.trg-arc   2.1   Aug 14 2007 16:25:38   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_nw_ad_link_br.trg-arc   2.2   Aug 31 2007 17:22:10   malexander  $
 --       Module Name      : $Workfile:   nm_nw_ad_link_br.trg  $
---       Date into PVCS   : $Date:   Aug 14 2007 16:25:38  $
---       Date fetched Out : $Modtime:   Aug 14 2007 15:30:04  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Aug 31 2007 17:22:10  $
+--       Date fetched Out : $Modtime:   Aug 31 2007 16:28:30  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.6
 -------------------------------------------------------------------------
 DECLARE
@@ -19,8 +19,11 @@ l_rec_nwad NM_NW_AD_LINK_ALL%ROWTYPE;
 l_rec_nadt nm_nw_ad_types%ROWTYPE;
 
 BEGIN
-
-   nm3nwad.g_tab_nadl.DELETE;
+  --MJA add 31-Aug-07
+  --New functionality to allow override
+  If Not nm3nwad.bypass_nw_ad_link_all
+  Then 
+    nm3nwad.g_tab_nadl.DELETE;
    
 -- GJ - squeeze as much performance as possible.....
 -- there are 4 denormalised columns on the nm_nw_ad_link_all table 
@@ -56,7 +59,7 @@ BEGIN
    l_rec_nwad.nad_primary_ad     := :NEW.nad_primary_ad;
    
    nm3nwad.g_tab_nadl(nm3nwad.g_tab_nadl.COUNT+1) := l_rec_nwad;
-
+ End If;
 END nm_nw_ad_link_br;
 /
 

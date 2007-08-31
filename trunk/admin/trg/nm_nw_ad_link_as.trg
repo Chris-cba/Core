@@ -4,20 +4,27 @@ ON NM_NW_AD_LINK_ALL
 REFERENCING NEW AS NEW OLD AS OLD
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm_nw_ad_link_as.trg	1.3 12/22/04
---       Module Name      : nm_nw_ad_link_as.trg
---       Date into SCCS   : 04/12/22 14:34:49
---       Date fetched Out : 07/06/13 17:03:30
---       SCCS Version     : 1.3
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_nw_ad_link_as.trg-arc   2.1   Aug 31 2007 17:22:10   malexander  $
+--       Module Name      : $Workfile:   nm_nw_ad_link_as.trg  $
+--       Date into SCCS   : $Date:   Aug 31 2007 17:22:10  $
+--       Date fetched Out : $Modtime:   Aug 31 2007 16:28:06  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on 
+--
 --
 -----------------------------------------------------------------------------
 --    Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 DECLARE
 BEGIN
-   nm3nwad.process_table_nwad_link;
+  --MJA add 31-Aug-07
+  --New functionality to allow override
+  If Not nm3nwad.bypass_nw_ad_link_all
+  Then 
+    nm3nwad.process_table_nwad_link;
+  End If;
 END nm_nw_ad_link_as;
 /
 
