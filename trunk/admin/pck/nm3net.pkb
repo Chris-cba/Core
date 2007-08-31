@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY Nm3net AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkb-arc   2.1   Aug 31 2007 15:58:42   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkb-arc   2.2   Aug 31 2007 17:34:30   malexander  $
 --       Module Name      : $Workfile:   nm3net.pkb  $
---       Date into SCCS   : $Date:   Aug 31 2007 15:58:42  $
---       Date fetched Out : $Modtime:   Aug 31 2007 14:23:34  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Aug 31 2007 17:34:30  $
+--       Date fetched Out : $Modtime:   Aug 31 2007 16:42:38  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on 
 --
 --
@@ -5183,7 +5183,7 @@ IS
   --
 Begin
   --
-  Return g_bypass_nm_members_trgs;
+  Return nvl(g_bypass_nm_members_trgs, FALSE);
   --
 End bypass_nm_members_trgs;
 --
@@ -5201,7 +5201,7 @@ IS
   --
 Begin
   --
-  Return g_bypass_nm_elements_trgs;
+  Return nvl(g_bypass_nm_elements_trgs, FALSE);
   --
 End bypass_nm_elements_trgs;
 --
@@ -5217,7 +5217,7 @@ IS
   --
 Begin
   --
-  Return g_bypass_nm_points_trgs;
+  Return nvl(g_bypass_nm_points_trgs, FALSE);
   --
 End bypass_nm_points_trgs;
 --

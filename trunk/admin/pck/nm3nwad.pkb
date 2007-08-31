@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.2   Aug 31 2007 15:58:42   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.3   Aug 31 2007 17:34:30   malexander  $
 --       Module Name      : $Workfile:   nm3nwad.pkb  $
---       Date into PVCS   : $Date:   Aug 31 2007 15:58:42  $
---       Date fetched Out : $Modtime:   Aug 31 2007 14:49:24  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Aug 31 2007 17:34:30  $
+--       Date fetched Out : $Modtime:   Aug 31 2007 16:42:58  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -36,7 +36,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.2  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.3  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'nm3nwad';
 
@@ -3786,7 +3786,7 @@ IS
   --
 Begin
   --
-  Return g_bypass_nw_ad_link_all;
+  Return nvl(g_bypass_nw_ad_link_all, FALSE);
   --
 End bypass_nw_ad_link_all;
 --
