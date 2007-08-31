@@ -1,13 +1,14 @@
 CREATE OR REPLACE PACKAGE Nm3nwad AS
 --<PACKAGE>
 -----------------------------------------------------------------------------
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3nwad.pkh	1.12 07/18/06
---       Module Name      : nm3nwad.pkh
---       Date into SCCS   : 06/07/18 15:36:13
---       Date fetched Out : 07/06/13 14:13:03
---       SCCS Version     : 1.12
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkh-arc   2.1   Aug 31 2007 15:58:42   malexander  $
+--       Module Name      : $Workfile:   nm3nwad.pkh  $
+--       Date into SCCS   : $Date:   Aug 31 2007 15:58:42  $
+--       Date fetched Out : $Modtime:   Aug 31 2007 14:46:40  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on 
 --
 -- Author : A Edwards/P Stanton/G Johnson
 --
@@ -26,6 +27,10 @@ CREATE OR REPLACE PACKAGE Nm3nwad AS
 --</PACKAGE>
 --<GLOBVAR>
     g_sccsid      CONSTANT  VARCHAR2(2000) := '@(#)nm3nwad.pkh	1.12 07/18/06';
+    
+  -- MJA add 31-Aug-07
+  -- Globals for use in bypassing triggers
+  g_bypass_nw_ad_link_all BOOLEAN := FALSE;
 
 TYPE rec_link IS RECORD
        ( pi_inv_type NM_NW_AD_TYPES.nad_inv_type%TYPE
@@ -671,6 +676,23 @@ FUNCTION ad_is_valid_on_new_ne(pi_old_nad_id            IN nm_nw_ad_types.nad_id
 -----------------------------------------------------------------------------
 --<PROC NAME='primary_ad_link_start_date'
 FUNCTION primary_ad_link_start_date(pi_nad_ne_id      IN nm_nw_ad_link_all.nad_ne_id%TYPE) RETURN nm_nw_ad_link_all.nad_start_date%TYPE;
+--</PROC>
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="bypass_nw_ad_link_all">
+-- MJA add 31-Aug-07
+-- Speaks for itself.  If true then bypass triggers.
+-- To be called in NM_NW_AD_LINK_AS, NM_NW_AD_LINK_BR triggers to see if 
+--  bypass required
+FUNCTION bypass_nw_ad_link_all RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="bypass_nw_ad_link_all">
+-- MJA add 31-Aug-07
+-- Sets global g_bypass_nw_ad_link_all true or false.
+PROCEDURE bypass_nw_ad_link_all ( pi_mode IN BOOLEAN );
 --</PROC>
 --
 -----------------------------------------------------------------------------

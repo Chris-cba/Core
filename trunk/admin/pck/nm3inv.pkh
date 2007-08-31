@@ -1,13 +1,14 @@
 CREATE OR REPLACE PACKAGE Nm3inv AS
 --<PACKAGE>
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3inv.pkh	1.48 09/14/06
---       Module Name      : nm3inv.pkh
---       Date into SCCS   : 06/09/14 16:14:36
---       Date fetched Out : 07/06/13 14:11:55
---       SCCS Version     : 1.48
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkh-arc   2.1   Aug 31 2007 15:58:42   malexander  $
+--       Module Name      : $Workfile:   nm3inv.pkh  $
+--       Date into SCCS   : $Date:   Aug 31 2007 15:58:42  $
+--       Date fetched Out : $Modtime:   Aug 31 2007 14:38:38  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on 
 --
 --   nm3inv package header
 --
@@ -54,6 +55,9 @@ CREATE OR REPLACE PACKAGE Nm3inv AS
 --
   g_ita_query NM_INV_TYPE_ATTRIBS_ALL.ita_query%TYPE; -- GJ 24-MAY-2005 - required for ita_query validation
 --
+   -- MJA add 31-Aug-07
+   -- Globals for use in bypassing triggers
+  g_bypass_inv_items_all_trgs BOOLEAN := FALSE;
 --
 --</GLOBVAR>
 --
@@ -1129,6 +1133,25 @@ PROCEDURE check_asset_location(pi_nit_inv_type IN nm_inv_types_all.nit_inv_type%
                               ,pi_begin_mp     IN nm_members_all.nm_begin_mp%TYPE
                               ,pi_end_mp       IN nm_members_all.nm_end_mp%TYPE);
 --
+--</PROC>
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="bypass_inv_items_all_trgs">
+-- MJA add 31-Aug-07
+-- Speaks for itself.  If true then bypass triggers.
+-- To be called in NM_INV_ITEMS_ALL_SDO_B_UPD, NM_INV_ITEMS_ALL_SDO_B_STM,
+--  NM_INV_ITEMS_ALL_SDO_A_STM, NM_INV_ITEMS_ALL_ROLE_SEC, NM_INV_ITEMS_ALL_EXCL_A_STM,
+--  NM_INV_ITEMS_ALL_EXCL_B_ROW, NM_INV_ITEMS_ALL_EXCL_B_STM triggers to see if 
+--  bypass required
+FUNCTION bypass_inv_items_all_trgs RETURN BOOLEAN;
+--</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="bypass_inv_items_all_trgs">
+-- MJA add 31-Aug-07
+-- Sets global g_bypass_inv_items_all_trgs true or false.
+PROCEDURE bypass_inv_items_all_trgs ( pi_mode IN BOOLEAN );
 --</PROC>
 --
 ----------------------------------------------------------------------------------------------

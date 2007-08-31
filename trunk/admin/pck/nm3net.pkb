@@ -1,11 +1,12 @@
 CREATE OR REPLACE PACKAGE BODY Nm3net AS
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3net.pkb	1.139 03/08/07
---       Module Name      : nm3net.pkb
---       Date into SCCS   : 07/03/08 12:10:21
---       Date fetched Out : 07/06/13 14:12:56
---       SCCS Version     : 1.139
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkb-arc   2.1   Aug 31 2007 15:58:42   malexander  $
+--       Module Name      : $Workfile:   nm3net.pkb  $
+--       Date into SCCS   : $Date:   Aug 31 2007 15:58:42  $
+--       Date fetched Out : $Modtime:   Aug 31 2007 14:23:34  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on 
 --
 --
 --   Author : Rob Coupe
@@ -5169,6 +5170,100 @@ EXCEPTION
 END  get_id_and_type_from_unique;
 --
 -----------------------------------------------------------------------------
+--
+-- MJA add 31-Aug-07
+-- Speaks for itself.  If true then bypass triggers.
+-- To be called in NM_MEMBERS_SDO_TRG, NM_MEMBERS_SDE_TRG, NM_MEMBERS_B_IU_END_SLK_TRG,
+--   NM_MEMBERS_ALL_EXCL_B_STM, NM_MEMBERS_ALL_EXCL_B_ROW, NM_MEMBERS_ALL_EXCL_A_STM
+--   NM_MEMBERS_ALL_AU_INSERT_CHECK triggers to see if bypass required
+--
+FUNCTION bypass_nm_members_trgs 
+  RETURN BOOLEAN
+IS
+  --
+Begin
+  --
+  Return g_bypass_nm_members_trgs;
+  --
+End bypass_nm_members_trgs;
+--
+----------------------------------------------------------------------------------
+--
+-- MJA add 31-Aug-07
+-- Speaks for itself.  If true then bypass triggers.
+-- To be called in NM_ELEMENTS_ALL_AU_CHECK, NM_ELEMENTS_ALL_DT_TRG, NM_ELEMENTS_ALL_WHO,
+--   NM_ELEMENTS_ALL_BS_NSG_VAL, NM_ELEMENTS_ALL_BR_NSG_VAL, NM_ELEMENTS_ALL_AS_NSG_VAL
+--   triggers to see if bypass required
+--
+FUNCTION bypass_nm_elements_trgs 
+  RETURN BOOLEAN
+IS
+  --
+Begin
+  --
+  Return g_bypass_nm_elements_trgs;
+  --
+End bypass_nm_elements_trgs;
+--
+----------------------------------------------------------------------------------
+--
+-- MJA add 31-Aug-07
+-- Speaks for itself.  If true then bypass triggers.
+-- To be called in NM_POINTS_SDO, NM_POINTS_SDO_ROW triggers to see if bypass required
+--
+FUNCTION bypass_nm_points_trgs 
+  RETURN BOOLEAN
+IS
+  --
+Begin
+  --
+  Return g_bypass_nm_points_trgs;
+  --
+End bypass_nm_points_trgs;
+--
+----------------------------------------------------------------------------------
+--
+-- MJA add 31-Aug-07
+-- Sets global g_bypass_nm_members_trgs true or false.
+--
+PROCEDURE bypass_nm_members_trgs ( pi_mode IN BOOLEAN )
+IS
+  --
+Begin
+  --
+  g_bypass_nm_members_trgs := pi_mode;
+  --
+End bypass_nm_members_trgs;
+--
+----------------------------------------------------------------------------------
+--
+-- MJA add 31-Aug-07
+-- Sets global g_bypass_nm_elements_trgs true or false.
+--
+PROCEDURE bypass_nm_elements_trgs ( pi_mode IN BOOLEAN )
+IS
+  --
+Begin
+  --
+  g_bypass_nm_elements_trgs := pi_mode;
+  --
+End bypass_nm_elements_trgs;
+--
+----------------------------------------------------------------------------------
+--
+-- MJA add 31-Aug-07
+-- Sets global g_bypass_nm_points_trgs true or false.
+--
+PROCEDURE bypass_nm_points_trgs ( pi_mode IN BOOLEAN )
+IS
+  --
+Begin
+  --
+  g_bypass_nm_points_trgs := pi_mode;
+  --
+End bypass_nm_points_trgs;
+--
+----------------------------------------------------------------------------------
 --
 END Nm3net;
 /

@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.1   Jul 18 2007 15:21:58   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.2   Aug 31 2007 15:58:42   malexander  $
 --       Module Name      : $Workfile:   nm3nwad.pkb  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:21:58  $
---       Date fetched Out : $Modtime:   Jun 29 2007 14:53:24  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Aug 31 2007 15:58:42  $
+--       Date fetched Out : $Modtime:   Aug 31 2007 14:49:24  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 -- NM3NWAD - Additional Data link package
 --
 -- 12-MAY-2006      GJ   Date logic changed for Primary AD Types
---                       nm_nw_ad_link_all.nad_start_date & nm_inv_items_all.iit_start_date
+--                       nm_nw_ad_link_all.nad_start_date and nm_inv_items_all.iit_start_date
 --                       must equal the start date of the element that the AD relates to
 --                       Also amended end_date_date_nadl to accept effective date parameter.
 --                       Was previously assuming that end dating was always on nm3user.get_effective_date                   
@@ -36,7 +36,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.1  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.2  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'nm3nwad';
 
@@ -3772,6 +3772,37 @@ BEGIN
  RETURN(nm3get.get_ne_all(pi_ne_id => pi_nad_ne_id).ne_start_date);
 
 END primary_ad_link_start_date; 
+--
+-----------------------------------------------------------------------------
+--
+-- MJA add 31-Aug-07
+-- Speaks for itself.  If true then bypass triggers.
+-- To be called in NM_NW_AD_LINK_AS, NM_NW_AD_LINK_BR triggers to see if 
+--  bypass required
+--
+FUNCTION bypass_nw_ad_link_all 
+  RETURN BOOLEAN
+IS
+  --
+Begin
+  --
+  Return g_bypass_nw_ad_link_all;
+  --
+End bypass_nw_ad_link_all;
+--
+----------------------------------------------------------------------------------
+--
+-- MJA add 31-Aug-07
+-- Sets global g_bypass_nw_ad_link_all true or false.
+--
+PROCEDURE bypass_nw_ad_link_all ( pi_mode IN BOOLEAN )
+IS
+  --
+Begin
+  --
+  g_bypass_nw_ad_link_all := pi_mode;
+  --
+End bypass_nw_ad_link_all;
 --
 -----------------------------------------------------------------------------
 --   
