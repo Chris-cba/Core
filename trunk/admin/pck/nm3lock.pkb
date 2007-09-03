@@ -2,13 +2,14 @@ CREATE OR REPLACE PACKAGE BODY nm3lock AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3lock.pkb	1.16 07/18/06
---       Module Name      : nm3lock.pkb
---       Date into SCCS   : 06/07/18 10:30:23
---       Date fetched Out : 07/06/13 14:12:24
---       SCCS Version     : 1.16
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock.pkb-arc   2.2   Sep 03 2007 15:04:18   smarshall  $
+--       Module Name      : $Workfile:   nm3lock.pkb  $
+--       Date into PVCS   : $Date:   Sep 03 2007 15:04:18  $
+--       Date fetched Out : $Modtime:   Sep 03 2007 14:13:06  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on         : 1.16
 --
 --
 --   Author : Jonathan Mills
@@ -21,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lock AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3lock.pkb	1.16 07/18/06"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';;
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lock';
