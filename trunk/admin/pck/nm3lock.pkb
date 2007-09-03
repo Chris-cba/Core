@@ -143,7 +143,7 @@ BEGIN
 -- GJ 17-JUL-2006 lock for update regardless
 -- 
 --   IF p_lock_ele_for_update THEN
-     l_sql := l_sql|| 'FOR UPDATE';
+     l_sql := l_sql|| 'FOR UPDATE of ne_id'; --SM 03092006 710020 added 'of ne_id' so only the nm_elements table gets locked
 --   END IF;	    
 
   OPEN c1 FOR l_sql USING p_ne_id, Nm3user.get_user_id ; 
