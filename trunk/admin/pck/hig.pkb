@@ -1,11 +1,14 @@
 CREATE OR REPLACE PACKAGE BODY hig AS
---   SCCS Identifiers :-
+-----------------------------------------------------------------------------
 --
---       sccsid           : @(#)hig.pkb	1.39 08/16/06
---       Module Name      : hig.pkb
---       Date into SCCS   : 06/08/16 15:35:00
---       Date fetched Out : 07/06/13 14:10:16
---       SCCS Version     : 1.39
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/hig.pkb-arc   2.1   Sep 03 2007 10:54:42   malexander  $
+--       Module Name      : $Workfile:   hig.pkb  $
+--       Date into SCCS   : $Date:   Sep 03 2007 10:54:42  $
+--       Date fetched Out : $Modtime:   Sep 03 2007 09:21:44  $
+--       SCCS Version     : $Revision:   2.1  $
+--       Based on 1.39
 --
 --
 --   Author :
@@ -13,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY hig AS
 --   HIGHWAYS application generic utilities package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--	Copyright (c) exor corporation ltd, 2007
 -----------------------------------------------------------------------------
 --
   g_body_sccsid	CONSTANT	varchar2(2000) := '"@(#)hig.pkb	1.39 08/16/06"';
@@ -1374,10 +1377,10 @@ END date_convert;
   --
   -----------------------------------------------------------------------------
   --
-   PROCEDURE raise_ner (pi_appl               IN nm_errors.ner_appl%TYPE
-                      ,pi_id                 IN nm_errors.ner_id%TYPE
-                      ,pi_sqlcode            IN pls_integer DEFAULT -20000
-                      ,pi_supplementary_info IN varchar2    DEFAULT NULL
+   PROCEDURE raise_ner( pi_appl               IN nm_errors.ner_appl%TYPE
+                      , pi_id                 IN nm_errors.ner_id%TYPE
+                      , pi_sqlcode            IN pls_integer DEFAULT -20000
+                      , pi_supplementary_info IN varchar2    DEFAULT NULL
                       ) IS
 --
      l_rec_ner nm_errors%ROWTYPE;
@@ -1427,6 +1430,12 @@ END date_convert;
      IF pi_supplementary_info IS NOT NULL
       THEN
         l_sqlerrm := l_sqlerrm||': '||pi_supplementary_info;
+     END IF;
+     --
+     -- MJA add 03-Sep-07
+     IF l_rec_ner.ner_cause IS NOT NULL
+     THEN
+       l_sqlerrm := l_sqlerrm||chr(10)||': '||l_rec_ner.ner_cause;
      END IF;
      --
      g_last_ner_appl  := pi_appl;
