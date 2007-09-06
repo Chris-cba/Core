@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.5   Aug 31 2007 10:36:58   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.6   Sep 06 2007 10:55:14   sscanlon  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Aug 31 2007 10:36:58  $
---       Date fetched Out : $Modtime:   Aug 31 2007 10:15:46  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Sep 06 2007 10:55:14  $
+--       Date fetched Out : $Modtime:   Sep 06 2007 10:53:30  $
+--       Version          : $Revision:   2.6  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-31-AUG-2007 10:15
+06-SEP-2007 10:53
 
 TABLES PROCESSED
 ================
@@ -81406,6 +81406,57 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
+        'AVM'
+       ,'VM_REF'
+       ,'Reference Data'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'AVM'
+                    AND  HSTF_CHILD = 'VM_REF');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'AVM'
+       ,'VM_REP'
+       ,'Reports'
+       ,'F'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'AVM'
+                    AND  HSTF_CHILD = 'VM_REP');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'AVM'
+       ,'VM_VAL'
+       ,'Valuations'
+       ,'F'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'AVM'
+                    AND  HSTF_CHILD = 'VM_VAL');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
         'CLM'
        ,'CLM_ADMIN'
        ,'Administration'
@@ -83114,6 +83165,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'FAVOURITES'
                     AND  HSTF_CHILD = 'AST');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
+       ,'AVM'
+       ,'Asset Valuation Manager'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'AVM');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -94742,6 +94810,227 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'UKP_UTILITIES_REPORTS'
                     AND  HSTF_CHILD = 'UKP0095');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'VM_REF'
+       ,'HIG1820'
+       ,'Units And Conversions'
+       ,'M'
+       ,6 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'VM_REF'
+                    AND  HSTF_CHILD = 'HIG1820');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'VM_REF'
+       ,'NM0410'
+       ,'Asset Metamodel'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'VM_REF'
+                    AND  HSTF_CHILD = 'NM0410');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'VM_REF'
+       ,'VM1000'
+       ,'Valuation Attribute Types'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'VM_REF'
+                    AND  HSTF_CHILD = 'VM1000');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'VM_REF'
+       ,'VM1010'
+       ,'Valuation Rulesets'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'VM_REF'
+                    AND  HSTF_CHILD = 'VM1010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'VM_REF'
+       ,'VM1020'
+       ,'Asset Register Types'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'VM_REF'
+                    AND  HSTF_CHILD = 'VM1020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'VM_REF'
+       ,'VM1060'
+       ,'Valuation Report Definitions'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'VM_REF'
+                    AND  HSTF_CHILD = 'VM1060');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'VM_REP'
+       ,'VM1050'
+       ,'Asset Valuation Report'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'VM_REP'
+                    AND  HSTF_CHILD = 'VM1050');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'VM_REP'
+       ,'VM1052'
+       ,'Asset Movements Report'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'VM_REP'
+                    AND  HSTF_CHILD = 'VM1052');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'VM_REP'
+       ,'VM1054'
+       ,'Valuation Ruleset Report'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'VM_REP'
+                    AND  HSTF_CHILD = 'VM1054');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'VM_VAL'
+       ,'NM0510'
+       ,'Asset Items'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'VM_VAL'
+                    AND  HSTF_CHILD = 'NM0510');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'VM_VAL'
+       ,'VM1030'
+       ,'Asset Registers'
+       ,'M'
+       ,2 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'VM_VAL'
+                    AND  HSTF_CHILD = 'VM1030');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'VM_VAL'
+       ,'VM1040'
+       ,'Asset Valuations'
+       ,'M'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'VM_VAL'
+                    AND  HSTF_CHILD = 'VM1040');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'VM_VAL'
+       ,'VM1044'
+       ,'Close a Valuation'
+       ,'M'
+       ,4 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'VM_VAL'
+                    AND  HSTF_CHILD = 'VM1044');
 --
 --
 COMMIT;
