@@ -2,7 +2,7 @@ CREATE OR REPLACE VIEW V_NM_FT_ATTRIBUTE_MAPPING
 (ITA_INV_TYPE, NIT_TABLE_NAME, ITA_ATTRIB_NAME, IIT_ATTRIB_NAME)
 AS
 select
--- PVCS Version     : $Revision:   2.0  $
+-- PVCS Version     : $Revision:   2.1  $
  q1.ita_inv_type
 ,q1.nit_table_name
 ,q1.ita_attrib_name
@@ -26,7 +26,7 @@ select
    a.rid, a.ita_inv_type, t2.nit_table_name, a.ita_attrib_name, a.ita_fld_length, a.ita_format
   ,decode(t.nit_foreign_pk_column, null, a.ita_format2, 'PK') ita_format2
   ,row_number() over (partition by a.ita_inv_type
-    , decode(t.nit_foreign_pk_column, null, a.ita_format2, 'PK') order by a.ita_disp_seq_no, a.ita_attrib_name) rnum
+    , decode(t.nit_foreign_pk_column, null, a.ita_format2, 'PK') order by a.ita_attrib_name) rnum
 from
    (select rowid rid
       ,ita_inv_type, ita_attrib_name, ita_fld_length, ita_format, ita_disp_seq_no
