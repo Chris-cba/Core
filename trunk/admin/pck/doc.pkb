@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY doc AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc.pkb-arc   2.0   Jun 14 2007 14:59:48   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc.pkb-arc   2.1   Sep 07 2007 11:19:46   malexander  $
 --       Module Name      : $Workfile:   doc.pkb  $
---       Date into SCCS   : $Date:   Jun 14 2007 14:59:48  $
---       Date fetched Out : $Modtime:   Jun 14 2007 14:59:00  $
---       SCCS Version     : $Revision:   2.0  $
+--       Date into SCCS   : $Date:   Sep 07 2007 11:19:46  $
+--       Date fetched Out : $Modtime:   Sep 07 2007 09:38:08  $
+--       SCCS Version     : $Revision:   2.1  $
 --       Based on SCCS Version     : 1.12
 --
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY doc AS
 -----------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.0  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
    g_package_name    CONSTANT varchar2(30) := 'doc';
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -588,7 +588,9 @@ END get_tab_das_docs;
 --
 -------------------------------------------------------------------------------------------------------
 --
-FUNCTION get_doc_url(pi_doc_id  IN docs.doc_id%TYPE) RETURN VARCHAR2 IS
+FUNCTION get_doc_url( pi_doc_id  IN docs.doc_id%TYPE
+                    , pi_ret_ext IN boolean DEFAULT TRUE
+                    ) RETURN VARCHAR2 IS
 
   l_url          doc_locations.DLC_PATHNAME%TYPE;
   l_dlc          doc_locations%ROWTYPE;
@@ -650,11 +652,16 @@ BEGIN
 
   -- if there is an associated file extension with this document and the document does not already have a file extension then
   -- append this extension on to the url
-  IF l_dmd.dmd_file_extension IS NOT NULL AND INSTR(l_docs.doc_file,'.') = 0
-  THEN
-    l_url := l_url || '.' || l_dmd.dmd_file_extension;
-  END IF;
-
+  --
+  -- MJA log 706710 (inc 49707 and 702638)
+  -- Do not add extension if pi_ret_ext passed as false
+  If pi_ret_ext
+  Then
+    IF l_dmd.dmd_file_extension IS NOT NULL AND INSTR(l_docs.doc_file,'.') = 0
+    THEN
+      l_url := l_url || '.' || l_dmd.dmd_file_extension;
+    END IF;
+  End If;
   --
 --  RETURN(
 --          nm3web.string_to_url(pi_str               => l_url)

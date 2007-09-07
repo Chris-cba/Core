@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE doc AS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc.pkh-arc   2.0   Jun 14 2007 14:59:48   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc.pkh-arc   2.1   Sep 07 2007 11:19:46   malexander  $
 --       Module Name      : $Workfile:   doc.pkh  $
---       Date into SCCS   : $Date:   Jun 14 2007 14:59:48  $
---       Date fetched Out : $Modtime:   Jun 14 2007 14:59:00  $
---       SCCS Version     : $Revision:   2.0  $
+--       Date into SCCS   : $Date:   Sep 07 2007 11:19:46  $
+--       Date fetched Out : $Modtime:   Sep 07 2007 09:37:54  $
+--       SCCS Version     : $Revision:   2.1  $
 --       Based on SCCS Version     : 1.7
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE doc AS
 --</PACKAGE>
   /* SCCS ID keyword, do not remove */
 --<GLOBVAR>
-  g_sccsid	CONSTANT	VARCHAR2(2000) := '"$Revision:   2.0  $"'; --'"@(#)doc.pck	1.8 01/10/00"';
+  g_sccsid	CONSTANT	VARCHAR2(2000) := '"$Revision:   2.1  $"'; --'"@(#)doc.pck	1.8 01/10/00"';
 
   TYPE     t_dgt_tab     IS TABLE OF doc_gateways%ROWTYPE INDEX BY binary_integer;
   TYPE     t_docs_tab    IS TABLE OF docs%ROWTYPE INDEX BY binary_integer;
@@ -133,7 +133,9 @@ FUNCTION get_tab_das_docs(
 --<PROC NAME="get_doc_url">
 -- This function returns  URL for a given document by analysing the docs records
 -- and also pulling in values from corresponding doc_Location and doc_media records
-FUNCTION get_doc_url(pi_doc_id  IN docs.doc_id%TYPE) RETURN VARCHAR2;
+FUNCTION get_doc_url( pi_doc_id  IN docs.doc_id%TYPE
+                    , pi_ret_ext IN boolean DEFAULT TRUE
+                    ) RETURN VARCHAR2;
 --</PROC>
 --
 -----------------------------------------------------------------------------
