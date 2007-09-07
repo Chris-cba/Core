@@ -2,11 +2,11 @@ CREATE OR REPLACE package body nm3sql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sql.pkb-arc   2.0   Jul 23 2007 16:46:54   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sql.pkb-arc   2.1   Sep 07 2007 16:48:06   ptanava  $
 --       Module Name      : $Workfile:   nm3sql.pkb  $
---       Date into PVCS   : $Date:   Jul 23 2007 16:46:54  $
---       Date fetched Out : $Modtime:   Jul 23 2007 16:46:34  $
---       PVCS Version     : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Sep 07 2007 16:48:06  $
+--       Date fetched Out : $Modtime:   Sep 07 2007 16:46:14  $
+--       PVCS Version     : $Revision:   2.1  $
 --       Based on sccs version : 
 --
 --   Author : Priidu Tanava
@@ -16,8 +16,12 @@ CREATE OR REPLACE package body nm3sql as
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2005
 -----------------------------------------------------------------------------
---
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.0  $"';
+/*History
+  07.09.07 PT added implementation for split_code_tbl()
+*/
+
+
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.1  $"';
   g_package_name    constant  varchar2(30) := 'nm3sql';
 
   m_date_format constant varchar2(20) := 'DD-MON-YYYY';
@@ -391,8 +395,25 @@ CREATE OR REPLACE package body nm3sql as
     ,p_delim in varchar2
   )
   is
+    d       integer := length(p_delim);
+    s       integer := length(p_string) + 1;
+    i       integer := 1;
+    i_last  integer := 1;
   begin
-    raise_application_error(-20001, 'Not implemeted');
+    p_tbl := new nm_code_tbl();
+    if p_string is null or p_delim is null then
+      return;
+    end if;
+    loop
+      i := instr(p_string, p_delim, i, 1);
+      exit when i = 0;
+      p_tbl.extend;
+      p_tbl(p_tbl.last) := substr(p_string, i_last, i-i_last);
+      i := i + d;
+      i_last := i;
+    end loop;
+    p_tbl.extend;
+    p_tbl(p_tbl.last) := substr(p_string, i_last, s);
   end;
   --
   procedure join_code_tbl(
