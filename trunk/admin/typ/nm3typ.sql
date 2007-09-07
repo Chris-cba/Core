@@ -14,6 +14,13 @@ prompt Dropping Existing Types
 set term off
 
 BEGIN
+ execute immediate ('DROP TYPE BODY nm_id_code_tbl');
+EXCEPTION
+WHEN others THEN
+  Null;
+END;
+/
+BEGIN
  execute immediate ('DROP TYPE BODY NM_PLACEMENT');
 EXCEPTION
 WHEN others THEN
@@ -1725,7 +1732,7 @@ start '&&run_file'
 --------------------------------------------------------------------------------------------
 --
 set term on
-prompt nm_membership_tbl header
+prompt nm_analytic_chunk_type header
 set term off
 set define on
 set feedback off
@@ -1738,7 +1745,7 @@ start '&&run_file'
 --------------------------------------------------------------------------------------------
 --
 set term on
-prompt nm_membership_tbl header
+prompt nm_analytic_chunk_type body
 set term off
 set define on
 set feedback off
@@ -1751,7 +1758,7 @@ start '&&run_file'
 --------------------------------------------------------------------------------------------
 --
 set term on
-prompt nm_membership_tbl header
+prompt nm_analytic_hash_type header
 set term off
 set define on
 set feedback off
@@ -1764,12 +1771,37 @@ start '&&run_file'
 --------------------------------------------------------------------------------------------
 --
 set term on
-prompt nm_membership_tbl header
+prompt nm_analytic_hash_type body
 set term off
 set define on
 set feedback off
 select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
         '&terminator'||'nm_analytic_hash_type.tyw' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt nm_id_code_type header
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'nm_id_code_type.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--set term on
+prompt nm_id_code_tbl header
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'nm_id_code_tbl.tyh' run_file
 from dual
 /
 start '&&run_file'
