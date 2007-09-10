@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Pre_Migration_Check AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/mig/pre_migration_check.pkb-arc   2.2   Jul 31 2007 09:47:24   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/mig/pre_migration_check.pkb-arc   2.3   Sep 10 2007 11:33:20   dyounger  $
 --       Module Name      : $Workfile:   pre_migration_check.pkb  $
---       Date into PVCS   : $Date:   Jul 31 2007 09:47:24  $
---       Date fetched Out : $Modtime:   Jul 31 2007 08:57:32  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Sep 10 2007 11:33:20  $
+--       Date fetched Out : $Modtime:   Sep 10 2007 11:22:36  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : Darren Cope/Stuart Marshall/Graeme Johnson
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY Pre_Migration_Check AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.2  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.3  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'pre_migration_check';
 
@@ -3294,7 +3294,7 @@ BEGIN
     v_dummy := NULL;
 --    g_sql := 'select DISTINCT iit.'||v_tab_iad_attrib_name(ad)||' from inv_items_all iit where iit.iit_ity_inv_code = '''||v_tab_iad_ita_inv_code(ad)||'''                                                               and iit.'||v_tab_iad_attrib_name(ad)||' is not null and not exists (select 1 from inv_attri_domains iad where iad.iad_ita_inv_code='''||v_tab_iad_ita_inv_code(ad)||'''  and iad.iad_ita_attrib_name='''||v_tab_iad_attrib_name(ad)||'''                                                                    and iad.iad_value =iit.'||v_tab_iad_attrib_name(ad)||')';
 
-    g_sql:=  'SELECT DISTINCT iit.'||v_tab_iad_attrib_name(ad)||' FROM INV_ITEMS_ALL iit WHERE iit.iit_ity_inv_code = '''||v_tab_iad_ita_inv_code(ad)||''' AND iit.iit_ity_sys_flag='''||v_tab_iad_ita_inv_code(ad)||''' AND iit.'||v_tab_iad_attrib_name(ad)||' IS NOT NULL AND NOT EXISTS (SELECT 1 FROM INV_ATTRI_DOMAINS iad WHERE iad.iad_ita_inv_code='''||v_tab_iad_ita_inv_code(ad)||'''  AND iad.iad_ita_attrib_name='''||v_tab_iad_attrib_name(ad)||''' AND iad.iad_ita_ity_sys_flag='''||v_tab_iad_ita_ity_sys_flag(ad)||'''  AND iad.iad_value =iit.'||v_tab_iad_attrib_name(ad)||')';
+    g_sql:=  'SELECT DISTINCT iit.'||v_tab_iad_attrib_name(ad)||' FROM INV_ITEMS_ALL iit WHERE iit.iit_ity_inv_code = '''||v_tab_iad_ita_inv_code(ad)||''' AND iit.iit_ity_sys_flag='''||v_tab_iad_ita_ity_sys_flag(ad)||''' AND iit.'||v_tab_iad_attrib_name(ad)||' IS NOT NULL AND NOT EXISTS (SELECT 1 FROM INV_ATTRI_DOMAINS iad WHERE iad.iad_ita_inv_code='''||v_tab_iad_ita_inv_code(ad)||'''  AND iad.iad_ita_attrib_name='''||v_tab_iad_attrib_name(ad)||''' AND iad.iad_ita_ity_sys_flag='''||v_tab_iad_ita_ity_sys_flag(ad)||'''  AND iad.iad_value =iit.'||v_tab_iad_attrib_name(ad)||')';
 
     OPEN ref_cur FOR g_sql;
     LOOP
@@ -3629,7 +3629,7 @@ BEGIN
         CLOSE ref_cur;
 
         IF v_dummy >0 THEN
-          g_error := 'Attribute ('||csrec.ita_attrib_name||') Inventory Type ('||csrec.ita_iit_inv_code||') Sys Flaf ('||csrec.ita_ity_sys_Flag||')Count ('||v_dummy||')';
+          g_error := 'Attribute ('||csrec.ita_attrib_name||') Inventory Type ('||csrec.ita_iit_inv_code||') Sys Flag ('||csrec.ita_ity_sys_Flag||')Count ('||v_dummy||')';
 
            ----------------------------------------------------------
            -- Insert details of failure into PRE_MIGRATION_CHK_ISSUES
