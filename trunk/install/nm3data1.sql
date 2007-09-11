@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.8   Aug 28 2007 11:49:36   sscanlon  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.9   Sep 11 2007 09:45:14   gjohnson  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Aug 28 2007 11:49:36  $
---       Date fetched Out : $Modtime:   Aug 28 2007 11:45:00  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Sep 11 2007 09:45:14  $
+--       Date fetched Out : $Modtime:   Sep 11 2007 08:53:12  $
+--       Version          : $Revision:   2.9  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-28-AUG-2007 11:44
+11-SEP-2007 09:35
 
 TABLES PROCESSED
 ================
@@ -32363,11 +32363,33 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
+        'USEORIGHU'
+       ,'NET'
+       ,'Use original homo update'
+       ,'Used in the historic asset loader, if set to Y this reverts to the original homo update code completely'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'USEORIGHU');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
         'HISTINVLOC'
        ,'NET'
        ,'Enable Historic Asset Location'
        ,'Set to Y to enable historic loation of assets when the network has been edited.'
-       ,''
+       ,'Y_OR_N'
        ,'VARCHAR2'
        ,'N'
        ,'N' FROM DUAL
@@ -34334,6 +34356,16 @@ SELECT
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
                    WHERE HOV_ID = 'USEINVXSP');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'USEORIGHU'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'USEORIGHU');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
