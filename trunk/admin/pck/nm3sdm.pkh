@@ -1052,6 +1052,16 @@ FUNCTION get_global_unit_factor RETURN NUMBER;
 --</PROC>
 -----------------------------------------------------------------------------
 --
+-----------------------------------------------------------------------------
+--
+--<PROC NAME=""MAINTAIN_NTV>
+-- Triggered from nm_themes_all, maintains visible themes
+  PROCEDURE maintain_ntv 
+             ( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE
+             , pi_mode     IN VARCHAR2);
+--</PROC>
+-----------------------------------------------------------------------------
+--
 --<PRAGMA>
    PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
    PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
