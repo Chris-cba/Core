@@ -8,11 +8,11 @@ DECLARE
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_themes_all_b_iu_trg.trg-arc   2.1   Aug 06 2007 10:02:34   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_themes_all_b_iu_trg.trg-arc   2.2   Sep 12 2007 11:38:56   aedwards  $
 --       Module Name      : $Workfile:   nm_themes_all_b_iu_trg.trg  $
---       Date into SCCS   : $Date:   Aug 06 2007 10:02:34  $
---       Date fetched Out : $Modtime:   Aug 06 2007 09:12:34  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Sep 12 2007 11:38:56  $
+--       Date fetched Out : $Modtime:   Sep 12 2007 10:29:34  $
+--       SCCS Version     : $Revision:   2.2  $
 --
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2006
@@ -46,6 +46,10 @@ BEGIN
 --   END IF;
 --
 --
+  IF INSERTING 
+  THEN 
+    nm3sdm.maintain_ntv (:NEW.nth_theme_id,'INSERTING');
+  END IF;
 --
 EXCEPTION
    WHEN OTHERS THEN
