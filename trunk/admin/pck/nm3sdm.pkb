@@ -8650,6 +8650,36 @@ END;
     RETURN g_unit_conv;
   END;
 
-
+--
+------------------------------------------------------------------------------
+-- AE Added new procedure to maintain visable themes
+-- very basic version to start with, it doesn't deal with it on a user basis,
+-- so changes affect all users 
+-- 
+  PROCEDURE maintain_ntv 
+             ( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE
+             , pi_mode     IN VARCHAR2)
+  IS
+    l_default_vis VARCHAR2(1) := nvl(hig.get_user_or_sys_opt('DEFVISNTH'),'N');
+  BEGIN
+  --
+    IF pi_mode = 'INSERTING'
+    THEN
+    --
+      INSERT INTO nm_themes_visible (ntv_nth_theme_id,ntv_visible)
+      VALUES (pi_theme_id, l_default_vis);
+    --
+    -- Delete maintained via FK 
+--    ELSIF pi_mode = 'DELETING'
+--    THEN
+--    --
+--      DELETE nm_themes_visible
+--      WHERE ntv_nth_theme_id = pi_theme_id;
+    END IF;
+  --
+  END maintain_ntv;
+--
+------------------------------------------------------------------------------
+--
 END Nm3sdm;
 /
