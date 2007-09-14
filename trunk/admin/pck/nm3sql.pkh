@@ -2,11 +2,11 @@ CREATE OR REPLACE package nm3sql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sql.pkh-arc   2.0   Jul 23 2007 16:46:54   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sql.pkh-arc   2.1   Sep 14 2007 17:17:26   ptanava  $
 --       Module Name      : $Workfile:   nm3sql.pkh  $
---       Date into PVCS   : $Date:   Jul 23 2007 16:46:54  $
---       Date fetched Out : $Modtime:   Jul 23 2007 16:46:34  $
---       PVCS Version     : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Sep 14 2007 17:17:26  $
+--       Date fetched Out : $Modtime:   Sep 14 2007 17:05:20  $
+--       PVCS Version     : $Revision:   2.1  $
 --       Based on sccs version : 
 --
 --   Author : Priidu Tanava
@@ -17,7 +17,7 @@ CREATE OR REPLACE package nm3sql as
 --	Copyright (c) exor corporation ltd, 2005
 -----------------------------------------------------------------------------
 --
-  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.0  $"';
+  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
   
   subtype id_type   is number(9);
   subtype code_type is varchar2(80);
@@ -116,6 +116,12 @@ CREATE OR REPLACE package nm3sql as
     ,p_delim in varchar2
   );
   
+  procedure join_sys_refcursor(
+     p_string out varchar2
+    ,p_cur in sys_refcursor
+    ,p_delim in varchar2
+  );
+  
   
   function get_rounded_cardinality(
      p_cardinality in integer
@@ -126,6 +132,11 @@ CREATE OR REPLACE package nm3sql as
      p_rec in out longops_rec
     ,p_increment in pls_integer
   );
+  
+  function null_literal(
+     p_data_type in varchar2
+    ,p_format in varchar2 default null
+  ) return varchar2;
   
 end;
 /
