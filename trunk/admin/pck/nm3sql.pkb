@@ -2,11 +2,11 @@ CREATE OR REPLACE package body nm3sql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sql.pkb-arc   2.1   Sep 07 2007 16:48:06   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sql.pkb-arc   2.2   Sep 14 2007 17:17:24   ptanava  $
 --       Module Name      : $Workfile:   nm3sql.pkb  $
---       Date into PVCS   : $Date:   Sep 07 2007 16:48:06  $
---       Date fetched Out : $Modtime:   Sep 07 2007 16:46:14  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Sep 14 2007 17:17:24  $
+--       Date fetched Out : $Modtime:   Sep 14 2007 17:07:34  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on sccs version : 
 --
 --   Author : Priidu Tanava
@@ -18,10 +18,11 @@ CREATE OR REPLACE package body nm3sql as
 -----------------------------------------------------------------------------
 /*History
   07.09.07 PT added implementation for split_code_tbl()
+  13.09.07 PT added join_sys_refcursor() and null_literal()
 */
 
 
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.1  $"';
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.2  $"';
   g_package_name    constant  varchar2(30) := 'nm3sql';
 
   m_date_format constant varchar2(20) := 'DD-MON-YYYY';
@@ -389,6 +390,32 @@ CREATE OR REPLACE package body nm3sql as
   end;
   
   
+  -- this joins the values from an open cursor that selects one column
+  --  varchar2(80) expected, indirect conversion otherwise.
+  --  the cursor is closed upon successful completion.
+  --  upon error it is the calleres responsability to close the cursror.
+  procedure join_sys_refcursor(
+     p_string out varchar2
+    ,p_cur in sys_refcursor
+    ,p_delim in varchar2
+  )
+  is
+    l_delim   varchar2(5);
+    l_value   varchar2(80);
+  begin
+    if p_delim is null then
+      return;
+    end if;
+    loop
+      fetch p_cur into l_value;
+      exit when p_cur%notfound;
+      p_string := p_string||l_delim||l_value;
+      l_delim := p_delim;
+    end loop;
+    close p_cur;
+  end;
+  
+  
   procedure split_code_tbl(
      p_tbl out nm_code_tbl
     ,p_string in varchar2
@@ -475,6 +502,32 @@ CREATE OR REPLACE package body nm3sql as
         ,target_desc => p_rec.target_desc
       );
     end if;
+  end;
+  
+  
+  
+  -- this returns null literal for sql wrapped in an apropriate format function
+  function null_literal(
+     p_data_type in varchar2
+    ,p_format in varchar2
+  ) return varchar2
+  is
+    l_alias varchar2(32);
+  begin
+    case upper(p_data_type)
+    when 'VARCHAR2' then
+      return 'null'||l_alias;
+    when 'NUMBER' then
+      return 'to_number(null)';
+    when 'DATE' then
+      if p_format is null then
+        return 'to_date(null)';
+      else
+        return 'to_date(null, '''||p_format||''')';
+      end if;
+    else
+      raise subscript_outside_limit;
+    end case;
   end;
 
 end;
