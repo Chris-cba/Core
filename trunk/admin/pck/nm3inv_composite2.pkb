@@ -2,24 +2,27 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.0   Jul 23 2007 14:30:44   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.1   Sep 18 2007 17:30:30   ptanava  $
 --       Module Name      : $Workfile:   nm3inv_composite2.pkb  $
---       Date into PVCS   : $Date:   Jul 23 2007 14:30:44  $
---       Date fetched Out : $Modtime:   Jul 23 2007 14:30:24  $
---       PVCS Version     : $Revision:   2.0  $
---       Based on sccs version : 
+--       Date into PVCS   : $Date:   Sep 18 2007 17:30:30  $
+--       Date fetched Out : $Modtime:   Sep 17 2007 17:43:52  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on sccs version :
+--       Temp version     : 2.0.2
 --
---   Author : Priidu
+--   Author : Priidu Tanava
 --
 --   Bulk Merge Composite Inventory package body
 --
 -----------------------------------------------------------------------------
 --   Copyright (c) exor corporation ltd, 2005
 -----------------------------------------------------------------------------
---
---all global package variables here h
---
-  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.0  $"';
+/* History:
+  24.07.07 PT added set_job_broken(), improved progress reporting in get_progress_text()
+  27.07.07 PT fixed a bug in process_from_iit_tmp() to cope with empty nm_mrg_derived_inv_values_tmp table.
+*/
+
+  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.1  $"';
   g_package_name  constant  varchar2(30) := 'nm3inv_composite2';
 
   -- Bulk merge types
@@ -69,6 +72,8 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
      p_inv_type in nm_inv_types_all.nit_inv_type%type
     ,pt_attr in out attrib_tbl
   );
+  
+  procedure set_job_broken(p_job in number);
 
 --
   g_mrg_results_table VARCHAR2(30);
@@ -84,6 +89,10 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
    
   m_next_iit_ne_id      nm_inv_items_all.iit_ne_id%type;
   m_next_iit_ne_id_flag pls_integer := 0;
+  
+  --
+  m_ad_hoc_job      number;
+  m_ad_hoc_sqlerrm  varchar2(32767);
 
 
 --
@@ -1047,6 +1056,7 @@ END get_merge_results_view;
     
     pragma autonomous_transaction;
   begin
+    nm3dbg.debug_on;
     nm3dbg.putln(g_package_name||'.submit_job('
       ||'p_what_hint='||p_what_hint
       ||', p_what='||p_what
@@ -1104,6 +1114,49 @@ END get_merge_results_view;
       rollback;
       raise;
     
+  end;
+  
+  
+  
+  -- this does not set the job broken but sets the next run date to year 4000
+  --  (oracle resets the broken flag if set on a running job)
+  -- also adds the error message at the end of job's what
+  -- called from within the error handler of call_rebuild()
+  procedure set_job_broken(p_job in number)
+  is
+    l_what   varchar2(4000);
+    l_errmsg varchar2(4000);
+    i binary_integer;
+    pragma autonomous_transaction;
+  begin
+    nm3dbg.putln(g_package_name||'.set_job_broken('
+      ||'p_job='||p_job
+      ||')');
+    select what
+    into l_what
+    from all_jobs
+    where job = p_job;
+    l_errmsg := substr(l_what, instr(l_what, ';') + 1);
+    if l_errmsg is not null then
+      l_what := null;
+    else
+      l_what := l_what||chr(10)||'/*'||chr(10)||substr(sqlerrm, 1, 3500)||chr(10)||'*/';
+      nm3dbg.putln(l_what);
+    end if;
+    dbms_job.change(
+        job       => p_job
+       ,what      => l_what
+       ,next_date => to_date('01/01/4000', 'DD/MM/YYYY')
+       ,interval  => null
+    );
+    commit;
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.set_job_broken('
+        ||'p_job='||p_job
+        ||')');
+      rollback;
+      raise;
   end;
   
   
@@ -1191,6 +1244,7 @@ END get_merge_results_view;
             ||l_sql
         ||cr||');';
   end;
+  
 
   
   -- this is the access point for both the dmbs_job and direct calling
@@ -1221,8 +1275,10 @@ END get_merge_results_view;
     l_admin_unit_id hig_users.hus_admin_unit%type;
     t_ne    nm_id_tbl;
     t_nse   nm_id_tbl;
+    l_job_failures number := 0;
     
   begin
+    nm3dbg.debug_on; nm3dbg.timing_on;
     nm3dbg.putln(g_package_name||'.call_rebuild('
       ||'p_dbms_job_no='||p_dbms_job_no
       ||', p_inv_type='||p_inv_type
@@ -1237,6 +1293,17 @@ END get_merge_results_view;
       ||', p_value3='||p_value3
       ||')');
     nm3dbg.ind;
+    
+    if p_dbms_job_no is not null then
+      select j.failures
+      into l_job_failures
+      from all_jobs j
+      where j.job = p_dbms_job_no;
+    end if;
+    if l_job_failures > 0 then
+      raise_application_error(-20001
+        , 'Job '||p_dbms_job_no||' is failing. Attempt '||to_char(l_job_failures + 1)||'. Check and resubmit');
+    end if;
     
     select * into r_nmnd 
     from nm_mrg_nit_derivation
@@ -1308,7 +1375,8 @@ END get_merge_results_view;
       ,pt_nse           => t_nse
       ,p_ignore_poe     => true
     );
-    
+
+
     nm3dbg.deind;
   exception
     when others then
@@ -1325,11 +1393,10 @@ END get_merge_results_view;
         ||', p_value3='||p_value3
         ||')');
       if p_dbms_job_no is not null then
-        dbms_job.broken(p_dbms_job_no, true);
+        set_job_broken(p_job => p_dbms_job_no);
         --dbms_job.remove(p_dbms_job_no);
       end if;
       raise;
- 
   end;
 
   
@@ -1377,7 +1444,7 @@ END get_merge_results_view;
     i             binary_integer;
     
   begin
-    nm3dbg.debug_on; nm3dbg.timing_on;
+    
     nm3dbg.putln(g_package_name||'.do_rebuild('
       ||'p_op_context='||p_op_context
       ||', p_inv_type='||p_inv_type
@@ -1454,7 +1521,7 @@ END get_merge_results_view;
     r_longops.op_name     := 'Derived asset rebuild';
     r_longops.context     := p_op_context;
     r_longops.sofar       := 0;
-    r_longops.totalwork   := 6;
+    r_longops.totalwork   := 7;
     r_longops.target_desc  := p_inv_type;
     nm3sql.set_longops(p_rec => r_longops, p_increment => 0);
 
@@ -1504,7 +1571,20 @@ END get_merge_results_view;
     t_events(t_events.count+1) := 'Merge job committed with id: '||l_mrg_job_id;
     
     
-    -- 5. Popluate the iit temp table
+    
+    -- 5. Preprocess engineering dynseg
+    nm3eng_dynseg_util.populate_tmp_table(
+       p_mrg_job_id => l_mrg_job_id
+      ,p_inv_type   => p_inv_type
+      ,p_sqlcount   => l_sqlcount -- out
+    );
+    nm3eng_dynseg_util.set_context_mrg_job_id(l_mrg_job_id);
+    nm3eng_dynseg_util.load_iit_mapping(p_inv_type);
+    nm3sql.set_longops(p_rec => r_longops, p_increment => 1);
+    t_events(t_events.count+1) := 'Preprocessed dynseg records count: '||l_sqlcount;
+    
+    
+    -- 6. Popluate the iit temp table
     ins_iit_tmp_values(
        p_inv_type => p_inv_type
       ,p_mrg_view => p_mrg_view
@@ -1518,7 +1598,7 @@ END get_merge_results_view;
     t_events(t_events.count+1) := 'Loaded temporary invitems count: '||l_sqlcount;
     
     
-    -- 6. Create the composite inv items and placements
+    -- 7. Create the composite inv items and placements
     process_from_iit_tmp(
        p_inv_type       => p_inv_type
       ,p_mrg_job_id     => l_mrg_job_id
@@ -1751,7 +1831,7 @@ END get_merge_results_view;
       -- 2.1.1 end date the members whose start date is not rebuild's effective date
       -- if the effective date is same as old start date (two edits in same day)
       --  then we must delete, not enddate
-      forall i in 1 .. t_rowid.last
+      forall i in 1 .. t_rowid.count
         delete from nm_members_all
         where rowid = t_rowid(i)
           and nm_start_date = p_effective_date;
@@ -1760,7 +1840,7 @@ END get_merge_results_view;
           
           
       -- set the enddate for the rest (the normal processing)
-      forall i in 1 .. t_rowid.last
+      forall i in 1 .. t_rowid.count
         update nm_members_all
           set nm_end_date = p_effective_date
         where rowid = t_rowid(i)
@@ -2388,7 +2468,8 @@ END get_merge_results_view;
     ,p_job_no in binary_integer
   ) return varchar2
   is
-    l_text varchar2(512 byte);
+    l_text    varchar2(512 byte);
+    l_sqlerrm varchar2(4000);
   begin
     if p_job_no is not null then
       select o.message into l_text
@@ -2399,9 +2480,24 @@ END get_merge_results_view;
     return l_text;
   exception
     when no_data_found then
-      return '#error: Operation not found';
+      declare
+        l_job_failures number;
+      begin
+        select j.failures, replace(substr(j.what, instr(j.what, ';')+5), chr(10)||'*/') errmsg
+        into l_job_failures, l_sqlerrm
+        from all_jobs j
+        where j.job = p_job_no;
+        if l_job_failures > 0 then
+          return 'Job '||p_job_no||' has failed: '||l_sqlerrm;
+        else
+          return 'Unable to report progess on job '||p_job_no;
+        end if;
+      exception
+        when no_data_found then null;
+      end;
+      return '#error: Job '||p_job_no||' not found';
     when too_many_rows then
-      return '#error: Duplicate operation';
+      return '#error: Duplicate job '||p_job_no;
   end;
     
     
