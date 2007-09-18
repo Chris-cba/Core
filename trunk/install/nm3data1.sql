@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.9   Sep 11 2007 09:45:14   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.10   Sep 18 2007 13:50:26   sscanlon  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Sep 11 2007 09:45:14  $
---       Date fetched Out : $Modtime:   Sep 11 2007 08:53:12  $
---       Version          : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Sep 18 2007 13:50:26  $
+--       Date fetched Out : $Modtime:   Sep 18 2007 13:48:50  $
+--       Version          : $Revision:   2.10  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-11-SEP-2007 09:35
+18-SEP-2007 13:48
 
 TABLES PROCESSED
 ================
@@ -98,7 +98,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'ACC'
        ,'accidents manager'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,8
@@ -124,7 +124,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'AST'
        ,'asset manager'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,65
        ,null
@@ -150,7 +150,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'AVM'
        ,'Asset Valuation Manager'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,null
@@ -176,7 +176,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'CLM'
        ,'street lighting manager'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,24
@@ -202,7 +202,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'DOC'
        ,'document manager'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,4
@@ -228,7 +228,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'ENQ'
        ,'public enquiry manager'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,null
@@ -254,7 +254,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'HIG'
        ,'exor'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,72
        ,1
@@ -280,7 +280,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'IM'
        ,'Information Manager'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,null
@@ -306,7 +306,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'MAI'
        ,'maintenance manager'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,6
@@ -332,7 +332,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'MRWA'
        ,'MRWA'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,null
@@ -358,7 +358,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'NET'
        ,'network manager'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,78
        ,2
@@ -384,7 +384,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'NSG'
        ,'Street Gazetteer Manager'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,null
@@ -410,7 +410,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'PMS'
        ,'structural projects v2 - REDUNDANT'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,26
@@ -436,7 +436,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'PROW'
        ,'Public Rights Of Way Manager'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,null
@@ -462,7 +462,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'SCH'
        ,'schemes enterprise edition'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,null
@@ -488,7 +488,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'STP'
        ,'Schemes'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,20
@@ -514,7 +514,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'STR'
        ,'structures manager'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,14
@@ -540,7 +540,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'SWR'
        ,'street works manager'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,22
@@ -566,7 +566,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'TM'
        ,'traffic interface manager'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,30
@@ -592,7 +592,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'UKP'
        ,'ukpms'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,null
@@ -618,7 +618,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'USR'
        ,'lrs'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,null
@@ -644,7 +644,7 @@ INSERT INTO HIG_PRODUCTS
 SELECT 
         'WMP'
        ,'Web Mapping'
-       ,'4.0'
+       ,'4.0.2.0'
        ,''
        ,null
        ,null
@@ -30955,6 +30955,28 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
+        'WMSDEFSTAT'
+       ,'HIG'
+       ,'WMS Default State'
+       ,'Set to 0 if WMS is not to be displayed at startup. Set to 1 if WMS is to be displayed at startup'
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'WMSDEFSTAT');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
         'WEBMAINIMG'
        ,'HIG'
        ,'Image for main menu'
@@ -34466,6 +34488,16 @@ SELECT
        ,'1,7' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
                    WHERE HOV_ID = 'WEEKEND');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'WMSDEFSTAT'
+       ,'0' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'WMSDEFSTAT');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
