@@ -1,12 +1,13 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.1   Jul 24 2007 13:06:46   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.2   Sep 18 2007 17:26:02   ptanava  $
 --       Module Name      : $Workfile:   nm3eng_dynseg.pkb  $
---       Date into PVCS   : $Date:   Jul 24 2007 13:06:46  $
---       Date fetched Out : $Modtime:   Jul 24 2007 12:58:28  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Sep 18 2007 17:26:02  $
+--       Date fetched Out : $Modtime:   Sep 18 2007 17:16:32  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on sccs version : 1.13
+--       Temp version 2.1.2
 --
 --   Author : Jonathan Mills
 --
@@ -19,12 +20,14 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
     24.07.07 PT modified build_sql() so that the FT placements are now expected to be read from nm_members as for iit_inv_items
                   and not be included in the veiw
                 this complements the similar FT treatment in the nm3bulk_merge package
+    17.09.07 PT added nm3eng_dynseg_util bulk preprocessing for mrg_job_id based functions.
+                  This completes the implementing of the bulk processing used in connection with derived assets
 */
 
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg';
@@ -52,6 +55,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
    g_bins_run       BOOLEAN := FALSE;
    --
    g_field_is_number BOOLEAN;
+   
    --
 --
 -----------------------------------------------------------------------------
@@ -200,7 +204,6 @@ PROCEDURE populate_stats_arrays (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_
    l_change_reqd BOOLEAN;
 --
 BEGIN
---
 --   nm_debug.debug('populate_stats_arrays 1');
 --
    IF g_merge_run
@@ -280,6 +283,10 @@ BEGIN
 --      nm_debug.debug('NSA_MAX_DEC_PLACES_Y   : '||   g_stat_array.NSA_MAX_DEC_PLACES_Y   ,-1);
 --      nm_debug.debug_off;
 --
+  else
+    --
+    null;
+    
    END IF;
 --
 END populate_stats_arrays;
@@ -310,21 +317,33 @@ FUNCTION get_most_common_value (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_j
                                ) RETURN VARCHAR2 IS
 --
 BEGIN
---
-   running_for_merge;
-   running_bins;
---
-   populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
-                         ,pi_nms_section_id => pi_nms_section_id
-                         ,pi_inv_type       => pi_inv_type
-                         ,pi_xsp            => pi_xsp
-                         ,pi_view_col       => pi_view_col
-                         );
---
-   RETURN  g_val_dist_arr.nvda_highest_pct;
---
+  
+  -- use derived assets preprocessed value
+  if pi_nms_mrg_job_id = nm3eng_dynseg_util.get_context_mrg_job_id then
+    return nm3eng_dynseg_util.get_chr_value(
+              p_call_func       => 'get_most_common_value'
+             ,p_mrg_section_id  => pi_nms_section_id
+             ,p_inv_type        => pi_inv_type
+             ,p_xsp             => pi_xsp
+             ,p_call_attrib     => pi_view_col
+           );
+  
+  -- original standard processing
+  else
+    running_for_merge;
+    running_bins;
+    populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
+                          ,pi_nms_section_id => pi_nms_section_id
+                          ,pi_inv_type       => pi_inv_type
+                          ,pi_xsp            => pi_xsp
+                          ,pi_view_col       => pi_view_col
+                          );
+ 
+    RETURN  g_val_dist_arr.nvda_highest_pct;
+  
+  end if;
+
 EXCEPTION
---
    WHEN g_eng_dynseg_exception
     THEN
       RAISE_APPLICATION_ERROR(g_eng_dynseg_exc_code,g_eng_dynseg_exc_msg);
@@ -396,27 +415,39 @@ FUNCTION get_maximum_value (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_i
                            ,pi_inv_type         IN VARCHAR2
                            ,pi_xsp              IN VARCHAR2
                            ,pi_view_col         IN VARCHAR2
-                           ) RETURN NUMBER IS
+                           ) RETURN NUMBER
+IS
 BEGIN
---
+
+  -- use derived assets preprocessed value
+  if pi_nms_mrg_job_id = nm3eng_dynseg_util.get_context_mrg_job_id then
+    return nm3eng_dynseg_util.get_num_value(
+              p_call_func       => 'get_maximum_value'
+             ,p_mrg_section_id  => pi_nms_section_id
+             ,p_inv_type        => pi_inv_type
+             ,p_xsp             => pi_xsp
+             ,p_call_attrib     => pi_view_col
+           );
+  
+  -- original standard processing
+  else
    running_for_merge;
    running_stats;
---
    populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
                                  ,pi_nms_section_id => pi_nms_section_id
                                  ,pi_inv_type       => pi_inv_type
                                  ,pi_xsp            => pi_xsp
                                  ,pi_view_col       => pi_view_col
                                  );
---
    RETURN  g_stat_array.nsa_max_x;
---
+   
+  end if;
+
 EXCEPTION
---
    WHEN g_eng_dynseg_exception
     THEN
       RAISE_APPLICATION_ERROR(g_eng_dynseg_exc_code,g_eng_dynseg_exc_msg);
---
+
 END get_maximum_value;
 --
 -----------------------------------------------------------------------------
@@ -484,23 +515,34 @@ FUNCTION get_minimum_value (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_i
                            ,pi_inv_type         IN VARCHAR2
                            ,pi_xsp              IN VARCHAR2
                            ,pi_view_col         IN VARCHAR2
-                           ) RETURN NUMBER IS
+                           ) RETURN NUMBER
+IS
 BEGIN
---
-   running_for_merge;
-   running_stats;
---
-   populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
-                         ,pi_nms_section_id => pi_nms_section_id
-                         ,pi_inv_type       => pi_inv_type
-                         ,pi_xsp            => pi_xsp
-                         ,pi_view_col       => pi_view_col
-                         );
---
-   RETURN  g_stat_array.nsa_min_x;
---
+  -- use derived assets preprocessed value
+  if pi_nms_mrg_job_id = nm3eng_dynseg_util.get_context_mrg_job_id then
+    return nm3eng_dynseg_util.get_num_value(
+              p_call_func       => 'get_minimum_value'
+             ,p_mrg_section_id  => pi_nms_section_id
+             ,p_inv_type        => pi_inv_type
+             ,p_xsp             => pi_xsp
+             ,p_call_attrib     => pi_view_col
+           );
+  
+  -- original standard processing
+  else
+    running_for_merge;
+    running_stats;
+    populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
+                          ,pi_nms_section_id => pi_nms_section_id
+                          ,pi_inv_type       => pi_inv_type
+                          ,pi_xsp            => pi_xsp
+                          ,pi_view_col       => pi_view_col
+                          );
+    RETURN  g_stat_array.nsa_min_x;
+    
+  end if;
+
 EXCEPTION
---
    WHEN g_eng_dynseg_exception
     THEN
       RAISE_APPLICATION_ERROR(g_eng_dynseg_exc_code,g_eng_dynseg_exc_msg);
@@ -572,23 +614,35 @@ FUNCTION get_length_weighted_ave (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg
                                  ,pi_inv_type         IN VARCHAR2
                                  ,pi_xsp              IN VARCHAR2
                                  ,pi_view_col         IN VARCHAR2
-                                 ) RETURN NUMBER IS
+                                 ) RETURN NUMBER
+IS
 BEGIN
---
-   running_for_merge;
-   running_stats;
---
-   populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
-                         ,pi_nms_section_id => pi_nms_section_id
-                         ,pi_inv_type       => pi_inv_type
-                         ,pi_xsp            => pi_xsp
-                         ,pi_view_col       => pi_view_col
-                         );
---
-   RETURN g_stat_array.nsa_y_weighted_ave_x;
---
+  -- use derived assets preprocessed value
+  if pi_nms_mrg_job_id = nm3eng_dynseg_util.get_context_mrg_job_id then
+    return nm3eng_dynseg_util.get_num_value(
+              p_call_func       => 'get_length_weighted_ave'
+             ,p_mrg_section_id  => pi_nms_section_id
+             ,p_inv_type        => pi_inv_type
+             ,p_xsp             => pi_xsp
+             ,p_call_attrib     => pi_view_col
+           );
+  
+  -- original standard processing
+  else
+    running_for_merge;
+    running_stats;
+    populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
+                          ,pi_nms_section_id => pi_nms_section_id
+                          ,pi_inv_type       => pi_inv_type
+                          ,pi_xsp            => pi_xsp
+                          ,pi_view_col       => pi_view_col
+                          );
+ 
+    RETURN g_stat_array.nsa_y_weighted_ave_x;
+   
+ end if;
+
 EXCEPTION
---
    WHEN g_eng_dynseg_exception
     THEN
       RAISE_APPLICATION_ERROR(g_eng_dynseg_exc_code,g_eng_dynseg_exc_msg);
@@ -662,21 +716,32 @@ FUNCTION get_median_value (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id
                           ,pi_view_col         IN VARCHAR2
                           ) RETURN NUMBER IS
 BEGIN
---
-   running_for_merge;
-   running_stats;
---
-   populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
-                         ,pi_nms_section_id => pi_nms_section_id
-                         ,pi_inv_type       => pi_inv_type
-                         ,pi_xsp            => pi_xsp
-                         ,pi_view_col       => pi_view_col
-                         );
---
-   RETURN g_stat_array.nsa_median_x;
---
+  -- use derived assets preprocessed value
+  if pi_nms_mrg_job_id = nm3eng_dynseg_util.get_context_mrg_job_id then
+    return nm3eng_dynseg_util.get_num_value(
+              p_call_func       => 'get_median_value'
+             ,p_mrg_section_id  => pi_nms_section_id
+             ,p_inv_type        => pi_inv_type
+             ,p_xsp             => pi_xsp
+             ,p_call_attrib     => pi_view_col
+           );
+  
+  -- original standard processing
+  else
+    running_for_merge;
+    running_stats;
+    populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
+                          ,pi_nms_section_id => pi_nms_section_id
+                          ,pi_inv_type       => pi_inv_type
+                          ,pi_xsp            => pi_xsp
+                          ,pi_view_col       => pi_view_col
+                          );
+ 
+    RETURN g_stat_array.nsa_median_x;
+  
+  end if;
+
 EXCEPTION
---
    WHEN g_eng_dynseg_exception
     THEN
       RAISE_APPLICATION_ERROR(g_eng_dynseg_exc_code,g_eng_dynseg_exc_msg);
@@ -748,23 +813,34 @@ FUNCTION get_mean_value (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%T
                         ,pi_inv_type         IN VARCHAR2
                         ,pi_xsp              IN VARCHAR2
                         ,pi_view_col         IN VARCHAR2
-                        ) RETURN NUMBER IS
+                        ) RETURN NUMBER
+IS
 BEGIN
---
-   running_for_merge;
-   running_stats;
---
-   populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
-                         ,pi_nms_section_id => pi_nms_section_id
-                         ,pi_inv_type       => pi_inv_type
-                         ,pi_xsp            => pi_xsp
-                         ,pi_view_col       => pi_view_col
-                         );
---
-   RETURN g_stat_array.nsa_mean_x;
---
+  -- use derived assets preprocessed value
+  if pi_nms_mrg_job_id = nm3eng_dynseg_util.get_context_mrg_job_id then
+    return nm3eng_dynseg_util.get_num_value(
+              p_call_func       => 'get_mean_value'
+             ,p_mrg_section_id  => pi_nms_section_id
+             ,p_inv_type        => pi_inv_type
+             ,p_xsp             => pi_xsp
+             ,p_call_attrib     => pi_view_col
+           );
+  
+  -- original standard processing
+  else
+    running_for_merge;
+    running_stats;
+    populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
+                          ,pi_nms_section_id => pi_nms_section_id
+                          ,pi_inv_type       => pi_inv_type
+                          ,pi_xsp            => pi_xsp
+                          ,pi_view_col       => pi_view_col
+                          );
+    RETURN g_stat_array.nsa_mean_x;
+  
+  end if;
+
 EXCEPTION
---
    WHEN g_eng_dynseg_exception
     THEN
       RAISE_APPLICATION_ERROR(g_eng_dynseg_exc_code,g_eng_dynseg_exc_msg);
@@ -836,23 +912,35 @@ FUNCTION get_variance (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYP
                       ,pi_inv_type         IN VARCHAR2
                       ,pi_xsp              IN VARCHAR2
                       ,pi_view_col         IN VARCHAR2
-                      ) RETURN NUMBER IS
+                      ) RETURN NUMBER
+IS
 BEGIN
---
-   running_for_merge;
-   running_stats;
---
-   populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
-                         ,pi_nms_section_id => pi_nms_section_id
-                         ,pi_inv_type       => pi_inv_type
-                         ,pi_xsp            => pi_xsp
-                         ,pi_view_col       => pi_view_col
-                         );
---
-   RETURN g_stat_array.nsa_var_x;
---
+  -- use derived assets preprocessed value
+  if pi_nms_mrg_job_id = nm3eng_dynseg_util.get_context_mrg_job_id then
+    return nm3eng_dynseg_util.get_num_value(
+              p_call_func       => 'get_variance'
+             ,p_mrg_section_id  => pi_nms_section_id
+             ,p_inv_type        => pi_inv_type
+             ,p_xsp             => pi_xsp
+             ,p_call_attrib     => pi_view_col
+           );
+  
+  -- original standard processing
+  else
+    running_for_merge;
+    running_stats;
+    populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
+                          ,pi_nms_section_id => pi_nms_section_id
+                          ,pi_inv_type       => pi_inv_type
+                          ,pi_xsp            => pi_xsp
+                          ,pi_view_col       => pi_view_col
+                          );
+ 
+    RETURN g_stat_array.nsa_var_x;
+   
+  end if;
+
 EXCEPTION
---
    WHEN g_eng_dynseg_exception
     THEN
       RAISE_APPLICATION_ERROR(g_eng_dynseg_exc_code,g_eng_dynseg_exc_msg);
@@ -924,23 +1012,35 @@ FUNCTION get_standard_deviation (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_
                                 ,pi_inv_type         IN VARCHAR2
                                 ,pi_xsp              IN VARCHAR2
                                 ,pi_view_col         IN VARCHAR2
-                                ) RETURN NUMBER IS
+                                ) RETURN NUMBER
+IS
 BEGIN
---
-   running_for_merge;
-   running_stats;
---
-   populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
-                         ,pi_nms_section_id => pi_nms_section_id
-                         ,pi_inv_type       => pi_inv_type
-                         ,pi_xsp            => pi_xsp
-                         ,pi_view_col       => pi_view_col
-                         );
---
-   RETURN g_stat_array.nsa_sd_x;
---
+  -- use derived assets preprocessed value
+  if pi_nms_mrg_job_id = nm3eng_dynseg_util.get_context_mrg_job_id then
+    return nm3eng_dynseg_util.get_num_value(
+              p_call_func       => 'get_standard_deviation'
+             ,p_mrg_section_id  => pi_nms_section_id
+             ,p_inv_type        => pi_inv_type
+             ,p_xsp             => pi_xsp
+             ,p_call_attrib     => pi_view_col
+           );
+  
+  -- original standard processing
+  else
+    running_for_merge;
+    running_stats;
+    populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
+                          ,pi_nms_section_id => pi_nms_section_id
+                          ,pi_inv_type       => pi_inv_type
+                          ,pi_xsp            => pi_xsp
+                          ,pi_view_col       => pi_view_col
+                          );
+ 
+    RETURN g_stat_array.nsa_sd_x;
+   
+  end if;
+
 EXCEPTION
---
    WHEN g_eng_dynseg_exception
     THEN
       RAISE_APPLICATION_ERROR(g_eng_dynseg_exc_code,g_eng_dynseg_exc_msg);
@@ -1015,21 +1115,33 @@ FUNCTION get_biased_standard_deviation
                 ,pi_inv_type         IN VARCHAR2
                 ,pi_xsp              IN VARCHAR2
                 ,pi_view_col         IN VARCHAR2
-                ) RETURN NUMBER IS
+                ) RETURN NUMBER
+IS
 BEGIN
---
-   running_for_merge;
-   running_stats;
---
-   populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
-                         ,pi_nms_section_id => pi_nms_section_id
-                         ,pi_inv_type       => pi_inv_type
-                         ,pi_xsp            => pi_xsp
-                         ,pi_view_col       => pi_view_col
-                         );
---
-   RETURN g_stat_array.nsa_biased_sd_x;
---
+  -- use derived assets preprocessed value
+  if pi_nms_mrg_job_id = nm3eng_dynseg_util.get_context_mrg_job_id then
+    return nm3eng_dynseg_util.get_num_value(
+              p_call_func       => 'get_biased_standard_deviation'
+             ,p_mrg_section_id  => pi_nms_section_id
+             ,p_inv_type        => pi_inv_type
+             ,p_xsp             => pi_xsp
+             ,p_call_attrib     => pi_view_col
+           );
+  
+  -- original standard processing
+  else
+    running_for_merge;
+    running_stats;
+    populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
+                          ,pi_nms_section_id => pi_nms_section_id
+                          ,pi_inv_type       => pi_inv_type
+                          ,pi_xsp            => pi_xsp
+                          ,pi_view_col       => pi_view_col
+                          );
+    RETURN g_stat_array.nsa_biased_sd_x;
+   
+  end if;
+  
 EXCEPTION
 --
    WHEN g_eng_dynseg_exception
@@ -1109,21 +1221,33 @@ FUNCTION get_biased_variance
                 ,pi_inv_type         IN VARCHAR2
                 ,pi_xsp              IN VARCHAR2
                 ,pi_view_col         IN VARCHAR2
-                ) RETURN NUMBER IS
+                ) RETURN NUMBER
+IS
 BEGIN
---
-   running_for_merge;
-   running_stats;
---
-   populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
-                         ,pi_nms_section_id => pi_nms_section_id
-                         ,pi_inv_type       => pi_inv_type
-                         ,pi_xsp            => pi_xsp
-                         ,pi_view_col       => pi_view_col
-                         );
---
-   RETURN g_stat_array.nsa_biased_var_x;
---
+  -- use derived assets preprocessed value
+  if pi_nms_mrg_job_id = nm3eng_dynseg_util.get_context_mrg_job_id then
+    return nm3eng_dynseg_util.get_num_value(
+              p_call_func       => 'get_biased_variance'
+             ,p_mrg_section_id  => pi_nms_section_id
+             ,p_inv_type        => pi_inv_type
+             ,p_xsp             => pi_xsp
+             ,p_call_attrib     => pi_view_col
+           );
+  
+  -- original standard processing
+  else
+    running_for_merge;
+    running_stats;
+    populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
+                          ,pi_nms_section_id => pi_nms_section_id
+                          ,pi_inv_type       => pi_inv_type
+                          ,pi_xsp            => pi_xsp
+                          ,pi_view_col       => pi_view_col
+                          );
+    RETURN g_stat_array.nsa_biased_var_x;
+    
+  end if;
+  
 EXCEPTION
 --
    WHEN g_eng_dynseg_exception
@@ -1203,23 +1327,34 @@ FUNCTION get_first_value
                 ,pi_inv_type         IN VARCHAR2
                 ,pi_xsp              IN VARCHAR2
                 ,pi_view_col         IN VARCHAR2
-                ) RETURN NUMBER IS
+                ) RETURN NUMBER
+IS
 BEGIN
---
-   running_for_merge;
-   running_stats;
---
-   populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
-                         ,pi_nms_section_id => pi_nms_section_id
-                         ,pi_inv_type       => pi_inv_type
-                         ,pi_xsp            => pi_xsp
-                         ,pi_view_col       => pi_view_col
-                         );
---
-   RETURN g_stat_array.nsa_first_x;
---
+  -- use derived assets preprocessed value
+  if pi_nms_mrg_job_id = nm3eng_dynseg_util.get_context_mrg_job_id then
+    return nm3eng_dynseg_util.get_num_value(
+              p_call_func       => 'get_first_value'
+             ,p_mrg_section_id  => pi_nms_section_id
+             ,p_inv_type        => pi_inv_type
+             ,p_xsp             => pi_xsp
+             ,p_call_attrib     => pi_view_col
+           );
+  
+  -- original standard processing
+  else
+    running_for_merge;
+    running_stats;
+    populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
+                          ,pi_nms_section_id => pi_nms_section_id
+                          ,pi_inv_type       => pi_inv_type
+                          ,pi_xsp            => pi_xsp
+                          ,pi_view_col       => pi_view_col
+                          );
+    RETURN g_stat_array.nsa_first_x;
+  
+  end if;
+
 EXCEPTION
---
    WHEN g_eng_dynseg_exception
     THEN
       RAISE_APPLICATION_ERROR(g_eng_dynseg_exc_code,g_eng_dynseg_exc_msg);
@@ -1297,23 +1432,34 @@ FUNCTION get_last_value
                 ,pi_inv_type         IN VARCHAR2
                 ,pi_xsp              IN VARCHAR2
                 ,pi_view_col         IN VARCHAR2
-                ) RETURN NUMBER IS
+                ) RETURN NUMBER
+IS
 BEGIN
---
-   running_for_merge;
-   running_stats;
---
-   populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
-                         ,pi_nms_section_id => pi_nms_section_id
-                         ,pi_inv_type       => pi_inv_type
-                         ,pi_xsp            => pi_xsp
-                         ,pi_view_col       => pi_view_col
-                         );
---
-   RETURN g_stat_array.nsa_last_x;
---
+  -- use derived assets preprocessed value
+  if pi_nms_mrg_job_id = nm3eng_dynseg_util.get_context_mrg_job_id then
+    return nm3eng_dynseg_util.get_num_value(
+              p_call_func       => 'get_last_value'
+             ,p_mrg_section_id  => pi_nms_section_id
+             ,p_inv_type        => pi_inv_type
+             ,p_xsp             => pi_xsp
+             ,p_call_attrib     => pi_view_col
+           );
+  
+  -- original standard processing
+  else
+    running_for_merge;
+    running_stats;
+    populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
+                          ,pi_nms_section_id => pi_nms_section_id
+                          ,pi_inv_type       => pi_inv_type
+                          ,pi_xsp            => pi_xsp
+                          ,pi_view_col       => pi_view_col
+                          );
+    RETURN g_stat_array.nsa_last_x;
+  
+  end if;
+
 EXCEPTION
---
    WHEN g_eng_dynseg_exception
     THEN
       RAISE_APPLICATION_ERROR(g_eng_dynseg_exc_code,g_eng_dynseg_exc_msg);
@@ -1393,21 +1539,31 @@ FUNCTION get_most_frequent_value
                 ,pi_view_col         IN VARCHAR2
                 ) RETURN VARCHAR2 IS
 BEGIN
---
-   running_for_merge;
-   running_bins;
---
-   populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
-                         ,pi_nms_section_id => pi_nms_section_id
-                         ,pi_inv_type       => pi_inv_type
-                         ,pi_xsp            => pi_xsp
-                         ,pi_view_col       => pi_view_col
-                         );
---
-   RETURN  g_val_dist_arr.nvda_most_numerous;
---
+  -- use derived assets preprocessed value
+  if pi_nms_mrg_job_id = nm3eng_dynseg_util.get_context_mrg_job_id then
+    return nm3eng_dynseg_util.get_chr_value(
+              p_call_func       => 'get_most_frequent_value'
+             ,p_mrg_section_id  => pi_nms_section_id
+             ,p_inv_type        => pi_inv_type
+             ,p_xsp             => pi_xsp
+             ,p_call_attrib     => pi_view_col
+           );
+  
+  -- original standard processing
+  else
+    running_for_merge;
+    running_bins;
+    populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
+                          ,pi_nms_section_id => pi_nms_section_id
+                          ,pi_inv_type       => pi_inv_type
+                          ,pi_xsp            => pi_xsp
+                          ,pi_view_col       => pi_view_col
+                          );
+    RETURN  g_val_dist_arr.nvda_most_numerous;
+  
+  end if;
+
 EXCEPTION
---
    WHEN g_eng_dynseg_exception
     THEN
       RAISE_APPLICATION_ERROR(g_eng_dynseg_exc_code,g_eng_dynseg_exc_msg);
@@ -1846,38 +2002,50 @@ FUNCTION get_value_count
                 ,pi_xsp              IN VARCHAR2
                 ,pi_view_col         IN VARCHAR2
                 ,pi_value            IN VARCHAR2
-                ) RETURN NUMBER IS
---
+                ) RETURN NUMBER
+IS
    l_retval   NUMBER := 0;
    l_val_dist nm_value_distribution;
---
+
 BEGIN
---
-   running_for_merge;
-   running_bins;
---
-   populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
-                         ,pi_nms_section_id => pi_nms_section_id
-                         ,pi_inv_type       => pi_inv_type
-                         ,pi_xsp            => pi_xsp
-                         ,pi_view_col       => pi_view_col
-                         );
---
-   FOR i IN 1..g_val_dist_arr.value_dist_count
-    LOOP
-      l_val_dist := g_val_dist_arr.get_entry(i);
-      IF  (l_val_dist.nvd_value IS NULL AND pi_value IS NULL)
-       OR  l_val_dist.nvd_value = pi_value
-       THEN
-         l_retval := l_val_dist.nvd_item_count;
-         EXIT;
-      END IF;
-   END LOOP;
---
-   RETURN  l_retval;
---
+  -- use derived assets preprocessed value
+  if pi_nms_mrg_job_id = nm3eng_dynseg_util.get_context_mrg_job_id then
+    return nm3eng_dynseg_util.get_num_value(
+              p_call_func       => 'get_value_count'
+             ,p_mrg_section_id  => pi_nms_section_id
+             ,p_inv_type        => pi_inv_type
+             ,p_xsp             => pi_xsp
+             ,p_call_attrib     => pi_view_col
+             ,p_call_value      => pi_value
+           );
+  
+  -- original standard processing
+  else
+    running_for_merge;
+    running_bins;
+    populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
+                          ,pi_nms_section_id => pi_nms_section_id
+                          ,pi_inv_type       => pi_inv_type
+                          ,pi_xsp            => pi_xsp
+                          ,pi_view_col       => pi_view_col
+                          );
+
+    FOR i IN 1..g_val_dist_arr.value_dist_count
+     LOOP
+       l_val_dist := g_val_dist_arr.get_entry(i);
+       IF  (l_val_dist.nvd_value IS NULL AND pi_value IS NULL)
+        OR  l_val_dist.nvd_value = pi_value
+        THEN
+          l_retval := l_val_dist.nvd_item_count;
+          EXIT;
+       END IF;
+    END LOOP;
+
+    RETURN  l_retval;
+  
+  end if;
+
 EXCEPTION
---
    WHEN g_eng_dynseg_exception
     THEN
       RAISE_APPLICATION_ERROR(g_eng_dynseg_exc_code,g_eng_dynseg_exc_msg);
@@ -2049,21 +2217,31 @@ FUNCTION get_sum
                            ,pi_view_col         IN VARCHAR2
                            ) RETURN NUMBER IS
 BEGIN
---
+  -- use derived assets preprocessed value
+  if pi_nms_mrg_job_id = nm3eng_dynseg_util.get_context_mrg_job_id then
+    return nm3eng_dynseg_util.get_num_value(
+              p_call_func       => 'get_sum'
+             ,p_mrg_section_id  => pi_nms_section_id
+             ,p_inv_type        => pi_inv_type
+             ,p_xsp             => pi_xsp
+             ,p_call_attrib     => pi_view_col
+           );
+  
+  -- original standard processing
+  else
    running_for_merge;
    running_stats;
---
    populate_stats_arrays (pi_nms_mrg_job_id => pi_nms_mrg_job_id
                          ,pi_nms_section_id => pi_nms_section_id
                          ,pi_inv_type       => pi_inv_type
                          ,pi_xsp            => pi_xsp
                          ,pi_view_col       => pi_view_col
                          );
---
    RETURN  g_stat_array.nsa_sum_x;
---
+  
+  end if;
+
 EXCEPTION
---
    WHEN g_eng_dynseg_exception
     THEN
       RAISE_APPLICATION_ERROR(g_eng_dynseg_exc_code,g_eng_dynseg_exc_msg);
@@ -2142,7 +2320,15 @@ PROCEDURE build_sql (pi_inv_type   IN     VARCHAR2
   -- PT 24.07.07 end
   
 BEGIN
---
+  nm3dbg.putln(g_package_name||'.build_sql('
+    ||'pi_inv_type='||pi_inv_type
+    ||', pi_xsp='||pi_xsp
+    ||', pi_view_col='||pi_view_col
+    ||', pi_wrap_nvl='||nm3dbg.to_char(pi_wrap_nvl)
+    ||', pi_allow_null='||nm3dbg.to_char(pi_allow_null)
+    ||')');
+  nm3dbg.ind;
+    
    IF g_merge_run
     THEN
       l_table_name   := 'nm_mrg_section_members';
@@ -2205,19 +2391,26 @@ BEGIN
    l_col_name    := l_rec_ita.ita_attrib_name;
    po_dec_places := l_rec_ita.ita_dec_places;
 --
+  nm3dbg.putln('l_rec_nit.nit_table_name='||l_rec_nit.nit_table_name);
 
   -- PT 24.07.07 start
-  if l_rec_nit.nit_table_name is not null then
-    select n.nin_nw_type
-    into l_nin_nw_type
-    from nm_inv_nw_all n
-    where n.nin_nit_inv_code = pi_inv_type
-      and rownum = 1;
-    l_inv_table_name  := l_rec_nit.nit_table_name;
-    l_inv_ne_id_col   := l_rec_nit.nit_foreign_pk_column;
-  end if;
+  begin
+    if l_rec_nit.nit_table_name is not null then
+      select n.nin_nw_type
+      into l_nin_nw_type
+      from nm_inv_nw_all n
+      where n.nin_nit_inv_code = pi_inv_type
+        and rownum = 1;
+      l_inv_table_name  := l_rec_nit.nit_table_name;
+      l_inv_ne_id_col   := l_rec_nit.nit_foreign_pk_column;
+    end if;
+  exception
+    when no_data_found then
+      null;
+  end;
   -- PT 24.07.07 end
   
+  nm3dbg.putln('l_nin_nw_type='||l_nin_nw_type);
     
    IF l_rec_nit.nit_table_name IS NULL or l_nin_nw_type is not null
     THEN
@@ -2244,7 +2437,8 @@ BEGIN
               ||CHR(10)||' AND   nsm.'||l_ne_id_col||'          = nm.nm_ne_id_of'
               ||CHR(10)||' AND   nm.nm_end_mp          > nsm.'||l_begin_mp_col
               ||CHR(10)||' AND   nm.nm_begin_mp        <= nsm.'||l_end_mp_col
-              ||CHR(10)||' AND   nm.nm_ne_id_in         = iit.'||l_inv_ne_id_col;
+              ||CHR(10)||' AND   nm.nm_ne_id_in         = iit.'||l_inv_ne_id_col
+              ||chr(10)||' and   :inv_type is not null';
               --||CHR(10)||' AND   nm.nm_type             = '||nm3flx.string('I')
               --||CHR(10)||' AND   nm.nm_obj_type         = :inv_type';
       
@@ -2267,6 +2461,18 @@ BEGIN
               ||CHR(10)||' AND   :xsp IS not NULL';
         
       END IF;
+      
+      
+--       if pi_xsp is null then
+--         g_sql := g_sql||chr(10)||' and :xsp is null';
+--         
+--       elsif l_rec_nit.nit_table_name is null then
+--         g_sql := g_sql||chr(10)||' and iit.iit_x_sect = :xsp';
+--         
+--       else
+--         g_sql := g_sql||chr(10)||' and :xsp is not null';
+--         
+--       end if;
         
 
    -- PT 24.07.07
@@ -2316,8 +2522,10 @@ BEGIN
                ||CHR(10)||' ORDER BY nte_seq_no';
    END IF;
    
-   nm_debug.debug(g_sql);
+   --nm_debug.debug(g_sql);
    --
+   
+  nm3dbg.deind;
 --
 END build_sql;
 --
@@ -2344,6 +2552,14 @@ PROCEDURE fetch_sql (pi_nms_mrg_job_id IN nm_mrg_sections.nms_mrg_job_id%TYPE   
    l_cur      nm3type.ref_cursor;
 --
 BEGIN
+  nm3dbg.putln(g_package_name||'.fetch_sql('
+    ||'pi_nms_mrg_job_id='||pi_nms_mrg_job_id
+    ||', pi_nms_section_id='||pi_nms_section_id
+    ||', pi_nte_job_id='||pi_nte_job_id
+    ||', pi_inv_type='||pi_inv_type
+    ||', pi_xsp='||pi_xsp
+    ||')');
+  nm3dbg.ind;
 --
 --   nm_debug.debug('######## '||pi_nms_mrg_job_id||':'||pi_nms_section_id,-1);
 --
@@ -2356,6 +2572,7 @@ BEGIN
 --   nm_debug.debug(pi_nms_mrg_job_id||':'||pi_nms_section_id||':'||pi_inv_type||':'||pi_xsp);
 --   nm_debug.debug_off;
 --
+  
    IF g_merge_run
     THEN
       OPEN  l_cur FOR g_sql USING pi_nms_mrg_job_id,pi_nms_section_id,pi_inv_type,pi_xsp;
@@ -2402,15 +2619,38 @@ BEGIN
    CLOSE l_cur;
 --
    l_ind := l_tab_value.FIRST;
+   
+   nm3dbg.putln('l_tab_value.count='||l_tab_value.count);
 --
    WHILE l_ind IS NOT NULL
     LOOP
       g_val_dist_arr := g_val_dist_arr.add_value (l_tab_value(l_ind),l_tab_length(l_ind));
       l_ind          := l_tab_value.NEXT(l_ind);
    END LOOP;
---
---      nm_debug.debug_off;
---
+
+   nm3dbg.deind;
+exception
+  when others then
+    declare
+      l_debug_on boolean := nm_debug.is_debug_on;
+    begin
+      if not l_debug_on then
+        nm_debug.debug_on;
+      end if;
+      nm_debug.debug(sqlerrm||': '||g_package_name||'.fetch_sql('
+        ||'pi_nms_mrg_job_id='||pi_nms_mrg_job_id
+        ||' ,pi_nms_section_id='||pi_nms_section_id
+        ||' ,pi_nte_job_id='||pi_nte_job_id
+        ||' ,pi_inv_type='||pi_inv_type
+        ||' ,pi_xsp='||pi_xsp
+        ||')');
+      nm_debug.debug(g_sql);
+      if not l_debug_on then
+        nm_debug.debug_off;
+      end if;
+    end;
+    raise;
+
 END fetch_sql;
 --
 -----------------------------------------------------------------------------
@@ -2447,5 +2687,6 @@ END running_bins;
 --
 -----------------------------------------------------------------------------
 --
+
 END nm3eng_dynseg;
 /
