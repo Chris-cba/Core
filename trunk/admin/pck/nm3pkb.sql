@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.3   Sep 07 2007 16:42:24   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.4   Sep 19 2007 14:09:50   ptanava  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   Sep 07 2007 16:42:24  $
---       Date fetched Out : $Modtime:   Sep 07 2007 16:40:18  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Sep 19 2007 14:09:50  $
+--       Date fetched Out : $Modtime:   Sep 19 2007 14:09:10  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --
 --   Author : Graeme Johnson
@@ -1866,6 +1866,53 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&term
 FROM dual 
 / 
 start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm3dynsql.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3dynsql.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm3bulk_mrg.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3bulk_mrg.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm3inv_composite2.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3inv_composite2.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm3eng_dynseg_util.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3eng_dynseg_util.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+
 --
 -- New PACKAGE BODIES above here
 --
