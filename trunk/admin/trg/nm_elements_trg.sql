@@ -4,13 +4,14 @@ CREATE OR REPLACE TRIGGER a_ins_nm_elements
        ON     nm_elements_all
        FOR    EACH ROW
 DECLARE
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.1   Aug 01 2007 15:18:12   dyounger  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.2   Sep 19 2007 12:24:00   malexander  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Aug 01 2007 15:18:12  $
---       Date fetched Out : $Modtime:   Aug 01 2007 14:24:24  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Sep 19 2007 12:24:00  $
+--       Date fetched Out : $Modtime:   Sep 19 2007 11:30:36  $
+--       SCCS Version     : $Revision:   2.2  $
+--       Based on 
 --       Based on 1.11
 --
 --      TRIGGER a_ins_nm_elements
@@ -83,13 +84,14 @@ CREATE OR REPLACE TRIGGER b_upd_nm_elements
        ON      nm_elements_all
        FOR     EACH ROW
 DECLARE
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.1   Aug 01 2007 15:18:12   dyounger  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.2   Sep 19 2007 12:24:00   malexander  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Aug 01 2007 15:18:12  $
---       Date fetched Out : $Modtime:   Aug 01 2007 14:24:24  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Sep 19 2007 12:24:00  $
+--       Date fetched Out : $Modtime:   Sep 19 2007 11:30:36  $
+--       SCCS Version     : $Revision:   2.2  $
+--       Based on 
 --       Based on 1.11
 --
 --     TRIGGER b_upd_nm_elements
@@ -206,13 +208,14 @@ CREATE OR REPLACE TRIGGER b_ins_nm_elements
        ON      nm_elements_all
        FOR     EACH ROW
 BEGIN
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.1   Aug 01 2007 15:18:12   dyounger  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.2   Sep 19 2007 12:24:00   malexander  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Aug 01 2007 15:18:12  $
---       Date fetched Out : $Modtime:   Aug 01 2007 14:24:24  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Sep 19 2007 12:24:00  $
+--       Date fetched Out : $Modtime:   Sep 19 2007 11:30:36  $
+--       SCCS Version     : $Revision:   2.2  $
+--       Based on 
 --       Based on 1.11
 --
 --   TRIGGER b_ins_nm_elements
@@ -223,6 +226,10 @@ BEGIN
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
+  --MJA add 31-Aug-07
+  --New functionality to allow override
+  If Not nm3net.bypass_nm_elements_trgs
+  Then 
     IF :NEW.ne_type != 'D' THEN
         nm3nwval.bfr_trigger_validate_element ( p_ne_id             =>:NEW.ne_id,
                                                 p_ne_unique         =>:NEW.ne_unique,
@@ -247,6 +254,7 @@ BEGIN
                                                 p_ne_nsg_ref        =>:NEW.ne_nsg_ref,
                                                 p_ne_version_no     =>:NEW.ne_version_no );
     END IF;
+  End If;
 END b_ins_nm_elements;
 /
 /*<TOAD_FILE_CHUNK>*/
@@ -256,14 +264,14 @@ CREATE OR REPLACE TRIGGER a_del_nm_elements
        ON      nm_elements_all
        FOR     EACH ROW
 DECLARE
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.1   Aug 01 2007 15:18:12   dyounger  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.2   Sep 19 2007 12:24:00   malexander  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Aug 01 2007 15:18:12  $
---       Date fetched Out : $Modtime:   Aug 01 2007 14:24:24  $
---       SCCS Version     : $Revision:   2.1  $
---       Based on 1.11
+--       Date into SCCS   : $Date:   Sep 19 2007 12:24:00  $
+--       Date fetched Out : $Modtime:   Sep 19 2007 11:30:36  $
+--       SCCS Version     : $Revision:   2.2  $
+--       Based on 
 --
 --     TRIGGER a_del_nm_elements
 --       AFTER   DELETE
@@ -351,13 +359,14 @@ CREATE OR REPLACE TRIGGER b_del_nm_elements
        FOR     EACH ROW
 DECLARE
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.1   Aug 01 2007 15:18:12   dyounger  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.2   Sep 19 2007 12:24:00   malexander  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Aug 01 2007 15:18:12  $
---       Date fetched Out : $Modtime:   Aug 01 2007 14:24:24  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Sep 19 2007 12:24:00  $
+--       Date fetched Out : $Modtime:   Sep 19 2007 11:30:36  $
+--       SCCS Version     : $Revision:   2.2  $
+--       Based on 
 --       Based on 1.11
 --
 --      TRIGGER  b_del_nm_elements
