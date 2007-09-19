@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.2   Sep 07 2007 16:41:44   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.3   Sep 19 2007 14:05:42   ptanava  $
 --       Module Name      : $Workfile:   nm3pkh.sql  $
---       Date into PVCS   : $Date:   Sep 07 2007 16:41:44  $
---       Date fetched Out : $Modtime:   Sep 07 2007 16:38:52  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Sep 19 2007 14:05:42  $
+--       Date fetched Out : $Modtime:   Sep 19 2007 14:04:20  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : Graeme Johnson
@@ -32,6 +32,8 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&term
 FROM dual                                                                                                                                                                                                                                                 
 /                                                                                                                                                                                                                                                         
 start '&run_file'                                                                                                                                                                                                                                         
+
+
 
 
 --
@@ -2049,8 +2051,9 @@ FROM dual
 / 
 start '&run_file'
 --
------------------------------------------------------------------------------------------ 
---SET TERM ON 
+-----------------------------------------------------------------------------------------
+--
+SET TERM ON 
 PROMPT nm3sql.pkh
 SET TERM OFF
 SET DEFINE ON 
@@ -2061,6 +2064,51 @@ start '&run_file'
 --
 ----------------------------------------------------------------------------------------- 
 --
+SET TERM ON 
+PROMPT nm3dynsql.pkh
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3dynsql.pkh' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm3bulk_mrg.pkh
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3bulk_mrg.pkh' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm3inv_composite2.pkh
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3inv_composite2.pkh' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm3eng_dynseg_util.pkh
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3eng_dynseg_util.pkh' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+
 
 --
 -- New PACKAGE HEADERS above here
