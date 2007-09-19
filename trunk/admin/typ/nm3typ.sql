@@ -14,7 +14,21 @@ prompt Dropping Existing Types
 set term off
 
 BEGIN
- execute immediate ('DROP TYPE BODY nm_id_code_tbl');
+ execute immediate ('DROP TYPE nm_dynseg_call_tbl');
+EXCEPTION
+WHEN others THEN
+  Null;
+END;
+/
+BEGIN
+ execute immediate ('DROP TYPE nm_dynseg_sql_tbl');
+EXCEPTION
+WHEN others THEN
+  Null;
+END;
+/
+BEGIN
+ execute immediate ('DROP TYPE nm_id_code_tbl');
 EXCEPTION
 WHEN others THEN
   Null;
@@ -1795,7 +1809,8 @@ from dual
 start '&&run_file'
 --
 --------------------------------------------------------------------------------------------
---set term on
+--
+set term on
 prompt nm_id_code_tbl header
 set term off
 set define on
@@ -1808,6 +1823,60 @@ start '&&run_file'
 --
 --------------------------------------------------------------------------------------------
 --
+
+set term on
+prompt nm_dynseg_call_type header
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'nm_dynseg_call_type.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt nm_dynseg_call_tbl header
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'nm_dynseg_call_tbl.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt nm_dynseg_sql_type header
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'nm_dynseg_sql_type.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt nm_dynseg_sql_tbl header
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'nm_dynseg_sql_tbl.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+
 
 -- *************************************************************************************************************
 -- * new types above here                                                                                      *
