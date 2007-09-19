@@ -1,0 +1,30 @@
+CREATE OR REPLACE
+type nm_dynseg_sql_type
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:$
+--       Module Name      : $Workfile:$
+--       Date into PVCS   : $Date:$
+--       Date fetched Out : $Modtime:$
+--       PVCS Version     : $Revision:$
+--       Based on sccs version : 
+--
+--   Author : Priidu Tanava
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2006
+-----------------------------------------------------------------------------
+as object (
+   call_func      varchar2(30)
+  ,call_invtype   varchar2(4)
+  ,call_xsp       varchar2(4)
+  ,call_attrib    varchar2(30)
+  ,call_value     varchar2(50)
+  ,nit_table      varchar2(30)
+  ,ita_attrib     varchar2(30)
+  ,iit_attrib     varchar2(30)
+  ,ita_format     varchar2(10)
+)
+/
+

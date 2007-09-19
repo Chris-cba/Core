@@ -1,0 +1,19 @@
+CREATE OR REPLACE
+type nm_dynseg_call_tbl
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:$
+--       Module Name      : $Workfile:$
+--       Date into PVCS   : $Date:$
+--       Date fetched Out : $Modtime:$
+--       PVCS Version     : $Revision:$
+--       Based on sccs version : 
+--
+--   Author : Priidu Tanava
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2006
+-----------------------------------------------------------------------------
+as table of nm_dynseg_call_type
+/
