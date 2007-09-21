@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.10   Sep 18 2007 13:50:26   sscanlon  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.11   Sep 21 2007 17:21:36   malexander  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Sep 18 2007 13:50:26  $
---       Date fetched Out : $Modtime:   Sep 18 2007 13:48:50  $
---       Version          : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Sep 21 2007 17:21:36  $
+--       Date fetched Out : $Modtime:   Sep 21 2007 17:19:24  $
+--       Version          : $Revision:   2.11  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-18-SEP-2007 13:48
+21-SEP-2007 17:19
 
 TABLES PROCESSED
 ================
@@ -13284,6 +13284,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'NET'
                     AND  NER_ID = 452);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,453
+       ,null
+       ,'Invalid module'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 453);
 --
 --
 --********** HIG_DOMAINS **********--
@@ -30965,6 +30982,28 @@ SELECT
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'WMSDEFSTAT');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
+        'EDIFDLROLE'
+       ,'HIG'
+       ,'EDIF Download Users Role'
+       ,'EDIF Download Users Role restricts to users with specified role (all users apply when null).'
+       ,''
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'EDIFDLROLE');
 --
 INSERT INTO HIG_OPTION_LIST
        (HOL_ID
