@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.6   Sep 06 2007 10:55:14   sscanlon  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.7   Sep 24 2007 15:24:38   jwadsworth  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Sep 06 2007 10:55:14  $
---       Date fetched Out : $Modtime:   Sep 06 2007 10:53:30  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Sep 24 2007 15:24:38  $
+--       Date fetched Out : $Modtime:   Sep 24 2007 14:53:08  $
+--       Version          : $Revision:   2.7  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-06-SEP-2007 10:53
+24-SEP-2007 14:52
 
 TABLES PROCESSED
 ================
@@ -83726,6 +83726,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'HIG_GIS'
                     AND  HSTF_CHILD = 'GIS0010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_GIS'
+       ,'GIS0011'
+       ,'Maintain Visible Themes'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_GIS'
+                    AND  HSTF_CHILD = 'GIS0011');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
