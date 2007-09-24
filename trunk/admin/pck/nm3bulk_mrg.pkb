@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.0   Jul 23 2007 11:38:16   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.1   Sep 24 2007 08:50:44   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Jul 23 2007 11:38:16  $
---       Date fetched Out : $Modtime:   Jul 23 2007 11:37:58  $
---       PVCS Version     : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Sep 24 2007 08:50:44  $
+--       Date fetched Out : $Modtime:   Sep 21 2007 14:50:18  $
+--       PVCS Version     : $Revision:   2.1  $
 --       Based on sccs version : 
 --
 --
@@ -21,17 +21,19 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 -----------------------------------------------------------------------------
 
 /* History
-  17.04.07  PT change in std_populate_by_route(), now uses slk values to
+  17.04.07  PT change in std_populate(), now uses slk values to
                 calculate begin and end offsets
   23.04.07  PT fixed a bug in ins_datum_homo_chunks(): in q3 rownum without order by
   27.05.07  PT changed the cartesian overlap criteria in both
-                std_populate_by_route() and std_insert_invitems()
+                std_populate() and std_insert_invitems()
                 now accommodates the point items - they were left out before
                 => =< are now logically used instead of ><
   23.07.07  PT fixed a bug in the above change - missing brackets with OR
+  21.09.07  PT implemented the std_run() without the p_group_type specified: assemble by datum homo chunks;
+                added process_datums_group_type()
 */
-  sccsid            constant  varchar2(30)  :='"$Revision:   2.0  $"';
-  g_package_name    CONSTANT  varchar2(30)  := 'nm3bulk_mrg';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.1  $"';
+  g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
   qt  constant varchar2(1) := chr(39);  -- single quote
@@ -82,7 +84,22 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   ) return varchar2;
   
   
+  
+  function get_version return varchar2 is
+  begin
+     return g_sccsid;
+  end get_version;
+  --
+  -----------------------------------------------------------------------------
+  --
+  function get_body_version return varchar2 is
+  begin
+     return g_body_sccsid;
+  end get_body_version;
+  
+  
   -----------------------------------------------------------------
+  
  
   -- this executes the main bulk source query
   --  the results are put into nm_mrg_split_results_tmp, previous results truncated
@@ -970,14 +987,14 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   
   -- this populates the standard results table by route connectivity
   --  todo: 
-  procedure std_populate_by_route(
+  procedure std_populate(
      p_nmq_id in nm_mrg_query_all.nmq_id%type
     ,pt_attr in ita_mapping_tbl
     ,p_admin_unit_id in nm_admin_units_all.nau_admin_unit%type
     ,p_splits_rowcount in integer
     ,p_homo_rowcount in integer
     ,p_route_id in nm_elements_all.ne_id%type
-    ,p_route_type in nm_members_all.nm_obj_type%type
+    ,p_group_type in nm_members_all.nm_obj_type%type
     ,p_all_routes in boolean
     ,p_ignore_poe in boolean
     ,p_description in varchar2
@@ -1022,62 +1039,71 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     l_nqr_memb_count    integer := 0;
     l_section_id        nm_mrg_sections_all.nms_mrg_section_id%type := 0;
     l_nsm_measure       mp_type := 0;
+    
+    l_sql_lag_nm_ne_id_in   varchar2(200);
 
   begin
-    nm3dbg.putln(g_package_name||'.std_populate_by_route('
+    nm3dbg.putln(g_package_name||'.std_populate('
       ||'p_nmq_id='||p_nmq_id
       ||', pt_attr.count='||pt_attr.count
       ||', p_admin_unit_id='||p_admin_unit_id
       ||', p_splits_rowcount='||p_splits_rowcount
       ||', p_homo_rowcount='||p_homo_rowcount
+      ||', p_route_id='||p_route_id
+      ||', p_group_type='||p_group_type
       ||', p_all_routes='||nm3flx.boolean_to_char(p_all_routes)
       ||', p_ignore_poe='||nm3flx.boolean_to_char(p_ignore_poe)
       ||', p_description='||p_description
       ||')');
     nm3dbg.ind;
     
+    
     l_homo_cardinality := nm3sql.get_rounded_cardinality(p_homo_rowcount);
     
     
-    -- if populate by route then
-    
-    l_sql := nm3dynsql.sql_route_connectivity(
-       p_all_routes => p_all_routes
-      ,p_route_id   => p_route_id
-      ,p_route_type => p_route_type
-      ,p_ignore_poe => p_ignore_poe
-    );
+    -- assemble by route
+    if p_group_type is not null then
+      l_sql := nm3dynsql.sql_route_connectivity(
+         p_all_routes => p_all_routes
+        ,p_route_id   => p_route_id
+        ,p_route_type => p_group_type
+        ,p_ignore_poe => p_ignore_poe
+      );
+      
+      l_sql_lag_nm_ne_id_in := 
+              '  ,lag(qq.nm_ne_id_in, 1, null) over'
+        ||cr||'    (order by qq.nm_ne_id_in)';
 
-    -- else
+      
+    -- assemble by datum
+    else
+      l_sql :=
+            'select'
+      ||cr||'   hc2.*'
+      ||cr||'  ,rownum chunk_no'
+      ||cr||'from ('
+      ||cr||'select'
+      ||cr||'   hc.nm_ne_id_of nm_ne_id_in'   -- the datum is the route
+      ||cr||'  ,1 chunk_seq'
+      ||cr||'  ,hc.nm_ne_id_of'
+      ||cr||'  ,hc.nm_begin_mp begin_mp'
+      ||cr||'  ,hc.nm_end_mp end_mp'
+      ||cr||'  ,hc.hash_value'
+      ||cr||'  ,hc.nm_begin_mp'
+      ||cr||'  ,hc.nm_end_mp'
+      ||cr||'  ,-1 nt_unit_in'
+      ||cr||'  ,-1 nt_unit_of'
+      ||cr||'  ,hc.nm_begin_mp measure'
+      ||cr||'  ,hc.nm_end_mp end_measure'
+      ||cr||'  ,cast(null as number) nm_slk'
+      ||cr||'  ,cast(null as number) nm_end_slk'
+      ||cr||'from nm_mrg_datum_homo_chunks_tmp hc'
+      ||cr||'order by hc.nm_ne_id_of, hc.nm_begin_mp'
+      ||cr||') hc2';
+      
+      l_sql_lag_nm_ne_id_in := '  ,to_number(null)';
     
--- this is the dummy route connectivity sql
---  when we assemble by datum
---  todo: yet to be implemented
---     l_sql :=
---           'select'
---     ||cr||'   hc2.*'
---     ||cr||'  ,rownum chunk_no'
---     ||cr||'from ('
---     ||cr||'select'
---     ||cr||'   -1 nm_ne_id_in'
---     ||cr||'  ,1 chunk_seq'
---     ||cr||'  ,hc.nm_ne_id_of'
---     ||cr||'  ,hc.nm_begin_mp begin_mp'
---     ||cr||'  ,hc.nm_end_mp end_mp'
---     ||cr||'  ,hc.hash_value'
---     ||cr||'  ,hc.nm_begin_mp'
---     ||cr||'  ,hc.nm_end_mp'
---     ||cr||'  ,-1 nt_unit_in'
---     ||cr||'  ,-1 nt_unit_of'
---     ||cr||'  ,hc.nm_begin_mp measure'
---     ||cr||'  ,hc.nm_end_mp end_measure'
---     ||cr||'  ,cast(null as number) nm_slk'
---     ||cr||'  ,cast(null as number) nm_end_slk'
---     ||cr||'from nm_mrg_datum_homo_chunks_tmp hc'
---     ||cr||'order by hc.nm_ne_id_of, hc.nm_begin_mp'
---     ||cr||') hc2';
-    
-    -- end if;
+    end if;
     
     l_sql :=
           'select /*+ cardinality(inv '||l_homo_cardinality||') */'
@@ -1097,7 +1123,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ||cr||'  ,qq.nm_slk'
     ||cr||'  ,qq.nm_end_slk'
     ||cr||'  ,lag(qq.nm_ne_id_in, 1, null) over'
-    ||cr||'    (order by qq.nm_ne_id_in) lag_nm_ne_id_in' 
+    ||cr||'    (order by qq.nm_ne_id_in) lag_nm_ne_id_in'
     ||cr||'  ,lag(qq.chunk_no, 1, null) over'
     ||cr||'    (partition by qq.nm_ne_id_in order by qq.chunk_no) lag_chunk_no'
     ||cr||'  ,lag(qq.chunk_seq, 1, null) over'
@@ -1116,12 +1142,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ||cr||'order by 1, 2, 3, 5'
     ;
     
-    
 
-    
-    
     nm3dbg.putln(l_sql);
-    
     
     
     -- init static vaules
@@ -1144,10 +1166,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       fetch cur into r;
       exit when cur%notfound;
 
-      -- new route (new results record)
+      -- same route
       if r.nm_ne_id_in = r.lag_nm_ne_id_in then null;
         --nm3dbg.putln('null: '||r.nm_ne_id_in||'  '||r.lag_nm_ne_id_in);
         
+      -- new route (new results record)
       else
         --nm3dbg.putln('r_res.nqr_mrg_job_id='||r_res.nqr_mrg_job_id);
         
@@ -1301,9 +1324,17 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     nm3dbg.deind;
   exception
     when others then
-      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.std_populate_by_route('
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.std_populate('
         ||'p_nmq_id='||p_nmq_id
+        ||', pt_attr.count='||pt_attr.count
         ||', p_admin_unit_id='||p_admin_unit_id
+        ||', p_splits_rowcount='||p_splits_rowcount
+        ||', p_homo_rowcount='||p_homo_rowcount
+        ||', p_route_id='||p_route_id
+        ||', p_group_type='||p_group_type
+        ||', p_all_routes='||nm3flx.boolean_to_char(p_all_routes)
+        ||', p_ignore_poe='||nm3flx.boolean_to_char(p_ignore_poe)
+        ||', l_homo_cardinality='||l_homo_cardinality
         ||')');
       raise;
    
@@ -1319,7 +1350,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ,p_nqr_admin_unit in nm_mrg_query_results_all.nqr_admin_unit%type
     ,p_nmq_descr in nm_mrg_query_all.nmq_descr%type
     ,p_route_id in nm_elements_all.ne_id%type
-    ,p_route_type in nm_members_all.nm_obj_type%type
+    ,p_group_type in nm_members_all.nm_obj_type%type
     ,p_all_routes in boolean
     ,p_ignore_poe in boolean
     ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
@@ -1343,7 +1374,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       ||', p_nqr_admin_unit='||p_nqr_admin_unit
       ||', p_nmq_descr='||p_nmq_descr
       ||', p_route_id='||p_route_id
-      ||', p_route_type='||p_route_type
+      ||', p_group_type='||p_group_type
       ||', p_all_routes='||nm3flx.boolean_to_char(p_all_routes)
       ||', p_ignore_poe='||nm3flx.boolean_to_char(p_ignore_poe)
       ||')');
@@ -1372,14 +1403,14 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     );
     commit;
     nm3sql.set_longops(p_rec => p_longops_rec, p_increment => 1);
-    std_populate_by_route(
+    std_populate(
        p_nmq_id         => p_nmq_id
       ,pt_attr          => t_inv
       ,p_admin_unit_id  => p_nqr_admin_unit
       ,p_splits_rowcount => l_splits_rowcount -- in
       ,p_homo_rowcount  => l_homo_rowcount    -- in
       ,p_route_id       => p_route_id
-      ,p_route_type     => p_route_type
+      ,p_group_type     => p_group_type
       ,p_all_routes     => l_all_routes
       ,p_ignore_poe     => l_ignore_poe
       ,p_description    => p_nmq_descr
@@ -1396,7 +1427,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||', p_nqr_admin_unit='||p_nqr_admin_unit
         ||', p_nmq_descr='||p_nmq_descr
         ||', p_route_id='||p_route_id
-        ||', p_route_type='||p_route_type
+        ||', p_group_type='||p_group_type
         ||', p_all_routes='||nm3flx.boolean_to_char(p_all_routes)
         ||', p_ignore_poe='||nm3flx.boolean_to_char(p_ignore_poe)
         ||')');
@@ -1872,6 +1903,78 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     end loop;
     return '('||s||')';
     
+  end;
+  
+  
+  
+  -- this assignes the group type based on the group types of the loaded criteria datums
+  --  if the p_group_type_in is found and fully covered the this is returned
+  --  if any other type is the only group type covering the datums fully then this is returned
+  --  p_group_type_out is null in any other cases
+  procedure process_datums_group_type(
+     p_group_type_in  in nm_group_types_all.ngt_group_type%type
+    ,p_group_type_out out nm_group_types_all.ngt_group_type%type
+  )
+  is
+    l_count       integer := nm3sql.get_id_tbl_count;
+    l_cardinality integer := nm3sql.get_rounded_cardinality(l_count);
+
+    type  group_type_tbl  is table of nm_group_types_all.ngt_group_type%type index by binary_integer;
+    type  count_tbl       is table of integer index by binary_integer;
+    t_group_types group_type_tbl;
+    t_counts      count_tbl;
+    
+  begin
+    execute immediate
+            'select /*+ cardinality(x '||l_cardinality||') */'
+      ||cr||'   nm_obj_type'
+      ||cr||'  ,count(*) cnt'
+      ||cr||'from'
+      ||cr||'   table(cast(nm3sql.get_id_tbl as nm_id_tbl)) x'
+      ||cr||'  ,nm_members m'
+      ||cr||'  ,nm_group_types gt'
+      ||cr||'where x.column_value = m.nm_ne_id_of'
+      ||cr||'  and m.nm_obj_type = gt.ngt_group_type'
+      ||cr||'  and m.nm_type = ''G'''
+      ||cr||'  and gt.ngt_linear_flag = ''Y'''
+      ||cr||'  and gt.ngt_exclusive_flag = ''Y'''
+      ||cr||'group by nm_obj_type'
+      ||cr||'having count(*) = :p_count'
+      ||cr||'order by decode(nm_obj_type, :p_group_type, 1, 2)'
+    bulk collect into
+       t_group_types
+      ,t_counts
+    using
+       l_count
+      ,p_group_type_in;
+      
+    
+    -- if p_group_type_in is found then return this in any case
+    --  return any other group type only if it is they only one found
+    for i in 1 .. t_group_types.count loop
+      if i = 1 then
+        p_group_type_out := p_group_type_in;
+        
+      elsif p_group_type_out != p_group_type_in then
+        p_group_type_out := null;
+
+      end if;
+    
+    end loop;
+    
+    nm3dbg.putln(g_package_name||'.process_group_type('
+      ||'p_group_type_in='||p_group_type_in
+      ||', p_group_type_out='||p_group_type_out
+      ||')');
+    
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.process_group_type('
+        ||'p_group_type_in='||p_group_type_in
+        ||', p_group_type_out='||p_group_type_out
+        ||')');
+      raise;
+
   end;
   
 
