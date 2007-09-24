@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.0   Sep 19 2007 09:44:08   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.1   Sep 24 2007 14:47:12   ptanava  $
 --       Module Name      : $Workfile:   nm3eng_dynseg_util.pkb  $
---       Date into PVCS   : $Date:   Sep 19 2007 09:44:08  $
---       Date fetched Out : $Modtime:   Sep 19 2007 08:52:06  $
---       PVCS Version     : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Sep 24 2007 14:47:12  $
+--       Date fetched Out : $Modtime:   Sep 24 2007 14:46:22  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --   Author : Priidu Tanava
 --
@@ -15,15 +15,15 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 --	Copyright (c) exor corporation ltd, 2007
 -----------------------------------------------------------------------------
 /* History
-    17.09.07 PT First delivery with get_first_value(), get_last_value(), get_most_frequent_value()
-                  , get_median_value(), get_biased_standard_deviation() and get_biased_variance() unimplemented.
-                The calls must be visible in the defining metadata, cannot use inside other custom functions.
-                All foreign tables must be without nm_members.
+  17.09.07 PT First delivery with get_first_value(), get_last_value(), get_most_frequent_value()
+                , get_median_value(), get_biased_standard_deviation() and get_biased_variance() unimplemented.
+              The calls must be visible in the defining metadata, cannot use inside other custom functions.
+              All foreign tables must be without nm_members.
+  24.09.07 PT Implemented get_first_value() and get_last_value()
 */
 
 
-
-  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.0  $"';
+  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg_util';
   
   cr            constant varchar2(1) := chr(10);
@@ -290,9 +290,9 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     
     -- the unimplemented ones
     if p_call_func in (
-       'get_first_value'                -- not possible to implement, requires route connectivity    
-      ,'get_last_value'                 -- not possible to implement, requires route connectivity
-      ,'get_most_frequent_value'        -- to be implemented
+       --'get_first_value'                -- not possible to implement, requires route connectivity    
+      --,'get_last_value'                 -- not possible to implement, requires route connectivity
+       'get_most_frequent_value'        -- to be implemented
       ,'get_median_value'               -- to be implemented
       ,'get_biased_standard_deviation'  -- logic not known
       ,'get_biased_variance'            -- logic not known
@@ -398,6 +398,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     ||cr||'  ,qm.nm_ne_id_of'
     ||cr||'  ,qm.nm_obj_type'
     ||cr||'  ,qm.nm_length / decode(nvl(qm.section_length, 0), 0, 1, qm.section_length) nm_length_pct'
+    ||cr||'  ,qm.nsm_measure'
     ||cr||'  ,im.*'
     ||cr||'from ('
     ||cr||'select'
@@ -407,6 +408,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     ||cr||'  ,mm2.nm_obj_type'
     ||cr||'  ,mm2.nm_length'
     ||cr||'  ,sum((mm2.max_mp_end - mm2.min_mp_begin) * mm2.row_num) over (partition by mm2.section_id) section_length'
+    ||cr||'  ,mm2.nsm_measure'
     ||cr||'from ('
     ||cr||'select mm.*'
     ||cr||'  ,mm.end_mp - mm.begin_mp nm_length'
@@ -421,6 +423,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     ||cr||'  ,m.nm_obj_type'
     ||cr||'  ,greatest(m.nm_begin_mp, sm.nsm_begin_mp) begin_mp'
     ||cr||'  ,least(m.nm_end_mp, sm.nsm_end_mp) end_mp'
+    ||cr||'  ,sm.nsm_measure'
     ||cr||'from'
     ||cr||'   nm_mrg_section_members sm'
     ||cr||'  ,nm_members m'
@@ -608,12 +611,18 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     end if;
     
     
-    -- most common values has q1 wrapper, don't need the group by in q
-    if l_sql_func_code = 'mcv' then
+    -- the calls with q1 wrapper don't need the group by in q
+    if l_sql_func_code in (
+       'mcv'
+      ,'first'
+      ,'last'
+    )
+    then
       l_sql_group_by := null;
       
     else
       l_sql_group_by := cr||l_sql_group_by;
+      
     end if;
     
     
@@ -643,7 +652,12 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     
     -- apply the outer q1 wrapper where needed
     --  most_common_value(), most_frequent_value()
-    if l_sql_func_code in ('mcv', 'mfv') then
+    if l_sql_func_code in (
+       'mcv'
+      ,'first'
+      ,'last'
+    )
+    then
       l_sql := sql_main_q1_wrap(
          p_main_q_sql => l_sql
         ,p_inv_type   => p_inv_type
@@ -738,8 +752,14 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     )
     loop
       -- most common value
-      if p_func_code = 'mcv' then
+      if p_func_code in (
+         'mcv'
+        ,'first'
+        ,'last'
+      )   
+      then
         l_sql_values := l_sql_values||', min(q1.'||r.alias||') '||r.alias;
+        
         
       -- most frequent value
       elsif p_func_code = 'mfv' then
@@ -913,6 +933,18 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
             ||') over (partition by q.section_id, q.inv_type'||l_sql_x_sect||' order by q.nm_length_pct desc)';
           
           
+        -- first value
+        when l_func_code = 'first' then
+          l_value := 'first_value(q.'||l_alias
+            ||') over (partition by q.section_id, q.inv_type'||l_sql_x_sect||' order by q.nsm_measure)';
+            
+            
+        -- last value
+        when l_func_code = 'last' then
+          l_value := 'first_value(q.'||l_alias
+            ||') over (partition by q.section_id, q.inv_type'||l_sql_x_sect||' order by q.nsm_measure desc)';
+            
+              
         -- median (order by middle)
         --when l_func_code = 'median' then
         --  null;
