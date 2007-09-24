@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.11   Sep 21 2007 17:21:36   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.12   Sep 24 2007 15:27:00   jwadsworth  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Sep 21 2007 17:21:36  $
---       Date fetched Out : $Modtime:   Sep 21 2007 17:19:24  $
---       Version          : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Sep 24 2007 15:27:00  $
+--       Date fetched Out : $Modtime:   Sep 24 2007 14:55:18  $
+--       Version          : $Revision:   2.12  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-21-SEP-2007 17:19
+24-SEP-2007 14:55
 
 TABLES PROCESSED
 ================
@@ -26692,6 +26692,30 @@ INSERT INTO HIG_MODULES
        ,HMO_MENU
        )
 SELECT 
+        'GIS0011'
+       ,'Maintain Visible Themes'
+       ,'gis0011'
+       ,'FMX'
+       ,''
+       ,'N'
+       ,'N'
+       ,'HIG'
+       ,'FORM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
+                   WHERE HMO_MODULE = 'GIS0011');
+--
+INSERT INTO HIG_MODULES
+       (HMO_MODULE
+       ,HMO_TITLE
+       ,HMO_FILENAME
+       ,HMO_MODULE_TYPE
+       ,HMO_FASTPATH_OPTS
+       ,HMO_FASTPATH_INVALID
+       ,HMO_USE_GRI
+       ,HMO_APPLICATION
+       ,HMO_MENU
+       )
+SELECT 
         'GIS0020'
        ,'GIS Layer Tool'
        ,'gis0020'
@@ -31016,6 +31040,28 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
+        'DEFVISNTH'
+       ,'HIG'
+       ,'Default Visible Theme Flag'
+       ,'This option must be Y or N'
+       ,'Y_OR_N'
+       ,'VARCHAR2'
+       ,'N'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'DEFVISNTH');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
         'WEBMAINIMG'
        ,'HIG'
        ,'Image for main menu'
@@ -33677,6 +33723,16 @@ SELECT
        ,'1' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
                    WHERE HOV_ID = 'DEFUNITID');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'DEFVISNTH'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'DEFVISNTH');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
