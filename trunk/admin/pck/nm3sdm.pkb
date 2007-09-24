@@ -3,13 +3,14 @@ AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3sdm.pkb	1.91 04/11/07
---       Module Name      : nm3sdm.pkb
---       Date into SCCS   : 07/04/11 09:59:12
---       Date fetched Out : 07/06/13 14:13:27
---       SCCS Version     : 1.91
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.2   Sep 24 2007 18:00:22   malexander  $
+--       Module Name      : $Workfile:   nm3sdm.pkb  $
+--       Date into SCCS   : $Date:   Sep 24 2007 18:00:22  $
+--       Date fetched Out : $Modtime:   Sep 24 2007 17:06:14  $
+--       SCCS Version     : $Revision:   2.2  $
+--       Based on : 1.91
 --
 --   Author : R.A. Coupe
 --
@@ -8451,8 +8452,22 @@ PROCEDURE Create_Msv_Feature_Views
 --         END;
 --      END LOOP;
    --
+     -- MJA 24-Sep_2007: using In causing bind errors
      l_sql := 
-       'INSERT INTO mdsys.sdo_geom_metadata_table '||nl||
+        'INSERT INTO mdsys.sdo_geom_metadata_table '||nl||
+        '(sdo_owner, sdo_table_name, '||nl||
+        ' sdo_column_name, sdo_diminfo, '||nl||
+        ' sdo_srid ) '||nl||
+        'SELECT '''||pi_sub_username||''', sdo_table_name, sdo_column_name, sdo_diminfo, sdo_srid '||nl||
+        '  FROM mdsys.sdo_geom_metadata_table a'||nl||
+        ' WHERE sdo_owner = hig.get_application_owner '||nl||
+        '   AND NOT EXISTS '||nl||
+        '     (SELECT 1 FROM mdsys.sdo_geom_metadata_table b '||nl||
+        '       WHERE '''||pi_sub_username||'''  = b.sdo_owner '||nl||
+        '         AND a.sdo_table_name  = b.sdo_table_name '||nl||
+        '         AND a.sdo_column_name = b.sdo_column_name ) ';
+       -- MJA 24-Sep_2007: using In causing bind errors
+       /*'INSERT INTO mdsys.sdo_geom_metadata_table '||nl||
         '(sdo_owner, sdo_table_name, '||nl||
         ' sdo_column_name, sdo_diminfo, '||nl||
         ' sdo_srid ) '||nl||
@@ -8463,7 +8478,7 @@ PROCEDURE Create_Msv_Feature_Views
         '     (SELECT 1 FROM mdsys.sdo_geom_metadata_table b '||nl||
         '       WHERE :pi_sub_username  = b.sdo_owner '||nl||
         '         AND a.sdo_table_name  = b.sdo_table_name '||nl||
-        '         AND a.sdo_column_name = b.sdo_column_name ) ';
+        '         AND a.sdo_column_name = b.sdo_column_name ) ';*/
    -- 
       IF pi_role_restrict
       THEN
@@ -8479,7 +8494,9 @@ PROCEDURE Create_Msv_Feature_Views
      nm_debug.debug_on;
      nm_debug.debug(l_sql);
    --
-     EXECUTE IMMEDIATE l_sql USING IN pi_sub_username;
+     -- MJA 24-Sep_2007: using In causing bind errors
+     EXECUTE IMMEDIATE l_sql; -- USING IN pi_sub_username;
+     --EXECUTE IMMEDIATE l_sql USING IN pi_sub_username;
    --
    EXCEPTION
       WHEN e_no_data
