@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.1   Aug 08 2007 09:20:56   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.2   Sep 24 2007 15:25:50   jwadsworth  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Aug 08 2007 09:20:56  $
---       Date fetched Out : $Modtime:   Aug 08 2007 08:57:42  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Sep 24 2007 15:25:50  $
+--       Date fetched Out : $Modtime:   Sep 24 2007 14:53:44  $
+--       Version          : $Revision:   2.2  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-08-AUG-2007 08:57
+24-SEP-2007 14:53
 
 TABLES PROCESSED
 ================
@@ -532,6 +532,19 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'GIS0010'
                     AND  HMR_ROLE = 'HIG_ADMIN');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'GIS0011'
+       ,'HIG_USER'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'GIS0011'
+                    AND  HMR_ROLE = 'HIG_USER');
 --
 INSERT INTO HIG_MODULE_ROLES
        (HMR_MODULE
