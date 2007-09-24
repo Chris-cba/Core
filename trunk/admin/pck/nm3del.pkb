@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --
 -----------------------------------------------------------------------------
 --
---   PVCS Identifiers :-
+--   SCCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3del.pkb-arc   2.2   Jul 20 2007 14:00:44   gjohnson  $
---       Module Name      : $Workfile:   nm3del.pkb  $
---       Date into PVCS   : $Date:   Jul 20 2007 14:00:44  $
---       Date fetched Out : $Modtime:   Jul 20 2007 13:54:34  $
---       PVCS Version     : $Revision:   2.2  $
+--       sccsid           : %W% %G%
+--       Module Name      : %M%
+--       Date into SCCS   : %E% %U%
+--       Date fetched Out : %D% %T%
+--       SCCS Version     : %I%
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.2  $"
+--   nm3get_gen body   : "@(#)nm3get_gen.pkb	1.50 02/01/06"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"%W% %G%"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3del';
@@ -3740,7 +3740,8 @@ END del_ne_all;
 --
 --   Procedure to del using NEH_PK constraint
 --
-PROCEDURE del_neh (pi_neh_id            nm_element_history.neh_id%TYPE
+PROCEDURE del_neh (pi_neh_ne_id_old     nm_element_history.neh_ne_id_old%TYPE
+                  ,pi_neh_ne_id_new     nm_element_history.neh_ne_id_new%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -3752,7 +3753,8 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_neh
-                   (pi_neh_id            => pi_neh_id
+                   (pi_neh_ne_id_old     => pi_neh_ne_id_old
+                   ,pi_neh_ne_id_new     => pi_neh_ne_id_new
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
