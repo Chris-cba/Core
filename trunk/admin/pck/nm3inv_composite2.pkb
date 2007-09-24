@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.1   Sep 18 2007 17:30:30   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.2   Sep 24 2007 08:56:14   ptanava  $
 --       Module Name      : $Workfile:   nm3inv_composite2.pkb  $
---       Date into PVCS   : $Date:   Sep 18 2007 17:30:30  $
---       Date fetched Out : $Modtime:   Sep 17 2007 17:43:52  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Sep 24 2007 08:56:14  $
+--       Date fetched Out : $Modtime:   Sep 21 2007 13:58:58  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on sccs version :
 --       Temp version     : 2.0.2
 --
@@ -20,9 +20,12 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 /* History:
   24.07.07 PT added set_job_broken(), improved progress reporting in get_progress_text()
   27.07.07 PT fixed a bug in process_from_iit_tmp() to cope with empty nm_mrg_derived_inv_values_tmp table.
+  21.09.07 PT in do_rebuild() added the eng_dynseg bulk processing (total number of steps now 7)
+                copied get_nmu_id_for_hig_owner() from nm3inv_composite.pkb.
+                this package makes no reference to the old code now.
 */
 
-  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.1  $"';
+  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.2  $"';
   g_package_name  constant  varchar2(30) := 'nm3inv_composite2';
 
   -- Bulk merge types
@@ -58,6 +61,9 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     ,pt_nse in nm_id_tbl
   );
   
+  function get_nmu_id_for_hig_owner
+  return nm_mail_users.nmu_id%type;
+  
   procedure send_mail2(
      p_title in varchar2
     ,p_inv_type in nm_inv_types_all.nit_inv_type%type
@@ -75,15 +81,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
   
   procedure set_job_broken(p_job in number);
 
---
-  g_mrg_results_table VARCHAR2(30);
-  g_tab_inv_type_to_validate nm3type.tab_varchar4;
---
-  c_app_owner  CONSTANT VARCHAR2(30) := hig.get_application_owner;
-  c_session_id CONSTANT NUMBER       := USERENV('SESSIONID');
-  c_inv_items  CONSTANT VARCHAR2(30) := 'NM_INV_ITEMS_ALL';
-  g_ok_to_turn_off_au_security BOOLEAN;
-  g_last_nqt_inv_type  nm_inv_types.nit_inv_type%TYPE;
+
    
   cr  constant varchar2(1) := chr(10);
    
@@ -95,12 +93,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
   m_ad_hoc_sqlerrm  varchar2(32767);
 
 
---
------------------------------------------------------------------------------
---
-PROCEDURE get_and_check_results_valid (p_nmnd_nit_inv_type nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
-                                      ,p_nqr_mrg_job_id    nm_mrg_query_results.nqr_mrg_job_id%TYPE
-                                      );
+
 
 --
 -----------------------------------------------------------------------------
@@ -119,916 +112,6 @@ PROCEDURE get_and_check_results_valid (p_nmnd_nit_inv_type nm_mrg_nit_derivation
      return g_body_sccsid;
   end get_body_version;
   
-
-  
---
------------------------------------------------------------------------------
---
-PROCEDURE build_and_parse_sql (p_nmnd_nit_inv_type nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
-                              ,p_check_all_mand_fields BOOLEAN DEFAULT TRUE
-                              ) IS
-   --
-   TYPE tab_nmid IS TABLE OF nm_mrg_ita_derivation%ROWTYPE INDEX BY BINARY_INTEGER;
-   l_tab_nmid tab_nmid;
-   l_tab_columns nm3type.tab_varchar30;
-   --
-   PROCEDURE append (p_text VARCHAR2, p_nl BOOLEAN DEFAULT TRUE) IS
-   BEGIN
-      nm3tab_varchar.append (g_block, p_text, p_nl);
-   END append;
-   --
-   PROCEDURE check_l_tab_columns IS
-      l_col_string  nm3type.max_varchar2;
-   BEGIN
-      IF l_tab_columns.COUNT != 0
-       THEN
-         FOR i IN 1..l_tab_columns.COUNT
-          LOOP
-            l_col_string := l_col_string||nm3flx.i_t_e(i>1,',',Null)||l_tab_columns(i);
-         END LOOP;
-         hig.raise_ner (pi_appl               => nm3type.c_hig
-                       ,pi_id                 => 107
-                       ,pi_supplementary_info => l_col_string
-                       );
-      END IF;
-   END check_l_tab_columns;
-   --
-BEGIN
-  nm3dbg.putln(g_package_name||'.build_and_parse_sql('
-    ||'p_nmnd_nit_inv_type='||p_nmnd_nit_inv_type
-    ||', p_check_all_mand_fields='||nm3dbg.to_char(p_check_all_mand_fields)
-    ||')');
-  nm3dbg.ind;
-
-   g_nmnd_nit_inv_type := p_nmnd_nit_inv_type;
-   g_rec_nmnd          := get_nmnd (p_nmnd_nit_inv_type);
-   g_block.DELETE;
-   append ('DECLARE');
-   append ('--');
-   append ('   CURSOR cs_results (c_job_id     nm_mrg_sections.nms_mrg_job_id%TYPE');
-   append ('                     ,c_section_id nm_mrg_sections.nms_mrg_section_id%TYPE');
-   append ('                     ) IS');
-   append ('   SELECT *');
-   append ('    FROM  '||g_mrg_results_table||' '||g_mrg_record_name);
-   append ('   WHERE  nqr_mrg_job_id     = c_job_id');
-   append ('    AND   nms_mrg_section_id = c_section_id');
-   IF g_rec_nmnd.nmnd_where_clause IS NOT NULL
-    THEN
-      append ('    AND  ('||g_rec_nmnd.nmnd_where_clause||')');
-   END IF;
-   append (';',FALSE);
-   append ('--');
-   append ('   '||g_inv_record_name||' nm_inv_items%ROWTYPE;');
-   append ('   '||g_mrg_record_name||' '||g_mrg_results_table||'%ROWTYPE;');
-   append ('   l_found BOOLEAN;');
-   append ('--');
-   append ('BEGIN');
-   append ('--');
-   append ('   IF NOT '||g_package_name||'.g_parse_only');
-   append ('    THEN');
-   append ('      OPEN  cs_results ('||g_package_name||'.g_nms_mrg_job_id,'||g_package_name||'.g_nms_mrg_section_id);');
-   append ('      FETCH cs_results INTO '||g_mrg_record_name||';');
-   append ('      l_found := cs_results%FOUND;');
-   append ('      CLOSE cs_results;');
-   append ('--');
-   append ('      '||g_package_name||'.g_where_clause_failed := FALSE;');
-   append ('      IF NOT l_found');
-   append ('       THEN');
-   IF g_rec_nmnd.nmnd_where_clause IS NOT NULL
-    THEN
-      append ('         '||g_package_name||'.g_where_clause_failed := TRUE;');
-   ELSE
-      append ('         hig.raise_ner (pi_appl               => nm3type.c_hig');
-      append ('                       ,pi_id                 => 67');
-      append ('                       ,pi_supplementary_info => '||nm3flx.string(g_mrg_results_table));
-      append ('                       );');
-   END IF;
-   append ('      END IF;');
-   append ('--');
-   append ('      IF NOT '||g_package_name||'.g_where_clause_failed');
-   append ('       THEN');
-   append ('         '||g_inv_record_name||'.iit_ne_id      := nm3seq.next_ne_id_seq;');
-   append ('         '||g_inv_record_name||'.iit_inv_type   := '||g_package_name||'.g_nmnd_nit_inv_type;');
-   append ('         '||g_inv_record_name||'.iit_start_date := nm3user.get_effective_date;');
-   append ('      END IF;');
-   append ('--');
-   append ('   END IF;');
-   append ('--');
-   --
-   SELECT *
-    BULK  COLLECT
-    INTO  l_tab_nmid
-    FROM  nm_mrg_ita_derivation
-   WHERE  nmid_ita_inv_type = g_nmnd_nit_inv_type
-   ORDER BY nmid_seq_no;
-   --
-   append ('   IF '||g_package_name||'.g_where_clause_failed');
-   append ('    THEN');
-   append ('      '||g_package_name||'.g_rec_iit := Null;');
-   append ('   ELSE');
-   FOR i IN 1..l_tab_nmid.COUNT
-    LOOP
-      IF UPPER(l_tab_nmid(i).nmid_ita_attrib_name) = 'IIT_ADMIN_UNIT'
-       THEN
-         check_au_derivation (pi_nmid_ita_inv_type => l_tab_nmid(i).nmid_ita_inv_type
-                             ,pi_nmid_derivation   => l_tab_nmid(i).nmid_derivation
-                             );
-      END IF;
-      append ('      '||g_inv_record_name||'.'||l_tab_nmid(i).nmid_ita_attrib_name||' := '||l_tab_nmid(i).nmid_derivation||';');
-   END LOOP;
-   --
-   append ('      '||g_package_name||'.g_rec_iit := '||g_inv_record_name||';');
-   append ('   END IF;');
-   append ('--');
-   append ('END;');
-
-   --putln(substr('g_block='||g_block(1), 1, 4000));
-   nm3dbg.putln('g_block='||g_block(1));
-   
-
-   g_parse_only := TRUE;
-   nm3ddl.execute_tab_varchar (g_block);
-   g_parse_only := FALSE;
---
-   IF p_check_all_mand_fields
-    THEN
-      --
-      -- This code only checks to see if there is a derivation for each mandatory
-      --  (both on NM_INV_ITEMS and logically) field. if the derivation evaluates to
-      --  Null in individual circumstances then this will be trapped in the creation of
-      --  the asset
-      --
-      -- Check for mandatory in the table itself.
-      --
-      SELECT column_name
-       BULK  COLLECT
-       INTO  l_tab_columns
-       FROM  all_tab_columns
-      WHERE  owner      = c_app_owner
-       AND   table_name = c_inv_items
-       AND   nullable   = 'N'
-       AND   allowable_inv_column (column_name) = 'TRUE'
-        AND  NOT EXISTS (SELECT 1
-                          FROM  nm_mrg_ita_derivation
-                         WHERE  nmid_ita_inv_type    = g_nmnd_nit_inv_type
-                          AND   nmid_ita_attrib_name = column_name
-                        );
-      check_l_tab_columns;
-      SELECT ita_attrib_name
-       BULK  COLLECT
-       INTO  l_tab_columns
-       FROM  nm_inv_type_attribs
-      WHERE  ita_inv_type     = g_nmnd_nit_inv_type
-       AND   ita_mandatory_yn = 'Y'
-       AND   NOT EXISTS (SELECT 1
-                          FROM  nm_mrg_ita_derivation
-                         WHERE  nmid_ita_inv_type    = ita_inv_type
-                          AND   nmid_ita_attrib_name = ita_attrib_name
-                        );
-      check_l_tab_columns;
-   END IF;
-   
-   nm3dbg.deind;
---
-END build_and_parse_sql;
---
------------------------------------------------------------------------------
---
-PROCEDURE validate_nmnd (p_nmnd_nit_inv_type     nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
-                        ,p_check_all_mand_fields BOOLEAN DEFAULT TRUE
-                        ) IS
-BEGIN
---
-   nm_debug.proc_start (g_package_name,'validate_nmnd');
---
-   get_and_check_results_valid (p_nmnd_nit_inv_type => p_nmnd_nit_inv_type
-                               ,p_nqr_mrg_job_id    => -1
-                               );
---
-   build_and_parse_sql (p_nmnd_nit_inv_type     => p_nmnd_nit_inv_type
-                       ,p_check_all_mand_fields => p_check_all_mand_fields
-                       );
---
-   nm_debug.proc_start (g_package_name,'validate_nmnd');
---
-END validate_nmnd;
---
------------------------------------------------------------------------------
---
-PROCEDURE check_nmnd (p_rec_nmnd nm_mrg_nit_derivation%ROWTYPE) IS
-   l_rec_nit nm_inv_types%ROWTYPE;
-BEGIN
---
-   nm_debug.proc_start (g_package_name,'check_nmnd');
---
-   l_rec_nit := nm3get.get_nit (pi_nit_inv_type => p_rec_nmnd.nmnd_nit_inv_type);
---
-   IF invsec.chk_inv_type_valid_for_role (l_rec_nit.nit_inv_type) = invsec.c_false_string
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 86
-                    ,pi_supplementary_info => Null
-                    );
-   ELSIF l_rec_nit.nit_category != c_composite_nic_category
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_net
-                    ,pi_id                 => 400
-                    ,pi_supplementary_info => 'nit_category-'||l_rec_nit.nit_category||' != '||c_composite_nic_category
-                    );
-   ELSIF l_rec_nit.nit_exclusive != 'Y'
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_net
-                    ,pi_id                 => 401
-                    ,pi_supplementary_info => 'nit_exclusive-'||l_rec_nit.nit_exclusive||' != "Y"'
-                    );
---   ELSIF l_rec_nit.nit_x_sect_allow_flag != 'N'
---    THEN
---      hig.raise_ner (pi_appl               => nm3type.c_net
---                    ,pi_id                 => 402
---                    ,pi_supplementary_info => 'nit_x_sect_allow_flag-'||l_rec_nit.nit_x_sect_allow_flag||' != "N"'
---                    );
-   END IF;
---
-   nm_debug.proc_end (g_package_name,'check_nmnd');
---
-END check_nmnd;
---
------------------------------------------------------------------------------
---
-FUNCTION get_nmnd (pi_nmnd_nit_inv_type nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
-                  ) RETURN nm_mrg_nit_derivation%ROWTYPE IS
---
-   CURSOR cs_nmnd (c_nmnd_nit_inv_type nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE) IS
-   SELECT *
-    FROM  nm_mrg_nit_derivation
-   WHERE  nmnd_nit_inv_type = c_nmnd_nit_inv_type;
---
-   l_rec_nmnd nm_mrg_nit_derivation%ROWTYPE;
-   l_found    BOOLEAN;
---
-BEGIN
---
-   nm_debug.proc_start (g_package_name,'get_nmnd');
---
-   OPEN  cs_nmnd (pi_nmnd_nit_inv_type);
-   FETCH cs_nmnd INTO l_rec_nmnd;
-   l_found := cs_nmnd%FOUND;
-   CLOSE cs_nmnd;
---
-   IF NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_supplementary_info => 'nm_mrg_nit_derivation.nmnd_nit_inv_type="'||pi_nmnd_nit_inv_type||'"'
-                    );
-   END IF;
---
-   nm_debug.proc_end (g_package_name,'get_nmnd');
---
-   RETURN l_rec_nmnd;
---
-END get_nmnd;
---
------------------------------------------------------------------------------
---
-PROCEDURE get_and_check_results_valid (p_nmnd_nit_inv_type nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
-                                      ,p_nqr_mrg_job_id    nm_mrg_query_results.nqr_mrg_job_id%TYPE
-                                      ) IS
---
-   l_rec_nqr      nm_mrg_query_results%ROWTYPE;
-   l_rec_nmnd     nm_mrg_nit_derivation%ROWTYPE;
-   l_rec_nit      nm_inv_types%ROWTYPE;
-   l_nmq_unique_1 nm_mrg_query.nmq_unique%TYPE;
-   l_nmq_unique_2 nm_mrg_query.nmq_unique%TYPE;
---
-BEGIN
-  nm3dbg.putln(g_package_name||'.get_and_check_results_valid('
-    ||'p_nmnd_nit_inv_type='||p_nmnd_nit_inv_type
-    ||', p_nqr_mrg_job_id='||p_nqr_mrg_job_id
-    ||')');
-  nm3dbg.ind;
-  
-
-   l_rec_nmnd         := get_nmnd (pi_nmnd_nit_inv_type => p_nmnd_nit_inv_type);
-   l_rec_nit          := nm3get.get_nit (pi_nit_inv_type => l_rec_nmnd.nmnd_nit_inv_type);
-   g_nmnd_is_point    := l_rec_nit.nit_pnt_or_cont = 'P';
-   g_last_update_date := l_rec_nmnd.nmnd_last_refresh_date;
-   
-   
-   -- this checks that the mrg_query of the mrg_job_id is same as
-   --   that of the comp inv_type
-   IF p_nqr_mrg_job_id != -1
-    THEN
-   --
-      l_rec_nqr  := nm3get.get_nmqr (pi_nqr_mrg_job_id => p_nqr_mrg_job_id);
-   --
-      IF l_rec_nmnd.nmnd_nmq_id != l_rec_nqr.nqr_nmq_id
-       THEN
-         l_nmq_unique_1 := nm3get.get_nmq (pi_nmq_id          => l_rec_nmnd.nmnd_nmq_id
-                                          ,pi_raise_not_found => FALSE
-                                          ).nmq_unique;
-         l_nmq_unique_2 := nm3get.get_nmq (pi_nmq_id          => l_rec_nqr.nqr_nmq_id
-                                          ,pi_raise_not_found => FALSE
-                                          ).nmq_unique;
-                                          
-         -- Query is invalid                              
-         hig.raise_ner (pi_appl               => nm3type.c_net
-                       ,pi_id                 => 121
-                       ,pi_supplementary_info => l_nmq_unique_1||' != '||l_nmq_unique_2
-                       );
-      END IF;
-   --
-   END IF;
---
-   g_mrg_results_table := get_merge_results_view (l_rec_nmnd.nmnd_nmq_id);
-  nm3dbg.putln('g_mrg_results_table='||g_mrg_results_table);
---
---   nm_debug.proc_end (g_package_name,'get_and_check_results_valid');
---
-  nm3dbg.deind;
-END get_and_check_results_valid;
---
------------------------------------------------------------------------------
---
-PROCEDURE nmid_b_iu_stm_trg IS
-BEGIN
---
-   nm_debug.proc_start (g_package_name,'nmid_b_iu_stm_trg');
---
-   g_tab_inv_type_to_validate.DELETE;
---
-   nm_debug.proc_end (g_package_name,'nmid_b_iu_stm_trg');
---
-END nmid_b_iu_stm_trg;
---
------------------------------------------------------------------------------
---
-PROCEDURE nmid_b_iu_row_trg (p_rec_nmid nm_mrg_ita_derivation%ROWTYPE) IS
-   l_found BOOLEAN := FALSE;
-BEGIN
---
-   nm_debug.proc_start (g_package_name,'nmid_b_iu_row_trg');
---
-   FOR i IN 1..g_tab_inv_type_to_validate.COUNT
-    LOOP
-      l_found := g_tab_inv_type_to_validate(i) = p_rec_nmid.nmid_ita_inv_type;
-      EXIT WHEN l_found;
-   END LOOP;
-   IF NOT l_found
-    THEN
-      g_tab_inv_type_to_validate(g_tab_inv_type_to_validate.COUNT+1) := p_rec_nmid.nmid_ita_inv_type;
-   END IF;
---
-   nm_debug.proc_end (g_package_name,'nmid_b_iu_row_trg');
---
-END nmid_b_iu_row_trg;
---
------------------------------------------------------------------------------
---
-PROCEDURE nmid_a_iu_stm_trg IS
-BEGIN
---
-   nm_debug.proc_start (g_package_name,'nmid_a_iu_stm_trg');
---
-   FOR i IN 1..g_tab_inv_type_to_validate.COUNT
-    LOOP
-      validate_nmnd (p_nmnd_nit_inv_type     => g_tab_inv_type_to_validate(i)
-                    ,p_check_all_mand_fields => FALSE -- do not check at this stage
-                    );
-   END LOOP;
---
-   g_tab_inv_type_to_validate.DELETE;
---
-   nm_debug.proc_end (g_package_name,'nmid_a_iu_stm_trg');
---
-END nmid_a_iu_stm_trg;
---
------------------------------------------------------------------------------
---
-PROCEDURE check_au_derivation (pi_nmid_ita_inv_type nm_mrg_ita_derivation.nmid_ita_inv_type%TYPE
-                              ,pi_nmid_derivation   nm_mrg_ita_derivation.nmid_derivation%TYPE
-                              ) IS
---
-   c_mrg_dot      CONSTANT VARCHAR2(40) := UPPER(g_mrg_record_name||'.');
-   c_mrg_dot_len  CONSTANT PLS_INTEGER  := LENGTH(c_mrg_dot);
-   l_derivation   nm_mrg_ita_derivation.nmid_derivation%TYPE := UPPER(pi_nmid_derivation);
-   l_deriv_ok     BOOLEAN := FALSE;
-   l_inv_type     VARCHAR2(4);
-   l_rec_nit_dest nm_inv_types%ROWTYPE;
-   l_rec_nit_src  nm_inv_types%ROWTYPE;
-   l_rec_nau      nm_admin_units%ROWTYPE;
-   l_dummy        nm3type.max_varchar2;
-   l_cur          nm3type.ref_cursor;
---
-BEGIN
---
-   l_rec_nit_dest := nm3get.get_nit (pi_nit_inv_type => pi_nmid_ita_inv_type);
-   g_ok_to_turn_off_au_security := TRUE;
-   IF nm3flx.can_string_be_select_from_dual (l_derivation)
-    THEN
-      g_ok_to_turn_off_au_security := FALSE;
-      l_deriv_ok                   := TRUE;
-      OPEN  l_cur FOR 'SELECT '||l_derivation||' FROM DUAL';
-      FETCH l_cur
-       INTO l_dummy;
-      CLOSE l_cur;
-      l_rec_nau := nm3get.get_nau_all (pi_nau_admin_unit  => l_dummy
-                                      ,pi_raise_not_found => FALSE
-                                      );
-      IF l_rec_nau.nau_admin_unit IS NULL
-       THEN
-         hig.raise_ner (pi_appl               => nm3type.c_net
-                       ,pi_id                 => 406
-                       ,pi_supplementary_info => l_derivation
-                       );
-      ELSIF l_rec_nau.nau_admin_type != l_rec_nit_dest.nit_admin_type
-       THEN
-         hig.raise_ner (pi_appl               => nm3type.c_net
-                       ,pi_id                 => 407
-                       ,pi_supplementary_info => l_derivation
-                       );
-      END IF;
-   ELSIF SUBSTR(l_derivation,1,c_mrg_dot_len) != c_mrg_dot
-    THEN
-      l_deriv_ok := FALSE;
-   ELSIF SUBSTR(l_derivation,-11) != '_ADMIN_UNIT'
-    THEN
-      l_deriv_ok := FALSE;
-   ELSE
-      l_inv_type := SUBSTR(l_derivation,5,4);
-      IF INSTR(l_inv_type,'_') != 0
-       THEN
-         l_inv_type := SUBSTR(l_inv_type,1,INSTR(l_inv_type,'_')-1);
-      END IF;
-      l_rec_nit_src  := nm3get.get_nit (pi_nit_inv_type => l_inv_type);
-      IF l_rec_nit_dest.nit_admin_type != l_rec_nit_src.nit_admin_type
-       THEN
-         hig.raise_ner (pi_appl               => nm3type.c_net
-                       ,pi_id                 => 404
-                       ,pi_supplementary_info => pi_nmid_derivation
-                       );
-      ELSE
-         l_deriv_ok := TRUE;
-      END IF;
-   END IF;
---
-   IF NOT l_deriv_ok
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_net
-                    ,pi_id                 => 405
-                    ,pi_supplementary_info => pi_nmid_derivation
-                    );
-   END IF;
---
-END check_au_derivation;
---
------------------------------------------------------------------------------
---
-FUNCTION get_mrg_record_name RETURN VARCHAR2 IS
-BEGIN
-   RETURN g_mrg_record_name;
-END get_mrg_record_name;
---
------------------------------------------------------------------------------
---
-FUNCTION get_inv_record_name RETURN VARCHAR2 IS
-BEGIN
-   RETURN g_inv_record_name;
-END get_inv_record_name;
---
------------------------------------------------------------------------------
---
-
-  
-  -- This is called separateley from nm0420 before job submit
-  procedure check_no_refresh_running(
-     p_nmnd_nit_inv_type in nm_mrg_nit_derivation.nmnd_nit_inv_type%type
-  )
-  is
-  begin
-    nm3dbg.putln(g_package_name||'.check_no_refresh_running('
-      ||'p_nmnd_nit_inv_type='||p_nmnd_nit_inv_type
-      ||')');
-    
-    if p_nmnd_nit_inv_type is null then
-      raise_application_error(-20001, g_package_name||'.check_no_refresh_running: Invalid argument');
-    end if;
-    
-    get_lock(
-       p_inv_type => p_nmnd_nit_inv_type
-    );
-    release_lock(
-       p_inv_type => p_nmnd_nit_inv_type
-    );
-    
-  exception
-    when others then
-      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.check_no_refresh_running('
-        ||'p_nmnd_nit_inv_type='||p_nmnd_nit_inv_type
-        ||')');
-      raise;
-  end;
-
-
-  
-  -- This is the original direct call procedure, now a wrapper
-  procedure refresh_nmnd(
-     p_nmnd_nit_inv_type  in nm_mrg_nit_derivation.nmnd_nit_inv_type%type
-    ,p_effective_date     in date
-    ,p_force_full_refresh in boolean
-  )
-  is
-  begin
-    nm3dbg.putln(g_package_name||'.refresh_nmnd('
-        ||'p_nmnd_nit_inv_type='||p_nmnd_nit_inv_type
-        ||', p_effective_date='||p_effective_date
-        ||', p_force_full_refresh='||nm3dbg.to_char(p_force_full_refresh)
-        ||')');
-    nm3dbg.ind;
-    
-    if not p_force_full_refresh then
-       raise_application_error(-20085,
-        'p_force_full_refresh=false no longer supported');
-    end if;
-    
-    call_rebuild(
-       p_dbms_job_no    => null
-      ,p_inv_type       => p_nmnd_nit_inv_type
-      ,p_effective_date => p_effective_date
-    );
-
-    nm3dbg.deind;
-  exception
-    when others then
-      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.refresh_nmnd('
-        ||'p_nmnd_nit_inv_type='||p_nmnd_nit_inv_type
-        ||', p_effective_date='||p_effective_date
-        ||', p_force_full_refresh='||nm3dbg.to_char(p_force_full_refresh)
-        ||')');
-      raise;
-  end;
-    
-
---
------------------------------------------------------------------------------
---
-FUNCTION get_bonfire_night RETURN DATE IS
-BEGIN
-   RETURN c_bonfire_night;
-END get_bonfire_night;
---
------------------------------------------------------------------------------
---
-FUNCTION get_not_null (pi_ita_mandatory_yn VARCHAR2
-                      ,pi_atc_nullable     VARCHAR2
-                      ,pi_column_name      VARCHAR2
-                      ,pi_nit_x_sect_allow VARCHAR2
-                      ) RETURN VARCHAR2 IS
-   c_not_null CONSTANT VARCHAR2(8) := 'NOT NULL';
-   l_bool   BOOLEAN;
-BEGIN
-   IF pi_ita_mandatory_yn IS NOT NULL
-    THEN
-      l_bool := pi_ita_mandatory_yn='Y';
-   ELSE
-      IF   pi_column_name = 'IIT_X_SECT'
-       THEN
-         l_bool := pi_nit_x_sect_allow = 'Y';
-      ELSE
-         l_bool := pi_atc_nullable = 'N';
-      END IF;
-   END IF;
-   RETURN nm3flx.i_t_e (l_bool,c_not_null,Null);
-END get_not_null;
---
------------------------------------------------------------------------------
---
-FUNCTION allowable_inv_column (p_column VARCHAR2) RETURN VARCHAR2 IS
-BEGIN
-   RETURN nm3flx.boolean_to_char(NOT p_column IN ('IIT_CREATED_BY'
-                                                 ,'IIT_DATE_CREATED'
-                                                 ,'IIT_DATE_MODIFIED'
-                                                 ,'IIT_INV_TYPE'
-                                                 ,'IIT_MODIFIED_BY'
-                                                 ,'IIT_NE_ID'
-                                                 ,'IIT_PRIMARY_KEY'
-                                                 ,'IIT_FOREIGN_KEY'
-                                                 ,'IIT_START_DATE'
-                                                 )
-                                );
-END allowable_inv_column;
---
------------------------------------------------------------------------------
---
-FUNCTION get_composite_nic_category RETURN nm_inv_categories.nic_category%TYPE IS
-BEGIN
-   RETURN c_composite_nic_category;
-END get_composite_nic_category;
---
------------------------------------------------------------------------------
---
-PROCEDURE refresh_pending_nmnd (p_effective_date DATE DEFAULT nm3user.get_effective_date
-                               ) IS
---
-   CURSOR cs_nmnd_rebuild IS
-   SELECT nmnd_nit_inv_type
-    FROM  nm_mrg_nit_derivation
-   WHERE  (nmnd_last_rebuild_date + nmnd_rebuild_interval_days) < SYSDATE
-    AND   NOT EXISTS (SELECT 1
-                       FROM  nm_mrg_nit_derivation_refresh
-                      WHERE  nmndr_nmnd_nit_inv_type   = nmnd_nit_inv_type
-                       AND   nmndr_refresh_finish_date IS NULL
-                     );
-
---
-   l_tab_nit nm3type.tab_varchar4;
---
-   l_block         nm3type.max_varchar2;
-   l_job           BINARY_INTEGER;
-   c_mask CONSTANT VARCHAR2(30) := 'DD/MM/YYYY';
-   l_some_to_do    BOOLEAN := FALSE;
---
-   PROCEDURE do_nit_arr (p_rebuild BOOLEAN) IS
-   BEGIN
-      FOR i IN 1..l_tab_nit.COUNT
-       LOOP
-         l_some_to_do := TRUE;
-         l_block := l_block
-                 ||CHR(10)||'  do_it ('||nm3flx.string(l_tab_nit(i))||','||nm3flx.boolean_to_char(p_rebuild)||');';
-      END LOOP;
-   END do_nit_arr;
---
-BEGIN
---
-   nm_debug.proc_start (g_package_name,'refresh_pending_nmnd');
---
-   l_block :=            '-- rebuild/refresh all pending composite'
-              ||CHR(10)||'DECLARE'
-              ||CHR(10)||'  c_eff_date CONSTANT DATE := TO_DATE('||nm3flx.string(TO_CHAR(p_effective_date,c_mask))||','||nm3flx.string(c_mask)||');'
-              ||CHR(10)||'  PROCEDURE do_it (pi_inv_type VARCHAR2, p_rebuild BOOLEAN) IS'
-              ||CHR(10)||'  BEGIN'
-              ||CHR(10)||'    '||g_package_name||'.refresh_nmnd'
-              ||CHR(10)||'       (p_nmnd_nit_inv_type  => pi_inv_type'
-              ||CHR(10)||'       ,p_effective_date     => c_eff_date'
-              ||CHR(10)||'       ,p_force_full_refresh => p_rebuild'
-              ||CHR(10)||'       );'
-              ||CHR(10)||'  END do_it;'
-              ||CHR(10)||'BEGIN';
---
-   OPEN  cs_nmnd_rebuild;
-   FETCH cs_nmnd_rebuild
-    BULK COLLECT
-    INTO l_tab_nit;
-   CLOSE cs_nmnd_rebuild;
---
-   do_nit_arr (TRUE);
-
---
-   l_block := l_block
-              ||CHR(10)||'END;';
-   IF l_some_to_do
-    THEN
-      create_dbms_job (pi_what              => l_block
-                      ,pi_when              => SYSDATE
-                      ,pi_next              => Null
-                      ,pi_allow_duplicate   => FALSE
-                      ,pi_commit_autonomous => TRUE
-                      );
-   END IF;
---
-   nm_debug.proc_end (g_package_name,'refresh_pending_nmnd');
-   
-   
-
---
-END refresh_pending_nmnd;
---
------------------------------------------------------------------------------
---
-PROCEDURE refresh_nmnd_as_job (p_nmnd_nit_inv_type  nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
-                              ,p_effective_date     DATE    DEFAULT nm3user.get_effective_date
-                              ,p_force_full_refresh BOOLEAN DEFAULT FALSE
-                              ) IS
-   l_block         nm3type.max_varchar2;
-   l_job           BINARY_INTEGER;
-   c_mask CONSTANT VARCHAR2(30) := 'DD/MM/YYYY';
-   
-BEGIN
-  nm3dbg.putln(g_package_name||'.refresh_nmnd_as_job('
-    ||'p_nmnd_nit_inv_type='||p_nmnd_nit_inv_type
-    ||', p_effective_date='||p_effective_date
-    ||', p_force_full_refresh='||nm3dbg.to_char(p_force_full_refresh)
-    ||')');
-  nm3dbg.ind;
-  
---
-   l_block :=            '-- '||p_nmnd_nit_inv_type||' refresh'
-              ||CHR(10)||'BEGIN'
-              ||CHR(10)||'   '||g_package_name||'.refresh_nmnd'
-              ||CHR(10)||'                 (p_nmnd_nit_inv_type  => '||nm3flx.string(p_nmnd_nit_inv_type)
-              ||CHR(10)||'                 ,p_effective_date     => TO_DATE('||nm3flx.string(TO_CHAR(p_effective_date,c_mask))||','||nm3flx.string(c_mask)||')'
-              ||CHR(10)||'                 ,p_force_full_refresh => '||nm3flx.boolean_to_char(p_force_full_refresh)
-              ||CHR(10)||'                 );'
-              ||CHR(10)||'END;';
-              
-   nm3dbg.putln('l_block='||l_block);
---
-   create_dbms_job (pi_what              => l_block
-                   ,pi_when              => SYSDATE
-                   ,pi_next              => Null
-                   ,pi_allow_duplicate   => FALSE
-                   ,pi_commit_autonomous => TRUE
-                   );
-               
-  nm3dbg.deind;
-
-exception
-  when others then
-    nm3dbg.puterr(sqlerrm||': '||g_package_name||'.refresh_nmnd_as_job('
-      ||'p_nmnd_nit_inv_type='||p_nmnd_nit_inv_type
-      ||', p_effective_date='||p_effective_date
-      ||', p_force_full_refresh='||nm3dbg.to_char(p_force_full_refresh)
-      ||')');
-    raise;
-
-END refresh_nmnd_as_job;
---
------------------------------------------------------------------------------
---
-FUNCTION get_nmu_id_for_hig_owner RETURN nm_mail_users.nmu_id%TYPE IS
---
-   CURSOR cs_nmu (c_user VARCHAR2) IS
-   SELECT nmu_id
-    FROM  nm_mail_users
-         ,hig_users
-   WHERE  hus_username = c_user
-    AND   hus_user_id  = nmu_hus_user_id;
---
-   l_nmu_id nm_mail_users.nmu_id%TYPE;
---
-BEGIN
---
-   nm_debug.proc_start (g_package_name,'get_nmu_id_for_hig_owner');
---
-   OPEN  cs_nmu (c_app_owner);
-   FETCH cs_nmu
-    INTO l_nmu_id;
-   CLOSE cs_nmu;
---
-   nm_debug.proc_end (g_package_name,'get_nmu_id_for_hig_owner');
---
-   RETURN l_nmu_id;
---
-END get_nmu_id_for_hig_owner;
---
------------------------------------------------------------------------------
---
-PROCEDURE submit_refresh_pending_job (p_interval_days PLS_INTEGER DEFAULT 1) IS
-   l_what nm3type.max_varchar2;
-BEGIN
---
-   nm_debug.proc_start (g_package_name,'submit_refresh_pending_job');
---
-   l_what :=            '-- the job which creates the job which refreshes the composite inv types'
-             ||CHR(10)||'   '||g_package_name||'.refresh_pending_nmnd;';
---
-   create_job_to_run_every_n_days (p_what          => l_what
-                                  ,p_interval_days => p_interval_days
-                                  );
---
-   nm_debug.proc_end (g_package_name,'submit_refresh_pending_job');
---
-END submit_refresh_pending_job;
---
------------------------------------------------------------------------------
---
-PROCEDURE create_job_to_run_every_n_days (p_what          VARCHAR2
-                                         ,p_interval_days PLS_INTEGER DEFAULT 1
-                                         ) IS
-   l_next nm3type.max_varchar2;
-BEGIN
---
-   nm_debug.proc_start (g_package_name,'create_job_to_run_every_n_days');
---
-   IF NVL(p_interval_days,0) > 0
-    THEN
-      l_next := 'TRUNC(SYSDATE)+'||p_interval_days;
-   END IF;
---
-   create_dbms_job (pi_what              => p_what
-                   ,pi_when              => TRUNC(SYSDATE)+1
-                   ,pi_next              => l_next
-                   ,pi_allow_duplicate   => FALSE
-                   ,pi_commit_autonomous => TRUE
-                   );
---
-   nm_debug.proc_end (g_package_name,'create_job_to_run_every_n_days');
---
-END create_job_to_run_every_n_days;
---
------------------------------------------------------------------------------
---
-PROCEDURE create_dbms_job (pi_what              VARCHAR2
-                          ,pi_when              DATE     DEFAULT SYSDATE
-                          ,pi_next              VARCHAR2 DEFAULT Null
-                          ,pi_allow_duplicate   BOOLEAN  DEFAULT FALSE
-                          ,pi_commit_autonomous BOOLEAN  DEFAULT TRUE
-                          ) IS
-   PROCEDURE create_it IS
-      l_job NUMBER;
-   BEGIN
-      dbms_job.submit (job       => l_job
-                      ,what      => pi_what
-                      ,next_date => pi_when
-                      ,interval  => pi_next
-                      );
-   END create_it;
-   PROCEDURE create_it_auton IS
-      PRAGMA AUTONOMOUS_TRANSACTION;
-   BEGIN
-      create_it;
-      COMMIT;
-   END create_it_auton;
-   
-BEGIN
-  nm3dbg.putln(g_package_name||'.create_dbms_job('
-    ||'pi_when='||pi_when
-    ||', pi_next='||pi_next
-    ||', pi_allow_duplicate='||nm3dbg.to_char(pi_allow_duplicate)
-    ||', pi_commit_autonomous='||nm3dbg.to_char(pi_commit_autonomous)
-    ||')');
-  nm3dbg.ind;
-  nm3dbg.putln('pi_what='||pi_what);
-  
---
-   nm3dbms_job.make_sure_processes_available;
---
-   IF NOT pi_allow_duplicate
-    AND nm3dbms_job.does_job_exist_by_what (pi_what)
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_net
-                    ,pi_id                 => 412
-                    ,pi_supplementary_info => CHR(10)||pi_what
-                    );
-   END IF;
---
-   IF pi_commit_autonomous
-    THEN
-      create_it_auton;
-   ELSE
-      create_it;
-   END IF;
-   
-  nm3dbg.deind;
-
-exception
-  when others then
-    nm3dbg.puterr(substr(
-      sqlerrm||': '||g_package_name||'.create_dbms_job('
-      ||'pi_when='||pi_when
-      ||', pi_next='||pi_next
-      ||', pi_allow_duplicate='||nm3dbg.to_char(pi_allow_duplicate)
-      ||', pi_commit_autonomous='||nm3dbg.to_char(pi_commit_autonomous)
-      ||', pi_what='||pi_what
-      ||')', 1, 4000));
-    raise;
---
-END create_dbms_job;
---
------------------------------------------------------------------------------
---
-FUNCTION get_merge_view_alias RETURN VARCHAR2 IS
-BEGIN
-   RETURN g_mrg_record_name;
-END get_merge_view_alias;
---
------------------------------------------------------------------------------
---
-FUNCTION get_inv_view_alias RETURN VARCHAR2 IS
-BEGIN
-   RETURN g_inv_record_name;
-END get_inv_view_alias;
---
------------------------------------------------------------------------------
---
-FUNCTION get_merge_results_view (p_nmq_id nm_mrg_query.nmq_id%TYPE) RETURN VARCHAR2 IS
-   l_retval nm3type.max_varchar2;
-BEGIN
-   IF p_nmq_id IS NOT NULL
-    THEN
-      DECLARE
-         l_no_query EXCEPTION;
-         PRAGMA EXCEPTION_INIT (l_no_query, -20901);
-      BEGIN
-         l_retval := nm3mrg_view.get_mrg_view_name_by_qry_id(pi_qry_id => p_nmq_id)||'_SVL';
-      EXCEPTION
-         WHEN l_no_query
-          THEN
-            l_retval := Null;
-      END;
-   END IF;
-   RETURN l_retval;
-END get_merge_results_view;
 
 
   --------------------------------------------------------------------
@@ -1398,7 +481,9 @@ END get_merge_results_view;
       end if;
       raise;
   end;
+  
 
+  
   
 
   -----------------------------------------------------------------------
@@ -1429,19 +514,22 @@ END get_merge_results_view;
   is
     l_mrg_job_id  nm_mrg_query_results_all.nqr_mrg_job_id%type;
     l_all_routes  boolean := false;
+    l_route_id    id_type;
     l_nqr_description nm_mrg_query_results_all.nqr_description%type;
     l_sqlcount    number(8);
     l_sqlcount2   number(8);
     t_id          nm_id_tbl := new nm_id_tbl();
     t_attr        attrib_tbl := pt_unique_attr;
     l_effective_date constant date := nm3user.get_effective_date;
-    l_route_id    nm_elements_all.ne_id%type;
     --
     t_events      nm3type.tab_varchar32767;
     l_op_index    pls_integer;
     l_op_slno     pls_integer;
     r_longops     nm3sql.longops_rec;
     i             binary_integer;
+    l_group_type  nm_group_types_all.ngt_group_type%type;
+    l_nt_datum    nm_types.nt_datum%type;
+    cur           sys_refcursor;
     
   begin
     
@@ -1463,6 +551,15 @@ END get_merge_results_view;
       ||', p_ignore_poe='||nm3dbg.to_char(p_ignore_poe)
       ||')');
     nm3dbg.ind;
+    
+    
+    -- validate input parameters
+    if p_inv_type is null
+      or p_effective_date is null
+    then
+      raise_application_error(-20101, 'Invalid or missimg parameters');
+    end if;
+    
     
     
     l_nqr_description := 'Derived Asset '''||p_inv_type||''' rebuild';
@@ -1488,33 +585,21 @@ END get_merge_results_view;
     );
     
     
-    -- the serializable ensures that we don't have invitem edits between
-    --  the merge query steps
-    -- if we do the transaction fails
-    set transaction isolation level serializable;
-    
     
     if l_effective_date = p_effective_date then null;
     else
       nm3user.set_effective_date(p_effective_date);
     end if;
     
-    -- validate input parameters
-    if p_inv_type is null
-      or p_effective_date is null
-    then
-      raise_application_error(-20101, 'Invalid or missimg parameters');
-    end if;
+
+
     
-    -- Todo!
-    if p_ngt_group_type is null then
-      raise_application_error(-20101
-      , 'Runnig derivied assets without specifying the Driving Group Type is not yet implemented');
-      
-    end if;
+    -- the serializable ensures that we don't have invitem edits between
+    --  the merge query steps
+    -- if we do the transaction fails
+    set transaction isolation level serializable;
     
-    
-    
+
     
     -- 0 initialize
     r_longops.rindex      := dbms_application_info.set_session_longops_nohint;
@@ -1524,6 +609,10 @@ END get_merge_results_view;
     r_longops.totalwork   := 7;
     r_longops.target_desc  := p_inv_type;
     nm3sql.set_longops(p_rec => r_longops, p_increment => 0);
+    
+    
+
+    
 
     -- 1. Populate the network criteria
     -- 1.1 We have datums/routes/extents selected via Gazetteer
@@ -1532,24 +621,68 @@ END get_merge_results_view;
          pt_ne => pt_ne
         ,pt_nse => pt_nse   
       );
+      -- make sure we have a coherent driving group type
+      --  this will be null if the p_ngt_group_type is not fully covered by the criteria datums
+      --    and no other single group type fully covers the criteria datums
+      nm3bulk_mrg.process_datums_group_type(
+         p_group_type_in  => p_ngt_group_type
+        ,p_group_type_out => l_group_type
+      );
+      
+      -- assign the route_id if only one route selected.
+      --  this keeps the route connectivity small.
+      -- TODO: the route connectivity should also use an id_tbl instead of one single id
+      --  at the moment the next level is straight all routes of one group type
+      if pt_ne.count = 1 then
+        l_route_id := pt_ne(1);
+      end if;
+      
       
     -- 1.3 we have a group type (linear)
     elsif p_ngt_group_type is not null then
       nm3bulk_mrg.load_group_type_datums(p_ngt_group_type);
+      l_group_type := p_ngt_group_type;
       
       
     -- 1.4 we have a network type (linear)
     elsif p_nt_type is not null then
-      raise_application_error(-20099
-        ,'Running Derived Assets on network type only not yet implemented');
+      -- the nt_type must be a datum nt_type
+      begin
+        select nt_datum into l_nt_datum
+        from nm_types 
+        where nt_type = p_nt_type
+          and nt_linear = 'Y'
+          and nt_datum = 'Y';
+      exception
+        when no_data_found then
+          raise_application_error(-20001
+            ,'The driving network type must be a linear datum type: '||p_nt_type);
+      end;
       
-    -- 1.5 no network criteria specified
-    else
-      raise_application_error(-20099
-        ,'Running Derived Assets on the whole network not yet implemented');
-      l_all_routes := true;
+      -- load datums of the given nt_type
+      open cur for
+        select e.ne_id
+        from nm_elements e
+        where e.ne_nt_type = p_nt_type;
+      nm3sql.load_id_tbl(cur);
+        
+        
+        
+      -- 1.5 no network criteria specified
+      else
+        -- load all datums of datum nt_type 
+        open cur for
+          select e.ne_id
+          from nm_elements e
+          where e.ne_nt_type in (select nt_type from nm_types
+                                 where nt_datum = 'Y'
+                                   and nt_linear = 'Y');
+        nm3sql.load_id_tbl(cur);
+      
+      end if;
     
-    end if;
+    
+    
     
     nm3sql.set_longops(p_rec => r_longops, p_increment => 1);
     t_events(t_events.count+1) := 'Loaded criteria datum count: '||nm3sql.get_id_tbl_count;
@@ -1561,8 +694,8 @@ END get_merge_results_view;
       ,p_nqr_admin_unit => p_admin_unit_id
       ,p_nmq_descr      => l_nqr_description
       ,p_route_id       => l_route_id
-      ,p_route_type     => p_ngt_group_type
-      ,p_all_routes     => l_all_routes
+      ,p_group_type     => l_group_type
+      ,p_all_routes     => false
       ,p_ignore_poe     => p_ignore_poe
       ,p_mrg_job_id     => l_mrg_job_id
       ,p_longops_rec    => r_longops
@@ -1644,6 +777,9 @@ END get_merge_results_view;
         ||', p_ignore_poe='||nm3dbg.to_char(p_ignore_poe)
         ||')');
         nm3user.set_effective_date(l_effective_date);
+        if cur%isopen then
+          close cur;
+        end if;
         if p_send_mail then
           t_events(t_events.count+1) := sqlerrm;
           send_mail2(
@@ -1694,6 +830,11 @@ END get_merge_results_view;
     end;
     
   begin
+    nm3dbg.putln(g_package_name||'.process_exclusive_attrs('
+      ||'p_inv_type='||p_inv_type
+      ||', pt_attr.count='||pt_attr.count
+      ||')');
+    nm3dbg.ind;
   
     -- compare the passed in parameters table to the exclusive attributes specified in metadata
     --  if not all passed in then raise error    
@@ -1739,6 +880,15 @@ END get_merge_results_view;
             
       i := pt_attr.next(i);
     end loop;
+    
+    nm3dbg.deind;
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.process_exclusive_attrs('
+        ||'p_inv_type='||p_inv_type
+        ||', pt_attr.count='||pt_attr.count
+        ||')');
+      raise;
   
   end;
   
@@ -2134,6 +1284,13 @@ END get_merge_results_view;
       l_sql := l_sql||cr||','||r.nmid_derivation||' '||r.column_name;
     end loop;
     return l_sql;
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.sql_mrg_iit_record('
+        ||'p_inv_type='||p_inv_type
+        ||', l_sql='||l_sql
+        ||')');
+      raise;
   end;
   
   
@@ -2182,6 +1339,12 @@ END get_merge_results_view;
     from nm_mrg_derived_inv_values_tmp
     where rowid = p_rowid;
     return l_rec;
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.get_iit_tmp_rec('
+        ||'p_rowid='||p_rowid
+        ||')');
+      raise;
   end;
   
   
@@ -2502,9 +1665,7 @@ END get_merge_results_view;
     
     
     
-  
-  
-  
+
   function to_string_attrib_tbl(p_tbl in attrib_tbl) return varchar2
   is
     l_ret varchar2(32767);
@@ -2516,8 +1677,36 @@ END get_merge_results_view;
     end loop;
     return '('||l_ret||')';
   end;
+
   
   
+  -- the logic of this one is copied from the old nm3inv_composite.pkb
+  --  returns the mail user id
+  --  if more than one defined then returns the first one by id
+  function get_nmu_id_for_hig_owner
+  return nm_mail_users.nmu_id%type
+  is
+     l_nmu_id nm_mail_users.nmu_id%type;
+  begin
+    select nmu_id into l_nmu_id
+    from (
+    select mu.nmu_id
+    from
+       nm_mail_users mu
+      ,hig_users u
+    where u.hus_user_id  = mu.nmu_hus_user_id
+      and u.hus_username = hig.get_application_owner
+    order by mu.nmu_id
+    ) where rownum = 1;
+    return l_nmu_id;
+  exception
+    when no_data_found then
+      return null;
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.get_nmu_id_for_hig_owner('
+        ||')');
+      raise;
+  end;
   
 
 --
