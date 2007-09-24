@@ -2,11 +2,11 @@ create or replace package nm3bulk_mrg as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.0   Jul 23 2007 14:30:44   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.1   Sep 24 2007 08:49:56   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkh  $
---       Date into PVCS   : $Date:   Jul 23 2007 14:30:44  $
---       Date fetched Out : $Modtime:   Jul 23 2007 14:30:24  $
---       PVCS Version     : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Sep 24 2007 08:49:56  $
+--       Date fetched Out : $Modtime:   Sep 21 2007 10:34:32  $
+--       PVCS Version     : $Revision:   2.1  $
 --       Based on sccs version : 
 --
 --   Author : Priidu Tanava
@@ -17,7 +17,7 @@ create or replace package nm3bulk_mrg as
 --   Copyright (c) exor corporation ltd, 2006
 -----------------------------------------------------------------------------
 
-  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.0  $"';
+  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.1  $"';
    
 
   type nm_obj_type_tbl is table of nm_members_all.nm_obj_type%type index by binary_integer;
@@ -69,14 +69,14 @@ create or replace package nm3bulk_mrg as
   );
   
   
-  procedure std_populate_by_route(
+  procedure std_populate(
      p_nmq_id in nm_mrg_query_all.nmq_id%type
     ,pt_attr in ita_mapping_tbl
     ,p_admin_unit_id in nm_admin_units_all.nau_admin_unit%type
     ,p_splits_rowcount in integer
     ,p_homo_rowcount in integer
     ,p_route_id in nm_elements_all.ne_id%type
-    ,p_route_type in nm_members_all.nm_obj_type%type
+    ,p_group_type in nm_members_all.nm_obj_type%type
     ,p_all_routes in boolean
     ,p_ignore_poe in boolean
     ,p_description in varchar2
@@ -89,7 +89,7 @@ create or replace package nm3bulk_mrg as
     ,p_nqr_admin_unit in nm_mrg_query_results_all.nqr_admin_unit%type
     ,p_nmq_descr in nm_mrg_query_all.nmq_descr%type
     ,p_route_id in nm_elements_all.ne_id%type
-    ,p_route_type in nm_members_all.nm_obj_type%type
+    ,p_group_type in nm_members_all.nm_obj_type%type
     ,p_all_routes in boolean
     ,p_ignore_poe in boolean
     ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
@@ -106,6 +106,11 @@ create or replace package nm3bulk_mrg as
   );
   procedure load_extent_datums(
      p_nse_id in nm_saved_extents.nse_id%type
+  );
+  
+  procedure process_datums_group_type(
+     p_group_type_in  in nm_group_types_all.ngt_group_type%type
+    ,p_group_type_out out nm_group_types_all.ngt_group_type%type
   );
   
 
