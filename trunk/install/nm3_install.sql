@@ -1,4 +1,4 @@
-define sccsid = '$Revision:   2.1  $'
+define sccsid = '$Revision:   2.2  $'
 
 set echo off
 set linesize 120
@@ -426,11 +426,11 @@ SET TERM ON
 Prompt Setting The Version Number...
 SET TERM OFF
 BEGIN
-      hig2.upgrade('HIG','nm3_install.sql','Installed','4.0');
-      hig2.upgrade('NET','nm3_install.sql','Installed','4.0');
-      hig2.upgrade('DOC','nm3_install.sql','Installed','4.0');
-      hig2.upgrade('AST','nm3_install.sql','Installed','4.0');
-      hig2.upgrade('WMP','nm3_install.sql','Installed','4.0');
+      hig2.upgrade('HIG','nm3_install.sql','Installed','4.0.2.0');
+      hig2.upgrade('NET','nm3_install.sql','Installed','4.0.2.0');
+      hig2.upgrade('DOC','nm3_install.sql','Installed','4.0.2.0');
+      hig2.upgrade('AST','nm3_install.sql','Installed','4.0.2.0');
+      hig2.upgrade('WMP','nm3_install.sql','Installed','4.0.2.0');
 END;
 /
 COMMIT;
