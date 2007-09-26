@@ -2,13 +2,15 @@
 -----------------------------------------------------------------------------
 
 CREATE OR REPLACE PACKAGE BODY hig2 IS
---   SCCS Identifiers :-
+-----------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)hig2.pkb	1.4 02/22/06
---       Module Name      : hig2.pkb
---       Date into SCCS   : 06/02/22 14:14:58
---       Date fetched Out : 07/06/13 14:10:27
---       SCCS Version     : 1.4
+--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/hig2.pkb-arc   2.1   Sep 26 2007 15:18:08   sscanlon  $
+--       Module Name                : $Workfile:   hig2.pkb  $
+--       Date into PVCS             : $Date:   Sep 26 2007 15:18:08  $
+--       Date fetched Out           : $Modtime:   Sep 26 2007 14:12:24  $
+--       PVCS Version               : $Revision:   2.1  $
+--       Based on SCCS version      : 1.4
 --
 --
 --   Author :
@@ -18,9 +20,9 @@ CREATE OR REPLACE PACKAGE BODY hig2 IS
 -- Procedures which are executed sporadically should be held in hig2.pck.
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--    Copyright (c) exor corporation ltd, 2007 
 -----------------------------------------------------------------------------
-   g_body_sccsid     CONSTANT  VARCHAR2(80) := '"@(#)hig2.pkb	1.4 02/22/06"';
+   g_body_sccsid     CONSTANT  VARCHAR2(80) := '"@(#)hig2.pkb    1.4 02/22/06"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
 -----------------------------------------------------------------------------
@@ -40,7 +42,6 @@ END get_body_version;
 -----------------------------------------------------------------------------
 -- Procedure to keep a log of all installations, upgrades and patches
 -- applied to each product on the system.
-
 PROCEDURE upgrade
 (p_product         IN  hig_upgrades.hup_product%TYPE,
  p_upgrade_script  IN  hig_upgrades.upgrade_script%TYPE,
@@ -68,20 +69,20 @@ IF c1%FOUND THEN
 
    INSERT INTO hig_upgrades
        (hup_product,
-	date_upgraded,
-	from_version,
-	to_version,
-	upgrade_script,
-	executed_by,
-	remarks)
+    date_upgraded,
+    from_version,
+    to_version,
+    upgrade_script,
+    executed_by,
+    remarks)
    VALUES
        (p_product,
-	SYSDATE,
-	l_version,
-	NVL(p_to_version,'Unchanged'),
-	p_upgrade_script,
-	USER,
-	p_remarks);
+    SYSDATE,
+    l_version,
+    NVL(p_to_version,'Unchanged'),
+    p_upgrade_script,
+    USER,
+    p_remarks);
    COMMIT;
 ELSE
    dbms_output.put_line('Error updating the version - product record not found');
@@ -92,7 +93,8 @@ CLOSE c1;
 END upgrade;
 --
 -----------------------------------------------------------------------------
---
+-- This procedure checks to see if the upgrade should be allowed to continue 
+-- based on the current version of the product
 PROCEDURE pre_upgrade_check (p_product               hig_products.hpr_product%TYPE
                             ,p_new_version           hig_products.hpr_version%TYPE
                             ,p_allowed_old_version_1 hig_products.hpr_version%TYPE
@@ -144,6 +146,34 @@ BEGIN
    END IF;
 --
 END pre_upgrade_check;
+--
+-----------------------------------------------------------------------------
+-- This procedure checks to see if the install should be allowed to continue 
+-- if this product has dependencies on another product.
+-- All products should depend on NM3 / Core.
+PROCEDURE product_exists_at_version (p_product                   hig_products.hpr_product%TYPE
+                                    ,p_version                   hig_products.hpr_version%TYPE
+                                    ) IS
+   l_rec_hpr    hig_products%ROWTYPE;
+   l_found      BOOLEAN := FALSE;
+
+BEGIN
+--
+  -- get row from hig products for product you are checking 
+  l_rec_hpr := nm3get.get_hpr(pi_hpr_product => p_product
+                             ,pi_raise_not_found => TRUE);
+
+  -- return true if product found at required version is licensed, else default value remains                                
+  IF p_version = l_rec_hpr.hpr_version AND l_rec_hpr.hpr_key IS NOT NULL THEN
+    l_found := TRUE;
+  END IF;       
+  
+  -- stop the installation if product was not found at required version 
+  IF NOT l_found THEN
+      RAISE_APPLICATION_ERROR(-20000,'Installation terminated: "'||p_product||'" version '||p_version||' must be installed and licensed');
+  END IF;    
+--
+END product_exists_at_version;
 --
 -----------------------------------------------------------------------------
 --
