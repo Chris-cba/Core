@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.12   Sep 24 2007 15:27:00   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.13   Sep 26 2007 10:50:36   jwadsworth  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Sep 24 2007 15:27:00  $
---       Date fetched Out : $Modtime:   Sep 24 2007 14:55:18  $
---       Version          : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Sep 26 2007 10:50:36  $
+--       Date fetched Out : $Modtime:   Sep 26 2007 10:48:16  $
+--       Version          : $Revision:   2.13  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-24-SEP-2007 14:55
+26-SEP-2007 10:48
 
 TABLES PROCESSED
 ================
@@ -31040,6 +31040,28 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
+        'WEBCONFIG'
+       ,'HIG'
+       ,'Config Value'
+       ,'Config Value'
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'WEBCONFIG');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
         'DEFVISNTH'
        ,'HIG'
        ,'Default Visible Theme Flag'
@@ -34523,6 +34545,16 @@ SELECT
        ,'C:\' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
                    WHERE HOV_ID = 'UTLFILEDIR');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'WEBCONFIG'
+       ,'4010_systemtest' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'WEBCONFIG');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
