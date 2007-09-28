@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE doc AS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc.pkh-arc   2.1   Sep 07 2007 11:19:46   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc.pkh-arc   2.2   Sep 28 2007 16:10:34   dyounger  $
 --       Module Name      : $Workfile:   doc.pkh  $
---       Date into SCCS   : $Date:   Sep 07 2007 11:19:46  $
---       Date fetched Out : $Modtime:   Sep 07 2007 09:37:54  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Sep 28 2007 16:10:34  $
+--       Date fetched Out : $Modtime:   Sep 28 2007 15:13:06  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on SCCS Version     : 1.7
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE doc AS
 --</PACKAGE>
   /* SCCS ID keyword, do not remove */
 --<GLOBVAR>
-  g_sccsid	CONSTANT	VARCHAR2(2000) := '"$Revision:   2.1  $"'; --'"@(#)doc.pck	1.8 01/10/00"';
+  g_sccsid	CONSTANT	VARCHAR2(2000) := '"$Revision:   2.2  $"'; --'"@(#)doc.pck	1.8 01/10/00"';
 
   TYPE     t_dgt_tab     IS TABLE OF doc_gateways%ROWTYPE INDEX BY binary_integer;
   TYPE     t_docs_tab    IS TABLE OF docs%ROWTYPE INDEX BY binary_integer;
@@ -154,7 +154,7 @@ FUNCTION das_against_network (pi_das_table_name IN doc_assocs.das_table_name%TYP
 --
 --<PROC NAME="get_address_xy">
 -- This procedure returns XY coords for a given postcode/building number
-  PROCEDURE get_address_xy 
+  PROCEDURE get_address_xy
               ( pi_postcode     IN  hig_address.had_postcode%TYPE
               , pi_building_no  IN  hig_address.had_building_no%TYPE
               , po_x            OUT NUMBER
@@ -163,13 +163,36 @@ FUNCTION das_against_network (pi_das_table_name IN doc_assocs.das_table_name%TYP
 --
 -----------------------------------------------------------------------------
 --
+--<PROC NAME="get_address_xy">
+-- This procedure returns XY coords for a given postcode/building name
+  PROCEDURE get_address_xy
+              ( pi_postcode      IN  hig_address.had_postcode%TYPE
+              , pi_building_name IN  hig_address.had_building_name%TYPE
+              , po_x             OUT NUMBER
+              , po_y             OUT NUMBER );
+----</PROC>
+--
+-----------------------------------------------------------------------------
+--
 --<PROC NAME="set_address_xy_gdo">
 -- This procedure inserts gdo for a given postcode/building no. using the proc
 -- get_address_xy
-  PROCEDURE set_address_xy_gdo 
+  PROCEDURE set_address_xy_gdo
               ( pi_doc_id          IN  docs.doc_id%TYPE
               , pi_postcode        IN  hig_address.had_postcode%TYPE
               , pi_building_no     IN  hig_address.had_building_no%TYPE
+              , po_gis_session_id OUT gis_data_objects.gdo_session_id%TYPE);
+----</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_address_xy_gdo">
+-- This procedure inserts gdo for a given postcode/building name. using the proc
+-- get_address_xy
+  PROCEDURE set_address_xy_gdo
+              ( pi_doc_id          IN  docs.doc_id%TYPE
+              , pi_postcode        IN  hig_address.had_postcode%TYPE
+              , pi_building_name   IN  hig_address.had_building_name%TYPE
               , po_gis_session_id OUT gis_data_objects.gdo_session_id%TYPE);
 ----</PROC>
 --
@@ -186,7 +209,7 @@ FUNCTION das_against_network (pi_das_table_name IN doc_assocs.das_table_name%TYP
 --
 --<PROC NAME="update_pem_with_rse_from_gdo">
   PROCEDURE update_pem_with_rse_from_gdo
-              ( pi_session_id      IN gis_data_objects.gdo_session_id%TYPE 
+              ( pi_session_id      IN gis_data_objects.gdo_session_id%TYPE
               , pi_doc_id          IN docs.doc_id%TYPE );
 ----</PROC>
 --
