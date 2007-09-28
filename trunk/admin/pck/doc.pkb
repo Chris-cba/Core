@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY doc AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc.pkb-arc   2.1   Sep 07 2007 11:19:46   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc.pkb-arc   2.2   Sep 28 2007 16:10:20   dyounger  $
 --       Module Name      : $Workfile:   doc.pkb  $
---       Date into SCCS   : $Date:   Sep 07 2007 11:19:46  $
---       Date fetched Out : $Modtime:   Sep 07 2007 09:38:08  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Sep 28 2007 16:10:20  $
+--       Date fetched Out : $Modtime:   Sep 21 2007 12:24:58  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on SCCS Version     : 1.12
 --
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY doc AS
 -----------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
    g_package_name    CONSTANT varchar2(30) := 'doc';
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -878,6 +878,138 @@ END das_against_network;
 --
 -----------------------------------------------------------------------------
 --
+-- This procedure returns XY coords for a given postcode/building name
+
+  PROCEDURE get_address_xy
+              ( pi_postcode       IN  hig_address.had_postcode%TYPE
+              , pi_building_name  IN  hig_address.had_building_name%TYPE
+              , po_x             OUT NUMBER
+              , po_y             OUT NUMBER )
+  IS
+  --
+
+  -- Cannot guarantee uniquness - bring back the first row we find.
+    CURSOR get_xy_from_hdp
+      ( cp_postcode       IN  hig_address_point.hdp_postcode%TYPE
+      , cp_building_name  IN  hig_address_point.hdp_building_name%TYPE )
+      IS
+      SELECT hdp_xco, hdp_yco
+        FROM hig_address_point
+       WHERE hdp_postcode    = cp_postcode
+         AND hdp_building_name = cp_building_name
+         AND hdp_xco IS NOT NULL
+         AND hdp_yco IS NOT NULL
+         AND ROWNUM = 1;
+  -- Cannot guarantee uniquness - bring back the first row we find.
+    CURSOR get_xy_from_had
+      ( cp_postcode       IN  hig_address.had_postcode%TYPE
+      , cp_building_name  IN  hig_address.had_building_name%TYPE )
+      IS
+      SELECT had_xco, had_yco
+        FROM hig_address
+       WHERE had_postcode    = cp_postcode
+         AND had_building_name = cp_building_name
+         AND had_xco IS NOT NULL
+         AND had_yco IS NOT NULL
+         AND ROWNUM = 1;
+  --
+    l_x                        NUMBER;
+    l_y                        NUMBER;
+    e_no_coords                EXCEPTION;
+  --
+  BEGIN
+    ----------------------------------------
+    -- Get XYs from HIG_ADDRESS_POINT first
+    ----------------------------------------
+    OPEN  get_xy_from_hdp ( pi_postcode, pi_building_name );
+    FETCH get_xy_from_hdp INTO l_x, l_y;
+    CLOSE get_xy_from_hdp;
+
+    --
+    IF l_x IS NULL
+    OR l_y IS NULL
+    THEN
+
+    ---------------------------------------------------------------
+    -- Get XYs from HIG_ADDRESS if not exists in HIG_ADDRESS_POINT
+    ---------------------------------------------------------------
+
+    /*
+      Please note, the code here is used to try and make sense of the dodgy
+      coordinates that seem to be on Hig_Address/_Point tables
+      If it's wrong, it's wrong.. the data I had to work with at the time
+      determined this logic.
+
+      Coords are assumed to be a length of 6 digits (not including DPs).
+    */
+      OPEN  get_xy_from_had ( pi_postcode, pi_building_name );
+      FETCH get_xy_from_had INTO l_x, l_y;
+      CLOSE get_xy_from_had;
+    --
+      IF  l_x IS NOT NULL
+      AND l_y IS NOT NULL THEN
+      --
+      -- If X coord is more than 6 length, then divide by factor of 10
+        IF length(round(l_x)) > 6 THEN
+          --
+          FOR i IN 6..(length(round(l_x))-1) LOOP
+            l_x := l_x/10;
+          END LOOP;
+
+      -- If X coord is less than 6 length, then multiply by factor of 10
+        ELSIF length(round(l_x)) < 6 THEN
+          --
+          FOR i IN (length(round(l_x))+1)..6 LOOP
+           l_x := l_x*10;
+          END LOOP;
+          --
+        END IF;
+      --
+        po_x := l_x;
+      --
+      -- If Y coord is more than 6 length, then multiply by factor of 10
+        IF length(round(l_y)) > 6 THEN
+          --
+          FOR i IN 6..(length(round(l_y))-1) LOOP
+            l_y := l_y/10;
+          END LOOP;
+          --
+      -- If Y coord is less than 6 length, then divide by factor of 10
+        ELSIF length(round(l_y)) < 6
+          THEN
+          --
+          FOR i IN (length(round(l_y))+1)..6 LOOP
+           l_y := l_y*10;
+          END LOOP;
+          --
+        END IF;
+      --
+        po_y := l_y;
+      --
+      ELSE
+        po_x := NULL;
+        po_y := NULL;
+      --
+      END IF;
+    --
+    ELSE
+    --
+      po_x := l_x;
+      po_y := l_y;
+    --
+    END IF;
+  --
+  EXCEPTION
+    WHEN e_no_coords
+    THEN
+      RAISE_APPLICATION_ERROR(-20501,'No coordinates exist for '||pi_postcode||' Name - '||pi_building_name);
+    WHEN OTHERS
+    THEN
+      RAISE;
+  END get_address_xy;
+--
+-----------------------------------------------------------------------------
+--
 -- This procedure inserts gdo for a given postcode/building no. using the proc
 -- get_address_xy
   PROCEDURE set_address_xy_gdo
@@ -895,6 +1027,58 @@ END das_against_network;
                    , pi_building_no  => pi_building_no
                    , po_x            => l_x
                    , po_y            => l_y
+                   );
+  --
+    IF l_x IS NOT NULL
+    AND l_y IS NOT NULL
+    THEN
+    --
+      l_sess := higgis.get_session_id;
+    --
+    -- Set gdo_string to DOC_ID PK value so that Locator knows we are doing this particular bit
+    -- of processing - i.e. it knows what to return to GDO.
+
+      INSERT INTO gis_data_objects
+        (gdo_session_id, gdo_pk_id, gdo_rse_he_id, gdo_st_chain, gdo_end_chain, gdo_x_val,gdo_y_val
+        ,gdo_theme_name, gdo_feature_id, gdo_xsp, gdo_offset, gdo_seq_no, gdo_dynamic_theme ,gdo_string)
+      VALUES
+        (l_sess,nvl(hig.get_user_or_sys_opt ('SDOPTZOOM'),150),NULL,NULL,NULL,l_x,l_y
+        ,NULL,NULL,NULL,NULL,NULL,'N',pi_doc_id);
+    --
+    ELSE
+    -- NO XYs so zoom to initial extent;
+      reset_map (l_sess);
+    --
+      UPDATE gis_data_objects
+         SET gdo_string = pi_doc_id
+       WHERE gdo_session_id = l_sess;
+    --
+    END IF;
+  --
+    po_gis_session_id  :=  l_sess;
+  --
+  END set_address_xy_gdo;
+--
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+--
+-- This procedure inserts gdo for a given postcode/building name. using the proc
+-- get_address_xy
+  PROCEDURE set_address_xy_gdo
+              ( pi_doc_id          IN  docs.doc_id%TYPE
+              , pi_postcode        IN  hig_address.had_postcode%TYPE
+              , pi_building_name   IN  hig_address.had_building_name%TYPE
+              , po_gis_session_id OUT gis_data_objects.gdo_session_id%TYPE)
+  IS
+    l_x    NUMBER;
+    l_y    NUMBER;
+    l_sess NUMBER;
+  BEGIN
+  --
+    get_address_xy ( pi_postcode       => pi_postcode
+                   , pi_building_name  => pi_building_name
+                   , po_x              => l_x
+                   , po_y              => l_y
                    );
   --
     IF l_x IS NOT NULL
