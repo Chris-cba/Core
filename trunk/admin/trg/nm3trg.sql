@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.1   Jul 18 2007 15:30:20   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.2   Oct 02 2007 10:10:26   aedwards  $
 --       Module Name      : $Workfile:   nm3trg.sql  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:30:20  $
---       Date fetched Out : $Modtime:   Jul 18 2007 14:10:20  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Oct 02 2007 10:10:26  $
+--       Date fetched Out : $Modtime:   Oct 02 2007 09:17:56  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --   Author : Graeme Johnson
@@ -1412,6 +1412,17 @@ PROMPT nm_themes_all_as_trg.trg
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_themes_all_as_trg.trg' run_file
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm_themes_all_ai_trg.trg 
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_themes_all_ai_trg.trg' run_file
 FROM dual 
 / 
 start '&run_file' 
