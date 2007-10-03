@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.1   Sep 24 2007 08:50:44   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.2   Oct 03 2007 10:08:08   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Sep 24 2007 08:50:44  $
---       Date fetched Out : $Modtime:   Sep 21 2007 14:50:18  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Oct 03 2007 10:08:08  $
+--       Date fetched Out : $Modtime:   Oct 03 2007 10:06:44  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on sccs version : 
 --
 --
@@ -30,9 +30,10 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                 => =< are now logically used instead of ><
   23.07.07  PT fixed a bug in the above change - missing brackets with OR
   21.09.07  PT implemented the std_run() without the p_group_type specified: assemble by datum homo chunks;
-                added process_datums_group_type()
+                added process_datums_group_type()         
+  03.10.07  PT in ins_splits() fixed the FT nm_obj_type problem
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.1  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.2  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -288,13 +289,13 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
               
             end if;
           
-          end loop;
+          end loop;   -- second attributes loop
         
-        end if;
+        end if;  -- foreign table
         
-      end if;
+      end if; -- first usage of the attribute
       
-    end loop;
+    end loop; -- first attributes loop
     
     
     -- build the effective date where sql
@@ -354,7 +355,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         l_sql_ft := l_sql_ft
               ||l_union_all
           ||cr||'select'||l_sql_cardinality
-          ||cr||'    '||a1||'.nm_obj_type, '||a1||'.nm_ne_id_in, '||a1||'.nm_ne_id_of, '||a1||'.nm_begin_mp, '||a1||'.nm_end_mp'
+          ||cr||'    '''||t_ft(i).inv_type||''' nm_obj_type, '||a1||'.nm_ne_id_in, '||a1||'.nm_ne_id_of, '||a1||'.nm_begin_mp, '||a1||'.nm_end_mp'
+          --||cr||'    '||a1||'.nm_obj_type, '||a1||'.nm_ne_id_in, '||a1||'.nm_ne_id_of, '||a1||'.nm_begin_mp, '||a1||'.nm_end_mp'
           ||cr||'  , '||a1||'.nm_date_modified, '||a1||'.nm_type, null iit_rowid, cast(null as date) iit_date_modified'
           ||cr||'from'
           ||cr||'   nm_members_all '||a1
@@ -1763,11 +1765,20 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   is
     cur sys_refcursor;
   begin
+    nm3dbg.putln(g_package_name||'.load_group_datums('
+      ||'p_group_id='||p_group_id
+      ||')');
     open cur for
       select distinct nm_ne_id_of
       from nm_members
       where nm_ne_id_in = p_group_id;
     nm3sql.load_id_tbl(cur);
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_group_datums('
+        ||'p_group_id='||p_group_id
+        ||')');
+      raise;
   end;
   
   
@@ -1777,11 +1788,20 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   is
     cur sys_refcursor;
   begin
+    nm3dbg.putln(g_package_name||'.p_group_type('
+      ||'p_group_type='||p_group_type
+      ||')');
     open cur for
       select distinct nm_ne_id_of
       from nm_members
       where nm_obj_type = p_group_type;
     nm3sql.load_id_tbl(cur);
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.p_group_type('
+        ||'p_group_type='||p_group_type
+        ||')');
+      raise;
   end;
   
   
@@ -1791,11 +1811,20 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   is
     cur sys_refcursor;
   begin
+    nm3dbg.putln(g_package_name||'.load_extent_datums('
+      ||'p_nse_id='||p_nse_id
+      ||')');
     open cur for
       select distinct d.nsd_ne_id
       from nm_saved_extent_member_datums d
       where d.nsd_nse_id = p_nse_id;
     nm3sql.load_id_tbl(cur);
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_extent_datums('
+        ||'p_nse_id='||p_nse_id
+        ||')');
+      raise;
   end;  
   
   
@@ -1908,8 +1937,9 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   
   
   -- this assignes the group type based on the group types of the loaded criteria datums
-  --  if the p_group_type_in is found and fully covered the this is returned
-  --  if any other type is the only group type covering the datums fully then this is returned
+  --  if the p_group_type_in is found and fully covered the this is returned, null otherwise
+  --  if p_group_type_in is not given then the first type covering all datums 
+  --    with lowest number of roads is returned
   --  p_group_type_out is null in any other cases
   procedure process_datums_group_type(
      p_group_type_in  in nm_group_types_all.ngt_group_type%type
@@ -1918,56 +1948,54 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   is
     l_count       integer := nm3sql.get_id_tbl_count;
     l_cardinality integer := nm3sql.get_rounded_cardinality(l_count);
+    l_sql_q_where varchar2(100);
 
-    type  group_type_tbl  is table of nm_group_types_all.ngt_group_type%type index by binary_integer;
-    type  count_tbl       is table of integer index by binary_integer;
-    t_group_types group_type_tbl;
-    t_counts      count_tbl;
-    
   begin
+    nm3dbg.putln(g_package_name||'.process_datums_group_type('
+      ||'p_group_type_in='||p_group_type_in
+      ||')');
+    nm3dbg.ind;
+    
+    if p_group_type_in is not null then
+      l_sql_q_where := 'where q.nm_obj_type = '''||p_group_type_in||'''';
+      
+    else
+      l_sql_q_where := 'where rownum = 1';
+      
+    end if;
+      
+
     execute immediate
-            'select /*+ cardinality(x '||l_cardinality||') */'
-      ||cr||'   nm_obj_type'
-      ||cr||'  ,count(*) cnt'
+            'select q.nm_obj_type'
+      ||cr||'from ('
+      ||cr||'select /*+ cardinality(x '||l_cardinality||') */'
+      ||cr||'   m.nm_obj_type'
+      ||cr||'  ,count(*) element_count'
+      ||cr||'  ,count(distinct nm_ne_id_in) road_count'
       ||cr||'from'
       ||cr||'   table(cast(nm3sql.get_id_tbl as nm_id_tbl)) x'
-      ||cr||'  ,nm_members m'
-      ||cr||'  ,nm_group_types gt'
+      ||cr||'  ,nm_members_all m'
+      ||cr||'  ,(select ngt_group_type from nm_group_types' 
+      ||cr||'		where ngt_linear_flag = ''Y'' and ngt_exclusive_flag = ''Y'') gt' 
       ||cr||'where x.column_value = m.nm_ne_id_of'
       ||cr||'  and m.nm_obj_type = gt.ngt_group_type'
       ||cr||'  and m.nm_type = ''G'''
-      ||cr||'  and gt.ngt_linear_flag = ''Y'''
-      ||cr||'  and gt.ngt_exclusive_flag = ''Y'''
-      ||cr||'group by nm_obj_type'
-      ||cr||'having count(*) = :p_count'
-      ||cr||'order by decode(nm_obj_type, :p_group_type, 1, 2)'
-    bulk collect into
-       t_group_types
-      ,t_counts
-    using
-       l_count
-      ,p_group_type_in;
+      ||cr||'group by'
+      ||cr||'   m.nm_obj_type'
+      ||cr||'having count(*) = :l_sqlcount'
+      ||cr||'order by 2 desc, 3 asc'
+      ||cr||') q'
+      ||cr||l_sql_q_where
+    into p_group_type_out
+    using l_count;
       
-    
-    -- if p_group_type_in is found then return this in any case
-    --  return any other group type only if it is they only one found
-    for i in 1 .. t_group_types.count loop
-      if i = 1 then
-        p_group_type_out := p_group_type_in;
-        
-      elsif p_group_type_out != p_group_type_in then
-        p_group_type_out := null;
 
-      end if;
-    
-    end loop;
-    
-    nm3dbg.putln(g_package_name||'.process_group_type('
-      ||'p_group_type_in='||p_group_type_in
-      ||', p_group_type_out='||p_group_type_out
-      ||')');
-    
+    nm3dbg.putln('p_group_type_out='||p_group_type_out);
+    nm3dbg.deind;
   exception
+    when no_data_found then
+      nm3dbg.putln('no_data_found');
+      nm3dbg.deind;
     when others then
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.process_group_type('
         ||'p_group_type_in='||p_group_type_in
