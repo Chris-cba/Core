@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : %W% %G%
---       Module Name      : %M%
---       Date into SCCS   : %E% %U%
---       Date fetched Out : %D% %T%
---       SCCS Version     : %I%
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkb-arc   2.4   Oct 04 2007 14:26:02   jwadsworth  $
+--       Module Name      : $Workfile:   nm3get.pkb  $
+--       Date into PVCS   : $Date:   Oct 04 2007 14:26:02  $
+--       Date fetched Out : $Modtime:   Oct 04 2007 14:04:00  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "@(#)nm3get_gen.pkb	1.50 02/01/06"
+--   nm3get_gen body   : "$Revision:   2.4  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"%W% %G%"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3get';
@@ -4889,17 +4889,15 @@ END get_ne_all;
 --
 --   Function to get using NEH_PK constraint
 --
-FUNCTION get_neh (pi_neh_ne_id_old     nm_element_history.neh_ne_id_old%TYPE
-                 ,pi_neh_ne_id_new     nm_element_history.neh_ne_id_new%TYPE
+FUNCTION get_neh (pi_neh_id            nm_element_history.neh_id%TYPE
                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                  ) RETURN nm_element_history%ROWTYPE IS
 --
    CURSOR cs_neh IS
-   SELECT /*+ INDEX (neh NEH_IND_NEW) */ *
+   SELECT /*+ INDEX (neh NEH_PK) */ *
     FROM  nm_element_history neh
-   WHERE  neh.neh_ne_id_old = pi_neh_ne_id_old
-    AND   neh.neh_ne_id_new = pi_neh_ne_id_new;
+   WHERE  neh.neh_id = pi_neh_id;
 --
    l_found  BOOLEAN;
    l_retval nm_element_history%ROWTYPE;
@@ -4919,8 +4917,7 @@ BEGIN
                     ,pi_id                 => 67
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'nm_element_history (NEH_PK)'
-                                              ||CHR(10)||'neh_ne_id_old => '||pi_neh_ne_id_old
-                                              ||CHR(10)||'neh_ne_id_new => '||pi_neh_ne_id_new
+                                              ||CHR(10)||'neh_id => '||pi_neh_id
                     );
    END IF;
 --

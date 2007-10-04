@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : %W% %G%
---       Module Name      : %M%
---       Date into SCCS   : %E% %U%
---       Date fetched Out : %D% %T%
---       SCCS Version     : %I%
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.4   Oct 04 2007 14:26:02   jwadsworth  $
+--       Module Name      : $Workfile:   nm3ins.pkb  $
+--       Date into PVCS   : $Date:   Oct 04 2007 14:26:02  $
+--       Date fetched Out : $Modtime:   Oct 04 2007 14:04:02  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "@(#)nm3get_gen.pkb	1.50 02/01/06"
+--   nm3get_gen body   : "$Revision:   2.4  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"%W% %G%"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
@@ -111,6 +111,8 @@ BEGIN
             ,doc_compl_insurance_claim
             ,doc_compl_summons_received
             ,doc_compl_user_type
+            ,doc_date_time_arrived
+            ,doc_reason_for_later_arrival
             )
      VALUES (p_rec_doc.doc_id
             ,p_rec_doc.doc_title
@@ -171,6 +173,8 @@ BEGIN
             ,p_rec_doc.doc_compl_insurance_claim
             ,p_rec_doc.doc_compl_summons_received
             ,p_rec_doc.doc_compl_user_type
+            ,p_rec_doc.doc_date_time_arrived
+            ,p_rec_doc.doc_reason_for_later_arrival
             )
    RETURNING doc_id
             ,doc_title
@@ -231,6 +235,8 @@ BEGIN
             ,doc_compl_insurance_claim
             ,doc_compl_summons_received
             ,doc_compl_user_type
+            ,doc_date_time_arrived
+            ,doc_reason_for_later_arrival
       INTO   p_rec_doc.doc_id
             ,p_rec_doc.doc_title
             ,p_rec_doc.doc_dcl_code
@@ -289,7 +295,9 @@ BEGIN
             ,p_rec_doc.doc_compl_follow_up3
             ,p_rec_doc.doc_compl_insurance_claim
             ,p_rec_doc.doc_compl_summons_received
-            ,p_rec_doc.doc_compl_user_type;
+            ,p_rec_doc.doc_compl_user_type
+            ,p_rec_doc.doc_date_time_arrived
+            ,p_rec_doc.doc_reason_for_later_arrival;
 --
    nm_debug.proc_end(g_package_name,'ins_doc');
 --
@@ -5557,34 +5565,56 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'ins_neh');
 --
+   p_rec_neh.neh_actioned_date              := NVL(p_rec_neh.neh_actioned_date,TRUNC(SYSDATE) );
+   p_rec_neh.neh_actioned_by                := NVL(p_rec_neh.neh_actioned_by,USER );
 --
    INSERT INTO nm_element_history
-            (neh_ne_id_old
+            (neh_id
+            ,neh_ne_id_old
             ,neh_ne_id_new
             ,neh_operation
             ,neh_effective_date
             ,neh_actioned_date
             ,neh_actioned_by
+            ,neh_old_ne_length
+            ,neh_new_ne_length
+            ,neh_param_1
+            ,neh_param_2
             )
-     VALUES (p_rec_neh.neh_ne_id_old
+     VALUES (p_rec_neh.neh_id
+            ,p_rec_neh.neh_ne_id_old
             ,p_rec_neh.neh_ne_id_new
             ,p_rec_neh.neh_operation
             ,p_rec_neh.neh_effective_date
             ,p_rec_neh.neh_actioned_date
             ,p_rec_neh.neh_actioned_by
+            ,p_rec_neh.neh_old_ne_length
+            ,p_rec_neh.neh_new_ne_length
+            ,p_rec_neh.neh_param_1
+            ,p_rec_neh.neh_param_2
             )
-   RETURNING neh_ne_id_old
+   RETURNING neh_id
+            ,neh_ne_id_old
             ,neh_ne_id_new
             ,neh_operation
             ,neh_effective_date
             ,neh_actioned_date
             ,neh_actioned_by
-      INTO   p_rec_neh.neh_ne_id_old
+            ,neh_old_ne_length
+            ,neh_new_ne_length
+            ,neh_param_1
+            ,neh_param_2
+      INTO   p_rec_neh.neh_id
+            ,p_rec_neh.neh_ne_id_old
             ,p_rec_neh.neh_ne_id_new
             ,p_rec_neh.neh_operation
             ,p_rec_neh.neh_effective_date
             ,p_rec_neh.neh_actioned_date
-            ,p_rec_neh.neh_actioned_by;
+            ,p_rec_neh.neh_actioned_by
+            ,p_rec_neh.neh_old_ne_length
+            ,p_rec_neh.neh_new_ne_length
+            ,p_rec_neh.neh_param_1
+            ,p_rec_neh.neh_param_2;
 --
    nm_debug.proc_end(g_package_name,'ins_neh');
 --
