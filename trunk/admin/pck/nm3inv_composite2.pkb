@@ -2,13 +2,12 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.2   Sep 24 2007 08:56:14   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.3   Oct 04 2007 16:55:12   ptanava  $
 --       Module Name      : $Workfile:   nm3inv_composite2.pkb  $
---       Date into PVCS   : $Date:   Sep 24 2007 08:56:14  $
---       Date fetched Out : $Modtime:   Sep 21 2007 13:58:58  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Oct 04 2007 16:55:12  $
+--       Date fetched Out : $Modtime:   Oct 04 2007 16:41:14  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on sccs version :
---       Temp version     : 2.0.2
 --
 --   Author : Priidu Tanava
 --
@@ -23,9 +22,10 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
   21.09.07 PT in do_rebuild() added the eng_dynseg bulk processing (total number of steps now 7)
                 copied get_nmu_id_for_hig_owner() from nm3inv_composite.pkb.
                 this package makes no reference to the old code now.
+  04.10.07 PT accommodated nm3bulk_mrg changes in handling datum criteria 
 */
 
-  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.2  $"';
+  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.3  $"';
   g_package_name  constant  varchar2(30) := 'nm3inv_composite2';
 
   -- Bulk merge types
@@ -56,10 +56,6 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
      p_inv_type in nm_inv_types_all.nit_inv_type%type
   );
   
-  procedure load_gaz_criteria(
-     pt_ne in nm_id_tbl
-    ,pt_nse in nm_id_tbl
-  );
   
   function get_nmu_id_for_hig_owner
   return nm_mail_users.nmu_id%type;
@@ -606,78 +602,102 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     r_longops.op_name     := 'Derived asset rebuild';
     r_longops.context     := p_op_context;
     r_longops.sofar       := 0;
-    r_longops.totalwork   := 7;
+    r_longops.totalwork   := 8;
     r_longops.target_desc  := p_inv_type;
     nm3sql.set_longops(p_rec => r_longops, p_increment => 0);
     
     
 
-    
 
     -- 1. Populate the network criteria
+    
     -- 1.1 We have datums/routes/extents selected via Gazetteer
     if pt_ne.count > 0 or pt_nse.count > 0 then
-      load_gaz_criteria(
-         pt_ne => pt_ne
-        ,pt_nse => pt_nse   
+    
+      nm3bulk_mrg.load_gaz_list_datums(
+         p_group_type => p_ngt_group_type
+        ,pt_ne        => pt_ne
+        ,pt_nse       => pt_nse
+        ,p_sqlcount   => l_sqlcount
       );
+  
+--       load_gaz_criteria(
+--          pt_ne => pt_ne
+--         ,pt_nse => pt_nse   
+--       );
       -- make sure we have a coherent driving group type
       --  this will be null if the p_ngt_group_type is not fully covered by the criteria datums
       --    and no other single group type fully covers the criteria datums
-      nm3bulk_mrg.process_datums_group_type(
-         p_group_type_in  => p_ngt_group_type
-        ,p_group_type_out => l_group_type
-      );
+--       nm3bulk_mrg.process_datums_group_type(
+--          p_group_type_in  => p_ngt_group_type
+--         ,p_group_type_out => l_group_type
+--       );
       
       -- assign the route_id if only one route selected.
       --  this keeps the route connectivity small.
       -- TODO: the route connectivity should also use an id_tbl instead of one single id
       --  at the moment the next level is straight all routes of one group type
-      if pt_ne.count = 1 then
-        l_route_id := pt_ne(1);
-      end if;
+--       if pt_ne.count = 1 then
+--         l_route_id := pt_ne(1);
+--       end if;
       
       
     -- 1.3 we have a group type (linear)
     elsif p_ngt_group_type is not null then
-      nm3bulk_mrg.load_group_type_datums(p_ngt_group_type);
-      l_group_type := p_ngt_group_type;
+--       nm3bulk_mrg.load_group_type_datums(p_ngt_group_type);
+--       l_group_type := p_ngt_group_type;
+      
+      nm3bulk_mrg.load_group_type_datums(
+         p_group_type => p_ngt_group_type
+        ,p_sqlcount => l_sqlcount
+      );
       
       
     -- 1.4 we have a network type (linear)
     elsif p_nt_type is not null then
       -- the nt_type must be a datum nt_type
-      begin
-        select nt_datum into l_nt_datum
-        from nm_types 
-        where nt_type = p_nt_type
-          and nt_linear = 'Y'
-          and nt_datum = 'Y';
-      exception
-        when no_data_found then
-          raise_application_error(-20001
-            ,'The driving network type must be a linear datum type: '||p_nt_type);
-      end;
+--       begin
+--         select nt_datum into l_nt_datum
+--         from nm_types 
+--         where nt_type = p_nt_type
+--           and nt_linear = 'Y'
+--           and nt_datum = 'Y';
+--       exception
+--         when no_data_found then
+--           raise_application_error(-20001
+--             ,'The driving network type must be a linear datum type: '||p_nt_type);
+--       end;
       
       -- load datums of the given nt_type
-      open cur for
-        select e.ne_id
-        from nm_elements e
-        where e.ne_nt_type = p_nt_type;
-      nm3sql.load_id_tbl(cur);
+      nm3bulk_mrg.load_nt_type_datums(
+         p_group_type => null
+        ,p_nt_type => p_nt_type
+        ,p_sqlcount => l_sqlcount
+      );
+      
+--       open cur for
+--         select e.ne_id
+--         from nm_elements e
+--         where e.ne_nt_type = p_nt_type;
+--       nm3sql.load_id_tbl(cur);
         
         
         
       -- 1.5 no network criteria specified
       else
-        -- load all datums of datum nt_type 
-        open cur for
-          select e.ne_id
-          from nm_elements e
-          where e.ne_nt_type in (select nt_type from nm_types
-                                 where nt_datum = 'Y'
-                                   and nt_linear = 'Y');
-        nm3sql.load_id_tbl(cur);
+        -- load all datums of datum nt_type
+        nm3bulk_mrg.load_all_network_datums(
+           p_group_type => null
+          ,p_sqlcount => l_sqlcount
+        );
+        
+--         open cur for
+--           select e.ne_id
+--           from nm_elements e
+--           where e.ne_nt_type in (select nt_type from nm_types
+--                                  where nt_datum = 'Y'
+--                                    and nt_linear = 'Y');
+--         nm3sql.load_id_tbl(cur);
       
       end if;
     
@@ -685,21 +705,31 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     
     
     nm3sql.set_longops(p_rec => r_longops, p_increment => 1);
-    t_events(t_events.count+1) := 'Loaded criteria datum count: '||nm3sql.get_id_tbl_count;
-    
+--     t_events(t_events.count+1) := 'Loaded criteria datum count: '||nm3sql.get_id_tbl_count;
+    t_events(t_events.count+1) := 'Loaded criteria datum count: '||l_sqlcount;
 
-    -- 2,3,4. Run the bulk merge query
+    -- 2,3,4,5. Run the bulk merge query
     nm3bulk_mrg.std_run(
        p_nmq_id         => p_nmq_id
       ,p_nqr_admin_unit => p_admin_unit_id
       ,p_nmq_descr      => l_nqr_description
-      ,p_route_id       => l_route_id
-      ,p_group_type     => l_group_type
-      ,p_all_routes     => false
       ,p_ignore_poe     => p_ignore_poe
+      ,p_criteria_rowcount => l_sqlcount
       ,p_mrg_job_id     => l_mrg_job_id
       ,p_longops_rec    => r_longops
     );
+    
+--     nm3bulk_mrg.std_run(
+--        p_nmq_id         => p_nmq_id
+--       ,p_nqr_admin_unit => p_admin_unit_id
+--       ,p_nmq_descr      => l_nqr_description
+--       ,p_route_id       => l_route_id
+--       ,p_group_type     => l_group_type
+--       ,p_all_routes     => false
+--       ,p_ignore_poe     => p_ignore_poe
+--       ,p_mrg_job_id     => l_mrg_job_id
+--       ,p_longops_rec    => r_longops
+--     );
     commit;
     t_events(t_events.count+1) := 'Merge job committed with id: '||l_mrg_job_id;
     
@@ -1555,70 +1585,6 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
   end;
   
   
-  
-  -- this loads the nm3sql id table with the criteria datum ids'
-  --  taken from the element/route/extent ids passed in by pt_gaz
-  -- called from do_rebuild()
-  procedure load_gaz_criteria(
-     pt_ne in nm_id_tbl
-    ,pt_nse in nm_id_tbl
-  )
-  is
-    i       binary_integer := pt_ne.first;
-    t_group nm_id_tbl := new nm_id_tbl();
-    t_datum nm_id_tbl := new nm_id_tbl();
-    cur     sys_refcursor;
-  begin
-    nm3dbg.putln(g_package_name||'.load_gaz_criteria('
-      ||'pt_ne.count='||pt_ne.count
-      ||', pt_nse.count='||pt_nse.count
-      ||')');
-      
-    -- divide the datum and group elements into different tables
-    while i is not null loop
-      if nm3net.element_is_a_datum(pt_ne(i)) then
-        t_datum.extend;
-        t_datum(t_datum.last) := pt_ne(i);
-      else
-        t_group.extend;
-        t_group(t_group.last) := pt_ne(i);
-      end if;
-      i := pt_ne.next(i);
-    end loop;
-    
-      
-    -- open the distinct union query over three sources
-    --  1) extents 2) datums 3) groups
-    --  and load the criteria datum ids from this query
-    open cur for
-      select distinct id from (
-        select /*+ cardinality(x 2) */ d.nsd_ne_id id
-        from
-           nm_saved_extent_member_datums d
-          ,table(cast(pt_nse as nm_id_tbl)) x
-        where d.nsd_nse_id = x.column_value
-        union all
-        select column_value id
-        from
-           table(cast(t_datum as nm_id_tbl))
-        union all
-        select /*+ cardinality(x2 2) */ m.nm_ne_id_of id
-        from 
-           nm_members m
-          ,table(cast(t_group as nm_id_tbl)) x2
-        where nm_ne_id_in = x2.column_value
-      );
-    nm3sql.load_id_tbl(cur);
-
-  exception
-    when others then
-      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_gaz_criteria('
-        ||'pt_ne.count='||pt_ne.count
-        ||', pt_nse.count='||pt_nse.count
-        ||')');
-      raise;
-    
-  end;
   
   
   
