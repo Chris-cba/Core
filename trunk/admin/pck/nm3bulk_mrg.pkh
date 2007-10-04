@@ -2,11 +2,11 @@ create or replace package nm3bulk_mrg as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.1   Sep 24 2007 08:49:56   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.2   Oct 04 2007 16:56:36   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkh  $
---       Date into PVCS   : $Date:   Sep 24 2007 08:49:56  $
---       Date fetched Out : $Modtime:   Sep 21 2007 10:34:32  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Oct 04 2007 16:56:36  $
+--       Date fetched Out : $Modtime:   Oct 04 2007 15:28:30  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on sccs version : 
 --
 --   Author : Priidu Tanava
@@ -17,7 +17,7 @@ create or replace package nm3bulk_mrg as
 --   Copyright (c) exor corporation ltd, 2006
 -----------------------------------------------------------------------------
 
-  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.1  $"';
+  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.2  $"';
    
 
   type nm_obj_type_tbl is table of nm_members_all.nm_obj_type%type index by binary_integer;
@@ -56,8 +56,8 @@ create or replace package nm3bulk_mrg as
   procedure ins_splits(
      pt_attr in ita_mapping_tbl
     ,p_effective_date in date
-    ,p_all_routes in boolean
-    ,p_splits_rowcount out integer
+    ,p_criteria_rowcount in integer
+    ,p_rowcount_out out integer
   );
   
   procedure ins_datum_homo_chunks(
@@ -65,7 +65,12 @@ create or replace package nm3bulk_mrg as
     ,pt_itd  in itd_tbl
     ,p_inner_join in boolean
     ,p_splits_rowcount in integer
-    ,p_homo_rowcount out integer
+    ,p_rowcount_out out integer
+  );
+  
+  procedure ins_route_connectivity(
+     p_criteria_rowcount in integer
+    ,p_ignore_poe in boolean
   );
   
   
@@ -74,10 +79,6 @@ create or replace package nm3bulk_mrg as
     ,pt_attr in ita_mapping_tbl
     ,p_admin_unit_id in nm_admin_units_all.nau_admin_unit%type
     ,p_splits_rowcount in integer
-    ,p_homo_rowcount in integer
-    ,p_route_id in nm_elements_all.ne_id%type
-    ,p_group_type in nm_members_all.nm_obj_type%type
-    ,p_all_routes in boolean
     ,p_ignore_poe in boolean
     ,p_description in varchar2
     ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
@@ -88,10 +89,8 @@ create or replace package nm3bulk_mrg as
      p_nmq_id in nm_mrg_query_all.nmq_id%type
     ,p_nqr_admin_unit in nm_mrg_query_results_all.nqr_admin_unit%type
     ,p_nmq_descr in nm_mrg_query_all.nmq_descr%type
-    ,p_route_id in nm_elements_all.ne_id%type
-    ,p_group_type in nm_members_all.nm_obj_type%type
-    ,p_all_routes in boolean
     ,p_ignore_poe in boolean
+    ,p_criteria_rowcount in integer
     ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
     ,p_longops_rec in out nm3sql.longops_rec
   );
@@ -100,18 +99,44 @@ create or replace package nm3bulk_mrg as
   -- convinience network criteria loaders
   procedure load_group_datums(
      p_group_id in nm_elements_all.ne_id%type
+    ,p_sqlcount out pls_integer
   );
   procedure load_group_type_datums(
      p_group_type in nm_members_all.nm_obj_type%type
+    ,p_sqlcount out pls_integer
   );
   procedure load_extent_datums(
-     p_nse_id in nm_saved_extents.nse_id%type
+     p_group_type in nm_group_types.ngt_group_type%type
+    ,p_nse_id in nm_saved_extents.nse_id%type
+    ,p_sqlcount out pls_integer
   );
+  procedure load_nt_type_datums(
+     p_group_type in varchar2
+    ,p_nt_type in nm_types.nt_type%type
+    ,p_sqlcount out pls_integer
+  );
+  procedure load_all_network_datums(
+     p_group_type in varchar2
+    ,p_sqlcount out pls_integer
+  );
+  procedure load_gaz_list_datums(
+     p_group_type in varchar2
+    ,pt_ne in nm_id_tbl
+    ,pt_nse in nm_id_tbl
+    ,p_sqlcount out pls_integer
+  );
+  
+  
   
   procedure process_datums_group_type(
      p_group_type_in  in nm_group_types_all.ngt_group_type%type
     ,p_group_type_out out nm_group_types_all.ngt_group_type%type
   );
+  
+  
+  function get_datum_id_tbl return nm_id_tbl;
+  function get_group_id_tbl return nm_id_tbl;
+  function get_nse_id_tbl return nm_id_tbl;
   
 
   
