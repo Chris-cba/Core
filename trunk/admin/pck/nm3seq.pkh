@@ -3,13 +3,13 @@ CREATE OR REPLACE PACKAGE nm3seq IS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : %W% %G%
---       Module Name      : %M%
---       Date into SCCS   : %E% %U%
---       Date fetched Out : %D% %T%
---       SCCS Version     : %I%
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3seq.pkh-arc   2.4   Oct 04 2007 14:26:04   jwadsworth  $
+--       Module Name      : $Workfile:   nm3seq.pkh  $
+--       Date into PVCS   : $Date:   Oct 04 2007 14:26:04  $
+--       Date fetched Out : $Modtime:   Oct 04 2007 14:04:00  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --
 --   Author : Jonathan Mills
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE nm3seq IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "@(#)nm3get_gen.pkb	1.50 02/01/06"
+--   nm3get_gen body   : "$Revision:   2.4  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE nm3seq IS
 --
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid          CONSTANT  VARCHAR2(2000) := '"%W% %G%"';
+   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
 --  g_sccsid is the SCCS ID for the package
 --
 --</GLOBVAR>
@@ -423,6 +423,26 @@ PRAGMA RESTRICT_REFERENCES (next_nd_id_seq, WNPS, WNDS);
 FUNCTION curr_nd_id_seq RETURN PLS_INTEGER;
 --
 PRAGMA RESTRICT_REFERENCES (curr_nd_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="next_neh_id_seq">
+-- Returns NEH_ID_SEQ.NEXTVAL
+FUNCTION next_neh_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (next_neh_id_seq, WNPS, WNDS);
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="curr_neh_id_seq">
+-- Returns NEH_ID_SEQ.CURRVAL
+FUNCTION curr_neh_id_seq RETURN PLS_INTEGER;
+--
+PRAGMA RESTRICT_REFERENCES (curr_neh_id_seq, WNPS, WNDS);
 --
 --</PROC>
 --
