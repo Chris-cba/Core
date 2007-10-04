@@ -2,11 +2,11 @@ CREATE OR REPLACE package nm3dynsql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkh-arc   2.0   Jul 23 2007 16:46:54   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkh-arc   2.1   Oct 04 2007 16:57:28   ptanava  $
 --       Module Name      : $Workfile:   nm3dynsql.pkh  $
---       Date into PVCS   : $Date:   Jul 23 2007 16:46:54  $
---       Date fetched Out : $Modtime:   Jul 23 2007 16:46:34  $
---       PVCS Version     : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Oct 04 2007 16:57:28  $
+--       Date fetched Out : $Modtime:   Oct 04 2007 10:52:40  $
+--       PVCS Version     : $Revision:   2.1  $
 --       Based on sccs version : 
 --
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE package nm3dynsql as
 --	Copyright (c) exor corporation ltd, 2005
 -----------------------------------------------------------------------------
 --
-  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.0  $"';
+  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
   
   subtype nm_id_type    is number(9);
   subtype nm_code_type  is varchar2(80);
@@ -78,9 +78,7 @@ CREATE OR REPLACE package nm3dynsql as
   function sql_effective_date_tbl return varchar2;
   
   function sql_route_connectivity(
-     p_all_routes in boolean
-    ,p_route_id in number
-    ,p_route_type in varchar2
+     p_criteria_rowcount in integer
     ,p_ignore_poe in boolean
   ) return varchar2;
   
