@@ -1,12 +1,30 @@
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data6.sql-arc   2.1   Oct 04 2007 17:59:38   jwadsworth  $
+--       Module Name      : $Workfile:   nm3data6.sql  $
+--       Date into PVCS   : $Date:   Oct 04 2007 17:59:38  $
+--       Date fetched Out : $Modtime:   Oct 04 2007 17:54:40  $
+--       Version          : $Revision:   2.1  $
+--
+--   Product metadata script
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2007
+-----------------------------------------------------------------------------
+--
+--
 /***************************************************************************
 
 INFO
 ====
-As at Release 4.0
+As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-14-NOV-2006 13:39
+04-OCT-2007 17:54
 
 TABLES PROCESSED
 ================
@@ -23,11 +41,10 @@ NM_INV_CATEGORIES
 NM_INV_CATEGORY_MODULES
 NM_FILL_PATTERNS
 NM_VISUAL_ATTRIBUTES
-NM_SPECIAL_CHARS
 
 TABLE OWNER
 ===========
-NM3DATA
+NM3_METADATA
 
 MODE (A-Append R-Refresh)
 ========================
@@ -35,7 +52,6 @@ A
 
 ***************************************************************************/
 
-define sccsid = '@(#)nm3data6.sql	1.26 11/14/06'
 set define off;
 set feedback off;
 
@@ -52,6 +68,9 @@ commit;
 
 --
 --********** NM_UNIT_DOMAINS **********--
+SET TERM ON
+PROMPT nm_unit_domains
+SET TERM OFF
 --
 -- Columns
 -- UD_DOMAIN_ID                   NOT NULL NUMBER(4)
@@ -86,6 +105,9 @@ SELECT
 --
 --
 --********** NM_UNITS **********--
+SET TERM ON
+PROMPT nm_units
+SET TERM OFF
 --
 -- Columns
 -- UN_DOMAIN_ID                   NOT NULL NUMBER(38)
@@ -182,14 +204,17 @@ SELECT
 --
 --
 --********** NM_UNIT_CONVERSIONS **********--
+SET TERM ON
+PROMPT nm_unit_conversions
+SET TERM OFF
 --
 -- Columns
 -- UC_UNIT_ID_IN                  NOT NULL NUMBER(4)
---   UC_FK_UN_FROM (Pos 1)
 --   UC_PK (Pos 1)
+--   UC_FK_UN_FROM (Pos 1)
 -- UC_UNIT_ID_OUT                 NOT NULL NUMBER(4)
---   UC_FK_UN_TO (Pos 1)
 --   UC_PK (Pos 2)
+--   UC_FK_UN_TO (Pos 1)
 -- UC_FUNCTION                    NOT NULL VARCHAR2(40)
 -- UC_CONVERSION                  NOT NULL VARCHAR2(2000)
 -- UC_CONVERSION_FACTOR                    NUMBER(22)
@@ -435,6 +460,9 @@ SELECT
 --
 --
 --********** COLOURS **********--
+SET TERM ON
+PROMPT colours
+SET TERM OFF
 --
 -- Columns
 -- COLOUR                         NOT NULL VARCHAR2(12)
@@ -2245,14 +2273,17 @@ SELECT
 --
 --
 --********** NM_ADMIN_GROUPS **********--
+SET TERM ON
+PROMPT nm_admin_groups
+SET TERM OFF
 --
 -- Columns
 -- NAG_PARENT_ADMIN_UNIT          NOT NULL NUMBER(9)
---   HAG_FK1_HAU (Pos 1)
 --   HAG_PK (Pos 1)
+--   HAG_FK1_HAU (Pos 1)
 -- NAG_CHILD_ADMIN_UNIT           NOT NULL NUMBER(9)
---   HAG_FK2_HAU (Pos 1)
 --   HAG_PK (Pos 2)
+--   HAG_FK2_HAU (Pos 1)
 -- NAG_DIRECT_LINK                NOT NULL VARCHAR2(1)
 --
 --
@@ -2271,6 +2302,9 @@ SELECT
 --
 --
 --********** NM_NODE_TYPES **********--
+SET TERM ON
+PROMPT nm_node_types
+SET TERM OFF
 --
 -- Columns
 -- NNT_TYPE                       NOT NULL VARCHAR2(4)
@@ -2296,6 +2330,9 @@ SELECT
 --
 --
 --********** NM_MAIL_GROUPS **********--
+SET TERM ON
+PROMPT nm_mail_groups
+SET TERM OFF
 --
 -- Columns
 -- NMG_ID                         NOT NULL NUMBER(9)
@@ -2315,6 +2352,9 @@ SELECT
 --
 --
 --********** NM_MAIL_USERS **********--
+SET TERM ON
+PROMPT nm_mail_users
+SET TERM OFF
 --
 -- Columns
 -- NMU_ID                         NOT NULL NUMBER(9)
@@ -2341,6 +2381,9 @@ SELECT
 --
 --
 --********** NM_EVENT_TYPES **********--
+SET TERM ON
+PROMPT nm_event_types
+SET TERM OFF
 --
 -- Columns
 -- NET_TYPE                       NOT NULL VARCHAR2(4)
@@ -2357,11 +2400,11 @@ INSERT INTO NM_EVENT_TYPES
        ,NET_DESCR
        )
 SELECT 
-        'GENR'
-       ,'GENERIC'
-       ,'NM3 Event' FROM DUAL
+        'ERRR'
+       ,'ERROR'
+       ,'Error' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_EVENT_TYPES
-                   WHERE NET_TYPE = 'GENR');
+                   WHERE NET_TYPE = 'ERRR');
 --
 INSERT INTO NM_EVENT_TYPES
        (NET_TYPE
@@ -2369,14 +2412,17 @@ INSERT INTO NM_EVENT_TYPES
        ,NET_DESCR
        )
 SELECT 
-        'ERRR'
-       ,'ERROR'
-       ,'Error' FROM DUAL
+        'GENR'
+       ,'GENERIC'
+       ,'NM3 Event' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_EVENT_TYPES
-                   WHERE NET_TYPE = 'ERRR');
+                   WHERE NET_TYPE = 'GENR');
 --
 --
 --********** NM_INV_CATEGORIES **********--
+SET TERM ON
+PROMPT nm_inv_categories
+SET TERM OFF
 --
 -- Columns
 -- NIC_CATEGORY                   NOT NULL VARCHAR2(1)
@@ -2409,10 +2455,20 @@ INSERT INTO NM_INV_CATEGORIES
        ,NIC_DESCR
        )
 SELECT 
-        'X'
-       ,'Generated Exclusive Inventory Type' FROM DUAL
+        'F'
+       ,'Foreign Table' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORIES
-                   WHERE NIC_CATEGORY = 'X');
+                   WHERE NIC_CATEGORY = 'F');
+--
+INSERT INTO NM_INV_CATEGORIES
+       (NIC_CATEGORY
+       ,NIC_DESCR
+       )
+SELECT 
+        'G'
+       ,'Additional Data Inventory' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORIES
+                   WHERE NIC_CATEGORY = 'G');
 --
 INSERT INTO NM_INV_CATEGORIES
        (NIC_CATEGORY
@@ -2429,31 +2485,24 @@ INSERT INTO NM_INV_CATEGORIES
        ,NIC_DESCR
        )
 SELECT 
-        'F'
-       ,'Foreign Table' FROM DUAL
+        'X'
+       ,'Generated Exclusive Inventory Type' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORIES
-                   WHERE NIC_CATEGORY = 'F');
---
-INSERT INTO NM_INV_CATEGORIES
-       (NIC_CATEGORY
-       ,NIC_DESCR
-       )
-SELECT 
-        'G'
-       ,'Additional Data Inventory' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORIES
-                   WHERE NIC_CATEGORY = 'G');
+                   WHERE NIC_CATEGORY = 'X');
 --
 --
 --********** NM_INV_CATEGORY_MODULES **********--
+SET TERM ON
+PROMPT nm_inv_category_modules
+SET TERM OFF
 --
 -- Columns
 -- ICM_NIC_CATEGORY               NOT NULL VARCHAR2(1)
---   ICM_NIC_FK (Pos 1)
 --   ICM_PK (Pos 1)
+--   ICM_NIC_FK (Pos 1)
 -- ICM_HMO_MODULE                 NOT NULL VARCHAR2(30)
---   ICM_HMO_FK (Pos 1)
 --   ICM_PK (Pos 2)
+--   ICM_HMO_FK (Pos 1)
 -- ICM_UPDATABLE                  NOT NULL VARCHAR2(1)
 --   ICM_UPDATABLE_CHK
 --
@@ -2477,102 +2526,11 @@ INSERT INTO NM_INV_CATEGORY_MODULES
        ,ICM_UPDATABLE
        )
 SELECT 
-        'G'
-       ,'NM0510'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'G'
-                    AND  ICM_HMO_MODULE = 'NM0510');
---
-INSERT INTO NM_INV_CATEGORY_MODULES
-       (ICM_NIC_CATEGORY
-       ,ICM_HMO_MODULE
-       ,ICM_UPDATABLE
-       )
-SELECT 
-        'X'
-       ,'NM0510'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'X'
-                    AND  ICM_HMO_MODULE = 'NM0510');
---
-INSERT INTO NM_INV_CATEGORY_MODULES
-       (ICM_NIC_CATEGORY
-       ,ICM_HMO_MODULE
-       ,ICM_UPDATABLE
-       )
-SELECT 
-        'I'
-       ,'NM0510'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'I'
-                    AND  ICM_HMO_MODULE = 'NM0510');
---
-INSERT INTO NM_INV_CATEGORY_MODULES
-       (ICM_NIC_CATEGORY
-       ,ICM_HMO_MODULE
-       ,ICM_UPDATABLE
-       )
-SELECT 
-        'F'
-       ,'NM0510'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'F'
-                    AND  ICM_HMO_MODULE = 'NM0510');
---
-INSERT INTO NM_INV_CATEGORY_MODULES
-       (ICM_NIC_CATEGORY
-       ,ICM_HMO_MODULE
-       ,ICM_UPDATABLE
-       )
-SELECT 
         'C'
        ,'NM0560'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
                    WHERE ICM_NIC_CATEGORY = 'C'
-                    AND  ICM_HMO_MODULE = 'NM0560');
---
-INSERT INTO NM_INV_CATEGORY_MODULES
-       (ICM_NIC_CATEGORY
-       ,ICM_HMO_MODULE
-       ,ICM_UPDATABLE
-       )
-SELECT 
-        'X'
-       ,'NM0560'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'X'
-                    AND  ICM_HMO_MODULE = 'NM0560');
---
-INSERT INTO NM_INV_CATEGORY_MODULES
-       (ICM_NIC_CATEGORY
-       ,ICM_HMO_MODULE
-       ,ICM_UPDATABLE
-       )
-SELECT 
-        'I'
-       ,'NM0560'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'I'
-                    AND  ICM_HMO_MODULE = 'NM0560');
---
-INSERT INTO NM_INV_CATEGORY_MODULES
-       (ICM_NIC_CATEGORY
-       ,ICM_HMO_MODULE
-       ,ICM_UPDATABLE
-       )
-SELECT 
-        'F'
-       ,'NM0560'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'F'
                     AND  ICM_HMO_MODULE = 'NM0560');
 --
 INSERT INTO NM_INV_CATEGORY_MODULES
@@ -2594,11 +2552,63 @@ INSERT INTO NM_INV_CATEGORY_MODULES
        ,ICM_UPDATABLE
        )
 SELECT 
-        'X'
-       ,'NM0570'
+        'C'
+       ,'NM0575'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'X'
+                   WHERE ICM_NIC_CATEGORY = 'C'
+                    AND  ICM_HMO_MODULE = 'NM0575');
+--
+INSERT INTO NM_INV_CATEGORY_MODULES
+       (ICM_NIC_CATEGORY
+       ,ICM_HMO_MODULE
+       ,ICM_UPDATABLE
+       )
+SELECT 
+        'C'
+       ,'NM0590'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
+                   WHERE ICM_NIC_CATEGORY = 'C'
+                    AND  ICM_HMO_MODULE = 'NM0590');
+--
+INSERT INTO NM_INV_CATEGORY_MODULES
+       (ICM_NIC_CATEGORY
+       ,ICM_HMO_MODULE
+       ,ICM_UPDATABLE
+       )
+SELECT 
+        'D'
+       ,'NM0510'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
+                   WHERE ICM_NIC_CATEGORY = 'D'
+                    AND  ICM_HMO_MODULE = 'NM0510');
+--
+INSERT INTO NM_INV_CATEGORY_MODULES
+       (ICM_NIC_CATEGORY
+       ,ICM_HMO_MODULE
+       ,ICM_UPDATABLE
+       )
+SELECT 
+        'D'
+       ,'NM0560'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
+                   WHERE ICM_NIC_CATEGORY = 'D'
+                    AND  ICM_HMO_MODULE = 'NM0560');
+--
+INSERT INTO NM_INV_CATEGORY_MODULES
+       (ICM_NIC_CATEGORY
+       ,ICM_HMO_MODULE
+       ,ICM_UPDATABLE
+       )
+SELECT 
+        'D'
+       ,'NM0570'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
+                   WHERE ICM_NIC_CATEGORY = 'D'
                     AND  ICM_HMO_MODULE = 'NM0570');
 --
 INSERT INTO NM_INV_CATEGORY_MODULES
@@ -2607,12 +2617,51 @@ INSERT INTO NM_INV_CATEGORY_MODULES
        ,ICM_UPDATABLE
        )
 SELECT 
-        'I'
-       ,'NM0570'
+        'D'
+       ,'NM0575'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'I'
-                    AND  ICM_HMO_MODULE = 'NM0570');
+                   WHERE ICM_NIC_CATEGORY = 'D'
+                    AND  ICM_HMO_MODULE = 'NM0575');
+--
+INSERT INTO NM_INV_CATEGORY_MODULES
+       (ICM_NIC_CATEGORY
+       ,ICM_HMO_MODULE
+       ,ICM_UPDATABLE
+       )
+SELECT 
+        'D'
+       ,'NM0590'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
+                   WHERE ICM_NIC_CATEGORY = 'D'
+                    AND  ICM_HMO_MODULE = 'NM0590');
+--
+INSERT INTO NM_INV_CATEGORY_MODULES
+       (ICM_NIC_CATEGORY
+       ,ICM_HMO_MODULE
+       ,ICM_UPDATABLE
+       )
+SELECT 
+        'F'
+       ,'NM0510'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
+                   WHERE ICM_NIC_CATEGORY = 'F'
+                    AND  ICM_HMO_MODULE = 'NM0510');
+--
+INSERT INTO NM_INV_CATEGORY_MODULES
+       (ICM_NIC_CATEGORY
+       ,ICM_HMO_MODULE
+       ,ICM_UPDATABLE
+       )
+SELECT 
+        'F'
+       ,'NM0560'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
+                   WHERE ICM_NIC_CATEGORY = 'F'
+                    AND  ICM_HMO_MODULE = 'NM0560');
 --
 INSERT INTO NM_INV_CATEGORY_MODULES
        (ICM_NIC_CATEGORY
@@ -2633,12 +2682,12 @@ INSERT INTO NM_INV_CATEGORY_MODULES
        ,ICM_UPDATABLE
        )
 SELECT 
-        'G'
-       ,'NM0560'
+        'F'
+       ,'NM0590'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'G'
-                    AND  ICM_HMO_MODULE = 'NM0560');
+                   WHERE ICM_NIC_CATEGORY = 'F'
+                    AND  ICM_HMO_MODULE = 'NM0590');
 --
 INSERT INTO NM_INV_CATEGORY_MODULES
        (ICM_NIC_CATEGORY
@@ -2647,11 +2696,11 @@ INSERT INTO NM_INV_CATEGORY_MODULES
        )
 SELECT 
         'G'
-       ,'NM0570'
-       ,'N' FROM DUAL
+       ,'NM0105'
+       ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
                    WHERE ICM_NIC_CATEGORY = 'G'
-                    AND  ICM_HMO_MODULE = 'NM0570');
+                    AND  ICM_HMO_MODULE = 'NM0105');
 --
 INSERT INTO NM_INV_CATEGORY_MODULES
        (ICM_NIC_CATEGORY
@@ -2686,23 +2735,10 @@ INSERT INTO NM_INV_CATEGORY_MODULES
        )
 SELECT 
         'G'
-       ,'NM0105'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'G'
-                    AND  ICM_HMO_MODULE = 'NM0105');
---
-INSERT INTO NM_INV_CATEGORY_MODULES
-       (ICM_NIC_CATEGORY
-       ,ICM_HMO_MODULE
-       ,ICM_UPDATABLE
-       )
-SELECT 
-        'D'
        ,'NM0510'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'D'
+                   WHERE ICM_NIC_CATEGORY = 'G'
                     AND  ICM_HMO_MODULE = 'NM0510');
 --
 INSERT INTO NM_INV_CATEGORY_MODULES
@@ -2711,11 +2747,11 @@ INSERT INTO NM_INV_CATEGORY_MODULES
        ,ICM_UPDATABLE
        )
 SELECT 
-        'D'
+        'G'
        ,'NM0560'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'D'
+                   WHERE ICM_NIC_CATEGORY = 'G'
                     AND  ICM_HMO_MODULE = 'NM0560');
 --
 INSERT INTO NM_INV_CATEGORY_MODULES
@@ -2724,11 +2760,11 @@ INSERT INTO NM_INV_CATEGORY_MODULES
        ,ICM_UPDATABLE
        )
 SELECT 
-        'D'
+        'G'
        ,'NM0570'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'D'
+                   WHERE ICM_NIC_CATEGORY = 'G'
                     AND  ICM_HMO_MODULE = 'NM0570');
 --
 INSERT INTO NM_INV_CATEGORY_MODULES
@@ -2750,6 +2786,110 @@ INSERT INTO NM_INV_CATEGORY_MODULES
        ,ICM_UPDATABLE
        )
 SELECT 
+        'I'
+       ,'NM0510'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
+                   WHERE ICM_NIC_CATEGORY = 'I'
+                    AND  ICM_HMO_MODULE = 'NM0510');
+--
+INSERT INTO NM_INV_CATEGORY_MODULES
+       (ICM_NIC_CATEGORY
+       ,ICM_HMO_MODULE
+       ,ICM_UPDATABLE
+       )
+SELECT 
+        'I'
+       ,'NM0560'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
+                   WHERE ICM_NIC_CATEGORY = 'I'
+                    AND  ICM_HMO_MODULE = 'NM0560');
+--
+INSERT INTO NM_INV_CATEGORY_MODULES
+       (ICM_NIC_CATEGORY
+       ,ICM_HMO_MODULE
+       ,ICM_UPDATABLE
+       )
+SELECT 
+        'I'
+       ,'NM0570'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
+                   WHERE ICM_NIC_CATEGORY = 'I'
+                    AND  ICM_HMO_MODULE = 'NM0570');
+--
+INSERT INTO NM_INV_CATEGORY_MODULES
+       (ICM_NIC_CATEGORY
+       ,ICM_HMO_MODULE
+       ,ICM_UPDATABLE
+       )
+SELECT 
+        'I'
+       ,'NM0575'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
+                   WHERE ICM_NIC_CATEGORY = 'I'
+                    AND  ICM_HMO_MODULE = 'NM0575');
+--
+INSERT INTO NM_INV_CATEGORY_MODULES
+       (ICM_NIC_CATEGORY
+       ,ICM_HMO_MODULE
+       ,ICM_UPDATABLE
+       )
+SELECT 
+        'I'
+       ,'NM0590'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
+                   WHERE ICM_NIC_CATEGORY = 'I'
+                    AND  ICM_HMO_MODULE = 'NM0590');
+--
+INSERT INTO NM_INV_CATEGORY_MODULES
+       (ICM_NIC_CATEGORY
+       ,ICM_HMO_MODULE
+       ,ICM_UPDATABLE
+       )
+SELECT 
+        'X'
+       ,'NM0510'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
+                   WHERE ICM_NIC_CATEGORY = 'X'
+                    AND  ICM_HMO_MODULE = 'NM0510');
+--
+INSERT INTO NM_INV_CATEGORY_MODULES
+       (ICM_NIC_CATEGORY
+       ,ICM_HMO_MODULE
+       ,ICM_UPDATABLE
+       )
+SELECT 
+        'X'
+       ,'NM0560'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
+                   WHERE ICM_NIC_CATEGORY = 'X'
+                    AND  ICM_HMO_MODULE = 'NM0560');
+--
+INSERT INTO NM_INV_CATEGORY_MODULES
+       (ICM_NIC_CATEGORY
+       ,ICM_HMO_MODULE
+       ,ICM_UPDATABLE
+       )
+SELECT 
+        'X'
+       ,'NM0570'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
+                   WHERE ICM_NIC_CATEGORY = 'X'
+                    AND  ICM_HMO_MODULE = 'NM0570');
+--
+INSERT INTO NM_INV_CATEGORY_MODULES
+       (ICM_NIC_CATEGORY
+       ,ICM_HMO_MODULE
+       ,ICM_UPDATABLE
+       )
+SELECT 
         'X'
        ,'NM0590'
        ,'N' FROM DUAL
@@ -2757,99 +2897,11 @@ SELECT
                    WHERE ICM_NIC_CATEGORY = 'X'
                     AND  ICM_HMO_MODULE = 'NM0590');
 --
-INSERT INTO NM_INV_CATEGORY_MODULES
-       (ICM_NIC_CATEGORY
-       ,ICM_HMO_MODULE
-       ,ICM_UPDATABLE
-       )
-SELECT 
-        'I'
-       ,'NM0590'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'I'
-                    AND  ICM_HMO_MODULE = 'NM0590');
---
-INSERT INTO NM_INV_CATEGORY_MODULES
-       (ICM_NIC_CATEGORY
-       ,ICM_HMO_MODULE
-       ,ICM_UPDATABLE
-       )
-SELECT 
-        'F'
-       ,'NM0590'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'F'
-                    AND  ICM_HMO_MODULE = 'NM0590');
---
-INSERT INTO NM_INV_CATEGORY_MODULES
-       (ICM_NIC_CATEGORY
-       ,ICM_HMO_MODULE
-       ,ICM_UPDATABLE
-       )
-SELECT 
-        'D'
-       ,'NM0590'
-       ,'N' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'D'
-                    AND  ICM_HMO_MODULE = 'NM0590');
---
-INSERT INTO NM_INV_CATEGORY_MODULES
-       (ICM_NIC_CATEGORY
-       ,ICM_HMO_MODULE
-       ,ICM_UPDATABLE
-       )
-SELECT 
-        'C'
-       ,'NM0590'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'C'
-                    AND  ICM_HMO_MODULE = 'NM0590');
---
-INSERT INTO NM_INV_CATEGORY_MODULES
-       (ICM_NIC_CATEGORY
-       ,ICM_HMO_MODULE
-       ,ICM_UPDATABLE
-       )
-SELECT 
-        'C'
-       ,'NM0575'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'C'
-                    AND  ICM_HMO_MODULE = 'NM0575');
---
-INSERT INTO NM_INV_CATEGORY_MODULES
-       (ICM_NIC_CATEGORY
-       ,ICM_HMO_MODULE
-       ,ICM_UPDATABLE
-       )
-SELECT 
-        'D'
-       ,'NM0575'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'D'
-                    AND  ICM_HMO_MODULE = 'NM0575');
---
-INSERT INTO NM_INV_CATEGORY_MODULES
-       (ICM_NIC_CATEGORY
-       ,ICM_HMO_MODULE
-       ,ICM_UPDATABLE
-       )
-SELECT 
-        'I'
-       ,'NM0575'
-       ,'Y' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORY_MODULES
-                   WHERE ICM_NIC_CATEGORY = 'I'
-                    AND  ICM_HMO_MODULE = 'NM0575');
---
 --
 --********** NM_FILL_PATTERNS **********--
+SET TERM ON
+PROMPT nm_fill_patterns
+SET TERM OFF
 --
 -- Columns
 -- NFP_ID                         NOT NULL VARCHAR2(30)
@@ -2857,236 +2909,6 @@ SELECT
 --   NFP_PK (Pos 1)
 -- NFP_DESCR                               VARCHAR2(80)
 --
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'TRANSPARENT'
-       ,'Transparent' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'TRANSPARENT');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'BRICKREV'
-       ,'Brickrev' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'BRICKREV');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'HLINES1'
-       ,'Hlines1' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'HLINES1');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'HLINES2'
-       ,'Hlines2' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'HLINES2');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'HLINES3'
-       ,'Hlines3' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'HLINES3');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'HLINES4'
-       ,'Hlines4' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'HLINES4');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'HLINES5'
-       ,'Hlines5' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'HLINES5');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'HLINES6'
-       ,'Hlines6' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'HLINES6');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'HLINES7'
-       ,'Hlines7' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'HLINES7');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'VLINES1'
-       ,'Vlines1' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'VLINES1');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'VLINES2'
-       ,'Vlines2' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'VLINES2');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'VLINES3'
-       ,'Vlines3' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'VLINES3');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'VLINES4'
-       ,'Vlines4' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'VLINES4');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'VLINES5'
-       ,'Vlines5' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'VLINES5');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'VLINES6'
-       ,'Vlines6' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'VLINES6');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'VLINES7'
-       ,'Vlines7' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'VLINES7');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'THINLINE135'
-       ,'Thinline135' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'THINLINE135');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'MEDLINE45'
-       ,'Medline45' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'MEDLINE45');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'THICKLINE45'
-       ,'Thickline45' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'THICKLINE45');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'MULTITHIN45'
-       ,'Multithin45' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'MULTITHIN45');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'MULTIMED45'
-       ,'Multimed45' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'MULTIMED45');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'WAVE45'
-       ,'Wave45' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'WAVE45');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'MEDLINE135'
-       ,'Medline135' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'MEDLINE135');
 --
 INSERT INTO NM_FILL_PATTERNS
        (NFP_ID
@@ -3123,20 +2945,30 @@ INSERT INTO NM_FILL_PATTERNS
        ,NFP_DESCR
        )
 SELECT 
-        'BRICKSIDE'
-       ,'Brickside' FROM DUAL
+        'BRICK'
+       ,'Brick' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'BRICKSIDE');
+                   WHERE NFP_ID = 'BRICK');
 --
 INSERT INTO NM_FILL_PATTERNS
        (NFP_ID
        ,NFP_DESCR
        )
 SELECT 
-        'BRICK'
-       ,'Brick' FROM DUAL
+        'BRICKREV'
+       ,'Brickrev' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'BRICK');
+                   WHERE NFP_ID = 'BRICKREV');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'BRICKSIDE'
+       ,'Brickside' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'BRICKSIDE');
 --
 INSERT INTO NM_FILL_PATTERNS
        (NFP_ID
@@ -3253,26 +3085,6 @@ INSERT INTO NM_FILL_PATTERNS
        ,NFP_DESCR
        )
 SELECT 
-        'REVCRISSTHIN'
-       ,'Revcrissthin' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'REVCRISSTHIN');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
-        'REVCRISSTHICK'
-       ,'Revcrissthick' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'REVCRISSTHICK');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
         'CURVES1'
        ,'Curves1' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
@@ -3383,20 +3195,80 @@ INSERT INTO NM_FILL_PATTERNS
        ,NFP_DESCR
        )
 SELECT 
-        'REVGRID'
-       ,'Revgrid' FROM DUAL
+        'GRIDTHIN'
+       ,'Gridthin' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'REVGRID');
+                   WHERE NFP_ID = 'GRIDTHIN');
 --
 INSERT INTO NM_FILL_PATTERNS
        (NFP_ID
        ,NFP_DESCR
        )
 SELECT 
-        'GRIDTHIN'
-       ,'Gridthin' FROM DUAL
+        'HLINES1'
+       ,'Hlines1' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'GRIDTHIN');
+                   WHERE NFP_ID = 'HLINES1');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'HLINES2'
+       ,'Hlines2' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'HLINES2');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'HLINES3'
+       ,'Hlines3' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'HLINES3');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'HLINES4'
+       ,'Hlines4' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'HLINES4');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'HLINES5'
+       ,'Hlines5' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'HLINES5');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'HLINES6'
+       ,'Hlines6' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'HLINES6');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'HLINES7'
+       ,'Hlines7' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'HLINES7');
 --
 INSERT INTO NM_FILL_PATTERNS
        (NFP_ID
@@ -3473,6 +3345,46 @@ INSERT INTO NM_FILL_PATTERNS
        ,NFP_DESCR
        )
 SELECT 
+        'MEDLINE135'
+       ,'Medline135' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'MEDLINE135');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'MEDLINE45'
+       ,'Medline45' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'MEDLINE45');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'MULTIMED45'
+       ,'Multimed45' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'MULTIMED45');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'MULTITHIN45'
+       ,'Multithin45' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'MULTITHIN45');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
         'PAGODAS'
        ,'Pagodas' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
@@ -3497,6 +3409,46 @@ SELECT
        ,'Powder' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
                    WHERE NFP_ID = 'POWDER');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'REVCRISSTHICK'
+       ,'Revcrissthick' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'REVCRISSTHICK');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'REVCRISSTHIN'
+       ,'Revcrissthin' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'REVCRISSTHIN');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'REVGRID'
+       ,'Revgrid' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'REVGRID');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'REVSQUARES'
+       ,'Revsquares' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'REVSQUARES');
 --
 INSERT INTO NM_FILL_PATTERNS
        (NFP_ID
@@ -3553,16 +3505,6 @@ INSERT INTO NM_FILL_PATTERNS
        ,NFP_DESCR
        )
 SELECT 
-        'REVSQUARES'
-       ,'Revsquares' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
-                   WHERE NFP_ID = 'REVSQUARES');
---
-INSERT INTO NM_FILL_PATTERNS
-       (NFP_ID
-       ,NFP_DESCR
-       )
-SELECT 
         'STITCHING'
        ,'Stitching' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
@@ -3593,6 +3535,16 @@ INSERT INTO NM_FILL_PATTERNS
        ,NFP_DESCR
        )
 SELECT 
+        'THICKLINE45'
+       ,'Thickline45' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'THICKLINE45');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
         'THINBOX'
        ,'Thinbox' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
@@ -3603,10 +3555,30 @@ INSERT INTO NM_FILL_PATTERNS
        ,NFP_DESCR
        )
 SELECT 
+        'THINLINE135'
+       ,'Thinline135' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'THINLINE135');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
         'TILE1'
        ,'Tile1' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
                    WHERE NFP_ID = 'TILE1');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'TRANSPARENT'
+       ,'Transparent' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'TRANSPARENT');
 --
 INSERT INTO NM_FILL_PATTERNS
        (NFP_ID
@@ -3633,10 +3605,90 @@ INSERT INTO NM_FILL_PATTERNS
        ,NFP_DESCR
        )
 SELECT 
+        'VLINES1'
+       ,'Vlines1' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'VLINES1');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'VLINES2'
+       ,'Vlines2' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'VLINES2');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'VLINES3'
+       ,'Vlines3' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'VLINES3');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'VLINES4'
+       ,'Vlines4' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'VLINES4');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'VLINES5'
+       ,'Vlines5' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'VLINES5');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'VLINES6'
+       ,'Vlines6' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'VLINES6');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'VLINES7'
+       ,'Vlines7' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'VLINES7');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
         'WALKER'
        ,'Walker' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
                    WHERE NFP_ID = 'WALKER');
+--
+INSERT INTO NM_FILL_PATTERNS
+       (NFP_ID
+       ,NFP_DESCR
+       )
+SELECT 
+        'WAVE45'
+       ,'Wave45' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_FILL_PATTERNS
+                   WHERE NFP_ID = 'WAVE45');
 --
 INSERT INTO NM_FILL_PATTERNS
        (NFP_ID
@@ -3700,6 +3752,9 @@ SELECT
 --
 --
 --********** NM_VISUAL_ATTRIBUTES **********--
+SET TERM ON
+PROMPT nm_visual_attributes
+SET TERM OFF
 --
 -- Columns
 -- NVA_ID                         NOT NULL VARCHAR2(30)
@@ -6121,638 +6176,6 @@ SELECT
        ,'TRANSPARENT' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_VISUAL_ATTRIBUTES
                    WHERE NVA_ID = 'VA_100');
---
---
---********** NM_SPECIAL_CHARS **********--
---
--- Columns
--- NSCH_ASCII_CHARACTER           NOT NULL NUMBER(3)
---   NSCH_PK (Pos 1)
---
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        32 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 32);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        33 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 33);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        34 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 34);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        35 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 35);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        36 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 36);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        37 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 37);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        38 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 38);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        39 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 39);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        40 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 40);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        41 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 41);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        42 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 42);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        43 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 43);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        44 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 44);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        45 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 45);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        46 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 46);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        47 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 47);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        58 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 58);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        59 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 59);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        60 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 60);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        61 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 61);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        62 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 62);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        63 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 63);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        64 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 64);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        91 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 91);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        92 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 92);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        93 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 93);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        94 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 94);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        96 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 96);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        123 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 123);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        124 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 124);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        125 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 125);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        126 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 126);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        127 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 127);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        128 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 128);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        129 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 129);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        130 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 130);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        131 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 131);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        132 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 132);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        133 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 133);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        134 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 134);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        135 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 135);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        136 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 136);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        137 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 137);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        138 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 138);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        139 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 139);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        140 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 140);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        141 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 141);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        142 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 142);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        143 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 143);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        144 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 144);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        145 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 145);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        146 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 146);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        147 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 147);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        148 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 148);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        149 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 149);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        150 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 150);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        151 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 151);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        152 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 152);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        153 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 153);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        154 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 154);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        155 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 155);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        156 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 156);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        157 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 157);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        158 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 158);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        159 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 159);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        160 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 160);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        161 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 161);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        162 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 162);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        163 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 163);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        164 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 164);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        165 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 165);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        166 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 166);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        167 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 167);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        168 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 168);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        169 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 169);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        170 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 170);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        171 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 171);
---
-INSERT INTO NM_SPECIAL_CHARS
-       (NSCH_ASCII_CHARACTER
-       )
-SELECT 
-        172 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
-                   WHERE NSCH_ASCII_CHARACTER = 172);
 --
 --
 COMMIT;
