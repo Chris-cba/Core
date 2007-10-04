@@ -4,12 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.2   Oct 03 2007 10:08:08   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.3   Oct 04 2007 16:56:34   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Oct 03 2007 10:08:08  $
---       Date fetched Out : $Modtime:   Oct 03 2007 10:06:44  $
---       PVCS Version     : $Revision:   2.2  $
---       Based on sccs version : 
+--       Date into PVCS   : $Date:   Oct 04 2007 16:56:34  $
+--       Date fetched Out : $Modtime:   Oct 04 2007 15:41:40  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : Priidu Tanava
@@ -30,10 +29,12 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                 => =< are now logically used instead of ><
   23.07.07  PT fixed a bug in the above change - missing brackets with OR
   21.09.07  PT implemented the std_run() without the p_group_type specified: assemble by datum homo chunks;
-                added process_datums_group_type()         
+                added process_datums_group_type()
   03.10.07  PT in ins_splits() fixed the FT nm_obj_type problem
+  04.10.07  PT rewrote the datum criteria to use nm_datum_criteria_tmp, rewrote criteria loading,
+                introduced nm_datum_connectivity_tmp to separate out the route connectivity results
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.2  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.3  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -56,6 +57,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     nm_mrg_section_members%rowtype index by binary_integer;
   type nm_mrg_section_inv_values_tbl is table of
     nm_mrg_section_inv_values_all%rowtype index by binary_integer;
+    
+    
+  mt_datum_id nm_id_tbl;
+  mt_group_id nm_id_tbl;
+  mt_nse_id   nm_id_tbl;
     
     
   connect_by_loop exception; -- CONNECT BY loop in user data
@@ -85,6 +91,16 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   ) return varchar2;
   
   
+  function sql_load_nm_datum_criteria_tmp(
+     p_elements_sql in varchar2
+  ) return varchar2;
+  
+  procedure ensure_group_type_linear(
+     p_group_type_in in nm_group_types.ngt_group_type%type
+    ,p_group_type_out out nm_group_types.ngt_group_type%type
+  );
+  
+  
   
   function get_version return varchar2 is
   begin
@@ -101,6 +117,26 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   
   -----------------------------------------------------------------
   
+  
+  
+  function get_datum_id_tbl return nm_id_tbl
+  is
+  begin
+    return mt_datum_id;
+  end;
+  
+  function get_group_id_tbl return nm_id_tbl
+  is
+  begin
+    return mt_group_id;
+  end;
+  
+  function get_nse_id_tbl return nm_id_tbl
+  is
+  begin
+    return mt_nse_id;
+  end;
+  
  
   -- this executes the main bulk source query
   --  the results are put into nm_mrg_split_results_tmp, previous results truncated
@@ -108,8 +144,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   procedure ins_splits(
      pt_attr in ita_mapping_tbl
     ,p_effective_date in date
-    ,p_all_routes in boolean
-    ,p_splits_rowcount out integer
+    ,p_criteria_rowcount in integer
+    ,p_rowcount_out out integer
   )
   is
     type ft_where_rec is record (
@@ -154,10 +190,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       if l_alias is not null then
         l_alias := l_alias||'.';
       end if;
-      if p_all_routes then return null;
-      else
-        return cr||p_connector||l_alias||lower(p_column)||' = x.column_value';
-      end if;
+      return cr||p_connector||l_alias||lower(p_column)||' = x.datum_id';
     end;
     
      function sql_ft_criteria(
@@ -183,7 +216,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     nm3dbg.putln(g_package_name||'.ins_splits('
       ||'pt_attr.count='||pt_attr.count
       ||', p_effective_date='||p_effective_date
-      ||', p_all_routes='||nm3flx.boolean_to_char(p_all_routes)
+      ||', p_criteria_rowcount='||p_criteria_rowcount
       ||')');
     nm3dbg.ind;
   
@@ -201,32 +234,12 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
      
       
     -- calculate the cardinality hint value
-    --  for the route datum criterium table
-    l_cardinality := nm3sql.get_rounded_cardinality(nm3sql.get_id_tbl_count);
-      
+    l_cardinality := nm3sql.get_rounded_cardinality(p_criteria_rowcount);
     
+    l_sql_cardinality := ' /*+ cardinality(x '||l_cardinality||') */';
     
-    if p_all_routes then null;
-    else
-      if l_cardinality = 0 then
-        raise_application_error(-20066,
-          'Cannot run merge query. ''All routes'' parameter false'
-            ||' and the datum criteria table has no elements.'
-        );
-      end if;
-    
-      --l_sql_route_datums_tbl := 
-      --  cr||'  ,(select /*+ cardinality(x '||l_cardinality||') */ x.column_value'
-      --    ||' from table(cast(nm3sql.get_id_tbl as nm_id_tbl)) x)';
-      
-      l_sql_cardinality := ' /*+ cardinality(x '||l_cardinality||') */';
+    l_sql_route_datums_tbl := cr||'  ,nm_datum_criteria_tmp x';
 
-      l_sql_route_datums_tbl := 
-        cr||'  ,(select column_value'
-          ||' from table(cast(nm3sql.get_id_tbl as nm_id_tbl))) x';
-          
-    end if;    
-    
     
     -- build the obj_types and inv item attributes criteria
     --  for standard invitems
@@ -289,24 +302,22 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
               
             end if;
           
-          end loop;   -- second attributes loop
+          end loop;
         
-        end if;  -- foreign table
+        end if;
         
-      end if; -- first usage of the attribute
+      end if;
       
-    end loop; -- first attributes loop
+    end loop;
     
     
     -- build the effective date where sql
     l_sql_nm_effective_date := nm3dynsql.sql_effective_date(
-       --p_bind_count         => l_effective_date_bind_count
        p_date               => l_effective_date
       ,p_start_date_column  => 'nm_start_date'
       ,p_end_date_column    => 'nm_end_date'
     );
     l_sql_iit_effective_date := nm3dynsql.sql_effective_date(
-       --p_bind_count         => l_effective_date_bind_count
        p_date               => l_effective_date
       ,p_start_date_column  => 'i.iit_start_date'
       ,p_end_date_column    => 'i.iit_end_date'
@@ -322,7 +333,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||cr||'from'
         ||cr||'   nm_members_all'
         ||cr||'  ,nm_inv_items_all i'
-            ||l_sql_route_datums_tbl
+        ||cr||'  ,nm_datum_criteria_tmp x'
         ||cr||'where nm_ne_id_in = i.iit_ne_id'
             ||sql_datum_tbl_join('nm_ne_id_of', '  and ')
         ||cr||'  and '||l_sql_nm_effective_date
@@ -356,12 +367,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
               ||l_union_all
           ||cr||'select'||l_sql_cardinality
           ||cr||'    '''||t_ft(i).inv_type||''' nm_obj_type, '||a1||'.nm_ne_id_in, '||a1||'.nm_ne_id_of, '||a1||'.nm_begin_mp, '||a1||'.nm_end_mp'
-          --||cr||'    '||a1||'.nm_obj_type, '||a1||'.nm_ne_id_in, '||a1||'.nm_ne_id_of, '||a1||'.nm_begin_mp, '||a1||'.nm_end_mp'
           ||cr||'  , '||a1||'.nm_date_modified, '||a1||'.nm_type, null iit_rowid, cast(null as date) iit_date_modified'
           ||cr||'from'
           ||cr||'   nm_members_all '||a1
           ||cr||'  ,'||t_ft(i).table_name||' '||a2
-              ||l_sql_route_datums_tbl
+          ||cr||'  ,nm_datum_criteria_tmp x'
           ||cr||'where '||a1||'.nm_ne_id_in = '||a2||'.'||t_ft(i).table_pk_column
               ||sql_datum_tbl_join('nm_ne_id_of', '  and ', a1)
           ||cr||'  and '||l_sql_nm_effective_date
@@ -391,7 +401,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           ||cr||'  ,cast(null as date) iit_date_modified'
           ||cr||'from'
           ||cr||'   '||t_ft(i).table_name
-              ||l_sql_route_datums_tbl
+          ||cr||'  ,nm_datum_criteria_tmp x'
               ||sql_datum_tbl_join(t_ft(i).table_ne_column, 'where ')
               ||sql_ft_criteria(l_where_and, t_ft(i).where_sql);
             
@@ -459,8 +469,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     nm3dbg.putln(l_sql);
     execute immediate l_sql;
 
-    p_splits_rowcount := sql%rowcount;
-    commit;
+    p_rowcount_out := sql%rowcount;
     
     nm3dbg.deind;
   exception
@@ -468,7 +477,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.ins_splits('
         ||'pt_attr.count='||pt_attr.count
         ||', p_effective_date='||p_effective_date
-        ||', p_all_routes='||nm3flx.boolean_to_char(p_all_routes)
+        ||', p_criteria_rowcount='||p_criteria_rowcount
         ||')');
       --rollback;
       raise;
@@ -485,7 +494,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ,pt_itd   in itd_tbl
     ,p_inner_join in boolean
     ,p_splits_rowcount in integer
-    ,p_homo_rowcount out integer
+    ,p_rowcount_out out integer
   )
   is
     i                 binary_integer;
@@ -755,9 +764,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       'insert /*+ append */ into '||l_table_name
       ||cr||l_sql;
       
-    p_homo_rowcount := sql%rowcount;
+    p_rowcount_out := sql%rowcount;
       
-    commit;
     
     nm3dbg.deind;
   exception
@@ -986,18 +994,111 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   end;
   
   
+  -- this populates the route connectivity temp table nm_datum_connectivity_tmp
+  procedure ins_route_connectivity(
+     p_criteria_rowcount in integer
+    ,p_ignore_poe in boolean
+  )
+  is
+    l_sql varchar2(10000);
+    l_sql_outer varchar2(1000);
+    l_sql_conn varchar2(10000);
+    l_sqlcount  pls_integer;
+    
+  begin
+    nm3dbg.putln(g_package_name||'.ins_route_connectivity('
+      ||'p_criteria_rowcount='||p_criteria_rowcount
+      ||', p_ignore_poe='||nm3flx.boolean_to_char(p_ignore_poe)
+      ||')');
+    nm3dbg.ind;
+    
+    l_sql_conn := nm3dynsql2.sql_route_connectivity(
+                     p_criteria_rowcount => p_criteria_rowcount
+                    ,p_ignore_poe => p_ignore_poe
+                  );
+             
+    l_sql_outer := 'insert into nm_datum_connectivity_tmp ('
+       ||cr||'  nm_ne_id_in, chunk_no, chunk_seq, nm_ne_id_of, nm_begin_mp, nm_end_mp'
+       ||cr||', measure, end_measure, nm_slk, nm_end_slk, nt_unit_in, nt_unit_of'
+       ||cr||')'
+       ||cr||'select'
+       ||cr||'  nm_ne_id_in, chunk_no, chunk_seq, nm_ne_id_of, nm_begin_mp, nm_end_mp'
+       ||cr||', measure, end_measure, nm_slk, nm_end_slk, nt_unit_in, nt_unit_of'
+       ||cr||'from (';
+       
+    l_sql := l_sql_outer
+       ||cr||l_sql_conn
+       ||cr||')';
+       
+    execute immediate 'truncate table nm_datum_connectivity_tmp';
+    
+    nm3dbg.putln(l_sql);
+    execute immediate l_sql;
+    l_sqlcount := sql%rowcount;
+    
+    nm3dbg.putln('routes insert sqlcount: '||l_sqlcount);
+    
+    
+    -- take care of single datums           
+    l_sql_conn :=
+            'select'
+      ||cr||'   hc2.*'
+      ||cr||'  ,rownum chunk_no'
+      ||cr||'from ('
+      ||cr||'select'
+      ||cr||'   hc.nm_ne_id_of nm_ne_id_in'   -- the datum is the route
+      ||cr||'  ,1 chunk_seq'
+      ||cr||'  ,hc.nm_ne_id_of'
+      ||cr||'  ,hc.nm_begin_mp begin_mp'
+      ||cr||'  ,hc.nm_end_mp end_mp'
+      ||cr||'  ,hc.hash_value'
+      ||cr||'  ,hc.nm_begin_mp'
+      ||cr||'  ,hc.nm_end_mp'
+      ||cr||'  ,-1 nt_unit_in'
+      ||cr||'  ,-1 nt_unit_of'
+      ||cr||'  ,hc.nm_begin_mp measure'
+      ||cr||'  ,hc.nm_end_mp end_measure'
+      ||cr||'  ,cast(null as number) nm_slk'
+      ||cr||'  ,cast(null as number) nm_end_slk'
+      ||cr||'from'
+      ||cr||'   nm_mrg_datum_homo_chunks_tmp hc'
+      ||cr||'  ,nm_datum_criteria_tmp d'
+      ||cr||'where hc.nm_ne_id_of = d.datum_id'
+      ||cr||'  and d.group_id is null'
+      ||cr||'order by hc.nm_ne_id_of, hc.nm_begin_mp'
+      ||cr||') hc2';
+                  
+    l_sql := l_sql_outer
+       ||cr||l_sql_conn
+       ||cr||')';
+       
+    nm3dbg.putln(l_sql);
+    execute immediate l_sql;
+    l_sqlcount := sql%rowcount;
+    nm3dbg.putln('datums insert sqlcount: '||l_sqlcount);
+    
+    
+    nm3dbg.deind;
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.ins_route_connectivity('
+        ||'p_criteria_rowcount='||p_criteria_rowcount
+        ||', p_ignore_poe='||nm3flx.boolean_to_char(p_ignore_poe)
+        ||')');
+      raise;
+    
+  end;
+    
+    
   
-  -- this populates the standard results table by route connectivity
-  --  todo: 
+  
+  -- this populates the standard results table
+  --  todo: more comments needed here
   procedure std_populate(
      p_nmq_id in nm_mrg_query_all.nmq_id%type
     ,pt_attr in ita_mapping_tbl
     ,p_admin_unit_id in nm_admin_units_all.nau_admin_unit%type
     ,p_splits_rowcount in integer
-    ,p_homo_rowcount in integer
-    ,p_route_id in nm_elements_all.ne_id%type
-    ,p_group_type in nm_members_all.nm_obj_type%type
-    ,p_all_routes in boolean
     ,p_ignore_poe in boolean
     ,p_description in varchar2
     ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
@@ -1033,16 +1134,10 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     l_chunk_no  number(6);
     i           binary_integer;
     k           binary_integer;
-    
-    l_sql               varchar2(32767);
-    cur                 sys_refcursor;
-    l_homo_cardinality  integer;
-    r                   route_inv_rec;
     l_nqr_memb_count    integer := 0;
     l_section_id        nm_mrg_sections_all.nms_mrg_section_id%type := 0;
     l_nsm_measure       mp_type := 0;
-    
-    l_sql_lag_nm_ne_id_in   varchar2(200);
+
 
   begin
     nm3dbg.putln(g_package_name||'.std_populate('
@@ -1050,123 +1145,59 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       ||', pt_attr.count='||pt_attr.count
       ||', p_admin_unit_id='||p_admin_unit_id
       ||', p_splits_rowcount='||p_splits_rowcount
-      ||', p_homo_rowcount='||p_homo_rowcount
-      ||', p_route_id='||p_route_id
-      ||', p_group_type='||p_group_type
-      ||', p_all_routes='||nm3flx.boolean_to_char(p_all_routes)
       ||', p_ignore_poe='||nm3flx.boolean_to_char(p_ignore_poe)
       ||', p_description='||p_description
       ||')');
     nm3dbg.ind;
-    
-    
-    l_homo_cardinality := nm3sql.get_rounded_cardinality(p_homo_rowcount);
-    
-    
-    -- assemble by route
-    if p_group_type is not null then
-      l_sql := nm3dynsql.sql_route_connectivity(
-         p_all_routes => p_all_routes
-        ,p_route_id   => p_route_id
-        ,p_route_type => p_group_type
-        ,p_ignore_poe => p_ignore_poe
-      );
-      
-      l_sql_lag_nm_ne_id_in := 
-              '  ,lag(qq.nm_ne_id_in, 1, null) over'
-        ||cr||'    (order by qq.nm_ne_id_in)';
 
-      
-    -- assemble by datum
-    else
-      l_sql :=
-            'select'
-      ||cr||'   hc2.*'
-      ||cr||'  ,rownum chunk_no'
-      ||cr||'from ('
-      ||cr||'select'
-      ||cr||'   hc.nm_ne_id_of nm_ne_id_in'   -- the datum is the route
-      ||cr||'  ,1 chunk_seq'
-      ||cr||'  ,hc.nm_ne_id_of'
-      ||cr||'  ,hc.nm_begin_mp begin_mp'
-      ||cr||'  ,hc.nm_end_mp end_mp'
-      ||cr||'  ,hc.hash_value'
-      ||cr||'  ,hc.nm_begin_mp'
-      ||cr||'  ,hc.nm_end_mp'
-      ||cr||'  ,-1 nt_unit_in'
-      ||cr||'  ,-1 nt_unit_of'
-      ||cr||'  ,hc.nm_begin_mp measure'
-      ||cr||'  ,hc.nm_end_mp end_measure'
-      ||cr||'  ,cast(null as number) nm_slk'
-      ||cr||'  ,cast(null as number) nm_end_slk'
-      ||cr||'from nm_mrg_datum_homo_chunks_tmp hc'
-      ||cr||'order by hc.nm_ne_id_of, hc.nm_begin_mp'
-      ||cr||') hc2';
-      
-      l_sql_lag_nm_ne_id_in := '  ,to_number(null)';
-    
-    end if;
-    
-    l_sql :=
-          'select /*+ cardinality(inv '||l_homo_cardinality||') */'
-    ||cr||'   qq.nm_ne_id_in'
-    ||cr||'  ,qq.chunk_no'
-    ||cr||'  ,qq.chunk_seq'
-    ||cr||'  ,qq.nm_ne_id_of'
-    ||cr||'  ,greatest(inv.nm_begin_mp, qq.nm_begin_mp) begin_mp'
-    ||cr||'  ,least(inv.nm_end_mp, qq.nm_end_mp) end_mp'
-    ||cr||'  ,inv.hash_value'
-    ||cr||'  ,qq.nm_begin_mp'
-    ||cr||'  ,qq.nm_end_mp'
-    ||cr||'  ,qq.nt_unit_in'
-    ||cr||'  ,qq.nt_unit_of'
-    ||cr||'  ,qq.measure'
-    ||cr||'  ,qq.end_measure'
-    ||cr||'  ,qq.nm_slk'
-    ||cr||'  ,qq.nm_end_slk'
-    ||cr||'  ,lag(qq.nm_ne_id_in, 1, null) over'
-    ||cr||'    (order by qq.nm_ne_id_in) lag_nm_ne_id_in'
-    ||cr||'  ,lag(qq.chunk_no, 1, null) over'
-    ||cr||'    (partition by qq.nm_ne_id_in order by qq.chunk_no) lag_chunk_no'
-    ||cr||'  ,lag(qq.chunk_seq, 1, null) over'
-    ||cr||'    (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp) lag_chunk_seq'
-    ||cr||'  ,lag(inv.hash_value, 1, null) over'
-    ||cr||'    (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp) lag_hash_value'
-    ||cr||'from'
-    ||cr||'('
-    ||cr||l_sql
-    ||cr||') qq'
-    ||cr||', nm_mrg_datum_homo_chunks_tmp inv'
-    ||cr||'where qq.nm_ne_id_of = inv.nm_ne_id_of'    
-    ||cr||'  and ((qq.nm_begin_mp < inv.nm_end_mp and qq.nm_end_mp > inv.nm_begin_mp)'
-    ||cr||'    or ((qq.nm_begin_mp = qq.nm_end_mp or inv.nm_begin_mp = inv.nm_end_mp)'
-    ||cr||'      and (qq.nm_begin_mp = inv.nm_end_mp or qq.nm_end_mp = inv.nm_begin_mp)))'
-    ||cr||'order by 1, 2, 3, 5'
-    ;
-    
-
-    nm3dbg.putln(l_sql);
-    
     
     -- init static vaules
     r_res.NQR_NMQ_ID := p_nmq_id;
     r_res.NQR_SOURCE := 'ROUTE';
     r_res.NQR_ADMIN_UNIT := p_admin_unit_id;
     
-    
     nm3dbg.putln('open route connectivity query');
-    
+
     
     -- chunk_no identifies the connected chunk within route
     --  (each route can have many distinct connected chunks
     --    because of breaks in connectivity)
     -- cunk_seq is the order by of the pieces within chunk
-  
-
-    open cur for l_sql;
+    for r in (
+      select
+         qq.nm_ne_id_in
+        ,qq.chunk_no
+        ,qq.chunk_seq
+        ,qq.nm_ne_id_of
+        ,greatest(inv.nm_begin_mp, qq.nm_begin_mp) begin_mp
+        ,least(inv.nm_end_mp, qq.nm_end_mp) end_mp
+        ,inv.hash_value
+        ,qq.nm_begin_mp
+        ,qq.nm_end_mp
+        ,qq.nt_unit_in
+        ,qq.nt_unit_of
+        ,qq.measure
+        ,qq.end_measure
+        ,qq.nm_slk
+        ,qq.nm_end_slk
+        ,lag(qq.nm_ne_id_in, 1, null) over
+          (order by qq.nm_ne_id_in) lag_nm_ne_id_in
+        ,lag(qq.chunk_no, 1, null) over
+          (partition by qq.nm_ne_id_in order by qq.chunk_no) lag_chunk_no
+        ,lag(qq.chunk_seq, 1, null) over
+          (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp) lag_chunk_seq
+        ,lag(inv.hash_value, 1, null) over
+          (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp) lag_hash_value
+      from
+         nm_datum_connectivity_tmp qq
+        ,nm_mrg_datum_homo_chunks_tmp inv
+      where qq.nm_ne_id_of = inv.nm_ne_id_of    
+        and ((qq.nm_begin_mp < inv.nm_end_mp and qq.nm_end_mp > inv.nm_begin_mp)
+          or ((qq.nm_begin_mp = qq.nm_end_mp or inv.nm_begin_mp = inv.nm_end_mp)
+            and (qq.nm_begin_mp = inv.nm_end_mp or qq.nm_end_mp = inv.nm_begin_mp)))
+      order by 1, 2, 3, 5
+    )
     loop
-      fetch cur into r;
-      exit when cur%notfound;
 
       -- same route
       if r.nm_ne_id_in = r.lag_nm_ne_id_in then null;
@@ -1292,9 +1323,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       
     end loop;
     
-    close cur;
-    
-    
     
     -- last one after loop        
     if r_res.nqr_mrg_job_id is not null then
@@ -1331,12 +1359,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||', pt_attr.count='||pt_attr.count
         ||', p_admin_unit_id='||p_admin_unit_id
         ||', p_splits_rowcount='||p_splits_rowcount
-        ||', p_homo_rowcount='||p_homo_rowcount
-        ||', p_route_id='||p_route_id
-        ||', p_group_type='||p_group_type
-        ||', p_all_routes='||nm3flx.boolean_to_char(p_all_routes)
         ||', p_ignore_poe='||nm3flx.boolean_to_char(p_ignore_poe)
-        ||', l_homo_cardinality='||l_homo_cardinality
         ||')');
       raise;
    
@@ -1351,37 +1374,35 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
      p_nmq_id in nm_mrg_query_all.nmq_id%type
     ,p_nqr_admin_unit in nm_mrg_query_results_all.nqr_admin_unit%type
     ,p_nmq_descr in nm_mrg_query_all.nmq_descr%type
-    ,p_route_id in nm_elements_all.ne_id%type
-    ,p_group_type in nm_members_all.nm_obj_type%type
-    ,p_all_routes in boolean
     ,p_ignore_poe in boolean
+    ,p_criteria_rowcount in integer
     ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
     ,p_longops_rec in out nm3sql.longops_rec
   )
   is
-    t_inv             nm3bulk_mrg.ita_mapping_tbl;
-    t_idt             nm3bulk_mrg.itd_tbl;
+    t_inv             ita_mapping_tbl;
+    t_idt             itd_tbl;
     l_inner_join      boolean;
     l_effective_date  constant date := nm3user.get_effective_date;
     l_all_routes      boolean := false;
     l_ignore_poe      boolean := true;
     l_splits_rowcount integer;
     l_homo_rowcount   integer;
+    l_connect_rowcount  integer;
     
-    pragma autonomous_transaction;
+    --pragma autonomous_transaction;
     
   begin
     nm3dbg.putln(g_package_name||'.std_run('
       ||'p_nmq_id='||p_nmq_id
       ||', p_nqr_admin_unit='||p_nqr_admin_unit
       ||', p_nmq_descr='||p_nmq_descr
-      ||', p_route_id='||p_route_id
-      ||', p_group_type='||p_group_type
-      ||', p_all_routes='||nm3flx.boolean_to_char(p_all_routes)
       ||', p_ignore_poe='||nm3flx.boolean_to_char(p_ignore_poe)
+      ||', p_criteria_rowcount='||p_criteria_rowcount
       ||')');
     nm3dbg.ind;
         
+    -- 1
     load_attrib_metadata(
        pt_attr  => t_inv
       ,pt_itd   => t_idt
@@ -1391,34 +1412,35 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ins_splits(
        pt_attr            => t_inv
       ,p_effective_date   => l_effective_date
-      ,p_all_routes       => false
-      ,p_splits_rowcount  => l_splits_rowcount    -- out
+      ,p_criteria_rowcount  => p_criteria_rowcount
+      ,p_rowcount_out     => l_splits_rowcount    -- out
     );
-    commit;
     nm3sql.set_longops(p_rec => p_longops_rec, p_increment => 1);
+    -- 2
     ins_datum_homo_chunks(
        pt_attr          => t_inv
       ,pt_itd           => t_idt
       ,p_inner_join     => l_inner_join
       ,p_splits_rowcount => l_splits_rowcount -- in
-      ,p_homo_rowcount  => l_homo_rowcount    -- out
+      ,p_rowcount_out   => l_homo_rowcount    -- out
     );
-    commit;
     nm3sql.set_longops(p_rec => p_longops_rec, p_increment => 1);
+    -- 3
+    ins_route_connectivity(
+       p_criteria_rowcount  => p_criteria_rowcount
+      ,p_ignore_poe         => l_ignore_poe
+    );
+    nm3sql.set_longops(p_rec => p_longops_rec, p_increment => 1);
+    -- 4
     std_populate(
        p_nmq_id         => p_nmq_id
       ,pt_attr          => t_inv
       ,p_admin_unit_id  => p_nqr_admin_unit
       ,p_splits_rowcount => l_splits_rowcount -- in
-      ,p_homo_rowcount  => l_homo_rowcount    -- in
-      ,p_route_id       => p_route_id
-      ,p_group_type     => p_group_type
-      ,p_all_routes     => l_all_routes
       ,p_ignore_poe     => l_ignore_poe
       ,p_description    => p_nmq_descr
       ,p_mrg_job_id     => p_mrg_job_id       -- out
     );
-    commit;
     nm3sql.set_longops(p_rec => p_longops_rec, p_increment => 1);
     
     nm3dbg.deind;
@@ -1428,10 +1450,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||'p_nmq_id='||p_nmq_id
         ||', p_nqr_admin_unit='||p_nqr_admin_unit
         ||', p_nmq_descr='||p_nmq_descr
-        ||', p_route_id='||p_route_id
-        ||', p_group_type='||p_group_type
-        ||', p_all_routes='||nm3flx.boolean_to_char(p_all_routes)
         ||', p_ignore_poe='||nm3flx.boolean_to_char(p_ignore_poe)
+        ||', p_criteria_rowcount='||p_criteria_rowcount
         ||')');
       rollback;
       raise;
@@ -1761,73 +1781,422 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   
   procedure load_group_datums(
      p_group_id in nm_elements_all.ne_id%type
+    ,p_sqlcount out pls_integer
   )
   is
-    cur sys_refcursor;
+    l_sql varchar2(10000);
+    l_group_type nm_group_types.ngt_group_type%type;
+    
   begin
     nm3dbg.putln(g_package_name||'.load_group_datums('
       ||'p_group_id='||p_group_id
       ||')');
-    open cur for
-      select distinct nm_ne_id_of
-      from nm_members
-      where nm_ne_id_in = p_group_id;
-    nm3sql.load_id_tbl(cur);
+      
+    -- look up the group type
+    select e.ne_gty_group_type
+    into l_group_type
+    from nm_elements e
+    where e.ne_id = p_group_id;
+    
+    
+    -- element is group
+    if l_group_type is not null then
+      l_sql :=
+        sql_load_nm_datum_criteria_tmp(
+           p_elements_sql => 
+                  '    select nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
+            ||cr||'    from nm_members'
+            ||cr||'    where nm_ne_id_in = :p_group_id'
+            ||cr||'    group by nm_ne_id_of' 
+        );
+        
+      ensure_group_type_linear(
+         p_group_type_in  => l_group_type
+        ,p_group_type_out => l_group_type
+      );
+        
+        
+    -- element is datum
+    else
+      l_sql :=
+        sql_load_nm_datum_criteria_tmp(
+           p_elements_sql => 
+                  '    select ne_id nm_ne_id_of, 0 begin_mp, ne_length end_mp'
+            ||cr||'    from nm_elements'
+            ||cr||'    where ne_id = :p_group_id' 
+        );
+    
+    end if;
+    
+      
+    execute immediate 'truncate table nm_datum_criteria_tmp';
+    
+    nm3dbg.putln(l_sql);
+    execute immediate l_sql
+    using
+       l_group_type
+      ,p_group_id;
+    
+    p_sqlcount := sql%rowcount;
+    nm3dbg.deind;
+
   exception
     when others then
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_group_datums('
         ||'p_group_id='||p_group_id
+        ||', l_group_type='||l_group_type
         ||')');
       raise;
   end;
   
   
-  procedure load_group_type_datums(
-     p_group_type in nm_members_all.nm_obj_type%type
+
+  
+  
+  procedure load_extent_datums(
+     p_group_type in nm_group_types.ngt_group_type%type
+    ,p_nse_id in nm_saved_extents.nse_id%type
+    ,p_sqlcount out pls_integer
   )
   is
-    cur sys_refcursor;
+    l_sql     constant varchar2(10000) :=
+      sql_load_nm_datum_criteria_tmp(
+         p_elements_sql => 
+                '    select d.nsd_ne_id nm_ne_id_of, min(d.nsd_begin_mp) begin_mp, max(d.nsd_end_mp) end_mp'
+          ||cr||'    from nm_saved_extent_member_datums d'
+          ||cr||'    where d.nsd_nse_id = :p_nse_id'
+          ||cr||'    group by d.nsd_ne_id' 
+      );
+    l_group_type nm_group_types.ngt_group_type%type;
+    
   begin
-    nm3dbg.putln(g_package_name||'.p_group_type('
+    nm3dbg.putln(g_package_name||'.load_extent_datums('
       ||'p_group_type='||p_group_type
+      ||', p_nse_id='||p_nse_id
       ||')');
-    open cur for
-      select distinct nm_ne_id_of
-      from nm_members
-      where nm_obj_type = p_group_type;
-    nm3sql.load_id_tbl(cur);
+    nm3dbg.ind;
+    
+    ensure_group_type_linear(
+       p_group_type_in  => p_group_type
+      ,p_group_type_out => l_group_type
+    );
+    
+    execute immediate 'truncate table nm_datum_criteria_tmp';
+    
+    nm3dbg.putln(l_sql);
+    execute immediate l_sql
+    using
+       l_group_type
+      ,p_nse_id;
+    
+    p_sqlcount := sql%rowcount;
+    nm3dbg.deind;
   exception
     when others then
-      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.p_group_type('
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_extent_datums('
+        ||'p_nse_id='||p_nse_id
+        ||', l_group_type='||l_group_type
+        ||')');
+      raise;
+  
+  end;
+  
+
+  
+  
+  procedure load_group_type_datums(
+     p_group_type in nm_members_all.nm_obj_type%type
+    ,p_sqlcount out pls_integer
+  )
+  is
+    l_sql     constant varchar2(10000) :=
+      sql_load_nm_datum_criteria_tmp(
+         p_elements_sql => 
+                '    select nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
+          ||cr||'    from nm_members'
+          ||cr||'    where nm_obj_type = :p_group_type'
+          ||cr||'    group by nm_ne_id_of' 
+      );
+    l_group_type nm_group_types.ngt_group_type%type;
+      
+  begin
+    nm3dbg.putln(g_package_name||'.load_group_type_datums('
+      ||'p_group_type='||p_group_type
+      ||')');
+    nm3dbg.ind;
+    
+    -- check that the type given is linear group type
+    --  if not then don't use it for route connectivity
+    ensure_group_type_linear(
+       p_group_type_in  => p_group_type
+      ,p_group_type_out => l_group_type
+    );
+    
+    execute immediate 'truncate table nm_datum_criteria_tmp';
+    
+    nm3dbg.putln(l_sql);
+    execute immediate l_sql
+    using
+       l_group_type
+      ,p_group_type;
+    
+    p_sqlcount := sql%rowcount;
+    nm3dbg.deind;
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_group_type_datums('
+        ||'p_group_type='||p_group_type
+        ||', l_group_type='||l_group_type
+        ||')');
+      raise;
+  end;
+  
+
+
+  procedure load_nt_type_datums(
+     p_group_type in varchar2
+    ,p_nt_type in nm_types.nt_type%type
+    ,p_sqlcount out pls_integer
+  )
+  is
+    l_nt_type nm_types.nt_type%type;
+    l_group_type nm_group_types.ngt_group_type%type;
+    l_sql     constant varchar2(10000) :=
+      sql_load_nm_datum_criteria_tmp(
+         p_elements_sql => 
+                '    select e.ne_id nm_ne_id_of, to_number(null) begin_mp, to_number(null) end_mp'
+          ||cr||'    from nm_elements e'
+          ||cr||'    where e.ne_nt_type in ('
+          ||cr||'      select nt_type from nm_types' 
+          ||cr||'      where nt_datum = ''Y'''
+          ||cr||'        and nt_linear = ''Y'''
+          ||cr||'        and nt_type = :l_nt_type'
+          ||cr||'    )'
+      );
+  begin
+    nm3dbg.putln(g_package_name||'.load_nt_type_datums('
+      ||'p_group_type='||p_group_type
+      ||', p_nt_type='||p_nt_type
+      ||')');
+    nm3dbg.ind;
+    
+    execute immediate 'truncate table nm_datum_criteria_tmp';
+    
+
+    -- check that the type given is linear datum type
+    begin
+      select nt_type into l_nt_type
+      from nm_types where nt_type = p_nt_type
+        and nt_datum = 'Y' and nt_linear = 'Y';
+    exception
+      when no_data_found then
+        raise_application_error(-20301
+          ,'Invalid parameter: nt_type must be a linear datm networ type: '||p_nt_type);
+    end;
+    
+    ensure_group_type_linear(
+       p_group_type_in  => p_group_type
+      ,p_group_type_out => l_group_type
+    );
+      
+    nm3dbg.putln(l_sql);
+    execute immediate l_sql
+    using
+       l_group_type
+      ,l_nt_type;
+      
+    p_sqlcount := sql%rowcount;
+    nm3dbg.deind;
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_nt_type_datums('
+        ||'p_group_type='||p_group_type
+        ||', p_nt_type='||p_nt_type
+        ||', l_group_type='||l_group_type
+        ||')');
+      raise;
+  end;
+  
+  
+  
+  procedure load_all_network_datums(
+     p_group_type in varchar2
+    ,p_sqlcount out pls_integer
+  )
+  is
+    l_sql constant varchar2(10000) :=
+      sql_load_nm_datum_criteria_tmp(
+         p_elements_sql => 
+                '    select e.ne_id nm_ne_id_of, to_number(null) begin_mp, to_number(null) end_mp'
+          ||cr||'    from nm_elements e'
+          ||cr||'    where e.ne_nt_type in ('
+          ||cr||'      select nt_type from nm_types' 
+          ||cr||'      where nt_datum = ''Y'''
+          ||cr||'        and nt_linear = ''Y'''
+          ||cr||'    )'
+      );
+
+  begin
+    nm3dbg.putln(g_package_name||'.load_all_network_datums('
+      ||'p_group_type='||p_group_type
+      ||')');
+    nm3dbg.ind;
+      
+    execute immediate 'truncate table nm_datum_criteria_tmp';
+    
+    nm3dbg.putln(l_sql);
+    execute immediate l_sql
+    using 
+       p_group_type;
+       
+    p_sqlcount := sql%rowcount;
+    nm3dbg.deind;
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_all_network_datums('
         ||'p_group_type='||p_group_type
         ||')');
       raise;
   end;
   
   
-  procedure load_extent_datums(
-     p_nse_id in nm_saved_extents.nse_id%type
+  
+  
+  -- this is called from nm3inv_composite2
+  procedure load_gaz_list_datums(
+     p_group_type in varchar2
+    ,pt_ne in nm_id_tbl
+    ,pt_nse in nm_id_tbl
+    ,p_sqlcount out pls_integer
   )
   is
-    cur sys_refcursor;
+    i             binary_integer := pt_ne.first;
+    l_inner_sql   varchar2(4000);
+    l_sql         varchar2(10000);
+    l_union_all   varchar2(20);
+    l_union_count pls_integer := 0;
+    
   begin
-    nm3dbg.putln(g_package_name||'.load_extent_datums('
-      ||'p_nse_id='||p_nse_id
+    nm3dbg.putln(g_package_name||'.load_gaz_list_datums('
+      ||'p_group_type='||p_group_type
+      ||', pt_ne.count='||pt_ne.count
+      ||', pt_nse.count='||pt_nse.count
       ||')');
-    open cur for
-      select distinct d.nsd_ne_id
-      from nm_saved_extent_member_datums d
-      where d.nsd_nse_id = p_nse_id;
-    nm3sql.load_id_tbl(cur);
+      
+    -- reset the cached id tables
+    mt_datum_id := new nm_id_tbl();
+    mt_group_id := new nm_id_tbl();
+    mt_nse_id   := new nm_id_tbl();
+      
+
+    -- saved extents
+    if pt_nse.count > 0 then
+      mt_nse_id := pt_nse;
+      l_inner_sql := 
+             '    select /*+ cardinality(x 2) */'
+       ||cr||'      d.nsd_ne_id nm_ne_id_of, min(d.nsd_begin_mp) begin_mp, max(d.nsd_end_mp) end_mp'
+       ||cr||'    from'
+       ||cr||'       nm_saved_extent_member_datums d'
+       ||cr||'      ,table(cast('||g_package_name||'.get_nse_id_tbl as nm_id_tbl)) x'
+       ||cr||'    where d.nsd_nse_id = x.column_value'
+       ||cr||'    group by d.nsd_ne_id';
+       
+      l_union_all := cr||'    union all'||cr;
+      l_union_count := l_union_count + 1;
+      
+    end if;
+  
+  
+    -- routes and single datums
+    if pt_ne.count > 0 then
+
+      -- divide the datum and group elements into different tables
+      while i is not null loop
+        if nm3net.element_is_a_datum(pt_ne(i)) then
+          mt_datum_id.extend;
+          mt_datum_id(mt_datum_id.last) := pt_ne(i);
+        else
+          mt_group_id.extend;
+          mt_group_id(mt_group_id.last) := pt_ne(i);
+        end if;
+        i := pt_ne.next(i);
+      end loop;
+      
+
+      -- datums
+      if mt_datum_id.count > 0 then
+        l_inner_sql := l_inner_sql
+              ||l_union_all
+              ||'    select /*+ cardinality(x 2) */'
+          ||cr||'       ne_id nm_ne_id_of, 0 begin_mp, ne_length end_mp'
+          ||cr||'    from'
+          ||cr||'       nm_elements'
+          ||cr||'      ,table(cast('||g_package_name||'.get_datum_id_tbl as nm_id_tbl)) x'
+          ||cr||'    where ne_id = x.column_value';
+       
+        l_union_all := cr||'    union all'||cr;
+        l_union_count := l_union_count + 1;
+
+      end if;
+        
+      -- groups
+      if mt_group_id.count > 0 then
+        l_inner_sql := l_inner_sql
+              ||l_union_all
+              ||'    select /*+ cardinality(x 2) */'
+          ||cr||'      nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
+          ||cr||'    from'
+          ||cr||'       nm_members'
+          ||cr||'      ,table(cast('||g_package_name||'.get_group_id_tbl as nm_id_tbl)) x'
+          ||cr||'    where nm_ne_id_in = x.column_value'
+          ||cr||'    group by nm_ne_id_of';
+          
+          l_union_count := l_union_count + 1;
+      
+      end if;
+    
+    end if;
+    
+    -- if more than one source then wrap all into another group by to ensure distinct nm_ne_id_of
+    if l_union_count > 1 then
+      
+      l_inner_sql := 
+              '    select nm_ne_id_of, min(begin_mp) begin_mp, max(end_mp) end_mp'
+        ||cr||'    from ('
+        ||cr||l_inner_sql
+        ||cr||'    )'
+        ||cr||'    group by nm_ne_id_of';
+        
+    end if;
+      
+      
+    l_sql :=
+      sql_load_nm_datum_criteria_tmp(
+         p_elements_sql => l_inner_sql
+      );
+
+      
+    execute immediate 'truncate table nm_datum_criteria_tmp';
+    
+    nm3dbg.putln(l_sql);
+    execute immediate l_sql
+    using 
+       p_group_type;
+       
+    p_sqlcount := sql%rowcount;
+      
   exception
     when others then
-      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_extent_datums('
-        ||'p_nse_id='||p_nse_id
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_gaz_list_datums('
+        ||'p_group_type='||p_group_type
+        ||', pt_ne.count='||pt_ne.count
+        ||', pt_nse.count='||pt_nse.count
         ||')');
       raise;
-  end;  
+    
+  end;
   
-  
+
   
   
   -- this builds the effective date where clause for dynamic sql
@@ -2005,7 +2374,74 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 
   end;
   
-
+  
+  -- this nullifies the passed passed in group type if it is not linear
+  procedure ensure_group_type_linear(
+     p_group_type_in in nm_group_types.ngt_group_type%type
+    ,p_group_type_out out nm_group_types.ngt_group_type%type
+  )
+  is
+  begin
+    select ngt_group_type into p_group_type_out
+    from nm_group_types where ngt_group_type = p_group_type_in
+      and ngt_linear_flag = 'Y';
+  exception
+    -- silent here, only log
+    when no_data_found then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.ensure_group_type_linear('
+        ||'p_group_type_in='||p_group_type_in
+        ||')');
+  end;
+  
+  
+  
+  -- this populatest the nm_datum_criteria_tmp table
+  --  
+  function sql_load_nm_datum_criteria_tmp(
+     p_elements_sql in varchar2
+  ) return varchar2
+  is
+  begin
+    return
+            'insert into nm_datum_criteria_tmp ('
+      ||cr||'  datum_id, begin_mp, end_mp, group_id'
+      ||cr||')'
+      ||cr||'select'
+      ||cr||'   q2.nm_ne_id_of'
+      ||cr||'  ,q2.nm_begin_mp'
+      ||cr||'  ,q2.nm_end_mp'
+      ||cr||'  ,decode(q2.in_count, 1, null, q2.nm_ne_id_in) nm_ne_id_in'
+      --||cr||'  ,decode(q2.in_count, 1, null, q2.nm_obj_type) nm_obj_type'
+      --||cr||'  ,q2.of_count'
+      --||cr||'  ,q2.in_count'
+      ||cr||'from ('
+      ||cr||'select q.*'
+      ||cr||'  ,decode(q.nm_ne_id_of, null, 1,' 
+      ||cr||'    row_number() over (partition by q.nm_ne_id_of'
+      ||cr||'      order by decode(q.nm_obj_type, :l_group_type, 10000000, q.obj_type_count) desc, q.nm_obj_type)) row_num'
+      ||cr||'from ('
+      ||cr||'select /*+ first_rows */'
+      ||cr||'   e.nm_ne_id_of'
+      ||cr||'  ,m.nm_ne_id_in'
+      ||cr||'  ,m.nm_obj_type'
+      ||cr||'  ,nvl(greatest(m.nm_begin_mp, e.begin_mp), m.nm_begin_mp) nm_begin_mp'
+      ||cr||'  ,nvl(least(m.nm_end_mp, e.end_mp), m.nm_end_mp) nm_end_mp'
+      ||cr||'  ,decode(m.nm_ne_id_of, null, null, count(*) over (partition by m.nm_ne_id_of)) of_count'
+      ||cr||'  ,decode(m.nm_ne_id_in, null, null, count(*) over (partition by m.nm_ne_id_in)) in_count'
+      ||cr||'  ,decode(m.nm_obj_type, null, null, count(*) over (partition by m.nm_obj_type)) obj_type_count'
+      ||cr||'from'
+      ||cr||'   ('
+      ||cr||p_elements_sql
+      ||cr||'   ) e'
+      ||cr||'  ,(select nm_ne_id_of, nm_ne_id_in, nm_begin_mp, nm_end_mp, nm_obj_type'
+      ||cr||'    from nm_members, nm_group_types'
+      ||cr||'    where nm_obj_type = ngt_group_type and ngt_linear_flag = ''Y'') m'
+      ||cr||'where e.nm_ne_id_of = m.nm_ne_id_of (+)'
+      ||cr||') q'
+      ||cr||') q2'
+      ||cr||'where q2.row_num = 1';
+      
+  end;
 
   
 /* exec_splits_query
