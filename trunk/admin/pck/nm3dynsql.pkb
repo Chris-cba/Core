@@ -2,11 +2,11 @@ CREATE OR REPLACE package body nm3dynsql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.0   Jul 23 2007 16:46:54   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.1   Oct 04 2007 16:57:26   ptanava  $
 --       Module Name      : $Workfile:   nm3dynsql.pkb  $
---       Date into PVCS   : $Date:   Jul 23 2007 16:46:54  $
---       Date fetched Out : $Modtime:   Jul 23 2007 16:46:34  $
---       PVCS Version     : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Oct 04 2007 16:57:26  $
+--       Date fetched Out : $Modtime:   Oct 04 2007 11:11:54  $
+--       PVCS Version     : $Revision:   2.1  $
 --       Based on sccs version : 
 --
 --
@@ -21,9 +21,10 @@ CREATE OR REPLACE package body nm3dynsql as
 /* History
   24.05.07  PT in is_cicular() added logic to cope with data where two nodes
                 are connected by more than one element - same direction and lane
+  04.10.07  PT changed sql_route_connectivity() to work with the nm_datum_criteria_tmp table
 */
 
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.0  $"';
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.1  $"';
   g_package_name    constant  varchar2(30) := 'nm3dynsql';
   
   
@@ -112,74 +113,33 @@ CREATE OR REPLACE package body nm3dynsql as
   
   
   -- this returns the sql select statement for route connectivity.
-  --  p_all_routes: if true then all network is included and the datums
-  --    loaded in nm3sql are not considered as restricting criteria
-  --  p_route_id: optional, if given then the nm_members is restricted by the
-  --    given route id. otherwise all routes, where the nm3sql loaded datums
-  --    are members, are returned
-  --  p_route_type: optional, if given then only routes of the given type
-  --    are returned. ignored if p_route_id is given
+  --  the nm_datum_criteria_tmp must be filled before the sql is used
+  --  p_criteria_rowcount: the record count in nm_datum_criteria_tmp
   --  p_ignore_poe: if true then the poe's are not treated as discontinuities.
-  
   function sql_route_connectivity(
-     p_all_routes in boolean
-    ,p_route_id in number
-    ,p_route_type in varchar2
+     p_criteria_rowcount in integer
     ,p_ignore_poe in boolean
   ) return varchar2
   is
     l_sql             varchar2(32767);
     l_cardinality     integer;
-    l_q0_hint         varchar2(100);
-    l_sql_datums_tbl  varchar2(300);
-    l_sql_datums_join varchar2(1000);
     l_sql_ignore_poe  varchar2(300);
     l_sql_route_where varchar2(300);
-    l_bind_count      number(2);
-    l_sql_route_id    varchar2(100);
     l_effective_date  date := nm3user.get_effective_date;
     l_sql_effective_date_tbl  varchar2(200);
     l_sql_effective_date_join varchar2(500);
     
   begin
-  
-    if not p_all_routes then
-      l_cardinality := nm3sql.get_rounded_cardinality(nm3sql.get_id_tbl_count);
-      
-      if l_cardinality = 0 then
-        raise_application_error(-20101
-          ,'Invalid parameters for '||g_package_name||'.sql_route_connectivity():'
-            ||' p_all_routes flag must be true when datums cardinality is 0');
-      end if;
-      
-      l_q0_hint := '/*+ cardinality(d '||l_cardinality||') */';
-      l_sql_datums_tbl := 
-         cr||'  ,(select column_value nm_ne_id_of'
-       ||cr||'    from table(cast(nm3sql.get_id_tbl as nm_id_tbl))) d';
-       
-      l_sql_datums_join :=
-          cr||'  and d.nm_ne_id_of = m.nm_ne_id_of';
-      
-    else
-      l_q0_hint := '/*+ all_rows */';
-      
-    end if;
-    
-    
-    -- restrict by route_id or route type
-    if p_route_id is not null then
-      nm3sql.set_context_value('route_id', p_route_id);
-      l_sql_route_where := cr
-        ||'  and m.nm_ne_id_in = to_number(sys_context(''nm_sql'', ''route_id''))';
-      
-    elsif p_route_type is not null then
-      nm3sql.set_context_value('route_type', p_route_type);
-      l_sql_route_where := cr
-        ||'  and m.nm_obj_type = sys_context(''nm_sql'', ''route_type'')';
+    nm3dbg.putln(g_package_name||'.sql_route_connectivity('
+      ||'p_criteria_rowcount='||p_criteria_rowcount
+      ||', p_ignore_poe='||nm3flx.boolean_to_char(p_ignore_poe)
+      ||')');
+    nm3dbg.ind;
 
-    end if;
-    
-    
+
+    l_cardinality := nm3sql.get_rounded_cardinality(p_criteria_rowcount);
+
+
     if p_ignore_poe then null;
     else
       l_sql_ignore_poe := cr||'          and s1.nm_end_slk = s2.nm_slk';
@@ -279,7 +239,7 @@ CREATE OR REPLACE package body nm3dynsql as
     ||cr||'  over (partition by q0.nm_ne_id_in, cd_start_node)'
     ||cr||' dual_end_node_count'
     ||cr||'from ('
-    ||cr||'select '||l_q0_hint    
+    ||cr||'select /*+ cardinality(d '||l_cardinality||') */'
     ||cr||'   rownum row_num'
     ||cr||'  ,m.nm_ne_id_in'
     ||cr||'  ,m.nm_ne_id_of'
@@ -314,15 +274,16 @@ CREATE OR REPLACE package body nm3dynsql as
     ||cr||'    where nsc_sub_class = e.ne_sub_class and nsc_nw_type = e.ne_nt_type'
     ||cr||'   ), 1)) nsc_seq_no'
     ||cr||'from'
-    ||cr||'   nm_members_all m'
-        ||l_sql_datums_tbl
+    ||cr||'   nm_datum_criteria_tmp d'
+    ||cr||'  ,nm_members_all m'
     ||cr||'  ,nm_elements_all e'
     ||cr||'  ,nm_group_types_all gt'
     ||cr||'  ,nm_types t'
     ||cr||'  ,nm_types t2'
         ||l_sql_effective_date_tbl
     ||cr||'where m.nm_ne_id_of = e.ne_id'
-        ||l_sql_datums_join
+    ||cr||'  and m.nm_ne_id_of = d.datum_id'
+    ||cr||'  and m.nm_ne_id_in = d.group_id'
     ||cr||'  and m.nm_obj_type = gt.ngt_group_type'
     ||cr||'  and e.ne_nt_type = t.nt_type'
     ||cr||'  and gt.ngt_nt_type = t2.nt_type'
@@ -331,7 +292,6 @@ CREATE OR REPLACE package body nm3dynsql as
     ||cr||'  and gt.ngt_end_date is null'
     ||cr||'  and m.nm_type = ''G'''
     ||cr||'  and gt.ngt_linear_flag = ''Y'''
-        ||l_sql_route_where
     ||cr||') q0'
     ||cr||'order by q0.nm_seg_no, q0.nm_seq_no'
     ||cr||')'
