@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.4   Oct 05 2007 14:19:22   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.5   Oct 05 2007 14:31:56   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Oct 05 2007 14:19:22  $
---       Date fetched Out : $Modtime:   Oct 05 2007 14:03:06  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Oct 05 2007 14:31:56  $
+--       Date fetched Out : $Modtime:   Oct 05 2007 14:31:02  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --
 --   Author : Priidu Tanava
@@ -32,10 +32,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                 added process_datums_group_type()
   03.10.07  PT in ins_splits() fixed the FT nm_obj_type problem
   04.10.07  PT rewrote the datum criteria to use nm_datum_criteria_tmp, rewrote criteria loading,
-                introduced nm_datum_connectivity_tmp to separate out the route connectivity results
+                introduced nm_route_connectivity_tmp to separate out the route connectivity results
   05.10.07  PT fixed a bad reference to nm3dynsql2 package. must be nm3dynsql
+                renamed nm_datum_connectivity_tmp to nm_route_connectivity_tmp
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.4  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.5  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -995,7 +996,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   end;
   
   
-  -- this populates the route connectivity temp table nm_datum_connectivity_tmp
+  -- this populates the route connectivity temp table nm_route_connectivity_tmp
   procedure ins_route_connectivity(
      p_criteria_rowcount in integer
     ,p_ignore_poe in boolean
@@ -1018,7 +1019,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                     ,p_ignore_poe => p_ignore_poe
                   );
              
-    l_sql_outer := 'insert into nm_datum_connectivity_tmp ('
+    l_sql_outer := 'insert into nm_route_connectivity_tmp ('
        ||cr||'  nm_ne_id_in, chunk_no, chunk_seq, nm_ne_id_of, nm_begin_mp, nm_end_mp'
        ||cr||', measure, end_measure, nm_slk, nm_end_slk, nt_unit_in, nt_unit_of'
        ||cr||')'
@@ -1031,7 +1032,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
        ||cr||l_sql_conn
        ||cr||')';
        
-    execute immediate 'truncate table nm_datum_connectivity_tmp';
+    execute immediate 'truncate table nm_route_connectivity_tmp';
     
     nm3dbg.putln(l_sql);
     execute immediate l_sql;
@@ -1190,7 +1191,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ,lag(inv.hash_value, 1, null) over
           (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp) lag_hash_value
       from
-         nm_datum_connectivity_tmp qq
+         nm_route_connectivity_tmp qq
         ,nm_mrg_datum_homo_chunks_tmp inv
       where qq.nm_ne_id_of = inv.nm_ne_id_of    
         and ((qq.nm_begin_mp < inv.nm_end_mp and qq.nm_end_mp > inv.nm_begin_mp)
