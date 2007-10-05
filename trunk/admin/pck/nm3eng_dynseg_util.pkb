@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.1   Sep 24 2007 14:47:12   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.2   Oct 05 2007 09:56:20   ptanava  $
 --       Module Name      : $Workfile:   nm3eng_dynseg_util.pkb  $
---       Date into PVCS   : $Date:   Sep 24 2007 14:47:12  $
---       Date fetched Out : $Modtime:   Sep 24 2007 14:46:22  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Oct 05 2007 09:56:20  $
+--       Date fetched Out : $Modtime:   Oct 05 2007 09:25:26  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --   Author : Priidu Tanava
 --
@@ -17,19 +17,21 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 /* History
   17.09.07 PT First delivery with get_first_value(), get_last_value(), get_most_frequent_value()
                 , get_median_value(), get_biased_standard_deviation() and get_biased_variance() unimplemented.
-              The calls must be visible in the defining metadata, cannot use inside other custom functions.
+              The calls must be visible in the defining metadata, cannot use inside custom plsql functions.
               All foreign tables must be without nm_members.
   24.09.07 PT Implemented get_first_value() and get_last_value()
+  05.10.07 PT in sql_get_value() added invisible call error flag so that the error is logged only once
 */
 
 
-  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg_util';
   
   cr            constant varchar2(1) := chr(10);
   
   mt_sql        nm_dynseg_sql_tbl;            
   m_inv_type    nm_inv_types_all.nit_inv_type%type;
+  m_invisible_call  boolean := false;
   
   type          iit_column_type is record (
      col_name   varchar2(30)
@@ -1595,8 +1597,22 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
   exception
     -- invtype_column combination not found in mt_iit_cols
     when no_data_found then
-      raise_application_error(-20010,
-        'Invisible nm3eng_dynseg call');
+      if m_invisible_call then
+        nm3dbg.deind;
+        return 
+                'select null'
+          ||cr||'from nm_eng_dynseg_values_tmp v'
+          ||cr||'where v.grp_operation = :p_operation'
+          ||cr||'  and v.grp_section_id = :p_section_id'
+          ||cr||'  and v.grp_inv_type = :p_inv_type'
+          ||cr||'  and v.grp_xsp = :p_xsp'
+          ||cr||'  and v.grp_value_column = :p_value_column'
+          ||cr||'  and v.grp_value = :p_value';
+      else
+        m_invisible_call := true;
+        raise_application_error(-20010,
+          'Invisible nm3eng_dynseg call');
+      end if;
     when others then
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.sql_get_value('
         ||'p_func_code='||p_func_code
@@ -1647,6 +1663,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     m_context_inv_type    := null;
     --
     mt_iit_cols           := t_dummy2;
+    m_invisible_call      := false;
   end;
   
 
