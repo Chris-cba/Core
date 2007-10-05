@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.3   Oct 04 2007 16:56:34   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.4   Oct 05 2007 14:19:22   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Oct 04 2007 16:56:34  $
---       Date fetched Out : $Modtime:   Oct 04 2007 15:41:40  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Oct 05 2007 14:19:22  $
+--       Date fetched Out : $Modtime:   Oct 05 2007 14:03:06  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --
 --   Author : Priidu Tanava
@@ -33,8 +33,9 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   03.10.07  PT in ins_splits() fixed the FT nm_obj_type problem
   04.10.07  PT rewrote the datum criteria to use nm_datum_criteria_tmp, rewrote criteria loading,
                 introduced nm_datum_connectivity_tmp to separate out the route connectivity results
+  05.10.07  PT fixed a bad reference to nm3dynsql2 package. must be nm3dynsql
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.3  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.4  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -1012,7 +1013,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       ||')');
     nm3dbg.ind;
     
-    l_sql_conn := nm3dynsql2.sql_route_connectivity(
+    l_sql_conn := nm3dynsql.sql_route_connectivity(
                      p_criteria_rowcount => p_criteria_rowcount
                     ,p_ignore_poe => p_ignore_poe
                   );
