@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.3   Oct 04 2007 16:55:12   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.4   Oct 08 2007 10:39:44   ptanava  $
 --       Module Name      : $Workfile:   nm3inv_composite2.pkb  $
---       Date into PVCS   : $Date:   Oct 04 2007 16:55:12  $
---       Date fetched Out : $Modtime:   Oct 04 2007 16:41:14  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Oct 08 2007 10:39:44  $
+--       Date fetched Out : $Modtime:   Oct 08 2007 10:25:18  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on sccs version :
 --
 --   Author : Priidu Tanava
@@ -22,10 +22,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
   21.09.07 PT in do_rebuild() added the eng_dynseg bulk processing (total number of steps now 7)
                 copied get_nmu_id_for_hig_owner() from nm3inv_composite.pkb.
                 this package makes no reference to the old code now.
-  04.10.07 PT accommodated nm3bulk_mrg changes in handling datum criteria 
+  04.10.07 PT accommodated nm3bulk_mrg changes in handling datum criteria
+  08.10.07 PT in call_rebuild() merge results view name is now built from the merge unique.
 */
 
-  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.3  $"';
+  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.4  $"';
   g_package_name  constant  varchar2(30) := 'nm3inv_composite2';
 
   -- Bulk merge types
@@ -347,13 +348,14 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     ,p_value3 in varchar2
   )
   is
-    r_nmnd  nm_mrg_nit_derivation%rowtype;
+    r_nmnd        nm_mrg_nit_derivation%rowtype;
+    l_nmq_unique  nm_mrg_query_all.nmq_unique%type;
     l_keep_history boolean := false;
-    t_attr  attrib_tbl;
-    i       binary_integer := 0;
+    t_attr        attrib_tbl;
+    i             binary_integer := 0;
     l_admin_unit_id hig_users.hus_admin_unit%type;
-    t_ne    nm_id_tbl;
-    t_nse   nm_id_tbl;
+    t_ne          nm_id_tbl;
+    t_nse         nm_id_tbl;
     l_job_failures number := 0;
     
   begin
@@ -387,6 +389,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     select * into r_nmnd 
     from nm_mrg_nit_derivation
     where nmnd_nit_inv_type = p_inv_type;
+    
+    -- lookup merge query name
+    select nmq_unique into l_nmq_unique
+    from nm_mrg_query_all
+    where nmq_id = r_nmnd.nmnd_nmq_id;
     
     
     select u.hus_admin_unit into l_admin_unit_id
@@ -443,7 +450,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
       ,p_effective_date => p_effective_date
       ,p_admin_unit_id  => l_admin_unit_id
       ,p_admin_id       => r_nmnd.nmnd_nmu_id_admin
-      ,p_mrg_view       => 'V_MRG_'||r_nmnd.nmnd_nit_inv_type||'_SVL'
+      ,p_mrg_view       => 'V_MRG_'||l_nmq_unique||'_SVL'
       ,p_mrg_view_where => r_nmnd.nmnd_where_clause
       ,pt_unique_attr   => t_attr
       ,p_keep_history   => l_keep_history
@@ -745,7 +752,6 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     nm3eng_dynseg_util.load_iit_mapping(p_inv_type);
     nm3sql.set_longops(p_rec => r_longops, p_increment => 1);
     t_events(t_events.count+1) := 'Preprocessed dynseg records count: '||l_sqlcount;
-    
     
     -- 6. Popluate the iit temp table
     ins_iit_tmp_values(
