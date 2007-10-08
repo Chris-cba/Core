@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.2   Oct 05 2007 09:56:20   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.3   Oct 08 2007 10:41:28   ptanava  $
 --       Module Name      : $Workfile:   nm3eng_dynseg_util.pkb  $
---       Date into PVCS   : $Date:   Oct 05 2007 09:56:20  $
---       Date fetched Out : $Modtime:   Oct 05 2007 09:25:26  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Oct 08 2007 10:41:28  $
+--       Date fetched Out : $Modtime:   Oct 08 2007 10:37:32  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --   Author : Priidu Tanava
 --
@@ -21,10 +21,12 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
               All foreign tables must be without nm_members.
   24.09.07 PT Implemented get_first_value() and get_last_value()
   05.10.07 PT in sql_get_value() added invisible call error flag so that the error is logged only once
+              in populate_tmp_table() fixed the crashing when no dynseg calls in the asset setup
+  08.10.07 PT in populate_tmp_table() added autonomous commit to ensure pk creation
 */
 
 
-  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg_util';
   
   cr            constant varchar2(1) := chr(10);
@@ -350,6 +352,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
   
   -- this populates the temporarty results table
   --  this is the main data source for quick lookups later
+  -- autonomous commit to ensure pk creation
   procedure populate_tmp_table(
      p_mrg_job_id in nm_mrg_query_results_all.nqr_mrg_job_id%type
     ,p_inv_type in nm_inv_types.nit_inv_type%type
@@ -363,6 +366,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     l_sql_ft_tables         varchar2(32767);
     l_sql_main_calls        varchar2(32767);
     l_iit_ft_union          varchar2(20);
+    pragma autonomous_transaction;
     
   begin
     nm3dbg.putln(g_package_name||'.populate_tmp_table('
@@ -388,7 +392,20 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     if l_sql_iit_table is not null and l_sql_ft_tables is not null then
       l_iit_ft_union := cr||'union all';
     end if;
-
+    
+    
+    execute immediate 'truncate table nm_eng_dynseg_values_tmp';
+    
+    
+    -- if no dynseg calls then exit early
+    if l_sql_iit_table is null and l_sql_ft_tables is null then
+      nm3dbg.putln('no dynseg calls');
+      nm3dbg.deind;
+      p_sqlcount := 0;
+      return;
+      
+    end if;
+    
   
     l_sql := 
           'select q2.*'
@@ -459,18 +476,21 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     
     nm3dbg.putln(l_sql);
     
-    execute immediate 'truncate table nm_eng_dynseg_values_tmp';
     execute immediate l_sql
       using p_mrg_job_id;
-    nm3dbg.deind;
-    p_sqlcount := sql%rowcount;
     
+    -- the commit here enssures that the pk index on the temp table is created
+    commit;
+    
+    p_sqlcount := sql%rowcount;
+    nm3dbg.deind;
   exception
     when others then
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.populate_tmp_table('
         ||'p_mrg_job_id='||p_mrg_job_id
         ||', p_inv_type='||p_inv_type
         ||')');
+      rollback;
       raise;
       
   end;
