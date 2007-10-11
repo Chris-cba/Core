@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.2   Sep 24 2007 15:25:50   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.3   Oct 11 2007 18:16:48   ptanava  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Sep 24 2007 15:25:50  $
---       Date fetched Out : $Modtime:   Sep 24 2007 14:53:44  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Oct 11 2007 18:16:48  $
+--       Date fetched Out : $Modtime:   Oct 11 2007 18:13:36  $
+--       Version          : $Revision:   2.3  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-24-SEP-2007 14:53
+11-OCT-2007 18:13
 
 TABLES PROCESSED
 ================
@@ -1995,11 +1995,24 @@ INSERT INTO HIG_MODULE_ROLES
        ,HMR_MODE
        )
 SELECT 
-        'NM0420'
+        'NM0430'
        ,'HIG_ADMIN'
        ,'NORMAL' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
-                   WHERE HMR_MODULE = 'NM0420'
+                   WHERE HMR_MODULE = 'NM0430'
+                    AND  HMR_ROLE = 'HIG_ADMIN');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'NM0435'
+       ,'HIG_ADMIN'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'NM0435'
                     AND  HMR_ROLE = 'HIG_ADMIN');
 --
 INSERT INTO HIG_MODULE_ROLES
@@ -2606,11 +2619,11 @@ INSERT INTO HIG_MODULE_ROLES
        ,HMR_MODE
        )
 SELECT 
-        'NM7051'
+        'NM7051B'
        ,'HIG_USER'
        ,'NORMAL' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
-                   WHERE HMR_MODULE = 'NM7051'
+                   WHERE HMR_MODULE = 'NM7051B'
                     AND  HMR_ROLE = 'HIG_USER');
 --
 INSERT INTO HIG_MODULE_ROLES
@@ -4195,11 +4208,11 @@ INSERT INTO HIG_MODULE_KEYWORDS
        ,HMK_OWNER
        )
 SELECT 
-        'NM7051'
+        'NM7051B'
        ,'MERGE QUERY RESULTS'
        ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_KEYWORDS
-                   WHERE HMK_HMO_MODULE = 'NM7051'
+                   WHERE HMK_HMO_MODULE = 'NM7051B'
                     AND  HMK_KEYWORD = 'MERGE QUERY RESULTS'
                     AND  HMK_OWNER = 1);
 --

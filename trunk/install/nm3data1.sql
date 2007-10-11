@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.14   Oct 02 2007 15:57:40   dyounger  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.15   Oct 11 2007 18:16:48   ptanava  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Oct 02 2007 15:57:40  $
---       Date fetched Out : $Modtime:   Oct 02 2007 15:03:12  $
---       Version          : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Oct 11 2007 18:16:48  $
+--       Date fetched Out : $Modtime:   Oct 11 2007 18:08:02  $
+--       Version          : $Revision:   2.15  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-26-SEP-2007 10:48
+11-OCT-2007 18:07
 
 TABLES PROCESSED
 ================
@@ -95,7 +95,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'ACC'
        ,'accidents manager'
        ,'4.0.2.0'
@@ -121,7 +121,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'AST'
        ,'asset manager'
        ,'4.0.2.0'
@@ -147,7 +147,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'AVM'
        ,'Asset Valuation Manager'
        ,'4.0.2.0'
@@ -173,7 +173,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'CLM'
        ,'street lighting manager'
        ,'4.0.2.0'
@@ -199,7 +199,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'DOC'
        ,'document manager'
        ,'4.0.2.0'
@@ -225,7 +225,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'ENQ'
        ,'public enquiry manager'
        ,'4.0.2.0'
@@ -251,7 +251,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'HIG'
        ,'exor'
        ,'4.0.2.0'
@@ -277,7 +277,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'IM'
        ,'Information Manager'
        ,'4.0.2.0'
@@ -303,7 +303,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'MAI'
        ,'maintenance manager'
        ,'4.0.2.0'
@@ -329,7 +329,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'MRWA'
        ,'MRWA'
        ,'4.0.2.0'
@@ -355,7 +355,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'NET'
        ,'network manager'
        ,'4.0.2.0'
@@ -381,7 +381,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'NSG'
        ,'Street Gazetteer Manager'
        ,'4.0.2.0'
@@ -407,7 +407,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'PMS'
        ,'structural projects v2 - REDUNDANT'
        ,'4.0.2.0'
@@ -433,7 +433,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'PROW'
        ,'Public Rights Of Way Manager'
        ,'4.0.2.0'
@@ -459,7 +459,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'SCH'
        ,'schemes enterprise edition'
        ,'4.0.2.0'
@@ -485,7 +485,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'STP'
        ,'Schemes'
        ,'4.0.2.0'
@@ -511,7 +511,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'STR'
        ,'structures manager'
        ,'4.0.2.0'
@@ -537,7 +537,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'SWR'
        ,'street works manager'
        ,'4.0.2.0'
@@ -563,7 +563,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'TM'
        ,'traffic interface manager'
        ,'4.0.2.0'
@@ -589,7 +589,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'UKP'
        ,'ukpms'
        ,'4.0.2.0'
@@ -615,7 +615,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'USR'
        ,'lrs'
        ,'4.0.2.0'
@@ -641,7 +641,7 @@ INSERT INTO HIG_PRODUCTS
        ,HPR_LAUNCHPAD_ICON
        ,HPR_IMAGE_TYPE
        )
-SELECT
+SELECT 
         'WMP'
        ,'Web Mapping'
        ,'4.0.2.0'
@@ -678,7 +678,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,1
        ,1
@@ -695,7 +695,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,2
        ,2
@@ -712,7 +712,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,3
        ,5
@@ -729,7 +729,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,4
        ,6
@@ -746,7 +746,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,5
        ,14
@@ -763,7 +763,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,6
        ,72
@@ -780,7 +780,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,7
        ,73
@@ -797,7 +797,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,8
        ,74
@@ -814,7 +814,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,9
        ,75
@@ -831,7 +831,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,10
        ,76
@@ -848,7 +848,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,11
        ,78
@@ -865,7 +865,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,12
        ,81
@@ -882,7 +882,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,13
        ,83
@@ -899,7 +899,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,14
        ,88
@@ -916,7 +916,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,15
        ,90
@@ -933,7 +933,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,16
        ,91
@@ -950,7 +950,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,17
        ,102
@@ -967,7 +967,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,18
        ,103
@@ -984,7 +984,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,19
        ,109
@@ -1001,7 +1001,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,20
        ,110
@@ -1018,7 +1018,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,21
        ,111
@@ -1035,7 +1035,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,22
        ,117
@@ -1052,7 +1052,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,23
        ,120
@@ -1069,7 +1069,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,24
        ,121
@@ -1086,7 +1086,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,25
        ,123
@@ -1103,7 +1103,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,26
        ,124
@@ -1120,7 +1120,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,27
        ,125
@@ -1137,7 +1137,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,28
        ,126
@@ -1154,7 +1154,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,29
        ,128
@@ -1171,7 +1171,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,30
        ,129
@@ -1188,7 +1188,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,31
        ,135
@@ -1205,7 +1205,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,32
        ,136
@@ -1222,7 +1222,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,33
        ,138
@@ -1239,7 +1239,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,34
        ,143
@@ -1256,7 +1256,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,35
        ,144
@@ -1273,7 +1273,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,36
        ,145
@@ -1290,7 +1290,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,37
        ,146
@@ -1307,7 +1307,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,38
        ,147
@@ -1324,7 +1324,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,39
        ,148
@@ -1341,7 +1341,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,40
        ,149
@@ -1358,7 +1358,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,41
        ,150
@@ -1375,7 +1375,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,42
        ,151
@@ -1392,7 +1392,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,43
        ,153
@@ -1409,7 +1409,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,44
        ,154
@@ -1426,7 +1426,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,45
        ,159
@@ -1443,7 +1443,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,46
        ,162
@@ -1460,7 +1460,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,47
        ,164
@@ -1477,7 +1477,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,48
        ,166
@@ -1494,7 +1494,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,49
        ,169
@@ -1511,7 +1511,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,50
        ,182
@@ -1528,7 +1528,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,51
        ,183
@@ -1545,7 +1545,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,52
        ,184
@@ -1562,7 +1562,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,53
        ,185
@@ -1579,7 +1579,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,54
        ,186
@@ -1596,7 +1596,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,55
        ,187
@@ -1613,7 +1613,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,56
        ,188
@@ -1630,7 +1630,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,57
        ,189
@@ -1647,7 +1647,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,58
        ,190
@@ -1664,7 +1664,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,59
        ,342
@@ -1681,7 +1681,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,60
        ,639
@@ -1698,7 +1698,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,61
        ,9608
@@ -1715,7 +1715,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,62
        ,null
@@ -1732,7 +1732,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,63
        ,null
@@ -1749,7 +1749,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,64
        ,null
@@ -1766,7 +1766,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,65
        ,null
@@ -1783,7 +1783,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,66
        ,null
@@ -1800,7 +1800,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,67
        ,null
@@ -1817,7 +1817,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,68
        ,null
@@ -1834,7 +1834,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,69
        ,null
@@ -1851,7 +1851,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,70
        ,null
@@ -1868,7 +1868,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,71
        ,null
@@ -1885,7 +1885,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,72
        ,null
@@ -1902,7 +1902,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,73
        ,null
@@ -1919,7 +1919,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,74
        ,null
@@ -1936,7 +1936,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,75
        ,null
@@ -1953,7 +1953,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,76
        ,null
@@ -1970,7 +1970,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,77
        ,null
@@ -1987,7 +1987,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,78
        ,null
@@ -2004,7 +2004,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,79
        ,null
@@ -2021,7 +2021,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,80
        ,null
@@ -2038,7 +2038,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,81
        ,null
@@ -2055,7 +2055,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,82
        ,null
@@ -2072,7 +2072,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,83
        ,null
@@ -2089,7 +2089,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,84
        ,null
@@ -2106,7 +2106,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,85
        ,null
@@ -2123,7 +2123,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,86
        ,null
@@ -2140,7 +2140,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,87
        ,null
@@ -2157,7 +2157,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,88
        ,null
@@ -2174,7 +2174,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,89
        ,null
@@ -2191,7 +2191,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,90
        ,null
@@ -2208,7 +2208,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,91
        ,null
@@ -2225,7 +2225,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,92
        ,null
@@ -2242,7 +2242,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,93
        ,null
@@ -2259,7 +2259,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,94
        ,null
@@ -2276,7 +2276,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,95
        ,null
@@ -2293,7 +2293,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,96
        ,null
@@ -2310,7 +2310,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,97
        ,null
@@ -2327,7 +2327,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,98
        ,null
@@ -2344,7 +2344,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,99
        ,null
@@ -2361,7 +2361,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,100
        ,null
@@ -2378,7 +2378,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,101
        ,null
@@ -2395,7 +2395,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,102
        ,null
@@ -2412,7 +2412,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,103
        ,null
@@ -2429,7 +2429,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,104
        ,null
@@ -2446,7 +2446,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,105
        ,null
@@ -2463,7 +2463,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,106
        ,null
@@ -2480,7 +2480,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,107
        ,null
@@ -2497,7 +2497,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,108
        ,null
@@ -2514,7 +2514,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,109
        ,null
@@ -2531,7 +2531,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,110
        ,null
@@ -2548,7 +2548,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,111
        ,null
@@ -2565,7 +2565,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,112
        ,null
@@ -2582,7 +2582,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,113
        ,null
@@ -2599,7 +2599,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,114
        ,null
@@ -2616,7 +2616,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,115
        ,null
@@ -2633,7 +2633,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,116
        ,null
@@ -2650,7 +2650,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,117
        ,null
@@ -2667,7 +2667,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,118
        ,null
@@ -2684,7 +2684,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,119
        ,null
@@ -2701,7 +2701,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,120
        ,null
@@ -2718,7 +2718,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,121
        ,null
@@ -2735,7 +2735,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,122
        ,null
@@ -2752,7 +2752,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,123
        ,null
@@ -2769,7 +2769,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,124
        ,null
@@ -2786,7 +2786,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,125
        ,null
@@ -2803,7 +2803,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,126
        ,null
@@ -2820,7 +2820,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,127
        ,null
@@ -2837,7 +2837,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,128
        ,null
@@ -2854,7 +2854,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,129
        ,null
@@ -2871,7 +2871,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,130
        ,null
@@ -2888,7 +2888,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,131
        ,null
@@ -2905,7 +2905,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,132
        ,null
@@ -2922,7 +2922,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,133
        ,null
@@ -2939,7 +2939,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,134
        ,null
@@ -2956,7 +2956,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,135
        ,null
@@ -2973,7 +2973,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,136
        ,null
@@ -2990,7 +2990,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,137
        ,null
@@ -3007,7 +3007,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,139
        ,null
@@ -3024,7 +3024,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,140
        ,null
@@ -3041,7 +3041,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,141
        ,null
@@ -3058,7 +3058,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,142
        ,null
@@ -3075,7 +3075,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,143
        ,null
@@ -3092,7 +3092,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,144
        ,null
@@ -3109,7 +3109,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,145
        ,null
@@ -3126,7 +3126,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,146
        ,null
@@ -3143,7 +3143,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,147
        ,null
@@ -3160,7 +3160,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,148
        ,null
@@ -3177,7 +3177,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,149
        ,null
@@ -3194,7 +3194,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,150
        ,null
@@ -3211,7 +3211,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,151
        ,null
@@ -3228,7 +3228,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,152
        ,null
@@ -3245,7 +3245,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,153
        ,null
@@ -3262,7 +3262,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,154
        ,null
@@ -3279,7 +3279,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,155
        ,null
@@ -3296,7 +3296,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,156
        ,null
@@ -3313,7 +3313,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,157
        ,null
@@ -3330,7 +3330,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,158
        ,null
@@ -3347,7 +3347,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,159
        ,null
@@ -3364,7 +3364,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,160
        ,null
@@ -3381,7 +3381,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,161
        ,null
@@ -3398,7 +3398,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,162
        ,null
@@ -3415,7 +3415,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,163
        ,null
@@ -3432,7 +3432,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,164
        ,null
@@ -3449,7 +3449,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,165
        ,null
@@ -3466,7 +3466,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,166
        ,null
@@ -3483,7 +3483,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,167
        ,null
@@ -3500,7 +3500,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,168
        ,null
@@ -3517,7 +3517,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,169
        ,null
@@ -3534,7 +3534,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,170
        ,null
@@ -3551,7 +3551,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,171
        ,null
@@ -3568,7 +3568,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,172
        ,null
@@ -3585,7 +3585,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,173
        ,null
@@ -3602,7 +3602,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,174
        ,null
@@ -3619,7 +3619,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,175
        ,null
@@ -3636,7 +3636,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,176
        ,null
@@ -3653,7 +3653,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,177
        ,null
@@ -3670,7 +3670,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,178
        ,null
@@ -3687,7 +3687,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,179
        ,null
@@ -3704,7 +3704,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,180
        ,null
@@ -3721,7 +3721,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,181
        ,null
@@ -3738,7 +3738,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,182
        ,null
@@ -3755,7 +3755,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,183
        ,null
@@ -3772,7 +3772,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,184
        ,null
@@ -3789,7 +3789,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,185
        ,null
@@ -3806,7 +3806,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,186
        ,null
@@ -3823,7 +3823,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,187
        ,null
@@ -3840,7 +3840,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,188
        ,null
@@ -3857,7 +3857,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,189
        ,null
@@ -3874,7 +3874,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,190
        ,null
@@ -3891,7 +3891,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,191
        ,null
@@ -3908,7 +3908,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,192
        ,null
@@ -3925,7 +3925,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,193
        ,null
@@ -3942,7 +3942,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,194
        ,null
@@ -3959,7 +3959,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,195
        ,null
@@ -3976,7 +3976,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,196
        ,null
@@ -3993,7 +3993,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,197
        ,null
@@ -4010,7 +4010,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,198
        ,null
@@ -4027,7 +4027,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,199
        ,null
@@ -4044,7 +4044,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,201
        ,null
@@ -4061,7 +4061,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,202
        ,null
@@ -4078,7 +4078,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,203
        ,null
@@ -4095,7 +4095,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,204
        ,null
@@ -4112,7 +4112,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,205
        ,null
@@ -4129,7 +4129,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,206
        ,null
@@ -4146,7 +4146,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,207
        ,null
@@ -4163,7 +4163,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,208
        ,null
@@ -4180,7 +4180,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,209
        ,null
@@ -4197,7 +4197,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,210
        ,null
@@ -4214,7 +4214,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,211
        ,null
@@ -4231,7 +4231,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,212
        ,null
@@ -4248,7 +4248,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,213
        ,null
@@ -4265,7 +4265,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,214
        ,null
@@ -4282,7 +4282,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,215
        ,null
@@ -4299,7 +4299,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,216
        ,null
@@ -4316,7 +4316,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,217
        ,null
@@ -4333,7 +4333,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,218
        ,null
@@ -4350,7 +4350,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,219
        ,null
@@ -4367,7 +4367,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,220
        ,null
@@ -4384,7 +4384,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,221
        ,null
@@ -4401,7 +4401,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,222
        ,null
@@ -4418,7 +4418,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,230
        ,null
@@ -4435,7 +4435,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,231
        ,null
@@ -4452,7 +4452,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,232
        ,null
@@ -4469,7 +4469,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,233
        ,null
@@ -4486,7 +4486,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,234
        ,null
@@ -4503,7 +4503,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,235
        ,null
@@ -4520,7 +4520,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,236
        ,null
@@ -4537,7 +4537,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,237
        ,null
@@ -4554,7 +4554,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,238
        ,null
@@ -4571,7 +4571,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,239
        ,null
@@ -4588,7 +4588,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,240
        ,null
@@ -4605,7 +4605,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,241
        ,null
@@ -4622,7 +4622,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,242
        ,null
@@ -4639,7 +4639,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,243
        ,null
@@ -4656,7 +4656,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,244
        ,null
@@ -4673,7 +4673,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,245
        ,null
@@ -4690,7 +4690,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,246
        ,null
@@ -4707,7 +4707,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,247
        ,null
@@ -4724,7 +4724,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,248
        ,null
@@ -4741,7 +4741,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,249
        ,null
@@ -4758,7 +4758,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,250
        ,null
@@ -4775,7 +4775,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,251
        ,null
@@ -4792,7 +4792,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,252
        ,null
@@ -4809,7 +4809,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,253
        ,null
@@ -4826,7 +4826,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,254
        ,null
@@ -4843,7 +4843,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,255
        ,null
@@ -4860,7 +4860,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,256
        ,null
@@ -4877,7 +4877,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,257
        ,null
@@ -4894,7 +4894,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,259
        ,null
@@ -4911,7 +4911,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,260
        ,null
@@ -4928,7 +4928,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,261
        ,null
@@ -4945,7 +4945,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,262
        ,null
@@ -4962,7 +4962,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,263
        ,null
@@ -4979,7 +4979,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,264
        ,null
@@ -4996,7 +4996,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,265
        ,null
@@ -5013,7 +5013,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,266
        ,null
@@ -5030,7 +5030,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,267
        ,null
@@ -5047,7 +5047,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,268
        ,null
@@ -5064,7 +5064,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,269
        ,null
@@ -5081,7 +5081,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,270
        ,null
@@ -5098,7 +5098,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,271
        ,null
@@ -5115,7 +5115,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,272
        ,null
@@ -5132,7 +5132,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,273
        ,null
@@ -5149,7 +5149,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,274
        ,null
@@ -5166,7 +5166,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,275
        ,null
@@ -5183,7 +5183,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,276
        ,null
@@ -5200,7 +5200,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,277
        ,null
@@ -5217,7 +5217,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,278
        ,null
@@ -5234,7 +5234,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,279
        ,null
@@ -5251,7 +5251,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,280
        ,null
@@ -5268,7 +5268,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,281
        ,null
@@ -5285,7 +5285,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,282
        ,null
@@ -5302,7 +5302,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,283
        ,null
@@ -5319,7 +5319,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,284
        ,null
@@ -5336,7 +5336,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,285
        ,null
@@ -5353,7 +5353,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,286
        ,null
@@ -5370,7 +5370,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,287
        ,null
@@ -5387,7 +5387,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,288
        ,null
@@ -5404,7 +5404,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,289
        ,null
@@ -5421,7 +5421,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,290
        ,null
@@ -5438,7 +5438,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,291
        ,null
@@ -5455,7 +5455,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,292
        ,null
@@ -5472,7 +5472,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,293
        ,null
@@ -5489,7 +5489,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,294
        ,null
@@ -5506,7 +5506,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,295
        ,null
@@ -5523,7 +5523,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,296
        ,null
@@ -5540,7 +5540,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,297
        ,null
@@ -5557,7 +5557,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,298
        ,null
@@ -5574,7 +5574,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,434
        ,null
@@ -5591,7 +5591,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,435
        ,null
@@ -5608,7 +5608,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,436
        ,null
@@ -5625,7 +5625,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,437
        ,null
@@ -5642,7 +5642,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,438
        ,null
@@ -5659,7 +5659,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,442
        ,null
@@ -5676,7 +5676,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,443
        ,null
@@ -5693,7 +5693,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,444
        ,null
@@ -5710,7 +5710,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,445
        ,null
@@ -5727,7 +5727,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'HIG'
        ,500
        ,null
@@ -5744,7 +5744,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'MRWA'
        ,1
        ,null
@@ -5761,7 +5761,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,1
        ,7
@@ -5778,7 +5778,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,2
        ,139
@@ -5795,7 +5795,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,3
        ,341
@@ -5812,7 +5812,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,4
        ,null
@@ -5829,7 +5829,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,5
        ,null
@@ -5846,7 +5846,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,6
        ,null
@@ -5863,7 +5863,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,7
        ,null
@@ -5880,7 +5880,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,8
        ,null
@@ -5897,7 +5897,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,9
        ,null
@@ -5914,7 +5914,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,10
        ,null
@@ -5931,7 +5931,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,11
        ,null
@@ -5948,7 +5948,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,12
        ,null
@@ -5965,7 +5965,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,13
        ,null
@@ -5982,7 +5982,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,14
        ,null
@@ -5999,7 +5999,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,15
        ,null
@@ -6016,7 +6016,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,16
        ,null
@@ -6033,7 +6033,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,17
        ,null
@@ -6050,7 +6050,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,18
        ,null
@@ -6067,7 +6067,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,19
        ,null
@@ -6084,7 +6084,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,20
        ,null
@@ -6101,7 +6101,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,21
        ,null
@@ -6118,7 +6118,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,22
        ,null
@@ -6135,7 +6135,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,23
        ,null
@@ -6152,7 +6152,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,24
        ,null
@@ -6169,7 +6169,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,25
        ,null
@@ -6186,7 +6186,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,26
        ,null
@@ -6203,7 +6203,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,27
        ,null
@@ -6220,7 +6220,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,28
        ,null
@@ -6237,7 +6237,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,29
        ,null
@@ -6254,7 +6254,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,30
        ,null
@@ -6271,7 +6271,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,31
        ,null
@@ -6288,7 +6288,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,32
        ,null
@@ -6305,7 +6305,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,33
        ,null
@@ -6322,7 +6322,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,34
        ,null
@@ -6339,7 +6339,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,35
        ,null
@@ -6356,7 +6356,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,36
        ,null
@@ -6373,7 +6373,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,37
        ,null
@@ -6390,7 +6390,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,38
        ,null
@@ -6407,7 +6407,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,39
        ,null
@@ -6424,7 +6424,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,40
        ,null
@@ -6441,7 +6441,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,41
        ,null
@@ -6458,7 +6458,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,42
        ,null
@@ -6475,7 +6475,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,43
        ,null
@@ -6492,7 +6492,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,44
        ,null
@@ -6509,7 +6509,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,45
        ,null
@@ -6526,7 +6526,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,46
        ,null
@@ -6543,7 +6543,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,47
        ,null
@@ -6560,7 +6560,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,48
        ,null
@@ -6577,7 +6577,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,49
        ,null
@@ -6594,7 +6594,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,50
        ,null
@@ -6611,7 +6611,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,51
        ,null
@@ -6628,7 +6628,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,52
        ,null
@@ -6645,7 +6645,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,53
        ,null
@@ -6662,7 +6662,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,54
        ,null
@@ -6679,7 +6679,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,55
        ,null
@@ -6696,7 +6696,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,56
        ,null
@@ -6713,7 +6713,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,57
        ,null
@@ -6730,7 +6730,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,58
        ,null
@@ -6747,7 +6747,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,59
        ,null
@@ -6764,7 +6764,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,60
        ,null
@@ -6781,7 +6781,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,61
        ,null
@@ -6798,7 +6798,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,62
        ,null
@@ -6815,7 +6815,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,63
        ,null
@@ -6832,7 +6832,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,64
        ,null
@@ -6849,7 +6849,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,65
        ,null
@@ -6866,7 +6866,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,66
        ,null
@@ -6883,7 +6883,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,67
        ,null
@@ -6900,7 +6900,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,68
        ,null
@@ -6917,7 +6917,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,69
        ,null
@@ -6934,7 +6934,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,70
        ,null
@@ -6951,7 +6951,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,71
        ,null
@@ -6968,7 +6968,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,72
        ,null
@@ -6985,7 +6985,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,73
        ,null
@@ -7002,7 +7002,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,74
        ,null
@@ -7019,7 +7019,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,75
        ,null
@@ -7036,7 +7036,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,76
        ,null
@@ -7053,7 +7053,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,77
        ,null
@@ -7070,7 +7070,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,78
        ,null
@@ -7087,7 +7087,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,79
        ,null
@@ -7104,7 +7104,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,80
        ,null
@@ -7121,7 +7121,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,81
        ,null
@@ -7138,7 +7138,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,82
        ,null
@@ -7155,7 +7155,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,83
        ,null
@@ -7172,7 +7172,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,84
        ,null
@@ -7189,7 +7189,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,85
        ,null
@@ -7206,7 +7206,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,86
        ,null
@@ -7223,7 +7223,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,87
        ,null
@@ -7240,7 +7240,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,88
        ,null
@@ -7257,7 +7257,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,89
        ,null
@@ -7274,7 +7274,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,90
        ,null
@@ -7291,7 +7291,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,91
        ,null
@@ -7308,7 +7308,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,92
        ,null
@@ -7325,7 +7325,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,93
        ,null
@@ -7342,7 +7342,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,94
        ,null
@@ -7359,7 +7359,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,95
        ,null
@@ -7376,7 +7376,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,96
        ,null
@@ -7393,7 +7393,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,97
        ,null
@@ -7410,7 +7410,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,98
        ,null
@@ -7427,7 +7427,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,99
        ,null
@@ -7444,7 +7444,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,100
        ,null
@@ -7461,7 +7461,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,101
        ,null
@@ -7478,7 +7478,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,102
        ,null
@@ -7495,7 +7495,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,103
        ,null
@@ -7512,7 +7512,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,104
        ,null
@@ -7529,7 +7529,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,105
        ,null
@@ -7546,7 +7546,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,106
        ,null
@@ -7563,7 +7563,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,107
        ,null
@@ -7580,7 +7580,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,108
        ,null
@@ -7597,7 +7597,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,109
        ,null
@@ -7614,7 +7614,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,110
        ,null
@@ -7631,7 +7631,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,111
        ,null
@@ -7648,7 +7648,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,112
        ,null
@@ -7665,7 +7665,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,113
        ,null
@@ -7682,7 +7682,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,114
        ,null
@@ -7699,7 +7699,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,115
        ,null
@@ -7716,7 +7716,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,116
        ,null
@@ -7733,7 +7733,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,117
        ,null
@@ -7750,7 +7750,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,118
        ,null
@@ -7767,7 +7767,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,119
        ,null
@@ -7784,7 +7784,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,120
        ,null
@@ -7801,7 +7801,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,121
        ,null
@@ -7818,7 +7818,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,122
        ,null
@@ -7835,7 +7835,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,123
        ,null
@@ -7852,7 +7852,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,124
        ,null
@@ -7869,7 +7869,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,125
        ,null
@@ -7886,7 +7886,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,126
        ,null
@@ -7903,7 +7903,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,127
        ,null
@@ -7920,7 +7920,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,128
        ,null
@@ -7937,7 +7937,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,129
        ,null
@@ -7954,7 +7954,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,130
        ,null
@@ -7971,7 +7971,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,131
        ,null
@@ -7988,7 +7988,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,132
        ,null
@@ -8005,7 +8005,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,133
        ,null
@@ -8022,7 +8022,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,134
        ,null
@@ -8039,7 +8039,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,135
        ,null
@@ -8056,7 +8056,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,136
        ,null
@@ -8073,7 +8073,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,137
        ,null
@@ -8090,7 +8090,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,138
        ,null
@@ -8107,7 +8107,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,139
        ,null
@@ -8124,7 +8124,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,140
        ,null
@@ -8141,7 +8141,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,141
        ,null
@@ -8158,7 +8158,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,142
        ,null
@@ -8175,7 +8175,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,143
        ,null
@@ -8192,7 +8192,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,144
        ,null
@@ -8209,7 +8209,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,145
        ,null
@@ -8226,7 +8226,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,146
        ,null
@@ -8243,7 +8243,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,147
        ,null
@@ -8260,7 +8260,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,148
        ,null
@@ -8277,7 +8277,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,149
        ,null
@@ -8294,7 +8294,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,150
        ,null
@@ -8311,7 +8311,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,151
        ,null
@@ -8328,7 +8328,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,152
        ,null
@@ -8345,7 +8345,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,153
        ,null
@@ -8362,7 +8362,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,154
        ,null
@@ -8379,7 +8379,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,155
        ,null
@@ -8396,7 +8396,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,156
        ,null
@@ -8413,7 +8413,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,157
        ,null
@@ -8430,7 +8430,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,158
        ,null
@@ -8447,7 +8447,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,159
        ,null
@@ -8464,7 +8464,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,160
        ,null
@@ -8481,7 +8481,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,161
        ,null
@@ -8498,7 +8498,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,162
        ,null
@@ -8515,7 +8515,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,163
        ,null
@@ -8532,7 +8532,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,164
        ,null
@@ -8549,7 +8549,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,165
        ,null
@@ -8566,7 +8566,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,166
        ,null
@@ -8583,7 +8583,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,167
        ,null
@@ -8600,7 +8600,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,168
        ,null
@@ -8617,7 +8617,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,169
        ,null
@@ -8634,7 +8634,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,170
        ,null
@@ -8651,7 +8651,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,171
        ,null
@@ -8668,7 +8668,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,172
        ,null
@@ -8685,7 +8685,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,173
        ,null
@@ -8702,7 +8702,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,174
        ,null
@@ -8719,7 +8719,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,175
        ,null
@@ -8736,7 +8736,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,176
        ,null
@@ -8753,7 +8753,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,177
        ,null
@@ -8770,7 +8770,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,178
        ,null
@@ -8787,7 +8787,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,179
        ,null
@@ -8804,7 +8804,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,180
        ,null
@@ -8821,7 +8821,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,181
        ,null
@@ -8838,7 +8838,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,182
        ,null
@@ -8855,7 +8855,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,183
        ,null
@@ -8872,7 +8872,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,184
        ,null
@@ -8889,7 +8889,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,185
        ,null
@@ -8906,7 +8906,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,186
        ,null
@@ -8923,7 +8923,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,187
        ,null
@@ -8940,7 +8940,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,188
        ,null
@@ -8957,7 +8957,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,189
        ,null
@@ -8974,7 +8974,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,190
        ,null
@@ -8991,7 +8991,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,191
        ,null
@@ -9008,7 +9008,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,192
        ,null
@@ -9025,7 +9025,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,193
        ,null
@@ -9042,7 +9042,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,194
        ,null
@@ -9059,7 +9059,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,195
        ,null
@@ -9076,7 +9076,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,196
        ,null
@@ -9093,7 +9093,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,197
        ,null
@@ -9110,7 +9110,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,198
        ,null
@@ -9127,7 +9127,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,199
        ,null
@@ -9144,7 +9144,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,200
        ,null
@@ -9161,7 +9161,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,201
        ,null
@@ -9178,7 +9178,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,202
        ,null
@@ -9195,7 +9195,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,203
        ,null
@@ -9212,7 +9212,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,204
        ,null
@@ -9229,7 +9229,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,205
        ,null
@@ -9246,7 +9246,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,206
        ,null
@@ -9263,7 +9263,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,207
        ,null
@@ -9280,7 +9280,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,208
        ,null
@@ -9297,7 +9297,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,209
        ,null
@@ -9314,7 +9314,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,210
        ,null
@@ -9331,7 +9331,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,211
        ,null
@@ -9348,7 +9348,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,212
        ,null
@@ -9365,7 +9365,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,213
        ,null
@@ -9382,7 +9382,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,214
        ,null
@@ -9399,7 +9399,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,215
        ,null
@@ -9416,7 +9416,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,216
        ,null
@@ -9433,7 +9433,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,217
        ,null
@@ -9450,7 +9450,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,218
        ,null
@@ -9467,7 +9467,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,219
        ,null
@@ -9484,7 +9484,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,220
        ,null
@@ -9501,7 +9501,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,221
        ,null
@@ -9518,7 +9518,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,222
        ,null
@@ -9535,7 +9535,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,223
        ,null
@@ -9552,7 +9552,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,224
        ,null
@@ -9569,7 +9569,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,225
        ,null
@@ -9586,7 +9586,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,226
        ,null
@@ -9603,7 +9603,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,227
        ,null
@@ -9620,7 +9620,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,228
        ,null
@@ -9637,7 +9637,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,229
        ,null
@@ -9654,7 +9654,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,230
        ,null
@@ -9671,7 +9671,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,231
        ,null
@@ -9688,7 +9688,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,232
        ,null
@@ -9705,7 +9705,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,233
        ,null
@@ -9722,7 +9722,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,234
        ,null
@@ -9739,7 +9739,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,235
        ,null
@@ -9756,7 +9756,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,236
        ,null
@@ -9773,7 +9773,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,237
        ,null
@@ -9790,7 +9790,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,238
        ,null
@@ -9807,7 +9807,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,239
        ,null
@@ -9824,7 +9824,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,240
        ,null
@@ -9841,7 +9841,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,241
        ,null
@@ -9858,7 +9858,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,242
        ,null
@@ -9875,7 +9875,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,243
        ,null
@@ -9892,7 +9892,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,244
        ,null
@@ -9909,7 +9909,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,245
        ,null
@@ -9926,7 +9926,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,246
        ,null
@@ -9943,7 +9943,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,247
        ,null
@@ -9960,7 +9960,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,248
        ,null
@@ -9977,7 +9977,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,249
        ,null
@@ -9994,7 +9994,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,250
        ,null
@@ -10011,7 +10011,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,251
        ,null
@@ -10028,7 +10028,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,252
        ,null
@@ -10045,7 +10045,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,253
        ,null
@@ -10062,7 +10062,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,254
        ,null
@@ -10079,7 +10079,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,255
        ,null
@@ -10096,7 +10096,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,256
        ,null
@@ -10113,7 +10113,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,257
        ,null
@@ -10130,7 +10130,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,258
        ,null
@@ -10147,7 +10147,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,259
        ,null
@@ -10164,7 +10164,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,260
        ,null
@@ -10181,7 +10181,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,261
        ,null
@@ -10198,7 +10198,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,262
        ,null
@@ -10215,7 +10215,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,263
        ,null
@@ -10232,7 +10232,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,264
        ,null
@@ -10249,7 +10249,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,265
        ,null
@@ -10266,7 +10266,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,266
        ,null
@@ -10283,7 +10283,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,267
        ,null
@@ -10300,7 +10300,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,268
        ,null
@@ -10317,7 +10317,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,269
        ,null
@@ -10334,7 +10334,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,270
        ,null
@@ -10351,7 +10351,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,271
        ,null
@@ -10368,7 +10368,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,272
        ,null
@@ -10385,7 +10385,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,273
        ,null
@@ -10402,7 +10402,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,274
        ,null
@@ -10419,7 +10419,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,275
        ,null
@@ -10436,7 +10436,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,276
        ,null
@@ -10453,7 +10453,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,277
        ,null
@@ -10470,7 +10470,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,278
        ,null
@@ -10487,7 +10487,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,279
        ,null
@@ -10504,7 +10504,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,280
        ,null
@@ -10521,7 +10521,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,281
        ,null
@@ -10538,7 +10538,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,282
        ,null
@@ -10555,7 +10555,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,283
        ,null
@@ -10572,7 +10572,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,284
        ,null
@@ -10589,7 +10589,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,285
        ,null
@@ -10606,7 +10606,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,286
        ,null
@@ -10623,7 +10623,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,287
        ,null
@@ -10640,7 +10640,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,288
        ,null
@@ -10657,7 +10657,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,289
        ,null
@@ -10674,7 +10674,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,290
        ,null
@@ -10691,7 +10691,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,291
        ,null
@@ -10708,7 +10708,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,292
        ,null
@@ -10725,7 +10725,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,293
        ,null
@@ -10742,7 +10742,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,294
        ,null
@@ -10759,7 +10759,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,295
        ,null
@@ -10776,7 +10776,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,296
        ,null
@@ -10793,7 +10793,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,297
        ,null
@@ -10810,7 +10810,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,298
        ,null
@@ -10827,7 +10827,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,299
        ,null
@@ -10844,7 +10844,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,300
        ,null
@@ -10861,7 +10861,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,301
        ,null
@@ -10878,7 +10878,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,302
        ,null
@@ -10895,7 +10895,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,303
        ,null
@@ -10912,7 +10912,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,304
        ,null
@@ -10929,7 +10929,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,305
        ,null
@@ -10946,7 +10946,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,306
        ,null
@@ -10963,7 +10963,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,307
        ,null
@@ -10980,7 +10980,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,308
        ,null
@@ -10997,7 +10997,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,309
        ,null
@@ -11014,7 +11014,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,310
        ,null
@@ -11031,7 +11031,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,311
        ,null
@@ -11048,7 +11048,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,312
        ,null
@@ -11065,7 +11065,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,313
        ,null
@@ -11082,7 +11082,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,314
        ,null
@@ -11099,7 +11099,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,315
        ,null
@@ -11116,7 +11116,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,316
        ,null
@@ -11133,7 +11133,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,317
        ,null
@@ -11150,7 +11150,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,318
        ,null
@@ -11167,7 +11167,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,319
        ,null
@@ -11184,7 +11184,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,320
        ,null
@@ -11201,7 +11201,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,321
        ,null
@@ -11218,7 +11218,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,322
        ,null
@@ -11235,7 +11235,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,323
        ,null
@@ -11252,7 +11252,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,324
        ,null
@@ -11269,7 +11269,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,325
        ,null
@@ -11286,7 +11286,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,326
        ,null
@@ -11303,7 +11303,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,327
        ,null
@@ -11320,7 +11320,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,328
        ,null
@@ -11337,7 +11337,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,329
        ,null
@@ -11354,7 +11354,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,330
        ,null
@@ -11371,7 +11371,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,331
        ,null
@@ -11388,7 +11388,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,332
        ,null
@@ -11405,7 +11405,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,333
        ,null
@@ -11422,7 +11422,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,334
        ,null
@@ -11439,7 +11439,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,335
        ,null
@@ -11456,7 +11456,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,336
        ,null
@@ -11473,7 +11473,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,337
        ,null
@@ -11490,7 +11490,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,338
        ,null
@@ -11507,7 +11507,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,339
        ,null
@@ -11524,7 +11524,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,340
        ,null
@@ -11541,7 +11541,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,341
        ,null
@@ -11558,7 +11558,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,342
        ,null
@@ -11575,7 +11575,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,343
        ,null
@@ -11592,7 +11592,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,344
        ,null
@@ -11609,7 +11609,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,345
        ,null
@@ -11626,7 +11626,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,346
        ,null
@@ -11643,7 +11643,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,347
        ,null
@@ -11660,7 +11660,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,348
        ,null
@@ -11677,7 +11677,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,349
        ,null
@@ -11694,7 +11694,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,350
        ,null
@@ -11711,7 +11711,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,351
        ,null
@@ -11728,7 +11728,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,352
        ,null
@@ -11745,7 +11745,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,353
        ,null
@@ -11762,7 +11762,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,354
        ,null
@@ -11779,7 +11779,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,355
        ,null
@@ -11796,7 +11796,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,356
        ,null
@@ -11813,7 +11813,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,357
        ,null
@@ -11830,7 +11830,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,358
        ,null
@@ -11847,7 +11847,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,359
        ,null
@@ -11864,7 +11864,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,360
        ,null
@@ -11881,7 +11881,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,361
        ,null
@@ -11898,7 +11898,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,362
        ,null
@@ -11915,7 +11915,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,363
        ,null
@@ -11932,7 +11932,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,364
        ,null
@@ -11949,7 +11949,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,365
        ,null
@@ -11966,7 +11966,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,366
        ,null
@@ -11983,7 +11983,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,367
        ,null
@@ -12000,7 +12000,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,368
        ,null
@@ -12017,7 +12017,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,369
        ,null
@@ -12034,7 +12034,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,370
        ,null
@@ -12051,7 +12051,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,371
        ,null
@@ -12068,7 +12068,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,372
        ,null
@@ -12085,7 +12085,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,373
        ,null
@@ -12102,7 +12102,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,374
        ,null
@@ -12119,7 +12119,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,375
        ,null
@@ -12136,7 +12136,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,376
        ,null
@@ -12153,7 +12153,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,377
        ,null
@@ -12170,7 +12170,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,378
        ,null
@@ -12187,7 +12187,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,379
        ,null
@@ -12204,7 +12204,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,380
        ,null
@@ -12221,7 +12221,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,381
        ,null
@@ -12238,7 +12238,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,382
        ,null
@@ -12255,7 +12255,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,383
        ,null
@@ -12272,7 +12272,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,384
        ,null
@@ -12289,7 +12289,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,385
        ,null
@@ -12306,7 +12306,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,386
        ,null
@@ -12323,7 +12323,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,387
        ,null
@@ -12340,7 +12340,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,388
        ,null
@@ -12357,7 +12357,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,389
        ,null
@@ -12374,7 +12374,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,390
        ,null
@@ -12391,7 +12391,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,391
        ,null
@@ -12408,7 +12408,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,392
        ,null
@@ -12425,7 +12425,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,393
        ,null
@@ -12442,7 +12442,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,394
        ,null
@@ -12459,7 +12459,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,395
        ,null
@@ -12476,7 +12476,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,396
        ,null
@@ -12493,7 +12493,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,397
        ,null
@@ -12510,7 +12510,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,398
        ,null
@@ -12527,7 +12527,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,399
        ,null
@@ -12544,7 +12544,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,400
        ,null
@@ -12561,7 +12561,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,401
        ,null
@@ -12578,7 +12578,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,402
        ,null
@@ -12595,7 +12595,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,403
        ,null
@@ -12612,7 +12612,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,404
        ,null
@@ -12629,7 +12629,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,405
        ,null
@@ -12646,7 +12646,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,406
        ,null
@@ -12663,7 +12663,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,407
        ,null
@@ -12680,7 +12680,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,408
        ,null
@@ -12697,7 +12697,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,409
        ,null
@@ -12714,7 +12714,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,410
        ,null
@@ -12731,7 +12731,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,411
        ,null
@@ -12748,7 +12748,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,412
        ,null
@@ -12765,7 +12765,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,413
        ,null
@@ -12782,7 +12782,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,421
        ,null
@@ -12799,7 +12799,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,422
        ,null
@@ -12816,7 +12816,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,423
        ,null
@@ -12833,7 +12833,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,424
        ,null
@@ -12850,7 +12850,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,425
        ,null
@@ -12867,7 +12867,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,426
        ,null
@@ -12884,7 +12884,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,427
        ,null
@@ -12901,7 +12901,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,428
        ,null
@@ -12918,7 +12918,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,429
        ,null
@@ -12935,7 +12935,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,430
        ,null
@@ -12952,7 +12952,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,431
        ,null
@@ -12969,7 +12969,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,432
        ,null
@@ -12986,7 +12986,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,433
        ,null
@@ -13003,7 +13003,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,436
        ,null
@@ -13020,7 +13020,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,437
        ,null
@@ -13037,7 +13037,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,438
        ,null
@@ -13054,7 +13054,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,439
        ,null
@@ -13071,7 +13071,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,440
        ,null
@@ -13088,7 +13088,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,441
        ,null
@@ -13105,7 +13105,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,442
        ,null
@@ -13122,7 +13122,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,443
        ,null
@@ -13139,7 +13139,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,444
        ,null
@@ -13156,7 +13156,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,445
        ,null
@@ -13173,7 +13173,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,446
        ,null
@@ -13190,7 +13190,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,447
        ,null
@@ -13207,7 +13207,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,448
        ,null
@@ -13224,7 +13224,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,449
        ,null
@@ -13241,7 +13241,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,450
        ,null
@@ -13258,7 +13258,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,451
        ,null
@@ -13275,7 +13275,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,452
        ,null
@@ -13292,7 +13292,7 @@ INSERT INTO NM_ERRORS
        ,NER_DESCR
        ,NER_CAUSE
        )
-SELECT
+SELECT 
         'NET'
        ,453
        ,null
@@ -13323,7 +13323,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'ADMIN TYPE GROUPINGS'
        ,'NET'
        ,'Admin Type Groupings'
@@ -13337,7 +13337,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'ADOPTION_STATUS'
        ,'HIG'
        ,'Adoption Status'
@@ -13351,7 +13351,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'BOOLEAN'
        ,'HIG'
        ,'"TRUE" or "FALSE"'
@@ -13365,7 +13365,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'BOOLEAN_CONNECTORS'
        ,'HIG'
        ,'Boolean Connectors'
@@ -13379,7 +13379,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'CALL_NM0570'
        ,'NET'
        ,'List of modules that call NM570'
@@ -13393,7 +13393,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'CALL_NM9999'
        ,'NET'
        ,'Modules that return domain instead of id'
@@ -13407,7 +13407,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'CARRIAGEWAY'
        ,'HIG'
        ,'Road Carriageway'
@@ -13421,7 +13421,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'COMPLAINT_SOURCE'
        ,'HIG'
        ,'Enquiry Source Codes'
@@ -13435,7 +13435,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'CONTACT_ORG_TYPE'
        ,'HIG'
        ,'Organisation Contact Type'
@@ -13449,7 +13449,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'CONTACT_PERSON_TYPE'
        ,'HIG'
        ,'Person Contact Type'
@@ -13463,7 +13463,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'CONTACT_TITLE'
        ,'HIG'
        ,'Title'
@@ -13477,7 +13477,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'CONTACT_VIP'
        ,'HIG'
        ,'Complaints VIP flag'
@@ -13491,7 +13491,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'CSV_DELIMITERS'
        ,'HIG'
        ,'CSV Delimiting Characters'
@@ -13505,7 +13505,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'CSV_LOAD_STATUSES'
        ,'HIG'
        ,'CSV File Load Statuses'
@@ -13519,7 +13519,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'CSV_PROCESS_SUBTYPE'
        ,'HIG'
        ,'CSV File Load Process Sub-Types'
@@ -13533,7 +13533,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'CSV_PROCESS_TYPE'
        ,'HIG'
        ,'CSV File Load Process Types'
@@ -13547,7 +13547,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'DATA_FORMAT'
        ,'HIG'
        ,'Valid Data Formats'
@@ -13561,7 +13561,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'DATE_FORMAT_MASK'
        ,'HIG'
        ,'Date Format Mask'
@@ -13575,7 +13575,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'DETERMINATION'
        ,'DOC'
        ,'Determination'
@@ -13589,7 +13589,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'DIRECTORY_SEPERATOR'
        ,'HIG'
        ,'Directory Seperator'
@@ -13603,7 +13603,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'DISCO_SUCK_TYPES'
        ,'HIG'
        ,'Discoverer "suck" types'
@@ -13617,7 +13617,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'DISCO_VERSIONS'
        ,'HIG'
        ,'Discoverer Versions'
@@ -13631,7 +13631,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'DOC_CATEGORIES'
        ,'HIG'
        ,'Document Categories'
@@ -13645,7 +13645,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'ELEC_DRAIN_CARR'
        ,'NET'
        ,'Elec/Drain/Carriageway'
@@ -13659,7 +13659,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'EXTEND_ROUTE_ST_DATE'
        ,'NET'
        ,'Default Start Date when extending route'
@@ -13673,7 +13673,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'FOOTWAY_CATEGORY'
        ,'HIG'
        ,'Footway Categories'
@@ -13687,7 +13687,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'GAZMODE'
        ,'NET'
        ,'Default Gazetteer Mode'
@@ -13701,7 +13701,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_E'
        ,'NET'
        ,'Fixed selectable cols for "E" gaz qry'
@@ -13715,7 +13715,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_I'
        ,'NET'
        ,'Fixed selectable cols for "I" gaz qry'
@@ -13729,7 +13729,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'GAZ_QRY_L_BRACKETS'
        ,'NET'
        ,'Opening Brackets for Gazeteer Queries'
@@ -13743,7 +13743,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'GAZ_QRY_OPERATORS'
        ,'NET'
        ,'Allowable operators for Gazeteer Queries'
@@ -13757,7 +13757,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'GAZ_QRY_R_BRACKETS'
        ,'NET'
        ,'Closing Brackets for Gazeteer Queries'
@@ -13771,7 +13771,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'GAZ_QRY_TYPE_TYPES'
        ,'NET'
        ,'Item Type Types for Gazeteer Queries'
@@ -13785,7 +13785,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'GEOMETRY_TYPE'
        ,'NET'
        ,'GIS Geometry Type'
@@ -13799,7 +13799,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'GIS_TYPES'
        ,'HIG'
        ,'GIS Types'
@@ -13813,7 +13813,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'GRI_GAZ_RESTRICTIONS'
        ,'HIG'
        ,'GRI Gazetteer Restrictions'
@@ -13827,7 +13827,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'HDN_JOIN_TYPES'
        ,'HIG'
        ,'HDN Join Types'
@@ -13841,7 +13841,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'HISTORY_OPERATION'
        ,'HIG'
        ,'Operations Recorded in History'
@@ -13855,7 +13855,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'IMAGE_TYPES'
        ,'HIG'
        ,'Image Types'
@@ -13869,7 +13869,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'INV_CATEGORY'
        ,'NET'
        ,'Inventory Category'
@@ -13883,7 +13883,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'INV_RELATION'
        ,'HIG'
        ,'Inventory Groupings Relationships'
@@ -13897,7 +13897,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'JOB_STATUS'
        ,'HIG'
        ,'Job Status'
@@ -13911,7 +13911,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'JPRIVLEVEL'
        ,'HIG'
        ,'Java Privs Level'
@@ -13925,7 +13925,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'LAUNCHPAD_MODE'
        ,'HIG'
        ,'Starting Mode for launchpad'
@@ -13939,7 +13939,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'LEG_NUMBERS'
        ,'NET'
        ,'Node Leg Numbers'
@@ -13953,7 +13953,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'LGAS'
        ,'NET'
        ,'Local Government Agancies'
@@ -13967,7 +13967,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'MAINTENANCE_CATEGORY'
        ,'HIG'
        ,'Road Maintenence Category'
@@ -13981,7 +13981,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'MC_INV_LD_ERR_STATUS'
        ,'HIG'
        ,'MapCapture Inventory Loader Error Status'
@@ -13995,7 +13995,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'MODULE_TYPE'
        ,'HIG'
        ,'Module Types'
@@ -14009,7 +14009,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'MRG_OUTPUT_TYPE'
        ,'NET'
        ,'Merge Output Type'
@@ -14023,7 +14023,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'MRWA_OWNER'
        ,'NET'
        ,'MRWA OWNER CODE'
@@ -14037,7 +14037,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'NETWORK_DIRECTION'
        ,'HIG'
        ,'Network Direction'
@@ -14051,7 +14051,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'NE_TYPE'
        ,'HIG'
        ,'Network Elements'
@@ -14065,7 +14065,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'NM_ELEMENTS_COLUMNS'
        ,'HIG'
        ,'NM Elements Table Columns'
@@ -14079,7 +14079,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'NM_TYPES'
        ,'NET'
        ,'NM Types'
@@ -14093,7 +14093,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'PBI_CONDITION'
        ,'NET'
        ,'SQL Condition Types'
@@ -14107,7 +14107,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'PBI_SR_COND'
        ,'NET'
        ,'SQL Single Row Conditions'
@@ -14121,7 +14121,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'PEO_TITLE_CODE'
        ,'HIG'
        ,'Job Title Codes'
@@ -14135,7 +14135,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'POE_TYPES'
        ,'NET'
        ,'POE Types'
@@ -14149,7 +14149,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'POP3_HEADER_FIELDS'
        ,'HIG'
        ,'Header Fields For POP3 Mail'
@@ -14163,7 +14163,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'PRIVILEGE_TYPE'
        ,'HIG'
        ,'Privilege Types'
@@ -14177,7 +14177,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'PROPERTY_TYPE'
        ,'HIG'
        ,'Property Type'
@@ -14191,7 +14191,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'ROAD_CARRIAGEWAY'
        ,'HIG'
        ,'Road Carriageway Types'
@@ -14205,7 +14205,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'ROAD_CLASS'
        ,'HIG'
        ,'Road Classes for Linkcode Prefix'
@@ -14219,7 +14219,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'ROAD_ENVIRONMENT'
        ,'HIG'
        ,'Road Environment Types'
@@ -14233,7 +14233,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'ROAD_SYS_FLAG'
        ,'HIG'
        ,'Road System Flag'
@@ -14247,7 +14247,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'ROAD_TYPE'
        ,'HIG'
        ,'Road Types'
@@ -14261,7 +14261,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'RSE_NLA_TYPE'
        ,'HIG'
        ,'Non-Linear Area Types'
@@ -14275,7 +14275,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'SAV_FORMAT'
        ,'NET'
        ,'Export Formats'
@@ -14289,7 +14289,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'SECTIONS'
        ,'HIG'
        ,'Road Section Classifications'
@@ -14303,7 +14303,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'SECTION_STATUS'
        ,'HIG'
        ,'Road Section Status'
@@ -14317,7 +14317,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'SECT_LENGTH_STATUS'
        ,'NET'
        ,'Road Section length status'
@@ -14331,7 +14331,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'SECURITY_MODES'
        ,'HIG'
        ,'Security Access Modes'
@@ -14345,7 +14345,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'SURFACE_CONDITION'
        ,'HIG'
        ,'Road Surface Condition'
@@ -14359,7 +14359,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'THEME_TYPE'
        ,'NET'
        ,'GIS Theme Type'
@@ -14373,7 +14373,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'WEATHER_CONDITION'
        ,'HIG'
        ,'Weather Condition'
@@ -14387,7 +14387,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'XREF_REL_TYPE'
        ,'NET'
        ,'Cross Reference Relationship Type'
@@ -14401,7 +14401,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'MAI'
        ,'Valid Cross Sectional Positions'
@@ -14415,7 +14415,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'X_ATTR_VAL_TYPES'
        ,'NET'
        ,'Cross Attribute Validation Types'
@@ -14429,7 +14429,7 @@ INSERT INTO HIG_DOMAINS
        ,HDO_TITLE
        ,HDO_CODE_LENGTH
        )
-SELECT
+SELECT 
         'Y_OR_N'
        ,'HIG'
        ,'"Y"es or "N"o'
@@ -14465,7 +14465,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ADMIN TYPE GROUPINGS'
        ,'1'
        ,'Highway Authority'
@@ -14486,7 +14486,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ADMIN TYPE GROUPINGS'
        ,'2'
        ,'Utility'
@@ -14507,7 +14507,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ADMIN TYPE GROUPINGS'
        ,'3'
        ,'Private Street Manager'
@@ -14528,7 +14528,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ADMIN TYPE GROUPINGS'
        ,'4'
        ,'Transport Authority'
@@ -14549,7 +14549,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ADMIN TYPE GROUPINGS'
        ,'5'
        ,'Bridge Authority'
@@ -14570,7 +14570,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ADMIN TYPE GROUPINGS'
        ,'6'
        ,'Sewer Authority'
@@ -14591,7 +14591,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ADMIN TYPE GROUPINGS'
        ,'7'
        ,'Street Naming Authority'
@@ -14612,7 +14612,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ADMIN TYPE GROUPINGS'
        ,'8'
        ,'Other Interested'
@@ -14633,7 +14633,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ADMIN TYPE GROUPINGS'
        ,'LOCKED'
        ,'Locked'
@@ -14654,7 +14654,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ADOPTION_STATUS'
        ,'A'
        ,'Adopted'
@@ -14675,7 +14675,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ADOPTION_STATUS'
        ,'P'
        ,'Pending'
@@ -14696,7 +14696,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ADOPTION_STATUS'
        ,'U'
        ,'Unadopted'
@@ -14717,7 +14717,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'BOOLEAN'
        ,'FALSE'
        ,'False'
@@ -14738,7 +14738,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'BOOLEAN'
        ,'TRUE'
        ,'True'
@@ -14759,7 +14759,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'BOOLEAN_CONNECTORS'
        ,'AND'
        ,'AND'
@@ -14780,7 +14780,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'BOOLEAN_CONNECTORS'
        ,'OR'
        ,'OR'
@@ -14801,7 +14801,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CALL_NM0570'
        ,'DOC0150'
        ,'Public Enquiries'
@@ -14822,7 +14822,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CALL_NM0570'
        ,'NM0510'
        ,'Asset Items'
@@ -14843,7 +14843,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CALL_NM0570'
        ,'NM0560'
        ,'Assets on a Route'
@@ -14864,7 +14864,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CALL_NM0570'
        ,'NM0590'
        ,'Asset Maintenance'
@@ -14885,7 +14885,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CALL_NM9999'
        ,'GRI0200'
        ,'Reports'
@@ -14906,7 +14906,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CARRIAGEWAY'
        ,'L'
        ,'Left Carriageway'
@@ -14927,7 +14927,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CARRIAGEWAY'
        ,'R'
        ,'Right Carriageway'
@@ -14948,7 +14948,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CARRIAGEWAY'
        ,'S'
        ,'Single Carriageway'
@@ -14969,7 +14969,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINT_SOURCE'
        ,'I'
        ,'Internal Staff'
@@ -14990,7 +14990,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINT_SOURCE'
        ,'L'
        ,'Letter'
@@ -15011,7 +15011,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINT_SOURCE'
        ,'O'
        ,'Other'
@@ -15032,7 +15032,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINT_SOURCE'
        ,'P'
        ,'Personal Call'
@@ -15053,7 +15053,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINT_SOURCE'
        ,'T'
        ,'Telephone'
@@ -15074,7 +15074,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_ORG_TYPE'
        ,'INSURER'
        ,'Insurance Company'
@@ -15095,7 +15095,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_ORG_TYPE'
        ,'POLICE'
        ,'Police'
@@ -15116,7 +15116,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_ORG_TYPE'
        ,'SOLICITOR'
        ,'Solicitor'
@@ -15137,7 +15137,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_PERSON_TYPE'
        ,'CLAIMANT'
        ,'Claimant'
@@ -15158,7 +15158,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_PERSON_TYPE'
        ,'ENQUIRER'
        ,'Enquirer'
@@ -15179,7 +15179,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_PERSON_TYPE'
        ,'RESPONSIBLE'
        ,'Responsible Party'
@@ -15200,7 +15200,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_PERSON_TYPE'
        ,'THIRD_PARTY'
        ,'Third Party'
@@ -15221,7 +15221,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_PERSON_TYPE'
        ,'WITNESS'
        ,'Witness'
@@ -15242,7 +15242,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_TITLE'
        ,'DR'
        ,'Dr.'
@@ -15263,7 +15263,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_TITLE'
        ,'MISS'
        ,'Miss.'
@@ -15284,7 +15284,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_TITLE'
        ,'MR'
        ,'Mr.'
@@ -15305,7 +15305,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_TITLE'
        ,'MRS'
        ,'Mrs.'
@@ -15326,7 +15326,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_TITLE'
        ,'MS'
        ,'Master'
@@ -15347,7 +15347,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_TITLE'
        ,'REV'
        ,'Rev.'
@@ -15368,7 +15368,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_VIP'
        ,'CO'
        ,'Councillor'
@@ -15389,7 +15389,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_VIP'
        ,'MP'
        ,'Member of Parliament'
@@ -15410,7 +15410,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CONTACT_VIP'
        ,'PO'
        ,'Police'
@@ -15431,7 +15431,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_DELIMITERS'
        ,''
        ,'Tab'
@@ -15452,7 +15452,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_DELIMITERS'
        ,'!'
        ,'Bang'
@@ -15473,7 +15473,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_DELIMITERS'
        ,','
        ,'Comma'
@@ -15494,7 +15494,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_DELIMITERS'
        ,'.'
        ,'Tab'
@@ -15515,7 +15515,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_DELIMITERS'
        ,'|'
        ,'Bar'
@@ -15536,7 +15536,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_LOAD_STATUSES'
        ,'E'
        ,'Error in Validation or Insert'
@@ -15557,7 +15557,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_LOAD_STATUSES'
        ,'H'
        ,'In Holding Table'
@@ -15578,7 +15578,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_LOAD_STATUSES'
        ,'I'
        ,'Record Inserted'
@@ -15599,7 +15599,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_LOAD_STATUSES'
        ,'V'
        ,'Validation Completed'
@@ -15620,7 +15620,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_LOAD_STATUSES'
        ,'X'
        ,'Error in transfer to holding table'
@@ -15641,7 +15641,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_PROCESS_SUBTYPE'
        ,'F'
        ,'Produce Log Files'
@@ -15662,7 +15662,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_PROCESS_SUBTYPE'
        ,'L'
        ,'Load'
@@ -15683,7 +15683,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_PROCESS_SUBTYPE'
        ,'V'
        ,'Validate'
@@ -15704,7 +15704,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_PROCESS_TYPE'
        ,'C'
        ,'Load New Batch (client)'
@@ -15725,7 +15725,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_PROCESS_TYPE'
        ,'H'
        ,'Batch Housekeeping'
@@ -15746,7 +15746,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_PROCESS_TYPE'
        ,'P'
        ,'Process Existing Batch'
@@ -15767,7 +15767,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'CSV_PROCESS_TYPE'
        ,'T'
        ,'Load New Batch (server)'
@@ -15788,7 +15788,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DATA_FORMAT'
        ,'DATE'
        ,'Date'
@@ -15809,7 +15809,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DATA_FORMAT'
        ,'NUMBER'
        ,'Number'
@@ -15830,7 +15830,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DATA_FORMAT'
        ,'VARCHAR2'
        ,'Varchar2'
@@ -15851,7 +15851,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DATE_FORMAT_MASK'
        ,'DAY MONTH YEAR'
        ,'DAY MONTH YEAR'
@@ -15872,7 +15872,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DATE_FORMAT_MASK'
        ,'DD-MON-YYYY'
        ,'DD-MON-YYYY'
@@ -15893,7 +15893,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DATE_FORMAT_MASK'
        ,'DD/MM/YY'
        ,'DD/MM/YY'
@@ -15914,7 +15914,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DATE_FORMAT_MASK'
        ,'DD/MM/YYYY'
        ,'DD/MM/YYYY'
@@ -15935,7 +15935,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DATE_FORMAT_MASK'
        ,'HH24:MI'
        ,'HH24:MI'
@@ -15956,7 +15956,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DATE_FORMAT_MASK'
        ,'HH:MI'
        ,'HH:MI'
@@ -15977,7 +15977,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DATE_FORMAT_MASK'
        ,'MM/YYYY'
        ,'MM/YYYY'
@@ -15998,7 +15998,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DATE_FORMAT_MASK'
        ,'MON-YYYY'
        ,'MON-YYYY'
@@ -16019,7 +16019,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DATE_FORMAT_MASK'
        ,'YYYYMMDD'
        ,'YYYYMMDD'
@@ -16040,7 +16040,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DIRECTORY_SEPERATOR'
        ,'/'
        ,'UNIX Style'
@@ -16061,7 +16061,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DIRECTORY_SEPERATOR'
        ,'\'
        ,'DOS/Windows Style'
@@ -16082,7 +16082,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DISCO_SUCK_TYPES'
        ,'ACC'
        ,'Accidents Manager'
@@ -16103,7 +16103,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DISCO_SUCK_TYPES'
        ,'DEF'
        ,'Default'
@@ -16124,7 +16124,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DISCO_SUCK_TYPES'
        ,'INV'
        ,'Inventory'
@@ -16145,7 +16145,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DISCO_SUCK_TYPES'
        ,'INV_NW'
        ,'Inventory (joined to Network)'
@@ -16166,7 +16166,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DISCO_SUCK_TYPES'
        ,'STR'
        ,'Structures Manager'
@@ -16187,7 +16187,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DISCO_VERSIONS'
        ,'4'
        ,'v4'
@@ -16208,7 +16208,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DISCO_VERSIONS'
        ,'5'
        ,'v5'
@@ -16229,7 +16229,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DOC_CATEGORIES'
        ,'GENERAL'
        ,'Comments not related to other Categories'
@@ -16250,7 +16250,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DOC_CATEGORIES'
        ,'LIGHTING'
        ,'Comments related to Street Lighting'
@@ -16271,7 +16271,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DOC_CATEGORIES'
        ,'MAJ/MIN'
        ,'Comments related to Minor/Major Works'
@@ -16292,7 +16292,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DOC_CATEGORIES'
        ,'ROUTINE'
        ,'Comments related to Routine Maintenance'
@@ -16313,7 +16313,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DOC_CATEGORIES'
        ,'TRAFFIC'
        ,'Comments related to Traffic'
@@ -16334,7 +16334,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'DOC_CATEGORIES'
        ,'UTILITY'
        ,'Comments related to Public Utilities'
@@ -16355,7 +16355,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ELEC_DRAIN_CARR'
        ,'C'
        ,'Carriageway'
@@ -16376,7 +16376,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ELEC_DRAIN_CARR'
        ,'D'
        ,'Drainage'
@@ -16397,7 +16397,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ELEC_DRAIN_CARR'
        ,'E'
        ,'Electrical'
@@ -16418,7 +16418,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'EXTEND_ROUTE_ST_DATE'
        ,'1'
        ,'Leave Null'
@@ -16439,7 +16439,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'EXTEND_ROUTE_ST_DATE'
        ,'2'
        ,'From Previous'
@@ -16460,7 +16460,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'EXTEND_ROUTE_ST_DATE'
        ,'3'
        ,'Effective Date'
@@ -16481,7 +16481,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'EXTEND_ROUTE_ST_DATE'
        ,'4'
        ,'Previous element membership'
@@ -16502,7 +16502,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'FOOTWAY_CATEGORY'
        ,'1'
        ,'Main Shopping Areas'
@@ -16523,7 +16523,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'FOOTWAY_CATEGORY'
        ,'2'
        ,'Busy Urban Areas'
@@ -16544,7 +16544,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'FOOTWAY_CATEGORY'
        ,'3'
        ,'Less used Urban and Busy Rural'
@@ -16565,7 +16565,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'FOOTWAY_CATEGORY'
        ,'4'
        ,'Little used Rural'
@@ -16586,7 +16586,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'FOOTWAY_CATEGORY'
        ,'5'
        ,'Alleyways'
@@ -16607,7 +16607,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZMODE'
        ,'ADVANCED'
        ,'Start Gazetteer in Advanced mode'
@@ -16628,7 +16628,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZMODE'
        ,'STANDARD'
        ,'Start Gazetteer in Standard mode'
@@ -16649,7 +16649,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_E'
        ,'NE_ADMIN_UNIT'
        ,'Admin Unit'
@@ -16670,7 +16670,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_E'
        ,'NE_CREATED_BY'
        ,'Created By'
@@ -16691,7 +16691,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_E'
        ,'NE_DATE_CREATED'
        ,'Date Created'
@@ -16712,7 +16712,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_E'
        ,'NE_DATE_MODIFIED'
        ,'Date Modified'
@@ -16733,7 +16733,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_E'
        ,'NE_DESCR'
        ,'Description'
@@ -16754,7 +16754,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_E'
        ,'NE_END_DATE'
        ,'End Date'
@@ -16775,7 +16775,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_E'
        ,'NE_LENGTH'
        ,'Element Length'
@@ -16796,7 +16796,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_E'
        ,'NE_MODIFIED_BY'
        ,'Modified By'
@@ -16817,7 +16817,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_E'
        ,'NE_NO_END'
        ,'End Node'
@@ -16838,7 +16838,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_E'
        ,'NE_NO_START'
        ,'Start Node'
@@ -16859,7 +16859,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_E'
        ,'NE_START_DATE'
        ,'Start Date'
@@ -16880,7 +16880,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_E'
        ,'NE_TYPE'
        ,'Element Type'
@@ -16901,7 +16901,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_E'
        ,'NE_UNIQUE'
        ,'Unique Reference'
@@ -16922,7 +16922,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_I'
        ,'IIT_ADMIN_UNIT'
        ,'Admin Unit'
@@ -16943,7 +16943,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_I'
        ,'IIT_CREATED_BY'
        ,'Created By'
@@ -16964,7 +16964,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_I'
        ,'IIT_DATE_CREATED'
        ,'Date Created'
@@ -16985,7 +16985,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_I'
        ,'IIT_DATE_MODIFIED'
        ,'Date Modified'
@@ -17006,7 +17006,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_I'
        ,'IIT_DESCR'
        ,'Description'
@@ -17027,7 +17027,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_I'
        ,'IIT_END_DATE'
        ,'End Date'
@@ -17048,7 +17048,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_I'
        ,'IIT_MODIFIED_BY'
        ,'Modified By'
@@ -17069,7 +17069,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_I'
        ,'IIT_NOTE'
        ,'Note'
@@ -17090,7 +17090,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_I'
        ,'IIT_PEO_INVENT_BY_ID'
        ,'Inspected By'
@@ -17111,7 +17111,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_I'
        ,'IIT_PRIMARY_KEY'
        ,'Primary Key'
@@ -17132,7 +17132,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_I'
        ,'IIT_START_DATE'
        ,'Start Date'
@@ -17153,7 +17153,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_FIXED_COLS_I'
        ,'IIT_X_SECT'
        ,'XSP'
@@ -17174,7 +17174,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_L_BRACKETS'
        ,'('
        ,'('
@@ -17195,7 +17195,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_L_BRACKETS'
        ,'(('
        ,'(('
@@ -17216,7 +17216,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_L_BRACKETS'
        ,'((('
        ,'((('
@@ -17237,7 +17237,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_L_BRACKETS'
        ,'(((('
        ,'(((('
@@ -17258,7 +17258,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_L_BRACKETS'
        ,'((((('
        ,'((((('
@@ -17279,7 +17279,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_OPERATORS'
        ,'AND'
        ,'AND'
@@ -17300,7 +17300,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_OPERATORS'
        ,'OR'
        ,'OR'
@@ -17321,7 +17321,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_R_BRACKETS'
        ,')'
        ,')'
@@ -17342,7 +17342,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_R_BRACKETS'
        ,'))'
        ,'))'
@@ -17363,7 +17363,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_R_BRACKETS'
        ,')))'
        ,')))'
@@ -17384,7 +17384,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_R_BRACKETS'
        ,'))))'
        ,'))))'
@@ -17405,7 +17405,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_R_BRACKETS'
        ,')))))'
        ,')))))'
@@ -17426,7 +17426,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_TYPE_TYPES'
        ,'E'
        ,'Element'
@@ -17447,7 +17447,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GAZ_QRY_TYPE_TYPES'
        ,'I'
        ,'Inventory'
@@ -17468,7 +17468,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GEOMETRY_TYPE'
        ,'2001'
        ,'2D Point'
@@ -17489,7 +17489,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GEOMETRY_TYPE'
        ,'2002'
        ,'2D Line'
@@ -17510,7 +17510,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GEOMETRY_TYPE'
        ,'2003'
        ,'2D Polygon'
@@ -17531,7 +17531,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GEOMETRY_TYPE'
        ,'2004'
        ,'2D Collection'
@@ -17552,7 +17552,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GEOMETRY_TYPE'
        ,'2005'
        ,'2D Multi-point'
@@ -17573,7 +17573,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GEOMETRY_TYPE'
        ,'2006'
        ,'2D Multi-line'
@@ -17594,7 +17594,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GEOMETRY_TYPE'
        ,'2007'
        ,'2D Multi-polygon'
@@ -17615,7 +17615,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GEOMETRY_TYPE'
        ,'3001'
        ,'3D Point'
@@ -17636,7 +17636,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GEOMETRY_TYPE'
        ,'3002'
        ,'3D Line'
@@ -17657,7 +17657,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GEOMETRY_TYPE'
        ,'3003'
        ,'3D Polygon'
@@ -17678,7 +17678,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GEOMETRY_TYPE'
        ,'3004'
        ,'3D Collection'
@@ -17699,7 +17699,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GEOMETRY_TYPE'
        ,'3005'
        ,'3D Multi-point'
@@ -17720,7 +17720,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GEOMETRY_TYPE'
        ,'3006'
        ,'3D Multi-line'
@@ -17741,7 +17741,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GEOMETRY_TYPE'
        ,'3007'
        ,'3D Multi-polygon'
@@ -17762,7 +17762,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GIS_TYPES'
        ,'DDE'
        ,'DDE'
@@ -17783,7 +17783,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GIS_TYPES'
        ,'NONE'
        ,'None'
@@ -17804,7 +17804,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GIS_TYPES'
        ,'OTHER'
        ,'Other'
@@ -17825,7 +17825,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GRI_GAZ_RESTRICTIONS'
        ,'EXTENT'
        ,'Saved Network Extents'
@@ -17846,7 +17846,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GRI_GAZ_RESTRICTIONS'
        ,'NW_ALL'
        ,'Any Network Element'
@@ -17867,7 +17867,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GRI_GAZ_RESTRICTIONS'
        ,'NW_DAT'
        ,'Datums Only'
@@ -17888,7 +17888,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'GRI_GAZ_RESTRICTIONS'
        ,'NW_GRP'
        ,'Groups Only'
@@ -17909,7 +17909,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'HDN_JOIN_TYPES'
        ,'TABLE'
        ,'HDN Table Join'
@@ -17930,7 +17930,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'HISTORY_OPERATION'
        ,'B'
        ,'Recalibrate'
@@ -17951,7 +17951,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'HISTORY_OPERATION'
        ,'C'
        ,'Close'
@@ -17972,7 +17972,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'HISTORY_OPERATION'
        ,'E'
        ,'Manual Edit'
@@ -17993,7 +17993,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'HISTORY_OPERATION'
        ,'H'
        ,'Shift'
@@ -18014,7 +18014,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'HISTORY_OPERATION'
        ,'L'
        ,'Rescale'
@@ -18035,7 +18035,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'HISTORY_OPERATION'
        ,'M'
        ,'Merge'
@@ -18056,7 +18056,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'HISTORY_OPERATION'
        ,'N'
        ,'Reclass'
@@ -18077,7 +18077,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'HISTORY_OPERATION'
        ,'R'
        ,'Replace'
@@ -18098,7 +18098,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'HISTORY_OPERATION'
        ,'S'
        ,'Split'
@@ -18119,7 +18119,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'HISTORY_OPERATION'
        ,'V'
        ,'Reverse'
@@ -18140,7 +18140,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'IMAGE_TYPES'
        ,'BMP'
        ,'Windows Bitmap File'
@@ -18161,7 +18161,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'IMAGE_TYPES'
        ,'CALS'
        ,'CALS File'
@@ -18182,7 +18182,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'IMAGE_TYPES'
        ,'GIF'
        ,'GIF File'
@@ -18203,7 +18203,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'IMAGE_TYPES'
        ,'JFIF'
        ,'JFIF File'
@@ -18224,7 +18224,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'IMAGE_TYPES'
        ,'PCX'
        ,'PCX File'
@@ -18245,7 +18245,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'IMAGE_TYPES'
        ,'PICT'
        ,'Pict File'
@@ -18266,7 +18266,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'IMAGE_TYPES'
        ,'RAS'
        ,'Raster Image'
@@ -18287,7 +18287,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'IMAGE_TYPES'
        ,'TIFF'
        ,'TIFF File'
@@ -18308,7 +18308,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'INV_CATEGORY'
        ,'C'
        ,'Condition'
@@ -18329,7 +18329,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'INV_CATEGORY'
        ,'F'
        ,'Foreign Table'
@@ -18350,7 +18350,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'INV_CATEGORY'
        ,'I'
        ,'General Inventory'
@@ -18371,7 +18371,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'INV_CATEGORY'
        ,'R'
        ,'Road Construction'
@@ -18392,7 +18392,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'INV_CATEGORY'
        ,'X'
        ,'Generated Exclusive Inventory Type'
@@ -18413,7 +18413,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'INV_RELATION'
        ,'AT'
        ,'Child exists at the same location as the parent'
@@ -18434,7 +18434,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'INV_RELATION'
        ,'DERIVED'
        ,'The parent is derived by location'
@@ -18455,7 +18455,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'INV_RELATION'
        ,'IN'
        ,'Child must exist within the parent'
@@ -18476,7 +18476,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'INV_RELATION'
        ,'NONE'
        ,'No location relationship is enforced'
@@ -18497,7 +18497,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'INV_RELATION'
        ,'RELATIVE'
        ,'Child must exist within the parent but its location'
@@ -18518,7 +18518,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'JOB_STATUS'
        ,'COMPLETE'
        ,'Complete'
@@ -18539,7 +18539,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'JOB_STATUS'
        ,'ERROR'
        ,'In Error'
@@ -18560,7 +18560,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'JOB_STATUS'
        ,'IN_PROGRESS'
        ,'In Progress'
@@ -18581,7 +18581,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'JOB_STATUS'
        ,'NOT_STARTED'
        ,'Not Started'
@@ -18602,7 +18602,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'JPRIVLEVEL'
        ,'B'
        ,'Both Role And User Level'
@@ -18623,7 +18623,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'JPRIVLEVEL'
        ,'R'
        ,'Role Level'
@@ -18644,7 +18644,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'JPRIVLEVEL'
        ,'U'
        ,'User Level'
@@ -18665,7 +18665,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LAUNCHPAD_MODE'
        ,'LAUNCHPAD'
        ,'Launchpad'
@@ -18686,7 +18686,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LAUNCHPAD_MODE'
        ,'SYSTEM'
        ,'System'
@@ -18707,7 +18707,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LAUNCHPAD_MODE'
        ,'USER'
        ,'User'
@@ -18728,7 +18728,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LEG_NUMBERS'
        ,'1'
        ,'North'
@@ -18749,7 +18749,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LEG_NUMBERS'
        ,'2'
        ,'North-East'
@@ -18770,7 +18770,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LEG_NUMBERS'
        ,'3'
        ,'East'
@@ -18791,7 +18791,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LEG_NUMBERS'
        ,'4'
        ,'South-East'
@@ -18812,7 +18812,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LEG_NUMBERS'
        ,'5'
        ,'South'
@@ -18833,7 +18833,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LEG_NUMBERS'
        ,'6'
        ,'South-West'
@@ -18854,7 +18854,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LEG_NUMBERS'
        ,'7'
        ,'West'
@@ -18875,7 +18875,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LEG_NUMBERS'
        ,'8'
        ,'North-West'
@@ -18896,7 +18896,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LEG_NUMBERS'
        ,'9'
        ,'Unknown'
@@ -18917,7 +18917,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'001'
        ,'Broome'
@@ -18938,7 +18938,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'002'
        ,'Halls Creek'
@@ -18959,7 +18959,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'003'
        ,'Derby-West Kimberley'
@@ -18980,7 +18980,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'004'
        ,'Wyndham-East Kimberley'
@@ -19001,7 +19001,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'005'
        ,'Christmas Island'
@@ -19022,7 +19022,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'006'
        ,'Cocos Island'
@@ -19043,7 +19043,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'010'
        ,'Northern Territory'
@@ -19064,7 +19064,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'101'
        ,'Armadale City'
@@ -19085,7 +19085,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'102'
        ,'Kalamunda'
@@ -19106,7 +19106,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'103'
        ,'Cockburn City'
@@ -19127,7 +19127,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'104'
        ,'Gosnells City'
@@ -19148,7 +19148,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'105'
        ,'Kwinana Town'
@@ -19169,7 +19169,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'106'
        ,'Mundaring'
@@ -19190,7 +19190,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'107'
        ,'Rockingham'
@@ -19211,7 +19211,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'108'
        ,'Serpentine-jarrahdale'
@@ -19232,7 +19232,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'109'
        ,'Swan City'
@@ -19253,7 +19253,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'110'
        ,'Wanneroo City'
@@ -19274,7 +19274,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'111'
        ,'Bassendean Town'
@@ -19295,7 +19295,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'112'
        ,'Bayswater City'
@@ -19316,7 +19316,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'113'
        ,'Belmont City'
@@ -19337,7 +19337,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'114'
        ,'Canning City'
@@ -19358,7 +19358,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'115'
        ,'Claremont Town'
@@ -19379,7 +19379,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'116'
        ,'Cottesloe Town'
@@ -19400,7 +19400,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'117'
        ,'East Fremantle Town'
@@ -19421,7 +19421,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'118'
        ,'Fremantle City'
@@ -19442,7 +19442,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'119'
        ,'Melville City'
@@ -19463,7 +19463,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'121'
        ,'Mosman Park Town'
@@ -19484,7 +19484,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'122'
        ,'Nedlands City'
@@ -19505,7 +19505,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'123'
        ,'Peppermint Grove'
@@ -19526,7 +19526,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'124'
        ,'Perth City'
@@ -19547,7 +19547,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'125'
        ,'Stirling City'
@@ -19568,7 +19568,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'126'
        ,'South Perth City'
@@ -19589,7 +19589,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'127'
        ,'Subiaco City'
@@ -19610,7 +19610,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'128'
        ,'Cambridge Town'
@@ -19631,7 +19631,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'129'
        ,'Victoria Park Town'
@@ -19652,7 +19652,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'130'
        ,'Vincent Town'
@@ -19673,7 +19673,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'131'
        ,'Joondalup City'
@@ -19694,7 +19694,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'150'
        ,'King''s Park'
@@ -19715,7 +19715,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'155'
        ,'Rottnest Island'
@@ -19736,7 +19736,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'201'
        ,'Augusta-Margaret River'
@@ -19757,7 +19757,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'203'
        ,'Bridgetown-Greenbushes'
@@ -19778,7 +19778,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'204'
        ,'Bunbury City'
@@ -19799,7 +19799,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'205'
        ,'Busselton'
@@ -19820,7 +19820,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'206'
        ,'Capel'
@@ -19841,7 +19841,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'207'
        ,'Collie'
@@ -19862,7 +19862,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'208'
        ,'Dardanup'
@@ -19883,7 +19883,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'209'
        ,'Waroona'
@@ -19904,7 +19904,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'211'
        ,'Harvey'
@@ -19925,7 +19925,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'212'
        ,'Mandurah City'
@@ -19946,7 +19946,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'213'
        ,'Manjimup'
@@ -19967,7 +19967,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'214'
        ,'Boddington'
@@ -19988,7 +19988,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'215'
        ,'Murray'
@@ -20009,7 +20009,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'216'
        ,'Nannup'
@@ -20030,7 +20030,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'217'
        ,'Donnybrook-Balingup'
@@ -20051,7 +20051,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'218'
        ,'Boyup Brook'
@@ -20072,7 +20072,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'302'
        ,'Albany City'
@@ -20093,7 +20093,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'303'
        ,'Broomehill'
@@ -20114,7 +20114,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'304'
        ,'Cranbrook'
@@ -20135,7 +20135,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'305'
        ,'Denmark'
@@ -20156,7 +20156,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'306'
        ,'Dumbleyung'
@@ -20177,7 +20177,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'307'
        ,'Gnowangerup'
@@ -20198,7 +20198,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'308'
        ,'Katanning'
@@ -20219,7 +20219,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'309'
        ,'Kent'
@@ -20240,7 +20240,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'310'
        ,'Kojonup'
@@ -20261,7 +20261,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'311'
        ,'Lake Grace'
@@ -20282,7 +20282,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'312'
        ,'Plantagenet'
@@ -20303,7 +20303,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'313'
        ,'Tambellup'
@@ -20324,7 +20324,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'315'
        ,'Wagin'
@@ -20345,7 +20345,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'316'
        ,'West Arthur'
@@ -20366,7 +20366,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'317'
        ,'Woodanilling'
@@ -20387,7 +20387,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'318'
        ,'Jerramungup'
@@ -20408,7 +20408,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'401'
        ,'Beverley'
@@ -20429,7 +20429,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'402'
        ,'Brookton'
@@ -20450,7 +20450,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'403'
        ,'Bruce Rock'
@@ -20471,7 +20471,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'404'
        ,'Corrigin'
@@ -20492,7 +20492,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'405'
        ,'Cuballing'
@@ -20513,7 +20513,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'406'
        ,'Cunderdin'
@@ -20534,7 +20534,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'407'
        ,'Dowerin'
@@ -20555,7 +20555,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'408'
        ,'Goomalling'
@@ -20576,7 +20576,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'409'
        ,'Kellerberrin'
@@ -20597,7 +20597,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'410'
        ,'Kondinin'
@@ -20618,7 +20618,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'411'
        ,'Koorda'
@@ -20639,7 +20639,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'412'
        ,'Kulin'
@@ -20660,7 +20660,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'413'
        ,'Trayning'
@@ -20681,7 +20681,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'414'
        ,'Merredin'
@@ -20702,7 +20702,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'415'
        ,'Mt Marshall'
@@ -20723,7 +20723,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'416'
        ,'Mukinbudin'
@@ -20744,7 +20744,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'417'
        ,'Narembeen'
@@ -20765,7 +20765,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'418'
        ,'Narrogin Town'
@@ -20786,7 +20786,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'419'
        ,'Narrogin'
@@ -20807,7 +20807,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'420'
        ,'Northam Town'
@@ -20828,7 +20828,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'421'
        ,'Northam'
@@ -20849,7 +20849,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'422'
        ,'Nungarin'
@@ -20870,7 +20870,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'423'
        ,'Pingelly'
@@ -20891,7 +20891,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'424'
        ,'Quairading'
@@ -20912,7 +20912,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'425'
        ,'Tammin'
@@ -20933,7 +20933,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'426'
        ,'Toodyay'
@@ -20954,7 +20954,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'427'
        ,'Wandering'
@@ -20975,7 +20975,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'428'
        ,'Westonia'
@@ -20996,7 +20996,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'429'
        ,'Wickepin'
@@ -21017,7 +21017,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'430'
        ,'Williams'
@@ -21038,7 +21038,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'431'
        ,'Wyalkatchem'
@@ -21059,7 +21059,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'433'
        ,'York'
@@ -21080,7 +21080,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'501'
        ,'Carnamah'
@@ -21101,7 +21101,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'502'
        ,'Chittering'
@@ -21122,7 +21122,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'503'
        ,'Dalwallinu'
@@ -21143,7 +21143,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'504'
        ,'Dandaragan'
@@ -21164,7 +21164,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'505'
        ,'Geraldton City'
@@ -21185,7 +21185,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'506'
        ,'Greenough'
@@ -21206,7 +21206,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'507'
        ,'Gingin'
@@ -21227,7 +21227,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'508'
        ,'Irwin'
@@ -21248,7 +21248,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'509'
        ,'Mingenew'
@@ -21269,7 +21269,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'510'
        ,'Moora'
@@ -21290,7 +21290,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'511'
        ,'Morawa'
@@ -21311,7 +21311,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'512'
        ,'Mullewa'
@@ -21332,7 +21332,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'513'
        ,'Northampton'
@@ -21353,7 +21353,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'514'
        ,'Perenjori'
@@ -21374,7 +21374,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'515'
        ,'Three Springs'
@@ -21395,7 +21395,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'516'
        ,'Chapman Valley'
@@ -21416,7 +21416,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'517'
        ,'Victoria Plains'
@@ -21437,7 +21437,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'518'
        ,'Wongan-Ballidu'
@@ -21458,7 +21458,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'519'
        ,'Coorow'
@@ -21479,7 +21479,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'602'
        ,'Coolgardie'
@@ -21500,7 +21500,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'603'
        ,'Dundas'
@@ -21521,7 +21521,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'604'
        ,'Esperance'
@@ -21542,7 +21542,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'605'
        ,'Kalgoorlie-Boulder'
@@ -21563,7 +21563,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'607'
        ,'Laverton'
@@ -21584,7 +21584,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'608'
        ,'Leonora'
@@ -21605,7 +21605,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'609'
        ,'Menzies'
@@ -21626,7 +21626,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'610'
        ,'Ravensthorpe'
@@ -21647,7 +21647,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'611'
        ,'Yilgarn'
@@ -21668,7 +21668,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'612'
        ,'Ngaanyatjarraku'
@@ -21689,7 +21689,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'701'
        ,'Sandstone'
@@ -21710,7 +21710,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'702'
        ,'Cue'
@@ -21731,7 +21731,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'703'
        ,'Meekatharra'
@@ -21752,7 +21752,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'704'
        ,'Mt Magnet'
@@ -21773,7 +21773,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'705'
        ,'Murchison'
@@ -21794,7 +21794,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'706'
        ,'Wiluna'
@@ -21815,7 +21815,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'707'
        ,'Yalgoo'
@@ -21836,7 +21836,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'803'
        ,'Carnarvon'
@@ -21857,7 +21857,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'804'
        ,'Shark Bay'
@@ -21878,7 +21878,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'805'
        ,'Upper Gascoyne'
@@ -21899,7 +21899,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'806'
        ,'Exmouth'
@@ -21920,7 +21920,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'811'
        ,'Ashburton'
@@ -21941,7 +21941,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'812'
        ,'East Pilbara'
@@ -21962,7 +21962,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'813'
        ,'Port Hedland Town'
@@ -21983,7 +21983,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'814'
        ,'Roebourne'
@@ -22004,7 +22004,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'900'
        ,'Avon Valley NP'
@@ -22025,7 +22025,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'904'
        ,'Nambung NP'
@@ -22046,7 +22046,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'910'
        ,'Fitzgerald NP'
@@ -22067,7 +22067,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'914'
        ,'Stirling Range NP'
@@ -22088,7 +22088,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'915'
        ,'Torndirrup NP'
@@ -22109,7 +22109,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'916'
        ,'West Cape Howe NP'
@@ -22130,7 +22130,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'917'
        ,'William Bay NP'
@@ -22151,7 +22151,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'918'
        ,'Two Peoples Bay Sanctuary'
@@ -22172,7 +22172,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'922'
        ,'D''entrecasteaux NP'
@@ -22193,7 +22193,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'923'
        ,'Leeuwin-Naturaliste NP'
@@ -22214,7 +22214,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'924'
        ,'Warren NP'
@@ -22235,7 +22235,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'927'
        ,'Walpole-Nornalup NP'
@@ -22256,7 +22256,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'928'
        ,'Mt Frankland NP'
@@ -22277,7 +22277,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'930'
        ,'Cape Range NP'
@@ -22298,7 +22298,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'941'
        ,'Kalbarri NP'
@@ -22319,7 +22319,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'951'
        ,'Cape Arid NP'
@@ -22340,7 +22340,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'952'
        ,'Cape Le Grand NP'
@@ -22361,7 +22361,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'955'
        ,'Peak Charles NP'
@@ -22382,7 +22382,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'956'
        ,'Stokes NP'
@@ -22403,7 +22403,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'960'
        ,'Bungle Bungle NP'
@@ -22424,7 +22424,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'961'
        ,'Geikie Gorge NP'
@@ -22445,7 +22445,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'963'
        ,'Windjana Gorge NP'
@@ -22466,7 +22466,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'972'
        ,'John Forrest NP'
@@ -22487,7 +22487,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'973'
        ,'Yanchep NP'
@@ -22508,7 +22508,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'974'
        ,'Serpentine NP'
@@ -22529,7 +22529,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'980'
        ,'Karijini NP'
@@ -22550,7 +22550,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'981'
        ,'Millstream-Chichester NP'
@@ -22571,7 +22571,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'990'
        ,'Various - 990'
@@ -22592,7 +22592,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'991'
        ,'Various - 991'
@@ -22613,7 +22613,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'992'
        ,'Various Pilbara'
@@ -22634,7 +22634,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'993'
        ,'Various Gascoyne'
@@ -22655,7 +22655,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'999'
        ,'Unknown Local Gov'
@@ -22676,7 +22676,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'LGAS'
        ,'ABC'
        ,'test AU'
@@ -22697,7 +22697,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MAINTENANCE_CATEGORY'
        ,'1'
        ,'Motorways'
@@ -22718,7 +22718,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MAINTENANCE_CATEGORY'
        ,'2'
        ,'Regional and Primary Routes'
@@ -22739,7 +22739,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MAINTENANCE_CATEGORY'
        ,'3A'
        ,'Main Distributor Roads'
@@ -22760,7 +22760,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MAINTENANCE_CATEGORY'
        ,'3B'
        ,'Secondary Distributor Roads'
@@ -22781,7 +22781,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MAINTENANCE_CATEGORY'
        ,'4A'
        ,'Local Roads'
@@ -22802,7 +22802,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MAINTENANCE_CATEGORY'
        ,'4B'
        ,'Local Access Roads'
@@ -22823,7 +22823,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MAINTENANCE_CATEGORY'
        ,'5'
        ,'Side Roads'
@@ -22844,7 +22844,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MC_INV_LD_ERR_STATUS'
        ,'0'
        ,'No Error'
@@ -22865,7 +22865,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MC_INV_LD_ERR_STATUS'
        ,'1'
        ,'General Error'
@@ -22886,7 +22886,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MC_INV_LD_ERR_STATUS'
        ,'2'
        ,'Conflict'
@@ -22907,7 +22907,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MC_INV_LD_ERR_STATUS'
        ,'3'
        ,'Conflict Resolved'
@@ -22928,7 +22928,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MODULE_TYPE'
        ,'DIS'
        ,'Discoverer report'
@@ -22949,7 +22949,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MODULE_TYPE'
        ,'EPT'
        ,'Entry Point'
@@ -22970,7 +22970,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MODULE_TYPE'
        ,'EXE'
        ,'Host executable'
@@ -22991,7 +22991,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MODULE_TYPE'
        ,'FMX'
        ,'Forms executable'
@@ -23012,7 +23012,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MODULE_TYPE'
        ,'R25'
        ,'Reports 2.5'
@@ -23033,7 +23033,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MODULE_TYPE'
        ,'SQL'
        ,'Client based SQL'
@@ -23054,7 +23054,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MODULE_TYPE'
        ,'SVR'
        ,'Server based executable (Incl SQL)'
@@ -23075,7 +23075,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MODULE_TYPE'
        ,'URL'
        ,'URL'
@@ -23096,7 +23096,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MODULE_TYPE'
        ,'WEB'
        ,'Web Page'
@@ -23117,7 +23117,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MRG_OUTPUT_TYPE'
        ,'C/S'
        ,'Client & Server'
@@ -23138,7 +23138,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MRG_OUTPUT_TYPE'
        ,'CLIENT'
        ,'Client'
@@ -23159,7 +23159,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MRG_OUTPUT_TYPE'
        ,'SERVER'
        ,'Server'
@@ -23180,7 +23180,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'MRWA_OWNER'
        ,'000'
        ,'MRWA Highways and Mains'
@@ -23201,7 +23201,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NETWORK_DIRECTION'
        ,'EB'
        ,'East Bound'
@@ -23222,7 +23222,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NETWORK_DIRECTION'
        ,'NB'
        ,'North Bound'
@@ -23243,7 +23243,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NETWORK_DIRECTION'
        ,'SB'
        ,'South Bound'
@@ -23264,7 +23264,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NETWORK_DIRECTION'
        ,'WB'
        ,'West Bound'
@@ -23285,7 +23285,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NE_TYPE'
        ,'D'
        ,'Distance Break'
@@ -23306,7 +23306,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NE_TYPE'
        ,'G'
        ,'Group of Sections'
@@ -23327,7 +23327,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NE_TYPE'
        ,'P'
        ,'Group of Groups'
@@ -23348,7 +23348,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NE_TYPE'
        ,'S'
        ,'Section'
@@ -23369,7 +23369,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NM_ELEMENTS_COLUMNS'
        ,'NE_GROUP'
        ,'NE_GROUP'
@@ -23390,7 +23390,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NM_ELEMENTS_COLUMNS'
        ,'NE_NAME_1'
        ,'NE_NAME_1'
@@ -23411,7 +23411,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NM_ELEMENTS_COLUMNS'
        ,'NE_NAME_2'
        ,'NE_NAME_2'
@@ -23432,7 +23432,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NM_ELEMENTS_COLUMNS'
        ,'NE_NSG_REF'
        ,'NE_NSG_REF'
@@ -23453,7 +23453,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NM_ELEMENTS_COLUMNS'
        ,'NE_NUMBER'
        ,'NE_NUMBER'
@@ -23474,7 +23474,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NM_ELEMENTS_COLUMNS'
        ,'NE_OWNER'
        ,'NE_OWNER'
@@ -23495,7 +23495,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NM_ELEMENTS_COLUMNS'
        ,'NE_PREFIX'
        ,'NE_PREFIX'
@@ -23516,7 +23516,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NM_ELEMENTS_COLUMNS'
        ,'NE_SUB_CLASS'
        ,'NE_SUB_CLASS'
@@ -23537,7 +23537,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NM_ELEMENTS_COLUMNS'
        ,'NE_SUB_TYPE'
        ,'NE_SUB_TYPE'
@@ -23558,7 +23558,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NM_ELEMENTS_COLUMNS'
        ,'NE_VERSION_NO'
        ,'NE_VERSION_NO'
@@ -23579,7 +23579,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NM_TYPES'
        ,'G'
        ,'Group'
@@ -23600,7 +23600,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'NM_TYPES'
        ,'I'
        ,'Inventory'
@@ -23621,7 +23621,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_CONDITION'
        ,'<'
        ,'Less than'
@@ -23642,7 +23642,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_CONDITION'
        ,'<='
        ,'<='
@@ -23663,7 +23663,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_CONDITION'
        ,'<>'
        ,'Not equal to'
@@ -23684,7 +23684,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_CONDITION'
        ,'='
        ,'Equal to'
@@ -23705,7 +23705,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_CONDITION'
        ,'>'
        ,'Greater than'
@@ -23726,7 +23726,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_CONDITION'
        ,'>='
        ,'>='
@@ -23747,7 +23747,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_CONDITION'
        ,'BETWEEN'
        ,'between'
@@ -23768,7 +23768,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_CONDITION'
        ,'IN'
        ,'In'
@@ -23789,7 +23789,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_CONDITION'
        ,'IS NOT NULL'
        ,'is not null'
@@ -23810,7 +23810,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_CONDITION'
        ,'IS NULL'
        ,'is null'
@@ -23831,7 +23831,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_CONDITION'
        ,'LIKE'
        ,'Like'
@@ -23852,7 +23852,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_CONDITION'
        ,'NOT BETWEEN'
        ,'Not between'
@@ -23873,7 +23873,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_CONDITION'
        ,'NOT IN'
        ,'Not in'
@@ -23894,7 +23894,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_CONDITION'
        ,'NOT LIKE'
        ,'Not like'
@@ -23915,7 +23915,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_SR_COND'
        ,'<'
        ,'Less than'
@@ -23936,7 +23936,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_SR_COND'
        ,'<='
        ,'Less than or equal to'
@@ -23957,7 +23957,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_SR_COND'
        ,'<>'
        ,'Not equal to'
@@ -23978,7 +23978,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_SR_COND'
        ,'='
        ,'Equals'
@@ -23999,7 +23999,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_SR_COND'
        ,'>'
        ,'Greater than'
@@ -24020,7 +24020,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_SR_COND'
        ,'>='
        ,'Greater than or equal to'
@@ -24041,7 +24041,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PBI_SR_COND'
        ,'LIKE'
        ,'Like'
@@ -24062,7 +24062,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PEO_TITLE_CODE'
        ,'INSP'
        ,'Inspector'
@@ -24083,7 +24083,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PEO_TITLE_CODE'
        ,'SUPV'
        ,'Supervisor'
@@ -24104,7 +24104,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'POE_TYPES'
        ,'G'
        ,'Gap'
@@ -24125,7 +24125,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'POE_TYPES'
        ,'N'
        ,'Not a POE'
@@ -24146,7 +24146,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'POE_TYPES'
        ,'O'
        ,'Overlap'
@@ -24167,7 +24167,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'POP3_HEADER_FIELDS'
        ,'DATE'
        ,'DATE'
@@ -24188,7 +24188,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'POP3_HEADER_FIELDS'
        ,'FROM'
        ,'FROM'
@@ -24209,7 +24209,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'POP3_HEADER_FIELDS'
        ,'MESSAGE-ID'
        ,'MESSAGE-ID'
@@ -24230,7 +24230,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'POP3_HEADER_FIELDS'
        ,'ORIGINAL-RECIPIENT'
        ,'ORIGINAL-RECIPIENT'
@@ -24251,7 +24251,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'POP3_HEADER_FIELDS'
        ,'RETURN-PATH'
        ,'RETURN-PATH'
@@ -24272,7 +24272,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'POP3_HEADER_FIELDS'
        ,'SUBJECT'
        ,'SUBJECT'
@@ -24293,7 +24293,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'POP3_HEADER_FIELDS'
        ,'TO'
        ,'TO'
@@ -24314,7 +24314,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PRIVILEGE_TYPE'
        ,'ALL'
        ,'Select, Insert, Update, Delete Privileges'
@@ -24335,7 +24335,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PRIVILEGE_TYPE'
        ,'DELETE'
        ,'Delete Privilege'
@@ -24356,7 +24356,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PRIVILEGE_TYPE'
        ,'INSERT'
        ,'Insert Privilege'
@@ -24377,7 +24377,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PRIVILEGE_TYPE'
        ,'SELECT'
        ,'Select Privilege'
@@ -24398,7 +24398,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PRIVILEGE_TYPE'
        ,'UPDATE'
        ,'Update Privilege'
@@ -24419,7 +24419,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PROPERTY_TYPE'
        ,'BACK'
        ,'Backcourt'
@@ -24440,7 +24440,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'PROPERTY_TYPE'
        ,'NORM'
        ,'Normal'
@@ -24461,7 +24461,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_CARRIAGEWAY'
        ,'D'
        ,'Dual Carriageway'
@@ -24482,7 +24482,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_CARRIAGEWAY'
        ,'S'
        ,'Single Carriageway'
@@ -24503,7 +24503,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_CLASS'
        ,'A'
        ,'Classified A Roads'
@@ -24524,7 +24524,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_CLASS'
        ,'B'
        ,'Classified B Roads'
@@ -24545,7 +24545,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_CLASS'
        ,'C'
        ,'Classified C Roads'
@@ -24566,7 +24566,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_CLASS'
        ,'D'
        ,'Urban Zones'
@@ -24587,7 +24587,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_CLASS'
        ,'F'
        ,'Footpath'
@@ -24608,7 +24608,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_CLASS'
        ,'M'
        ,'Motorway'
@@ -24629,7 +24629,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_CLASS'
        ,'P'
        ,'Carpark'
@@ -24650,7 +24650,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_CLASS'
        ,'U'
        ,'Unclassified'
@@ -24671,7 +24671,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_ENVIRONMENT'
        ,'R'
        ,'Rural'
@@ -24692,7 +24692,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_ENVIRONMENT'
        ,'S'
        ,'Suburban'
@@ -24713,7 +24713,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_ENVIRONMENT'
        ,'U'
        ,'Urban'
@@ -24734,7 +24734,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_SYS_FLAG'
        ,'D'
        ,'DTP'
@@ -24755,7 +24755,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_SYS_FLAG'
        ,'L'
        ,'Local'
@@ -24776,7 +24776,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_TYPE'
        ,'AP'
        ,'All Purpose'
@@ -24797,7 +24797,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'ROAD_TYPE'
        ,'M_'
        ,'Motorway'
@@ -24818,7 +24818,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'RSE_NLA_TYPE'
        ,'1'
        ,'Rural'
@@ -24839,7 +24839,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'RSE_NLA_TYPE'
        ,'2'
        ,'Town Centre'
@@ -24860,7 +24860,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'RSE_NLA_TYPE'
        ,'3'
        ,'Urban'
@@ -24881,7 +24881,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'RSE_NLA_TYPE'
        ,'4'
        ,'Parkland'
@@ -24902,7 +24902,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'RSE_NLA_TYPE'
        ,'5'
        ,'Play Area'
@@ -24923,7 +24923,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'RSE_NLA_TYPE'
        ,'6'
        ,'Car Parking'
@@ -24944,7 +24944,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'RSE_NLA_TYPE'
        ,'7'
        ,'Shopping Precinct'
@@ -24965,7 +24965,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'RSE_NLA_TYPE'
        ,'9'
        ,'Other'
@@ -24986,7 +24986,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'SAV_FORMAT'
        ,'CSV'
        ,'Comma Separated Values'
@@ -25007,7 +25007,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'SAV_FORMAT'
        ,'XML'
        ,'Xml'
@@ -25028,7 +25028,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'SECTIONS'
        ,'AP'
        ,'All Purpose'
@@ -25049,7 +25049,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'SECTIONS'
        ,'M_'
        ,'Motorway'
@@ -25070,7 +25070,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'SECTION_STATUS'
        ,'O'
        ,'Open'
@@ -25091,7 +25091,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'SECTION_STATUS'
        ,'P'
        ,'Proposed'
@@ -25112,7 +25112,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'SECTION_STATUS'
        ,'U'
        ,'In Use'
@@ -25133,7 +25133,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'SECT_LENGTH_STATUS'
        ,'E'
        ,'Estimated'
@@ -25154,7 +25154,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'SECT_LENGTH_STATUS'
        ,'M'
        ,'Measured'
@@ -25175,7 +25175,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'SECT_LENGTH_STATUS'
        ,'U'
        ,'Unknown'
@@ -25196,7 +25196,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'SECURITY_MODES'
        ,'NORMAL'
        ,'Normal Access'
@@ -25217,7 +25217,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'SECURITY_MODES'
        ,'READONLY'
        ,'Readonly Access'
@@ -25238,7 +25238,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'SURFACE_CONDITION'
        ,'DRY'
        ,'Dry'
@@ -25259,7 +25259,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'SURFACE_CONDITION'
        ,'ICE'
        ,'Ice'
@@ -25280,7 +25280,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'SURFACE_CONDITION'
        ,'SNOW'
        ,'Snow'
@@ -25301,7 +25301,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'SURFACE_CONDITION'
        ,'WET'
        ,'Wet'
@@ -25322,7 +25322,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'THEME_TYPE'
        ,'LOCL'
        ,'Local'
@@ -25343,7 +25343,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'THEME_TYPE'
        ,'SDE'
        ,'Esri Spatial Database Engine'
@@ -25364,7 +25364,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'THEME_TYPE'
        ,'SDO'
        ,'Oracle Spatial'
@@ -25385,7 +25385,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'WEATHER_CONDITION'
        ,'FINE'
        ,'Fine'
@@ -25406,7 +25406,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'WEATHER_CONDITION'
        ,'FOG'
        ,'Fog'
@@ -25427,7 +25427,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'WEATHER_CONDITION'
        ,'RAIN'
        ,'Rain'
@@ -25448,7 +25448,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'WEATHER_CONDITION'
        ,'SNOW'
        ,'Snow'
@@ -25469,7 +25469,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'0'
        ,'Right Outside Verge'
@@ -25490,7 +25490,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'1'
        ,'Left Outside Verge'
@@ -25511,7 +25511,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'2'
        ,'Left Footway'
@@ -25532,7 +25532,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'3'
        ,'Left Verge'
@@ -25553,7 +25553,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'4'
        ,'Lane 1'
@@ -25574,7 +25574,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'5'
        ,'Lane 2'
@@ -25595,7 +25595,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'6'
        ,'Lane 3'
@@ -25616,7 +25616,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'7'
        ,'Lane 4'
@@ -25637,7 +25637,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'8'
        ,'Right Verge'
@@ -25658,7 +25658,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'9'
        ,'Right Footway'
@@ -25679,7 +25679,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'E'
        ,'Right Turning Lane'
@@ -25700,7 +25700,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'Q'
        ,'Slip Road'
@@ -25721,7 +25721,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'R'
        ,'Bus Lane'
@@ -25742,7 +25742,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'T'
        ,'Crawler Lane'
@@ -25763,7 +25763,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'W'
        ,'Left Turning Lane'
@@ -25784,7 +25784,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'XSP_VALUES'
        ,'Y'
        ,'Any Other Option'
@@ -25805,7 +25805,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'X_ATTR_VAL_TYPES'
        ,'1'
        ,'Ast Type and Location Based Cross Item Validation'
@@ -25826,7 +25826,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'X_ATTR_VAL_TYPES'
        ,'2'
        ,'Network Type & Location Based Cross Item Validation'
@@ -25847,7 +25847,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'X_ATTR_VAL_TYPES'
        ,'3'
        ,'Inventory Record Based Cross Attribute Validation'
@@ -25868,7 +25868,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'Y_OR_N'
        ,'N'
        ,'No'
@@ -25889,7 +25889,7 @@ INSERT INTO HIG_CODES
        ,HCO_START_DATE
        ,HCO_END_DATE
        )
-SELECT
+SELECT 
         'Y_OR_N'
        ,'Y'
        ,'Yes'
@@ -25917,7 +25917,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Black'
        ,'BLACK' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -25927,7 +25927,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Blue'
        ,'BLUE' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -25937,7 +25937,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Brick Pattern'
        ,'BRICK' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -25947,7 +25947,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Brick Slanted L/R'
        ,'BRICK_LR' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -25957,7 +25957,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Brick Slanted R/L'
        ,'BRICK_RL' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -25967,7 +25967,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Brown'
        ,'BROWN' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -25977,7 +25977,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Cyan'
        ,'CYAN' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -25987,7 +25987,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Dark Blue'
        ,'DARKBLUE' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -25997,7 +25997,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Dark Cyan'
        ,'DARKCYAN' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -26007,7 +26007,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Dark Green'
        ,'DARKGREEN' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -26017,7 +26017,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Dark Grey'
        ,'DARKGREY' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -26027,7 +26027,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Dark Magenta'
        ,'DARKMAGENTA' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -26037,7 +26037,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Dark Red'
        ,'DARKRED' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -26047,7 +26047,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Dark Yellow'
        ,'DARKYELLOW' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -26057,7 +26057,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Green'
        ,'GREEN' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -26067,7 +26067,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Grey'
        ,'GREY' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -26077,7 +26077,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Hash Line Left\Right'
        ,'DIAGONAL_LR' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -26087,7 +26087,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Hash Line Right\Left'
        ,'DIAGONAL_RL' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -26097,7 +26097,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Magenta'
        ,'MAGENTA' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -26107,7 +26107,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Red'
        ,'RED' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -26117,7 +26117,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'White'
        ,'WHITE' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -26127,7 +26127,7 @@ INSERT INTO HIG_COLOURS
        (HCL_COLOUR
        ,HCL_VISUAL_ATTRIBUTE
        )
-SELECT
+SELECT 
         'Yellow'
        ,'YELLOW' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_COLOURS
@@ -26163,7 +26163,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'ABOUT'
        ,'About Forms'
        ,'about'
@@ -26187,7 +26187,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'ABOUT_SERVER'
        ,'About Server Objects'
        ,'about_server'
@@ -26211,7 +26211,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'AUDIT'
        ,'Audit Tables'
        ,'audit'
@@ -26235,7 +26235,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'CALENDAR'
        ,'Calendar'
        ,'calendar'
@@ -26259,7 +26259,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'DOC0100'
        ,'Documents'
        ,'doc0100'
@@ -26283,7 +26283,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'DOC0110'
        ,'Document Types'
        ,'doc0110'
@@ -26307,7 +26307,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'DOC0112'
        ,'Document Classes'
        ,'doc0112'
@@ -26331,7 +26331,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'DOC0114'
        ,'Circulation by Person'
        ,'doc0114'
@@ -26355,7 +26355,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'DOC0115'
        ,'Circulation by Document'
        ,'doc0115'
@@ -26379,7 +26379,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'DOC0116'
        ,'Keywords'
        ,'doc0116'
@@ -26403,7 +26403,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'DOC0118'
        ,'Media/Locations'
        ,'doc0118'
@@ -26427,7 +26427,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'DOC0120'
        ,'Associated Documents'
        ,'doc0120'
@@ -26451,7 +26451,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'DOC0122'
        ,'Keyword Search'
        ,'doc0122'
@@ -26475,7 +26475,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'DOC0130'
        ,'Document Gateways'
        ,'doc0130'
@@ -26499,7 +26499,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'DOC0140'
        ,'List of Documents by Association'
        ,'doc0140'
@@ -26523,7 +26523,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'DOC0200'
        ,'Select Template'
        ,'doc0200'
@@ -26547,7 +26547,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'DOC0201'
        ,'Templates'
        ,'doc0201'
@@ -26571,7 +26571,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'DOC0202'
        ,'Template Users'
        ,'doc0202'
@@ -26595,7 +26595,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'DOCWEB0010'
        ,'Run Query'
        ,'dm3query.list_queries'
@@ -26619,7 +26619,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GIS'
        ,'GIS Availability (dummy module)'
        ,'GIS'
@@ -26643,7 +26643,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GIS0005'
        ,'GIS Projects'
        ,'gis0005'
@@ -26667,7 +26667,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GIS0010'
        ,'GIS Themes'
        ,'gis0010'
@@ -26691,7 +26691,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GIS0011'
        ,'Maintain Visible Themes'
        ,'gis0011'
@@ -26715,7 +26715,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GIS0020'
        ,'GIS Layer Tool'
        ,'gis0020'
@@ -26739,7 +26739,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GISWEB0020'
        ,'Show items on web page'
        ,'nm3web_map.define_item_to_show'
@@ -26763,7 +26763,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GISWEB0021'
        ,'Show item on web page'
        ,'nm3web_map.show_gdo'
@@ -26787,7 +26787,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GRI0200'
        ,'GRI Front End'
        ,'gri0200'
@@ -26811,7 +26811,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GRI0205'
        ,'Server based listener for running none forms based apps from clients'
        ,'gri0205'
@@ -26835,7 +26835,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GRI0210'
        ,'GRI Past Reports'
        ,'gri0210'
@@ -26859,7 +26859,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GRI0220'
        ,'GRI Modules'
        ,'gri0220'
@@ -26883,7 +26883,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GRI0230'
        ,'GRI Parameters'
        ,'gri0230'
@@ -26907,7 +26907,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GRI0240'
        ,'GRI Module Parameters'
        ,'gri0240'
@@ -26931,7 +26931,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GRI0250'
        ,'GRI Parameter Dependencies'
        ,'gri0250'
@@ -26955,7 +26955,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GRI0260'
        ,'GRI Saved Parameters'
        ,'gri0260'
@@ -26979,7 +26979,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GRI9998'
        ,'GRI Server Test'
        ,'gri9998'
@@ -27003,7 +27003,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'GRI9999'
        ,'GRI Test Report'
        ,'gri9999'
@@ -27027,7 +27027,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1220'
        ,'Intervals'
        ,'hig1220'
@@ -27051,7 +27051,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1510'
        ,'Audited Data'
        ,'hig1510'
@@ -27075,7 +27075,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1802'
        ,'Menu Options for a User'
        ,'hig1802'
@@ -27099,7 +27099,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1804'
        ,'Menu Options for a Role'
        ,'hig1804'
@@ -27123,7 +27123,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1806'
        ,'Fastpath'
        ,'hig1806'
@@ -27147,7 +27147,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1807'
        ,'Favourites'
        ,'hig1807'
@@ -27171,7 +27171,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1807A'
        ,'Favourites - Administer System Favs'
        ,'hig1807'
@@ -27195,7 +27195,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1808'
        ,'Search'
        ,'hig1808'
@@ -27219,7 +27219,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1809'
        ,'Run Module'
        ,'hig1809'
@@ -27243,7 +27243,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1810'
        ,'Colour Pallette'
        ,'hig1810'
@@ -27267,7 +27267,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1815'
        ,'Contacts'
        ,'hig1815'
@@ -27291,7 +27291,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1820'
        ,'Units and Conversions'
        ,'hig1820'
@@ -27315,7 +27315,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1832'
        ,'Users'
        ,'hig1832'
@@ -27339,7 +27339,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1833'
        ,'Change Password'
        ,'hig1833'
@@ -27363,7 +27363,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1836'
        ,'Roles'
        ,'hig1836'
@@ -27387,7 +27387,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1837'
        ,'User Option Administration'
        ,'hig1838'
@@ -27411,7 +27411,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1839'
        ,'Module Keywords'
        ,'hig1839'
@@ -27435,7 +27435,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1840'
        ,'User Preferences'
        ,'hig1840'
@@ -27459,7 +27459,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1850'
        ,'Report Styles'
        ,'hig1850'
@@ -27483,7 +27483,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1860'
        ,'Admin Units'
        ,'hig1860'
@@ -27507,7 +27507,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1862'
        ,'Admin Units'
        ,'hig1862'
@@ -27531,7 +27531,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1864'
        ,'Users Report'
        ,'hig1864'
@@ -27555,7 +27555,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1866'
        ,'Users By Admin Unit'
        ,'hig1866'
@@ -27579,7 +27579,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1868'
        ,'User Roles'
        ,'hig1868'
@@ -27603,7 +27603,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1880'
        ,'Modules'
        ,'hig1880'
@@ -27627,7 +27627,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1881'
        ,'Module Usages'
        ,'hig1881'
@@ -27651,7 +27651,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1885'
        ,'Maintain URL Modules'
        ,'HIG1885'
@@ -27675,7 +27675,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1890'
        ,'Products'
        ,'hig1890'
@@ -27699,7 +27699,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1895'
        ,'Directories'
        ,'hig1895'
@@ -27723,7 +27723,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1900'
        ,'Mail Users'
        ,'hig1900'
@@ -27747,7 +27747,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1901'
        ,'Mail Groups'
        ,'hig1901'
@@ -27771,7 +27771,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1903'
        ,'Mail Message Administration'
        ,'hig1903'
@@ -27795,7 +27795,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1910'
        ,'POP3 Mail Server Definition'
        ,'hig1910'
@@ -27819,7 +27819,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1911'
        ,'POP3 Mail Message View'
        ,'hig1911'
@@ -27843,7 +27843,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1912'
        ,'POP3 Mail Processing Rules'
        ,'hig1912'
@@ -27867,7 +27867,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG1950'
        ,'Discoverer API Definition'
        ,'hig1950'
@@ -27891,7 +27891,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG2010'
        ,'CSV Loader Destination Tables'
        ,'hig2010'
@@ -27915,7 +27915,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG2020'
        ,'CSV Loader File Definitions Tables'
        ,'hig2020'
@@ -27939,7 +27939,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG2100'
        ,'Produce Database Healthcheck File'
        ,'HIG2100'
@@ -27963,7 +27963,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG3664'
        ,'Financial Years'
        ,'hig3664'
@@ -27987,7 +27987,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG5000'
        ,'Maintain Entry Points'
        ,'HIG5000'
@@ -28011,7 +28011,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG9110'
        ,'Status Codes'
        ,'hig9110'
@@ -28035,7 +28035,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG9115'
        ,'List of Status Codes'
        ,'hig9115'
@@ -28059,7 +28059,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG9120'
        ,'Domains'
        ,'hig9120'
@@ -28083,7 +28083,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG9125'
        ,'List of Static Reference Data'
        ,'hig9125'
@@ -28107,7 +28107,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG9130'
        ,'Product Options'
        ,'hig9130'
@@ -28131,7 +28131,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG9135'
        ,'Product and User Option List'
        ,'hig9135'
@@ -28155,7 +28155,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG9150'
        ,'Maintain Character Sets'
        ,'hig9150'
@@ -28179,7 +28179,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG9170'
        ,'Holidays'
        ,'hig9170'
@@ -28203,7 +28203,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG9180'
        ,'v2 Errors'
        ,'hig9180'
@@ -28227,7 +28227,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG9185'
        ,'v3 Errors'
        ,'hig9185'
@@ -28251,7 +28251,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIG9190'
        ,'TXT to PRN Conversion'
        ,'hig9190'
@@ -28275,7 +28275,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIGHWAYS'
        ,'Highways by exor Launchpad'
        ,'highways'
@@ -28299,7 +28299,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIGWEB1902'
        ,'Mail'
        ,'nm3web_mail.write_mail'
@@ -28323,7 +28323,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'HIGWEB2030'
        ,'CSV File Upload'
        ,'nm3web_load.main'
@@ -28347,7 +28347,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NET1100'
        ,'Gazetteer'
        ,'net1100'
@@ -28371,7 +28371,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0001'
        ,'Node Types'
        ,'nm0001'
@@ -28395,7 +28395,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0002'
        ,'Network Types'
        ,'nm0002'
@@ -28419,7 +28419,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0004'
        ,'Group Types'
        ,'nm0004'
@@ -28443,7 +28443,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0005'
        ,'Network Cross Reference Rules'
        ,'nm0005'
@@ -28467,7 +28467,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0101'
        ,'Nodes'
        ,'nm0101'
@@ -28491,7 +28491,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0105'
        ,'Elements'
        ,'nm0105'
@@ -28515,7 +28515,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0106'
        ,'Element Details'
        ,'nm0106'
@@ -28539,7 +28539,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0107'
        ,'Element Members'
        ,'nm0107'
@@ -28563,7 +28563,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0110'
        ,'Groups of Sections'
        ,'nm0110'
@@ -28587,7 +28587,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0111'
        ,'Circular Group Start Point'
        ,'nm0111'
@@ -28611,7 +28611,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0115'
        ,'Groups of Groups'
        ,'nm0115'
@@ -28635,7 +28635,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0120'
        ,'Create Network Extent'
        ,'nm0120'
@@ -28659,7 +28659,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0121'
        ,'Create Group'
        ,'nm0121'
@@ -28683,7 +28683,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0122'
        ,'Extent Limits'
        ,'nm0122'
@@ -28707,7 +28707,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0150'
        ,'Network Nodes Report'
        ,'nm0150'
@@ -28731,7 +28731,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0151'
        ,'Node Usage Report'
        ,'nm0151'
@@ -28755,7 +28755,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0153'
        ,'Group of Sections Membership Report'
        ,'nm0153'
@@ -28779,7 +28779,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0154'
        ,'Route Log Report'
        ,'nm0154'
@@ -28803,7 +28803,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0155'
        ,'Group Hierarchy Report'
        ,'nm0155'
@@ -28827,7 +28827,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0200'
        ,'Split Element'
        ,'nm0200'
@@ -28851,7 +28851,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0201'
        ,'Merge Elements'
        ,'nm0201'
@@ -28875,7 +28875,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0202'
        ,'Replace Element'
        ,'nm0202'
@@ -28899,7 +28899,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0203'
        ,'Undo Split'
        ,'nm0203'
@@ -28923,7 +28923,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0204'
        ,'Undo Merge'
        ,'nm0204'
@@ -28947,7 +28947,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0205'
        ,'Undo Replace'
        ,'nm0205'
@@ -28971,7 +28971,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0206'
        ,'Close Element'
        ,'nm0206'
@@ -28995,7 +28995,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0207'
        ,'Unclose Element'
        ,'nm0207'
@@ -29019,7 +29019,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0220'
        ,'Reclassify Element'
        ,'nm0220'
@@ -29043,7 +29043,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0301'
        ,'Asset Domains'
        ,'nm0301'
@@ -29067,7 +29067,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0305'
        ,'XSP and Reversal Rules'
        ,'nm0305'
@@ -29091,7 +29091,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0306'
        ,'Asset XSPs'
        ,'nm0306'
@@ -29115,7 +29115,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0410'
        ,'Asset Metamodel'
        ,'nm0410'
@@ -29139,7 +29139,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0411'
        ,'Asset Exclusive View Creation'
        ,'nm0411'
@@ -29163,7 +29163,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0415'
        ,'Asset Attribute Sets'
        ,'nm0415'
@@ -29187,10 +29187,10 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
-        'NM0420'
+SELECT 
+        'NM0430'
        ,'Derived Asset Setup'
-       ,'nm0420'
+       ,'nm0430'
        ,'FMX'
        ,''
        ,'N'
@@ -29198,7 +29198,7 @@ SELECT
        ,'AST'
        ,'FORM' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
-                   WHERE HMO_MODULE = 'NM0420');
+                   WHERE HMO_MODULE = 'NM0430');
 --
 INSERT INTO HIG_MODULES
        (HMO_MODULE
@@ -29211,7 +29211,31 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
+        'NM0435'
+       ,'Create Derived Assets'
+       ,'nm0435'
+       ,'FMX'
+       ,''
+       ,'N'
+       ,'N'
+       ,'AST'
+       ,'FORM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
+                   WHERE HMO_MODULE = 'NM0435');
+--
+INSERT INTO HIG_MODULES
+       (HMO_MODULE
+       ,HMO_TITLE
+       ,HMO_FILENAME
+       ,HMO_MODULE_TYPE
+       ,HMO_FASTPATH_OPTS
+       ,HMO_FASTPATH_INVALID
+       ,HMO_USE_GRI
+       ,HMO_APPLICATION
+       ,HMO_MENU
+       )
+SELECT 
         'NM0500'
        ,'Network Walker'
        ,'nm0500'
@@ -29235,7 +29259,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0510'
        ,'Asset Items'
        ,'nm0510'
@@ -29259,7 +29283,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0511'
        ,'Reconcile MapCapture Load Errors'
        ,'nm0511'
@@ -29283,7 +29307,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0515'
        ,'Locate Item'
        ,'nm0515'
@@ -29307,7 +29331,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0520'
        ,'Asset Location History'
        ,'nm0520'
@@ -29331,7 +29355,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0530'
        ,'Global Asset Update'
        ,'nm0530'
@@ -29355,7 +29379,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0535'
        ,'Bulk Asset Update'
        ,'nm0535'
@@ -29379,7 +29403,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0550'
        ,'Cross Attribute Validation Setup'
        ,'nm0550'
@@ -29403,7 +29427,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0551'
        ,'Cross Item Validation Setup'
        ,'nm0551'
@@ -29427,7 +29451,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0560'
        ,'Assets On A Route'
        ,'nm0560'
@@ -29451,7 +29475,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0561'
        ,'Assets on Route Results'
        ,'nm0560'
@@ -29475,7 +29499,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0562'
        ,'Assets On Route Report - By Offset'
        ,'nm0560'
@@ -29499,7 +29523,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0563'
        ,'Assets On Route Report- By Type and Offset'
        ,'nm0560'
@@ -29523,7 +29547,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0570'
        ,'Find Assets'
        ,'nm0570'
@@ -29547,7 +29571,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0571'
        ,'Matching Items'
        ,'nm0570'
@@ -29571,7 +29595,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0572'
        ,'Locator'
        ,'nm0572'
@@ -29595,7 +29619,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0573'
        ,'Asset Grid'
        ,'nm0573'
@@ -29619,7 +29643,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0575'
        ,'Delete Global Assets'
        ,'nm0575'
@@ -29643,7 +29667,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0580'
        ,'Create MapCapture Metadata File'
        ,'nm0580'
@@ -29667,7 +29691,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0590'
        ,'Asset Maintenance'
        ,'nm0590'
@@ -29691,7 +29715,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0600'
        ,'Maintain Element XRefs'
        ,'nm0600'
@@ -29715,7 +29739,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM0700'
        ,'Maintain Additional Data'
        ,'nm0700'
@@ -29739,7 +29763,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM1100'
        ,'Gazetteer'
        ,'nm1100'
@@ -29763,7 +29787,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM1200'
        ,'SLK Calculator'
        ,'nm1200'
@@ -29787,7 +29811,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM1201'
        ,'Offset Calculator'
        ,'nm1201'
@@ -29811,7 +29835,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM1861'
        ,'Asset Admin Unit Security Maintenance'
        ,'nm1861'
@@ -29835,7 +29859,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM2000'
        ,'Recalibrate Element'
        ,'nm2000'
@@ -29859,7 +29883,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM3010'
        ,'Job Operations'
        ,'nm3010'
@@ -29883,7 +29907,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM3020'
        ,'Job Types'
        ,'nm3020'
@@ -29907,7 +29931,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM3030'
        ,'Job Control'
        ,'nm3030'
@@ -29931,7 +29955,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM7040'
        ,'PBI Queries'
        ,'nm7040'
@@ -29955,7 +29979,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM7041'
        ,'PBI Query Results'
        ,'nm7041'
@@ -29979,7 +30003,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM7050'
        ,'Merge Queries'
        ,'nm7050'
@@ -30003,10 +30027,10 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
-        'NM7051'
+SELECT 
+        'NM7051B'
        ,'Merge Query Results'
-       ,'nm7051'
+       ,'nm7051b'
        ,'FMX'
        ,''
        ,'N'
@@ -30014,7 +30038,7 @@ SELECT
        ,'AST'
        ,'FORM' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
-                   WHERE HMO_MODULE = 'NM7051');
+                   WHERE HMO_MODULE = 'NM7051B');
 --
 INSERT INTO HIG_MODULES
        (HMO_MODULE
@@ -30027,7 +30051,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM7052'
        ,'Merge Query'
        ,'nm7052'
@@ -30051,7 +30075,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM7053'
        ,'Merge Query Defaults'
        ,'nm7053'
@@ -30075,7 +30099,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM7055'
        ,'Merge File Definition'
        ,'nm7055'
@@ -30099,7 +30123,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM7057'
        ,'Merge Results Extract'
        ,'nm7057'
@@ -30123,7 +30147,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM7058'
        ,'Merge Query Roles'
        ,'nm7058'
@@ -30147,7 +30171,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NM9999'
        ,'Extended LOV'
        ,'nm9999'
@@ -30171,7 +30195,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NMWEB0000'
        ,'NM3 Web Main Menu'
        ,'nm3web.main_menu'
@@ -30195,7 +30219,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NMWEB0001'
        ,'About'
        ,'nm3web.about'
@@ -30219,7 +30243,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NMWEB0002'
        ,'Help'
        ,'nm3web.help'
@@ -30243,7 +30267,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NMWEB0003'
        ,'About Server Objects'
        ,'nm3web.about_server_objects'
@@ -30267,7 +30291,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NMWEB0004'
        ,'Web Favourites'
        ,'nm3web_fav.show_favourites'
@@ -30291,7 +30315,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NMWEB0005'
        ,'NM3 Web APD'
        ,'nm3web_apd.launch_apd'
@@ -30315,7 +30339,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NMWEB0010'
        ,'XML Upload'
        ,'nm3upload.xml_upload'
@@ -30339,7 +30363,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NMWEB0020'
        ,'Engineering Dynamic Segmentation'
        ,'nm3web_eng_dynseg.main'
@@ -30363,7 +30387,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NMWEB0035'
        ,'Loaded Objects'
        ,'nm3upload.list_loaded'
@@ -30387,7 +30411,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NMWEB0043'
        ,'Upload file to Oracle Directory'
        ,'nm3file.web_upload_to_dir'
@@ -30411,7 +30435,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NMWEB0044'
        ,'Download from Oracle Directory'
        ,'nm3file.web_download_from_dir'
@@ -30435,7 +30459,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NMWEB7057'
        ,'Submit Merge Query in batch'
        ,'nm3web_mrg.main'
@@ -30459,7 +30483,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NSG0020'
        ,'NSG Export'
        ,'nsg0020'
@@ -30483,7 +30507,7 @@ INSERT INTO HIG_MODULES
        ,HMO_APPLICATION
        ,HMO_MENU
        )
-SELECT
+SELECT 
         'NSG0021'
        ,'NSG Export Log'
        ,'nsg0021'
@@ -30533,7 +30557,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WEEKEND'
        ,'HIG'
        ,'Weekend Day Numbers'
@@ -30555,7 +30579,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'RMMSFLAG'
        ,'HIG'
        ,'RMMS Network Type Flag'
@@ -30577,7 +30601,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'HIGGISAVLB'
        ,'HIG'
        ,'GIS Availability Flag'
@@ -30599,7 +30623,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DEFREPTYPE'
        ,'HIG'
        ,'Word Template Default Rep Type'
@@ -30621,7 +30645,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DIRREPSTRN'
        ,'HIG'
        ,'Directory Separator'
@@ -30643,7 +30667,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'GRILSTNAME'
        ,'HIG'
        ,'GRI Listener Name'
@@ -30665,7 +30689,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'HIGGISTYPE'
        ,'HIG'
        ,'GIS Type'
@@ -30687,7 +30711,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'GRIDATE'
        ,'HIG'
        ,'GRI Format Mask'
@@ -30709,7 +30733,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'HTMLHLPST'
        ,'HIG'
        ,'WebHelp HTML Entry Point'
@@ -30731,7 +30755,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SDMREGULYR'
        ,'HIG'
        ,'Register user layers for SDM'
@@ -30753,7 +30777,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SMTPAUDTIT'
        ,'HIG'
        ,'Audit info in mail titles'
@@ -30775,7 +30799,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WMSSERVER'
        ,'HIG'
        ,'WMS Server URL'
@@ -30797,7 +30821,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WMSLAYERS'
        ,'HIG'
        ,'WMS Layers'
@@ -30819,7 +30843,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WMSLYRNAME'
        ,'HIG'
        ,'WMS Layer Name'
@@ -30841,7 +30865,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WMSSVCNAME'
        ,'HIG'
        ,'WMS Service Name'
@@ -30863,7 +30887,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WMSIMGFMT'
        ,'HIG'
        ,'WMS Image Format'
@@ -30885,7 +30909,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'HTML_BASE'
        ,'HIG'
        ,'WebHelp HTML Base'
@@ -30907,7 +30931,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SDOSURKEY'
        ,'HIG'
        ,'SDO Surrogate Key'
@@ -30929,7 +30953,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'HIG_ST_CSS'
        ,'HIG'
        ,'URL for static CSS'
@@ -30951,7 +30975,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'FAVMODE'
        ,'HIG'
        ,'Favourite Mode'
@@ -30973,7 +30997,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'FAVURL'
        ,'HIG'
        ,'URL displayed in HIG1807'
@@ -30995,7 +31019,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WMSDEFSTAT'
        ,'HIG'
        ,'WMS Default State'
@@ -31017,7 +31041,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'EDIFDLROLE'
        ,'HIG'
        ,'EDIF Download Users Role'
@@ -31039,7 +31063,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WEBCONFIG'
        ,'HIG'
        ,'Config Value'
@@ -31061,7 +31085,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DEFVISNTH'
        ,'HIG'
        ,'Default Visible Theme Flag'
@@ -31083,7 +31107,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WEBMAINIMG'
        ,'HIG'
        ,'Image for main menu'
@@ -31105,7 +31129,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WEBMAINURL'
        ,'HIG'
        ,'URL for image in main menu'
@@ -31127,7 +31151,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'NSGDATA'
        ,'HIG'
        ,'System uses NSG data'
@@ -31149,7 +31173,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SDESERVER'
        ,'HIG'
        ,'SDE Server'
@@ -31171,7 +31195,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SDEINST'
        ,'HIG'
        ,'SDE instance name'
@@ -31193,7 +31217,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DEBUGAUTON'
        ,'HIG'
        ,'Use Autonomous Debug'
@@ -31215,7 +31239,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'REPOUTPATH'
        ,'HIG'
        ,'Reports Output Path'
@@ -31237,7 +31261,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'UTL_URLDIR'
        ,'HIG'
        ,'Web Reports Output URL'
@@ -31259,7 +31283,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'IDWINTITLE'
        ,'HIG'
        ,'Module ID on Window Titles'
@@ -31281,7 +31305,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WEBDOCPATH'
        ,'HIG'
        ,'Document Access Path'
@@ -31303,7 +31327,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'RPRTSTYLE'
        ,'HIG'
        ,'Report Style'
@@ -31325,7 +31349,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DISCEULUSR'
        ,'HIG'
        ,'Discoverer EUL User'
@@ -31347,7 +31371,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'LOGOIMAGE'
        ,'HIG'
        ,'Logo Image'
@@ -31369,7 +31393,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DISCO_VERS'
        ,'HIG'
        ,'Discoverer Version'
@@ -31391,7 +31415,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'HIGWINTITL'
        ,'HIG'
        ,'Window title for Highways'
@@ -31413,7 +31437,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SDOSINGSHP'
        ,'HIG'
        ,'Single Shape Inv'
@@ -31435,7 +31459,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SDODATEVW'
        ,'HIG'
        ,'Date Views as Themes'
@@ -31457,7 +31481,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'REGSDELAY'
        ,'HIG'
        ,'Registration of SDE Layers'
@@ -31479,7 +31503,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'MAPCAP_DIR'
        ,'HIG'
        ,'The MapCapture Load directory'
@@ -31501,7 +31525,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'MAPCAP_INT'
        ,'HIG'
        ,'MapCapture load proces timeout'
@@ -31523,7 +31547,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'MAPCAP_EML'
        ,'HIG'
        ,'MapCapture email address'
@@ -31545,7 +31569,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WEBMENUMOD'
        ,'HIG'
        ,'HTML Main Menu Module'
@@ -31567,7 +31591,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WEBTOPIMG'
        ,'HIG'
        ,'Image for top frame'
@@ -31589,7 +31613,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SMTPDOMAIN'
        ,'HIG'
        ,'SMTP Domain'
@@ -31611,7 +31635,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SMTPPORT'
        ,'HIG'
        ,'SMTP Port'
@@ -31633,7 +31657,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'NM3WEBHOST'
        ,'HIG'
        ,'NM3 Web Host'
@@ -31655,7 +31679,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'NM3WEBPATH'
        ,'HIG'
        ,'NM3 Web Path'
@@ -31677,7 +31701,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'NM3WEBCSS'
        ,'HIG'
        ,'NM3 Path to CSS'
@@ -31699,7 +31723,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SQLLDR_ERR'
        ,'HIG'
        ,'SQL*Loader Allowed Errors'
@@ -31721,7 +31745,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'BROWSERPTH'
        ,'HIG'
        ,'Path to Internet Explorer'
@@ -31743,7 +31767,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'PCOMMIT'
        ,'HIG'
        ,'Commit on count = set value'
@@ -31765,7 +31789,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SHAPE_TAB'
        ,'HIG'
        ,'SDM Shape Table Name'
@@ -31787,7 +31811,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SQLLDR_EXE'
        ,'HIG'
        ,'SQL*Loader Executable'
@@ -31809,7 +31833,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DBWINTITLE'
        ,'HIG'
        ,'DB Info in Window Titles'
@@ -31831,7 +31855,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'INVVIEWSLK'
        ,'HIG'
        ,'Show SLK On Inventory Views'
@@ -31853,7 +31877,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DISWEBHOST'
        ,'HIG'
        ,'Discoverer Web Host'
@@ -31875,7 +31899,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DISWEBPATH'
        ,'HIG'
        ,'Discoverer Web Path'
@@ -31897,7 +31921,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DISBRNDIMG'
        ,'HIG'
        ,'Discoverer Web Brand Image'
@@ -31919,7 +31943,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DISCO_MODE'
        ,'HIG'
        ,'Discoverer Run Mode'
@@ -31941,7 +31965,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DISFRMSTYL'
        ,'HIG'
        ,'Discoverer Web Frame Style'
@@ -31963,7 +31987,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DISWINWDTH'
        ,'HIG'
        ,'Discoverer Web  Window Width'
@@ -31985,7 +32009,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DISWINHGHT'
        ,'HIG'
        ,'Discoverer Web  Window Height'
@@ -32007,7 +32031,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'GRIJOBPRM'
        ,'HIG'
        ,'Name of GRI job id param.'
@@ -32029,7 +32053,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SMTPSERVER'
        ,'HIG'
        ,'SMTP Server'
@@ -32051,7 +32075,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SDODEFTOL'
        ,'HIG'
        ,'SDO Default Tolerance'
@@ -32073,7 +32097,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'REPURL'
        ,'HIG'
        ,'Reports Server URL'
@@ -32095,7 +32119,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'NOT_6I_REP'
        ,'HIG'
        ,'Using non-6i Reports Server'
@@ -32117,7 +32141,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'UPDRDONLY'
        ,'HIG'
        ,'Allow update of subordinates'
@@ -32139,7 +32163,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'ALLOWDEBUG'
        ,'HIG'
        ,'Allow debug'
@@ -32161,7 +32185,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'JPRIVLEVEL'
        ,'HIG'
        ,'Java Privs Level'
@@ -32183,7 +32207,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'HIGPUBSYN'
        ,'HIG'
        ,'Create Public Synonyms'
@@ -32205,7 +32229,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'HIGUSEIMAG'
        ,'HIG'
        ,'Launchpad Image Usage'
@@ -32227,7 +32251,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'BATMAXPRN'
        ,'HIG'
        ,'Max Batch Print Warning Level'
@@ -32249,7 +32273,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'NETINVCODE'
        ,'HIG'
        ,'Network Inventory Code'
@@ -32271,7 +32295,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'NETUSELRS'
        ,'HIG'
        ,'Use of Linear Referencing'
@@ -32293,7 +32317,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DEFUNITID'
        ,'HIG'
        ,'Default Unit Identifier'
@@ -32315,7 +32339,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'USRTBLSPCE'
        ,'HIG'
        ,'Default User Tablespace'
@@ -32337,7 +32361,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'USRPROFILE'
        ,'HIG'
        ,'Default User Profile'
@@ -32359,7 +32383,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'USRQUOTA'
        ,'HIG'
        ,'Default User Quota'
@@ -32381,7 +32405,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'GAZMODE'
        ,'NET'
        ,'Gazetteer Mode'
@@ -32403,7 +32427,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'GAZ_RGT'
        ,'NET'
        ,'Default Gazetteer Group Type'
@@ -32425,7 +32449,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SAV_FORMAT'
        ,'NET'
        ,'Export Format'
@@ -32447,7 +32471,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DEFASSTYPE'
        ,'NET'
        ,'Default Asset Search'
@@ -32469,7 +32493,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'MRGVIEWTRU'
        ,'NET'
        ,'Merge Views Include True'
@@ -32491,7 +32515,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'USEORIGHU'
        ,'NET'
        ,'Use original homo update'
@@ -32513,7 +32537,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'HISTINVLOC'
        ,'NET'
        ,'Enable Historic Asset Location'
@@ -32535,7 +32559,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DCDEXPATH'
        ,'NET'
        ,'DCD download directory'
@@ -32557,7 +32581,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DEFAORDPI'
        ,'NET'
        ,'Default AOR Dist Point Int'
@@ -32579,7 +32603,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'AOREXTDINV'
        ,'NET'
        ,'AoR do not truncate inventory'
@@ -32601,7 +32625,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'AORSTRMAP'
        ,'NET'
        ,'AoR strip map'
@@ -32623,7 +32647,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'ATTRLSTSEP'
        ,'NET'
        ,'Inv Attribute List Separator'
@@ -32645,7 +32669,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'EXTRTEDATE'
        ,'NET'
        ,'Ele Start Date on extend route'
@@ -32667,7 +32691,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'MULTINVRTE'
        ,'NET'
        ,'Inventory On Multiple Routes'
@@ -32689,7 +32713,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'XMLCRENODE'
        ,'NET'
        ,'Create node from XML Datums'
@@ -32711,7 +32735,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'INVRTETAB'
        ,'NET'
        ,'Show Route Tab in Inv Form'
@@ -32733,7 +32757,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SHOWINVPK'
        ,'NET'
        ,'Show Primary Key in Inv Form'
@@ -32755,7 +32779,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'REVLEGNO'
        ,'NET'
        ,'Reverse Leg Nos on Route Rev'
@@ -32777,7 +32801,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'INVAPIPACK'
        ,'NET'
        ,'Create API pack. for inv type'
@@ -32799,7 +32823,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'INVROUTEVW'
        ,'NET'
        ,'Create inv on route views'
@@ -32821,7 +32845,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SDERUNLE'
        ,'NET'
        ,'Run Loadevents from server.'
@@ -32843,7 +32867,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'MRGAUTYPE'
        ,'NET'
        ,'AU Type for Merge Security'
@@ -32865,7 +32889,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SDEBATDIR'
        ,'NET'
        ,'Create loadevents batch files.'
@@ -32887,7 +32911,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'PREFLRM'
        ,'NET'
        ,'Preferred LRM'
@@ -32909,7 +32933,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DISPWDVIS'
        ,'NET'
        ,'Discoverer Password Visible'
@@ -32931,7 +32955,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'USEINVXSP'
        ,'NET'
        ,'Use Inventory XSP'
@@ -32953,7 +32977,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'MRGPOE'
        ,'NET'
        ,'Split Merge Results at POE'
@@ -32975,7 +32999,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'MRGROUTE'
        ,'NET'
        ,'Split Merge Results by route'
@@ -32997,7 +33021,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'CHECKROUTE'
        ,'NET'
        ,'Use route checks'
@@ -33019,7 +33043,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'UTLFILEDIR'
        ,'NET'
        ,'UTL File Directory'
@@ -33041,7 +33065,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'PBIPOE'
        ,'NET'
        ,'Split PBI Results at POE'
@@ -33063,7 +33087,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'MAPCAPTURE'
        ,'NET'
        ,'Is MapCapture Used'
@@ -33085,7 +33109,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SHOWRTEDIR'
        ,'NET'
        ,'Show Route Direction'
@@ -33107,7 +33131,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DEFITEMTYP'
        ,'NET'
        ,'Default Reference Item Type'
@@ -33129,7 +33153,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'INH_PAR_AU'
        ,'NET'
        ,'Inherit AU in reclassify'
@@ -33151,7 +33175,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'DISAMBIGSC'
        ,'NET'
        ,'Display Ambig Sub Class'
@@ -33173,7 +33197,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'GISGRPTYPE'
        ,'NET'
        ,'GIS Road Group Type'
@@ -33195,7 +33219,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WEBMAPMSV'
        ,'WMP'
        ,'OMV Servlet URL'
@@ -33217,7 +33241,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WEBMAPNAME'
        ,'WMP'
        ,'Base Map'
@@ -33239,7 +33263,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WEBMAPDSRC'
        ,'WMP'
        ,'Data Source'
@@ -33261,7 +33285,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WEBMAPDBUG'
        ,'WMP'
        ,'Map Debug'
@@ -33283,7 +33307,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WEBMAPTITL'
        ,'WMP'
        ,'Map Banner'
@@ -33305,7 +33329,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'OVRVWSTYLE'
        ,'WMP'
        ,'Overview Line Style'
@@ -33327,7 +33351,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'LINESTYLE'
        ,'WMP'
        ,'Map Highlight Line Style'
@@ -33349,7 +33373,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'POINTSTYLE'
        ,'WMP'
        ,'Map Highlight Point Style'
@@ -33371,7 +33395,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'JDBCHOST'
        ,'WMP'
        ,'JDBC Host'
@@ -33393,7 +33417,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'JDBCPORT'
        ,'WMP'
        ,'JDBC Port'
@@ -33415,7 +33439,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'JDBCSID'
        ,'WMP'
        ,'JDBC SID'
@@ -33437,7 +33461,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SDOPTZOOM'
        ,'WMP'
        ,'Point Zoom Scale'
@@ -33459,7 +33483,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SDODEFNTH'
        ,'WMP'
        ,'SDO DEFECT Theme ID'
@@ -33481,7 +33505,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SDOPEMNTH'
        ,'WMP'
        ,'SDO PEM Theme ID'
@@ -33503,7 +33527,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WEBMAPBUFR'
        ,'WMP'
        ,'MSV Buffer Colour'
@@ -33525,7 +33549,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SDOFETBUFF'
        ,'WMP'
        ,'SDO Fetch Buffer Size'
@@ -33547,7 +33571,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WEBMAPSERV'
        ,'WMP'
        ,'Web Map Server'
@@ -33569,7 +33593,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'SDOCLIPTYP'
        ,'WMP'
        ,'Clipping Algorithm'
@@ -33591,7 +33615,7 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MIXED_CASE
        ,HOL_USER_OPTION
        )
-SELECT
+SELECT 
         'WEBMAPPRDS'
        ,'WMP'
        ,'Preferred Data Source'
@@ -33620,7 +33644,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'ALLOWDEBUG'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33630,7 +33654,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'AOREXTDINV'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33640,7 +33664,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'AORSTRMAP'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33650,7 +33674,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'ATTRLSTSEP'
        ,', ' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33660,7 +33684,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'BATMAXPRN'
        ,'50' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33670,7 +33694,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'BROWSERPTH'
        ,'"C:\Program Files\Internet Explorer\IEXPLORE.EXE"' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33680,7 +33704,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'CHECKROUTE'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33690,7 +33714,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DBWINTITLE'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33700,7 +33724,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DCDEXPATH'
        ,'E:\UTL_FILE\' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33710,7 +33734,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DEBUGAUTON'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33720,7 +33744,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DEFAORDPI'
        ,'100' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33730,7 +33754,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DEFREPTYPE'
        ,'REPT' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33740,7 +33764,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DEFUNITID'
        ,'1' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33750,7 +33774,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DEFVISNTH'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33760,7 +33784,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DIRREPSTRN'
        ,'/' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33770,7 +33794,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DISAMBIGSC'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33780,7 +33804,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DISBRNDIMG'
        ,'http://www.<host_not_set>.com/logo.gif' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33790,7 +33814,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DISCO_MODE'
        ,'WEB' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33800,7 +33824,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DISCO_VERS'
        ,'4' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33810,7 +33834,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DISFRMSTYL'
        ,'separate' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33820,7 +33844,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DISPWDVIS'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33830,7 +33854,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DISWEBHOST'
        ,'http://www.<host_not_set>.com/' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33840,7 +33864,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DISWEBPATH'
        ,'infomgr/Discwb33/html/english/ms_ie/start_ie.htm' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33850,7 +33874,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DISWINHGHT'
        ,'764' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33860,7 +33884,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'DISWINWDTH'
        ,'1026' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33870,7 +33894,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'EXTRTEDATE'
        ,'3' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33880,7 +33904,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'FAVURL'
        ,'http://www.exorcorp.com' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33890,7 +33914,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'GAZMODE'
        ,'STANDARD' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33900,7 +33924,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'GISGRPTYPE'
        ,'GIS' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33910,7 +33934,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'GRIDATE'
        ,'DD-MON-YYYY' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33920,7 +33944,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'GRIJOBPRM'
        ,'GRP_JOB_ID' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33930,7 +33954,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'GRILSTNAME'
        ,'LSTNER' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33940,7 +33964,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'HIGGISAVLB'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33950,7 +33974,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'HIGGISTYPE'
        ,'DDE' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33960,7 +33984,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'HIGPUBSYN'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33970,7 +33994,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'HIGUSEIMAG'
        ,'FALSE' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33980,7 +34004,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'HIGWINTITL'
        ,'ADMIN INSTANCE' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -33990,7 +34014,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'HISTINVLOC'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34000,7 +34024,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'HTMLHLPST'
        ,'/hig/webhelp/hig.htm' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34010,7 +34034,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'HTML_BASE'
        ,'http://www.<host_not_set>.com/webhelp' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34020,7 +34044,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'IDWINTITLE'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34030,7 +34054,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'INH_PAR_AU'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34040,7 +34064,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'INVAPIPACK'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34050,7 +34074,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'INVROUTEVW'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34060,7 +34084,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'INVRTETAB'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34070,7 +34094,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'INVVIEWSLK'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34080,7 +34104,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'JPRIVLEVEL'
        ,'R' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34090,7 +34114,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'LOGOIMAGE'
        ,'exor.jpg' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34100,7 +34124,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'MAPCAPTURE'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34110,7 +34134,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'MAPCAP_EML'
        ,'31' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34120,7 +34144,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'MRGPOE'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34130,7 +34154,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'MRGROUTE'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34140,7 +34164,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'MRGVIEWTRU'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34150,7 +34174,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'MULTINVRTE'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34160,7 +34184,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'NETINVCODE'
        ,'RD' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34170,7 +34194,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'NETUSELRS'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34180,7 +34204,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'NM3WEBCSS'
        ,'nm3web.process_download?pi_name=exor.css' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34190,7 +34214,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'NM3WEBHOST'
        ,'http://www.<host_not_set>.com/' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34200,7 +34224,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'NM3WEBPATH'
        ,'pls/<DAD name not set>' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34210,7 +34234,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'NOT_6I_REP'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34220,7 +34244,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'NSGDATA'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34230,7 +34254,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'PBIPOE'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34240,7 +34264,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'PCOMMIT'
        ,'1000' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34250,7 +34274,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'REGSDELAY'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34260,7 +34284,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'REPURL'
        ,'javascript:message("Product option REPURL not set, please contact your system admin");' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34270,7 +34294,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'REVLEGNO'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34280,7 +34304,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'RMMSFLAG'
        ,'3' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34290,7 +34314,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'RPRTSTYLE'
        ,'EXOR_DEFAULT' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34300,7 +34324,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SDEBATDIR'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34310,7 +34334,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SDERUNLE'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34320,7 +34344,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SDMREGULYR'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34330,7 +34354,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SDOCLIPTYP'
        ,'SDO' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34340,7 +34364,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SDODATEVW'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34350,7 +34374,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SDODEFTOL'
        ,'0.005' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34360,7 +34384,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SDOFETBUFF'
        ,'200' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34370,7 +34394,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SDOSINGSHP'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34380,7 +34404,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SDOSURKEY'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34390,7 +34414,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SHAPE_TAB'
        ,'SHAPES' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34400,7 +34424,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SHOWINVPK'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34410,7 +34434,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SHOWRTEDIR'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34420,7 +34444,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SMTPAUDTIT'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34430,7 +34454,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SMTPDOMAIN'
        ,'###enter your Domain###' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34440,7 +34464,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SMTPPORT'
        ,'25' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34450,7 +34474,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SMTPSERVER'
        ,'###enter your SMTP Server###' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34460,7 +34484,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SQLLDR_ERR'
        ,'50' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34470,7 +34494,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'SQLLDR_EXE'
        ,'sqlldr' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34480,7 +34504,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'UPDRDONLY'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34490,7 +34514,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'USEINVXSP'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34500,7 +34524,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'USEORIGHU'
        ,'Y' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34510,7 +34534,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'USRPROFILE'
        ,'DEFAULT' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34520,7 +34544,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'USRQUOTA'
        ,'10M' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34530,7 +34554,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'USRTBLSPCE'
        ,'HIGHWAYS' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34540,7 +34564,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'UTLFILEDIR'
        ,'C:\' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34550,9 +34574,9 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'WEBCONFIG'
-       ,'** set this to the required sso_userid **' FROM DUAL
+       ,'4010_systemtest' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
                    WHERE HOV_ID = 'WEBCONFIG');
 --
@@ -34560,7 +34584,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'WEBDOCPATH'
        ,'docs' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34570,7 +34594,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'WEBMAINIMG'
        ,'docs/exor.gif' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34580,7 +34604,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'WEBMAINURL'
        ,'http://www.exorcorp.com/' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34590,7 +34614,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'WEBMENUMOD'
        ,'NMWEB0000' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34600,7 +34624,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'WEBTOPIMG'
        ,'docs/exor_small.gif' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34610,7 +34634,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'WEEKEND'
        ,'1,7' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34620,7 +34644,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'WMSDEFSTAT'
        ,'0' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34630,7 +34654,7 @@ INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
        ,HOV_VALUE
        )
-SELECT
+SELECT 
         'XMLCRENODE'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34673,7 +34697,7 @@ INSERT INTO HIG_STATUS_DOMAINS
        ,HSD_FEATURE8
        ,HSD_FEATURE9
        )
-SELECT
+SELECT 
         'COMPLAINTS'
        ,'HIG'
        ,'Enquiry Status Codes'
@@ -34703,7 +34727,7 @@ INSERT INTO HIG_STATUS_DOMAINS
        ,HSD_FEATURE8
        ,HSD_FEATURE9
        )
-SELECT
+SELECT 
         'ENQUIRY_ACTION_STATUS'
        ,'HIG'
        ,'Enquiry Action Status'
@@ -34765,7 +34789,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_START_DATE
        ,HSC_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINTS'
        ,'CO'
        ,'Complete'
@@ -34802,7 +34826,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_START_DATE
        ,HSC_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINTS'
        ,'DD'
        ,'Decision Deferred'
@@ -34839,7 +34863,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_START_DATE
        ,HSC_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINTS'
        ,'DR'
        ,'Defect Raised'
@@ -34876,7 +34900,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_START_DATE
        ,HSC_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINTS'
        ,'NA'
        ,'No Action Necessary'
@@ -34913,7 +34937,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_START_DATE
        ,HSC_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINTS'
        ,'NI'
        ,'Notice Issued'
@@ -34950,7 +34974,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_START_DATE
        ,HSC_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINTS'
        ,'OD'
        ,'Overdue'
@@ -34987,7 +35011,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_START_DATE
        ,HSC_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINTS'
        ,'RE'
        ,'Received'
@@ -35024,7 +35048,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_START_DATE
        ,HSC_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINTS'
        ,'RF'
        ,'Referred To Other Body'
@@ -35061,7 +35085,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_START_DATE
        ,HSC_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINTS'
        ,'RI'
        ,'Re-Issued'
@@ -35098,7 +35122,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_START_DATE
        ,HSC_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINTS'
        ,'UI'
        ,'Under Investigation'
@@ -35135,7 +35159,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_START_DATE
        ,HSC_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINTS'
        ,'WA'
        ,'Work Actioned'
@@ -35172,7 +35196,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_START_DATE
        ,HSC_END_DATE
        )
-SELECT
+SELECT 
         'COMPLAINTS'
        ,'WI'
        ,'Work Instructed'
@@ -35209,7 +35233,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_START_DATE
        ,HSC_END_DATE
        )
-SELECT
+SELECT 
         'ENQUIRY_ACTION_STATUS'
        ,'DUMMY'
        ,'Dummy'
@@ -35253,7 +35277,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'DOCS'
        ,'DOC_ID'
        ,'DOC_ID_SEQ'
@@ -35268,7 +35292,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'DOC_ACTIONS'
        ,'DAC_ID'
        ,'DAC_ID_SEQ'
@@ -35283,7 +35307,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'DOC_DAMAGE'
        ,'DDG_ID'
        ,'DDG_ID_SEQ'
@@ -35298,7 +35322,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'DOC_DAMAGE_COSTS'
        ,'DDC_ID'
        ,'DDC_ID_SEQ'
@@ -35313,7 +35337,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'DOC_LOCATIONS'
        ,'DLC_ID'
        ,'DLC_ID_SEQ'
@@ -35328,7 +35352,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'DOC_QUERY'
        ,'DQ_ID'
        ,'DQ_ID_SEQ'
@@ -35343,7 +35367,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'DOC_REDIR_PRIOR'
        ,'DRP_ID'
        ,'DRP_ID_SEQ'
@@ -35358,7 +35382,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'HIG_ADDRESS'
        ,'HAD_ID'
        ,'HAD_ID_SEQ'
@@ -35373,7 +35397,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'HIG_CONTACTS'
        ,'HCT_ID'
        ,'HCT_ID_SEQ'
@@ -35388,7 +35412,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'HIG_USERS'
        ,'HUS_USER_ID'
        ,'HUS_USER_ID_SEQ'
@@ -35403,7 +35427,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_ADMIN_UNITS_ALL'
        ,'NAU_ADMIN_UNIT'
        ,'NAU_ADMIN_UNIT_SEQ'
@@ -35418,7 +35442,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_AREA_LOCK'
        ,'NAL_ID'
        ,'NAL_SEQ'
@@ -35433,7 +35457,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_AUDIT_WHEN'
        ,'NAW_ID'
        ,'NAW_ID_SEQ'
@@ -35448,7 +35472,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_AU_SUB_TYPES'
        ,'NSTY_ID'
        ,'NSTY_ID_SEQ'
@@ -35463,7 +35487,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_DBUG'
        ,'ND_ID'
        ,'ND_ID_SEQ'
@@ -35478,7 +35502,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_ELEMENTS_ALL'
        ,'NE_ID'
        ,'NE_ID_SEQ'
@@ -35493,7 +35517,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_ELEMENT_HISTORY'
        ,'NEH_ID'
        ,'NEH_ID_SEQ'
@@ -35508,7 +35532,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_EVENT_LOG'
        ,'NEL_ID'
        ,'NEL_ID_SEQ'
@@ -35523,7 +35547,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_INV_ITEMS_ALL'
        ,'IIT_NE_ID'
        ,'NE_ID_SEQ'
@@ -35538,7 +35562,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_INV_TYPE_ATTRIB_BANDINGS'
        ,'ITB_BANDING_ID'
        ,'ITB_BANDING_ID_SEQ'
@@ -35553,7 +35577,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_INV_TYPE_ATTRIB_BAND_DETS'
        ,'ITD_BAND_SEQ'
        ,'ITD_BAND_SEQ_SEQ'
@@ -35568,7 +35592,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_JOB_CONTROL'
        ,'NJC_JOB_ID'
        ,'NJC_JOB_ID_SEQ'
@@ -35583,7 +35607,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_JOB_OPERATIONS'
        ,'NJO_ID'
        ,'NJO_ID_SEQ'
@@ -35598,7 +35622,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_LAYERS'
        ,'NL_LAYER_ID'
        ,'NL_LAYER_ID_SEQ'
@@ -35613,7 +35637,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_LAYER_SETS'
        ,'NLS_SET_ID'
        ,'NLS_SET_ID_SEQ'
@@ -35628,7 +35652,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_LOAD_DESTINATIONS'
        ,'NLD_ID'
        ,'NLD_ID_SEQ'
@@ -35643,7 +35667,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_LOAD_FILES'
        ,'NLF_ID'
        ,'NLF_ID_SEQ'
@@ -35658,7 +35682,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_MAIL_GROUPS'
        ,'NMG_ID'
        ,'NMG_ID_SEQ'
@@ -35673,7 +35697,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_MAIL_MESSAGE'
        ,'NMM_ID'
        ,'NMM_ID_SEQ'
@@ -35688,7 +35712,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_MAIL_MESSAGE_TEXT'
        ,'NMMT_LINE_ID'
        ,'NMMT_LINE_ID_SEQ'
@@ -35703,7 +35727,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_MAIL_USERS'
        ,'NMU_ID'
        ,'NMU_ID_SEQ'
@@ -35718,7 +35742,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_MRG_CLASSES'
        ,'NQC_ID'
        ,'NQC_ID_SEQ'
@@ -35733,7 +35757,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_MRG_OUTPUT_FILE'
        ,'NMF_ID'
        ,'NMF_ID_SEQ'
@@ -35748,7 +35772,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_MRG_QUERY_ALL'
        ,'NMQ_ID'
        ,'NMQ_ID_SEQ'
@@ -35763,7 +35787,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_MRG_QUERY_TYPES_ALL'
        ,'NQT_SEQ_NO'
        ,'NQT_SEQ_NO_SEQ'
@@ -35778,7 +35802,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_NODES_ALL'
        ,'NO_NODE_ID'
        ,'NO_NODE_ID_SEQ'
@@ -35793,7 +35817,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_NSG_EXPORT'
        ,'NXP_ID'
        ,'NXP_ID_SEQ'
@@ -35808,7 +35832,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_PBI_QUERY'
        ,'NPQ_ID'
        ,'NPQ_ID_SEQ'
@@ -35823,7 +35847,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_PBI_QUERY_TYPES'
        ,'NQT_SEQ_NO'
        ,'NQT_SEQ_NO_SEQ'
@@ -35838,7 +35862,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_POINTS'
        ,'NP_ID'
        ,'NP_ID_SEQ'
@@ -35853,7 +35877,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_PROGRESS'
        ,'PRG_PROGRESS_ID'
        ,'PRG_ID_SEQ'
@@ -35868,7 +35892,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_SAVED_EXTENTS'
        ,'NSE_ID'
        ,'NSE_ID_SEQ'
@@ -35883,7 +35907,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_SAVED_EXTENT_MEMBERS'
        ,'NSM_ID'
        ,'NSM_ID_SEQ'
@@ -35898,7 +35922,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_UNITS'
        ,'UN_UNIT_ID'
        ,'UN_UNIT_ID_SEQ'
@@ -35913,7 +35937,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_UNIT_DOMAINS'
        ,'UD_DOMAIN_ID'
        ,'UD_DOMAIN_ID_SEQ'
@@ -35928,7 +35952,7 @@ INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
        ,HSA_SEQUENCE_NAME
        ,HSA_LAST_REBUILD_DATE
        )
-SELECT
+SELECT 
         'NM_X_INV_CONDITIONS'
        ,'NXIC_ID'
        ,'NXIC_ID_SEQ'
@@ -35961,7 +35985,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMC_DISPLAY_SIGN_CHK'
        ,'NM_MRG_OUTPUT_COLS'
        ,'HIG'
@@ -35975,7 +35999,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMF_YN_CHK'
        ,'NM_MRG_OUTPUT_FILE'
        ,'HIG'
@@ -35989,7 +36013,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMC_PAD_CHK'
        ,'NM_MRG_OUTPUT_COLS'
        ,'HIG'
@@ -36003,7 +36027,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMC_DISP_DP_CHK'
        ,'NM_MRG_OUTPUT_COLS'
        ,'HIG'
@@ -36017,7 +36041,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HOL_MIXED_CASE_CHK'
        ,'HIG_OPTION_LIST'
        ,'HIG'
@@ -36031,7 +36055,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GT_LOCATION_UPDATABLE_CHK'
        ,'GIS_THEMES_ALL'
        ,'HIG'
@@ -36045,7 +36069,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITA_EXCL_YN_CHK'
        ,'NM_INV_TYPE_ATTRIBS_ALL'
        ,'HIG'
@@ -36059,7 +36083,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NAT_UPDATE_CHK'
        ,'NM_AUDIT_TABLES'
        ,'HIG'
@@ -36073,7 +36097,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NAT_DELETE_CHK'
        ,'NM_AUDIT_TABLES'
        ,'HIG'
@@ -36087,7 +36111,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NAT_INSERT_CHK'
        ,'NM_AUDIT_TABLES'
        ,'HIG'
@@ -36101,7 +36125,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMM_HTML_CHK'
        ,'NM_MAIL_MESSAGE'
        ,'HIG'
@@ -36115,7 +36139,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLFC_MANDATORY_CHK'
        ,'NM_LOAD_FILE_COLS'
        ,'HIG'
@@ -36129,7 +36153,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NGQ_QUERY_ALL_ITEMS_CHK'
        ,'NM_GAZ_QUERY'
        ,'HIG'
@@ -36143,7 +36167,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_11049_GTF_S_000'
        ,'GIS_THEME_FUNCTIONS_ALL'
        ,'HIG'
@@ -36157,7 +36181,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_3268_HUS_I_000'
        ,'HIG_USERS'
        ,'HIG'
@@ -36171,7 +36195,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_3268_HUS_U_000'
        ,'HIG_USERS'
        ,'HIG'
@@ -36185,7 +36209,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_3268_HUS_U_001'
        ,'HIG_USERS'
        ,'HIG'
@@ -36199,7 +36223,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_3385_NGT_L_000'
        ,'NM_GROUP_TYPES_ALL'
        ,'HIG'
@@ -36213,7 +36237,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_3385_NGT_M_000'
        ,'NM_GROUP_TYPES_ALL'
        ,'HIG'
@@ -36227,7 +36251,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_3385_NGT_P_000'
        ,'NM_GROUP_TYPES_ALL'
        ,'HIG'
@@ -36241,7 +36265,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_3385_NGT_R_000'
        ,'NM_GROUP_TYPES_ALL'
        ,'HIG'
@@ -36255,7 +36279,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_3385_NGT_S_000'
        ,'NM_GROUP_TYPES_ALL'
        ,'HIG'
@@ -36269,7 +36293,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ICM_UPDATABLE_CHK'
        ,'NM_INV_CATEGORY_MODULES'
        ,'HIG'
@@ -36283,7 +36307,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_3496_NIN_L_000'
        ,'NM_INV_NW_ALL'
        ,'HIG'
@@ -36297,7 +36321,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2747_NIT_C_000'
        ,'NM_INV_TYPES_ALL'
        ,'HIG'
@@ -36311,7 +36335,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2747_NIT_E_000'
        ,'NM_INV_TYPES_ALL'
        ,'HIG'
@@ -36325,7 +36349,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2747_NIT_E_001'
        ,'NM_INV_TYPES_ALL'
        ,'HIG'
@@ -36339,7 +36363,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2747_NIT_F_000'
        ,'NM_INV_TYPES_ALL'
        ,'HIG'
@@ -36353,7 +36377,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2747_NIT_L_000'
        ,'NM_INV_TYPES_ALL'
        ,'HIG'
@@ -36367,7 +36391,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2747_NIT_M_000'
        ,'NM_INV_TYPES_ALL'
        ,'HIG'
@@ -36381,7 +36405,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2747_NIT_R_000'
        ,'NM_INV_TYPES_ALL'
        ,'HIG'
@@ -36395,7 +36419,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2747_NIT_T_000'
        ,'NM_INV_TYPES_ALL'
        ,'HIG'
@@ -36409,7 +36433,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2747_NIT_U_000'
        ,'NM_INV_TYPES_ALL'
        ,'HIG'
@@ -36423,7 +36447,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2747_NIT_U_001'
        ,'NM_INV_TYPES_ALL'
        ,'HIG'
@@ -36437,7 +36461,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2747_NIT_X_000'
        ,'NM_INV_TYPES_ALL'
        ,'HIG'
@@ -36451,7 +36475,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NOD_MANDATORY_CHK'
        ,'NM_OPERATION_DATA'
        ,'HIG'
@@ -36465,7 +36489,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NJT_NW_LOCK_CHK'
        ,'NM_JOB_TYPES'
        ,'HIG'
@@ -36479,7 +36503,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_17932_NMQ_T_000'
        ,'NM_MRG_QUERY_ALL'
        ,'HIG'
@@ -36493,7 +36517,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2725_ITA_Q_000'
        ,'NM_INV_TYPE_ATTRIBS_ALL'
        ,'HIG'
@@ -36507,7 +36531,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_3574_ITG_M_000'
        ,'NM_INV_TYPE_GROUPINGS_ALL'
        ,'HIG'
@@ -36521,7 +36545,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMS_IN_RESULTS_CHK'
        ,'NM_MRG_SECTIONS_ALL'
        ,'HIG'
@@ -36535,7 +36559,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2521_NT_DA_000'
        ,'NM_TYPES'
        ,'HIG'
@@ -36549,7 +36573,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2521_NT_LI_000'
        ,'NM_TYPES'
        ,'HIG'
@@ -36563,7 +36587,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2521_NT_PO_000'
        ,'NM_TYPES'
        ,'HIG'
@@ -36577,7 +36601,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2590_NTC_D_000'
        ,'NM_TYPE_COLUMNS'
        ,'HIG'
@@ -36591,7 +36615,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2590_NTC_I_000'
        ,'NM_TYPE_COLUMNS'
        ,'HIG'
@@ -36605,7 +36629,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2590_NTC_M_000'
        ,'NM_TYPE_COLUMNS'
        ,'HIG'
@@ -36619,7 +36643,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_3481_NTI_A_000'
        ,'NM_TYPE_INCLUSION'
        ,'HIG'
@@ -36633,7 +36657,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_3481_NTI_A_001'
        ,'NM_TYPE_INCLUSION'
        ,'HIG'
@@ -36647,7 +36671,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_3481_NTI_R_000'
        ,'NM_TYPE_INCLUSION'
        ,'HIG'
@@ -36661,7 +36685,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_9208_NSR_A_000'
        ,'NM_TYPE_SUBCLASS_RESTRICTIONS'
        ,'HIG'
@@ -36675,7 +36699,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_45298_NXL_C_000'
        ,'NM_X_LOCATION_RULES'
        ,'HIG'
@@ -36689,7 +36713,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_45298_NXL_E_000'
        ,'NM_X_LOCATION_RULES'
        ,'HIG'
@@ -36703,7 +36727,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_45298_NXL_X_000'
        ,'NM_X_LOCATION_RULES'
        ,'HIG'
@@ -36717,7 +36741,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_16954_NXN_C_000'
        ,'NM_X_NW_RULES'
        ,'HIG'
@@ -36731,7 +36755,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_16954_NXN_E_000'
        ,'NM_X_NW_RULES'
        ,'HIG'
@@ -36745,7 +36769,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_2775_XRV_M_000'
        ,'XSP_REVERSAL'
        ,'HIG'
@@ -36759,7 +36783,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITD_PK'
        ,'NM_INV_TYPE_ATTRIB_BAND_DETS'
        ,'HIG'
@@ -36773,7 +36797,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NM_INV_TYPE_COLOURS_PK'
        ,'NM_INV_TYPE_COLOURS'
        ,'HIG'
@@ -36787,7 +36811,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITG_PK'
        ,'NM_INV_TYPE_GROUPINGS_ALL'
        ,'HIG'
@@ -36801,7 +36825,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITR_PK'
        ,'NM_INV_TYPE_ROLES'
        ,'HIG'
@@ -36815,7 +36839,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NJC_PK'
        ,'NM_JOB_CONTROL'
        ,'HIG'
@@ -36829,7 +36853,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NM_JOB_CONTROL_UK'
        ,'NM_JOB_CONTROL'
        ,'HIG'
@@ -36843,7 +36867,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NJO_PK'
        ,'NM_JOB_OPERATIONS'
        ,'HIG'
@@ -36857,7 +36881,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NJO_UK'
        ,'NM_JOB_OPERATIONS'
        ,'HIG'
@@ -36871,7 +36895,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NJV_PK'
        ,'NM_JOB_OPERATION_DATA_VALUES'
        ,'HIG'
@@ -36885,7 +36909,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NJT_PK'
        ,'NM_JOB_TYPES'
        ,'HIG'
@@ -36899,7 +36923,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'JTO_PK'
        ,'NM_JOB_TYPES_OPERATIONS'
        ,'HIG'
@@ -36913,7 +36937,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NL_PK'
        ,'NM_LAYERS'
        ,'HIG'
@@ -36927,7 +36951,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLS_PK'
        ,'NM_LAYER_SETS'
        ,'HIG'
@@ -36941,7 +36965,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLB_PK'
        ,'NM_LOAD_BATCHES'
        ,'HIG'
@@ -36955,7 +36979,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLBS_PK'
        ,'NM_LOAD_BATCH_STATUS'
        ,'HIG'
@@ -36969,7 +36993,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLD_PK'
        ,'NM_LOAD_DESTINATIONS'
        ,'HIG'
@@ -36983,7 +37007,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLD_UK1'
        ,'NM_LOAD_DESTINATIONS'
        ,'HIG'
@@ -36997,7 +37021,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLD_UK2'
        ,'NM_LOAD_DESTINATIONS'
        ,'HIG'
@@ -37011,7 +37035,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLDD_PK'
        ,'NM_LOAD_DESTINATION_DEFAULTS'
        ,'HIG'
@@ -37025,7 +37049,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLF_PK'
        ,'NM_LOAD_FILES'
        ,'HIG'
@@ -37039,7 +37063,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLF_UK'
        ,'NM_LOAD_FILES'
        ,'HIG'
@@ -37053,7 +37077,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLFC_PK'
        ,'NM_LOAD_FILE_COLS'
        ,'HIG'
@@ -37067,7 +37091,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLFC_UK'
        ,'NM_LOAD_FILE_COLS'
        ,'HIG'
@@ -37081,7 +37105,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLCD_PK'
        ,'NM_LOAD_FILE_COL_DESTINATIONS'
        ,'HIG'
@@ -37095,7 +37119,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLCD_UK'
        ,'NM_LOAD_FILE_COL_DESTINATIONS'
        ,'HIG'
@@ -37109,7 +37133,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLFD_PK'
        ,'NM_LOAD_FILE_DESTINATIONS'
        ,'HIG'
@@ -37123,7 +37147,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLFD_UK'
        ,'NM_LOAD_FILE_DESTINATIONS'
        ,'HIG'
@@ -37137,7 +37161,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMG_PK'
        ,'NM_MAIL_GROUPS'
        ,'HIG'
@@ -37151,7 +37175,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMGM_PK'
        ,'NM_MAIL_GROUP_MEMBERSHIP'
        ,'HIG'
@@ -37165,7 +37189,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMM_PK'
        ,'NM_MAIL_MESSAGE'
        ,'HIG'
@@ -37179,7 +37203,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMMR_PK'
        ,'NM_MAIL_MESSAGE_RECIPIENTS'
        ,'HIG'
@@ -37193,7 +37217,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMMT_PK'
        ,'NM_MAIL_MESSAGE_TEXT'
        ,'HIG'
@@ -37207,7 +37231,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMU_PK'
        ,'NM_MAIL_USERS'
        ,'HIG'
@@ -37221,7 +37245,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NM_PK'
        ,'NM_MEMBERS_ALL'
        ,'HIG'
@@ -37235,7 +37259,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMST_PK'
        ,'NM_MEMBERS_SDE_TEMP'
        ,'HIG'
@@ -37249,7 +37273,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMH_PK'
        ,'NM_MEMBER_HISTORY'
        ,'HIG'
@@ -37263,7 +37287,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NDQA_PK'
        ,'NM_MRG_DEFAULT_QUERY_ATTRIBS'
        ,'HIG'
@@ -37277,7 +37301,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NDQT_PK'
        ,'NM_MRG_DEFAULT_QUERY_TYPES_ALL'
        ,'HIG'
@@ -37291,7 +37315,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMID_PK'
        ,'NM_MRG_INV_DERIVATION'
        ,'HIG'
@@ -37305,7 +37329,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMM2_UK'
        ,'NM_MRG_MEMBERS2'
        ,'HIG'
@@ -37319,7 +37343,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMC_PK'
        ,'NM_MRG_OUTPUT_COLS'
        ,'HIG'
@@ -37333,7 +37357,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMC_UK'
        ,'NM_MRG_OUTPUT_COLS'
        ,'HIG'
@@ -37347,7 +37371,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMCD_PK'
        ,'NM_MRG_OUTPUT_COL_DECODE'
        ,'HIG'
@@ -37361,7 +37385,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMF_PK'
        ,'NM_MRG_OUTPUT_FILE'
        ,'HIG'
@@ -37375,7 +37399,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMF_UK'
        ,'NM_MRG_OUTPUT_FILE'
        ,'HIG'
@@ -37389,7 +37413,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMQ_PK'
        ,'NM_MRG_QUERY_ALL'
        ,'HIG'
@@ -37403,7 +37427,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMQ_UK'
        ,'NM_MRG_QUERY_ALL'
        ,'HIG'
@@ -37417,7 +37441,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMQA_PK'
        ,'NM_MRG_QUERY_ATTRIBS'
        ,'HIG'
@@ -37431,7 +37455,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMQR_PK'
        ,'NM_MRG_QUERY_RESULTS_ALL'
        ,'HIG'
@@ -37445,7 +37469,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMQRT2_PK'
        ,'NM_MRG_QUERY_RESULTS_TEMP2'
        ,'HIG'
@@ -37459,7 +37483,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NQRO_PK'
        ,'NM_MRG_QUERY_ROLES'
        ,'HIG'
@@ -37473,7 +37497,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMQT_PK'
        ,'NM_MRG_QUERY_TYPES_ALL'
        ,'HIG'
@@ -37487,7 +37511,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NQU_PK'
        ,'NM_MRG_QUERY_USERS'
        ,'HIG'
@@ -37501,7 +37525,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMQV_PK'
        ,'NM_MRG_QUERY_VALUES'
        ,'HIG'
@@ -37515,7 +37539,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMS_PK'
        ,'NM_MRG_SECTIONS_ALL'
        ,'HIG'
@@ -37529,7 +37553,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMSIV_PK'
        ,'NM_MRG_SECTION_INV_VALUES_ALL'
        ,'HIG'
@@ -37543,7 +37567,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMSM_PK'
        ,'NM_MRG_SECTION_MEMBERS'
        ,'HIG'
@@ -37557,7 +37581,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NN_PK'
        ,'NM_NODES_ALL'
        ,'HIG'
@@ -37571,7 +37595,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NN_UK'
        ,'NM_NODES_ALL'
        ,'HIG'
@@ -37585,7 +37609,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NNT_PK'
        ,'NM_NODE_TYPES'
        ,'HIG'
@@ -37599,7 +37623,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NNU_PK'
        ,'NM_NODE_USAGES_ALL'
        ,'HIG'
@@ -37613,7 +37637,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NNG_PK'
        ,'NM_NT_GROUPINGS_ALL'
        ,'HIG'
@@ -37627,7 +37651,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NPE_PK'
        ,'NM_NW_PERSISTENT_EXTENTS'
        ,'HIG'
@@ -37641,7 +37665,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMO_PK'
        ,'NM_OPERATIONS'
        ,'HIG'
@@ -37655,7 +37679,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NOD_PK'
        ,'NM_OPERATION_DATA'
        ,'HIG'
@@ -37669,7 +37693,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NOD_UK'
        ,'NM_OPERATION_DATA'
        ,'HIG'
@@ -37683,7 +37707,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NOD_SCRN_TEXT_UK'
        ,'NM_OPERATION_DATA'
        ,'HIG'
@@ -37697,7 +37721,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NPQ_PK'
        ,'NM_PBI_QUERY'
        ,'HIG'
@@ -37711,7 +37735,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NPQ_UK'
        ,'NM_PBI_QUERY'
        ,'HIG'
@@ -37725,7 +37749,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NQA_PK'
        ,'NM_PBI_QUERY_ATTRIBS'
        ,'HIG'
@@ -37739,7 +37763,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NQR_PK'
        ,'NM_PBI_QUERY_RESULTS'
        ,'HIG'
@@ -37753,7 +37777,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NQT_PK'
        ,'NM_PBI_QUERY_TYPES'
        ,'HIG'
@@ -37767,7 +37791,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NQV_PK'
        ,'NM_PBI_QUERY_VALUES'
        ,'HIG'
@@ -37781,7 +37805,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NPS_PK'
        ,'NM_PBI_SECTIONS'
        ,'HIG'
@@ -37795,7 +37819,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NPM_PK'
        ,'NM_PBI_SECTION_MEMBERS'
        ,'HIG'
@@ -37809,7 +37833,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NP_PK'
        ,'NM_POINTS'
        ,'HIG'
@@ -37823,7 +37847,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NRD_UK'
        ,'NM_RECLASS_DETAILS'
        ,'HIG'
@@ -37837,7 +37861,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NRD_PK'
        ,'NM_RECLASS_DETAILS'
        ,'HIG'
@@ -37851,7 +37875,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NRT_PK'
        ,'NM_RESCALE_SEG_TREE'
        ,'HIG'
@@ -37865,7 +37889,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NRT_UK'
        ,'NM_RESCALE_SEG_TREE'
        ,'HIG'
@@ -37879,7 +37903,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMR_PK'
        ,'NM_REVERSAL'
        ,'HIG'
@@ -37893,7 +37917,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NSE_PK'
        ,'NM_SAVED_EXTENTS'
        ,'HIG'
@@ -37907,7 +37931,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NSE_UK'
        ,'NM_SAVED_EXTENTS'
        ,'HIG'
@@ -37921,7 +37945,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NSM_PK'
        ,'NM_SAVED_EXTENT_MEMBERS'
        ,'HIG'
@@ -37935,7 +37959,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NSD_PK'
        ,'NM_SAVED_EXTENT_MEMBER_DATUMS'
        ,'HIG'
@@ -37949,7 +37973,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMTR_PK'
        ,'NM_SDE_TEMP_RESCALE'
        ,'HIG'
@@ -37963,7 +37987,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NS_PK'
        ,'NM_SHAPES_1'
        ,'HIG'
@@ -37977,7 +38001,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'TII_PK'
        ,'NM_TEMP_INV_ITEMS'
        ,'HIG'
@@ -37991,7 +38015,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'TIL_PK'
        ,'NM_TEMP_INV_ITEMS_LIST'
        ,'HIG'
@@ -38005,7 +38029,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'TII_TEMP_PK'
        ,'NM_TEMP_INV_ITEMS_TEMP'
        ,'HIG'
@@ -38019,7 +38043,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'TIM_PK'
        ,'NM_TEMP_INV_MEMBERS'
        ,'HIG'
@@ -38033,7 +38057,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'TIM_TEMP_PK'
        ,'NM_TEMP_INV_MEMBERS_TEMP'
        ,'HIG'
@@ -38047,7 +38071,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NM_TEMP_NODES_PK'
        ,'NM_TEMP_NODES'
        ,'HIG'
@@ -38061,7 +38085,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NT_PK'
        ,'NM_TYPES'
        ,'HIG'
@@ -38075,7 +38099,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NT_UK'
        ,'NM_TYPES'
        ,'HIG'
@@ -38089,7 +38113,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NTC_PK'
        ,'NM_TYPE_COLUMNS'
        ,'HIG'
@@ -38103,7 +38127,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NTI_PK'
        ,'NM_TYPE_INCLUSION'
        ,'HIG'
@@ -38117,7 +38141,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NTI_UK'
        ,'NM_TYPE_INCLUSION'
        ,'HIG'
@@ -38131,7 +38155,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NTL_PK'
        ,'NM_TYPE_LAYERS_ALL'
        ,'HIG'
@@ -38145,7 +38169,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NSC_PK'
        ,'NM_TYPE_SUBCLASS'
        ,'HIG'
@@ -38159,7 +38183,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NSR_PK'
        ,'NM_TYPE_SUBCLASS_RESTRICTIONS'
        ,'HIG'
@@ -38173,7 +38197,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'UN_PK'
        ,'NM_UNITS'
        ,'HIG'
@@ -38187,7 +38211,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'UC_PK'
        ,'NM_UNIT_CONVERSIONS'
        ,'HIG'
@@ -38201,7 +38225,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'UK_PK'
        ,'NM_UNIT_DOMAINS'
        ,'HIG'
@@ -38215,7 +38239,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NUF_PK'
        ,'NM_UPLOAD_FILES'
        ,'HIG'
@@ -38229,7 +38253,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NUA_PK'
        ,'NM_USER_AUS_ALL'
        ,'HIG'
@@ -38243,7 +38267,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NVA_PK'
        ,'NM_VISUAL_ATTRIBUTES'
        ,'HIG'
@@ -38257,7 +38281,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NM_XML_FILES_PK'
        ,'NM_XML_FILES'
        ,'HIG'
@@ -38271,7 +38295,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NM_XML_BATCHES_PK'
        ,'NM_XML_LOAD_BATCHES'
        ,'HIG'
@@ -38285,7 +38309,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NM_XML_LOAD_ERRORS_PK'
        ,'NM_XML_LOAD_ERRORS'
        ,'HIG'
@@ -38299,7 +38323,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NWX_PK'
        ,'NM_XSP'
        ,'HIG'
@@ -38313,7 +38337,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NXD_PK'
        ,'NM_X_DRIVING_CONDITIONS'
        ,'HIG'
@@ -38327,7 +38351,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NXE_PK'
        ,'NM_X_ERRORS'
        ,'HIG'
@@ -38341,7 +38365,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NXIC_PK'
        ,'NM_X_INV_CONDITIONS'
        ,'HIG'
@@ -38355,7 +38379,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NXL_PK'
        ,'NM_X_LOCATION_RULES'
        ,'HIG'
@@ -38369,7 +38393,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NXN_PK'
        ,'NM_X_NW_RULES'
        ,'HIG'
@@ -38383,7 +38407,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'PK_NM_X_RULES'
        ,'NM_X_RULES'
        ,'HIG'
@@ -38397,7 +38421,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NXV_PK'
        ,'NM_X_VAL_CONDITIONS'
        ,'HIG'
@@ -38411,7 +38435,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'XSR_PK'
        ,'XSP_RESTRAINTS'
        ,'HIG'
@@ -38425,7 +38449,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'XRV_PK'
        ,'XSP_REVERSAL'
        ,'HIG'
@@ -38439,7 +38463,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NCSM_PK'
        ,'NM_CHARACTER_SET_MEMBERS'
        ,'HIG'
@@ -38453,7 +38477,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NCS_PK'
        ,'NM_CHARACTER_SETS'
        ,'HIG'
@@ -38467,7 +38491,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ANALYSE_ALL_TABS_LOG_PK'
        ,'ANALYSE_ALL_TABS_LOG'
        ,'HIG'
@@ -38481,7 +38505,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'COLOURS_PK'
        ,'COLOURS'
        ,'HIG'
@@ -38495,7 +38519,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'COL_UK'
        ,'COLOURS'
        ,'HIG'
@@ -38509,7 +38533,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DOC_PK'
        ,'DOCS'
        ,'HIG'
@@ -38523,7 +38547,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DAC_PK'
        ,'DOC_ACTIONS'
        ,'HIG'
@@ -38537,7 +38561,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DAS_PK'
        ,'DOC_ASSOCS'
        ,'HIG'
@@ -38551,7 +38575,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DCL_PK'
        ,'DOC_CLASS'
        ,'HIG'
@@ -38565,7 +38589,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DCL_UK1'
        ,'DOC_CLASS'
        ,'HIG'
@@ -38579,7 +38603,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DCP_PK'
        ,'DOC_COPIES'
        ,'HIG'
@@ -38593,7 +38617,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DDG_PK'
        ,'DOC_DAMAGE'
        ,'HIG'
@@ -38607,7 +38631,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DDC_PK'
        ,'DOC_DAMAGE_COSTS'
        ,'HIG'
@@ -38621,7 +38645,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DEC_PK'
        ,'DOC_ENQUIRY_CONTACTS'
        ,'HIG'
@@ -38635,7 +38659,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DET_PK'
        ,'DOC_ENQUIRY_TYPES'
        ,'HIG'
@@ -38649,7 +38673,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DET_UNQ'
        ,'DOC_ENQUIRY_TYPES'
        ,'HIG'
@@ -38663,7 +38687,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DGT_PK'
        ,'DOC_GATEWAYS'
        ,'HIG'
@@ -38677,7 +38701,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DGT_UK1'
        ,'DOC_GATEWAYS'
        ,'HIG'
@@ -38691,7 +38715,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DGS_PK'
        ,'DOC_GATE_SYNS'
        ,'HIG'
@@ -38705,7 +38729,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DHI_PK'
        ,'DOC_HISTORY'
        ,'HIG'
@@ -38719,7 +38743,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DKY_PK'
        ,'DOC_KEYS'
        ,'HIG'
@@ -38733,7 +38757,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DKW_PK'
        ,'DOC_KEYWORDS'
        ,'HIG'
@@ -38747,7 +38771,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DLC_PK'
        ,'DOC_LOCATIONS'
        ,'HIG'
@@ -38761,7 +38785,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DLC_UK'
        ,'DOC_LOCATIONS'
        ,'HIG'
@@ -38775,7 +38799,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DMD_PK'
        ,'DOC_MEDIA'
        ,'HIG'
@@ -38789,7 +38813,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DMD_UK'
        ,'DOC_MEDIA'
        ,'HIG'
@@ -38803,7 +38827,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DQ_PK'
        ,'DOC_QUERY'
        ,'HIG'
@@ -38817,7 +38841,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DQ_UK'
        ,'DOC_QUERY'
        ,'HIG'
@@ -38831,7 +38855,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DQC_PK'
        ,'DOC_QUERY_COLS'
        ,'HIG'
@@ -38845,7 +38869,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DRP_PK'
        ,'DOC_REDIR_PRIOR'
        ,'HIG'
@@ -38859,7 +38883,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DSC_PK'
        ,'DOC_STD_COSTS'
        ,'HIG'
@@ -38873,7 +38897,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DSY_PK'
        ,'DOC_SYNONYMS'
        ,'HIG'
@@ -38887,7 +38911,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DTC_PK'
        ,'DOC_TEMPLATE_COLUMNS'
        ,'HIG'
@@ -38901,7 +38925,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DTG_PK'
        ,'DOC_TEMPLATE_GATEWAYS'
        ,'HIG'
@@ -38915,7 +38939,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DTU_PK'
        ,'DOC_TEMPLATE_USERS'
        ,'HIG'
@@ -38929,7 +38953,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DTP_PK'
        ,'DOC_TYPES'
        ,'HIG'
@@ -38943,7 +38967,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DTP_UK'
        ,'DOC_TYPES'
        ,'HIG'
@@ -38957,7 +38981,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'EXOR_VERSION_TAB_PK'
        ,'EXOR_VERSION_TAB'
        ,'HIG'
@@ -38971,7 +38995,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GDOBJ_PK'
        ,'GIS_DATA_OBJECTS'
        ,'HIG'
@@ -38985,7 +39009,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GIS_PROJECTS_PK'
        ,'GIS_PROJECTS'
        ,'HIG'
@@ -38999,7 +39023,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GT_PK'
        ,'GIS_THEMES_ALL'
        ,'HIG'
@@ -39013,7 +39037,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GT_UK'
        ,'GIS_THEMES_ALL'
        ,'HIG'
@@ -39027,7 +39051,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GTF_PK'
        ,'GIS_THEME_FUNCTIONS_ALL'
        ,'HIG'
@@ -39041,7 +39065,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GTHR_PK'
        ,'GIS_THEME_ROLES'
        ,'HIG'
@@ -39055,7 +39079,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GL_PK'
        ,'GRI_LOV'
        ,'HIG'
@@ -39069,7 +39093,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GRM_PK'
        ,'GRI_MODULES'
        ,'HIG'
@@ -39083,7 +39107,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GMP_PK'
        ,'GRI_MODULE_PARAMS'
        ,'HIG'
@@ -39097,7 +39121,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GP_PK'
        ,'GRI_PARAMS'
        ,'HIG'
@@ -39111,7 +39135,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GPD_PK'
        ,'GRI_PARAM_DEPENDENCIES'
        ,'HIG'
@@ -39125,7 +39149,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GPL_PK'
        ,'GRI_PARAM_LOOKUP'
        ,'HIG'
@@ -39139,7 +39163,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GRR_PK'
        ,'GRI_REPORT_RUNS'
        ,'HIG'
@@ -39153,7 +39177,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GRP_PK'
        ,'GRI_RUN_PARAMETERS'
        ,'HIG'
@@ -39167,7 +39191,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GSP_PK'
        ,'GRI_SAVED_PARAMS'
        ,'HIG'
@@ -39181,7 +39205,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GSS_PK'
        ,'GRI_SAVED_SETS'
        ,'HIG'
@@ -39195,7 +39219,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GRS_PK'
        ,'GRI_SPOOL'
        ,'HIG'
@@ -39209,7 +39233,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'GTR_PK'
        ,'GROUP_TYPE_ROLES'
        ,'HIG'
@@ -39223,7 +39247,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HAD_PK'
        ,'HIG_ADDRESS'
        ,'HIG'
@@ -39237,7 +39261,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HCCA_PK'
        ,'HIG_CHECK_CONSTRAINT_ASSOCS'
        ,'HIG'
@@ -39251,7 +39275,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HCO_PK'
        ,'HIG_CODES'
        ,'HIG'
@@ -39265,7 +39289,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HCL_PK'
        ,'HIG_COLOURS'
        ,'HIG'
@@ -39279,7 +39303,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HCT_PK'
        ,'HIG_CONTACTS'
        ,'HIG'
@@ -39293,7 +39317,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HCA_PK'
        ,'HIG_CONTACT_ADDRESS'
        ,'HIG'
@@ -39307,7 +39331,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HDBA_PK'
        ,'HIG_DISCO_BUSINESS_AREAS'
        ,'HIG'
@@ -39321,7 +39345,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HDBA_UK'
        ,'HIG_DISCO_BUSINESS_AREAS'
        ,'HIG'
@@ -39335,7 +39359,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HDCV_PK'
        ,'HIG_DISCO_COL_VALUES'
        ,'HIG'
@@ -39349,7 +39373,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HDCV_UK'
        ,'HIG_DISCO_COL_VALUES'
        ,'HIG'
@@ -39363,7 +39387,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HDFK_PK'
        ,'HIG_DISCO_FOREIGN_KEYS'
        ,'HIG'
@@ -39377,7 +39401,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HDFK_UK'
        ,'HIG_DISCO_FOREIGN_KEYS'
        ,'HIG'
@@ -39391,7 +39415,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HDKC_PK'
        ,'HIG_DISCO_FOREIGN_KEY_COLS'
        ,'HIG'
@@ -39405,7 +39429,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HDT_PK'
        ,'HIG_DISCO_TABLES'
        ,'HIG'
@@ -39419,7 +39443,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HDT_UK1'
        ,'HIG_DISCO_TABLES'
        ,'HIG'
@@ -39433,7 +39457,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HDT_UK2'
        ,'HIG_DISCO_TABLES'
        ,'HIG'
@@ -39447,7 +39471,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HDTC_PK'
        ,'HIG_DISCO_TAB_COLUMNS'
        ,'HIG'
@@ -39461,7 +39485,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HDO_PK'
        ,'HIG_DOMAINS'
        ,'HIG'
@@ -39475,7 +39499,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HER_PK'
        ,'HIG_ERRORS'
        ,'HIG'
@@ -39489,7 +39513,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HHO_PK'
        ,'HIG_HOLIDAYS'
        ,'HIG'
@@ -39503,7 +39527,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HIG_MODULES_PK'
        ,'HIG_MODULES'
        ,'HIG'
@@ -39517,7 +39541,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HMH_PK'
        ,'HIG_MODULE_HISTORY'
        ,'HIG'
@@ -39531,7 +39555,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HMH_UK'
        ,'HIG_MODULE_HISTORY'
        ,'HIG'
@@ -39545,7 +39569,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HMK_PK'
        ,'HIG_MODULE_KEYWORDS'
        ,'HIG'
@@ -39559,7 +39583,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HMR_PK'
        ,'HIG_MODULE_ROLES'
        ,'HIG'
@@ -39573,7 +39597,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HMU_PK'
        ,'HIG_MODULE_USAGES'
        ,'HIG'
@@ -39587,7 +39611,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HOL_PK'
        ,'HIG_OPTION_LIST'
        ,'HIG'
@@ -39601,7 +39625,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HOV_PK'
        ,'HIG_OPTION_VALUES'
        ,'HIG'
@@ -39615,7 +39639,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HPR_PK'
        ,'HIG_PRODUCTS'
        ,'HIG'
@@ -39629,7 +39653,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HPR_UK1'
        ,'HIG_PRODUCTS'
        ,'HIG'
@@ -39643,7 +39667,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HRS_PK'
        ,'HIG_REPORT_STYLES'
        ,'HIG'
@@ -39657,7 +39681,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HIG_ROLES_PK'
        ,'HIG_ROLES'
        ,'HIG'
@@ -39671,7 +39695,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HSA_PK'
        ,'HIG_SEQUENCE_ASSOCIATIONS'
        ,'HIG'
@@ -39685,7 +39709,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HSC_PK'
        ,'HIG_STATUS_CODES'
        ,'HIG'
@@ -39699,7 +39723,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HSC_UK1'
        ,'HIG_STATUS_CODES'
        ,'HIG'
@@ -39713,7 +39737,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HSD_PK'
        ,'HIG_STATUS_DOMAINS'
        ,'HIG'
@@ -39727,7 +39751,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HSF_PK'
        ,'HIG_SYSTEM_FAVOURITES'
        ,'HIG'
@@ -39741,7 +39765,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HUP_PK'
        ,'HIG_UPGRADES'
        ,'HIG'
@@ -39755,7 +39779,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HIG_USERS_PK'
        ,'HIG_USERS'
        ,'HIG'
@@ -39769,7 +39793,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HUS_UK'
        ,'HIG_USERS'
        ,'HIG'
@@ -39783,7 +39807,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HUF_PK'
        ,'HIG_USER_FAVOURITES'
        ,'HIG'
@@ -39797,7 +39821,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HUH_PK'
        ,'HIG_USER_HISTORY'
        ,'HIG'
@@ -39811,7 +39835,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HUO_PK'
        ,'HIG_USER_OPTIONS'
        ,'HIG'
@@ -39825,7 +39849,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HUR_PK'
        ,'HIG_USER_ROLES'
        ,'HIG'
@@ -39839,7 +39863,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HWCH_PK'
        ,'HIG_WEB_CONTXT_HLP'
        ,'HIG'
@@ -39853,7 +39877,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HAG_PK'
        ,'NM_ADMIN_GROUPS'
        ,'HIG'
@@ -39867,7 +39891,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HAU_PK'
        ,'NM_ADMIN_UNITS_ALL'
        ,'HIG'
@@ -39881,7 +39905,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HAU_UK1'
        ,'NM_ADMIN_UNITS_ALL'
        ,'HIG'
@@ -39895,7 +39919,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HAU_UK2'
        ,'NM_ADMIN_UNITS_ALL'
        ,'HIG'
@@ -39909,7 +39933,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NARH_PK'
        ,'NM_ASSETS_ON_ROUTE_HOLDING'
        ,'HIG'
@@ -39923,7 +39947,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NARS_PK'
        ,'NM_ASSETS_ON_ROUTE_STORE'
        ,'HIG'
@@ -39937,7 +39961,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NARSA_PK'
        ,'NM_ASSETS_ON_ROUTE_STORE_ATT'
        ,'HIG'
@@ -39951,7 +39975,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NARSD_PK'
        ,'NM_ASSETS_ON_ROUTE_STORE_ATT_D'
        ,'HIG'
@@ -39965,7 +39989,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NARSH_PK'
        ,'NM_ASSETS_ON_ROUTE_STORE_HEAD'
        ,'HIG'
@@ -39979,7 +40003,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NARST_PK'
        ,'NM_ASSETS_ON_ROUTE_STORE_TOTAL'
        ,'HIG'
@@ -39993,7 +40017,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NM_AUDIT_PK'
        ,'NM_AUDIT_ACTIONS'
        ,'HIG'
@@ -40007,7 +40031,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NACH_PK'
        ,'NM_AUDIT_CHANGES'
        ,'HIG'
@@ -40021,7 +40045,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NM_AUDIT_COLUMNS_PK'
        ,'NM_AUDIT_COLUMNS'
        ,'HIG'
@@ -40035,7 +40059,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NM_AUDIT_KEY_COLS_PK'
        ,'NM_AUDIT_KEY_COLS'
        ,'HIG'
@@ -40049,7 +40073,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NM_AUDIT_TABLES_PK'
        ,'NM_AUDIT_TABLES'
        ,'HIG'
@@ -40063,7 +40087,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NM_AUDIT_TEMP_PK'
        ,'NM_AUDIT_TEMP'
        ,'HIG'
@@ -40077,7 +40101,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NAT_PK'
        ,'NM_AU_TYPES'
        ,'HIG'
@@ -40091,7 +40115,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ND_PK'
        ,'NM_DBUG'
        ,'HIG'
@@ -40105,7 +40129,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NE_PK'
        ,'NM_ELEMENTS_ALL'
        ,'HIG'
@@ -40119,7 +40143,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NE_UK'
        ,'NM_ELEMENTS_ALL'
        ,'HIG'
@@ -40133,7 +40157,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NEH_PK'
        ,'NM_ELEMENT_HISTORY'
        ,'HIG'
@@ -40147,7 +40171,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NER_PK'
        ,'NM_ERRORS'
        ,'HIG'
@@ -40161,7 +40185,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NEL_PK'
        ,'NM_EVENT_LOG'
        ,'HIG'
@@ -40175,7 +40199,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NET_PK'
        ,'NM_EVENT_TYPES'
        ,'HIG'
@@ -40189,7 +40213,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NET_UK'
        ,'NM_EVENT_TYPES'
        ,'HIG'
@@ -40203,7 +40227,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NFP_PK'
        ,'NM_FILL_PATTERNS'
        ,'HIG'
@@ -40217,7 +40241,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NGQ_PK'
        ,'NM_GAZ_QUERY'
        ,'HIG'
@@ -40231,7 +40255,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NGQA_PK'
        ,'NM_GAZ_QUERY_ATTRIBS'
        ,'HIG'
@@ -40245,7 +40269,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NGQI_PK'
        ,'NM_GAZ_QUERY_ITEM_LIST'
        ,'HIG'
@@ -40259,7 +40283,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NGQT_PK'
        ,'NM_GAZ_QUERY_TYPES'
        ,'HIG'
@@ -40273,7 +40297,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NGQV_PK'
        ,'NM_GAZ_QUERY_VALUES'
        ,'HIG'
@@ -40287,7 +40311,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NGA_PK'
        ,'NM_GIS_AREA_OF_INTEREST'
        ,'HIG'
@@ -40301,7 +40325,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NGR_PK'
        ,'NM_GROUP_RELATIONS_ALL'
        ,'HIG'
@@ -40315,7 +40339,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NGT_PK'
        ,'NM_GROUP_TYPES_ALL'
        ,'HIG'
@@ -40329,7 +40353,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NIAS_PK'
        ,'NM_INV_ATTRIBUTE_SETS'
        ,'HIG'
@@ -40343,7 +40367,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NSIA_PK'
        ,'NM_INV_ATTRIBUTE_SET_INV_ATTR'
        ,'HIG'
@@ -40357,7 +40381,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NSIT_PK'
        ,'NM_INV_ATTRIBUTE_SET_INV_TYPES'
        ,'HIG'
@@ -40371,7 +40395,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'IAL_PK'
        ,'NM_INV_ATTRI_LOOKUP_ALL'
        ,'HIG'
@@ -40385,7 +40409,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NIC_PK'
        ,'NM_INV_CATEGORIES'
        ,'HIG'
@@ -40399,7 +40423,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ICM_PK'
        ,'NM_INV_CATEGORY_MODULES'
        ,'HIG'
@@ -40413,7 +40437,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ID_PK'
        ,'NM_INV_DOMAINS_ALL'
        ,'HIG'
@@ -40427,7 +40451,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'INV_ITEMS_ALL_PK'
        ,'NM_INV_ITEMS_ALL'
        ,'HIG'
@@ -40441,7 +40465,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'IIT_UK'
        ,'NM_INV_ITEMS_ALL'
        ,'HIG'
@@ -40455,7 +40479,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'IIG_PK'
        ,'NM_INV_ITEM_GROUPINGS_ALL'
        ,'HIG'
@@ -40469,7 +40493,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'IIG_UK'
        ,'NM_INV_ITEM_GROUPINGS_ALL'
        ,'HIG'
@@ -40483,7 +40507,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NIN_PK'
        ,'NM_INV_NW_ALL'
        ,'HIG'
@@ -40497,7 +40521,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITY_PK'
        ,'NM_INV_TYPES_ALL'
        ,'HIG'
@@ -40511,7 +40535,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITA_PK'
        ,'NM_INV_TYPE_ATTRIBS_ALL'
        ,'HIG'
@@ -40525,7 +40549,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITA_UK_VIEW_ATTRI'
        ,'NM_INV_TYPE_ATTRIBS_ALL'
        ,'HIG'
@@ -40539,7 +40563,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITA_UK_VIEW_COL'
        ,'NM_INV_TYPE_ATTRIBS_ALL'
        ,'HIG'
@@ -40553,7 +40577,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITB_PK'
        ,'NM_INV_TYPE_ATTRIB_BANDINGS'
        ,'HIG'
@@ -40567,7 +40591,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITB_UK'
        ,'NM_INV_TYPE_ATTRIB_BANDINGS'
        ,'HIG'
@@ -40581,7 +40605,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HCCA_UPPERCASE_CHK'
        ,'HIG_CHECK_CONSTRAINT_ASSOCS'
        ,'HIG'
@@ -40595,7 +40619,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HSA_UPPERCASE_CHK'
        ,'HIG_SEQUENCE_ASSOCIATIONS'
        ,'HIG'
@@ -40609,7 +40633,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NE_UNIQUE_UPPER_CHK'
        ,'NM_ELEMENTS_ALL'
        ,'HIG'
@@ -40623,7 +40647,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NET_UNIQUE_CHK'
        ,'NM_EVENT_TYPES'
        ,'HIG'
@@ -40637,7 +40661,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NFP_ID_CHK'
        ,'NM_FILL_PATTERNS'
        ,'HIG'
@@ -40651,7 +40675,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NGT_GROUP_TYPE_UPPER_CHK'
        ,'NM_GROUP_TYPES_ALL'
        ,'HIG'
@@ -40665,7 +40689,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NIT_INV_TYPE_UPPER_CHK'
        ,'NM_INV_TYPES_ALL'
        ,'HIG'
@@ -40679,7 +40703,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NJC_UNIQUE_CHK'
        ,'NM_JOB_CONTROL'
        ,'HIG'
@@ -40693,7 +40717,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLD_TABLE_NAME_CHK'
        ,'NM_LOAD_DESTINATIONS'
        ,'HIG'
@@ -40707,7 +40731,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLD_TABLE_SHORT_NAME_CHK'
        ,'NM_LOAD_DESTINATIONS'
        ,'HIG'
@@ -40721,7 +40745,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLDD_COLUMN_NAME_CHK'
        ,'NM_LOAD_DESTINATION_DEFAULTS'
        ,'HIG'
@@ -40735,7 +40759,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLF_UNIQUE_CHK'
        ,'NM_LOAD_FILES'
        ,'HIG'
@@ -40749,7 +40773,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLFC_HOLDING_COL_CHK'
        ,'NM_LOAD_FILE_COLS'
        ,'HIG'
@@ -40763,7 +40787,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NQC_NAME_CHK'
        ,'NM_MRG_CLASSES'
        ,'HIG'
@@ -40777,7 +40801,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMC_VIEW_COL_NAME_CHK'
        ,'NM_MRG_OUTPUT_COLS'
        ,'HIG'
@@ -40791,7 +40815,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NT_TYPE_UPPER_CHK'
        ,'NM_TYPES'
        ,'HIG'
@@ -40805,7 +40829,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NSC_SUB_CLASS_UPPER_CHK'
        ,'NM_TYPE_SUBCLASS'
        ,'HIG'
@@ -40819,7 +40843,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NVA_ID_CHK'
        ,'NM_VISUAL_ATTRIBUTES'
        ,'HIG'
@@ -40833,7 +40857,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NWX_X_SECT_UPPER_CHK'
        ,'NM_XSP'
        ,'HIG'
@@ -40847,7 +40871,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DCL_END_DATE_TCHK'
        ,'DOC_CLASS'
        ,'HIG'
@@ -40861,7 +40885,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DCL_START_DATE_TCHK'
        ,'DOC_CLASS'
        ,'HIG'
@@ -40875,7 +40899,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DGT_END_DATE_TCHK'
        ,'DOC_GATEWAYS'
        ,'HIG'
@@ -40889,7 +40913,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DGT_START_DATE_TCHK'
        ,'DOC_GATEWAYS'
        ,'HIG'
@@ -40903,7 +40927,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DLC_END_DATE_TCHK'
        ,'DOC_LOCATIONS'
        ,'HIG'
@@ -40917,7 +40941,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DLC_START_DATE_TCHK'
        ,'DOC_LOCATIONS'
        ,'HIG'
@@ -40931,7 +40955,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DMD_END_DATE_TCHK'
        ,'DOC_MEDIA'
        ,'HIG'
@@ -40945,7 +40969,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DMD_START_DATE_TCHK'
        ,'DOC_MEDIA'
        ,'HIG'
@@ -40959,7 +40983,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DTP_END_DATE_TCHK'
        ,'DOC_TYPES'
        ,'HIG'
@@ -40973,7 +40997,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'DTP_START_DATE_TCHK'
        ,'DOC_TYPES'
        ,'HIG'
@@ -40987,7 +41011,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HCO_END_DATE_TCHK'
        ,'HIG_CODES'
        ,'HIG'
@@ -41001,7 +41025,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HCO_START_DATE_TCHK'
        ,'HIG_CODES'
        ,'HIG'
@@ -41015,7 +41039,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HCT_END_DATE_TCHK'
        ,'HIG_CONTACTS'
        ,'HIG'
@@ -41029,7 +41053,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HCT_START_DATE_TCHK'
        ,'HIG_CONTACTS'
        ,'HIG'
@@ -41043,7 +41067,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HSC_END_DATE_TCHK'
        ,'HIG_STATUS_CODES'
        ,'HIG'
@@ -41057,7 +41081,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HSC_START_DATE_TCHK'
        ,'HIG_STATUS_CODES'
        ,'HIG'
@@ -41071,7 +41095,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HUS_END_DATE_TCHK'
        ,'HIG_USERS'
        ,'HIG'
@@ -41085,7 +41109,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HUS_START_DATE_TCHK'
        ,'HIG_USERS'
        ,'HIG'
@@ -41099,7 +41123,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HUR_START_DATE_TCHK'
        ,'HIG_USER_ROLES'
        ,'HIG'
@@ -41113,7 +41137,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NAU_END_DATE_TCHK'
        ,'NM_ADMIN_UNITS_ALL'
        ,'HIG'
@@ -41127,7 +41151,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NAU_START_DATE_TCHK'
        ,'NM_ADMIN_UNITS_ALL'
        ,'HIG'
@@ -41141,7 +41165,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NE_END_DATE_TCHK'
        ,'NM_ELEMENTS_ALL'
        ,'HIG'
@@ -41155,7 +41179,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NE_START_DATE_TCHK'
        ,'NM_ELEMENTS_ALL'
        ,'HIG'
@@ -41169,7 +41193,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NGR_END_DATE_TCHK'
        ,'NM_GROUP_RELATIONS_ALL'
        ,'HIG'
@@ -41183,7 +41207,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NGR_START_DATE_TCHK'
        ,'NM_GROUP_RELATIONS_ALL'
        ,'HIG'
@@ -41197,7 +41221,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NGT_END_DATE_TCHK'
        ,'NM_GROUP_TYPES_ALL'
        ,'HIG'
@@ -41211,7 +41235,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NGT_START_DATE_TCHK'
        ,'NM_GROUP_TYPES_ALL'
        ,'HIG'
@@ -41225,7 +41249,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'IAL_END_DATE_TCHK'
        ,'NM_INV_ATTRI_LOOKUP_ALL'
        ,'HIG'
@@ -41239,7 +41263,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'IAL_START_DATE_TCHK'
        ,'NM_INV_ATTRI_LOOKUP_ALL'
        ,'HIG'
@@ -41253,7 +41277,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ID_END_DATE_TCHK'
        ,'NM_INV_DOMAINS_ALL'
        ,'HIG'
@@ -41267,7 +41291,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ID_START_DATE_TCHK'
        ,'NM_INV_DOMAINS_ALL'
        ,'HIG'
@@ -41281,7 +41305,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'IIT_END_DATE_TCHK'
        ,'NM_INV_ITEMS_ALL'
        ,'HIG'
@@ -41295,7 +41319,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'IIT_START_DATE_TCHK'
        ,'NM_INV_ITEMS_ALL'
        ,'HIG'
@@ -41309,7 +41333,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'IIG_END_DATE_TCHK'
        ,'NM_INV_ITEM_GROUPINGS_ALL'
        ,'HIG'
@@ -41323,7 +41347,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'IIG_START_DATE_TCHK'
        ,'NM_INV_ITEM_GROUPINGS_ALL'
        ,'HIG'
@@ -41337,7 +41361,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NIN_END_DATE_TCHK'
        ,'NM_INV_NW_ALL'
        ,'HIG'
@@ -41351,7 +41375,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NIN_START_DATE_TCHK'
        ,'NM_INV_NW_ALL'
        ,'HIG'
@@ -41365,7 +41389,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NIT_END_DATE_TCHK'
        ,'NM_INV_TYPES_ALL'
        ,'HIG'
@@ -41379,7 +41403,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NIT_START_DATE_TCHK'
        ,'NM_INV_TYPES_ALL'
        ,'HIG'
@@ -41393,7 +41417,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITA_END_DATE_TCHK'
        ,'NM_INV_TYPE_ATTRIBS_ALL'
        ,'HIG'
@@ -41407,7 +41431,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITA_START_DATE_TCHK'
        ,'NM_INV_TYPE_ATTRIBS_ALL'
        ,'HIG'
@@ -41421,7 +41445,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITG_END_DATE_TCHK'
        ,'NM_INV_TYPE_GROUPINGS_ALL'
        ,'HIG'
@@ -41435,7 +41459,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITG_START_DATE_TCHK'
        ,'NM_INV_TYPE_GROUPINGS_ALL'
        ,'HIG'
@@ -41449,7 +41473,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NM_END_DATE_TCHK'
        ,'NM_MEMBERS_ALL'
        ,'HIG'
@@ -41463,7 +41487,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NM_START_DATE_TCHK'
        ,'NM_MEMBERS_ALL'
        ,'HIG'
@@ -41477,7 +41501,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMST_END_DATE_TCHK'
        ,'NM_MEMBERS_SDE_TEMP'
        ,'HIG'
@@ -41491,7 +41515,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMST_START_DATE_TCHK'
        ,'NM_MEMBERS_SDE_TEMP'
        ,'HIG'
@@ -41505,7 +41529,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMH_NM_END_DATE_TCHK'
        ,'NM_MEMBER_HISTORY'
        ,'HIG'
@@ -41519,7 +41543,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMH_NM_START_DATE_TCHK'
        ,'NM_MEMBER_HISTORY'
        ,'HIG'
@@ -41533,7 +41557,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NO_END_DATE_TCHK'
        ,'NM_NODES_ALL'
        ,'HIG'
@@ -41547,7 +41571,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NO_START_DATE_TCHK'
        ,'NM_NODES_ALL'
        ,'HIG'
@@ -41561,7 +41585,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NNU_END_DATE_TCHK'
        ,'NM_NODE_USAGES_ALL'
        ,'HIG'
@@ -41575,7 +41599,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NNU_START_DATE_TCHK'
        ,'NM_NODE_USAGES_ALL'
        ,'HIG'
@@ -41589,7 +41613,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NNG_END_DATE_TCHK'
        ,'NM_NT_GROUPINGS_ALL'
        ,'HIG'
@@ -41603,7 +41627,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NNG_START_DATE_TCHK'
        ,'NM_NT_GROUPINGS_ALL'
        ,'HIG'
@@ -41617,7 +41641,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NS_END_DATE_TCHK'
        ,'NM_SHAPES_1'
        ,'HIG'
@@ -41631,7 +41655,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NS_START_DATE_TCHK'
        ,'NM_SHAPES_1'
        ,'HIG'
@@ -41645,7 +41669,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'TII_END_DATE_TCHK'
        ,'NM_TEMP_INV_ITEMS'
        ,'HIG'
@@ -41659,7 +41683,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'TII_START_DATE_TCHK'
        ,'NM_TEMP_INV_ITEMS'
        ,'HIG'
@@ -41673,7 +41697,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'TIM_END_DATE_TCHK'
        ,'NM_TEMP_INV_MEMBERS'
        ,'HIG'
@@ -41687,7 +41711,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'TIM_START_DATE_TCHK'
        ,'NM_TEMP_INV_MEMBERS'
        ,'HIG'
@@ -41701,7 +41725,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NTL_END_DATE_TCHK'
        ,'NM_TYPE_LAYERS_ALL'
        ,'HIG'
@@ -41715,7 +41739,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NTL_START_DATE_TCHK'
        ,'NM_TYPE_LAYERS_ALL'
        ,'HIG'
@@ -41729,7 +41753,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NUA_END_DATE_TCHK'
        ,'NM_USER_AUS_ALL'
        ,'HIG'
@@ -41743,7 +41767,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NUA_START_DATE_TCHK'
        ,'NM_USER_AUS_ALL'
        ,'HIG'
@@ -41757,7 +41781,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_3631_ITR_M_000'
        ,'NM_INV_TYPE_ROLES'
        ,'HIG'
@@ -41771,7 +41795,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'AVCON_3717_NUA_M_000'
        ,'NM_USER_AUS_ALL'
        ,'HIG'
@@ -41785,7 +41809,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HOL_DATATYPE_CHK'
        ,'HIG_OPTION_LIST'
        ,'HIG'
@@ -41799,7 +41823,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ID_DATATYPE_CHK'
        ,'NM_INV_DOMAINS_ALL'
        ,'HIG'
@@ -41813,7 +41837,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITA_FORMAT_CHK'
        ,'NM_INV_TYPE_ATTRIBS_ALL'
        ,'HIG'
@@ -41827,7 +41851,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLFC_DATATYPE_CHK'
        ,'NM_LOAD_FILE_COLS'
        ,'HIG'
@@ -41841,7 +41865,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMC_DATA_TYPE_CHK'
        ,'NM_MRG_OUTPUT_COLS'
        ,'HIG'
@@ -41855,7 +41879,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NOD_DATA_TYPE_CHK'
        ,'NM_OPERATION_DATA'
        ,'HIG'
@@ -41869,7 +41893,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NAC_COL_ID_INTEGER'
        ,'NM_AUDIT_COLUMNS'
        ,'HIG'
@@ -41883,7 +41907,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NJO_SEQ_CHK'
        ,'NM_JOB_OPERATIONS'
        ,'HIG'
@@ -41897,7 +41921,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMC_DEC_PLACES_CHK4'
        ,'NM_MRG_OUTPUT_COLS'
        ,'HIG'
@@ -41911,7 +41935,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NOD_SEQ_CHK'
        ,'NM_OPERATION_DATA'
        ,'HIG'
@@ -41925,7 +41949,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMC_LENGTH_CHK'
        ,'NM_MRG_OUTPUT_COLS'
        ,'HIG'
@@ -41939,7 +41963,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMC_SEQ_NO_CHK'
        ,'NM_MRG_OUTPUT_COLS'
        ,'HIG'
@@ -41953,7 +41977,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NEA_SEVERITY_CHK'
        ,'NM_EVENT_ALERT_MAILS'
        ,'HIG'
@@ -41967,7 +41991,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NEL_SEVERITY_CHK'
        ,'NM_EVENT_LOG'
        ,'HIG'
@@ -41981,7 +42005,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NJO_BEGIN_MP_CHK'
        ,'NM_JOB_OPERATIONS'
        ,'HIG'
@@ -41995,7 +42019,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLFC_SEQ_NO_CHK'
        ,'NM_LOAD_FILE_COLS'
        ,'HIG'
@@ -42009,7 +42033,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NMC_DEC_PLACES_CHK3'
        ,'NM_MRG_OUTPUT_COLS'
        ,'HIG'
@@ -42023,7 +42047,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NGQA_BRACKET_CHK'
        ,'NM_GAZ_QUERY_ATTRIBS'
        ,'HIG'
@@ -42037,7 +42061,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NQA_BRACKET_CHK'
        ,'NM_PBI_QUERY_ATTRIBS'
        ,'HIG'
@@ -42051,7 +42075,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NJC_NPE_JOB_ID_CHK'
        ,'NM_JOB_CONTROL'
        ,'HIG'
@@ -42065,7 +42089,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NJC_STATUS_CHK'
        ,'NM_JOB_CONTROL'
        ,'HIG'
@@ -42079,7 +42103,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NJO_STATUS_CHK'
        ,'NM_JOB_OPERATIONS'
        ,'HIG'
@@ -42093,7 +42117,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLFC_DATE_FORMAT_MASK_CHK'
        ,'NM_LOAD_FILE_COLS'
        ,'HIG'
@@ -42107,7 +42131,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HSTF_CONNECT_LOOP_CHK'
        ,'HIG_STANDARD_FAVOURITES'
        ,'HIG'
@@ -42121,7 +42145,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HSF_CONNECT_LOOP_CHK'
        ,'HIG_SYSTEM_FAVOURITES'
        ,'HIG'
@@ -42135,7 +42159,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'HUF_CONNECT_LOOP_CHK'
        ,'HIG_USER_FAVOURITES'
        ,'HIG'
@@ -42149,7 +42173,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NLFC_VARCHAR_SIZE_CHK2'
        ,'NM_LOAD_FILE_COLS'
        ,'NET'
@@ -42163,7 +42187,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NVA_BG_BLUE_CHK'
        ,'NM_VISUAL_ATTRIBUTES'
        ,'NET'
@@ -42177,7 +42201,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NVA_BG_GREEN_CHK'
        ,'NM_VISUAL_ATTRIBUTES'
        ,'NET'
@@ -42191,7 +42215,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NVA_BG_RED_CHK'
        ,'NM_VISUAL_ATTRIBUTES'
        ,'NET'
@@ -42205,7 +42229,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NVA_FG_BLUE_CHK'
        ,'NM_VISUAL_ATTRIBUTES'
        ,'NET'
@@ -42219,7 +42243,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NVA_FG_GREEN_CHK'
        ,'NM_VISUAL_ATTRIBUTES'
        ,'NET'
@@ -42233,7 +42257,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NVA_FG_RED_CHK'
        ,'NM_VISUAL_ATTRIBUTES'
        ,'NET'
@@ -42247,7 +42271,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NT_DATUM_NODE_CHK'
        ,'NM_TYPES'
        ,'NET'
@@ -42261,7 +42285,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITA_EXCL_MAND_CHECK'
        ,'NM_INV_TYPE_ATTRIBS_ALL'
        ,'NET'
@@ -42275,7 +42299,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'ITA_EXCL_TYPE_CHK'
        ,'NM_INV_TYPE_ATTRIBS_ALL'
        ,'NET'
@@ -42289,7 +42313,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NTC_DISPLAYED_MANDATORY_CHK'
        ,'NM_TYPE_COLUMNS'
        ,'NET'
@@ -42303,7 +42327,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NTC_DOMAIN_COL_TYPE_CHK'
        ,'NM_TYPE_COLUMNS'
        ,'NET'
@@ -42317,7 +42341,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NTC_UNIQUE_SEQ_MAND_CHK'
        ,'NM_TYPE_COLUMNS'
        ,'NET'
@@ -42331,7 +42355,7 @@ INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        ,HCCA_NER_APPL
        ,HCCA_NER_ID
        )
-SELECT
+SELECT 
         'NTC_UNIQUE_FORMAT_CHK'
        ,'NM_TYPE_COLUMNS'
        ,'NET'
@@ -42366,7 +42390,7 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_DATATYPE
        ,HUOL_MIXED_CASE
        )
-SELECT
+SELECT 
         'DEFAORPBI'
        ,'AST'
        ,'PBI query used in AOR'
@@ -42386,7 +42410,7 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_DATATYPE
        ,HUOL_MIXED_CASE
        )
-SELECT
+SELECT 
         'DEFATTRSET'
        ,'AST'
        ,'Default Attribute Set'
@@ -42406,7 +42430,7 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_DATATYPE
        ,HUOL_MIXED_CASE
        )
-SELECT
+SELECT 
         'DATE_MASK'
        ,'HIG'
        ,'User Date Mask'
@@ -42426,7 +42450,7 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_DATATYPE
        ,HUOL_MIXED_CASE
        )
-SELECT
+SELECT 
         'INTERPATH'
        ,'HIG'
        ,'Interfaces Output File Path'
@@ -42446,7 +42470,7 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_DATATYPE
        ,HUOL_MIXED_CASE
        )
-SELECT
+SELECT 
         'PREFUNITS'
        ,'HIG'
        ,'User preferred units'
@@ -42466,7 +42490,7 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_DATATYPE
        ,HUOL_MIXED_CASE
        )
-SELECT
+SELECT 
         'REPCLIPATH'
        ,'HIG'
        ,'Reports Client Path'
@@ -42486,7 +42510,7 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_DATATYPE
        ,HUOL_MIXED_CASE
        )
-SELECT
+SELECT 
         'REPDEFCMND'
        ,'HIG'
        ,'Reports Default Command'
@@ -42506,7 +42530,7 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_DATATYPE
        ,HUOL_MIXED_CASE
        )
-SELECT
+SELECT 
         'REPPRNNORM'
        ,'HIG'
        ,'Normal Print Command'
@@ -42526,7 +42550,7 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_DATATYPE
        ,HUOL_MIXED_CASE
        )
-SELECT
+SELECT 
         'REPPRNWIDE'
        ,'HIG'
        ,'Wide Print Command'
@@ -42546,7 +42570,7 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_DATATYPE
        ,HUOL_MIXED_CASE
        )
-SELECT
+SELECT 
         'REPSQLPLUS'
        ,'HIG'
        ,'Reports SQL Plus command'
@@ -42566,7 +42590,7 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_DATATYPE
        ,HUOL_MIXED_CASE
        )
-SELECT
+SELECT 
         'REPVEWTOOL'
        ,'HIG'
        ,'Reports Viewing Tool'
@@ -42586,7 +42610,7 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_DATATYPE
        ,HUOL_MIXED_CASE
        )
-SELECT
+SELECT 
         'UTL_DIR'
        ,'HIG'
        ,'UTL_FILE Directory'
@@ -42606,7 +42630,7 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_DATATYPE
        ,HUOL_MIXED_CASE
        )
-SELECT
+SELECT 
         'STARTGIS'
        ,'HIG'
        ,'Auto-start GIS'
@@ -42626,7 +42650,7 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_DATATYPE
        ,HUOL_MIXED_CASE
        )
-SELECT
+SELECT 
         'WEBAPDRAD'
        ,'NET'
        ,'Use Radio Buttons to select'
@@ -42646,7 +42670,7 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_DATATYPE
        ,HUOL_MIXED_CASE
        )
-SELECT
+SELECT 
         'WEBAPDDEP'
        ,'NET'
        ,'Calculate APD dependencies'
@@ -42666,7 +42690,7 @@ INSERT INTO HIG_USER_OPTION_LIST
        ,HUOL_DATATYPE
        ,HUOL_MIXED_CASE
        )
-SELECT
+SELECT 
         'DEFITEMTYP'
        ,'NET'
        ,'Default Reference Item Type'
@@ -42693,7 +42717,7 @@ INSERT INTO NM_CHARACTER_SETS
        (NCS_CODE
        ,NCS_DESCRIPTION
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,'Invalid Characters for DDL' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SETS
@@ -42717,7 +42741,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,32 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42728,7 +42752,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,33 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42739,7 +42763,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,34 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42750,7 +42774,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,35 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42761,7 +42785,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,36 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42772,7 +42796,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,37 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42783,7 +42807,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,38 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42794,7 +42818,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,39 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42805,7 +42829,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,40 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42816,7 +42840,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,41 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42827,7 +42851,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,42 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42838,7 +42862,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,43 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42849,7 +42873,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,44 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42860,7 +42884,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,45 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42871,7 +42895,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,46 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42882,7 +42906,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,47 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42893,7 +42917,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,58 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42904,7 +42928,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,59 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42915,7 +42939,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,60 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42926,7 +42950,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,61 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42937,7 +42961,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,62 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42948,7 +42972,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,63 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42959,7 +42983,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42970,7 +42994,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,91 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42981,7 +43005,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,92 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -42992,7 +43016,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,93 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43003,7 +43027,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,94 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43014,7 +43038,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,96 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43025,7 +43049,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,123 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43036,7 +43060,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,124 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43047,7 +43071,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,125 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43058,7 +43082,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,126 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43069,7 +43093,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,127 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43080,7 +43104,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,128 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43091,7 +43115,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,129 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43102,7 +43126,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,130 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43113,7 +43137,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,131 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43124,7 +43148,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,132 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43135,7 +43159,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,133 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43146,7 +43170,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,134 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43157,7 +43181,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,135 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43168,7 +43192,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,136 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43179,7 +43203,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,137 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43190,7 +43214,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,138 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43201,7 +43225,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,139 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43212,7 +43236,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,140 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43223,7 +43247,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,141 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43234,7 +43258,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,142 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43245,7 +43269,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,143 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43256,7 +43280,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,144 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43267,7 +43291,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,145 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43278,7 +43302,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,146 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43289,7 +43313,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,147 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43300,7 +43324,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,148 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43311,7 +43335,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,149 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43322,7 +43346,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,150 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43333,7 +43357,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,151 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43344,7 +43368,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,152 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43355,7 +43379,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,153 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43366,7 +43390,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,154 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43377,7 +43401,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,155 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43388,7 +43412,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,156 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43399,7 +43423,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,157 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43410,7 +43434,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,158 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43421,7 +43445,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,159 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43432,7 +43456,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,160 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43443,7 +43467,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,161 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43454,7 +43478,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,162 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43465,7 +43489,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,163 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43476,7 +43500,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,164 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43487,7 +43511,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,165 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43498,7 +43522,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,166 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43509,7 +43533,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,167 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43520,7 +43544,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,168 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43531,7 +43555,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,169 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43542,7 +43566,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,170 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43553,7 +43577,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,171 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
@@ -43564,7 +43588,7 @@ INSERT INTO NM_CHARACTER_SET_MEMBERS
        (NCSM_NCS_CODE
        ,NCSM_ASCII_CHARACTER
        )
-SELECT
+SELECT 
         'INVALID_FOR_DDL'
        ,172 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
