@@ -1,20 +1,18 @@
 create or replace type body nm_analytic_chunk_type
 is
+--   PVCS Identifiers :-
 --
------------------------------------------------------------------------------
---
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm_analytic_chunk_type.tyb	1.1 02/01/07
---       Module Name      : nm_analytic_chunk_type.tyb
---       Date into SCCS   : 07/02/01 16:25:56
---       Date fetched Out : 07/06/13 17:04:20
---       SCCS Version     : 1.1
+--       pvcsid           : $Header:$
+--       Module Name      : $Workfile:$
+--       Date into PVCS   : $Date:$
+--       Date fetched Out : $Modtime:$
+--       PVCS Version     : $Revision:$
+--       Based on SCCS version : 1.1
 --
 --   Author : Priidu Tanava
 --
 --   This type supports the custom aggregate function group_chunk_no_seq()
---   The actual processing logic is implemented in package nm3bulk_mrg_analytic
+--   The actual processing logic is implemented in package nm3analytic_connectivity
 --
 -----------------------------------------------------------------------------
 --   Copyright (c) exor corporation ltd, 2006
@@ -25,7 +23,7 @@ return number is
 begin
   sctx := nm_analytic_chunk_type(null);
   --dbms_output.put_line('ODCIAggregateInitialize');
-  nm3bulk_mrg_analytic.chunk_no_init;
+  nm3analytic_connectivity.chunk_no_init;
   return ODCIConst.Success;
 end;
 
@@ -33,7 +31,7 @@ member function ODCIAggregateIterate(self IN OUT nm_analytic_chunk_type, value I
 return number is
   i       binary_integer;
 begin
-  i := nm3bulk_mrg_analytic.chunk_no_iterate(value);
+  i := nm3analytic_connectivity.chunk_no_iterate(value);
   --dbms_output.put_line('ODCIAggregateIterate: '||i||' '||value);
   return ODCIConst.Success;
 end;
@@ -41,7 +39,7 @@ end;
 member function ODCIAggregateTerminate(self IN nm_analytic_chunk_type, returnValue OUT 
 varchar2, flags IN number) return number is
 begin  
-  returnValue := nm3bulk_mrg_analytic.chunk_terminate;
+  returnValue := nm3analytic_connectivity.chunk_terminate;
   --dbms_output.put_line('ODCIAggregateTerminate: '||returnValue);
   return ODCIConst.Success;
 end;
