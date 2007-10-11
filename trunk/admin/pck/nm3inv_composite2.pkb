@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.4   Oct 08 2007 10:39:44   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.5   Oct 11 2007 18:48:20   ptanava  $
 --       Module Name      : $Workfile:   nm3inv_composite2.pkb  $
---       Date into PVCS   : $Date:   Oct 08 2007 10:39:44  $
---       Date fetched Out : $Modtime:   Oct 08 2007 10:25:18  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Oct 11 2007 18:48:20  $
+--       Date fetched Out : $Modtime:   Oct 11 2007 18:39:16  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on sccs version :
 --
 --   Author : Priidu Tanava
@@ -24,9 +24,10 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
                 this package makes no reference to the old code now.
   04.10.07 PT accommodated nm3bulk_mrg changes in handling datum criteria
   08.10.07 PT in call_rebuild() merge results view name is now built from the merge unique.
+  10.10.07 PT cleanup of dead code and variables
 */
 
-  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.4  $"';
+  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.5  $"';
   g_package_name  constant  varchar2(30) := 'nm3inv_composite2';
 
   -- Bulk merge types
@@ -128,9 +129,6 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     ,p_interval in varchar2
   )
   is
-    l_job         binary_integer;
-    l_broken      varchar2(1);
-    l_this_date   date;
     l_len         binary_integer := length(p_what_hint);
     cur           sys_refcursor;
     
@@ -234,6 +232,8 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     when others then
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.set_job_broken('
         ||'p_job='||p_job
+        ||', l_what='||l_what
+        ||', l_errmsg='||l_errmsg
         ||')');
       rollback;
       raise;
@@ -241,7 +241,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
   
   
   
-  -- This builds a hit to the dbms_job WHAT sql
+  -- This builds a hint to the dbms_job WHAT sql
   -- the hint will be the first line in WHAT
   -- the hint can be used to determine if a job is already submitted
   function sql_dbms_job_what_hint(
@@ -278,7 +278,6 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     l_sql   varchar2(32767);
     cr      constant varchar2(1) := chr(10);
     l_effective_date varchar2(40);
-    l_hint  varchar2(100);
     
   begin
     if p_effective_date is null then
@@ -477,6 +476,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
         ||', p_value2='||p_value2
         ||', p_attr3='||p_attr3
         ||', p_value3='||p_value3
+        ||', r_nmnd.nmnd_nmq_id='||r_nmnd.nmnd_nmq_id
+        ||', l_nmq_unique='||l_nmq_unique
+        ||', l_admin_unit_id='||l_admin_unit_id
+        ||', i='||i
+        ||', l_job_failures='||l_job_failures
         ||')');
       if p_dbms_job_no is not null then
         set_job_broken(p_job => p_dbms_job_no);
@@ -515,27 +519,17 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     ,p_ignore_poe in boolean
   )
   is
-    l_mrg_job_id  nm_mrg_query_results_all.nqr_mrg_job_id%type;
-    l_all_routes  boolean := false;
-    l_route_id    id_type;
+    l_mrg_job_id    nm_mrg_query_results_all.nqr_mrg_job_id%type;
     l_nqr_description nm_mrg_query_results_all.nqr_description%type;
-    l_sqlcount    number(8);
-    l_sqlcount2   number(8);
-    t_id          nm_id_tbl := new nm_id_tbl();
-    t_attr        attrib_tbl := pt_unique_attr;
+    l_sqlcount      number(8);
+    l_sqlcount2     number(8);
+    t_attr          attrib_tbl := pt_unique_attr;
     l_effective_date constant date := nm3user.get_effective_date;
-    --
-    t_events      nm3type.tab_varchar32767;
-    l_op_index    pls_integer;
-    l_op_slno     pls_integer;
-    r_longops     nm3sql.longops_rec;
-    i             binary_integer;
-    l_group_type  nm_group_types_all.ngt_group_type%type;
-    l_nt_datum    nm_types.nt_datum%type;
-    cur           sys_refcursor;
+    t_events        nm3type.tab_varchar32767;
+    r_longops       nm3sql.longops_rec;
+    l_group_type    nm_group_types_all.ngt_group_type%type;
     
   begin
-    
     nm3dbg.putln(g_package_name||'.do_rebuild('
       ||'p_op_context='||p_op_context
       ||', p_inv_type='||p_inv_type
@@ -581,7 +575,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     
     
     -- process the unique attributes
-    --  this validates and builds the value sql string
+    --  this validates and builds the value sql string(s)
     process_exclusive_attrs(
        p_inv_type => p_inv_type
       ,pt_attr => t_attr
@@ -594,12 +588,9 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
       nm3user.set_effective_date(p_effective_date);
     end if;
     
-
-
     
-    -- the serializable ensures that we don't have invitem edits between
-    --  the merge query steps
-    -- if we do the transaction fails
+    -- the serializable ensures that we don't see invitem edits between the merge query steps
+    -- note that if there are many edits then the transaction may fail. it should then be retried.
     set transaction isolation level serializable;
     
 
@@ -628,91 +619,40 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
         ,p_sqlcount   => l_sqlcount
       );
   
---       load_gaz_criteria(
---          pt_ne => pt_ne
---         ,pt_nse => pt_nse   
---       );
-      -- make sure we have a coherent driving group type
-      --  this will be null if the p_ngt_group_type is not fully covered by the criteria datums
-      --    and no other single group type fully covers the criteria datums
---       nm3bulk_mrg.process_datums_group_type(
---          p_group_type_in  => p_ngt_group_type
---         ,p_group_type_out => l_group_type
---       );
-      
-      -- assign the route_id if only one route selected.
-      --  this keeps the route connectivity small.
-      -- TODO: the route connectivity should also use an id_tbl instead of one single id
-      --  at the moment the next level is straight all routes of one group type
---       if pt_ne.count = 1 then
---         l_route_id := pt_ne(1);
---       end if;
-      
-      
-    -- 1.3 we have a group type (linear)
+
+    -- 1.2 we have a group type (linear)
     elsif p_ngt_group_type is not null then
---       nm3bulk_mrg.load_group_type_datums(p_ngt_group_type);
---       l_group_type := p_ngt_group_type;
-      
       nm3bulk_mrg.load_group_type_datums(
          p_group_type => p_ngt_group_type
         ,p_sqlcount => l_sqlcount
       );
       
       
-    -- 1.4 we have a network type (linear)
+    -- 1.3 we have a network type (linear)
     elsif p_nt_type is not null then
-      -- the nt_type must be a datum nt_type
---       begin
---         select nt_datum into l_nt_datum
---         from nm_types 
---         where nt_type = p_nt_type
---           and nt_linear = 'Y'
---           and nt_datum = 'Y';
---       exception
---         when no_data_found then
---           raise_application_error(-20001
---             ,'The driving network type must be a linear datum type: '||p_nt_type);
---       end;
-      
+
       -- load datums of the given nt_type
       nm3bulk_mrg.load_nt_type_datums(
          p_group_type => null
         ,p_nt_type => p_nt_type
         ,p_sqlcount => l_sqlcount
       );
+        
+        
+    -- 1.4 no network criteria specified
+    else
+      -- load all datums of datum nt_type
+      nm3bulk_mrg.load_all_network_datums(
+         p_group_type => null
+        ,p_sqlcount => l_sqlcount
+      );
       
---       open cur for
---         select e.ne_id
---         from nm_elements e
---         where e.ne_nt_type = p_nt_type;
---       nm3sql.load_id_tbl(cur);
-        
-        
-        
-      -- 1.5 no network criteria specified
-      else
-        -- load all datums of datum nt_type
-        nm3bulk_mrg.load_all_network_datums(
-           p_group_type => null
-          ,p_sqlcount => l_sqlcount
-        );
-        
---         open cur for
---           select e.ne_id
---           from nm_elements e
---           where e.ne_nt_type in (select nt_type from nm_types
---                                  where nt_datum = 'Y'
---                                    and nt_linear = 'Y');
---         nm3sql.load_id_tbl(cur);
-      
-      end if;
     
+    end if;
     
     
     
     nm3sql.set_longops(p_rec => r_longops, p_increment => 1);
---     t_events(t_events.count+1) := 'Loaded criteria datum count: '||nm3sql.get_id_tbl_count;
     t_events(t_events.count+1) := 'Loaded criteria datum count: '||l_sqlcount;
 
     -- 2,3,4,5. Run the bulk merge query
@@ -726,23 +666,12 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
       ,p_longops_rec    => r_longops
     );
     
---     nm3bulk_mrg.std_run(
---        p_nmq_id         => p_nmq_id
---       ,p_nqr_admin_unit => p_admin_unit_id
---       ,p_nmq_descr      => l_nqr_description
---       ,p_route_id       => l_route_id
---       ,p_group_type     => l_group_type
---       ,p_all_routes     => false
---       ,p_ignore_poe     => p_ignore_poe
---       ,p_mrg_job_id     => l_mrg_job_id
---       ,p_longops_rec    => r_longops
---     );
     commit;
     t_events(t_events.count+1) := 'Merge job committed with id: '||l_mrg_job_id;
     
     
     
-    -- 5. Preprocess engineering dynseg
+    -- 6. Preprocess engineering dynseg
     nm3eng_dynseg_util.populate_tmp_table(
        p_mrg_job_id => l_mrg_job_id
       ,p_inv_type   => p_inv_type
@@ -753,7 +682,8 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     nm3sql.set_longops(p_rec => r_longops, p_increment => 1);
     t_events(t_events.count+1) := 'Preprocessed dynseg records count: '||l_sqlcount;
     
-    -- 6. Popluate the iit temp table
+    
+    -- 7. Popluate the iit temp table
     ins_iit_tmp_values(
        p_inv_type => p_inv_type
       ,p_mrg_view => p_mrg_view
@@ -767,7 +697,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     t_events(t_events.count+1) := 'Loaded temporary invitems count: '||l_sqlcount;
     
     
-    -- 7. Create the composite inv items and placements
+    -- 8. Create the composite inv items and placements
     process_from_iit_tmp(
        p_inv_type       => p_inv_type
       ,p_mrg_job_id     => l_mrg_job_id
@@ -811,11 +741,13 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
         ||', pt_ne.count='||pt_ne.count
         ||', pt_nse.count='||pt_nse.count
         ||', p_ignore_poe='||nm3dbg.to_char(p_ignore_poe)
+        ||', l_mrg_job_id='||l_mrg_job_id
+        ||', l_sqlcount='||l_sqlcount
+        ||', l_sqlcount2='||l_sqlcount2
+        ||', l_effective_date='||l_effective_date
+        ||', l_group_type='||l_group_type
         ||')');
         nm3user.set_effective_date(l_effective_date);
-        if cur%isopen then
-          close cur;
-        end if;
         if p_send_mail then
           t_events(t_events.count+1) := sqlerrm;
           send_mail2(
@@ -868,7 +800,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
   begin
     nm3dbg.putln(g_package_name||'.process_exclusive_attrs('
       ||'p_inv_type='||p_inv_type
-      ||', pt_attr.count='||pt_attr.count
+      ||', pt_attr='||to_string_attrib_tbl(pt_attr)
       ||')');
     nm3dbg.ind;
   
@@ -922,7 +854,10 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     when others then
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.process_exclusive_attrs('
         ||'p_inv_type='||p_inv_type
-        ||', pt_attr.count='||pt_attr.count
+        ||', pt_attr='||to_string_attrib_tbl(pt_attr)
+        ||', l_count='||l_count
+        ||', l_found='||nm3dbg.to_char(l_found)
+        ||', i='||i
         ||')');
       raise;
   
@@ -942,9 +877,8 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     ,p_member_count out pls_integer
   )
   is
-
     type rowid_tbl  is table of rowid index by binary_integer;
-    t_rowid   rowid_tbl;
+    t_rowid         rowid_tbl;
     l_enddate_count pls_integer;
     l_delete_count  pls_integer;
     l_invitem_count pls_integer;
@@ -953,12 +887,10 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     l_sql_where   varchar2(4000);
     i             binary_integer;
 
-    
-
-  -- the main procedure body starts here
   begin
     nm3dbg.putln(g_package_name||'.process_from_iit_tmp('
       ||'p_inv_type='||p_inv_type
+      ||', p_mrg_job_id='||p_mrg_job_id
       ||', pt_attr='||to_string_attrib_tbl(pt_attr)
       ||', p_iit_tmp_cardinality='||p_iit_tmp_cardinality
       ||', p_keep_history='||nm3dbg.to_char(p_keep_history)
@@ -1171,9 +1103,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     when others then
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.process_from_iit_tmp('
         ||'p_inv_type='||p_inv_type
+        ||', p_mrg_job_id='||p_mrg_job_id
         ||', pt_attr='||to_string_attrib_tbl(pt_attr)
         ||', p_iit_tmp_cardinality='||p_iit_tmp_cardinality
         ||', p_keep_history='||nm3dbg.to_char(p_keep_history)
+        ||', i='||i
         ||')');
       raise;
   end;
@@ -1209,6 +1143,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
       ||', p_mrg_view='||p_mrg_view
       ||', p_mrg_view_where='||p_mrg_view_where
       ||', p_effective_date='||p_effective_date
+      ||', pt_attr='||to_string_attrib_tbl(pt_attr)
       ||')');
     nm3dbg.ind;
     
@@ -1272,6 +1207,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     execute immediate l_sql using p_effective_date, p_mrg_job_id;
     p_sqlcount := sql%rowcount;
     
+    -- autonomous
     commit;
     
     nm3dbg.deind;
