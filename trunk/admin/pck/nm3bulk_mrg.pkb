@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.5   Oct 05 2007 14:31:56   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.6   Oct 11 2007 18:47:24   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Oct 05 2007 14:31:56  $
---       Date fetched Out : $Modtime:   Oct 05 2007 14:31:02  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Oct 11 2007 18:47:24  $
+--       Date fetched Out : $Modtime:   Oct 11 2007 18:44:32  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --
 --   Author : Priidu Tanava
@@ -35,8 +35,9 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                 introduced nm_route_connectivity_tmp to separate out the route connectivity results
   05.10.07  PT fixed a bad reference to nm3dynsql2 package. must be nm3dynsql
                 renamed nm_datum_connectivity_tmp to nm_route_connectivity_tmp
+  10.10.07  PT added append hints to temp table inserts (where applicable)
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.5  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.6  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -212,7 +213,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       return cr||p_connector||l_alias||p_where_sql;
     end;
     
-    --pragma autonomous_transaction;  
+    pragma autonomous_transaction;  
     
   begin
     nm3dbg.putln(g_package_name||'.ins_splits('
@@ -470,6 +471,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     
     nm3dbg.putln(l_sql);
     execute immediate l_sql;
+    commit;
 
     p_rowcount_out := sql%rowcount;
     
@@ -481,7 +483,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||', p_effective_date='||p_effective_date
         ||', p_criteria_rowcount='||p_criteria_rowcount
         ||')');
-      --rollback;
+      rollback;
       raise;
     
   end;
@@ -586,12 +588,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           ||''' then '||l_inv_alias||'.'||l_attrib||' end '||pt_attr(i).MRG_ATTRIB;
         i := pt_attr.next(i);
       end loop;
-      --i := p_groups.first;
-      --while i is not null loop
-      --  s := s||cr||'  ,case when t.nm_type = ''G'' and t.nm_obj_type = '''||p_groups(i)
-      --    ||''' then t.nm_ne_id_in end GROUP_'||p_groups(i)||'_ID';
-      --  i := p_groups.next(i);
-      --end loop;
       return s;
       
     end;
@@ -636,7 +632,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       return s;
     end;
     
-    --pragma autonomous_transaction;
+    pragma autonomous_transaction;
 
   -- main procedure body starts here
   begin
@@ -761,10 +757,12 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     
     nm3dbg.putln(l_sql);
     
+    
     -- insert
     execute immediate 
-      'insert /*+ append */ into '||l_table_name
+      'insert /*+ append */ into nm_mrg_datum_homo_chunks_tmp'
       ||cr||l_sql;
+    commit;
       
     p_rowcount_out := sql%rowcount;
       
@@ -772,13 +770,13 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     nm3dbg.deind;
   exception
     when others then
-      nm3dbg.puterr(sqlerrm||'; '||g_package_name||'.ins_datum_homo_chunks('
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.ins_datum_homo_chunks('
         ||'pt_attr.count='||pt_attr.count
         ||', pt_itd.count='||pt_itd.count
         ||', p_inner_join='||nm3flx.boolean_to_char(p_inner_join)
         ||', p_splits_rowcount='||p_splits_rowcount
         ||')');
-      --rollback;
+      rollback;
       raise;
 
   end;
@@ -1007,6 +1005,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     l_sql_conn varchar2(10000);
     l_sqlcount  pls_integer;
     
+    pragma autonomous_transaction;
+    
   begin
     nm3dbg.putln(g_package_name||'.ins_route_connectivity('
       ||'p_criteria_rowcount='||p_criteria_rowcount
@@ -1019,7 +1019,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                     ,p_ignore_poe => p_ignore_poe
                   );
              
-    l_sql_outer := 'insert into nm_route_connectivity_tmp ('
+    l_sql_outer := 'insert /*+ append */ into nm_route_connectivity_tmp ('
        ||cr||'  nm_ne_id_in, chunk_no, chunk_seq, nm_ne_id_of, nm_begin_mp, nm_end_mp'
        ||cr||', measure, end_measure, nm_slk, nm_end_slk, nt_unit_in, nt_unit_of'
        ||cr||')'
@@ -1036,6 +1036,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     
     nm3dbg.putln(l_sql);
     execute immediate l_sql;
+    commit;
     l_sqlcount := sql%rowcount;
     
     nm3dbg.putln('routes insert sqlcount: '||l_sqlcount);
@@ -1076,6 +1077,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
        
     nm3dbg.putln(l_sql);
     execute immediate l_sql;
+    commit;
     l_sqlcount := sql%rowcount;
     nm3dbg.putln('datums insert sqlcount: '||l_sqlcount);
     
@@ -1087,6 +1089,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||'p_criteria_rowcount='||p_criteria_rowcount
         ||', p_ignore_poe='||nm3flx.boolean_to_char(p_ignore_poe)
         ||')');
+      rollback;
       raise;
     
   end;
@@ -1340,6 +1343,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         insert into nm_mrg_sections_all values t_sect(i);
       forall i in 1 .. t_memb.count
         insert into nm_mrg_section_members values t_memb(i);
+      
       
       -- insert all invitems
       std_insert_invitems(
@@ -1673,6 +1677,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     
     -- 1. insert into the temp table
     --      nm_mrg_section_inv_values_tmp is temporary table with on commit delete rows
+    --      don't use append hint here as the table does not preserve rows
     l_sql := 
           'insert into nm_mrg_section_inv_values_tmp('
     ||cr||'  nsi_mrg_section_id, nsv_mrg_job_id, nsv_value_id, nsv_inv_type, nsv_x_sect, nsv_pnt_or_cont'
@@ -1788,6 +1793,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   is
     l_sql varchar2(10000);
     l_group_type nm_group_types.ngt_group_type%type;
+    pragma autonomous_transaction;
     
   begin
     nm3dbg.putln(g_package_name||'.load_group_datums('
@@ -1838,6 +1844,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     using
        l_group_type
       ,p_group_id;
+    commit;
     
     p_sqlcount := sql%rowcount;
     nm3dbg.deind;
@@ -1848,6 +1855,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||'p_group_id='||p_group_id
         ||', l_group_type='||l_group_type
         ||')');
+      rollback;
       raise;
   end;
   
@@ -1870,6 +1878,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           ||cr||'    group by d.nsd_ne_id' 
       );
     l_group_type nm_group_types.ngt_group_type%type;
+    pragma autonomous_transaction;
     
   begin
     nm3dbg.putln(g_package_name||'.load_extent_datums('
@@ -1890,6 +1899,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     using
        l_group_type
       ,p_nse_id;
+    commit;
     
     p_sqlcount := sql%rowcount;
     nm3dbg.deind;
@@ -1899,6 +1909,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||'p_nse_id='||p_nse_id
         ||', l_group_type='||l_group_type
         ||')');
+      rollback;
       raise;
   
   end;
@@ -1920,6 +1931,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           ||cr||'    group by nm_ne_id_of' 
       );
     l_group_type nm_group_types.ngt_group_type%type;
+    pragma autonomous_transaction;
       
   begin
     nm3dbg.putln(g_package_name||'.load_group_type_datums('
@@ -1941,6 +1953,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     using
        l_group_type
       ,p_group_type;
+    commit;
     
     p_sqlcount := sql%rowcount;
     nm3dbg.deind;
@@ -1950,6 +1963,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||'p_group_type='||p_group_type
         ||', l_group_type='||l_group_type
         ||')');
+      rollback;
       raise;
   end;
   
@@ -1975,6 +1989,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           ||cr||'        and nt_type = :l_nt_type'
           ||cr||'    )'
       );
+    pragma autonomous_transaction;
+    
   begin
     nm3dbg.putln(g_package_name||'.load_nt_type_datums('
       ||'p_group_type='||p_group_type
@@ -2006,6 +2022,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     using
        l_group_type
       ,l_nt_type;
+    commit;
       
     p_sqlcount := sql%rowcount;
     nm3dbg.deind;
@@ -2016,6 +2033,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||', p_nt_type='||p_nt_type
         ||', l_group_type='||l_group_type
         ||')');
+      rollback;
       raise;
   end;
   
@@ -2037,6 +2055,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           ||cr||'        and nt_linear = ''Y'''
           ||cr||'    )'
       );
+    pragma autonomous_transaction;
 
   begin
     nm3dbg.putln(g_package_name||'.load_all_network_datums('
@@ -2050,6 +2069,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     execute immediate l_sql
     using 
        p_group_type;
+    commit;
        
     p_sqlcount := sql%rowcount;
     nm3dbg.deind;
@@ -2058,6 +2078,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_all_network_datums('
         ||'p_group_type='||p_group_type
         ||')');
+      rollback;
       raise;
   end;
   
@@ -2077,6 +2098,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     l_sql         varchar2(10000);
     l_union_all   varchar2(20);
     l_union_count pls_integer := 0;
+    pragma autonomous_transaction;
     
   begin
     nm3dbg.putln(g_package_name||'.load_gaz_list_datums('
@@ -2184,7 +2206,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     execute immediate l_sql
     using 
        p_group_type;
-       
+    commit;
+    
     p_sqlcount := sql%rowcount;
       
   exception
@@ -2194,6 +2217,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||', pt_ne.count='||pt_ne.count
         ||', pt_nse.count='||pt_nse.count
         ||')');
+      rollback;
       raise;
     
   end;
@@ -2405,7 +2429,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   is
   begin
     return
-            'insert into nm_datum_criteria_tmp ('
+            'insert /*+ append */ into nm_datum_criteria_tmp ('
       ||cr||'  datum_id, begin_mp, end_mp, group_id'
       ||cr||')'
       ||cr||'select'
