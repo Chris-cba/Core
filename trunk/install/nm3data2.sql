@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.7   Sep 24 2007 15:24:38   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.8   Oct 11 2007 18:16:46   ptanava  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Sep 24 2007 15:24:38  $
---       Date fetched Out : $Modtime:   Sep 24 2007 14:53:08  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Oct 11 2007 18:16:46  $
+--       Date fetched Out : $Modtime:   Oct 11 2007 18:13:28  $
+--       Version          : $Revision:   2.8  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-24-SEP-2007 14:52
+11-OCT-2007 18:13
 
 TABLES PROCESSED
 ================
@@ -81322,13 +81322,30 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'AST_REF'
-       ,'NM0420'
+       ,'NM0430'
        ,'Derived Asset Setup'
        ,'M'
        ,9 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'AST_REF'
-                    AND  HSTF_CHILD = 'NM0420');
+                    AND  HSTF_CHILD = 'NM0430');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'AST_REF'
+       ,'NM0435'
+       ,'Create Derived Assets'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'AST_REF'
+                    AND  HSTF_CHILD = 'NM0435');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -89295,13 +89312,13 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'NET_QUERIES'
-       ,'NM7051'
+       ,'NM7051B'
        ,'Merge Query Results'
        ,'M'
        ,6 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'NET_QUERIES'
-                    AND  HSTF_CHILD = 'NM7051');
+                    AND  HSTF_CHILD = 'NM7051B');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -89574,6 +89591,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'NSG_DATA'
                     AND  HSTF_CHILD = 'NSG0090');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NSG_DATA'
+       ,'NSG0110'
+       ,'Organisations and Districts'
+       ,'M'
+       ,25 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NSG_DATA'
+                    AND  HSTF_CHILD = 'NSG0110');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
