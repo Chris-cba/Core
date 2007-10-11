@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.3   Oct 08 2007 10:41:28   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.4   Oct 11 2007 18:49:02   ptanava  $
 --       Module Name      : $Workfile:   nm3eng_dynseg_util.pkb  $
---       Date into PVCS   : $Date:   Oct 08 2007 10:41:28  $
---       Date fetched Out : $Modtime:   Oct 08 2007 10:37:32  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Oct 11 2007 18:49:02  $
+--       Date fetched Out : $Modtime:   Oct 11 2007 10:13:42  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --   Author : Priidu Tanava
 --
@@ -23,10 +23,12 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
   05.10.07 PT in sql_get_value() added invisible call error flag so that the error is logged only once
               in populate_tmp_table() fixed the crashing when no dynseg calls in the asset setup
   08.10.07 PT in populate_tmp_table() added autonomous commit to ensure pk creation
+  10.10.07 PT added append hint to temp table inserts
+  11.10.07 PT fixed an upper-lower case problem in get_calls_tbl()
 */
 
 
-  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
+  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg_util';
   
   cr            constant varchar2(1) := chr(10);
@@ -221,7 +223,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     loop
       
       loop
-        i_start := nvl(instr(r.nmid_derivation, l_dynseg, i_start + 1), 0);
+        i_start := nvl(instr(lower(r.nmid_derivation), l_dynseg, i_start + 1), 0);
         exit when i_start = 0;
         
         i_right_br  := instr(r.nmid_derivation, ')', i_start);
@@ -468,7 +470,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 
     
     l_sql := 
-          'insert into nm_eng_dynseg_values_tmp ('
+          'insert /*+ append */ into nm_eng_dynseg_values_tmp ('
     ||cr||'  grp_operation, grp_section_id, grp_inv_type, grp_xsp, grp_value_column, grp_value'
     ||cr||sql_all_iit_attrib_list(p_inv_type)
     ||cr||')'
@@ -479,7 +481,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     execute immediate l_sql
       using p_mrg_job_id;
     
-    -- the commit here enssures that the pk index on the temp table is created
+    -- autonomous commit needed with append hint, the pk is also only created with commit
     commit;
     
     p_sqlcount := sql%rowcount;
