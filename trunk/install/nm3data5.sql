@@ -1,12 +1,30 @@
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data5.sql-arc   2.1   Oct 16 2007 16:57:26   malexander  $
+--       Module Name      : $Workfile:   nm3data5.sql  $
+--       Date into PVCS   : $Date:   Oct 16 2007 16:57:26  $
+--       Date fetched Out : $Modtime:   Oct 16 2007 16:50:40  $
+--       Version          : $Revision:   2.1  $
+--
+--   Product metadata script
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2007
+-----------------------------------------------------------------------------
+--
+--
 /***************************************************************************
 
 INFO
 ====
-As at Release 4.0
+As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-18-JAN-2007 16:55
+16-OCT-2007 16:50
 
 TABLES PROCESSED
 ================
@@ -26,7 +44,7 @@ NM_UPLOAD_FILE_GATEWAY_COLS
 
 TABLE OWNER
 ===========
-NM3DATA
+NM3_METADATA
 
 MODE (A-Append R-Refresh)
 ========================
@@ -34,7 +52,6 @@ A
 
 ***************************************************************************/
 
-define sccsid = '@(#)nm3data5.sql	1.27 01/18/07'
 set define off;
 set feedback off;
 
@@ -44,6 +61,9 @@ set feedback off;
 
 --
 --********** DOC_CLASS **********--
+SET TERM ON
+PROMPT doc_class
+SET TERM OFF
 --
 -- Columns
 -- DCL_CODE                       NOT NULL VARCHAR2(4)
@@ -54,9 +74,9 @@ set feedback off;
 -- DCL_START_DATE                          DATE
 -- DCL_END_DATE                            DATE
 -- DCL_DTP_CODE                   NOT NULL VARCHAR2(4)
---   DCL_FK_DTP (Pos 1)
 --   DCL_PK (Pos 1)
 --   DCL_UK1 (Pos 1)
+--   DCL_FK_DTP (Pos 1)
 --
 --
 INSERT INTO DOC_CLASS
@@ -384,6 +404,9 @@ SELECT
 --
 --
 --********** DOC_MEDIA **********--
+SET TERM ON
+PROMPT doc_media
+SET TERM OFF
 --
 -- Columns
 -- DMD_ID                         NOT NULL NUMBER(9)
@@ -455,22 +478,22 @@ INSERT INTO DOC_MEDIA
        ,DMD_ICON
        )
 SELECT 
-        2
-       ,'WORD_DOCUMENTS'
-       ,'Microsoft word docs'
-       ,'d:\Program Files\Microsoft Office\Office\winword'
-       ,''
-       ,'winword'
+        1
+       ,'MORE'
+       ,'Display ASCII files'
+       ,'more'
        ,''
        ,''
        ,''
        ,''
-       ,'DOC'
+       ,''
+       ,''
+       ,''
        ,null
        ,null
-       ,'doc_icon.gif' FROM DUAL
+       ,'txt_icon.gif' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM DOC_MEDIA
-                   WHERE DMD_ID = 2);
+                   WHERE DMD_ID = 1);
 --
 INSERT INTO DOC_MEDIA
        (DMD_ID
@@ -489,25 +512,28 @@ INSERT INTO DOC_MEDIA
        ,DMD_ICON
        )
 SELECT 
-        999999999
-       ,'MORE'
-       ,'Display ASCII files'
-       ,'more'
+        2
+       ,'WORD_DOCUMENTS'
+       ,'Microsoft word docs'
+       ,'d:\Program Files\Microsoft Office\Office\winword'
+       ,''
+       ,'winword'
        ,''
        ,''
        ,''
        ,''
-       ,''
-       ,''
-       ,''
+       ,'DOC'
        ,null
        ,null
-       ,'txt_icon.gif' FROM DUAL
+       ,'doc_icon.gif' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM DOC_MEDIA
-                   WHERE DMD_ID = 999999999);
+                   WHERE DMD_ID = 2);
 --
 --
 --********** DOC_LOCATIONS **********--
+SET TERM ON
+PROMPT doc_locations
+SET TERM OFF
 --
 -- Columns
 -- DLC_ID                         NOT NULL NUMBER(9)
@@ -550,6 +576,9 @@ SELECT
 --
 --
 --********** DOC_TEMPLATE_GATEWAYS **********--
+SET TERM ON
+PROMPT doc_template_gateways
+SET TERM OFF
 --
 -- Columns
 -- DTG_DMD_ID                     NOT NULL NUMBER(9)
@@ -627,11 +656,14 @@ SELECT
 --
 --
 --********** DOC_TEMPLATE_COLUMNS **********--
+SET TERM ON
+PROMPT doc_template_columns
+SET TERM OFF
 --
 -- Columns
 -- DTC_TEMPLATE_NAME              NOT NULL VARCHAR2(30)
---   DTC_FK_DTG (Pos 1)
 --   DTC_PK (Pos 1)
+--   DTC_FK_DTG (Pos 1)
 -- DTC_COL_NAME                   NOT NULL VARCHAR2(250)
 -- DTC_COL_TYPE                   NOT NULL VARCHAR2(9)
 -- DTC_COL_ALIAS                  NOT NULL VARCHAR2(30)
@@ -17572,17 +17604,20 @@ SELECT
 --
 --
 --********** DOC_ENQUIRY_TYPES **********--
+SET TERM ON
+PROMPT doc_enquiry_types
+SET TERM OFF
 --
 -- Columns
 -- DET_DTP_CODE                   NOT NULL VARCHAR2(4)
---   DET_FK_DCL (Pos 1)
---   DET_FK_DTP (Pos 1)
 --   DET_PK (Pos 1)
 --   DET_UNQ (Pos 1)
+--   DET_FK_DTP (Pos 1)
+--   DET_FK_DCL (Pos 1)
 -- DET_DCL_CODE                   NOT NULL VARCHAR2(4)
---   DET_FK_DCL (Pos 2)
 --   DET_PK (Pos 2)
 --   DET_UNQ (Pos 2)
+--   DET_FK_DCL (Pos 2)
 -- DET_CODE                       NOT NULL VARCHAR2(4)
 --   DET_PK (Pos 3)
 --   DET_UNQ (Pos 3)
@@ -17596,6 +17631,9 @@ SELECT
 --
 --
 --********** HIG_USERS **********--
+SET TERM ON
+PROMPT hig_users
+SET TERM OFF
 --
 -- Columns
 -- HUS_USER_ID                    NOT NULL NUMBER(9)
@@ -17660,16 +17698,19 @@ SELECT
 --
 --
 --********** HIG_USER_FAVOURITES **********--
+SET TERM ON
+PROMPT hig_user_favourites
+SET TERM OFF
 --
 -- Columns
 -- HUF_USER_ID                    NOT NULL NUMBER(38)
 --   HUF_PK (Pos 1)
 -- HUF_PARENT                     NOT NULL VARCHAR2(30)
---   HUF_CONNECT_LOOP_CHK
 --   HUF_PK (Pos 2)
--- HUF_CHILD                      NOT NULL VARCHAR2(30)
 --   HUF_CONNECT_LOOP_CHK
+-- HUF_CHILD                      NOT NULL VARCHAR2(30)
 --   HUF_PK (Pos 3)
+--   HUF_CONNECT_LOOP_CHK
 -- HUF_DESCR                      NOT NULL VARCHAR2(80)
 -- HUF_TYPE                       NOT NULL VARCHAR2(1)
 --   AVCON_5327_HUF_T_000
@@ -17695,17 +17736,20 @@ SELECT
 --
 --
 --********** HIG_SYSTEM_FAVOURITES **********--
+SET TERM ON
+PROMPT hig_system_favourites
+SET TERM OFF
 --
 -- Columns
 -- HSF_USER_ID                    NOT NULL NUMBER(9)
---   HSF_HUS_FK (Pos 1)
 --   HSF_PK (Pos 1)
+--   HSF_HUS_FK (Pos 1)
 -- HSF_PARENT                     NOT NULL VARCHAR2(30)
---   HSF_CONNECT_LOOP_CHK
 --   HSF_PK (Pos 2)
--- HSF_CHILD                      NOT NULL VARCHAR2(30)
 --   HSF_CONNECT_LOOP_CHK
+-- HSF_CHILD                      NOT NULL VARCHAR2(30)
 --   HSF_PK (Pos 3)
+--   HSF_CONNECT_LOOP_CHK
 -- HSF_DESCR                      NOT NULL VARCHAR2(80)
 -- HSF_TYPE                       NOT NULL VARCHAR2(1)
 --
@@ -17730,6 +17774,9 @@ SELECT
 --
 --
 --********** NM_LOAD_DESTINATIONS **********--
+SET TERM ON
+PROMPT nm_load_destinations
+SET TERM OFF
 --
 -- Columns
 -- NLD_ID                         NOT NULL NUMBER(9)
@@ -17752,13 +17799,13 @@ INSERT INTO NM_LOAD_DESTINATIONS
        ,NLD_VALIDATION_PROC
        )
 SELECT 
-        47
-       ,'NM_INV_ITEMS'
-       ,'IIT'
-       ,'NM3INS.INS_IIT_ALL'
-       ,'NM3INV.VALIDATE_REC_IIT' FROM DUAL
+        4
+       ,'NM_LD_MC_ALL_INV_TMP'
+       ,'MIT'
+       ,'NM3MAPCAPTURE_INS_INV.INS_INV'
+       ,'' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
-                   WHERE NLD_ID = 47);
+                   WHERE NLD_ID = 4);
 --
 INSERT INTO NM_LOAD_DESTINATIONS
        (NLD_ID
@@ -17791,6 +17838,134 @@ SELECT
        ,'' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
                    WHERE NLD_ID = 35);
+--
+INSERT INTO NM_LOAD_DESTINATIONS
+       (NLD_ID
+       ,NLD_TABLE_NAME
+       ,NLD_TABLE_SHORT_NAME
+       ,NLD_INSERT_PROC
+       ,NLD_VALIDATION_PROC
+       )
+SELECT 
+        44
+       ,'V_LOAD_POINT_INV_MEM_ON_ELE'
+       ,'LIPE'
+       ,'nm3inv_load.load_point_on_ele'
+       ,'nm3inv_load.validate_point_on_ele' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
+                   WHERE NLD_ID = 44);
+--
+INSERT INTO NM_LOAD_DESTINATIONS
+       (NLD_ID
+       ,NLD_TABLE_NAME
+       ,NLD_TABLE_SHORT_NAME
+       ,NLD_INSERT_PROC
+       ,NLD_VALIDATION_PROC
+       )
+SELECT 
+        47
+       ,'NM_INV_ITEMS'
+       ,'IIT'
+       ,'NM3INS.INS_IIT_ALL'
+       ,'NM3INV.VALIDATE_REC_IIT' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
+                   WHERE NLD_ID = 47);
+--
+INSERT INTO NM_LOAD_DESTINATIONS
+       (NLD_ID
+       ,NLD_TABLE_NAME
+       ,NLD_TABLE_SHORT_NAME
+       ,NLD_INSERT_PROC
+       ,NLD_VALIDATION_PROC
+       )
+SELECT 
+        64
+       ,'V_LOAD_RESIZE_ROUTE'
+       ,'V_RSZ'
+       ,'NM3NET_LOAD.RESIZE_ROUTE'
+       ,'NM3NET_LOAD.VALIDATE_RESIZE_ROUTE' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
+                   WHERE NLD_ID = 64);
+--
+INSERT INTO NM_LOAD_DESTINATIONS
+       (NLD_ID
+       ,NLD_TABLE_NAME
+       ,NLD_TABLE_SHORT_NAME
+       ,NLD_INSERT_PROC
+       ,NLD_VALIDATION_PROC
+       )
+SELECT 
+        84
+       ,'V_LOAD_LOCATE_INV_BY_REF'
+       ,'LIBR'
+       ,'nm3mp_ref.locate_asset'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
+                   WHERE NLD_ID = 84);
+--
+INSERT INTO NM_LOAD_DESTINATIONS
+       (NLD_ID
+       ,NLD_TABLE_NAME
+       ,NLD_TABLE_SHORT_NAME
+       ,NLD_INSERT_PROC
+       ,NLD_VALIDATION_PROC
+       )
+SELECT 
+        104
+       ,'NM_NW_AD_LINK_ALL'
+       ,'NWAD'
+       ,' NM3NWAD.INS_NADL'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
+                   WHERE NLD_ID = 104);
+--
+INSERT INTO NM_LOAD_DESTINATIONS
+       (NLD_ID
+       ,NLD_TABLE_NAME
+       ,NLD_TABLE_SHORT_NAME
+       ,NLD_INSERT_PROC
+       ,NLD_VALIDATION_PROC
+       )
+SELECT 
+        501
+       ,'V_LOAD_RESCALE_ROUTE'
+       ,'V_RSC'
+       ,'NM3NET_LOAD.RESCALE_ROUTE'
+       ,'NM3NET_LOAD.VALIDATE_RESCALE_ROUTE' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
+                   WHERE NLD_ID = 501);
+--
+INSERT INTO NM_LOAD_DESTINATIONS
+       (NLD_ID
+       ,NLD_TABLE_NAME
+       ,NLD_TABLE_SHORT_NAME
+       ,NLD_INSERT_PROC
+       ,NLD_VALIDATION_PROC
+       )
+SELECT 
+        502
+       ,'V_LOAD_RESEQ_ROUTE'
+       ,'V_RSQ'
+       ,'NM3NET_LOAD.RESEQ_ROUTE'
+       ,'NM3NET_LOAD.VALIDATE_RESEQ_ROUTE' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
+                   WHERE NLD_ID = 502);
+--
+INSERT INTO NM_LOAD_DESTINATIONS
+       (NLD_ID
+       ,NLD_TABLE_NAME
+       ,NLD_TABLE_SHORT_NAME
+       ,NLD_INSERT_PROC
+       ,NLD_VALIDATION_PROC
+       )
+SELECT 
+        503
+       ,'V_LOAD_DISTANCE_BREAK'
+       ,'V_DB'
+       ,'NM3NET_LOAD.CREATE_DISTANCE_BREAK'
+       ,'NM3NET_LOAD.VALIDATE_DISTANCE_BREAK' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
+                   WHERE NLD_ID = 503);
 --
 INSERT INTO NM_LOAD_DESTINATIONS
        (NLD_ID
@@ -20304,146 +20479,99 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
                    WHERE NLD_ID = 1174);
 --
-INSERT INTO NM_LOAD_DESTINATIONS
-       (NLD_ID
-       ,NLD_TABLE_NAME
-       ,NLD_TABLE_SHORT_NAME
-       ,NLD_INSERT_PROC
-       ,NLD_VALIDATION_PROC
-       )
-SELECT 
-        501
-       ,'V_LOAD_RESCALE_ROUTE'
-       ,'V_RSC'
-       ,'NM3NET_LOAD.RESCALE_ROUTE'
-       ,'NM3NET_LOAD.VALIDATE_RESCALE_ROUTE' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
-                   WHERE NLD_ID = 501);
---
-INSERT INTO NM_LOAD_DESTINATIONS
-       (NLD_ID
-       ,NLD_TABLE_NAME
-       ,NLD_TABLE_SHORT_NAME
-       ,NLD_INSERT_PROC
-       ,NLD_VALIDATION_PROC
-       )
-SELECT 
-        502
-       ,'V_LOAD_RESEQ_ROUTE'
-       ,'V_RSQ'
-       ,'NM3NET_LOAD.RESEQ_ROUTE'
-       ,'NM3NET_LOAD.VALIDATE_RESEQ_ROUTE' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
-                   WHERE NLD_ID = 502);
---
-INSERT INTO NM_LOAD_DESTINATIONS
-       (NLD_ID
-       ,NLD_TABLE_NAME
-       ,NLD_TABLE_SHORT_NAME
-       ,NLD_INSERT_PROC
-       ,NLD_VALIDATION_PROC
-       )
-SELECT 
-        503
-       ,'V_LOAD_DISTANCE_BREAK'
-       ,'V_DB'
-       ,'NM3NET_LOAD.CREATE_DISTANCE_BREAK'
-       ,'NM3NET_LOAD.VALIDATE_DISTANCE_BREAK' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
-                   WHERE NLD_ID = 503);
---
-INSERT INTO NM_LOAD_DESTINATIONS
-       (NLD_ID
-       ,NLD_TABLE_NAME
-       ,NLD_TABLE_SHORT_NAME
-       ,NLD_INSERT_PROC
-       ,NLD_VALIDATION_PROC
-       )
-SELECT 
-        4
-       ,'NM_LD_MC_ALL_INV_TMP'
-       ,'MIT'
-       ,'NM3MAPCAPTURE_INS_INV.INS_INV'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
-                   WHERE NLD_ID = 4);
---
-INSERT INTO NM_LOAD_DESTINATIONS
-       (NLD_ID
-       ,NLD_TABLE_NAME
-       ,NLD_TABLE_SHORT_NAME
-       ,NLD_INSERT_PROC
-       ,NLD_VALIDATION_PROC
-       )
-SELECT 
-        44
-       ,'V_LOAD_POINT_INV_MEM_ON_ELE'
-       ,'LIPE'
-       ,'nm3inv_load.load_point_on_ele'
-       ,'nm3inv_load.validate_point_on_ele' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
-                   WHERE NLD_ID = 44);
---
-INSERT INTO NM_LOAD_DESTINATIONS
-       (NLD_ID
-       ,NLD_TABLE_NAME
-       ,NLD_TABLE_SHORT_NAME
-       ,NLD_INSERT_PROC
-       ,NLD_VALIDATION_PROC
-       )
-SELECT 
-        64
-       ,'V_LOAD_RESIZE_ROUTE'
-       ,'V_RSZ'
-       ,'NM3NET_LOAD.RESIZE_ROUTE'
-       ,'NM3NET_LOAD.VALIDATE_RESIZE_ROUTE' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
-                   WHERE NLD_ID = 64);
---
-INSERT INTO NM_LOAD_DESTINATIONS
-       (NLD_ID
-       ,NLD_TABLE_NAME
-       ,NLD_TABLE_SHORT_NAME
-       ,NLD_INSERT_PROC
-       ,NLD_VALIDATION_PROC
-       )
-SELECT 
-        84
-       ,'V_LOAD_LOCATE_INV_BY_REF'
-       ,'LIBR'
-       ,'nm3mp_ref.locate_asset'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
-                   WHERE NLD_ID = 84);
---
-INSERT INTO NM_LOAD_DESTINATIONS
-       (NLD_ID
-       ,NLD_TABLE_NAME
-       ,NLD_TABLE_SHORT_NAME
-       ,NLD_INSERT_PROC
-       ,NLD_VALIDATION_PROC
-       )
-SELECT 
-        104
-       ,'NM_NW_AD_LINK_ALL'
-       ,'NWAD'
-       ,' NM3NWAD.INS_NADL'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATIONS
-                   WHERE NLD_ID = 104);
---
 --
 --********** NM_LOAD_DESTINATION_DEFAULTS **********--
+SET TERM ON
+PROMPT nm_load_destination_defaults
+SET TERM OFF
 --
 -- Columns
 -- NLDD_NLD_ID                    NOT NULL NUMBER(9)
---   NLDD_NLD_FK (Pos 1)
 --   NLDD_PK (Pos 1)
+--   NLDD_NLD_FK (Pos 1)
 -- NLDD_COLUMN_NAME               NOT NULL VARCHAR2(30)
 --   NLDD_COLUMN_NAME_CHK
 --   NLDD_PK (Pos 2)
 -- NLDD_VALUE                     NOT NULL VARCHAR2(100)
 --
+--
+INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
+       (NLDD_NLD_ID
+       ,NLDD_COLUMN_NAME
+       ,NLDD_VALUE
+       )
+SELECT 
+        34
+       ,'NO_NODE_ID'
+       ,'no_.no_node_name' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
+                   WHERE NLDD_NLD_ID = 34
+                    AND  NLDD_COLUMN_NAME = 'NO_NODE_ID');
+--
+INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
+       (NLDD_NLD_ID
+       ,NLDD_COLUMN_NAME
+       ,NLDD_VALUE
+       )
+SELECT 
+        34
+       ,'NO_NODE_TYPE'
+       ,'''ROAD''' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
+                   WHERE NLDD_NLD_ID = 34
+                    AND  NLDD_COLUMN_NAME = 'NO_NODE_TYPE');
+--
+INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
+       (NLDD_NLD_ID
+       ,NLDD_COLUMN_NAME
+       ,NLDD_VALUE
+       )
+SELECT 
+        34
+       ,'NO_NP_ID'
+       ,'np.np_id' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
+                   WHERE NLDD_NLD_ID = 34
+                    AND  NLDD_COLUMN_NAME = 'NO_NP_ID');
+--
+INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
+       (NLDD_NLD_ID
+       ,NLDD_COLUMN_NAME
+       ,NLDD_VALUE
+       )
+SELECT 
+        35
+       ,'NP_DESCR'
+       ,'''Migrated Point''' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
+                   WHERE NLDD_NLD_ID = 35
+                    AND  NLDD_COLUMN_NAME = 'NP_DESCR');
+--
+INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
+       (NLDD_NLD_ID
+       ,NLDD_COLUMN_NAME
+       ,NLDD_VALUE
+       )
+SELECT 
+        35
+       ,'NP_ID'
+       ,'nm3seq.next_np_id_seq' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
+                   WHERE NLDD_NLD_ID = 35
+                    AND  NLDD_COLUMN_NAME = 'NP_ID');
+--
+INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
+       (NLDD_NLD_ID
+       ,NLDD_COLUMN_NAME
+       ,NLDD_VALUE
+       )
+SELECT 
+        44
+       ,'IIT_NE_ID'
+       ,'IIT.IIT_NE_ID' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
+                   WHERE NLDD_NLD_ID = 44
+                    AND  NLDD_COLUMN_NAME = 'IIT_NE_ID');
 --
 INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
        (NLDD_NLD_ID
@@ -20457,6 +20585,97 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
                    WHERE NLDD_NLD_ID = 47
                     AND  NLDD_COLUMN_NAME = 'IIT_NE_ID');
+--
+INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
+       (NLDD_NLD_ID
+       ,NLDD_COLUMN_NAME
+       ,NLDD_VALUE
+       )
+SELECT 
+        104
+       ,'NAD_END_DATE'
+       ,'ne.ne_end_date' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
+                   WHERE NLDD_NLD_ID = 104
+                    AND  NLDD_COLUMN_NAME = 'NAD_END_DATE');
+--
+INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
+       (NLDD_NLD_ID
+       ,NLDD_COLUMN_NAME
+       ,NLDD_VALUE
+       )
+SELECT 
+        104
+       ,'NAD_GTY_TYPE'
+       ,'ne.ne_gty_group_type' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
+                   WHERE NLDD_NLD_ID = 104
+                    AND  NLDD_COLUMN_NAME = 'NAD_GTY_TYPE');
+--
+INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
+       (NLDD_NLD_ID
+       ,NLDD_COLUMN_NAME
+       ,NLDD_VALUE
+       )
+SELECT 
+        104
+       ,'NAD_IIT_NE_ID'
+       ,'iit.iit_ne_id' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
+                   WHERE NLDD_NLD_ID = 104
+                    AND  NLDD_COLUMN_NAME = 'NAD_IIT_NE_ID');
+--
+INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
+       (NLDD_NLD_ID
+       ,NLDD_COLUMN_NAME
+       ,NLDD_VALUE
+       )
+SELECT 
+        104
+       ,'NAD_INV_TYPE'
+       ,'iit.iit_inv_type' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
+                   WHERE NLDD_NLD_ID = 104
+                    AND  NLDD_COLUMN_NAME = 'NAD_INV_TYPE');
+--
+INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
+       (NLDD_NLD_ID
+       ,NLDD_COLUMN_NAME
+       ,NLDD_VALUE
+       )
+SELECT 
+        104
+       ,'NAD_NE_ID'
+       ,'ne.ne_id' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
+                   WHERE NLDD_NLD_ID = 104
+                    AND  NLDD_COLUMN_NAME = 'NAD_NE_ID');
+--
+INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
+       (NLDD_NLD_ID
+       ,NLDD_COLUMN_NAME
+       ,NLDD_VALUE
+       )
+SELECT 
+        104
+       ,'NAD_NT_TYPE'
+       ,'ne.ne_nt_type' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
+                   WHERE NLDD_NLD_ID = 104
+                    AND  NLDD_COLUMN_NAME = 'NAD_NT_TYPE');
+--
+INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
+       (NLDD_NLD_ID
+       ,NLDD_COLUMN_NAME
+       ,NLDD_VALUE
+       )
+SELECT 
+        104
+       ,'NAD_START_DATE'
+       ,'ne.ne_start_Date' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
+                   WHERE NLDD_NLD_ID = 104
+                    AND  NLDD_COLUMN_NAME = 'NAD_START_DATE');
 --
 INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
        (NLDD_NLD_ID
@@ -20535,71 +20754,6 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
                    WHERE NLDD_NLD_ID = 1021
                     AND  NLDD_COLUMN_NAME = 'DQ_ID');
---
-INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
-       (NLDD_NLD_ID
-       ,NLDD_COLUMN_NAME
-       ,NLDD_VALUE
-       )
-SELECT 
-        34
-       ,'NO_NODE_ID'
-       ,'no_.no_node_name' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
-                   WHERE NLDD_NLD_ID = 34
-                    AND  NLDD_COLUMN_NAME = 'NO_NODE_ID');
---
-INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
-       (NLDD_NLD_ID
-       ,NLDD_COLUMN_NAME
-       ,NLDD_VALUE
-       )
-SELECT 
-        34
-       ,'NO_NODE_TYPE'
-       ,'''ROAD''' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
-                   WHERE NLDD_NLD_ID = 34
-                    AND  NLDD_COLUMN_NAME = 'NO_NODE_TYPE');
---
-INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
-       (NLDD_NLD_ID
-       ,NLDD_COLUMN_NAME
-       ,NLDD_VALUE
-       )
-SELECT 
-        34
-       ,'NO_NP_ID'
-       ,'np.np_id' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
-                   WHERE NLDD_NLD_ID = 34
-                    AND  NLDD_COLUMN_NAME = 'NO_NP_ID');
---
-INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
-       (NLDD_NLD_ID
-       ,NLDD_COLUMN_NAME
-       ,NLDD_VALUE
-       )
-SELECT 
-        35
-       ,'NP_DESCR'
-       ,'''Migrated Point''' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
-                   WHERE NLDD_NLD_ID = 35
-                    AND  NLDD_COLUMN_NAME = 'NP_DESCR');
---
-INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
-       (NLDD_NLD_ID
-       ,NLDD_COLUMN_NAME
-       ,NLDD_VALUE
-       )
-SELECT 
-        35
-       ,'NP_ID'
-       ,'nm3seq.next_np_id_seq' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
-                   WHERE NLDD_NLD_ID = 35
-                    AND  NLDD_COLUMN_NAME = 'NP_ID');
 --
 INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
        (NLDD_NLD_ID
@@ -20978,118 +21132,25 @@ SELECT
                    WHERE NLDD_NLD_ID = 1174
                     AND  NLDD_COLUMN_NAME = 'IIT_NE_ID');
 --
-INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
-       (NLDD_NLD_ID
-       ,NLDD_COLUMN_NAME
-       ,NLDD_VALUE
-       )
-SELECT 
-        44
-       ,'IIT_NE_ID'
-       ,'IIT.IIT_NE_ID' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
-                   WHERE NLDD_NLD_ID = 44
-                    AND  NLDD_COLUMN_NAME = 'IIT_NE_ID');
---
-INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
-       (NLDD_NLD_ID
-       ,NLDD_COLUMN_NAME
-       ,NLDD_VALUE
-       )
-SELECT 
-        104
-       ,'NAD_END_DATE'
-       ,'ne.ne_end_date' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
-                   WHERE NLDD_NLD_ID = 104
-                    AND  NLDD_COLUMN_NAME = 'NAD_END_DATE');
---
-INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
-       (NLDD_NLD_ID
-       ,NLDD_COLUMN_NAME
-       ,NLDD_VALUE
-       )
-SELECT 
-        104
-       ,'NAD_GTY_TYPE'
-       ,'ne.ne_gty_group_type' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
-                   WHERE NLDD_NLD_ID = 104
-                    AND  NLDD_COLUMN_NAME = 'NAD_GTY_TYPE');
---
-INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
-       (NLDD_NLD_ID
-       ,NLDD_COLUMN_NAME
-       ,NLDD_VALUE
-       )
-SELECT 
-        104
-       ,'NAD_IIT_NE_ID'
-       ,'iit.iit_ne_id' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
-                   WHERE NLDD_NLD_ID = 104
-                    AND  NLDD_COLUMN_NAME = 'NAD_IIT_NE_ID');
---
-INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
-       (NLDD_NLD_ID
-       ,NLDD_COLUMN_NAME
-       ,NLDD_VALUE
-       )
-SELECT 
-        104
-       ,'NAD_INV_TYPE'
-       ,'iit.iit_inv_type' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
-                   WHERE NLDD_NLD_ID = 104
-                    AND  NLDD_COLUMN_NAME = 'NAD_INV_TYPE');
---
-INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
-       (NLDD_NLD_ID
-       ,NLDD_COLUMN_NAME
-       ,NLDD_VALUE
-       )
-SELECT 
-        104
-       ,'NAD_NE_ID'
-       ,'ne.ne_id' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
-                   WHERE NLDD_NLD_ID = 104
-                    AND  NLDD_COLUMN_NAME = 'NAD_NE_ID');
---
-INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
-       (NLDD_NLD_ID
-       ,NLDD_COLUMN_NAME
-       ,NLDD_VALUE
-       )
-SELECT 
-        104
-       ,'NAD_NT_TYPE'
-       ,'ne.ne_nt_type' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
-                   WHERE NLDD_NLD_ID = 104
-                    AND  NLDD_COLUMN_NAME = 'NAD_NT_TYPE');
---
-INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
-       (NLDD_NLD_ID
-       ,NLDD_COLUMN_NAME
-       ,NLDD_VALUE
-       )
-SELECT 
-        104
-       ,'NAD_START_DATE'
-       ,'ne.ne_start_Date' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_LOAD_DESTINATION_DEFAULTS
-                   WHERE NLDD_NLD_ID = 104
-                    AND  NLDD_COLUMN_NAME = 'NAD_START_DATE');
---
 --
 --********** NM_UPLOAD_FILE_GATEWAYS **********--
+SET TERM ON
+PROMPT nm_upload_file_gateways
+SET TERM OFF
 --
 -- Columns
 -- NUFG_TABLE_NAME                NOT NULL VARCHAR2(30)
---   NUFG_PK (Pos 1)
 --   NUFG_TABLE_NAME_UPPER_CHK
+--   NUFG_PK (Pos 1)
 --
+--
+INSERT INTO NM_UPLOAD_FILE_GATEWAYS
+       (NUFG_TABLE_NAME
+       )
+SELECT 
+        'NM_LOAD_BATCHES' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_UPLOAD_FILE_GATEWAYS
+                   WHERE NUFG_TABLE_NAME = 'NM_LOAD_BATCHES');
 --
 INSERT INTO NM_UPLOAD_FILE_GATEWAYS
        (NUFG_TABLE_NAME
@@ -21107,25 +21168,20 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_UPLOAD_FILE_GATEWAYS
                    WHERE NUFG_TABLE_NAME = 'NM_MRG_QUERY_RESULTS');
 --
-INSERT INTO NM_UPLOAD_FILE_GATEWAYS
-       (NUFG_TABLE_NAME
-       )
-SELECT 
-        'NM_LOAD_BATCHES' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_UPLOAD_FILE_GATEWAYS
-                   WHERE NUFG_TABLE_NAME = 'NM_LOAD_BATCHES');
---
 --
 --********** NM_UPLOAD_FILE_GATEWAY_COLS **********--
+SET TERM ON
+PROMPT nm_upload_file_gateway_cols
+SET TERM OFF
 --
 -- Columns
 -- NUFGC_NUFG_TABLE_NAME          NOT NULL VARCHAR2(30)
---   NUFGC_NUFG_FK (Pos 1)
 --   NUFGC_PK (Pos 1)
 --   NUFGC_UK (Pos 1)
+--   NUFGC_NUFG_FK (Pos 1)
 -- NUFGC_SEQ                      NOT NULL NUMBER(1)
---   NUFGC_PK (Pos 2)
 --   NUFGC_SEQ_CHK
+--   NUFGC_PK (Pos 2)
 -- NUFGC_COLUMN_NAME              NOT NULL VARCHAR2(30)
 --   NUFGC_COLUMN_NAME_UPPER_CHK
 --   NUFGC_UK (Pos 2)
@@ -21140,12 +21196,12 @@ INSERT INTO NM_UPLOAD_FILE_GATEWAY_COLS
        ,NUFGC_COLUMN_DATATYPE
        )
 SELECT 
-        'NM_MRG_QUERY_RESULTS'
+        'NM_LOAD_BATCHES'
        ,1
-       ,'NQR_MRG_JOB_ID'
+       ,'NLB_BATCH_NO'
        ,'NUMBER' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_UPLOAD_FILE_GATEWAY_COLS
-                   WHERE NUFGC_NUFG_TABLE_NAME = 'NM_MRG_QUERY_RESULTS'
+                   WHERE NUFGC_NUFG_TABLE_NAME = 'NM_LOAD_BATCHES'
                     AND  NUFGC_SEQ = 1);
 --
 INSERT INTO NM_UPLOAD_FILE_GATEWAY_COLS
@@ -21170,12 +21226,12 @@ INSERT INTO NM_UPLOAD_FILE_GATEWAY_COLS
        ,NUFGC_COLUMN_DATATYPE
        )
 SELECT 
-        'NM_LOAD_BATCHES'
+        'NM_MRG_QUERY_RESULTS'
        ,1
-       ,'NLB_BATCH_NO'
+       ,'NQR_MRG_JOB_ID'
        ,'NUMBER' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_UPLOAD_FILE_GATEWAY_COLS
-                   WHERE NUFGC_NUFG_TABLE_NAME = 'NM_LOAD_BATCHES'
+                   WHERE NUFGC_NUFG_TABLE_NAME = 'NM_MRG_QUERY_RESULTS'
                     AND  NUFGC_SEQ = 1);
 --
 --
