@@ -1,4 +1,12 @@
-DROP VIEW nm_mail_pop_servers_v
+DECLARE
+ ex_no_bother EXCEPTION;
+ pragma exception_init(ex_no_bother,-955);
+BEGIN
+ EXECUTE IMMEDIATE ('DROP VIEW nm_mail_pop_servers_v');
+EXCEPTION
+  WHEN ex_no_bother THEN 
+   Null;
+END; 
 /
 
 CREATE FORCE VIEW nm_mail_pop_servers_v AS
