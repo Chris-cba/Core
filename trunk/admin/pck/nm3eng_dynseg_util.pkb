@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.4   Oct 11 2007 18:49:02   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.5   Oct 18 2007 12:30:02   ptanava  $
 --       Module Name      : $Workfile:   nm3eng_dynseg_util.pkb  $
---       Date into PVCS   : $Date:   Oct 11 2007 18:49:02  $
---       Date fetched Out : $Modtime:   Oct 11 2007 10:13:42  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Oct 18 2007 12:30:02  $
+--       Date fetched Out : $Modtime:   Oct 17 2007 17:32:46  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --   Author : Priidu Tanava
 --
@@ -25,10 +25,12 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
   08.10.07 PT in populate_tmp_table() added autonomous commit to ensure pk creation
   10.10.07 PT added append hint to temp table inserts
   11.10.07 PT fixed an upper-lower case problem in get_calls_tbl()
+              sql%rowcount before commit
+  17.10.07 PT removed autonomous transaction
 */
 
 
-  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
+  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg_util';
   
   cr            constant varchar2(1) := chr(10);
@@ -296,8 +298,6 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     
     -- the unimplemented ones
     if p_call_func in (
-       --'get_first_value'                -- not possible to implement, requires route connectivity    
-      --,'get_last_value'                 -- not possible to implement, requires route connectivity
        'get_most_frequent_value'        -- to be implemented
       ,'get_median_value'               -- to be implemented
       ,'get_biased_standard_deviation'  -- logic not known
@@ -368,7 +368,6 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     l_sql_ft_tables         varchar2(32767);
     l_sql_main_calls        varchar2(32767);
     l_iit_ft_union          varchar2(20);
-    pragma autonomous_transaction;
     
   begin
     nm3dbg.putln(g_package_name||'.populate_tmp_table('
@@ -376,6 +375,10 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
       ||', p_inv_type='||p_inv_type
       ||')');
     nm3dbg.ind;
+    
+    if p_mrg_job_id is null or p_inv_type is null then
+      raise_application_error(-20101, 'Invalid call parameter');
+    end if;
     
     
     l_sql_all_alias_list  := sql_all_alias_list(p_inv_type);
@@ -480,11 +483,10 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     
     execute immediate l_sql
       using p_mrg_job_id;
-    
-    -- autonomous commit needed with append hint, the pk is also only created with commit
+    p_sqlcount := sql%rowcount;
     commit;
     
-    p_sqlcount := sql%rowcount;
+    nm3dbg.putln('nm_eng_dynseg_values_tmp count:'||p_sqlcount);
     nm3dbg.deind;
   exception
     when others then
@@ -492,7 +494,6 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
         ||'p_mrg_job_id='||p_mrg_job_id
         ||', p_inv_type='||p_inv_type
         ||')');
-      rollback;
       raise;
       
   end;
@@ -759,12 +760,11 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     l_sql_values    varchar2(1000);
     
   begin
-    nm3dbg.putln(g_package_name||'.sql_main_q1_wrap('
-        ||'  p_inv_type='||p_inv_type
-        ||', p_func_code='||p_func_code
-        ||', p_has_xsp='||p_has_xsp
-      ||')');
-    nm3dbg.ind;
+--     nm3dbg.putln(g_package_name||'.sql_main_q1_wrap('
+--         ||'  p_inv_type='||p_inv_type
+--         ||', p_func_code='||p_func_code
+--         ||', p_has_xsp='||p_has_xsp
+--       ||')');
     
     -- build the calculated values list
     for r in (
@@ -811,7 +811,6 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
       
     end if;
         
-    nm3dbg.deind;
     return  'select'
       ||cr||'   q1.operation'
       ||cr||'  ,q1.section_id'
@@ -888,12 +887,11 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
       
   
   begin
-    nm3dbg.putln(g_package_name||'.sql_main_q_values('
-      ||'p_inv_type='||p_inv_type
-      ||', p_call_func='||p_call_func
-      ||', p_has_xsp='||p_has_xsp
-      ||')');
-    nm3dbg.ind;
+--     nm3dbg.putln(g_package_name||'.sql_main_q_values('
+--       ||'p_inv_type='||p_inv_type
+--       ||', p_call_func='||p_call_func
+--       ||', p_has_xsp='||p_has_xsp
+--       ||')');
     
     l_func_code := call_func_code(p_call_func);
     
@@ -1003,7 +1001,6 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     close c_attr;
     
 
-    nm3dbg.deind;
     return l_sql;
   exception
     when others then
@@ -1042,13 +1039,12 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     l_or      varchar2(10);
   
   begin
-    nm3dbg.putln(g_package_name||'.sql_main_q_where('
-      ||'p_inv_type='||p_inv_type
-      ||', p_call_func='||p_call_func
-      ||', p_has_xsp='||p_has_xsp
-      ||', p_has_value='||p_has_value
-      ||')');
-    nm3dbg.ind;
+--     nm3dbg.putln(g_package_name||'.sql_main_q_where('
+--       ||'p_inv_type='||p_inv_type
+--       ||', p_call_func='||p_call_func
+--       ||', p_has_xsp='||p_has_xsp
+--       ||', p_has_value='||p_has_value
+--       ||')');
     
     -- loop through the combinations
     --  each combination becomes a distinct 'and' where clause
@@ -1189,7 +1185,6 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
       
     end if;
       
-    nm3dbg.deind;
     return 'where '||l_sql;
   exception
     when others then
