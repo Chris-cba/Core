@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.6   Oct 11 2007 18:47:24   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.7   Oct 18 2007 12:28:44   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Oct 11 2007 18:47:24  $
---       Date fetched Out : $Modtime:   Oct 11 2007 18:44:32  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Oct 18 2007 12:28:44  $
+--       Date fetched Out : $Modtime:   Oct 18 2007 12:24:50  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --
 --   Author : Priidu Tanava
@@ -36,8 +36,13 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   05.10.07  PT fixed a bad reference to nm3dynsql2 package. must be nm3dynsql
                 renamed nm_datum_connectivity_tmp to nm_route_connectivity_tmp
   10.10.07  PT added append hints to temp table inserts (where applicable)
+                sql%rowcount before commit
+  17.10.07  PT removed autonomous transactions
+                added grups of groups support to load_group_datums() and load_gaz_list_datums()
+                added both ways FT support to ins_datum_homo_chunks() and std_insert_invitems()
+                added FT key preserved check (more work needed) to ins_splits()
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.6  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.7  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -64,12 +69,18 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     
   mt_datum_id nm_id_tbl;
   mt_group_id nm_id_tbl;
+  mt_gg_id    nm_id_tbl;
   mt_nse_id   nm_id_tbl;
     
     
   connect_by_loop exception; -- CONNECT BY loop in user data
   pragma exception_init(connect_by_loop, -1436);
-    
+  
+  key_not_preserved exception; -- ORA-01445: cannot select ROWID from a join view without a key-preserved table
+  pragma exception_init(key_not_preserved, -1445);
+  
+  invalid_rowid exception; -- ORA-01410: invalid ROWID
+  pragma exception_init(invalid_rowid, -1410);
   
   procedure std_insert_invitems(
      p_mrg_job_id in nm_mrg_query_results_all.nqr_mrg_job_id%type
@@ -103,6 +114,9 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ,p_group_type_out out nm_group_types.ngt_group_type%type
   );
   
+  function is_key_preserved(
+     p_table_name in varchar2
+  ) return boolean;
   
   
   function get_version return varchar2 is
@@ -121,24 +135,29 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   -----------------------------------------------------------------
   
   
-  
+  -- this id table functions are used by load_gaz_list_datums()
   function get_datum_id_tbl return nm_id_tbl
   is
   begin
     return mt_datum_id;
   end;
-  
   function get_group_id_tbl return nm_id_tbl
   is
   begin
     return mt_group_id;
   end;
-  
+  -- groups of groups
+  function get_gg_id_tbl return nm_id_tbl
+  is
+  begin
+    return mt_gg_id;
+  end;
   function get_nse_id_tbl return nm_id_tbl
   is
   begin
     return mt_nse_id;
   end;
+  
   
  
   -- this executes the main bulk source query
@@ -180,6 +199,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     l_sql_cardinality           varchar2(40);
     l_union_all                 varchar2(10);
     l_effective_date            date := p_effective_date;
+    l_key_preserved             boolean;
     
     
     function sql_datum_tbl_join(
@@ -212,8 +232,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       end if;
       return cr||p_connector||l_alias||p_where_sql;
     end;
-    
-    pragma autonomous_transaction;  
+ 
     
   begin
     nm3dbg.putln(g_package_name||'.ins_splits('
@@ -225,9 +244,10 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   
 
     -- nm_mrg_split_results_tmp is global temporary on commit preserve rows
+    -- (implicit commit)
     execute immediate
-      'truncate table nm_mrg_split_results_tmp';      
-      
+      'truncate table nm_mrg_split_results_tmp';
+  
       
     -- effective date is used directly as bind variable in the sql
     if l_effective_date is null then
@@ -360,9 +380,19 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     -- build the ft table sources
     for i in 1 .. t_ft.count loop
     
-      -- it is a virutal nm_inv_items_all table
+      l_key_preserved := is_key_preserved(t_ft(i).table_name);
+    
+      -- it is a virtual nm_inv_items_all table
       if t_ft(i).table_iit_flag = 'Y' then
       
+        
+        -- check that the table does not include nm_members
+        if not l_key_preserved then
+          raise_application_error(-20001,
+            'External assets placed on the network must have a true primary key: '||t_ft(i).inv_type);
+        end if;
+            
+
         a1 := 'm'||i;
         a2 := 'i'||i;
 
@@ -383,6 +413,14 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       
       -- it is a true foreign table
       else
+      
+        -- check that the FT view includes a join to nm_members
+        -- TODO: the current key preserved check returns false positives, not used
+--         if l_key_preserved then
+--           raise_application_error(-20001,
+--             'External assets not placed on the network must use a join to nm_members for positioning: '||t_ft(i).inv_type);
+--         end if;
+        
       
         if t_ft(i).table_ne_column is null then
           raise_application_error(-20001,
@@ -414,9 +452,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       
       
     end loop;
-    
-
-    
     
 
     l_sql := 'insert /*+ append */ into nm_mrg_split_results_tmp'
@@ -471,10 +506,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     
     nm3dbg.putln(l_sql);
     execute immediate l_sql;
+    p_rowcount_out := sql%rowcount;
     commit;
 
-    p_rowcount_out := sql%rowcount;
     
+    nm3dbg.putln('nm_mrg_split_results_tmp count: '||p_rowcount_out);
     nm3dbg.deind;
   exception
     when others then
@@ -483,7 +519,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||', p_effective_date='||p_effective_date
         ||', p_criteria_rowcount='||p_criteria_rowcount
         ||')');
-      rollback;
       raise;
     
   end;
@@ -504,7 +539,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     i                 binary_integer;
     l_sql             varchar2(32767);
     l_invitems_where  varchar2(32767);
-    l_table_name constant varchar2(30) := 'nm_mrg_datum_homo_chunks_tmp';
     l_cardinality     integer;
     l_sql_inner_join  varchar2(100);
     l_inv_type_count  number(4) := 0;
@@ -594,19 +628,53 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 
 
 
-    --  ,(select 'SECT' ft_inv_type, ft2.* from v_nm_sect ft2) i2
+    --  ,(select 'XNAA' ft_inv_type, ft2.FT_PK_COL, ft2.NAA_DESCR from XNMDOT_NAA ft2) i2
+    --  ,(select  distinct 'SEGM' ft_inv_type, ft8.NE_FT_PK_COL, ft8.GROUP_TYPE, ft8.ROUTE from XNMDOT_V_SEGM ft8) i8
     function sql_ft_sources return varchar2
     is
       s       varchar2(4000);
       k       binary_integer := 1;
+      s_tmp   varchar2(1000);
+      s_tmp_tbl varchar2(30);
+      l_distinct varchar2(10);
+      
     begin
       i := pt_attr.first;
       while i is not null loop
-        if pt_attr(i).seq = 1 and pt_attr(i).table_name is not null then
-          k := k + 1;
-          s := s||cr||'    ,(select '''||pt_attr(i).INV_TYPE||''' ft_inv_type, ft'||k||'.* from '
-            ||pt_attr(i).TABLE_NAME||' ft'||k||') i'||k;
+      
+        -- finish the previous if present
+        if pt_attr(i).seq = 1 and s_tmp is not null then
+          s := s||cr||s_tmp||' from '||s_tmp_tbl||' ft'||k||') i'||k;
+          s_tmp := null;
+          s_tmp_tbl := null;
+        end if; 
+      
+        -- it is an FT 
+        if pt_attr(i).table_name is not null then
+          
+          -- start new
+          if pt_attr(i).seq = 1 then
+            k := k + 1;
+            
+            -- table is signalled as having the pk not preserved (inflated by nm_members)
+--             if pt_attr(i).table_iit_flag = 'N' then
+--               l_distinct := ' distinct ';
+--             else
+--               l_distinct := null;
+--             end if;
+--             
+--             s_tmp := '    ,(select '||l_distinct||''''||pt_attr(i).INV_TYPE||''' ft_inv_type, '
+            s_tmp := '    ,(select distinct '''||pt_attr(i).INV_TYPE||''' ft_inv_type, '
+              ||'ft'||k||'.'||pt_attr(i).table_pk_column||', ft'||k||'.'||pt_attr(i).ita_attrib_name;
+            s_tmp_tbl := pt_attr(i).table_name;
+              
+          -- add column to existing
+          else
+            s_tmp := s_tmp||', ft'||k||'.'||pt_attr(i).ita_attrib_name;
+          
+          end if;
         end if;
+        
         i := pt_attr.next(i);
       end loop;
       return s;
@@ -632,7 +700,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       return s;
     end;
     
-    pragma autonomous_transaction;
 
   -- main procedure body starts here
   begin
@@ -643,6 +710,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       ||', p_splits_rowcount='||p_splits_rowcount
       ||')');
     nm3dbg.ind;
+    
+    -- truncate (implicit commit)
+    -- nm_mrg_datum_homo_chunks_tmp is global temporary on commit preserve rows
+    execute immediate 
+      'truncate table nm_mrg_datum_homo_chunks_tmp';
 
     
     l_cardinality := nm3sql.get_rounded_cardinality(p_splits_rowcount);
@@ -748,13 +820,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ||cr||'   q6.nm_ne_id_of'
     ||cr||'  ,decode(q6.begin_mp, null, nvl(q6.lag_begin_1, q6.lag_begin_2), q6.begin_mp)'
     ||cr||'  ,decode(q6.end_mp, null, nvl(q6.lead_end_1, q6.lead_end_2), q6.end_mp)';
-        
-    
-    -- truncate
-    -- nm_mrg_datum_homo_chunks_tmp is global temporary on commit preserve rows
-    execute immediate 
-      'truncate table nm_mrg_datum_homo_chunks_tmp';
-    
+   
     nm3dbg.putln(l_sql);
     
     
@@ -762,11 +828,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     execute immediate 
       'insert /*+ append */ into nm_mrg_datum_homo_chunks_tmp'
       ||cr||l_sql;
+    p_rowcount_out := sql%rowcount;
     commit;
       
-    p_rowcount_out := sql%rowcount;
       
-    
+    nm3dbg.putln('nm_mrg_datum_homo_chunks_tmp count: '||p_rowcount_out);
     nm3dbg.deind;
   exception
     when others then
@@ -776,7 +842,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||', p_inner_join='||nm3flx.boolean_to_char(p_inner_join)
         ||', p_splits_rowcount='||p_splits_rowcount
         ||')');
-      rollback;
       raise;
 
   end;
@@ -862,6 +927,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     nm3dbg.putln(g_package_name||'.load_attrib_metadata('
       ||'p_nmq_id='||p_nmq_id
       ||')');
+    nm3dbg.ind;
   
     -- read the inner/outer join flag
     select nmq_inner_outer_join into l_nmq_inner_outer_join
@@ -984,6 +1050,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 
     end loop;
     
+    nm3dbg.putln('pt_attr.count='||pt_attr.count||', pt_itd.count='||pt_itd.count);
+    nm3dbg.deind;
   exception
     when others then
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_attrib_metadata('
@@ -1000,12 +1068,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ,p_ignore_poe in boolean
   )
   is
-    l_sql varchar2(10000);
-    l_sql_outer varchar2(1000);
-    l_sql_conn varchar2(10000);
-    l_sqlcount  pls_integer;
-    
-    pragma autonomous_transaction;
+    l_sql         varchar2(10000);
+    l_sql_outer   varchar2(1000);
+    l_sql_conn    varchar2(10000);
+    l_sqlcount    pls_integer;
+
     
   begin
     nm3dbg.putln(g_package_name||'.ins_route_connectivity('
@@ -1036,10 +1103,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     
     nm3dbg.putln(l_sql);
     execute immediate l_sql;
-    commit;
     l_sqlcount := sql%rowcount;
+    commit;
     
-    nm3dbg.putln('routes insert sqlcount: '||l_sqlcount);
+    
+    nm3dbg.putln('nm_route_connectivity_tmp routes count: '||l_sqlcount);
     
     
     -- take care of single datums           
@@ -1077,11 +1145,10 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
        
     nm3dbg.putln(l_sql);
     execute immediate l_sql;
-    commit;
     l_sqlcount := sql%rowcount;
-    nm3dbg.putln('datums insert sqlcount: '||l_sqlcount);
+    commit;
     
-    
+    nm3dbg.putln('nm_route_connectivity_tmp datums count: '||l_sqlcount);
     nm3dbg.deind;
   exception
     when others then
@@ -1089,7 +1156,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||'p_criteria_rowcount='||p_criteria_rowcount
         ||', p_ignore_poe='||nm3flx.boolean_to_char(p_ignore_poe)
         ||')');
-      rollback;
       raise;
     
   end;
@@ -1098,7 +1164,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   
   
   -- this populates the standard results table
-  --  todo: more comments needed here
+  -- TODO: more comments
   procedure std_populate(
      p_nmq_id in nm_mrg_query_all.nmq_id%type
     ,pt_attr in ita_mapping_tbl
@@ -1142,6 +1208,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     l_nqr_memb_count    integer := 0;
     l_section_id        nm_mrg_sections_all.nms_mrg_section_id%type := 0;
     l_nsm_measure       mp_type := 0;
+    j           pls_integer := 0;
 
 
   begin
@@ -1161,8 +1228,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     r_res.NQR_SOURCE := 'ROUTE';
     r_res.NQR_ADMIN_UNIT := p_admin_unit_id;
     
-    nm3dbg.putln('open route connectivity query');
-
+    nm3dbg.putln('open populate query');
+    
     
     -- chunk_no identifies the connected chunk within route
     --  (each route can have many distinct connected chunks
@@ -1196,14 +1263,15 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       from
          nm_route_connectivity_tmp qq
         ,nm_mrg_datum_homo_chunks_tmp inv
-      where qq.nm_ne_id_of = inv.nm_ne_id_of    
+      where qq.nm_ne_id_of = inv.nm_ne_id_of
         and ((qq.nm_begin_mp < inv.nm_end_mp and qq.nm_end_mp > inv.nm_begin_mp)
           or ((qq.nm_begin_mp = qq.nm_end_mp or inv.nm_begin_mp = inv.nm_end_mp)
             and (qq.nm_begin_mp = inv.nm_end_mp or qq.nm_end_mp = inv.nm_begin_mp)))
       order by 1, 2, 3, 5
     )
     loop
-
+      j := j + 1;
+      
       -- same route
       if r.nm_ne_id_in = r.lag_nm_ne_id_in then null;
         --nm3dbg.putln('null: '||r.nm_ne_id_in||'  '||r.lag_nm_ne_id_in);
@@ -1329,6 +1397,14 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     end loop;
     
     
+    -- test the loop count
+    nm3dbg.putln('populate count: '||j);
+    if j = 0 then
+      raise_application_error(-20001,
+        'No merge results');
+    end if;
+    
+    
     -- last one after loop        
     if r_res.nqr_mrg_job_id is not null then
     
@@ -1357,6 +1433,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     -- assign the out value
     p_mrg_job_id := r_res.nqr_mrg_job_id;
   
+    
     nm3dbg.deind;
   exception
     when others then
@@ -1366,6 +1443,13 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||', p_admin_unit_id='||p_admin_unit_id
         ||', p_splits_rowcount='||p_splits_rowcount
         ||', p_ignore_poe='||nm3flx.boolean_to_char(p_ignore_poe)
+        ||', j='||j
+        ||', i='||i
+        ||', k='||k
+        ||', l_section_id='||l_section_id
+        ||', l_chunk_no='||l_chunk_no
+        ||', l_nqr_memb_count='||l_nqr_memb_count
+        ||', l_nsm_measure='||l_nsm_measure
         ||')');
       raise;
    
@@ -1390,13 +1474,10 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     t_idt             itd_tbl;
     l_inner_join      boolean;
     l_effective_date  constant date := nm3user.get_effective_date;
-    l_all_routes      boolean := false;
     l_ignore_poe      boolean := true;
     l_splits_rowcount integer;
     l_homo_rowcount   integer;
     l_connect_rowcount  integer;
-    
-    --pragma autonomous_transaction;
     
   begin
     nm3dbg.putln(g_package_name||'.std_run('
@@ -1456,10 +1537,14 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||'p_nmq_id='||p_nmq_id
         ||', p_nqr_admin_unit='||p_nqr_admin_unit
         ||', p_nmq_descr='||p_nmq_descr
-        ||', p_ignore_poe='||nm3flx.boolean_to_char(p_ignore_poe)
+        ||', p_ignore_poe='||nm3dbg.to_char(p_ignore_poe)
         ||', p_criteria_rowcount='||p_criteria_rowcount
+        ||', l_inner_join='||nm3dbg.to_char(l_inner_join)
+        ||', l_ignore_poe='||nm3dbg.to_char(l_ignore_poe)
+        ||', l_splits_rowcount='||l_splits_rowcount
+        ||', l_homo_rowcount='||l_homo_rowcount
+        ||', l_connect_rowcount='||l_connect_rowcount
         ||')');
-      rollback;
       raise;
       
   end;
@@ -1469,7 +1554,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   
   
   -- this populates the section_inv_values and section_member_inv tables
-  --  todo: 
+  --  called from within std_populate()
   procedure std_insert_invitems(
      p_mrg_job_id in nm_mrg_query_results_all.nqr_mrg_job_id%type
     ,pt_attr in ita_mapping_tbl
@@ -1517,19 +1602,53 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     end;
     
     
-    --  ,(select 'SECT' ft_inv_type, ft2.* from v_nm_sect ft2) i2
+    --  ,(select 'XNAA' ft_inv_type, ft2.FT_PK_COL, ft2.NAA_DESCR from XNMDOT_NAA ft2) i2
+    --  ,(select  distinct 'SEGM' ft_inv_type, ft8.NE_FT_PK_COL, ft8.GROUP_TYPE, ft8.ROUTE from XNMDOT_V_SEGM ft8) i8
+    -- repeate from ins_datum_homo_chunks()
     function sql_ft_sources return varchar2
     is
-      s       varchar2(4000);
-      k       binary_integer := 1;
+      s           varchar2(4000);
+      k           binary_integer := 1;
+      s_tmp       varchar2(1000);
+      s_tmp_tbl   varchar2(30);
+      l_distinct  varchar2(10);
     begin
       i := pt_attr.first;
       while i is not null loop
-        if pt_attr(i).seq = 1 and pt_attr(i).table_name is not null then
-          k := k + 1;
-          s := s||cr||'    ,(select '''||pt_attr(i).INV_TYPE||''' ft_inv_type, ft'||k||'.* from '
-            ||pt_attr(i).TABLE_NAME||' ft'||k||') i'||k;
+      
+        -- finish the previous if present
+        if pt_attr(i).seq = 1 and s_tmp is not null then
+          s := s||cr||s_tmp||' from '||s_tmp_tbl||' ft'||k||') i'||k;
+          s_tmp := null;
+          s_tmp_tbl := null;
         end if;
+
+        -- it is an FT
+        if pt_attr(i).table_name is not null then
+        
+          -- start new
+          if pt_attr(i).seq = 1 then
+            k := k + 1;
+            
+            -- table is signalled as having the pk not preserved (inflated by nm_members)
+--             if pt_attr(i).table_iit_flag = 'N' then
+--               l_distinct := ' distinct ';
+--             else
+--               l_distinct := null;
+--             end if;
+--             
+--             s_tmp := '    ,(select '||l_distinct||''''||pt_attr(i).INV_TYPE||''' ft_inv_type, '
+            s_tmp := '    ,(select distinct '''||pt_attr(i).INV_TYPE||''' ft_inv_type, '
+              ||'ft'||k||'.'||pt_attr(i).table_pk_column||', ft'||k||'.'||pt_attr(i).ita_attrib_name;
+            s_tmp_tbl := pt_attr(i).table_name;
+              
+          -- add column to existing
+          else
+            s_tmp := s_tmp||', ft'||k||'.'||pt_attr(i).ita_attrib_name;
+          
+          end if;
+        end if;
+        
         i := pt_attr.next(i);
       end loop;
       return s;
@@ -1738,7 +1857,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     nm3dbg.putln(l_sql);
     execute immediate l_sql using p_mrg_job_id, p_mrg_job_id, p_mrg_job_id;
     
-    nm3dbg.putln('1 sql%rowcount='||sql%rowcount);
+    nm3dbg.putln('nm_mrg_section_inv_values_tmp rowcount='||sql%rowcount);
     
     
     
@@ -1757,7 +1876,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     nm3dbg.putln(l_sql);
     execute immediate l_sql;
     
-    nm3dbg.putln('2 sql%rowcount='||sql%rowcount);
+    nm3dbg.putln('nm_mrg_section_inv_values_all rowcount='||sql%rowcount);
     
     
     
@@ -1769,9 +1888,9 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       nsv_mrg_job_id, nsi_mrg_section_id, nsv_inv_type, nsv_x_sect, nsv_value_id
     from nm_mrg_section_inv_values_tmp;
     
-    nm3dbg.putln('3 sql%rowcount='||sql%rowcount);
+    nm3dbg.putln('nm_mrg_section_member_inv rowcount='||sql%rowcount);
     
-  
+    
     nm3dbg.deind;
   exception
     when others then
@@ -1786,29 +1905,29 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   
   
   
+  -- loads datum criteria for as single group or datum
+  --  the group can be linear or non linear
+  --  TODO: add support for group of groups
   procedure load_group_datums(
      p_group_id in nm_elements_all.ne_id%type
     ,p_sqlcount out pls_integer
   )
   is
-    l_sql varchar2(10000);
-    l_group_type nm_group_types.ngt_group_type%type;
-    pragma autonomous_transaction;
+    l_sql         varchar2(10000);
+    l_group_type  nm_group_types.ngt_group_type%type;
+    l_ne_type     nm_elements.ne_type%type;
     
   begin
     nm3dbg.putln(g_package_name||'.load_group_datums('
       ||'p_group_id='||p_group_id
       ||')');
       
-    -- look up the group type
-    select e.ne_gty_group_type
-    into l_group_type
-    from nm_elements e
-    where e.ne_id = p_group_id;
+    l_ne_type := nm3net.get_ne_type(p_group_id);
     
+    case 
     
-    -- element is group
-    if l_group_type is not null then
+    -- linear or non-linear group
+    when l_ne_type = 'G' then
       l_sql :=
         sql_load_nm_datum_criteria_tmp(
            p_elements_sql => 
@@ -1817,15 +1936,9 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
             ||cr||'    where nm_ne_id_in = :p_group_id'
             ||cr||'    group by nm_ne_id_of' 
         );
-        
-      ensure_group_type_linear(
-         p_group_type_in  => l_group_type
-        ,p_group_type_out => l_group_type
-      );
-        
-        
-    -- element is datum
-    else
+
+    -- datum or distance breake
+    when l_ne_type in ('S','D') then
       l_sql :=
         sql_load_nm_datum_criteria_tmp(
            p_elements_sql => 
@@ -1834,7 +1947,33 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
             ||cr||'    where ne_id = :p_group_id' 
         );
     
-    end if;
+    -- group of groups
+    when l_ne_type = 'P' then
+      l_sql :=
+        sql_load_nm_datum_criteria_tmp(
+           p_elements_sql => 
+                  '    select nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
+            ||cr||'    from'
+            ||cr||'       nm_members'
+            ||cr||'    where nm_ne_id_of in ('
+            ||cr||'      select ne_id'
+            ||cr||'      from'
+            ||cr||'         nm_elements'
+            ||cr||'      where ne_id in (select nm_ne_id_of from nm_members'
+            ||cr||'                        connect by nm_ne_id_in = prior nm_ne_id_of'
+            ||cr||'                        start with nm_ne_id_in = :p_group_id)'
+            ||cr||'        and ne_type = ''S'''
+            ||cr||'      )'
+            ||cr||'    group by nm_ne_id_of'
+         );
+    
+    end case;
+    
+    ensure_group_type_linear(
+       p_group_type_in  => l_group_type
+      ,p_group_type_out => l_group_type
+    );
+    
     
       
     execute immediate 'truncate table nm_datum_criteria_tmp';
@@ -1844,25 +1983,26 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     using
        l_group_type
       ,p_group_id;
-    commit;
-    
     p_sqlcount := sql%rowcount;
+    commit;
+   
+    nm3dbg.putln('nm_datum_criteria_tmp rowcount='||p_sqlcount);
     nm3dbg.deind;
-
   exception
     when others then
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_group_datums('
         ||'p_group_id='||p_group_id
         ||', l_group_type='||l_group_type
+        ||', l_ne_type='||l_ne_type
         ||')');
-      rollback;
       raise;
+      
   end;
   
   
 
   
-  
+  -- load datum criteria for a single saved extent
   procedure load_extent_datums(
      p_group_type in nm_group_types.ngt_group_type%type
     ,p_nse_id in nm_saved_extents.nse_id%type
@@ -1878,7 +2018,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           ||cr||'    group by d.nsd_ne_id' 
       );
     l_group_type nm_group_types.ngt_group_type%type;
-    pragma autonomous_transaction;
     
   begin
     nm3dbg.putln(g_package_name||'.load_extent_datums('
@@ -1899,9 +2038,10 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     using
        l_group_type
       ,p_nse_id;
+    p_sqlcount := sql%rowcount;
     commit;
     
-    p_sqlcount := sql%rowcount;
+    nm3dbg.putln('nm_mrg_section_member_inv rowcount='||p_sqlcount);
     nm3dbg.deind;
   exception
     when others then
@@ -1909,14 +2049,15 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||'p_nse_id='||p_nse_id
         ||', l_group_type='||l_group_type
         ||')');
-      rollback;
       raise;
   
   end;
   
 
   
-  
+  -- load datum criteria for a single group type
+  --  the group type can be linear or non-linear
+  --  if linear then the type is used for route connectivity
   procedure load_group_type_datums(
      p_group_type in nm_members_all.nm_obj_type%type
     ,p_sqlcount out pls_integer
@@ -1931,7 +2072,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           ||cr||'    group by nm_ne_id_of' 
       );
     l_group_type nm_group_types.ngt_group_type%type;
-    pragma autonomous_transaction;
       
   begin
     nm3dbg.putln(g_package_name||'.load_group_type_datums('
@@ -1953,9 +2093,10 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     using
        l_group_type
       ,p_group_type;
+    p_sqlcount := sql%rowcount;
     commit;
     
-    p_sqlcount := sql%rowcount;
+    nm3dbg.putln('nm_datum_criteria_tmp rowcount='||p_sqlcount);
     nm3dbg.deind;
   exception
     when others then
@@ -1963,21 +2104,22 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||'p_group_type='||p_group_type
         ||', l_group_type='||l_group_type
         ||')');
-      rollback;
       raise;
+      
   end;
   
 
-
+  -- load datum criteria for one network type
+  --  the type must be linear datum type
   procedure load_nt_type_datums(
      p_group_type in varchar2
     ,p_nt_type in nm_types.nt_type%type
     ,p_sqlcount out pls_integer
   )
   is
-    l_nt_type nm_types.nt_type%type;
-    l_group_type nm_group_types.ngt_group_type%type;
-    l_sql     constant varchar2(10000) :=
+    l_nt_type     nm_types.nt_type%type;
+    l_group_type  nm_group_types.ngt_group_type%type;
+    l_sql         constant varchar2(10000) :=
       sql_load_nm_datum_criteria_tmp(
          p_elements_sql => 
                 '    select e.ne_id nm_ne_id_of, to_number(null) begin_mp, to_number(null) end_mp'
@@ -1989,7 +2131,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           ||cr||'        and nt_type = :l_nt_type'
           ||cr||'    )'
       );
-    pragma autonomous_transaction;
     
   begin
     nm3dbg.putln(g_package_name||'.load_nt_type_datums('
@@ -1999,7 +2140,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     nm3dbg.ind;
     
     execute immediate 'truncate table nm_datum_criteria_tmp';
-    
 
     -- check that the type given is linear datum type
     begin
@@ -2009,7 +2149,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     exception
       when no_data_found then
         raise_application_error(-20301
-          ,'Invalid parameter: nt_type must be a linear datm networ type: '||p_nt_type);
+          ,'Invalid parameter: nt_type must be a linear datm network type: '||p_nt_type);
     end;
     
     ensure_group_type_linear(
@@ -2022,9 +2162,10 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     using
        l_group_type
       ,l_nt_type;
+    p_sqlcount := sql%rowcount;
     commit;
       
-    p_sqlcount := sql%rowcount;
+    nm3dbg.putln('nm_datum_criteria_tmp rowcount='||p_sqlcount);
     nm3dbg.deind;
   exception
     when others then
@@ -2033,17 +2174,18 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||', p_nt_type='||p_nt_type
         ||', l_group_type='||l_group_type
         ||')');
-      rollback;
       raise;
+      
   end;
   
   
-  
+  -- load datum ctriteria for the whole network
   procedure load_all_network_datums(
      p_group_type in varchar2
     ,p_sqlcount out pls_integer
   )
   is
+    l_group_type  nm_group_types.ngt_group_type%type;
     l_sql constant varchar2(10000) :=
       sql_load_nm_datum_criteria_tmp(
          p_elements_sql => 
@@ -2055,7 +2197,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           ||cr||'        and nt_linear = ''Y'''
           ||cr||'    )'
       );
-    pragma autonomous_transaction;
 
   begin
     nm3dbg.putln(g_package_name||'.load_all_network_datums('
@@ -2065,21 +2206,28 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       
     execute immediate 'truncate table nm_datum_criteria_tmp';
     
+    ensure_group_type_linear(
+       p_group_type_in  => p_group_type
+      ,p_group_type_out => l_group_type
+    );
+    
     nm3dbg.putln(l_sql);
     execute immediate l_sql
-    using 
-       p_group_type;
+    using
+       l_group_type;
+    p_sqlcount := sql%rowcount;
     commit;
        
-    p_sqlcount := sql%rowcount;
+    nm3dbg.putln('nm_datum_criteria_tmp rowcount='||p_sqlcount);
     nm3dbg.deind;
   exception
     when others then
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_all_network_datums('
         ||'p_group_type='||p_group_type
+        ||', l_group_type='||l_group_type
         ||')');
-      rollback;
       raise;
+      
   end;
   
   
@@ -2093,12 +2241,16 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ,p_sqlcount out pls_integer
   )
   is
+    l_group_type  nm_group_types.ngt_group_type%type;
     i             binary_integer := pt_ne.first;
     l_inner_sql   varchar2(4000);
     l_sql         varchar2(10000);
     l_union_all   varchar2(20);
     l_union_count pls_integer := 0;
-    pragma autonomous_transaction;
+    l_other_count pls_integer;
+    l_gg_count    pls_integer;
+    
+    l_ne_type     nm_elements.ne_type%type;
     
   begin
     nm3dbg.putln(g_package_name||'.load_gaz_list_datums('
@@ -2106,14 +2258,17 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       ||', pt_ne.count='||pt_ne.count
       ||', pt_nse.count='||pt_nse.count
       ||')');
-      
+    nm3dbg.ind;
+    
+
     -- reset the cached id tables
     mt_datum_id := new nm_id_tbl();
     mt_group_id := new nm_id_tbl();
+    mt_gg_id    := new nm_id_tbl();
     mt_nse_id   := new nm_id_tbl();
       
 
-    -- saved extents
+    -- 1 saved extents
     if pt_nse.count > 0 then
       mt_nse_id := pt_nse;
       l_inner_sql := 
@@ -2125,49 +2280,64 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
        ||cr||'    where d.nsd_nse_id = x.column_value'
        ||cr||'    group by d.nsd_ne_id';
        
+       
       l_union_all := cr||'    union all'||cr;
       l_union_count := l_union_count + 1;
       
     end if;
   
   
-    -- routes and single datums
+  
+    -- 2 routes and single datums
     if pt_ne.count > 0 then
 
       -- divide the datum and group elements into different tables
       while i is not null loop
-        if nm3net.element_is_a_datum(pt_ne(i)) then
+        l_ne_type := nm3net.get_ne_type(pt_ne(i));
+        case l_ne_type
+        -- datum
+        when 'S' then
           mt_datum_id.extend;
           mt_datum_id(mt_datum_id.last) := pt_ne(i);
-        else
+        -- distance break
+        when 'D' then
+          mt_datum_id.extend;
+          mt_datum_id(mt_datum_id.last) := pt_ne(i);
+        -- group
+        when 'G' then
           mt_group_id.extend;
           mt_group_id(mt_group_id.last) := pt_ne(i);
-        end if;
+        -- group of groups
+        when 'P' then
+          mt_gg_id.extend;
+          mt_gg_id(mt_gg_id.last) := pt_ne(i);
+        end case;
         i := pt_ne.next(i);
       end loop;
       
 
-      -- datums
+      -- 2.1 datums (and distance breaks)
       if mt_datum_id.count > 0 then
         l_inner_sql := l_inner_sql
               ||l_union_all
-              ||'    select /*+ cardinality(x 2) */'
+              ||'    select /*+ cardinality(x 1) */'
           ||cr||'       ne_id nm_ne_id_of, 0 begin_mp, ne_length end_mp'
           ||cr||'    from'
           ||cr||'       nm_elements'
           ||cr||'      ,table(cast('||g_package_name||'.get_datum_id_tbl as nm_id_tbl)) x'
           ||cr||'    where ne_id = x.column_value';
-       
-        l_union_all := cr||'    union all'||cr;
-        l_union_count := l_union_count + 1;
-
-      end if;
         
-      -- groups
+          l_union_all := cr||'    union all'||cr;
+          l_union_count := l_union_count + 1;
+            
+      end if;
+      
+      
+      -- 2.2 groups
       if mt_group_id.count > 0 then
         l_inner_sql := l_inner_sql
               ||l_union_all
-              ||'    select /*+ cardinality(x 2) */'
+              ||'    select /*+ cardinality(x 1) */'
           ||cr||'      nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
           ||cr||'    from'
           ||cr||'       nm_members'
@@ -2175,11 +2345,38 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           ||cr||'    where nm_ne_id_in = x.column_value'
           ||cr||'    group by nm_ne_id_of';
           
+          l_union_all := cr||'    union all'||cr;
+          l_union_count := l_union_count + 1;
+      
+      end if;
+      
+      
+      -- 2.3 groups of groups
+      if mt_gg_id.count > 0 then
+        l_inner_sql := l_inner_sql
+              ||l_union_all
+              ||'    select nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
+          ||cr||'    from'
+          ||cr||'       nm_members'
+          ||cr||'    where nm_ne_id_of in ('
+          ||cr||'      select ne_id'
+          ||cr||'      from'
+          ||cr||'         nm_elements'
+          ||cr||'      where ne_id in (select nm_ne_id_of from nm_members'
+          ||cr||'                        connect by nm_ne_id_in = prior nm_ne_id_of'
+          ||cr||'                        start with nm_ne_id_in in (select /*+ cardinality(x 1) */ x.column_value from table(cast('
+                                                                   ||g_package_name||'.get_gg_id_tbl as nm_id_tbl)) x))'
+          ||cr||'        and ne_type = ''S'''
+          ||cr||'      )'
+          ||cr||'    group by nm_ne_id_of';
+        
+          l_union_all := cr||'    union all'||cr;
           l_union_count := l_union_count + 1;
       
       end if;
     
     end if;
+    
     
     -- if more than one source then wrap all into another group by to ensure distinct nm_ne_id_of
     if l_union_count > 1 then
@@ -2199,26 +2396,31 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
          p_elements_sql => l_inner_sql
       );
 
-      
     execute immediate 'truncate table nm_datum_criteria_tmp';
+    
+    ensure_group_type_linear(
+       p_group_type_in  => p_group_type
+      ,p_group_type_out => l_group_type
+    );
     
     nm3dbg.putln(l_sql);
     execute immediate l_sql
     using 
-       p_group_type;
+       l_group_type;
+    p_sqlcount := sql%rowcount;
     commit;
     
-    p_sqlcount := sql%rowcount;
-      
-  exception
-    when others then
-      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_gaz_list_datums('
-        ||'p_group_type='||p_group_type
-        ||', pt_ne.count='||pt_ne.count
-        ||', pt_nse.count='||pt_nse.count
-        ||')');
-      rollback;
-      raise;
+    nm3dbg.putln('nm_datum_criteria_tmp rowcount='||p_sqlcount);
+    nm3dbg.deind;
+--   exception
+--     when others then
+--       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_gaz_list_datums('
+--         ||'p_group_type='||p_group_type
+--         ||', pt_ne.count='||pt_ne.count
+--         ||', pt_nse.count='||pt_nse.count
+--         ||', l_group_type='||l_group_type
+--         ||')');
+--       raise;
     
   end;
   
@@ -2331,11 +2533,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   
   
   
-  -- this assignes the group type based on the group types of the loaded criteria datums
-  --  if the p_group_type_in is found and fully covered the this is returned, null otherwise
-  --  if p_group_type_in is not given then the first type covering all datums 
-  --    with lowest number of roads is returned
-  --  p_group_type_out is null in any other cases
+  -- TODO: this is no longer used, take out with the next header version
   procedure process_datums_group_type(
      p_group_type_in  in nm_group_types_all.ngt_group_type%type
     ,p_group_type_out out nm_group_types_all.ngt_group_type%type
@@ -2351,54 +2549,10 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       ||')');
     nm3dbg.ind;
     
-    if p_group_type_in is not null then
-      l_sql_q_where := 'where q.nm_obj_type = '''||p_group_type_in||'''';
-      
-    else
-      l_sql_q_where := 'where rownum = 1';
-      
-    end if;
-      
-
-    execute immediate
-            'select q.nm_obj_type'
-      ||cr||'from ('
-      ||cr||'select /*+ cardinality(x '||l_cardinality||') */'
-      ||cr||'   m.nm_obj_type'
-      ||cr||'  ,count(*) element_count'
-      ||cr||'  ,count(distinct nm_ne_id_in) road_count'
-      ||cr||'from'
-      ||cr||'   table(cast(nm3sql.get_id_tbl as nm_id_tbl)) x'
-      ||cr||'  ,nm_members_all m'
-      ||cr||'  ,(select ngt_group_type from nm_group_types' 
-      ||cr||'		where ngt_linear_flag = ''Y'' and ngt_exclusive_flag = ''Y'') gt' 
-      ||cr||'where x.column_value = m.nm_ne_id_of'
-      ||cr||'  and m.nm_obj_type = gt.ngt_group_type'
-      ||cr||'  and m.nm_type = ''G'''
-      ||cr||'group by'
-      ||cr||'   m.nm_obj_type'
-      ||cr||'having count(*) = :l_sqlcount'
-      ||cr||'order by 2 desc, 3 asc'
-      ||cr||') q'
-      ||cr||l_sql_q_where
-    into p_group_type_out
-    using l_count;
-      
-
-    nm3dbg.putln('p_group_type_out='||p_group_type_out);
-    nm3dbg.deind;
-  exception
-    when no_data_found then
-      nm3dbg.putln('no_data_found');
-      nm3dbg.deind;
-    when others then
-      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.process_group_type('
-        ||'p_group_type_in='||p_group_type_in
-        ||', p_group_type_out='||p_group_type_out
-        ||')');
-      raise;
+    raise_application_error(-20999, 'Dead plsql code');
 
   end;
+  
   
   
   -- this nullifies the passed passed in group type if it is not linear
@@ -2421,8 +2575,10 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   
   
   
-  -- this populatest the nm_datum_criteria_tmp table
-  --  
+  -- this is the sql wrapper that inserts into nm_datum_criteria_tmp
+  --  and calculates the group_id for each datum returned by the p_elements_sql
+  -- this is called for each datum criteria load procedure
+  -- TODO: consider turning this into a procedure that also executes the sql.
   function sql_load_nm_datum_criteria_tmp(
      p_elements_sql in varchar2
   ) return varchar2
@@ -2437,9 +2593,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       ||cr||'  ,q2.nm_begin_mp'
       ||cr||'  ,q2.nm_end_mp'
       ||cr||'  ,decode(q2.in_count, 1, null, q2.nm_ne_id_in) nm_ne_id_in'
-      --||cr||'  ,decode(q2.in_count, 1, null, q2.nm_obj_type) nm_obj_type'
-      --||cr||'  ,q2.of_count'
-      --||cr||'  ,q2.in_count'
       ||cr||'from ('
       ||cr||'select q.*'
       ||cr||'  ,decode(q.nm_ne_id_of, null, 1,' 
@@ -2468,7 +2621,52 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       ||cr||'where q2.row_num = 1';
       
   end;
+  
+  
 
+  
+  -- this tries to select rowid from an FT table
+  --  if succeeds then the table has a proper preserved pk
+  --  if not then it is deflated by a join to nm_members or its native positioning data
+  -- TODO: need to properly deal with materialized views, index organized and external tables
+  procedure test_key_preserved(
+     p_table_name in varchar2
+  )
+  is
+    l_rowid rowid;
+    l_dummy varchar2(1);
+  begin
+    execute immediate 'select rowid from '||p_table_name||' where rownum = 1' into l_rowid;
+    -- if the next line does not raise invalid_rowid then the rowid is from nm_members
+    select 'x' into l_dummy from nm_members_all where rowid = l_rowid;
+    raise key_not_preserved;
+  exception
+    when no_data_found then
+      null;
+    when invalid_rowid then
+      null;
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.test_key_preserved('
+        ||'p_table_name='||p_table_name
+        ||')');
+      raise;
+  end;
+  
+  
+  function is_key_preserved(
+     p_table_name in varchar2
+  ) return boolean
+  is
+  begin
+    test_key_preserved(p_table_name);
+    return true;
+  exception
+    when key_not_preserved then
+      return false;
+  end;
+  
+  
+    
   
 /* exec_splits_query
 
