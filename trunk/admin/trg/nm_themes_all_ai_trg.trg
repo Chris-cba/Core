@@ -1,16 +1,17 @@
 CREATE OR REPLACE TRIGGER NM_THEMES_ALL_AI_TRG
-AFTER DELETE
+AFTER INSERT
 ON NM_THEMES_ALL 
 REFERENCING NEW AS NEW OLD AS OLD
+FOR EACH ROW
 DECLARE
 -----------------------------------------------------------------------------
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/trg/nm_themes_all_ai_trg.trg-arc   2.0   Oct 02 2007 11:15:16   jwadsworth  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/trg/nm_themes_all_ai_trg.trg-arc   2.1   Oct 18 2007 15:56:38   aedwards  $
 -- Module Name : $Workfile:   nm_themes_all_ai_trg.trg  $
--- Date into PVCS : $Date:   Oct 02 2007 11:15:16  $
--- Date fetched Out : $Modtime:   Oct 02 2007 10:21:56  $
--- PVCS Version : $Revision:   2.0  $
+-- Date into PVCS : $Date:   Oct 18 2007 15:56:38  $
+-- Date fetched Out : $Modtime:   Oct 18 2007 15:55:32  $
+-- PVCS Version : $Revision:   2.1  $
 -- Based on SCCS version :
 -----------------------------------------------------------------------------
 --  Copyright (c) exor corporation ltd, 2004
