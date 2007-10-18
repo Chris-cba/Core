@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.5   Oct 11 2007 18:48:20   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.6   Oct 18 2007 12:31:02   ptanava  $
 --       Module Name      : $Workfile:   nm3inv_composite2.pkb  $
---       Date into PVCS   : $Date:   Oct 11 2007 18:48:20  $
---       Date fetched Out : $Modtime:   Oct 11 2007 18:39:16  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Oct 18 2007 12:31:02  $
+--       Date fetched Out : $Modtime:   Oct 17 2007 17:33:26  $
+--       PVCS Version     : $Revision:   2.6  $
 --       Based on sccs version :
 --
 --   Author : Priidu Tanava
@@ -14,7 +14,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 --   Bulk Merge Composite Inventory package body
 --
 -----------------------------------------------------------------------------
---   Copyright (c) exor corporation ltd, 2005
+--   Copyright (c) exor corporation ltd, 2007
 -----------------------------------------------------------------------------
 /* History:
   24.07.07 PT added set_job_broken(), improved progress reporting in get_progress_text()
@@ -25,10 +25,14 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
   04.10.07 PT accommodated nm3bulk_mrg changes in handling datum criteria
   08.10.07 PT in call_rebuild() merge results view name is now built from the merge unique.
   10.10.07 PT cleanup of dead code and variables
+  17.10.07 PT removed autonomous transaction
 */
 
-  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.5  $"';
+  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.6  $"';
   g_package_name  constant  varchar2(30) := 'nm3inv_composite2';
+  
+  cant_serialize exception;
+  pragma exception_init(cant_serialize, -8177);
 
   -- Bulk merge types
   type xsp_tbl is table of nm_inv_items_all.iit_x_sect%type index by binary_integer;
@@ -132,7 +136,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     l_len         binary_integer := length(p_what_hint);
     cur           sys_refcursor;
     
-    pragma autonomous_transaction;
+    --pragma autonomous_transaction;
   begin
     nm3dbg.debug_on;
     nm3dbg.putln(g_package_name||'.submit_job('
@@ -205,7 +209,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     l_what   varchar2(4000);
     l_errmsg varchar2(4000);
     i binary_integer;
-    pragma autonomous_transaction;
+    --pragma autonomous_transaction;
   begin
     nm3dbg.putln(g_package_name||'.set_job_broken('
       ||'p_job='||p_job
@@ -590,7 +594,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     
     
     -- the serializable ensures that we don't see invitem edits between the merge query steps
-    -- note that if there are many edits then the transaction may fail. it should then be retried.
+    -- possible error: ORA-08177 can't serialize access for this transaction
+    --  this is happens when somenone else has modified the nm_inv_items_all or nm_members_all
+    --  the modification must be on the same block. it is possible to happen. retry.
+    -- NB! autonomous transactions cannot be used with temp table inserts within the serializable transaction
+    --  as it makes the results invisible.
     set transaction isolation level serializable;
     
 
@@ -708,7 +716,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
       ,p_item_count     => l_sqlcount
       ,p_member_count   => l_sqlcount2
     );
-    commit;
+    --commit;
     t_events(t_events.count+1) := 'Final invitems count: '||l_sqlcount
       ||', member count: '||l_sqlcount2;
     nm3sql.set_longops(p_rec => r_longops, p_increment => 1);
@@ -725,6 +733,22 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     
     nm3dbg.deind;
   exception
+    when cant_serialize then
+      rollback;
+      nm3user.set_effective_date(l_effective_date);
+      if p_send_mail then
+        t_events(t_events.count+1) := sqlerrm;
+        send_mail2(
+           p_title => 'Run Derived Assets Error'
+          ,p_inv_type => p_inv_type
+          ,p_effective_date => p_effective_date
+          ,p_user_id => p_admin_id
+          ,pt_lines => t_events
+        );
+      end if;
+      raise_application_error(-20001,
+        'Other edits have occured that may compromize the results of this job. Transaction rolled back. Please retry.');
+        
     when others then
       nm3dbg.puterr(sqlerrm||'; '||g_package_name||'.do_rebuild('
         ||'p_op_context='||p_op_context
@@ -747,6 +771,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
         ||', l_effective_date='||l_effective_date
         ||', l_group_type='||l_group_type
         ||')');
+        rollback;
         nm3user.set_effective_date(l_effective_date);
         if p_send_mail then
           t_events(t_events.count+1) := sqlerrm;
@@ -1134,8 +1159,6 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     i       binary_integer;
     l_derivation  varchar2(4000);
     
-    pragma autonomous_transaction;
-    
   begin
     nm3dbg.putln(g_package_name||'.ins_iit_tmp_values('
       ||'p_inv_type='||p_inv_type
@@ -1148,6 +1171,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     nm3dbg.ind;
     
     -- nm_mrg_derived_inv_values_tmp is global temporary on commit preserve rows
+    -- (implicit commit)
     execute immediate
       'truncate table nm_mrg_derived_inv_values_tmp';
 
@@ -1206,10 +1230,9 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
        
     execute immediate l_sql using p_effective_date, p_mrg_job_id;
     p_sqlcount := sql%rowcount;
-    
-    -- autonomous
     commit;
     
+    nm3dbg.putln('nm_mrg_derived_inv_values_tmp count:'||p_sqlcount);
     nm3dbg.deind;
   exception
     when others then
@@ -1220,7 +1243,6 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
         ||', p_mrg_view_where='||p_mrg_view_where
         ||', p_effective_date='||p_effective_date
         ||')');
-      rollback;
       raise;
 
   end;
