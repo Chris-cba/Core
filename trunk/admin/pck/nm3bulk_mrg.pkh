@@ -2,11 +2,11 @@ create or replace package nm3bulk_mrg as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.2   Oct 04 2007 16:56:36   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.3   Oct 18 2007 12:26:50   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkh  $
---       Date into PVCS   : $Date:   Oct 04 2007 16:56:36  $
---       Date fetched Out : $Modtime:   Oct 04 2007 15:28:30  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Oct 18 2007 12:26:50  $
+--       Date fetched Out : $Modtime:   Oct 18 2007 10:03:56  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on sccs version : 
 --
 --   Author : Priidu Tanava
@@ -17,7 +17,7 @@ create or replace package nm3bulk_mrg as
 --   Copyright (c) exor corporation ltd, 2006
 -----------------------------------------------------------------------------
 
-  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.2  $"';
+  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.3  $"';
    
 
   type nm_obj_type_tbl is table of nm_members_all.nm_obj_type%type index by binary_integer;
@@ -136,6 +136,7 @@ create or replace package nm3bulk_mrg as
   
   function get_datum_id_tbl return nm_id_tbl;
   function get_group_id_tbl return nm_id_tbl;
+  function get_gg_id_tbl return nm_id_tbl;
   function get_nse_id_tbl return nm_id_tbl;
   
 
