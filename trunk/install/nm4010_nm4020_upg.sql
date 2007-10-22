@@ -3,11 +3,11 @@
 --
 --   SCCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_upg.sql-arc   2.3   Aug 17 2007 09:54:36   dyounger  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_upg.sql-arc   2.4   Oct 22 2007 15:04:50   jwadsworth  $
 --       Module Name      : $Workfile:   nm4010_nm4020_upg.sql  $
---       Date into PVCS   : $Date:   Aug 17 2007 09:54:36  $
---       Date fetched Out : $Modtime:   Aug 17 2007 09:02:36  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Oct 22 2007 15:04:50  $
+--       Date fetched Out : $Modtime:   Oct 22 2007 15:03:46  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on SCCS version :
 --
 -----------------------------------------------------------------------------
@@ -93,37 +93,8 @@ start &&run_file
 SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
---               ****************   RE-RUN INDEXES   *******************
-SET TERM ON
-PROMPT Re-running Indexes...
-PROMPT Ignore errors resulting from index already existing...
-SET TERM OFF
-SET DEFINE ON
-SELECT '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'nm3.ind' run_file
-FROM dual
-/
-SET FEEDBACK ON
-start &&run_file
-SET FEEDBACK OFF
---
----------------------------------------------------------------------------------------------------
---               ****************   RE-RUN CONSTRAINTS   *******************
-SET TERM ON
-PROMPT Re-running Constraints...
-PROMPT Ignore errors resulting from constraint already existing...
-SET TERM OFF
-SET DEFINE ON
-SELECT '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'nm3.con' run_file
-FROM dual
-/
-SET FEEDBACK ON
-start &&run_file
-SET FEEDBACK OFF
---
----------------------------------------------------------------------------------------------------
 --                        **************** VIEWS   ****************
+--
 SET TERM ON
 PROMPT Views...
 SET TERM OFF
