@@ -9,11 +9,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_metadata_upg.sql-arc   2.2   Oct 18 2007 12:06:28   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_metadata_upg.sql-arc   2.3   Oct 22 2007 13:55:18   jwadsworth  $
 --       Module Name      : $Workfile:   nm4010_nm4020_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Oct 18 2007 12:06:28  $
---       Date fetched Out : $Modtime:   Oct 18 2007 11:52:30  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Oct 22 2007 13:55:18  $
+--       Date fetched Out : $Modtime:   Oct 22 2007 13:50:38  $
+--       Version          : $Revision:   2.3  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -1750,8 +1750,28 @@ where not exists (select 1
 				   where hmo_module = 'GIS0011');
 
 insert into hig_modules
-  select 'GIS0011','Maintain Visible Themes','gis0011','FMX',NULL,'N','N','HIG','FORM'
-  from dual;
+     (hmo_module
+	 ,hmo_title
+	 ,hmo_filename
+	 ,hmo_module_type
+	 ,hmo_fastpath_opts
+	 ,hmo_fastpath_invalid
+	 ,hmo_use_gri
+	 ,hmo_application
+	 ,hmo_menu)
+select 'GIS0011'
+      ,'Maintain Visible Themes'
+	  ,'gis0011'
+	  ,'FMX'
+	  ,NULL
+	  ,'N'
+	  ,'N'
+	  ,'HIG'
+	  ,'FORM'
+  from dual
+  where not exists (select 1
+                      from hig_modules
+					 where hmo_module = 'GIS0011');
 
 insert into hig_module_roles
      (hmr_module
