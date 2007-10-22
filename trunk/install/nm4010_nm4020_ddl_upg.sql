@@ -9,11 +9,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_ddl_upg.sql-arc   2.4   Oct 22 2007 14:30:34   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_ddl_upg.sql-arc   2.5   Oct 22 2007 14:34:52   jwadsworth  $
 --       Module Name      : $Workfile:   nm4010_nm4020_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Oct 22 2007 14:30:34  $
---       Date fetched Out : $Modtime:   Oct 18 2007 11:52:30  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Oct 22 2007 14:34:52  $
+--       Date fetched Out : $Modtime:   Oct 22 2007 14:33:06  $
+--       Version          : $Revision:   2.5  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -327,8 +327,14 @@ SET TERM OFF
 -- DEVELOPMENT COMMENTS
 -- Table dropped and contents now part of nm_character_sets and nm_character_set_members table structures and functionality under ncs_code = 'INVALID_FOR_DDL'.  Chris has updated designer for the DDL changes,
 ------------------------------------------------------------------
-drop table nm_special_chars;
+BEGIN
+ EXECUTE IMMEDIATE ('drop table nm_special_chars');
+EXCEPTION
+  WHEN others THEN 
+   Null;
+END; 
 /
+
 ------------------------------------------------------------------
 
 
