@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.3   Jul 26 2007 16:37:14   gjohnson  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.4   Oct 23 2007 11:36:40   smarshall  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Jul 26 2007 16:37:14  $
---       Date fetched Out : $Modtime:   Jul 26 2007 16:23:06  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Oct 23 2007 11:36:40  $
+--       Date fetched Out : $Modtime:   Oct 23 2007 11:24:08  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --
 --   Author : Jonathan Mills
@@ -26,7 +26,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                              ,end_mp   nm_members.nm_end_mp%TYPE); 
    type t_chunk_arr is table of t_chunk_rec index by pls_integer;
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -1996,6 +1996,12 @@ BEGIN
       pi_pl.pl_start < nm.nm_end_mp
     AND
       pi_pl.pl_end > nm.nm_begin_mp
+    and
+      (nm.nm_end_date is NULL
+       OR
+       (nm.nm_end_date > pi_nm_rec.nm_start_date
+        AND
+        nm.nm_start_date <> nm.nm_end_date))
     order by
       nm.nm_start_date;
       
@@ -2032,6 +2038,9 @@ BEGIN
                                                         ,pi_chunk_arr => l_chunk_arr);
           
           --create mems for all bits in overlap not already processed
+          db('create mems for all bits in overlap not already processed');
+          db('l_unprocessed_pl_arr:');
+          nm3pla.dump_placement_array(p_pl_arr => l_unprocessed_pl_arr);
           cr8_mems_for_pl_arr(pi_pl_arr => l_unprocessed_pl_arr
                              ,pi_nm_rec => l_nm_rec);
           
@@ -2040,6 +2049,8 @@ BEGIN
         end if;
         
         --record that we have processed this chunk
+        db('record that we have processed this chunk');
+        db('--' || l_nm_rec.nm_begin_mp || ' to' || l_nm_rec.nm_end_mp);
         add_chunk_to_array(pi_begin_mp   => l_nm_rec.nm_begin_mp
                           ,pi_end_mp     => l_nm_rec.nm_end_mp
                           ,pio_chunk_arr => l_chunk_arr);
@@ -2047,6 +2058,9 @@ BEGIN
         --remove overlap from pl_arr
         l_pl_arr := nm3pla.remove_pl_from_pl_arr(pi_pl_arr => l_pl_arr
                                                 ,pi_pl     => l_pl);
+        db('remove overlap from pl_arr');
+        db('l_pl_arr with overlap removed:');
+        nm3pla.dump_placement_array(p_pl_arr => l_pl_arr);
       END IF;
     END LOOP;
   else
@@ -2076,6 +2090,12 @@ BEGIN
       pi_pl.pl_start = nm.nm_end_mp
     AND
       pi_pl.pl_end = nm.nm_begin_mp
+    and
+      (nm.nm_end_date is NULL
+       OR
+       (nm.nm_end_date > pi_nm_rec.nm_start_date
+        AND
+        nm.nm_start_date <> nm.nm_end_date))
     ORDER BY
       nm.nm_start_date;
       
