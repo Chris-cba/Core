@@ -3,11 +3,11 @@
 --
 --   SCCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_upg.sql-arc   2.4   Oct 22 2007 15:04:50   jwadsworth  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_upg.sql-arc   2.5   Oct 24 2007 15:35:52   jwadsworth  $
 --       Module Name      : $Workfile:   nm4010_nm4020_upg.sql  $
---       Date into PVCS   : $Date:   Oct 22 2007 15:04:50  $
---       Date fetched Out : $Modtime:   Oct 22 2007 15:03:46  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Oct 24 2007 15:35:52  $
+--       Date fetched Out : $Modtime:   Oct 24 2007 13:59:40  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on SCCS version :
 --
 -----------------------------------------------------------------------------
@@ -86,6 +86,34 @@ SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'install'||
         '&terminator'||'nm4010_nm4020_ddl_upg.sql' run_file
+FROM dual
+/
+SET FEEDBACK ON
+start &&run_file
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                        **************** DROP CHECK CONSTRAINTS   ****************
+SET TERM ON
+PROMPT Dropping Check Constraints...
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'drop_nm3_cons.sql' run_file
+FROM dual
+/
+SET FEEDBACK ON
+start &&run_file
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                        **************** CREATE CHECK CONSTRAINTS   ****************
+SET TERM ON
+PROMPT Creating Check Constraints...
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'create_nm3_check_cons.sql' run_file
 FROM dual
 /
 SET FEEDBACK ON
