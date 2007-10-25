@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.2   Oct 02 2007 10:10:26   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.3   Oct 25 2007 09:57:38   ptanava  $
 --       Module Name      : $Workfile:   nm3trg.sql  $
---       Date into PVCS   : $Date:   Oct 02 2007 10:10:26  $
---       Date fetched Out : $Modtime:   Oct 02 2007 09:17:56  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Oct 25 2007 09:57:38  $
+--       Date fetched Out : $Modtime:   Oct 25 2007 09:55:14  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : Graeme Johnson
@@ -1742,6 +1742,17 @@ PROMPT nm_members_all_nw_edit_audit.trg
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_members_all_nw_edit_audit.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm_inv_items_instead_iu.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_inv_items_instead_iu.trg' run_file 
 FROM dual 
 / 
 start '&run_file' 
