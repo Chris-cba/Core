@@ -4,22 +4,16 @@ CREATE OR REPLACE TRIGGER nm_inv_items_all_b_upd
          ON    NM_INV_ITEMS_ALL
        FOR EACH ROW
 DECLARE
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm_inv_items.trg	1.8 05/17/02
---       Module Name      : nm_inv_items.trg
---       Date into SCCS   : 02/05/17 10:03:48
---       Date fetched Out : 07/06/13 17:02:52
---       SCCS Version     : 1.8
---
---      TRIGGER nm_inv_items_all_b_upd
---       BEFORE  UPDATE OF iit_foreign_key
---         ON    nm_inv_items_all
---       FOR EACH ROW
---
------------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
------------------------------------------------------------------------------
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items.trg-arc   2.1   Oct 25 2007 16:38:34   gjohnson  $
+--       Module Name      : $Workfile:   nm_inv_items.trg  $
+--       Date into PVCS   : $Date:   Oct 25 2007 16:38:34  $
+--       Date fetched Out : $Modtime:   Oct 25 2007 14:51:32  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.8
+-------------------------------------------------------------------------
 BEGIN
    IF NVL(:OLD.iit_foreign_key,nm3type.c_nvl) <> NVL(:NEW.iit_foreign_key,nm3type.c_nvl)
     THEN
@@ -40,21 +34,16 @@ CREATE OR REPLACE TRIGGER nm_inv_items_all_b_ins_upd
        BEFORE INSERT OR UPDATE OF iit_end_date
        ON      NM_INV_ITEMS_ALL
 BEGIN
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm_inv_items.trg	1.8 05/17/02
---       Module Name      : nm_inv_items.trg
---       Date into SCCS   : 02/05/17 10:03:48
---       Date fetched Out : 07/06/13 17:02:52
---       SCCS Version     : 1.8
---
---      TRIGGER nm_inv_items_all_b_ins_upd
---      BEFORE INSERT OR UPDATE OF iit_end_date
---       on      nm_inv_items_all
---
------------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
------------------------------------------------------------------------------
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items.trg-arc   2.1   Oct 25 2007 16:38:34   gjohnson  $
+--       Module Name      : $Workfile:   nm_inv_items.trg  $
+--       Date into PVCS   : $Date:   Oct 25 2007 16:38:34  $
+--       Date fetched Out : $Modtime:   Oct 25 2007 14:51:32  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.8
+-------------------------------------------------------------------------
    --
    -- Clear any rows out of the PL/SQL Table (just in case)
    --
@@ -73,22 +62,16 @@ CREATE OR REPLACE TRIGGER nm_inv_items_all_b_ins_upd_row
        ON      NM_INV_ITEMS_ALL
        FOR     EACH ROW
 DECLARE
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm_inv_items.trg	1.8 05/17/02
---       Module Name      : nm_inv_items.trg
---       Date into SCCS   : 02/05/17 10:03:48
---       Date fetched Out : 07/06/13 17:02:52
---       SCCS Version     : 1.8
---
---      TRIGGER nm_inv_items_all_b_ins_upd_row
---       before  insert OR update OF iit_end_date
---       on      nm_inv_items_all
---       for     each row
---
------------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
------------------------------------------------------------------------------
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items.trg-arc   2.1   Oct 25 2007 16:38:34   gjohnson  $
+--       Module Name      : $Workfile:   nm_inv_items.trg  $
+--       Date into PVCS   : $Date:   Oct 25 2007 16:38:34  $
+--       Date fetched Out : $Modtime:   Oct 25 2007 14:51:32  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.8
+-------------------------------------------------------------------------
 --
    l_rec_nii nm_inv_items%ROWTYPE;
 --
@@ -138,21 +121,16 @@ CREATE OR REPLACE TRIGGER nm_inv_items_all_a_ins_upd
        AFTER   INSERT OR UPDATE OF iit_start_date, iit_end_date
        ON      NM_INV_ITEMS_ALL
 BEGIN
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm_inv_items.trg	1.8 05/17/02
---       Module Name      : nm_inv_items.trg
---       Date into SCCS   : 02/05/17 10:03:48
---       Date fetched Out : 07/06/13 17:02:52
---       SCCS Version     : 1.8
---
---       TRIGGER nm_inv_items_all_a_ins_upd
---       after   insert or update of iit_end_date
---       on      nm_inv_items_all
---
------------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
------------------------------------------------------------------------------
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items.trg-arc   2.1   Oct 25 2007 16:38:34   gjohnson  $
+--       Module Name      : $Workfile:   nm_inv_items.trg  $
+--       Date into PVCS   : $Date:   Oct 25 2007 16:38:34  $
+--       Date fetched Out : $Modtime:   Oct 25 2007 14:51:32  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.8
+-------------------------------------------------------------------------
 --
    IF (UPDATING AND nm3invval.g_process_update_trigger)
     OR INSERTING
@@ -170,28 +148,25 @@ CREATE OR REPLACE TRIGGER nm_inv_items_mand_check
        ON     NM_INV_ITEMS_ALL
        FOR    EACH ROW
 BEGIN
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm_inv_items.trg	1.8 05/17/02
---       Module Name      : nm_inv_items.trg
---       Date into SCCS   : 02/05/17 10:03:48
---       Date fetched Out : 07/06/13 17:02:52
---       SCCS Version     : 1.8
---
---      TRIGGER nm_inv_items_mand_check
---       BEFORE INSERT OR UPDATE
---       ON     NM_INV_ITEMS_ALL
---       FOR    EACH ROW
---
------------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
------------------------------------------------------------------------------
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items.trg-arc   2.1   Oct 25 2007 16:38:34   gjohnson  $
+--       Module Name      : $Workfile:   nm_inv_items.trg  $
+--       Date into PVCS   : $Date:   Oct 25 2007 16:38:34  $
+--       Date fetched Out : $Modtime:   Oct 25 2007 14:51:32  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.8
+-------------------------------------------------------------------------
 --
    IF :NEW.iit_primary_key IS NULL
     THEN
       :NEW.iit_primary_key := :NEW.iit_ne_id;
    END IF;
+   
+   
+  IF NOT nm3inv.bypass_inv_items_all_trgs THEN
+   
 --
    nm3inv.g_rec_iit.iit_ne_id                 := :NEW.iit_ne_id;
    nm3inv.g_rec_iit.iit_inv_type              := :NEW.iit_inv_type;
@@ -364,5 +339,8 @@ BEGIN
    --
    nm3inv.validate_rec_iit;
    --
+   
+  END IF;
+     
 END nm_inv_items_mand_check;
 /
