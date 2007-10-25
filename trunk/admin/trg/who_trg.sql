@@ -1,6 +1,18 @@
 --
 -- This script creates all of the table_name_who triggers
 --
+-----------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.1   Oct 25 2007 12:55:16   sscanlon  $
+--       Module Name                : $Workfile:   who_trg.sql  $
+--       Date into PVCS             : $Date:   Oct 25 2007 12:55:16  $
+--       Date fetched Out           : $Modtime:   Oct 25 2007 12:54:40  $
+--       PVCS Version               : $Revision:   2.1  $
+--       Based on SCCS version      : 1.4
+-----------------------------------------------------------------------------
+-- Copyright (c) exor corporation ltd, 2007
+-----------------------------------------------------------------------------
 set serveroutput on size 100000
 --
 DECLARE
@@ -18,7 +30,8 @@ DECLARE
      from user_tab_columns
    where  table_name = p_table_name
     AND  (column_name    like '%'||p_type||'_BY'
-          or column_name like '%DATE_'||p_type);
+          or column_name like '%DATE_'||p_type)
+    order by column_id;
 --
    l_trigger_name VARCHAR2(30);
 --
@@ -31,16 +44,16 @@ BEGIN
    l_tab_comments(1)  := '--';
    l_tab_comments(2)  := '--   SCCS Identifiers :-';
    l_tab_comments(3)  := '--';
-   l_tab_comments(4)  := '--       sccsid           : @(#)who_trg.sql	1.4 09/16/02';
-   l_tab_comments(5)  := '--       Module Name      : who_trg.sql';
-   l_tab_comments(6)  := '--       Date into SCCS   : 02/09/16 10:32:58';
-   l_tab_comments(7)  := '--       Date fetched Out : 07/06/13 17:03:54';
-   l_tab_comments(8)  := '--       SCCS Version     : 1.4';
+   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.1   Oct 25 2007 12:55:16   sscanlon  $';
+   l_tab_comments(5)  := '--       Module Name                : $Workfile:   who_trg.sql  $';
+   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Oct 25 2007 12:55:16  $';
+   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Oct 25 2007 12:54:40  $';
+   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.1  $';
    l_tab_comments(9)  := '--';
    l_tab_comments(10) := '--   table_name_WHO trigger';
    l_tab_comments(11) := '--';
    l_tab_comments(12) := '-----------------------------------------------------------------------------';
-   l_tab_comments(13) := '--	Copyright (c) exor corporation ltd, 2001';
+   l_tab_comments(13) := '--    Copyright (c) exor corporation ltd, 2007';
    l_tab_comments(14) := '-----------------------------------------------------------------------------';
    l_tab_comments(15) := '--';
 --
