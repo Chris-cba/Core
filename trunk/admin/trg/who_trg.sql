@@ -4,11 +4,11 @@
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.1   Oct 25 2007 12:55:16   sscanlon  $
+--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.2   Oct 25 2007 13:02:18   sscanlon  $
 --       Module Name                : $Workfile:   who_trg.sql  $
---       Date into PVCS             : $Date:   Oct 25 2007 12:55:16  $
---       Date fetched Out           : $Modtime:   Oct 25 2007 12:54:40  $
---       PVCS Version               : $Revision:   2.1  $
+--       Date into PVCS             : $Date:   Oct 25 2007 13:02:18  $
+--       Date fetched Out           : $Modtime:   Oct 25 2007 13:00:12  $
+--       PVCS Version               : $Revision:   2.2  $
 --       Based on SCCS version      : 1.4
 -----------------------------------------------------------------------------
 -- Copyright (c) exor corporation ltd, 2007
@@ -17,7 +17,7 @@ set serveroutput on size 100000
 --
 DECLARE
 --
-   TYPE tab_comments IS TABLE of VARCHAR2(100) INDEX BY BINARY_INTEGER;
+   TYPE tab_comments IS TABLE of VARCHAR2(250) INDEX BY BINARY_INTEGER;
    l_tab_comments tab_comments;
 --
    CURSOR cs_cols (p_table_name VARCHAR2, p_type VARCHAR2) IS
@@ -44,11 +44,11 @@ BEGIN
    l_tab_comments(1)  := '--';
    l_tab_comments(2)  := '--   SCCS Identifiers :-';
    l_tab_comments(3)  := '--';
-   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.1   Oct 25 2007 12:55:16   sscanlon  $';
+   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.2   Oct 25 2007 13:02:18   sscanlon  $';
    l_tab_comments(5)  := '--       Module Name                : $Workfile:   who_trg.sql  $';
-   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Oct 25 2007 12:55:16  $';
-   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Oct 25 2007 12:54:40  $';
-   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.1  $';
+   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Oct 25 2007 13:02:18  $';
+   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Oct 25 2007 13:00:12  $';
+   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.2  $';
    l_tab_comments(9)  := '--';
    l_tab_comments(10) := '--   table_name_WHO trigger';
    l_tab_comments(11) := '--';
