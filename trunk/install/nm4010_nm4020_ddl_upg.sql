@@ -9,11 +9,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_ddl_upg.sql-arc   2.5   Oct 22 2007 14:34:52   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_ddl_upg.sql-arc   2.6   Oct 26 2007 11:53:34   jwadsworth  $
 --       Module Name      : $Workfile:   nm4010_nm4020_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Oct 22 2007 14:34:52  $
---       Date fetched Out : $Modtime:   Oct 22 2007 14:33:06  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Oct 26 2007 11:53:34  $
+--       Date fetched Out : $Modtime:   Oct 26 2007 11:28:30  $
+--       Version          : $Revision:   2.6  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -173,8 +173,8 @@ CREATE TABLE nm_element_history
   neh_ne_id_new       number(9)                 NOT NULL,
   neh_operation       varchar2(1)               NOT NULL,
   neh_effective_date  date                      NOT NULL,
-  neh_actioned_date   date                      DEFAULT TRUNC(SYSDATE) NOT NULL,
-  neh_actioned_by     varchar2(30)              DEFAULT USER NOT NULL,
+  neh_actioned_date   date                      DEFAULT trunc(sysdate) NOT NULL,
+  neh_actioned_by     varchar2(30)              DEFAULT user NOT NULL,
   neh_old_ne_length   number,
   neh_new_ne_length   number,
   neh_param_1         number,
@@ -241,7 +241,7 @@ FROM
    ORDER BY
      neho.neh_actioned_date) nehv;
 
-
+DROP TABLE NM_ELEMENT_HISTORY_OLD;
 ------------------------------------------------------------------
 
 
@@ -377,7 +377,7 @@ SET TERM OFF
 -- PT  18-SEP-2007
 -- 
 -- DEVELOPMENT COMMENTS
--- Change IIT_LENGTH from NUMBER(6) to NUMBER. Note, schema is compiled with this script. Otherwise the policy function on NM_INV_ITEMS_ALL may fail.
+-- Change IIT_LENGTH from NUMBER(6) to NUMBER. This copies the iit_length values out into a table zz_iit_length_change_tmp. The table can be dropped manually once all ok. This script no longer compiles the schema.
 ------------------------------------------------------------------
 
 -- dropping temp table
@@ -460,45 +460,12 @@ alter table nm_inv_items_all modify (
 /
 
 
-
--- compiling schema, this may take a while
---  if we don't do it the policy function may fail in the next step
-prompt compiling schema, this may take a while ...
-begin
-for r in (
-  select o.object_name, o.object_type
-  from user_objects o
-  where o.status = 'INVALID'
-  order by
-  case o.object_type
-  when 'PACKAGE' then 1
-  when 'FUNCTION' then 2
-  when 'PROCEDURE' then 3
-  when 'TYPE' then 4
-  when 'VIEW' then 5
-  when 'TYPE BODY' then 6
-  when 'PACKAGE BODY' then 7
-  when 'TRIGGER' then 8
-  end
-)
-loop
-  begin
-  case r.object_type
-  when 'PACKAGE' then         execute immediate 'alter package '||r.object_name||' compile';
-  when 'FUNCTION' then        execute immediate 'alter function '||r.object_name||' compile';
-  when 'PROCEDURE' then       execute immediate 'alter procedure '||r.object_name||' compile';
-  when 'TYPE' then            execute immediate 'alter type '||r.object_name||' compile';
-  when 'VIEW' then            execute immediate 'alter view '||r.object_name||' compile';
-  when 'TYPE BODY' then       execute immediate 'alter type '||r.object_name||' compile body';
-  when 'PACKAGE BODY' then    execute immediate 'alter package '||r.object_name||' compile body';
-  when 'TRIGGER' then         execute immediate 'alter trigger '||r.object_name||' compile';
-  end case;
-  exception
-    when others then
-      null;
-  end;
-end loop;
-end;
+-- compile the nm_inv_items_all security policy package
+-- the next step could fail otherwise
+prompt compiling invsec package
+alter package invsec compile
+/
+alter package invsec compile body
 /
 
 
