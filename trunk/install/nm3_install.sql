@@ -1,4 +1,4 @@
-define sccsid = '$Revision:   2.2  $'
+define sccsid = '$Revision:   2.3  $'
 
 set echo off
 set linesize 120
@@ -176,6 +176,34 @@ from dual
 /
 SET FEEDBACK ON
 start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                        **************** DROP CHECK CONSTRAINTS   ****************
+SET TERM ON
+PROMPT Dropping Check Constraints...
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'drop_nm3_cons.sql' run_file
+FROM dual
+/
+SET FEEDBACK ON
+start &&run_file
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                        **************** CREATE CHECK CONSTRAINTS   ****************
+SET TERM ON
+PROMPT Creating Check Constraints...
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'create_nm3_check_cons.sql' run_file
+FROM dual
+/
+SET FEEDBACK ON
+start &&run_file
 SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
