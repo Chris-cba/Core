@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.3   Jul 20 2007 08:10:08   sscanlon  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.4   Oct 26 2007 09:08:22   sscanlon  $
 --       Module Name      	: $Workfile:   nm3inv_view.pkb  $
---       Date into PVCS   	: $Date:   Jul 20 2007 08:10:08  $
---       Date fetched Out 	: $Modtime:   Jul 20 2007 07:20:22  $
---       PVCS Version     	: $Revision:   2.3  $
+--       Date into PVCS   	: $Date:   Oct 26 2007 09:08:22  $
+--       Date fetched Out 	: $Modtime:   Oct 26 2007 09:00:02  $
+--       PVCS Version     	: $Revision:   2.4  $
 --       Based on SCCS version 	: 1.56
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --      Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.3      $';
+   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.4      $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
 --all global package variables here
@@ -1349,7 +1349,7 @@ BEGIN
    FOR cs_rec IN (SELECT *
                    FROM  nm_type_columns
                   WHERE  ntc_nt_type = pi_nt_type
-                 )
+               ORDER BY  NTC_SEQ_NO)
     LOOP
       l_rec_ntc := cs_rec;
       DECLARE
@@ -1570,7 +1570,7 @@ BEGIN
    FOR cs_rec IN (SELECT *
                    FROM  nm_type_columns
                   WHERE  ntc_nt_type = pi_nt_type
-                 )
+                  ORDER BY NTC_SEQ_NO) --sscanlon fix
     LOOP
       l_rec_ntc := cs_rec;
       DECLARE
