@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.2   Sep 24 2007 18:00:22   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.3   Oct 29 2007 10:42:08   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into SCCS   : $Date:   Sep 24 2007 18:00:22  $
---       Date fetched Out : $Modtime:   Sep 24 2007 17:06:14  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Oct 29 2007 10:42:08  $
+--       Date fetched Out : $Modtime:   Oct 29 2007 10:40:54  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on : 1.91
 --
 --   Author : R.A. Coupe
@@ -3124,6 +3124,12 @@ PROCEDURE split_element_shapes (
     l_rec_new_nth.nth_feature_table  := l_new_table_name;
 
     Nm3ins.ins_nth(l_rec_new_nth);
+    
+    INSERT INTO NM_NW_THEMES
+      ( nnth_nlt_id, nnth_nth_theme_id )
+    SELECT nnth_nlt_id, l_rec_new_nth.nth_theme_id
+      FROM nm_nw_themes
+     WHERE nnth_nth_theme_id = l_rec_nth.nth_theme_id;
 
 --    Nm_Debug.DEBUG('theme created - now set the base-table theme attribute');
     -- Update (now the) view theme to point to new table
