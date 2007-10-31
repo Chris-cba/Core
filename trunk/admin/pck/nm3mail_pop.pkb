@@ -34,7 +34,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail_pop AS
 --
    c_colon           CONSTANT  VARCHAR2(1)    := ':';
    c_app_owner       CONSTANT  VARCHAR2(30)   := hig.get_application_owner;
+   
    c_failing_command CONSTANT  VARCHAR2(30)   := 'BADGER';
+   
+   c_failing_str_opt constant  hig_option_list.hol_id%type := 'POPFAILSTR';
+   c_failing_string  CONSTANT  VARCHAR2(100) := NVL(hig.get_sysopt(p_option_id => c_failing_str_opt), '-ERR%'||UPPER(c_failing_command)||'%');
 --
    g_retry_count               PLS_INTEGER;
    g_retry_limit     CONSTANT  PLS_INTEGER    := 3;
@@ -194,7 +198,7 @@ END write_failing_command;
 --
 FUNCTION is_failed_command (p_text VARCHAR2) RETURN BOOLEAN IS
 BEGIN
-   RETURN UPPER(p_text) LIKE '-ERR%'||UPPER(c_failing_command)||'%';
+   RETURN UPPER(p_text) LIKE c_failing_string;
 END is_failed_command;
 --
 -----------------------------------------------------------------------------
@@ -284,7 +288,7 @@ BEGIN
    l_decrypted_password := decrypt_data (l_rec_nmps.nmps_password);
 --
 --   nm_debug.delete_debug(TRUE);
---   nm_debug.debug_on;
+   nm_debug.debug_on;
 --   nm_debug.set_level(4);
    debug_nmps_internal (l_rec_nmps);
 --
@@ -314,7 +318,7 @@ BEGIN
 --
    l_tab_retr_command := build_retr_commands (l_output);
 --
---   nm3tab_varchar.debug_tab_varchar (l_tab_retr_command);
+   nm3tab_varchar.debug_tab_varchar (l_tab_retr_command);
 --
    close_connection (l_conn);
 --
