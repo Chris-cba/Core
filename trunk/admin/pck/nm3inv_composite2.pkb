@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.6   Oct 18 2007 12:31:02   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.7   Nov 01 2007 16:47:34   ptanava  $
 --       Module Name      : $Workfile:   nm3inv_composite2.pkb  $
---       Date into PVCS   : $Date:   Oct 18 2007 12:31:02  $
---       Date fetched Out : $Modtime:   Oct 17 2007 17:33:26  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Nov 01 2007 16:47:34  $
+--       Date fetched Out : $Modtime:   Nov 01 2007 16:46:26  $
+--       PVCS Version     : $Revision:   2.7  $
 --       Based on sccs version :
 --
 --   Author : Priidu Tanava
@@ -26,9 +26,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
   08.10.07 PT in call_rebuild() merge results view name is now built from the merge unique.
   10.10.07 PT cleanup of dead code and variables
   17.10.07 PT removed autonomous transaction
+  26.10.07 PT added procedure validate_nt_type() used in do_rebuild() to check p_nt_type allowed
+                nm3bulk_mrg.ins_route_connectivity() now called separately in do_rebuild()
 */
 
-  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.6  $"';
+  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.7  $"';
   g_package_name  constant  varchar2(30) := 'nm3inv_composite2';
   
   cant_serialize exception;
@@ -83,7 +85,10 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
   
   procedure set_job_broken(p_job in number);
 
-
+  procedure validate_nt_type(
+     p_inv_type in varchar2
+    ,p_nt_type in varchar2
+  );
    
   cr  constant varchar2(1) := chr(10);
    
@@ -636,9 +641,15 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
       );
       
       
-    -- 1.3 we have a network type (linear)
+    -- 1.3 we have a network type
     elsif p_nt_type is not null then
 
+      -- network type must be linear datum type and allwed for the inv_type
+      validate_nt_type(
+         p_inv_type => p_inv_type
+        ,p_nt_type  => p_nt_type
+      );
+      
       -- load datums of the given nt_type
       nm3bulk_mrg.load_nt_type_datums(
          p_group_type => null
@@ -658,12 +669,19 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     
     end if;
     
-    
-    
     nm3sql.set_longops(p_rec => r_longops, p_increment => 1);
     t_events(t_events.count+1) := 'Loaded criteria datum count: '||l_sqlcount;
-
-    -- 2,3,4,5. Run the bulk merge query
+    
+    
+    -- 2 populate route connectivity
+    nm3bulk_mrg.ins_route_connectivity(
+       p_criteria_rowcount  => l_sqlcount
+      ,p_ignore_poe         => p_ignore_poe
+    );
+    nm3sql.set_longops(p_rec => r_longops, p_increment => 1);
+    
+    
+    -- 3,4,5. Run the bulk merge query
     nm3bulk_mrg.std_run(
        p_nmq_id         => p_nmq_id
       ,p_nqr_admin_unit => p_admin_unit_id
@@ -747,7 +765,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
         );
       end if;
       raise_application_error(-20001,
-        'Other edits have occured that may compromize the results of this job. Transaction rolled back. Please retry.');
+        'Other edits have affected the consistency of the results. Transaction rolled back. Please retry.');
         
     when others then
       nm3dbg.puterr(sqlerrm||'; '||g_package_name||'.do_rebuild('
@@ -1637,6 +1655,33 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
         ||')');
       raise;
   end;
+  
+  
+  -- this validates the network type parameter, called from do_rebuild()
+  procedure validate_nt_type(
+     p_inv_type in varchar2
+    ,p_nt_type in varchar2
+  )
+  is
+    l_dummy varchar2(1);
+    l_msg   varchar2(100);
+  begin
+    l_msg := 'The network type must a linear datum type';
+    select 'x' dummy into l_dummy
+    from nm_types t
+    where t.nt_type = p_nt_type
+      and t.nt_datum = 'Y'
+      and t.nt_linear = 'Y';
+    --
+    l_msg := 'The network type is not allowed for the derived asset type';
+    select 'x' dummy into l_dummy
+    from nm_inv_nw n
+    where n.nin_nit_inv_code = p_inv_type
+      and n.nin_nw_type = p_nt_type;
+   exception
+     when no_data_found then
+       raise_application_error(-20001, l_msg);
+   end;
   
 
 --
