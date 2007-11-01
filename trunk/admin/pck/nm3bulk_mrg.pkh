@@ -2,11 +2,11 @@ create or replace package nm3bulk_mrg as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.3   Oct 18 2007 12:26:50   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.4   Nov 01 2007 16:37:36   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkh  $
---       Date into PVCS   : $Date:   Oct 18 2007 12:26:50  $
---       Date fetched Out : $Modtime:   Oct 18 2007 10:03:56  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Nov 01 2007 16:37:36  $
+--       Date fetched Out : $Modtime:   Oct 19 2007 13:42:14  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on sccs version : 
 --
 --   Author : Priidu Tanava
@@ -17,7 +17,7 @@ create or replace package nm3bulk_mrg as
 --   Copyright (c) exor corporation ltd, 2006
 -----------------------------------------------------------------------------
 
-  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.3  $"';
+  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.4  $"';
    
 
   type nm_obj_type_tbl is table of nm_members_all.nm_obj_type%type index by binary_integer;
@@ -79,7 +79,6 @@ create or replace package nm3bulk_mrg as
     ,pt_attr in ita_mapping_tbl
     ,p_admin_unit_id in nm_admin_units_all.nau_admin_unit%type
     ,p_splits_rowcount in integer
-    ,p_ignore_poe in boolean
     ,p_description in varchar2
     ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
   );
