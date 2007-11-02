@@ -9,11 +9,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_metadata_upg.sql-arc   2.3   Oct 22 2007 13:55:18   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_metadata_upg.sql-arc   2.4   Nov 02 2007 13:57:50   jwadsworth  $
 --       Module Name      : $Workfile:   nm4010_nm4020_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Oct 22 2007 13:55:18  $
---       Date fetched Out : $Modtime:   Oct 22 2007 13:50:38  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Nov 02 2007 13:57:50  $
+--       Date fetched Out : $Modtime:   Nov 02 2007 13:55:06  $
+--       Version          : $Revision:   2.4  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -1869,7 +1869,7 @@ INSERT
       ,hol_user_option) 
 SELECT 'WEBCONFIG'
       ,'HIG'
-      ,'Config Value'
+      ,'Set this to the required sso_userid - A maximum of 30 characters'
       ,'Config Value'
       ,NULL
       ,'VARCHAR2'
@@ -1886,7 +1886,7 @@ INSERT
       (hov_id
       ,hov_value)
 SELECT 'WEBCONFIG'
-      ,'** set this to the required sso_userid **'
+      ,null
   FROM dual
  WHERE NOT EXISTS(SELECT 1
                     FROM  hig_option_values
@@ -2492,14 +2492,6 @@ union all
 select 'AST_REF', 'NM0435', 'Create Derived Assets', 'M', 10 from dual
 union all
 select 'NET_QUERIES', 'NM7051B', 'Merge Query Results', 'M', 6 from dual
-/
-------------------------------------------------------------------
-
-
-------------------------------------------------------------------
-
-------------------------------------------------------------------
-COMMIT
 /
 ------------------------------------------------------------------
 
