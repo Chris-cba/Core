@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.8   Oct 11 2007 18:16:46   ptanava  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.9   Nov 07 2007 16:37:46   jwadsworth  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Oct 11 2007 18:16:46  $
---       Date fetched Out : $Modtime:   Oct 11 2007 18:13:28  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Nov 07 2007 16:37:46  $
+--       Date fetched Out : $Modtime:   Nov 07 2007 16:35:30  $
+--       Version          : $Revision:   2.9  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.2.0
 
 GENERATION DATE
 ===============
-11-OCT-2007 18:13
+07-NOV-2007 16:35
 
 TABLES PROCESSED
 ================
@@ -83481,6 +83481,23 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'FAVOURITES'
+       ,'TMA'
+       ,'TMA'
+       ,'F'
+       ,16 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'FAVOURITES'
+                    AND  HSTF_CHILD = 'TMA');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'FAVOURITES'
        ,'UKP'
        ,'UKPMS'
        ,'F'
@@ -85912,23 +85929,6 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'MAI_INV'
-       ,'MAI2310'
-       ,'Inventory Items'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_INV'
-                    AND  HSTF_CHILD = 'MAI2310');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_INV'
        ,'MAI_INV_REPORTS'
        ,'Reports'
        ,'F'
@@ -87109,57 +87109,6 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'MAI_REF_INVENTORY'
                     AND  HSTF_CHILD = 'MAI1430');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INVENTORY'
-       ,'MAI1440'
-       ,'Inventory Colour Map'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY'
-                    AND  HSTF_CHILD = 'MAI1440');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INVENTORY'
-       ,'MAI1910'
-       ,'XSP Values'
-       ,'M'
-       ,4 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY'
-                    AND  HSTF_CHILD = 'MAI1910');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'MAI_REF_INVENTORY'
-       ,'MAI1920'
-       ,'Inventory XSPs'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'MAI_REF_INVENTORY'
-                    AND  HSTF_CHILD = 'MAI1920');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -89591,23 +89540,6 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'NSG_DATA'
                     AND  HSTF_CHILD = 'NSG0090');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA'
-       ,'NSG0110'
-       ,'Organisations and Districts'
-       ,'M'
-       ,25 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA'
-                    AND  HSTF_CHILD = 'NSG0110');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
