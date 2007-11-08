@@ -9,11 +9,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_metadata_upg.sql-arc   2.5   Nov 08 2007 09:20:00   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_metadata_upg.sql-arc   2.6   Nov 08 2007 10:08:58   jwadsworth  $
 --       Module Name      : $Workfile:   nm4010_nm4020_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Nov 08 2007 09:20:00  $
---       Date fetched Out : $Modtime:   Nov 08 2007 09:15:28  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Nov 08 2007 10:08:58  $
+--       Date fetched Out : $Modtime:   Nov 08 2007 09:59:26  $
+--       Version          : $Revision:   2.6  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -1951,7 +1951,7 @@ SELECT
        ,'N'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
-                   WHERE HOL_ID = 'EDIFDLROLE')
+                   WHERE HOL_ID = 'EDIFDLROLE');
 ------------------------------------------------------------------
 
 
