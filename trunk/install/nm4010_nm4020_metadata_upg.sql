@@ -9,11 +9,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_metadata_upg.sql-arc   2.4   Nov 02 2007 13:57:50   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_metadata_upg.sql-arc   2.5   Nov 08 2007 09:20:00   jwadsworth  $
 --       Module Name      : $Workfile:   nm4010_nm4020_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Nov 02 2007 13:57:50  $
---       Date fetched Out : $Modtime:   Nov 02 2007 13:55:06  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Nov 08 2007 09:20:00  $
+--       Date fetched Out : $Modtime:   Nov 08 2007 09:15:28  $
+--       Version          : $Revision:   2.5  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -1803,11 +1803,9 @@ from dual where not exists (select 1
 							   and hstf_child = 'GIS0011');
 
 insert into nm_themes_visible
-select nth_theme_id, 'N'
+select nth_theme_id, 'Y'
 from nm_themes_all
-where exists
-  (select 1 from v_nm_msv_themes
-     where vnmt_theme_name = nth_theme_name);
+where nth_theme_type = 'SDO';
      
 INSERT
   INTO hig_option_list
