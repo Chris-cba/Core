@@ -9,11 +9,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_metadata_upg.sql-arc   2.7   Nov 08 2007 14:15:36   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4010_nm4020_metadata_upg.sql-arc   2.8   Nov 08 2007 15:13:56   jwadsworth  $
 --       Module Name      : $Workfile:   nm4010_nm4020_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Nov 08 2007 14:15:36  $
---       Date fetched Out : $Modtime:   Nov 08 2007 14:14:42  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Nov 08 2007 15:13:56  $
+--       Date fetched Out : $Modtime:   Nov 08 2007 14:43:24  $
+--       Version          : $Revision:   2.8  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -1884,7 +1884,7 @@ INSERT
       (hov_id
       ,hov_value)
 SELECT 'WEBCONFIG'
-      ,null
+      ,'Y'
   FROM dual
  WHERE NOT EXISTS(SELECT 1
                     FROM  hig_option_values
