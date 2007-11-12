@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.2   Aug 29 2007 18:59:52   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.3   Nov 12 2007 16:00:04   malexander  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Aug 29 2007 18:59:52  $
---       Date fetched Out : $Modtime:   Aug 29 2007 17:59:36  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Nov 12 2007 16:00:04  $
+--       Date fetched Out : $Modtime:   Nov 12 2007 15:41:54  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.2  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.3  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -3418,6 +3418,8 @@ AS
           'END;';
           
           RETURN(get_global_boolean);
+  ELSE
+    RETURN False;
   END IF;
   
   END england_wales_asd_in_use;
@@ -3436,6 +3438,8 @@ AS
           'END;';
           
           RETURN(get_global_boolean);
+  ELSE
+    RETURN False;
   END IF;
   
   END scotland_asd_in_use;
