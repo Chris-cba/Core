@@ -6,11 +6,11 @@ CREATE OR REPLACE TRIGGER a_ins_nm_elements
 DECLARE
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.2   Sep 19 2007 12:24:00   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.3   Nov 14 2007 13:59:28   aedwards  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Sep 19 2007 12:24:00  $
---       Date fetched Out : $Modtime:   Sep 19 2007 11:30:36  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Nov 14 2007 13:59:28  $
+--       Date fetched Out : $Modtime:   Nov 14 2007 13:58:54  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --       Based on 1.11
 --
@@ -86,11 +86,11 @@ CREATE OR REPLACE TRIGGER b_upd_nm_elements
 DECLARE
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.2   Sep 19 2007 12:24:00   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.3   Nov 14 2007 13:59:28   aedwards  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Sep 19 2007 12:24:00  $
---       Date fetched Out : $Modtime:   Sep 19 2007 11:30:36  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Nov 14 2007 13:59:28  $
+--       Date fetched Out : $Modtime:   Nov 14 2007 13:58:54  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --       Based on 1.11
 --
@@ -210,11 +210,11 @@ CREATE OR REPLACE TRIGGER b_ins_nm_elements
 BEGIN
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.2   Sep 19 2007 12:24:00   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.3   Nov 14 2007 13:59:28   aedwards  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Sep 19 2007 12:24:00  $
---       Date fetched Out : $Modtime:   Sep 19 2007 11:30:36  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Nov 14 2007 13:59:28  $
+--       Date fetched Out : $Modtime:   Nov 14 2007 13:58:54  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --       Based on 1.11
 --
@@ -266,11 +266,11 @@ CREATE OR REPLACE TRIGGER a_del_nm_elements
 DECLARE
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.2   Sep 19 2007 12:24:00   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.3   Nov 14 2007 13:59:28   aedwards  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Sep 19 2007 12:24:00  $
---       Date fetched Out : $Modtime:   Sep 19 2007 11:30:36  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Nov 14 2007 13:59:28  $
+--       Date fetched Out : $Modtime:   Nov 14 2007 13:58:54  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --
 --     TRIGGER a_del_nm_elements
@@ -300,7 +300,8 @@ DECLARE
      and   nvl(nlt_gty_type, nm3type.c_nvl ) = nvl( c_gt_type, nm3type.c_nvl )
      and nlt_g_i_d = 'D'
      and nnth_nlt_id = nlt_id
-     and nnth_nth_theme_id = nth_theme_id;
+     and nnth_nth_theme_id = nth_theme_id
+     and nth_base_table_theme IS NULL;
 
 --
 BEGIN
@@ -361,11 +362,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.2   Sep 19 2007 12:24:00   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.3   Nov 14 2007 13:59:28   aedwards  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Sep 19 2007 12:24:00  $
---       Date fetched Out : $Modtime:   Sep 19 2007 11:30:36  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Nov 14 2007 13:59:28  $
+--       Date fetched Out : $Modtime:   Nov 14 2007 13:58:54  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --       Based on 1.11
 --
