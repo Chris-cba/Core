@@ -1,5 +1,5 @@
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.1      $"';
+define sccsid = '"$Revision::   2.2      $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
@@ -52,10 +52,11 @@ DECLARE
   p_admin_unit_code varchar2(100) := UPPER('&P_ADMIN_UNIT_CODE');
   p_admin_unit_name varchar2(100) := UPPER('&P_ADMIN_UNIT_NAME');
 --
-  l_oracle9i  boolean;
-  l_oracle10g boolean;
-
-  
+  l_oracle9i    boolean;
+  l_oracle10gr1 boolean;
+  l_oracle10gr2 boolean;
+--
+ 
   FUNCTION db_is_9i RETURN boolean IS
 
     l_dummy pls_integer;
@@ -84,7 +85,7 @@ DECLARE
 
   END db_is_9i;
 
-  FUNCTION db_is_10g RETURN boolean IS
+  FUNCTION db_is_10gr1 RETURN boolean IS
 
     l_dummy pls_integer;
 
@@ -101,7 +102,7 @@ DECLARE
              FROM
                v$version
              WHERE
-               UPPER(banner) LIKE '%10G%');
+               UPPER(banner) LIKE '%10.1%');
 
     RETURN TRUE;
 
@@ -110,8 +111,35 @@ DECLARE
     THEN
       RETURN FALSE;
 
-  END db_is_10g;
+  END db_is_10gr1;
 
+  FUNCTION db_is_10gr2 RETURN boolean IS
+
+    l_dummy pls_integer;
+
+  BEGIN
+    SELECT
+      1
+    INTO
+      l_dummy
+    FROM
+      dual
+    WHERE
+      EXISTS(SELECT
+               1
+             FROM
+               v$version
+             WHERE
+               UPPER(banner) LIKE '%10.2%');
+
+    RETURN TRUE;
+
+  EXCEPTION
+    WHEN no_data_found
+    THEN
+      RETURN FALSE;
+
+  END db_is_10gr2;
 
    PROCEDURE check_listener_locks IS
 --   
@@ -370,13 +398,30 @@ DECLARE
                          ,p_tmptab varchar2 )
    IS
    BEGIN
-      EXECUTE IMMEDIATE 'CREATE USER '|| p_user
-           || CHR(10) ||' IDENTIFIED BY '||p_pass
-           || CHR(10) ||' DEFAULT TABLESPACE '||p_deftab
-           || CHR(10) ||' QUOTA UNLIMITED ON '||p_deftab
-           || CHR(10) ||' TEMPORARY TABLESPACE '||p_tmptab
-           || CHR(10) ||' QUOTA UNLIMITED ON '||p_tmptab
-           || CHR(10) ||' QUOTA 0K ON SYSTEM';
+   
+      -- Cannot grant quota on temporary tablespace for 10gR2
+
+      IF NOT l_oracle10gr2 THEN
+
+         EXECUTE IMMEDIATE 'CREATE USER '|| p_user
+              || CHR(10) ||' IDENTIFIED BY '||p_pass
+              || CHR(10) ||' DEFAULT TABLESPACE '||p_deftab
+              || CHR(10) ||' QUOTA UNLIMITED ON '||p_deftab
+              || CHR(10) ||' TEMPORARY TABLESPACE '||p_tmptab
+              || CHR(10) ||' QUOTA UNLIMITED ON '||p_tmptab
+              || CHR(10) ||' QUOTA 0K ON SYSTEM';
+       
+	   ELSE
+	  
+         EXECUTE IMMEDIATE 'CREATE USER '|| p_user
+              || CHR(10) ||' IDENTIFIED BY '||p_pass
+              || CHR(10) ||' DEFAULT TABLESPACE '||p_deftab
+              || CHR(10) ||' QUOTA UNLIMITED ON '||p_deftab
+              || CHR(10) ||' TEMPORARY TABLESPACE '||p_tmptab
+              || CHR(10) ||' QUOTA 0K ON SYSTEM';
+
+	   END IF;		  
+
    END create_user;
 --
    PROCEDURE do_grants ( p_user varchar2 )
@@ -422,7 +467,8 @@ DECLARE
      EXECUTE IMMEDIATE 'GRANT CREATE ANY DIRECTORY TO  ' || p_user;             -- Added by GJ 31-AUG-2005
      EXECUTE IMMEDIATE 'GRANT DROP ANY SYNONYM TO  ' || p_user;                 -- Added by GJ 17-MAY-2007     
      IF l_oracle9i
-     OR l_oracle10g
+     OR l_oracle10gr1
+	 OR l_oracle10gr2 
      THEN
        EXECUTE IMMEDIATE 'grant select any dictionary to '    || p_user || ' with admin option';
        EXECUTE IMMEDIATE 'grant execute on sys.dbms_pipe to ' || p_user || ' with grant option';
@@ -797,7 +843,8 @@ DECLARE
 BEGIN
 --
  l_oracle9i  := db_is_9i;
- l_oracle10g := db_is_10g;
+ l_oracle10gr1 := db_is_10gr1;
+ l_oracle10gr2 := db_is_10gr2;
 --
  check_listener_locks;
 -- 
