@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.2   Aug 09 2007 10:21:06   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.3   Nov 15 2007 13:18:14   smarshall  $
 --       Module Name      : $Workfile:   nm2_nm3_migration.pkb  $
---       Date into PVCS   : $Date:   Aug 09 2007 10:21:06  $
---       Date fetched Out : $Modtime:   Aug 09 2007 10:17:48  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Nov 15 2007 13:18:14  $
+--       Date fetched Out : $Modtime:   Nov 15 2007 12:10:06  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --   Author D.Cope
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm2_nm3_migration';
   g_proc_name    VARCHAR2(50);
   g_log_file                UTL_FILE.FILE_TYPE;
@@ -7913,6 +7913,12 @@ BEGIN
   --need to do this AFTER the network and Assets have been migrated.
   append_log_content(pi_text => 'DOC_ASSOCS');
   --need to do this at the appropriate effective date due to triggers on doc_assocs
+
+  IF NOT Nm3ddl.does_object_exist('IIT_V2_ITEM_ID','INDEX') THEN
+    EXECUTE IMMEDIATE 'CREATE INDEX iit_v2_item_id ON nm_inv_items_all(iit_num_attrib115)';
+  END IF;
+
+
 
   FOR c_das_type IN
     (SELECT DISTINCT das_table_name FROM v2_doc_Assocs) LOOP
