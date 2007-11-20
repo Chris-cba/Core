@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.3   Nov 12 2007 16:00:04   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.4   Nov 20 2007 09:17:26   aedwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Nov 12 2007 16:00:04  $
---       Date fetched Out : $Modtime:   Nov 12 2007 15:41:54  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Nov 20 2007 09:17:26  $
+--       Date fetched Out : $Modtime:   Nov 20 2007 09:17:04  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.3  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.4  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -790,7 +790,7 @@ AS
                BEGIN
                   SELECT wktext
                     INTO l_results (i).c_usgm_srid_meaning
-                    FROM MDSYS.user_cs_srs
+                    FROM MDSYS.cs_srs
                    WHERE srid = l_rec_usgm.srid;
                EXCEPTION
                   WHEN OTHERS
