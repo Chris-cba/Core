@@ -705,6 +705,20 @@ BEGIN
     RETURN l_ret_files;
   
   ELSE
+
+    -- if no file extention param is passed in
+    -- and  filename is same as parse file extention 
+    -- it indicates that we have a directory name - so knock those out of what is returned
+    --
+    FOR i IN 1..g_files.COUNT LOOP
+
+      IF nm3flx.get_file_extenstion(g_files(i)) != g_files(i) THEN 
+
+         l_ret_files(l_ret_files.COUNT+1) := g_files(i);
+      END IF;
+       
+    END LOOP;
+    RETURN l_ret_files;
     nm_debug.proc_end(g_package_name,'get_files_in_directory');
     RETURN g_files;
   END IF;
