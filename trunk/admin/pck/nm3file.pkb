@@ -2,13 +2,14 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+-- PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3file.pkb	1.18 12/12/06
---       Module Name      : nm3file.pkb
---       Date into SCCS   : 06/12/12 14:13:56
---       Date fetched Out : 07/06/13 14:11:32
---       SCCS Version     : 1.18
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.2   Nov 21 2007 09:45:02   jwadsworth  $
+-- Module Name : $Workfile:   nm3file.pkb  $
+-- Date into PVCS : $Date:   Nov 21 2007 09:45:02  $
+-- Date fetched Out : $Modtime:   Nov 21 2007 09:44:28  $
+-- PVCS Version : $Revision:   2.2  $
+-- Based on SCCS version : 
 --
 --
 --   Author : Jonathan Mills
