@@ -28,10 +28,13 @@ create table temp_depend as
 select d.d_obj# object_id
       ,d.p_obj# referenced_object_id
  from  sys.dependency$ d
-where  d.d_owner# in (select user#
-                       From  sys.user$
-                      where  name = USER
-                     )
+where  d.d_obj# in 
+       (select object_id
+          From sys.dba_objects
+             , sys.user$
+         where name = USER
+           and owner = name
+       )
 /
 CREATE INDEX IX1 ON
   TEMP_DEPEND(OBJECT_ID)
