@@ -1,15 +1,13 @@
 CREATE OR REPLACE PACKAGE BODY nm3ausec_maint AS
 --
------------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3ausec_maint.pkb	1.4 05/08/03
---       Module Name      : nm3ausec_maint.pkb
---       Date into SCCS   : 03/05/08 00:04:17
---       Date fetched Out : 07/06/13 14:11:09
---       SCCS Version     : 1.4
---
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec_maint.pkb-arc   2.2   Nov 23 2007 12:24:18   ptanava  $
+--       Module Name      : $Workfile:   nm3ausec_maint.pkb  $
+--       Date into PVCS   : $Date:   Nov 23 2007 12:24:18  $
+--       Date fetched Out : $Modtime:   Nov 23 2007 12:23:54  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on SCCS version : 1.4
 --
 --   Author : Jonathan Mills
 --
@@ -25,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec_maint AS
 */
 
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3ausec_maint.pkb	1.4 05/08/03"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ausec_maint';
 --
    TYPE rec_parent IS RECORD
