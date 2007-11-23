@@ -18,12 +18,14 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec_maint AS
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2002
 -----------------------------------------------------------------------------
---
---all global package variables here
+
+/* History
+  23.11.07 PT fixed a bug in process_each_inv_item() whereby the continous item placements were not dealt properly
+                fixed by removing an unnecessary temp extent creation.
+*/
+
 --
    g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3ausec_maint.pkb	1.4 05/08/03"';
---  g_body_sccsid is the SCCS ID for the package body
---
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ausec_maint';
 --
    TYPE rec_parent IS RECORD
@@ -102,8 +104,13 @@ PROCEDURE update_admin_unit (pi_nte_job_id     IN nm_nw_temp_extents.nte_job_id%
    END reset_for_return;
 --
 BEGIN
---
-   nm_debug.proc_start(g_package_name,'update_admin_unit');
+--   nm3dbg.putln(g_package_name||'.update_admin_unit('
+--     ||'pi_nte_job_id='||pi_nte_job_id
+--     ||', pi_admin_type='||pi_admin_type
+--     ||', pi_admin_unit='||pi_admin_unit
+--     ||', pi_effective_date='||pi_effective_date
+--     ||')');
+--   nm3dbg.ind;
 --
    -- Set the effective date
    nm3user.set_effective_date (pi_effective_date);
@@ -116,6 +123,7 @@ BEGIN
    g_tab_rec_iig.DELETE;
 --
    l_admin_type := nm3ausec.get_au_type (pi_admin_unit);
+--   nm3dbg.putln('l_admin_type='||l_admin_type);
    IF l_admin_type != pi_admin_type
     THEN
       hig.raise_ner (pi_appl                => nm3type.c_net
@@ -142,6 +150,8 @@ BEGIN
                             );
 --
    END LOOP;
+   
+--    nm3dbg.putln('g_tab_rec_iig.count='||g_tab_rec_iig.count);
 --
    FOR i IN 1..g_tab_rec_iig.COUNT
     LOOP
@@ -167,6 +177,7 @@ BEGIN
       END;
    END LOOP;
 --
+--   nm3dbg.putln('l_tab_iig_top_id.count='||l_tab_iig_top_id.count);
    FORALL i IN 1..l_tab_iig_top_id.COUNT
       INSERT INTO nm_inv_item_groupings
             (iig_top_id
@@ -191,20 +202,29 @@ BEGIN
                          WHERE  iig_item_id    = l_tab_iig_item_id(i)
                           AND   iig_parent_id  = l_tab_iig_parent_id(i)
                         );
+                        
+--  raise zero_divide;
 --
    -- Reset the data for return
    reset_for_return;
 --
-   nm_debug.proc_start(g_package_name,'update_admin_unit');
---
-EXCEPTION
---
-   WHEN others
-    THEN
-      reset_for_return;
-      RAISE;
---
-END update_admin_unit;
+--   nm3dbg.deind;
+exception
+  when others then
+--     nm3dbg.puterr(sqlerrm||': '||g_package_name||'.update_admin_unit('
+--       ||'pi_nte_job_id='||pi_nte_job_id
+--       ||', pi_admin_type='||pi_admin_type
+--       ||', pi_admin_unit='||pi_admin_unit
+--       ||', pi_effective_date='||pi_effective_date
+--       ||', l_admin_type='||l_admin_type
+--       ||', l_tab_future_inv.count='||l_tab_future_inv.count
+--       ||', l_tab_affected_inv.count='||l_tab_affected_inv.count
+--       ||', g_tab_rec_iig.count='||g_tab_rec_iig.count
+--       ||')');
+    reset_for_return;
+    raise;
+    
+END;
 --
 -----------------------------------------------------------------------------
 --
@@ -263,9 +283,14 @@ PROCEDURE process_each_inv_item (pi_nte_job_id IN nm_nw_temp_extents.nte_job_id%
    l_is_point_item           BOOLEAN;
 --
 BEGIN
---
-   nm_debug.proc_start(g_package_name,'process_each_inv_item');
---
+--   nm3dbg.putln(g_package_name||'.process_each_inv_item('
+--     ||'pi_nte_job_id='||pi_nte_job_id
+--     ||', pi_iit_ne_id='||pi_iit_ne_id
+--     ||', pi_admin_unit='||pi_admin_unit
+--     ||')');
+--   nm3dbg.ind;
+
+  
    OPEN  cs_check_future (pi_iit_ne_id, c_effective_date);
    FETCH cs_check_future INTO l_dummy;
    IF cs_check_future%FOUND
@@ -279,13 +304,15 @@ BEGIN
 --
    -- Get the inventory record
    l_rec_iit := nm3inv.get_inv_item (pi_iit_ne_id);
-   IF l_rec_iit.iit_inv_type='ARBE'
-    THEN
-      nm_debug.set_level(3);
-   ELSE
-      nm_debug.set_level(2);
-   END IF;
-   nm_debug.debug(l_rec_iit.iit_inv_type);
+  --nm3dbg.putln('l_rec_iit.iit_inv_type='||l_rec_iit.iit_inv_type);
+  
+--    IF l_rec_iit.iit_inv_type='ARBE'
+--     THEN
+--       nm_debug.set_level(3);
+--    ELSE
+--       nm_debug.set_level(2);
+--    END IF;
+   
 --
    IF  l_rec_iit.iit_inv_type IS NULL     -- No READONLY access
     OR NOT invsec.is_inv_item_updatable (p_iit_inv_type   => l_rec_iit.iit_inv_type
@@ -325,12 +352,17 @@ BEGIN
 --
 --   nm_debug.debug('pi_nte_job_id');
 --   nm3extent.debug_temp_extents(pi_nte_job_id);
+--   nm3dbg.putln('nm3extent.create_temp_ne('
+--      ||'pi_source_id='||pi_iit_ne_id
+--      ||', pi_source='||nm3extent.c_route
+--      ||')');
    nm3extent.create_temp_ne (pi_source_id => pi_iit_ne_id
                             ,pi_source    => nm3extent.c_route
                             ,po_job_id    => l_inv_nte_job_id
                             );
---   nm_debug.debug('l_inv_nte_job_id');
+--   nm3dbg.putln('  l_inv_nte_job_id='||l_inv_nte_job_id);
 --   nm3extent.debug_temp_extents(l_inv_nte_job_id);
+   
 --
    IF l_is_point_item
     THEN
@@ -342,17 +374,22 @@ BEGIN
                            ,po_nte_job_id_points_in_linear => l_new_inv_loc_nte_job_id
                            );
    ELSE
-      nm3extent.create_temp_ne_intx_of_temp_ne
-                       (pi_nte_job_id_1         => pi_nte_job_id
-                       ,pi_nte_job_id_2         => l_inv_nte_job_id
-                       ,pi_resultant_nte_job_id => l_new_inv_loc_nte_job_id
-                       );
+-- PT continuous items fix: the new extent is wrong here.
+--       nm3extent.create_temp_ne_intx_of_temp_ne
+--                        (pi_nte_job_id_1         => pi_nte_job_id
+--                        ,pi_nte_job_id_2         => l_inv_nte_job_id
+--                        ,pi_resultant_nte_job_id => l_new_inv_loc_nte_job_id
+--                        );
+      l_new_inv_loc_nte_job_id := l_inv_nte_job_id;
    END IF;
 --   nm_debug.debug('l_new_inv_loc_nte_job_id');
 --   nm3extent.debug_temp_extents(l_new_inv_loc_nte_job_id);
 --
    l_rec_parent.old_iit_ne_id       := pi_iit_ne_id;
    l_rec_parent.new_iit_ne_id       := l_rec_iit.iit_ne_id;
+--    nm3dbg.putln('l_rec_parent.old_iit_ne_id='||l_rec_parent.old_iit_ne_id
+--     ||'l_rec_parent.new_iit_ne_id='||l_rec_parent.new_iit_ne_id);
+   
    FOR cs_rec IN (SELECT *
                    FROM  nm_inv_item_groupings
                   WHERE  iig_parent_id = pi_iit_ne_id
@@ -361,7 +398,12 @@ BEGIN
       l_rec_parent.old_child_iit_ne_id     := cs_rec.iig_item_id;
       g_tab_rec_parent(cs_rec.iig_item_id) := l_rec_parent;
    END LOOP;
---
+   
+--   nm3dbg.putln('nm3homo.end_inv_location_by_temp_ne('
+--      ||'pi_iit_ne_id='||pi_iit_ne_id
+--      ||', l_new_inv_loc_nte_job_id='||l_new_inv_loc_nte_job_id
+--      ||')');
+--   nm3extent.debug_temp_extents(l_new_inv_loc_nte_job_id);
    nm3homo.end_inv_location_by_temp_ne
                     (pi_iit_ne_id            => pi_iit_ne_id
                     ,pi_nte_job_id           => l_new_inv_loc_nte_job_id
@@ -370,7 +412,8 @@ BEGIN
                     ,pi_leave_child_items    => TRUE
                     ,po_warning_code         => l_warning_code
                     ,po_warning_msg          => l_warning_msg
-                    );
+                    );  
+          
 --
    IF l_rec_nit.nit_pnt_or_cont = 'C'
     THEN
@@ -384,6 +427,8 @@ BEGIN
    OPEN  cs_nte_count (l_new_inv_loc_nte_job_id);
    FETCH cs_nte_count INTO l_count;
    CLOSE cs_nte_count;
+   
+--    nm3dbg.putln('l_count='||l_count);
 --
    IF l_count > 0
     THEN
@@ -425,12 +470,23 @@ BEGIN
       END IF;
 --      nm_debug.debug('........... recreating '||l_rec_iit.iit_inv_type||' '||pi_iit_ne_id||' as '||l_rec_iit.iit_ne_id||'('||l_rec_iit.iit_primary_key||')');
       -- Create the new inventory record
+      
+--       nm3dbg.putln('nm3inv.insert_nm_inv_items('
+--         ||'l_rec_iit(iit_ne_id='||l_rec_iit.iit_ne_id||'))');
+      
       nm3inv.insert_nm_inv_items (l_rec_iit);
       --
       DECLARE
          l_pl_arr nm_placement_array := nm3pla.initialise_placement_array;
       BEGIN
          l_pl_arr := nm3pla.get_placement_from_temp_ne (l_new_inv_loc_nte_job_id);
+         
+         l_pl_arr := nm3pla.get_placement_from_temp_ne (l_new_inv_loc_nte_job_id);
+         
+--          nm3dbg.putln('nm3homo_o.relocate_inv_at_pl('
+--             ||'p_nm_ne_id_in='||l_rec_iit.iit_ne_id
+--             ||', p_placement_array.count='||l_pl_arr.npa_placement_array.count
+--             ||')');
          nm3homo_o.relocate_inv_at_pl (p_nm_ne_id_in     => l_rec_iit.iit_ne_id
                                       ,p_placement_array => l_pl_arr
                                       ,p_effective_date  => c_effective_date
@@ -438,10 +494,29 @@ BEGIN
       END;
    END IF;
 --
-   DELETE FROM nm_nw_temp_extents
-   WHERE  nte_job_id IN (l_inv_nte_job_id,l_new_inv_loc_nte_job_id);
+--    DELETE FROM nm_nw_temp_extents
+--    WHERE  nte_job_id IN (l_inv_nte_job_id,l_new_inv_loc_nte_job_id);
 --
-   nm_debug.proc_end(g_package_name,'process_each_inv_item');
+
+--   nm3dbg.deind;
+-- exception
+--   when others then
+--     nm3dbg.puterr(sqlerrm||': '||g_package_name||'.process_each_inv_item('
+--       ||'pi_nte_job_id='||pi_nte_job_id
+--       ||', pi_iit_ne_id='||pi_iit_ne_id
+--       ||', pi_admin_unit='||pi_admin_unit
+--       ||', l_rec_iit.iit_inv_type='||l_rec_iit.iit_inv_type
+--       ||', l_is_point_item='||nm3dbg.to_char(l_is_point_item)
+--       ||', l_rec_iit.iit_ne_id='||l_rec_iit.iit_ne_id
+--       ||', l_check_for_inv='||nm3dbg.to_char(l_check_for_inv)
+--       ||', l_inv_nte_job_id='||l_inv_nte_job_id
+--       ||', l_new_inv_loc_nte_job_id='||l_new_inv_loc_nte_job_id
+--       ||', l_rec_parent.old_iit_ne_id='||l_rec_parent.old_iit_ne_id
+--       ||', l_rec_parent.new_iit_ne_id='||l_rec_parent.new_iit_ne_id
+--       ||', l_rec_nit.nit_pnt_or_cont='||l_rec_nit.nit_pnt_or_cont
+--       ||', l_call_homo='||nm3dbg.to_char(l_call_homo)
+--       ||')');
+--     raise;
 --
 END process_each_inv_item;
 --
@@ -452,8 +527,11 @@ PROCEDURE create_point_temp_ne (pi_nte_job_id_all_points       IN     nm_nw_temp
                                ,po_nte_job_id_points_in_linear    OUT nm_nw_temp_extents.nte_job_id%TYPE
                                ) IS
 BEGIN
---
-   nm_debug.proc_start(g_package_name,'create_point_temp_ne');
+--   nm3dbg.putln(g_package_name||'.create_point_temp_ne('
+--     ||'pi_nte_job_id_all_points='||pi_nte_job_id_all_points
+--     ||', pi_nte_job_id_linear='||pi_nte_job_id_linear
+--     ||')');
+--   nm3dbg.ind;
 --
    po_nte_job_id_points_in_linear := nm3net.get_next_nte_id;
 --
@@ -481,9 +559,10 @@ BEGIN
                    AND   nte_pt.nte_ne_id_of = nte_lin.nte_ne_id_of
                    AND   nte_pt.nte_begin_mp BETWEEN nte_lin.nte_begin_mp AND nte_lin.nte_end_mp
                  );
---
-   nm_debug.proc_end(g_package_name,'create_point_temp_ne');
---
+--   nm3dbg.putln('nm_nw_temp_extents insert count: '||sql%rowcount);
+--   nm3dbg.putln('po_nte_job_id_points_in_linear='||po_nte_job_id_points_in_linear);
+--   nm3dbg.deind;
+
 END create_point_temp_ne;
 --
 -----------------------------------------------------------------------------
