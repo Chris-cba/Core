@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.1   Jul 18 2007 15:23:06   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.2   Nov 27 2007 16:28:18   ptanava  $
 --       Module Name      : $Workfile:   nm3recal.pkb  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:23:06  $
---       Date fetched Out : $Modtime:   Jun 29 2007 14:55:36  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Nov 27 2007 16:28:18  $
+--       Date fetched Out : $Modtime:   Nov 27 2007 16:26:44  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --   Author : Jonathan Mills
@@ -18,10 +18,13 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
---
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
---  g_body_sccsid is the SCCS ID for the package body
---
+/* History
+  PT 23.11.07 recalibrate zero divide fix, subtracting just enough so that the difference is later absorbed in rounding
+               e.g 5 becomes 4.9999 with 3 dec_places
+               this not yet tested on nm3sdm.recalibrate_element_shape() and others procducts
+*/
+
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
    g_package_name    CONSTANT  varchar2(30) := 'nm3recal';
 --
    g_tab_rec_nm      nm3type.tab_rec_nm;
@@ -139,9 +142,11 @@ PROCEDURE recalibrate_section (pi_ne_id             IN nm_elements.ne_id%TYPE
    l_begin_mp          number := NVL(pi_begin_mp,0);
    
    l_neh_rec nm_element_history%rowtype;
+
 --
 BEGIN
---
+  nm_debug.debug_on;
+
    nm_debug.proc_start(g_package_name,'recalibrate_section');
 --
    nm3ausec.set_status(nm3type.c_off);
@@ -171,10 +176,37 @@ BEGIN
       g_recal_exc_msg  := 'Recalibrate BEGIN_MP ('||l_begin_mp||') is greater than element NE_LENGTH ('||g_element_length||')';
       RAISE g_recal_exception;
    END IF;
+   
+  -- PT added start not negative check
+  if l_begin_mp < 0 then
+    g_recal_exc_code := -20053;
+    g_recal_exc_msg  := 'Recalibrate BEGIN_MP ('||l_begin_mp||') cannot be negative';
+    RAISE g_recal_exception;
+  end if;
 --
-   l_old_length_to_end := g_element_length - l_begin_mp;
---
-   l_length_ratio := pi_new_length_to_end / l_old_length_to_end;
+  
+  
+  -- PT zero divide fix, subtracting just enough so that the difference is later absorbed in rounding
+  --  e.g 5 becomes 4.9999 with 3 dec_places
+  if l_begin_mp = g_element_length then
+    l_begin_mp := g_element_length - (1 / to_number(rpad('1', g_dec_places + 2, '0')));
+  end if;
+  
+    l_old_length_to_end := g_element_length - l_begin_mp;
+    
+    l_length_ratio := pi_new_length_to_end / l_old_length_to_end;
+    
+  
+  nm_debug.debug(
+      'pi_ne_id='||pi_ne_id
+  ||', pi_begin_mp='||pi_begin_mp
+  ||', pi_new_length_to_end='||pi_new_length_to_end
+  ||', l_begin_mp='||l_begin_mp
+  ||', g_element_length='||g_element_length
+  ||', l_old_length_to_end='||l_old_length_to_end
+  ||', l_length_ratio='||l_length_ratio
+  ||')');
+    
 --
    IF l_old_length_to_end = pi_new_length_to_end
     THEN
@@ -182,11 +214,12 @@ BEGIN
       g_recal_exc_msg  := 'Nothing to do. NEW and OLD lengths are identical';
       RAISE g_recal_exception;
    END IF;
+   
 --
 -- Increase the length of the element
 --
    UPDATE nm_elements
-    SET   ne_length = ne_length + (pi_new_length_to_end - l_old_length_to_end)
+    SET   ne_length = round(ne_length + (pi_new_length_to_end - l_old_length_to_end),g_dec_places)
    WHERE  ne_id     = pi_ne_id;
 --
    l_new_length := nm3get.get_ne (pi_ne_id => pi_ne_id).ne_length;
@@ -194,9 +227,11 @@ BEGIN
 -- Modify NNU_CHAIN for this element
 --
    UPDATE nm_node_usages
-    SET   nnu_chain     = nnu_chain + (pi_new_length_to_end - l_old_length_to_end)
+    SET   nnu_chain     = round(nnu_chain + (pi_new_length_to_end - l_old_length_to_end),g_dec_places)
    WHERE  nnu_ne_id     = pi_ne_id
     AND   nnu_node_type = 'E';
+    
+    
 --
 -- Added by AE
 -- RAC - Recalibrate the element shape
@@ -206,13 +241,16 @@ BEGIN
                                  --  Corrected by RAC - can't use higgis.has_shape.
                                  --  Also, moved up before the changes to the members.
     THEN
+      -- PT todo: this fails on another broken package down the line on dorset@dawson
+      --  the p_measure parameter goes in same as element length if same, to be tested on a working package    
    nm3sdm.recalibrate_element_shape(p_ne_id=> pi_ne_id,
-                                    p_measure => l_begin_mp,
+                                    p_measure => round(l_begin_mp,g_dec_places),
                                     p_new_length_to_end => pi_new_length_to_end);
+    null;
    END IF;
 --
 
-
+-- PT this handles the fix well, replaced pi_begin with l_begin_mp in the members call
    FOR l_count IN 1..g_tab_ne_id.COUNT
     LOOP
       IF  g_tab_end_mp(l_count) >  l_begin_mp
@@ -224,7 +262,7 @@ BEGIN
                                        ,pi_begin_mp       => g_tab_begin_mp(l_count)
                                        ,pi_end_mp         => g_tab_end_mp(l_count)
                                        ,pi_start_date     => g_tab_start_date(l_count)
-                                       ,pi_recal_start_mp => pi_begin_mp
+                                       ,pi_recal_start_mp => l_begin_mp --pi_begin_mp
                                        ,pi_length_ratio   => l_length_ratio
 --*                                       ,pi_effective_date => pi_effective_date
                                        );
@@ -238,6 +276,9 @@ BEGIN
    END LOOP;
 --
 
+  -- PT 
+  -- this runs throuh ok
+  -- todo: to be tested so that there are real assets affected
    recalibrate_other_products (pi_ne_id             => pi_ne_id
                               ,pi_recal_start_point => l_begin_mp
                               ,pi_length_ratio      => l_length_ratio
@@ -253,7 +294,7 @@ BEGIN
    l_neh_rec.neh_effective_date := nm3user.get_effective_date;
    l_neh_rec.neh_old_ne_length  := g_element_length;
    l_neh_rec.neh_new_ne_length  := l_new_length;
-   l_neh_rec.neh_param_1        := pi_begin_mp;
+   l_neh_rec.neh_param_1        := round(l_begin_mp,g_dec_places); --pi_begin_mp;
    l_neh_rec.neh_param_2        := pi_new_length_to_end;
    
    nm3ins.ins_neh(p_rec_neh => l_neh_rec);
@@ -261,17 +302,20 @@ BEGIN
    reset_for_return;
 --
    nm_debug.proc_end(g_package_name,'recalibrate_section');
+   nm_debug.debug_off;
 --
 EXCEPTION
 --
    WHEN g_recal_exception
     THEN
+      nm_debug.debug_off;
       reset_for_return;
       RAISE_APPLICATION_ERROR(g_recal_exc_code, g_recal_exc_msg);
---    WHEN others
---     THEN
---       reset_for_return;
---       RAISE;
+   WHEN others
+    THEN
+      nm_debug.debug_off;
+      reset_for_return;
+      RAISE;
 --
 END recalibrate_section;
 --
@@ -311,6 +355,17 @@ BEGIN
    l_new_begin_mp := ROUND(l_new_begin_mp,g_dec_places);
    l_new_end_mp   := ROUND(l_new_end_mp,g_dec_places);
 --
+
+    nm_debug.debug(
+      '  l_new_begin_mp='||l_new_begin_mp
+  ||', l_new_end_mp='||l_new_end_mp
+  ||', pi_ne_id_in='||pi_ne_id_in
+  ||', pi_ne_id_of='||pi_ne_id_of
+  ||', pi_begin_mp='||pi_begin_mp
+  ||', pi_length_ratio='||pi_length_ratio
+  ||', g_dec_places='||g_dec_places
+  ||')');
+
    UPDATE nm_members_all
     SET   nm_begin_mp   = l_new_begin_mp
          ,nm_end_mp     = l_new_end_mp
