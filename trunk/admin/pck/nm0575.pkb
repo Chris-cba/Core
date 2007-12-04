@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.1   Dec 03 2007 08:05:36   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.2   Dec 04 2007 21:23:42   ptanava  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Dec 03 2007 08:05:36  $
---       Date fetched Out : $Modtime:   Dec 03 2007 07:59:24  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Dec 04 2007 21:23:42  $
+--       Date fetched Out : $Modtime:   Dec 04 2007 21:18:30  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -16,15 +16,14 @@ AS
 -----------------------------------------------------------------------------
 
 /* History
-  30.11.07 PT complete rewrite of close logic. now closes partially with better performance
-                todo: the gaz query unchanged and slow, should be possible to replace with bits from the new close logic
+  30.11.07 PT complete rewrite of close logic for better performance. logic changed, now closes assets partially
 */
 
   -----------
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.1  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.2  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -33,10 +32,6 @@ AS
   --g_network_placement_array  nm_placement_array; -- referred to when processing assets to close/delete     
   g_tab_selected_categories  nm3type.tab_varchar4; -- populated by the form
 
-
-  g_tab_selected_xsps        nm3type.tab_varchar4; -- populated by the form
-          
-  g_current_result_set_id    nm_gaz_query_item_list.NGQI_JOB_ID%TYPE;
   
   g_delete                   CONSTANT VARCHAR2(1) := 'D';
   g_close                    CONSTANT VARCHAR2(1) := 'C';
@@ -49,6 +44,7 @@ AS
   mt_inv_categories nm_code_tbl;
   mt_inv_types      nm_code_tbl;
   m_nte_job_id      nm_nw_temp_extents.nte_job_id%type;
+  m_xsp_changed     boolean := false;
   
   
   procedure close_member_record(
@@ -59,6 +55,11 @@ AS
     ,p_begin_mp in mp_type
     ,p_start_date in date
   );
+  
+  function are_tables_equal(
+     pt_1 in nm3type.tab_varchar4
+    ,pt_2 in nm3type.tab_varchar4
+  ) return boolean;
                                                                                  
 --
 -----------------------------------------------------------------------------
@@ -86,12 +87,15 @@ IS
   i binary_integer;
   
 BEGIN
-  nm3dbg.debug_on;
   nm3dbg.putln(g_package_name||'.set_g_tab_selected_categories('
     ||'pi_tab_selected_categories.count='||pi_tab_selected_categories.count
     ||')');
   nm3dbg.ind;
   
+  m_xsp_changed := true;
+  
+  
+  -- categories cache table
   mt_inv_categories := new nm_code_tbl();
   i := pi_tab_selected_categories.first;
   while i is not null loop
@@ -100,14 +104,22 @@ BEGIN
     i := pi_tab_selected_categories.next(i);
   end loop;
   
+  
+  -- inv types cache table
+  select t.nit_inv_type
+  bulk collect into mt_inv_types
+  from
+     nm_inv_types t
+  where t.nit_category in (select column_value from table(cast(get_inv_categories_tbl as nm_code_tbl)));
+  
+  
+  -- xsp temp table
   delete from nm0575_possible_xsps
   where xsp_value not in (
     select r.xsr_x_sect_value
     from
        nm_xsp_restraints r
-      ,nm_inv_types t
-    where r.xsr_ity_inv_code = t.nit_inv_type
-      and t.nit_category in (select column_value from table(cast(get_inv_categories_tbl as nm_code_tbl)))
+    where r.xsr_ity_inv_code in (select column_value from table(cast(get_inv_types_tbl as nm_code_tbl)))
     );
   nm3dbg.putln('nm0575_possible_xsps delete  count: '||sql%rowcount);
 --
@@ -121,9 +133,7 @@ BEGIN
     ,'N' xsp_selected
   from
      nm_xsp_restraints r
-    ,nm_inv_types t
-  where r.xsr_ity_inv_code = t.nit_inv_type
-    and t.nit_category in (select column_value from table(cast(get_inv_categories_tbl as nm_code_tbl)))
+  where r.xsr_ity_inv_code in (select column_value from table(cast(get_inv_types_tbl as nm_code_tbl)))
   group by
      r.xsr_x_sect_value
   ) s
@@ -150,237 +160,128 @@ exception
 END set_g_tab_selected_categories;
 
 
-FUNCTION setup_gaz_query(pi_source_ne_id       IN nm_gaz_query.ngq_source_id%TYPE
-                        ,pi_begin_mp           IN nm_gaz_query.ngq_begin_mp%TYPE
-                        ,pi_end_mp             IN nm_gaz_query.ngq_end_mp%TYPE
-                        ,pi_ambig_sub_class    IN nm_gaz_query.ngq_ambig_sub_class%TYPE) RETURN nm_gaz_query.ngq_id%TYPE IS
-
-   l_rec_ngq nm_gaz_query%ROWTYPE;
-   l_seq     PLS_INTEGER;
-   
-   
-   PROCEDURE add_xsp_restrictions(pi_ngq_id nm_gaz_query.ngq_id%TYPE) IS
-
-
-     l_last_ngqt nm_gaz_query_types.ngqt_seq_no%TYPE := -1;
-     l_operator  VARCHAR2(3);
-     l_seq       pls_integer :=0;
-
-   BEGIN
-     nm3dbg.putln(g_package_name||'.setup_gaz_query.add_xsp_restrictions('
-       ||'pi_ngq_id='||pi_ngq_id
-       ||')');
-      --
-      -- loop around all asset types for the gaz query and join to selected XSP types
-      -- and create the necessary NM_GAZ_QUERY_ATTRIBS and NM_GAZ_QUERY_VALUES records
-      --
-      FOR t IN (select * 
-                from  nm_gaz_query_types
-                     ,nm0575_possible_xsps
-                     ,nm_inv_types_all
-                where ngqt_ngq_id = pi_ngq_id
-                and   nit_inv_type = ngqt_item_type
-                and   nit_x_sect_allow_flag = 'Y'  -- only add xsp restriction to those asset types that allow it
-                and   xsp_selected = 'Y'
-                order by ngqt_ngq_id, ngqt_seq_no) LOOP
-               
-           --
-           -- if this is the first record for the asset type to be processed
-           -- the treat different to if it is second, third, fourth etc
-           --
-           IF l_last_ngqt = t.ngqt_seq_no THEN     
-                l_operator := 'OR';
-           ELSE
-                l_operator := 'AND';
-                l_seq := 0;
-           END IF;
-                                                      
-           l_last_ngqt := t.ngqt_seq_no;
-           l_seq := l_seq +1;
-                           
-           insert into nm_gaz_query_attribs(ngqa_ngq_id
-                                           ,ngqa_ngqt_seq_no
-                                           ,ngqa_seq_no
-                                           ,ngqa_attrib_name
-                                           ,ngqa_operator
-                                           ,ngqa_condition)
-            values (t.ngqt_ngq_id
-                   ,t.ngqt_seq_no
-                   ,l_seq
-                   ,'IIT_X_SECT'
-                   ,l_operator
-                   ,'=');
-                   
-            insert into nm_gaz_query_values(ngqv_ngq_id
-                                           ,ngqv_ngqt_seq_no
-                                           ,ngqv_ngqa_seq_no
-                                           ,ngqv_sequence
-                                           ,ngqv_value)
-                        VALUES                                       
-                               (t.ngqt_ngq_id
-                               ,t.ngqt_seq_no
-                               ,l_seq
-                               ,1
-                               ,t.xsp_value);
-        
-         END LOOP;        
-        
-        commit;
-   exception
-    when others then
-      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.do_query('
-        ||'pi_ngq_id='||pi_ngq_id
-        ||', l_last_ngqt='||l_last_ngqt
-        ||', l_operator='||l_operator
-        ||', l_seq='||l_seq
-        ||')');
-      raise;
-   
-   END add_xsp_restrictions;
- 
-BEGIN
-  nm3dbg.putln(g_package_name||'.setup_gaz_query('
-    ||'pi_source_ne_id='||pi_source_ne_id
-    ||', pi_begin_mp='||pi_begin_mp
-    ||', pi_end_mp='||pi_end_mp
-    ||', pi_ambig_sub_class='||pi_ambig_sub_class
-    ||')');
-  nm3dbg.ind;
-    
-   l_rec_ngq := Null;
-   
-   l_rec_ngq.ngq_id                  := nm3seq.next_ngq_id_seq;
-
-   nm3gaz_qry.set_ngq_source_etc(pi_ne_id         => pi_source_ne_id
-                                ,po_ngq_source_id => l_rec_ngq.ngq_source_id
-                                ,po_ngq_source    => l_rec_ngq.ngq_source
-                                ,po_ngq_query_all_items => l_rec_ngq.ngq_query_all_items); 
-  
-   l_rec_ngq.ngq_open_or_closed      := nm3gaz_qry.c_closed_query;
-   l_rec_ngq.ngq_items_or_area       := nm3gaz_qry.c_items_query;
-   l_rec_ngq.ngq_begin_mp            := pi_begin_mp;
-   l_rec_ngq.ngq_begin_datum_ne_id   := Null;
-   l_rec_ngq.ngq_begin_datum_offset  := Null;
-   l_rec_ngq.ngq_end_mp              := pi_end_mp;
-   l_rec_ngq.ngq_end_datum_ne_id     := Null;
-   l_rec_ngq.ngq_end_datum_offset    := Null;
-   l_rec_ngq.ngq_ambig_sub_class     := pi_ambig_sub_class;
-   nm3ins.ins_ngq (l_rec_ngq);
-
-
---
--- set a global placement array that stores the network that the gaz
--- query was restricted on
--- this is used when processing assets in order to ascertain whether
--- a given asset is placed over just the network we restricted on
--- or it is only partially over this network
--- 
-
-  -- PT comment out
---    IF l_rec_ngq.ngq_query_all_items = 'N' THEN
---     g_network_placement_array := nm3pla.get_placement_from_ne(p_ne_id_in => l_rec_ngq.ngq_source_id);
---    END IF;
---    
-  -- the temp extent gives the route members adjusted for begin/end 
-  nm3extent.create_temp_ne (
-     pi_source_id => pi_source_ne_id
-    ,pi_source    => 'ROUTE'
-    ,pi_begin_mp  => pi_begin_mp
-    ,pi_end_mp    => pi_end_mp
-    ,po_job_id    => m_nte_job_id
-  );
-  nm3dbg.putln('m_nte_job_id='||m_nte_job_id);
-
-
---nm_debug.debug_on;
---nm3debug.debug_ngq(l_rec_ngq);
-   
---
-   nm3gaz_qry.add_inv_types_for_categories(pi_ngq_id              => l_rec_ngq.ngq_id
-                                          ,pi_tab_categories      => g_tab_selected_categories
-                                          ,pi_exclude_off_network => TRUE);
-
-
---
--- set up some restrictions on XSPs to our gaz query
---
- add_xsp_restrictions(pi_ngq_id => l_rec_ngq.ngq_id); 
-
-   
-  nm3dbg.deind;
-   RETURN(l_rec_ngq.ngq_id);
-
-exception
-  when others then
-    nm3dbg.puterr(sqlerrm||': '||g_package_name||'.do_query('
-      ||'pi_source_ne_id='||pi_source_ne_id
-      ||', pi_begin_mp='||pi_begin_mp
-      ||', pi_end_mp='||pi_end_mp
-      ||', pi_ambig_sub_class='||pi_ambig_sub_class
-      ||', g_tab_selected_categories.count='||g_tab_selected_categories.count
-      ||')');
-    raise;                                         
-
-END setup_gaz_query;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_current_result_set_id RETURN nm_gaz_query_item_list.NGQI_JOB_ID%TYPE IS
 
-BEGIN
-  RETURN(g_current_result_set_id);
-END get_current_result_set_id;
---
------------------------------------------------------------------------------
---
-PROCEDURE do_query(pi_source_ne_id        IN nm_gaz_query.ngq_source_id%TYPE
-                  ,pi_begin_mp            IN nm_gaz_query.ngq_begin_mp%TYPE
-                  ,pi_end_mp              IN nm_gaz_query.ngq_end_mp%TYPE
-                  ,pi_ambig_sub_class     IN nm_gaz_query.ngq_ambig_sub_class%TYPE) IS
-
-
+-- this populates the nm0575_matching_records
+-- this is called form the form immediately before a query is run on the table
+PROCEDURE do_query(
+   pi_source_type        in varchar2
+  ,pi_source_ne_id       IN nm_gaz_query.ngq_source_id%TYPE
+  ,pi_begin_mp           IN nm_gaz_query.ngq_begin_mp%TYPE
+  ,pi_end_mp             IN nm_gaz_query.ngq_end_mp%TYPE
+  --,pi_ambig_sub_class    IN nm_gaz_query.ngq_ambig_sub_class%TYPE
+)
+IS
  l_ngq_id nm_gaz_query.ngq_id%TYPE;
+ l_nte_source varchar2(20);
+ l_tmp_count  pls_integer;
 
- 
 BEGIN
-  nm3dbg.debug_on; nm3dbg.timing_on;
   nm3dbg.putln(g_package_name||'.do_query('
-    ||'pi_source_ne_id='||pi_source_ne_id
+    ||', pi_source_type='||pi_source_type
+    ||', pi_source_ne_id='||pi_source_ne_id
     ||', pi_begin_mp='||pi_begin_mp
     ||', pi_end_mp='||pi_end_mp
-    ||', pi_ambig_sub_class='||pi_ambig_sub_class
+    ||', m_xsp_changed='||nm3dbg.to_char(m_xsp_changed)
+--    ||', pi_ambig_sub_class='||pi_ambig_sub_class
     ||')');
   nm3dbg.ind;
- --
- -- a precursor to calling this procedure is that the
- -- set_g_tab_selected_categories has been called
- -- if it's not been set then we just won't bother doing anything cos
- -- there would be no results returned by gaz query
- --
- 
-  nm3dbg.putln('g_tab_selected_categories.COUNT='||g_tab_selected_categories.COUNT); 
- IF  g_tab_selected_categories.COUNT >0 THEN
-
-   l_ngq_id :=  setup_gaz_query(pi_source_ne_id       => pi_source_ne_id
-                               ,pi_begin_mp           => pi_begin_mp
-                               ,pi_end_mp             => pi_end_mp
-                               ,pi_ambig_sub_class    => pi_ambig_sub_class);
-   nm3dbg.putln('l_ngq_id='||l_ngq_id);
-                                     
-   g_current_result_set_id := nm3gaz_qry.perform_query (pi_ngq_id => l_ngq_id);
-   nm3dbg.putln('g_current_result_set_id='||g_current_result_set_id);
---   po_tab_summary_results := get_tab_summary_results;
- END IF;
   
+  
+  if pi_source_type = 'E' then
+    l_nte_source := 'SAVED';
+  else
+    l_nte_source := 'ROUTE';
+  end if;
+
+  if m_xsp_changed then
+    
+    -- clear the previous temp extent
+    if m_nte_job_id is not null then
+      delete from nm_nw_temp_extents
+      where nte_job_id = m_nte_job_id;
+    end if;
+    
+    commit;
+    execute immediate 'truncate table nm0575_matching_records';
+    
+    -- an area of interest is defined
+    if pi_source_ne_id is not null then
+    
+      nm3extent.create_temp_ne (
+         pi_source_id => pi_source_ne_id
+        ,pi_source    => l_nte_source
+        ,pi_begin_mp  => pi_begin_mp
+        ,pi_end_mp    => pi_end_mp
+        ,po_job_id    => m_nte_job_id
+      );
+      nm3dbg.putln('m_nte_job_id='||m_nte_job_id);
+  
+      
+      if g_tab_selected_categories.count > 0 then
+      
+        insert into nm0575_matching_records (
+          asset_category, asset_type, asset_type_descr, asset_count
+        )
+        select
+           t.nit_category asset_category
+          ,t.nit_inv_type asset_type
+          ,t.nit_descr asset_type_descr
+          ,count(*) asset_count
+        from (
+        select
+        distinct i.iit_ne_id, i.iit_inv_type
+        from
+           nm_nw_temp_extents xe
+          ,nm_members m
+          ,nm_inv_items i
+          ,(select column_value from table(cast(get_inv_types_tbl as nm_code_tbl))) xt 
+          ,(select x2.xsp_value from nm0575_possible_xsps x2 where x2.xsp_selected = 'Y'
+            union all select '~~~~' xsp_value from dual) xs
+        where xe.nte_ne_id_of = m.nm_ne_id_of
+          and xe.nte_job_id = m_nte_job_id
+          and m.nm_begin_mp <= xe.nte_end_mp
+          and m.nm_end_mp >= xe.nte_begin_mp
+          and (m.nm_begin_mp = m.nm_end_mp or (m.nm_begin_mp < xe.nte_end_mp and m.nm_end_mp > xe.nte_begin_mp))
+          and (xe.nte_begin_mp < xe.nte_end_mp or m.nm_begin_mp = m.nm_end_mp)
+          and m.nm_ne_id_in = i.iit_ne_id
+          and i.iit_inv_type = xt.column_value
+          and nvl(i.iit_x_sect, '~~~~') = xs.xsp_value
+        ) q
+        ,nm_inv_types t
+        where q.iit_inv_type = t.nit_inv_type
+        group by
+           t.nit_category
+          ,t.nit_inv_type
+          ,t.nit_descr;
+        nm3dbg.putln('insert nm0575_matching_records count: '||sql%rowcount);
+        
+        
+      -- assets over all network
+      else
+        -- todo: not implemented
+        null;
+        
+      end if;
+      
+    end if;
+  
+    m_xsp_changed := false;
+    
+  end if; -- do_query
+
   nm3dbg.deind;
 exception
   when others then
     nm3dbg.puterr(sqlerrm||': '||g_package_name||'.do_query('
-      ||'pi_source_ne_id='||pi_source_ne_id
+      ||', pi_source_type='||pi_source_type
+      ||', pi_source_ne_id='||pi_source_ne_id
       ||', pi_begin_mp='||pi_begin_mp
       ||', pi_end_mp='||pi_end_mp
-      ||', pi_ambig_sub_class='||pi_ambig_sub_class
-      ||', g_tab_selected_categories.count='||g_tab_selected_categories.count
+      ||', m_xsp_changed='||nm3dbg.to_char(m_xsp_changed)
+      ||', m_nte_job_id='||m_nte_job_id
       ||')');
     raise;
     
@@ -392,14 +293,17 @@ END do_query;
 PROCEDURE clear_event_log IS
 
 BEGIN
-
-delete from nm0575_event_log;
-commit;
+  null;
+-- delete from nm0575_event_log;
+-- commit;
 
 END;
 --
 -----------------------------------------------------------------------------
 --
+
+-- this is called from the form's Process button
+-- the table contains the asset types user has choosen for close/delete
 PROCEDURE process_tab_asset_types(pi_tab_asset_types  IN nm3type.tab_varchar4
                                  ,pi_action           IN VARCHAR2
                                  ,pi_process_partial  IN VARCHAR2) IS
@@ -416,13 +320,12 @@ PROCEDURE process_tab_asset_types(pi_tab_asset_types  IN nm3type.tab_varchar4
   l_main_count      pls_integer := 0;
   l_partial_count   pls_integer := 0;
   l_child_count     pls_integer := 0;
-  r_log           nm0575_event_log%rowtype;
+  --r_log           nm0575_event_log%rowtype;
   l_action        varchar2(20);
  
 
 
 BEGIN
-  nm3dbg.debug_on; nm3dbg.timing_on;
   nm3dbg.putln(g_package_name||'.process_tab_asset_types('
     ||'pi_tab_asset_types.count='||pi_tab_asset_types.count
     ||', pi_action='||pi_action
@@ -451,15 +354,15 @@ BEGIN
   end loop;
   nm3dbg.putln('t_code.count='||t_code.count);
   
-  
-  -- todo: store the next cursor results in a temp table (without the nm_member values)
-  -- then just run everything as a series of bulk statements
-  --  the current solution is only to avoid creating the temp table - needs some general core planning first.
+  -- todo: run over whole network
   
   -- open the main assets query
   -- this closes / resizes all placements (including potential child placements)
   --  (the top distinct removes duplicates caused by multiples from nm_inv_item_groupings table
-  --   the disticnt below removes duplicate point items - create by falling element start/end)
+  --   the disticnt below removes duplicate point items - the ones that fall on element start/end)
+  -- the result excludes touching continuous itmes but includes touching point items
+  -- if the temp extent is a single point, then only the points that fall onto it are processed
+  --  the continuous items that run over the point are also excluded and thus not split.
   for r in (
     select q2.*
       ,row_number() over (partition by q2.nm_ne_id_in order by 1) iit_rownum
@@ -468,6 +371,7 @@ BEGIN
        q.iit_ne_id nm_ne_id_in
       ,q.nm_ne_id_of
       ,q.nm_begin_mp
+      ,q.nm_end_mp
       ,q.nm_start_date
       ,q.nm_admin_unit
       ,q.nm_type
@@ -540,6 +444,8 @@ BEGIN
     ) q
     ,nm_inv_item_groupings g
     where q.nte_ne_id_of is not null
+      and (q.nm_begin_mp = q.nm_end_mp or (q.nm_begin_mp < q.nte_end_mp and q.nm_end_mp > q.nte_begin_mp))
+      and (q.nte_begin_mp < q.nte_end_mp or q.nm_begin_mp = q.nm_end_mp)
       and q.iit_ne_id = g.iig_parent_id (+)
     ) q2
   )
@@ -547,16 +453,17 @@ BEGIN
   -- start of the main asset placements loop
   loop
     l_main_count := l_main_count + 1;
---     nm3dbg.putln(l_main_count||'=(nm_ne_id_in='||r.nm_ne_id_in
---       ||', nm_ne_id_of='||r.nm_ne_id_of
---       ||', nm_begin_mp='||r.nm_begin_mp
---       ||', excluded_member_count='||r.excluded_member_count
---       ||', iig_parent_id='||r.iig_parent_id
---       ||', keep_begin_mp='||r.keep_begin_mp
---       ||', keep_end_mp='||r.keep_end_mp
---       ||', keep_begin_mp2='||r.keep_begin_mp2
---       ||', keep_end_mp2='||r.keep_end_mp2
---       ||')');
+    nm3dbg.putln(l_main_count||'=(nm_ne_id_in='||r.nm_ne_id_in
+      ||', nm_ne_id_of='||r.nm_ne_id_of
+      ||', nm_begin_mp='||r.nm_begin_mp
+      ||', nm_end_mp='||r.nm_end_mp
+      ||', excluded_member_count='||r.excluded_member_count
+      ||', iig_parent_id='||r.iig_parent_id
+      ||', keep_begin_mp='||r.keep_begin_mp
+      ||', keep_end_mp='||r.keep_end_mp
+      ||', keep_begin_mp2='||r.keep_begin_mp2
+      ||', keep_end_mp2='||r.keep_end_mp2
+      ||')');
       
        
     -- close the current asset placement
@@ -619,7 +526,7 @@ BEGIN
         -- bulk collect all the child item ids
         select g.iig_item_id, g.iig_top_id
         bulk collect into t_iig_item_id, t_iig_top_id
-        from nm_inv_item_groupings_all g
+        from nm_inv_item_groupings g
         connect by prior g.iig_item_id = g.iig_parent_id
         start with g.iig_parent_id = r.iig_parent_id;
         
@@ -632,13 +539,15 @@ BEGIN
           update nm_inv_item_groupings_all g
             set g.iig_end_date = l_effective_date
           where g.iig_item_id = t_iig_item_id(i)
-            and g.iig_top_id = t_iig_top_id(i);
+            and g.iig_top_id = t_iig_top_id(i)
+            and g.iig_end_date is null;
         
         else
           forall i in 1 .. t_iig_item_id.count
           delete from nm_inv_item_groupings_all g
           where g.iig_item_id = t_iig_item_id(i)
-            and g.iig_top_id = t_iig_top_id(i);
+            and g.iig_top_id = t_iig_top_id(i)
+            and g.iig_end_date is null;
         
         end if;
         
@@ -649,13 +558,13 @@ BEGIN
           update nm_members_all m
             set m.nm_end_date = l_effective_date
           where m.nm_ne_id_in = t_iig_item_id(i)
-            and m.nm_end_date is not null;
+            and m.nm_end_date is null;
         
         else
           forall i in 1 .. t_iig_item_id.count  
           delete from nm_members_all m
           where m.nm_ne_id_in = t_iig_item_id(i)
-            and m.nm_end_date is not null;
+            and m.nm_end_date is null;
         
         end if;
         
@@ -665,13 +574,13 @@ BEGIN
           update nm_inv_items_all i
             set i.iit_end_date = l_effective_date
           where i.iit_ne_id = t_iig_item_id(i)
-            and i.iit_end_date is not null;
+            and i.iit_end_date is null;
         
         else
           forall i in 1 .. t_iig_item_id.count  
           delete from nm_inv_items_all i
           where i.iit_ne_id = t_iig_item_id(i)
-            and i.iit_end_date is not null;
+            and i.iit_end_date is null;
         
         end if;
         
@@ -709,14 +618,14 @@ BEGIN
     update nm_inv_items_all
     set iit_end_date = l_effective_date
     where iit_ne_id = t_iit_id(i)
-      and iit_end_date is not null;
+      and iit_end_date is null;
   
   -- delete
   elsif pi_action = 'D' then
     forall i in 1 .. t_iit_id.count
     delete from nm_inv_items_all
     where iit_ne_id = t_iit_id(i)
-      and iit_end_date is not null;
+      and iit_end_date is null;
       
   end if;
   
@@ -724,33 +633,6 @@ BEGIN
   nm3dbg.putln('l_partial_count='||l_partial_count);
   nm3dbg.putln('l_child_count='||l_child_count);
   
-  r_log.log_action      := pi_action;
-  r_log.log_error_flag  := 'N';
-  if pi_action = 'C' then
-    l_action := 'end dated';
-    r_log.log_iit_ne_id   := 0;
-  else
-    l_action := 'deleted';
-    r_log.log_iit_ne_id   := 10;
-  end if;
-  
-  r_log.log_iit_ne_id   := r_log.log_iit_ne_id + 1;
-  r_log.log_message     := l_main_count||' placement records '||l_action;
-  insert into nm0575_event_log values r_log;
-  
-  r_log.log_iit_ne_id   := r_log.log_iit_ne_id + 1;
-  r_log.log_message     := t_iit_id.count||' assets items '||l_action;
-  insert into nm0575_event_log values r_log;
-  
-  r_log.log_iit_ne_id   := r_log.log_iit_ne_id + 1;
-  r_log.log_message     := l_partial_count||' assets items partially '||l_action;
-  insert into nm0575_event_log values r_log;
-  
-  r_log.log_iit_ne_id   := r_log.log_iit_ne_id + 1;
-  r_log.log_message     := l_child_count||' child items '||l_action;
-  insert into nm0575_event_log values r_log;
- 
- 
 --   raise zero_divide;
  
   nm3dbg.deind;
@@ -760,6 +642,7 @@ exception
       ||'pi_tab_asset_types.count='||pi_tab_asset_types.count
       ||', pi_action='||pi_action
       ||', pi_process_partial='||pi_process_partial
+      ||', m_nte_job_id='||m_nte_job_id
       ||')');
     raise;
  
@@ -773,9 +656,8 @@ PROCEDURE tidy_up IS
 
 BEGIN
 
- delete from nm_gaz_query_item_list
- where  ngqi_job_id = g_current_result_set_id;
- 
+  delete from nm_gaz_query_item_list
+  where  ngqi_job_id = m_nte_job_id;
  
   mt_inv_categories := null;
   mt_inv_types      := null;
@@ -848,10 +730,11 @@ END tidy_up;
         and nm_ne_id_of = p_ne_id_of
         and nm_begin_mp = p_begin_mp
         and nm_start_date = p_start_date
-        and nm_end_date is not null;
---       if sql%rowcount = 0 then
---         raise no_data_found;
---       end if;
+        and nm_end_date is null;
+      if sql%rowcount = 0 then
+        nm3dbg.putln('update no_data_found: close_member_record('||p_action
+          ||', '||p_ne_id_in||', '||p_ne_id_of||', '||p_begin_mp||', '||p_start_date||')');
+      end if;
     
     -- delete
     elsif p_action = 'D' then
@@ -862,9 +745,57 @@ END tidy_up;
         and nm_ne_id_of = p_ne_id_of
         and nm_begin_mp = p_begin_mp
         and nm_start_date = p_start_date
-        and nm_end_date is not null;
+        and nm_end_date is null;
+      if sql%rowcount = 0 then
+        nm3dbg.putln('delete no_data_found: close_member_record('||p_action
+          ||', '||p_ne_id_in||', '||p_ne_id_of||', '||p_begin_mp||', '||p_start_date||')');
+      end if;
         
     end if;
+  end;
+  
+  
+  
+  -- this is useful code, but not used here.
+  function are_tables_equal(
+     pt_1 in nm3type.tab_varchar4
+    ,pt_2 in nm3type.tab_varchar4
+  ) return boolean
+  is
+    i_count binary_integer;
+  begin
+    i_count := greatest(pt_1.count, pt_2.count);
+    
+    for i in 1 .. i_count loop
+      if pt_1.exists(i) then
+        if pt_2.exists(i) then
+          if pt_1(i) = pt_2(i) then
+            null;
+          elsif pt_1(i) is null and pt_2(i) is null then
+            null;
+          else
+            return false;
+          end if;
+        else
+          return false;
+        end if;
+      elsif pt_2.exists(i) then
+        return false;
+      end if;
+    end loop;
+    
+    return true;
+    
+  end;
+  
+  
+  
+  procedure set_xsp_changed
+  is
+  begin
+    nm3dbg.putln(g_package_name||'.set_xsp_changed('
+      ||')');
+    m_xsp_changed := true;
   end;
     
 END nm0575;

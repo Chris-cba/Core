@@ -2,11 +2,11 @@ create or replace package nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkh-arc   2.1   Dec 03 2007 08:11:00   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkh-arc   2.2   Dec 04 2007 21:23:42   ptanava  $
 --       Module Name      : $Workfile:   nm0575.pkh  $
---       Date into PVCS   : $Date:   Dec 03 2007 08:11:00  $
---       Date fetched Out : $Modtime:   Nov 30 2007 18:59:02  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Dec 04 2007 21:23:42  $
+--       Date fetched Out : $Modtime:   Dec 04 2007 21:08:38  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on SCCS version : 1.2
 --
 --
@@ -21,7 +21,7 @@ AS
   -----------
   --constants
   -----------
-  g_sccsid CONSTANT VARCHAR2(2000) := '"$Revision:   2.1  $"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '"$Revision:   2.2  $"';
   
 
 --
@@ -45,14 +45,15 @@ PROCEDURE set_g_tab_selected_categories(pi_tab_selected_categories IN nm3type.ta
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_current_result_set_id RETURN nm_gaz_query_item_list.NGQI_JOB_ID%TYPE;
---
 -----------------------------------------------------------------------------
 --
-PROCEDURE do_query(pi_source_ne_id       IN nm_gaz_query.ngq_source_id%TYPE
-                  ,pi_begin_mp           IN nm_gaz_query.ngq_begin_mp%TYPE
-                  ,pi_end_mp             IN nm_gaz_query.ngq_end_mp%TYPE
-                  ,pi_ambig_sub_class    IN nm_gaz_query.ngq_ambig_sub_class%TYPE);
+PROCEDURE do_query(
+   pi_source_type        in varchar2
+  ,pi_source_ne_id       IN nm_gaz_query.ngq_source_id%TYPE
+  ,pi_begin_mp           IN nm_gaz_query.ngq_begin_mp%TYPE
+  ,pi_end_mp             IN nm_gaz_query.ngq_end_mp%TYPE
+  --,pi_ambig_sub_class    IN nm_gaz_query.ngq_ambig_sub_class%TYPE
+);
 --
 -----------------------------------------------------------------------------
 --   
@@ -88,6 +89,9 @@ PROCEDURE tidy_up;
   
   
   procedure set_inv_types_tbl(p_tbl in nm_code_tbl);
+  
+  procedure set_xsp_changed;
+
   
   
 end nm0575;
