@@ -1,0 +1,211 @@
+
+/*
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/util.sqlj-arc   2.2   Dec 04 2007 18:08:56   jwadsworth  $
+--       Module Name      : $Workfile:   util.sqlj  $
+--       Date into SCCS   : $Date:   Dec 04 2007 18:08:56  $
+--       Date fetched Out : $Modtime:   Dec 04 2007 18:08:34  $
+--       SCCS Version     : $Revision:   2.2  $
+--       Based on 
+--
+--
+--
+--   Author : I Turnbull
+--
+--    Util.java
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2002
+-----------------------------------------------------------------------------
+*/
+  import java.io.*;
+  import java.lang.*;
+  import java.sql.*;
+  import oracle.sql.*;
+  import oracle.jdbc.driver.*;
+
+
+  public class Util extends Object
+  {
+
+    public static int RunThis(String args)
+    {
+    Runtime rt = Runtime.getRuntime();
+    int     rc = -1;
+
+    try
+    {
+       Process p = rt.exec(args);
+
+       int bufSize = 4096;
+       BufferedInputStream bis = new BufferedInputStream(p.getInputStream(), bufSize);
+       int len;
+       byte buffer[] = new byte[bufSize];
+
+       // Echo back what the program spit out
+       //while ((len = bis.read(buffer, 0, bufSize)) != -1)
+         // System.out.write(buffer, 0, len);
+
+       rc = p.waitFor();
+    }
+    catch (Exception e)
+    {
+       e.printStackTrace();
+       rc = -1;
+    }
+//    finally
+//    {
+       return rc;
+//    }
+    }
+
+    //runs the process, but doesn't wait for it to finish
+    public static int RunThisNoWait(String args)
+    {
+    Runtime rt = Runtime.getRuntime();
+    int     rc = 1;
+
+    try
+    {
+       Process p = rt.exec(args);
+
+       int bufSize = 4096;
+       BufferedInputStream bis = new BufferedInputStream(p.getInputStream(), bufSize);
+       int len;
+       byte buffer[] = new byte[bufSize];
+
+       // Echo back what the program spit out
+       //while ((len = bis.read(buffer, 0, bufSize)) != -1)
+         // System.out.write(buffer, 0, len);
+
+       //rc = p.waitFor();
+    }
+    catch (Exception e)
+    {
+       e.printStackTrace();
+       rc = -1;
+    }
+//    finally
+//    {
+       return rc;
+//    }
+    }
+
+    public static void GetFileList(String directory)
+    throws SQLException
+    {
+      File path = new File( directory );
+      String[] list = path.list();
+      String element;
+
+      for(int i = 0; i < list.length; i++)
+      {
+          element = list[i];
+          #sql { CALL nm3file.append_file_to_dir_list( :element) };
+      }      
+    }
+  
+    public static void DeleteFile(String directory, String FileName)
+    throws SQLException
+    {
+      File FName     = new File( directory.concat(FileName));
+      FName.delete();
+      
+   }
+
+    // Copies src file to dst file.
+    // If the dst file does not exist, it is created
+    static void copy(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
+    
+        // Transfer bytes from in to out
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        in.close();
+        out.close();
+    }
+   
+
+  private static String doMove
+    ( File  sourceFile
+    , File  targetFile
+    , String overWrite
+    )
+  {
+
+    if ( ! sourceFile.exists() )
+    {
+      throw new RuntimeException("moveFile: 'from' file " + sourceFile.getName() + " does not exist" ) ;
+    }
+
+    if ( ! sourceFile.canWrite() )
+    {
+      throw new RuntimeException("moveFile: 'from' file " + sourceFile.getName() + " cannot write (i.e. remove) this file" ) ;
+    }
+
+    if ( targetFile.exists() )
+    {
+      if( ! "Y".equals(overWrite))
+      {
+        throw new RuntimeException("moveFile: 'to' file " + targetFile.getName() + " already exists and over write not set" ) ;
+      }
+      else
+      {
+        targetFile.delete();
+      }
+    }
+    
+
+    boolean success = sourceFile.renameTo(targetFile);
+    // Rename failed so we try copy/delete
+    if ( ! success )
+    {
+      try {
+
+        copy( sourceFile, targetFile ) ;
+        success = sourceFile.delete() ;
+        if ( !success )
+        { 
+          targetFile.delete() ;
+          throw new RuntimeException("moveFile: 'from' file " + sourceFile.getName() + " cannot remove original file" ) ;
+        }
+        success = true ;
+        
+      } catch ( Exception e ) { throw new RuntimeException( e.getMessage() ) ; }
+    }
+    return( (success )?"Y":"N" ) ;
+  }
+  public static String moveFile
+    ( String fileFrom
+    , String fileTo
+    , String fromDir
+    , String toDir
+    , String overWrite
+    )
+  {
+
+    File sourceFile = new File( new File( fromDir ) , fileFrom ) ;
+    File targetFile = new File( new File( toDir ) , fileTo ) ;
+    
+    return doMove( sourceFile, targetFile, overWrite ) ;
+
+  }
+  public static String moveFile
+    ( String fileFrom
+    , String fileTo
+    , String overWrite
+    )
+  {
+
+    File sourceFile = new File( fileFrom ) ;
+    File targetFile = new File( fileTo ) ;
+
+    return doMove( sourceFile, targetFile, overWrite ) ;
+
+  }
+}
+
