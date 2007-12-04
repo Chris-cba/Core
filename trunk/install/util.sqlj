@@ -52,10 +52,10 @@
        e.printStackTrace();
        rc = -1;
     }
-    finally
-    {
+//    finally
+//    {
        return rc;
-    }
+//    }
     }
 
     //runs the process, but doesn't wait for it to finish
@@ -84,10 +84,10 @@
        e.printStackTrace();
        rc = -1;
     }
-    finally
-    {
+//    finally
+//    {
        return rc;
-    }
+//    }
     }
 
     public static void GetFileList(String directory)
