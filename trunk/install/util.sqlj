@@ -1,12 +1,13 @@
 
 /*
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)util.sqlj	1.7 11/25/05
---       Module Name      : util.sqlj
---       Date into SCCS   : 05/11/25 11:25:43
---       Date fetched Out : 07/01/31 13:21:01
---       SCCS Version     : 1.7
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/util.sqlj-arc   2.2   Dec 04 2007 18:08:56   jwadsworth  $
+--       Module Name      : $Workfile:   util.sqlj  $
+--       Date into SCCS   : $Date:   Dec 04 2007 18:08:56  $
+--       Date fetched Out : $Modtime:   Dec 04 2007 18:08:34  $
+--       SCCS Version     : $Revision:   2.2  $
+--       Based on 
 --
 --
 --
