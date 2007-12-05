@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.2   Nov 27 2007 16:28:18   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.3   Dec 05 2007 15:31:44   ptanava  $
 --       Module Name      : $Workfile:   nm3recal.pkb  $
---       Date into PVCS   : $Date:   Nov 27 2007 16:28:18  $
---       Date fetched Out : $Modtime:   Nov 27 2007 16:26:44  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Dec 05 2007 15:31:44  $
+--       Date fetched Out : $Modtime:   Dec 05 2007 15:26:18  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : Jonathan Mills
@@ -22,9 +22,10 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
   PT 23.11.07 recalibrate zero divide fix, subtracting just enough so that the difference is later absorbed in rounding
                e.g 5 becomes 4.9999 with 3 dec_places
                this not yet tested on nm3sdm.recalibrate_element_shape() and others procducts
+  PT 05.12.07 mairecal.recal_data() brough in line with the others in recalibrate_other_products()
 */
 
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
    g_package_name    CONSTANT  varchar2(30) := 'nm3recal';
 --
    g_tab_rec_nm      nm3type.tab_rec_nm;
@@ -768,16 +769,17 @@ BEGIN
 --
    IF hig.is_product_licensed( nm3type.c_mai )
     THEN
-      EXECUTE IMMEDIATE            'BEGIN'
-                        ||CHR(10)||'   mairecal.recal_data'
-                        ||CHR(10)||'         (p_rse_he_id   => :pi_ne_id'
-                        ||CHR(10)||'         ,p_orig_length => :pi_orig_length'
-                        ||CHR(10)||'         ,p_new_length  => :pi_new_length'
-                        ||CHR(10)||'         );'
-                        ||CHR(10)||'END;'
-       USING IN pi_ne_id
-               ,g_element_length
-               ,pi_new_datum_length;
+      dyn_recal('mairecal.recal_data');
+--       EXECUTE IMMEDIATE            'BEGIN'
+--                         ||CHR(10)||'   mairecal.recal_data'
+--                         ||CHR(10)||'         (p_rse_he_id   => :pi_ne_id'
+--                         ||CHR(10)||'         ,p_orig_length => :pi_orig_length'
+--                         ||CHR(10)||'         ,p_new_length  => :pi_new_length'
+--                         ||CHR(10)||'         );'
+--                         ||CHR(10)||'END;'
+--        USING IN pi_ne_id
+--                ,g_element_length
+--                ,pi_new_datum_length;
    END IF;
 --
 END recalibrate_other_products;
