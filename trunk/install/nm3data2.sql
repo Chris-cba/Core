@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.9   Nov 07 2007 16:37:46   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.10   Dec 14 2007 14:20:26   sscanlon  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Nov 07 2007 16:37:46  $
---       Date fetched Out : $Modtime:   Nov 07 2007 16:35:30  $
---       Version          : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Dec 14 2007 14:20:26  $
+--       Date fetched Out : $Modtime:   Dec 14 2007 14:17:18  $
+--       Version          : $Revision:   2.10  $
 --
 --   Product metadata script
 --
@@ -20,11 +20,11 @@
 
 INFO
 ====
-As at Release 4.0.2.0
+As at Release 4.0.4.0
 
 GENERATION DATE
 ===============
-07-NOV-2007 16:35
+14-DEC-2007 14:16
 
 TABLES PROCESSED
 ================
@@ -84076,6 +84076,57 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'HIG_REFERENCE'
+       ,'HIG4010'
+       ,'Standard Text Maintenance'
+       ,'M'
+       ,18 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG4010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG4020'
+       ,'Standard Text Usage'
+       ,'M'
+       ,19 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG4020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
+       ,'HIG4025'
+       ,'My Standard Text Usage'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_REFERENCE'
+                    AND  HSTF_CHILD = 'HIG4025');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_REFERENCE'
        ,'HIG5000'
        ,'Maintain Entry Points'
        ,'M'
@@ -88343,6 +88394,23 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'MAI_WORKS_REPORTS'
+       ,'MAI3970'
+       ,'Print Gang Work Orders'
+       ,'M'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'MAI_WORKS_REPORTS'
+                    AND  HSTF_CHILD = 'MAI3970');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'MAI_WORKS_REPORTS'
        ,'MAI5032'
        ,'Print Cyclic Maintenance Done'
        ,'M'
@@ -89540,6 +89608,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'NSG_DATA'
                     AND  HSTF_CHILD = 'NSG0090');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'NSG_DATA'
+       ,'NSG0110'
+       ,'Organisations and Districts'
+       ,'M'
+       ,25 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NSG_DATA'
+                    AND  HSTF_CHILD = 'NSG0110');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -93841,6 +93926,1366 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'TM'
                     AND  HSTF_CHILD = 'TM_REFERENCE');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA'
+       ,'TMA_ACTIVITIES'
+       ,'Activities'
+       ,'F'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA'
+                    AND  HSTF_CHILD = 'TMA_ACTIVITIES');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA'
+       ,'TMA_DATA_EXCHANGE'
+       ,'Data Exchange'
+       ,'F'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA'
+                    AND  HSTF_CHILD = 'TMA_DATA_EXCHANGE');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA'
+       ,'TMA_INSPECTIONS'
+       ,'Inspections'
+       ,'F'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA'
+                    AND  HSTF_CHILD = 'TMA_INSPECTIONS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA'
+       ,'TMA_REFERENCE_DATA'
+       ,'Reference Data'
+       ,'F'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA'
+                    AND  HSTF_CHILD = 'TMA_REFERENCE_DATA');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACTIVITIES'
+       ,'TMA_ACT_ADMINISTRATION'
+       ,'Administration'
+       ,'F'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA_ACT_ADMINISTRATION');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACTIVITIES'
+       ,'TMA_ACT_FINANCIAL'
+       ,'Financial'
+       ,'F'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA_ACT_FINANCIAL');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACTIVITIES'
+       ,'TMA_ACT_OTHER_ACTIVITIES'
+       ,'Other Activities'
+       ,'F'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA_ACT_OTHER_ACTIVITIES');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACTIVITIES'
+       ,'TMA_ACT_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,60 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA_ACT_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACTIVITIES'
+       ,'TMA_ACT_RESTRICTIONS'
+       ,'Restrictions'
+       ,'F'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA_ACT_RESTRICTIONS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACTIVITIES'
+       ,'TMA_ACT_WORKS'
+       ,'Works'
+       ,'F'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA_ACT_WORKS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_ADMINISTRATION'
+       ,'TMA1130'
+       ,'Merge Unattributable Works'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_ADMINISTRATION'
+                    AND  HSTF_CHILD = 'TMA1130');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_ADMINISTRATION'
+       ,'TMA1140'
+       ,'Allocate Provisional Works'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_ADMINISTRATION'
+                    AND  HSTF_CHILD = 'TMA1140');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_FINANCIAL'
+       ,'TMA1080'
+       ,'S74 Charges'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_FINANCIAL'
+                    AND  HSTF_CHILD = 'TMA1080');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_FINANCIAL'
+       ,'TMA1090'
+       ,'Informal Works Overrun'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_FINANCIAL'
+                    AND  HSTF_CHILD = 'TMA1090');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_FINANCIAL'
+       ,'TMA1100'
+       ,'FPNs'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_FINANCIAL'
+                    AND  HSTF_CHILD = 'TMA1100');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_OTHER_ACTIVITIES'
+       ,'TMA1120'
+       ,'Licenced Works'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_OTHER_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA1120');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_OTHER_ACTIVITIES'
+       ,'TMA1150'
+       ,'Non-Street Works Activities'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_OTHER_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA1150');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_OTHER_ACTIVITIES'
+       ,'TMA1160'
+       ,'Query Licenced Works'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_OTHER_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA1160');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_OTHER_ACTIVITIES'
+       ,'TMA1170'
+       ,'Query Non-Street Works Activities'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_OTHER_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA1170');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_RESTRICTIONS'
+       ,'TMA1110'
+       ,'Restrictions'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_RESTRICTIONS'
+                    AND  HSTF_CHILD = 'TMA1110');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_RESTRICTIONS'
+       ,'TMA1180'
+       ,'Send All Restrictions'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_RESTRICTIONS'
+                    AND  HSTF_CHILD = 'TMA1180');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_RESTRICTIONS'
+       ,'TMA3020'
+       ,'Get Restriction'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_RESTRICTIONS'
+                    AND  HSTF_CHILD = 'TMA3020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_WORKS'
+       ,'TMA1000'
+       ,'Works'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_WORKS'
+                    AND  HSTF_CHILD = 'TMA1000');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_WORKS'
+       ,'TMA1005'
+       ,'View Archived Works/Sites'
+       ,'M'
+       ,15 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_WORKS'
+                    AND  HSTF_CHILD = 'TMA1005');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_WORKS'
+       ,'TMA1010'
+       ,'Projects'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_WORKS'
+                    AND  HSTF_CHILD = 'TMA1010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_WORKS'
+       ,'TMA1020'
+       ,'Comments'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_WORKS'
+                    AND  HSTF_CHILD = 'TMA1020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_WORKS'
+       ,'TMA1030'
+       ,'Review Notices'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_WORKS'
+                    AND  HSTF_CHILD = 'TMA1030');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_WORKS'
+       ,'TMA1040'
+       ,'Query Works'
+       ,'M'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_WORKS'
+                    AND  HSTF_CHILD = 'TMA1040');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_WORKS'
+       ,'TMA1050'
+       ,'Query Overrunning Works'
+       ,'M'
+       ,60 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_WORKS'
+                    AND  HSTF_CHILD = 'TMA1050');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_WORKS'
+       ,'TMA1060'
+       ,'Error Corrections'
+       ,'M'
+       ,70 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_WORKS'
+                    AND  HSTF_CHILD = 'TMA1060');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_WORKS'
+       ,'TMA1070'
+       ,'Directions'
+       ,'M'
+       ,80 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_WORKS'
+                    AND  HSTF_CHILD = 'TMA1070');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_BATCH_PROCESSING'
+       ,'TMA_DATA_BATCH_PROCESSING_INSP'
+       ,'Inspections'
+       ,'F'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING'
+                    AND  HSTF_CHILD = 'TMA_DATA_BATCH_PROCESSING_INSP');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_BATCH_PROCESSING_INSP'
+       ,'TMA5500'
+       ,'Inspection Download'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING_INSP'
+                    AND  HSTF_CHILD = 'TMA5500');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_BATCH_PROCESSING_INSP'
+       ,'TMA5510'
+       ,'Inspections Batch File Summary'
+       ,'M'
+       ,60 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING_INSP'
+                    AND  HSTF_CHILD = 'TMA5510');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_BATCH_PROCESSING_INSP'
+       ,'TMA5520'
+       ,'Inspection Download to DCD'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING_INSP'
+                    AND  HSTF_CHILD = 'TMA5520');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_BATCH_PROCESSING_INSP'
+       ,'TMA5530'
+       ,'Automatic Inspection Download to DCD'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING_INSP'
+                    AND  HSTF_CHILD = 'TMA5530');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_BATCH_PROCESSING_INSP'
+       ,'TMA5600'
+       ,'Inspection Upload'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING_INSP'
+                    AND  HSTF_CHILD = 'TMA5600');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_BATCH_PROCESSING_INSP'
+       ,'TMA5610'
+       ,'Automatic Inspection Upload'
+       ,'M'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING_INSP'
+                    AND  HSTF_CHILD = 'TMA5610');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_BATCH_PROCESSING_INSP'
+       ,'TMA5620'
+       ,'Inspections Upload Transaction Summary'
+       ,'M'
+       ,70 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING_INSP'
+                    AND  HSTF_CHILD = 'TMA5620');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_EXCHANGE'
+       ,'TMA_DATA_BATCH_PROCESSING'
+       ,'Batch Processing'
+       ,'F'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_EXCHANGE'
+                    AND  HSTF_CHILD = 'TMA_DATA_BATCH_PROCESSING');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_EXCHANGE'
+       ,'TMA_DATA_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_EXCHANGE'
+                    AND  HSTF_CHILD = 'TMA_DATA_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_EXCHANGE'
+       ,'TMA_DATA_WEB_SERVICES'
+       ,'Web Services'
+       ,'F'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_EXCHANGE'
+                    AND  HSTF_CHILD = 'TMA_DATA_WEB_SERVICES');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_WEB_SERVICES'
+       ,'TMA3000'
+       ,'Monitor Web Service Transactions'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_WEB_SERVICES'
+                    AND  HSTF_CHILD = 'TMA3000');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_WEB_SERVICES'
+       ,'TMA3010'
+       ,'Send EToN Ping'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_WEB_SERVICES'
+                    AND  HSTF_CHILD = 'TMA3010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_INSPECTIONS'
+       ,'TMA5000'
+       ,'Inspections'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_INSPECTIONS'
+                    AND  HSTF_CHILD = 'TMA5000');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_INSPECTIONS'
+       ,'TMA5020'
+       ,'Inspections Sent/Received'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_INSPECTIONS'
+                    AND  HSTF_CHILD = 'TMA5020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_INSPECTIONS'
+       ,'TMA5030'
+       ,'Query Inspection Defects'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_INSPECTIONS'
+                    AND  HSTF_CHILD = 'TMA5030');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_INSPECTIONS'
+       ,'TMA5100'
+       ,'Schedule Inspections'
+       ,'M'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_INSPECTIONS'
+                    AND  HSTF_CHILD = 'TMA5100');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_INSPECTIONS'
+       ,'TMA5110'
+       ,'Annual Inspection Profiles'
+       ,'M'
+       ,60 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_INSPECTIONS'
+                    AND  HSTF_CHILD = 'TMA5110');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_INSPECTIONS'
+       ,'TMA5270'
+       ,'Defect Inspection Schedules'
+       ,'M'
+       ,70 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_INSPECTIONS'
+                    AND  HSTF_CHILD = 'TMA5270');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_INSPECTIONS'
+       ,'TMA_INSP_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,500 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_INSPECTIONS'
+                    AND  HSTF_CHILD = 'TMA_INSP_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_INSP_REPORTS'
+       ,'TMA6000'
+       ,'Works Inspection Report'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'TMA6000');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_INSP_REPORTS'
+       ,'TMA6010'
+       ,'Generic Inspections Report'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'TMA6010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_INSP_REPORTS'
+       ,'TMA6030'
+       ,'Prospective Inspections Report'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'TMA6030');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_INSP_REPORTS'
+       ,'TMA6040'
+       ,'Sample Inspection Quotas Report'
+       ,'M'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'TMA6040');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_INSP_REPORTS'
+       ,'TMA6050'
+       ,'Inspection Performance'
+       ,'M'
+       ,60 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'TMA6050');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_INSP_REPORTS'
+       ,'TMA6060'
+       ,'Inspection Performance Hierarchy'
+       ,'M'
+       ,70 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'TMA6060');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_INSP_REPORTS'
+       ,'TMA6070'
+       ,'Annual Inspection Profiles'
+       ,'M'
+       ,80 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'TMA6070');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_INSP_REPORTS'
+       ,'TMA6080'
+       ,'Sample Inspections Invoice Report'
+       ,'M'
+       ,90 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'TMA6080');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_INSP_REPORTS'
+       ,'TMA6090'
+       ,'Inspections Invoice'
+       ,'M'
+       ,100 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_INSP_REPORTS'
+                    AND  HSTF_CHILD = 'TMA6090');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REFERENCE_DATA'
+       ,'TMA_REF_ACTIVITIES'
+       ,'Activities'
+       ,'F'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REFERENCE_DATA'
+                    AND  HSTF_CHILD = 'TMA_REF_ACTIVITIES');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REFERENCE_DATA'
+       ,'TMA_REF_ADMINISTRATION'
+       ,'Administration'
+       ,'F'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REFERENCE_DATA'
+                    AND  HSTF_CHILD = 'TMA_REF_ADMINISTRATION');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REFERENCE_DATA'
+       ,'TMA_REF_BATCH_PROCESSING'
+       ,'Batch Processing'
+       ,'F'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REFERENCE_DATA'
+                    AND  HSTF_CHILD = 'TMA_REF_BATCH_PROCESSING');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REFERENCE_DATA'
+       ,'TMA_REF_INSPECTIONS'
+       ,'Inspections'
+       ,'F'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REFERENCE_DATA'
+                    AND  HSTF_CHILD = 'TMA_REF_INSPECTIONS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REFERENCE_DATA'
+       ,'TMA_REF_REPORTS'
+       ,'Reports'
+       ,'F'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REFERENCE_DATA'
+                    AND  HSTF_CHILD = 'TMA_REF_REPORTS');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REF_ACTIVITIES'
+       ,'TMA2000'
+       ,'Notice Review Rules'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REF_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA2000');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REF_ACTIVITIES'
+       ,'TMA2010'
+       ,'Notice Types'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REF_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA2010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REF_ACTIVITIES'
+       ,'TMA2020'
+       ,'Works Categories'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REF_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA2020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REF_ACTIVITIES'
+       ,'TMA2030'
+       ,'Status Transitions'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REF_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA2030');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REF_ACTIVITIES'
+       ,'TMA2040'
+       ,'Agreement Types'
+       ,'M'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REF_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA2040');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REF_ACTIVITIES'
+       ,'TMA2050'
+       ,'Notice Warnings'
+       ,'M'
+       ,60 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REF_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA2050');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REF_ADMINISTRATION'
+       ,'TMA0010'
+       ,'Contacts'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REF_ADMINISTRATION'
+                    AND  HSTF_CHILD = 'TMA0010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REF_ADMINISTRATION'
+       ,'TMA0020'
+       ,'Street Groups'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REF_ADMINISTRATION'
+                    AND  HSTF_CHILD = 'TMA0020');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REF_ADMINISTRATION'
+       ,'TMA0030'
+       ,'Unassigned Streets'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REF_ADMINISTRATION'
+                    AND  HSTF_CHILD = 'TMA0030');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REF_ADMINISTRATION'
+       ,'TMA0040'
+       ,'User Street Groups'
+       ,'M'
+       ,40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REF_ADMINISTRATION'
+                    AND  HSTF_CHILD = 'TMA0040');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REF_ADMINISTRATION'
+       ,'TMA0050'
+       ,'My Street Groups'
+       ,'M'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REF_ADMINISTRATION'
+                    AND  HSTF_CHILD = 'TMA0050');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REF_INSPECTIONS'
+       ,'TMA5200'
+       ,'Inspections Metadata'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REF_INSPECTIONS'
+                    AND  HSTF_CHILD = 'TMA5200');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REF_INSPECTIONS'
+       ,'TMA5290'
+       ,'Inspectors'
+       ,'M'
+       ,90 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REF_INSPECTIONS'
+                    AND  HSTF_CHILD = 'TMA5290');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REF_INSPECTIONS'
+       ,'TMA5300'
+       ,'Inspection Rulesets'
+       ,'M'
+       ,100 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REF_INSPECTIONS'
+                    AND  HSTF_CHILD = 'TMA5300');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_REF_REPORTS'
+       ,'TMA9000'
+       ,'Reference Data Report'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REF_REPORTS'
+                    AND  HSTF_CHILD = 'TMA9000');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
