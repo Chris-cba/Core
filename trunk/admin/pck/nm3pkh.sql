@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.3   Sep 19 2007 14:05:42   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.4   Dec 14 2007 15:18:30   sscanlon  $
 --       Module Name      : $Workfile:   nm3pkh.sql  $
---       Date into PVCS   : $Date:   Sep 19 2007 14:05:42  $
---       Date fetched Out : $Modtime:   Sep 19 2007 14:04:20  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Dec 14 2007 15:18:30  $
+--       Date fetched Out : $Modtime:   Dec 14 2007 15:17:02  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --
 --   Author : Graeme Johnson
@@ -2102,6 +2102,28 @@ PROMPT nm3eng_dynseg_util.pkh
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3eng_dynseg_util.pkh' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_links.pkh
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'hig_links.pkh' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_std_text.pkh
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'hig_std_text.pkh' run_file
 FROM dual 
 / 
 start '&run_file'

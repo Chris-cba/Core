@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.4   Sep 19 2007 14:09:50   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.5   Dec 14 2007 15:18:30   sscanlon  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   Sep 19 2007 14:09:50  $
---       Date fetched Out : $Modtime:   Sep 19 2007 14:09:10  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Dec 14 2007 15:18:30  $
+--       Date fetched Out : $Modtime:   Dec 14 2007 15:17:00  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --
 --   Author : Graeme Johnson
@@ -1912,7 +1912,31 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&term
 FROM dual 
 / 
 start '&run_file'
-
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_links.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'hig_links.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_std_text.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'hig_std_text.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
 --
 -- New PACKAGE BODIES above here
 --
