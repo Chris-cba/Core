@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE hig_std_text AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/tma/admin/pck/hig_std_text.pkh-arc   3.0   Dec 14 2007 13:55:18   jwadsworth  $
+--       sccsid           : $Header:   //vm_latest/archives/tma/admin/pck/hig_std_text.pkh-arc   3.1   Dec 14 2007 15:19:56   jwadsworth  $
 --       Module Name      : $Workfile:   hig_std_text.pkh  $
---       Date into SCCS   : $Date:   Dec 14 2007 13:55:18  $
---       Date fetched Out : $Modtime:   Dec 14 2007 13:54:24  $
---       SCCS Version     : $Revision:   3.0  $
+--       Date into SCCS   : $Date:   Dec 14 2007 15:19:56  $
+--       Date fetched Out : $Modtime:   Dec 14 2007 15:15:48  $
+--       SCCS Version     : $Revision:   3.1  $
 --       Based on 
 --
 --
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE hig_std_text AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid   CONSTANT varchar2(30) :='"$Revision:   3.0  $"';
+   g_sccsid   CONSTANT varchar2(30) :='"$Revision:   3.1  $"';
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------
