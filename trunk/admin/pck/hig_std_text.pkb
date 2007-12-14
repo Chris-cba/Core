@@ -3,11 +3,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/tma/admin/pck/hig_std_text.pkb-arc   3.0   Dec 14 2007 13:55:18   jwadsworth  $
+--       sccsid           : $Header:   //vm_latest/archives/tma/admin/pck/hig_std_text.pkb-arc   3.1   Dec 14 2007 15:19:38   jwadsworth  $
 --       Module Name      : $Workfile:   hig_std_text.pkb  $
---       Date into SCCS   : $Date:   Dec 14 2007 13:55:18  $
---       Date fetched Out : $Modtime:   Dec 14 2007 13:54:24  $
---       SCCS Version     : $Revision:   3.0  $
+--       Date into SCCS   : $Date:   Dec 14 2007 15:19:38  $
+--       Date fetched Out : $Modtime:   Dec 14 2007 15:15:48  $
+--       SCCS Version     : $Revision:   3.1  $
 --       Based on 
 --
 --
@@ -19,10 +19,10 @@ AS
 -----------------------------------------------------------------------------
 --    Copyright (c) exor corporation ltd, 2007
 -----------------------------------------------------------------------------
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.0  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.1  $';
    g_package_name CONSTANT varchar2(30) := 'tma_fpns_api';
 
---sccsid constant varchar2(30) :='"$Revision:   3.0  $"';
+--sccsid constant varchar2(30) :='"$Revision:   3.1  $"';
 --   g_body_sccsid is the SCCS ID for the package body
 --
 --------------------------------------------------------------------------------
