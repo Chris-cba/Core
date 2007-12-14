@@ -1,0 +1,41 @@
+CREATE OR REPLACE package hig_links as
+--<PACKAGE>
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/hig_links.pkh-arc   3.0   Dec 14 2007 15:21:16   jwadsworth  $
+--       Module Name      : $Workfile:   hig_links.pkh  $
+--       Date into SCCS   : $Date:   Dec 14 2007 15:21:16  $
+--       Date fetched Out : $Modtime:   Dec 14 2007 15:20:48  $
+--       SCCS Version     : $Revision:   3.0  $
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2007
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   3.0  $';
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+
+/*
+  purpose:
+    This package server side parameter passing mechanisms between any two forms in the system.
+
+  change history:
+    06.04.2006, Milani, created draft version in Warrington
+*/
+  procedure create_module_call (
+    p_hmlc_method_id          in   hig_module_link_calls.hmlc_method_id%type
+   ,p_hmlc_param_from_value   in   hig_module_link_calls.hmlc_param_from_value%type
+  );
+
+  procedure delete_module_call (
+    p_hmlc_id   in   hig_module_link_calls.hmlc_id%type
+  );
+end;
+/
+
