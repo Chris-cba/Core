@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.3   Oct 11 2007 18:16:48   ptanava  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.4   Dec 17 2007 10:55:16   sscanlon  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Oct 11 2007 18:16:48  $
---       Date fetched Out : $Modtime:   Oct 11 2007 18:13:36  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Dec 17 2007 10:55:16  $
+--       Date fetched Out : $Modtime:   Dec 17 2007 10:48:26  $
+--       Version          : $Revision:   2.4  $
 --
 --   Product metadata script
 --
@@ -20,11 +20,11 @@
 
 INFO
 ====
-As at Release 4.0.2.0
+As at Release 4.0.4.0
 
 GENERATION DATE
 ===============
-11-OCT-2007 18:13
+17-DEC-2007 10:48
 
 TABLES PROCESSED
 ================
@@ -1285,6 +1285,58 @@ SELECT
        ,'READONLY' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'HIG3664'
+                    AND  HMR_ROLE = 'HIG_USER');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'HIG4010'
+       ,'HIG_ADMIN'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'HIG4010'
+                    AND  HMR_ROLE = 'HIG_ADMIN');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'HIG4020'
+       ,'HIG_ADMIN'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'HIG4020'
+                    AND  HMR_ROLE = 'HIG_ADMIN');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'HIG4025'
+       ,'HIG_USER'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'HIG4025'
+                    AND  HMR_ROLE = 'HIG_USER');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'HIG4030'
+       ,'HIG_USER'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'HIG4030'
                     AND  HMR_ROLE = 'HIG_USER');
 --
 INSERT INTO HIG_MODULE_ROLES
@@ -2911,6 +2963,19 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'NMWEB7057'
                     AND  HMR_ROLE = 'WEB_USER');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'TMA0010'
+       ,'HIG_ADMIN'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'TMA0010'
+                    AND  HMR_ROLE = 'HIG_ADMIN');
 --
 --
 --********** HIG_MODULE_KEYWORDS **********--
