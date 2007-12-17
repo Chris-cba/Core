@@ -1,13 +1,12 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.2   Sep 18 2007 17:26:02   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.3   Dec 17 2007 13:31:40   ptanava  $
 --       Module Name      : $Workfile:   nm3eng_dynseg.pkb  $
---       Date into PVCS   : $Date:   Sep 18 2007 17:26:02  $
---       Date fetched Out : $Modtime:   Sep 18 2007 17:16:32  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Dec 17 2007 13:31:40  $
+--       Date fetched Out : $Modtime:   Dec 17 2007 13:29:44  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on sccs version : 1.13
---       Temp version 2.1.2
 --
 --   Author : Jonathan Mills
 --
@@ -17,17 +16,18 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --	Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 /* History
-    24.07.07 PT modified build_sql() so that the FT placements are now expected to be read from nm_members as for iit_inv_items
-                  and not be included in the veiw
-                this complements the similar FT treatment in the nm3bulk_merge package
-    17.09.07 PT added nm3eng_dynseg_util bulk preprocessing for mrg_job_id based functions.
-                  This completes the implementing of the bulk processing used in connection with derived assets
+  24.07.07 PT modified build_sql() so that the FT placements are now expected to be read from nm_members as for iit_inv_items
+                and not be included in the veiw
+              this complements the similar FT treatment in the nm3bulk_merge package
+  17.09.07 PT added nm3eng_dynseg_util bulk preprocessing for mrg_job_id based functions.
+                This completes the implementing of the bulk processing used in connection with derived assets
+  17.12.07 PT fix bug in build_sql() of not restricting inv_type correctly (brought up by kansas null value function return)
 */
 
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg';
@@ -2437,8 +2437,14 @@ BEGIN
               ||CHR(10)||' AND   nsm.'||l_ne_id_col||'          = nm.nm_ne_id_of'
               ||CHR(10)||' AND   nm.nm_end_mp          > nsm.'||l_begin_mp_col
               ||CHR(10)||' AND   nm.nm_begin_mp        <= nsm.'||l_end_mp_col
-              ||CHR(10)||' AND   nm.nm_ne_id_in         = iit.'||l_inv_ne_id_col
-              ||chr(10)||' and   :inv_type is not null';
+              ||CHR(10)||' AND   nm.nm_ne_id_in         = iit.'||l_inv_ne_id_col;
+         
+      -- PT for standard iit tables restrict type (ft tables restrict themselves)     
+      if l_rec_nit.nit_table_name is null then
+        g_sql := g_sql
+          ||chr(10)||' and iit.iit_inv_type = :inv_type';
+          
+      end if;
               --||CHR(10)||' AND   nm.nm_type             = '||nm3flx.string('I')
               --||CHR(10)||' AND   nm.nm_obj_type         = :inv_type';
       
