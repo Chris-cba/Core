@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.15   Oct 11 2007 18:16:48   ptanava  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.16   Dec 17 2007 10:42:56   sscanlon  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Oct 11 2007 18:16:48  $
---       Date fetched Out : $Modtime:   Oct 11 2007 18:08:02  $
---       Version          : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Dec 17 2007 10:42:56  $
+--       Date fetched Out : $Modtime:   Dec 17 2007 10:35:14  $
+--       Version          : $Revision:   2.16  $
 --
 --   Product metadata script
 --
@@ -20,11 +20,11 @@
 
 INFO
 ====
-As at Release 4.0.2.0
+As at Release 4.0.4.0
 
 GENERATION DATE
 ===============
-11-OCT-2007 18:07
+17-DEC-2007 10:34
 
 TABLES PROCESSED
 ================
@@ -27988,6 +27988,102 @@ INSERT INTO HIG_MODULES
        ,HMO_MENU
        )
 SELECT 
+        'HIG4010'
+       ,'Standard Text Maintenance'
+       ,'hig4010'
+       ,'FMX'
+       ,''
+       ,'N'
+       ,'N'
+       ,'HIG'
+       ,'FORM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
+                   WHERE HMO_MODULE = 'HIG4010');
+--
+INSERT INTO HIG_MODULES
+       (HMO_MODULE
+       ,HMO_TITLE
+       ,HMO_FILENAME
+       ,HMO_MODULE_TYPE
+       ,HMO_FASTPATH_OPTS
+       ,HMO_FASTPATH_INVALID
+       ,HMO_USE_GRI
+       ,HMO_APPLICATION
+       ,HMO_MENU
+       )
+SELECT 
+        'HIG4020'
+       ,'Standard Text Usage'
+       ,'hig4020'
+       ,'FMX'
+       ,''
+       ,'N'
+       ,'N'
+       ,'HIG'
+       ,'FORM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
+                   WHERE HMO_MODULE = 'HIG4020');
+--
+INSERT INTO HIG_MODULES
+       (HMO_MODULE
+       ,HMO_TITLE
+       ,HMO_FILENAME
+       ,HMO_MODULE_TYPE
+       ,HMO_FASTPATH_OPTS
+       ,HMO_FASTPATH_INVALID
+       ,HMO_USE_GRI
+       ,HMO_APPLICATION
+       ,HMO_MENU
+       )
+SELECT 
+        'HIG4025'
+       ,'My Standard Text Usuage'
+       ,'hig4020'
+       ,'FMX'
+       ,''
+       ,'N'
+       ,'N'
+       ,'HIG'
+       ,'FORM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
+                   WHERE HMO_MODULE = 'HIG4025');
+--
+INSERT INTO HIG_MODULES
+       (HMO_MODULE
+       ,HMO_TITLE
+       ,HMO_FILENAME
+       ,HMO_MODULE_TYPE
+       ,HMO_FASTPATH_OPTS
+       ,HMO_FASTPATH_INVALID
+       ,HMO_USE_GRI
+       ,HMO_APPLICATION
+       ,HMO_MENU
+       )
+SELECT 
+        'HIG4030'
+       ,'Standard Text'
+       ,'hig4020'
+       ,'FMX'
+       ,''
+       ,'N'
+       ,'N'
+       ,'HIG'
+       ,'FORM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
+                   WHERE HMO_MODULE = 'HIG4030');
+--
+INSERT INTO HIG_MODULES
+       (HMO_MODULE
+       ,HMO_TITLE
+       ,HMO_FILENAME
+       ,HMO_MODULE_TYPE
+       ,HMO_FASTPATH_OPTS
+       ,HMO_FASTPATH_INVALID
+       ,HMO_USE_GRI
+       ,HMO_APPLICATION
+       ,HMO_MENU
+       )
+SELECT 
         'HIG5000'
        ,'Maintain Entry Points'
        ,'HIG5000'
@@ -30519,6 +30615,30 @@ SELECT
        ,'FORM' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
                    WHERE HMO_MODULE = 'NSG0021');
+--
+INSERT INTO HIG_MODULES
+       (HMO_MODULE
+       ,HMO_TITLE
+       ,HMO_FILENAME
+       ,HMO_MODULE_TYPE
+       ,HMO_FASTPATH_OPTS
+       ,HMO_FASTPATH_INVALID
+       ,HMO_USE_GRI
+       ,HMO_APPLICATION
+       ,HMO_MENU
+       )
+SELECT 
+        'TMA0010'
+       ,'Contacts'
+       ,'tma0010'
+       ,'FMX'
+       ,''
+       ,'N'
+       ,'N'
+       ,'TMA'
+       ,'FORM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
+                   WHERE HMO_MODULE = 'TMA0010');
 --
 --
 --********** HIG_OPTION_LIST **********--
@@ -35960,6 +36080,51 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
                    WHERE HSA_TABLE_NAME = 'NM_X_INV_CONDITIONS'
                     AND  HSA_COLUMN_NAME = 'NXIC_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
+        'TMA_CONTACTS_ALL'
+       ,'CNT_ID'
+       ,'TMA_CNT_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'TMA_CONTACTS_ALL'
+                    AND  HSA_COLUMN_NAME = 'CNT_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
+        'TMA_CONTACT_ASSOCIATIONS'
+       ,'CNTA_ID'
+       ,'TMA_CNTA_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'TMA_CONTACT_ASSOCIATIONS'
+                    AND  HSA_COLUMN_NAME = 'CNTA_ID');
+--
+INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
+       (HSA_TABLE_NAME
+       ,HSA_COLUMN_NAME
+       ,HSA_SEQUENCE_NAME
+       ,HSA_LAST_REBUILD_DATE
+       )
+SELECT 
+        'TMA_CONTACT_ROLES'
+       ,'CNTR_ROLE_ID'
+       ,'TMA_CNTR_ID_SEQ'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
+                   WHERE HSA_TABLE_NAME = 'TMA_CONTACT_ROLES'
+                    AND  HSA_COLUMN_NAME = 'CNTR_ROLE_ID');
 --
 --
 --********** HIG_CHECK_CONSTRAINT_ASSOCS **********--
