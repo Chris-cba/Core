@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.16   Dec 17 2007 10:42:56   sscanlon  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.17   Dec 18 2007 18:11:42   sscanlon  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Dec 17 2007 10:42:56  $
---       Date fetched Out : $Modtime:   Dec 17 2007 10:35:14  $
---       Version          : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Dec 18 2007 18:11:42  $
+--       Date fetched Out : $Modtime:   Dec 18 2007 18:10:22  $
+--       Version          : $Revision:   2.17  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.4.0
 
 GENERATION DATE
 ===============
-17-DEC-2007 10:34
+18-DEC-2007 18:10
 
 TABLES PROCESSED
 ================
