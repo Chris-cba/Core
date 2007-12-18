@@ -1,12 +1,13 @@
 
 create or replace package body higpipe is
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)higpipe.pkb	1.4 11/21/06
---       Module Name      : higpipe.pkb
---       Date into SCCS   : 06/11/21 14:42:16
---       Date fetched Out : 07/06/13 14:10:38
---       SCCS Version     : 1.4
+--       pvcsid               : $Header:   //vm_latest/archives/nm3/admin/pck/higpipe.pkb-arc   2.1   Dec 18 2007 13:58:00   ptanava  $
+--       Module Name          : $Workfile:   higpipe.pkb  $
+--       Date into PVCS       : $Date:   Dec 18 2007 13:58:00  $
+--       Date fetched Out     : $Modtime:   Dec 18 2007 13:43:32  $
+--       PVCS Version         : $Revision:   2.1  $
+--       Based on SCCS Version     : 1.4
 --
 --   Author :
 --
@@ -16,10 +17,14 @@ create or replace package body higpipe is
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)higpipe.pkb	1.1 03/01/01"';
---  g_body_sccsid is the SCCS ID for the package body
---
---
+/* History
+  11.03.07 PT check_pipe() now uses higgrirp.write_gri_spool()
+*/
+
+   g_body_sccsid            constant  varchar2(200) := '"$Revision:   2.1  $"';
+   g_package_name           constant varchar2(30) := 'higpipe';
+
+   
 -----------------------------------------------------------------------------
 --
 FUNCTION get_version RETURN varchar2 IS
@@ -119,28 +124,34 @@ begin
 		/* actual message */
 		info := substr (info, commapos + 1);
 
-		if jobnum is not null then
+    if jobnum is not null then
 
+      -- this does autonomous commit
+      higgrirp.write_gri_spool(
+         a_job_id   => jobnum
+        ,a_message  => info
+      );
+      
             /* get the next sequence number */
-            SELECT nvl(max(GRS_LINE_NO),0) + 1
-            INTO   seqno
-            FROM GRI_SPOOL
-            WHERE GRS_JOB_ID = jobnum;
-
-			INSERT INTO GRI_SPOOL
-			(
-				GRS_JOB_ID,
-				GRS_LINE_NO,
-				GRS_TEXT
-			)
-			VALUES
-			(
-				jobnum,
-				seqno,
-				info
-			);
-
-			commit;
+--             SELECT nvl(max(GRS_LINE_NO),0) + 1
+--             INTO   seqno
+--             FROM gri_spool
+--             WHERE GRS_JOB_ID = jobnum;
+-- 
+-- 			INSERT INTO gri_spool
+-- 			(
+-- 				GRS_JOB_ID,
+-- 				GRS_LINE_NO,
+-- 				GRS_TEXT
+-- 			)
+-- 			VALUES
+-- 			(
+-- 				jobnum,
+-- 				seqno,
+-- 				info
+-- 			);
+-- 
+-- 			commit;
 
 		else
 
