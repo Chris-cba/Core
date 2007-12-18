@@ -1,6 +1,6 @@
 -- C:\Dev\TMA\nm3.sqs
 --
--- Generated for Oracle 9i on Mon Dec 17  17:41:55 2007 by Server Generator 9.0.2.94.12
+-- Generated for Oracle 9i on Tue Dec 18  18:29:24 2007 by Server Generator 9.0.2.94.12
  
 PROMPT Creating Sequence 'BATCH_ID_SEQ'
 CREATE SEQUENCE BATCH_ID_SEQ
@@ -173,7 +173,7 @@ CREATE SEQUENCE HMLC_ID_SEQ
  NOMAXVALUE
  NOMINVALUE
  NOCYCLE
- CACHE 0
+ NOCACHE
 /
 
 PROMPT Creating Sequence 'HST_TEXT_ID_SEQ'
@@ -181,7 +181,7 @@ CREATE SEQUENCE HST_TEXT_ID_SEQ
  NOMAXVALUE
  NOMINVALUE
  NOCYCLE
- CACHE 0
+ NOCACHE
 /
 
 PROMPT Creating Sequence 'HUS_USER_ID_SEQ'
