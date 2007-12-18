@@ -1,12 +1,12 @@
 CREATE OR REPLACE PACKAGE BODY higgrirp AS
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)higgrirp.pkb	1.5 06/26/03
---       Module Name      : higgrirp.pkb
---       Date into SCCS   : 03/06/26 10:43:19
---       Date fetched Out : 07/06/13 14:10:37
---       SCCS Version     : 1.5
---
+--       pvcsid               : $Header:   //vm_latest/archives/nm3/admin/pck/higgrirp.pkb-arc   2.1   Dec 18 2007 13:57:16   ptanava  $
+--       Module Name          : $Workfile:   higgrirp.pkb  $
+--       Date into PVCS       : $Date:   Dec 18 2007 13:57:16  $
+--       Date fetched Out     : $Modtime:   Dec 18 2007 13:44:18  $
+--       PVCS Version         : $Revision:   2.1  $
+--       Based on SCCS version : 1.5
 --
 --   Author :
 --
@@ -16,10 +16,15 @@ CREATE OR REPLACE PACKAGE BODY higgrirp AS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 
-  g_body_sccsid            CONSTANT  varchar2(2000) := '"@(#)higgrirp.pkb	1.5 06/26/03"';
---  g_body_sccsid is the SCCS ID for the package body
+/* History
+  11.12.07 PT write_gri_spool() rewritten to use a sequence instead of package variable for the grs_line_no
+                this proc can now be safely called concurrently from multiple sessios.
+                to test for gri_spool presence use gri_spool_exists() as before.
+                (use dbms_lock.sleep() to give time to ohter sessions if needed)
+*/
 
-  g_package_name           CONSTANT varchar2(30) := 'higgrirp';
+  g_body_sccsid            constant  varchar2(200) := '"$Revision:   2.1  $"';
+  g_package_name           constant varchar2(30) := 'higgrirp';
   
   c_reports_file_extension CONSTANT varchar2(4) := '.rep';
 --
@@ -408,24 +413,34 @@ END;
     CLOSE c_get_module;
   --
   END;  	/* End of procedure INIT_RPT */
-
-  PROCEDURE write_gri_spool
-    (a_job_id   IN integer
-    ,a_message  IN varchar2) IS
-
-  PRAGMA autonomous_transaction;
   
-  BEGIN
-    INSERT INTO gri_spool(grs_job_id,
-                          grs_line_no,
-                          grs_text)
-                   VALUES(a_job_id,
-                          NVL(higgrirp.grs_line_no,1),
-                          a_message);
-    COMMIT;
-    higgrirp.grs_line_no := NVL(higgrirp.grs_line_no,1) + 1;
-  END;
---
+  
+  -- PT write_gri_spool rewritten to use a sequence instead of package variable for the grs_line_no
+  procedure write_gri_spool(
+     a_job_id in integer
+    ,a_message in varchar2
+  )
+  is
+    --l_line_no gri_spool.grs_line_no%type;
+    pragma autonomous_transaction;
+    
+  begin
+    insert into gri_spool (
+       grs_job_id, grs_line_no, grs_text
+    )
+    values (
+      a_job_id, grs_line_no_seq.nextval, a_message
+    )
+    returning grs_line_no into higgrirp.grs_line_no;
+    commit;
+  
+  exception
+    when others then
+      rollback;
+      raise;
+      
+  end;
+    
 -----------------------------------------------------------------------------
 --
 FUNCTION gri_spool_exists(pi_job_id IN gri_spool.grs_job_id%TYPE) RETURN BOOLEAN IS
