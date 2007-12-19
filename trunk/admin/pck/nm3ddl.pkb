@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.2   Aug 28 2007 11:59:18   sscanlon  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.3   Dec 19 2007 15:04:06   dyounger  $
 --       Module Name      	: $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   	: $Date:   Aug 28 2007 11:59:18  $
---       Date fetched Out 	: $Modtime:   Aug 28 2007 11:07:42  $
---       PVCS Version     	: $Revision:   2.2  $
+--       Date into PVCS   	: $Date:   Dec 19 2007 15:04:06  $
+--       Date fetched Out 	: $Modtime:   Dec 19 2007 14:56:22  $
+--       PVCS Version     	: $Revision:   2.3  $
 --       Based on SCCS version 	: 1.53
 --
 --
@@ -1071,6 +1071,35 @@ PROCEDURE create_user (p_rec_hus            IN OUT HIG_USERS%ROWTYPE
                       ||CHR(10)||'WHERE  ROWNUM = 0';
      END IF;
    END take_copy_of_table;
+   
+   FUNCTION db_is_10gr2 RETURN boolean IS
+ 
+     l_dummy pls_integer;
+ 
+   BEGIN
+     SELECT
+      1
+     INTO
+      l_dummy
+     FROM
+      dual
+     WHERE
+       EXISTS(SELECT
+                1
+              FROM
+                v$version
+              WHERE
+                UPPER(banner) LIKE '%10.2%');
+ 
+      RETURN TRUE;
+ 
+    EXCEPTION
+      WHEN no_data_found
+      THEN
+        RETURN FALSE;
+ 
+   END db_is_10gr2;
+
 --
 BEGIN
   --
@@ -1141,7 +1170,11 @@ BEGIN
   IF p_temp_tablespace IS NOT NULL
    THEN
       append(' TEMPORARY TABLESPACE '||p_temp_tablespace);
-      append(' QUOTA UNLIMITED ON '||p_temp_tablespace);
+      
+      IF NOT db_is_10gr2
+      THEN
+        append(' QUOTA UNLIMITED ON '||p_temp_tablespace);
+      END IF;
   END IF;
   append(' QUOTA 0k on SYSTEM');
   --
