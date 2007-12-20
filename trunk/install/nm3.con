@@ -1,6 +1,19 @@
 -- C:\Dev\TMA\nm3.con
 --
--- Generated for Oracle 9i on Mon Dec 17  17:41:55 2007 by Server Generator 9.0.2.94.12
+-- Generated for Oracle 9i on Wed Dec 19  14:19:43 2007 by Server Generator 9.0.2.94.12
+
+----------------------------------------------------------------------------- 
+--   PVCS Identifiers :-
+--
+--       pvcsid                     : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.8   Dec 20 2007 08:26:16   sscanlon  $
+--       Module Name                : $Workfile:   nm3.con  $
+--       Date into PVCS             : $Date:   Dec 20 2007 08:26:16  $
+--       Date fetched Out           : $Modtime:   Dec 20 2007 08:22:38  $
+--       PVCS Version               : $Revision:   2.8  $
+--       Based on SCCS version      : 
+-----------------------------------------------------------------------------
+-- Copyright (c) exor corporation ltd, 2007
+-----------------------------------------------------------------------------
   
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -512,6 +525,12 @@ PROMPT Creating Primary Key on 'HIG_MODULE_LINKS'
 ALTER TABLE HIG_MODULE_LINKS
  ADD (CONSTRAINT HML_PK PRIMARY KEY 
   (HML_ID))
+/
+
+PROMPT Creating Primary Key on 'HIG_MODULE_LINK_CALLS'
+ALTER TABLE HIG_MODULE_LINK_CALLS
+ ADD (CONSTRAINT HMLC_PK PRIMARY KEY 
+  (HMLC_ID))
 /
 
 PROMPT Creating Primary Key on 'HIG_MODULE_LINK_METHODS'
@@ -4309,6 +4328,13 @@ ALTER TABLE HIG_MODULE_LINKS ADD (CONSTRAINT
   ,HML_BLOCK_NAME_TO) REFERENCES HIG_MODULE_BLOCKS
   (HMB_MODULE_NAME
   ,HMB_BLOCK_NAME))
+/
+
+PROMPT Creating Foreign Key on 'HIG_MODULE_LINK_CALLS'
+ALTER TABLE HIG_MODULE_LINK_CALLS ADD (CONSTRAINT
+ HMLC_HMLM_FK FOREIGN KEY 
+  (HMLC_METHOD_ID) REFERENCES HIG_MODULE_LINK_METHODS
+  (HMLM_ID))
 /
 
 PROMPT Creating Foreign Key on 'HIG_MODULE_LINK_METHODS'
