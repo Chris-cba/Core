@@ -1,6 +1,12 @@
--- C:\Dev\TMA\nm3.sqs
+-- PVCS Identifiers :-
 --
--- Generated for Oracle 9i on Tue Dec 18  18:29:24 2007 by Server Generator 9.0.2.94.12
+-- sccsid                : $Header:   //vm_latest/archives/nm3/install/nm3.sqs-arc   2.4   Dec 21 2007 15:33:10   Chris Parkinson  $
+-- Module Name           : $Workfile:   nm3.sqs  $
+-- Date into PVCS        : $Date:   Dec 21 2007 15:33:10  $
+-- Date fetched Out      : $Modtime:   Dec 21 2007 15:29:44  $
+-- PVCS Version          : $Revision:   2.4  $
+--
+-- Generated for Oracle 9i on Fri Dec 21  14:34:40 2007 by Server Generator 9.0.2.94.12
  
 PROMPT Creating Sequence 'BATCH_ID_SEQ'
 CREATE SEQUENCE BATCH_ID_SEQ
@@ -113,6 +119,15 @@ CREATE SEQUENCE GIS_SESSION_ID
  NOMAXVALUE
  NOMINVALUE
  NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'GRS_LINE_NO_SEQ'
+CREATE SEQUENCE GRS_LINE_NO_SEQ
+ START WITH 1
+ MAXVALUE 999999
+ MINVALUE 1
+ CYCLE
  NOCACHE
 /
 
