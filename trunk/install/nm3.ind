@@ -1,6 +1,12 @@
--- C:\Dev\TMA\nm3.ind
+-- PVCS Identifiers :-
 --
--- Generated for Oracle 9i on Mon Dec 17  17:41:55 2007 by Server Generator 9.0.2.94.12
+-- sccsid                : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.5   Dec 21 2007 15:33:46   Chris Parkinson  $
+-- Module Name           : $Workfile:   nm3.ind  $
+-- Date into PVCS        : $Date:   Dec 21 2007 15:33:46  $
+-- Date fetched Out      : $Modtime:   Dec 21 2007 15:29:34  $
+-- PVCS Version          : $Revision:   2.5  $
+--
+-- Generated for Oracle 9i on Fri Dec 21  14:34:39 2007 by Server Generator 9.0.2.94.12
   
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
@@ -227,6 +233,12 @@ CREATE INDEX GSP_FK_GSS_IND ON GRI_SAVED_PARAMS
 PROMPT Creating Index 'GSS_FK_GRM_IND'
 CREATE INDEX GSS_FK_GRM_IND ON GRI_SAVED_SETS
  (GSS_MODULE)
+/
+
+PROMPT Creating Index 'GRS_JOB_LINE_IND'
+CREATE INDEX GRS_JOB_LINE_IND ON GRI_SPOOL
+ (GRS_JOB_ID
+ ,GRS_LINE_NO)
 /
 
 PROMPT Creating Index 'HAD_IND1'
