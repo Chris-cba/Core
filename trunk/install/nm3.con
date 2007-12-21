@@ -1,19 +1,12 @@
--- C:\Dev\TMA\nm3.con
+-- PVCS Identifiers :-
 --
--- Generated for Oracle 9i on Wed Dec 19  14:19:43 2007 by Server Generator 9.0.2.94.12
-
------------------------------------------------------------------------------ 
---   PVCS Identifiers :-
+-- sccsid                : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.9   Dec 21 2007 15:34:22   Chris Parkinson  $
+-- Module Name           : $Workfile:   nm3.con  $
+-- Date into PVCS        : $Date:   Dec 21 2007 15:34:22  $
+-- Date fetched Out      : $Modtime:   Dec 21 2007 15:29:26  $
+-- PVCS Version          : $Revision:   2.9  $
 --
---       pvcsid                     : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.8   Dec 20 2007 08:26:16   sscanlon  $
---       Module Name                : $Workfile:   nm3.con  $
---       Date into PVCS             : $Date:   Dec 20 2007 08:26:16  $
---       Date fetched Out           : $Modtime:   Dec 20 2007 08:22:38  $
---       PVCS Version               : $Revision:   2.8  $
---       Based on SCCS version      : 
------------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2007
------------------------------------------------------------------------------
+-- Generated for Oracle 9i on Fri Dec 21  14:34:39 2007 by Server Generator 9.0.2.94.12
   
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -286,13 +279,6 @@ PROMPT Creating Primary Key on 'GRI_SAVED_SETS'
 ALTER TABLE GRI_SAVED_SETS
  ADD (CONSTRAINT GSS_PK PRIMARY KEY 
   (GSS_ID))
-/
-
-PROMPT Creating Primary Key on 'GRI_SPOOL'
-ALTER TABLE GRI_SPOOL
- ADD (CONSTRAINT GRS_PK PRIMARY KEY 
-  (GRS_LINE_NO
-  ,GRS_JOB_ID))
 /
 
 PROMPT Creating Primary Key on 'GROUP_TYPE_ROLES'
@@ -2712,7 +2698,7 @@ PROMPT Creating Check Constraint on 'HIG_USER_ROLES'
 ALTER TABLE HIG_USER_ROLES
  ADD (CONSTRAINT HUR_START_DATE_TCHK CHECK (HUR_START_DATE=TRUNC(HUR_START_DATE)))
 /
-                    
+                     
 PROMPT Creating Check Constraint on 'NM_ASSETS_ON_ROUTE_STORE_HEAD'
 ALTER TABLE NM_ASSETS_ON_ROUTE_STORE_HEAD
  ADD (CONSTRAINT NARSH_ENTIRE_CHK CHECK (narsh_entire IN ('Y', 'N')))
