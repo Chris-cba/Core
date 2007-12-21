@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.8   Nov 01 2007 16:30:46   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.9   Dec 21 2007 15:38:10   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Nov 01 2007 16:30:46  $
---       Date fetched Out : $Modtime:   Nov 01 2007 16:26:28  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Dec 21 2007 15:38:10  $
+--       Date fetched Out : $Modtime:   Dec 17 2007 18:29:08  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --
 --   Author : Priidu Tanava
@@ -43,11 +43,12 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                 added FT key preserved check (more work needed) to ins_splits()
   19.10.07  PT added merge security, au seccurity, 'MRGPOE' option
   29.10.07  PT ins_route_connectivity() made independent from std_run()
+  17.12.07  PT added rowid_with_group_by exceptin to test_key_preserved(), fixed a typo in exception init
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.8  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.9  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -84,8 +85,12 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   key_not_preserved exception; -- ORA-01445: cannot select ROWID from a join view without a key-preserved table
   pragma exception_init(key_not_preserved, -1445);
   
-  invalid_rowid exception; -- ORA-01410: invalid ROWID
+  invalid_rowid exception; -- ORA-01410: invalid ROWID (e.g. materialized view)
   pragma exception_init(invalid_rowid, -1410);
+  
+  rowid_with_group_by exception; -- ORA-01446 cannot select ROWID from view with DISTINCT, GROUP BY, etc.
+  pragma exception_init(rowid_with_group_by, -1446);
+  
   
   procedure std_insert_invitems(
      p_mrg_job_id in nm_mrg_query_results_all.nqr_mrg_job_id%type
@@ -2672,6 +2677,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     when no_data_found then
       null;
     when invalid_rowid then
+      null;
+    when rowid_with_group_by then
       null;
     when others then
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.test_key_preserved('
