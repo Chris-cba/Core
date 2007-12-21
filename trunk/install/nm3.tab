@@ -1,6 +1,12 @@
--- C:\Dev\TMA\nm3.tab
+-- PVCS Identifiers :-
 --
--- Generated for Oracle 9i on Mon Dec 17  17:41:52 2007 by Server Generator 9.0.2.94.12
+-- sccsid                : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.7   Dec 21 2007 15:32:40   Chris Parkinson  $
+-- Module Name           : $Workfile:   nm3.tab  $
+-- Date into PVCS        : $Date:   Dec 21 2007 15:32:40  $
+-- Date fetched Out      : $Modtime:   Dec 21 2007 15:29:50  $
+-- PVCS Version          : $Revision:   2.7  $
+--
+-- Generated for Oracle 9i on Fri Dec 21  14:34:37 2007 by Server Generator 9.0.2.94.12
  
 
 
@@ -1500,6 +1506,15 @@ CREATE GLOBAL TEMPORARY TABLE NM0575_EVENT_LOG
  ,LOG_ERROR_FLAG VARCHAR2(1) NOT NULL
  )
  ON COMMIT PRESERVE ROWS
+/
+
+PROMPT Creating Table 'NM0575_MATCHING_RECORDS'
+CREATE GLOBAL TEMPORARY TABLE NM0575_MATCHING_RECORDS
+ (ASSET_CATEGORY VARCHAR2(1)
+ ,ASSET_TYPE VARCHAR2(4)
+ ,ASSET_TYPE_DESCR VARCHAR2(80)
+ ,ASSET_COUNT NUMBER
+ )
 /
 
 PROMPT Creating Table 'NM0575_POSSIBLE_XSPS'
