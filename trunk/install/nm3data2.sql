@@ -3,16 +3,16 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.10   Dec 14 2007 14:20:26   sscanlon  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.11   Jan 02 2008 15:11:54   sscanlon  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Dec 14 2007 14:20:26  $
---       Date fetched Out : $Modtime:   Dec 14 2007 14:17:18  $
---       Version          : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jan 02 2008 15:11:54  $
+--       Date fetched Out : $Modtime:   Jan 02 2008 15:09:48  $
+--       Version          : $Revision:   2.11  $
 --
 --   Product metadata script
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--	Copyright (c) exor corporation ltd, 2008
 -----------------------------------------------------------------------------
 --
 --
@@ -24,7 +24,7 @@ As at Release 4.0.4.0
 
 GENERATION DATE
 ===============
-14-DEC-2007 14:16
+02-JAN-2008 15:09
 
 TABLES PROCESSED
 ================
@@ -84079,7 +84079,7 @@ SELECT
        ,'HIG4010'
        ,'Standard Text Maintenance'
        ,'M'
-       ,18 FROM DUAL
+       ,19 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'HIG_REFERENCE'
                     AND  HSTF_CHILD = 'HIG4010');
@@ -84096,7 +84096,7 @@ SELECT
        ,'HIG4020'
        ,'Standard Text Usage'
        ,'M'
-       ,19 FROM DUAL
+       ,20 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'HIG_REFERENCE'
                     AND  HSTF_CHILD = 'HIG4020');
@@ -84113,7 +84113,7 @@ SELECT
        ,'HIG4025'
        ,'My Standard Text Usage'
        ,'M'
-       ,20 FROM DUAL
+       ,21 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'HIG_REFERENCE'
                     AND  HSTF_CHILD = 'HIG4025');
