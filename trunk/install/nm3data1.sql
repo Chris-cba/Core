@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.18   Jan 02 2008 16:25:20   sscanlon  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.19   Jan 03 2008 15:21:02   sscanlon  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Jan 02 2008 16:25:20  $
---       Date fetched Out : $Modtime:   Jan 02 2008 16:08:04  $
---       Version          : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Jan 03 2008 15:21:02  $
+--       Date fetched Out : $Modtime:   Jan 03 2008 15:18:22  $
+--       Version          : $Revision:   2.19  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.4.0
 
 GENERATION DATE
 ===============
-02-JAN-2008 16:07
+03-JAN-2008 15:18
 
 TABLES PROCESSED
 ================
@@ -28047,6 +28047,30 @@ SELECT
        ,'FORM' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
                    WHERE HMO_MODULE = 'HIG4025');
+--
+INSERT INTO HIG_MODULES
+       (HMO_MODULE
+       ,HMO_TITLE
+       ,HMO_FILENAME
+       ,HMO_MODULE_TYPE
+       ,HMO_FASTPATH_OPTS
+       ,HMO_FASTPATH_INVALID
+       ,HMO_USE_GRI
+       ,HMO_APPLICATION
+       ,HMO_MENU
+       )
+SELECT 
+        'HIG4030'
+       ,'Standard Text'
+       ,'hig4020'
+       ,'FMX'
+       ,''
+       ,'N'
+       ,'N'
+       ,'HIG'
+       ,'FORM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
+                   WHERE HMO_MODULE = 'HIG4030');
 --
 INSERT INTO HIG_MODULES
        (HMO_MODULE
