@@ -1,13 +1,14 @@
 CREATE OR REPLACE PACKAGE Nm2_Nm3_Migration AS
 --<PACKAGE>
 -----------------------------------------------------------------------------
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
--- sccsid : @(#)nm2_nm3_migration.pkh	1.10 01/09/07
--- Module Name : nm2_nm3_migration.pkh
--- Date into SCCS : 07/01/09 14:26:09
--- Date fetched Out : 07/01/09 14:36:16
--- SCCS Version : 1.10
+--       pvcsid                : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkh-arc   2.1   Jan 03 2008 10:22:28   smarshall  $
+--       Module Name           : $Workfile:   nm2_nm3_migration.pkh  $
+--       Date into PVCS        : $Date:   Jan 03 2008 10:22:28  $
+--       Date fetched Out      : $Modtime:   Jan 03 2008 10:21:16  $
+--       PVCS Version          : $Revision:   2.1  $
+--       Based on SCCS Version : 1.10
 --
 --
 --   Author :
@@ -150,5 +151,40 @@ PROCEDURE Fix_Route_Theme;
 
 --PROCEDURE pc_inv_mig_nm2_nm3_by_id (p_iit_item_id    NM_INV_ITEMS_ALL.iit_ne_id%TYPE) ;
 */
+
+procedure resume_invent_migration
+(pi_log_file_location IN VARCHAR2
+,pi_inv_type              IN varchar2
+,pi_sys_Flag              IN varchar2
+,pi_go_on in boolean);
+
+PROCEDURE initialise(pi_log_file_location  IN VARCHAR2
+                    ,pi_log_file_name      IN VARCHAR2
+                    ,pi_first_stage        IN BOOLEAN DEFAULT FALSE
+                    ,pi_with_debug         IN BOOLEAN DEFAULT FALSE);
+
+PROCEDURE append_proc_start_to_log;
+
+PROCEDURE append_log_content(pi_text      IN VARCHAR
+                            ,pi_indent    IN VARCHAR2 DEFAULT 'Y'
+                            ,pi_timestamp IN BOOLEAN  DEFAULT TRUE);
+
+PROCEDURE pc_inv_mig_nm2_nm3_by_type (p_nit_inv_type NM_INV_ITEMS_ALL.iit_inv_type%TYPE
+                                     ,p_nit_sys_flag VARCHAR2
+                                     ,p_update_progress BOOLEAN DEFAULT FALSE
+                                     )	;
+
+PROCEDURE analyse_inventory_tables (p_percent NUMBER DEFAULT 1);
+
+PROCEDURE report_any_errors(p_extra_text IN VARCHAR2 DEFAULT NULL);
+
+PROCEDURE append_proc_end_to_log;
+
+PROCEDURE stop_migration(p_error IN VARCHAR2);
+
+PROCEDURE do_optional_commit;
+
+PROCEDURE pc_inv_mig_nm2_nm3_by_id (p_iit_item_id    NM_INV_ITEMS_ALL.iit_ne_id%TYPE);
+
 END Nm2_Nm3_Migration;
 /
