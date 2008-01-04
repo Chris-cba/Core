@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.9   Dec 21 2007 15:38:10   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.10   Jan 04 2008 12:28:12   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Dec 21 2007 15:38:10  $
---       Date fetched Out : $Modtime:   Dec 17 2007 18:29:08  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Jan 04 2008 12:28:12  $
+--       Date fetched Out : $Modtime:   Jan 04 2008 12:23:02  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --
 --   Author : Priidu Tanava
@@ -43,12 +43,13 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                 added FT key preserved check (more work needed) to ins_splits()
   19.10.07  PT added merge security, au seccurity, 'MRGPOE' option
   29.10.07  PT ins_route_connectivity() made independent from std_run()
-  17.12.07  PT added rowid_with_group_by exceptin to test_key_preserved(), fixed a typo in exception init
+  17.12.07  PT added rowid_with_group_by exception to test_key_preserved(), fixed a typo in exception init
+  04.01.08  PT fixed the missing 'last one after loop' error in ins_datum_homo_chunks() and std_insert_invitems()
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.9  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.10  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -665,15 +666,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           -- start new
           if pt_attr(i).seq = 1 then
             k := k + 1;
-            
-            -- table is signalled as having the pk not preserved (inflated by nm_members)
---             if pt_attr(i).table_iit_flag = 'N' then
---               l_distinct := ' distinct ';
---             else
---               l_distinct := null;
---             end if;
---             
---             s_tmp := '    ,(select '||l_distinct||''''||pt_attr(i).INV_TYPE||''' ft_inv_type, '
             s_tmp := '    ,(select distinct '''||pt_attr(i).INV_TYPE||''' ft_inv_type, '
               ||'ft'||k||'.'||pt_attr(i).table_pk_column||', ft'||k||'.'||pt_attr(i).ita_attrib_name;
             s_tmp_tbl := pt_attr(i).table_name;
@@ -687,6 +679,12 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         
         i := pt_attr.next(i);
       end loop;
+      
+      -- last one after loop
+      if s_tmp is not null then
+        s := s||cr||s_tmp||' from '||s_tmp_tbl||' ft'||k||') i'||k;
+      end if; 
+      
       return s;
     end;
 
@@ -1660,15 +1658,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           -- start new
           if pt_attr(i).seq = 1 then
             k := k + 1;
-            
-            -- table is signalled as having the pk not preserved (inflated by nm_members)
---             if pt_attr(i).table_iit_flag = 'N' then
---               l_distinct := ' distinct ';
---             else
---               l_distinct := null;
---             end if;
---             
---             s_tmp := '    ,(select '||l_distinct||''''||pt_attr(i).INV_TYPE||''' ft_inv_type, '
             s_tmp := '    ,(select distinct '''||pt_attr(i).INV_TYPE||''' ft_inv_type, '
               ||'ft'||k||'.'||pt_attr(i).table_pk_column||', ft'||k||'.'||pt_attr(i).ita_attrib_name;
             s_tmp_tbl := pt_attr(i).table_name;
@@ -1682,6 +1671,12 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         
         i := pt_attr.next(i);
       end loop;
+      
+      -- last one after loop
+      if s_tmp is not null then
+        s := s||cr||s_tmp||' from '||s_tmp_tbl||' ft'||k||') i'||k;
+      end if;
+      
       return s;
     end;
     
