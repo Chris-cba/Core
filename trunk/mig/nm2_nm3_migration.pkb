@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.4   Jan 03 2008 10:22:18   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.5   Jan 07 2008 15:34:02   Ian Turnbull  $
 --       Module Name      : $Workfile:   nm2_nm3_migration.pkb  $
---       Date into PVCS   : $Date:   Jan 03 2008 10:22:18  $
---       Date fetched Out : $Modtime:   Jan 03 2008 10:12:16  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jan 07 2008 15:34:02  $
+--       Date fetched Out : $Modtime:   Jan 07 2008 15:33:10  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --   Author D.Cope
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm2_nm3_migration';
   g_proc_name    VARCHAR2(50);
   g_log_file                UTL_FILE.FILE_TYPE;
@@ -2962,7 +2962,7 @@ INSERT INTO DOC_MEDIA
 )
 SELECT
  dmd_id
-,dmd_name
+,decode(dmd_name,'MORE','MORE v2',dmd_name)
 ,dmd_descr
 ,dmd_display_command
 ,dmd_scan_command
@@ -7940,7 +7940,7 @@ BEGIN
 	   ) LOOP
       BEGIN
         l_das_rec_id:=c1rec.das_rec_id;
-		
+
 	    l_start_Date:=TO_DATE('01-JAN-1670','DD-MON-YYYY');
 		l_end_date:=TO_DATE('31-dec-9999','DD-MON-YYYY');
   	    IF l_das_network THEN
@@ -7976,11 +7976,11 @@ BEGIN
       EXCEPTION
 	  when dup_val_on_index then
 	    if l_das_rec_id!=c1rec.das_Rec_id then
-		  null; --this is invnetory and has the id changed - ok to attempt to load more than once 
+		  null; --this is invnetory and has the id changed - ok to attempt to load more than once
 		else
 		  raise;
 		end if;
-		 
+
 	  WHEN NO_DATA_FOUND THEN
         --asset/netowrk has not been moigrated - cant find the start date
 		--dont migrate the doc assoc
@@ -9103,7 +9103,7 @@ procedure resume_invent_migration
 ,pi_sys_Flag              IN varchar2
 ,pi_go_on in boolean
 )  is
-	
+
   TYPE l_ref IS REF CURSOR;
 --
    get_inv_types l_ref;
@@ -9211,12 +9211,12 @@ BEGIN
    nm2_nm3_migration.append_proc_end_to_log;
 --
   end if;
-  
+
 EXCEPTION
  WHEN OTHERS THEN
    nm2_nm3_migration.append_log_content(SQLERRM);
    nm2_nm3_migration.stop_migration('Inventory migration aborted');
-end   resume_invent_migration; 	
+end   resume_invent_migration;
 
 
 
