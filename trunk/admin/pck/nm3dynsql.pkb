@@ -2,11 +2,11 @@ CREATE OR REPLACE package body nm3dynsql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.1   Oct 04 2007 16:57:26   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.2   Jan 09 2008 10:32:42   ptanava  $
 --       Module Name      : $Workfile:   nm3dynsql.pkb  $
---       Date into PVCS   : $Date:   Oct 04 2007 16:57:26  $
---       Date fetched Out : $Modtime:   Oct 04 2007 11:11:54  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jan 09 2008 10:32:42  $
+--       Date fetched Out : $Modtime:   Jan 09 2008 10:28:56  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on sccs version : 
 --
 --
@@ -22,9 +22,10 @@ CREATE OR REPLACE package body nm3dynsql as
   24.05.07  PT in is_cicular() added logic to cope with data where two nodes
                 are connected by more than one element - same direction and lane
   04.10.07  PT changed sql_route_connectivity() to work with the nm_datum_criteria_tmp table
+  09.01.08  PT added nm3dbg.deind to sql_route_connectivity()
 */
 
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.1  $"';
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.2  $"';
   g_package_name    constant  varchar2(30) := 'nm3dynsql';
   
   
@@ -363,6 +364,7 @@ CREATE OR REPLACE package body nm3dynsql as
     ||cr||') q4'
     ||cr||'where q4.member_rownum = 1'
     ;
+    nm3dbg.deind;
     return l_sql;
     
   end;
