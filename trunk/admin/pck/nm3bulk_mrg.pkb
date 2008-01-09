@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.10   Jan 04 2008 12:28:12   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.11   Jan 09 2008 10:34:44   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Jan 04 2008 12:28:12  $
---       Date fetched Out : $Modtime:   Jan 04 2008 12:23:02  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jan 09 2008 10:34:44  $
+--       Date fetched Out : $Modtime:   Jan 09 2008 10:29:32  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --
 --   Author : Priidu Tanava
@@ -45,11 +45,12 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   29.10.07  PT ins_route_connectivity() made independent from std_run()
   17.12.07  PT added rowid_with_group_by exception to test_key_preserved(), fixed a typo in exception init
   04.01.08  PT fixed the missing 'last one after loop' error in ins_datum_homo_chunks() and std_insert_invitems()
+  09.01.08  PT fixed xsp handling in ins_datum_homo_chunks()
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.10  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.11  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -553,6 +554,16 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     l_cardinality     integer;
     l_sql_inner_join  varchar2(100);
     l_inv_type_count  number(4) := 0;
+    
+    
+    -- this appends xsp to the attribute name observing the 30 char length limit
+    function attribute_xsp_name(p_attr_name in varchar2, p_xsp in varchar2) return varchar2
+    is
+    begin
+      return substr(p_attr_name, 1
+        , 30 - case when p_xsp is null then 0 else length(p_xsp) + 1 end)
+        ||case when p_xsp is null then null else '_'||p_xsp end;
+    end;
         
     
     --       q.RCON_MATERIAL
@@ -587,7 +598,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
             then
               l_band_value := l_band_value + 1;
               l_case := l_case
-                ||cr||'           when '||p_alias||'.'||pt_attr(i).MRG_ATTRIB||' between '
+                ||cr||'           when '||p_alias||'.'||attribute_xsp_name(pt_attr(i).MRG_ATTRIB, pt_attr(i).xsp)||' between '
                     ||pt_itd(k).itd_band_min_value||' and '
                     ||pt_itd(k).itd_band_max_value||' then '||qt||l_band_value||qt;
             end if;
@@ -599,10 +610,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
              s := s||l_cr||'case'||l_case
           ||cr||'           else null end';
         else
-          s := s||l_cr||p_alias||'.'||pt_attr(i).MRG_ATTRIB;
+          s := s||l_cr||p_alias||'.'||attribute_xsp_name(pt_attr(i).MRG_ATTRIB, pt_attr(i).xsp);
         end if;
         
         l_cr := cr||'    ||'',''||';
+        
         i := pt_attr.next(i);
       end loop;
       return s;
@@ -619,9 +631,12 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     begin
       i := pt_attr.first;
       while i is not null loop
+        -- ft assets have no xsp
         if pt_attr(i).table_name is null then
           l_inv_alias := 'i';
           l_attrib := pt_attr(i).IIT_ATTRIB_NAME;
+          
+        -- standard assets (may have xsp)
         else
           if pt_attr(i).seq = 1 then
             k := k + 1;
@@ -629,8 +644,12 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           l_inv_alias := 'i'||k;
           l_attrib := pt_attr(i).ITA_ATTRIB_NAME;
         end if;
-        s := s||cr||'  ,case when t.nm_type = ''I'' and t.nm_obj_type = '''||pt_attr(i).INV_TYPE
-          ||''' then '||l_inv_alias||'.'||l_attrib||' end '||pt_attr(i).MRG_ATTRIB;
+        s := s||cr||'  ,case when t.nm_type = ''I'' and t.nm_obj_type = '''||pt_attr(i).INV_TYPE||'''';
+        if pt_attr(i).xsp is not null then
+          s := s||' and i.iit_x_sect = '''||pt_attr(i).xsp||'''';
+        end if;
+        s := s||' then '||l_inv_alias||'.'||l_attrib||' end '||attribute_xsp_name(pt_attr(i).MRG_ATTRIB, pt_attr(i).xsp);
+        
         i := pt_attr.next(i);
       end loop;
       return s;
