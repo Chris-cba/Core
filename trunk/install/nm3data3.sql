@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.6   Jan 03 2008 15:21:42   sscanlon  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.7   Jan 09 2008 17:21:40   dyounger  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Jan 03 2008 15:21:42  $
---       Date fetched Out : $Modtime:   Jan 03 2008 15:18:24  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Jan 09 2008 17:21:40  $
+--       Date fetched Out : $Modtime:   Jan 09 2008 17:13:46  $
+--       Version          : $Revision:   2.7  $
 --
 --   Product metadata script
 --
@@ -2976,6 +2976,71 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'TMA0010'
                     AND  HMR_ROLE = 'HIG_ADMIN');
+--                    
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'NET5002'
+       ,'NET_ADMIN'
+       ,'NORMAL' FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                  WHERE HMR_MODULE = 'NET5002'
+                  AND HMR_ROLE = 'NET_ADMIN');
+--                  
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       ) 
+SELECT
+        'NET5003'
+       ,'HIG_USER'
+       ,'NORMAL' FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                  WHERE HMR_MODULE = 'NET5003'
+                  AND HMR_ROLE = 'HIG_USER');
+--                  
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       ) 
+SELECT
+        'NET5085'
+       ,'NET_ADMIN'
+       ,'NORMAL' FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                  WHERE HMR_MODULE = 'NET5085'
+                  AND HMR_ROLE = 'NET_ADMIN');
+--                  
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT
+       'NET5090'
+      ,'NET_ADMIN'
+      ,'NORMAL' FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                  WHERE HMR_MODULE = 'NET5090'
+                  AND HMR_ROLE = 'NET_ADMIN');
+--                  
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT
+       'NET5095'
+      ,'NET_ADMIN'
+      ,'NORMAL' FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                  WHERE HMR_MODULE = 'NET5095'
+                  AND HMR_ROLE = 'NET_ADMIN');                    
 --
 --
 --********** HIG_MODULE_KEYWORDS **********--
