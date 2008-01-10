@@ -168,33 +168,37 @@ END compress_tab_vc_by_lf;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION remove_tab_vc_linefeeds (
-                                  p_tab_vc nm3type.tab_varchar32767
-                                  ) RETURN nm3type.tab_varchar32767 IS
+FUNCTION cleanse_tab_vc (pi_tab_vc             IN nm3type.tab_varchar32767
+                        ,pi_remove_blank_lines IN BOOLEAN DEFAULT TRUE
+                        ,pi_remove_cr          IN BOOLEAN DEFAULT TRUE
+                         ) RETURN nm3type.tab_varchar32767 IS
+ 
+     l_retval nm3type.tab_varchar32767;
+     
+     l_line nm3type.max_varchar2;
 
--- GJ 10-JAN-2008
--- rip off of compress_tab_vc_by_lf
--- when in some cases appears to to introduce an additional a blank line between each line
--- and didn't want to touch because impact could be massive
---
-   l_retval nm3type.tab_varchar32767;
+  BEGIN
 
-BEGIN
+     FOR i IN 1..pi_tab_vc.COUNT
+     LOOP
 
-   FOR i IN 1..p_tab_vc.COUNT
-    LOOP
-      nm3tab_varchar.append (l_retval,p_tab_vc(i),FALSE);
+        l_line := pi_tab_vc(i);
 
-      IF nm3flx.right(p_tab_vc(i),1) = CHR(10) THEN  -- strip off the last CHR(10) character of the current line and nullify the next 
-       l_retval(l_retval.COUNT) := substr(l_retval(l_retval.COUNT), 1, length(l_retval(l_retval.COUNT)) - 1);
-       l_retval(l_retval.COUNT+1) := Null;
-      END IF;
+        IF pi_remove_cr AND nm3flx.right(l_line,1) = CHR(10) THEN
+               l_line := substr(l_line, 1, length(l_line) - 1);
+        END IF;
 
-   END LOOP;
 
-   RETURN l_retval;
---
-END remove_tab_vc_linefeeds;
+        IF (l_line IS NOT NULL) OR (l_line IS NULL AND pi_remove_blank_lines = FALSE)  THEN
+           l_retval(l_retval.count+1) := l_line;
+        END IF;           
+           
+     END LOOP;
+
+     RETURN l_retval;
+  
+
+END cleanse_tab_vc;
 --
 -----------------------------------------------------------------------------
 --
