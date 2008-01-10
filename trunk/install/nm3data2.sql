@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.12   Jan 09 2008 17:20:10   dyounger  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.13   Jan 10 2008 18:07:16   sscanlon  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Jan 09 2008 17:20:10  $
---       Date fetched Out : $Modtime:   Jan 09 2008 16:57:10  $
---       Version          : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Jan 10 2008 18:07:16  $
+--       Date fetched Out : $Modtime:   Jan 10 2008 17:15:58  $
+--       Version          : $Revision:   2.13  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.4.0
 
 GENERATION DATE
 ===============
-02-JAN-2008 15:09
+10-JAN-2008 17:15
 
 TABLES PROCESSED
 ================
@@ -1003,146 +1003,6 @@ SELECT
        ,'' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM GRI_MODULES
                    WHERE GRM_MODULE = 'NM0580');
---
-INSERT INTO GRI_MODULES
-       (GRM_MODULE
-       ,GRM_MODULE_TYPE
-       ,GRM_MODULE_PATH
-       ,GRM_FILE_TYPE
-       ,GRM_TAG_FLAG
-       ,GRM_TAG_TABLE
-       ,GRM_TAG_COLUMN
-       ,GRM_TAG_WHERE
-       ,GRM_LINESIZE
-       ,GRM_PAGESIZE
-       ,GRM_PRE_PROCESS
-       )
-SELECT 
-        'NET5002'
-       ,'N/A'
-       ,'$PROD_HOME/bin'
-       ,'lis'
-       ,'N'
-       ,''
-       ,''
-       ,''
-       ,132
-       ,66
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM GRI_MODULES
-                   WHERE GRM_MODULE = 'NET5002');        
---
-INSERT INTO GRI_MODULES
-       (GRM_MODULE
-       ,GRM_MODULE_TYPE
-       ,GRM_MODULE_PATH
-       ,GRM_FILE_TYPE
-       ,GRM_TAG_FLAG
-       ,GRM_TAG_TABLE
-       ,GRM_TAG_COLUMN
-       ,GRM_TAG_WHERE
-       ,GRM_LINESIZE
-       ,GRM_PAGESIZE
-       ,GRM_PRE_PROCESS
-       )
-SELECT 
-       'NET5003'
-      ,'N/A'
-      ,'$PROD_HOME/bin'
-      ,'lis'
-      ,'Y'
-      ,'ROAD_SEGS'
-      ,'RSE_HE_ID'
-      ,''
-      ,132
-      ,66
-      ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM GRI_MODULES
-                   WHERE GRM_MODULE = 'NET5003'); 
---
-INSERT INTO GRI_MODULES
-       (GRM_MODULE
-       ,GRM_MODULE_TYPE
-       ,GRM_MODULE_PATH
-       ,GRM_FILE_TYPE
-       ,GRM_TAG_FLAG
-       ,GRM_TAG_TABLE
-       ,GRM_TAG_COLUMN
-       ,GRM_TAG_WHERE
-       ,GRM_LINESIZE
-       ,GRM_PAGESIZE
-       ,GRM_PRE_PROCESS
-       )
-SELECT
-       'NET5085'
-      ,'N/A'
-      ,'$PROD_HOME/bin'
-      ,'lis'
-      ,'N'
-      ,''
-      ,''
-      ,''
-      ,80
-      ,66
-      ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM GRI_MODULES
-                   WHERE GRM_MODULE = 'NET5085');      
---
-INSERT INTO GRI_MODULES
-       (GRM_MODULE
-       ,GRM_MODULE_TYPE
-       ,GRM_MODULE_PATH
-       ,GRM_FILE_TYPE
-       ,GRM_TAG_FLAG
-       ,GRM_TAG_TABLE
-       ,GRM_TAG_COLUMN
-       ,GRM_TAG_WHERE
-       ,GRM_LINESIZE
-       ,GRM_PAGESIZE
-       ,GRM_PRE_PROCESS
-       )
-SELECT
-       'NET5090'
-      ,'N/A'
-      ,'$PROD_HOME/bin'
-      ,'lis'
-      ,'N'
-      ,''
-      ,''
-      ,''
-      ,132
-      ,66
-      ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM GRI_MODULES
-                   WHERE GRM_MODULE = 'NET5090');      
---      
-INSERT INTO GRI_MODULES
-       (GRM_MODULE
-       ,GRM_MODULE_TYPE
-       ,GRM_MODULE_PATH
-       ,GRM_FILE_TYPE
-       ,GRM_TAG_FLAG
-       ,GRM_TAG_TABLE
-       ,GRM_TAG_COLUMN
-       ,GRM_TAG_WHERE
-       ,GRM_LINESIZE
-       ,GRM_PAGESIZE
-       ,GRM_PRE_PROCESS
-       )
-SELECT
-       'NET5095'
-      ,'N/A'
-      ,'$PROD_HOME/bin'
-      ,'lis'
-      ,'N'
-      ,''
-      ,''
-      ,''
-      ,132
-      ,66
-      ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM GRI_MODULES
-                   WHERE GRM_MODULE = 'NET5095');                                 
 --
 --
 --********** GRI_PARAMS **********--
@@ -2844,90 +2704,6 @@ SELECT
        ,'' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM GRI_PARAMS
                    WHERE GP_PARAM = 'XSP');
---                   
-INSERT INTO GRI_PARAMS
-       (GP_PARAM
-       ,GP_PARAM_TYPE
-       ,GP_TABLE
-       ,GP_COLUMN
-       ,GP_DESCR_COLUMN
-       ,GP_SHOWN_COLUMN
-       ,GP_SHOWN_TYPE
-       ,GP_DESCR_TYPE
-       ,GP_ORDER
-       ,GP_CASE
-       ,GP_GAZ_RESTRICTION
-       )
-SELECT 
-        'ADMIN_UNIT'
-       ,'NUMBER'
-       ,'HIG_ADMIN_UNITS'
-       ,'HAU_ADMIN_UNIT'
-       ,'HAU_NAME'
-       ,'HAU_UNIT_CODE'
-       ,'CHAR'
-       ,''
-       ,''
-       ,''
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM GRI_PARAMS
-                   WHERE GP_PARAM = 'ADMIN_UNIT');       
---
-INSERT INTO GRI_PARAMS
-       (GP_PARAM
-       ,GP_PARAM_TYPE
-       ,GP_TABLE
-       ,GP_COLUMN
-       ,GP_DESCR_COLUMN
-       ,GP_SHOWN_COLUMN
-       ,GP_SHOWN_TYPE
-       ,GP_DESCR_TYPE
-       ,GP_ORDER
-       ,GP_CASE
-       ,GP_GAZ_RESTRICTION
-       )
-SELECT
-        'ROAD_ID'
-       ,'NUMBER'
-       ,'ROAD_SEGMENTS_ALL'
-       ,'RSE_HE_ID'
-       ,'RSE_DESCR'
-       ,'RSE_UNIQUE'
-       ,'CHAR'
-       ,''
-       ,''
-       ,''
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM GRI_PARAMS
-                   WHERE GP_PARAM = 'ROAD_ID');     
---
-INSERT INTO GRI_PARAMS
-       (GP_PARAM
-       ,GP_PARAM_TYPE
-       ,GP_TABLE
-       ,GP_COLUMN
-       ,GP_DESCR_COLUMN
-       ,GP_SHOWN_COLUMN
-       ,GP_SHOWN_TYPE
-       ,GP_DESCR_TYPE
-       ,GP_ORDER
-       ,GP_CASE
-       ,GP_GAZ_RESTRICTION
-       )
-SELECT
-        'ALL_ROAD_GPS'
-       ,'CHAR'
-       ,'GRI_PARAM_LOOKUP'
-       ,'GPL_VALUE'
-       ,'GPL_DESCR'
-       ,'GPL_VALUE'
-       ,'CHAR'
-       ,''
-       ,''
-       ,''
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM GRI_PARAMS
-                   WHERE GP_PARAM = 'ALL_ROAD_GPS');    
 --
 --
 --********** GRI_MODULE_PARAMS **********--
@@ -5463,312 +5239,6 @@ SELECT
                    WHERE GMP_MODULE = 'NM0563'
                     AND  GMP_PARAM = 'A_NUMBER');
 --
-INSERT INTO GRI_MODULE_PARAMS 
-       (GMP_MODULE
-       ,GMP_PARAM
-       ,GMP_SEQ
-       ,GMP_PARAM_DESCR
-       ,GMP_MANDATORY
-       ,GMP_NO_ALLOWED
-       ,GMP_WHERE
-       ,GMP_TAG_RESTRICTION
-       ,GMP_TAG_WHERE
-       ,GMP_DEFAULT_TABLE
-       ,GMP_DEFAULT_COLUMN
-       ,GMP_DEFAULT_WHERE
-       ,GMP_VISIBLE
-       ,GMP_GAZETTEER
-       ,GMP_LOV
-       ,GMP_VAL_GLOBAL
-       ,GMP_WILDCARD
-       ,GMP_HINT_TEXT
-       ,GMP_ALLOW_PARTIAL
-       ,GMP_BASE_TABLE
-       ,GMP_BASE_TABLE_COLUMN
-       ,GMP_OPERATOR
-       )
-SELECT 
-        'NET5002'
-       ,'ALL_ROAD_GPS'
-       ,3
-       ,'Include all Road Groups (Y/N)'
-       ,'Y'
-       ,1
-       ,'GPL_PARAM=''ALL_ROAD_GPS'''
-       ,'N'
-       ,''
-       ,'GRI_PARAM_LOOKUP'
-       ,'GPL_VALUE'
-       ,'GPL_VALUE=''N'' AND GPL_PARAM=''ALL_ROAD_GPS'''
-       ,'Y'
-       ,'N'
-       ,'Y'
-       ,''
-       ,'N'
-       ,''
-       ,'N'
-       ,''
-       ,''
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM GRI_MODULE_PARAMS
-                   WHERE GMP_MODULE = 'NET5002'
-                    AND  GMP_PARAM = 'ALL_ROAD_GPS');        
---
-INSERT INTO GRI_MODULE_PARAMS 
-       (GMP_MODULE
-       ,GMP_PARAM
-       ,GMP_SEQ
-       ,GMP_PARAM_DESCR
-       ,GMP_MANDATORY
-       ,GMP_NO_ALLOWED
-       ,GMP_WHERE
-       ,GMP_TAG_RESTRICTION
-       ,GMP_TAG_WHERE
-       ,GMP_DEFAULT_TABLE
-       ,GMP_DEFAULT_COLUMN
-       ,GMP_DEFAULT_WHERE
-       ,GMP_VISIBLE
-       ,GMP_GAZETTEER
-       ,GMP_LOV
-       ,GMP_VAL_GLOBAL
-       ,GMP_WILDCARD
-       ,GMP_HINT_TEXT
-       ,GMP_ALLOW_PARTIAL
-       ,GMP_BASE_TABLE
-       ,GMP_BASE_TABLE_COLUMN
-       ,GMP_OPERATOR
-       )
-SELECT 
-        'NET5002'
-       ,'ADMIN_UNIT'
-       ,1
-       ,'Admin Unit'
-       ,'Y'
-       ,1
-       ,'(HAU_ADMIN_UNIT IN (SELECT HAG_CHILD_ADMIN_UNIT FROM HIG_ADMIN_GROUPS WHERE HAG_PARENT_ADMIN_UNIT IN (SELECT HUS_ADMIN_UNIT FROM HIG_USERS WHERE HUS_USERNAME = USER)))'
-       ,'N'
-       ,''
-       ,'HIG_ADMIN_UNITS'
-       ,'HAU_ADMIN_UNIT'
-       ,'HAU_ADMIN_UNIT = (SELECT MAX(HUS_ADMIN_UNIT) FROM HIG_USERS WHERE HUS_USERNAME = USER)'
-       ,'Y'
-       ,'N'
-       ,'Y'
-       ,''
-       ,'N'
-      ,''
-       ,'N'
-       ,''
-       ,''
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM GRI_MODULE_PARAMS
-                   WHERE GMP_MODULE = 'NET5002'
-                    AND  GMP_PARAM = 'ADMIN_UNIT');       
---
-INSERT INTO GRI_MODULE_PARAMS 
-       (GMP_MODULE
-       ,GMP_PARAM
-       ,GMP_SEQ
-       ,GMP_PARAM_DESCR
-       ,GMP_MANDATORY
-       ,GMP_NO_ALLOWED
-       ,GMP_WHERE
-       ,GMP_TAG_RESTRICTION
-       ,GMP_TAG_WHERE
-       ,GMP_DEFAULT_TABLE
-       ,GMP_DEFAULT_COLUMN
-       ,GMP_DEFAULT_WHERE
-       ,GMP_VISIBLE
-       ,GMP_GAZETTEER
-       ,GMP_LOV
-       ,GMP_VAL_GLOBAL
-       ,GMP_WILDCARD
-       ,GMP_HINT_TEXT
-       ,GMP_ALLOW_PARTIAL
-       ,GMP_BASE_TABLE
-       ,GMP_BASE_TABLE_COLUMN
-       ,GMP_OPERATOR
-       )
-SELECT 
-        'NET5002'
-       ,'ROAD_ID'
-       ,2
-       ,'Road Id'
-       ,'N'
-       ,1
-       ,'RSE_ADMIN_UNIT IN (SELECT HAG_CHILD_ADMIN_UNIT FROM HIG_ADMIN_GROUPS WHERE HAG_PARENT_ADMIN_UNIT = :ADMIN_UNIT)'
-       ,'N'
-       ,''
-       ,''
-       ,''
-       ,''
-       ,'Y'
-       ,'Y'
-       ,'N'
-       ,'road_id'
-       ,'N'
-       ,''
-       ,'N'
-       ,''
-       ,''
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM GRI_MODULE_PARAMS
-                   WHERE GMP_MODULE = 'NET5002'
-                    AND  GMP_PARAM = 'ROAD_ID'); 
---                       
-INSERT INTO GRI_MODULE_PARAMS 
-       (GMP_MODULE
-       ,GMP_PARAM
-       ,GMP_SEQ
-       ,GMP_PARAM_DESCR
-       ,GMP_MANDATORY
-       ,GMP_NO_ALLOWED
-       ,GMP_WHERE
-       ,GMP_TAG_RESTRICTION
-       ,GMP_TAG_WHERE
-       ,GMP_DEFAULT_TABLE
-       ,GMP_DEFAULT_COLUMN
-       ,GMP_DEFAULT_WHERE
-       ,GMP_VISIBLE
-       ,GMP_GAZETTEER
-       ,GMP_LOV
-       ,GMP_VAL_GLOBAL
-       ,GMP_WILDCARD
-       ,GMP_HINT_TEXT
-       ,GMP_ALLOW_PARTIAL
-       ,GMP_BASE_TABLE
-       ,GMP_BASE_TABLE_COLUMN
-       ,GMP_OPERATOR
-       )
-SELECT 
-        'NET5003'
-       ,'ADMIN_UNIT'
-       ,1
-       ,'Admin Unit'
-       ,'Y'
-       ,1
-       ,'(HAU_ADMIN_UNIT IN (SELECT HAG_CHILD_ADMIN_UNIT FROM HIG_ADMIN_GROUPS WHERE HAG_PARENT_ADMIN_UNIT IN (SELECT HUS_ADMIN_UNIT FROM HIG_USERS WHERE HUS_USERNAME = USER)))'
-       ,'N'
-       ,''
-       ,'HIG_ADMIN_UNITS'
-       ,'HAU_ADMIN_UNIT'
-       ,'HAU_ADMIN_UNIT = (SELECT MAX(HUS_ADMIN_UNIT) FROM HIG_USERS WHERE HUS_USERNAME = USER)'
-       ,'Y'
-       ,'N'
-       ,'Y'
-       ,''
-       ,'N'
-       ,''
-       ,'N'
-       ,''
-       ,''
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM GRI_MODULE_PARAMS
-                   WHERE GMP_MODULE = 'NET5003'
-                    AND  GMP_PARAM = 'ADMIN_UNIT');
---
-INSERT INTO GRI_MODULE_PARAMS 
-       (GMP_MODULE
-       ,GMP_PARAM
-       ,GMP_SEQ
-       ,GMP_PARAM_DESCR
-       ,GMP_MANDATORY
-       ,GMP_NO_ALLOWED
-       ,GMP_WHERE
-       ,GMP_TAG_RESTRICTION
-       ,GMP_TAG_WHERE
-       ,GMP_DEFAULT_TABLE
-       ,GMP_DEFAULT_COLUMN
-       ,GMP_DEFAULT_WHERE
-       ,GMP_VISIBLE
-       ,GMP_GAZETTEER
-       ,GMP_LOV
-       ,GMP_VAL_GLOBAL
-       ,GMP_WILDCARD
-       ,GMP_HINT_TEXT
-       ,GMP_ALLOW_PARTIAL
-       ,GMP_BASE_TABLE
-       ,GMP_BASE_TABLE_COLUMN
-       ,GMP_OPERATOR
-       )
-SELECT 
-        'NET5003'
-       ,'ROAD_ID'
-       ,2
-       ,'Road Id'
-       ,'Y'
-       ,1
-       ,'RSE_ADMIN_UNIT IN (SELECT HAG_CHILD_ADMIN_UNIT FROM HIG_ADMIN_GROUPS WHERE HAG_PARENT_ADMIN_UNIT = :ADMIN_UNIT)'
-       ,'Y'
-       ,'RSE_HE_ID IN (SELECT :ROAD_ID FROM DUAL UNION SELECT RSM_RSE_HE_ID_OF FROM ROAD_SEG_MEMBS WHERE RSM_END_DATE IS NULL CONNECT BY PRIOR RSM_RSE_HE_ID_OF = RSM_RSE_HE_ID_IN START WITH RSM_RSE_HE_ID_IN = :ROAD_ID)'
-       ,''
-       ,''
-       ,''
-       ,'Y'
-       ,'Y'
-       ,'N'
-       ,'road_id'
-       ,'N'
-       ,''
-       ,'N'
-       ,''
-       ,''
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM GRI_MODULE_PARAMS
-                   WHERE GMP_MODULE = 'NET5003'
-                    AND  GMP_PARAM = 'ROAD_ID');
---                     
-INSERT INTO GRI_MODULE_PARAMS 
-       (GMP_MODULE
-       ,GMP_PARAM
-       ,GMP_SEQ
-       ,GMP_PARAM_DESCR
-       ,GMP_MANDATORY
-       ,GMP_NO_ALLOWED
-       ,GMP_WHERE
-       ,GMP_TAG_RESTRICTION
-       ,GMP_TAG_WHERE
-       ,GMP_DEFAULT_TABLE
-       ,GMP_DEFAULT_COLUMN
-       ,GMP_DEFAULT_WHERE
-       ,GMP_VISIBLE
-       ,GMP_GAZETTEER
-       ,GMP_LOV
-       ,GMP_VAL_GLOBAL
-       ,GMP_WILDCARD
-       ,GMP_HINT_TEXT
-       ,GMP_ALLOW_PARTIAL
-       ,GMP_BASE_TABLE
-       ,GMP_BASE_TABLE_COLUMN
-       ,GMP_OPERATOR
-       )
-SELECT
-        'NET5085'
-       ,'ROAD_ID'
-       ,1
-       ,'Road Part'
-       ,'N'
-       ,1
-       ,'RSE_GTY_GROUP_TYPE=''RP'''
-       ,'N'
-       ,''
-       ,''
-       ,''
-       ,''
-       ,'Y'
-       ,'N'
-       ,'Y'
-       ,''
-       ,'N'
-       ,'Enter the Road Part'
-       ,'N'
-       ,''
-       ,''
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM GRI_MODULE_PARAMS
-                   WHERE GMP_MODULE = 'NET5085'
-                    AND  GMP_PARAM = 'ROAD_ID');                           
---
 --
 --********** GRI_PARAM_DEPENDENCIES **********--
 SET TERM ON
@@ -5871,34 +5341,6 @@ SELECT
                    WHERE GPD_MODULE = 'NM0151'
                     AND  GPD_DEP_PARAM = 'ELEMENT_TYPE'
                     AND  GPD_INDEP_PARAM = 'REGION_OF_INTEREST');
---
-INSERT INTO GRI_PARAM_DEPENDENCIES
-       (GPD_MODULE
-       ,GPD_DEP_PARAM
-       ,GPD_INDEP_PARAM
-       )
-SELECT
-        'NET5002'
-       ,'ROAD_ID'
-       ,'ADMIN_UNIT' FROM DUAL
-WHERE NOT EXISTS (SELECT 1 FROM GRI_PARAM_DEPENDENCIES
-                   WHERE GPD_MODULE = 'NET5002'
-                    AND  GPD_DEP_PARAM = 'ROAD_ID'
-                    AND  GPD_INDEP_PARAM = 'ADMIN_UNIT');
---
-INSERT INTO GRI_PARAM_DEPENDENCIES
-       (GPD_MODULE
-       ,GPD_DEP_PARAM
-       ,GPD_INDEP_PARAM
-       )
-SELECT
-        'NET5003'
-       ,'ROAD_ID'
-       ,'ADMIN_UNIT' FROM DUAL
-WHERE NOT EXISTS (SELECT 1 FROM GRI_PARAM_DEPENDENCIES
-                   WHERE GPD_MODULE = 'NET5003'
-                    AND  GPD_DEP_PARAM = 'ROAD_ID'
-                    AND  GPD_INDEP_PARAM = 'ADMIN_UNIT');
 --
 --
 --********** GRI_PARAM_LOOKUP **********--
@@ -6161,32 +5603,6 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM GRI_PARAM_LOOKUP
                    WHERE GPL_PARAM = 'P_1868_MODE'
                     AND  GPL_VALUE = 'B');
---
-INSERT INTO GRI_PARAM_LOOKUP
-       (GPL_PARAM
-       ,GPL_VALUE
-       ,GPL_DESCR
-       )
-SELECT 
-        'ALL_ROAD_GPS'
-       ,'N'
-       ,'No' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM GRI_PARAM_LOOKUP
-                   WHERE GPL_PARAM = 'ALL_ROAD_GPS'
-                    AND  GPL_VALUE = 'N');
---
-INSERT INTO GRI_PARAM_LOOKUP
-       (GPL_PARAM
-       ,GPL_VALUE
-       ,GPL_DESCR
-       )
-SELECT 
-        'ALL_ROAD_GPS'
-       ,'Y'
-       ,'Yes' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM GRI_PARAM_LOOKUP
-                   WHERE GPL_PARAM = 'ALL_ROAD_GPS'
-                    AND  GPL_VALUE = 'Y');       
 --
 --
 --********** HIG_ERRORS **********--
@@ -94741,23 +94157,6 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'TMA_ACT_FINANCIAL'
-       ,'TMA1090'
-       ,'Informal Works Overrun'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'TMA_ACT_FINANCIAL'
-                    AND  HSTF_CHILD = 'TMA1090');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'TMA_ACT_FINANCIAL'
        ,'TMA1100'
        ,'FPNs'
        ,'M'
@@ -94945,23 +94344,6 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'TMA_ACT_WORKS'
-       ,'TMA1020'
-       ,'Comments'
-       ,'M'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'TMA_ACT_WORKS'
-                    AND  HSTF_CHILD = 'TMA1020');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'TMA_ACT_WORKS'
        ,'TMA1030'
        ,'Review Notices'
        ,'M'
@@ -95047,6 +94429,23 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'TMA_DATA_BATCH_PROCESSING'
+       ,'TMA_DATA_BATCH_PROCESSING_DCD'
+       ,'DCD Inspections'
+       ,'F'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING'
+                    AND  HSTF_CHILD = 'TMA_DATA_BATCH_PROCESSING_DCD');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_BATCH_PROCESSING'
        ,'TMA_DATA_BATCH_PROCESSING_INSP'
        ,'Inspections'
        ,'F'
@@ -95054,6 +94453,57 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING'
                     AND  HSTF_CHILD = 'TMA_DATA_BATCH_PROCESSING_INSP');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_BATCH_PROCESSING_DCD'
+       ,'TMA5515'
+       ,'DCD Extract'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING_DCD'
+                    AND  HSTF_CHILD = 'TMA5515');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_BATCH_PROCESSING_DCD'
+       ,'TMA5520'
+       ,'Inspection Download to DCD'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING_DCD'
+                    AND  HSTF_CHILD = 'TMA5520');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_DATA_BATCH_PROCESSING_DCD'
+       ,'TMA5530'
+       ,'Automatic Inspection Download to DCD'
+       ,'M'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING_DCD'
+                    AND  HSTF_CHILD = 'TMA5530');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -95084,7 +94534,7 @@ SELECT
        ,'TMA5510'
        ,'Inspections Batch File Summary'
        ,'M'
-       ,60 FROM DUAL
+       ,40 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING_INSP'
                     AND  HSTF_CHILD = 'TMA5510');
@@ -95098,44 +94548,10 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'TMA_DATA_BATCH_PROCESSING_INSP'
-       ,'TMA5520'
-       ,'Inspection Download to DCD'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING_INSP'
-                    AND  HSTF_CHILD = 'TMA5520');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'TMA_DATA_BATCH_PROCESSING_INSP'
-       ,'TMA5530'
-       ,'Automatic Inspection Download to DCD'
-       ,'M'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING_INSP'
-                    AND  HSTF_CHILD = 'TMA5530');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'TMA_DATA_BATCH_PROCESSING_INSP'
        ,'TMA5600'
        ,'Inspection Upload'
        ,'M'
-       ,40 FROM DUAL
+       ,20 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING_INSP'
                     AND  HSTF_CHILD = 'TMA5600');
@@ -95152,7 +94568,7 @@ SELECT
        ,'TMA5610'
        ,'Automatic Inspection Upload'
        ,'M'
-       ,50 FROM DUAL
+       ,30 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING_INSP'
                     AND  HSTF_CHILD = 'TMA5610');
@@ -95169,7 +94585,7 @@ SELECT
        ,'TMA5620'
        ,'Inspections Upload Transaction Summary'
        ,'M'
-       ,70 FROM DUAL
+       ,50 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'TMA_DATA_BATCH_PROCESSING_INSP'
                     AND  HSTF_CHILD = 'TMA5620');
@@ -95726,6 +95142,23 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
+        'TMA_REF_ACTIVITIES'
+       ,'TMA2060'
+       ,'S74 Charge Profiles'
+       ,'M'
+       ,70 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_REF_ACTIVITIES'
+                    AND  HSTF_CHILD = 'TMA2060');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
         'TMA_REF_ADMINISTRATION'
        ,'TMA0010'
        ,'Contacts'
@@ -95904,23 +95337,6 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'TM_REFERENCE'
                     AND  HSTF_CHILD = 'TM0001');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'UKP'
-       ,'UKP0043'
-       ,'Road Condition Indicator Coverage'
-       ,'M'
-       ,8 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'UKP'
-                    AND  HSTF_CHILD = 'UKP0043');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -96151,6 +95567,74 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
+        'UKP_BVPI_REPORTS'
+       ,'UKP0044'
+       ,'THS/010a Condition of Principal Roads'
+       ,'M'
+       ,9 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_BVPI_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0044');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_BVPI_REPORTS'
+       ,'UKP0045'
+       ,'THS/010b Condition of Non-Principal Roads'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_BVPI_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0045');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_BVPI_REPORTS'
+       ,'UKP0046'
+       ,'SRMCS Carriageway Condition Indicator'
+       ,'M'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_BVPI_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0046');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_BVPI_REPORTS'
+       ,'UKP0047'
+       ,'Northern Ireland PI Report'
+       ,'M'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_BVPI_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0047');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
         'UKP_LOAD_DATA'
        ,'MAI2100C'
        ,'Load Inventory - Stage 1'
@@ -96227,6 +95711,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'UKP_LOAD_DATA'
                     AND  HSTF_CHILD = 'UKP0027');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_LOAD_DATA'
+       ,'UKP0042'
+       ,'Weighting Set Loader'
+       ,'M'
+       ,11 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_LOAD_DATA'
+                    AND  HSTF_CHILD = 'UKP0042');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -96805,6 +96306,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'UKP_UTILITIES_REPORTS'
                     AND  HSTF_CHILD = 'UKP0029');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'UKP_UTILITIES_REPORTS'
+       ,'UKP0043'
+       ,'Road Condition Indicator Coverage'
+       ,'M'
+       ,8 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'UKP_UTILITIES_REPORTS'
+                    AND  HSTF_CHILD = 'UKP0043');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
