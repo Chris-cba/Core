@@ -2,13 +2,14 @@ CREATE OR REPLACE PACKAGE BODY nm3tab_varchar AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+-- PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3tab_varchar.pkb	1.2 07/24/03
---       Module Name      : nm3tab_varchar.pkb
---       Date into SCCS   : 03/07/24 03:34:38
---       Date fetched Out : 07/06/13 14:13:37
---       SCCS Version     : 1.2
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3tab_varchar.pkb-arc   2.3   Jan 10 2008 17:09:22   jwadsworth  $
+-- Module Name : $Workfile:   nm3tab_varchar.pkb  $
+-- Date into PVCS : $Date:   Jan 10 2008 17:09:22  $
+-- Date fetched Out : $Modtime:   Jan 10 2008 17:09:10  $
+-- PVCS Version : $Revision:   2.3  $
+-- Based on SCCS version : 
 --
 --
 --   Author : Jonathan Mills
