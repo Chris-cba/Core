@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.20   Jan 09 2008 11:04:06   dyounger  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.21   Jan 10 2008 17:49:16   sscanlon  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Jan 09 2008 11:04:06  $
---       Date fetched Out : $Modtime:   Jan 09 2008 11:02:20  $
---       Version          : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Jan 10 2008 17:49:16  $
+--       Date fetched Out : $Modtime:   Jan 10 2008 17:15:36  $
+--       Version          : $Revision:   2.21  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.4.0
 
 GENERATION DATE
 ===============
-03-JAN-2008 15:18
+10-JAN-2008 17:15
 
 TABLES PROCESSED
 ================
@@ -30639,128 +30639,6 @@ SELECT
        ,'FORM' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
                    WHERE HMO_MODULE = 'TMA0010');
---
-INSERT INTO HIG_MODULES
-       (HMO_MODULE
-       ,HMO_TITLE
-       ,HMO_FILENAME
-       ,HMO_MODULE_TYPE
-       ,HMO_FASTPATH_OPTS
-       ,HMO_FASTPATH_INVALID
-       ,HMO_USE_GRI
-       ,HMO_APPLICATION
-       ,HMO_MENU
-       ) 
-SELECT
-        'NET5002'
-       ,'Print Road Groups and their Membership'
-       ,'net5002'
-       ,'R25'
-       ,''
-       ,'N'
-       ,'Y'
-       ,'NET'
-       ,'FORM' FROM DUAL
- WHERE NOT EXISTS (SELECT '1' FROM HIG_MODULES
-                   WHERE HMO_MODULE = 'NET5002');
---                   
-INSERT INTO HIG_MODULES
-       (HMO_MODULE
-       ,HMO_TITLE
-       ,HMO_FILENAME
-       ,HMO_MODULE_TYPE
-       ,HMO_FASTPATH_OPTS
-       ,HMO_FASTPATH_INVALID
-       ,HMO_USE_GRI
-       ,HMO_APPLICATION
-       ,HMO_MENU
-       ) 
-SELECT
-        'NET5003'
-       ,'Print Full Sections within a Group'
-       ,'net5003'
-       ,'R25'
-       ,''
-       ,'N'
-       ,'Y'
-       ,'NET'
-       ,'FORM' FROM DUAL
-WHERE NOT EXISTS (SELECT '1' FROM HIG_MODULES
-                  WHERE HMO_MODULE = 'NET5003');
---                  
-INSERT INTO HIG_MODULES
-       (HMO_MODULE
-       ,HMO_TITLE
-       ,HMO_FILENAME
-       ,HMO_MODULE_TYPE
-       ,HMO_FASTPATH_OPTS
-       ,HMO_FASTPATH_INVALID
-       ,HMO_USE_GRI
-       ,HMO_APPLICATION
-       ,HMO_MENU
-       ) 
-SELECT
-        'NET5085'
-       ,'Print Road Parts and their Membership'
-       ,'net5085'
-       ,'R25'
-       ,''
-       ,'N'
-       ,'Y'
-       ,'NET'
-       ,'FORM' FROM DUAL
-WHERE NOT EXISTS (SELECT '1' FROM HIG_MODULES
-                  WHERE HMO_MODULE = 'NET5085');
---                  
-INSERT INTO HIG_MODULES
-       (HMO_MODULE
-       ,HMO_TITLE
-       ,HMO_FILENAME
-       ,HMO_MODULE_TYPE
-       ,HMO_FASTPATH_OPTS
-       ,HMO_FASTPATH_INVALID
-       ,HMO_USE_GRI
-       ,HMO_APPLICATION
-       ,HMO_MENU
-       ) 
-SELECT
-        'NET5090'
-       ,'Print Road Parts with No Sections'
-       ,'net5090'
-       ,'R25'
-       ,'' 
-       ,'N'
-       ,'Y'
-       ,'NET'
-       ,'FORM' FROM DUAL
-WHERE NOT EXISTS (SELECT '1'
-                  FROM HIG_MODULES
-                  where HMO_MODULE = 'NET5090');
---                  
-INSERT INTO HIG_MODULES
-       (HMO_MODULE
-       ,HMO_TITLE
-       ,HMO_FILENAME
-       ,HMO_MODULE_TYPE
-       ,HMO_FASTPATH_OPTS
-       ,HMO_FASTPATH_INVALID
-       ,HMO_USE_GRI
-       ,HMO_APPLICATION
-       ,HMO_MENU
-       ) 
-SELECT
-        'NET5095'
-       ,'Print Sections not Allocated to a Road Part'
-       ,'net5095'
-       ,'R25'
-       ,''
-       ,'N'
-       ,'Y'
-       ,'NET'
-       ,'FORM' FROM DUAL
-       WHERE NOT EXISTS (SELECT '1'
-                         FROM HIG_MODULES
-                         WHERE HMO_MODULE = 'NET5095');                                      
 --
 --
 --********** HIG_OPTION_LIST **********--
