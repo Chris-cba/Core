@@ -2,13 +2,14 @@ CREATE OR REPLACE PACKAGE BODY nm3clob AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+-- PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3clob.pkb	1.11 06/02/03
---       Module Name      : nm3clob.pkb
---       Date into SCCS   : 03/06/02 16:15:12
---       Date fetched Out : 07/06/13 14:11:10
---       SCCS Version     : 1.11
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3clob.pkb-arc   2.2   Jan 10 2008 16:41:34   jwadsworth  $
+-- Module Name : $Workfile:   nm3clob.pkb  $
+-- Date into PVCS : $Date:   Jan 10 2008 16:41:34  $
+-- Date fetched Out : $Modtime:   Jan 10 2008 16:41:04  $
+-- PVCS Version : $Revision:   2.2  $
+-- Based on SCCS version : 
 --
 --
 --   Author : Jonathan Mills

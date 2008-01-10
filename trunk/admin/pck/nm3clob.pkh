@@ -1,13 +1,13 @@
 CREATE OR REPLACE PACKAGE nm3clob AS
 --<PACKAGE>
---   SCCS Identifiers :-
+-- PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3clob.pkh	1.9 09/19/02
---       Module Name      : nm3clob.pkh
---       Date into SCCS   : 02/09/19 12:03:44
---       Date fetched Out : 07/06/13 14:11:11
---       SCCS Version     : 1.9
---
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3clob.pkh-arc   2.2   Jan 10 2008 16:41:34   jwadsworth  $
+-- Module Name : $Workfile:   nm3clob.pkh  $
+-- Date into PVCS : $Date:   Jan 10 2008 16:41:34  $
+-- Date fetched Out : $Modtime:   Jan 10 2008 16:40:54  $
+-- PVCS Version : $Revision:   2.2  $
+-- Based on SCCS version : 
 --
 --   Author : Jonathan Mills
 --
