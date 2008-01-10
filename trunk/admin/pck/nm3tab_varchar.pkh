@@ -84,14 +84,11 @@ FUNCTION compress_tab_vc_by_lf (p_tab_vc nm3type.tab_varchar32767
                                ) RETURN nm3type.tab_varchar32767;
 --</PROC>
 -----------------------------------------------------------------------------
---<PROC NAME="remove_tab_vc_linefeeds">
--- GJ 10-JAN-2008
--- rip off of compress_tab_vc_by_lf
--- when in some cases appears to to introduce an additional a blank line between each line
--- and didn't want to touch because impact could be massive
-FUNCTION remove_tab_vc_linefeeds (
-                                  p_tab_vc nm3type.tab_varchar32767
-                                  ) RETURN nm3type.tab_varchar32767;
+--<PROC NAME="cleanse_tab_vc">
+FUNCTION cleanse_tab_vc (pi_tab_vc             IN nm3type.tab_varchar32767
+                        ,pi_remove_blank_lines IN BOOLEAN DEFAULT TRUE
+                        ,pi_remove_cr          IN BOOLEAN DEFAULT TRUE
+                         ) RETURN nm3type.tab_varchar32767;
 --</PROC>
 -----------------------------------------------------------------------------
 --
