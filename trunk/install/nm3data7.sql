@@ -3,16 +3,16 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.2   Aug 28 2007 11:50:18   sscanlon  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.3   Jan 10 2008 18:15:04   sscanlon  $
 --       Module Name      : $Workfile:   nm3data7.sql  $
---       Date into PVCS   : $Date:   Aug 28 2007 11:50:18  $
---       Date fetched Out : $Modtime:   Aug 28 2007 11:45:04  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jan 10 2008 18:15:04  $
+--       Date fetched Out : $Modtime:   Jan 10 2008 17:16:24  $
+--       Version          : $Revision:   2.3  $
 --
 --   Product metadata script
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--	Copyright (c) exor corporation ltd, 2008
 -----------------------------------------------------------------------------
 --
 --
@@ -20,11 +20,11 @@
 
 INFO
 ====
-As at Release 4.0.2.0
+As at Release 4.0.4.0
 
 GENERATION DATE
 ===============
-28-AUG-2007 11:45
+10-JAN-2008 17:16
 
 TABLES PROCESSED
 ================
@@ -13417,6 +13417,24 @@ SELECT
        ,452
        ,null
        ,'Cannot locate asset on this network as it has been edited.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 453;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,453
+       ,null
+       ,'Invalid module'
        ,'' FROM DUAL;
 --
 --
