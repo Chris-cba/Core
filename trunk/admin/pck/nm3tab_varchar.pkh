@@ -83,7 +83,16 @@ PROCEDURE append_tab_varchar (p_tab_vc_main      IN OUT NOCOPY nm3type.tab_varch
 FUNCTION compress_tab_vc_by_lf (p_tab_vc nm3type.tab_varchar32767
                                ) RETURN nm3type.tab_varchar32767;
 --</PROC>
---
+-----------------------------------------------------------------------------
+--<PROC NAME="remove_tab_vc_linefeeds">
+-- GJ 10-JAN-2008
+-- rip off of compress_tab_vc_by_lf
+-- when in some cases appears to to introduce an additional a blank line between each line
+-- and didn't want to touch because impact could be massive
+FUNCTION remove_tab_vc_linefeeds (
+                                  p_tab_vc nm3type.tab_varchar32767
+                                  ) RETURN nm3type.tab_varchar32767;
+--</PROC>
 -----------------------------------------------------------------------------
 --
 --<PROC NAME="append">

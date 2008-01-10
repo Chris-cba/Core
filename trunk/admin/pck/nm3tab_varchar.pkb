@@ -168,6 +168,36 @@ END compress_tab_vc_by_lf;
 --
 -----------------------------------------------------------------------------
 --
+FUNCTION remove_tab_vc_linefeeds (
+                                  p_tab_vc nm3type.tab_varchar32767
+                                  ) RETURN nm3type.tab_varchar32767 IS
+
+-- GJ 10-JAN-2008
+-- rip off of compress_tab_vc_by_lf
+-- when in some cases appears to to introduce an additional a blank line between each line
+-- and didn't want to touch because impact could be massive
+--
+   l_retval nm3type.tab_varchar32767;
+
+BEGIN
+
+   FOR i IN 1..p_tab_vc.COUNT
+    LOOP
+      nm3tab_varchar.append (l_retval,p_tab_vc(i),FALSE);
+
+      IF nm3flx.right(p_tab_vc(i),1) = CHR(10) THEN  -- strip off the last CHR(10) character of the current line and nullify the next 
+       l_retval(l_retval.COUNT) := substr(l_retval(l_retval.COUNT), 1, length(l_retval(l_retval.COUNT)) - 1);
+       l_retval(l_retval.COUNT+1) := Null;
+      END IF;
+
+   END LOOP;
+
+   RETURN l_retval;
+--
+END remove_tab_vc_linefeeds;
+--
+-----------------------------------------------------------------------------
+--
 PROCEDURE append (p_tab_vc IN OUT NOCOPY nm3type.tab_varchar32767
                  ,p_text   IN            VARCHAR2
                  ,p_nl     IN            BOOLEAN DEFAULT TRUE

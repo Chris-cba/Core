@@ -370,7 +370,8 @@ END clob_to_blob;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION clob_to_tab_varchar (pi_clob IN clob) RETURN nm3type.tab_varchar32767 IS
+FUNCTION clob_to_tab_varchar (pi_clob           IN clob
+                             ,pi_orig_lf_method IN BOOLEAN DEFAULT TRUE) RETURN nm3type.tab_varchar32767 IS
 --
    l_varchar            varchar2(32767);
    c_vc_length CONSTANT pls_integer := 32767;
@@ -396,7 +397,12 @@ BEGIN
    END LOOP;
 --
    l_retval := nm3tab_varchar.split_rough_chunked_tab_vc_lf (l_retval);
-   l_retval := nm3tab_varchar.compress_tab_vc_by_lf(l_retval);
+   
+   IF pi_orig_lf_method THEN
+     l_retval := nm3tab_varchar.compress_tab_vc_by_lf(l_retval);
+   ELSE
+     l_retval := nm3tab_varchar.remove_tab_vc_linefeeds(l_retval);
+   END IF;             
 --
    nm_debug.proc_end(g_package_name,'clob_to_tab_varchar');
 --

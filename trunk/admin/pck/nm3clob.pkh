@@ -170,7 +170,8 @@ FUNCTION clob_to_blob(pi_clob IN CLOB
 --<PROC NAME="clob_to_tab_varchar">
 -- This function converts the specified clob into an array of VARCHAR2(32767)
 --
-FUNCTION clob_to_tab_varchar (pi_clob IN CLOB) RETURN nm3type.tab_varchar32767;
+FUNCTION clob_to_tab_varchar (pi_clob IN CLOB
+                             ,pi_orig_lf_method IN BOOLEAN DEFAULT TRUE) RETURN nm3type.tab_varchar32767;
 --</PROC>
 --
 -----------------------------------------------------------------------------
