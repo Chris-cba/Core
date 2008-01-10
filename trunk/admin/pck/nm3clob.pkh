@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3clob AS
 --<PACKAGE>
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3clob.pkh-arc   2.2   Jan 10 2008 16:41:34   jwadsworth  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3clob.pkh-arc   2.3   Jan 10 2008 16:55:22   gjohnson  $
 -- Module Name : $Workfile:   nm3clob.pkh  $
--- Date into PVCS : $Date:   Jan 10 2008 16:41:34  $
--- Date fetched Out : $Modtime:   Jan 10 2008 16:40:54  $
--- PVCS Version : $Revision:   2.2  $
+-- Date into PVCS : $Date:   Jan 10 2008 16:55:22  $
+-- Date fetched Out : $Modtime:   Jan 10 2008 16:50:58  $
+-- PVCS Version : $Revision:   2.3  $
 -- Based on SCCS version : 
 --
 --   Author : Jonathan Mills
@@ -170,8 +170,7 @@ FUNCTION clob_to_blob(pi_clob IN CLOB
 --<PROC NAME="clob_to_tab_varchar">
 -- This function converts the specified clob into an array of VARCHAR2(32767)
 --
-FUNCTION clob_to_tab_varchar (pi_clob IN CLOB
-                             ,pi_orig_lf_method IN BOOLEAN DEFAULT TRUE) RETURN nm3type.tab_varchar32767;
+FUNCTION clob_to_tab_varchar (pi_clob IN CLOB) RETURN nm3type.tab_varchar32767;
 --</PROC>
 --
 -----------------------------------------------------------------------------

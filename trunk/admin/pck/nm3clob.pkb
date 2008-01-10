@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3clob AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3clob.pkb-arc   2.2   Jan 10 2008 16:41:34   jwadsworth  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3clob.pkb-arc   2.3   Jan 10 2008 16:55:22   gjohnson  $
 -- Module Name : $Workfile:   nm3clob.pkb  $
--- Date into PVCS : $Date:   Jan 10 2008 16:41:34  $
--- Date fetched Out : $Modtime:   Jan 10 2008 16:41:04  $
--- PVCS Version : $Revision:   2.2  $
+-- Date into PVCS : $Date:   Jan 10 2008 16:55:22  $
+-- Date fetched Out : $Modtime:   Jan 10 2008 16:50:56  $
+-- PVCS Version : $Revision:   2.3  $
 -- Based on SCCS version : 
 --
 --
@@ -371,8 +371,7 @@ END clob_to_blob;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION clob_to_tab_varchar (pi_clob           IN clob
-                             ,pi_orig_lf_method IN BOOLEAN DEFAULT TRUE) RETURN nm3type.tab_varchar32767 IS
+FUNCTION clob_to_tab_varchar (pi_clob           IN clob) RETURN nm3type.tab_varchar32767 IS
 --
    l_varchar            varchar2(32767);
    c_vc_length CONSTANT pls_integer := 32767;
@@ -399,11 +398,7 @@ BEGIN
 --
    l_retval := nm3tab_varchar.split_rough_chunked_tab_vc_lf (l_retval);
    
-   IF pi_orig_lf_method THEN
-     l_retval := nm3tab_varchar.compress_tab_vc_by_lf(l_retval);
-   ELSE
-     l_retval := nm3tab_varchar.remove_tab_vc_linefeeds(l_retval);
-   END IF;             
+   l_retval := nm3tab_varchar.compress_tab_vc_by_lf(l_retval);
 --
    nm_debug.proc_end(g_package_name,'clob_to_tab_varchar');
 --
