@@ -4,11 +4,11 @@
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.2   Oct 25 2007 13:02:18   sscanlon  $
+--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.3   Jan 11 2008 14:58:58   sscanlon  $
 --       Module Name                : $Workfile:   who_trg.sql  $
---       Date into PVCS             : $Date:   Oct 25 2007 13:02:18  $
---       Date fetched Out           : $Modtime:   Oct 25 2007 13:00:12  $
---       PVCS Version               : $Revision:   2.2  $
+--       Date into PVCS             : $Date:   Jan 11 2008 14:58:58  $
+--       Date fetched Out           : $Modtime:   Jan 11 2008 14:56:24  $
+--       PVCS Version               : $Revision:   2.3  $
 --       Based on SCCS version      : 1.4
 -----------------------------------------------------------------------------
 -- Copyright (c) exor corporation ltd, 2007
@@ -44,11 +44,11 @@ BEGIN
    l_tab_comments(1)  := '--';
    l_tab_comments(2)  := '--   SCCS Identifiers :-';
    l_tab_comments(3)  := '--';
-   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.2   Oct 25 2007 13:02:18   sscanlon  $';
+   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/trg/who_trg.sql-arc   2.3   Jan 11 2008 14:58:58   sscanlon  $';
    l_tab_comments(5)  := '--       Module Name                : $Workfile:   who_trg.sql  $';
-   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Oct 25 2007 13:02:18  $';
-   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Oct 25 2007 13:00:12  $';
-   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.2  $';
+   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jan 11 2008 14:58:58  $';
+   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jan 11 2008 14:56:24  $';
+   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.3  $';
    l_tab_comments(9)  := '--';
    l_tab_comments(10) := '--   table_name_WHO trigger';
    l_tab_comments(11) := '--';
@@ -71,6 +71,7 @@ BEGIN
                          or utc.column_name like '%DATE_CREATED'
                          or utc.column_name like '%DATE_MODIFIED'
                         )
+                    AND ut.object_name not like 'BIN%'        --sscanlon fix 11JAN2008, fix for 10g installs
                   GROUP BY utc.TABLE_NAME
                   HAVING COUNT(*) = 4
                  )
