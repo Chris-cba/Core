@@ -64,6 +64,7 @@ FUNCTION get_body_version RETURN varchar2;
 --  from the instantiate_user trigger
 --
 PROCEDURE initialise_context;
+PROCEDURE initialise_context(pi_username varchar2);
 --</PROC>
 --
 -----------------------------------------------------------------------------

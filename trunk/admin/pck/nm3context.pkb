@@ -90,8 +90,16 @@ END get_body_version;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE initialise_context IS
+procedure initialise_context
+IS
+begin
+   initialise_context(user);
+end initialise_context ;
 --
+-----------------------------------------------------------------------------
+--
+PROCEDURE initialise_context(pi_username varchar2) 
+is
    l_user_id          hig_users.hus_user_id%TYPE;
    l_hus_unrestricted hig_users.hus_unrestricted%TYPE;
 --
