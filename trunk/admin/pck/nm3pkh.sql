@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.4   Dec 14 2007 15:18:30   sscanlon  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.5   Jan 15 2008 11:18:56   gjohnson  $
 --       Module Name      : $Workfile:   nm3pkh.sql  $
---       Date into PVCS   : $Date:   Dec 14 2007 15:18:30  $
---       Date fetched Out : $Modtime:   Dec 14 2007 15:17:02  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jan 15 2008 11:18:56  $
+--       Date fetched Out : $Modtime:   Jan 15 2008 11:15:38  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --
 --   Author : Graeme Johnson
@@ -2124,6 +2124,17 @@ PROMPT hig_std_text.pkh
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'hig_std_text.pkh' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm3xml.pkh
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3xml.pkh' run_file
 FROM dual 
 / 
 start '&run_file'
