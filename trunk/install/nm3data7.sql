@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.3   Jan 10 2008 18:15:04   sscanlon  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.4   Jan 15 2008 10:57:38   gjohnson  $
 --       Module Name      : $Workfile:   nm3data7.sql  $
---       Date into PVCS   : $Date:   Jan 10 2008 18:15:04  $
---       Date fetched Out : $Modtime:   Jan 10 2008 17:16:24  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jan 15 2008 10:57:38  $
+--       Date fetched Out : $Modtime:   Jan 15 2008 10:55:36  $
+--       Version          : $Revision:   2.4  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.4.0
 
 GENERATION DATE
 ===============
-10-JAN-2008 17:16
+15-JAN-2008 10:55
 
 TABLES PROCESSED
 ================
@@ -5426,6 +5426,24 @@ SELECT
        ,null
        ,'This module is not available when the application is run on the web.'
        ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 501;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,501
+       ,null
+       ,'XML Read error'
+       ,'Error suggests XML is not ''well formed''' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
  WHERE NER_APPL = 'MRWA'

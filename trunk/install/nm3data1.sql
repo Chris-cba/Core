@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.21   Jan 10 2008 17:49:16   sscanlon  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.22   Jan 15 2008 10:57:38   gjohnson  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Jan 10 2008 17:49:16  $
---       Date fetched Out : $Modtime:   Jan 10 2008 17:15:36  $
---       Version          : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   Jan 15 2008 10:57:38  $
+--       Date fetched Out : $Modtime:   Jan 15 2008 10:55:34  $
+--       Version          : $Revision:   2.22  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.4.0
 
 GENERATION DATE
 ===============
-10-JAN-2008 17:15
+15-JAN-2008 10:55
 
 TABLES PROCESSED
 ================
@@ -5736,6 +5736,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'HIG'
                     AND  NER_ID = 500);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,501
+       ,null
+       ,'XML Read error'
+       ,'Error suggests XML is not ''well formed''' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 501);
 --
 INSERT INTO NM_ERRORS
        (NER_APPL
