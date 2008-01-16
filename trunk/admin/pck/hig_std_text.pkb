@@ -3,11 +3,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/tma/admin/pck/hig_std_text.pkb-arc   3.1   Dec 14 2007 15:19:38   jwadsworth  $
+--       sccsid           : $Header:   //vm_latest/archives/tma/admin/pck/hig_std_text.pkb-arc   3.2   Jan 16 2008 12:08:10   bodriscoll  $
 --       Module Name      : $Workfile:   hig_std_text.pkb  $
---       Date into SCCS   : $Date:   Dec 14 2007 15:19:38  $
---       Date fetched Out : $Modtime:   Dec 14 2007 15:15:48  $
---       SCCS Version     : $Revision:   3.1  $
+--       Date into SCCS   : $Date:   Jan 16 2008 12:08:10  $
+--       Date fetched Out : $Modtime:   Jan 15 2008 17:16:02  $
+--       SCCS Version     : $Revision:   3.2  $
 --       Based on 
 --
 --
@@ -19,10 +19,10 @@ AS
 -----------------------------------------------------------------------------
 --    Copyright (c) exor corporation ltd, 2007
 -----------------------------------------------------------------------------
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.1  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.2  $';
    g_package_name CONSTANT varchar2(30) := 'tma_fpns_api';
 
---sccsid constant varchar2(30) :='"$Revision:   3.1  $"';
+--sccsid constant varchar2(30) :='"$Revision:   3.2  $"';
 --   g_body_sccsid is the SCCS ID for the package body
 --
 --------------------------------------------------------------------------------
@@ -192,8 +192,42 @@ begin
      ind := ind + 1;
      
    end loop;   
+                       
 
 end;                          
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_FIELD_DESC">
+-- get field description when no standard text exists --
+FUNCTION get_field_desc(p_hmi_module_name in hig_module_items.hmi_module_name%type,
+                        p_hmi_block_name  in hig_module_items.hmi_block_name%type,
+                        p_hmi_item_name   in hig_module_items.hmi_item_name%type) RETURN hig_module_items.hmi_field_desc%type IS
+  
+                     
+cursor get_desc is                             
+   select hmi_field_desc
+   from   hig_module_items
+   where  upper(hmi_module_name) = upper(p_hmi_module_name)
+   and    upper(hmi_block_name) = upper(p_hmi_block_name)
+   and    upper(hmi_item_name)  = upper(p_hmi_item_name);
+   
+   l_ret  hig_module_items.hmi_field_desc%type;
+                       
+BEGIN
+
+
+   open get_desc;
+  
+      fetch get_desc into l_ret;
+              
+   close get_desc;   
+
+   return l_ret;
+  
+
+END;                                                                     
 --</PROC>
 --
 -----------------------------------------------------------------------------
@@ -268,7 +302,7 @@ Begin
             (hstu_user_id, hstu_module_item_id, hstu_text_id, hstu_top_ranking)
      Values (p_user_id, p_hst_module_item_id,l_hst_text_id,'N' );
      
-     commit;
+     --commit;
       
   end loop;  
   --
