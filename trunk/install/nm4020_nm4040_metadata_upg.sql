@@ -9,11 +9,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4020_nm4040_metadata_upg.sql-arc   3.1   Jan 18 2008 08:36:34   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4020_nm4040_metadata_upg.sql-arc   3.2   Jan 18 2008 11:08:48   jwadsworth  $
 --       Module Name      : $Workfile:   nm4020_nm4040_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Jan 18 2008 08:36:34  $
---       Date fetched Out : $Modtime:   Jan 18 2008 08:33:18  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jan 18 2008 11:08:48  $
+--       Date fetched Out : $Modtime:   Jan 18 2008 11:06:20  $
+--       Version          : $Revision:   3.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -150,7 +150,7 @@ SET TERM OFF
 ------------------------------------------------------------------
 Insert into HIG_STANDARD_FAVOURITES
    (HSTF_PARENT, HSTF_CHILD, HSTF_DESCR, HSTF_TYPE, HSTF_ORDER)
-select 'FAVOURITES', 'TMA', 'TMA', 'F', 16);
+select 'FAVOURITES', 'TMA', 'TMA', 'F', 16
   from dual
   where not exists (select 1 
                       from HIG_STANDARD_FAVOURITES 
