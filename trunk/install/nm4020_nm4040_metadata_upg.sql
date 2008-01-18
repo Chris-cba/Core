@@ -9,11 +9,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4020_nm4040_metadata_upg.sql-arc   3.0   Jan 11 2008 11:39:38   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4020_nm4040_metadata_upg.sql-arc   3.1   Jan 18 2008 08:36:34   jwadsworth  $
 --       Module Name      : $Workfile:   nm4020_nm4040_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Jan 11 2008 11:39:38  $
---       Date fetched Out : $Modtime:   Jan 11 2008 11:39:02  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jan 18 2008 08:36:34  $
+--       Date fetched Out : $Modtime:   Jan 18 2008 08:33:18  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -148,6 +148,15 @@ SET TERM OFF
 -- Added hig_standard_favourites data for TMA product and additional module for NSG (Organisations and Districts, module number NSG0110)
 -- For relative install metadata see nm3data2.sql delta 2.10
 ------------------------------------------------------------------
+Insert into HIG_STANDARD_FAVOURITES
+   (HSTF_PARENT, HSTF_CHILD, HSTF_DESCR, HSTF_TYPE, HSTF_ORDER)
+select 'FAVOURITES', 'TMA', 'TMA', 'F', 16);
+  from dual
+  where not exists (select 1 
+                      from HIG_STANDARD_FAVOURITES 
+                      where HSTF_PARENT = 'FAVOURITES'
+                        and HSTF_CHILD = 'TMA' );
+
 Insert into HIG_STANDARD_FAVOURITES
    (HSTF_PARENT, HSTF_CHILD, HSTF_DESCR, HSTF_TYPE, HSTF_ORDER)
 select 'HIG_REFERENCE', 'HIG4010', 'Standard Text Maintenance', 'M', 19
@@ -845,6 +854,63 @@ SELECT 'TMA_REF_ACTIVITIES','TMA2060','S74 Charge Profiles','M',70
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'TMA_REF_ACTIVITIES'
                     AND  HSTF_CHILD = 'TMA2060');
+
+-------------------------------------
+-- changes emailed from GJohnson
+-------------------------------------
+delete from hig_standard_favourites
+where HSTF_parent like 'TMA_%BAT%'
+/
+
+INSERT INTO HIG_STANDARD_FAVOURITES 
+( HSTF_PARENT, HSTF_CHILD, HSTF_DESCR, HSTF_TYPE,HSTF_ORDER ) 
+VALUES ( 'TMA_DATA_BATCH_PROCESSING', 'TMA_DATA_BATCH_PROCESSING_DCD', 'DCD Inspections', 'F', 20)
+/
+ 
+INSERT INTO HIG_STANDARD_FAVOURITES 
+( HSTF_PARENT, HSTF_CHILD, HSTF_DESCR, HSTF_TYPE,HSTF_ORDER ) 
+VALUES ( 'TMA_DATA_BATCH_PROCESSING', 'TMA_DATA_BATCH_PROCESSING_INSP', 'Inspections', 'F', 10)
+/
+
+INSERT INTO HIG_STANDARD_FAVOURITES 
+( HSTF_PARENT, HSTF_CHILD, HSTF_DESCR, HSTF_TYPE,HSTF_ORDER ) 
+VALUES ( 'TMA_DATA_BATCH_PROCESSING_DCD', 'TMA5515', 'DCD Extract', 'M', 10)
+/
+
+INSERT INTO HIG_STANDARD_FAVOURITES 
+( HSTF_PARENT, HSTF_CHILD, HSTF_DESCR, HSTF_TYPE,HSTF_ORDER ) 
+VALUES ( 'TMA_DATA_BATCH_PROCESSING_DCD', 'TMA5520', 'Inspection Download to DCD', 'M', 20)
+/
+
+INSERT INTO HIG_STANDARD_FAVOURITES 
+( HSTF_PARENT, HSTF_CHILD, HSTF_DESCR, HSTF_TYPE,HSTF_ORDER ) 
+VALUES ( 'TMA_DATA_BATCH_PROCESSING_DCD', 'TMA5530', 'Automatic Inspection Download to DCD', 'M', 30)
+/
+
+INSERT INTO HIG_STANDARD_FAVOURITES 
+( HSTF_PARENT, HSTF_CHILD, HSTF_DESCR, HSTF_TYPE,HSTF_ORDER ) 
+VALUES ( 'TMA_DATA_BATCH_PROCESSING_INSP', 'TMA5500', 'Inspection Download', 'M', 10)
+/
+
+INSERT INTO HIG_STANDARD_FAVOURITES 
+( HSTF_PARENT, HSTF_CHILD, HSTF_DESCR, HSTF_TYPE,HSTF_ORDER ) 
+VALUES ( 'TMA_DATA_BATCH_PROCESSING_INSP', 'TMA5510', 'Inspections Batch File Summary', 'M', 40)
+/
+
+INSERT INTO HIG_STANDARD_FAVOURITES 
+( HSTF_PARENT, HSTF_CHILD, HSTF_DESCR, HSTF_TYPE,HSTF_ORDER ) VALUES ( 'TMA_DATA_BATCH_PROCESSING_INSP', 'TMA5600', 'Inspection Upload', 'M', 20)
+/ 
+
+INSERT INTO HIG_STANDARD_FAVOURITES 
+( HSTF_PARENT, HSTF_CHILD, HSTF_DESCR, HSTF_TYPE,HSTF_ORDER ) VALUES ( 'TMA_DATA_BATCH_PROCESSING_INSP', 'TMA5610', 'Automatic Inspection Upload', 'M', 30)
+/
+
+INSERT INTO HIG_STANDARD_FAVOURITES 
+( HSTF_PARENT, HSTF_CHILD, HSTF_DESCR, HSTF_TYPE,HSTF_ORDER ) 
+VALUES ( 'TMA_DATA_BATCH_PROCESSING_INSP', 'TMA5620', 'Inspections Upload Transaction Summary', 'M', 50)
+/
+
+COMMIT;
 ------------------------------------------------------------------
 
 
@@ -1638,6 +1704,37 @@ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                   AND HMR_ROLE = 'NET_ADMIN');
                                     
 
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT nm_error 501
+SET TERM OFF
+
+-- GJ  15-JAN-2008
+-- 
+-- DEVELOPMENT COMMENTS
+-- New error - called in nm3xml package
+------------------------------------------------------------------
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,501
+       ,null
+       ,'XML Read error'
+       ,'Error suggests XML is not ''well formed''' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 501);
+
+commit;
 ------------------------------------------------------------------
 
 

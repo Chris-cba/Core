@@ -9,11 +9,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4020_nm4040_ddl_upg.sql-arc   3.0   Jan 11 2008 11:39:38   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4020_nm4040_ddl_upg.sql-arc   3.1   Jan 18 2008 08:36:34   jwadsworth  $
 --       Module Name      : $Workfile:   nm4020_nm4040_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jan 11 2008 11:39:38  $
---       Date fetched Out : $Modtime:   Jan 11 2008 11:39:00  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jan 18 2008 08:36:34  $
+--       Date fetched Out : $Modtime:   Jan 18 2008 08:33:18  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -453,6 +453,28 @@ ALTER TABLE HIG_MODULE_ITEMS ADD (CONSTRAINT
   ,HMB_BLOCK_NAME))
 /
 
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT NM_THEMES_ALL add missing default values
+SET TERM OFF
+
+-- SSC  17-JAN-2008
+-- 
+-- DEVELOPMENT COMMENTS
+-- NM-THEMES_ALL was missing default values on 3 columns.
+-- These have been added here.
+------------------------------------------------------------------
+alter table nm_themes_all modify NTH_LREF_MANDATORY default 'N'
+/
+
+alter table nm_themes_all modify NTH_USE_HISTORY default 'N'
+/
+
+alter table nm_themes_all modify nth_location_updatable default 'N'
+/
 ------------------------------------------------------------------
 
 
