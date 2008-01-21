@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY hig AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/hig.pkb-arc   2.1   Sep 03 2007 10:54:42   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/hig.pkb-arc   2.2   Jan 21 2008 13:54:32   gjohnson  $
 --       Module Name      : $Workfile:   hig.pkb  $
---       Date into SCCS   : $Date:   Sep 03 2007 10:54:42  $
---       Date fetched Out : $Modtime:   Sep 03 2007 09:21:44  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Jan 21 2008 13:54:32  $
+--       Date fetched Out : $Modtime:   Jan 21 2008 13:53:20  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on 1.39
 --
 --
@@ -1551,9 +1551,37 @@ BEGIN
    nm_debug.proc_end(g_package_name,'set_useopt');
 --
 END set_useopt;
-  --
-  -----------------------------------------------------------------------------
-  --
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE set_opt (pi_hov_id          hig_option_values.hov_id%TYPE
+                  ,pi_hov_value       hig_option_values.hov_value%TYPE
+                     ) IS
+--
+   l_rec_hov hig_option_values%ROWTYPE;
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'set_opt');
+--
+   l_rec_hov.hov_id          := pi_hov_id;
+   l_rec_hov.hov_value       := pi_hov_value;
+--
+   nm3del.del_hov (pi_hov_id          => l_rec_hov.hov_id
+                  ,pi_raise_not_found => FALSE
+                  );
+--
+   IF pi_hov_value IS NOT NULL
+    THEN
+      nm3ins.ins_hov (p_rec_hov => l_rec_hov);
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'set_opt');
+--
+END set_opt;
+--
+-----------------------------------------------------------------------------
+--
 PROCEDURE raise_constraint_violation_ner (pi_constraint_name IN hig_check_constraint_assocs.hcca_constraint_name%TYPE
                                          ,pi_sqlcode         IN pls_integer DEFAULT -20000
                                          ) IS

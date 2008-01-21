@@ -441,12 +441,22 @@ FUNCTION is_enterprise_edition RETURN boolean;
   ----------------------------------------------------------------------------------------------
   --
   --<PROC NAME="set_useopt">
-  -- Sets the user option
+  -- Sets the user option value
   --
   PROCEDURE set_useopt (pi_huo_hus_user_id hig_user_options.huo_hus_user_id%TYPE
                        ,pi_huo_id          hig_user_options.huo_id%TYPE
                        ,pi_huo_value       hig_user_options.huo_value%TYPE
                        );
+  --</PROC>
+  --
+  ----------------------------------------------------------------------------------------------
+  --
+  --<PROC NAME="set_opt">
+  -- Sets the product option value
+  --
+PROCEDURE set_opt (pi_hov_id          hig_option_values.hov_id%TYPE
+                  ,pi_hov_value       hig_option_values.hov_value%TYPE
+                     );
   --</PROC>
   --
   ----------------------------------------------------------------------------------------------
