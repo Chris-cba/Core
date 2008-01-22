@@ -2,15 +2,15 @@ CREATE OR REPLACE PACKAGE BODY nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.3   Aug 14 2007 17:27:02   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.4   Jan 22 2008 15:59:30   gjohnson  $
 --       Module Name      : $Workfile:   nm3flx.pkb  $
---       Date into PVCS   : $Date:   Aug 14 2007 17:27:02  $
---       Date fetched Out : $Modtime:   Aug 14 2007 14:40:58  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jan 22 2008 15:59:30  $
+--       Date fetched Out : $Modtime:   Jan 22 2008 15:58:54  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.47
 -------------------------------------------------------------------------
 --
-  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.3  $';
+  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.4  $';
 
    g_package_name    CONSTANT varchar2(30) := 'nm3flx';
 -- Package variables
@@ -1754,6 +1754,16 @@ BEGIN
    RETURN REPLACE(l_retval,' ',NULL);
 --
 END convert_seconds_to_hh_mi_ss;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION convert_hh_mi_ss_to_seconds(pi_hh_mi_ss IN VARCHAR2) RETURN VARCHAR2 IS
+
+BEGIN
+
+ RETURN to_char(to_date(pi_hh_mi_ss,'HH24:MI:SS'),'SSSSS');
+
+END convert_hh_mi_ss_to_seconds;
 --
 -----------------------------------------------------------------------------
 --
