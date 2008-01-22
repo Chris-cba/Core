@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkh-arc   2.3   Aug 14 2007 17:27:02   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkh-arc   2.4   Jan 22 2008 15:59:32   gjohnson  $
 --       Module Name      : $Workfile:   nm3flx.pkh  $
---       Date into PVCS   : $Date:   Aug 14 2007 17:27:02  $
---       Date fetched Out : $Modtime:   Aug 14 2007 14:24:24  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jan 22 2008 15:59:32  $
+--       Date fetched Out : $Modtime:   Jan 22 2008 15:58:56  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -479,11 +479,15 @@ FUNCTION get_file_extenstion (p_filename varchar2) RETURN varchar2;
 --
 -----------------------------------------------------------------------------
 --
---<PROC NAME="">
---  This function takes a number of seconds and returns HH:MI:SS.nn
---   for example 2680.34 would become
+--<PROC NAME="convert_seconds_to_hh_mi_ss">
+--  This function takes a number of seconds and returns HH:MI:SS
 --
 FUNCTION convert_seconds_to_hh_mi_ss (p_seconds number) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="convert_hh_mi_ss_to_seconds">
+FUNCTION convert_hh_mi_ss_to_seconds(pi_hh_mi_ss IN VARCHAR2) RETURN VARCHAR2;
 --</PROC>
 --
 -----------------------------------------------------------------------------
