@@ -9,11 +9,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4022_nm4040_ddl_upg.sql-arc   2.0   Jan 22 2008 10:27:58   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4022_nm4040_ddl_upg.sql-arc   2.1   Jan 23 2008 14:35:30   jwadsworth  $
 --       Module Name      : $Workfile:   nm4022_nm4040_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jan 22 2008 10:27:58  $
---       Date fetched Out : $Modtime:   Jan 22 2008 10:27:16  $
---       Version          : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Jan 23 2008 14:35:30  $
+--       Date fetched Out : $Modtime:   Jan 23 2008 14:32:38  $
+--       Version          : $Revision:   2.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -475,6 +475,27 @@ alter table nm_themes_all modify NTH_USE_HISTORY default 'N'
 
 alter table nm_themes_all modify nth_location_updatable default 'N'
 /
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New sequence GRS_LINE_NO_SEQ
+SET TERM OFF
+
+-- JWA  23-JAN-2008
+-- 
+-- DEVELOPMENT COMMENTS
+-- New sequence required for higgrip.
+------------------------------------------------------------------
+CREATE SEQUENCE GRS_LINE_NO_SEQ
+ START WITH 1
+ MAXVALUE 999999
+ MINVALUE 1
+ CYCLE
+ NOCACHE
+/
+
 ------------------------------------------------------------------
 
 
