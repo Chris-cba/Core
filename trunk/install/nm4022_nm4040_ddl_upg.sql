@@ -1,5 +1,5 @@
 ------------------------------------------------------------------
--- nm4022_nm4040_ddl_upg.sql
+-- nm4020_nm4040_ddl_upg.sql
 ------------------------------------------------------------------
 
 
@@ -9,11 +9,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4022_nm4040_ddl_upg.sql-arc   2.1   Jan 23 2008 14:35:30   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4022_nm4040_ddl_upg.sql-arc   2.2   Jan 23 2008 15:23:22   jwadsworth  $
 --       Module Name      : $Workfile:   nm4022_nm4040_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jan 23 2008 14:35:30  $
---       Date fetched Out : $Modtime:   Jan 23 2008 14:32:38  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jan 23 2008 15:23:22  $
+--       Date fetched Out : $Modtime:   Jan 23 2008 15:21:00  $
+--       Version          : $Revision:   2.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -495,6 +495,31 @@ CREATE SEQUENCE GRS_LINE_NO_SEQ
  CYCLE
  NOCACHE
 /
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT NM0575 Matching Records
+SET TERM OFF
+
+-- JWA  23-JAN-2008
+-- 
+-- DEVELOPMENT COMMENTS
+-- Creating temporary table
+------------------------------------------------------------------
+drop view nm0575_matching_records
+/
+create global temporary table nm0575_matching_records
+(
+  asset_category    varchar2(1),
+  asset_type        varchar2(4),
+  asset_type_descr  varchar2(80),
+  asset_count       number
+)
+/
+
 
 ------------------------------------------------------------------
 
