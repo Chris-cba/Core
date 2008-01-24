@@ -44,6 +44,7 @@ CREATE OR REPLACE PACKAGE BODY nm3locator AS
   g_locator_returned boolean DEFAULT FALSE;
   g_eastings         gis_data_objects.gdo_x_val%TYPE;
   g_northings        gis_data_objects.gdo_x_val%TYPE;
+  g_multi_coords     nm3sdo_gdo.tab_xys;
 --
 -----------------------------------------------------------------------------
 --
@@ -1729,7 +1730,7 @@ RETURN boolean IS
   l_tab_northings nm3type.tab_number;
   no_data EXCEPTION;
 BEGIN
-  nm_debug.debug_on;
+  --nm_debug.debug_on;
   nm_debug.debug('Parameters');
   nm_debug.debug('pi_session_id : '||pi_session_id);
   OPEN get_coords(pi_session_id);
@@ -1749,6 +1750,46 @@ EXCEPTION
     nm_debug.debug('Returning false');
     RETURN FALSE;
 END get_coords_from_session;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_multi_coords_from_gdo(pi_session_id IN gis_data_objects.gdo_session_id%TYPE
+                                  ,po_coords    OUT nm3sdo_gdo.tab_xys)
+RETURN boolean IS
+  CURSOR get_coords(p_session_id IN gis_data_objects.gdo_session_id%TYPE) IS
+  SELECT gdo_seq_no+1
+        ,gdo_x_val
+        ,gdo_y_val
+  FROM gis_data_objects g
+  WHERE gdo_session_id = p_session_id
+  AND   (gdo_x_val IS NOT NULL
+        OR gdo_y_val IS NOT NULL)
+  ORDER BY gdo_seq_no;
+
+  retval  nm3sdo_gdo.tab_xys;
+  no_data EXCEPTION;
+BEGIN
+  nm_debug.debug_on;
+  nm_debug.debug('In multi coords proc');
+  nm_debug.debug('Parameters');
+  nm_debug.debug('pi_session_id : '||pi_session_id);
+  OPEN get_coords(pi_session_id);
+  FETCH get_coords BULK COLLECT INTO retval;
+  CLOSE get_coords;
+
+  IF retval.COUNT = 0 THEN
+    RAISE no_data;
+  END IF;
+  
+  po_coords := retval;
+
+  nm_debug.debug('returning true');
+  RETURN TRUE;
+EXCEPTION
+  WHEN no_data THEN
+    nm_debug.debug('Returning false');
+    RETURN FALSE;
+END get_multi_coords_from_gdo;
 --
 -----------------------------------------------------------------------------
 --
@@ -1844,6 +1885,45 @@ BEGIN
   po_eastings  := g_eastings;
   po_northings := g_northings;
 END return_stored_coords;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE store_multi_coords
+            (pi_coords IN nm3sdo_gdo.tab_xys) 
+IS
+BEGIN
+  g_multi_coords := pi_coords;
+END store_multi_coords;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE return_multi_stored_coords
+            (po_coords OUT nm3sdo_gdo.tab_xys) 
+IS
+BEGIN
+  po_coords := g_multi_coords;
+END return_multi_stored_coords;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION is_gdo_multi_coord ( pi_gis_session_id IN gis_data_objects.gdo_session_id%TYPE)
+RETURN BOOLEAN
+IS
+  l_count NUMBER;
+BEGIN
+  SELECT COUNT(*) INTO l_count
+    FROM gis_data_objects
+   WHERE gdo_session_id = pi_gis_session_id;
+  IF l_count > 1
+  THEN
+    RETURN TRUE;
+  ELSE
+    RETURN FALSE;
+  END IF;
+EXCEPTION
+  WHEN NO_DATA_FOUND
+  THEN raise_application_error (-20999,'No coords exist for '||pi_gis_session_id||' in GIS_DATA_OBJECTS table');
+END is_gdo_multi_coord;
 --
 -----------------------------------------------------------------------------
 --
