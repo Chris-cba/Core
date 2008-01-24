@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.13   Jan 10 2008 18:07:16   sscanlon  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.14   Jan 24 2008 17:52:54   sscanlon  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Jan 10 2008 18:07:16  $
---       Date fetched Out : $Modtime:   Jan 10 2008 17:15:58  $
---       Version          : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Jan 24 2008 17:52:54  $
+--       Date fetched Out : $Modtime:   Jan 24 2008 17:44:24  $
+--       Version          : $Revision:   2.14  $
 --
 --   Product metadata script
 --
@@ -24,7 +24,7 @@ As at Release 4.0.4.0
 
 GENERATION DATE
 ===============
-10-JAN-2008 17:15
+24-JAN-2008 17:43
 
 TABLES PROCESSED
 ================
@@ -94232,6 +94232,40 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'TMA_ACT_OTHER_ACTIVITIES'
                     AND  HSTF_CHILD = 'TMA1170');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_REPORTS'
+       ,'TMA7010'
+       ,'Phase Due to Complete'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_REPORTS'
+                    AND  HSTF_CHILD = 'TMA7010');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'TMA_ACT_REPORTS'
+       ,'TMA7020'
+       ,'Phase Due to Start'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'TMA_ACT_REPORTS'
+                    AND  HSTF_CHILD = 'TMA7020');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
