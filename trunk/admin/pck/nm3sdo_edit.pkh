@@ -5,11 +5,11 @@ AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm3sdo_edit.pkh	1.4 08/02/06
---       Module Name      : nm3sdo_edit.pkh
---       Date into SCCS   : 06/08/02 16:34:28
---       Date fetched Out : 07/06/13 14:13:32
---       SCCS Version     : 1.4
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkh-arc   2.1   Jan 24 2008 20:33:42   aedwards  $
+--       Module Name      : $Workfile:   NM3SDO_EDIT.pkh  $
+--       Date into SCCS   : $Date:   Jan 24 2008 20:33:42  $
+--       Date fetched Out : $Modtime:   Jan 24 2008 20:32:20  $
+--       SCCS Version     : $Revision:   2.1  $
 --
 --  Author :  R Coupe
 --            A Edwards
@@ -22,7 +22,7 @@ AS
 --
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '@(#)nm3sdo_edit.pkh	1.4 08/02/06';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 -----------------------------------------------------------------------------
@@ -64,21 +64,11 @@ FUNCTION test_space
 --
 -----------------------------------------------------------------------------
 --
---<PROC NAME="set_srid">
+--<PROC NAME="aset_srid">
 -- Set SRID
 FUNCTION set_srid
           ( pi_geom IN mdsys.sdo_geometry
           , pi_srid IN NUMBER )
-  RETURN mdsys.sdo_geometry;
---</PROC>
---
------------------------------------------------------------------------------
---
---<PROC NAME="set_srid">
--- Set SRID by theme
-FUNCTION set_srid
-          ( pi_theme IN nm_themes_all.nth_theme_id%TYPE,
-            pi_geom IN mdsys.sdo_geometry )
   RETURN mdsys.sdo_geometry;
 --</PROC>
 --
@@ -164,7 +154,8 @@ PROCEDURE add_shape
          ( pi_nth_id IN NUMBER
          , pi_pk     IN NUMBER
          , pi_fk     IN NUMBER
-         , pi_shape  IN mdsys.sdo_geometry );
+         , pi_shape  IN mdsys.sdo_geometry 
+         , pi_start_dt IN DATE DEFAULT NULL);
 --
 -----------------------------------------------------------------------------
 --<PROC_NAME="process_inv_xy_update">
@@ -201,6 +192,16 @@ PROCEDURE update_point_lref
             , pi_lref_value IN nm_lref
             , pi_pk_value   IN VARCHAR2
             );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC_NAME="end_date_shape">
+-- End-dates a shape
+PROCEDURE end_date_shape
+          ( pi_nth_id IN NUMBER
+          , pi_pk     IN NUMBER
+          , pi_date   IN DATE );
+--</PROC>
 --
 -----------------------------------------------------------------------------
 --
