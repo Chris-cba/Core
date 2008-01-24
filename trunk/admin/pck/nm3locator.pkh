@@ -332,6 +332,12 @@ FUNCTION get_coords_from_session(pi_session_id IN gis_data_objects.gdo_session_i
                                 ,po_eastings   OUT gis_data_objects.gdo_x_val%TYPE
                                 ,po_northings  OUT gis_data_objects.gdo_y_val%TYPE) 
 RETURN boolean;
+--
+------------------------------------------------------------------------------
+--
+FUNCTION get_multi_coords_from_gdo(pi_session_id IN gis_data_objects.gdo_session_id%TYPE
+                                  ,po_coords    OUT nm3sdo_gdo.tab_xys ) 
+RETURN boolean;
 --</PROC>
 --
 -----------------------------------------------------------------------------
@@ -379,11 +385,34 @@ PROCEDURE trim_results_to_selected_items;
 --
 -- Supporting functions for locator lov functionality
 PROCEDURE set_locator_lov_return(p_retval IN boolean);
+--
+-----------------------------------------------------------------------------
+--
 FUNCTION locator_lov_return RETURN boolean;
+--
+-----------------------------------------------------------------------------
+--
 PROCEDURE store_coords(pi_eastings               IN    gis_data_objects.gdo_x_val%TYPE
                       ,pi_northings              IN    gis_data_objects.gdo_x_val%TYPE);
+--
+-----------------------------------------------------------------------------
+--
 PROCEDURE return_stored_coords(po_eastings       OUT    gis_data_objects.gdo_x_val%TYPE
                               ,po_northings      OUT    gis_data_objects.gdo_x_val%TYPE);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE store_multi_coords(pi_coords IN nm3sdo_gdo.tab_xys);
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE return_multi_stored_coords(po_coords OUT nm3sdo_gdo.tab_xys);
+
+FUNCTION is_gdo_multi_coord ( pi_gis_session_id IN gis_data_objects.gdo_session_id%TYPE)
+RETURN BOOLEAN;
+--
+-----------------------------------------------------------------------------
+--
 --</PROC>
 --
 -----------------------------------------------------------------------------
