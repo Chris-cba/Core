@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY hig AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/hig.pkb-arc   2.2   Jan 21 2008 13:54:32   gjohnson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/hig.pkb-arc   2.3   Jan 24 2008 15:31:00   gjohnson  $
 --       Module Name      : $Workfile:   hig.pkb  $
---       Date into SCCS   : $Date:   Jan 21 2008 13:54:32  $
---       Date fetched Out : $Modtime:   Jan 21 2008 13:53:20  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Jan 24 2008 15:31:00  $
+--       Date fetched Out : $Modtime:   Jan 22 2008 17:36:32  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 1.39
 --
 --
@@ -737,7 +737,38 @@ END valid_fk_hco;
 	,po_hco_meaning    => a_hco_meaning
         );
   END valid_fk_hco;
+--
+-----------------------------------------------------------------------------
+--
+ FUNCTION code_is_in_domain(pi_hco_code   IN hig_codes.hco_code%TYPE
+                           ,pi_hco_domain IN hig_codes.hco_domain%TYPE
+                           ) RETURN BOOLEAN IS
+ 
+ l_retval BOOLEAN := TRUE;
+                            
+ BEGIN
+ 
+  IF pi_hco_code IS NOT NULL THEN
 
+
+    BEGIN
+       hig.valid_fk_hco(pi_hco_domain  =>  upper(pi_hco_domain)
+                       ,pi_hco_code    =>  pi_hco_code);
+       l_retval := TRUE;
+    EXCEPTION
+       WHEN others THEN
+         l_retval := FALSE;
+    END;                      
+    
+                                                
+  END IF;                           
+
+  RETURN(l_retval);
+  
+END code_is_in_domain;
+--
+-----------------------------------------------------------------------------
+--
   -----------------------------------------------------------------------------
   -- Function to return nau_unit_code
   --

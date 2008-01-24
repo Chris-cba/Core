@@ -232,6 +232,13 @@ FUNCTION is_enterprise_edition RETURN boolean;
 	, a_date_mask   IN      varchar2 := 'DD-MON-YYYY'
   );
 --</PROC>
+--<PROC NAME="code_is_in_domain">
+-- is a given code in a given domain
+--
+FUNCTION code_is_in_domain(pi_hco_code   IN hig_codes.hco_code%TYPE
+                           ,pi_hco_domain IN hig_codes.hco_domain%TYPE
+                           ) RETURN BOOLEAN;
+--</PROC>
   -----------------------------------------------------------------------------
 --<PROC NAME="get_hau_unit_code">
   -- Function to return nau_unit_code
