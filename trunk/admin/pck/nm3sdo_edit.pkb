@@ -3,13 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3sdo_edit.pkb	1.11 08/02/06
---       Module Name      : nm3sdo_edit.pkb
---       Date into SCCS   : 06/08/02 16:30:24
---       Date fetched Out : 07/06/13 14:13:31
---       SCCS Version     : 1.11
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.1   Jan 24 2008 20:34:08   aedwards  $
+--       Module Name      : $Workfile:   NM3SDO_EDIT.pkb  $
+--       Date into SCCS   : $Date:   Jan 24 2008 20:34:08  $
+--       Date fetched Out : $Modtime:   Jan 24 2008 20:32:30  $
+--       SCCS Version     : $Revision:   2.1  $
 --
 --
 --  Author :  R Coupe
@@ -25,8 +23,8 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '@(#)nm3sdo_edit.pkb	1.11 08/02/06';
-  g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.1  $';
+  g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_lock';
 --
 -----------------------------------------------------------------------------
 --
@@ -62,21 +60,6 @@ BEGIN
                              );
 END set_srid;
 --
------------------------------------------------------------------------------
---
-FUNCTION set_srid (pi_theme IN nm_themes_all.nth_theme_id%TYPE, pi_geom IN MDSYS.SDO_GEOMETRY )
-   RETURN MDSYS.SDO_GEOMETRY
-IS
-l_usgm user_sdo_geom_metadata%ROWTYPE;
-BEGIN
-
-   l_usgm := Nm3sdo.get_theme_metadata( pi_theme );
-   
-   RETURN set_srid( pi_geom => pi_geom,
-                    pi_srid => l_usgm.srid ); 
-END set_srid;
---
-
 -----------------------------------------------------------------------------
 --
 /* Pass in a geometry and test to see if it's been locked in NM_AREA_LOCK
@@ -200,22 +183,19 @@ FUNCTION validate_geometry (
    RETURN VARCHAR2
 IS
    retval    VARCHAR2 (2000)       := 'FALSE';
-   l_usgm    user_sdo_geom_metadata%ROWTYPE := Nm3sdo.get_theme_metadata(pi_nth_theme_id);
+   diminfo   MDSYS.sdo_dim_array
+                                := Nm3sdo.get_theme_diminfo (pi_nth_theme_id);
    l_lrs     NUMBER;
    l_dim     NUMBER;
 BEGIN
    l_dim := pi_geom.get_dims ();
    l_lrs := pi_geom.get_lrs_dim ();
 
-   IF NVL( l_usgm.srid, -999999 ) != NVL(pi_geom.sdo_srid, Nm3type.c_big_number ) THEN
-     retval := '13365: Layer SRID does not match geometry SRID';
-   ELSE     
-     IF l_lrs > 0
-     THEN
-        retval := sdo_lrs.validate_lrs_geometry (pi_geom, l_usgm.diminfo);
-     ELSE
-        retval := sdo_geom.validate_geometry_with_context (pi_geom, l_usgm.diminfo);
-     END IF;
+   IF l_lrs > 0
+   THEN
+      retval := sdo_lrs.validate_lrs_geometry (pi_geom, diminfo);
+   ELSE
+      retval := sdo_geom.validate_geometry_with_context (pi_geom, diminfo);
    END IF;
 
    RETURN retval;
@@ -500,10 +480,10 @@ BEGIN
                      || ') VALUES ( :pi_pk, :pi_shape, :pi_date );'
                      ||' WHEN OTHERS THEN RAISE;'
                      ||'END;';
-      Nm_Debug.DEBUG ('Just before insert');
+      nm_debug.debug ('Just before insert');
          EXECUTE IMMEDIATE l_temp
                     USING pi_pk, pi_shape, pi_date;
-      Nm_Debug.DEBUG ('Just after insert');
+      nm_debug.debug ('Just after insert');
       END IF;
 
    ELSE
@@ -531,7 +511,7 @@ BEGIN
        END IF;
 
    END IF;
-   Nm_Debug.DEBUG('Finished move reshape');
+   nm_debug.debug('Finished move reshape');
 EXCEPTION
   WHEN OTHERS THEN RAISE;
 END;
@@ -573,7 +553,8 @@ PROCEDURE add_shape (
    pi_nth_id   IN   NUMBER,
    pi_pk       IN   NUMBER,
    pi_fk       IN   NUMBER,
-   pi_shape    IN   MDSYS.SDO_GEOMETRY
+   pi_shape    IN   MDSYS.SDO_GEOMETRY,
+   pi_start_dt IN   DATE DEFAULT NULL
 )
 IS
    l_nth       NM_THEMES_ALL%ROWTYPE   := Nm3get.get_nth (pi_nth_id);
@@ -590,13 +571,13 @@ BEGIN
    Nm_Debug.DEBUG (lstr);
 
    BEGIN
-      Nm_Debug.DEBUG ('X + Y = '||pi_shape.sdo_point.x||'-'||pi_shape.sdo_point.y);
+--      nm_debug.debug ('X + Y = '||pi_shape.sdo_point.x||'-'||pi_shape.sdo_point.y);
       EXECUTE IMMEDIATE lstr
         USING pi_shape, pi_pk;
 
       l_sqlcount := SQL%rowcount;
 
-      Nm_Debug.DEBUG('SQL COUNT = '||TO_CHAR(l_sqlcount));
+      nm_debug.debug('SQL COUNT = '||to_char(l_sqlcount)||' - using PK_ID = '||pi_pk);
       IF l_sqlcount = 0
       THEN
          Nm_Debug.DEBUG('No data found');
@@ -650,12 +631,12 @@ BEGIN
             AND l_nth.nth_end_date_column   IS NOT NULL
             THEN
             --
-              Nm_Debug.DEBUG ('X + Y = '||
-                              pi_shape.sdo_point.x||'-'||
-                              pi_shape.sdo_point.y);
+--              nm_debug.debug ('X + Y = '||
+--                              pi_shape.sdo_point.x||'-'||
+--                              pi_shape.sdo_point.y);
             --
               EXECUTE IMMEDIATE lstr
-                USING pi_pk, pi_fk, Nm3user.get_effective_date, pi_shape;
+                USING pi_pk, pi_fk, nvl(pi_start_dt,nm3user.get_effective_date), pi_shape;
             --
             ELSE
               EXECUTE IMMEDIATE lstr
@@ -668,12 +649,12 @@ BEGIN
             AND l_nth.nth_end_date_column   IS NOT NULL
             THEN
             --
-              Nm_Debug.DEBUG ('X + Y = '||
-                              pi_shape.sdo_point.x||'-'||
-                              pi_shape.sdo_point.y);
+--              nm_debug.debug ('X + Y = '||
+--                              pi_shape.sdo_point.x||'-'||
+--                              pi_shape.sdo_point.y);
             --
               EXECUTE IMMEDIATE lstr
-              USING pi_pk, Nm3user.get_effective_date, pi_shape;
+              USING pi_pk, nvl(pi_start_dt,nm3user.get_effective_date), pi_shape;
             --
             ELSE
               EXECUTE IMMEDIATE lstr
@@ -681,8 +662,8 @@ BEGIN
             END IF;
          END IF;
       END IF;
-   EXCEPTION
-      WHEN OTHERS THEN RAISE;
+--   EXCEPTION
+--      WHEN OTHERS THEN RAISE;
    END;
 --    nm_debug.debug_off;
 END;
@@ -787,7 +768,7 @@ BEGIN
     FETCH check_for_layer BULK COLLECT INTO l_tab_nith;
     CLOSE check_for_layer;
 --
-    Nm_Debug.DEBUG(' count = '||l_tab_nith.COUNT );
+    nm_debug.debug(' count = '||l_tab_nith.COUNT );
 --
     IF l_tab_nith.COUNT > 0
     THEN
@@ -807,13 +788,13 @@ BEGIN
         AND get_theme_gtype(l_rec_nth.nth_theme_id) = 2001
         THEN
           -- construct a new point shape
-          l_geom := Nm3sdo.get_2d_pt(l_rec_iit.iit_x, l_rec_iit.iit_y);
+          l_geom := nm3sdo.get_2d_pt(l_rec_iit.iit_x, l_rec_iit.iit_y);
 
           IF is_located ( pi_inv_type => l_rec_iit.iit_inv_type)
           THEN
           --
           --<RAC - 3.2.1.1
-            l_lref := Nm3sdo.get_nearest_lref( l_rec_nth.nth_theme_id, l_geom );
+            l_lref := nm3sdo.get_nearest_lref( l_rec_nth.nth_theme_id, l_geom );
 
             IF  l_lref.lr_ne_id IS NULL 
             AND is_inv_loc_mandatory( l_rec_iit.iit_inv_type) 
@@ -822,7 +803,7 @@ BEGIN
             END IF;
           --RAC>
           --
-            Nm3extent.create_temp_ne
+            nm3extent.create_temp_ne
                 ( l_lref.lr_ne_id
                 , Nm3extent.c_route
                 , l_lref.lr_offset
@@ -833,7 +814,7 @@ BEGIN
               Nm3homo.homo_update
               ( p_temp_ne_id_in  => g_nte_job_id
               , p_iit_ne_id      => l_rec_iit.iit_ne_id
-              , p_effective_date => Nm3user.get_effective_date);
+              , p_effective_date => nm3user.get_effective_date);
             EXCEPTION
               WHEN OTHERS
               THEN RAISE ;
@@ -910,6 +891,29 @@ BEGIN
 END update_point_lref;
 --
 -----------------------------------------------------------------------------
+--
+PROCEDURE end_date_shape
+          ( pi_nth_id IN NUMBER
+          , pi_pk     IN NUMBER
+          , pi_date   IN DATE )
+IS
+   l_nth       NM_THEMES_ALL%ROWTYPE   := Nm3get.get_nth (pi_nth_id);
+   lstr        Nm3type.max_varchar2;
+   lf          VARCHAR2 (1)            := CHR (10);
+   l_sqlcount  PLS_INTEGER;
+BEGIN
+   IF l_nth.nth_end_date_column IS NOT NULL
+   AND l_nth.nth_use_history = 'Y'
+   THEN
+     lstr := lstr || 'update ' || l_nth.nth_feature_table || lf;
+     lstr := lstr || '   set ' || l_nth.nth_end_date_column || ' = :pi_date'|| lf;
+     lstr := lstr || '   where ' || l_nth.nth_feature_pk_column || ' = :pi_pk'|| lf;
+     lstr := lstr || '     and ' ||l_nth.nth_end_date_column || ' is null';
+     EXECUTE IMMEDIATE lstr USING IN pi_date, pi_pk;
+   END IF;
+END end_date_shape;
+--
+------------------------------------------------------------------------------
 --
 END Nm3sdo_Edit;
 /
