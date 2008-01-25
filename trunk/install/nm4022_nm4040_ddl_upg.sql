@@ -1,5 +1,5 @@
 ------------------------------------------------------------------
--- nm4020_nm4040_ddl_upg.sql
+-- nm4022_nm4040_ddl_upg.sql
 ------------------------------------------------------------------
 
 
@@ -9,11 +9,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4022_nm4040_ddl_upg.sql-arc   2.2   Jan 23 2008 15:23:22   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4022_nm4040_ddl_upg.sql-arc   2.3   Jan 25 2008 13:17:30   jwadsworth  $
 --       Module Name      : $Workfile:   nm4022_nm4040_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jan 23 2008 15:23:22  $
---       Date fetched Out : $Modtime:   Jan 23 2008 15:21:00  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jan 25 2008 13:17:30  $
+--       Date fetched Out : $Modtime:   Jan 25 2008 13:15:44  $
+--       Version          : $Revision:   2.3  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
