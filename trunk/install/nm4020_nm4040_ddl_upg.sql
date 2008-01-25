@@ -9,11 +9,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4020_nm4040_ddl_upg.sql-arc   3.1   Jan 18 2008 08:36:34   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4020_nm4040_ddl_upg.sql-arc   3.2   Jan 25 2008 13:35:26   jwadsworth  $
 --       Module Name      : $Workfile:   nm4020_nm4040_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jan 18 2008 08:36:34  $
---       Date fetched Out : $Modtime:   Jan 18 2008 08:33:18  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jan 25 2008 13:35:26  $
+--       Date fetched Out : $Modtime:   Jan 25 2008 13:10:58  $
+--       Version          : $Revision:   3.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -475,6 +475,52 @@ alter table nm_themes_all modify NTH_USE_HISTORY default 'N'
 
 alter table nm_themes_all modify nth_location_updatable default 'N'
 /
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New sequence GRS_LINE_NO_SEQ
+SET TERM OFF
+
+-- JWA  23-JAN-2008
+-- 
+-- DEVELOPMENT COMMENTS
+-- New sequence required for higgrip.
+------------------------------------------------------------------
+CREATE SEQUENCE GRS_LINE_NO_SEQ
+ START WITH 1
+ MAXVALUE 999999
+ MINVALUE 1
+ CYCLE
+ NOCACHE
+/
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT NM0575 Matching Records
+SET TERM OFF
+
+-- JWA  23-JAN-2008
+-- 
+-- DEVELOPMENT COMMENTS
+-- Creating temporary table
+------------------------------------------------------------------
+drop view nm0575_matching_records
+/
+create global temporary table nm0575_matching_records
+(
+  asset_category    varchar2(1),
+  asset_type        varchar2(4),
+  asset_type_descr  varchar2(80),
+  asset_count       number
+)
+/
+
+
 ------------------------------------------------------------------
 
 
