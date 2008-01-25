@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.1   Jan 24 2008 20:34:08   aedwards  $
---       Module Name      : $Workfile:   NM3SDO_EDIT.pkb  $
---       Date into SCCS   : $Date:   Jan 24 2008 20:34:08  $
---       Date fetched Out : $Modtime:   Jan 24 2008 20:32:30  $
---       SCCS Version     : $Revision:   2.1  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.2   Jan 25 2008 21:39:04   aedwards  $
+--       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
+--       Date into SCCS   : $Date:   Jan 25 2008 21:39:04  $
+--       Date fetched Out : $Modtime:   Jan 25 2008 21:38:04  $
+--       SCCS Version     : $Revision:   2.2  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.1  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.2  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_lock';
 --
 -----------------------------------------------------------------------------
@@ -912,6 +912,25 @@ BEGIN
      EXECUTE IMMEDIATE lstr USING IN pi_date, pi_pk;
    END IF;
 END end_date_shape;
+--
+------------------------------------------------------------------------------
+--
+PROCEDURE delete_shape
+          ( pi_nth_id IN NUMBER
+          , pi_pk     IN NUMBER)
+IS
+  l_nth        NM_THEMES_ALL%ROWTYPE   := Nm3get.get_nth (pi_nth_id);
+   lstr        Nm3type.max_varchar2;
+   lf          VARCHAR2 (1)            := CHR (10);
+BEGIN
+  IF l_nth.nth_feature_table IS NOT NULL
+  AND l_nth.nth_feature_shape_column IS NOT NULL
+  THEN
+    lstr := lstr || 'delete ' || l_nth.nth_feature_table || lf;
+    lstr := lstr || ' where ' || l_nth.nth_feature_pk_column || ' = :pi_pk';
+    EXECUTE IMMEDIATE lstr USING IN pi_pk;
+  END IF;
+END delete_shape;
 --
 ------------------------------------------------------------------------------
 --
