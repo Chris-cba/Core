@@ -5,11 +5,11 @@ AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkh-arc   2.1   Jan 24 2008 20:33:42   aedwards  $
---       Module Name      : $Workfile:   NM3SDO_EDIT.pkh  $
---       Date into SCCS   : $Date:   Jan 24 2008 20:33:42  $
---       Date fetched Out : $Modtime:   Jan 24 2008 20:32:20  $
---       SCCS Version     : $Revision:   2.1  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkh-arc   2.2   Jan 25 2008 21:38:54   aedwards  $
+--       Module Name      : $Workfile:   nm3sdo_edit.pkh  $
+--       Date into SCCS   : $Date:   Jan 25 2008 21:38:54  $
+--       Date fetched Out : $Modtime:   Jan 25 2008 21:37:52  $
+--       SCCS Version     : $Revision:   2.2  $
 --
 --  Author :  R Coupe
 --            A Edwards
@@ -22,7 +22,7 @@ AS
 --
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.1  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 -----------------------------------------------------------------------------
@@ -143,6 +143,15 @@ PROCEDURE reshape
           ( pi_nth_id IN NUMBER
           , pi_pk     IN NUMBER
           , pi_shape  IN mdsys.sdo_geometry );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC_NAME="delete_shape">
+-- Deletes shape from feature table
+PROCEDURE delete_shape
+          ( pi_nth_id IN NUMBER
+          , pi_pk     IN NUMBER);
 --</PROC>
 --
 -----------------------------------------------------------------------------
