@@ -932,7 +932,7 @@ BEGIN
    l_geom := pi_geom;
 
    IF l_geom IS NOT NULL THEN
-     l_geom := Nm3sdo_Edit.set_srid( pi_gt_theme_id, l_geom );
+     l_geom := Nm3sdo.set_srid( pi_gt_theme_id, l_geom );
    END IF;     
 
    l_rec_gt := Nm3get.get_nth (pi_nth_theme_id => pi_gt_theme_id);
