@@ -2,14 +2,14 @@ CREATE OR REPLACE PACKAGE BODY Nm3homo_Gis AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+-- PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3homo_gis.pkb	1.24 08/03/06
---       Module Name      : nm3homo_gis.pkb
---       Date into SCCS   : 06/08/03 15:57:37
---       Date fetched Out : 07/06/13 14:11:45
---       SCCS Version     : 1.24
---
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_gis.pkb-arc   2.2   Jan 27 2008 09:02:34   jwadsworth  $
+-- Module Name : $Workfile:   nm3homo_gis.pkb  $
+-- Date into PVCS : $Date:   Jan 27 2008 09:02:34  $
+-- Date fetched Out : $Modtime:   Jan 27 2008 09:01:56  $
+-- PVCS Version : $Revision:   2.2  $
+-- Based on SCCS version : 
 --   Author : Jonathan Mills
 --
 --   GIS wrapper for asset (and other products) location package body
