@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3del.pkb-arc   2.4   Oct 04 2007 14:26:02   jwadsworth  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3del.pkb-arc   2.5   Jan 28 2008 10:52:52   jwadsworth  $
 --       Module Name      : $Workfile:   nm3del.pkb  $
---       Date into PVCS   : $Date:   Oct 04 2007 14:26:02  $
---       Date fetched Out : $Modtime:   Oct 04 2007 14:04:02  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jan 28 2008 10:52:52  $
+--       Date fetched Out : $Modtime:   Jan 27 2008 18:29:50  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.4  $"
+--   nm3get_gen body   : "$Revision:   2.5  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3del';
@@ -186,8 +186,8 @@ END del_dcl;
 --
 --   Procedure to del using DCL_UK1 constraint
 --
-PROCEDURE del_dcl (pi_dcl_dtp_code      doc_class.dcl_dtp_code%TYPE
-                  ,pi_dcl_name          doc_class.dcl_name%TYPE
+PROCEDURE del_dcl (pi_dcl_name          doc_class.dcl_name%TYPE
+                  ,pi_dcl_dtp_code      doc_class.dcl_dtp_code%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -199,8 +199,8 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_dcl
-                   (pi_dcl_dtp_code      => pi_dcl_dtp_code
-                   ,pi_dcl_name          => pi_dcl_name
+                   (pi_dcl_name          => pi_dcl_name
+                   ,pi_dcl_dtp_code      => pi_dcl_dtp_code
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
@@ -2841,9 +2841,9 @@ END del_nau;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using HAU_UK1 constraint
+--   Procedure to del using HAU_UK2 constraint
 --
-PROCEDURE del_nau (pi_nau_unit_code     nm_admin_units.nau_unit_code%TYPE
+PROCEDURE del_nau (pi_nau_name          nm_admin_units.nau_name%TYPE
                   ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
@@ -2856,7 +2856,7 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_nau
-                   (pi_nau_unit_code     => pi_nau_unit_code
+                   (pi_nau_name          => pi_nau_name
                    ,pi_nau_admin_type    => pi_nau_admin_type
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
@@ -2876,9 +2876,9 @@ END del_nau;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using HAU_UK2 constraint
+--   Procedure to del using HAU_UK1 constraint
 --
-PROCEDURE del_nau (pi_nau_name          nm_admin_units.nau_name%TYPE
+PROCEDURE del_nau (pi_nau_unit_code     nm_admin_units.nau_unit_code%TYPE
                   ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
@@ -2891,7 +2891,7 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_nau
-                   (pi_nau_name          => pi_nau_name
+                   (pi_nau_unit_code     => pi_nau_unit_code
                    ,pi_nau_admin_type    => pi_nau_admin_type
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
@@ -2944,9 +2944,9 @@ END del_nau_all;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using HAU_UK1 constraint
+--   Procedure to del using HAU_UK2 constraint
 --
-PROCEDURE del_nau_all (pi_nau_unit_code     nm_admin_units_all.nau_unit_code%TYPE
+PROCEDURE del_nau_all (pi_nau_name          nm_admin_units_all.nau_name%TYPE
                       ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
                       ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                       ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
@@ -2959,7 +2959,7 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_nau_all
-                   (pi_nau_unit_code     => pi_nau_unit_code
+                   (pi_nau_name          => pi_nau_name
                    ,pi_nau_admin_type    => pi_nau_admin_type
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
@@ -2979,9 +2979,9 @@ END del_nau_all;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using HAU_UK2 constraint
+--   Procedure to del using HAU_UK1 constraint
 --
-PROCEDURE del_nau_all (pi_nau_name          nm_admin_units_all.nau_name%TYPE
+PROCEDURE del_nau_all (pi_nau_unit_code     nm_admin_units_all.nau_unit_code%TYPE
                       ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
                       ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                       ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
@@ -2994,7 +2994,7 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_nau_all
-                   (pi_nau_name          => pi_nau_name
+                   (pi_nau_unit_code     => pi_nau_unit_code
                    ,pi_nau_admin_type    => pi_nau_admin_type
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
@@ -5227,10 +5227,10 @@ END del_ita;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using ITA_UK_VIEW_ATTRI constraint
+--   Procedure to del using ITA_UK_VIEW_COL constraint
 --
 PROCEDURE del_ita (pi_ita_inv_type      nm_inv_type_attribs.ita_inv_type%TYPE
-                  ,pi_ita_view_attri    nm_inv_type_attribs.ita_view_attri%TYPE
+                  ,pi_ita_view_col_name nm_inv_type_attribs.ita_view_col_name%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -5243,7 +5243,7 @@ BEGIN
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_ita
                    (pi_ita_inv_type      => pi_ita_inv_type
-                   ,pi_ita_view_attri    => pi_ita_view_attri
+                   ,pi_ita_view_col_name => pi_ita_view_col_name
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
@@ -5262,10 +5262,10 @@ END del_ita;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using ITA_UK_VIEW_COL constraint
+--   Procedure to del using ITA_UK_VIEW_ATTRI constraint
 --
 PROCEDURE del_ita (pi_ita_inv_type      nm_inv_type_attribs.ita_inv_type%TYPE
-                  ,pi_ita_view_col_name nm_inv_type_attribs.ita_view_col_name%TYPE
+                  ,pi_ita_view_attri    nm_inv_type_attribs.ita_view_attri%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -5278,7 +5278,7 @@ BEGIN
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_ita
                    (pi_ita_inv_type      => pi_ita_inv_type
-                   ,pi_ita_view_col_name => pi_ita_view_col_name
+                   ,pi_ita_view_attri    => pi_ita_view_attri
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
@@ -5332,10 +5332,10 @@ END del_ita_all;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using ITA_UK_VIEW_ATTRI constraint
+--   Procedure to del using ITA_UK_VIEW_COL constraint
 --
 PROCEDURE del_ita_all (pi_ita_inv_type      nm_inv_type_attribs_all.ita_inv_type%TYPE
-                      ,pi_ita_view_attri    nm_inv_type_attribs_all.ita_view_attri%TYPE
+                      ,pi_ita_view_col_name nm_inv_type_attribs_all.ita_view_col_name%TYPE
                       ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                       ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                       ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -5348,7 +5348,7 @@ BEGIN
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_ita_all
                    (pi_ita_inv_type      => pi_ita_inv_type
-                   ,pi_ita_view_attri    => pi_ita_view_attri
+                   ,pi_ita_view_col_name => pi_ita_view_col_name
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
@@ -5367,10 +5367,10 @@ END del_ita_all;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using ITA_UK_VIEW_COL constraint
+--   Procedure to del using ITA_UK_VIEW_ATTRI constraint
 --
 PROCEDURE del_ita_all (pi_ita_inv_type      nm_inv_type_attribs_all.ita_inv_type%TYPE
-                      ,pi_ita_view_col_name nm_inv_type_attribs_all.ita_view_col_name%TYPE
+                      ,pi_ita_view_attri    nm_inv_type_attribs_all.ita_view_attri%TYPE
                       ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                       ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                       ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -5383,7 +5383,7 @@ BEGIN
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_ita_all
                    (pi_ita_inv_type      => pi_ita_inv_type
-                   ,pi_ita_view_col_name => pi_ita_view_col_name
+                   ,pi_ita_view_attri    => pi_ita_view_attri
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
@@ -6240,39 +6240,6 @@ END del_nld;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using NLD_UK1 constraint
---
-PROCEDURE del_nld (pi_nld_table_name    nm_load_destinations.nld_table_name%TYPE
-                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                  ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                  ) IS
-   l_rowid ROWID;
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'del_nld');
---
-   -- Lock the row first
-   l_rowid := nm3lock_gen.lock_nld
-                   (pi_nld_table_name    => pi_nld_table_name
-                   ,pi_raise_not_found   => pi_raise_not_found
-                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
-                   ,pi_locked_sqlcode    => pi_locked_sqlcode
-                   );
---
-   IF l_rowid IS NOT NULL
-    THEN
-      DELETE nm_load_destinations nld
-      WHERE ROWID = l_rowid;
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'del_nld');
---
-END del_nld;
---
------------------------------------------------------------------------------
---
---
 --   Procedure to del using NLD_UK2 constraint
 --
 PROCEDURE del_nld (pi_nld_table_short_name nm_load_destinations.nld_table_short_name%TYPE
@@ -6291,6 +6258,39 @@ BEGIN
                    ,pi_raise_not_found      => pi_raise_not_found
                    ,pi_not_found_sqlcode    => pi_not_found_sqlcode
                    ,pi_locked_sqlcode       => pi_locked_sqlcode
+                   );
+--
+   IF l_rowid IS NOT NULL
+    THEN
+      DELETE nm_load_destinations nld
+      WHERE ROWID = l_rowid;
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'del_nld');
+--
+END del_nld;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Procedure to del using NLD_UK1 constraint
+--
+PROCEDURE del_nld (pi_nld_table_name    nm_load_destinations.nld_table_name%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                  ) IS
+   l_rowid ROWID;
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'del_nld');
+--
+   -- Lock the row first
+   l_rowid := nm3lock_gen.lock_nld
+                   (pi_nld_table_name    => pi_nld_table_name
+                   ,pi_raise_not_found   => pi_raise_not_found
+                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
+                   ,pi_locked_sqlcode    => pi_locked_sqlcode
                    );
 --
    IF l_rowid IS NOT NULL
@@ -8375,10 +8375,10 @@ END del_nod;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using NOD_SCRN_TEXT_UK constraint
+--   Procedure to del using NOD_UK constraint
 --
 PROCEDURE del_nod (pi_nod_nmo_operation nm_operation_data.nod_nmo_operation%TYPE
-                  ,pi_nod_scrn_text     nm_operation_data.nod_scrn_text%TYPE
+                  ,pi_nod_seq           nm_operation_data.nod_seq%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -8391,7 +8391,7 @@ BEGIN
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_nod
                    (pi_nod_nmo_operation => pi_nod_nmo_operation
-                   ,pi_nod_scrn_text     => pi_nod_scrn_text
+                   ,pi_nod_seq           => pi_nod_seq
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
@@ -8410,10 +8410,10 @@ END del_nod;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using NOD_UK constraint
+--   Procedure to del using NOD_SCRN_TEXT_UK constraint
 --
 PROCEDURE del_nod (pi_nod_nmo_operation nm_operation_data.nod_nmo_operation%TYPE
-                  ,pi_nod_seq           nm_operation_data.nod_seq%TYPE
+                  ,pi_nod_scrn_text     nm_operation_data.nod_scrn_text%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -8426,7 +8426,7 @@ BEGIN
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_nod
                    (pi_nod_nmo_operation => pi_nod_nmo_operation
-                   ,pi_nod_seq           => pi_nod_seq
+                   ,pi_nod_scrn_text     => pi_nod_scrn_text
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
@@ -9547,39 +9547,6 @@ END del_nti;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using NTI_PARENT_TYPE_UK constraint
---
-PROCEDURE del_nti (pi_nti_nw_parent_type nm_type_inclusion.nti_nw_parent_type%TYPE
-                  ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
-                  ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
-                  ,pi_locked_sqlcode     PLS_INTEGER DEFAULT -20000
-                  ) IS
-   l_rowid ROWID;
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'del_nti');
---
-   -- Lock the row first
-   l_rowid := nm3lock_gen.lock_nti
-                   (pi_nti_nw_parent_type => pi_nti_nw_parent_type
-                   ,pi_raise_not_found    => pi_raise_not_found
-                   ,pi_not_found_sqlcode  => pi_not_found_sqlcode
-                   ,pi_locked_sqlcode     => pi_locked_sqlcode
-                   );
---
-   IF l_rowid IS NOT NULL
-    THEN
-      DELETE nm_type_inclusion nti
-      WHERE ROWID = l_rowid;
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'del_nti');
---
-END del_nti;
---
------------------------------------------------------------------------------
---
---
 --   Procedure to del using NTI_UK constraint
 --
 PROCEDURE del_nti (pi_nti_nw_child_type nm_type_inclusion.nti_nw_child_type%TYPE
@@ -9600,6 +9567,39 @@ BEGIN
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
+                   );
+--
+   IF l_rowid IS NOT NULL
+    THEN
+      DELETE nm_type_inclusion nti
+      WHERE ROWID = l_rowid;
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'del_nti');
+--
+END del_nti;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Procedure to del using NTI_PARENT_TYPE_UK constraint
+--
+PROCEDURE del_nti (pi_nti_nw_parent_type nm_type_inclusion.nti_nw_parent_type%TYPE
+                  ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                  ,pi_locked_sqlcode     PLS_INTEGER DEFAULT -20000
+                  ) IS
+   l_rowid ROWID;
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'del_nti');
+--
+   -- Lock the row first
+   l_rowid := nm3lock_gen.lock_nti
+                   (pi_nti_nw_parent_type => pi_nti_nw_parent_type
+                   ,pi_raise_not_found    => pi_raise_not_found
+                   ,pi_not_found_sqlcode  => pi_not_found_sqlcode
+                   ,pi_locked_sqlcode     => pi_locked_sqlcode
                    );
 --
    IF l_rowid IS NOT NULL
