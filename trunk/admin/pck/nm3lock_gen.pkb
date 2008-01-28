@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock_gen.pkb-arc   2.4   Oct 04 2007 14:26:04   jwadsworth  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock_gen.pkb-arc   2.5   Jan 28 2008 10:52:54   jwadsworth  $
 --       Module Name      : $Workfile:   nm3lock_gen.pkb  $
---       Date into PVCS   : $Date:   Oct 04 2007 14:26:04  $
---       Date fetched Out : $Modtime:   Oct 04 2007 14:04:02  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jan 28 2008 10:52:54  $
+--       Date fetched Out : $Modtime:   Jan 27 2008 18:29:50  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.4  $"
+--   nm3get_gen body   : "$Revision:   2.5  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lock_gen';
@@ -406,8 +406,8 @@ END lock_dcl;
 --
 --   Function to lock using DCL_UK1 constraint
 --
-FUNCTION lock_dcl (pi_dcl_dtp_code      doc_class.dcl_dtp_code%TYPE
-                  ,pi_dcl_name          doc_class.dcl_name%TYPE
+FUNCTION lock_dcl (pi_dcl_name          doc_class.dcl_name%TYPE
+                  ,pi_dcl_dtp_code      doc_class.dcl_dtp_code%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -416,8 +416,8 @@ FUNCTION lock_dcl (pi_dcl_dtp_code      doc_class.dcl_dtp_code%TYPE
    CURSOR cs_dcl IS
    SELECT /*+ INDEX (dcl DCL_UK1) */ ROWID
     FROM  doc_class dcl
-   WHERE  dcl.dcl_dtp_code = pi_dcl_dtp_code
-    AND   dcl.dcl_name     = pi_dcl_name
+   WHERE  dcl.dcl_name     = pi_dcl_name
+    AND   dcl.dcl_dtp_code = pi_dcl_dtp_code
    FOR UPDATE NOWAIT;
 --
    l_found         BOOLEAN;
@@ -440,8 +440,8 @@ BEGIN
                     ,pi_id                 => 67
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'doc_class (DCL_UK1)'
-                                              ||CHR(10)||'dcl_dtp_code => '||pi_dcl_dtp_code
                                               ||CHR(10)||'dcl_name     => '||pi_dcl_name
+                                              ||CHR(10)||'dcl_dtp_code => '||pi_dcl_dtp_code
                     );
    END IF;
 --
@@ -457,8 +457,8 @@ EXCEPTION
                     ,pi_id                 => 33
                     ,pi_sqlcode            => pi_locked_sqlcode
                     ,pi_supplementary_info => 'doc_class (DCL_UK1)'
-                                              ||CHR(10)||'dcl_dtp_code => '||pi_dcl_dtp_code
                                               ||CHR(10)||'dcl_name     => '||pi_dcl_name
+                                              ||CHR(10)||'dcl_dtp_code => '||pi_dcl_dtp_code
                     );
 --
 END lock_dcl;
@@ -468,8 +468,8 @@ END lock_dcl;
 --
 --   Procedure to lock using DCL_UK1 constraint
 --
-PROCEDURE lock_dcl (pi_dcl_dtp_code      doc_class.dcl_dtp_code%TYPE
-                   ,pi_dcl_name          doc_class.dcl_name%TYPE
+PROCEDURE lock_dcl (pi_dcl_name          doc_class.dcl_name%TYPE
+                   ,pi_dcl_dtp_code      doc_class.dcl_dtp_code%TYPE
                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                    ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -482,8 +482,8 @@ BEGIN
    nm_debug.proc_start(g_package_name,'lock_dcl');
 --
    l_rowid := lock_dcl
-                   (pi_dcl_dtp_code      => pi_dcl_dtp_code
-                   ,pi_dcl_name          => pi_dcl_name
+                   (pi_dcl_name          => pi_dcl_name
+                   ,pi_dcl_dtp_code      => pi_dcl_dtp_code
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    );
@@ -7297,97 +7297,6 @@ END lock_nau;
 -----------------------------------------------------------------------------
 --
 --
---   Function to lock using HAU_UK1 constraint
---
-FUNCTION lock_nau (pi_nau_unit_code     nm_admin_units.nau_unit_code%TYPE
-                  ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
-                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                  ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                  ) RETURN ROWID IS
---
-   CURSOR cs_nau IS
-   SELECT /*+ INDEX (nau HAU_UK1) */ ROWID
-    FROM  nm_admin_units nau
-   WHERE  nau.nau_unit_code  = pi_nau_unit_code
-    AND   nau.nau_admin_type = pi_nau_admin_type
-   FOR UPDATE NOWAIT;
---
-   l_found         BOOLEAN;
-   l_retval        ROWID;
-   l_record_locked EXCEPTION;
-   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_nau');
---
-   OPEN  cs_nau;
-   FETCH cs_nau INTO l_retval;
-   l_found := cs_nau%FOUND;
-   CLOSE cs_nau;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_admin_units (HAU_UK1)'
-                                              ||CHR(10)||'nau_unit_code  => '||pi_nau_unit_code
-                                              ||CHR(10)||'nau_admin_type => '||pi_nau_admin_type
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'lock_nau');
---
-   RETURN l_retval;
---
-EXCEPTION
---
-   WHEN l_record_locked
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 33
-                    ,pi_sqlcode            => pi_locked_sqlcode
-                    ,pi_supplementary_info => 'nm_admin_units (HAU_UK1)'
-                                              ||CHR(10)||'nau_unit_code  => '||pi_nau_unit_code
-                                              ||CHR(10)||'nau_admin_type => '||pi_nau_admin_type
-                    );
---
-END lock_nau;
---
------------------------------------------------------------------------------
---
---
---   Procedure to lock using HAU_UK1 constraint
---
-PROCEDURE lock_nau (pi_nau_unit_code     nm_admin_units.nau_unit_code%TYPE
-                   ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
-                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                   ) IS
---
-   l_rowid ROWID;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_nau');
---
-   l_rowid := lock_nau
-                   (pi_nau_unit_code     => pi_nau_unit_code
-                   ,pi_nau_admin_type    => pi_nau_admin_type
-                   ,pi_raise_not_found   => pi_raise_not_found
-                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
-                   );
---
-   nm_debug.proc_end(g_package_name,'lock_nau');
---
-END lock_nau;
---
------------------------------------------------------------------------------
---
---
 --   Function to lock using HAU_UK2 constraint
 --
 FUNCTION lock_nau (pi_nau_name          nm_admin_units.nau_name%TYPE
@@ -7467,6 +7376,97 @@ BEGIN
 --
    l_rowid := lock_nau
                    (pi_nau_name          => pi_nau_name
+                   ,pi_nau_admin_type    => pi_nau_admin_type
+                   ,pi_raise_not_found   => pi_raise_not_found
+                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
+                   );
+--
+   nm_debug.proc_end(g_package_name,'lock_nau');
+--
+END lock_nau;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Function to lock using HAU_UK1 constraint
+--
+FUNCTION lock_nau (pi_nau_unit_code     nm_admin_units.nau_unit_code%TYPE
+                  ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                  ) RETURN ROWID IS
+--
+   CURSOR cs_nau IS
+   SELECT /*+ INDEX (nau HAU_UK1) */ ROWID
+    FROM  nm_admin_units nau
+   WHERE  nau.nau_unit_code  = pi_nau_unit_code
+    AND   nau.nau_admin_type = pi_nau_admin_type
+   FOR UPDATE NOWAIT;
+--
+   l_found         BOOLEAN;
+   l_retval        ROWID;
+   l_record_locked EXCEPTION;
+   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'lock_nau');
+--
+   OPEN  cs_nau;
+   FETCH cs_nau INTO l_retval;
+   l_found := cs_nau%FOUND;
+   CLOSE cs_nau;
+--
+   IF pi_raise_not_found AND NOT l_found
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 67
+                    ,pi_sqlcode            => pi_not_found_sqlcode
+                    ,pi_supplementary_info => 'nm_admin_units (HAU_UK1)'
+                                              ||CHR(10)||'nau_unit_code  => '||pi_nau_unit_code
+                                              ||CHR(10)||'nau_admin_type => '||pi_nau_admin_type
+                    );
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'lock_nau');
+--
+   RETURN l_retval;
+--
+EXCEPTION
+--
+   WHEN l_record_locked
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 33
+                    ,pi_sqlcode            => pi_locked_sqlcode
+                    ,pi_supplementary_info => 'nm_admin_units (HAU_UK1)'
+                                              ||CHR(10)||'nau_unit_code  => '||pi_nau_unit_code
+                                              ||CHR(10)||'nau_admin_type => '||pi_nau_admin_type
+                    );
+--
+END lock_nau;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Procedure to lock using HAU_UK1 constraint
+--
+PROCEDURE lock_nau (pi_nau_unit_code     nm_admin_units.nau_unit_code%TYPE
+                   ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                   ) IS
+--
+   l_rowid ROWID;
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'lock_nau');
+--
+   l_rowid := lock_nau
+                   (pi_nau_unit_code     => pi_nau_unit_code
                    ,pi_nau_admin_type    => pi_nau_admin_type
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
@@ -7564,97 +7564,6 @@ END lock_nau_all;
 -----------------------------------------------------------------------------
 --
 --
---   Function to lock using HAU_UK1 constraint
---
-FUNCTION lock_nau_all (pi_nau_unit_code     nm_admin_units_all.nau_unit_code%TYPE
-                      ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
-                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                      ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                      ) RETURN ROWID IS
---
-   CURSOR cs_nau_all IS
-   SELECT /*+ INDEX (nau_all HAU_UK1) */ ROWID
-    FROM  nm_admin_units_all nau_all
-   WHERE  nau_all.nau_unit_code  = pi_nau_unit_code
-    AND   nau_all.nau_admin_type = pi_nau_admin_type
-   FOR UPDATE NOWAIT;
---
-   l_found         BOOLEAN;
-   l_retval        ROWID;
-   l_record_locked EXCEPTION;
-   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_nau_all');
---
-   OPEN  cs_nau_all;
-   FETCH cs_nau_all INTO l_retval;
-   l_found := cs_nau_all%FOUND;
-   CLOSE cs_nau_all;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_admin_units_all (HAU_UK1)'
-                                              ||CHR(10)||'nau_unit_code  => '||pi_nau_unit_code
-                                              ||CHR(10)||'nau_admin_type => '||pi_nau_admin_type
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'lock_nau_all');
---
-   RETURN l_retval;
---
-EXCEPTION
---
-   WHEN l_record_locked
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 33
-                    ,pi_sqlcode            => pi_locked_sqlcode
-                    ,pi_supplementary_info => 'nm_admin_units_all (HAU_UK1)'
-                                              ||CHR(10)||'nau_unit_code  => '||pi_nau_unit_code
-                                              ||CHR(10)||'nau_admin_type => '||pi_nau_admin_type
-                    );
---
-END lock_nau_all;
---
------------------------------------------------------------------------------
---
---
---   Procedure to lock using HAU_UK1 constraint
---
-PROCEDURE lock_nau_all (pi_nau_unit_code     nm_admin_units_all.nau_unit_code%TYPE
-                       ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
-                       ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                       ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                       ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                       ) IS
---
-   l_rowid ROWID;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_nau_all');
---
-   l_rowid := lock_nau_all
-                   (pi_nau_unit_code     => pi_nau_unit_code
-                   ,pi_nau_admin_type    => pi_nau_admin_type
-                   ,pi_raise_not_found   => pi_raise_not_found
-                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
-                   );
---
-   nm_debug.proc_end(g_package_name,'lock_nau_all');
---
-END lock_nau_all;
---
------------------------------------------------------------------------------
---
---
 --   Function to lock using HAU_UK2 constraint
 --
 FUNCTION lock_nau_all (pi_nau_name          nm_admin_units_all.nau_name%TYPE
@@ -7734,6 +7643,97 @@ BEGIN
 --
    l_rowid := lock_nau_all
                    (pi_nau_name          => pi_nau_name
+                   ,pi_nau_admin_type    => pi_nau_admin_type
+                   ,pi_raise_not_found   => pi_raise_not_found
+                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
+                   );
+--
+   nm_debug.proc_end(g_package_name,'lock_nau_all');
+--
+END lock_nau_all;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Function to lock using HAU_UK1 constraint
+--
+FUNCTION lock_nau_all (pi_nau_unit_code     nm_admin_units_all.nau_unit_code%TYPE
+                      ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
+                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                      ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                      ) RETURN ROWID IS
+--
+   CURSOR cs_nau_all IS
+   SELECT /*+ INDEX (nau_all HAU_UK1) */ ROWID
+    FROM  nm_admin_units_all nau_all
+   WHERE  nau_all.nau_unit_code  = pi_nau_unit_code
+    AND   nau_all.nau_admin_type = pi_nau_admin_type
+   FOR UPDATE NOWAIT;
+--
+   l_found         BOOLEAN;
+   l_retval        ROWID;
+   l_record_locked EXCEPTION;
+   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'lock_nau_all');
+--
+   OPEN  cs_nau_all;
+   FETCH cs_nau_all INTO l_retval;
+   l_found := cs_nau_all%FOUND;
+   CLOSE cs_nau_all;
+--
+   IF pi_raise_not_found AND NOT l_found
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 67
+                    ,pi_sqlcode            => pi_not_found_sqlcode
+                    ,pi_supplementary_info => 'nm_admin_units_all (HAU_UK1)'
+                                              ||CHR(10)||'nau_unit_code  => '||pi_nau_unit_code
+                                              ||CHR(10)||'nau_admin_type => '||pi_nau_admin_type
+                    );
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'lock_nau_all');
+--
+   RETURN l_retval;
+--
+EXCEPTION
+--
+   WHEN l_record_locked
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 33
+                    ,pi_sqlcode            => pi_locked_sqlcode
+                    ,pi_supplementary_info => 'nm_admin_units_all (HAU_UK1)'
+                                              ||CHR(10)||'nau_unit_code  => '||pi_nau_unit_code
+                                              ||CHR(10)||'nau_admin_type => '||pi_nau_admin_type
+                    );
+--
+END lock_nau_all;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Procedure to lock using HAU_UK1 constraint
+--
+PROCEDURE lock_nau_all (pi_nau_unit_code     nm_admin_units_all.nau_unit_code%TYPE
+                       ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
+                       ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                       ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                       ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                       ) IS
+--
+   l_rowid ROWID;
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'lock_nau_all');
+--
+   l_rowid := lock_nau_all
+                   (pi_nau_unit_code     => pi_nau_unit_code
                    ,pi_nau_admin_type    => pi_nau_admin_type
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
@@ -12916,97 +12916,6 @@ END lock_ita;
 -----------------------------------------------------------------------------
 --
 --
---   Function to lock using ITA_UK_VIEW_ATTRI constraint
---
-FUNCTION lock_ita (pi_ita_inv_type      nm_inv_type_attribs.ita_inv_type%TYPE
-                  ,pi_ita_view_attri    nm_inv_type_attribs.ita_view_attri%TYPE
-                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                  ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                  ) RETURN ROWID IS
---
-   CURSOR cs_ita IS
-   SELECT /*+ INDEX (ita ITA_UK_VIEW_ATTRI) */ ROWID
-    FROM  nm_inv_type_attribs ita
-   WHERE  ita.ita_inv_type   = pi_ita_inv_type
-    AND   ita.ita_view_attri = pi_ita_view_attri
-   FOR UPDATE NOWAIT;
---
-   l_found         BOOLEAN;
-   l_retval        ROWID;
-   l_record_locked EXCEPTION;
-   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_ita');
---
-   OPEN  cs_ita;
-   FETCH cs_ita INTO l_retval;
-   l_found := cs_ita%FOUND;
-   CLOSE cs_ita;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_inv_type_attribs (ITA_UK_VIEW_ATTRI)'
-                                              ||CHR(10)||'ita_inv_type   => '||pi_ita_inv_type
-                                              ||CHR(10)||'ita_view_attri => '||pi_ita_view_attri
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'lock_ita');
---
-   RETURN l_retval;
---
-EXCEPTION
---
-   WHEN l_record_locked
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 33
-                    ,pi_sqlcode            => pi_locked_sqlcode
-                    ,pi_supplementary_info => 'nm_inv_type_attribs (ITA_UK_VIEW_ATTRI)'
-                                              ||CHR(10)||'ita_inv_type   => '||pi_ita_inv_type
-                                              ||CHR(10)||'ita_view_attri => '||pi_ita_view_attri
-                    );
---
-END lock_ita;
---
------------------------------------------------------------------------------
---
---
---   Procedure to lock using ITA_UK_VIEW_ATTRI constraint
---
-PROCEDURE lock_ita (pi_ita_inv_type      nm_inv_type_attribs.ita_inv_type%TYPE
-                   ,pi_ita_view_attri    nm_inv_type_attribs.ita_view_attri%TYPE
-                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                   ) IS
---
-   l_rowid ROWID;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_ita');
---
-   l_rowid := lock_ita
-                   (pi_ita_inv_type      => pi_ita_inv_type
-                   ,pi_ita_view_attri    => pi_ita_view_attri
-                   ,pi_raise_not_found   => pi_raise_not_found
-                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
-                   );
---
-   nm_debug.proc_end(g_package_name,'lock_ita');
---
-END lock_ita;
---
------------------------------------------------------------------------------
---
---
 --   Function to lock using ITA_UK_VIEW_COL constraint
 --
 FUNCTION lock_ita (pi_ita_inv_type      nm_inv_type_attribs.ita_inv_type%TYPE
@@ -13087,6 +12996,97 @@ BEGIN
    l_rowid := lock_ita
                    (pi_ita_inv_type      => pi_ita_inv_type
                    ,pi_ita_view_col_name => pi_ita_view_col_name
+                   ,pi_raise_not_found   => pi_raise_not_found
+                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
+                   );
+--
+   nm_debug.proc_end(g_package_name,'lock_ita');
+--
+END lock_ita;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Function to lock using ITA_UK_VIEW_ATTRI constraint
+--
+FUNCTION lock_ita (pi_ita_inv_type      nm_inv_type_attribs.ita_inv_type%TYPE
+                  ,pi_ita_view_attri    nm_inv_type_attribs.ita_view_attri%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                  ) RETURN ROWID IS
+--
+   CURSOR cs_ita IS
+   SELECT /*+ INDEX (ita ITA_UK_VIEW_ATTRI) */ ROWID
+    FROM  nm_inv_type_attribs ita
+   WHERE  ita.ita_inv_type   = pi_ita_inv_type
+    AND   ita.ita_view_attri = pi_ita_view_attri
+   FOR UPDATE NOWAIT;
+--
+   l_found         BOOLEAN;
+   l_retval        ROWID;
+   l_record_locked EXCEPTION;
+   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'lock_ita');
+--
+   OPEN  cs_ita;
+   FETCH cs_ita INTO l_retval;
+   l_found := cs_ita%FOUND;
+   CLOSE cs_ita;
+--
+   IF pi_raise_not_found AND NOT l_found
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 67
+                    ,pi_sqlcode            => pi_not_found_sqlcode
+                    ,pi_supplementary_info => 'nm_inv_type_attribs (ITA_UK_VIEW_ATTRI)'
+                                              ||CHR(10)||'ita_inv_type   => '||pi_ita_inv_type
+                                              ||CHR(10)||'ita_view_attri => '||pi_ita_view_attri
+                    );
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'lock_ita');
+--
+   RETURN l_retval;
+--
+EXCEPTION
+--
+   WHEN l_record_locked
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 33
+                    ,pi_sqlcode            => pi_locked_sqlcode
+                    ,pi_supplementary_info => 'nm_inv_type_attribs (ITA_UK_VIEW_ATTRI)'
+                                              ||CHR(10)||'ita_inv_type   => '||pi_ita_inv_type
+                                              ||CHR(10)||'ita_view_attri => '||pi_ita_view_attri
+                    );
+--
+END lock_ita;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Procedure to lock using ITA_UK_VIEW_ATTRI constraint
+--
+PROCEDURE lock_ita (pi_ita_inv_type      nm_inv_type_attribs.ita_inv_type%TYPE
+                   ,pi_ita_view_attri    nm_inv_type_attribs.ita_view_attri%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                   ) IS
+--
+   l_rowid ROWID;
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'lock_ita');
+--
+   l_rowid := lock_ita
+                   (pi_ita_inv_type      => pi_ita_inv_type
+                   ,pi_ita_view_attri    => pi_ita_view_attri
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    );
@@ -13189,97 +13189,6 @@ END lock_ita_all;
 -----------------------------------------------------------------------------
 --
 --
---   Function to lock using ITA_UK_VIEW_ATTRI constraint
---
-FUNCTION lock_ita_all (pi_ita_inv_type      nm_inv_type_attribs_all.ita_inv_type%TYPE
-                      ,pi_ita_view_attri    nm_inv_type_attribs_all.ita_view_attri%TYPE
-                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                      ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                      ) RETURN ROWID IS
---
-   CURSOR cs_ita_all IS
-   SELECT /*+ INDEX (ita_all ITA_UK_VIEW_ATTRI) */ ROWID
-    FROM  nm_inv_type_attribs_all ita_all
-   WHERE  ita_all.ita_inv_type   = pi_ita_inv_type
-    AND   ita_all.ita_view_attri = pi_ita_view_attri
-   FOR UPDATE NOWAIT;
---
-   l_found         BOOLEAN;
-   l_retval        ROWID;
-   l_record_locked EXCEPTION;
-   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_ita_all');
---
-   OPEN  cs_ita_all;
-   FETCH cs_ita_all INTO l_retval;
-   l_found := cs_ita_all%FOUND;
-   CLOSE cs_ita_all;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_inv_type_attribs_all (ITA_UK_VIEW_ATTRI)'
-                                              ||CHR(10)||'ita_inv_type   => '||pi_ita_inv_type
-                                              ||CHR(10)||'ita_view_attri => '||pi_ita_view_attri
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'lock_ita_all');
---
-   RETURN l_retval;
---
-EXCEPTION
---
-   WHEN l_record_locked
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 33
-                    ,pi_sqlcode            => pi_locked_sqlcode
-                    ,pi_supplementary_info => 'nm_inv_type_attribs_all (ITA_UK_VIEW_ATTRI)'
-                                              ||CHR(10)||'ita_inv_type   => '||pi_ita_inv_type
-                                              ||CHR(10)||'ita_view_attri => '||pi_ita_view_attri
-                    );
---
-END lock_ita_all;
---
------------------------------------------------------------------------------
---
---
---   Procedure to lock using ITA_UK_VIEW_ATTRI constraint
---
-PROCEDURE lock_ita_all (pi_ita_inv_type      nm_inv_type_attribs_all.ita_inv_type%TYPE
-                       ,pi_ita_view_attri    nm_inv_type_attribs_all.ita_view_attri%TYPE
-                       ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                       ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                       ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                       ) IS
---
-   l_rowid ROWID;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_ita_all');
---
-   l_rowid := lock_ita_all
-                   (pi_ita_inv_type      => pi_ita_inv_type
-                   ,pi_ita_view_attri    => pi_ita_view_attri
-                   ,pi_raise_not_found   => pi_raise_not_found
-                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
-                   );
---
-   nm_debug.proc_end(g_package_name,'lock_ita_all');
---
-END lock_ita_all;
---
------------------------------------------------------------------------------
---
---
 --   Function to lock using ITA_UK_VIEW_COL constraint
 --
 FUNCTION lock_ita_all (pi_ita_inv_type      nm_inv_type_attribs_all.ita_inv_type%TYPE
@@ -13360,6 +13269,97 @@ BEGIN
    l_rowid := lock_ita_all
                    (pi_ita_inv_type      => pi_ita_inv_type
                    ,pi_ita_view_col_name => pi_ita_view_col_name
+                   ,pi_raise_not_found   => pi_raise_not_found
+                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
+                   );
+--
+   nm_debug.proc_end(g_package_name,'lock_ita_all');
+--
+END lock_ita_all;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Function to lock using ITA_UK_VIEW_ATTRI constraint
+--
+FUNCTION lock_ita_all (pi_ita_inv_type      nm_inv_type_attribs_all.ita_inv_type%TYPE
+                      ,pi_ita_view_attri    nm_inv_type_attribs_all.ita_view_attri%TYPE
+                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                      ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                      ) RETURN ROWID IS
+--
+   CURSOR cs_ita_all IS
+   SELECT /*+ INDEX (ita_all ITA_UK_VIEW_ATTRI) */ ROWID
+    FROM  nm_inv_type_attribs_all ita_all
+   WHERE  ita_all.ita_inv_type   = pi_ita_inv_type
+    AND   ita_all.ita_view_attri = pi_ita_view_attri
+   FOR UPDATE NOWAIT;
+--
+   l_found         BOOLEAN;
+   l_retval        ROWID;
+   l_record_locked EXCEPTION;
+   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'lock_ita_all');
+--
+   OPEN  cs_ita_all;
+   FETCH cs_ita_all INTO l_retval;
+   l_found := cs_ita_all%FOUND;
+   CLOSE cs_ita_all;
+--
+   IF pi_raise_not_found AND NOT l_found
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 67
+                    ,pi_sqlcode            => pi_not_found_sqlcode
+                    ,pi_supplementary_info => 'nm_inv_type_attribs_all (ITA_UK_VIEW_ATTRI)'
+                                              ||CHR(10)||'ita_inv_type   => '||pi_ita_inv_type
+                                              ||CHR(10)||'ita_view_attri => '||pi_ita_view_attri
+                    );
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'lock_ita_all');
+--
+   RETURN l_retval;
+--
+EXCEPTION
+--
+   WHEN l_record_locked
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 33
+                    ,pi_sqlcode            => pi_locked_sqlcode
+                    ,pi_supplementary_info => 'nm_inv_type_attribs_all (ITA_UK_VIEW_ATTRI)'
+                                              ||CHR(10)||'ita_inv_type   => '||pi_ita_inv_type
+                                              ||CHR(10)||'ita_view_attri => '||pi_ita_view_attri
+                    );
+--
+END lock_ita_all;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Procedure to lock using ITA_UK_VIEW_ATTRI constraint
+--
+PROCEDURE lock_ita_all (pi_ita_inv_type      nm_inv_type_attribs_all.ita_inv_type%TYPE
+                       ,pi_ita_view_attri    nm_inv_type_attribs_all.ita_view_attri%TYPE
+                       ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                       ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                       ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                       ) IS
+--
+   l_rowid ROWID;
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'lock_ita_all');
+--
+   l_rowid := lock_ita_all
+                   (pi_ita_inv_type      => pi_ita_inv_type
+                   ,pi_ita_view_attri    => pi_ita_view_attri
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    );
@@ -15549,91 +15549,6 @@ END lock_nld;
 -----------------------------------------------------------------------------
 --
 --
---   Function to lock using NLD_UK1 constraint
---
-FUNCTION lock_nld (pi_nld_table_name    nm_load_destinations.nld_table_name%TYPE
-                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                  ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                  ) RETURN ROWID IS
---
-   CURSOR cs_nld IS
-   SELECT /*+ INDEX (nld NLD_UK1) */ ROWID
-    FROM  nm_load_destinations nld
-   WHERE  nld.nld_table_name = pi_nld_table_name
-   FOR UPDATE NOWAIT;
---
-   l_found         BOOLEAN;
-   l_retval        ROWID;
-   l_record_locked EXCEPTION;
-   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_nld');
---
-   OPEN  cs_nld;
-   FETCH cs_nld INTO l_retval;
-   l_found := cs_nld%FOUND;
-   CLOSE cs_nld;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_load_destinations (NLD_UK1)'
-                                              ||CHR(10)||'nld_table_name => '||pi_nld_table_name
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'lock_nld');
---
-   RETURN l_retval;
---
-EXCEPTION
---
-   WHEN l_record_locked
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 33
-                    ,pi_sqlcode            => pi_locked_sqlcode
-                    ,pi_supplementary_info => 'nm_load_destinations (NLD_UK1)'
-                                              ||CHR(10)||'nld_table_name => '||pi_nld_table_name
-                    );
---
-END lock_nld;
---
------------------------------------------------------------------------------
---
---
---   Procedure to lock using NLD_UK1 constraint
---
-PROCEDURE lock_nld (pi_nld_table_name    nm_load_destinations.nld_table_name%TYPE
-                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                   ) IS
---
-   l_rowid ROWID;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_nld');
---
-   l_rowid := lock_nld
-                   (pi_nld_table_name    => pi_nld_table_name
-                   ,pi_raise_not_found   => pi_raise_not_found
-                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
-                   );
---
-   nm_debug.proc_end(g_package_name,'lock_nld');
---
-END lock_nld;
---
------------------------------------------------------------------------------
---
---
 --   Function to lock using NLD_UK2 constraint
 --
 FUNCTION lock_nld (pi_nld_table_short_name nm_load_destinations.nld_table_short_name%TYPE
@@ -15710,6 +15625,91 @@ BEGIN
                    (pi_nld_table_short_name => pi_nld_table_short_name
                    ,pi_raise_not_found      => pi_raise_not_found
                    ,pi_not_found_sqlcode    => pi_not_found_sqlcode
+                   );
+--
+   nm_debug.proc_end(g_package_name,'lock_nld');
+--
+END lock_nld;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Function to lock using NLD_UK1 constraint
+--
+FUNCTION lock_nld (pi_nld_table_name    nm_load_destinations.nld_table_name%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                  ) RETURN ROWID IS
+--
+   CURSOR cs_nld IS
+   SELECT /*+ INDEX (nld NLD_UK1) */ ROWID
+    FROM  nm_load_destinations nld
+   WHERE  nld.nld_table_name = pi_nld_table_name
+   FOR UPDATE NOWAIT;
+--
+   l_found         BOOLEAN;
+   l_retval        ROWID;
+   l_record_locked EXCEPTION;
+   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'lock_nld');
+--
+   OPEN  cs_nld;
+   FETCH cs_nld INTO l_retval;
+   l_found := cs_nld%FOUND;
+   CLOSE cs_nld;
+--
+   IF pi_raise_not_found AND NOT l_found
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 67
+                    ,pi_sqlcode            => pi_not_found_sqlcode
+                    ,pi_supplementary_info => 'nm_load_destinations (NLD_UK1)'
+                                              ||CHR(10)||'nld_table_name => '||pi_nld_table_name
+                    );
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'lock_nld');
+--
+   RETURN l_retval;
+--
+EXCEPTION
+--
+   WHEN l_record_locked
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 33
+                    ,pi_sqlcode            => pi_locked_sqlcode
+                    ,pi_supplementary_info => 'nm_load_destinations (NLD_UK1)'
+                                              ||CHR(10)||'nld_table_name => '||pi_nld_table_name
+                    );
+--
+END lock_nld;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Procedure to lock using NLD_UK1 constraint
+--
+PROCEDURE lock_nld (pi_nld_table_name    nm_load_destinations.nld_table_name%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                   ) IS
+--
+   l_rowid ROWID;
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'lock_nld');
+--
+   l_rowid := lock_nld
+                   (pi_nld_table_name    => pi_nld_table_name
+                   ,pi_raise_not_found   => pi_raise_not_found
+                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    );
 --
    nm_debug.proc_end(g_package_name,'lock_nld');
@@ -21100,97 +21100,6 @@ END lock_nod;
 -----------------------------------------------------------------------------
 --
 --
---   Function to lock using NOD_SCRN_TEXT_UK constraint
---
-FUNCTION lock_nod (pi_nod_nmo_operation nm_operation_data.nod_nmo_operation%TYPE
-                  ,pi_nod_scrn_text     nm_operation_data.nod_scrn_text%TYPE
-                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                  ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                  ) RETURN ROWID IS
---
-   CURSOR cs_nod IS
-   SELECT /*+ INDEX (nod NOD_SCRN_TEXT_UK) */ ROWID
-    FROM  nm_operation_data nod
-   WHERE  nod.nod_nmo_operation = pi_nod_nmo_operation
-    AND   nod.nod_scrn_text     = pi_nod_scrn_text
-   FOR UPDATE NOWAIT;
---
-   l_found         BOOLEAN;
-   l_retval        ROWID;
-   l_record_locked EXCEPTION;
-   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_nod');
---
-   OPEN  cs_nod;
-   FETCH cs_nod INTO l_retval;
-   l_found := cs_nod%FOUND;
-   CLOSE cs_nod;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_operation_data (NOD_SCRN_TEXT_UK)'
-                                              ||CHR(10)||'nod_nmo_operation => '||pi_nod_nmo_operation
-                                              ||CHR(10)||'nod_scrn_text     => '||pi_nod_scrn_text
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'lock_nod');
---
-   RETURN l_retval;
---
-EXCEPTION
---
-   WHEN l_record_locked
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 33
-                    ,pi_sqlcode            => pi_locked_sqlcode
-                    ,pi_supplementary_info => 'nm_operation_data (NOD_SCRN_TEXT_UK)'
-                                              ||CHR(10)||'nod_nmo_operation => '||pi_nod_nmo_operation
-                                              ||CHR(10)||'nod_scrn_text     => '||pi_nod_scrn_text
-                    );
---
-END lock_nod;
---
------------------------------------------------------------------------------
---
---
---   Procedure to lock using NOD_SCRN_TEXT_UK constraint
---
-PROCEDURE lock_nod (pi_nod_nmo_operation nm_operation_data.nod_nmo_operation%TYPE
-                   ,pi_nod_scrn_text     nm_operation_data.nod_scrn_text%TYPE
-                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                   ) IS
---
-   l_rowid ROWID;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_nod');
---
-   l_rowid := lock_nod
-                   (pi_nod_nmo_operation => pi_nod_nmo_operation
-                   ,pi_nod_scrn_text     => pi_nod_scrn_text
-                   ,pi_raise_not_found   => pi_raise_not_found
-                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
-                   );
---
-   nm_debug.proc_end(g_package_name,'lock_nod');
---
-END lock_nod;
---
------------------------------------------------------------------------------
---
---
 --   Function to lock using NOD_UK constraint
 --
 FUNCTION lock_nod (pi_nod_nmo_operation nm_operation_data.nod_nmo_operation%TYPE
@@ -21271,6 +21180,97 @@ BEGIN
    l_rowid := lock_nod
                    (pi_nod_nmo_operation => pi_nod_nmo_operation
                    ,pi_nod_seq           => pi_nod_seq
+                   ,pi_raise_not_found   => pi_raise_not_found
+                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
+                   );
+--
+   nm_debug.proc_end(g_package_name,'lock_nod');
+--
+END lock_nod;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Function to lock using NOD_SCRN_TEXT_UK constraint
+--
+FUNCTION lock_nod (pi_nod_nmo_operation nm_operation_data.nod_nmo_operation%TYPE
+                  ,pi_nod_scrn_text     nm_operation_data.nod_scrn_text%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                  ) RETURN ROWID IS
+--
+   CURSOR cs_nod IS
+   SELECT /*+ INDEX (nod NOD_SCRN_TEXT_UK) */ ROWID
+    FROM  nm_operation_data nod
+   WHERE  nod.nod_nmo_operation = pi_nod_nmo_operation
+    AND   nod.nod_scrn_text     = pi_nod_scrn_text
+   FOR UPDATE NOWAIT;
+--
+   l_found         BOOLEAN;
+   l_retval        ROWID;
+   l_record_locked EXCEPTION;
+   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'lock_nod');
+--
+   OPEN  cs_nod;
+   FETCH cs_nod INTO l_retval;
+   l_found := cs_nod%FOUND;
+   CLOSE cs_nod;
+--
+   IF pi_raise_not_found AND NOT l_found
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 67
+                    ,pi_sqlcode            => pi_not_found_sqlcode
+                    ,pi_supplementary_info => 'nm_operation_data (NOD_SCRN_TEXT_UK)'
+                                              ||CHR(10)||'nod_nmo_operation => '||pi_nod_nmo_operation
+                                              ||CHR(10)||'nod_scrn_text     => '||pi_nod_scrn_text
+                    );
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'lock_nod');
+--
+   RETURN l_retval;
+--
+EXCEPTION
+--
+   WHEN l_record_locked
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 33
+                    ,pi_sqlcode            => pi_locked_sqlcode
+                    ,pi_supplementary_info => 'nm_operation_data (NOD_SCRN_TEXT_UK)'
+                                              ||CHR(10)||'nod_nmo_operation => '||pi_nod_nmo_operation
+                                              ||CHR(10)||'nod_scrn_text     => '||pi_nod_scrn_text
+                    );
+--
+END lock_nod;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Procedure to lock using NOD_SCRN_TEXT_UK constraint
+--
+PROCEDURE lock_nod (pi_nod_nmo_operation nm_operation_data.nod_nmo_operation%TYPE
+                   ,pi_nod_scrn_text     nm_operation_data.nod_scrn_text%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                   ) IS
+--
+   l_rowid ROWID;
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'lock_nod');
+--
+   l_rowid := lock_nod
+                   (pi_nod_nmo_operation => pi_nod_nmo_operation
+                   ,pi_nod_scrn_text     => pi_nod_scrn_text
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    );
@@ -23763,91 +23763,6 @@ END lock_nti;
 -----------------------------------------------------------------------------
 --
 --
---   Function to lock using NTI_PARENT_TYPE_UK constraint
---
-FUNCTION lock_nti (pi_nti_nw_parent_type nm_type_inclusion.nti_nw_parent_type%TYPE
-                  ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
-                  ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
-                  ,pi_locked_sqlcode     PLS_INTEGER DEFAULT -20000
-                  ) RETURN ROWID IS
---
-   CURSOR cs_nti IS
-   SELECT /*+ INDEX (nti NTI_PARENT_TYPE_UK) */ ROWID
-    FROM  nm_type_inclusion nti
-   WHERE  nti.nti_nw_parent_type = pi_nti_nw_parent_type
-   FOR UPDATE NOWAIT;
---
-   l_found         BOOLEAN;
-   l_retval        ROWID;
-   l_record_locked EXCEPTION;
-   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_nti');
---
-   OPEN  cs_nti;
-   FETCH cs_nti INTO l_retval;
-   l_found := cs_nti%FOUND;
-   CLOSE cs_nti;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_type_inclusion (NTI_PARENT_TYPE_UK)'
-                                              ||CHR(10)||'nti_nw_parent_type => '||pi_nti_nw_parent_type
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'lock_nti');
---
-   RETURN l_retval;
---
-EXCEPTION
---
-   WHEN l_record_locked
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 33
-                    ,pi_sqlcode            => pi_locked_sqlcode
-                    ,pi_supplementary_info => 'nm_type_inclusion (NTI_PARENT_TYPE_UK)'
-                                              ||CHR(10)||'nti_nw_parent_type => '||pi_nti_nw_parent_type
-                    );
---
-END lock_nti;
---
------------------------------------------------------------------------------
---
---
---   Procedure to lock using NTI_PARENT_TYPE_UK constraint
---
-PROCEDURE lock_nti (pi_nti_nw_parent_type nm_type_inclusion.nti_nw_parent_type%TYPE
-                   ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
-                   ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
-                   ,pi_locked_sqlcode     PLS_INTEGER DEFAULT -20000
-                   ) IS
---
-   l_rowid ROWID;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_nti');
---
-   l_rowid := lock_nti
-                   (pi_nti_nw_parent_type => pi_nti_nw_parent_type
-                   ,pi_raise_not_found    => pi_raise_not_found
-                   ,pi_not_found_sqlcode  => pi_not_found_sqlcode
-                   );
---
-   nm_debug.proc_end(g_package_name,'lock_nti');
---
-END lock_nti;
---
------------------------------------------------------------------------------
---
---
 --   Function to lock using NTI_UK constraint
 --
 FUNCTION lock_nti (pi_nti_nw_child_type nm_type_inclusion.nti_nw_child_type%TYPE
@@ -23930,6 +23845,91 @@ BEGIN
                    ,pi_nti_child_column  => pi_nti_child_column
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
+                   );
+--
+   nm_debug.proc_end(g_package_name,'lock_nti');
+--
+END lock_nti;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Function to lock using NTI_PARENT_TYPE_UK constraint
+--
+FUNCTION lock_nti (pi_nti_nw_parent_type nm_type_inclusion.nti_nw_parent_type%TYPE
+                  ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                  ,pi_locked_sqlcode     PLS_INTEGER DEFAULT -20000
+                  ) RETURN ROWID IS
+--
+   CURSOR cs_nti IS
+   SELECT /*+ INDEX (nti NTI_PARENT_TYPE_UK) */ ROWID
+    FROM  nm_type_inclusion nti
+   WHERE  nti.nti_nw_parent_type = pi_nti_nw_parent_type
+   FOR UPDATE NOWAIT;
+--
+   l_found         BOOLEAN;
+   l_retval        ROWID;
+   l_record_locked EXCEPTION;
+   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'lock_nti');
+--
+   OPEN  cs_nti;
+   FETCH cs_nti INTO l_retval;
+   l_found := cs_nti%FOUND;
+   CLOSE cs_nti;
+--
+   IF pi_raise_not_found AND NOT l_found
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 67
+                    ,pi_sqlcode            => pi_not_found_sqlcode
+                    ,pi_supplementary_info => 'nm_type_inclusion (NTI_PARENT_TYPE_UK)'
+                                              ||CHR(10)||'nti_nw_parent_type => '||pi_nti_nw_parent_type
+                    );
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'lock_nti');
+--
+   RETURN l_retval;
+--
+EXCEPTION
+--
+   WHEN l_record_locked
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 33
+                    ,pi_sqlcode            => pi_locked_sqlcode
+                    ,pi_supplementary_info => 'nm_type_inclusion (NTI_PARENT_TYPE_UK)'
+                                              ||CHR(10)||'nti_nw_parent_type => '||pi_nti_nw_parent_type
+                    );
+--
+END lock_nti;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Procedure to lock using NTI_PARENT_TYPE_UK constraint
+--
+PROCEDURE lock_nti (pi_nti_nw_parent_type nm_type_inclusion.nti_nw_parent_type%TYPE
+                   ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
+                   ,pi_locked_sqlcode     PLS_INTEGER DEFAULT -20000
+                   ) IS
+--
+   l_rowid ROWID;
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'lock_nti');
+--
+   l_rowid := lock_nti
+                   (pi_nti_nw_parent_type => pi_nti_nw_parent_type
+                   ,pi_raise_not_found    => pi_raise_not_found
+                   ,pi_not_found_sqlcode  => pi_not_found_sqlcode
                    );
 --
    nm_debug.proc_end(g_package_name,'lock_nti');

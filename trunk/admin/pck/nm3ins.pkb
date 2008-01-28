@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.4   Oct 04 2007 14:26:02   jwadsworth  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.5   Jan 28 2008 10:52:54   jwadsworth  $
 --       Module Name      : $Workfile:   nm3ins.pkb  $
---       Date into PVCS   : $Date:   Oct 04 2007 14:26:02  $
---       Date fetched Out : $Modtime:   Oct 04 2007 14:04:02  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jan 28 2008 10:52:54  $
+--       Date fetched Out : $Modtime:   Jan 27 2008 18:29:50  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.4  $"
+--   nm3get_gen body   : "$Revision:   2.5  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
@@ -5565,8 +5565,8 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'ins_neh');
 --
-   p_rec_neh.neh_actioned_date              := NVL(p_rec_neh.neh_actioned_date,TRUNC(SYSDATE) );
-   p_rec_neh.neh_actioned_by                := NVL(p_rec_neh.neh_actioned_by,USER );
+   p_rec_neh.neh_actioned_date              := NVL(p_rec_neh.neh_actioned_date,trunc(sysdate) );
+   p_rec_neh.neh_actioned_by                := NVL(p_rec_neh.neh_actioned_by,user );
 --
    INSERT INTO nm_element_history
             (neh_id
@@ -17198,12 +17198,18 @@ BEGIN
    p_rec_nth.nth_feature_shape_column       := NVL(p_rec_nth.nth_feature_shape_column,'SHAPE'
  );
    p_rec_nth.nth_hpr_product                := NVL(p_rec_nth.nth_hpr_product,'NET' );
+   p_rec_nth.nth_location_updatable         := NVL(p_rec_nth.nth_location_updatable,'N'
+);
    p_rec_nth.nth_theme_type                 := NVL(p_rec_nth.nth_theme_type,'LOCL'
  );
    p_rec_nth.nth_dependency                 := NVL(p_rec_nth.nth_dependency,'D' );
    p_rec_nth.nth_storage                    := NVL(p_rec_nth.nth_storage,'D' );
    p_rec_nth.nth_update_on_edit             := NVL(p_rec_nth.nth_update_on_edit,'N' );
+   p_rec_nth.nth_use_history                := NVL(p_rec_nth.nth_use_history,'N'
+);
    p_rec_nth.nth_snap_to_theme              := NVL(p_rec_nth.nth_snap_to_theme,'N' );
+   p_rec_nth.nth_lref_mandatory             := NVL(p_rec_nth.nth_lref_mandatory,'N'
+);
    p_rec_nth.nth_tolerance                  := NVL(p_rec_nth.nth_tolerance,10 );
    p_rec_nth.nth_tol_units                  := NVL(p_rec_nth.nth_tol_units,1 );
    p_rec_nth.nth_dynamic_theme              := NVL(p_rec_nth.nth_dynamic_theme,'N' );
