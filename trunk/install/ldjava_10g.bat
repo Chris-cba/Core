@@ -1,12 +1,12 @@
 @echo off
---   PVCS Identifiers :-
---
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/install/ldjava_10g.bat-arc   2.0   Dec 10 2007 09:34:32   jwadsworth  $
---       Module Name      : $Workfile:   ldjava_10g.bat  $
---       Date into PVCS   : $Date:   Dec 10 2007 09:34:32  $
---       Date fetched Out : $Modtime:   Dec 10 2007 09:33:44  $
---       PVCS Version     : $Revision:   2.0  $
---       Based on SCCS version : 
+rem --   PVCS Identifiers :-
+rem --
+rem --       pvcsid                 : $Header:   //vm_latest/archives/nm3/install/ldjava_10g.bat-arc   2.1   Feb 01 2008 10:54:22   jwadsworth  $
+rem --       Module Name      : $Workfile:   ldjava_10g.bat  $
+rem --       Date into PVCS   : $Date:   Feb 01 2008 10:54:22  $
+rem --       Date fetched Out : $Modtime:   Feb 01 2008 10:53:38  $
+rem --       PVCS Version     : $Revision:   2.1  $
+rem --       Based on SCCS version : 
 rem --
 rem --   Author : I Turnbull
 rem --
