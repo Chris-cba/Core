@@ -9,11 +9,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4020_nm4040_ddl_upg.sql-arc   3.2   Jan 25 2008 13:35:26   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4020_nm4040_ddl_upg.sql-arc   3.3   Feb 01 2008 09:47:24   jwadsworth  $
 --       Module Name      : $Workfile:   nm4020_nm4040_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jan 25 2008 13:35:26  $
---       Date fetched Out : $Modtime:   Jan 25 2008 13:10:58  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Feb 01 2008 09:47:24  $
+--       Date fetched Out : $Modtime:   Feb 01 2008 09:43:56  $
+--       Version          : $Revision:   3.3  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -521,6 +521,20 @@ create global temporary table nm0575_matching_records
 /
 
 
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Drop GRS_PK Constraint
+SET TERM OFF
+
+-- JWA  28-JAN-2008
+-- 
+-- DEVELOPMENT COMMENTS
+-- Dropping GRS_PK constraint.
+------------------------------------------------------------------
+alter table gri_spool drop constraint grs_pk;
 ------------------------------------------------------------------
 
 
