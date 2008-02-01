@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3context AUTHID CURRENT_USER IS
 --<PACKAGE>
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkh-arc   2.2   Jan 15 2008 08:57:38   jwadsworth  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkh-arc   2.3   Feb 01 2008 15:50:52   jwadsworth  $
 -- Module Name : $Workfile:   nm3context.pkh  $
--- Date into PVCS : $Date:   Jan 15 2008 08:57:38  $
--- Date fetched Out : $Modtime:   Jan 15 2008 08:56:22  $
--- PVCS Version : $Revision:   2.2  $
+-- Date into PVCS : $Date:   Feb 01 2008 15:50:52  $
+-- Date fetched Out : $Modtime:   Feb 01 2008 15:49:48  $
+-- PVCS Version : $Revision:   2.3  $
 -- Based on SCCS version : 
 --
 --
@@ -19,7 +19,8 @@ CREATE OR REPLACE PACKAGE nm3context AUTHID CURRENT_USER IS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3context.pkh	1.2 08/13/01"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) :='"$Revision:   2.3  $"';
+
 --  g_sccsid is the SCCS ID for the package
 --
 -- g_context_namespace is the name of the context used to hold global information
