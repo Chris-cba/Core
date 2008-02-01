@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3context AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkb-arc   2.2   Jan 15 2008 08:57:26   jwadsworth  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkb-arc   2.3   Feb 01 2008 15:51:08   jwadsworth  $
 -- Module Name : $Workfile:   nm3context.pkb  $
--- Date into PVCS : $Date:   Jan 15 2008 08:57:26  $
--- Date fetched Out : $Modtime:   Jan 15 2008 08:56:34  $
--- PVCS Version : $Revision:   2.2  $
+-- Date into PVCS : $Date:   Feb 01 2008 15:51:08  $
+-- Date fetched Out : $Modtime:   Feb 01 2008 15:49:32  $
+-- PVCS Version : $Revision:   2.3  $
 -- Based on SCCS version : 
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3context AS
 --	Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3context.pkb	1.12 02/06/03"';
+   g_body_sccsid     CONSTANT  varchar2(2000) :='"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
 --all global package variables here
