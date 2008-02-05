@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3context AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkb-arc   2.3   Feb 01 2008 15:51:08   jwadsworth  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkb-arc   2.4   Feb 05 2008 10:50:12   jwadsworth  $
 -- Module Name : $Workfile:   nm3context.pkb  $
--- Date into PVCS : $Date:   Feb 01 2008 15:51:08  $
--- Date fetched Out : $Modtime:   Feb 01 2008 15:49:32  $
--- PVCS Version : $Revision:   2.3  $
+-- Date into PVCS : $Date:   Feb 05 2008 10:50:12  $
+-- Date fetched Out : $Modtime:   Feb 05 2008 10:40:00  $
+-- PVCS Version : $Revision:   2.4  $
 -- Based on SCCS version : 
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3context AS
 --	Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) :='"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) :='"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
 --all global package variables here
@@ -106,7 +106,7 @@ is
 --
    l_unrestricted_inv varchar2(5);
    l_unrestricted_acc varchar2(5);
-   l_user             varchar2(30) := USER;
+   l_user             varchar2(30) := pi_username;
 --
    CURSOR cs_inst IS
    SELECT instance_name
