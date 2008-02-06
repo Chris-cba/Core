@@ -1,4 +1,4 @@
-define sccsid = '$Revision:   2.5  $'
+define sccsid = '$Revision:   2.6  $'
 
 set echo off
 set linesize 120
@@ -406,20 +406,6 @@ SET TERM ON
 Prompt Creating Synonyms That Do Not Exist...
 SET TERM OFF
 EXECUTE nm3ddl.refresh_all_synonyms;
---
----------------------------------------------------------------------------------------------------
---                        ****************   ROLES  *******************
-SET TERM ON
-Prompt Updating HIG_USER_ROLES...
-SET TERM OFF
-SET DEFINE ON
-select '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'hig_user_roles.sql' run_file
-from dual
-/
-SET FEEDBACK ON
-start &&run_file
-SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                  ****************   UNIT CONVERSION FUNCTIONS  *******************
