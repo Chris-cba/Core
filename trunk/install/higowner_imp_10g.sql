@@ -52,30 +52,23 @@ DECLARE
   p_admin_unit_code varchar2(100) := 'A';
   p_admin_unit_name varchar2(100) := 'A';
 --
-  l_oracle9i  boolean;
-  l_oracle10g boolean;
-
+  l_oracle9i    boolean;
+  l_oracle10gR1 boolean;
+  l_oracle10gR2 boolean;
+--
+  v varchar2(100);  -- version
+  c varchar2(100);  -- compatibility
+--
   
-  FUNCTION db_is_9i RETURN boolean IS
-
-    l_dummy pls_integer;
+  FUNCTION db_is_9i(db_version varchar2) RETURN boolean IS
 
   BEGIN
-    SELECT
-      1
-    INTO
-      l_dummy
-    FROM
-      dual
-    WHERE
-      EXISTS(SELECT
-               1
-             FROM
-               v$version
-             WHERE
-               UPPER(banner) LIKE '%ORACLE9I%');
-
-    RETURN TRUE;
+ 
+    IF SUBSTR(db_version,1,1) = 9 THEN
+       RETURN TRUE;
+    ELSE
+       RETURN FALSE;
+    END IF;
 
   EXCEPTION
     WHEN no_data_found
@@ -84,34 +77,39 @@ DECLARE
 
   END db_is_9i;
 
-  FUNCTION db_is_10g RETURN boolean IS
-
-    l_dummy pls_integer;
+  FUNCTION db_is_10gR1(db_version varchar2) RETURN boolean IS
 
   BEGIN
-    SELECT
-      1
-    INTO
-      l_dummy
-    FROM
-      dual
-    WHERE
-      EXISTS(SELECT
-               1
-             FROM
-               v$version
-             WHERE
-               UPPER(banner) LIKE '%10G%');
 
-    RETURN TRUE;
+    IF SUBSTR(db_version,1,4) = 10.1 THEN
+       RETURN TRUE;
+    ELSE
+       RETURN FALSE;
+    END IF;
 
   EXCEPTION
     WHEN no_data_found
     THEN
       RETURN FALSE;
 
-  END db_is_10g;
+  END db_is_10gR1;
 
+  FUNCTION db_is_10gR2(db_version varchar2) RETURN boolean IS
+
+  BEGIN
+
+    IF SUBSTR(db_version,1,4) >= 10.2 THEN
+       RETURN TRUE;
+    ELSE
+       RETURN FALSE;
+    END IF;
+
+  EXCEPTION
+    WHEN no_data_found
+    THEN
+      RETURN FALSE;
+
+  END db_is_10gR2;
 
    PROCEDURE check_listener_locks IS
 --   
@@ -370,13 +368,28 @@ DECLARE
                          ,p_tmptab varchar2 )
    IS
    BEGIN
-      EXECUTE IMMEDIATE 'CREATE USER '|| p_user
-           || CHR(10) ||' IDENTIFIED BY '||p_pass
-           || CHR(10) ||' DEFAULT TABLESPACE '||p_deftab
-           || CHR(10) ||' QUOTA UNLIMITED ON '||p_deftab
-           || CHR(10) ||' TEMPORARY TABLESPACE '||p_tmptab
-           || CHR(10) ||' QUOTA UNLIMITED ON '||p_tmptab
-           || CHR(10) ||' QUOTA 0K ON SYSTEM';
+
+      IF NOT l_oracle10gR2 THEN 
+
+         EXECUTE IMMEDIATE 'CREATE USER '|| p_user
+              || CHR(10) ||' IDENTIFIED BY '||p_pass
+              || CHR(10) ||' DEFAULT TABLESPACE '||p_deftab
+              || CHR(10) ||' QUOTA UNLIMITED ON '||p_deftab
+              || CHR(10) ||' TEMPORARY TABLESPACE '||p_tmptab
+              || CHR(10) ||' QUOTA UNLIMITED ON '||p_tmptab
+              || CHR(10) ||' QUOTA 0K ON SYSTEM';
+
+      ELSE
+
+         EXECUTE IMMEDIATE 'CREATE USER '|| p_user
+              || CHR(10) ||' IDENTIFIED BY '||p_pass
+              || CHR(10) ||' DEFAULT TABLESPACE '||p_deftab
+              || CHR(10) ||' QUOTA UNLIMITED ON '||p_deftab
+              || CHR(10) ||' TEMPORARY TABLESPACE '||p_tmptab
+              || CHR(10) ||' QUOTA 0K ON SYSTEM';
+
+      END IF;
+
    END create_user;
 --
    PROCEDURE do_grants ( p_user varchar2 )
@@ -421,7 +434,8 @@ DECLARE
      EXECUTE IMMEDIATE 'GRANT DROP ANY DIRECTORY TO  ' || p_user;               -- Added by GJ 31-AUG-2005
      EXECUTE IMMEDIATE 'GRANT CREATE ANY DIRECTORY TO  ' || p_user;             -- Added by GJ 31-AUG-2005
      IF l_oracle9i
-     OR l_oracle10g
+     OR l_oracle10gR1
+     OR l_oracle10gR2
      THEN
        EXECUTE IMMEDIATE 'grant select any dictionary to '    || p_user || ' with admin option';
        EXECUTE IMMEDIATE 'grant execute on sys.dbms_pipe to ' || p_user || ' with grant option';
@@ -782,8 +796,11 @@ DECLARE
 --
 BEGIN
 --
- l_oracle9i  := db_is_9i;
- l_oracle10g := db_is_10g;
+ dbms_utility.db_version(v,c);
+--
+ l_oracle9i    := db_is_9i(v);
+ l_oracle10gR1 := db_is_10gR1(v);
+ l_oracle10gR2 := db_is_10gR2(v);
 --
  check_listener_locks;
 -- 
