@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4022_nm4040_upg.sql-arc   2.0   Jan 22 2008 10:27:58   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4022_nm4040_upg.sql-arc   2.1   Feb 12 2008 13:57:22   jwadsworth  $
 --       Module Name      : $Workfile:   nm4022_nm4040_upg.sql  $
---       Date into PVCS   : $Date:   Jan 22 2008 10:27:58  $
---       Date fetched Out : $Modtime:   Jan 22 2008 10:27:16  $
---       Version          : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Feb 12 2008 13:57:22  $
+--       Date fetched Out : $Modtime:   Feb 07 2008 09:07:20  $
+--       Version          : $Revision:   2.1  $
 --
 --   Product upgrade script
 --
@@ -235,6 +235,20 @@ FROM dual
 SET FEEDBACK ON
 start &&run_file
 SET FEEDBACK OFF
+---------------------------------------------------------------------------------------------------
+--                         ****************  HIG ROLES  *******************
+SET TERM ON
+prompt Roles...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'higroles' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
 ---------------------------------------------------------------------------------------------------
 --                  ****************   METADATA  *******************
 SET TERM ON
