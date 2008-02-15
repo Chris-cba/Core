@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4040_nm4041_upg.sql-arc   2.0   Feb 13 2008 15:18:22   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4040_nm4041_upg.sql-arc   2.1   Feb 15 2008 08:14:26   jwadsworth  $
 --       Module Name      : $Workfile:   nm4040_nm4041_upg.sql  $
---       Date into PVCS   : $Date:   Feb 13 2008 15:18:22  $
---       Date fetched Out : $Modtime:   Feb 13 2008 15:17:32  $
---       Version          : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Feb 15 2008 08:14:26  $
+--       Date fetched Out : $Modtime:   Feb 14 2008 11:19:06  $
+--       Version          : $Revision:   2.1  $
 --
 --   Product upgrade script
 --
@@ -69,15 +69,6 @@ SET FEEDBACK OFF
 ---------------------------------------------------------------------------------------------------
 --                        **************** TYPES   ****************
 --
-SET TERM OFF
-SET DEFINE ON
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||
-        '&terminator'||'typ'||'&terminator'||'nm3typ.sql' run_file
-FROM dual
-/
-SET FEEDBACK ON
-start &&run_file
-SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   DDL   *******************
@@ -95,47 +86,12 @@ SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --               ****************   RE-RUN INDEXES   *******************
-SET TERM ON
-PROMPT Re-running Indexes...
-PROMPT Ignore errors resulting from index already existing...
-SET TERM OFF
-SET DEFINE ON
-SELECT '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'nm3.ind' run_file
-FROM dual
-/
-SET FEEDBACK ON
-start &&run_file
-SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --               ****************   RE-RUN CONSTRAINTS   *******************
-SET TERM ON
-PROMPT Re-running Constraints...
-PROMPT Ignore errors resulting from constraint already existing...
-SET TERM OFF
-SET DEFINE ON
-SELECT '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'nm3.con' run_file
-FROM dual
-/
-SET FEEDBACK ON
-start &&run_file
-SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                        **************** VIEWS   ****************
-SET TERM ON
-PROMPT Views...
-SET TERM OFF
-SET DEFINE ON
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||
-        '&terminator'||'views'||'&terminator'||'nm3views.sql' run_file
-FROM dual
-/
-SET FEEDBACK ON
-start &&run_file
-SET FEEDBACK OFF
 --
 SET TERM OFF
 SET DEFINE ON
@@ -150,16 +106,6 @@ SET FEEDBACK OFF
 ---------------------------------------------------------------------------------------------------
 --                        **************** TRIGGERS   ****************
 --
-SET TERM ON
-PROMPT Triggers...
-SET TERM OFF
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||
-        '&terminator'||'trg'||'&terminator'||'nm3trg.sql' run_file
-FROM dual
-/
-SET FEEDBACK ON
-start &&run_file
-SET FEEDBACK OFF
 --
 --
 ---------------------------------------------------------------------------------------------------
