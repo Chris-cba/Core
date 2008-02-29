@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.3   Dec 19 2007 15:04:06   dyounger  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.4   Feb 29 2008 14:50:22   aedwards  $
 --       Module Name      	: $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   	: $Date:   Dec 19 2007 15:04:06  $
---       Date fetched Out 	: $Modtime:   Dec 19 2007 14:56:22  $
---       PVCS Version     	: $Revision:   2.3  $
+--       Date into PVCS   	: $Date:   Feb 29 2008 14:50:22  $
+--       Date fetched Out 	: $Modtime:   Feb 29 2008 14:42:58  $
+--       PVCS Version     	: $Revision:   2.4  $
 --       Based on SCCS version 	: 1.53
 --
 --
@@ -1255,6 +1255,25 @@ BEGIN
    THEN
       create_all_priv_syns (p_rec_hus.hus_username);
   END IF;
+  
+  --
+  --
+  -- Create mcp metadata
+  --
+  --
+  IF hig.is_product_licensed('MCP') 
+  THEN
+    BEGIN
+      EXECUTE IMMEDIATE
+        'BEGIN '||
+        '  nm3mcp_sde.STORE_PASSWORD(:pi_username, :pi_password); '||
+        'END;'
+      USING IN upper(p_rec_hus.hus_username), IN upper(p_password);
+    EXCEPTION
+      WHEN OTHERS THEN NULL;
+    END;
+  END IF;
+
   --
   --
   Nm_Debug.proc_end(g_package_name,'create_user');
