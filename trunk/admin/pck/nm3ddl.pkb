@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.4   Feb 29 2008 14:50:22   aedwards  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.5   Mar 20 2008 15:47:36   dyounger  $
 --       Module Name      	: $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   	: $Date:   Feb 29 2008 14:50:22  $
---       Date fetched Out 	: $Modtime:   Feb 29 2008 14:42:58  $
---       PVCS Version     	: $Revision:   2.4  $
+--       Date into PVCS   	: $Date:   Mar 20 2008 15:47:36  $
+--       Date fetched Out 	: $Modtime:   Mar 20 2008 15:37:34  $
+--       PVCS Version     	: $Revision:   2.5  $
 --       Based on SCCS version 	: 1.53
 --
 --
@@ -1732,7 +1732,10 @@ IS
      '    WHERE sdo_owner = '||Nm3flx.string(Hig.get_application_owner);
   EXCEPTION
     WHEN OTHERS THEN
-      raise_application_error(-20001,'Failed to create view USER_SDO_MAPS'||chr(10)||nm3flx.parse_error_message(sqlerrm));
+      -- raise_application_error(-20001,'Failed to create view USER_SDO_MAPS'||chr(10)||nm3flx.parse_error_message(sqlerrm));
+      -- 712315 removed above line to stop creation of users falling over in hig1832 and allow the creation of user_sdo_maps view. 
+      NULL;
+      
   END create_user_sdo_maps;
   --
   --
@@ -1762,7 +1765,9 @@ IS
       '    WHERE sdo_owner = '||Nm3flx.string(Hig.get_application_owner);
   EXCEPTION
     WHEN OTHERS THEN
-      raise_application_error(-20001,'Failed to create view USER_SDO_THEMES'||chr(10)||nm3flx.parse_error_message(sqlerrm));
+      -- raise_application_error(-20001,'Failed to create view USER_SDO_THEMES'||chr(10)||nm3flx.parse_error_message(sqlerrm));
+      -- 712315 removed above line to stop creation of users falling over in hig1832 and allow the creation of user_sdo_themes view. 
+      NULL;
   END create_user_sdo_themes;
   --
   --
@@ -1792,7 +1797,9 @@ IS
       '    WHERE sdo_owner = '||Nm3flx.string(Hig.get_application_owner);
   EXCEPTION
     WHEN OTHERS THEN
-      raise_application_error(-20001,'Failed to create view USER_SDO_STYLES'||chr(10)||nm3flx.parse_error_message(sqlerrm));
+      -- raise_application_error(-20001,'Failed to create view USER_SDO_STYLES'||chr(10)||nm3flx.parse_error_message(sqlerrm));      
+      -- 712315 removed above line to stop creation of users falling over in hig1832 and allow the creation of user_sdo_styles view. 
+      NULL;
   END create_user_sdo_styles;
 
 
