@@ -94,36 +94,36 @@ PROCEDURE set_cent_size_theme AS
 
    l_srid    NUMBER;
    l_diminfo mdsys.sdo_dim_array;
-   l_geom    mdsys.sdo_geometry;   
-   
+   l_geom    mdsys.sdo_geometry;
+
 BEGIN
 
    Nm3sdo.set_diminfo_and_srid( Nm3sdo.get_nw_themes, l_diminfo, l_srid );
 
    l_geom := Nm3sdo.get_centre_and_size( Nm3sdo.convert_dim_array_to_mbr( l_diminfo ));
-   
+
 --   IF l_srid IS NULL THEN
-   
-     BEGIN     
-	 
+
+     BEGIN
+
        g_conversion_factor := Get_Scale;
-	 
+
      EXCEPTION
        WHEN OTHERS THEN
 	     g_conversion_factor := 1;
      END;
-	 
+
 --   ELSE
-   
+
 --     g_conversion_factor := 1;
-     
---   END IF;	 	 
+
+--   END IF;
 
    BEGIN
-   
+
       g_sql_string := 'insert into centsize ';
       g_sql_string := g_sql_string||'values (:l_geom )';
-	  
+
       EXECUTE IMMEDIATE g_sql_string USING l_geom;
       COMMIT;
 
@@ -350,31 +350,32 @@ BEGIN
   AND   nt_type = nlt_nt_type
   AND   nnth_nlt_id = nlt_id
   AND   nlt_g_i_d = 'D'
+  AND   nth_base_table_theme is null
   AND   ROWNUM = 1;
-  
+
   l_nth := Nm3get.get_nth( l_nth_id );
- 
---get the ratio of ne_length to feature length (after unit conversion) and set an appropriate scale factor. 
- 
+
+--get the ratio of ne_length to feature length (after unit conversion) and set an appropriate scale factor.
+
   cur_str := 'select avg(a.ne_length), avg(sdo_geom.sdo_length( nm3sdo.set_srid(b.'||l_nth.nth_feature_shape_column||',null), .00005 )) '||
              ' from nm_elements a, '||l_nth.nth_feature_table||' b '||
              ' where a.ne_id = b.'||l_nth.nth_feature_pk_column||' and rownum < 11';
-			 
-  EXECUTE IMMEDIATE cur_str INTO l_len, l_geom_len; 			 
+
+  EXECUTE IMMEDIATE cur_str INTO l_len, l_geom_len;
 
   IF l_unit != 1 THEN
     l_len := Nm3unit.convert_unit( l_unit, 1, l_len );
   END IF;
-    
+
   retval :=  l_len/l_geom_len;
-  
+
   RETURN retval;
 
 END;
 --
 -----------------------------------------------------------------------------
 --
-  PROCEDURE delete_gdo 
+  PROCEDURE delete_gdo
               ( pi_session_id IN gis_data_objects.gdo_session_id%TYPE )
   IS
   BEGIN
