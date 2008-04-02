@@ -1,19 +1,22 @@
 CREATE OR REPLACE PACKAGE BODY Mapviewer AS
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)mapviewer.pkb	1.15 04/05/07
---       Module Name      : mapviewer.pkb
---       Date into SCCS   : 07/04/05 11:41:22
---       Date fetched Out : 07/06/13 14:10:41
---       SCCS Version     : 1.15
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.2   Apr 02 2008 12:09:30   rcoupe  $
+--       Module Name      : $Workfile:   mapviewer.pkb  $
+--       Date into PVCS   : $Date:   Apr 02 2008 12:09:30  $
+--       Date fetched Out : $Modtime:   Apr 02 2008 12:05:24  $
+--       PVCS Version     : $Revision:   2.2  $
+
+
 --
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)mapviewer.pkb	1.15 04/05/07"';
+   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.2  $"';
+
 
 FUNCTION Get_Scale RETURN NUMBER;
 
