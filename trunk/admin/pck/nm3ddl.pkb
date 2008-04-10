@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.5   Mar 20 2008 15:47:36   dyounger  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.6   Apr 10 2008 14:40:20   rcoupe  $
 --       Module Name      	: $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   	: $Date:   Mar 20 2008 15:47:36  $
---       Date fetched Out 	: $Modtime:   Mar 20 2008 15:37:34  $
---       PVCS Version     	: $Revision:   2.5  $
+--       Date into PVCS   	: $Date:   Apr 10 2008 14:40:20  $
+--       Date fetched Out 	: $Modtime:   Apr 10 2008 14:38:20  $
+--       PVCS Version     	: $Revision:   2.6  $
 --       Based on SCCS version 	: 1.53
 --
 --
@@ -562,13 +562,51 @@ PROCEDURE refresh_private_synonyms IS
 --
    PRAGMA autonomous_transaction;
 --
+
+cursor cs_missing_synonyms is
+   SELECT hus_username, object_name
+    FROM  ALL_OBJECTS, hig_users, all_users
+    WHERE  owner = g_application_owner
+    and hus_is_hig_owner_flag != 'Y'
+    and hus_username = username
+    AND  (object_type IN ('TABLE'
+                         ,'VIEW'
+                         ,'FUNCTION'
+                         ,'PACKAGE'
+                         ,'PROCEDURE'
+                         ,'SEQUENCE'
+                         ,'TYPE'
+                         )
+          OR object_name IN ('RSE_HE_ID_SEQ','ROAD_SEG_MEMBS_PARTIAL','ROAD_SEGS_PARTIAL')
+         )
+    AND   object_name NOT IN ('SDE_EXCEPTIONS'
+                             ,'SDE_LOGFILES'
+                             ,'SDE_LOGFILE_DATA'
+                             ,'SDE_LOGFILE_LID_GEN' -- Omit SDE_ tables
+                             ,'INV_TMP'
+                             ,'TEMP_ADMIN_GROUPS'
+                             ,'TEMP_STR5080'
+                             ,'TEMP_STR5084' -- Exclude tables created by HIG1832 (create user)
+                             ,'TEMP_REPLACE_DEFECTS'   -- temp table created for MAI to support network edits
+                             ,'TEMP_UNREPLACE_DEFECTS' -- temp table created for MAI to support network edits
+                             ,'TEMP_UNSPLIT_DEFECTS'   -- temp table created for MAI to support network edits
+                             ,'TEMP_UNMERGE_DEFECTS'   -- temp table created for MAI to support network edits
+                             )
+    AND   object_name NOT LIKE 'BIN$%'
+    AND   not exists ( select 1 from all_synonyms s
+                       where s.synonym_name = object_name
+                       and   s.owner = hus_username
+                       and   s.table_owner = g_application_owner );
+
 BEGIN
 --
    Nm_Debug.proc_start(g_package_name,'refresh_private_synonyms');
 --
-   FOR cs_rec IN cs_users
-    LOOP
-      create_all_priv_syns (cs_rec.hus_username);
+   FOR cs_rec IN cs_missing_synonyms
+   LOOP
+      syn_exec_ddl('CREATE SYNONYM '||cs_rec.hus_username||'.'||cs_rec.object_name
+                         ||' FOR '||g_application_owner||'.'||cs_rec.object_name
+                  );
    END LOOP;
 
    commit; --sscanlon fix 38046 26-SEP-2006
@@ -1071,11 +1109,11 @@ PROCEDURE create_user (p_rec_hus            IN OUT HIG_USERS%ROWTYPE
                       ||CHR(10)||'WHERE  ROWNUM = 0';
      END IF;
    END take_copy_of_table;
-   
+
    FUNCTION db_is_10gr2 RETURN boolean IS
- 
+
      l_dummy pls_integer;
- 
+
    BEGIN
      SELECT
       1
@@ -1090,14 +1128,14 @@ PROCEDURE create_user (p_rec_hus            IN OUT HIG_USERS%ROWTYPE
                 v$version
               WHERE
                 UPPER(banner) LIKE '%10.2%');
- 
+
       RETURN TRUE;
- 
+
     EXCEPTION
       WHEN no_data_found
       THEN
         RETURN FALSE;
- 
+
    END db_is_10gr2;
 
 --
@@ -1170,7 +1208,7 @@ BEGIN
   IF p_temp_tablespace IS NOT NULL
    THEN
       append(' TEMPORARY TABLESPACE '||p_temp_tablespace);
-      
+
       IF NOT db_is_10gr2
       THEN
         append(' QUOTA UNLIMITED ON '||p_temp_tablespace);
@@ -1255,13 +1293,13 @@ BEGIN
    THEN
       create_all_priv_syns (p_rec_hus.hus_username);
   END IF;
-  
+
   --
   --
   -- Create mcp metadata
   --
   --
-  IF hig.is_product_licensed('MCP') 
+  IF hig.is_product_licensed('MCP')
   THEN
     BEGIN
       EXECUTE IMMEDIATE
@@ -1733,9 +1771,9 @@ IS
   EXCEPTION
     WHEN OTHERS THEN
       -- raise_application_error(-20001,'Failed to create view USER_SDO_MAPS'||chr(10)||nm3flx.parse_error_message(sqlerrm));
-      -- 712315 removed above line to stop creation of users falling over in hig1832 and allow the creation of user_sdo_maps view. 
+      -- 712315 removed above line to stop creation of users falling over in hig1832 and allow the creation of user_sdo_maps view.
       NULL;
-      
+
   END create_user_sdo_maps;
   --
   --
@@ -1766,7 +1804,7 @@ IS
   EXCEPTION
     WHEN OTHERS THEN
       -- raise_application_error(-20001,'Failed to create view USER_SDO_THEMES'||chr(10)||nm3flx.parse_error_message(sqlerrm));
-      -- 712315 removed above line to stop creation of users falling over in hig1832 and allow the creation of user_sdo_themes view. 
+      -- 712315 removed above line to stop creation of users falling over in hig1832 and allow the creation of user_sdo_themes view.
       NULL;
   END create_user_sdo_themes;
   --
@@ -1797,8 +1835,8 @@ IS
       '    WHERE sdo_owner = '||Nm3flx.string(Hig.get_application_owner);
   EXCEPTION
     WHEN OTHERS THEN
-      -- raise_application_error(-20001,'Failed to create view USER_SDO_STYLES'||chr(10)||nm3flx.parse_error_message(sqlerrm));      
-      -- 712315 removed above line to stop creation of users falling over in hig1832 and allow the creation of user_sdo_styles view. 
+      -- raise_application_error(-20001,'Failed to create view USER_SDO_STYLES'||chr(10)||nm3flx.parse_error_message(sqlerrm));
+      -- 712315 removed above line to stop creation of users falling over in hig1832 and allow the creation of user_sdo_styles view.
       NULL;
   END create_user_sdo_styles;
 
