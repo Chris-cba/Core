@@ -1,27 +1,26 @@
 CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
------------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3ausec.pkb	1.20 12/07/04
---       Module Name      : nm3ausec.pkb
---       Date into SCCS   : 04/12/07 10:28:33
---       Date fetched Out : 07/06/13 14:11:08
---       SCCS Version     : 1.20
---
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.1   Apr 21 2008 15:17:12   rcoupe  $
+--       Module Name      : $Workfile:   nm3ausec.pkb  $
+--       Date into PVCS   : $Date:   Apr 21 2008 15:17:12  $
+--       Date fetched Out : $Modtime:   Apr 21 2008 15:14:14  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on
 --
 --   Author : Rob Coupe
 --
 --   NM3 Admin Unit Security package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+-- Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3ausec.pkb	1.20 12/07/04"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ausec';
@@ -38,6 +37,9 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
    g_last_admin_type      nm_au_types.nat_admin_type%TYPE;
    g_last_admin_unit      nm_admin_units.nau_admin_unit%TYPE;
 --
+
+   g_use_group_security   hig_option_values.HOV_VALUE%type;
+
 -----------------------------------------------------------------------------
 --
 FUNCTION get_version RETURN varchar2 IS
@@ -108,6 +110,7 @@ FUNCTION check_au ( p_id IN number, p_au IN number ) RETURN number IS
 --
 BEGIN
 --
+
    OPEN  c1( p_id, p_au );
    FETCH c1 INTO retval;
    CLOSE c1;
@@ -160,12 +163,15 @@ PROCEDURE check_each_au IS
 --               WHERE nag_child_admin_unit  = c.nm_admin_unit
 --                AND  nag_parent_admin_unit = st1.nast_au_id )
 --     AND c.nm_ne_id_in != st1.nast_ne_id;
-   CURSOR c1 IS
+   CURSOR c1 (c_use_group_security in varchar2 )  IS
      SELECT /*+ RULE*/ c.nm_admin_unit
      FROM  nm_members          c
           ,nm_au_security_temp st1
     WHERE  nm3ausec.get_au_type(c.nm_admin_unit) = st1.nast_admin_type            -- We must check for the same au type
      AND   c.nm_ne_id_of = st1.nast_ne_of                                -- at the location provided from before trg
+     and (  ( c_use_group_security='N' and st1.NAST_NM_TYPE = 'I' and   c.nm_type = 'I' )
+          or c_use_group_security = 'Y' )
+
      --
      -- it's either IN the range of current inv
      --
@@ -197,12 +203,16 @@ PROCEDURE check_each_au IS
 -- look for an au element of the same type over the whole extent,
 -- excluding the record being inserted/updated
 --
-   CURSOR c2 IS
+   CURSOR c2 (c_use_group_security in varchar2) IS
      SELECT /*+ RULE*/ c.nm_admin_unit
      FROM  nm_members          c
           ,nm_au_security_temp nast
-     WHERE nm3ausec.get_au_type(c.nm_admin_unit) = nast.nast_admin_type           -- We must check for the same au type
+          ,nm_admin_units au
+     Where au.nau_admin_unit =  c.nm_admin_unit
+     and   au.NAU_ADMIN_TYPE =  nast.nast_admin_type                              -- We must check for the same au type
      AND   c.nm_ne_id_of = nast.nast_ne_of                                        -- at the location provided from before trg
+     and  (( c_use_group_security = 'Y' and nm_type = 'I' )
+     OR      c_use_group_security = 'N' )
      AND  c.nm_begin_mp <= nast.nast_nm_begin AND c.nm_end_mp >= nast.nast_nm_end -- overlapping with the whole of existing data
      AND   EXISTS ( SELECT 1 FROM nm_admin_groups                                 -- where the existing AU could be a parent
                WHERE nag_parent_admin_unit = c.nm_admin_unit
@@ -212,9 +222,7 @@ PROCEDURE check_each_au IS
   l_gaps_exist boolean := FALSE;
 --
    CURSOR cs_nast_exists IS
-   SELECT 1
-    FROM  nm_au_security_temp
-   WHERE  ROWNUM = 1;
+   SELECT 1 from dual where exists ( select 1 from nm_au_security_temp );
 --
    CURSOR cs_not_privvy IS
    SELECT 1
@@ -234,34 +242,36 @@ PROCEDURE check_each_au IS
 
    -- there may not be an existing membership that spans the whole
    -- proposed location of new item - but overall there could be
-   -- a number without gaps that do - so check for this 
+   -- a number without gaps that do - so check for this
     CURSOR c_memb IS
     SELECT c.nm_begin_mp
           ,c.nm_end_mp
-		  ,nast.nast_nm_begin
-		  ,nast.nast_nm_end		  
+    ,nast.nast_nm_begin
+    ,nast.nast_nm_end
     FROM   nm_members          c
+          ,nm_admin_units      nau
           ,nm_au_security_temp nast
-    WHERE  nm3ausec.get_au_type(c.nm_admin_unit) = nast.nast_admin_type           -- We must check for the same au type
+    WHERE  nau.nau_admin_type = nast.nast_admin_type                              -- We must check for the same au type
+    AND    nau_admin_unit     = c.nm_admin_unit
     AND    c.nm_ne_id_of = nast.nast_ne_of                                        -- at the location provided from before trg
-	AND    nast.nast_nm_begin <= c.nm_end_mp
-	AND    nast.nast_nm_end >= c.nm_begin_mp
+ AND    nast.nast_nm_begin <= c.nm_end_mp
+ AND    nast.nast_nm_end >= c.nm_begin_mp
     AND   EXISTS ( SELECT 1 FROM nm_admin_groups                                 -- where the existing AU could be a parent
                    WHERE nag_parent_admin_unit = c.nm_admin_unit
                    AND  nag_child_admin_unit  = nast.nast_au_id )
-    AND c.nm_ne_id_in != nast.nast_ne_id                                         -- ignoring the record just being ins/upd  
+    AND c.nm_ne_id_in != nast.nast_ne_id                                         -- ignoring the record just being ins/upd
     ORDER BY 1,2;
-  
+
     l_tab_begin_mp      nm3type.tab_number;
     l_tab_end_mp        nm3type.tab_number;
     l_tab_nast_begin_mp nm3type.tab_number;
     l_tab_nast_end_mp   nm3type.tab_number;
-	
-  
+
+
   BEGIN
 
     OPEN c_memb;
-    FETCH c_memb 
+    FETCH c_memb
       BULK COLLECT INTO l_tab_begin_mp, l_tab_end_mp,l_tab_nast_begin_mp,l_tab_nast_end_mp;
     CLOSE c_memb;
 
@@ -269,39 +279,49 @@ PROCEDURE check_each_au IS
     IF l_tab_begin_mp.COUNT = 0 THEN
       RETURN(FALSE);
     ELSIF (l_tab_begin_mp(1) > l_tab_nast_begin_mp(1)) OR  l_tab_end_mp( l_tab_end_mp.count ) < l_tab_nast_end_mp(l_tab_nast_end_mp.count) then
- 
+
       -------------------------------------------------------------
       -- start positition is less that the overall start
-   	  -- OR
-      -- end position is greater than the overall end 
+      -- OR
+      -- end position is greater than the overall end
       -- if so then placement at this position is not allowed
-      ------------------------------------------------------------  
-      RETURN(FALSE);   
-  
+      ------------------------------------------------------------
+      RETURN(FALSE);
+
     ELSE
 
       FOR i in 2..l_tab_begin_mp.count LOOP
-  
+
         -- check that there are no gaps between previous and current membership
-    	-- if so then placement at this position is not allowed 
+     -- if so then placement at this position is not allowed
 
 --        nm_debug.debug('Compare '||to_char(l_tab_begin_mp(i))||' with '||to_char(l_tab_end_mp(i-1)));
-        IF l_tab_begin_mp(i) > l_tab_end_mp(i-1) THEN 
+        IF l_tab_begin_mp(i) > l_tab_end_mp(i-1) THEN
           RETURN(FALSE);
         END IF;
-	  
-     END LOOP;	  
-	  
-    END IF;	  
-      
+
+     END LOOP;
+
+    END IF;
+
     RETURN(TRUE);
 
   END check_fragmented_memberships;
-  
+
 
 
 BEGIN
---
+--RAC - use a select into as use of hig.get_sysopt violates the pragma
+
+  begin
+    select hov_value into g_use_group_security
+    from hig_option_values
+    where hov_id = 'USEGRPSEC';
+  exception
+    when no_data_found then
+      g_use_group_security := 'Y';
+  end;
+
    -- If security is switched off for this operation
 -- nm_debug.debug('   IF get_status = nm3type.c_off');
    IF get_status = nm3type.c_off
@@ -326,7 +346,7 @@ BEGIN
 -- Check if one of this type which is in a different tree already exists.
 --
 --   nm_debug.debug('   OPEN  c1;');
-   OPEN  c1;
+   OPEN  c1(g_use_group_security);
 --   nm_debug.debug('   FETCH c1 INTO l_au;');
    FETCH c1 INTO l_au;
 --   nm_debug.debug('   IF c1%FOUND');
@@ -351,7 +371,7 @@ BEGIN
 --
 -- dbms_output.put_line( 'test for gaps');
 -- nm_debug.debug('   OPEN  c2;');
-   OPEN  c2;
+   OPEN  c2(g_use_group_security);
 -- nm_debug.debug('   FETCH c2 INTO l_au;');
    FETCH c2 INTO l_au;
 -- nm_debug.debug('   l_gaps_exist := c2%NOTFOUND;');
@@ -369,22 +389,22 @@ BEGIN
 --       dbms_output.put_line( 'NOT privvy');
          -- Check to make sure that this is a Network membership operation
 
-		 l_dummy := Null; -- initialise
+   l_dummy := Null; -- initialise
          OPEN  cs_not_privvy;
          FETCH cs_not_privvy INTO l_dummy;
-		 CLOSE cs_not_privvy;
-         IF l_dummy IS NOT NULL 
+   CLOSE cs_not_privvy;
+         IF l_dummy IS NOT NULL
           THEN -- If this is not a network membership operation then error
-			
-			
-			---------------------------------------------------------
-			-- GJ 03-DEC-2004
-			-- there may not be a single member that spans the whole
-			-- of the proposed placement for the membership - but
-			-- the fragemented members may overlap/join up to 
-			-- give an overall lenght that would allow placement 
-			-- therefore call function to check for this
-			---------------------------------------------------------
+
+
+   ---------------------------------------------------------
+   -- GJ 03-DEC-2004
+   -- there may not be a single member that spans the whole
+   -- of the proposed placement for the membership - but
+   -- the fragemented members may overlap/join up to
+   -- give an overall lenght that would allow placement
+   -- therefore call function to check for this
+   ---------------------------------------------------------
             IF NOT check_fragmented_memberships THEN
                  hig.raise_ner (pi_appl               => nm3type.c_net
                                ,pi_id                 => 235
@@ -470,9 +490,9 @@ FUNCTION get_au_mode(pi_user_id IN hig_users.hus_user_id%TYPE
       nag.nag_child_admin_unit = p_au
     ORDER BY
       nua.nua_mode;
-  
+
   l_found boolean;
-  
+
   l_retval nm_user_aus.nua_mode%TYPE;
 
 BEGIN
@@ -482,9 +502,9 @@ BEGIN
   OPEN cs_au_mode(p_user_id => pi_user_id
                  ,p_au      => pi_au);
     FETCH cs_au_mode INTO l_retval;
-    l_found := cs_au_mode%FOUND; 
-  CLOSE cs_au_mode; 
-   
+    l_found := cs_au_mode%FOUND;
+  CLOSE cs_au_mode;
+
   IF NOT(l_found)
   THEN
     --you should not be here!
@@ -726,12 +746,23 @@ BEGIN
       g_au_sec_exc_msg   := NULL;
    --
    END IF;
+
+     begin
+      select hov_value into g_use_group_security
+      from hig_option_values
+      where hov_id = 'USEGRPSEC';
+      exception
+      when no_data_found then
+        g_use_group_security := 'Y';
+    end;
+
 --
 --Now we are here, everything is OK, check that the au is exclusive etc
 --If inserting, we need to check the location has correct aus,
 --If updating, then only if the begin or end mp have changed do we need to
 --check the au over the location.
 --
+  if  ((g_use_group_security = 'Y' and p_rec.nm_type_new = 'I' ) or g_use_group_security = 'N' ) then
    IF   c_inserting
     OR (c_updating AND p_rec.nm_begin_mp_new       != p_rec.nm_begin_mp_old )
     OR (c_updating AND NVL(p_rec.nm_end_mp_new,-1) != NVL(p_rec.nm_end_mp_old,-1))
@@ -752,6 +783,7 @@ BEGIN
       l_rec_nast.nast_admin_type := g_last_admin_type;
       nm3ausec.ins_nast (l_rec_nast);
    END IF;
+  end if;
 --
 --The after insert/update statement level trigger will do the rest
 --
