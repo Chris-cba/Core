@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec_maint AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec_maint.pkb-arc   2.2   Nov 23 2007 12:24:18   ptanava  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec_maint.pkb-arc   2.3   Apr 23 2008 17:36:10   ptanava  $
 --       Module Name      : $Workfile:   nm3ausec_maint.pkb  $
---       Date into PVCS   : $Date:   Nov 23 2007 12:24:18  $
---       Date fetched Out : $Modtime:   Nov 23 2007 12:23:54  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 23 2008 17:36:10  $
+--       Date fetched Out : $Modtime:   Apr 23 2008 17:27:02  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on SCCS version : 1.4
 --
 --   Author : Jonathan Mills
@@ -20,10 +20,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec_maint AS
 /* History
   23.11.07 PT fixed a bug in process_each_inv_item() whereby the continous item placements were not dealt properly
                 fixed by removing an unnecessary temp extent creation.
+  23.04.08 PT modified the above by creating the intersect temp extent manually for continuous items.
 */
 
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ausec_maint';
 --
    TYPE rec_parent IS RECORD
@@ -265,6 +266,7 @@ PROCEDURE process_each_inv_item (pi_nte_job_id IN nm_nw_temp_extents.nte_job_id%
 --
    l_inv_nte_job_id          nm_nw_temp_extents.nte_job_id%TYPE;
    l_new_inv_loc_nte_job_id  nm_nw_temp_extents.nte_job_id%TYPE;
+--   l_old_inv_loc_nte_job_id   nm_nw_temp_extents.nte_job_id%type;
 --
    l_warning_code            varchar2(200);
    l_warning_msg             varchar2(200);
@@ -302,7 +304,7 @@ BEGIN
 --
    -- Get the inventory record
    l_rec_iit := nm3inv.get_inv_item (pi_iit_ne_id);
-  --nm3dbg.putln('l_rec_iit.iit_inv_type='||l_rec_iit.iit_inv_type);
+--  nm3dbg.putln('l_rec_iit.iit_inv_type='||l_rec_iit.iit_inv_type);
   
 --    IF l_rec_iit.iit_inv_type='ARBE'
 --     THEN
@@ -371,15 +373,51 @@ BEGIN
                            ,pi_nte_job_id_linear           => pi_nte_job_id
                            ,po_nte_job_id_points_in_linear => l_new_inv_loc_nte_job_id
                            );
+      
    ELSE
 -- PT continuous items fix: the new extent is wrong here.
+--     nm3dbg.putln('nm3extent.create_temp_ne_intx_of_temp_ne('
+--        ||'pi_nte_job_id_1='||pi_nte_job_id
+--        ||', pi_nte_job_id_2='||l_inv_nte_job_id
+--        ||')');
+        
+      -- PT the nm3extent.create_temp_ne_intx_of_temp_ne() creates the minus intersect where the two don't overlap
+      --  we create the overlapping union intersect manually here
+      select nte_id_seq.nextval into l_new_inv_loc_nte_job_id from dual;
+--      nm3dbg.putln('  l_new_inv_loc_nte_job_id='||l_new_inv_loc_nte_job_id);
+      
+      insert into nm_nw_temp_extents (
+        nte_job_id, nte_ne_id_of, nte_begin_mp, nte_end_mp, nte_cardinality, nte_seq_no, nte_route_ne_id
+      )
+      select *
+      from (
+      select
+        l_new_inv_loc_nte_job_id
+       ,e.nte_ne_id_of
+       ,greatest(e.nte_begin_mp, e2.nte_begin_mp) nte_begin_mp
+       ,least(e.nte_end_mp, e2.nte_end_mp) nte_end_mp
+       ,e.nte_cardinality
+       ,e.nte_seq_no
+       ,e.nte_route_ne_id
+      from
+         nm_nw_temp_extents e
+        ,nm_nw_temp_extents e2
+      where e.nte_job_id = pi_nte_job_id
+        and e2.nte_job_id = l_inv_nte_job_id
+        and e.nte_ne_id_of = e2.nte_ne_id_of
+      )
+      where nte_begin_mp < nte_end_mp;
+--      nm3dbg.putln('  l_new_inv_loc_nte_job_id rowcount='||sql%rowcount);
+        
 --       nm3extent.create_temp_ne_intx_of_temp_ne
 --                        (pi_nte_job_id_1         => pi_nte_job_id
 --                        ,pi_nte_job_id_2         => l_inv_nte_job_id
 --                        ,pi_resultant_nte_job_id => l_new_inv_loc_nte_job_id
---                        );
-      l_new_inv_loc_nte_job_id := l_inv_nte_job_id;
+--                        );            
+--      nm3dbg.putln('  l_new_inv_loc_nte_job_id='||l_new_inv_loc_nte_job_id);
+--      l_new_inv_loc_nte_job_id := l_inv_nte_job_id;
    END IF;
+    
 --   nm_debug.debug('l_new_inv_loc_nte_job_id');
 --   nm3extent.debug_temp_extents(l_new_inv_loc_nte_job_id);
 --
@@ -402,6 +440,11 @@ BEGIN
 --      ||', l_new_inv_loc_nte_job_id='||l_new_inv_loc_nte_job_id
 --      ||')');
 --   nm3extent.debug_temp_extents(l_new_inv_loc_nte_job_id);
+
+--     nm3dbg.putln('nm3extent.end_inv_location_by_temp_ne('
+--        ||'pi_iit_ne_id='||pi_iit_ne_id
+--        ||', pi_nte_job_id='||l_new_inv_loc_nte_job_id
+--        ||')');
    nm3homo.end_inv_location_by_temp_ne
                     (pi_iit_ne_id            => pi_iit_ne_id
                     ,pi_nte_job_id           => l_new_inv_loc_nte_job_id
