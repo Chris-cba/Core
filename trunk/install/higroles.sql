@@ -396,6 +396,7 @@ BEGIN
    grant_ ('ALTER USER');
    grant_ ('CREATE ANY TABLE');
    grant_ ('CREATE ANY TRIGGER');
+   grant_ ('CREATE ANY VIEW');
    EXECUTE IMMEDIATE 'grant '||l_role||' to '||USER;
    EXECUTE IMMEDIATE 'grant '||l_role||' to '||USER||' with admin option';
 END;
