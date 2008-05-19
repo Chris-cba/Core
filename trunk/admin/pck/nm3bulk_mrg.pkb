@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.11   Jan 09 2008 10:34:44   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.12   May 19 2008 18:31:06   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Jan 09 2008 10:34:44  $
---       Date fetched Out : $Modtime:   Jan 09 2008 10:29:32  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   May 19 2008 18:31:06  $
+--       Date fetched Out : $Modtime:   May 19 2008 18:26:38  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --
 --   Author : Priidu Tanava
@@ -46,11 +46,12 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   17.12.07  PT added rowid_with_group_by exception to test_key_preserved(), fixed a typo in exception init
   04.01.08  PT fixed the missing 'last one after loop' error in ins_datum_homo_chunks() and std_insert_invitems()
   09.01.08  PT fixed xsp handling in ins_datum_homo_chunks()
+  19.05.08  PT in std_populate() removed the 'No merge results' error 
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.11  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.12  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -598,7 +599,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
             then
               l_band_value := l_band_value + 1;
               l_case := l_case
-                ||cr||'           when '||p_alias||'.'||attribute_xsp_name(pt_attr(i).MRG_ATTRIB, pt_attr(i).xsp)||' between '
+                ||cr||'           when '||p_alias||'.'||attribute_xsp_name(pt_attr(i).mrg_attrib, pt_attr(i).xsp)||' between '
                     ||pt_itd(k).itd_band_min_value||' and '
                     ||pt_itd(k).itd_band_max_value||' then '||qt||l_band_value||qt;
             end if;
@@ -610,7 +611,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
              s := s||l_cr||'case'||l_case
           ||cr||'           else null end';
         else
-          s := s||l_cr||p_alias||'.'||attribute_xsp_name(pt_attr(i).MRG_ATTRIB, pt_attr(i).xsp);
+          s := s||l_cr||p_alias||'.'||attribute_xsp_name(pt_attr(i).mrg_attrib, pt_attr(i).xsp);
         end if;
         
         l_cr := cr||'    ||'',''||';
@@ -634,7 +635,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         -- ft assets have no xsp
         if pt_attr(i).table_name is null then
           l_inv_alias := 'i';
-          l_attrib := pt_attr(i).IIT_ATTRIB_NAME;
+          l_attrib := pt_attr(i).iit_attrib_name;
           
         -- standard assets (may have xsp)
         else
@@ -642,13 +643,13 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
             k := k + 1;
           end if;
           l_inv_alias := 'i'||k;
-          l_attrib := pt_attr(i).ITA_ATTRIB_NAME;
+          l_attrib := pt_attr(i).ita_attrib_name;
         end if;
-        s := s||cr||'  ,case when t.nm_type = ''I'' and t.nm_obj_type = '''||pt_attr(i).INV_TYPE||'''';
+        s := s||cr||'  ,case when t.nm_type = ''I'' and t.nm_obj_type = '''||pt_attr(i).inv_type||'''';
         if pt_attr(i).xsp is not null then
           s := s||' and i.iit_x_sect = '''||pt_attr(i).xsp||'''';
         end if;
-        s := s||' then '||l_inv_alias||'.'||l_attrib||' end '||attribute_xsp_name(pt_attr(i).MRG_ATTRIB, pt_attr(i).xsp);
+        s := s||' then '||l_inv_alias||'.'||l_attrib||' end '||attribute_xsp_name(pt_attr(i).mrg_attrib, pt_attr(i).xsp);
         
         i := pt_attr.next(i);
       end loop;
@@ -685,7 +686,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           -- start new
           if pt_attr(i).seq = 1 then
             k := k + 1;
-            s_tmp := '    ,(select distinct '''||pt_attr(i).INV_TYPE||''' ft_inv_type, '
+            s_tmp := '    ,(select distinct '''||pt_attr(i).inv_type||''' ft_inv_type, '
               ||'ft'||k||'.'||pt_attr(i).table_pk_column||', ft'||k||'.'||pt_attr(i).ita_attrib_name;
             s_tmp_tbl := pt_attr(i).table_name;
               
@@ -720,7 +721,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         if pt_attr(i).seq = 1 and pt_attr(i).table_name is not null then
           k := k + 1;
           s := s||cr||'    and t.nm_obj_type = i'||k||'.ft_inv_type (+)'
-                ||cr||'    and t.nm_ne_id_in = i'||k||'.'||pt_attr(i).TABLE_PK_COLUMN||' (+)';
+                ||cr||'    and t.nm_ne_id_in = i'||k||'.'||pt_attr(i).table_pk_column||' (+)';
         end if;
         i := pt_attr.next(i);
       end loop;
@@ -1021,20 +1022,20 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     )
     loop
       i := i + 1;
-      pt_attr(i).INV_TYPE           := r.nqt_inv_type;
+      pt_attr(i).inv_type           := r.nqt_inv_type;
       pt_attr(i).seq                := r.attrib_seq;
-      pt_attr(i).MRG_ATTRIB         := r.mrg_attrib_name;
-      pt_attr(i).ITA_ATTRIB_NAME    := r.ita_attrib_name;
-      pt_attr(i).IIT_ATTRIB_NAME    := r.iit_attrib_name;
-      pt_attr(i).ITA_FORMAT         := r.ita_format;
-      pt_attr(i).TABLE_NAME         := r.nit_table_name;
-      pt_attr(i).TABLE_IIT_FLAG     := r.table_iit_flag;
-      pt_attr(i).TABLE_PK_COLUMN    := r.nit_foreign_pk_column;
-      pt_attr(i).TABLE_NE_COLUMN    := r.nit_lr_ne_column_name;
-      pt_attr(i).TABLE_BEGIN_COLUMN := r.nit_lr_st_chain;
-      pt_attr(i).TABLE_END_COLUMN   := r.nit_lr_end_chain;
-      pt_attr(i).PNT_OR_CONT        := r.nit_pnt_or_cont;
-      pt_attr(i).XSP                := r.nqt_x_sect;
+      pt_attr(i).mrg_attrib         := r.mrg_attrib_name;
+      pt_attr(i).ita_attrib_name    := r.ita_attrib_name;
+      pt_attr(i).iit_attrib_name    := r.iit_attrib_name;
+      pt_attr(i).ita_format         := r.ita_format;
+      pt_attr(i).table_name         := r.nit_table_name;
+      pt_attr(i).table_iit_flag     := r.table_iit_flag;
+      pt_attr(i).table_pk_column    := r.nit_foreign_pk_column;
+      pt_attr(i).table_ne_column    := r.nit_lr_ne_column_name;
+      pt_attr(i).table_begin_column := r.nit_lr_st_chain;
+      pt_attr(i).table_end_column   := r.nit_lr_end_chain;
+      pt_attr(i).pnt_or_cont        := r.nit_pnt_or_cont;
+      pt_attr(i).xsp                := r.nqt_x_sect;
       
       
       l_where_attrib := get_attrib_name(
@@ -1252,9 +1253,9 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 
     
     -- init static vaules
-    r_res.NQR_NMQ_ID := p_nmq_id;
-    r_res.NQR_SOURCE := 'ROUTE';
-    r_res.NQR_ADMIN_UNIT := p_admin_unit_id;
+    r_res.nqr_nmq_id := p_nmq_id;
+    r_res.nqr_source := 'ROUTE';
+    r_res.nqr_admin_unit := p_admin_unit_id;
     
     nm3dbg.putln('open populate query');
     
@@ -1332,7 +1333,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         if r_res.nqr_mrg_job_id is null then
           r_res.nqr_mrg_job_id := nm3seq.next_rtg_job_id_seq;
           r_res.nqr_description := p_description;
-          r_res.nqr_source_id := r.NM_NE_ID_IN;
+          r_res.nqr_source_id := r.nm_ne_id_in;
           r_res.nqr_mrg_section_members_count := 0;
           r_res.nqr_admin_unit := p_admin_unit_id;
           insert into nm_mrg_query_results_all values r_res;
@@ -1425,12 +1426,12 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     end loop;
     
     
-    -- test the loop count
-    nm3dbg.putln('populate count: '||j);
-    if j = 0 then
-      raise_application_error(-20001,
-        'No merge results');
-    end if;
+--    -- test the loop count
+--    nm3dbg.putln('populate count: '||j);
+--    if j = 0 then
+--      raise_application_error(-20001,
+--        'No merge results');
+--    end if;
     
     
     -- last one after loop        
@@ -1460,6 +1461,9 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     
     -- assign the out value
     p_mrg_job_id := r_res.nqr_mrg_job_id;
+    if p_mrg_job_id is null then
+      p_mrg_job_id := nm3seq.next_rtg_job_id_seq;
+    end if;
   
     
     nm3dbg.deind;
@@ -1632,16 +1636,16 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         j := j + 1;
         if pt_attr(i).table_name is null then
           l_inv_alias := 'i';
-          l_attrib := pt_attr(i).IIT_ATTRIB_NAME;
+          l_attrib := pt_attr(i).iit_attrib_name;
         else
           if pt_attr(i).seq = 1 then
             k := k + 1;
           end if;
           l_inv_alias := 'i'||k;
-          l_attrib := pt_attr(i).ITA_ATTRIB_NAME;
+          l_attrib := pt_attr(i).ita_attrib_name;
         end if;
         s := s||cr||'  ,case t.nm_obj_type'
-          ||cr||'    when '''||pt_attr(i).INV_TYPE
+          ||cr||'    when '''||pt_attr(i).inv_type
           ||''' then '||l_inv_alias||'.'||l_attrib||' end NSV_ATTRIB'||j;
         i := pt_attr.next(i);
       end loop;
@@ -1677,7 +1681,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           -- start new
           if pt_attr(i).seq = 1 then
             k := k + 1;
-            s_tmp := '    ,(select distinct '''||pt_attr(i).INV_TYPE||''' ft_inv_type, '
+            s_tmp := '    ,(select distinct '''||pt_attr(i).inv_type||''' ft_inv_type, '
               ||'ft'||k||'.'||pt_attr(i).table_pk_column||', ft'||k||'.'||pt_attr(i).ita_attrib_name;
             s_tmp_tbl := pt_attr(i).table_name;
               
@@ -1713,7 +1717,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         if pt_attr(i).seq = 1 and pt_attr(i).table_name is not null then
           k := k + 1;
           s := s||cr||'    and t.nm_obj_type = i'||k||'.ft_inv_type (+)'
-                ||cr||'    and t.nm_ne_id_in = i'||k||'.'||pt_attr(i).TABLE_PK_COLUMN||' (+)';
+                ||cr||'    and t.nm_ne_id_in = i'||k||'.'||pt_attr(i).table_pk_column||' (+)';
         end if;
         i := pt_attr.next(i);
       end loop;
