@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.1   Jul 18 2007 15:20:12   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.2   May 30 2008 10:06:48   ptanava  $
 --       Module Name      : $Workfile:   nm3reclass.pkb  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:20:12  $
---       Date fetched Out : $Modtime:   Jun 29 2007 14:41:28  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 30 2008 10:06:48  $
+--       Date fetched Out : $Modtime:   May 30 2008 10:03:14  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --   Author : R.A. Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';
@@ -740,6 +740,7 @@ BEGIN
    END IF;
 --
 --  Create a NM_ELEMENT_HISTORY record.
+    g_rec_neh.neh_id             := null;
     g_rec_neh.neh_ne_id_old      := old_ne.ne_id;
     g_rec_neh.neh_ne_id_new      := p_new_ne_id;
     g_rec_neh.neh_operation      := c_neh_operation;
@@ -1427,7 +1428,8 @@ BEGIN
       --nm3debug.debug_ne(l_rec_new_ne);
       Nm3net.insert_any_element (l_rec_new_ne);
      -- nm3net.ins_ne (l_rec_new_ne);
-
+       
+       g_rec_neh.neh_id             := null;
        g_rec_neh.neh_ne_id_old      := p_old_ne.ne_id;
        g_rec_neh.neh_ne_id_new      := l_rec_new_ne.ne_id;
        g_rec_neh.neh_operation      := c_neh_operation;
