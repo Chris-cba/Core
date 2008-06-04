@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3net AS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkh-arc   2.1   Aug 31 2007 15:58:42   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkh-arc   2.2   Jun 04 2008 13:32:32   ptanava  $
 --       Module Name      : $Workfile:   nm3net.pkh  $
---       Date into SCCS   : $Date:   Aug 31 2007 15:58:42  $
---       Date fetched Out : $Modtime:   Aug 31 2007 14:14:56  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Jun 04 2008 13:32:32  $
+--       Date fetched Out : $Modtime:   Jun 03 2008 11:11:10  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on 
 --
 --
@@ -17,10 +17,10 @@ CREATE OR REPLACE PACKAGE nm3net AS
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
---</PACKAGE>
---all global package variables here
---<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(80) := '"@(#)nm3net.pkh	1.72 11/14/06"';
+
+-- 03.06.08 PT added pi_no_purpose parameter to create_node()
+
+  g_sccsid      CONSTANT  varchar2(80) := '"$Revision:   2.2  $"';
 --  g_sccsid is the SCCS_ID
 --
 
@@ -870,6 +870,7 @@ PROCEDURE create_node(pi_no_node_id   IN nm_nodes_all.no_node_id%TYPE
                      ,pi_no_descr     IN nm_nodes_all.no_descr%TYPE      DEFAULT NULL
                      ,pi_no_node_type IN nm_nodes_all.no_node_type%TYPE  DEFAULT NULL
                      ,pi_no_node_name IN nm_nodes_all.no_node_name%TYPE DEFAULT NULL
+                     ,pi_no_purpose   in nm_nodes_all.no_purpose%type default null
                      );
 -- Possible exceptions raised are
 -- -21002, 'No node types found'
