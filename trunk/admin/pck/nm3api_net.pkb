@@ -1,14 +1,12 @@
 CREATE OR REPLACE PACKAGE BODY nm3api_net AS
+--   PVCS Identifiers :-
 --
------------------------------------------------------------------------------
---
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3api_net.pkb	1.2 09/11/02
---       Module Name      : nm3api_net.pkb
---       Date into SCCS   : 02/09/11 09:37:07
---       Date fetched Out : 07/06/13 14:10:57
---       SCCS Version     : 1.2
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_net.pkb-arc   2.1   Jun 04 2008 13:29:32   ptanava  $
+--       Module Name      : $Workfile:   nm3api_net.pkb  $
+--       Date into PVCS   : $Date:   Jun 04 2008 13:29:32  $
+--       Date fetched Out : $Modtime:   Jun 03 2008 11:51:10  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on SCCS version : 1.2
 --
 --
 --   Author : Rob Coupe
@@ -18,10 +16,10 @@ CREATE OR REPLACE PACKAGE BODY nm3api_net AS
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2002
 -----------------------------------------------------------------------------
+
+-- 03.06.08 PT added p_no_purpose parameter to create_node() func and proc
 --
---all global package variables here
---
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3api_net.pkb	1.2 09/11/02"';
+   g_body_sccsid     CONSTANT  varchar2(200) :='"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3api_net';
@@ -48,6 +46,7 @@ FUNCTION  create_node (p_no_node_name   IN     nm_nodes.no_node_name%TYPE   DEFA
                       ,p_effective_date IN     nm_nodes.no_start_date%TYPE  DEFAULT nm3user.get_effective_date
                       ,p_np_grid_east   IN     nm_points.np_grid_east%TYPE  DEFAULT NULL
                       ,p_np_grid_north  IN     nm_points.np_grid_north%TYPE DEFAULT NULL
+                      ,p_no_purpose     in     nm_nodes.no_purpose%type default null  -- PT 03.06.08
                       ) RETURN nm_nodes.no_node_id%TYPE IS
 --
    l_no_node_id nm_nodes.no_node_id%TYPE;
@@ -62,6 +61,7 @@ BEGIN
                                         ,p_effective_date => p_effective_date
                                         ,p_np_grid_east   => p_np_grid_east
                                         ,p_np_grid_north  => p_np_grid_north
+                                        ,p_no_purpose     => p_no_purpose     -- PT 03.06.08
                                         );
 --
    nm_debug.proc_end (g_package_name,'create_node');
@@ -79,6 +79,7 @@ PROCEDURE create_node (p_no_node_name   IN     nm_nodes.no_node_name%TYPE   DEFA
                       ,p_np_grid_east   IN     nm_points.np_grid_east%TYPE  DEFAULT NULL
                       ,p_np_grid_north  IN     nm_points.np_grid_north%TYPE DEFAULT NULL
                       ,p_no_node_id        OUT nm_nodes.no_node_id%TYPE
+                      ,p_no_purpose     in     nm_nodes.no_purpose%type default null  -- PT 03.06.08
                       ) IS
 BEGIN
    p_no_node_id := create_node (p_no_node_name   => p_no_node_name
@@ -87,6 +88,7 @@ BEGIN
                                ,p_effective_date => p_effective_date
                                ,p_np_grid_east   => p_np_grid_east
                                ,p_np_grid_north  => p_np_grid_north
+                               ,p_no_purpose     => p_no_purpose    -- PT 03.06.08
                                );
 END create_node;
 --

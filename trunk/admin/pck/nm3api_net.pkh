@@ -1,12 +1,12 @@
 CREATE OR REPLACE PACKAGE nm3api_net as
---<PACKAGE>
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3api_net.pkh	1.2 09/11/02
---       Module Name      : nm3api_net.pkh
---       Date into SCCS   : 02/09/11 09:36:57
---       Date fetched Out : 07/06/13 14:10:58
---       SCCS Version     : 1.2
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_net.pkh-arc   2.1   Jun 04 2008 13:29:32   ptanava  $
+--       Module Name      : $Workfile:   nm3api_net.pkh  $
+--       Date into PVCS   : $Date:   Jun 04 2008 13:29:32  $
+--       Date fetched Out : $Modtime:   Jun 03 2008 19:53:30  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on SCCS version : 1.2
 --
 --
 --   Author : Rob Coupe
@@ -20,9 +20,8 @@ CREATE OR REPLACE PACKAGE nm3api_net as
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2002
 -----------------------------------------------------------------------------
---</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3api_net.pkh	1.2 09/11/02"';
+  g_sccsid      CONSTANT  VARCHAR2(200) :='"$Revision:   2.1  $"';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
@@ -53,6 +52,7 @@ FUNCTION  create_node (p_no_node_name   IN     nm_nodes.no_node_name%TYPE   DEFA
                       ,p_effective_date IN     nm_nodes.no_start_date%TYPE  DEFAULT nm3user.get_effective_date
                       ,p_np_grid_east   IN     nm_points.np_grid_east%TYPE  DEFAULT NULL
                       ,p_np_grid_north  IN     nm_points.np_grid_north%TYPE DEFAULT NULL
+                      ,p_no_purpose     in     nm_nodes.no_purpose%type default null  -- PT 03.06.08
                       ) RETURN nm_nodes.no_node_id%TYPE;
 --
 PROCEDURE create_node (p_no_node_name   IN     nm_nodes.no_node_name%TYPE   DEFAULT NULL
@@ -62,6 +62,7 @@ PROCEDURE create_node (p_no_node_name   IN     nm_nodes.no_node_name%TYPE   DEFA
                       ,p_np_grid_east   IN     nm_points.np_grid_east%TYPE  DEFAULT NULL
                       ,p_np_grid_north  IN     nm_points.np_grid_north%TYPE DEFAULT NULL
                       ,p_no_node_id        OUT nm_nodes.no_node_id%TYPE
+                      ,p_no_purpose     in     nm_nodes.no_purpose%type default null  -- PT 03.06.08
                       );
 --
 --</PROC>
