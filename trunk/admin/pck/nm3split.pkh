@@ -1,12 +1,12 @@
 CREATE OR REPLACE PACKAGE nm3split IS
---<PACKAGE>
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3split.pkh	1.7 11/18/04
---       Module Name      : nm3split.pkh
---       Date into SCCS   : 04/11/18 10:59:56
---       Date fetched Out : 07/06/13 14:13:36
---       SCCS Version     : 1.7
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkh-arc   2.1   Jun 04 2008 13:31:04   ptanava  $
+--       Module Name      : $Workfile:   nm3split.pkh  $
+--       Date into PVCS   : $Date:   Jun 04 2008 13:31:04  $
+--       Date fetched Out : $Modtime:   Jun 03 2008 19:53:32  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on SCCS version : 1.7
 --
 --
 --   Author : ITurnbull
@@ -16,11 +16,10 @@ CREATE OR REPLACE PACKAGE nm3split IS
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
---</PACKAGE>
---all global package variables here
---<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(80) := '"@(#)nm3split.pkh	1.7 11/18/04"';
---  g_sccsid is the SCCS_ID
+
+-- 03.06.08 PT added no_purpose parameter to create_node(), do_split_datum_or_group() and do_geo_split()
+
+  g_sccsid      CONSTANT  VARCHAR2(80)  := '"$Revision:   2.1  $"';
 --
    g_rec_ne_old   nm_elements%ROWTYPE;
    g_rec_ne_new_1 nm_elements%ROWTYPE;
@@ -105,6 +104,7 @@ PROCEDURE do_split_datum_or_group ( pi_ne_id                  IN     nm_elements
                                    ,pi_np_grid_east           IN     nm_points.np_grid_east%TYPE DEFAULT NULL
                                    ,pi_np_grid_north          IN     nm_points.np_grid_north%TYPE DEFAULT NULL
                                    ,pi_no_np_id               IN OUT nm_nodes.no_np_id%TYPE
+                                   ,pi_no_purpose             in     nm_nodes.no_purpose%type default null -- PT 03.06.08
 								   
                                    ,pi_ne_unique_1            IN     nm_elements.ne_unique%TYPE DEFAULT NULL  -- specified attributes for element 1
                                    ,pi_ne_type_1              IN     nm_elements.ne_type%TYPE DEFAULT NULL
@@ -229,9 +229,9 @@ PROCEDURE do_split_datum_or_group ( pi_ne_id                  IN     nm_elements
                        ,p_no_descr nm_nodes.no_descr%TYPE DEFAULT NULL
                        ,p_no_node_type nm_nodes.no_node_type%TYPE DEFAULT NULL
                        ,p_no_np_id nm_nodes.no_np_id%TYPE DEFAULT NULL
-
                        ,p_np_grid_east NM_POINTS.np_grid_east%TYPE DEFAULT NULL
                        ,p_np_grid_north NM_POINTS.np_grid_north%TYPE DEFAULT NULL
+                       ,p_no_purpose             in     nm_nodes.no_purpose%type default null -- PT 03.06.08
 
                        ,p_ne_unique_1 nm_elements.ne_unique%TYPE DEFAULT NULL
                        ,p_ne_type_1 nm_elements.ne_type%TYPE DEFAULT NULL
@@ -282,6 +282,7 @@ FUNCTION create_node (p_no_node_name   IN nm_nodes.no_node_name%TYPE   DEFAULT N
                      ,p_effective_date IN nm_nodes.no_start_date%TYPE  DEFAULT nm3user.get_effective_date
                      ,p_np_grid_east   IN NM_POINTS.np_grid_east%TYPE  DEFAULT NULL
                      ,p_np_grid_north  IN NM_POINTS.np_grid_north%TYPE DEFAULT NULL
+                     ,p_no_purpose     in nm_nodes_all.no_purpose%type default null
                      ) RETURN nm_nodes.no_node_id%TYPE;
 --</PROC>
 --
