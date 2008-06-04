@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY Nm3net AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkb-arc   2.2   Aug 31 2007 17:34:30   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkb-arc   2.3   Jun 04 2008 13:33:18   ptanava  $
 --       Module Name      : $Workfile:   nm3net.pkb  $
---       Date into SCCS   : $Date:   Aug 31 2007 17:34:30  $
---       Date fetched Out : $Modtime:   Aug 31 2007 16:42:38  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Jun 04 2008 13:33:18  $
+--       Date fetched Out : $Modtime:   Jun 03 2008 11:14:50  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --
 --
@@ -16,8 +16,12 @@ CREATE OR REPLACE PACKAGE BODY Nm3net AS
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
+
+-- 03.06.08 PT added pi_no_purpose parameter to create_node()
+--              (create_or_reuse_point_and_node() also creates nodes, this sets null no_purpose)
+
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3net.pkb	1.139 03/08/07"';
+   g_body_sccsid     CONSTANT  VARCHAR2(200) := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
   g_package_name CONSTANT  VARCHAR2(30) := 'nm3net';
 --
@@ -3120,6 +3124,7 @@ PROCEDURE create_node(pi_no_node_id   IN NM_NODES_ALL.no_node_id%TYPE
 	                 ,pi_no_descr     IN NM_NODES_ALL.no_descr%TYPE      DEFAULT NULL
 	                 ,pi_no_node_type IN NM_NODES_ALL.no_node_type%TYPE  DEFAULT NULL
                      ,pi_no_node_name IN NM_NODES_ALL.no_node_name%TYPE DEFAULT NULL
+                     ,pi_no_purpose   in nm_nodes_all.no_purpose%type default null -- PT 03.06.08
 	             ) IS
 --
    CURSOR cs_nnt IS
@@ -3171,6 +3176,7 @@ BEGIN
   l_rec_no.no_np_id      := pi_np_id;
   l_rec_no.no_descr      := NVL(pi_no_descr,l_node_default_name);
   l_rec_no.no_node_type  := l_node_type;
+  l_rec_no.no_purpose    := pi_no_purpose;  -- PT 03.06.08
 --
   Nm3ins.ins_no (l_rec_no);
    Nm_Debug.proc_end(g_package_name,'create_node');
@@ -4404,7 +4410,7 @@ END is_node_valid_on_nt_type;
 --
 ----------------------------------------------------------------------------------
 --
-FUNCTION Get_Sub_Type (pi_obj_type IN nm_group_types.ngt_group_type%TYPE
+FUNCTION get_sub_type (pi_obj_type IN nm_group_types.ngt_group_type%TYPE
                       ) RETURN NM_TYPES.nt_type%TYPE IS
 --
    CURSOR cs_nng (c_obj_type nm_group_types.ngt_group_type%TYPE) IS
@@ -4445,7 +4451,7 @@ BEGIN
 --
    RETURN l_retval;
 --
-END Get_Sub_Type;
+END get_sub_type;
 --
 ----------------------------------------------------------------------------------
 --
@@ -4751,6 +4757,7 @@ BEGIN
                                ,pi_no_descr     => pi_node_descr
                                ,pi_no_node_type => pi_no_node_type
                                ,pi_no_node_name => l_no_node_name
+                               ,pi_no_purpose   => null             -- PT 03.06.08
                                );
 
      END IF;
@@ -5153,7 +5160,7 @@ BEGIN
              po_id   := l_ne_rec.ne_id;
              po_type := l_ne_rec.ne_type;
 		  ELSE
-		     l_nse_rec := nm3get.GET_NSe(pi_nse_name => pi_unique);          				                             
+		     l_nse_rec := nm3get.get_nse(pi_nse_name => pi_unique);          				                             
 
              po_id   := l_nse_rec.nse_id;
              po_type := nm3extent.get_c_roi_extent;
