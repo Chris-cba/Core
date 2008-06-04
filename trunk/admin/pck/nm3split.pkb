@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.2   Jul 31 2007 10:32:26   sscanlon  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.3   Jun 04 2008 13:31:32   ptanava  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Jul 31 2007 10:32:26  $
---       Date fetched Out : $Modtime:   Jul 23 2007 15:47:42  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jun 04 2008 13:31:32  $
+--       Date fetched Out : $Modtime:   Jun 03 2008 11:41:40  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : ITurnbull
@@ -16,8 +16,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -----------------------------------------------------------------------------
 --   Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
+
+-- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
+
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -156,6 +159,7 @@ FUNCTION create_node_internal (p_no_node_id     IN nm_nodes.no_node_id%TYPE
                               ,p_effective_date IN nm_nodes.no_start_date%TYPE
                               ,p_np_grid_east   IN NM_POINTS.np_grid_east%TYPE  DEFAULT NULL
                               ,p_np_grid_north  IN NM_POINTS.np_grid_north%TYPE DEFAULT NULL
+                              ,p_no_purpose     in nm_nodes_all.no_purpose%type default null
                               ) RETURN nm_elements.ne_no_start%TYPE;
 --
 -----------------------------------------------------------------------------
@@ -198,6 +202,7 @@ FUNCTION create_node (p_no_node_name   IN nm_nodes.no_node_name%TYPE   DEFAULT N
                      ,p_effective_date IN nm_nodes.no_start_date%TYPE  DEFAULT Nm3user.get_effective_date
                      ,p_np_grid_east   IN NM_POINTS.np_grid_east%TYPE  DEFAULT NULL
                      ,p_np_grid_north  IN NM_POINTS.np_grid_north%TYPE DEFAULT NULL
+                     ,p_no_purpose     in nm_nodes_all.no_purpose%type default null
                      ) RETURN nm_nodes.no_node_id%TYPE IS
 --
    l_node_id  nm_nodes.no_node_id%TYPE;
@@ -222,6 +227,7 @@ BEGIN
                                      ,p_effective_date => p_effective_date
                                      ,p_np_grid_east   => p_np_grid_east
                                      ,p_np_grid_north  => p_np_grid_north
+                                     ,p_no_purpose     => p_no_purpose
                                      );
 --
    RETURN l_node_id;
@@ -240,6 +246,7 @@ FUNCTION create_node_internal (p_no_node_id     IN nm_nodes.no_node_id%TYPE
                               ,p_effective_date IN nm_nodes.no_start_date%TYPE
                               ,p_np_grid_east   IN NM_POINTS.np_grid_east%TYPE  DEFAULT NULL
                               ,p_np_grid_north  IN NM_POINTS.np_grid_north%TYPE DEFAULT NULL
+                              ,p_no_purpose     in nm_nodes_all.no_purpose%type default null
                               ) RETURN nm_elements.ne_no_start%TYPE IS
 --
    v_node_id  nm_nodes.no_node_id%TYPE := p_no_node_id;
@@ -265,6 +272,7 @@ BEGIN
                      ,pi_no_descr     => p_no_descr
                      ,pi_no_node_type => p_no_node_type
                      ,pi_no_node_name => p_no_node_name
+                     ,pi_no_purpose   => p_no_purpose
                      );
 --
    Nm_Debug.proc_end(g_package_name,'create_node_internal');
@@ -991,6 +999,8 @@ PROCEDURE do_split ( p_ne_id nm_elements.ne_id%TYPE -- the element to split
                     ,p_no_np_id            IN     nm_nodes.no_np_id%TYPE             DEFAULT NULL
                     ,p_np_grid_east        IN     NM_POINTS.np_grid_east%TYPE        DEFAULT NULL
                     ,p_np_grid_north       IN     NM_POINTS.np_grid_north%TYPE       DEFAULT NULL
+                    ,p_no_purpose          in     nm_nodes.no_purpose%type default null -- PT 03.06.08
+                    
                     ,p_ne_unique_1         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
                     ,p_ne_type_1           IN     nm_elements.ne_type%TYPE           DEFAULT NULL
                     ,p_ne_nt_type_1        IN     nm_elements.ne_nt_type%TYPE        DEFAULT NULL
@@ -1098,6 +1108,7 @@ BEGIN
                      ,p_effective_date => p_effective_date
                      ,p_np_grid_east   => l_grid_east
                      ,p_np_grid_north  => l_grid_north
+                     ,p_no_purpose     => p_no_purpose
                      );
 
       END IF;
@@ -1217,6 +1228,8 @@ PROCEDURE do_geo_split
                     ,p_no_np_id            IN     nm_nodes.no_np_id%TYPE             DEFAULT NULL
                     ,p_np_grid_east        IN     NM_POINTS.np_grid_east%TYPE        DEFAULT NULL
                     ,p_np_grid_north       IN     NM_POINTS.np_grid_north%TYPE       DEFAULT NULL
+                    ,p_no_purpose          in     nm_nodes.no_purpose%type default null -- PT 03.06.08
+                    
                     ,p_ne_unique_1         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
                     ,p_ne_type_1           IN     nm_elements.ne_type%TYPE           DEFAULT NULL
                     ,p_ne_nt_type_1        IN     nm_elements.ne_nt_type%TYPE        DEFAULT NULL
@@ -1293,6 +1306,7 @@ BEGIN
         ,p_no_np_id            => p_no_np_id
         ,p_np_grid_east        => p_np_grid_east
         ,p_np_grid_north       => p_np_grid_north
+        ,p_no_purpose          => p_no_purpose    -- PT 03.06.08
         ,p_ne_unique_1         => p_ne_unique_1
         ,p_ne_type_1           => p_ne_type_1
         ,p_ne_nt_type_1        => p_ne_nt_type_1
@@ -1862,22 +1876,22 @@ PROCEDURE split_group_memberships(pi_route_ne_id             IN  nm_elements.ne_
 
 --
 --
-  PROCEDURE end_date_existing_IN_members IS
+  PROCEDURE end_date_existing_in_members IS
   
   BEGIN
     UPDATE nm_members
     SET    nm_end_date = pi_effective_date
     WHERE  nm_ne_id_in = pi_route_ne_id;
-  END end_date_existing_IN_members;
+  END end_date_existing_in_members;
 --
 --
-  PROCEDURE end_date_existing_OF_members IS
+  PROCEDURE end_date_existing_of_members IS
 	
   BEGIN	 
     UPDATE nm_members
     SET    nm_end_date = pi_effective_date
     WHERE  nm_ne_id_of = pi_route_ne_id;
-  END end_date_existing_OF_members; 
+  END end_date_existing_of_members; 
 --
 --
   FUNCTION get_nm_members_constants(pi_nm_ne_id_in IN nm_members.nm_ne_id_in%TYPE) RETURN nm_members%ROWTYPE IS
@@ -2006,7 +2020,7 @@ BEGIN
  --
  r_nm_members := get_nm_members_constants(pi_nm_ne_id_in => pi_route_ne_id);  
 
- end_date_existing_IN_members;
+ end_date_existing_in_members;
                               
  --
  -- create memberships for first new group
@@ -2021,7 +2035,7 @@ BEGIN
                              ,pi_placement_array  => l_placement_array_right);  
  
  
- end_date_existing_OF_members;
+ end_date_existing_of_members;
 
 END split_group_memberships;
 --
@@ -2043,6 +2057,8 @@ PROCEDURE do_split_group(pi_route_ne_id             IN     nm_elements.ne_id%TYP
                         ,pi_no_node_type            IN     nm_nodes.no_node_type%TYPE         DEFAULT NULL
                         ,pi_np_grid_east            IN     NM_POINTS.np_grid_east%TYPE        DEFAULT NULL
                         ,pi_np_grid_north           IN     NM_POINTS.np_grid_north%TYPE       DEFAULT NULL
+                        ,pi_no_purpose              in     nm_nodes.no_purpose%type default null -- PT 03.06.08
+                        --
                         ,pi_ne_unique_1             IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
                         ,pi_ne_type_1               IN     nm_elements.ne_type%TYPE           DEFAULT NULL
                         ,pi_ne_nt_type_1            IN     nm_elements.ne_nt_type%TYPE        DEFAULT NULL
@@ -2113,7 +2129,9 @@ BEGIN
                     ,p_no_descr            => pi_no_descr
                     ,p_no_node_type        => pi_no_node_type
                     ,p_np_grid_east        => pi_np_grid_east
-                    ,p_np_grid_north       => pi_np_grid_north);
+                    ,p_np_grid_north       => pi_np_grid_north
+                    ,p_no_purpose          => pi_no_purpose   -- PT 03.06.08
+                    );
  END IF;
  
  
@@ -2256,6 +2274,7 @@ PROCEDURE do_split_datum_or_group ( pi_ne_id                  IN     nm_elements
                                    ,pi_np_grid_east           IN     NM_POINTS.np_grid_east%TYPE DEFAULT NULL
                                    ,pi_np_grid_north          IN     NM_POINTS.np_grid_north%TYPE DEFAULT NULL
                                    ,pi_no_np_id               IN OUT nm_nodes.no_np_id%TYPE
+                                   ,pi_no_purpose             in     nm_nodes.no_purpose%type default null -- PT 03.06.08
 
                                    ,pi_ne_unique_1            IN     nm_elements.ne_unique%TYPE DEFAULT NULL  -- specified attributes for element 1
                                    ,pi_ne_type_1              IN     nm_elements.ne_type%TYPE DEFAULT NULL
@@ -2331,6 +2350,7 @@ BEGIN
                     ,p_no_np_id            => pi_no_np_id
                     ,p_np_grid_east        => pi_np_grid_east
                     ,p_np_grid_north       => pi_np_grid_north
+                    ,p_no_purpose          => pi_no_purpose     -- PT 03.06.08
                     ,p_ne_unique_1         => pi_ne_unique_1
                     ,p_ne_type_1           => pi_ne_type_1
                     ,p_ne_nt_type_1        => pi_ne_nt_type_1
@@ -2386,6 +2406,7 @@ BEGIN
                         ,pi_no_node_type            => l_no_node_type
                         ,pi_np_grid_east            => pi_np_grid_east
                         ,pi_np_grid_north           => pi_np_grid_north
+                        ,pi_no_purpose              => pi_no_purpose     -- PT 03.06.08
                         ,pi_ne_unique_1             => pi_ne_unique_1
                         ,pi_ne_type_1               => pi_ne_type_1
                         ,pi_ne_nt_type_1            => pi_ne_nt_type_1
