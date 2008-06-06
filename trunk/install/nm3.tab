@@ -1,12 +1,12 @@
 -- PVCS Identifiers :-
 --
--- sccsid                : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.7   Dec 21 2007 15:32:40   Chris Parkinson  $
+-- sccsid                : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.8   Jun 06 2008 10:23:58   Chris Parkinson  $
 -- Module Name           : $Workfile:   nm3.tab  $
--- Date into PVCS        : $Date:   Dec 21 2007 15:32:40  $
--- Date fetched Out      : $Modtime:   Dec 21 2007 15:29:50  $
--- PVCS Version          : $Revision:   2.7  $
+-- Date into PVCS        : $Date:   Jun 06 2008 10:23:58  $
+-- Date fetched Out      : $Modtime:   Jun 06 2008 10:18:02  $
+-- PVCS Version          : $Revision:   2.8  $
 --
--- Generated for Oracle 9i on Fri Dec 21  14:34:37 2007 by Server Generator 9.0.2.94.12
+-- Generated for Oracle 9i on Fri Jun 06  10:03:09 2008 by Server Generator 9.0.2.94.12
  
 
 
@@ -6776,6 +6776,7 @@ CREATE TABLE NM_NODES_ALL
  ,NO_DATE_MODIFIED DATE NOT NULL
  ,NO_MODIFIED_BY VARCHAR2(30) NOT NULL
  ,NO_CREATED_BY VARCHAR2(30) NOT NULL
+ ,NO_PURPOSE VARCHAR2(240)
  )
 /
 
@@ -6829,6 +6830,8 @@ CREATE TABLE NM_NW_AD_LINK_ALL
  ,NAD_GTY_TYPE VARCHAR2(4)
  ,NAD_INV_TYPE VARCHAR2(4) NOT NULL
  ,NAD_PRIMARY_AD VARCHAR2(1) NOT NULL
+ ,NAD_MEMBER_ID NUMBER(9) NOT NULL
+ ,NAD_WHOLE_ROAD VARCHAR2(1) DEFAULT '1' NOT NULL
  )
 /
 
