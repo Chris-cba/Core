@@ -1,12 +1,12 @@
 -- PVCS Identifiers :-
 --
--- sccsid                : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.7   Apr 11 2008 15:49:00   Chris Parkinson  $
+-- sccsid                : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.8   Jun 06 2008 10:24:52   Chris Parkinson  $
 -- Module Name           : $Workfile:   nm3.ind  $
--- Date into PVCS        : $Date:   Apr 11 2008 15:49:00  $
--- Date fetched Out      : $Modtime:   Apr 11 2008 15:42:52  $
--- PVCS Version          : $Revision:   2.7  $
+-- Date into PVCS        : $Date:   Jun 06 2008 10:24:52  $
+-- Date fetched Out      : $Modtime:   Jun 06 2008 10:18:28  $
+-- PVCS Version          : $Revision:   2.8  $
 --
--- Generated for Oracle 9i on Fri Dec 21  14:34:39 2007 by Server Generator 9.0.2.94.12
+-- Generated for Oracle 9i on Fri Jun 06  10:03:12 2008 by Server Generator 9.0.2.94.12
   
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
@@ -1039,6 +1039,11 @@ CREATE INDEX NAD_IIT_NE_ID_IND ON NM_NW_AD_LINK_ALL
 PROMPT Creating Index 'NAD_INV_TYPE_IND'
 CREATE INDEX NAD_INV_TYPE_IND ON NM_NW_AD_LINK_ALL
  (NAD_INV_TYPE)
+/
+
+PROMPT Creating Index 'NAD_MEMBER_ID_IND'
+CREATE INDEX NAD_MEMBER_ID_IND ON NM_NW_AD_LINK_ALL
+ (NAD_MEMBER_ID)
 /
 
 PROMPT Creating Index 'NAD_NE_ID_IND'
