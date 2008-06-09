@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.3   Oct 29 2007 10:42:08   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.4   Jun 09 2008 16:03:04   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into SCCS   : $Date:   Oct 29 2007 10:42:08  $
---       Date fetched Out : $Modtime:   Oct 29 2007 10:40:54  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Jun 09 2008 16:03:04  $
+--       Date fetched Out : $Modtime:   Jun 09 2008 15:58:12  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on : 1.91
 --
 --   Author : R.A. Coupe
@@ -6660,7 +6660,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
    BEGIN
       Nm3sdm.g_role_array (Nm3sdm.g_role_idx) := pi_role;
       Nm3sdm.g_theme_role (Nm3sdm.g_role_idx) := pi_theme_id;
-      Nm3sdm.g_role_op (Nm3sdm.g_role_idx) := pi_mode;
+      Nm3sdm.g_role_op (Nm3sdm.g_role_idx)    := pi_mode;
    END set_subuser_globals_nthr;
 
 --
@@ -6673,11 +6673,122 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
    )
    IS
    BEGIN
-      Nm3sdm.g_role_array (Nm3sdm.g_role_idx) := pi_role;
+      Nm3sdm.g_role_array (Nm3sdm.g_role_idx)     := pi_role;
       Nm3sdm.g_username_array (Nm3sdm.g_role_idx) := pi_username;
-      Nm3sdm.g_role_op (Nm3sdm.g_role_idx) := pi_mode;
+      Nm3sdm.g_role_op (Nm3sdm.g_role_idx)        := pi_mode;
    END set_subuser_globals_hur;
 
+--
+---------------------------------------------------------------------------------------------------------------------------------
+--
+  PROCEDURE consolidate_feature_views
+              ( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE)
+  IS
+    -- Has to be autonomous because we are creating views in a trigger - therefore
+    -- it does a commit
+    
+    PRAGMA autonomous_transaction;
+  BEGIN
+    FOR i IN 
+      (SELECT  'DROP SYNONYM '|| hus_username||'.'|| nth_feature_table sql_text
+         FROM hig_users, all_users, nm_themes_all 
+        WHERE hus_username = username
+          AND hus_username != hig.get_application_owner
+          AND nth_theme_type = 'SDO'
+          AND nth_theme_id = pi_theme_id
+          AND EXISTS (
+                 SELECT 1
+                   FROM dba_synonyms
+                  WHERE owner != hig.get_application_owner
+                    AND owner = hus_username
+                    AND synonym_name = nth_feature_table
+                    AND owner != 'PUBLIC'))
+    LOOP
+      EXECUTE IMMEDIATE i.sql_text;
+    END LOOP;
+  --
+    FOR i IN
+      (SELECT  'CREATE OR REPLACE FORCE VIEW '|| hus_username||'.'|| nth_feature_table
+              || ' AS SELECT * FROM '|| hig.get_application_owner||'.'|| nth_feature_table create_sql, hus_username, nth_feature_table
+         FROM hig_users, all_users, nm_themes_all
+        WHERE hus_username = username
+          AND hus_username != hig.get_application_owner
+          AND nth_theme_type = 'SDO'
+          AND pi_theme_id = nth_theme_id
+          AND NOT EXISTS (
+                 SELECT 1
+                   FROM dba_objects
+                  WHERE owner != hig.get_application_owner
+                    AND owner = hus_username
+                    AND object_name = nth_feature_table
+                    AND object_type = 'VIEW')) 
+    LOOP
+      BEGIN
+        nm_debug.debug('con views - '||i.hus_username||' - '||i.nth_feature_table);
+        EXECUTE IMMEDIATE i.create_sql;
+      EXCEPTION
+        WHEN OTHERS THEN nm_debug.debug('con views Error - '||SQLERRM);
+      END;
+    END LOOP;
+  END consolidate_feature_views;
+--
+---------------------------------------------------------------------------------------------------------------------------------
+--
+  PROCEDURE consolidate_feature_views
+              ( pi_role      IN  nm_theme_roles.nthr_role%TYPE
+              , pi_username  IN  hig_users.hus_username%TYPE)
+  IS
+    -- Has to be autonomous because we are creating views in a trigger - therefore
+    -- it does a commit
+    
+    PRAGMA autonomous_transaction;
+  BEGIN
+    FOR i IN 
+      (SELECT 'DROP SYNONYM '|| hus_username||'.'|| nth_feature_table sql_text
+         FROM hig_users, all_users, nm_themes_all, nm_theme_roles 
+        WHERE hus_username = username
+          AND hus_username != hig.get_application_owner
+          AND hus_username = pi_username
+          AND nthr_role = pi_role
+          AND nthr_theme_id = nth_theme_id
+          AND nth_theme_type = 'SDO'
+          AND EXISTS (
+                 SELECT 1
+                   FROM dba_synonyms
+                  WHERE owner != hig.get_application_owner
+                    AND owner = hus_username
+                    AND synonym_name = nth_feature_table
+                    AND owner != 'PUBLIC'))
+    LOOP
+      EXECUTE IMMEDIATE i.sql_text;
+    END LOOP;
+  --
+    FOR i IN
+     (SELECT  'CREATE OR REPLACE FORCE VIEW '|| hus_username||'.'|| nth_feature_table
+              || ' AS SELECT * FROM '|| hig.get_application_owner||'.'|| nth_feature_table create_sql, hus_username, nth_feature_table
+         FROM hig_users, all_users, nm_themes_all, nm_theme_roles
+        WHERE hus_username = username
+          AND hus_username != hig.get_application_owner
+          AND nth_theme_type = 'SDO'
+          AND nthr_theme_id = nth_theme_id
+          AND nthr_role = pi_role
+          AND hus_username = pi_username
+          AND NOT EXISTS (
+                 SELECT 1
+                   FROM dba_objects
+                  WHERE owner != hig.get_application_owner
+                    AND owner = hus_username
+                    AND object_name = nth_feature_table
+                    AND object_type = 'VIEW'))
+    LOOP
+      BEGIN
+        nm_debug.debug('con views - '||i.hus_username||' - '||i.nth_feature_table);
+        EXECUTE IMMEDIATE i.create_sql;
+      EXCEPTION
+        WHEN OTHERS THEN nm_debug.debug('con views Error - '||SQLERRM);
+      END;
+    END LOOP;
+  END consolidate_feature_views;  
 --
 ---------------------------------------------------------------------------------------------------------------------------------
 --
@@ -6685,58 +6796,252 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
 /* Procedure to deal with creating subordinate user metadata triggered on
    nm_theme_roles data */
    IS
-      CURSOR c1 (c_role IN VARCHAR2, c_theme IN NUMBER)
+   --
+      PROCEDURE create_sub_sdo_layer
+                    ( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE
+                    , pi_role     IN nm_theme_roles.nthr_role%TYPE )
       IS
-         SELECT grantee, nthr_theme_id
-           FROM dba_role_privs, HIG_USERS, NM_THEME_ROLES a
-          WHERE granted_role = c_role
-            AND hus_username = grantee
-            AND hus_username != Hig.get_application_owner
-            AND a.nthr_role = granted_role
-            AND a.nthr_theme_id = c_theme;
---         AND NOT EXISTS (
---                SELECT 1
---                  FROM NM_THEME_ROLES b
---                 WHERE b.nthr_role != A.nthr_role
---                   AND b.nthr_theme_id = A.nthr_theme_id);
+      BEGIN
+      --
+      -- Insert the USGM based on current theme and role
+      --
+        INSERT INTO MDSYS.sdo_geom_metadata_table g
+          (sdo_owner, sdo_table_name, sdo_column_name, sdo_diminfo, sdo_srid)
+        SELECT hus_username, nth_feature_table, nth_feature_shape_column, sdo_diminfo, sdo_srid
+          FROM MDSYS.sdo_geom_metadata_table u,
+               (SELECT hus_username, nth_feature_table, nth_feature_shape_column
+                  FROM 
+                       -- Layers based on role - more than likely views
+                       (SELECT hus_username,
+                               a.nth_feature_table,
+                               a.nth_feature_shape_column
+                          FROM nm_themes_all a,
+                               nm_theme_roles,
+                               hig_user_roles,
+                               hig_users,
+                               all_users
+                         WHERE nthr_theme_id = a.nth_theme_id
+                           AND a.nth_theme_id = pi_theme_id
+                           AND nthr_role    = hur_role
+                           AND hur_role     = pi_role
+                           AND hur_username = hus_username
+                           AND hus_username = username
+                           AND hus_username != hig.get_application_owner
+                           AND NOT EXISTS (
+                                  SELECT 1
+                                    FROM MDSYS.sdo_geom_metadata_table g1
+                                   WHERE g1.sdo_owner = hus_username
+                                     AND g1.sdo_table_name = nth_feature_table
+                                     AND g1.sdo_column_name = nth_feature_shape_column)
+                        UNION ALL
+                        -- Base table themes
+                        SELECT hus_username,
+                               b.nth_feature_table,
+                               b.nth_feature_shape_column
+                          FROM nm_themes_all a,
+                               hig_users,
+                               all_users,
+                               nm_themes_all b
+                         WHERE b.nth_theme_id = a.nth_base_table_theme
+                           AND a.nth_theme_id = pi_theme_id
+                           AND hus_username = username
+                           AND hus_username != hig.get_application_owner
+                           AND NOT EXISTS (
+                                  SELECT 1
+                                    FROM MDSYS.sdo_geom_metadata_table g1
+                                   WHERE g1.sdo_owner = hus_username
+                                     AND g1.sdo_table_name = b.nth_feature_table
+                                     AND g1.sdo_column_name = b.nth_feature_shape_column))
+                GROUP BY hus_username, nth_feature_table, nth_feature_shape_column)
+         WHERE u.sdo_table_name = nth_feature_table
+           AND u.sdo_column_name = nth_feature_shape_column
+           AND u.sdo_owner = hig.get_application_owner;
+         nm_debug.debug('Inserted '||SQL%ROWCOUNT||' SDO metadata rows');
+      --
+      END create_sub_sdo_layer;
+    --
+    --------------------------------------------------------------------------
+    --
+      PROCEDURE delete_sub_sdo_layer
+                  ( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE
+                  , pi_role     IN nm_theme_roles.nthr_role%TYPE )
+      IS
+        l_tab_owner       nm3type.tab_varchar30;
+        l_tab_table_name  nm3type.tab_varchar30;
+        l_tab_column_name nm3type.tab_varchar30;
+      --
+      BEGIN
+      --
+        SELECT hus_username, nth_feature_table, nth_feature_shape_column
+          BULK COLLECT INTO l_tab_owner, l_tab_table_name, l_tab_column_name
+          FROM (SELECT hus_username, nth_feature_table, nth_feature_shape_column
+                  FROM (SELECT hus_username,
+                               a.nth_feature_table,
+                               a.nth_feature_shape_column
+                          FROM nm_themes_all a,
+                               hig_user_roles,
+                               hig_users,
+                               all_users
+                         WHERE a.nth_theme_id = pi_theme_id
+                           AND hur_role     = pi_role
+                           AND hur_username = hus_username
+                           AND hus_username = username
+                           AND hus_username != hig.get_application_owner
+                           AND EXISTS (
+                                  SELECT 1
+                                    FROM MDSYS.sdo_geom_metadata_table g1
+                                   WHERE g1.sdo_owner = hus_username
+                                     AND g1.sdo_table_name = nth_feature_table
+                                     AND g1.sdo_column_name = nth_feature_shape_column)
+                GROUP BY hus_username, nth_feature_table, nth_feature_shape_column)) layers;
+      --
+        IF l_tab_owner.COUNT > 0
+        THEN
+          FORALL i IN 1..l_tab_owner.COUNT
+            DELETE mdsys.sdo_geom_metadata_table
+             WHERE sdo_owner       = l_tab_owner(i)
+               AND sdo_table_name  = l_tab_table_name(i)
+               AND sdo_column_name = l_tab_column_name(i);
+        END IF;
+        nm_debug.debug('Deleted '||l_tab_owner.COUNT||' SDO metadata rows');
+      --
+      END delete_sub_sdo_layer;
+  --
    BEGIN
---   Nm_Debug.debug_on;
-      Nm_Debug.DEBUG (   'in process subuser nthr - index = '
-                      || TO_CHAR (Nm3sdm.g_role_idx)
-                     );
+  --
+  --------------------------------------------------------------
+  -- Loop through the rows being processed from nm_theme_roles
+  --------------------------------------------------------------
+  --  nm_debug.debug_on;
+  --  nm_debug.debug('Process NTHR');
+  --  nm_debug.debug('Rows = '||Nm3sdm.g_role_idx);
 
-      FOR i IN 1 .. Nm3sdm.g_role_idx
-      LOOP
-         IF Nm3sdm.g_role_op (Nm3sdm.g_role_idx) = 'I'
+  -----------
+  -- INSERTS 
+  -----------
+    
+     FOR i IN 1 .. Nm3sdm.g_role_idx
+     LOOP
+
+       IF Nm3sdm.g_role_op (Nm3sdm.g_role_idx) = 'I'
+       THEN
+
+       ------------------------------------
+       -- Create SDO layer for given Theme
+       ------------------------------------
+          create_sub_sdo_layer
+             ( pi_theme_id => nm3sdm.g_theme_role (i)
+             , pi_role     => nm3sdm.g_role_array (i) );
+
+       ------------------------------------------------------
+       -- Consolidate the feature views for subordiate users
+       ------------------------------------------------------
+          consolidate_feature_views( nm3sdm.g_theme_role (i) );
+
+      --------------------------------------------------
+      -- Register the SDE layer in the conventional way
+      --------------------------------------------------
+
+         IF hig.get_user_or_sys_opt('REGSDELAY') = 'Y'
          THEN
-            FOR irec IN c1 (Nm3sdm.g_role_array (i), Nm3sdm.g_theme_role (i))
-            LOOP
-               Nm_Debug.DEBUG (   'Creating SDO layer for '
-                               || irec.nthr_theme_id
-                               || '-'
-                               || irec.grantee
-                              );
-               Nm3sdo.create_sub_sdo_layer (p_theme_id      => irec.nthr_theme_id,
-                                            p_username      => irec.grantee
-                                           );
-            END LOOP;
-         ELSIF Nm3sdm.g_role_op (Nm3sdm.g_role_idx) = 'D'
-         THEN
-            FOR irec IN c1 (Nm3sdm.g_role_array (i), Nm3sdm.g_theme_role (i))
-            LOOP
-               Nm3sdo.remove_sub_sdo_layer (p_theme_id      => irec.nthr_theme_id,
-                                            p_username      => irec.grantee
-                                           );
-            END LOOP;
+         --
+           FOR u IN (SELECT hus_username 
+                       FROM hig_users
+                      WHERE hus_username != hig.get_application_owner
+                        AND EXISTS
+                        (SELECT 1 FROM hig_user_roles
+                          WHERE hur_role = nm3sdm.g_role_array (i)
+                            AND hur_username = hus_username)
+                        AND EXISTS
+                        (SELECT 1 FROM all_users
+                          WHERE username = hus_username))
+           LOOP
+             --nm_debug.debug('SDE = '||TO_CHAR (nm3sdm.g_theme_role (i))||' - '||u.hus_username);
+             BEGIN
+               EXECUTE IMMEDIATE
+                 (' begin '||
+                     'nm3sde.create_sub_sde_layer ( p_theme_id => '|| TO_CHAR (nm3sdm.g_theme_role (i))
+                                               || ',p_username => '''|| u.hus_username
+                                            || ''');'|| 
+                  ' end;');
+             EXCEPTION
+               WHEN OTHERS
+                 THEN
+                 -- Instead of whole process falling over, log the error and carry on
+                   Nm_Debug.debug_on;
+                   Nm_Debug.DEBUG ('Error copying SDE layer for '||nm3sdm.g_theme_role (i)||' - '||SQLERRM);
+                   Nm_Debug.debug_off;
+             END;
+
+           END LOOP;
+
          END IF;
-      END LOOP;
+       --
+     ----------
+     -- DELETES
+     ----------
+       ELSIF Nm3sdm.g_role_op (Nm3sdm.g_role_idx) = 'D'
+       THEN
+
+       -----------------------------------------
+       -- Drop SDO layers for subordiante users
+       -----------------------------------------
+
+          delete_sub_sdo_layer
+             ( pi_theme_id =>  nm3sdm.g_theme_role (i)
+             , pi_role     =>  nm3sdm.g_role_array (i) );
+
+       -----------------------------------------
+       -- Drop SDE layers for subordinate users
+       -----------------------------------------
+
+         IF hig.get_user_or_sys_opt('REGSDELAY') = 'Y'
+         THEN
+        --   nm_debug.debug('Delete SDE layer '||nm3sdm.g_theme_role (i));
+         --
+           FOR u IN (
+             SELECT hus_username, nth_feature_table, nth_feature_shape_column
+               FROM hig_users, nm_themes_all
+              WHERE hus_username != hig.get_application_owner
+                AND nth_theme_id = nm3sdm.g_theme_role (i)
+                AND EXISTS
+                (SELECT 1 FROM hig_user_roles
+                  WHERE hur_role = nm3sdm.g_role_array (i)
+                    AND hur_username = hus_username)
+                AND EXISTS
+                (SELECT 1 FROM all_users
+                  WHERE username = hus_username))
+           LOOP
+          --
+              BEGIN
+                EXECUTE IMMEDIATE 'begin '||
+                                     'nm3sde.drop_sub_layer_by_table( '
+                                                ||Nm3flx.string(u.nth_feature_table)||','
+                                                ||Nm3flx.string(u.nth_feature_shape_column)||','
+                                                ||Nm3flx.string(u.hus_username)||');'
+                               ||' end;';
+            --
+              EXCEPTION
+                WHEN OTHERS
+                  THEN
+                  -- Instead of whole process falling over, log the error and carry on
+                    Nm_Debug.debug_on;
+                    Nm_Debug.DEBUG ('Error dropping SDE layer for '||nm3sdm.g_theme_role (i)||' - '||SQLERRM);
+                    Nm_Debug.debug_off;
+              END;
+          --
+           END LOOP;
+
+         END IF;
+       --
+       END IF;
+     
+     END LOOP;
+   --
    EXCEPTION
-      WHEN NO_DATA_FOUND
-      THEN
-         NULL;
-      WHEN OTHERS
-      THEN
-         RAISE;
+     WHEN NO_DATA_FOUND THEN NULL;
+--     WHEN OTHERS        THEN RAISE;
+   --
    END process_subuser_nthr;
 
 --
@@ -6746,56 +7051,222 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
 /* Procedure to deal with creating subordinate user metadata triggered on
    nm_theme_roles data */
    IS
-      CURSOR c1 (c_role IN VARCHAR2, c_username IN VARCHAR2)
-      IS
-         SELECT grantee, nthr_theme_id
-           FROM dba_role_privs, HIG_USERS, NM_THEME_ROLES a
-          WHERE granted_role = c_role
-            AND hus_username = grantee
-            AND hus_username = c_username
-            AND hus_username != Hig.get_application_owner
-            AND a.nthr_role = granted_role;
---         AND NOT EXISTS (
---                SELECT 1
---                  FROM NM_THEME_ROLES b
---                 WHERE b.nthr_role != A.nthr_role
---                   AND b.nthr_theme_id = A.nthr_theme_id);
+   --
+     PROCEDURE create_sub_sdo_layers (pi_username IN hig_users.hus_username%TYPE 
+                                     ,pi_role     IN nm_theme_roles.nthr_role%TYPE )
+     IS
+       l_user hig_users.hus_username%TYPE := pi_username;
+     BEGIN
+     --
+       INSERT INTO MDSYS.sdo_geom_metadata_table g
+             (sdo_owner, sdo_table_name, sdo_column_name, sdo_diminfo, sdo_srid)
+         SELECT l_user, nth_feature_table, nth_feature_shape_column, sdo_diminfo, sdo_srid
+           FROM MDSYS.sdo_geom_metadata_table u,
+                (SELECT nth_feature_table, nth_feature_shape_column
+                   FROM 
+                        -- Layers based on role - more than likely views
+                        (SELECT a.nth_feature_table,
+                                a.nth_feature_shape_column
+                           FROM nm_themes_all a,
+                                nm_theme_roles
+                          WHERE nthr_theme_id = a.nth_theme_id
+                            AND nthr_role    = pi_role
+                            AND NOT EXISTS (
+                                   SELECT 1
+                                     FROM MDSYS.sdo_geom_metadata_table g1
+                                    WHERE g1.sdo_owner = l_user
+                                      AND g1.sdo_table_name = nth_feature_table
+                                      AND g1.sdo_column_name = nth_feature_shape_column)
+                         UNION ALL
+                         -- Base table themes
+                         SELECT b.nth_feature_table,
+                                b.nth_feature_shape_column
+                           FROM nm_themes_all a,
+                                nm_theme_roles,
+                                nm_themes_all b
+                          WHERE b.nth_theme_id = a.nth_base_table_theme
+                            AND nthr_theme_id = a.nth_theme_id
+                            AND nthr_role    = pi_role
+                            AND NOT EXISTS (
+                                   SELECT 1
+                                     FROM MDSYS.sdo_geom_metadata_table g1
+                                    WHERE g1.sdo_owner = l_user
+                                      AND g1.sdo_table_name = b.nth_feature_table
+                                      AND g1.sdo_column_name = b.nth_feature_shape_column))
+                 GROUP BY nth_feature_table, nth_feature_shape_column)
+          WHERE u.sdo_table_name = nth_feature_table
+            AND u.sdo_column_name = nth_feature_shape_column
+            AND u.sdo_owner = hig.get_application_owner;
+     --
+       nm_debug.debug('Inserted '||SQL%ROWCOUNT||' rows for role '||pi_role||' on user '||pi_username);
+     --
+     EXCEPTION
+       WHEN OTHERS 
+       THEN nm_debug.debug('Error - '||SQLERRM);
+     END create_sub_sdo_layers;
+   --
+     PROCEDURE delete_sdo_layers_by_role ( pi_username IN hig_users.hus_username%TYPE
+                                         , pi_role     IN nm_theme_roles.nthr_role%TYPE )
+     IS
+        l_tab_owner       nm3type.tab_varchar30;
+        l_tab_table_name  nm3type.tab_varchar30;
+        l_tab_column_name nm3type.tab_varchar30;
+     BEGIN
+       SELECT hus_username, nth_feature_table, nth_feature_shape_column
+          BULK COLLECT INTO l_tab_owner, l_tab_table_name, l_tab_column_name
+          FROM (SELECT hus_username, nth_feature_table, nth_feature_shape_column
+                  FROM (SELECT hus_username,
+                               a.nth_feature_table,
+                               a.nth_feature_shape_column
+                          FROM nm_themes_all a,
+                               nm_theme_roles,
+                               hig_users,
+                               all_users
+                         WHERE nthr_theme_id = a.nth_theme_id
+                           AND nthr_role     = pi_role
+                           AND hus_username = username
+                           AND username     = pi_username
+                           AND hus_username != hig.get_application_owner
+                           AND EXISTS (
+                                  SELECT 1
+                                    FROM MDSYS.sdo_geom_metadata_table g1
+                                   WHERE g1.sdo_owner = hus_username
+                                     AND g1.sdo_table_name = nth_feature_table
+                                     AND g1.sdo_column_name = nth_feature_shape_column)
+                GROUP BY hus_username, nth_feature_table, nth_feature_shape_column)) layers;
+     --
+       IF l_tab_owner.COUNT > 0
+       THEN
+         FOR i IN 1..l_tab_owner.COUNT LOOP
+           nm_debug.debug('Deleting SDO data for  '||l_tab_owner(i)||' - '||l_tab_table_name(i));
+         END LOOP;
+       END IF;
+     --
+        IF l_tab_owner.COUNT > 0
+        THEN
+          FORALL i IN 1..l_tab_owner.COUNT
+            DELETE mdsys.sdo_geom_metadata_table
+             WHERE sdo_owner       = l_tab_owner(i)
+               AND sdo_table_name  = l_tab_table_name(i)
+               AND sdo_column_name = l_tab_column_name(i);
+        END IF;
+     --
+     END delete_sdo_layers_by_role;
+  --
    BEGIN
-   nm_debug.debug_on;
-      Nm_Debug.DEBUG (   'in process subuser hurr - index = '||TO_CHAR (Nm3sdm.g_role_idx));
+  --
+  --  nm_debug.debug_on;
+  --  nm_debug.debug ('Process_subuser_hur');
+  --
+     FOR i IN 1 .. Nm3sdm.g_role_idx
+     LOOP
+     --
+        IF Nm3sdm.g_role_op (Nm3sdm.g_role_idx) = 'I'
+        THEN
+        --
+          nm_debug.debug('Create SDO data for '||nm3sdm.g_username_array (i)||' - '||nm3sdm.g_role_array (i));
+          create_sub_sdo_layers 
+            ( pi_username => nm3sdm.g_username_array (i)
+            , pi_role     => nm3sdm.g_role_array (i)  );
+            
+       --------------------------------------------------
+       -- Create any missing feature views for sub users
+       --------------------------------------------------
 
-      FOR i IN 1 .. Nm3sdm.g_role_idx
-      LOOP
-         IF Nm3sdm.g_role_op (Nm3sdm.g_role_idx) = 'I'
-         THEN
-         --
-            FOR irec IN c1 (Nm3sdm.g_role_array (i),Nm3sdm.g_username_array (i))
+          consolidate_feature_views
+            ( pi_role      => nm3sdm.g_role_array (i)
+            , pi_username  => nm3sdm.g_username_array (i) );
+
+       --------------------------------------------------
+       -- Register the SDE layer in the conventional way
+       --------------------------------------------------
+
+          IF hig.get_user_or_sys_opt('REGSDELAY') = 'Y'
+          THEN
+          --
+            FOR u IN (SELECT nthr_theme_id
+                        FROM nm_theme_roles
+                       WHERE nthr_role = nm3sdm.g_role_array (i) )
             LOOP
-               Nm_Debug.DEBUG ('Creating SDO data for '||irec.nthr_theme_id||' - '||irec.grantee);
-               Nm3sdo.create_sub_sdo_layer (p_theme_id      => irec.nthr_theme_id,
-                                            p_username      => irec.grantee
-                                           );
+              BEGIN
+                nm_debug.debug('Create SDE layer - '||u.nthr_theme_id
+                                           ||' - '||nm3sdm.g_username_array (i));
+                EXECUTE IMMEDIATE
+                  (' begin '||
+                      'nm3sde.create_sub_sde_layer ( p_theme_id => '|| TO_CHAR (u.nthr_theme_id)
+                                                || ',p_username => '''|| nm3sdm.g_username_array (i)
+                                             || ''');'|| 
+                   ' end;');
+              EXCEPTION
+                WHEN OTHERS
+                  THEN
+                  -- Instead of whole process falling over, log the error and carry on
+                    Nm_Debug.debug_on;
+                    Nm_Debug.DEBUG ('Error copying SDE layer for '||nm3sdm.g_theme_role (i)||' - '||SQLERRM);
+                    Nm_Debug.debug_off;
+              END;
+
             END LOOP;
-         --
-         ELSIF Nm3sdm.g_role_op (Nm3sdm.g_role_idx) = 'D'
+
+          END IF;
+        --
+        ELSIF Nm3sdm.g_role_op (Nm3sdm.g_role_idx) = 'D'
+        THEN
+        --
+          nm_debug.debug('Delete SDO data for '||nm3sdm.g_username_array (i)||' - '||nm3sdm.g_role_array (i));
+          delete_sdo_layers_by_role
+            ( pi_username =>  nm3sdm.g_username_array (i)
+            , pi_role     =>  nm3sdm.g_role_array (i) );
+            
+       -----------------------------------------
+       -- Drop SDE layers for subordinate users
+       -----------------------------------------
+
+         IF hig.get_user_or_sys_opt('REGSDELAY') = 'Y'
          THEN
-            FOR irec IN c1 (Nm3sdm.g_role_array (i), Nm3sdm.g_username_array (i))
-            LOOP
-               Nm3sdo.remove_sub_sdo_layer (p_theme_id      => irec.nthr_theme_id,
-                                            p_username      => irec.grantee
-                                           );
-            END LOOP;
+        --   nm_debug.debug('Delete SDE layer '||nm3sdm.g_theme_role (i));
+         --
+           FOR u IN (
+             SELECT nth_theme_id, nth_feature_table, nth_feature_shape_column
+               FROM nm_themes_all, nm_theme_roles
+              WHERE nthr_theme_id = nth_theme_id
+                AND nthr_role = nm3sdm.g_role_array (i)
+             )
+           LOOP
+          --
+              BEGIN
+                nm_debug.debug('Drop SDE layer - '||u.nth_feature_table
+                                           ||' - '||u.nth_feature_shape_column
+                                           ||' - '||nm3sdm.g_username_array (i));
+                EXECUTE IMMEDIATE 'begin '||
+                                     'nm3sde.drop_sub_layer_by_table( '
+                                                ||Nm3flx.string(u.nth_feature_table)||','
+                                                ||Nm3flx.string(u.nth_feature_shape_column)||','
+                                                ||Nm3flx.string(nm3sdm.g_username_array (i))||');'
+                               ||' end;';
+            --
+              EXCEPTION
+                WHEN OTHERS
+                  THEN
+                  -- Instead of whole process falling over, log the error and carry on
+                    Nm_Debug.debug_on;
+                    Nm_Debug.DEBUG ('Error dropping SDE layer for '||nm3sdm.g_theme_role (i)||' - '||SQLERRM);
+                    Nm_Debug.debug_off;
+              END;
+          --
+           END LOOP;
+         --
          END IF;
-      END LOOP;
+       --
+       END IF;
+     --
+     END LOOP;
+   --
    EXCEPTION
-      WHEN NO_DATA_FOUND
-      THEN
-         NULL;
-      WHEN OTHERS
-      THEN
-         RAISE;
+      WHEN NO_DATA_FOUND THEN NULL;
+      WHEN OTHERS        THEN RAISE;
+   --
    END process_subuser_hur;
-
 --
 ---------------------------------------------------------------------------------------------------------------------------------
 --
@@ -8221,7 +8692,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
 --
 ------------------------------------------------------------------------------
 --
-PROCEDURE Create_Msv_Feature_Views
+PROCEDURE create_msv_feature_views
                ( pi_username  IN   hig_users.hus_username%TYPE DEFAULT NULL)
 --
 -- View created for subordinate users that need access to the Highways owner
@@ -8390,7 +8861,7 @@ PROCEDURE Create_Msv_Feature_Views
       WHEN OTHERS
       THEN
          RAISE;
-   END Create_Msv_Feature_Views;
+   END create_msv_feature_views;
 
 --
 -----------------------------------------------------------------------------
