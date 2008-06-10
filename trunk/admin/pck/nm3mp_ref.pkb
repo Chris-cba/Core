@@ -4,12 +4,12 @@ CREATE OR REPLACE PACKAGE BODY nm3mp_ref AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm3mp_ref.pkb	1.1 12/22/06
---       Module Name      : nm3mp_ref.pkb
---       Date into SCCS   : 06/12/22 15:40:21
---       Date fetched Out : 07/06/13 14:12:41
---       SCCS Version     : 1.1
---
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mp_ref.pkb-arc   2.2   Jun 10 2008 15:40:44   rcoupe  $
+--       Module Name      : $Workfile:   nm3mp_ref.pkb  $
+--       Date into PVCS   : $Date:   Jun 10 2008 15:40:44  $
+--       Date fetched Out : $Modtime:   Jun 10 2008 15:40:26  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on 1.1 of sccs --
 --
 --   Author : Kevin Angus
 --
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mp_ref AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"@(#)nm3mp_ref.pkb	1.1 12/22/06"';
+  g_body_sccsid  CONSTANT varchar2(2000) :='"$Revision:   2.2  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3mp_ref';
 
