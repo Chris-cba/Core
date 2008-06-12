@@ -1,0 +1,66 @@
+CREATE OR REPLACE PACKAGE nm3sde_check
+AS
+--<PACKAGE>
+--
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde_check.pkh-arc   2.0   Jun 12 2008 11:24:54   aedwards  $
+--       Module Name      : $Workfile:   nm3sde_check.pkh  $
+--       Date into PVCS   : $Date:   Jun 12 2008 11:24:54  $
+--       Date fetched Out : $Modtime:   Jun 12 2008 11:22:56  $
+--       PVCS Version     : $Revision:   2.0  $
+--
+--   AEdwards
+--   SDE Metadata checker
+--
+--------------------------------------------------------------------------------
+--
+--</PACKAGE>
+  g_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.0  $"';
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_version 
+    RETURN VARCHAR2;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_body_version 
+    RETURN VARCHAR2;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SDE_VERSION">
+-- This function returns the current SDE version
+  FUNCTION get_sde_version
+  RETURN VARCHAR2;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="GET_ORACLE_VERSION">
+-- This function returns the current ORACLE version
+  FUNCTION get_oracle_summary
+  RETURN VARCHAR2;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="RUN_SDE_CHECK">
+-- This procedure runs the SDE metadata Checker
+  PROCEDURE run_sde_check
+                 ( pi_location IN VARCHAR2 DEFAULT NULL
+                 , pi_filename IN VARCHAR2 DEFAULT NULL);
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+END nm3sde_check;
+/
