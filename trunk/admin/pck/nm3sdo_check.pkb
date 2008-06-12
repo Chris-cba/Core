@@ -4,16 +4,16 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.0   Jun 12 2008 11:24:18   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.1   Jun 12 2008 15:48:24   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_check.pkb  $
---       Date into PVCS   : $Date:   Jun 12 2008 11:24:18  $
---       Date fetched Out : $Modtime:   Jun 12 2008 11:21:50  $
---       PVCS Version     : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Jun 12 2008 15:48:24  $
+--       Date fetched Out : $Modtime:   Jun 12 2008 15:48:06  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --------------------------------------------------------------------------------
 --
   g_package_name          CONSTANT varchar2(30)    := 'nm3sdo_check';
-  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.0  $"';
+  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.1  $"';
   lf                      CONSTANT VARCHAR2(30)    := chr(10);
   g_write_to_file                  BOOLEAN         := FALSE;
   l_results                        nm3type.tab_varchar32767;
@@ -190,6 +190,12 @@ AS
                          AND hur_username = hus_username
                          AND hus_username = username
                          AND hus_username != hig.get_application_owner
+                         AND NOT EXISTS
+                         -- Ignore the TMA Webservice schemas
+                           (SELECT 1 FROM all_objects o
+                             WHERE o.object_name = 'GET_RECIPIENTS'
+                               AND o.object_type = 'PROCEDURE'
+                               AND o.owner = hus_username)
                          AND NOT EXISTS (
                                 SELECT 1
                                   FROM MDSYS.sdo_geom_metadata_table g1
@@ -205,6 +211,12 @@ AS
                        WHERE b.nth_theme_id = a.nth_base_table_theme
                          AND hus_username = username
                          AND hus_username != hig.get_application_owner
+                         AND NOT EXISTS
+                         -- Ignore the TMA Webservice schemas
+                           (SELECT 1 FROM all_objects o
+                             WHERE o.object_name = 'GET_RECIPIENTS'
+                               AND o.object_type = 'PROCEDURE'
+                               AND o.owner = hus_username)
                          AND NOT EXISTS (
                                 SELECT 1
                                   FROM MDSYS.sdo_geom_metadata_table g1
@@ -244,6 +256,12 @@ AS
      WHERE hus_username = username
        AND hus_username != hig.get_application_owner
        AND nth_theme_type = 'SDO'
+       AND NOT EXISTS
+           -- Ignore the TMA Webservice schemas
+             (SELECT 1 FROM all_objects o
+               WHERE o.object_name = 'GET_RECIPIENTS'
+                 AND o.object_type = 'PROCEDURE'
+                 AND o.owner = hus_username)
        AND NOT EXISTS (
               SELECT 1
                 FROM dba_objects
