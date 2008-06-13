@@ -4,16 +4,16 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.1   Jun 12 2008 15:48:24   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.2   Jun 13 2008 11:19:10   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_check.pkb  $
---       Date into PVCS   : $Date:   Jun 12 2008 15:48:24  $
---       Date fetched Out : $Modtime:   Jun 12 2008 15:48:06  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jun 13 2008 11:19:10  $
+--       Date fetched Out : $Modtime:   Jun 13 2008 11:18:12  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --------------------------------------------------------------------------------
 --
   g_package_name          CONSTANT varchar2(30)    := 'nm3sdo_check';
-  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.1  $"';
+  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.2  $"';
   lf                      CONSTANT VARCHAR2(30)    := chr(10);
   g_write_to_file                  BOOLEAN         := FALSE;
   l_results                        nm3type.tab_varchar32767;
@@ -196,6 +196,11 @@ AS
                              WHERE o.object_name = 'GET_RECIPIENTS'
                                AND o.object_type = 'PROCEDURE'
                                AND o.owner = hus_username)
+                         -- Make sure the role is actually granted 
+                         AND EXISTS
+                           (SELECT * FROM dba_role_privs
+                             WHERE grantee = hus_username
+                               AND granted_role = nthr_role)
                          AND NOT EXISTS (
                                 SELECT 1
                                   FROM MDSYS.sdo_geom_metadata_table g1
@@ -222,7 +227,17 @@ AS
                                   FROM MDSYS.sdo_geom_metadata_table g1
                                  WHERE g1.sdo_owner = hus_username
                                    AND g1.sdo_table_name = b.nth_feature_table
-                                   AND g1.sdo_column_name = b.nth_feature_shape_column))
+                                   AND g1.sdo_column_name = b.nth_feature_shape_column)
+                         -- Make sure we only report base table themes that we actually
+                         -- have the roles to access their child View based themes
+                         AND a.nth_theme_id IN (
+                                SELECT z.nth_theme_id
+                                  FROM nm_themes_all z, nm_theme_roles
+                                 WHERE EXISTS (SELECT 1
+                                                 FROM hig_user_roles
+                                                WHERE hur_username = hus_username 
+                                                  AND hur_role = nthr_role)
+                                   AND nthr_theme_id = z.nth_theme_id))
             GROUP BY hus_username, nth_feature_table, nth_feature_shape_column)
      WHERE u.sdo_table_name = nth_feature_table
        AND u.sdo_column_name = nth_feature_shape_column
@@ -252,10 +267,21 @@ AS
            ||' view is missing which needs to be based on '
            || hig.get_application_owner||'.'|| nth_feature_table missing_views
       BULK COLLECT INTO l_results
-      FROM hig_users, all_users, nm_themes_all
+      FROM hig_users
+         , all_users
+         , nm_themes_all
+         , hig_user_roles
+         , nm_theme_roles
      WHERE hus_username = username
        AND hus_username != hig.get_application_owner
        AND nth_theme_type = 'SDO'
+       AND nthr_theme_id = nth_theme_id
+       AND nthr_role = hur_role
+       AND hur_username = hus_username
+       AND EXISTS
+         (SELECT * FROM dba_role_privs
+           WHERE grantee = hus_username
+             AND granted_role = nthr_role)
        AND NOT EXISTS
            -- Ignore the TMA Webservice schemas
              (SELECT 1 FROM all_objects o
