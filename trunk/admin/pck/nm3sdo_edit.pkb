@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.2   Jan 25 2008 21:39:04   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.3   Jun 19 2008 15:25:48   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Jan 25 2008 21:39:04  $
---       Date fetched Out : $Modtime:   Jan 25 2008 21:38:04  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Jun 19 2008 15:25:48  $
+--       Date fetched Out : $Modtime:   Jun 19 2008 15:22:34  $
+--       SCCS Version     : $Revision:   2.3  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.2  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.3  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_lock';
 --
 -----------------------------------------------------------------------------
@@ -60,6 +60,21 @@ BEGIN
                              );
 END set_srid;
 --
+-----------------------------------------------------------------------------
+--
+FUNCTION set_srid (pi_theme IN nm_themes_all.nth_theme_id%TYPE, pi_geom IN MDSYS.SDO_GEOMETRY )
+   RETURN MDSYS.SDO_GEOMETRY
+IS
+l_usgm user_sdo_geom_metadata%ROWTYPE;
+BEGIN
+
+   l_usgm := Nm3sdo.get_theme_metadata( pi_theme );
+   
+   RETURN set_srid( pi_geom => pi_geom,
+                    pi_srid => l_usgm.srid ); 
+END set_srid;
+--
+
 -----------------------------------------------------------------------------
 --
 /* Pass in a geometry and test to see if it's been locked in NM_AREA_LOCK
@@ -183,19 +198,22 @@ FUNCTION validate_geometry (
    RETURN VARCHAR2
 IS
    retval    VARCHAR2 (2000)       := 'FALSE';
-   diminfo   MDSYS.sdo_dim_array
-                                := Nm3sdo.get_theme_diminfo (pi_nth_theme_id);
+   l_usgm    user_sdo_geom_metadata%ROWTYPE := Nm3sdo.get_theme_metadata(pi_nth_theme_id);
    l_lrs     NUMBER;
    l_dim     NUMBER;
 BEGIN
    l_dim := pi_geom.get_dims ();
    l_lrs := pi_geom.get_lrs_dim ();
 
-   IF l_lrs > 0
-   THEN
-      retval := sdo_lrs.validate_lrs_geometry (pi_geom, diminfo);
-   ELSE
-      retval := sdo_geom.validate_geometry_with_context (pi_geom, diminfo);
+   IF NVL( l_usgm.srid, -999999 ) != NVL(pi_geom.sdo_srid, Nm3type.c_big_number ) THEN
+     retval := '13365: Layer SRID does not match geometry SRID';
+   ELSE     
+     IF l_lrs > 0
+     THEN
+        retval := sdo_lrs.validate_lrs_geometry (pi_geom, l_usgm.diminfo);
+     ELSE
+        retval := sdo_geom.validate_geometry_with_context (pi_geom, l_usgm.diminfo);
+     END IF;
    END IF;
 
    RETURN retval;
@@ -431,7 +449,7 @@ BEGIN
                      || '  WHEN DUP_VAL_ON_INDEX THEN '
                      || '   DELETE FROM '||l_nth.nth_feature_table
                      || '    WHERE '||l_nth.nth_feature_pk_column||' = :pi_pk'
-                     || '      AND '||l_nth.nth_end_date_column|| ' is not null ;'
+                     || '      AND '||l_nth.nth_start_date_column||' = :pi_date '||';'
                      || '   INSERT INTO '|| l_nth.nth_feature_table
                      || '( '|| l_nth.nth_feature_pk_column|| ', '
                      ||        l_nth.nth_feature_fk_column||', '
@@ -472,7 +490,7 @@ BEGIN
                      || '  WHEN DUP_VAL_ON_INDEX THEN '
                      || '   DELETE FROM '||l_nth.nth_feature_table
                      || '    WHERE '||l_nth.nth_feature_pk_column||' = :pi_pk'
-                     || '      AND '||l_nth.nth_end_date_column|| ' is not null ;'
+                     || '      AND '||l_nth.nth_start_date_column||' = :pi_date '||';'
                      || '   INSERT INTO '|| l_nth.nth_feature_table
                      || '( '|| l_nth.nth_feature_pk_column|| ', '
                      ||        l_nth.nth_feature_shape_column|| ', '
