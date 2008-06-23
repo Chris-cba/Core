@@ -40,6 +40,12 @@ PROCEDURE copy_sde_obj_from_theme( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE
                                  );
 FUNCTION get_SDE_pk ( p_nth IN NM_THEMES_ALL%ROWTYPE ) RETURN VARCHAR2;
 
+
+-- AE 19 June 2008
+-- delete column registry
+PROCEDURE del_creg( p_table IN VARCHAR2, p_owner IN VARCHAR2);
+
+
 -----------------------------------------------------------------------------
 --
 FUNCTION get_version RETURN VARCHAR2 IS
@@ -1121,139 +1127,166 @@ END;
 ---------------------------------------------------------------------------------------------------------------
 --
 
-PROCEDURE create_column_registry(p_table IN VARCHAR2, p_column IN VARCHAR2, p_rowid IN VARCHAR2 ) IS
+PROCEDURE create_column_registry (
+   p_table    IN   VARCHAR2,
+   p_column   IN   VARCHAR2,
+   p_rowid    IN   VARCHAR2
+)
+IS
+--
+   SUBTYPE layer_record_t IS sde.layers%ROWTYPE;
+--
+   CURSOR c1 (c_table IN VARCHAR2)
+   IS
+      SELECT column_name,
+             DECODE (data_type,
+                     'DATE', 7,
+                     'VARCHAR2', 5,
+                     'CHAR', 5,
+                     'NUMBER', 4,
+                     'INTEGER', 2,
+                     'SDO_GEOMETRY', 8
+                    ),
+             data_length, data_precision, data_scale, nullable
+        FROM user_tab_columns
+       WHERE table_name = c_table;
 
-CURSOR c1( c_table IN VARCHAR2 ) IS
-  SELECT column_name, DECODE(data_type,'DATE', 7, 'VARCHAR2', 5, 'CHAR', 5, 'NUMBER', 4, 'INTEGER', 2, 'SDO_GEOMETRY', 8 ), data_length, data_precision, data_scale, nullable
-  FROM user_tab_columns
-  WHERE table_name = c_table;
-  
-CURSOR c2 ( c_table IN VARCHAR2 ) IS
-  SELECT a.column_name
-  FROM user_cons_columns a, user_constraints b
-  WHERE a.constraint_name = b.constraint_name
-  AND  b.table_name = c_table
-  AND b.constraint_type IN ('P', 'U')
-  UNION
-  SELECT a.column_name
-  FROM user_ind_columns a, user_indexes b
-  WHERE a.index_name = b.index_name
-  AND  b.table_name = c_table
-  AND b.uniqueness = 'UNIQUE';
- 
+--
+   CURSOR c2 (c_table IN VARCHAR2)
+   IS
+      SELECT a.column_name
+        FROM user_cons_columns a, user_constraints b
+       WHERE a.constraint_name = b.constraint_name
+         AND b.table_name = c_table
+         AND b.constraint_type IN ('P', 'U')
+      UNION
+      SELECT a.column_name
+        FROM user_ind_columns a, user_indexes b
+       WHERE a.index_name = b.index_name
+         AND b.table_name = c_table
+         AND b.uniqueness = 'UNIQUE';
 
-l_col_tab            Nm3type.tab_varchar30;
-l_data_type_tab      Nm3type.tab_varchar30;
-l_data_length_tab    Nm3type.tab_number;
-l_data_precision_tab Nm3type.tab_number;
-l_data_scale_tab     Nm3type.tab_number;
-l_nullable_tab Nm3type.tab_varchar1;
-
-
-SUBTYPE layer_record_t             IS sde.layers%ROWTYPE;
-
-l_owner VARCHAR2(30) := Hig.get_application_owner;
-
-l_obj_id    INTEGER;
-l_obj_flag  NUMBER;
-l_pk_col    VARCHAR2(30);
-
-l_layer layer_record_t;
-
+--
+   l_col_tab              nm3type.tab_varchar30;
+   l_data_type_tab        nm3type.tab_varchar30;
+   l_data_length_tab      nm3type.tab_number;
+   l_data_precision_tab   nm3type.tab_number;
+   l_data_scale_tab       nm3type.tab_number;
+   l_nullable_tab         nm3type.tab_varchar1;
+   l_owner                VARCHAR2 (30)         := hig.get_application_owner;
+   l_obj_id               INTEGER;
+   l_obj_flag             NUMBER;
+   l_pk_col               VARCHAR2 (30);
+   l_layer                layer_record_t;
+--
 BEGIN
+--
+   OPEN c1 (p_table);
+   FETCH c1
+   BULK COLLECT INTO l_col_tab, l_data_type_tab, l_data_length_tab,
+                     l_data_precision_tab, l_data_scale_tab, l_nullable_tab;
+   CLOSE c1;
 
-
-  OPEN c1 ( p_table );
-  FETCH c1 BULK COLLECT INTO l_col_tab, l_data_type_tab, l_data_length_tab, l_data_precision_tab, l_data_scale_tab, l_nullable_tab;
-  CLOSE c1;
-  
 --assume single column unique key or primary key or unique index?
+   OPEN c2 (p_table);
+   FETCH c2
+    INTO l_pk_col;
+   CLOSE c2;
+--
+   l_layer := get_layer (p_table, p_column);
+--
+   FOR i IN 1 .. l_col_tab.COUNT
+   LOOP
+      IF l_col_tab (i) = p_column
+      THEN
+         l_data_precision_tab (i) := NULL;
+         l_data_length_tab (i) := NULL;
+         l_obj_id := l_layer.layer_id;
+         l_obj_flag := 131076;
+      ELSE
+         l_obj_id := NULL;
 
-  OPEN c2 (p_table );
-  FETCH c2 INTO l_pk_col;
-  CLOSE c2;
-  
-  l_layer := get_layer(p_table, p_column);
+         IF l_col_tab (i) = l_pk_col
+         THEN
+            l_obj_flag := 3;
+         ELSE
+            l_obj_flag := 4;
+         END IF;
 
-  FOR i IN 1..l_col_tab.COUNT LOOP
-  
-    IF l_col_tab(i) = p_column THEN
-      l_data_precision_tab(i) := NULL;
-      l_data_length_tab(i) := NULL;
-	  l_obj_id := l_layer.layer_id;
-      l_obj_flag := 131076;
-	ELSE
-	  l_obj_id := NULL;
-	  
-	  IF l_col_tab(i) = l_pk_col THEN
-	     l_obj_flag := 3;
-	  ELSE
-	     l_obj_flag := 4;
-	  END IF;
-		
+         IF l_data_type_tab (i) = 4 AND l_data_scale_tab (i) = 0
+         THEN
 
-    IF l_data_type_tab(i) = 4  AND l_data_scale_tab(i) = 0 THEN -- cater here for integer columns or number(38) or integer number columns
+     -- cater here for integer columns or number(38) or integer number columns
+     -- integer - set lengh only
 
---    integer - set lengh only 	
+            IF l_data_precision_tab (i) = 38
+            THEN                                 -- this is an integer column
+               l_data_type_tab (i) := 2;
+               l_data_length_tab (i) := 10;
+               l_data_precision_tab (i) := NULL;
+            ELSIF l_data_length_tab (i) = 22
+              AND l_data_precision_tab (i) IS NOT NULL
+            THEN        -- integer disguised a fixed length number with no dp.
+               l_data_type_tab (i) := 2;
+               l_data_length_tab (i) := l_data_precision_tab (i);
+               l_data_precision_tab (i) := NULL;
+            ELSIF l_data_length_tab (i) = 22
+              AND l_data_precision_tab (i) IS NULL
+            THEN                                   -- this is a generic number
+               l_data_type_tab (i) := 3;
+               l_data_length_tab (i) := 0;
+               l_data_precision_tab (i) := 0;
+            END IF;
+         ELSIF l_data_type_tab (i) = 4
+           AND l_data_length_tab (i) = 22
+           AND l_data_precision_tab (i) IS NULL
+           AND l_data_scale_tab (i) IS NULL
+         THEN                                      -- this is a generic number
+            l_data_type_tab (i) := 3;
+            l_data_length_tab (i) := 0;
+            l_data_precision_tab (i) := 0;
+         ELSIF l_data_type_tab (i) = 4
+         THEN
+            l_data_length_tab (i) := l_data_scale_tab (i);
+                                                   --l_data_precision_tab(i);
+            l_data_precision_tab (i) := l_data_scale_tab (i);
+         ELSIF l_data_type_tab (i) = 7
+         THEN
+            l_data_length_tab (i) := 0;
+         END IF;
 
-      IF l_data_precision_tab(i) = 38 THEN -- this is an integer column
-	    l_data_type_tab(i) := 2;
-		l_data_length_tab(i) := 10;
-	    l_data_precision_tab(i) := NULL;  
+         IF l_nullable_tab (i) = 'N'
+         THEN
+            l_obj_flag := 0;
+         ELSE
+            l_obj_flag := 4;
+         END IF;
 
-     ELSIF l_data_length_tab(i) = 22 AND l_data_precision_tab(i) IS NOT NULL THEN -- integer disguised a fixed length number with no dp.
-        l_data_type_tab(i) := 2;
-	    l_data_length_tab(i)    := l_data_precision_tab(i); 
-	    l_data_precision_tab(i) := NULL;  
-
-      ELSIF l_data_length_tab(i) = 22 AND l_data_precision_tab(i) IS NULL THEN -- this is a generic number
-        l_data_type_tab(i) := 3;
-	    l_data_length_tab(i)    := 0;
-	    l_data_precision_tab(i) := 0;  
-
+         IF l_col_tab (i) = p_rowid
+         THEN
+            l_obj_flag := 3;
+         END IF;
       END IF;
-	  	  
-   ELSIF l_data_type_tab(i) = 4 AND l_data_length_tab(i) = 22 AND l_data_precision_tab(i) IS NULL AND l_data_scale_tab(i) IS NULL THEN -- this is a generic number
-        l_data_type_tab(i) := 3;
-	    l_data_length_tab(i)    := 0;
-	    l_data_precision_tab(i) := 0;  
 
-	ELSIF l_data_type_tab(i) = 4  THEN
-	
-	  l_data_length_tab(i)    := l_data_scale_tab(i); --l_data_precision_tab(i);
-	  l_data_precision_tab(i) := l_data_scale_tab(i);
-
-    ELSIF l_data_type_tab(i) = 7 THEN
-	
-	  l_data_length_tab(i) := 0;
-	  	  
-	END IF;  
-
-    IF l_nullable_tab(i) = 'N' THEN
-		  l_obj_flag := 0;
-    ELSE
-		  l_obj_flag := 4;
-    END IF;		  
-	
-	IF l_col_tab(i) = p_rowid THEN
-	  l_obj_flag := 3;
-	END IF;
-	END IF;
-	
 --    execute immediate '
-
-	INSERT INTO sde.column_registry (
-       TABLE_NAME, OWNER, COLUMN_NAME, 
-       SDE_TYPE, COLUMN_SIZE, DECIMAL_DIGITS, 
-       DESCRIPTION, OBJECT_FLAGS, OBJECT_ID)
-	VALUES
-	 ( p_table, l_owner, l_col_tab(i), 
-	   l_data_type_tab(i), l_data_length_tab(i), l_data_precision_tab(i), --l_data_scale(i),
-	   NULL, l_obj_flag, l_obj_id );
-	   
+      INSERT INTO sde.column_registry
+                  (table_name, owner, column_name, sde_type,
+                   column_size, decimal_digits, description,
+                   object_flags, object_id
+                  )
+           VALUES (p_table, l_owner, l_col_tab (i), l_data_type_tab (i),
+                   l_data_length_tab (i), l_data_precision_tab (i),
+                                                            --l_data_scale(i),
+                                                                   NULL,
+                   l_obj_flag, l_obj_id
+                  );
    END LOOP;
-   
-END;
+--
+END create_column_registry;
+
+--
+---------------------------------------------------------------------------------------------------------------
+--
 
 --
 ---------------------------------------------------------------------------------------------------------------
@@ -1356,6 +1389,9 @@ IS
 --
 BEGIN
 --
+-- AE 19-June-2008
+-- Added call to del_creg to remove column_registry
+
    IF p_owner IS NOT NULL
    THEN
       OPEN c_layer2 (p_table, p_column, p_owner);
@@ -1366,6 +1402,7 @@ BEGIN
          del_layer (l_layer_id);
          del_gcol (p_table, p_column, p_owner);
          del_treg (p_table, p_owner);
+         del_creg (p_table, p_owner);
       ELSE
          CLOSE c_layer2;
       END IF;
@@ -1375,6 +1412,7 @@ BEGIN
          del_layer (irec.layer_id);
          del_gcol (p_table, p_column, irec.owner);
          del_treg (p_table, irec.owner);
+         del_creg (p_table, irec.owner);
       END LOOP;
    END IF;
 --
@@ -1426,6 +1464,22 @@ EXCEPTION
 END;
 
 -----------------------------------------------------------------------------------------
+
+PROCEDURE del_creg( p_table IN VARCHAR2, p_owner IN VARCHAR2)  IS
+
+BEGIN
+
+  DELETE 
+  FROM sde.column_registry
+  WHERE table_name = p_table
+  AND   owner = p_owner;
+
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN NULL;
+END;
+
+-----------------------------------------------------------------------------------------
+
 FUNCTION get_keyword RETURN VARCHAR2 IS
 retval VARCHAR2(32);
 BEGIN
@@ -1446,78 +1500,170 @@ END;
 PROCEDURE copy_sde_obj_from_theme( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE,
                                    p_theme_usr IN HIG_USER_ROLES.HUR_USERNAME%TYPE 
                                  ) IS
-
-l_layer  layer_record_t;
-l_geocol geocol_record_t;
-l_reg    registration_record_t;
-
-PRAGMA autonomous_transaction;
-
+--
+  l_layer  layer_record_t;
+  l_geocol geocol_record_t;
+  l_reg    registration_record_t;
+--
+  TYPE             tab_col_reg 
+  IS TABLE OF sde.column_registry%ROWTYPE INDEX BY BINARY_INTEGER;
+--
+  l_tab_col_reg    tab_col_reg;
+--
+  CURSOR get_col_reg ( c_table      IN VARCHAR2
+                     , c_for_owner  IN VARCHAR2)
+  IS
+    SELECT table_name, c_for_owner, column_name, sde_type
+         , column_size, decimal_digits
+         , description, object_flags, object_id 
+      FROM sde.column_registry a
+     WHERE a.owner = hig.get_application_owner
+       AND a.table_name = c_table
+       AND NOT EXISTS
+         (SELECT 1 FROM sde.column_registry b
+           WHERE b.owner = c_for_owner
+             AND b.table_name = a.table_name
+             AND b.column_name = a.column_name );
+--
+--
+--  PROCEDURE create_sub_column_registry (
+--     p_table    IN   VARCHAR2,
+--     p_owner    IN   VARCHAR2
+--  )
+--  IS
+--  --
+--    TYPE             tab_col_reg 
+--      IS TABLE OF sde.column_registry%ROWTYPE INDEX BY BINARY_INTEGER;
+--  --
+--    l_tab_col_reg    tab_col_reg;
+--  --
+--    CURSOR get_col_reg ( c_table      IN VARCHAR2
+--                       , c_for_owner  IN VARCHAR2)
+--    IS
+--      SELECT table_name, c_for_owner, column_name, sde_type
+--           , column_size, decimal_digits
+--           , description, object_flags, object_id 
+--        FROM sde.column_registry a
+--       WHERE a.owner = hig.get_application_owner
+--         AND a.table_name = c_table
+--         AND NOT EXISTS
+--           (SELECT 1 FROM sde.column_registry b
+--             WHERE b.owner = c_for_owner
+--               AND b.table_name = a.table_name
+--               AND b.column_name = a.column_name );
+--  --
+--  BEGIN
+--  --
+--     OPEN  get_col_reg (p_table, p_owner);
+--     FETCH get_col_reg BULK COLLECT INTO l_tab_col_reg;
+--     CLOSE get_col_reg;
+--  --
+--     IF l_tab_col_reg.COUNT > 0
+--     THEN
+--       nm_debug.debug_on;
+--       nm_debug.debug('Create '||l_tab_col_reg.COUNT||' rows of Col Reg for '||p_owner||'.'||p_table);
+--       FORALL i IN 1..l_tab_col_reg.COUNT
+--         INSERT INTO sde.column_registry
+--         VALUES l_tab_col_reg(i);
+--     END IF;
+--  --
+--  EXCEPTION
+--    WHEN OTHERS
+--    THEN nm_debug.debug('Error in col reg - '||SQLERRM);
+--  END create_sub_column_registry;
+--
+  PRAGMA   autonomous_transaction;
+--
 BEGIN
-  Nm_Debug.DEBUG ('In copy_sde_obj_from_theme');
-  Nm_Debug.DEBUG ('Theme = '||p_theme_id||' - '||p_theme_usr);
-  l_layer := get_layer_by_theme( p_theme_id );
 
-  l_layer.owner := p_theme_usr;
+  -- Clone the layer record
+  l_layer           := get_layer_by_theme( p_theme_id );
+  l_layer.owner     := p_theme_usr;
+  l_layer.layer_id  := get_next_sde_layer;
 
-  l_layer.layer_id := get_next_sde_layer;
-
-  l_geocol := get_geocol( l_layer.table_name, l_layer.spatial_column );
-
+  -- Clone the geometry columns record
+  l_geocol                := get_geocol( l_layer.table_name, l_layer.spatial_column );
   l_geocol.f_table_schema := p_theme_usr;
 
-  sde.layers_util.insert_layer( l_layer, l_geocol, l_layer.table_name ); --note that the last parameter is unused
+  -- Insert the new layer and geometry_columns records
+  -- note that the last parameter is unused
+  sde.layers_util.insert_layer( l_layer, l_geocol, l_layer.table_name ); 
 
+
+  -- Clone the Table registry record
+  -- sde.table_registry
   l_reg := get_treg( l_layer.table_name );
-
   l_reg.owner:= p_theme_usr;
-
   l_reg.registration_id := get_next_sde_table_id;
 
+  -- Insert the table registry record
   sde.registry_util.insert_registration( l_reg );
 
+  -- AE 19 June 2008
+  -- Create the column registry
+  --
+--  create_sub_column_registry 
+--    ( p_table    => l_layer.table_name,
+--      p_owner    => p_theme_usr );
+
+  OPEN  get_col_reg (l_layer.table_name, p_theme_usr);
+  FETCH get_col_reg BULK COLLECT INTO l_tab_col_reg;
+  CLOSE get_col_reg;
+--
+  IF l_tab_col_reg.COUNT > 0
+  THEN
+--    nm_debug.debug_on;
+--    nm_debug.debug('Create '||l_tab_col_reg.COUNT||' rows of Col Reg for '||p_owner||'.'||p_table);
+    FORALL i IN 1..l_tab_col_reg.COUNT
+      INSERT INTO sde.column_registry
+      VALUES l_tab_col_reg(i);
+  END IF;
+
+  COMMIT;
 EXCEPTION
-   WHEN NO_DATA_FOUND THEN NULL;
-   WHEN OTHERS THEN RAISE;
+  WHEN OTHERS THEN ROLLBACK; NULL;
+--EXCEPTION
+--   WHEN NO_DATA_FOUND THEN NULL;
+--   WHEN OTHERS THEN RAISE;
 END;
 -----------------------------------------------------------------------------------------
 
+--
+  PROCEDURE create_sub_sde_layer
+              (p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE
+              ,p_username IN HIG_USERS.HUS_USERNAME%TYPE) IS
 
-PROCEDURE create_sub_sde_layer
-            (p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE
-            ,p_username IN HIG_USERS.HUS_USERNAME%TYPE) IS
+  l_nth NM_THEMES_ALL%ROWTYPE;
 
-l_nth NM_THEMES_ALL%ROWTYPE;
+  l_layer  layer_record_t;
+  l_geocol geocol_record_t;
+  l_reg    registration_record_t;
+  l_sde_cnt NUMBER;
 
-l_layer  layer_record_t;
-l_geocol geocol_record_t;
-l_reg    registration_record_t;
-l_sde_cnt NUMBER;
+  BEGIN
 
-BEGIN
+  l_nth := Nm3get.get_nth( p_theme_id );
 
-l_nth := Nm3get.get_nth( p_theme_id );
+     SELECT COUNT(*)
+     INTO l_sde_cnt
+     FROM sde.layers
+     WHERE table_name = l_nth.nth_feature_table
+     AND   owner = p_username;
 
-   SELECT COUNT(*)
-   INTO l_sde_cnt
-   FROM sde.layers
-   WHERE table_name = l_nth.nth_feature_table
-   AND   owner = p_username;
+     IF l_sde_cnt > 0 THEN
+       NULL;
+     --Nm_Debug.DEBUG ('Multiple layers with same feature name');
 
-   IF l_sde_cnt > 0 THEN
-     NULL;
-   --Nm_Debug.DEBUG ('Multiple layers with same feature name');
+     ELSE
 
-   ELSE
+      --Nm_Debug.DEBUG ('Leaving Create_sde_lyr_theme_by_user');
 
-    --Nm_Debug.DEBUG ('Leaving Create_sde_lyr_theme_by_user');
+      copy_sde_obj_from_theme( p_theme_id  => p_theme_id,
+                               p_theme_usr => p_username
+                             );
 
-    copy_sde_obj_from_theme( p_theme_id  => p_theme_id,
-                             p_theme_usr => p_username
-                           );
-
-    END IF;
-END;
+      END IF;
+  END;
 
 
 
@@ -1543,6 +1689,9 @@ retval int_array := int_array( int_array_type( NULL ));
 BEGIN
   curstr := 'select t.column_value from table ( :p_ia.ia ) t, '||p_nth.nth_feature_table||
             ' where t.column_value  = '||l_reg.rowid_column;
+
+--nm_debug.debug_on;
+nm_debug.debug( curstr );
 
   EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.ia USING p_ia;
   
@@ -1591,67 +1740,91 @@ END;
 -------------------------------------------------------------------------------------------------------------------------------
 --
 
-FUNCTION get_SDE_pk ( p_nth IN NM_THEMES_ALL%ROWTYPE ) RETURN VARCHAR2 IS
-
-retval VARCHAR2(30) := p_nth.nth_feature_pk_column; 
-
+FUNCTION get_sde_pk (p_nth IN nm_themes_all%ROWTYPE)
+   RETURN VARCHAR2
+IS
+   retval   VARCHAR2 (30) := p_nth.nth_feature_pk_column;
 BEGIN
+   IF p_nth.nth_feature_pk_column = 'OBJECTID'
+   THEN
+      retval := 'OBJECTID';
+   ELSE
+      BEGIN
+         SELECT column_name
+           INTO retval
+           FROM user_tab_columns
+          WHERE table_name = p_nth.nth_feature_table
+            AND data_type = 'NUMBER'
+            AND (   (    column_name = 'OBJECTID'
+                     AND data_scale = 0
+                     AND data_precision = 38
+                    )
+                 OR (    data_precision IS NULL
+                     AND data_length = 22
+                     AND data_scale = 0
+                    )
+                );
+      EXCEPTION
+         WHEN NO_DATA_FOUND
+         THEN
+            retval := p_nth.nth_feature_pk_column;
+         WHEN TOO_MANY_ROWS
+         THEN
+            BEGIN
+               SELECT t.column_name
+                 INTO retval
+                 FROM user_tab_columns t,
+                      user_cons_columns cc,
+                      user_constraints c
+                WHERE t.table_name = p_nth.nth_feature_table
+                  AND t.table_name = c.table_name
+                  AND c.constraint_type IN ('P', 'U')
+                  AND c.constraint_name = cc.constraint_name
+                  AND cc.column_name = t.column_name
+                  AND cc.POSITION = 1
+                  AND data_type = 'NUMBER'
+                  AND (   (    t.column_name = 'OBJECTID'
+                           AND data_scale = 0
+                           AND data_precision = 38
+                          )
+                       OR (    data_precision IS NULL
+                           AND data_length = 22
+                           AND data_scale = 0
+                          )
+                      );
+            EXCEPTION
+               WHEN NO_DATA_FOUND
+               THEN
+                  SELECT t.column_name
+                    INTO retval
+                    FROM user_tab_columns t,
+                         user_ind_columns cc,
+                         user_indexes c
+                   WHERE t.table_name = p_nth.nth_feature_table
+                     AND t.table_name = c.table_name
+                     AND c.uniqueness = 'UNIQUE'
+                     AND c.index_name = cc.index_name
+                     AND cc.column_name = t.column_name
+                     AND cc.column_position = 1
+                     AND data_type = 'NUMBER'
+                     AND (   (    t.column_name = 'OBJECTID'
+                              AND data_scale = 0
+                              AND data_precision = 38
+                             )
+                          OR (    data_precision IS NULL
+                              AND data_length = 22
+                              AND data_scale = 0
+                             )
+                         );
+            END;
+         WHEN OTHERS
+         THEN
+            retval := p_nth.nth_feature_pk_column;
+      END;
+   END IF;
 
-  IF p_nth.nth_feature_pk_column = 'OBJECTID' THEN
-    retval := 'OBJECTID';
-  ELSE
-    BEGIN
-      SELECT column_name
-	  INTO retval
-	  FROM user_tab_columns
-	  WHERE table_name    = p_nth.nth_feature_table
-	  AND  data_type    = 'NUMBER'
-	  AND (( column_name = 'OBJECTID'
-	  AND  data_scale   = 0
-  	  AND  data_precision = 38) OR
-	    (data_precision IS NULL AND data_length = 22  AND data_scale = 0));
-    EXCEPTION
-	  WHEN NO_DATA_FOUND THEN
-	    retval := p_nth.nth_feature_pk_column;
-      WHEN TOO_MANY_ROWS THEN
-     BEGIN
-	  SELECT t.column_name
-	  INTO retval
-	  FROM user_tab_columns t, user_cons_columns cc, user_constraints c
-	  WHERE t.table_name    = p_nth.nth_feature_table
-	  AND t.table_name = c.table_name
-	  AND c.constraint_type IN ('P','U')
-	  AND c.constraint_name = cc.constraint_name
-	  AND cc.column_name = t.column_name
-	  AND cc.position = 1
-	  AND  data_type    = 'NUMBER'
-	  AND (( t.column_name = 'OBJECTID'
-	  AND  data_scale   = 0
-  	  AND  data_precision = 38) OR
-	    (data_precision IS NULL AND data_length = 22  AND data_scale = 0));
-		EXCEPTION 
-		WHEN NO_DATA_FOUND THEN
-SELECT t.column_name
-	  INTO retval
-	  FROM user_tab_columns t, user_ind_columns cc, user_indexes c
-	  WHERE t.table_name    = p_nth.nth_feature_table
-	  AND t.table_name = c.table_name
-	  AND c.uniqueness = 'UNIQUE'
-	  AND c.index_name = cc.index_name
-	  AND cc.column_name = t.column_name
-	  AND cc.column_position = 1
-	  AND  data_type    = 'NUMBER'
-	  AND (( t.column_name = 'OBJECTID'
-	  AND  data_scale   = 0
-  	  AND  data_precision = 38) OR
-	    (data_precision IS NULL AND data_length = 22  AND data_scale = 0));
-    END;
-      WHEN OTHERS THEN
-	    retval := p_nth.nth_feature_pk_column;
-    END;
-  END IF;
-  RETURN retval;
-END;  	  
+   RETURN retval;
+END;
 --
 -------------------------------------------------------------------------------------------------------------------------------
 --
