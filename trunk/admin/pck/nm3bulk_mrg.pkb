@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.12   May 19 2008 18:31:06   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.13   Jun 23 2008 11:15:48   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   May 19 2008 18:31:06  $
---       Date fetched Out : $Modtime:   May 19 2008 18:26:38  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Jun 23 2008 11:15:48  $
+--       Date fetched Out : $Modtime:   Jun 23 2008 11:08:20  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --
 --   Author : Priidu Tanava
@@ -46,12 +46,14 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   17.12.07  PT added rowid_with_group_by exception to test_key_preserved(), fixed a typo in exception init
   04.01.08  PT fixed the missing 'last one after loop' error in ins_datum_homo_chunks() and std_insert_invitems()
   09.01.08  PT fixed xsp handling in ins_datum_homo_chunks()
-  19.05.08  PT in std_populate() removed the 'No merge results' error 
+  19.05.08  PT in std_populate() removed the 'No merge results' error
+  23.06.08  PT fixed an error in cacluclating group_id in sql_load_datum_criteria_tmp()
+                load_group_datums() now uses explicit hard coded sql for linear groups
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.12  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.13  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -1962,9 +1964,10 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ,p_sqlcount out pls_integer
   )
   is
-    l_sql         varchar2(10000);
-    l_group_type  nm_group_types.ngt_group_type%type;
-    l_ne_type     nm_elements.ne_type%type;
+    l_sql               varchar2(10000);
+    l_group_type        nm_group_types.ngt_group_type%type;
+    l_ne_type           nm_elements.ne_type%type;
+    l_ngt_linear_flag   nm_group_types.ngt_linear_flag%type;
     
   begin
     nm3dbg.putln(g_package_name||'.load_group_datums('
@@ -1973,18 +1976,45 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       
     l_ne_type := nm3net.get_ne_type(p_group_id);
     
+    execute immediate 'truncate table nm_datum_criteria_tmp';
+    
     case 
     
     -- linear or non-linear group
     when l_ne_type = 'G' then
-      l_sql :=
-        sql_load_nm_datum_criteria_tmp(
-           p_elements_sql => 
-                  '    select nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
-            ||cr||'    from nm_members'
-            ||cr||'    where nm_ne_id_in = :p_group_id'
-            ||cr||'    group by nm_ne_id_of' 
-        );
+      l_group_type := nm3net.get_gty_type(p_group_id);
+      
+      -- this nullifies the l_group_type if not linear
+      ensure_group_type_linear(
+         p_group_type_in  => l_group_type
+        ,p_group_type_out => l_group_type
+      );
+      
+      -- linear group
+      if l_group_type is not null then
+      
+        -- special hard coded handling of a linear group
+        insert /*+ append */ into nm_datum_criteria_tmp (
+          datum_id, begin_mp, end_mp, group_id
+        )
+        select nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp, p_group_id group_id
+        from nm_members
+        where nm_ne_id_in = p_group_id
+        group by nm_ne_id_of;
+        p_sqlcount := sql%rowcount;
+       
+      -- non linear group 
+      else
+        l_sql :=
+          sql_load_nm_datum_criteria_tmp(
+             p_elements_sql => 
+                    '    select nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
+              ||cr||'    from nm_members'
+              ||cr||'    where nm_ne_id_in = :p_group_id'
+              ||cr||'    group by nm_ne_id_of' 
+          );
+      
+      end if;
 
     -- datum or distance breake
     when l_ne_type in ('S','D') then
@@ -2018,21 +2048,17 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     
     end case;
     
-    ensure_group_type_linear(
-       p_group_type_in  => l_group_type
-      ,p_group_type_out => l_group_type
-    );
-    
-    
+
+    if l_sql is not null then
+      nm3dbg.putln(l_sql);
+      execute immediate l_sql
+      using
+         p_group_id
+        ,l_group_type;
+      p_sqlcount := sql%rowcount;
       
-    execute immediate 'truncate table nm_datum_criteria_tmp';
+    end if;
     
-    nm3dbg.putln(l_sql);
-    execute immediate l_sql
-    using
-       l_group_type
-      ,p_group_id;
-    p_sqlcount := sql%rowcount;
     commit;
    
     nm3dbg.putln('nm_datum_criteria_tmp rowcount='||p_sqlcount);
@@ -2635,41 +2661,48 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   ) return varchar2
   is
   begin
+  
+    -- this selects the member counts for each datum for every linear group that the datum is member of
+    --  the group id with the highest member count is retunred in the group_id column
+    --  if l_group_type has value then the the groups of this type have preference
+    --  if two groups have equal highest count of members then the lowest nm_ne_id_in value is returned
     return
-            'insert /*+ append */ into nm_datum_criteria_tmp ('
+            'insert into nm_datum_criteria_tmp ('
       ||cr||'  datum_id, begin_mp, end_mp, group_id'
       ||cr||')'
-      ||cr||'select'
-      ||cr||'   q2.nm_ne_id_of'
-      ||cr||'  ,q2.nm_begin_mp'
-      ||cr||'  ,q2.nm_end_mp'
-      ||cr||'  ,decode(q2.in_count, 1, null, q2.nm_ne_id_in) nm_ne_id_in'
-      ||cr||'from ('
-      ||cr||'select q.*'
-      ||cr||'  ,decode(q.nm_ne_id_of, null, 1,' 
-      ||cr||'    row_number() over (partition by q.nm_ne_id_of'
-      ||cr||'      order by decode(q.nm_obj_type, :l_group_type, 10000000, q.obj_type_count) desc, q.nm_obj_type)) row_num'
-      ||cr||'from ('
-      ||cr||'select /*+ first_rows */'
-      ||cr||'   e.nm_ne_id_of'
-      ||cr||'  ,m.nm_ne_id_in'
-      ||cr||'  ,m.nm_obj_type'
-      ||cr||'  ,nvl(greatest(m.nm_begin_mp, e.begin_mp), m.nm_begin_mp) nm_begin_mp'
-      ||cr||'  ,nvl(least(m.nm_end_mp, e.end_mp), m.nm_end_mp) nm_end_mp'
-      ||cr||'  ,decode(m.nm_ne_id_of, null, null, count(*) over (partition by m.nm_ne_id_of)) of_count'
-      ||cr||'  ,decode(m.nm_ne_id_in, null, null, count(*) over (partition by m.nm_ne_id_in)) in_count'
-      ||cr||'  ,decode(m.nm_obj_type, null, null, count(*) over (partition by m.nm_obj_type)) obj_type_count'
-      ||cr||'from'
-      ||cr||'   ('
+      ||cr||'with dc as ('
       ||cr||p_elements_sql
-      ||cr||'   ) e'
-      ||cr||'  ,(select nm_ne_id_of, nm_ne_id_in, nm_begin_mp, nm_end_mp, nm_obj_type'
-      ||cr||'    from nm_members, nm_group_types'
-      ||cr||'    where nm_obj_type = ngt_group_type and ngt_linear_flag = ''Y'') m'
-      ||cr||'where e.nm_ne_id_of = m.nm_ne_id_of (+)'
+      ||cr||')'
+      ||cr||'select'
+      ||cr||'   dc.nm_ne_id_of'
+      ||cr||'  ,dc.begin_mp'
+      ||cr||'  ,dc.end_mp'
+      ||cr||'  ,q2.group_id'
+      ||cr||'from'
+      ||cr||'   dc'
+      ||cr||'  ,('
+      ||cr||'select distinct'
+      ||cr||'   q.nm_ne_id_of'
+      ||cr||'  ,first_value(q.nm_ne_id_in) over (partition by q.nm_ne_id_of order by q.gty_order, q.val_count desc, q.nm_ne_id_in) group_id'
+      ||cr||'from ('
+      ||cr||'select'
+      ||cr||'   m.nm_ne_id_of'
+      ||cr||'  ,m.nm_ne_id_in'
+      ||cr||'  ,decode(e.ne_gty_group_type, :l_group_type, 1, 2) gty_order'
+      ||cr||'  ,count(*) over (partition by m.nm_ne_id_in) val_count'
+      ||cr||'from'
+      ||cr||'   dc'
+      ||cr||'  ,nm_members m'
+      ||cr||'  ,nm_elements e'
+      ||cr||'  ,nm_group_types_all gt'
+      ||cr||'where dc.nm_ne_id_of = m.nm_ne_id_of'
+      ||cr||'  and m.nm_ne_id_in = e.ne_id'
+      ||cr||'  and e.ne_gty_group_type = gt.ngt_group_type'
+      ||cr||'  and gt.ngt_linear_flag = ''Y'''
       ||cr||') q'
       ||cr||') q2'
-      ||cr||'where q2.row_num = 1';
+      ||cr||'where dc.nm_ne_id_of = q2.nm_ne_id_of (+)';
+  
       
   end;
   
