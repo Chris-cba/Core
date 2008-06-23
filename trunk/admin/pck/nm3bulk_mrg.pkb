@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.13   Jun 23 2008 11:15:48   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.14   Jun 23 2008 11:36:30   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Jun 23 2008 11:15:48  $
---       Date fetched Out : $Modtime:   Jun 23 2008 11:08:20  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Jun 23 2008 11:36:30  $
+--       Date fetched Out : $Modtime:   Jun 23 2008 11:21:00  $
+--       PVCS Version     : $Revision:   2.14  $
 --
 --
 --   Author : Priidu Tanava
@@ -53,7 +53,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.13  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.14  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -2111,8 +2111,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     nm3dbg.putln(l_sql);
     execute immediate l_sql
     using
-       l_group_type
-      ,p_nse_id;
+       p_nse_id
+      ,l_group_type;
     p_sqlcount := sql%rowcount;
     commit;
     
@@ -2166,8 +2166,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     nm3dbg.putln(l_sql);
     execute immediate l_sql
     using
-       l_group_type
-      ,p_group_type;
+       p_group_type
+      ,l_group_type;
     p_sqlcount := sql%rowcount;
     commit;
     
@@ -2235,8 +2235,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     nm3dbg.putln(l_sql);
     execute immediate l_sql
     using
-       l_group_type
-      ,l_nt_type;
+       l_nt_type
+      ,l_group_type;
     p_sqlcount := sql%rowcount;
     commit;
       
