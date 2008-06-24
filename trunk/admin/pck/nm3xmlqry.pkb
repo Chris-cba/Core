@@ -2,13 +2,14 @@ CREATE OR REPLACE PACKAGE BODY nm3xmlqry AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3xmlqry.pkb	1.4 01/30/06
---       Module Name      : nm3xmlqry.pkb
---       Date into SCCS   : 06/01/30 12:38:02
---       Date fetched Out : 07/06/13 14:13:58
---       SCCS Version     : 1.4
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3xmlqry.pkb-arc   2.1   Jun 24 2008 12:11:32   rcoupe  $
+--       Module Name      : $Workfile:   nm3xmlqry.pkb  $
+--       Date into PVCS   : $Date:   Jun 24 2008 12:11:32  $
+--       Date fetched Out : $Modtime:   Jun 24 2008 12:10:46  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on         : 1.4
 --
 --
 --   Author : A.N. Other
@@ -21,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3xmlqry AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3xmlqry.pkb	1.4 01/30/06"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'NM3XMLQRY';
@@ -146,7 +147,7 @@ BEGIN
          l_row  := 'IIT_NE_ID';
          IF NOT nm3ddl.does_object_exist (l_tab,'VIEW')
          THEN
-           nm3inv_view.create_inv_view( p_inventory_type  => l_iit.iit_inv_type 
+           nm3inv_view.create_inv_view( p_inventory_type  => l_iit.iit_inv_type
                                       , p_join_to_network => FALSE
                                       , p_view_name       => l_dummy);
          END IF;
@@ -190,18 +191,18 @@ retval clob;
 begin
 
   l_nth := nm3get.get_nth( p_theme_id);
-  
-  if l_nth.nth_feature_fk_column is not null then
-    
+
+  if l_nth.nth_feature_fk_column is not null and l_nth.nth_feature_table != l_nth.nth_table_name then
+
     xmlqry := 'select ttab.* from '||l_nth.nth_table_name||' ttab,'||l_nth.nth_feature_table||' ftab'||
               ' where ttab.'||l_nth.nth_pk_column||' = ftab.'||l_nth.nth_feature_fk_column||
               ' and ftab.'||l_nth.nth_feature_pk_column||' = '||to_char(p_ne_id);
 
   else
-                
+
     xmlqry := 'select * from '||l_nth.nth_table_name||' ttab'||
               ' where ttab.'||l_nth.nth_pk_column||' = '||to_char(p_ne_id);
-              
+
   end if;
 
 --  l_type := 'N';
