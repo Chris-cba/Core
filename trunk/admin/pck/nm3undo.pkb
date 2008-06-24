@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.2   Jul 31 2007 10:35:10   sscanlon  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.3   Jun 24 2008 10:58:02   rcoupe  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Jul 31 2007 10:35:10  $
---       Date fetched Out : $Modtime:   Jul 24 2007 08:48:20  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jun 24 2008 10:58:02  $
+--       Date fetched Out : $Modtime:   Jun 24 2008 10:56:50  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -618,21 +618,26 @@ END undo_scheme;
          p_ne_id_new1 := l_new;
          p_ne_id_old1 := l_old;
 
-         IF l_op IN ('S', 'M')
+         IF l_op = 'M'
          THEN
             FETCH c_hist_from_new
              INTO l_new, l_old, l_op;
 
-            IF l_op = 'M'
-            THEN
 --      merge - need to get the others - there will be two old for one new
-               p_ne_id_new2 := NULL;
-               p_ne_id_old2 := l_old;
-            ELSE
+             p_ne_id_new2 := NULL;
+             p_ne_id_old2 := l_old;
+
+         ELSIF l_op = 'S' then
+           open c_hist_from_old ( l_old );
+           fetch c_hist_from_old into l_new, l_old, l_op;
+           p_ne_id_new1 := l_new;
+           p_ne_id_old1 := l_old;
+           
 --      split - need to get the others - there will be two new for one old
-               p_ne_id_new2 := l_new;
-               p_ne_id_old2 := NULL;
-            END IF;
+ 
+           fetch c_hist_from_old into l_new, l_old, l_op;
+           p_ne_id_new2 := l_new;
+           p_ne_id_old2 := NULL;
          ELSE
             p_ne_id_new2 := NULL;
             p_ne_id_old2 := NULL;
