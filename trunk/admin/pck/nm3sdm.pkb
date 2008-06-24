@@ -5,12 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.4   Jun 09 2008 16:03:04   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.5   Jun 24 2008 09:52:32   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into SCCS   : $Date:   Jun 09 2008 16:03:04  $
---       Date fetched Out : $Modtime:   Jun 09 2008 15:58:12  $
---       SCCS Version     : $Revision:   2.4  $
---       Based on : 1.91
+--       Date into PVCS   : $Date:   Jun 24 2008 09:52:32  $
+--       Date fetched Out : $Modtime:   Jun 24 2008 09:51:10  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --   Author : R.A. Coupe
 --
@@ -22,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '@(#)nm3sdm.pkb	1.91 04/11/07';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -397,7 +396,7 @@ AS
          || p_node_type
          || '''';
 
-         Nm_Debug.debug_on;
+--         Nm_Debug.debug_on;
          Nm_Debug.DEBUG( cur_string );
 
       Nm3ddl.create_object_and_syns( l_node_view, cur_string );
@@ -1290,7 +1289,7 @@ PROCEDURE split_element_shapes (
   PROCEDURE create_base_themes ( p_theme_id    IN NUMBER
 	                            ,p_base        IN nm_theme_array ) IS
   BEGIN
-  Nm_Debug.debug_on;
+--  Nm_Debug.debug_on;
     IF p_base.nta_theme_array(1).nthe_id IS NULL THEN
 	  Nm_Debug.DEBUG('No base themes');
 	ELSE
@@ -2166,7 +2165,7 @@ PROCEDURE split_element_shapes (
 
       IF Hig.get_sysopt ('REGSDELAY') = 'Y'
       THEN
-         nm_debug.debug_on;
+--         nm_debug.debug_on;
          nm_debug.debug('** Creating SDE Layer for - '||l_nth.nth_theme_id);
          EXECUTE IMMEDIATE (   'begin '
                             || '    nm3sde.register_sde_layer( p_theme_id => '||TO_CHAR( l_nth.nth_theme_id )||');'
@@ -4103,7 +4102,7 @@ end;
 --            || '''';
 --      END IF;
 
-         Nm_Debug.debug_on;
+--         Nm_Debug.debug_on;
          Nm_Debug.DEBUG( cur_string );
       Nm3ddl.create_object_and_syns ('V_' || p_table || '_DT', cur_string);
 --  execute immediate cur_string;
@@ -5798,7 +5797,7 @@ end;
             || '  and end_date = :end_date ) ';
 
 /*
-    nm_debug.debug_on;
+--    nm_debug.debug_on;
     nm_debug.delete_debug(true);
     nm_debug.debug(c_str);
 */
@@ -6539,7 +6538,7 @@ end;
 
       CLOSE c1;
 
-	  Nm_Debug.debug_on;
+--	  Nm_Debug.debug_on;
 	        FOR i IN 1 .. l_tab_nth_id.COUNT
       LOOP
 Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
@@ -6704,7 +6703,15 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                     AND synonym_name = nth_feature_table
                     AND owner != 'PUBLIC'))
     LOOP
-      EXECUTE IMMEDIATE i.sql_text;
+      BEGIN
+        EXECUTE IMMEDIATE i.sql_text;
+      EXCEPTION
+        WHEN OTHERS 
+        THEN
+          ROLLBACK;
+          nm_debug.debug('con views drop synonym Error - '||SQLERRM); 
+      END;
+      COMMIT;
     END LOOP;
   --
     FOR i IN
@@ -6760,7 +6767,11 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                     AND synonym_name = nth_feature_table
                     AND owner != 'PUBLIC'))
     LOOP
-      EXECUTE IMMEDIATE i.sql_text;
+      BEGIN
+        EXECUTE IMMEDIATE i.sql_text;
+      EXCEPTION
+        WHEN OTHERS THEN nm_debug.debug('con views drop synonym Error - '||SQLERRM); 
+      END;
     END LOOP;
   --
     FOR i IN
@@ -6968,7 +6979,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                WHEN OTHERS
                  THEN
                  -- Instead of whole process falling over, log the error and carry on
-                   Nm_Debug.debug_on;
+--                   Nm_Debug.debug_on;
                    Nm_Debug.DEBUG ('Error copying SDE layer for '||nm3sdm.g_theme_role (i)||' - '||SQLERRM);
                    Nm_Debug.debug_off;
              END;
@@ -7025,7 +7036,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                 WHEN OTHERS
                   THEN
                   -- Instead of whole process falling over, log the error and carry on
-                    Nm_Debug.debug_on;
+--                    Nm_Debug.debug_on;
                     Nm_Debug.DEBUG ('Error dropping SDE layer for '||nm3sdm.g_theme_role (i)||' - '||SQLERRM);
                     Nm_Debug.debug_off;
               END;
@@ -7172,10 +7183,15 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
        --------------------------------------------------
        -- Create any missing feature views for sub users
        --------------------------------------------------
-
-          consolidate_feature_views
-            ( pi_role      => nm3sdm.g_role_array (i)
-            , pi_username  => nm3sdm.g_username_array (i) );
+          BEGIN
+            consolidate_feature_views
+              ( pi_role      => nm3sdm.g_role_array (i)
+              , pi_username  => nm3sdm.g_username_array (i) );
+          EXCEPTION
+            WHEN OTHERS
+            THEN
+              nm_debug.debug('Error consoilating views ' ||SQLERRM);
+          END;
 
        --------------------------------------------------
        -- Register the SDE layer in the conventional way
@@ -7201,7 +7217,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                 WHEN OTHERS
                   THEN
                   -- Instead of whole process falling over, log the error and carry on
-                    Nm_Debug.debug_on;
+--                    Nm_Debug.debug_on;
                     Nm_Debug.DEBUG ('Error copying SDE layer for '||nm3sdm.g_theme_role (i)||' - '||SQLERRM);
                     Nm_Debug.debug_off;
               END;
@@ -7249,7 +7265,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                 WHEN OTHERS
                   THEN
                   -- Instead of whole process falling over, log the error and carry on
-                    Nm_Debug.debug_on;
+--                    Nm_Debug.debug_on;
                     Nm_Debug.DEBUG ('Error dropping SDE layer for '||nm3sdm.g_theme_role (i)||' - '||SQLERRM);
                     Nm_Debug.debug_off;
               END;
@@ -8968,7 +8984,7 @@ PROCEDURE create_msv_feature_views
             || '   WHERE gt_feature_table = sdo_table_name)';
       END IF;
    --
-     nm_debug.debug_on;
+--     nm_debug.debug_on;
      nm_debug.debug(l_sql);
    --
      -- MJA 24-Sep_2007: using In causing bind errors
