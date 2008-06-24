@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3xmlqry AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3xmlqry.pkb-arc   2.1   Jun 24 2008 12:11:32   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3xmlqry.pkb-arc   2.2   Jun 24 2008 13:19:40   rcoupe  $
 --       Module Name      : $Workfile:   nm3xmlqry.pkb  $
---       Date into PVCS   : $Date:   Jun 24 2008 12:11:32  $
---       Date fetched Out : $Modtime:   Jun 24 2008 12:10:46  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jun 24 2008 13:19:40  $
+--       Date fetched Out : $Modtime:   Jun 24 2008 13:18:58  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on         : 1.4
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3xmlqry AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'NM3XMLQRY';
@@ -196,12 +196,14 @@ begin
 
     xmlqry := 'select ttab.* from '||l_nth.nth_table_name||' ttab,'||l_nth.nth_feature_table||' ftab'||
               ' where ttab.'||l_nth.nth_pk_column||' = ftab.'||l_nth.nth_feature_fk_column||
-              ' and ftab.'||l_nth.nth_feature_pk_column||' = '||to_char(p_ne_id);
+              ' and ftab.'||l_nth.nth_feature_pk_column||' = '||to_char(p_ne_id)||
+              ' and rownum = 1 ';
 
   else
 
     xmlqry := 'select * from '||l_nth.nth_table_name||' ttab'||
-              ' where ttab.'||l_nth.nth_pk_column||' = '||to_char(p_ne_id);
+              ' where ttab.'||l_nth.nth_pk_column||' = '||to_char(p_ne_id)||
+              ' and rownum = 1';
 
   end if;
 
