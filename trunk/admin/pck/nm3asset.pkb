@@ -3836,7 +3836,7 @@ PROCEDURE get_non_linear_grp_membership (pi_iit_inv_type               IN     nm
           ,nm_members     g
   WHERE    nt_type = ne_nt_type
   AND      g.nm_ne_id_of  = i.nm_ne_id_of
-  AND      g.nm_begin_mp  < i.nm_end_mp
+  AND      g.nm_begin_mp  <= i.nm_end_mp -- 713738 added '<=', was <.  Wasn't displaying group membership for point assets at the beginning of a datum (the route start).
   AND      g.nm_end_mp    > i.nm_begin_mp
   AND      g.nm_ne_id_in  = ne_id
   AND      i.nm_ne_id_in  = pi_iit_ne_id
