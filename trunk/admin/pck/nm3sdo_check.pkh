@@ -5,11 +5,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkh-arc   2.0   Jun 12 2008 11:24:26   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkh-arc   2.1   Jun 25 2008 21:10:58   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_check.pkh  $
---       Date into PVCS   : $Date:   Jun 12 2008 11:24:26  $
---       Date fetched Out : $Modtime:   Jun 12 2008 11:23:04  $
---       PVCS Version     : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Jun 25 2008 21:10:58  $
+--       Date fetched Out : $Modtime:   Jun 25 2008 21:10:12  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --   AEdwards
 --   SDO/THEMES Metadata checker
@@ -17,7 +17,7 @@ AS
 --------------------------------------------------------------------------------
 --
 --</PACKAGE>
-  g_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.0  $"';
+  g_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.1  $"';
 --
 --------------------------------------------------------------------------------
 --
@@ -48,8 +48,9 @@ AS
 --<PROC NAME="RUN_SDO_CHECK">
 -- This procedure calls the SDO checker
   PROCEDURE run_sdo_check
-                 ( pi_location IN VARCHAR2 DEFAULT NULL
-                 , pi_filename IN VARCHAR2 DEFAULT NULL);
+                 ( pi_location    IN VARCHAR2 DEFAULT NULL
+                 , pi_filename    IN VARCHAR2 DEFAULT NULL
+                 , pi_skip_gtypes IN BOOLEAN  DEFAULT FALSE);
 --</PROC>
 --
 --------------------------------------------------------------------------------
