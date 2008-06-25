@@ -4,16 +4,16 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.2   Jun 13 2008 11:19:10   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.3   Jun 25 2008 21:11:36   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_check.pkb  $
---       Date into PVCS   : $Date:   Jun 13 2008 11:19:10  $
---       Date fetched Out : $Modtime:   Jun 13 2008 11:18:12  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jun 25 2008 21:11:36  $
+--       Date fetched Out : $Modtime:   Jun 25 2008 21:10:22  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --------------------------------------------------------------------------------
 --
   g_package_name          CONSTANT varchar2(30)    := 'nm3sdo_check';
-  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.2  $"';
+  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.3  $"';
   lf                      CONSTANT VARCHAR2(30)    := chr(10);
   g_write_to_file                  BOOLEAN         := FALSE;
   l_results                        nm3type.tab_varchar32767;
@@ -73,8 +73,9 @@ AS
 --------------------------------------------------------------------------------
 --
   PROCEDURE run_sdo_check
-                 ( pi_location IN VARCHAR2 DEFAULT NULL
-                 , pi_filename IN VARCHAR2 DEFAULT NULL)
+                 ( pi_location    IN VARCHAR2 DEFAULT NULL
+                 , pi_filename    IN VARCHAR2 DEFAULT NULL
+                 , pi_skip_gtypes IN BOOLEAN  DEFAULT FALSE)
   IS
     b_serverout    BOOLEAN := pi_location IS NULL OR pi_filename IS NULL;
   BEGIN
@@ -307,13 +308,80 @@ AS
   --
     IF l_results.COUNT = 0
     THEN
-      put('    PASS : All Subordinate User have feature views for Themes accessed via roles');
+      put('    PASS : All Subordinate users have feature views for Themes accessed via roles');
     ELSE 
       FOR i IN 1..l_results.COUNT LOOP
         put(l_results(i));
       END LOOP;
     END IF;
+    
   --
+--
+  IF NOT pi_skip_gtypes
+  THEN
+    ------------------------------------------------------------------------------
+    -- Report unrecognised Geometry Types
+    ------------------------------------------------------------------------------
+    --
+      DECLARE
+      --
+        l_tab_results nm3type.tab_varchar30;
+      --
+      BEGIN
+        FOR i IN
+          (SELECT nth_feature_table, nth_feature_shape_column
+             FROM nm_themes_all, user_sdo_geom_metadata
+            WHERE nth_feature_table = table_name
+              AND nth_feature_shape_column = column_name
+              AND nth_base_table_theme IS NULL
+              AND nth_theme_type  = 'SDO'
+            ORDER BY nth_theme_id
+          )
+        LOOP
+        --
+          EXECUTE IMMEDIATE 'SELECT UNIQUE a.'||i.nth_feature_shape_column||'.sdo_gtype'
+                           ||' FROM '||i.nth_feature_table||' a'
+                          ||' WHERE NOT EXISTS '
+                             ||' (SELECT 1 FROM hig_codes '
+                               ||' WHERE hco_domain = ''GEOMETRY_TYPE'''
+                                 ||' AND hco_code = a.'||i.nth_feature_shape_column||'.sdo_gtype)'
+          BULK COLLECT INTO l_tab_results;
+        --
+          IF l_tab_results.COUNT > 0
+          THEN
+            FOR j IN 1..l_tab_results.COUNT
+            LOOP
+              l_results(l_results.COUNT+1) 
+                := '    FAIL : '||i.nth_feature_table
+                          ||' ['||i.nth_feature_shape_column
+                          ||'] - '|| l_tab_results(j)
+                          ||' is not recognised';
+            END LOOP; 
+        --
+          END IF;
+      --
+        END LOOP;
+      --
+      END;
+    --
+    --
+      put(lf);
+      put('  ====================================================================');
+      put('  =  Unrecognised Geometry Types (Gtypes)');
+      put('  ====================================================================');
+      put(lf);
+    --
+      IF l_results.COUNT = 0
+      THEN
+        put('    PASS : No unrecognised gtypes found');
+      ELSE 
+        FOR i IN 1..l_results.COUNT LOOP
+          put(l_results(i));
+        END LOOP;
+      END IF;
+--
+    END IF;
+--
     put(lf);
     put(lf);
     put('********************************************************************');
@@ -1090,6 +1158,36 @@ AS
     IF l_results.COUNT = 0
     THEN
       put('    PASS : No triggers exist that relate to missing Themes');
+    ELSE 
+      FOR i IN 1..l_results.COUNT LOOP
+        put(l_results(i));
+      END LOOP;
+    END IF;
+--
+  ------------------------------------------------------------------------------
+  --
+    put(lf);
+    put('  ====================================================================');
+    put('  =  Incorrectly set Base Themes');
+    put('  ====================================================================');
+    put(lf);
+  --
+    SELECT '    FAIL : Theme '||z.nth_theme_name||' ['||z.nth_theme_id
+              ||'] '||' should not be referencing '||x.nth_theme_name
+              ||' ['||z.nth_theme_id
+              ||'] '||' in NM_BASE_THEMES'
+      BULK COLLECT INTO l_results
+      FROM nm_base_themes, nm_themes_all z, nm_themes_all x
+     WHERE EXISTS
+       (SELECT 1 FROM nm_themes_all b
+         WHERE b.nth_theme_id = nbth_base_theme
+           AND b.nth_base_table_theme IS NOT NULL)
+       AND z.nth_theme_id = nbth_theme_id
+       AND x.nth_theme_id = nbth_base_theme;
+  --
+    IF l_results.COUNT = 0
+    THEN
+      put('    PASS : No incorrect Base themes found');
     ELSE 
       FOR i IN 1..l_results.COUNT LOOP
         put(l_results(i));
