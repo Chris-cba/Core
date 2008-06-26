@@ -1,13 +1,14 @@
 CREATE OR REPLACE PACKAGE BODY Nm_Cncts IS
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm_cncts.pkb	1.5 11/17/06
---       Module Name      : nm_cncts.pkb
---       Date into SCCS   : 06/11/17 16:47:30
---       Date fetched Out : 07/06/13 14:10:42
---       SCCS Version     : 1.5
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm_cncts.pkb-arc   2.1   Jun 26 2008 17:19:06   rcoupe  $
+--       Module Name      : $Workfile:   nm_cncts.pkb  $
+--       Date into PVCS   : $Date:   Jun 26 2008 17:19:06  $
+--       Date fetched Out : $Modtime:   Jun 26 2008 17:10:54  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on            1.5 
 --
 --   Author : Rob Coupe
 --
@@ -1410,17 +1411,30 @@ END;
 
 FUNCTION Get_Cnct_No ( p_list IN int_array  ) RETURN nm_cnct_no_array IS
 retval nm_cnct_no_array := Init_Nm_Cnct_No_Array;
+/*
 
 CURSOR c_no ( c_ia IN int_array) IS
-  SELECT /*+INDEX (n, NNU_NE_FK_IND)*/nm_cnct_no(NULL, n.nnu_no_node_id, n.nnu_ne_id, n.nnu_node_type)
+  SELECT /*+INDEX (n, NNU_NE_FK_IND)*/ /*nm_cnct_no(NULL, n.nnu_no_node_id, n.nnu_ne_id, n.nnu_node_type)
   FROM nm_node_usages n, TABLE ( c_ia.ia ) e
   WHERE n.nnu_ne_id = e.COLUMN_VALUE;
+*/
+
+curstr varchar2(2000);
 
 BEGIN
 
+  curstr := 'select /*+cardinality( e '||to_char( p_list.ia.last)||') INDEX (n.NNU_NE_FK_IND)*/ '||
+            'nm_cnct_no(NULL, n.nnu_no_node_id, n.nnu_ne_id, n.nnu_node_type) '||
+            'FROM nm_node_usages n, TABLE ( :ia ) e '||
+            'WHERE n.nnu_ne_id = e.COLUMN_VALUE ';
+
+  execute immediate curstr bulk collect into retval.ncno_array using p_list.ia;
+
+/*
   OPEN c_no( p_list );
   FETCH c_no BULK COLLECT INTO retval.ncno_array;
   CLOSE c_no;
+*/
     
   RETURN retval;
   
@@ -1462,19 +1476,33 @@ END;
 FUNCTION Get_Cnct_Ne ( p_list IN int_array ) RETURN nm_cnct_ne_array IS
 retval nm_cnct_ne_array := Init_Nm_Cnct_Ne_Array;
 
+/*
 CURSOR c_ne ( c_ia IN int_array) IS
   SELECT nm_cnct_ne(NULL, e.ne_id, e.ne_no_start, e.ne_no_end, ne_length)
   FROM nm_elements e, TABLE ( c_ia.ia ) a
   WHERE e.ne_id = a.COLUMN_VALUE;
+*/
+
+curstr varchar2(2000);
 
 BEGIN
 
+  curstr := ' SELECT /*+cardinality( a '||to_char(p_list.ia.last)||') */ '|| 'nm_cnct_ne(NULL, e.ne_id, e.ne_no_start, e.ne_no_end, ne_length) '||
+            ' FROM nm_elements e, TABLE ( ia ) a '||
+            ' WHERE e.ne_id = a.COLUMN_VALUE ';
+
+
+/*
   OPEN c_ne( p_list );
   FETCH c_ne BULK COLLECT INTO retval.ncne_array;
   CLOSE c_ne;
+*/
   
 --  Nm_Debug.debug_on;
 --  Nm_Debug.DEBUG('last = '||TO_CHAR(retval.ncne_array.LAST));
+
+  execute immediate curstr bulk collect into retval.ncne_array;
+
   IF retval.ncne_array.LAST IS NULL  THEN
     RAISE_APPLICATION_ERROR( -20001, 'Empty dataset, cannot instantiate the object');
   END IF;
