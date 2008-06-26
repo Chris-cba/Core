@@ -4,12 +4,15 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm3sde.pkb	1.21 03/27/07
---       Module Name      : nm3sde.pkb
---       Date into SCCS   : 07/03/27 17:21:58
---       Date fetched Out : 07/06/13 14:13:24
---       SCCS Version     : 1.21
+--   PVCS Identifiers :-
 --
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.2   Jun 26 2008 15:18:06   rcoupe  $
+--       Module Name      : $Workfile:   nm3sde.pkb  $
+--       Date into PVCS   : $Date:   Jun 26 2008 15:18:06  $
+--       Date fetched Out : $Modtime:   Jun 26 2008 15:13:52  $
+--       PVCS Version     : $Revision:   2.2  $
+--
+--       Based on one of many versions labeled as 1.21
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '@(#)nm3sde.pkb	1.21 03/27/07';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -36,7 +39,7 @@ PROCEDURE pop_sde_obj_from_theme( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE,
 FUNCTION get_geocol( p_table IN VARCHAR2, p_column IN VARCHAR2 )  RETURN geocol_record_t;
 
 PROCEDURE copy_sde_obj_from_theme( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE,
-                                   p_theme_usr IN HIG_USER_ROLES.HUR_USERNAME%TYPE 
+                                   p_theme_usr IN HIG_USER_ROLES.HUR_USERNAME%TYPE
                                  );
 FUNCTION get_SDE_pk ( p_nth IN NM_THEMES_ALL%ROWTYPE ) RETURN VARCHAR2;
 
@@ -65,15 +68,15 @@ END get_body_version;
 FUNCTION get_sde_version RETURN VARCHAR2 IS
 retval VARCHAR2(255);
 BEGIN
-  SELECT prop_value 
+  SELECT prop_value
   INTO retval
   FROM sde.metadata
   WHERE record_id = 1;
 
-  IF SQL%NOTFOUND THEN 
+  IF SQL%NOTFOUND THEN
     RAISE_APPLICATION_ERROR( -20001, 'Version not found');
   END IF;
-  
+
   RETURN retval;
 END;
 --
@@ -103,13 +106,13 @@ BEGIN
 --nm_debug.debug_on;
 
   l_theme := Nm3sdm.get_nth( p_theme_id );
-  
+
   pop_sde_obj_from_theme( p_theme_id => p_theme_id,
                           p_parent_id => l_theme.nth_base_table_theme,
                           p_layer  => l_layer,
                           p_geocol => l_geocol,
                           p_reg    => l_reg);
-	
+
 END;
 
 --
@@ -205,18 +208,18 @@ BEGIN
   l_theme := Nm3get.get_nth( p_theme_id );
 
   IF p_parent_id IS NOT NULL THEN
-  
---  Here we have a view based on an existing table. Use the existing registration data as this is 
+
+--  Here we have a view based on an existing table. Use the existing registration data as this is
 --  assumed to be more reliable.
-  
+
     l_parent := Nm3get.get_nth( p_parent_id);
 
     BEGIN
       Nm_Debug.DEBUG('Parent = '||p_parent_id );
       p_layer  := get_sde_layer_from_theme(p_theme_id => p_parent_id );
-      p_geocol := get_geocol( l_parent.nth_feature_table, l_parent.nth_feature_shape_column ); 
+      p_geocol := get_geocol( l_parent.nth_feature_table, l_parent.nth_feature_shape_column );
 	  p_reg    := get_treg( l_parent.nth_feature_table );
-	  
+
     EXCEPTION
       WHEN NO_DATA_FOUND THEN
        Nm_Debug.DEBUG('No parent layer');
@@ -239,9 +242,9 @@ BEGIN
 --  RAC - FK issue still unresolved.
 
   ELSE
-  
+
     p_layer := generate_sde_layer_from_theme( l_theme );
-	  
+
   END IF;
 
   l_gtype  := Nm3sdo.get_theme_gtype( p_theme_id );
@@ -293,7 +296,7 @@ BEGIN
     no_access EXCEPTION;
     PRAGMA EXCEPTION_INIT ( no_access, -20037 );
   BEGIN
-  
+
     sde.sdo_util.register_layer( p_layer, p_geocol, p_reg );
 
   EXCEPTION
@@ -304,9 +307,9 @@ BEGIN
                    );
 --    raise_application_error (-20001, 'Table is not registered or SDE schema cannot see it');
   END;
-  
+
   Nm_Debug.DEBUG('Creating column reg');
-  
+
   create_column_registry( p_layer.table_name, p_geocol.f_geometry_column, p_reg.rowid_column );
 
 END;
@@ -383,62 +386,62 @@ l_base_lyr sde.layers%ROWTYPE;
 BEGIN
 
     l_base  := Nm3sdm.get_base_themes( p_nth.nth_theme_id );
-  
+
     IF l_base.nta_theme_array.LAST IS NOT NULL AND l_base.nta_theme_array(1) IS NOT NULL THEN
-	
+
       Nm3sdo.set_diminfo_and_srid( l_base, l_diminfo, l_srid ); -- this guarantees that consistent base srids are in use from the Oracle perspective
-      
+
 	ELSE
-	
+
       l_usgm := Nm3sdo.get_theme_metadata( p_nth.nth_theme_id );
 
       l_diminfo := l_usgm.diminfo;
       l_srid    := l_usgm.srid;
 
     END IF;
-    
+
     IF p_nth.nth_base_table_theme IS NOT NULL THEN
-    
+
       BEGIN
         l_base_lyr := get_layer_by_theme(  p_nth.nth_base_table_theme );
       EXCEPTION
-        WHEN OTHERS THEN        
+        WHEN OTHERS THEN
           retval.srid          := register_SRID_from_theme( p_nth.nth_theme_id, l_base, l_srid );
           retval.base_layer_id := 0;
-      END;          
-      
+      END;
+
 --    no need to try and find an appropriate srid - use the base table
 
       retval.srid          := l_base_lyr.srid;
       retval.base_layer_id := l_base_lyr.layer_id;
-      
-    ELSE                  
+
+    ELSE
 
       retval.srid          := register_SRID_from_theme( p_nth.nth_theme_id, l_base, l_srid );
       retval.base_layer_id := 0;
-      
-    END IF;      
-		   
-    retval.LAYER_ID           := get_next_sde_layer;                             
-    retval.DESCRIPTION        := p_nth.nth_theme_name;                
+
+    END IF;
+
+    retval.LAYER_ID           := get_next_sde_layer;
+    retval.DESCRIPTION        := p_nth.nth_theme_name;
     retval.DATABASE_NAME      := NULL;
-    retval.OWNER              := g_owner;   
-    retval.TABLE_NAME         := p_nth.nth_feature_table;     
-    retval.SPATIAL_COLUMN     := p_nth.nth_feature_shape_column;                    
-    retval.EFLAGS             := convert_to_sde_eflag( Nm3sdo.get_theme_gtype( p_nth.nth_theme_id ) );          
-    retval.LAYER_MASK         := 0;               
-    retval.GSIZE1             := 0;            
-    retval.GSIZE2             := 0;             
-    retval.GSIZE3             := 0;            
+    retval.OWNER              := g_owner;
+    retval.TABLE_NAME         := p_nth.nth_feature_table;
+    retval.SPATIAL_COLUMN     := p_nth.nth_feature_shape_column;
+    retval.EFLAGS             := convert_to_sde_eflag( Nm3sdo.get_theme_gtype( p_nth.nth_theme_id ) );
+    retval.LAYER_MASK         := 0;
+    retval.GSIZE1             := 0;
+    retval.GSIZE2             := 0;
+    retval.GSIZE3             := 0;
     retval.MINX               := l_diminfo(1).sdo_lb;
-    retval.MINY               := l_diminfo(2).sdo_lb;         
-    retval.MAXX               := l_diminfo(1).sdo_ub;      
+    retval.MINY               := l_diminfo(2).sdo_lb;
+    retval.MAXX               := l_diminfo(1).sdo_ub;
     retval.MAXY               := l_diminfo(2).sdo_ub;
     retval.CDATE              := get_date_for_sde;
     retval.LAYER_CONFIG       := g_keyword;
-    retval.OPTIMAL_ARRAY_SIZE := NULL;                      
-    retval.STATS_DATE         := NULL;               
-    retval.MINIMUM_ID         := 1;               
+    retval.OPTIMAL_ARRAY_SIZE := NULL;
+    retval.STATS_DATE         := NULL;
+    retval.MINIMUM_ID         := 1;
 
 
     RETURN retval;
@@ -484,15 +487,15 @@ BEGIN
   ELSE
 --  we have a single srid for the base layers
     retval := l_srids.ia(1);
-  END IF; 
+  END IF;
 
   RETURN retval;
-END;        
+END;
 
 BEGIN
 
    l_base_srid := get_base_srids( p_base );
-    
+
    IF l_base_srid IS NOT NULL THEN
 
      retval := l_base_srid;
@@ -508,17 +511,17 @@ BEGIN
      l_sref.falsez        := 0;
      l_sref.zunits        := 1;
      l_sref.falsem        := 0;
-   
+
 --   the problem here is that the gtype may not be there (due to errors). The munit is ignored for 2d data so just set to 1 just in case.
 --   ideally, this code would look at the units of the network to set the munits - but this code is used too generically - so teh table may
 --   not be network - so rely on the global value, this defaults to 1 anyway.
-   
-     IF Nm3sdo.get_theme_gtype( p_theme_id) = 3002 THEN 
+
+     IF Nm3sdo.get_theme_gtype( p_theme_id) = 3002 THEN
         l_sref.munits        := Nm3sdm.get_global_unit_factor;
      ELSE
        l_sref.munits         := 1;
      END IF;
-   
+
      l_sref.srtext        := NVL(Nm3sdo.get_srs_text( p_theme_id ), 'UNKNOWN');
 
      l_sref.description   := NULL;
@@ -531,7 +534,7 @@ BEGIN
 
      Nm_Debug.DEBUG( 'Set the srid by origin');
      retval := get_srid_by_origin( l_sref );
-   
+
      Nm_Debug.DEBUG('returned '||retval);
 
      IF retval IS NULL THEN
@@ -559,7 +562,7 @@ FUNCTION get_srid_by_origin( p_sref IN sref_record_t ) RETURN NUMBER IS
 --SRIDs should be consistent in the use of:
 -- 1 origin - this could be critical to rounding so they must be close
 -- 2 xyunits - this can be calculated unreliably, so again, as long as they are close
--- 3 munits - 
+-- 3 munits -
 -- 4 SRTEXT
 -- auth_srid - this is not critical - especially with Oracle srids as long as the base layers hold the same oracle srid - so we
 -- can ignore this.
@@ -710,7 +713,7 @@ CURSOR c_geocol( c_table IN VARCHAR2, c_column IN VARCHAR2, c_owner IN VARCHAR2 
   WHERE f_table_schema = c_owner
   AND   f_table_name = c_table
   AND   f_geometry_column = c_column;
-  
+
 
 l_geocol geocol_record_t;
 
@@ -742,7 +745,7 @@ CURSOR c_treg( c_table IN VARCHAR2, c_owner IN VARCHAR2 ) IS
   SELECT *
   FROM sde.table_registry
   WHERE owner = c_owner
-  AND   table_name = c_table;  
+  AND   table_name = c_table;
 
 l_treg registration_record_t;
 
@@ -822,9 +825,9 @@ srid_count INTEGER;
   IS
   BEGIN
   --
-    DELETE FROM sde.column_registry 
+    DELETE FROM sde.column_registry
     WHERE  (owner,table_name) IN
-             (SELECT owner,table_name 
+             (SELECT owner,table_name
               FROM   sde.table_registry
               WHERE  registration_id = p_layer);
 
@@ -843,9 +846,9 @@ srid_count INTEGER;
     -- Delete the geometry_columns.
 
     DELETE FROM sde.geometry_columns WHERE
-      (f_table_schema, f_table_name, f_geometry_column) = 
+      (f_table_schema, f_table_name, f_geometry_column) =
         (SELECT owner, table_name,spatial_column FROM
-           sde.layers WHERE layer_id = p_layer); 
+           sde.layers WHERE layer_id = p_layer);
 
     -- Make sure that something was deleted.
 
@@ -883,8 +886,8 @@ BEGIN
 
 --  sde.LAYERS_UTIL.delete_layer(l_layer.layer_id);
   delete_layer (l_layer.layer_id);
-   
--- remove_column_registry( l_layer.table_name ); 
+
+-- remove_column_registry( l_layer.table_name );
 
   IF srid_count = 0 THEN
     sde.sref_util.delete_spatial_references (l_layer.srid);
@@ -1352,12 +1355,12 @@ END;
 ---------------------------------------------------------------------------------------------------------------
 --
 
-PROCEDURE drop_sub_layer_by_table 
+PROCEDURE drop_sub_layer_by_table
 /*
    This procedure is used to remove subordinate user SDE metadata. It works in two
-   modes - 
+   modes -
       i. Trigger on nm_theme_roles will call this in a loop to remove all SDE
-         data for a given table and column. 
+         data for a given table and column.
      ii. Trigger on hig_user_roles will call this for a given user to clear out
          all SDE data for the role revoked - derived from nm_theme_roles
 */
@@ -1396,7 +1399,7 @@ BEGIN
    THEN
       OPEN c_layer2 (p_table, p_column, p_owner);
       FETCH c_layer2 INTO l_layer_id;
-      IF c_layer2%FOUND 
+      IF c_layer2%FOUND
       THEN
          CLOSE c_layer2;
          del_layer (l_layer_id);
@@ -1424,7 +1427,7 @@ PROCEDURE del_gcol( p_table IN VARCHAR2, p_column IN VARCHAR2, p_owner IN VARCHA
 
 BEGIN
 
-  DELETE 
+  DELETE
   FROM sde.geometry_columns
   WHERE f_table_name = p_table
   AND   f_geometry_column = p_column
@@ -1440,7 +1443,7 @@ PROCEDURE del_treg( p_table IN VARCHAR2, p_owner IN VARCHAR2)  IS
 
 BEGIN
 
-  DELETE 
+  DELETE
   FROM sde.table_registry
   WHERE table_name = p_table
   AND   owner = p_owner;
@@ -1455,7 +1458,7 @@ PROCEDURE del_layer( p_layer IN NUMBER )  IS
 
 BEGIN
 
-  DELETE 
+  DELETE
   FROM sde.layers
   WHERE layer_id = p_layer;
 
@@ -1469,7 +1472,7 @@ PROCEDURE del_creg( p_table IN VARCHAR2, p_owner IN VARCHAR2)  IS
 
 BEGIN
 
-  DELETE 
+  DELETE
   FROM sde.column_registry
   WHERE table_name = p_table
   AND   owner = p_owner;
@@ -1483,29 +1486,29 @@ END;
 FUNCTION get_keyword RETURN VARCHAR2 IS
 retval VARCHAR2(32);
 BEGIN
-  SELECT keyword 
+  SELECT keyword
   INTO retval
   FROM sde.dbtune
   WHERE CONFIG_STRING='SDO_GEOMETRY';
-  
+
   RETURN retval;
 EXCEPTION
   WHEN NO_DATA_FOUND THEN
     RAISE_APPLICATION_ERROR( -20001, 'Keyword not available' );
-  WHEN TOO_MANY_ROWS THEN 
+  WHEN TOO_MANY_ROWS THEN
     RAISE_APPLICATION_ERROR( -20001, 'Too many Keywords' );
 END;
 ----------------------------------------------------------------------------------------------
 ---
 PROCEDURE copy_sde_obj_from_theme( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE,
-                                   p_theme_usr IN HIG_USER_ROLES.HUR_USERNAME%TYPE 
+                                   p_theme_usr IN HIG_USER_ROLES.HUR_USERNAME%TYPE
                                  ) IS
 --
   l_layer  layer_record_t;
   l_geocol geocol_record_t;
   l_reg    registration_record_t;
 --
-  TYPE             tab_col_reg 
+  TYPE             tab_col_reg
   IS TABLE OF sde.column_registry%ROWTYPE INDEX BY BINARY_INTEGER;
 --
   l_tab_col_reg    tab_col_reg;
@@ -1515,7 +1518,7 @@ PROCEDURE copy_sde_obj_from_theme( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE
   IS
     SELECT table_name, c_for_owner, column_name, sde_type
          , column_size, decimal_digits
-         , description, object_flags, object_id 
+         , description, object_flags, object_id
       FROM sde.column_registry a
      WHERE a.owner = hig.get_application_owner
        AND a.table_name = c_table
@@ -1532,7 +1535,7 @@ PROCEDURE copy_sde_obj_from_theme( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE
 --  )
 --  IS
 --  --
---    TYPE             tab_col_reg 
+--    TYPE             tab_col_reg
 --      IS TABLE OF sde.column_registry%ROWTYPE INDEX BY BINARY_INTEGER;
 --  --
 --    l_tab_col_reg    tab_col_reg;
@@ -1542,7 +1545,7 @@ PROCEDURE copy_sde_obj_from_theme( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE
 --    IS
 --      SELECT table_name, c_for_owner, column_name, sde_type
 --           , column_size, decimal_digits
---           , description, object_flags, object_id 
+--           , description, object_flags, object_id
 --        FROM sde.column_registry a
 --       WHERE a.owner = hig.get_application_owner
 --         AND a.table_name = c_table
@@ -1587,7 +1590,7 @@ BEGIN
 
   -- Insert the new layer and geometry_columns records
   -- note that the last parameter is unused
-  sde.layers_util.insert_layer( l_layer, l_geocol, l_layer.table_name ); 
+  sde.layers_util.insert_layer( l_layer, l_geocol, l_layer.table_name );
 
 
   -- Clone the Table registry record
@@ -1602,7 +1605,7 @@ BEGIN
   -- AE 19 June 2008
   -- Create the column registry
   --
---  create_sub_column_registry 
+--  create_sub_column_registry
 --    ( p_table    => l_layer.table_name,
 --      p_owner    => p_theme_usr );
 
@@ -1672,7 +1675,7 @@ END;
 FUNCTION Get_Whole_Shape_Objectids ( p_theme_id IN NUMBER, p_id_array IN int_array ) RETURN int_array IS
 
 l_nth NM_THEMES_ALL%ROWTYPE := Nm3get.get_nth( p_theme_id );
-l_bas NM_THEMES_ALL%ROWTYPE := l_nth; 
+l_bas NM_THEMES_ALL%ROWTYPE := l_nth;
 l_reg sde.table_registry%ROWTYPE := Nm3sde.get_treg(l_nth.nth_feature_table);
 
 cur_str VARCHAR2(2000);
@@ -1687,22 +1690,22 @@ FUNCTION join_int_array( p_nth IN NM_THEMES_ALL%ROWTYPE, p_ia IN int_array ) RET
 curstr VARCHAR2(2000);
 retval int_array := int_array( int_array_type( NULL ));
 BEGIN
-  curstr := 'select t.column_value from table ( :p_ia.ia ) t, '||p_nth.nth_feature_table||
+  curstr := 'select /*cardinality( t '||to_char(p_ia.ia.last)||')*/ t.column_value from table ( :p_ia.ia ) t, '||p_nth.nth_feature_table||
             ' where t.column_value  = '||l_reg.rowid_column;
 
 --nm_debug.debug_on;
 nm_debug.debug( curstr );
 
   EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.ia USING p_ia;
-  
+
   RETURN retval;
-END;			
+END;
 
 
 BEGIN
 
   IF l_bas.nth_base_table_theme IS NOT NULL THEN
-  
+
       l_nth := Nm3get.get_nth( l_nth.nth_base_table_theme );
 
   END IF;
@@ -1721,19 +1724,19 @@ BEGIN
   --Nm_Debug.debug_on;
 
   Nm_Debug.DEBUG(cur_str);
-			 
+
   OPEN geocur FOR cur_str; -- using p_id_array;
   FETCH geocur BULK COLLECT INTO retval.ia;
-  CLOSE geocur; 		  
+  CLOSE geocur;
 
   IF l_bas.nth_base_table_theme IS NOT NULL THEN
 
     retval := join_int_array( l_bas, retval );
-	
+
   END IF;
-  	
+
   RETURN retval;
-  
+
 END;
 
 --
