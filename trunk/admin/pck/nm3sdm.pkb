@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.5   Jun 24 2008 09:52:32   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.6   Jun 26 2008 12:09:20   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jun 24 2008 09:52:32  $
---       Date fetched Out : $Modtime:   Jun 24 2008 09:51:10  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Jun 26 2008 12:09:20  $
+--       Date fetched Out : $Modtime:   Jun 26 2008 12:07:58  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -3001,15 +3001,19 @@ PROCEDURE split_element_shapes (
                                 ( pi_nth_theme_id       IN NM_THEMES_ALL.nth_theme_id%TYPE
                                 , pi_new_feature_table  IN NM_THEMES_ALL.nth_feature_table%TYPE DEFAULT NULL)
   IS
+    ---------------------------------------------------------------------------
    /* This procedure is designed to create a date tracked view of a given Datum
       SDO layer.
       It creates the view, metadata, theme. Renames base table to _TABLE.
       This is required so that MSV can display current shapes, as it is unable
       to perform a join back to nm_elements
    */
+    ---------------------------------------------------------------------------
   --
     e_not_datum_layer       EXCEPTION;
     e_new_ft_exists         EXCEPTION;
+    e_already_base_theme    EXCEPTION;
+    e_used_as_base_theme    EXCEPTION;
   --
     lf                      VARCHAR2(5) := CHR(10);
     l_new_table_name        NM_THEMES_ALL.nth_feature_table%TYPE;
@@ -3019,15 +3023,12 @@ PROCEDURE split_element_shapes (
     l_rec_nthr              NM_THEME_ROLES%ROWTYPE;
   --
     FUNCTION is_datum_layer
-               ( pi_nth_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE )
-    RETURN BOOLEAN
+               ( pi_nth_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE ) RETURN BOOLEAN
     IS
       l_dummy PLS_INTEGER;
     BEGIN
     --
-      SELECT nth_theme_id
-        INTO l_dummy
-        FROM NM_THEMES_ALL
+      SELECT nth_theme_id INTO l_dummy FROM NM_THEMES_ALL
        WHERE EXISTS
          (SELECT 1 FROM NM_NW_THEMES
            WHERE nth_theme_id = nnth_nth_theme_id
@@ -3046,42 +3047,70 @@ PROCEDURE split_element_shapes (
         THEN RAISE;
     END is_datum_layer;
   --
-  BEGIN
+    FUNCTION used_as_a_base_theme (pi_theme_id IN nm_themes_all.nth_theme_id%TYPE)
+    RETURN BOOLEAN
+    IS
+      l_dummy NUMBER;
+    BEGIN
+      SELECT count(*) INTO l_dummy FROM nm_themes_all
+       WHERE nth_base_table_theme = pi_theme_id;
+      IF l_dummy > 0
+        THEN RETURN TRUE;
+        ELSE RETURN FALSE;
+      END IF;
+    EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN RETURN FALSE;
+    END used_as_a_base_theme;
   --
-  -- AE check to make sure user is unrestricted
+  BEGIN
+    ---------------------------------------------------------------------------
+    -- Check to make sure user is unrestricted
+    ---------------------------------------------------------------------------
     IF NOT user_is_unrestricted
     THEN
       RAISE e_not_unrestricted;
     END IF;
 
---    Nm_Debug.debug_on;
-
+    ---------------------------------------------------------------------------
+    -- Make sure theme passed in is a datum layer
+    --------------------------------------------------------------------------- 
     l_rec_nth := Nm3get.get_nth ( pi_nth_theme_id => pi_nth_theme_id );
-  --
+
     IF NOT is_datum_layer ( pi_nth_theme_id )
     THEN
       RAISE e_not_datum_layer;
     END IF;
+
+    ---------------------------------------------------------------------------
+    -- Check to make sure the Theme passed in a view based theme!
+    ---------------------------------------------------------------------------
+    IF l_rec_nth.nth_base_table_theme IS NOT NULL
+    THEN
+      RAISE e_already_base_theme;
+    END IF;
+
+    IF used_as_a_base_theme ( pi_nth_theme_id )
+    THEN
+      RAISE e_used_as_base_theme;
+    END IF;
   --
-  -- Rename datum table
-    l_new_table_name := NVL( pi_new_feature_table
-                           , UPPER(l_rec_nth.nth_feature_table)||'_TABLE');
+    ---------------------------------------------------------------------------
+    -- Rename datum table
+    ---------------------------------------------------------------------------
+    l_new_table_name := NVL( pi_new_feature_table, UPPER(l_rec_nth.nth_feature_table)||'_TABLE');
 
     IF Nm3ddl.does_object_exist (l_new_table_name)
     THEN
       RAISE e_new_ft_exists;
     END IF;
 
---    Nm_Debug.DEBUG('execute rename');
-
     EXECUTE IMMEDIATE
       'RENAME '||l_rec_nth.nth_feature_table||' TO '||l_new_table_name;
 
---    nm_debug.debug(l_rec_nth.nth_feature_table||' renamed to '||l_new_table_name);
---    Nm_Debug.DEBUG('Rename completed - add metadata for new table');
-
-  --
-  --Create SDO metadata for renamed feature table
+    ---------------------------------------------------------------------------
+    --Create SDO metadata for renamed feature table
+    ---------------------------------------------------------------------------
     EXECUTE IMMEDIATE
       'INSERT INTO user_sdo_geom_metadata'||lf||
       ' (SELECT '||Nm3flx.string(l_new_table_name)||lf||
@@ -3090,32 +3119,24 @@ PROCEDURE split_element_shapes (
       '   WHERE table_name  = '||Nm3flx.string(l_rec_nth.nth_feature_table)||lf||
       '     AND column_name = '||Nm3flx.string(l_rec_nth.nth_feature_shape_column)||')';
 
---    Nm_Debug.DEBUG('Metadata completed, create view with original name');
-  --
-  -- Create date based view
-
+    ---------------------------------------------------------------------------
+    -- Create date based view
+    ---------------------------------------------------------------------------
     l_view_sql :=
       'CREATE OR REPLACE FORCE VIEW '||l_rec_nth.nth_feature_table||lf||
       'AS'||lf||
       'SELECT sdo.*'||lf||
       '  FROM '||l_new_table_name||' sdo '||lf||
-     ' WHERE exists ( select 1 from nm_elements ne '||lf||
-                     ' WHERE ne.ne_id = sdo.'||l_rec_nth.nth_feature_pk_column||')';
---  Nm_Debug.DEBUG(l_view_sql);
-/*
-      'AS'||lf||
-      'SELECT sdo.*'||lf||
-      '  FROM nm_elements ne '||lf||
-      '     , '||l_new_table_name||' sdo '||lf||
-      ' WHERE ne.ne_id = sdo.'||l_rec_nth.nth_feature_pk_column;
-*/
+      ' WHERE EXISTS ( SELECT 1 FROM nm_elements ne '||lf||
+                      ' WHERE ne.ne_id = sdo.'||l_rec_nth.nth_feature_pk_column||')';
 
-    Nm3ddl.create_object_and_syns( l_rec_nth.nth_feature_table, l_view_sql);
+    --Nm3ddl.create_object_and_syns( l_rec_nth.nth_feature_table, l_view_sql);
+    EXECUTE IMMEDIATE l_view_sql;
 
---    Nm_Debug.DEBUG('View and synonyms created');
-  --
-  -- Create new theme - but to maintain foreign keys, we need to update the old one
-  -- so that it points to the new feature table using base theme
+    ---------------------------------------------------------------------------
+    -- Create new theme - but to maintain foreign keys, we need to update the old one
+    -- so that it points to the new feature table using base theme
+    ---------------------------------------------------------------------------
 
     l_rec_new_nth                    := l_rec_nth;
     l_rec_new_nth.nth_theme_id       := Nm3seq.next_nth_theme_id_seq;
@@ -3123,15 +3144,16 @@ PROCEDURE split_element_shapes (
     l_rec_new_nth.nth_feature_table  := l_new_table_name;
 
     Nm3ins.ins_nth(l_rec_new_nth);
-    
+
     INSERT INTO NM_NW_THEMES
       ( nnth_nlt_id, nnth_nth_theme_id )
     SELECT nnth_nlt_id, l_rec_new_nth.nth_theme_id
       FROM nm_nw_themes
      WHERE nnth_nth_theme_id = l_rec_nth.nth_theme_id;
 
---    Nm_Debug.DEBUG('theme created - now set the base-table theme attribute');
+    ---------------------------------------------------------------------------
     -- Update (now the) view theme to point to new table
+    ---------------------------------------------------------------------------
     BEGIN
       UPDATE NM_THEMES_ALL
          SET nth_base_table_theme = l_rec_new_nth.nth_theme_id
@@ -3140,12 +3162,23 @@ PROCEDURE split_element_shapes (
       WHEN OTHERS
         THEN RAISE;
     END;
-  --
-  --
-  -- Create SDE layer if needed
 
---    Nm_Debug.DEBUG('And sde data');
+    ---------------------------------------------------------------------------
+    --  Update the NM_BASE_THEME record to point at the base table theme
+    --  where the base theme is incorrectly set to a view based theme
+    ---------------------------------------------------------------------------
+    UPDATE nm_base_themes
+       SET nbth_base_theme =(SELECT nth_base_table_theme
+                               FROM nm_themes_all
+                              WHERE nth_theme_id = nbth_base_theme)
+     WHERE EXISTS
+      (SELECT 1 FROM nm_themes_all
+        WHERE nth_theme_id = nbth_base_theme
+          AND nth_base_table_theme IS NOT NULL);
 
+    ---------------------------------------------------------------------------
+    -- Create SDE layer if needed
+    ---------------------------------------------------------------------------
     IF Hig.get_user_or_sys_opt('REGSDELAY') = 'Y'
     THEN
          EXECUTE IMMEDIATE (   ' begin  '
@@ -3154,6 +3187,13 @@ PROCEDURE split_element_shapes (
                            );
     END IF;
 
+    ---------------------------------------------------------------------------
+    -- Touch the nm_theme_roles to action creation of subuser views + metadata
+    ---------------------------------------------------------------------------
+    UPDATE nm_theme_roles
+       SET nthr_role = nthr_role
+     WHERE nthr_theme_id = pi_nth_theme_id;
+
   --
   EXCEPTION
     WHEN e_not_datum_layer
@@ -3161,17 +3201,23 @@ PROCEDURE split_element_shapes (
          Hig.raise_ner (pi_appl         => Nm3type.c_hig,
                         pi_id           => 274,
                         pi_sqlcode      => -20001,
-      pi_supplementary_info => l_rec_nth.nth_theme_name
+                        pi_supplementary_info => l_rec_nth.nth_theme_name
                        );
---    RAISE_APPLICATION_ERROR(-20001 ,l_rec_nth.nth_theme_name||' is not a datum layer');
     WHEN e_new_ft_exists
       THEN
          Hig.raise_ner (pi_appl         => Nm3type.c_hig,
                         pi_id           => 275,
                         pi_sqlcode      => -20001,
-      pi_supplementary_info => l_new_table_name
+                        pi_supplementary_info => l_new_table_name
                        );
---     RAISE_APPLICATION_ERROR(-20002 ,l_new_table_name||' already exists - please specify another');
+    WHEN e_already_base_theme
+      THEN
+       RAISE_APPLICATION_ERROR(-20101 ,l_rec_nth.nth_Theme_name||' is not a base table theme');
+
+    WHEN e_used_as_base_theme
+      THEN
+      RAISE_APPLICATION_ERROR(-20102 ,pi_nth_theme_id||' is already setup as a base table theme');
+
     WHEN OTHERS
       THEN
 
@@ -3206,16 +3252,24 @@ PROCEDURE split_element_shapes (
   PROCEDURE make_all_datum_layers_dt
   IS
   BEGIN
-    FOR i IN (SELECT nth_theme_id
-                FROM NM_THEMES_ALL
+    FOR i IN (SELECT *
+                FROM NM_THEMES_ALL a
                WHERE EXISTS
                (SELECT 1 FROM NM_NW_THEMES
-                 WHERE nth_theme_id = nnth_nth_theme_id
+                 WHERE a.nth_theme_id = nnth_nth_theme_id
                    AND EXISTS
                   (SELECT 1 FROM NM_LINEAR_TYPES
                     WHERE nlt_id = nnth_nlt_id
                       AND nlt_g_i_d = 'D'))
-                 AND nth_base_table_theme IS NULL)
+                 AND a.nth_base_table_theme IS NULL
+                 -- AE
+                 -- Make sure we don't pick up themes that are already
+                 -- used as base table themes - i.e. they don't need this
+                 -- running again !
+                 AND NOT EXISTS
+                   (SELECT 1 FROM nm_themes_all z
+                     WHERE a.nth_theme_id = z.nth_base_table_theme)
+              )
     LOOP
       make_datum_layer_dt ( pi_nth_theme_id => i.nth_theme_id );
     END LOOP;
