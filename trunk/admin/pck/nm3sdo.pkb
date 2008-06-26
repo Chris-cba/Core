@@ -2,13 +2,13 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 -----------------------------------------------------------------------------
 --
---   PVCS Identifiers :-
+---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.3   Jun 26 2008 12:05:26   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.4   Jun 26 2008 15:21:24   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jun 26 2008 12:05:26  $
---       Date fetched Out : $Modtime:   Jun 26 2008 10:43:34  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jun 26 2008 15:21:24  $
+--       Date fetched Out : $Modtime:   Jun 26 2008 15:19:50  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.4  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -1397,9 +1397,6 @@ BEGIN
 
   open memcur for curstr using l_pa.pa, p_ne_id;
 --  OPEN c1( p_ne_id, l_pa );
-
-nm_debug.debug_on;
-nm_debug.debug(curstr);
 
   FETCH memcur INTO retval;
 
@@ -7145,7 +7142,7 @@ BEGIN
      
 --     inventory/group - with member data - delete if there, then insert     
      
-       Nm_Debug.DEBUG('Inventory/Group');
+--       Nm_Debug.DEBUG('Inventory/Group');
        
        IF irec.dim_setting = 2 THEN
           get_shape_str := 'sdo_lrs.convert_to_std_geom(nm3sdo.get_shape_from_nm( '||TO_CHAR(p_layer)||', nm_ne_id_in, nm_ne_id_of, nm_begin_mp, nm_end_mp ))';
@@ -7157,8 +7154,8 @@ BEGIN
                          ' where ne_id_of = :ne_id ' USING p_ne_id;
 
 
-       Nm_Debug.DEBUG( 'delete from '||irec.nth_feature_table||
-                       ' where ne_id_of = :ne_id '||' using '||TO_CHAR(p_ne_id));
+--       Nm_Debug.DEBUG( 'delete from '||irec.nth_feature_table||
+--                       ' where ne_id_of = :ne_id '||' using '||TO_CHAR(p_ne_id));
 
        IF use_surrogate_key = 'N' THEN
 
@@ -7172,7 +7169,7 @@ BEGIN
                           ' and nm_obj_type = :objtype'||
         ' and nm_type = :b_nm_type';
 
-         Nm_Debug.DEBUG(lstr);
+--         Nm_Debug.DEBUG(lstr);
          EXECUTE IMMEDIATE lstr USING p_ne_id, irec.objtype, irec.g_or_i;
          
        ELSE
@@ -7187,7 +7184,7 @@ BEGIN
                           ' and nm_obj_type = :objtype'||
         ' and nm_type = :b_nm_type';
 
-         Nm_Debug.DEBUG(lstr );
+--         Nm_Debug.DEBUG(lstr );
 
          EXECUTE IMMEDIATE lstr USING p_ne_id, irec.objtype, irec.g_or_i;
 
@@ -7195,7 +7192,7 @@ BEGIN
        
      ELSE -- foreign table
      
-       Nm_Debug.DEBUG('Foreign table');
+--       Nm_Debug.DEBUG('Foreign table');
 
        DECLARE
 
@@ -7207,7 +7204,7 @@ BEGIN
          
 --         distinct FT and feature table, it could have measures or it could be 2d        
 
-           Nm_Debug.DEBUG('distinct FT and feature table');
+--           Nm_Debug.DEBUG('distinct FT and feature table');
          
            IF get_dims( irec.nth_theme_id ) = 2 THEN
              get_shape_str := 'sdo_lrs.convert_to_std_geom(nm3sdo.get_shape_from_nm( '||TO_CHAR(p_layer)||
@@ -7243,8 +7240,8 @@ BEGIN
                                ' from '||l_nth.nth_table_name||' where '||l_nth.nth_rse_fk_column||' = :ne_id )';
                                
 --             Nm_Debug.debug_on;
-             Nm_Debug.DEBUG(lstr);
-             Nm_Debug.debug_off;                               
+--             Nm_Debug.DEBUG(lstr);
+--             Nm_Debug.debug_off;                               
 
              EXECUTE IMMEDIATE lstr USING p_ne_id, p_ne_id;
               
@@ -7260,7 +7257,7 @@ BEGIN
                                ' from '||l_nth.nth_table_name||' where '||l_nth.nth_rse_fk_column||' = :ne_id )';
 
 
-             Nm_Debug.DEBUG(lstr);
+--             Nm_Debug.DEBUG(lstr);
 
              EXECUTE IMMEDIATE lstr USING p_ne_id, p_ne_id;
                                
@@ -7758,7 +7755,7 @@ BEGIN
     ELSE
       cur_string := cur_string||' from '||g_nth.nth_table_name;
     END IF;
-Nm_Debug.DEBUG(cur_string);
+--Nm_Debug.DEBUG(cur_string);
 --    cur_string := cur_string||' and rownum = 1';
 
     EXECUTE IMMEDIATE cur_string;
@@ -7921,7 +7918,7 @@ Nm_Debug.DEBUG(cur_string);
        cur_string := cur_string||' AND '||format_where_clause(g_nth.nth_where);
     END IF;
 
-    Nm_Debug.DEBUG(cur_string);
+--    Nm_Debug.DEBUG(cur_string);
 
     EXECUTE IMMEDIATE cur_string;
 
@@ -8722,7 +8719,7 @@ BEGIN
   
   l_used.ia(1) := 1;
   
-  Nm_Debug.DEBUG('Set the first part');
+--  Nm_Debug.DEBUG('Set the first part');
   
   WHILE l_used.ia.LAST < lp LOOP
   
@@ -8736,11 +8733,11 @@ BEGIN
   
       IF NOT used( l_used, i ) THEN
 
-        Nm_Debug.DEBUG('Part '||TO_CHAR(i)||' is unused');
+--        Nm_Debug.DEBUG('Part '||TO_CHAR(i)||' is unused');
       
         IF compare_pt( Nm3sdo.get_2d_pt(sdo_lrs.geom_segment_end_pt( retval )), Nm3sdo.get_2d_pt(sdo_lrs.geom_segment_start_pt( l_ga.nga(i).ng_geometry)) , l_tol ) = 'TRUE' THEN
     
-          Nm_Debug.DEBUG('Part '||TO_CHAR(i)||' is connected');
+--          Nm_Debug.DEBUG('Part '||TO_CHAR(i)||' is connected');
 
           Nm3sdo.add_segments(retval, l_ga.nga(i).ng_geometry, p_diminfo, TRUE );
           l_used.ia.EXTEND;
@@ -8749,7 +8746,7 @@ BEGIN
 
         ELSIF compare_pt( Nm3sdo.get_2d_pt(sdo_lrs.geom_segment_end_pt( retval )), Nm3sdo.get_2d_pt(sdo_lrs.geom_segment_end_pt( l_ga.nga(i).ng_geometry)), l_tol ) = 'TRUE' THEN
     
-          Nm_Debug.DEBUG('Part '||TO_CHAR(i)||' is connected after reverse');
+--          Nm_Debug.DEBUG('Part '||TO_CHAR(i)||' is connected after reverse');
 
           l_geom := Nm3sdo.reverse_geometry(l_ga.nga(i).ng_geometry );           
           Nm3sdo.add_segments(retval, l_geom, p_diminfo, TRUE);
@@ -8759,7 +8756,8 @@ BEGIN
 
         ELSE
       
-          Nm_Debug.DEBUG( 'No connection' );
+--          Nm_Debug.DEBUG( 'No connection' );
+          null;
         
         END IF;
 
@@ -9350,11 +9348,13 @@ BEGIN
 
         nm_debug.debug('Snapped and retrieved '||l_ntl.ntl_theme_list.count||' rows');
 
+/*
         FOR i IN l_ntl.ntl_theme_list.FIRST .. l_ntl.ntl_theme_list.LAST
         LOOP
           nm_debug.debug('Retrived PK = '||l_ntl.ntl_theme_list(i).ntd_pk_id);
           nm_debug.debug('Retrived Name = '||l_ntl.ntl_theme_list(i).ntd_name);
         END LOOP;
+*/
 
        IF l_ntl.ntl_theme_list(1).ntd_pk_id IS NOT NULL THEN
 
@@ -9558,11 +9558,9 @@ FUNCTION join_ptr_array( p_nth IN NM_THEMES_ALL%ROWTYPE, p_pa IN ptr_array ) RET
 curstr VARCHAR2(2000);
 retval ptr_array := Nm3array.init_ptr_array;
 BEGIN
-  curstr := 'select /*+cardinality ( t '||to_char(p_pa.pa.last )||' */ ptr( t.ptr_id, t.ptr_value ) from table ( :pa.pa ) t, '||p_nth.nth_feature_table||
+  curstr := 'select /*+cardinality ( t '||to_char(p_pa.pa.last )||') */ ptr( t.ptr_id, t.ptr_value ) from table ( :pa.pa ) t, '||p_nth.nth_feature_table||
             ' where t.ptr_value = '||p_nth.nth_feature_pk_column||' order by t.ptr_id';
 
---  nm_debug.debug_on;
---  nm_debug.debug(curstr);
   EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.pa USING p_pa;
 
   RETURN retval;
@@ -9586,7 +9584,7 @@ BEGIN
 
   nthrow := Nm3get.get_nth( p_theme );
   nthbas := nthrow;
-
+ 
   IF nthbas.nth_base_table_theme IS NOT NULL THEN
 
     nthrow := Nm3get.get_nth( nthrow.nth_base_table_theme );
@@ -9611,10 +9609,6 @@ BEGIN
 */
 
                                    
-
---  Nm_Debug.debug_on;
---  Nm_Debug.DEBUG( cur_string );
-
   EXECUTE IMMEDIATE cur_string BULK COLLECT INTO retval.pa USING p_geom, g_batch_size;
 
   IF nthrow.nth_feature_table != nthrow.nth_table_name THEN
@@ -10268,21 +10262,21 @@ retval nm_geom_array := Nm3array.INIT_NM_GEOM_ARRAY;
 lp NUMBER;
 BEGIN
   lp := Nm3sdo.get_no_parts( p_shape )/3;
-  Nm_Debug.DEBUG('No of parts = '||TO_CHAR(lp));
+--  Nm_Debug.DEBUG('No of parts = '||TO_CHAR(lp));
   IF lp = 1 THEN
     retval.nga(1).ng_ne_id := 1;
     retval.nga(1).ng_geometry :=  p_shape;
   ELSIF lp < 1 THEN
     RAISE_APPLICATION_ERROR( -20001, 'Fault');
   ELSE
-    Nm_Debug.DEBUG('Setting first bit');
+    --Nm_Debug.DEBUG('Setting first bit');
     retval.nga(1).ng_ne_id := 1;
     retval.nga(1).ng_geometry :=  sdo_util.EXTRACT( p_shape, 1, 1);
-    Nm_Debug.DEBUG('Last = '||TO_CHAR(retval.nga.LAST));
+--    Nm_Debug.DEBUG('Last = '||TO_CHAR(retval.nga.LAST));
     FOR i IN 2..lp LOOP
-      Nm_Debug.DEBUG('Setting bit '||TO_CHAR(i));
+--      Nm_Debug.DEBUG('Setting bit '||TO_CHAR(i));
       retval.nga.EXTEND;    
-      Nm_Debug.DEBUG('Extend - Last = '||TO_CHAR(retval.nga.LAST));
+--      Nm_Debug.DEBUG('Extend - Last = '||TO_CHAR(retval.nga.LAST));
       retval.nga(i) := nm_geom(i, sdo_util.EXTRACT( p_shape, i, 1));
       
     END LOOP;
@@ -10323,7 +10317,6 @@ IS
 BEGIN
   curstr := 'select /*+cardinality (t '||to_char(p_pa.pa.last)||')*/ ptr( t.ptr_id, t.ptr_value ) from table ( :pa.pa ) t, '||p_table||
             ' where t.ptr_value = '||p_key||' order by t.ptr_id';
-  nm_debug.debug( curstr );         
   EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.pa USING p_pa;
   RETURN retval;
 END;
