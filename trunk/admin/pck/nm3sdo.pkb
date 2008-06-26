@@ -4,11 +4,13 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.2   Oct 31 2007 10:48:02   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.3   Jun 26 2008 12:05:26   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into SCCS   : $Date:   Oct 31 2007 10:48:02  $
---       Date fetched Out : $Modtime:   Oct 31 2007 10:45:32  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jun 26 2008 12:05:26  $
+--       Date fetched Out : $Modtime:   Jun 26 2008 10:43:34  $
+--       PVCS Version     : $Revision:   2.3  $
+--       Based on
+
 --
 --   Author : Rob Coupe
 --
@@ -17,7 +19,8 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -------------------------------------------------------------------------------
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.3  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -547,7 +550,8 @@ CURSOR c_nth ( c_nt IN NM_TYPES.nt_type%TYPE ) IS
   AND   nnth_nlt_id = nlt_id
   AND   nlt_g_i_d   = 'D'
   AND   nlt_nt_type = c_nt
-  AND   nth_dependency = 'I';
+  AND   nth_dependency = 'I'
+  AND   nth_base_table_theme is null;
 
 BEGIN
   OPEN c_nth(p_nt);
@@ -1374,27 +1378,36 @@ FUNCTION get_nearest_to_xy_on_route( p_layer IN NUMBER,
                                      p_x IN NUMBER,
           p_y IN NUMBER ) RETURN nm_elements.ne_id%TYPE IS
 
-CURSOR c1 ( c_ne_id IN nm_elements.ne_id%TYPE, c_pa IN ptr_array ) IS
-SELECT nm_ne_id_of
-FROM nm_members, TABLE ( c_pa.pa ) p
-WHERE nm_ne_id_in = c_ne_id
-AND   p.ptr_value = nm_ne_id_of;
-
 l_pa  ptr_array;
-
+type memcurtype is ref cursor;
+memcur memcurtype;
+curstr varchar2(2000);
 retval     nm_elements.ne_id%TYPE;
+
 
 BEGIN
 
   l_pa := Get_Batch_Of_Base_Nn( p_theme => p_layer, p_x => p_x, p_y => p_y );
 
-  OPEN c1( p_ne_id, l_pa );
+  curstr := 'SELECT /*+cardinality( p '||to_char( l_pa.pa.last )||')*/ nm_ne_id_of '||
+            ' FROM nm_members, TABLE ( :pa ) p '|| 
+            ' WHERE nm_ne_id_in = :c_ne_id '||
+            ' AND   p.ptr_value = nm_ne_id_of'||
+            ' order by p.ptr_id';
 
-  FETCH c1 INTO retval;
+  open memcur for curstr using l_pa.pa, p_ne_id;
+--  OPEN c1( p_ne_id, l_pa );
 
-  CLOSE c1;
+nm_debug.debug_on;
+nm_debug.debug(curstr);
+
+  FETCH memcur INTO retval;
+
+  CLOSE memcur;
 
   RETURN retval;
+
+
 
 END;
 
@@ -2662,24 +2675,32 @@ l_g_len  NUMBER;
 l_temp   INTEGER;
 
 PROCEDURE set_theme_and_length( p_id IN ptr_array, po_theme OUT ptr_array, po_length OUT ptr_num_array ) IS
-CURSOR c1 ( c_id IN ptr_array ) IS
-  SELECT ptr( i.ptr_id, nth_theme_id), ptr_num( i.ptr_id, ne_length)
-  FROM nm_elements, NM_LINEAR_TYPES, NM_NW_THEMES, NM_THEMES_ALL, TABLE( c_id.pa ) i
-  WHERE ne_id = i.ptr_value
-  AND   ne_nt_type = nlt_nt_type
---  AND   nlt_g_i_d = 'D'
-  AND   nlt_id = nnth_nlt_id
-  AND   nth_theme_id = nnth_nth_theme_id;
-
+curstr varchar2(2000) := 
+   ' ptr( i.ptr_id, nth_theme_id), ptr_num( i.ptr_id, ne_length) '||
+   ' FROM nm_elements, NM_LINEAR_TYPES, NM_NW_THEMES, NM_THEMES_ALL, TABLE( :pa ) i '||
+   ' WHERE ne_id = i.ptr_value '||
+   ' AND   ne_nt_type = nlt_nt_type '||
+   ' AND   nlt_g_i_d = '||''''||'D'||''''|| 
+   ' AND   nlt_id = nnth_nlt_id '||
+   ' AND   nth_theme_id = nnth_nth_theme_id '||
+   ' AND   nth_base_table_theme is null ';
 BEGIN
 
   po_theme  := Nm3array.init_ptr_array;
   po_length := Nm3array.init_ptr_num_array;
 
+  curstr := 'select /*+cardinality ( i '||to_char( p_id.pa.last)||') */ '||curstr;
 
-  OPEN c1( p_id );
-  FETCH c1 BULK COLLECT INTO po_theme.pa, po_length.pa;
-  CLOSE c1;
+  execute immediate curstr bulk collect into po_theme.pa, po_length.pa using p_id.pa;
+
+--nm_debug.debug_on;
+--nm_debug.debug(curstr);
+
+  
+/*  OPEN c1( p_id );
+    FETCH c1 BULK COLLECT INTO po_theme.pa, po_length.pa;
+    CLOSE c1;
+*/    
 
  END;
 
@@ -2700,7 +2721,7 @@ END;
 
 BEGIN
 
-  Nm_Debug.debug_on;
+--  Nm_Debug.debug_on;
 
   IF l_nit.nit_table_name IS NULL THEN
 
@@ -2721,7 +2742,7 @@ BEGIN
 
   cur_string2 := ' select '||p_seq_name||'.nextval from nm_members';
 
- Nm_Debug.DEBUG(cur_string1);
+-- Nm_Debug.DEBUG(cur_string1);
   OPEN ref_cur FOR cur_string1;
 
   FETCH ref_cur BULK COLLECT INTO  v_it.pa, v_ne.pa, v_pl.npa_placement_array, l_date_tab LIMIT l_limit;
@@ -2881,6 +2902,19 @@ BEGIN
 
                   END IF;
  
+                    ELSIF p_pnt_or_cont = 'C' and v_pl.npa_placement_array(j).pl_start >= v_pl.npa_placement_array(j).pl_end THEN
+
+                IF p_job_id IS NULL THEN
+
+                   Nm_Debug.DEBUG('from '||TO_CHAR(v_pl.npa_placement_array(j).pl_start)||' to '||
+                                  TO_CHAR(v_pl.npa_placement_array(j).pl_end)||' l = '||TO_CHAR(l_g_len));
+                      ELSE
+
+                  add_dyn_seg_exception( 299, p_job_id, v_it.pa(j).ptr_value, v_ne.pa(j).ptr_value, l_g_len, l_len.pa(l_l_p).ptr_value,
+                                    v_pl.npa_placement_array(j).pl_start, v_pl.npa_placement_array(j).pl_end, 'Point in Linear Feature Set');
+
+                  END IF;
+
                     ELSE --lengths should be OK - go and get the shape
 
 --                l_geom := l_ge.nga(l_g_p).ng_geometry;
@@ -3202,24 +3236,32 @@ l_g_len  NUMBER;
 l_t      INTEGER;
 
 PROCEDURE set_theme_and_length( p_id IN ptr_array, po_theme OUT ptr_array, po_length OUT ptr_num_array ) IS
-CURSOR c1 ( c_id IN ptr_array ) IS
-  SELECT ptr( i.ptr_id, nth_theme_id), ptr_num( i.ptr_id, ne_length)
-  FROM nm_elements, NM_LINEAR_TYPES, NM_NW_THEMES, NM_THEMES_ALL, TABLE( c_id.pa ) i
-  WHERE ne_id = i.ptr_value
-  AND   ne_nt_type = nlt_nt_type
-  AND   nlt_g_i_d = 'D'
-  AND   nlt_id = nnth_nlt_id
-  AND   nth_theme_id = nnth_nth_theme_id;
-
+curstr varchar2(2000) := 
+   ' ptr( i.ptr_id, nth_theme_id), ptr_num( i.ptr_id, ne_length) '||
+   ' FROM nm_elements, NM_LINEAR_TYPES, NM_NW_THEMES, NM_THEMES_ALL, TABLE( :pa ) i '||
+   ' WHERE ne_id = i.ptr_value '||
+   ' AND   ne_nt_type = nlt_nt_type '||
+   ' AND   nlt_g_i_d = '||''''||'D'||''''|| 
+   ' AND   nlt_id = nnth_nlt_id '||
+   ' AND   nth_theme_id = nnth_nth_theme_id '||
+   ' AND   nth_base_table_theme is null ';
 BEGIN
 
   po_theme  := Nm3array.init_ptr_array;
   po_length := Nm3array.init_ptr_num_array;
 
+  curstr := 'select /*+cardinality ( i '||to_char( p_id.pa.last)||') */ '||curstr;
 
-  OPEN c1( p_id );
-  FETCH c1 BULK COLLECT INTO po_theme.pa, po_length.pa;
-  CLOSE c1;
+  execute immediate curstr bulk collect into po_theme.pa, po_length.pa using p_id.pa;
+
+--nm_debug.debug_on;
+--nm_debug.debug(curstr);
+
+  
+/*  OPEN c1( p_id );
+    FETCH c1 BULK COLLECT INTO po_theme.pa, po_length.pa;
+    CLOSE c1;
+*/    
 
  END;
 
@@ -3231,7 +3273,8 @@ cur_string VARCHAR2(2000);
 ref_cur    Nm3type.ref_cursor;
 BEGIN
 
-  cur_string := 'select nm_geom( a.ptr_id, '||TO_CHAR( nth.nth_feature_shape_column )||') from '||nth.nth_feature_table||
+  cur_string := 'select /*+cardinality (a '||to_char( p_id.pa.last)||')*/ '||
+                ' nm_geom( a.ptr_id, '||TO_CHAR( nth.nth_feature_shape_column )||') from '||nth.nth_feature_table||
                 ', table ( :pa ) a '||
     'where a.ptr_value = '||nth.nth_feature_pk_column ;
 
@@ -3432,7 +3475,20 @@ BEGIN
 
               END IF;
 
-                  ELSE
+                ELSIF v_pl.npa_placement_array(j).pl_start >= v_pl.npa_placement_array(j).pl_end THEN
+
+                  IF p_job_id IS NULL THEN
+
+                   Nm_Debug.DEBUG('from '||TO_CHAR(v_pl.npa_placement_array(j).pl_start)||' to '||
+                                  TO_CHAR(v_pl.npa_placement_array(j).pl_end)||' l = '||TO_CHAR(l_g_len));
+                      ELSE
+
+                   add_dyn_seg_exception( 299, p_job_id, v_it.pa(j).ptr_value, v_ne.pa(j).ptr_value, l_g_len, l_len.pa(l_l_p).ptr_value,
+                                    v_pl.npa_placement_array(j).pl_start, v_pl.npa_placement_array(j).pl_end, 'Point in Linear Feature Set');
+
+                  END IF;
+
+                ELSE
 
 --              l_geom := l_ge.nga(l_g_p).ng_geometry;
 
@@ -3937,11 +3993,20 @@ PROCEDURE delete_layer_shape( p_layer IN NUMBER,
                               p_ne_id IN nm_elements.ne_id%TYPE ) IS
 
 cur_string VARCHAR2(2000);
+l_nth      nm_themes_all%rowtype;
 
 BEGIN
 
-  IF set_theme( p_layer ) THEN
-    set_theme_metadata( p_layer );
+  l_nth := nm3get.get_nth( p_layer );
+  
+  IF l_nth.nth_base_table_theme IS NOT NULL THEN
+  
+    l_nth := Nm3get.get_nth( l_nth.nth_base_table_theme);
+ 
+  END IF; 
+  
+  IF set_theme( l_nth.nth_theme_id ) THEN
+    set_theme_metadata( l_nth.nth_theme_id );
   END IF;
 
   cur_string  := 'delete from '||g_usgm.table_name||
@@ -3961,10 +4026,20 @@ FUNCTION rescale_layer_element( p_layer IN NUMBER,
 retval    mdsys.sdo_geometry := Get_Layer_Element_Geometry( p_layer, p_ne_id );
 l_length  nm_elements.ne_length%TYPE := Nm3net.Get_Ne_Length(p_ne_id);
 
+l_nth      nm_themes_all%rowtype;
+
 BEGIN
 
-  IF set_theme( p_layer ) THEN
-    set_theme_metadata( p_layer );
+  l_nth := nm3get.get_nth( p_layer );
+  
+  IF l_nth.nth_base_table_theme IS NOT NULL THEN
+  
+    l_nth := Nm3get.get_nth( l_nth.nth_base_table_theme);
+ 
+  END IF; 
+  
+  IF set_theme( l_nth.nth_theme_id ) THEN
+    set_theme_metadata( l_nth.nth_theme_id );
   END IF;
 
   sdo_lrs.redefine_geom_segment( retval, g_usgm.diminfo, 0, l_length);
@@ -4330,7 +4405,8 @@ BEGIN
   END IF;
 
 
-    cur_string := 'select b.ne_length, e.pl_ne_id, e.pl_start, e.pl_end, e.pl_measure, '||
+    cur_string := 'select /*+cardinality( e '||to_char(p_pl_array.npa_placement_array.last)||') */ '||
+       ' b.ne_length, e.pl_ne_id, e.pl_start, e.pl_end, e.pl_measure, '||
        ' decode( nm3sdo.is_clipped( e.pl_start, e.pl_end, b.ne_length), '||
        ' 1, a.'||g_usgm.column_name||', sdo_lrs.clip_geom_segment( a.'||g_usgm.column_name||', :l_dim_info, e.pl_start, e.pl_end ))'||
        ' from nm_elements b, '||g_usgm.table_name||' a, table ( '||
@@ -4741,8 +4817,17 @@ l_is_datum         BOOLEAN := Nm3net.element_is_a_datum( p_ne_id );
 
 BEGIN
 
-  IF set_theme( p_layer ) THEN
- set_theme_metadata( p_layer );
+  l_nth := nm3get.get_nth( p_layer );
+  
+  IF l_nth.nth_base_table_theme IS NOT NULL THEN
+  
+    l_nth := Nm3get.get_nth( l_nth.nth_base_table_theme);
+ 
+  END IF; 
+  
+
+  IF set_theme( l_nth.nth_theme_id ) THEN
+    set_theme_metadata( l_nth.nth_theme_id );
   END IF;
 
 --Nm_Debug.debug_on;
@@ -4788,6 +4873,9 @@ BEGIN
                                                         g_usgm.column_name||', objectid)'||
                    'select :ne_val, :geom_val, '||get_spatial_seq( p_layer )||'.nextval from dual';
   END IF;
+
+--nm_debug.debug_on;
+--nm_debug.debug(cur_string);
 
   EXECUTE IMMEDIATE cur_string USING p_ne_id, ignore_measure(l_geom);
 
@@ -7047,7 +7135,7 @@ END;
 
 BEGIN
 
-Nm_Debug.debug_on;
+--Nm_Debug.debug_on;
 
   FOR irec IN c_themes( p_layer ) LOOP
 
@@ -7154,7 +7242,7 @@ Nm_Debug.debug_on;
                                ' where '||l_nth.nth_feature_pk_column||' in ( select '||l_nth.nth_pk_column||
                                ' from '||l_nth.nth_table_name||' where '||l_nth.nth_rse_fk_column||' = :ne_id )';
                                
-             Nm_Debug.debug_on;
+--             Nm_Debug.debug_on;
              Nm_Debug.DEBUG(lstr);
              Nm_Debug.debug_off;                               
 
@@ -7560,7 +7648,7 @@ l_dummy    NUMBER;
 --
 BEGIN
 
-  Nm_Debug.debug_on;
+--  Nm_Debug.debug_on;
 
   IF set_theme( p_nth_id ) THEN
     set_theme_metadata( p_nth_id );
@@ -7744,8 +7832,8 @@ Nm_Debug.DEBUG(cur_string);
          cur_string := cur_string||' AND '||format_where_clause(g_nth.nth_where);
     END IF;
 
-    Nm_Debug.debug_on;
-    Nm_Debug.DEBUG(cur_string);
+--    Nm_Debug.debug_on;
+--    Nm_Debug.DEBUG(cur_string);
     EXECUTE IMMEDIATE cur_string;
 
     l_dummy := Nm3sdo.clone_pt_from_line( p_base_theme, g_nth.nth_feature_table, g_nth.nth_feature_shape_column);
@@ -8618,7 +8706,7 @@ END;
       
 BEGIN
 
-  Nm_Debug.debug_on;
+--  Nm_Debug.debug_on;
   
   l_ga := get_parts( p_geom );
 
@@ -8922,10 +9010,10 @@ BEGIN
 
   END IF;
 
-  Nm_Debug.debug_on;
-  Nm_Debug.DEBUG( cur_string );
+--  Nm_Debug.debug_on;
+--  Nm_Debug.DEBUG( cur_string );
 
-  nm_debug.debug('Execute statement');
+--  nm_debug.debug('Execute statement');
 
   IF l_get_projection THEN
 
@@ -9254,7 +9342,7 @@ BEGIN
 
   l_ntl := Get_Objects_In_Buffer( l_nth.nth_theme_id, p_geom, l_nth.nth_tolerance, l_nth.nth_tol_units, l_get_projection );
 
-     nm_debug.debug_on;
+--     nm_debug.debug_on;
 
 --        Nm_Debug.DEBUG('returned from get objects ');
 
@@ -9470,11 +9558,11 @@ FUNCTION join_ptr_array( p_nth IN NM_THEMES_ALL%ROWTYPE, p_pa IN ptr_array ) RET
 curstr VARCHAR2(2000);
 retval ptr_array := Nm3array.init_ptr_array;
 BEGIN
-  curstr := 'select ptr( t.ptr_id, t.ptr_value ) from table ( :pa.pa ) t, '||p_nth.nth_feature_table||
+  curstr := 'select /*+cardinality ( t '||to_char(p_pa.pa.last )||' */ ptr( t.ptr_id, t.ptr_value ) from table ( :pa.pa ) t, '||p_nth.nth_feature_table||
             ' where t.ptr_value = '||p_nth.nth_feature_pk_column||' order by t.ptr_id';
 
-  nm_debug.debug_on;
-  nm_debug.debug(curstr);
+--  nm_debug.debug_on;
+--  nm_debug.debug(curstr);
   EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.pa USING p_pa;
 
   RETURN retval;
@@ -9594,15 +9682,16 @@ BEGIN
 
   nthmet := Nm3sdo.get_theme_metadata( p_theme);
 
-  cur_string := 'select ptr(rownum, ft.'||nthrow.nth_feature_pk_column||') from '||nthrow.nth_feature_table||' ft '||
+  cur_string := 'select /*+cardinality( ne_list '||to_char(p_ne_array.last)||')*/ '||
+                'ptr(rownum, ft.'||nthrow.nth_feature_pk_column||') from '||nthrow.nth_feature_table||' ft '||
                 ', table ( :b_ne_array ) ne_list '||
                 'where sdo_nn( '||nthrow.nth_feature_shape_column||', :p_geom ,'||''''||
                 'SDO_BATCH_SIZE='||TO_CHAR(10)||''''||') = '||''''||'TRUE'||''''||
                 ' and rownum <= 10 '||
                 ' and ft.'||nthrow.nth_pk_column||' = ne_list.ne_id';
 
-  Nm_Debug.debug_on;
-  Nm_Debug.DEBUG( cur_string );
+--  Nm_Debug.debug_on;
+--  Nm_Debug.DEBUG( cur_string );
 
   EXECUTE IMMEDIATE cur_string BULK COLLECT INTO retval.pa USING p_ne_array, p_geom;
 
@@ -9750,7 +9839,8 @@ cur_string VARCHAR2(2000);
 ref_cur    Nm3type.ref_cursor;
 BEGIN
 
-  cur_string := 'select nm_geom( a.ptr_id, '||TO_CHAR( nth.nth_feature_shape_column )||') from '||nth.nth_feature_table||
+  cur_string := 'select /*+cardinality (a '||to_char( p_id.pa.last)||')*/ '||
+                ' nm_geom( a.ptr_id, '||TO_CHAR( nth.nth_feature_shape_column )||') from '||nth.nth_feature_table||
                 ', table ( :pa ) a '||
     'where a.ptr_value = '||nth.nth_feature_pk_column ;
 
@@ -10055,7 +10145,8 @@ curstr VARCHAR2(2000);
 retval nm_theme_list := Nm3array.init_nm_theme_list;
 BEGIN
   --curstr := 'select nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  :new_name, a.ntd_distance, a.ntd_measure, :new_descr )   '||
-curstr := 'select nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  a.ntd_name, a.ntd_distance, a.ntd_measure, :new_descr )   '||
+curstr := 'select /*+cardinality( a '||to_char( p_ntl.ntl_theme_list.last)||') */ '||
+          ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  a.ntd_name, a.ntd_distance, a.ntd_measure, :new_descr )   '||
                   ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||
                  ' where a.ntd_pk_id  = '||p_nth.nth_feature_pk_column||' order by  a.ntd_distance';
      
@@ -10230,8 +10321,9 @@ IS
   curstr   VARCHAR2(2000);
   retval   ptr_array := Nm3array.init_ptr_array;
 BEGIN
-  curstr := 'select ptr( t.ptr_id, t.ptr_value ) from table ( :pa.pa ) t, '||p_table||
+  curstr := 'select /*+cardinality (t '||to_char(p_pa.pa.last)||')*/ ptr( t.ptr_id, t.ptr_value ) from table ( :pa.pa ) t, '||p_table||
             ' where t.ptr_value = '||p_key||' order by t.ptr_id';
+  nm_debug.debug( curstr );         
   EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.pa USING p_pa;
   RETURN retval;
 END;
