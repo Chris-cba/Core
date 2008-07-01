@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.6   Jun 26 2008 12:09:20   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.7   Jul 01 2008 11:12:44   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jun 26 2008 12:09:20  $
---       Date fetched Out : $Modtime:   Jun 26 2008 12:07:58  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Jul 01 2008 11:12:44  $
+--       Date fetched Out : $Modtime:   Jul 01 2008 11:12:04  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -6739,7 +6739,6 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
   IS
     -- Has to be autonomous because we are creating views in a trigger - therefore
     -- it does a commit
-    
     PRAGMA autonomous_transaction;
   BEGIN
     FOR i IN 
@@ -6762,8 +6761,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
       EXCEPTION
         WHEN OTHERS 
         THEN
-          ROLLBACK;
-          nm_debug.debug('con views drop synonym Error - '||SQLERRM); 
+          ROLLBACK; 
       END;
       COMMIT;
     END LOOP;
@@ -6785,10 +6783,9 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                     AND object_type = 'VIEW')) 
     LOOP
       BEGIN
-        nm_debug.debug('con views - '||i.hus_username||' - '||i.nth_feature_table);
         EXECUTE IMMEDIATE i.create_sql;
       EXCEPTION
-        WHEN OTHERS THEN nm_debug.debug('con views Error - '||SQLERRM);
+        WHEN OTHERS THEN NULL;
       END;
     END LOOP;
   END consolidate_feature_views;
@@ -6801,7 +6798,6 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
   IS
     -- Has to be autonomous because we are creating views in a trigger - therefore
     -- it does a commit
-    
     PRAGMA autonomous_transaction;
   BEGIN
     FOR i IN 
@@ -6824,7 +6820,8 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
       BEGIN
         EXECUTE IMMEDIATE i.sql_text;
       EXCEPTION
-        WHEN OTHERS THEN nm_debug.debug('con views drop synonym Error - '||SQLERRM); 
+        WHEN OTHERS 
+          THEN NULL; 
       END;
     END LOOP;
   --
@@ -6847,13 +6844,82 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                     AND object_type = 'VIEW'))
     LOOP
       BEGIN
-        nm_debug.debug('con views - '||i.hus_username||' - '||i.nth_feature_table);
         EXECUTE IMMEDIATE i.create_sql;
       EXCEPTION
-        WHEN OTHERS THEN nm_debug.debug('con views Error - '||SQLERRM);
+        WHEN OTHERS 
+          THEN NULL;
       END;
     END LOOP;
-  END consolidate_feature_views;  
+  END consolidate_feature_views;
+--
+--------------------------------------------------------------------------------
+--
+  PROCEDURE drop_feature_views 
+                ( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE )
+  IS
+    -- Has to be autonomous because we are creating views in a trigger - therefore
+    -- it does a commit
+    PRAGMA autonomous_transaction;
+  BEGIN
+    FOR i IN
+      (SELECT  'DROP VIEW '|| hus_username||'.'|| nth_feature_table drop_sql
+         FROM hig_users, all_users, nm_themes_all
+        WHERE hus_username = username
+          AND hus_username != hig.get_application_owner
+          AND nth_theme_type = 'SDO'
+          AND pi_theme_id = nth_theme_id
+          AND NOT EXISTS (
+                 SELECT 1
+                   FROM dba_objects
+                  WHERE owner != hig.get_application_owner
+                    AND owner = hus_username
+                    AND object_name = nth_feature_table
+                    AND object_type = 'VIEW'))
+ 
+    LOOP
+      BEGIN
+        EXECUTE IMMEDIATE i.drop_sql;
+      EXCEPTION
+        WHEN OTHERS THEN NULL;
+      END;
+    END LOOP;
+  END drop_feature_views;
+--
+--------------------------------------------------------------------------------
+--
+  PROCEDURE drop_feature_views  
+              ( pi_role     IN nm_theme_roles.nthr_role%TYPE
+              , pi_username IN hig_users.hus_username%TYPE )
+  IS
+    -- Has to be autonomous because we are creating views in a trigger - therefore
+    -- it does a commit
+    PRAGMA autonomous_transaction;
+  BEGIN
+    FOR i IN
+     (SELECT  'DROP VIEW '|| hus_username||'.'|| nth_feature_table drop_sql
+         FROM hig_users, all_users, nm_themes_all, nm_theme_roles
+        WHERE hus_username = username
+          AND hus_username != hig.get_application_owner
+          AND nth_theme_type = 'SDO'
+          AND nthr_theme_id = nth_theme_id
+          AND nthr_role = pi_role
+          AND hus_username = pi_username
+          AND NOT EXISTS (
+                 SELECT 1
+                   FROM dba_objects
+                  WHERE owner != hig.get_application_owner
+                    AND owner = hus_username
+                    AND object_name = nth_feature_table
+                    AND object_type = 'VIEW'))
+    LOOP
+      BEGIN
+        EXECUTE IMMEDIATE i.drop_sql;
+      EXCEPTION
+        WHEN OTHERS 
+          THEN NULL;
+      END;
+    END LOOP;
+  END drop_feature_views;
 --
 ---------------------------------------------------------------------------------------------------------------------------------
 --
@@ -7032,10 +7098,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
              EXCEPTION
                WHEN OTHERS
                  THEN
-                 -- Instead of whole process falling over, log the error and carry on
---                   Nm_Debug.debug_on;
-                   Nm_Debug.DEBUG ('Error copying SDE layer for '||nm3sdm.g_theme_role (i)||' - '||SQLERRM);
-                   Nm_Debug.debug_off;
+                 NULL;
              END;
 
            END LOOP;
@@ -7049,12 +7112,19 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
        THEN
 
        -----------------------------------------
-       -- Drop SDO layers for subordiante users
+       -- Drop SDO layers for subordinate users
        -----------------------------------------
 
           delete_sub_sdo_layer
              ( pi_theme_id =>  nm3sdm.g_theme_role (i)
              , pi_role     =>  nm3sdm.g_role_array (i) );
+
+       -----------------------------------------
+       --  Drop subordinate feature views
+       -----------------------------------------
+
+          drop_feature_views
+             ( pi_theme_id => nm3sdm.g_theme_role (i) );
 
        -----------------------------------------
        -- Drop SDE layers for subordinate users
@@ -7089,10 +7159,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
               EXCEPTION
                 WHEN OTHERS
                   THEN
-                  -- Instead of whole process falling over, log the error and carry on
---                    Nm_Debug.debug_on;
-                    Nm_Debug.DEBUG ('Error dropping SDE layer for '||nm3sdm.g_theme_role (i)||' - '||SQLERRM);
-                    Nm_Debug.debug_off;
+                  NULL;
               END;
           --
            END LOOP;
@@ -7105,7 +7172,6 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
    --
    EXCEPTION
      WHEN NO_DATA_FOUND THEN NULL;
---     WHEN OTHERS        THEN RAISE;
    --
    END process_subuser_nthr;
 
@@ -7167,7 +7233,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
      --
      EXCEPTION
        WHEN OTHERS 
-       THEN nm_debug.debug('Error - '||SQLERRM);
+       THEN NULL;
      END create_sub_sdo_layers;
    --
      PROCEDURE delete_sdo_layers_by_role ( pi_username IN hig_users.hus_username%TYPE
@@ -7200,13 +7266,6 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                                      AND g1.sdo_column_name = nth_feature_shape_column)
                 GROUP BY hus_username, nth_feature_table, nth_feature_shape_column)) layers;
      --
-       IF l_tab_owner.COUNT > 0
-       THEN
-         FOR i IN 1..l_tab_owner.COUNT LOOP
-           nm_debug.debug('Deleting SDO data for  '||l_tab_owner(i)||' - '||l_tab_table_name(i));
-         END LOOP;
-       END IF;
-     --
         IF l_tab_owner.COUNT > 0
         THEN
           FORALL i IN 1..l_tab_owner.COUNT
@@ -7220,16 +7279,12 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
   --
    BEGIN
   --
-  --  nm_debug.debug_on;
-  --  nm_debug.debug ('Process_subuser_hur');
-  --
      FOR i IN 1 .. Nm3sdm.g_role_idx
      LOOP
      --
         IF Nm3sdm.g_role_op (Nm3sdm.g_role_idx) = 'I'
         THEN
         --
-          nm_debug.debug('Create SDO data for '||nm3sdm.g_username_array (i)||' - '||nm3sdm.g_role_array (i));
           create_sub_sdo_layers 
             ( pi_username => nm3sdm.g_username_array (i)
             , pi_role     => nm3sdm.g_role_array (i)  );
@@ -7244,7 +7299,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
           EXCEPTION
             WHEN OTHERS
             THEN
-              nm_debug.debug('Error consoilating views ' ||SQLERRM);
+              NULL;
           END;
 
        --------------------------------------------------
@@ -7259,8 +7314,6 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                        WHERE nthr_role = nm3sdm.g_role_array (i) )
             LOOP
               BEGIN
-                nm_debug.debug('Create SDE layer - '||u.nthr_theme_id
-                                           ||' - '||nm3sdm.g_username_array (i));
                 EXECUTE IMMEDIATE
                   (' begin '||
                       'nm3sde.create_sub_sde_layer ( p_theme_id => '|| TO_CHAR (u.nthr_theme_id)
@@ -7270,10 +7323,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
               EXCEPTION
                 WHEN OTHERS
                   THEN
-                  -- Instead of whole process falling over, log the error and carry on
---                    Nm_Debug.debug_on;
-                    Nm_Debug.DEBUG ('Error copying SDE layer for '||nm3sdm.g_theme_role (i)||' - '||SQLERRM);
-                    Nm_Debug.debug_off;
+                  NULL;
               END;
 
             END LOOP;
@@ -7283,11 +7333,17 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
         ELSIF Nm3sdm.g_role_op (Nm3sdm.g_role_idx) = 'D'
         THEN
         --
-          nm_debug.debug('Delete SDO data for '||nm3sdm.g_username_array (i)||' - '||nm3sdm.g_role_array (i));
           delete_sdo_layers_by_role
             ( pi_username =>  nm3sdm.g_username_array (i)
             , pi_role     =>  nm3sdm.g_role_array (i) );
-            
+
+        ---------------------------------------------------
+        -- Drop subordinate feature views
+        ---------------------------------------------------
+          drop_feature_views  
+              ( pi_role     => nm3sdm.g_role_array (i) 
+              , pi_username => nm3sdm.g_username_array (i));
+
        -----------------------------------------
        -- Drop SDE layers for subordinate users
        -----------------------------------------
@@ -7305,9 +7361,6 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
            LOOP
           --
               BEGIN
-                nm_debug.debug('Drop SDE layer - '||u.nth_feature_table
-                                           ||' - '||u.nth_feature_shape_column
-                                           ||' - '||nm3sdm.g_username_array (i));
                 EXECUTE IMMEDIATE 'begin '||
                                      'nm3sde.drop_sub_layer_by_table( '
                                                 ||Nm3flx.string(u.nth_feature_table)||','
@@ -7318,10 +7371,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
               EXCEPTION
                 WHEN OTHERS
                   THEN
-                  -- Instead of whole process falling over, log the error and carry on
---                    Nm_Debug.debug_on;
-                    Nm_Debug.DEBUG ('Error dropping SDE layer for '||nm3sdm.g_theme_role (i)||' - '||SQLERRM);
-                    Nm_Debug.debug_off;
+                  NULL;
               END;
           --
            END LOOP;
