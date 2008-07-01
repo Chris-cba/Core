@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4040_nm4046_upg.sql-arc   3.1   Jun 27 2008 11:07:04   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4040_nm4046_upg.sql-arc   3.2   Jul 01 2008 11:18:12   aedwards  $
 --       Module Name      : $Workfile:   nm4040_nm4046_upg.sql  $
---       Date into PVCS   : $Date:   Jun 27 2008 11:07:04  $
---       Date fetched Out : $Modtime:   Jun 27 2008 11:06:00  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 01 2008 11:18:12  $
+--       Date fetched Out : $Modtime:   Jul 01 2008 11:17:46  $
+--       Version          : $Revision:   3.2  $
 --
 --   Product upgrade script
 --
@@ -122,6 +122,26 @@ SET FEEDBACK OFF
 --SET FEEDBACK ON
 --start &&run_file
 --SET FEEDBACK OFF
+
+
+--
+---------------------------------------------------------------------------------------------------
+-- 
+
+--               ****************   DOC INDEXES   *******************
+SET TERM ON
+PROMPT Running DOC related indexes...
+SET TERM OFF
+SET DEFINE ON
+SELECT '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'nm3_indexes.sql' run_file
+FROM dual
+/
+SET FEEDBACK ON
+start &&run_file
+SET FEEDBACK OFF
+
+
 --
 ---------------------------------------------------------------------------------------------------
 --                        **************** VIEWS   ****************
