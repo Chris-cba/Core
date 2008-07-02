@@ -4,16 +4,16 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.4   Jul 02 2008 16:29:00   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.5   Jul 02 2008 19:50:26   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_check.pkb  $
---       Date into PVCS   : $Date:   Jul 02 2008 16:29:00  $
---       Date fetched Out : $Modtime:   Jul 02 2008 16:28:36  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jul 02 2008 19:50:26  $
+--       Date fetched Out : $Modtime:   Jul 02 2008 19:50:00  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --------------------------------------------------------------------------------
 --
   g_package_name          CONSTANT varchar2(30)    := 'nm3sdo_check';
-  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.4  $"';
+  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.5  $"';
   lf                      CONSTANT VARCHAR2(30)    := chr(10);
   g_write_to_file                  BOOLEAN         := FALSE;
   l_results                        nm3type.tab_varchar32767;
@@ -1065,7 +1065,7 @@ AS
       BULK COLLECT INTO l_results
       FROM nm_themes_all
      WHERE nth_update_on_edit = 'I'
-       AND nth_base_table_theme IS NULL;
+       AND nth_base_table_theme IS NOT NULL;
   --
     IF l_results.COUNT = 0
     THEN
