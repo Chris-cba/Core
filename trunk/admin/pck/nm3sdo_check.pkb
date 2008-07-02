@@ -4,16 +4,16 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.3   Jun 25 2008 21:11:36   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.4   Jul 02 2008 16:29:00   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_check.pkb  $
---       Date into PVCS   : $Date:   Jun 25 2008 21:11:36  $
---       Date fetched Out : $Modtime:   Jun 25 2008 21:10:22  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jul 02 2008 16:29:00  $
+--       Date fetched Out : $Modtime:   Jul 02 2008 16:28:36  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --------------------------------------------------------------------------------
 --
   g_package_name          CONSTANT varchar2(30)    := 'nm3sdo_check';
-  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.3  $"';
+  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.4  $"';
   lf                      CONSTANT VARCHAR2(30)    := chr(10);
   g_write_to_file                  BOOLEAN         := FALSE;
   l_results                        nm3type.tab_varchar32767;
@@ -339,26 +339,35 @@ AS
           )
         LOOP
         --
-          EXECUTE IMMEDIATE 'SELECT UNIQUE a.'||i.nth_feature_shape_column||'.sdo_gtype'
-                           ||' FROM '||i.nth_feature_table||' a'
-                          ||' WHERE NOT EXISTS '
-                             ||' (SELECT 1 FROM hig_codes '
-                               ||' WHERE hco_domain = ''GEOMETRY_TYPE'''
-                                 ||' AND hco_code = a.'||i.nth_feature_shape_column||'.sdo_gtype)'
-          BULK COLLECT INTO l_tab_results;
-        --
-          IF l_tab_results.COUNT > 0
-          THEN
-            FOR j IN 1..l_tab_results.COUNT
-            LOOP
+          BEGIN
+            EXECUTE IMMEDIATE 'SELECT UNIQUE a.'||i.nth_feature_shape_column||'.sdo_gtype'
+                             ||' FROM '||i.nth_feature_table||' a'
+                            ||' WHERE NOT EXISTS '
+                               ||' (SELECT 1 FROM hig_codes '
+                                 ||' WHERE hco_domain = ''GEOMETRY_TYPE'''
+                                   ||' AND hco_code = a.'||i.nth_feature_shape_column||'.sdo_gtype)'
+            BULK COLLECT INTO l_tab_results;
+          --
+            IF l_tab_results.COUNT > 0
+            THEN
+              FOR j IN 1..l_tab_results.COUNT
+              LOOP
+                l_results(l_results.COUNT+1) 
+                  := '    FAIL : '||i.nth_feature_table
+                            ||' ['||i.nth_feature_shape_column
+                            ||'] - '|| l_tab_results(j)
+                            ||' is not recognised';
+              END LOOP; 
+          --
+            END IF;
+          EXCEPTION
+            WHEN OTHERS
+            THEN
               l_results(l_results.COUNT+1) 
-                := '    FAIL : '||i.nth_feature_table
-                          ||' ['||i.nth_feature_shape_column
-                          ||'] - '|| l_tab_results(j)
-                          ||' is not recognised';
-            END LOOP; 
-        --
-          END IF;
+                  := '    FAIL : '||i.nth_feature_table
+                            ||' ['||i.nth_feature_shape_column
+                            ||'] - appears to be incorrectly defined on the theme - please check';
+          END;
       --
         END LOOP;
       --
