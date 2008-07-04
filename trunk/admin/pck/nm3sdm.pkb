@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.8   Jul 04 2008 11:38:14   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.9   Jul 04 2008 16:35:00   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2008 11:38:14  $
---       Date fetched Out : $Modtime:   Jul 04 2008 11:37:36  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Jul 04 2008 16:35:00  $
+--       Date fetched Out : $Modtime:   Jul 04 2008 16:34:36  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -6850,12 +6850,6 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                  AND hur_username = hus_username
                  AND hus_username = username
                  AND hus_username != hig.get_application_owner
-                 AND NOT EXISTS (
-                        SELECT 1
-                          FROM sde.layers g1
-                         WHERE g1.owner = hus_username
-                           AND g1.table_name = nth_feature_table
-                           AND g1.spatial_column = nth_feature_shape_column)
               UNION ALL
               -- Base table themes
               SELECT hus_username,
@@ -6868,13 +6862,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                WHERE b.nth_theme_id = a.nth_base_table_theme
                  AND a.nth_theme_id = pi_theme_id
                  AND hus_username = username
-                 AND hus_username != hig.get_application_owner
-                 AND NOT EXISTS (
-                        SELECT 1
-                          FROM sde.layers g1
-                         WHERE g1.owner = hus_username
-                           AND g1.table_name = b.nth_feature_table
-                           AND g1.spatial_column = b.nth_feature_shape_column))
+                 AND hus_username != hig.get_application_owner)
           GROUP BY hus_username, nth_feature_table, nth_feature_shape_column)
         LOOP
         --
@@ -6891,9 +6879,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                                            || ''');'|| 
                  ' end;');
             EXCEPTION
-              WHEN OTHERS
-                THEN
-                RAISE;
+              WHEN OTHERS THEN NULL;
             END;
           --
           END IF;
@@ -7020,8 +7006,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
          END IF;
 
        EXCEPTION
-         WHEN NO_DATA_FOUND
-         THEN NULL;
+         WHEN NO_DATA_FOUND THEN NULL;
        END;
 
      END LOOP;
@@ -7099,12 +7084,6 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                           nm_theme_roles
                     WHERE nthr_theme_id = a.nth_theme_id
                       AND nthr_role    = pi_role
-                      AND NOT EXISTS (
-                             SELECT 1
-                               FROM sde.layers g1
-                              WHERE g1.owner = l_user
-                                AND g1.table_name = nth_feature_table
-                                AND g1.spatial_column = nth_feature_shape_column)
                    UNION ALL
                    -- Base table themes
                    SELECT b.nth_theme_id, b.nth_feature_table,
@@ -7114,19 +7093,8 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                           nm_themes_all b
                     WHERE b.nth_theme_id = a.nth_base_table_theme
                       AND nthr_theme_id = a.nth_theme_id
-                      AND nthr_role    = pi_role
-                      AND NOT EXISTS (
-                             SELECT 1
-                               FROM sde.layers g1
-                              WHERE g1.owner = l_user
-                                AND g1.table_name = b.nth_feature_table
-                                AND g1.spatial_column = b.nth_feature_shape_column))
-           GROUP BY nth_theme_id, nth_feature_table, nth_feature_shape_column)
-         WHERE NOT EXISTS
-           (SELECT 1 FROM sde.layers
-             WHERE owner = l_user
-               AND table_name = nth_feature_table
-               AND spatial_column = nth_feature_shape_column))
+                      AND nthr_role    = pi_role)
+           GROUP BY nth_theme_id, nth_feature_table, nth_feature_shape_column))
        LOOP
        --
          create_feature_view (pi_username, i.nth_feature_table);
@@ -7142,9 +7110,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                                           || ''');'|| 
                 ' end;');
            EXCEPTION
-             WHEN OTHERS
-               THEN
-               NULL;
+             WHEN OTHERS THEN NULL;
            END;
          END IF;
        END LOOP;
@@ -7216,9 +7182,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                                   ||' end;';
                --
                  EXCEPTION
-                   WHEN OTHERS
-                     THEN
-                     NULL;
+                   WHEN OTHERS THEN NULL;
                  END;
              --
             END IF;
@@ -7259,15 +7223,13 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
          END IF;
 
        EXCEPTION
-         WHEN NO_DATA_FOUND
-         THEN NULL;
+         WHEN NO_DATA_FOUND THEN NULL;
        END;
      --
      END LOOP;
    --
    EXCEPTION
       WHEN NO_DATA_FOUND THEN NULL;
-      WHEN OTHERS        THEN RAISE;
    --
    END process_subuser_hur;
 --
