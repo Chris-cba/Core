@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.9   Jul 04 2008 16:35:00   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.10   Jul 11 2008 09:38:24   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jul 04 2008 16:35:00  $
---       Date fetched Out : $Modtime:   Jul 04 2008 16:34:36  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Jul 11 2008 09:38:24  $
+--       Date fetched Out : $Modtime:   Jul 11 2008 09:37:26  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.9  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.10  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -965,6 +965,7 @@ PROCEDURE split_element_shapes (
    IS
       l_layer   NUMBER;
       l_geom    MDSYS.SDO_GEOMETRY;
+      l_errm    varchar2(100);
    BEGIN
       --nm_debug.debug_on;
       --nm_debug.debug('changing shapes');
@@ -972,19 +973,34 @@ PROCEDURE split_element_shapes (
 
       IF Nm3sdo.element_has_shape (l_layer, p_ne_id) = 'TRUE'
       THEN
+
+         l_geom := nm3sdo.GET_LAYER_ELEMENT_GEOMETRY( l_layer, p_ne_id );
+
+         nm3sdo_edit.reshape ( l_layer, p_ne_id, p_geom );
+
+         commit;
+
          --  nm_debug.debug('has shape in layer '|| to_char(l_layer));
+/*
          Nm3sdo.delete_layer_shape (p_layer => l_layer, p_ne_id => p_ne_id);
          Nm3sdo.insert_element_shape (p_layer      => l_layer,
                                       p_ne_id      => p_ne_id,
                                       p_geom       => p_geom
                                      );
+*/
          --  nm_debug.debug_on;
          --  nm_debug.debug('changing shapes');
          Nm3sdo.Change_Affected_Shapes (p_layer      => l_layer,
                                         p_ne_id      => p_ne_id);
       END IF;
-   END;
 
+      exception
+        when others then
+          l_errm := sqlerrm;
+          nm3sdo_edit.reshape( l_layer, p_ne_id, p_geom );
+          commit;
+          raise_application_error( -20001, l_errm );
+   END;
 --
 -----------------------------------------------------------------------------
 --
@@ -3074,7 +3090,7 @@ PROCEDURE split_element_shapes (
 
     ---------------------------------------------------------------------------
     -- Make sure theme passed in is a datum layer
-    --------------------------------------------------------------------------- 
+    ---------------------------------------------------------------------------
     l_rec_nth := Nm3get.get_nth ( pi_nth_theme_id => pi_nth_theme_id );
 
     IF NOT is_datum_layer ( pi_nth_theme_id )
@@ -6784,7 +6800,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
         SELECT hus_username, nth_feature_table, nth_feature_shape_column, sdo_diminfo, sdo_srid
           FROM MDSYS.sdo_geom_metadata_table u,
                (SELECT hus_username, nth_feature_table, nth_feature_shape_column
-                  FROM 
+                  FROM
                        -- Layers based on role - more than likely views
                        (SELECT hus_username,
                                a.nth_feature_table,
@@ -6833,9 +6849,9 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
 
          nm_debug.debug('Inserted '||SQL%ROWCOUNT||' SDO metadata rows');
       --
-        FOR i IN 
+        FOR i IN
          (SELECT hus_username, nth_feature_table, nth_feature_shape_column
-            FROM 
+            FROM
              -- Layers based on role - more than likely views
              (SELECT hus_username, nth_feature_table,  nth_feature_shape_column
                 FROM nm_themes_all a,
@@ -6876,7 +6892,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                 (' begin '||
                     'nm3sde.create_sub_sde_layer ( p_theme_id => '|| pi_theme_id
                                               || ',p_username => '''|| i.hus_username
-                                           || ''');'|| 
+                                           || ''');'||
                  ' end;');
             EXCEPTION
               WHEN OTHERS THEN NULL;
@@ -6974,7 +6990,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
   --------------------------------------------------------------
 
     -----------
-    -- INSERTS 
+    -- INSERTS
     -----------
 
      FOR i IN 1 .. Nm3sdm.g_role_idx
@@ -6985,7 +7001,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
 
          IF Nm3sdm.g_role_op (i) = 'I'
          THEN
-         
+
            nm_debug.debug('Create '||nm3sdm.g_theme_role (i));
 
            create_sub_sdo_layer
@@ -7025,7 +7041,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
    nm_theme_roles data */
    IS
    --
-     PROCEDURE create_sub_sdo_layers (pi_username IN hig_users.hus_username%TYPE 
+     PROCEDURE create_sub_sdo_layers (pi_username IN hig_users.hus_username%TYPE
                                      ,pi_role     IN nm_theme_roles.nthr_role%TYPE )
      IS
        l_user hig_users.hus_username%TYPE := pi_username;
@@ -7036,7 +7052,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
          SELECT l_user, nth_feature_table, nth_feature_shape_column, sdo_diminfo, sdo_srid
            FROM MDSYS.sdo_geom_metadata_table u,
                 (SELECT nth_feature_table, nth_feature_shape_column
-                   FROM 
+                   FROM
                         -- Layers based on role - more than likely views
                         (SELECT a.nth_feature_table,
                                 a.nth_feature_shape_column
@@ -7073,10 +7089,10 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
      --
        nm_debug.debug('Inserted '||SQL%ROWCOUNT||' rows for role '||pi_role||' on user '||pi_username);
      --
-       FOR i IN 
-         (SELECT * FROM 
+       FOR i IN
+         (SELECT * FROM
            (SELECT nth_theme_id, nth_feature_table, nth_feature_shape_column
-             FROM 
+             FROM
                   -- Layers based on role - more than likely views
                   (SELECT a.nth_theme_id, a.nth_feature_table,
                           a.nth_feature_shape_column
@@ -7107,7 +7123,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
                (' begin '||
                    'nm3sde.create_sub_sde_layer ( p_theme_id => '|| TO_CHAR (i.nth_theme_id)
                                              || ',p_username => '''|| pi_username
-                                          || ''');'|| 
+                                          || ''');'||
                 ' end;');
            EXCEPTION
              WHEN OTHERS THEN NULL;
@@ -7115,7 +7131,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
          END IF;
        END LOOP;
      EXCEPTION
-       WHEN OTHERS 
+       WHEN OTHERS
        THEN NULL;
      END create_sub_sdo_layers;
    --
@@ -7157,7 +7173,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
              WHERE sdo_owner       = l_tab_owner(i)
                AND sdo_table_name  = l_tab_table_name(i)
                AND sdo_column_name = l_tab_column_name(i);
-       
+
         -----------------------------------
         -- Drop subordinate feature views
         -----------------------------------
@@ -7188,7 +7204,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
             END IF;
 
           END LOOP;
-     
+
         END IF;
      --
      END delete_sdo_layers_by_role;
@@ -7205,7 +7221,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
           IF Nm3sdm.g_role_op (Nm3sdm.g_role_idx) = 'I'
           THEN
           --
-            create_sub_sdo_layers 
+            create_sub_sdo_layers
               ( pi_username => nm3sdm.g_username_array (i)
               , pi_role     => nm3sdm.g_role_array (i)  );
 
@@ -8735,7 +8751,7 @@ PROCEDURE create_msv_feature_views
 --
   -- Find which feature tables we need to create views for
   -- We only need views for feature tables that contain SRIDS
-  
+
   -- not longer the case - will create views for all feature tables
   --
       BEGIN
@@ -8895,7 +8911,7 @@ PROCEDURE create_msv_feature_views
 --      END LOOP;
    --
      -- MJA 24-Sep_2007: using In causing bind errors
-     l_sql := 
+     l_sql :=
         'INSERT INTO mdsys.sdo_geom_metadata_table '||nl||
         '(sdo_owner, sdo_table_name, '||nl||
         ' sdo_column_name, sdo_diminfo, '||nl||
@@ -8921,7 +8937,7 @@ PROCEDURE create_msv_feature_views
         '       WHERE :pi_sub_username  = b.sdo_owner '||nl||
         '         AND a.sdo_table_name  = b.sdo_table_name '||nl||
         '         AND a.sdo_column_name = b.sdo_column_name ) ';*/
-   -- 
+   --
       IF pi_role_restrict
       THEN
          l_sql :=
@@ -9113,9 +9129,9 @@ END;
 ------------------------------------------------------------------------------
 -- AE Added new procedure to maintain visable themes
 -- very basic version to start with, it doesn't deal with it on a user basis,
--- so changes affect all users 
--- 
-  PROCEDURE maintain_ntv 
+-- so changes affect all users
+--
+  PROCEDURE maintain_ntv
              ( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE
              , pi_mode     IN VARCHAR2)
   IS
@@ -9128,7 +9144,7 @@ END;
       INSERT INTO nm_themes_visible (ntv_nth_theme_id,ntv_visible)
       VALUES (pi_theme_id, l_default_vis);
     --
-    -- Delete maintained via FK 
+    -- Delete maintained via FK
 --    ELSIF pi_mode = 'DELETING'
 --    THEN
 --    --
