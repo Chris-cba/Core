@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.4   Jun 26 2008 15:21:24   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.5   Jul 11 2008 09:39:08   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jun 26 2008 15:21:24  $
---       Date fetched Out : $Modtime:   Jun 26 2008 15:19:50  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jul 11 2008 09:39:08  $
+--       Date fetched Out : $Modtime:   Jul 11 2008 09:34:58  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.5  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -658,15 +658,15 @@ END;
   BEGIN
 
     l_layer := Nm3sdo.Get_Datum_Theme( Nm3get.get_ne_all( p_ne_id ).ne_nt_type );
-    
+
     IF l_layer IS NULL THEN
 
-      RETURN NULL;      
-      
+      RETURN NULL;
+
     ELSE
 
      RETURN get_xy_from_measure( p_layer => l_layer, p_ne_id => p_ne_id, p_measure => p_measure );
-      
+
     END IF;
 
   END;
@@ -1390,7 +1390,7 @@ BEGIN
   l_pa := Get_Batch_Of_Base_Nn( p_theme => p_layer, p_x => p_x, p_y => p_y );
 
   curstr := 'SELECT /*+cardinality( p '||to_char( l_pa.pa.last )||')*/ nm_ne_id_of '||
-            ' FROM nm_members, TABLE ( :pa ) p '|| 
+            ' FROM nm_members, TABLE ( :pa ) p '||
             ' WHERE nm_ne_id_in = :c_ne_id '||
             ' AND   p.ptr_value = nm_ne_id_of'||
             ' order by p.ptr_id';
@@ -2411,7 +2411,7 @@ BEGIN
   l_layer := Get_Datum_Theme( l_nt );
   IF l_layer IS NOT NULL THEN
     RETURN get_shape_from_nm( l_layer, p_ne_id, p_ne_id_of, p_begin_mp, p_end_mp );
-  ELSE 
+  ELSE
     RETURN NULL;
   END IF;
 END;
@@ -2650,7 +2650,8 @@ v_st   num_array := Nm3array.init_num_array;
 v_nd   num_array := Nm3array.init_num_array;
 v_nlt  int_array := Nm3array.init_int_array;
 
-l_date_tab Nm3type.tab_date;
+l_date_tab     Nm3type.tab_date;
+l_end_date_tab Nm3type.tab_date;
 
 ref_cur    Nm3type.ref_cursor;
 ref_cur2   Nm3type.ref_cursor;
@@ -2672,12 +2673,12 @@ l_g_len  NUMBER;
 l_temp   INTEGER;
 
 PROCEDURE set_theme_and_length( p_id IN ptr_array, po_theme OUT ptr_array, po_length OUT ptr_num_array ) IS
-curstr varchar2(2000) := 
+curstr varchar2(2000) :=
    ' ptr( i.ptr_id, nth_theme_id), ptr_num( i.ptr_id, ne_length) '||
-   ' FROM nm_elements, NM_LINEAR_TYPES, NM_NW_THEMES, NM_THEMES_ALL, TABLE( :pa ) i '||
+   ' FROM nm_elements_all, NM_LINEAR_TYPES, NM_NW_THEMES, NM_THEMES_ALL, TABLE( :pa ) i '||
    ' WHERE ne_id = i.ptr_value '||
    ' AND   ne_nt_type = nlt_nt_type '||
-   ' AND   nlt_g_i_d = '||''''||'D'||''''|| 
+   ' AND   nlt_g_i_d = '||''''||'D'||''''||
    ' AND   nlt_id = nnth_nlt_id '||
    ' AND   nth_theme_id = nnth_nth_theme_id '||
    ' AND   nth_base_table_theme is null ';
@@ -2693,11 +2694,11 @@ BEGIN
 --nm_debug.debug_on;
 --nm_debug.debug(curstr);
 
-  
+
 /*  OPEN c1( p_id );
     FETCH c1 BULK COLLECT INTO po_theme.pa, po_length.pa;
     CLOSE c1;
-*/    
+*/
 
  END;
 
@@ -2722,27 +2723,27 @@ BEGIN
 
   IF l_nit.nit_table_name IS NULL THEN
 
-     cur_string1 :=  ' select ptr( rownum, m.nm_ne_id_in), ptr( rownum, m.nm_ne_id_of), nm_placement( m.nm_ne_id_of, m.nm_begin_mp, m.nm_end_mp, 0), m.nm_start_date '||
-                        '  from nm_members m where nm_type = '||''''||'I'||''''||' and nm_obj_type = '||''''||l_nit.nit_inv_type||'''';
+     cur_string1 :=  ' select ptr( rownum, m.nm_ne_id_in), ptr( rownum, m.nm_ne_id_of), nm_placement( m.nm_ne_id_of, m.nm_begin_mp, m.nm_end_mp, 0), m.nm_start_date, nm_end_date '||
+                        '  from nm_members_all m where nm_type = '||''''||'I'||''''||' and nm_obj_type = '||''''||l_nit.nit_inv_type||'''';
   ELSE
 
      cur_string1 :=  ' select ptr( rownum, a.'||l_nit.nit_foreign_pk_column||' ), ptr( rownum, a.'|| l_nit.nit_lr_ne_column_name||
                       '), nm_placement( '||l_nit.nit_lr_ne_column_name||
       ', '||l_nit.nit_lr_st_chain||
-      ', '||NVL(l_nit.nit_lr_end_chain,l_nit.nit_lr_st_chain)||', 0), trunc(sysdate) '||
+      ', '||NVL(l_nit.nit_lr_end_chain,l_nit.nit_lr_st_chain)||', 0), trunc(sysdate), null '||
                         '  from '||l_nit.nit_table_name||' a ';
   END IF;
 
   ins_string := 'insert into '||p_table_name||
-                ' ( objectid, ne_id, ne_id_of, nm_begin_mp, nm_end_mp, start_date, geoloc ) '||
-                '  values ( :l_objectid, :lne, :l_ne_id_of, :l_begin_mp, :l_end_mp, :start_date, :lgeom )';
+                ' ( objectid, ne_id, ne_id_of, nm_begin_mp, nm_end_mp, start_date, end_date, geoloc ) '||
+                '  values ( :l_objectid, :lne, :l_ne_id_of, :l_begin_mp, :l_end_mp, :start_date, :end_date, :lgeom )';
 
   cur_string2 := ' select '||p_seq_name||'.nextval from nm_members';
 
 -- Nm_Debug.DEBUG(cur_string1);
   OPEN ref_cur FOR cur_string1;
 
-  FETCH ref_cur BULK COLLECT INTO  v_it.pa, v_ne.pa, v_pl.npa_placement_array, l_date_tab LIMIT l_limit;
+  FETCH ref_cur BULK COLLECT INTO  v_it.pa, v_ne.pa, v_pl.npa_placement_array, l_date_tab, l_end_date_tab LIMIT l_limit;
 
 --nm_debug.debug( 'Fetched batch'||' count = '||to_char( v_ne.pa.last ));
 
@@ -2823,7 +2824,7 @@ BEGIN
 --        nm_debug.debug('Done - now get the dynsegged shapes for theme '||to_char(l_th_id.pa(i).ptr_value)||' - j is going from 1 to '||to_char( l_temp));
 
          FOR j IN 1..l_temp LOOP
-          
+
             BEGIN
 
 --            nm_debug.debug('Lookup '||to_char(v_ne.pa(j).ptr_value));
@@ -2832,12 +2833,12 @@ BEGIN
            l_p := get_id( l_pt, v_ne.pa(j).ptr_value );
 
               l_t := get_idx_from_id(l_th,l_p);
-              
-              IF l_t IS NULL OR l_t < 0 THEN 
-              
-                NULL; -- there is no theme shape - ignore this 
-                
-              ELSE           
+
+              IF l_t IS NULL OR l_t < 0 THEN
+
+                NULL; -- there is no theme shape - ignore this
+
+              ELSE
 
 --              ensure that the element in question is the correct theme
 
@@ -2898,7 +2899,7 @@ BEGIN
                                     v_pl.npa_placement_array(j).pl_start, v_pl.npa_placement_array(j).pl_end );
 
                   END IF;
- 
+
                     ELSIF p_pnt_or_cont = 'C' and v_pl.npa_placement_array(j).pl_start >= v_pl.npa_placement_array(j).pl_end THEN
 
                 IF p_job_id IS NULL THEN
@@ -2928,7 +2929,7 @@ BEGIN
                    v_pl.npa_placement_array(j).pl_end,
                      l_usgm.diminfo );
                         ELSE
- 
+
                           l_geom :=  locate_pt( l_ge.nga(l_g_p).ng_geometry,
                                         l_usgm.diminfo,
                                   v_pl.npa_placement_array(j).pl_start );
@@ -2946,11 +2947,11 @@ BEGIN
                                                  TO_CHAR(v_pl.npa_placement_array(j).pl_end)
                                          );
                           ELSE
-                          
-                            add_dyn_seg_exception(282, p_job_id, v_it.pa(j).ptr_value,  v_ne.pa(j).ptr_value, NULL, NULL,  
+
+                            add_dyn_seg_exception(282, p_job_id, v_it.pa(j).ptr_value,  v_ne.pa(j).ptr_value, NULL, NULL,
                                                      v_pl.npa_placement_array(j).pl_start,
-                                                     v_pl.npa_placement_array(j).pl_end, SQLERRM ); 
-                          END IF;                                                                                                                      
+                                                     v_pl.npa_placement_array(j).pl_end, SQLERRM );
+                          END IF;
 
 --                 RAISE_APPLICATION_ERROR(-20001, 'Problem with '||to_char(  v_ne.pa(j).ptr_value )||' from '||
 --                     to_char(v_pl.npa_placement_array(j).pl_start)||' to '||
@@ -2973,6 +2974,7 @@ BEGIN
                        v_pl.npa_placement_array(j).pl_start,
                                                     v_pl.npa_placement_array(j).pl_end,
                       l_date_tab(j),
+                      l_end_date_tab(j),
                       l_geom;
 
                       l_time3 := DBMS_UTILITY.GET_TIME - l_time1;
@@ -2989,13 +2991,13 @@ BEGIN
                   END IF;
                 END IF;
 --              nm_debug.debug('Done - loop over next id');
-              
+
               END IF;
 
             EXCEPTION
               WHEN OTHERS THEN NULL; -- there is no theme to represent the network - so no chance of clipping.
             END;
-             
+
           END LOOP; -- use another item
 
         END IF;
@@ -3004,10 +3006,10 @@ BEGIN
 --      nm_debug.debug('Done - do it over the next theme ');
 
       END LOOP; -- next theme
-    
+
     END IF;
 
-    FETCH ref_cur BULK COLLECT INTO v_it.pa, v_ne.pa, v_pl.npa_placement_array, l_date_tab LIMIT l_limit;
+    FETCH ref_cur BULK COLLECT INTO v_it.pa, v_ne.pa, v_pl.npa_placement_array, l_date_tab, l_end_date_tab LIMIT l_limit;
 
 --  nm_debug.debug('Next batch - go back to top of loop');
 
@@ -3213,7 +3215,8 @@ v_st   num_array := Nm3array.init_num_array;
 v_nd   num_array := Nm3array.init_num_array;
 v_nlt  int_array := Nm3array.init_int_array;
 
-l_date_tab Nm3type.tab_date;
+l_date_tab       Nm3type.tab_date;
+l_end_date_tab   Nm3type.tab_date;
 
 ref_cur    Nm3type.ref_cursor;
 ref_cur2   Nm3type.ref_cursor;
@@ -3233,12 +3236,12 @@ l_g_len  NUMBER;
 l_t      INTEGER;
 
 PROCEDURE set_theme_and_length( p_id IN ptr_array, po_theme OUT ptr_array, po_length OUT ptr_num_array ) IS
-curstr varchar2(2000) := 
+curstr varchar2(2000) :=
    ' ptr( i.ptr_id, nth_theme_id), ptr_num( i.ptr_id, ne_length) '||
-   ' FROM nm_elements, NM_LINEAR_TYPES, NM_NW_THEMES, NM_THEMES_ALL, TABLE( :pa ) i '||
+   ' FROM nm_elements_all, NM_LINEAR_TYPES, NM_NW_THEMES, NM_THEMES_ALL, TABLE( :pa ) i '||
    ' WHERE ne_id = i.ptr_value '||
    ' AND   ne_nt_type = nlt_nt_type '||
-   ' AND   nlt_g_i_d = '||''''||'D'||''''|| 
+   ' AND   nlt_g_i_d = '||''''||'D'||''''||
    ' AND   nlt_id = nnth_nlt_id '||
    ' AND   nth_theme_id = nnth_nth_theme_id '||
    ' AND   nth_base_table_theme is null ';
@@ -3254,11 +3257,11 @@ BEGIN
 --nm_debug.debug_on;
 --nm_debug.debug(curstr);
 
-  
+
 /*  OPEN c1( p_id );
     FETCH c1 BULK COLLECT INTO po_theme.pa, po_length.pa;
     CLOSE c1;
-*/    
+*/
 
  END;
 
@@ -3304,18 +3307,18 @@ BEGIN
 
 --  Nm_Debug.debug_on;
 
-  cur_string1 :=  ' select ptr( rownum, m.nm_ne_id_in), ptr( rownum, m.nm_ne_id_of), nm_placement( m.nm_ne_id_of, m.nm_begin_mp, m.nm_end_mp, 0), m.nm_start_date '||
-                        '  from nm_members m where nm_type = :gty and nm_obj_type = :p_type';
+  cur_string1 :=  ' select ptr( rownum, m.nm_ne_id_in), ptr( rownum, m.nm_ne_id_of), nm_placement( m.nm_ne_id_of, m.nm_begin_mp, m.nm_end_mp, 0), m.nm_start_date, m.nm_end_date '||
+                        '  from nm_members_all m where nm_type = :gty and nm_obj_type = :p_type';
 
   ins_string := 'insert into '||p_table_name||
-                ' ( objectid, ne_id, ne_id_of, nm_begin_mp, nm_end_mp, start_date, geoloc ) '||
-                '  values ( :l_objectid, :lne, :l_ne_id_of, :l_begin_mp, :l_end_mp, :start_date, :lgeom )';
+                ' ( objectid, ne_id, ne_id_of, nm_begin_mp, nm_end_mp, start_date, end_date, geoloc ) '||
+                '  values ( :l_objectid, :lne, :l_ne_id_of, :l_begin_mp, :l_end_mp, :start_date, :end_date, :lgeom )';
 
   cur_string2 := ' select '||p_seq_name||'.nextval from nm_members';
 
   OPEN ref_cur FOR cur_string1 USING 'G', p_gty_type;
 
-  FETCH ref_cur BULK COLLECT INTO  v_it.pa, v_ne.pa, v_pl.npa_placement_array, l_date_tab LIMIT l_limit;
+  FETCH ref_cur BULK COLLECT INTO  v_it.pa, v_ne.pa, v_pl.npa_placement_array, l_date_tab, l_end_date_tab LIMIT l_limit;
 
 --nm_debug.debug( 'Fetched batch'||' count = '||to_char( v_ne.pa.last ));
 
@@ -3377,22 +3380,22 @@ BEGIN
 --      nm_debug.debug('Done - now get the dynsegged shapes - last = '||to_char(v_it.pa.last));
 
         FOR j IN 1..v_it.pa.LAST LOOP
-        
+
           BEGIN
-          
+
 
 --          nm_debug.debug(to_char(j)||' Lookup j='||to_char(j)||', ne= '||to_char(v_ne.pa(j).ptr_value));
 
          l_p := l_pt.get_id( v_ne.pa(j).ptr_value );
 
             l_t := get_idx_from_id(l_th,l_p);
-              
-            IF l_t IS NULL OR l_t < 0 THEN 
-              
-              NULL; -- there is no theme shape - ignore this 
-                
-            ELSE           
-        
+
+            IF l_t IS NULL OR l_t < 0 THEN
+
+              NULL; -- there is no theme shape - ignore this
+
+            ELSE
+
 
             IF l_th.pa(get_idx_from_id(l_th,l_p)).ptr_value = l_th_id.pa(i).ptr_value THEN
 
@@ -3510,18 +3513,18 @@ BEGIN
                                                  TO_CHAR(v_pl.npa_placement_array(j).pl_end)
                                        );
                         ELSE
-                          
-                          add_dyn_seg_exception(282, p_job_id, v_it.pa(j).ptr_value,  v_ne.pa(j).ptr_value, NULL, NULL,  
+
+                          add_dyn_seg_exception(282, p_job_id, v_it.pa(j).ptr_value,  v_ne.pa(j).ptr_value, NULL, NULL,
                                                      v_pl.npa_placement_array(j).pl_start,
-                                                     v_pl.npa_placement_array(j).pl_end, SQLERRM ); 
-                        END IF;                                                                                                                      
+                                                     v_pl.npa_placement_array(j).pl_end, SQLERRM );
+                        END IF;
 
 
 
 --               RAISE_APPLICATION_ERROR(-20001, 'Problem with '||to_char(  v_ne.pa(j).ptr_value )||' from '||
 --                    to_char(v_pl.npa_placement_array(j).pl_start)||' to '||
 --                 to_char(v_pl.npa_placement_array(j).pl_end));
-             
+
                     END;
 
                     l_time2 := DBMS_UTILITY.GET_TIME - l_time1;
@@ -3543,6 +3546,7 @@ BEGIN
               v_pl.npa_placement_array(j).pl_start,
                                             v_pl.npa_placement_array(j).pl_end,
               l_date_tab(j),
+              l_end_date_tab(j),
               l_geom;
 
                     l_time3 := DBMS_UTILITY.GET_TIME - l_time1;
@@ -3556,12 +3560,12 @@ BEGIN
                   END IF;
                 END IF;
               END IF;
-            END IF; -- no ptr to a valid shape            
+            END IF; -- no ptr to a valid shape
 
           EXCEPTION
             WHEN OTHERS THEN NULL; -- there is no shape of the clipped element - so nothing to do.
           END;
-                    
+
         END LOOP;  -- over all member records
 
 --      Nm_Debug.DEBUG('Done - get the next theme');
@@ -3571,7 +3575,7 @@ BEGIN
 
 --  Nm_Debug.DEBUG('Next batch - go back to top of loop');
 
-    FETCH ref_cur BULK COLLECT INTO v_it.pa, v_ne.pa, v_pl.npa_placement_array, l_date_tab LIMIT l_limit;
+    FETCH ref_cur BULK COLLECT INTO v_it.pa, v_ne.pa, v_pl.npa_placement_array, l_date_tab, l_end_date_tab LIMIT l_limit;
 
 --  Nm_Debug.DEBUG( 'Fetched '||TO_CHAR(ic)||' batch'||' count it = '||TO_CHAR( v_it.pa.LAST )||' count ne = '||TO_CHAR( v_ne.pa.LAST )||
 --                  ' count pl = '||TO_CHAR( v_pl.npa_placement_array.LAST ));
@@ -3914,7 +3918,7 @@ EXCEPTION
   WHEN NO_DATA_FOUND THEN
     RETURN 'FALSE';
   WHEN TOO_MANY_ROWS THEN
-    RETURN 'TRUE';    
+    RETURN 'TRUE';
 END;
 
 --
@@ -3933,7 +3937,7 @@ BEGIN
 
  IF p_layer IS NULL THEN
    RETURN 'FALSE';
-  ELSE   
+  ELSE
   IF set_theme( p_layer ) THEN
     set_theme_metadata( p_layer );
   END IF;
@@ -3952,9 +3956,9 @@ BEGIN
   RETURN retval;
 EXCEPTION
   WHEN NO_DATA_FOUND THEN
-    RETURN 'FALSE'; 
+    RETURN 'FALSE';
   WHEN TOO_MANY_ROWS THEN
-    RETURN 'TRUE';    
+    RETURN 'TRUE';
 END;
 
 --
@@ -3995,13 +3999,13 @@ l_nth      nm_themes_all%rowtype;
 BEGIN
 
   l_nth := nm3get.get_nth( p_layer );
-  
+
   IF l_nth.nth_base_table_theme IS NOT NULL THEN
-  
+
     l_nth := Nm3get.get_nth( l_nth.nth_base_table_theme);
- 
-  END IF; 
-  
+
+  END IF;
+
   IF set_theme( l_nth.nth_theme_id ) THEN
     set_theme_metadata( l_nth.nth_theme_id );
   END IF;
@@ -4028,13 +4032,13 @@ l_nth      nm_themes_all%rowtype;
 BEGIN
 
   l_nth := nm3get.get_nth( p_layer );
-  
+
   IF l_nth.nth_base_table_theme IS NOT NULL THEN
-  
+
     l_nth := Nm3get.get_nth( l_nth.nth_base_table_theme);
- 
-  END IF; 
-  
+
+  END IF;
+
   IF set_theme( l_nth.nth_theme_id ) THEN
     set_theme_metadata( l_nth.nth_theme_id );
   END IF;
@@ -4815,13 +4819,13 @@ l_is_datum         BOOLEAN := Nm3net.element_is_a_datum( p_ne_id );
 BEGIN
 
   l_nth := nm3get.get_nth( p_layer );
-  
+
   IF l_nth.nth_base_table_theme IS NOT NULL THEN
-  
+
     l_nth := Nm3get.get_nth( l_nth.nth_base_table_theme);
- 
-  END IF; 
-  
+
+  END IF;
+
 
   IF set_theme( l_nth.nth_theme_id ) THEN
     set_theme_metadata( l_nth.nth_theme_id );
@@ -4833,11 +4837,11 @@ BEGIN
   IF g_usgm.srid != NVL(p_geom.sdo_srid, -99999) THEN
 
 --  Nm_Debug.DEBUG('Setting SRID to '||TO_CHAR(g_usgm.srid));
-    
+
     l_geom.sdo_srid := g_usgm.srid;
-    
-  END IF;    
-    
+
+  END IF;
+
   l_length := Nm3net.Get_Ne_Length( p_ne_id );
 
   IF sdo_lrs.geom_segment_end_measure ( l_geom, g_usgm.diminfo ) != l_length THEN
@@ -5920,7 +5924,7 @@ BEGIN
   THEN
 
     retval := get_gtype_from_theme;
-    
+
     IF retval IS NULL THEN
       retval := get_table_gtype( l_nth.nth_feature_table, l_nth.nth_feature_shape_column);
     END IF;
@@ -5934,7 +5938,7 @@ BEGIN
     END IF;
 */
     RETURN retval;
-    
+
   ELSE
 
      Hig.raise_ner(pi_appl                => Nm3type.c_hig
@@ -7042,16 +7046,21 @@ cur_string VARCHAR2(2000);
 
 BEGIN
 
-  BEGIN
-    EXECUTE IMMEDIATE 'alter session set sort_area_size = 20000000';
-  EXCEPTION
-    WHEN OTHERS THEN NULL;
-  END;
+  if nvl(hig.get_sysopt('SDOUSEQT'), 'N') = 'Y' then
+    create_qtree_idx( p_table, p_column);
+  else
 
-  cur_string := 'create index '||SUBSTR( p_table, 1, 24)||'_spidx on '||p_table||' ( '||p_column||' ) indextype is mdsys.spatial_index'||
-                ' parameters ('||''''||'sdo_indx_dims=2'||''''||')';
+    BEGIN
+      EXECUTE IMMEDIATE 'alter session set sort_area_size = 20000000';
+    EXCEPTION
+      WHEN OTHERS THEN NULL;
+    END;
 
-  EXECUTE IMMEDIATE cur_string;
+    cur_string := 'create index '||SUBSTR( p_table, 1, 24)||'_spidx on '||p_table||' ( '||p_column||' ) indextype is mdsys.spatial_index'||
+                  ' parameters ('||''''||'sdo_indx_dims=2'||''''||')';
+
+    EXECUTE IMMEDIATE cur_string;
+  end if;
 
 END;
 
@@ -7060,6 +7069,7 @@ END;
 PROCEDURE create_qtree_idx ( p_table IN VARCHAR2, p_column IN VARCHAR2 DEFAULT 'GEOLOC' ) IS
 
 cur_string VARCHAR2(2000);
+num_tiles  varchar2(10) := nvl(hig.get_sysopt('SDOQTTILES'), 6);
 
 BEGIN
 
@@ -7069,13 +7079,15 @@ BEGIN
     WHEN OTHERS THEN NULL;
   END;
 
-  cur_string := 'create index '||SUBSTR( p_table, 1, 24)||'_qtidx on '||p_table||' ( '||p_column||' ) indextype is mdsys.spatial_index'||
-                ' parameters ('||''''||'sdo_level=6'||''''||')';
 
+  cur_string := 'create index '||SUBSTR( p_table, 1, 24)||'_qtidx on '||p_table||' ( '||p_column||' ) indextype is mdsys.spatial_index'||
+                ' parameters ('||''''||'sdo_level='||num_tiles||''''||')';
+
+--nm_debug.debug_on;
+--nm_debug.debug(cur_string);
   EXECUTE IMMEDIATE cur_string;
 
 END;
-
 --
 ----------------------------------------------------------------------------------------------------------------------------------------
 --
@@ -7139,11 +7151,11 @@ BEGIN
      Nm_Debug.DEBUG('layer = '||TO_CHAR( p_layer )||' affecting '||TO_CHAR( irec.nth_theme_id )||' '||irec.nth_feature_table );
 
      IF irec.g_or_i != 'F' THEN
-     
---     inventory/group - with member data - delete if there, then insert     
-     
+
+--     inventory/group - with member data - delete if there, then insert
+
 --       Nm_Debug.DEBUG('Inventory/Group');
-       
+
        IF irec.dim_setting = 2 THEN
           get_shape_str := 'sdo_lrs.convert_to_std_geom(nm3sdo.get_shape_from_nm( '||TO_CHAR(p_layer)||', nm_ne_id_in, nm_ne_id_of, nm_begin_mp, nm_end_mp ))';
     ELSE
@@ -7171,7 +7183,7 @@ BEGIN
 
 --         Nm_Debug.DEBUG(lstr);
          EXECUTE IMMEDIATE lstr USING p_ne_id, irec.objtype, irec.g_or_i;
-         
+
        ELSE
 
          lstr := 'insert into '||irec.nth_feature_table||
@@ -7189,23 +7201,23 @@ BEGIN
          EXECUTE IMMEDIATE lstr USING p_ne_id, irec.objtype, irec.g_or_i;
 
        END IF;
-       
+
      ELSE -- foreign table
-     
+
 --       Nm_Debug.DEBUG('Foreign table');
 
        DECLARE
 
          l_nth nm_themes_all%ROWTYPE := Nm3get.get_nth( irec.nth_theme_id );
-         
+
        BEGIN
-       
+
          IF l_nth.nth_feature_table != l_nth.nth_table_name THEN
-         
---         distinct FT and feature table, it could have measures or it could be 2d        
+
+--         distinct FT and feature table, it could have measures or it could be 2d
 
 --           Nm_Debug.DEBUG('distinct FT and feature table');
-         
+
            IF get_dims( irec.nth_theme_id ) = 2 THEN
              get_shape_str := 'sdo_lrs.convert_to_std_geom(nm3sdo.get_shape_from_nm( '||TO_CHAR(p_layer)||
                               ', '||l_nth.nth_pk_column||
@@ -7219,14 +7231,14 @@ BEGIN
                               ', '||l_nth.nth_st_chain_column||
                               ', '||l_nth.nth_end_chain_column ||')';
         END IF;
-           
+
 
            IF l_nth.nth_rse_fk_column IS NULL OR
               l_nth.nth_st_chain_column IS NULL OR
               l_nth.nth_end_chain_column IS NULL THEN
-              
+
               RAISE_APPLICATION_ERROR(-20001, 'You need to link the feature and asset table and the network measures');
-           
+
 
            ELSIF l_nth.nth_feature_fk_column IS NULL THEN
 
@@ -7238,15 +7250,15 @@ BEGIN
                                ' and  '||l_nth.nth_pk_column||' = '||l_nth.nth_feature_pk_column||' )'||
                                ' where '||l_nth.nth_feature_pk_column||' in ( select '||l_nth.nth_pk_column||
                                ' from '||l_nth.nth_table_name||' where '||l_nth.nth_rse_fk_column||' = :ne_id )';
-                               
+
 --             Nm_Debug.debug_on;
 --             Nm_Debug.DEBUG(lstr);
---             Nm_Debug.debug_off;                               
+--             Nm_Debug.debug_off;
 
              EXECUTE IMMEDIATE lstr USING p_ne_id, p_ne_id;
-              
+
            ELSE
-           
+
 --           FT feature and theme tables are distinct, metadata is OK
 
              lstr := 'update '||l_nth.nth_feature_table||' f '||
@@ -7260,7 +7272,7 @@ BEGIN
 --             Nm_Debug.DEBUG(lstr);
 
              EXECUTE IMMEDIATE lstr USING p_ne_id, p_ne_id;
-                               
+
            END IF;
 
          ELSE
@@ -7274,9 +7286,9 @@ BEGIN
            EXECUTE IMMEDIATE lstr USING p_ne_id;
 
          END IF; --distinct tables
-         
-       END;          
-                                      
+
+       END;
+
      END IF;
    END LOOP;
 
@@ -8697,46 +8709,46 @@ BEGIN
   WHERE COLUMN_VALUE = l_i;
   RETURN TRUE;
 EXCEPTION
-  WHEN OTHERS THEN 
+  WHEN OTHERS THEN
     RETURN FALSE;
 END;
-      
+
 BEGIN
 
 --  Nm_Debug.debug_on;
-  
+
   l_ga := get_parts( p_geom );
 
   lp := l_ga.nga.LAST;
-    
+
   IF lp = 1 THEN
     RETURN p_geom;
   END IF;
-        
+
   ld := p_geom.get_dims;
- 
+
   retval := l_ga.nga(1).ng_geometry;
-  
+
   l_used.ia(1) := 1;
-  
+
 --  Nm_Debug.DEBUG('Set the first part');
-  
+
   WHILE l_used.ia.LAST < lp LOOP
-  
+
     IF lc > 20 THEN
       EXIT;
     END IF;
-    
+
     lc := lc + 1;
 
     FOR i IN 2..lp LOOP
-  
+
       IF NOT used( l_used, i ) THEN
 
 --        Nm_Debug.DEBUG('Part '||TO_CHAR(i)||' is unused');
-      
+
         IF compare_pt( Nm3sdo.get_2d_pt(sdo_lrs.geom_segment_end_pt( retval )), Nm3sdo.get_2d_pt(sdo_lrs.geom_segment_start_pt( l_ga.nga(i).ng_geometry)) , l_tol ) = 'TRUE' THEN
-    
+
 --          Nm_Debug.DEBUG('Part '||TO_CHAR(i)||' is connected');
 
           Nm3sdo.add_segments(retval, l_ga.nga(i).ng_geometry, p_diminfo, TRUE );
@@ -8745,30 +8757,30 @@ BEGIN
           EXIT;
 
         ELSIF compare_pt( Nm3sdo.get_2d_pt(sdo_lrs.geom_segment_end_pt( retval )), Nm3sdo.get_2d_pt(sdo_lrs.geom_segment_end_pt( l_ga.nga(i).ng_geometry)), l_tol ) = 'TRUE' THEN
-    
+
 --          Nm_Debug.DEBUG('Part '||TO_CHAR(i)||' is connected after reverse');
 
-          l_geom := Nm3sdo.reverse_geometry(l_ga.nga(i).ng_geometry );           
+          l_geom := Nm3sdo.reverse_geometry(l_ga.nga(i).ng_geometry );
           Nm3sdo.add_segments(retval, l_geom, p_diminfo, TRUE);
           l_used.ia.EXTEND;
           l_used.ia(l_used.ia.LAST) := i;
           EXIT;
 
         ELSE
-      
+
 --          Nm_Debug.DEBUG( 'No connection' );
           null;
-        
+
         END IF;
 
-      END IF;              
+      END IF;
 
     END LOOP;
-     
+
   END LOOP;
-  
-  RETURN retval;  
- 
+
+  RETURN retval;
+
 END;
 
 --
@@ -8906,21 +8918,21 @@ BEGIN
   l_tol :=  Nm3sdo.get_table_diminfo( p_nth.nth_feature_table, p_nth.nth_feature_shape_column )(1).sdo_tolerance;
 
   l_valid := validate_geometry( p_geometry, NULL, l_tol );
-  
+
   IF l_valid != 'TRUE' THEN
-  
+
     IF l_valid = 'FALSE' THEN
 
        RAISE_APPLICATION_ERROR(-20001, 'Invalid Geometry');
-    
+
     ELSE
 
        RAISE_APPLICATION_ERROR(-20001, 'Invalid Geometry - error code '||TO_CHAR(l_valid));
-    
-    END IF;    
- 
+
+    END IF;
+
   END IF;
-    
+
 
   IF p_get_projection = 'TRUE' THEN
 
@@ -8947,13 +8959,13 @@ BEGIN
 
 
   l_nth := p_nth;
-  
+
   IF p_nth.nth_base_table_theme IS NOT NULL THEN
-  
+
     l_nth := Nm3get.get_nth( l_nth.nth_base_table_theme);
- 
-  END IF; 
-  
+
+  END IF;
+
   IF l_nth.nth_feature_table = l_nth.nth_table_name THEN
 
      cur_string := 'select t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', t.'||l_nth.nth_pk_column;
@@ -9065,9 +9077,9 @@ BEGIN
 
   IF p_nth.nth_base_table_theme IS NOT NULL THEN
 -- ensure only those in the view are returned.
-    retval :=  join_ntl_array( p_nth, retval ); 
+    retval :=  join_ntl_array( p_nth, retval );
   END IF;
-   
+
   RETURN retval;
 
 END;
@@ -9584,7 +9596,7 @@ BEGIN
 
   nthrow := Nm3get.get_nth( p_theme );
   nthbas := nthrow;
- 
+
   IF nthbas.nth_base_table_theme IS NOT NULL THEN
 
     nthrow := Nm3get.get_nth( nthrow.nth_base_table_theme );
@@ -9597,25 +9609,25 @@ BEGIN
                 'where sdo_nn( '||nthrow.nth_feature_shape_column||', :p_geom ,'||''''||
                 'SDO_BATCH_SIZE='||TO_CHAR(g_batch_size)||''''||') = '||''''||'TRUE'||''''||
                 ' and rownum <= :g_batch_size';
-                
+
 
   /*
   IF nthrow.nth_feature_table != nthrow.nth_table_name THEN
-    
+
     cur_string := cur_string ||
                   ' and exists ( select 1 from '||nthrow.nth_table_name||' t '||
                   ' where ft.'||NVL( nthrow.nth_feature_fk_column, nthrow.nth_feature_pk_column )||' = t.'||nthrow.nth_pk_column||')';
   END IF;
 */
 
-                                   
+
   EXECUTE IMMEDIATE cur_string BULK COLLECT INTO retval.pa USING p_geom, g_batch_size;
 
   IF nthrow.nth_feature_table != nthrow.nth_table_name THEN
-  
+
     retval := local_join_ptr_array(retval, nthrow.nth_feature_table, nthrow.nth_feature_pk_column );
-    
-  END IF;    
+
+  END IF;
 
   IF nthbas.nth_base_table_theme IS NOT NULL THEN
 
@@ -10143,8 +10155,8 @@ curstr := 'select /*+cardinality( a '||to_char( p_ntl.ntl_theme_list.last)||') *
           ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  a.ntd_name, a.ntd_distance, a.ntd_measure, :new_descr )   '||
                   ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||
                  ' where a.ntd_pk_id  = '||p_nth.nth_feature_pk_column||' order by  a.ntd_distance';
-     
-  EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.ntl_theme_list 
+
+  EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.ntl_theme_list
     --USING p_nth.nth_theme_id, p_nth.nth_theme_name, p_nth.nth_theme_name, p_ntl;
     --USING p_nth.nth_theme_id, p_nth.nth_label_column, p_nth.nth_theme_name, p_ntl;
     USING p_nth.nth_theme_id, p_nth.nth_theme_name, p_ntl;
@@ -10158,7 +10170,7 @@ END;
 FUNCTION validate_geometry ( p_geom IN mdsys.sdo_geometry, p_nth_id IN nm_themes_all.nth_theme_id%TYPE, p_tol IN NUMBER ) RETURN VARCHAR2 IS
 l_tol     NUMBER;
 l_diminfo mdsys.sdo_dim_array;
-retval    VARCHAR2(10) := 'FALSE';
+retval    VARCHAR2(100) := 'FALSE';
 BEGIN
   IF p_nth_id IS NULL AND p_tol IS NULL THEN
       Hig.raise_ner(pi_appl                => Nm3type.c_hig
@@ -10166,32 +10178,32 @@ BEGIN
                     ,pi_sqlcode            => -20001
                     );
   ELSIF p_nth_id IS NOT NULL THEN
-  
+
     l_diminfo := get_theme_diminfo( p_nth_id );
- 
+
  IF l_diminfo IS NOT NULL THEN
-        
-      retval := sdo_geom.validate_geometry_with_context( p_geom, l_diminfo );
- 
+
+      retval := substr(sdo_geom.validate_geometry_with_context( p_geom, l_diminfo ), 1, 100);
+
     ELSE
 
    IF p_tol IS NOT NULL THEN
-   
-        retval  := sdo_geom.validate_geometry_with_context( p_geom, p_tol );
 
-      END IF;  
- 
-    END IF; 
- 
-  ELSE 
-  
-    retval  := sdo_geom.validate_geometry_with_context( p_geom, p_tol );
-   
+        retval  := substr(sdo_geom.validate_geometry_with_context( p_geom, p_tol ), 1, 100);
+
+      END IF;
+
+    END IF;
+
+  ELSE
+
+    retval  := substr(sdo_geom.validate_geometry_with_context( p_geom, p_tol ), 1, 100);
+
   END IF;
 
   RETURN retval;
-  
-END;  
+
+END;
 
 --
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -10215,18 +10227,18 @@ BEGIN
 
     l_nth := Nm3get.get_nth( p_nth_id );
 
-    l_usgm := get_usgm( l_nth.nth_feature_table, l_nth.nth_feature_shape_column ); 
-   
+    l_usgm := get_usgm( l_nth.nth_feature_table, l_nth.nth_feature_shape_column );
+
     retval := sdo_geom.sdo_length( p_geom, l_usgm.diminfo );
-    
+
   ELSIF p_tol IS NOT NULL THEN
-   
+
     retval := sdo_geom.sdo_length( p_geom, p_tol );
 
-  END IF; 
+  END IF;
 
   RETURN retval;
-END;     
+END;
 
 --
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -10275,13 +10287,13 @@ BEGIN
 --    Nm_Debug.DEBUG('Last = '||TO_CHAR(retval.nga.LAST));
     FOR i IN 2..lp LOOP
 --      Nm_Debug.DEBUG('Setting bit '||TO_CHAR(i));
-      retval.nga.EXTEND;    
+      retval.nga.EXTEND;
 --      Nm_Debug.DEBUG('Extend - Last = '||TO_CHAR(retval.nga.LAST));
       retval.nga(i) := nm_geom(i, sdo_util.EXTRACT( p_shape, i, 1));
-      
+
     END LOOP;
   END IF;
-  
+
   RETURN retval;
 END;
 
@@ -10297,8 +10309,8 @@ BEGIN
   Nm_Debug.DEBUG( 'compare '||TO_CHAR( p_geom1.sdo_point.x )||' with '||TO_CHAR( p_geom2.sdo_point.x )||' and  '||
                               TO_CHAR( p_geom1.sdo_point.y )||' with '||TO_CHAR( p_geom2.sdo_point.y ));
   IF ABS( p_geom1.sdo_point.x - p_geom2.sdo_point.x ) <= l_tol  AND
-     ABS( p_geom1.sdo_point.y - p_geom2.sdo_point.y ) <= l_tol THEN 
-     
+     ABS( p_geom1.sdo_point.y - p_geom2.sdo_point.y ) <= l_tol THEN
+
      retval := 'TRUE';
   END IF;
   RETURN retval;
