@@ -3,12 +3,12 @@ CREATE OR REPLACE PACKAGE BODY Nm_Cncts IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm_cncts.pkb-arc   2.1   Jun 26 2008 17:19:06   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm_cncts.pkb-arc   2.2   Jul 16 2008 09:04:36   rcoupe  $
 --       Module Name      : $Workfile:   nm_cncts.pkb  $
---       Date into PVCS   : $Date:   Jun 26 2008 17:19:06  $
---       Date fetched Out : $Modtime:   Jun 26 2008 17:10:54  $
---       PVCS Version     : $Revision:   2.1  $
---       Based on            1.5 
+--       Date into PVCS   : $Date:   Jul 16 2008 09:04:36  $
+--       Date fetched Out : $Modtime:   Jul 16 2008 09:03:08  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on            1.5
 --
 --   Author : Rob Coupe
 --
@@ -104,7 +104,7 @@ BEGIN
 
   FOR i IN 1..p_ne.ncne_array.LAST LOOP
     p_ne.ncne_array(i).row_id := i;
- 
+
 --  nm_debug.debug(to_char(i)||', ne_array rowid = '||to_char(l_ia.ia(i)));
   END LOOP;
 END;
@@ -427,8 +427,8 @@ BEGIN
   nc := g_cnct.nc_no_ptr.pa.LAST;
 
   l_no_id := g_cnct.nc_no_array.no_in_array( p_no_id );
-  
---  Nm_Debug.DEBUG('delaing with node '||TO_CHAR( p_no_id )||' found at no: '||TO_CHAR(l_no_id));      
+
+--  Nm_Debug.DEBUG('delaing with node '||TO_CHAR( p_no_id )||' found at no: '||TO_CHAR(l_no_id));
 
   g_cnct.nc_link.ncla_link.EXTEND ( nc - 1);
 
@@ -696,13 +696,13 @@ BEGIN
   Set_No_Ptrs( l_no, l_no_ptr );
 
   Set_Ne_Ptrs(l_ne);
-  
+
   reset_globals;
 
   g_cnct := nm_cnct( l_no_ptr, l_no, l_ne, l_la, NULL, NULL, NULL);
 
   g_cnct_instantiated := TRUE;
-  
+
 END;
 
 --
@@ -755,7 +755,7 @@ BEGIN
 
   Set_Ne_Ptrs ( l_ne );
 
-  reset_globals;  
+  reset_globals;
 
   g_cnct := nm_cnct( l_no_ptr, l_no, l_ne, l_la, NULL, NULL, NULL);
 
@@ -793,36 +793,36 @@ BEGIN
   ELSE
 
 --  Nm_Debug.debug_on;
-  
+
     l_ia := l_cnct_no.distinct_nodes;
-	
+
 --    Nm_Debug.DEBUG('distinct nodes retrieved');
-	
+
 --	for i in 1..l_ia.ia.last loop
-	
+
 --	  nm_debug.debug('distinct node '||to_char(i)||' = '||to_char(l_ia.ia(i)) );
-	  
+
 --	end loop;
 
     l_no_ptr := Set_Ia_Ptr( l_ia );
 
-  
+
     Set_No_Ptrs( l_cnct_no, l_no_ptr );
 
 --    Nm_Debug.DEBUG('Node ptrs');
-	  
+
     Set_Ne_Ptrs( l_cnct_ne );
 
 --    Nm_Debug.DEBUG('Node ptrs');
 
     reset_globals;
-	
+
     g_cnct := nm_cnct( l_no_ptr, l_cnct_no, l_cnct_ne, l_la, NVL( p_obj_type, Nm3net.get_gty_type( p_ne_id )), NULL, NULL);
-	
+
   END IF;
 
   g_cnct_instantiated := TRUE;
-  
+
 --  Nm_Debug.DEBUG('end of make_nm_cnct_from_ne');
 END;
 --
@@ -857,28 +857,28 @@ BEGIN
   ELSE
 
 --  nm_debug.debug_on;
-  
+
     l_ia := l_cnct_no.distinct_nodes;
-	
+
 --	for i in 1..l_ia.ia.last loop
-	
+
 --	  nm_debug.debug('distinct node '||to_char(i)||' = '||to_char(l_ia.ia(i)) );
-	  
+
 --	end loop;
 
     l_no_ptr := Set_Ia_Ptr( l_ia );
-  
+
     Set_No_Ptrs( l_cnct_no, l_no_ptr );
-  
+
     Set_Ne_Ptrs( l_cnct_ne );
 
     reset_globals;
-	
+
     g_cnct := nm_cnct( l_no_ptr, l_cnct_no, l_cnct_ne, l_la, p_obj_type, NULL, NULL);
-	
+
   END IF;
 
-  g_cnct_instantiated := TRUE;  
+  g_cnct_instantiated := TRUE;
 
 END;
 
@@ -908,14 +908,14 @@ CURSOR c1 ( c_ptr IN ptr_array, c_ncne IN nm_cnct_ne_array_type ) IS
   WHERE c.ptr_value = b.ne_id
   AND ROWNUM = 1
   ORDER BY c.ptr_id;
-  
+
 retval ptr_array := Nm3array.init_ptr_array;
 BEGIN
   OPEN c1( p_ptr, p_ncne );
   FETCH c1 BULK COLLECT INTO retval.pa;
   CLOSE c1;
   RETURN retval;
-END;      
+END;
 
 FUNCTION get_nearest ( p_nth_id IN INTEGER, p_x IN NUMBER, p_y IN NUMBER ) RETURN nm_lref IS
 l_ne ptr_array:= Nm3array.INIT_PTR_ARRAY;
@@ -925,17 +925,17 @@ BEGIN
 --  l_ne := Nm3sdo.Get_Batch_Of_Base_Nn( p_nth_id, Nm3sdo.get_2d_pt (p_x, p_y));
 
   l_ne := Get_Batch_Of_Base_Nn( p_nth_id, Nm3sdo.get_2d_pt (p_x, p_y), g_cnct.nc_ne_array.ncne_array);
-  
+
   IF l_ne.pa.LAST IS NULL OR l_ne.pa.LAST = 0 THEN
 --    Nm_Debug.debug_on;
 --    Nm_Debug.DEBUG('Probs ne.pa.last is '||TO_CHAR( l_ne.pa.LAST ));
-    
+
     RAISE_APPLICATION_ERROR(-20001, 'No street elements close enough to the xy co-ordinates');
-    
-  END IF;    
-  
+
+  END IF;
+
 --  l_ne := join_ne_array( l_ne, g_cnct.nc_ne_array.ncne_array );
-  
+
   l_ge := Nm3sdo.get_projection( p_nth_id, l_ne.pa(1).ptr_value, p_x, p_y );
 
   RETURN nm_lref( l_ne.pa(1).ptr_value, Nm3unit.get_formatted_value( l_ge.sdo_ordinates(3), Nm3net.get_nt_units_from_ne(l_ne.pa(1).ptr_value)));
@@ -995,48 +995,48 @@ BEGIN
   FOR i IN 1..l_last LOOP
     jpt := l_last - i + 1;
 	IF retval.npa_placement_array(jpt).pl_ne_id = p_pl.pl_ne_id THEN
-    
-      IF retval.npa_placement_array(jpt).pl_start >= p_pl.pl_start AND
-         retval.npa_placement_array(jpt).pl_end   <= p_pl.pl_end THEN      
 
---      Nm_Debug.DEBUG('remove row'); 
+      IF retval.npa_placement_array(jpt).pl_start >= p_pl.pl_start AND
+         retval.npa_placement_array(jpt).pl_end   <= p_pl.pl_end THEN
+
+--      Nm_Debug.DEBUG('remove row');
         NULL;
-       
+
 
       ELSIF retval.npa_placement_array(jpt).pl_start < p_pl.pl_start AND
             retval.npa_placement_array(jpt).pl_end   > p_pl.pl_end THEN
-            
+
 --      Nm_Debug.DEBUG('need to split the row - this should not happen');
         NULL;
 
       ELSIF retval.npa_placement_array(jpt).pl_start = p_pl.pl_start AND
             retval.npa_placement_array(jpt).pl_end   > p_pl.pl_end THEN
-            
+
 --      Nm_Debug.DEBUG('adjust the start - ');
 
-        retval.npa_placement_array(jpt) := nm_placement( p_pl.pl_ne_id, p_pl.pl_end, retval.npa_placement_array(jpt).pl_end, 0);                   
+        retval.npa_placement_array(jpt) := nm_placement( p_pl.pl_ne_id, p_pl.pl_end, retval.npa_placement_array(jpt).pl_end, 0);
 
       ELSIF retval.npa_placement_array(jpt).pl_start < p_pl.pl_start AND
             retval.npa_placement_array(jpt).pl_end   = p_pl.pl_end THEN
-            
+
 --      Nm_Debug.DEBUG('adjust the end');
 
-        retval.npa_placement_array(jpt) := nm_placement( p_pl.pl_ne_id,retval.npa_placement_array(jpt).pl_start, p_pl.pl_start, 0);                   
+        retval.npa_placement_array(jpt) := nm_placement( p_pl.pl_ne_id,retval.npa_placement_array(jpt).pl_start, p_pl.pl_start, 0);
 
       END IF;
-                                                                        
+
 	  EXIT;
-      
+
 	END IF;
   END LOOP;
   RETURN retval;
 END;
-   
+
 BEGIN
 
   IF is_cnct_instantiated = 0 THEN
     RAISE_APPLICATION_ERROR(-20001, 'Network not instantiated, cannot compute the connectivity');
-  END IF;    
+  END IF;
 
 --Timer.set_timer;
 
@@ -1050,12 +1050,12 @@ BEGIN
 
   l_start := get_nearest(p_layer, p_x1, p_y1);
   l_end   := get_nearest(p_layer, p_x2, p_y2);
-  
+
 --Timer.set_time('Start and end found');
-  
+
 --  Nm_Debug.DEBUG( 'st = '||TO_CHAR( l_start.lr_ne_id)||' - '||TO_CHAR(l_start.lr_offset));
 --  Nm_Debug.DEBUG( 'end= '||TO_CHAR( l_end.lr_ne_id)||' - '||TO_CHAR(l_end.lr_offset));
-  
+
   IF l_start.lr_ne_id = l_end.lr_ne_id THEN
 
 --	Nm_Debug.DEBUG('same element so no need for walking');
@@ -1086,86 +1086,86 @@ BEGIN
 	  make_cnct_from_line( p_layer, mdsys.sdo_geometry( 2002, NULL, NULL, mdsys.sdo_elem_info_array(1,2,1),mdsys.sdo_ordinate_array( p_x1, p_y1, p_x2, p_y2 )), 0.2 );
 
     END IF;
-		  
+
 --  Timer.set_time( 'cnct is made, get nearest nodes');
-    
+
     l_no_st := Get_Nearest_Node( l_start );
 
 	l_no_end := Get_Nearest_Node( l_end );
 
 --    Nm_Debug.DEBUG('st no = '||TO_CHAR(l_no_st));
 --    Nm_Debug.DEBUG('end no= '||TO_CHAR(l_no_end));
-		
-    IF p_compl_flag = 'Y' THEN
-	
-	  IF NOT g_cnct_complete THEN 
 
---      Timer.set_time('Instantiate and complete link table');      
-	    
+    IF p_compl_flag = 'Y' THEN
+
+	  IF NOT g_cnct_complete THEN
+
+--      Timer.set_time('Instantiate and complete link table');
+
 		instantiate_link_array;
 		complete_link_table;
-		
---      Timer.set_time('Instantiate and complete link table - finished');      
+
+--      Timer.set_time('Instantiate and complete link table - finished');
 
 	  END IF;
 
 --	  Nm_Debug.DEBUG('using a completed link');
 
 --    Timer.set_time( 'get path from complete link');
-      
+
   	  retval := get_path_from_complete_link( l_no_st, l_no_end );
 
 --    Timer.set_time( 'get path from complete link - finished');
 
 	ELSE
-	
+
 	  IF g_cnct_complete THEN
-	  
+
   --      Nm_Debug.DEBUG('Get path between nodes '||TO_CHAR(l_no_st)||' and '||TO_CHAR(l_no_end));
-		
+
 --      Timer.set_time( 'get path from complete link');
-      
+
 	    retval := get_path_from_complete_link( l_no_st, l_no_end );
 
 --      Timer.set_time( 'get path from complete link - finished');
-        
+
 --        Nm_Debug.DEBUG('end of get_path');
-				
+
 	  ELSE
-      
+
         IF l_no_st != l_no_end THEN
 
 --	      Nm_Debug.DEBUG('using a single node - from '||TO_CHAR(l_no_st)||' to '||TO_CHAR(l_no_end));
 
 --        Timer.set_time( 'init link table from single node');
-        
+
 	      init_link_from_node( l_no_st );
 
 --        Timer.set_time('init link form node has finished - now get the path');
-        
+
           retval := get_path( l_no_st, l_no_end );
 
 --   	  Timer.set_time('path from node has finished');
 
         ELSE
 
-/*        
-        
+/*
+
           DECLARE
             l_ne nm_cnct_ne_array;
           BEGIN
             l_ne := g_cnct.nc_ne_array.get_elements_in_array( int_array( int_array_type( l_start.lr_ne_id, l_end.lr_ne_id )));
-          
+
             retval := nm_placement_array( nm_placement_array_type( nm_placement( NULL, NULL, NULL, NULL )));
 
             FOR i IN 1.. l_ne.ncne_array.LAST LOOP
               retval := retval.add_element( nm_placement( l_ne.ncne_array(i).ne_id, 0, l_ne.ncne_array(i).ne_length, 0 ), FALSE );
             END LOOP;
-          END;            
+          END;
 
 */
           retval := nm_placement_array( nm_placement_array_type( nm_placement( NULL, NULL, NULL, NULL )));
-        
+
         END IF;
 
  	  END IF;
@@ -1174,45 +1174,45 @@ BEGIN
 --    Nm_Debug.debug_off;
 
 --  Timer.set_time('tidy up the partial bits');
-    
+
     l_st_in_path  := ( retval.find_element(l_start.lr_ne_id) > 0 );
 
     l_end_in_path := ( retval.find_element(l_end.lr_ne_id) > 0 );
 
 /*
     Nm_Debug.DEBUG('Find end element in path '||TO_CHAR(l_end.lr_ne_id ));
-    
+
     IF l_end_in_path THEN
       Nm_Debug.DEBUG('Found');
     ELSE
       Nm_Debug.DEBUG('not Found');
     END IF;
-*/    
+*/
 --
---  Now assess the fragments from the initial start/end point to the start/end node. 
+--  Now assess the fragments from the initial start/end point to the start/end node.
 --
 
 --     Nm_Debug.DEBUG( 'get end bits');
-  
+
      l_end_bits := g_cnct.nc_ne_array.get_elements_in_array( int_array(int_array_type(l_start.lr_ne_id, l_end.lr_ne_id)));
-  
+
 /*
      FOR i IN 1..l_end_bits.ncne_array.LAST LOOP
 
        Nm_Debug.DEBUG( TO_CHAR( l_end_bits.ncne_array(i).row_id)||', '||TO_CHAR( l_end_bits.ncne_array(i).ne_id )||', '||TO_CHAR( l_end_bits.ncne_array(i).no_st )||', '||TO_CHAR( l_end_bits.ncne_array(i).no_end ));
 
-     END LOOP;		
+     END LOOP;
 */
 
---	  
+--
      IF NOT l_st_in_path THEN
 --
 --     the starting element is not already in the path - we may need to add some
---	    
+--
        IF l_no_st = l_end_bits.ncne_array(1).no_st THEN
 
 --       The start node is the start of the path so the fragment from the start node to the starting measure needs to be added.
-         
+
 --       Nm_Debug.DEBUG( 'start/start - offset (add) = '||TO_CHAR(l_start.lr_offset));
 
          IF l_start.lr_offset > 0 THEN
@@ -1220,9 +1220,9 @@ BEGIN
          END IF;
 
  	   ELSIF l_no_st = l_end_bits.ncne_array(1).no_end THEN
-	
---       The start node is the end of the fist element so the fragment from the starting measure to the end node needs to be added. 
-  
+
+--       The start node is the end of the fist element so the fragment from the starting measure to the end node needs to be added.
+
 --       Nm_Debug.DEBUG( 'start/end - offset (add) = '||TO_CHAR(l_start.lr_offset)||' length = '||TO_CHAR(l_end_bits.ncne_array(1).ne_length));
 
          IF l_start.lr_offset < l_end_bits.ncne_array(1).ne_length THEN
@@ -1230,7 +1230,7 @@ BEGIN
          END IF;
 
 	   END IF;
-	
+
      ELSE
 
 --     the starting element is already included in the path - we may need to subtract some
@@ -1238,7 +1238,7 @@ BEGIN
        IF l_no_st = l_end_bits.ncne_array(1).no_st THEN
 
 --       The start node is the start of the path so the fragment from the start node to the starting measure needs to be subtracted
-         
+
 --       Nm_Debug.DEBUG( 'start/start - offset (minus) = '||TO_CHAR(l_start.lr_offset));
 
          IF l_start.lr_offset > 0 THEN
@@ -1247,9 +1247,9 @@ BEGIN
          END IF;
 
  	   ELSIF l_no_st = l_end_bits.ncne_array(1).no_end THEN
-	
---       The start node is the end of the fist element so the fragment from the starting measure to the end node needs to be added. 
-  
+
+--       The start node is the end of the fist element so the fragment from the starting measure to the end node needs to be added.
+
 --       Nm_Debug.DEBUG( 'start/end - offset (minus) = '||TO_CHAR(l_start.lr_offset)||' length = '||TO_CHAR(l_end_bits.ncne_array(1).ne_length));
 
          IF l_start.lr_offset < l_end_bits.ncne_array(1).ne_length THEN
@@ -1258,17 +1258,17 @@ BEGIN
          END IF;
 
 	   END IF;
-	
-     END IF;		
-	
+
+     END IF;
+
      IF NOT l_end_in_path THEN
 --
 --     the end element is not already in the path - we may need to add some
---	    
+--
        IF l_no_end = l_end_bits.ncne_array(2).no_st THEN
 
 --       end node is the end of path so add the fragment from the start node to the end measure.
-         
+
 --       Nm_Debug.DEBUG( 'end/start - offset (add) = '||TO_CHAR(l_end.lr_offset));
 
          IF l_end.lr_offset > 0 THEN
@@ -1276,9 +1276,9 @@ BEGIN
          END IF;
 
  	   ELSIF l_no_end = l_end_bits.ncne_array(2).no_end THEN
-	
---       The end node is the end of the last element so the fragment from the starting measure to the end node needs to be added. 
-  
+
+--       The end node is the end of the last element so the fragment from the starting measure to the end node needs to be added.
+
 --       Nm_Debug.DEBUG( 'end/end - offset (add) = '||TO_CHAR(l_end.lr_offset)||' length = '||TO_CHAR(l_end_bits.ncne_array(2).ne_length));
 
          IF l_end.lr_offset < l_end_bits.ncne_array(2).ne_length THEN
@@ -1286,15 +1286,15 @@ BEGIN
          END IF;
 
 	   END IF;
-	
+
      ELSE
 
 --     the last element is already included in the path - we may need to subtract some
 
        IF l_no_end = l_end_bits.ncne_array(2).no_st THEN
 
---       The end node is the start of the last element in the path so subtract 
-         
+--       The end node is the start of the last element in the path so subtract
+
 --       Nm_Debug.DEBUG( 'end/start - offset (minus) = '||TO_CHAR(l_end.lr_offset));
 
          IF l_end.lr_offset > 0 THEN
@@ -1303,9 +1303,9 @@ BEGIN
          END IF;
 
  	   ELSIF l_no_end = l_end_bits.ncne_array(2).no_end THEN
-	
---       The end node is the end of the last element so the fragment from the end measure to the end node needs to be subtracted 
-  
+
+--       The end node is the end of the last element so the fragment from the end measure to the end node needs to be subtracted
+
 --       Nm_Debug.DEBUG( 'end/end - offset (minus) = '||TO_CHAR(l_end.lr_offset)||' length = '||TO_CHAR(l_end_bits.ncne_array(2).ne_length));
 
          IF l_end.lr_offset < l_end_bits.ncne_array(2).ne_length THEN
@@ -1314,14 +1314,14 @@ BEGIN
          END IF;
 
 	   END IF;
-	
-     END IF;		
-	
+
+     END IF;
+
   END IF;
 
 --  Nm_Debug.DEBUG('end of get_pl_by_xy');
 --Timer.set_time('Finished');
-  
+
   RETURN retval;
 
 END;
@@ -1345,7 +1345,7 @@ BEGIN
   Nm_Cncts.make_cnct_from_tmp_extent( Create_Tmp_Spatial_Extent( l_theme_id, l_geom));
 
   g_cnct_instantiated := TRUE;
-  
+
 END;
 
 --
@@ -1359,7 +1359,7 @@ BEGIN
 
   g_start_node := NULL;
   g_end_node   := NULL;
-  
+
 END;
 
 --
@@ -1400,9 +1400,9 @@ BEGIN
   OPEN c_no( p_ne_id );
   FETCH c_no BULK COLLECT INTO retval.ncno_array;
   CLOSE c_no;
-    
+
   RETURN retval;
-  
+
 END;
 
 --
@@ -1435,9 +1435,9 @@ BEGIN
   FETCH c_no BULK COLLECT INTO retval.ncno_array;
   CLOSE c_no;
 */
-    
+
   RETURN retval;
-  
+
 END;
 
 --
@@ -1458,16 +1458,16 @@ BEGIN
   OPEN c_ne( p_ne_id );
   FETCH c_ne BULK COLLECT INTO retval.ncne_array;
   CLOSE c_ne;
-  
+
 --  Nm_Debug.debug_on;
 --  Nm_Debug.DEBUG('last = '||TO_CHAR(retval.ncne_array.LAST));
   IF retval.ncne_array.LAST IS NULL  THEN
     RAISE_APPLICATION_ERROR( -20001, 'Empty dataset, cannot instantiate the object');
   END IF;
 
-  
+
   RETURN retval;
-  
+
 END;
 
 --
@@ -1488,7 +1488,7 @@ curstr varchar2(2000);
 BEGIN
 
   curstr := ' SELECT /*+cardinality( a '||to_char(p_list.ia.last)||') */ '|| 'nm_cnct_ne(NULL, e.ne_id, e.ne_no_start, e.ne_no_end, ne_length) '||
-            ' FROM nm_elements e, TABLE ( ia ) a '||
+            ' FROM nm_elements e, TABLE ( :ia ) a '||
             ' WHERE e.ne_id = a.COLUMN_VALUE ';
 
 
@@ -1497,19 +1497,22 @@ BEGIN
   FETCH c_ne BULK COLLECT INTO retval.ncne_array;
   CLOSE c_ne;
 */
-  
+
 --  Nm_Debug.debug_on;
+
+--  nm_debug.debug(curstr);
+
 --  Nm_Debug.DEBUG('last = '||TO_CHAR(retval.ncne_array.LAST));
 
-  execute immediate curstr bulk collect into retval.ncne_array;
+  execute immediate curstr bulk collect into retval.ncne_array using p_list.ia;
 
   IF retval.ncne_array.LAST IS NULL  THEN
     RAISE_APPLICATION_ERROR( -20001, 'Empty dataset, cannot instantiate the object');
   END IF;
 
-  
+
   RETURN retval;
-  
+
 END;
 
 --
@@ -1520,15 +1523,15 @@ FUNCTION Create_Tmp_Spatial_Extent ( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TY
                                                        ,p_geom IN mdsys.sdo_geometry
 													   ,p_mask IN VARCHAR2 DEFAULT 'ANYINTERACT' ) RETURN NUMBER IS
 
-  
+
   lf     VARCHAR2(1) := CHR(13);
 
   cur_string Nm3type.max_varchar2;
-  
+
   l_nte      INTEGER := Nm3seq.next_nte_id_seq;
-  
+
   nthrow     NM_THEMES_ALL%ROWTYPE;
-  
+
 BEGIN
 
    nthrow := Nm3get.get_nth( p_theme_id );
@@ -1541,13 +1544,13 @@ BEGIN
        ' 1, rownum, null '||lf||
      ' from '||nthrow.nth_feature_table||'  s '||lf||
      ' where  sdo_relate(  s.'||nthrow.nth_feature_shape_column||' , :l_geom, '||''''||'mask='||p_mask||''''||') = '||''''||'TRUE'||'''';
-	 
+
   EXECUTE IMMEDIATE cur_string USING l_nte, p_geom;
-  
+
 --  Nm_Debug.DEBUG('Temp extent = '||TO_CHAR(l_nte));
-  
+
   RETURN l_nte;
-  
+
 END;
 --
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1558,7 +1561,7 @@ FUNCTION  is_cnct_instantiated RETURN INTEGER IS
 --                 two  for instantiated and having a completed link array
 BEGIN
   IF g_cnct_instantiated THEN
-    IF g_cnct_complete THEN 
+    IF g_cnct_complete THEN
       RETURN 2;
     ELSE
       RETURN 1;
@@ -1566,8 +1569,8 @@ BEGIN
   ELSE
     RETURN 0;
   END IF;
-END;                    
-  
+END;
+
 --
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --
@@ -1584,7 +1587,7 @@ cur_string VARCHAR2(2000);
 FUNCTION join_ncne ( p_pa IN ptr_array_type, p_ncne IN nm_cnct_ne_array_type ) RETURN ptr_array_type IS
 CURSOR c1 (  c_pa IN ptr_array_type, c_ncne IN nm_cnct_ne_array_type ) IS
   SELECT ptr( a.ptr_id, a.ptr_value )
-  FROM TABLE( c_pa ) a, 
+  FROM TABLE( c_pa ) a,
        TABLE( c_ncne ) b
   WHERE a.ptr_value = b.ne_id
   ORDER BY a.ptr_id;
@@ -1593,9 +1596,9 @@ BEGIN
   OPEN c1 ( p_pa, p_ncne);
   FETCH c1 BULK COLLECT INTO retval;
   CLOSE c1;
-    
+
   RETURN retval;
-END;         
+END;
 
 BEGIN
 
@@ -1618,11 +1621,11 @@ BEGIN
                 ' where dist <= '||NVL(nthrow.nth_tolerance, 10);
 
   EXECUTE IMMEDIATE cur_string BULK COLLECT INTO retval.pa USING p_geom; -- p_ne_array, p_geom;
-  
+
   IF retval.pa.LAST IS NOT NULL THEN
     retval.pa := join_ncne( retval.pa, p_ne_array );
-  END IF;    
-  
+  END IF;
+
   RETURN retval;
 END;
 
