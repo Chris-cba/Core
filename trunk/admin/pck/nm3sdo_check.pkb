@@ -4,16 +4,16 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.5   Jul 02 2008 19:50:26   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.6   Jul 17 2008 15:30:08   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_check.pkb  $
---       Date into PVCS   : $Date:   Jul 02 2008 19:50:26  $
---       Date fetched Out : $Modtime:   Jul 02 2008 19:50:00  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Jul 17 2008 15:30:08  $
+--       Date fetched Out : $Modtime:   Jul 17 2008 15:29:20  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --------------------------------------------------------------------------------
 --
   g_package_name          CONSTANT varchar2(30)    := 'nm3sdo_check';
-  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.5  $"';
+  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.6  $"';
   lf                      CONSTANT VARCHAR2(30)    := chr(10);
   g_write_to_file                  BOOLEAN         := FALSE;
   l_results                        nm3type.tab_varchar32767;
@@ -1088,7 +1088,8 @@ AS
     || '] has '||nth_sequence_name||' defined but the sequence does not exist'
       BULK COLLECT INTO l_results
       FROM nm_themes_all
-     WHERE NOT EXISTS 
+     WHERE nth_base_table_theme IS NULL
+       AND NOT EXISTS 
        ( SELECT 1 FROM user_sequences
           WHERE sequence_name = nth_sequence_name )
        AND nth_sequence_name IS NOT NULL;
@@ -1202,6 +1203,79 @@ AS
         put(l_results(i));
       END LOOP;
     END IF;
+--
+  ------------------------------------------------------------------------------
+  --
+    put(lf);
+    put('  ====================================================================');
+    put('  =  Out Of Step Theme Sequences');
+    put('  ====================================================================');
+    put(lf);
+--
+    DECLARE
+      l_curr_value  NUMBER;
+      l_table_value NUMBER;
+      b_found       BOOLEAN := FALSE;
+    BEGIN
+    --
+      FOR i IN (
+        SELECT *
+          FROM nm_themes_all
+         WHERE nth_sequence_name IS NOT NULL
+           AND nth_base_table_theme IS NULL
+           AND EXISTS (
+                  (SELECT 1
+                     FROM nm_nw_themes
+                    WHERE nnth_nth_theme_id = nth_theme_id)
+                  UNION
+                  (SELECT 1
+                     FROM nm_area_themes
+                    WHERE nath_nth_theme_id = nth_theme_id)
+                  UNION
+                  (SELECT 1
+                     FROM nm_inv_themes
+                    WHERE nith_nth_theme_id = nth_theme_id)
+                      ))
+      LOOP
+      --
+        BEGIN
+          l_curr_value := NULL;
+        --
+        -- Get the current sequence value
+          SELECT last_number INTO l_curr_value
+            FROM user_sequences
+           WHERE sequence_name = i.nth_sequence_name;
+        --
+          IF l_curr_value IS NOT NULL
+          THEN
+          --
+          -- Get the current table MAX value of OBJECTID
+            EXECUTE IMMEDIATE 'SELECT MAX(objectid) FROM '||i.nth_feature_table
+               INTO l_table_value;
+          --
+          -- Compare and raise
+            IF l_table_value > l_curr_value
+            THEN
+              b_found := TRUE;
+              put ( '    FAIL : Theme '||i.nth_theme_name||' ['||i.nth_feature_table||'] - '
+                                       ||i.nth_sequence_name||' ['||l_curr_value||
+                                      '] is less than the max OBJECTID - ['||l_table_value||']');
+            END IF;
+          --
+          END IF;
+        EXCEPTION
+          WHEN NO_DATA_FOUND
+          THEN NULL;
+        END;
+      --
+      END LOOP;
+      IF NOT b_found
+      THEN
+        put ('    PASS : All sequences are in step with feature table OBJECTIDs');
+      END IF;
+    --
+    END;
+--
   --
   ------------------------------------------------------------------------------
   --
