@@ -2,11 +2,11 @@ create or replace package body nm3dbg as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dbg.pkb-arc   2.0   Jul 23 2007 16:46:54   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dbg.pkb-arc   2.1   Jul 22 2008 11:41:52   ptanava  $
 --       Module Name      : $Workfile:   nm3dbg.pkb  $
---       Date into PVCS   : $Date:   Jul 23 2007 16:46:54  $
---       Date fetched Out : $Modtime:   Jul 23 2007 16:46:34  $
---       PVCS Version     : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Jul 22 2008 11:41:52  $
+--       Date fetched Out : $Modtime:   Jul 22 2008 11:40:08  $
+--       PVCS Version     : $Revision:   2.1  $
 --       Based on sccs version :
 --
 --   Author : Priidu Tanava
@@ -17,7 +17,12 @@ create or replace package body nm3dbg as
 --	Copyright (c) exor corporation ltd, 2005
 -----------------------------------------------------------------------------
 --
-  g_body_sccsid     constant  varchar2(2000) := '"$Revision:   2.0  $"';
+/* History
+  22.07.08 PT added rounding to timings to fix 10g different handling of localtimestamp
+*/
+
+
+  g_body_sccsid     constant  varchar2(2000) := '"$Revision:   2.1  $"';
   g_package_name    constant  varchar2(30)   := 'nm3dbg';
 
   
@@ -69,7 +74,7 @@ create or replace package body nm3dbg as
     if m_timing_on then
       select to_number(to_char(localtimestamp, 'SSSSS.FF')) t
       into l_timestamp from dual;
-      l_time := l_timestamp - m_timestamp;
+      l_time := round(l_timestamp - m_timestamp, 3)||' ';
     end if;
     nm_debug.debug(lpad(' ', m_ind * 2, ' ')||l_time);
     m_debug_on := false;
@@ -118,7 +123,7 @@ create or replace package body nm3dbg as
       if m_timing_on then
         select to_number(to_char(localtimestamp, 'SSSSS.FF')) t
         into l_timestamp from dual;
-        l_time := (l_timestamp - m_timestamp)||' ';
+        l_time := round(l_timestamp - m_timestamp, 3)||' ';
       end if;
       nm_debug.debug(lpad(' ', m_ind * 2, ' ')||l_time||p_text);
     end if;
