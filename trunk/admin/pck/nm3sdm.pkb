@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.10   Jul 11 2008 09:38:24   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.11   Jul 29 2008 15:14:24   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jul 11 2008 09:38:24  $
---       Date fetched Out : $Modtime:   Jul 11 2008 09:37:26  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jul 29 2008 15:14:24  $
+--       Date fetched Out : $Modtime:   Jul 29 2008 15:11:28  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.10  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.11  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -958,6 +958,8 @@ PROCEDURE split_element_shapes (
 --
 -----------------------------------------------------------------------------
 --
+--
+
    PROCEDURE reshape_element (
       p_ne_id   IN   nm_elements.ne_id%TYPE,
       p_geom    IN   MDSYS.SDO_GEOMETRY
@@ -965,7 +967,6 @@ PROCEDURE split_element_shapes (
    IS
       l_layer   NUMBER;
       l_geom    MDSYS.SDO_GEOMETRY;
-      l_errm    varchar2(100);
    BEGIN
       --nm_debug.debug_on;
       --nm_debug.debug('changing shapes');
@@ -978,28 +979,19 @@ PROCEDURE split_element_shapes (
 
          nm3sdo_edit.reshape ( l_layer, p_ne_id, p_geom );
 
-         commit;
-
-         --  nm_debug.debug('has shape in layer '|| to_char(l_layer));
-/*
-         Nm3sdo.delete_layer_shape (p_layer => l_layer, p_ne_id => p_ne_id);
-         Nm3sdo.insert_element_shape (p_layer      => l_layer,
-                                      p_ne_id      => p_ne_id,
-                                      p_geom       => p_geom
-                                     );
-*/
          --  nm_debug.debug_on;
          --  nm_debug.debug('changing shapes');
          Nm3sdo.Change_Affected_Shapes (p_layer      => l_layer,
                                         p_ne_id      => p_ne_id);
+      else
+         Nm3sdo.insert_element_shape (p_layer      => l_layer,
+                                      p_ne_id      => p_ne_id,
+                                      p_geom       => p_geom
+                                     );
+         Nm3sdo.Change_Affected_Shapes (p_layer      => l_layer,
+                                        p_ne_id      => p_ne_id);
       END IF;
 
-      exception
-        when others then
-          l_errm := sqlerrm;
-          nm3sdo_edit.reshape( l_layer, p_ne_id, p_geom );
-          commit;
-          raise_application_error( -20001, l_errm );
    END;
 --
 -----------------------------------------------------------------------------
