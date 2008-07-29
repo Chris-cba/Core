@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.1   Apr 21 2008 15:17:12   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.2   Jul 29 2008 22:05:48   rcoupe  $
 --       Module Name      : $Workfile:   nm3ausec.pkb  $
---       Date into PVCS   : $Date:   Apr 21 2008 15:17:12  $
---       Date fetched Out : $Modtime:   Apr 21 2008 15:14:14  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 29 2008 22:05:48  $
+--       Date fetched Out : $Modtime:   Jul 29 2008 22:04:26  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on
 --
 --   Author : Rob Coupe
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -762,7 +762,7 @@ BEGIN
 --If updating, then only if the begin or end mp have changed do we need to
 --check the au over the location.
 --
-  if  ((g_use_group_security = 'Y' and p_rec.nm_type_new = 'I' ) or g_use_group_security = 'N' ) then
+  if  ((g_use_group_security = 'N' and p_rec.nm_type_new = 'I' ) or g_use_group_security = 'Y' ) then
    IF   c_inserting
     OR (c_updating AND p_rec.nm_begin_mp_new       != p_rec.nm_begin_mp_old )
     OR (c_updating AND NVL(p_rec.nm_end_mp_new,-1) != NVL(p_rec.nm_end_mp_old,-1))
