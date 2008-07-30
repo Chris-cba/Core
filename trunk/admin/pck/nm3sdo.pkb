@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.5   Jul 11 2008 09:39:08   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.6   Jul 30 2008 10:28:28   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jul 11 2008 09:39:08  $
---       Date fetched Out : $Modtime:   Jul 11 2008 09:34:58  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Jul 30 2008 10:28:28  $
+--       Date fetched Out : $Modtime:   Jul 30 2008 10:26:08  $
+--       PVCS Version     : $Revision:   2.6  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.6  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -5868,7 +5868,7 @@ CURSOR c1( c_nth_id IN NUMBER ) IS
   AND   sdo_owner = Hig.get_application_owner
   AND   nth_theme_id = c_nth_id;
 
-dummy  mdsys.sdo_geom_metadata_table%ROWTYPE;
+dummy  sdo_geom_metadata_table%ROWTYPE; -- assumes synonym exists
 
 retval user_sdo_geom_metadata%ROWTYPE;
 
@@ -7046,21 +7046,16 @@ cur_string VARCHAR2(2000);
 
 BEGIN
 
-  if nvl(hig.get_sysopt('SDOUSEQT'), 'N') = 'Y' then
-    create_qtree_idx( p_table, p_column);
-  else
+  BEGIN
+    EXECUTE IMMEDIATE 'alter session set sort_area_size = 20000000';
+  EXCEPTION
+    WHEN OTHERS THEN NULL;
+  END;
 
-    BEGIN
-      EXECUTE IMMEDIATE 'alter session set sort_area_size = 20000000';
-    EXCEPTION
-      WHEN OTHERS THEN NULL;
-    END;
+  cur_string := 'create index '||SUBSTR( p_table, 1, 24)||'_spidx on '||p_table||' ( '||p_column||' ) indextype is mdsys.spatial_index'||
+                ' parameters ('||''''||'sdo_indx_dims=2'||''''||')';
 
-    cur_string := 'create index '||SUBSTR( p_table, 1, 24)||'_spidx on '||p_table||' ( '||p_column||' ) indextype is mdsys.spatial_index'||
-                  ' parameters ('||''''||'sdo_indx_dims=2'||''''||')';
-
-    EXECUTE IMMEDIATE cur_string;
-  end if;
+  EXECUTE IMMEDIATE cur_string;
 
 END;
 
@@ -8557,10 +8552,10 @@ IS
                ,pi_owner      IN VARCHAR2)
    IS
    BEGIN
-      DELETE FROM all_sdo_geom_metadata
-       WHERE owner = pi_owner
-         AND table_name = pi_table_name
-         AND column_name = pi_column;
+      DELETE FROM sdo_geom_metadata_table
+       WHERE sdo_owner = pi_owner
+         AND sdo_table_name = pi_table_name
+         AND sdo_column_name = pi_column;
    EXCEPTION
       WHEN NO_DATA_FOUND
       THEN NULL;
@@ -9405,7 +9400,7 @@ END;
       RETURN user_sdo_geom_metadata%ROWTYPE
    IS
       l_rec_usgm   user_sdo_geom_metadata%ROWTYPE;
-   dummy        mdsys.sdo_geom_metadata_table%ROWTYPE;
+   dummy        sdo_geom_metadata_table%ROWTYPE;
    BEGIN
       SELECT *
         INTO dummy
@@ -10244,8 +10239,8 @@ END;
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --
 
-FUNCTION get_srs_text( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE ) RETURN mdsys.cs_srs.wktext%TYPE IS
-retval mdsys.cs_srs.wktext%TYPE;
+FUNCTION get_srs_text( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE ) RETURN cs_srs.wktext%TYPE IS
+retval cs_srs.wktext%TYPE;
 CURSOR c1 ( c_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE ) IS
   SELECT wktext
   FROM NM_THEMES_ALL, mdsys.cs_srs c, user_sdo_geom_metadata u
