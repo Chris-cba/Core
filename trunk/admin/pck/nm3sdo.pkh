@@ -94,9 +94,9 @@ TYPE    nth_row_tab_type IS TABLE OF nth_row_type INDEX BY BINARY_INTEGER;
   FUNCTION Get_Batch_Of_Base_Nn( p_theme IN NUMBER, p_x IN NUMBER, p_y IN NUMBER )
     RETURN ptr_array;
 
-  FUNCTION Get_Batch_Of_Base_Nn( p_theme IN NUMBER, p_geom IN mdsys.sdo_geometry, p_ne_array IN  nm_cnct_ne_array_type ) 
+  FUNCTION Get_Batch_Of_Base_Nn( p_theme IN NUMBER, p_geom IN mdsys.sdo_geometry, p_ne_array IN  nm_cnct_ne_array_type )
     RETURN ptr_array;
-        
+
   FUNCTION get_nearest_nw_to_xy ( p_x IN NUMBER, p_y IN NUMBER,
                                   p_theme IN nm_theme_array ) RETURN nm_lref;
 
@@ -1703,8 +1703,8 @@ FUNCTION get_shape_length ( p_geom IN mdsys.sdo_geometry, p_nth_id IN nm_themes_
 -----------------------------------------------------------------------------
 
 --<PROC NAME="get_srs_text">
---Function to return srs text 
-FUNCTION get_srs_text( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE ) RETURN mdsys.cs_srs.wktext%TYPE;
+--Function to return srs text
+FUNCTION get_srs_text( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE ) RETURN cs_srs.wktext%TYPE;
 -----------------------------------------------------------------------------
 
 --all pragma definitions here
