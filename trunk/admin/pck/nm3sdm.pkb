@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.11   Jul 29 2008 15:14:24   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.12   Aug 01 2008 09:35:24   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Jul 29 2008 15:14:24  $
---       Date fetched Out : $Modtime:   Jul 29 2008 15:11:28  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Aug 01 2008 09:35:24  $
+--       Date fetched Out : $Modtime:   Aug 01 2008 09:34:44  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.11  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.12  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -8681,14 +8681,7 @@ PROCEDURE create_msv_feature_views
       l_higowner       VARCHAR2 (30)         := Hig.get_application_owner;
       l_tab_username   Nm3type.tab_varchar30;
       l_tab_ftabs      Nm3type.tab_varchar30;
---
       l_nl             VARCHAR2 (10)         := CHR (10);
---
-      e_no_users       EXCEPTION;
-      e_no_ftabs       EXCEPTION;
-      e_drop_syn       EXCEPTION;
-	  compile_error    EXCEPTION;
-	  PRAGMA EXCEPTION_INIT ( compile_error, -24344 );
 --
       FUNCTION is_priv_syn (
          pi_syn_name   IN   dba_synonyms.synonym_name%TYPE,
@@ -8704,17 +8697,11 @@ PROCEDURE create_msv_feature_views
            INTO l_var
            FROM dba_synonyms
           WHERE synonym_name = pi_syn_name AND owner = pi_owner;
-
          --
          RETURN TRUE;
       --
       EXCEPTION
-         WHEN NO_DATA_FOUND
-         THEN
-            RETURN FALSE;
-         WHEN OTHERS
-         THEN
-            RAISE;
+         WHEN OTHERS THEN RETURN FALSE;
       --
       END is_priv_syn;
 --
@@ -8732,12 +8719,7 @@ PROCEDURE create_msv_feature_views
                          WHERE username = hus_username
                            AND NVL(pi_username,'^$^') = NVL(hus_username,'^$^'));
       EXCEPTION
-         WHEN NO_DATA_FOUND
-         THEN
-            RAISE e_no_users;
-         WHEN OTHERS
-         THEN
-            RAISE;
+         WHEN OTHERS THEN NULL;
       END;
 
 --
@@ -8747,93 +8729,65 @@ PROCEDURE create_msv_feature_views
   -- not longer the case - will create views for all feature tables
   --
       BEGIN
-         SELECT table_name
-         BULK COLLECT INTO l_tab_ftabs
-           FROM user_sdo_geom_metadata;
-          --WHERE srid IS NOT NULL;
+        SELECT nth_feature_table
+          BULK COLLECT INTO l_tab_ftabs
+          FROM nm_themes_all
+         WHERE nth_theme_type = 'SDO'
+           AND EXISTS
+           (SELECT 1 FROM user_sdo_geom_metadata
+             WHERE table_name = nth_feature_table);
       EXCEPTION
-         WHEN NO_DATA_FOUND
-         THEN
-            RAISE e_no_ftabs;
-         WHEN OTHERS
-         THEN
-            RAISE;
+         WHEN OTHERS THEN NULL;
       END;
-
 --
+      IF l_tab_username.COUNT > 0
+      AND l_tab_ftabs.COUNT > 0
+      THEN 
   -- Create views for subordiate user(s)
-      FOR i IN 1 .. l_tab_username.COUNT
-      LOOP
-         FOR t IN 1 .. l_tab_ftabs.COUNT
-         LOOP
+        FOR i IN 1 .. l_tab_username.COUNT
+        LOOP
+          FOR t IN 1 .. l_tab_ftabs.COUNT
+          LOOP
             IF is_priv_syn (l_tab_ftabs (t), l_tab_username (i))
             THEN
-               BEGIN
+              BEGIN
 
-                  EXECUTE IMMEDIATE    'DROP SYNONYM '
-                                    || l_tab_username (i)
-                                    || '.'
-                                    || l_tab_ftabs (t);
-               EXCEPTION
-                  WHEN OTHERS
---            THEN RAISE e_drop_syn;
-                  THEN
-                     RAISE;
-               END;
+                EXECUTE IMMEDIATE    'DROP SYNONYM '
+                                  || l_tab_username (i)
+                                  || '.'
+                                  || l_tab_ftabs (t);
+              EXCEPTION
+                 WHEN OTHERS THEN NULL;
+              END;
             END IF;
 
             BEGIN
 
-               EXECUTE IMMEDIATE
-                                    'CREATE OR REPLACE FORCE VIEW '
-                                 || l_tab_username (i)
-                                 || '.'
-                                 || l_tab_ftabs (t)
-                                 || l_nl
-                                 || 'AS'
-                                 || l_nl
-                                 || '  SELECT * FROM '
-                                 || l_higowner
-                                 || '.'
-                                 || l_tab_ftabs (t);
+              EXECUTE IMMEDIATE
+                                   'CREATE OR REPLACE FORCE VIEW '
+                                || l_tab_username (i)
+                                || '.'
+                                || l_tab_ftabs (t)
+                                || l_nl
+                                || 'AS'
+                                || l_nl
+                                || '  SELECT * FROM '
+                                || l_higowner
+                                || '.'
+                                || l_tab_ftabs (t);
 
             EXCEPTION
-               WHEN compile_error
-               THEN
-                 nm_debug.debug ('Created with errors - '||l_tab_ftabs(t));
                WHEN OTHERS
-               THEN
-                  RAISE;
+               THEN NULL;
             END;
-         END LOOP;
-      END LOOP;
+          END LOOP;
+        END LOOP;
+      END IF;
 --
    EXCEPTION
-      WHEN e_no_users
-      THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 276,
-                        pi_sqlcode      => -20001
-                       );
---       raise_application_error (-20901, 'No subordinate users to process!');
-      WHEN e_no_ftabs
-      THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 277,
-                        pi_sqlcode      => -20001
-                       );
---        raise_application_error  'Creation of view(s) not neccessary - no layers use SRIDS' );
-      WHEN e_drop_syn
-      THEN
-         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
-                        pi_id           => 278,
-                        pi_sqlcode      => -20001,
-						pi_supplementary_info => SQLERRM||'-'||SQLCODE
-                       );
---        raise_application_error (-20903, 'Error dropping private synonym'|| SQLERRM || '-'  || SQLCODE );
       WHEN OTHERS
       THEN
-         RAISE;
+         NULL;
    END create_msv_feature_views;
 
 --
