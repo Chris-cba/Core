@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.6   Apr 10 2008 14:40:20   rcoupe  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.7   Aug 04 2008 16:17:06   aedwards  $
 --       Module Name      	: $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   	: $Date:   Apr 10 2008 14:40:20  $
---       Date fetched Out 	: $Modtime:   Apr 10 2008 14:38:20  $
---       PVCS Version     	: $Revision:   2.6  $
+--       Date into PVCS   	: $Date:   Aug 04 2008 16:17:06  $
+--       Date fetched Out 	: $Modtime:   Aug 04 2008 11:59:24  $
+--       PVCS Version     	: $Revision:   2.7  $
 --       Based on SCCS version 	: 1.53
 --
 --
@@ -519,31 +519,79 @@ END;
 -----------------------------------------------------------------------------
 --
 PROCEDURE refresh_public_synonyms IS
+----
+--   PRAGMA autonomous_transaction;
+----
+--BEGIN
+----
+--   Nm_Debug.proc_start(g_package_name,'refresh_public_synonyms');
+----
+--   IF NOT use_pub_syn
+--    THEN
+--      g_syn_exc_code := -20307;
+--      g_syn_exc_msg  := 'Application is configured to run using PRIVATE synonyms. Not creating PUBLIC synonyms';
+--      RAISE g_syn_exception;
+--   END IF;
+----
+--   FOR cs_rec IN cs_objects
+--    LOOP
+--      IF NOT check_syn_exists (c_public,cs_rec.object_name)
+--       THEN
+--         syn_exec_ddl('CREATE PUBLIC SYNONYM '||cs_rec.object_name
+--                      ||' FOR '||g_application_owner||'.'||cs_rec.object_name
+--                     );
+--      END IF;
+--   END LOOP;
+
+--   commit; --sscanlon fix 38046 26-SEP-2006
 --
    PRAGMA autonomous_transaction;
 --
+
+cursor cs_missing_synonyms is
+       SELECT object_name
+    FROM  ALL_OBJECTS
+    WHERE  owner = hig.get_application_owner
+    AND  (object_type IN ('TABLE'
+                         ,'VIEW'
+                         ,'FUNCTION'
+                         ,'PACKAGE'
+                         ,'PROCEDURE'
+                         ,'SEQUENCE'
+                         ,'TYPE'
+                         )
+          OR object_name IN ('RSE_HE_ID_SEQ','ROAD_SEG_MEMBS_PARTIAL','ROAD_SEGS_PARTIAL')
+         )
+    AND   object_name NOT IN ('SDE_EXCEPTIONS'
+                             ,'SDE_LOGFILES'
+                             ,'SDE_LOGFILE_DATA'
+                             ,'SDE_LOGFILE_LID_GEN' -- Omit SDE_ tables
+                             ,'INV_TMP'
+                             ,'TEMP_ADMIN_GROUPS'
+                             ,'TEMP_STR5080'
+                             ,'TEMP_STR5084' -- Exclude tables created by HIG1832 (create user)
+                             ,'TEMP_REPLACE_DEFECTS'   -- temp table created for MAI to support network edits
+                             ,'TEMP_UNREPLACE_DEFECTS' -- temp table created for MAI to support network edits
+                             ,'TEMP_UNSPLIT_DEFECTS'   -- temp table created for MAI to support network edits
+                             ,'TEMP_UNMERGE_DEFECTS'   -- temp table created for MAI to support network edits
+                             )
+    AND   object_name NOT LIKE 'BIN$%'
+    AND   not exists ( select 1 from all_synonyms s
+                       where s.synonym_name = object_name
+                       and   s.owner = 'PUBLIC'
+                       and   s.table_owner = hig.get_application_owner );
 BEGIN
 --
-   Nm_Debug.proc_start(g_package_name,'refresh_public_synonyms');
+   Nm_Debug.proc_start(g_package_name,'refresh_private_synonyms');
 --
-   IF NOT use_pub_syn
-    THEN
-      g_syn_exc_code := -20307;
-      g_syn_exc_msg  := 'Application is configured to run using PRIVATE synonyms. Not creating PUBLIC synonyms';
-      RAISE g_syn_exception;
-   END IF;
---
-   FOR cs_rec IN cs_objects
-    LOOP
-      IF NOT check_syn_exists (c_public,cs_rec.object_name)
-       THEN
-         syn_exec_ddl('CREATE PUBLIC SYNONYM '||cs_rec.object_name
+   FOR cs_rec IN cs_missing_synonyms
+   LOOP
+       syn_exec_ddl('CREATE PUBLIC SYNONYM '||cs_rec.object_name
                       ||' FOR '||g_application_owner||'.'||cs_rec.object_name
                      );
-      END IF;
    END LOOP;
 
-   commit; --sscanlon fix 38046 26-SEP-2006
+   commit;
 --
    Nm_Debug.proc_end(g_package_name,'refresh_public_synonyms');
 --
