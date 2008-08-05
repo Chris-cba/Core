@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.1   Jul 18 2007 15:20:36   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.2   Aug 05 2008 14:30:14   aedwards  $
 --       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:20:36  $
---       Date fetched Out : $Modtime:   Jun 29 2007 14:44:14  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Aug 05 2008 14:30:14  $
+--       Date fetched Out : $Modtime:   Jul 31 2008 08:57:56  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -479,6 +479,10 @@ BEGIN
       close_other_products ( p_ne_id
                             ,p_effective_date
                             );
+     UPDATE nm_nw_ad_link_all
+        SET nad_end_date = p_effective_date
+      WHERE nad_ne_id = p_ne_id;
+
     set_for_return;
     nm_debug.proc_end(g_package_name , 'do_close');
 --
