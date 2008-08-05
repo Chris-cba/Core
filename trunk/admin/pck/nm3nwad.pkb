@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.3   Aug 31 2007 17:34:30   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.4   Aug 05 2008 13:56:46   aedwards  $
 --       Module Name      : $Workfile:   nm3nwad.pkb  $
---       Date into PVCS   : $Date:   Aug 31 2007 17:34:30  $
---       Date fetched Out : $Modtime:   Aug 31 2007 16:42:58  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Aug 05 2008 13:56:46  $
+--       Date fetched Out : $Modtime:   Jul 23 2008 16:06:18  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --                       nm_nw_ad_link_all.nad_start_date and nm_inv_items_all.iit_start_date
 --                       must equal the start date of the element that the AD relates to
 --                       Also amended end_date_date_nadl to accept effective date parameter.
---                       Was previously assuming that end dating was always on nm3user.get_effective_date                   
+--                       Was previously assuming that end dating was always on nm3user.get_effective_date
 --
 -----------------------------------------------------------------------------
 --  Copyright (c) exor corporation ltd, 2004
@@ -36,7 +36,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.3  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.4  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'nm3nwad';
 
@@ -410,6 +410,48 @@ BEGIN
         l_rec_nadl.nad_start_date  := l_rec_ne.ne_start_date;
         l_rec_nadl.nad_ne_id       := l_rec_ne.ne_id;
         l_rec_nadl.nad_iit_ne_id   := l_tmp_iit;
+        l_rec_nadl.nad_whole_road  := 1;
+
+        CASE l_rec_inv.iit_inv_type
+        WHEN 'TP21'
+        THEN
+          IF l_rec_inv.iit_chr_attrib30 = 0
+          THEN
+            l_rec_nadl.nad_whole_road := 0;
+          END IF;
+        WHEN 'TP22'
+        THEN
+          IF l_rec_inv.iit_chr_attrib28 = 0
+          THEN
+            l_rec_nadl.nad_whole_road := 0;
+          END IF;
+        WHEN 'TP23'
+        THEN
+          IF l_rec_inv.iit_chr_attrib34 = 0
+          THEN
+            l_rec_nadl.nad_whole_road := 0;
+          END IF;
+        WHEN 'TP51'
+        THEN
+          IF l_rec_inv.iit_chr_attrib30 = 0
+          THEN
+            l_rec_nadl.nad_whole_road := 0;
+          END IF;
+        WHEN 'TP52'
+        THEN
+          IF l_rec_inv.iit_chr_attrib28 = 0
+          THEN
+            l_rec_nadl.nad_whole_road := 0;
+          END IF;
+        WHEN 'TP53'
+        THEN
+          IF l_rec_inv.iit_chr_attrib34 = '0'
+          THEN
+            l_rec_nadl.nad_whole_road := 0;
+          END IF;
+        ELSE
+          l_rec_nadl.nad_whole_road := 1;
+        END CASE;
 
         -- Create group inv link
         -- nm_debug.debug('create_any_group - > Create inv-group link');
@@ -476,7 +518,7 @@ BEGIN
 
   --create group
    Nm3net.insert_any_element(l_rec_ne);
-   
+
    -- Create associated inventory atts if present
    IF l_rec_inv.iit_admin_unit IS NOT NULL THEN
 
@@ -510,6 +552,47 @@ BEGIN
         l_rec_nadl.nad_start_date  := l_rec_ne.ne_start_date;
         l_rec_nadl.nad_ne_id       := l_rec_ne.ne_id;
         l_rec_nadl.nad_iit_ne_id   := l_tmp_iit;
+        
+        CASE l_rec_inv.iit_inv_type
+        WHEN 'TP21'
+        THEN
+          IF l_rec_inv.iit_chr_attrib30 = 0
+          THEN
+            l_rec_nadl.nad_whole_road := 0;
+          END IF;
+        WHEN 'TP22'
+        THEN
+          IF l_rec_inv.iit_chr_attrib28 = 0
+          THEN
+            l_rec_nadl.nad_whole_road := 0;
+          END IF;
+        WHEN 'TP23'
+        THEN
+          IF l_rec_inv.iit_chr_attrib34 = 0
+          THEN
+            l_rec_nadl.nad_whole_road := 0;
+          END IF;
+        WHEN 'TP51'
+        THEN
+          IF l_rec_inv.iit_chr_attrib30 = 0
+          THEN
+            l_rec_nadl.nad_whole_road := 0;
+          END IF;
+        WHEN 'TP52'
+        THEN
+          IF l_rec_inv.iit_chr_attrib28 = 0
+          THEN
+            l_rec_nadl.nad_whole_road := 0;
+          END IF;
+        WHEN 'TP53'
+        THEN
+          IF l_rec_inv.iit_chr_attrib34 = '0'
+          THEN
+            l_rec_nadl.nad_whole_road := 0;
+          END IF;
+        ELSE
+          l_rec_nadl.nad_whole_road := 1;
+        END CASE;
 
         -- Create group inv link
         -- nm_debug.debug('create_any_group - > Create inv-group link');
@@ -701,7 +784,7 @@ BEGIN
     g_iit_rec.iit_primary_key := TO_CHAR(g_iit_rec.iit_ne_id);
   END IF;
 
-  
+
   Nm3ins.ins_iit_all(p_rec_iit_all => g_iit_rec);
 
   RETURN g_iit_rec;
@@ -1107,12 +1190,12 @@ BEGIN
       Nm3nwad.end_date_nadl (pi_rec_nadl       => l_rec_nadl_prim
 	                        ,pi_effective_date => l_effective_date);
 
-      --	  
-      -- set start date of AD link record to be same as the inventory item which is same as element start date	  
+      --
+      -- set start date of AD link record to be same as the inventory item which is same as element start date
       --
 	  l_rec_nadl_prim.nad_start_date := l_rec_iit_prim_1.iit_start_date;
-	  
-	  
+
+
       -- Create Primary link for new element 1
       l_rec_nadl_prim.nad_ne_id     := pi_new_ne_id1;
       l_rec_nadl_prim.nad_iit_ne_id := l_rec_iit_prim_1.iit_ne_id;
@@ -1157,7 +1240,7 @@ BEGIN
 
          -- end date non primary link
          Nm3nwad.end_date_nadl (pi_rec_nadl       => l_tab_non_prim_nadl(i)
-  	                           ,pi_effective_date => l_effective_date);
+  	                            ,pi_effective_date => l_effective_date);
 
          -- Insert new inventory
          Nm3ins.ins_iit (l_rec_iit_np_1);
@@ -1332,7 +1415,7 @@ BEGIN
       UPDATE NM_INV_ITEMS_ALL
          SET iit_end_date = NULL
        WHERE iit_ne_id = l_rec_nadl_prim.nad_iit_ne_id;
-	   
+
       --
       -- derive start date of the AD Link record to be the start date of the new element
       --
@@ -1351,7 +1434,7 @@ BEGIN
 
    l_rec_nadl_prim := Nm3nwad.get_prim_nadl_from_ne_id(pi_old_ne_id2, FALSE);
 
-   IF  l_tab_non_prim_nadl1.COUNT > 0 
+   IF  l_tab_non_prim_nadl1.COUNT > 0
    AND l_rec_nadl_prim.nad_id     IS NOT NULL
    THEN
 
@@ -1364,7 +1447,7 @@ BEGIN
 
          end_date_nadl(pi_rec_nadl       => l_rec_nadl_non_prim
 		              ,pi_effective_date => l_effective_date);
-					  
+
          end_date_nadl(pi_rec_nadl       => l_rec_nadl_prim
 		              ,pi_effective_date => l_effective_date);
 
@@ -1581,7 +1664,7 @@ BEGIN
                                 ,pi_new_ne_nt_type        => pi_new_ne_nt_type
                                 ,pi_new_ne_gty_group_type => pi_new_ne_gty_group_type
       						    ,po_new_nad_id            => l_new_nad_id) THEN
-        
+
              -- create a duplicate inv item and associate with new element 1
              l_rec_iit_np                := Nm3get.get_iit_all (l_tab_non_prim_nadl(i).nad_iit_ne_id);
              l_rec_iit_np.iit_ne_id      := Nm3seq.next_ne_id_seq;
@@ -1600,14 +1683,14 @@ BEGIN
             --		 nm3debug.debug_iit(l_rec_iit_np);
             Nm3nwad.end_date_nadl (pi_rec_nadl => l_tab_non_prim_nadl(i)
 			                      ,pi_effective_date => l_effective_date);
-            Nm3ins.ins_iit_all (l_rec_iit_np);		 
+            Nm3ins.ins_iit_all (l_rec_iit_np);
             Nm3nwad.ins_nadl(l_rec_nadl_non_prim);
-			
+
 		 ELSE -- just end date the ad data
             Nm3nwad.end_date_nadl (pi_rec_nadl => l_tab_non_prim_nadl(i)
 			                      ,pi_effective_date => l_effective_date);
 
-         END IF;					 	
+         END IF;
 
       END LOOP;
    END IF;
@@ -1633,21 +1716,21 @@ PROCEDURE do_ad_replace
 
    l_rec_nadl_non_prim  NM_NW_AD_LINK%ROWTYPE;
    l_tab_non_prim_nadl  Nm3nwad.tab_nadl;
-   
+
    l_effective_date     DATE;
 
 BEGIN
 
    Nm_Debug.proc_start(g_package_name,'do_ad_replace');
 
-   l_effective_date := nm3get.get_ne_all(pi_ne_id => pi_new_ne_id).ne_start_date; -- end date to be start date of new element(s)   
+   l_effective_date := nm3get.get_ne_all(pi_ne_id => pi_new_ne_id).ne_start_date; -- end date to be start date of new element(s)
 
-   
+
    -- Get link record for primary AD from original element
    l_rec_nadl_prim := Nm3nwad.get_prim_nadl_from_ne_id
                         ( pi_nadl_ne_id      => pi_old_ne_id
                         , pi_raise_not_found => FALSE);
-						
+
    -- get non-primary ad
    l_tab_non_prim_nadl := Nm3nwad.get_non_prim_nadl_from_ne_id(pi_nadl_ne_id      => pi_old_ne_id
                                                               ,pi_end_dated       => FALSE
@@ -1801,14 +1884,14 @@ BEGIN
       LOOP
          -- Delete link
          l_rec_nadl_non_prim := l_tab_nadl_non_prim (i);
-         
+
          Nm3nwad.del_nadl (l_rec_nadl_non_prim);
          -- Delete inventory
          Nm3del.del_iit (l_rec_nadl_non_prim.nad_iit_ne_id);
       END LOOP;
    END IF;
 
-   l_tab_nadl_old := Nm3nwad.get_non_prim_nadl_from_ne_id 
+   l_tab_nadl_old := Nm3nwad.get_non_prim_nadl_from_ne_id
            ( pi_nadl_ne_id        => l_rec_element_hist.old_ne_id
              , pi_end_dated         => TRUE
              , pi_raise_not_found   => FALSE
@@ -1998,7 +2081,7 @@ BEGIN
    END IF;
   --
    BEGIN
-     EXECUTE IMMEDIATE l_sql 
+     EXECUTE IMMEDIATE l_sql
         INTO l_count USING pi_ne_id;
    EXCEPTION
      WHEN NO_DATA_FOUND
@@ -2476,7 +2559,7 @@ BEGIN
     , pi_nadl_rec.nad_ne_id
     , pi_nadl_rec.nad_start_date
 	, pi_nadl_rec.nad_end_date;
-	
+
 --
    Nm_Debug.proc_end(g_package_name,'ins_nadl');
 --
@@ -2488,7 +2571,7 @@ END ins_nadl;
 PROCEDURE end_date_nadl( pi_rec_nadl IN NM_NW_AD_LINK%ROWTYPE
                         ,pi_effective_date IN DATE  DEFAULT nm3user.get_effective_date )
 IS
-BEGIN 
+BEGIN
 --
    UPDATE NM_NW_AD_LINK_ALL
       SET nad_end_date  = pi_effective_date
@@ -2506,7 +2589,7 @@ BEGIN
 --       SET iit_end_date  = pi_effective_date
 --     WHERE iit_ne_id = pi_rec_nadl.nad_iit_ne_id
 -- 	   AND   iit_end_date IS NULL;
-	
+
 --
 END end_date_nadl;
 --
@@ -2521,10 +2604,10 @@ BEGIN
       SET nad_end_date  = pi_effective_date
     WHERE nad_ne_id     = pi_ne_id
 	  AND nad_end_date IS NULL;
-	  
+
 -- GJ 18-JUL-2006
 -- Note: Trigger on nm_nw_ad_link_all (nm_nw_ad_link_all_bu_trg)
---       will cascade end date the related nm_inv_item_all record	  
+--       will cascade end date the related nm_inv_item_all record
 --
 END end_date_all_ad_for_element;
 --
@@ -2888,8 +2971,8 @@ PROCEDURE get_prim_nadt_rc
      IF pi_gty_type IS NULL
        THEN
 
-       OPEN retval 
-            FOR 
+       OPEN retval
+            FOR
           SELECT *
             FROM NM_NW_AD_TYPES
            WHERE nad_nt_type = pi_nt_type
@@ -2900,7 +2983,7 @@ PROCEDURE get_prim_nadt_rc
        THEN
 
        OPEN retval
-             FOR 
+             FOR
           SELECT *
             FROM NM_NW_AD_TYPES
            WHERE nad_nt_type = pi_nt_type
@@ -2934,7 +3017,7 @@ BEGIN
       SELECT *
         FROM NM_NW_AD_LINK_ALL nadl
        WHERE nad_ne_id = pi_nadl_ne_id
-         AND EXISTS 
+         AND EXISTS
             (SELECT 1
                FROM NM_NW_AD_TYPES nadt
               WHERE nadl.nad_id = nadt.nad_id
@@ -2946,7 +3029,7 @@ BEGIN
       SELECT *
         FROM NM_NW_AD_LINK nadl
        WHERE nad_ne_id = pi_nadl_ne_id
-         AND EXISTS 
+         AND EXISTS
             (SELECT 1
                FROM NM_NW_AD_TYPES nadt
               WHERE nadl.nad_id = nadt.nad_id
@@ -2993,7 +3076,7 @@ BEGIN
          WHERE nad_ne_id = pi_nadl_ne_id
            AND EXISTS (SELECT 1
                          FROM NM_NW_AD_TYPES nadt
-                        WHERE nadt.nad_id = nadl.nad_id 
+                        WHERE nadt.nad_id = nadl.nad_id
                           AND nad_primary_ad = 'N');
 
    ELSE
@@ -3004,7 +3087,7 @@ BEGIN
          WHERE nad_ne_id = pi_nadl_ne_id
            AND EXISTS (SELECT 1
                          FROM NM_NW_AD_TYPES nadt
-                        WHERE nadt.nad_id = nadl.nad_id 
+                        WHERE nadt.nad_id = nadl.nad_id
                           AND nad_primary_ad = 'N');
    END IF;
 
@@ -3039,9 +3122,9 @@ BEGIN
 
   IF pi_gty_type IS NULL
   THEN
-  
+
     OPEN retval
-     FOR 
+     FOR
      SELECT *
        FROM NM_NW_AD_TYPES
       WHERE nad_nt_type = pi_nt_type
@@ -3154,8 +3237,8 @@ PROCEDURE create_group_with_prim_ad
             , pi_tab_nm     IN Nm3type.tab_number)
 IS
 
-TYPE tab_nm 
-  IS TABLE OF NM_MEMBERS%ROWTYPE 
+TYPE tab_nm
+  IS TABLE OF NM_MEMBERS%ROWTYPE
      INDEX BY BINARY_INTEGER;
 
    l_tab_nm    tab_nm;
@@ -3193,7 +3276,7 @@ BEGIN
 
   --create group
    Nm3net.insert_any_element(l_rec_ne);
-   
+
    -- Create associated inventory atts if present
    IF l_rec_iit.iit_admin_unit IS NOT NULL THEN
 
@@ -3293,7 +3376,7 @@ IS
 BEGIN
 
 -- Create associated inventory atts if present
-  IF l_rec_iit.iit_admin_unit IS NULL 
+  IF l_rec_iit.iit_admin_unit IS NULL
     THEN
     RAISE_APPLICATION_ERROR (-20502, 'Error with Non Primary AD Attribute values - Admin Unit must be set');
   ELSE
@@ -3308,10 +3391,10 @@ BEGIN
     EXCEPTION
       WHEN NO_DATA_FOUND
         THEN NULL;
-      WHEN OTHERS 
+      WHEN OTHERS
         THEN RAISE;
     END;
-    
+
     IF l_tab_nadt.COUNT = 0
     THEN
       -- No non-primary ad set up - so raise error
@@ -3369,7 +3452,7 @@ BEGIN
 EXCEPTION
   WHEN OTHERS
   THEN
-    l_found  := FALSE; 
+    l_found  := FALSE;
     RAISE;
 END append_datum_with_non_prim_ad;
 --
@@ -3391,7 +3474,7 @@ BEGIN
 --
 
 -- Create associated inventory atts if present
-  IF l_rec_iit.iit_admin_unit IS NULL 
+  IF l_rec_iit.iit_admin_unit IS NULL
     THEN
     RAISE_APPLICATION_ERROR (-20502, 'Error with Non Primary AD Attribute values - Admin Unit must be set');
   ELSE
@@ -3406,10 +3489,10 @@ BEGIN
     EXCEPTION
       WHEN NO_DATA_FOUND
         THEN NULL;
-      WHEN OTHERS 
+      WHEN OTHERS
         THEN RAISE;
     END;
-    
+
     IF l_tab_nadt.COUNT = 0
     THEN
       -- No non-primary ad set up - so raise error
@@ -3467,7 +3550,7 @@ BEGIN
 EXCEPTION
   WHEN OTHERS
   THEN
-    l_found  := FALSE; 
+    l_found  := FALSE;
     RAISE;
 END append_group_with_non_prim_ad;
 --
@@ -3569,22 +3652,22 @@ BEGIN
     IF l_rec_iit.iit_start_date IS NULL
       THEN l_rec_iit.iit_start_date := Nm3user.get_effective_date;
     END IF;
-  
-    IF l_rec_iit.iit_admin_unit IS NULL 
+
+    IF l_rec_iit.iit_admin_unit IS NULL
     THEN
       RAISE_APPLICATION_ERROR (-20502
        , 'Error with Non Primary AD Attribute values - Admin Unit must be set');
     END IF;
-  
+
   -- Initialise server
     Nm3nwad.iit_rec_init( pi_inv_type   => l_rec_iit.iit_inv_type
                         , pi_admin_unit => l_rec_iit.iit_admin_unit );
-  
+
     Nm3nwad.g_iit_rec := l_rec_iit;
-  
+
     -- Server inserts inv item
     l_tmp_iit_rec := Nm3nwad.iit_rec_insert_row;
-  
+
   -- set nad id above
    -- l_rec_nadl.nad_id := l_rec_nadt.nad_id;
     l_rec_nadl.nad_ne_id := l_ne_id;
@@ -3609,7 +3692,7 @@ PROCEDURE copy_ad_to_another_ne(pi_nad_inv_type       IN nm_nw_ad_types.nad_inv_
                                ,pi_ne_id_to           IN nm_elements_all.ne_id%TYPE
 							   ,pi_end_date_copy      IN BOOLEAN DEFAULT FALSE) IS
 
- CURSOR c1 IS 
+ CURSOR c1 IS
  SELECT  nad_id              nad_id
         ,nad_start_date      nad_start_date
         ,nad_iit_ne_id       iit_ne_id
@@ -3619,11 +3702,11 @@ PROCEDURE copy_ad_to_another_ne(pi_nad_inv_type       IN nm_nw_ad_types.nad_inv_
  WHERE  nad_ne_id    = pi_ne_id_from
  AND    iit_ne_id    = nad_iit_ne_id
  AND    iit_inv_type = pi_nad_inv_type;
- 
+
  l_iit_ne_id_new nm_inv_items_all.iit_ne_id%TYPE;
- l_nadl_rec      nm_nw_ad_link%ROWTYPE; 
- 
-							   
+ l_nadl_rec      nm_nw_ad_link%ROWTYPE;
+
+
 BEGIN
 
 
@@ -3637,7 +3720,7 @@ BEGIN
    nm3inv.copy_inv(pi_iit_ne_id      => i.iit_ne_id
                   ,pi_iit_start_date => i.iit_start_date
 				  ,po_iit_ne_id      => l_iit_ne_id_new);
-				  
+
    l_nadl_rec.nad_id         := i.nad_id;
    l_nadl_rec.nad_iit_ne_id  := l_iit_ne_id_new;
    l_nadl_rec.nad_ne_id      := pi_ne_id_to;
@@ -3645,38 +3728,38 @@ BEGIN
 
    IF pi_end_date_copy THEN
      l_nadl_rec.nad_end_date   :=  nm3user.get_effective_date;
-   ELSE 
+   ELSE
      l_nadl_rec.nad_end_date   :=  Null;
-   END IF;	 
-	  
+   END IF;
+
    ins_nadl( pi_nadl_rec => l_nadl_rec);
-   
+
    IF pi_end_date_copy THEN
       UPDATE nm_inv_items_all
 	  SET    iit_end_date = nm3user.get_effective_date
 	  WHERE  iit_ne_id = l_iit_ne_id_new;
-   END IF;				  
-				  
-   			  
+   END IF;
+
+
 
  END LOOP;
-  
+
 END copy_ad_to_another_ne;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_nadt_for_ne(pi_ne_id         IN nm_elements_all.ne_id%TYPE 
+FUNCTION get_nadt_for_ne(pi_ne_id         IN nm_elements_all.ne_id%TYPE
                         ,pi_nad_inv_type  IN nm_nw_ad_types.nad_inv_type%TYPE) RETURN nm_nw_ad_types%ROWTYPE IS
 
    l_rec_nadt NM_NW_AD_TYPES%ROWTYPE;
-   
+
 BEGIN
 
    SELECT typ.*
      INTO l_rec_nadt
      FROM nm_elements_all ne
-         ,nm_nw_ad_types typ	 
-    WHERE ne_id = pi_ne_id  
+         ,nm_nw_ad_types typ
+    WHERE ne_id = pi_ne_id
  	  AND nad_nt_type  = ne_nt_type
       AND nad_gty_type = ne_gty_group_type
 	  AND nad_inv_type = pi_nad_inv_type;
@@ -3742,22 +3825,22 @@ FUNCTION ad_is_valid_on_new_ne(pi_old_nad_id            IN nm_nw_ad_types.nad_id
                               ,pi_new_ne_nt_type        IN nm_elements.ne_nt_type%TYPE
                               ,pi_new_ne_gty_group_type IN nm_elements.ne_gty_group_type%TYPE
       						  ,po_new_nad_id            OUT nm_nw_ad_types.nad_id%TYPE) RETURN BOOLEAN IS
-  CURSOR c1 IS							  
-  select nadt2.nad_id 
-  from nm_nw_ad_types nadt1 
-      ,nm_nw_ad_types nadt2 
-  where nadt1.nad_id = pi_old_nad_id 
+  CURSOR c1 IS
+  select nadt2.nad_id
+  from nm_nw_ad_types nadt1
+      ,nm_nw_ad_types nadt2
+  where nadt1.nad_id = pi_old_nad_id
   and  nadt2.nad_nt_type = pi_new_ne_nt_type
-  and  NVL(nadt2.nad_gty_type,'-1') = NVL(pi_new_ne_gty_group_type,'-1') 
+  and  NVL(nadt2.nad_gty_type,'-1') = NVL(pi_new_ne_gty_group_type,'-1')
   and  nadt2.nad_inv_type = nadt1.nad_inv_type;
 
-  
+
 BEGIN
 
  OPEN c1;
  FETCH c1 INTO po_new_nad_id;
  CLOSE c1;
- 
+
  RETURN(po_new_nad_id IS NOT NULL);
 
 
@@ -3771,16 +3854,16 @@ BEGIN
 
  RETURN(nm3get.get_ne_all(pi_ne_id => pi_nad_ne_id).ne_start_date);
 
-END primary_ad_link_start_date; 
+END primary_ad_link_start_date;
 --
 -----------------------------------------------------------------------------
 --
 -- MJA add 31-Aug-07
 -- Speaks for itself.  If true then bypass triggers.
--- To be called in NM_NW_AD_LINK_AS, NM_NW_AD_LINK_BR triggers to see if 
+-- To be called in NM_NW_AD_LINK_AS, NM_NW_AD_LINK_BR triggers to see if
 --  bypass required
 --
-FUNCTION bypass_nw_ad_link_all 
+FUNCTION bypass_nw_ad_link_all
   RETURN BOOLEAN
 IS
   --
@@ -3805,6 +3888,6 @@ Begin
 End bypass_nw_ad_link_all;
 --
 -----------------------------------------------------------------------------
---   
+--
 END Nm3nwad;
 /
