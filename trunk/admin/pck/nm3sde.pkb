@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.2   Jun 26 2008 15:18:06   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.3   Aug 05 2008 16:12:40   rcoupe  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Jun 26 2008 15:18:06  $
---       Date fetched Out : $Modtime:   Jun 26 2008 15:13:52  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Aug 05 2008 16:12:40  $
+--       Date fetched Out : $Modtime:   Aug 05 2008 16:08:24  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -1482,6 +1482,7 @@ EXCEPTION
 END;
 
 -----------------------------------------------------------------------------------------
+/*
 
 FUNCTION get_keyword RETURN VARCHAR2 IS
 retval VARCHAR2(32);
@@ -1498,6 +1499,7 @@ EXCEPTION
   WHEN TOO_MANY_ROWS THEN
     RAISE_APPLICATION_ERROR( -20001, 'Too many Keywords' );
 END;
+*/
 ----------------------------------------------------------------------------------------------
 ---
 PROCEDURE copy_sde_obj_from_theme( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE,
