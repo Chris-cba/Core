@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE Nm3sde AS
 -- Hihways owner
 
    g_owner hig_users.hus_username%TYPE := Hig.get_application_owner;
-   
+
 --</GLOBVAR>
 --
   /* Type definitions.required by SDE */
@@ -184,7 +184,7 @@ FUNCTION get_xyunits( p_diminfo IN mdsys.sdo_dim_array ) RETURN NUMBER;
 --FUNCTION get_xyunits( p_layer_id IN sde.layers.layer_id%TYPE) RETURN NUMBER;
 --FUNCTION get_xyunits( xmin IN NUMBER, xmax IN NUMBER, ymin IN NUMBER, ymax IN NUMBER ) RETURN NUMBER;
 
-PROCEDURE drop_sub_layer_by_table 
+PROCEDURE drop_sub_layer_by_table
            ( p_table    IN   VARCHAR2
            , p_column   IN   VARCHAR2
            , p_owner    IN   VARCHAR2 DEFAULT NULL);
@@ -195,7 +195,7 @@ PROCEDURE del_treg( p_table IN VARCHAR2, p_owner IN VARCHAR2);
 
 PROCEDURE del_layer( p_layer IN NUMBER );
 
-FUNCTION get_keyword RETURN VARCHAR2;
+--FUNCTION get_keyword RETURN VARCHAR2;
 
 PROCEDURE create_sub_sde_layer
             (p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE
