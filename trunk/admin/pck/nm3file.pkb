@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.2   Nov 21 2007 09:45:02   jwadsworth  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.3   Aug 06 2008 15:27:06   bodriscoll  $
 -- Module Name : $Workfile:   nm3file.pkb  $
--- Date into PVCS : $Date:   Nov 21 2007 09:45:02  $
--- Date fetched Out : $Modtime:   Nov 21 2007 09:44:28  $
--- PVCS Version : $Revision:   2.2  $
+-- Date into PVCS : $Date:   Aug 06 2008 15:27:06  $
+-- Date fetched Out : $Modtime:   Aug 06 2008 15:22:40  $
+-- PVCS Version : $Revision:   2.3  $
 -- Based on SCCS version : 
 --
 --
@@ -115,8 +115,18 @@ procedure write_blob
   , p_file_name in varchar2
   ) is
 
-l_buffer        RAW(32767);
-l_buffer_size   CONSTANT BINARY_INTEGER := 32767;
+--77921 BOD 06/08/2008 
+--Have changed both l_buffer and l_buffer_size to 16383 from their original size of 32767. 
+--We were getting the error ORA-06502: PL/SQL: numeric or value error: character string buffer too small
+--when the statement l_buffer := replace( l_buffer, chr(13) ) ;  was executed. 
+--By reducing the buffer_size in half, the above statement executes successfully. 
+--However it will increase the number of loop iterations for files greater than 16383 chars.
+--
+--l_buffer        RAW(32767);
+--l_buffer_size   CONSTANT BINARY_INTEGER := 32767;
+l_buffer        RAW(16383);
+l_buffer_size   CONSTANT BINARY_INTEGER := 16383;
+
 l_amount        BINARY_INTEGER;
 l_offset        NUMBER(38);
 l_file_handle   UTL_FILE.FILE_TYPE;
