@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.7   Aug 04 2008 16:17:06   aedwards  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.8   Aug 07 2008 13:55:26   gjohnson  $
 --       Module Name      	: $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   	: $Date:   Aug 04 2008 16:17:06  $
---       Date fetched Out 	: $Modtime:   Aug 04 2008 11:59:24  $
---       PVCS Version     	: $Revision:   2.7  $
+--       Date into PVCS   	: $Date:   Aug 07 2008 13:55:26  $
+--       Date fetched Out 	: $Modtime:   Aug 07 2008 13:54:58  $
+--       PVCS Version     	: $Revision:   2.8  $
 --       Based on SCCS version 	: 1.53
 --
 --
@@ -2057,6 +2057,23 @@ BEGIN
     '-----------------------------------------------------------------------------';
 --
 END get_sccs_comments;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION sequence_nextval(pi_sequence_name IN VARCHAR2) RETURN PLS_INTEGER IS
+ 
+l_refcur nm3type.ref_cursor;
+l_retval PLS_INTEGER;
+
+BEGIN
+
+ OPEN l_refcur for 'select '||pi_sequence_name||'.nextval from dual';
+ FETCH l_refcur INTO l_retval;
+ CLOSE l_refcur;
+
+ RETURN(l_retval); 
+
+END sequence_nextval;
 --
 -----------------------------------------------------------------------------
 --
