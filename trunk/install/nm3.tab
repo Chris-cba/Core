@@ -1,10 +1,10 @@
 -- PVCS Identifiers :-
 --
--- sccsid                : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.8   Jun 06 2008 10:23:58   Chris Parkinson  $
+-- sccsid                : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.9   Aug 07 2008 15:08:30   malexander  $
 -- Module Name           : $Workfile:   nm3.tab  $
--- Date into PVCS        : $Date:   Jun 06 2008 10:23:58  $
--- Date fetched Out      : $Modtime:   Jun 06 2008 10:18:02  $
--- PVCS Version          : $Revision:   2.8  $
+-- Date into PVCS        : $Date:   Aug 07 2008 15:08:30  $
+-- Date fetched Out      : $Modtime:   Aug 07 2008 15:06:42  $
+-- PVCS Version          : $Revision:   2.9  $
 --
 -- Generated for Oracle 9i on Fri Jun 06  10:03:09 2008 by Server Generator 9.0.2.94.12
  
@@ -1223,7 +1223,7 @@ CREATE TABLE HIG_PRODUCTS
 
 PROMPT Creating Table 'HIG_PU'
 CREATE TABLE HIG_PU
- (HPU_PID VARCHAR2(15)
+ (HPU_PID VARCHAR2(20)
  ,HPU_START DATE
  ,HPU_NAME VARCHAR2(30)
  ,HPU_PRODUCT VARCHAR2(6)
