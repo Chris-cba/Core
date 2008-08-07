@@ -400,6 +400,12 @@ RETURN VARCHAR2;
 --</PROC>
 --
 -----------------------------------------------------------------------------
+--<PROC NAME="sequence_nextval">
+-- supply it with the name of a sequence and it'll give you the nextval back
+FUNCTION sequence_nextval(pi_sequence_name IN VARCHAR2) RETURN PLS_INTEGER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
 --
 --<PRAGMA>
    PRAGMA RESTRICT_REFERENCES (get_version, wnps, wnds);
