@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.3   Aug 05 2008 16:12:40   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.4   Aug 07 2008 14:31:36   aedwards  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Aug 05 2008 16:12:40  $
---       Date fetched Out : $Modtime:   Aug 05 2008 16:08:24  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Aug 07 2008 14:31:36  $
+--       Date fetched Out : $Modtime:   Aug 07 2008 14:30:50  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -288,7 +288,12 @@ BEGIN
 --  If it is a DB link then it is assumed SDE can see the table anyway, preferably with a public
 --  DB link (and appropriate privileges)
 
-    EXECUTE IMMEDIATE 'grant all on '||p_layer.table_name||' to SDE';
+    DECLARE
+      l_str   VARCHAR2(2000);
+    BEGIN
+      l_str := 'grant all on '||p_layer.table_name||' to SDE';
+      EXECUTE IMMEDIATE l_str;
+    END;
 
   END IF;
 
