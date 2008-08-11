@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3seq IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3seq.pkb-arc   2.5   Jan 28 2008 10:52:54   jwadsworth  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3seq.pkb-arc   2.6   Aug 11 2008 16:15:52   malexander  $
 --       Module Name      : $Workfile:   nm3seq.pkb  $
---       Date into PVCS   : $Date:   Jan 28 2008 10:52:54  $
---       Date fetched Out : $Modtime:   Jan 27 2008 18:29:50  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Aug 11 2008 16:15:52  $
+--       Date fetched Out : $Modtime:   Aug 11 2008 16:07:28  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3seq IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.5  $"
+--   nm3get_gen body   : "$Revision:   2.6  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3seq IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3seq';
