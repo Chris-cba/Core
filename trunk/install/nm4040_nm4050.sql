@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4040_nm4050.sql-arc   3.0   Apr 14 2008 10:15:00   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4040_nm4050.sql-arc   3.1   Aug 11 2008 17:27:06   malexander  $
 --       Module Name      : $Workfile:   nm4040_nm4050.sql  $
---       Date into PVCS   : $Date:   Apr 14 2008 10:15:00  $
---       Date fetched Out : $Modtime:   Apr 14 2008 10:14:20  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Aug 11 2008 17:27:06  $
+--       Date fetched Out : $Modtime:   Aug 11 2008 17:04:06  $
+--       Version          : $Revision:   3.1  $
 --
 --   Product upgrade script
 --
@@ -67,7 +67,7 @@ prompt About TO upgrade using exor base : &exor_base
 prompt
 ACCEPT ok_res prompt "OK to Continue with this setting ? (Y/N) "
 SELECT DECODE(UPPER('&ok_res'),'Y','&exor_base'||'nm3'||'&terminator'||
-        'install'||'&terminator'||'nm4040_nm4050_upg.sql','exit') run_file
+        'install'||'&terminator'||'nm404x_nm4050_upg.sql','exit') run_file
 FROM dual
 /
 start '&run_file'
