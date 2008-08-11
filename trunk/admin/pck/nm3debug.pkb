@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.5   Jan 28 2008 10:52:52   jwadsworth  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.6   Aug 11 2008 16:15:44   malexander  $
 --       Module Name      : $Workfile:   nm3debug.pkb  $
---       Date into PVCS   : $Date:   Jan 28 2008 10:52:52  $
---       Date fetched Out : $Modtime:   Jan 27 2008 18:29:50  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Aug 11 2008 16:15:44  $
+--       Date fetched Out : $Modtime:   Aug 11 2008 16:07:28  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.5  $"
+--   nm3get_gen body   : "$Revision:   2.6  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3debug';
@@ -5596,6 +5596,7 @@ BEGIN
    nm_debug.debug('no_date_modified : '||pi_rec_no.no_date_modified,p_level);
    nm_debug.debug('no_modified_by   : '||pi_rec_no.no_modified_by,p_level);
    nm_debug.debug('no_created_by    : '||pi_rec_no.no_created_by,p_level);
+   nm_debug.debug('no_purpose       : '||pi_rec_no.no_purpose,p_level);
 --
    nm_debug.proc_end(g_package_name,'debug_no');
 --
@@ -5619,6 +5620,7 @@ BEGIN
    nm_debug.debug('no_date_modified : '||pi_rec_no_all.no_date_modified,p_level);
    nm_debug.debug('no_modified_by   : '||pi_rec_no_all.no_modified_by,p_level);
    nm_debug.debug('no_created_by    : '||pi_rec_no_all.no_created_by,p_level);
+   nm_debug.debug('no_purpose       : '||pi_rec_no_all.no_purpose,p_level);
 --
    nm_debug.proc_end(g_package_name,'debug_no_all');
 --
