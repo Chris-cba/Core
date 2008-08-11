@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_metadata_upg.sql-arc   3.1   Aug 11 2008 09:58:36   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_metadata_upg.sql-arc   3.2   Aug 11 2008 16:41:10   malexander  $
 --       Module Name      : $Workfile:   nm4046_nm4050_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Aug 11 2008 09:58:36  $
---       Date fetched Out : $Modtime:   Aug 11 2008 09:55:14  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Aug 11 2008 16:41:10  $
+--       Date fetched Out : $Modtime:   Aug 11 2008 16:33:32  $
+--       Version          : $Revision:   3.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -147,6 +147,21 @@ UPDATE nm_nw_ad_link_all
 
 ALTER TABLE nm_nw_ad_link_all ENABLE ALL TRIGGERS;
 
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Create public synonym for mdsyssdo_geom_metadata_table
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (MICHAEL ALEXANDER)
+-- **** COMMENTS TO BE ADDED BY MICHAEL ALEXANDER ****
+-- 
+------------------------------------------------------------------
+Create Public Synonym sdo_geom_metadata_table for mdsys.sdo_geom_metadata_table;
 ------------------------------------------------------------------
 
 
