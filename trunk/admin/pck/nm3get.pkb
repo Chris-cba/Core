@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkb-arc   2.5   Jan 28 2008 10:52:54   jwadsworth  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkb-arc   2.6   Aug 11 2008 16:15:48   malexander  $
 --       Module Name      : $Workfile:   nm3get.pkb  $
---       Date into PVCS   : $Date:   Jan 28 2008 10:52:54  $
---       Date fetched Out : $Modtime:   Jan 27 2008 18:29:50  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Aug 11 2008 16:15:48  $
+--       Date fetched Out : $Modtime:   Aug 11 2008 16:07:26  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.5  $"
+--   nm3get_gen body   : "$Revision:   2.6  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3get';
@@ -1893,52 +1893,6 @@ END get_gss;
 -----------------------------------------------------------------------------
 --
 --
---   Function to get using GRS_PK constraint
---
-FUNCTION get_grs (pi_grs_line_no       gri_spool.grs_line_no%TYPE
-                 ,pi_grs_job_id        gri_spool.grs_job_id%TYPE
-                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                 ) RETURN gri_spool%ROWTYPE IS
---
-   CURSOR cs_grs IS
-   SELECT /*+ INDEX (grs GRS_PK) */ *
-    FROM  gri_spool grs
-   WHERE  grs.grs_line_no = pi_grs_line_no
-    AND   grs.grs_job_id  = pi_grs_job_id;
---
-   l_found  BOOLEAN;
-   l_retval gri_spool%ROWTYPE;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'get_grs');
---
-   OPEN  cs_grs;
-   FETCH cs_grs INTO l_retval;
-   l_found := cs_grs%FOUND;
-   CLOSE cs_grs;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'gri_spool (GRS_PK)'
-                                              ||CHR(10)||'grs_line_no => '||pi_grs_line_no
-                                              ||CHR(10)||'grs_job_id  => '||pi_grs_job_id
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'get_grs');
---
-   RETURN l_retval;
---
-END get_grs;
---
------------------------------------------------------------------------------
---
---
 --   Function to get using HAD_PK constraint
 --
 FUNCTION get_had (pi_had_id            hig_address.had_id%TYPE
@@ -3484,49 +3438,6 @@ BEGIN
    RETURN l_retval;
 --
 END get_hus;
---
------------------------------------------------------------------------------
---
---
---   Function to get using HUH_PK constraint
---
-FUNCTION get_huh (pi_huh_user_id       hig_user_history.huh_user_id%TYPE
-                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                 ) RETURN hig_user_history%ROWTYPE IS
---
-   CURSOR cs_huh IS
-   SELECT /*+ INDEX (huh HUH_HUS_FK_IND) */ *
-    FROM  hig_user_history huh
-   WHERE  huh.huh_user_id = pi_huh_user_id;
---
-   l_found  BOOLEAN;
-   l_retval hig_user_history%ROWTYPE;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'get_huh');
---
-   OPEN  cs_huh;
-   FETCH cs_huh INTO l_retval;
-   l_found := cs_huh%FOUND;
-   CLOSE cs_huh;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'hig_user_history (HUH_PK)'
-                                              ||CHR(10)||'huh_user_id => '||pi_huh_user_id
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'get_huh');
---
-   RETURN l_retval;
---
-END get_huh;
 --
 -----------------------------------------------------------------------------
 --
