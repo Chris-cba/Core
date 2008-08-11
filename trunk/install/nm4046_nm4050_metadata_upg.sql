@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_metadata_upg.sql-arc   3.0   Aug 08 2008 10:02:34   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_metadata_upg.sql-arc   3.1   Aug 11 2008 09:58:36   malexander  $
 --       Module Name      : $Workfile:   nm4046_nm4050_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Aug 08 2008 10:02:34  $
---       Date fetched Out : $Modtime:   Aug 08 2008 10:01:22  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Aug 11 2008 09:58:36  $
+--       Date fetched Out : $Modtime:   Aug 11 2008 09:55:14  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -118,6 +118,35 @@ FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'NET'
                     AND  NER_ID = 454);
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT NM_NW_AD_LINK_ALL correction
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- End date any NM_NW_AD_LINK_ALL records that refer to end-dated Elements
+-- 
+------------------------------------------------------------------
+ALTER TABLE nm_nw_ad_link_all DISABLE ALL TRIGGERS;
+
+UPDATE nm_nw_ad_link_all
+   SET nad_end_date = (SELECT ne_end_date 
+                         FROM nm_elements_all
+                        WHERE ne_id = nad_ne_id)
+ WHERE nad_end_date IS NULL
+   AND EXISTS
+         (SELECT 1 
+            FROM NM_ELEMENTS_ALL
+           WHERE ne_end_date IS NOT NULL
+             AND ne_id = nad_ne_id);
+
+ALTER TABLE nm_nw_ad_link_all ENABLE ALL TRIGGERS;
+
 ------------------------------------------------------------------
 
 
