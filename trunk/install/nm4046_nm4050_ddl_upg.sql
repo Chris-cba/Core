@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.0   Aug 08 2008 10:02:36   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.1   Aug 11 2008 09:58:38   malexander  $
 --       Module Name      : $Workfile:   nm4046_nm4050_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Aug 08 2008 10:02:36  $
---       Date fetched Out : $Modtime:   Aug 08 2008 10:01:22  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Aug 11 2008 09:58:38  $
+--       Date fetched Out : $Modtime:   Aug 11 2008 09:55:14  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -220,6 +220,28 @@ SET TERM OFF
 ------------------------------------------------------------------
 alter table hig_option_values modify hov_value varchar2(500)
 /
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Node Purpose column
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Add Node Purpose column to NM_NODES_ALL
+-- 
+------------------------------------------------------------------
+
+-- Add Node Purpose column
+
+alter table nm_nodes_all add (
+   no_purpose varchar(240)
+)
+/
+
 ------------------------------------------------------------------
 
 
