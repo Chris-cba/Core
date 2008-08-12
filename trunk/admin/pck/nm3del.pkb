@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3del.pkb-arc   2.6   Aug 11 2008 16:15:46   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3del.pkb-arc   2.7   Aug 12 2008 11:01:50   malexander  $
 --       Module Name      : $Workfile:   nm3del.pkb  $
---       Date into PVCS   : $Date:   Aug 11 2008 16:15:46  $
---       Date fetched Out : $Modtime:   Aug 11 2008 16:07:28  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Aug 12 2008 11:01:50  $
+--       Date fetched Out : $Modtime:   Aug 12 2008 10:12:34  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.6  $"
+--   nm3get_gen body   : "$Revision:   2.7  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3del';
@@ -2631,6 +2631,39 @@ BEGIN
    nm_debug.proc_end(g_package_name,'del_hus');
 --
 END del_hus;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Procedure to del using HUH_PK constraint
+--
+PROCEDURE del_huh (pi_huh_user_id       hig_user_history.huh_user_id%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                  ) IS
+   l_rowid ROWID;
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'del_huh');
+--
+   -- Lock the row first
+   l_rowid := nm3lock_gen.lock_huh
+                   (pi_huh_user_id       => pi_huh_user_id
+                   ,pi_raise_not_found   => pi_raise_not_found
+                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
+                   ,pi_locked_sqlcode    => pi_locked_sqlcode
+                   );
+--
+   IF l_rowid IS NOT NULL
+    THEN
+      DELETE hig_user_history huh
+      WHERE ROWID = l_rowid;
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'del_huh');
+--
+END del_huh;
 --
 -----------------------------------------------------------------------------
 --
