@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.7   Nov 01 2007 16:47:34   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.8   Aug 12 2008 11:18:00   ptanava  $
 --       Module Name      : $Workfile:   nm3inv_composite2.pkb  $
---       Date into PVCS   : $Date:   Nov 01 2007 16:47:34  $
---       Date fetched Out : $Modtime:   Nov 01 2007 16:46:26  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Aug 12 2008 11:18:00  $
+--       Date fetched Out : $Modtime:   Aug 12 2008 11:14:06  $
+--       PVCS Version     : $Revision:   2.8  $
 --       Based on sccs version :
 --
 --   Author : Priidu Tanava
@@ -28,9 +28,12 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
   17.10.07 PT removed autonomous transaction
   26.10.07 PT added procedure validate_nt_type() used in do_rebuild() to check p_nt_type allowed
                 nm3bulk_mrg.ins_route_connectivity() now called separately in do_rebuild()
+  08.08.08 PT in call_rebuild() made the admin unit lookup to go via nm_mail_users
+  12.08.08 PT added p_admin_unit_id to ins_iit_tmp_values()
+                added get_admin_unit() local proc to get value corresponding to asset inv type
 */
 
-  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.7  $"';
+  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.8  $"';
   g_package_name  constant  varchar2(30) := 'nm3inv_composite2';
   
   cant_serialize exception;
@@ -89,6 +92,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
      p_inv_type in varchar2
     ,p_nt_type in varchar2
   );
+  
+  
+  function get_admin_unit(
+     p_inv_type in varchar2
+  ) return number;
    
   cr  constant varchar2(1) := chr(10);
    
@@ -372,6 +380,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
       ||'p_dbms_job_no='||p_dbms_job_no
       ||', p_inv_type='||p_inv_type
       ||', p_effective_date='||p_effective_date
+      ||', p_send_mail='||nm3dbg.to_char(p_send_mail)
       ||', p_ne_delim='||p_ne_delim
       ||', p_nse_delim='||p_nse_delim
       ||', p_attr1='||p_attr1
@@ -403,10 +412,21 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     from nm_mrg_query_all
     where nmq_id = r_nmnd.nmnd_nmq_id;
     
-    
-    select u.hus_admin_unit into l_admin_unit_id
-    from hig_users u
-    where u.hus_user_id = r_nmnd.nmnd_nmu_id_admin;
+    -- look up admin unit
+    -- PT 08.08.08 made this to go via nm_mail_users
+    --  NB! r_nmnd.nmnd_nmu_id_admin is mail user id
+--    select u.hus_admin_unit into l_admin_unit_id
+--    from
+--       nm_mail_users mu
+--      ,hig_users u
+--    where mu.nmu_hus_user_id = u.hus_user_id
+--      and mu.nmu_id = r_nmnd.nmnd_nmu_id_admin;
+     
+    -- This returns the admin unit corresponding to the asset admin type
+    --  raises error if not found
+    --  if multiple found then min value
+    l_admin_unit_id := get_admin_unit(p_inv_type);
+
     
     if r_nmnd.nmnd_maintain_history = 'Y' then
       l_keep_history := true;
@@ -477,6 +497,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.call_rebuild('
         ||'p_dbms_job_no='||p_dbms_job_no
         ||', p_inv_type='||p_inv_type
+        ||', p_send_mail='||nm3dbg.to_char(p_send_mail)
         ||', p_ne_delim='||p_ne_delim
         ||', p_nse_delim='||p_nse_delim
         ||', p_attr1='||p_attr1
@@ -714,6 +735,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
        p_inv_type => p_inv_type
       ,p_mrg_view => p_mrg_view
       ,p_mrg_view_where => p_mrg_view_where
+      ,p_admin_unit_id => p_admin_unit_id
       ,p_effective_date => p_effective_date
       ,p_mrg_job_id => l_mrg_job_id
       ,pt_attr => t_attr
@@ -1166,6 +1188,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     ,p_mrg_job_id in nm_mrg_query_results_all.nqr_mrg_job_id%type
     ,p_mrg_view in varchar2
     ,p_mrg_view_where in varchar2
+    ,p_admin_unit_id in nm_admin_units_all.nau_admin_unit%type
     ,p_effective_date in date
     ,pt_attr in attrib_tbl
     ,p_sqlcount out number
@@ -1183,6 +1206,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
       ||', p_mrg_job_id='||p_mrg_job_id
       ||', p_mrg_view='||p_mrg_view
       ||', p_mrg_view_where='||p_mrg_view_where
+      ||', p_admin_unit_id='||p_admin_unit_id
       ||', p_effective_date='||p_effective_date
       ||', pt_attr='||to_string_attrib_tbl(pt_attr)
       ||')');
@@ -1202,6 +1226,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
           when 'IIT_NE_ID' then 'nm3net.get_next_ne_id'
           when 'IIT_INV_TYPE' then ''''||p_inv_type||''''
           when 'IIT_START_DATE' then ':p_effective_date'
+          when 'IIT_ADMIN_UNIT' then ':p_admin_unit_id'
           else nvl(d.nmid_derivation, 'null')
           end nmid_derivation
          ,tc.column_name
@@ -1246,7 +1271,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
        
     nm3dbg.putln(l_sql);
        
-    execute immediate l_sql using p_effective_date, p_mrg_job_id;
+    execute immediate l_sql using p_effective_date, p_admin_unit_id, p_mrg_job_id;
     p_sqlcount := sql%rowcount;
     commit;
     
@@ -1259,6 +1284,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
         ||', p_mrg_job_id='||p_mrg_job_id
         ||', p_mrg_view='||p_mrg_view
         ||', p_mrg_view_where='||p_mrg_view_where
+        ||', p_admin_unit_id='||p_admin_unit_id
         ||', p_effective_date='||p_effective_date
         ||')');
       raise;
@@ -1360,6 +1386,61 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
   end;
   
   
+  -- this returns the lowes id admin unit
+  --  of type corresponding to the asset type admin type
+  function get_admin_unit(
+     p_inv_type in varchar2
+  ) return number
+  is
+    l_admin_unit_id     integer;
+  begin
+    select
+       min(q.admin_unit_id) admin_unit_id
+    into
+       l_admin_unit_id
+    from (
+    select
+       u.hus_admin_unit admin_unit_id
+    from
+       nm_inv_types_all t
+      ,nm_mrg_nit_derivation nt
+      ,nm_mail_users mu
+      ,hig_users u
+      ,nm_admin_units au
+    where t.nit_inv_type = nt.nmnd_nit_inv_type
+      and mu.nmu_id = nt.nmnd_nmu_id_admin
+      and mu.nmu_hus_user_id = u.hus_user_id
+      and u.hus_admin_unit = au.nau_admin_unit
+      and t.nit_admin_type = au.nau_admin_type
+      and t.nit_inv_type = p_inv_type
+    union all
+    select
+       ua.nua_admin_unit admin_unit_id
+    from
+       nm_inv_types_all t
+      ,nm_mrg_nit_derivation nt
+      ,nm_mail_users mu
+      ,hig_users u
+      ,nm_user_aus ua
+      ,nm_admin_units au
+    where t.nit_inv_type = nt.nmnd_nit_inv_type
+      and mu.nmu_id = nt.nmnd_nmu_id_admin
+      and mu.nmu_hus_user_id = u.hus_user_id
+      and u.hus_user_id = ua.nua_user_id
+      and ua.nua_admin_unit = au.nau_admin_unit
+      and t.nit_admin_type = au.nau_admin_type
+      and t.nit_inv_type = p_inv_type
+    ) q;
+    return l_admin_unit_id;
+  exception
+    when no_data_found then
+      raise_application_error(-20001, 'No Admin Unit found for Admin Type '''
+        ||nm3inv.get_inv_admin_type(p_inv_type)
+        ||''' required for the Derived Asset Type.'
+        ||' Check Admin Units for the Administrator mail user for '''||p_inv_type||'''.'
+      );
+  end;
+  
   
   
   
@@ -1399,10 +1480,10 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
      --  CSS document.
      -- The text returned is in the format
      --  <LINK REL="STYLESHEET" HREF="\\Dachom17\iris\Public\iris.css">
-    l_css := hig.get_sysopt('HIG_ST_CSS');
+    l_css := hig.get_sysopt('hig_st_css');
     if l_css is not null then
       l_css := htf.linkrel(
-         crel => 'STYLESHEET'
+         crel => 'stylesheet'
         ,curl => l_css
       );
     end if;
@@ -1413,15 +1494,15 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     putln(l_css);
     putln(htf.headclose);
     putln(htf.bodyopen);
-    putln(htf.tableopen(cattributes=>'BORDER=1'));
+    putln(htf.tableopen(cattributes=>'border=1'));
     --
     putln(htf.tablerowopen);
-    putln(htf.tableheader('Inv Type'));
+    putln(htf.tableheader('inv Type'));
     putln(htf.tabledata(p_inv_type));
     putln(htf.tablerowclose);
     --
     putln(htf.tablerowopen);
-    putln(htf.tableheader('Effective Date'));
+    putln(htf.tableheader('effective Date'));
     putln(htf.tabledata(to_char(p_effective_date, nm3user.get_user_date_mask)));
     putln(htf.tablerowclose);
     
@@ -1479,7 +1560,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
      p_inv_type in nm_inv_types_all.nit_inv_type%type
   )
   is    
-    l_lock_name    constant varchar2(30) := 'DA_'||p_inv_type;
+    l_lock_name    constant varchar2(30) := 'da_'||p_inv_type;
     l_lock_handle  varchar2(128);
     l_lock_value   integer;
  
@@ -1517,7 +1598,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
          ,pi_supplementary_info => p_inv_type --||' started '||to_char(l_date,nm3type.c_full_date_Time_format)
       );
     else
-      raise_application_error(-20099, 'Internal dbms_lock error: '||l_lock_value);
+      raise_application_error(-20099, 'internal dbms_lock error: '||l_lock_value);
     end if;
     
   exception
@@ -1534,7 +1615,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
      p_inv_type in nm_inv_types_all.nit_inv_type%type
   )
   is    
-    l_lock_name    constant varchar2(30) := 'DA_'||p_inv_type;
+    l_lock_name    constant varchar2(30) := 'da_'||p_inv_type;
     l_lock_handle  varchar2(128);
     l_lock_value   integer;
  
@@ -1601,14 +1682,14 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
         if l_job_failures > 0 then
           return 'Job '||p_job_no||' has failed: '||l_sqlerrm;
         else
-          return 'Unable to report progess on job '||p_job_no;
+          return 'unable to report progess on job '||p_job_no;
         end if;
       exception
         when no_data_found then null;
       end;
       return '#error: Job '||p_job_no||' not found';
     when too_many_rows then
-      return '#error: Duplicate job '||p_job_no;
+      return '#error: duplicate job '||p_job_no;
   end;
     
     
@@ -1670,8 +1751,8 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     select 'x' dummy into l_dummy
     from nm_types t
     where t.nt_type = p_nt_type
-      and t.nt_datum = 'Y'
-      and t.nt_linear = 'Y';
+      and t.nt_datum = 'y'
+      and t.nt_linear = 'y';
     --
     l_msg := 'The network type is not allowed for the derived asset type';
     select 'x' dummy into l_dummy
