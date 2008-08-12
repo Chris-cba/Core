@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkb-arc   2.6   Aug 11 2008 16:15:48   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkb-arc   2.7   Aug 12 2008 11:01:48   malexander  $
 --       Module Name      : $Workfile:   nm3get.pkb  $
---       Date into PVCS   : $Date:   Aug 11 2008 16:15:48  $
---       Date fetched Out : $Modtime:   Aug 11 2008 16:07:26  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Aug 12 2008 11:01:48  $
+--       Date fetched Out : $Modtime:   Aug 12 2008 10:12:34  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.6  $"
+--   nm3get_gen body   : "$Revision:   2.7  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3get';
@@ -3438,6 +3438,49 @@ BEGIN
    RETURN l_retval;
 --
 END get_hus;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Function to get using HUH_PK constraint
+--
+FUNCTION get_huh (pi_huh_user_id       hig_user_history.huh_user_id%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN hig_user_history%ROWTYPE IS
+--
+   CURSOR cs_huh IS
+   SELECT /*+ INDEX (huh HUH_HUS_FK_IND) */ *
+    FROM  hig_user_history huh
+   WHERE  huh.huh_user_id = pi_huh_user_id;
+--
+   l_found  BOOLEAN;
+   l_retval hig_user_history%ROWTYPE;
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'get_huh');
+--
+   OPEN  cs_huh;
+   FETCH cs_huh INTO l_retval;
+   l_found := cs_huh%FOUND;
+   CLOSE cs_huh;
+--
+   IF pi_raise_not_found AND NOT l_found
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 67
+                    ,pi_sqlcode            => pi_not_found_sqlcode
+                    ,pi_supplementary_info => 'hig_user_history (HUH_PK)'
+                                              ||CHR(10)||'huh_user_id => '||pi_huh_user_id
+                    );
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'get_huh');
+--
+   RETURN l_retval;
+--
+END get_huh;
 --
 -----------------------------------------------------------------------------
 --

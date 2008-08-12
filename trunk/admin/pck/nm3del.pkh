@@ -5,11 +5,11 @@ CREATE OR REPLACE PACKAGE nm3del IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3del.pkh-arc   2.6   Aug 11 2008 16:15:46   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3del.pkh-arc   2.7   Aug 12 2008 11:01:48   malexander  $
 --       Module Name      : $Workfile:   nm3del.pkh  $
---       Date into PVCS   : $Date:   Aug 11 2008 16:15:46  $
---       Date fetched Out : $Modtime:   Aug 11 2008 16:07:26  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Aug 12 2008 11:01:48  $
+--       Date fetched Out : $Modtime:   Aug 12 2008 10:12:34  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --
 --   Author : Jonathan Mills
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE nm3del IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.6  $"
+--   nm3get_gen body   : "$Revision:   2.7  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE nm3del IS
 --
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
+   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
 --  g_sccsid is the SCCS ID for the package
 --
 --</GLOBVAR>
@@ -1017,6 +1017,19 @@ PROCEDURE del_hus (pi_hus_user_id       hig_users.hus_user_id%TYPE
 --   Procedure to del using HUS_UK constraint
 --
 PROCEDURE del_hus (pi_hus_username      hig_users.hus_username%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                  );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="del_huh">
+--
+--   Procedure to del using HUH_PK constraint
+--
+PROCEDURE del_huh (pi_huh_user_id       hig_user_history.huh_user_id%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
