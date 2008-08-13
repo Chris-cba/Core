@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm404x_nm4050_upg.sql-arc   3.0   Aug 12 2008 09:39:32   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm404x_nm4050_upg.sql-arc   3.1   Aug 13 2008 11:18:10   malexander  $
 --       Module Name      : $Workfile:   nm404x_nm4050_upg.sql  $
---       Date into PVCS   : $Date:   Aug 12 2008 09:39:32  $
---       Date fetched Out : $Modtime:   Aug 11 2008 17:21:50  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Aug 13 2008 11:18:10  $
+--       Date fetched Out : $Modtime:   Aug 13 2008 11:17:54  $
+--       Version          : $Revision:   3.1  $
 --       
 -------------------------------------------------------------------------
 --
@@ -79,9 +79,6 @@ begin
                           ,p_allowed_old_version_2 => '4.0.4.0'
                           );
 
-  hig2.product_exists_at_version (p_product    => 'HIG'
-                                 ,p_version    => '4.0.5.0'
-                                 );
 End;
 /
 WHENEVER SQLERROR CONTINUE
