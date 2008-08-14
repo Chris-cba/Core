@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4050_sdo_3302_upg.sql-arc   3.0   Aug 14 2008 08:24:54   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4050_sdo_3302_upg.sql-arc   3.1   Aug 14 2008 08:44:20   aedwards  $
 --       Module Name      : $Workfile:   nm4050_sdo_3302_upg.sql  $
---       Date into PVCS   : $Date:   Aug 14 2008 08:24:54  $
---       Date fetched Out : $Modtime:   Aug 14 2008 08:23:36  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Aug 14 2008 08:44:20  $
+--       Date fetched Out : $Modtime:   Aug 14 2008 08:42:40  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --
@@ -58,25 +58,6 @@ BEGIN
 EXCEPTION
   WHEN OTHERS THEN RETURN NULL;
 END x_get_index_name;
-/
-
-PROMPT
-PROMPT Creating temporary function x_validate_layer
-
-CREATE OR REPLACE FUNCTION x_validate_layer
-     (tab IN user_tables.table_name%TYPE, col user_tab_columns.column_name%TYPE)
-  RETURN nm3type.tab_varchar30
-IS
-  retval nm3type.tab_varchar30;
-BEGIN
-  SELECT UNIQUE 'ORA-'||sdo_geom.validate_geometry (geoloc, diminfo)
-    BULK COLLECT INTO retval
-    FROM nm_nit_tp21_sdo a, user_sdo_geom_metadata
-   WHERE table_name  = tab
-     AND column_name = col
-     AND sdo_geom.validate_geometry_with_context (geoloc, diminfo) != 'TRUE';
-  RETURN retval;
-END x_validate_layer;
 /
 
 set serverout on;
@@ -150,12 +131,6 @@ BEGIN
     --
       BEGIN
       --
---        l_validation := x_validate_layer ( l_tab_data(i).table_name
---                                         , l_tab_data(i).column_name );
---      --
---        IF l_validation.COUNT < 0
---        THEN
-      --
           l_op := 'Dropping spatial index';
         --
           IF l_tab_data(i).index_name IS NOT NULL
@@ -205,12 +180,6 @@ BEGIN
                              AND nth_feature_shape_column = l_tab_data(i).column_name)
                   );
      --
---        ELSE
---          FOR v IN 1..l_validation.COUNT
---          LOOP
---            sop ('Validation errors with '||l_tab_data(i).table_name||' - '||l_validation(v));
---          END LOOP;
---        END IF;
       EXCEPTION
         WHEN OTHERS
         THEN sop ('Error processing '||l_tab_data(i).table_name
@@ -233,7 +202,6 @@ PROMPT
 
 DROP FUNCTION x_get_max_gtype;
 DROP FUNCTION x_get_index_name;
-DROP FUNCTION x_validate_layer;
 
 PROMPT =========================================================================
 PROMPT
