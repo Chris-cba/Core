@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm404x_nm4050_upg.sql-arc   3.1   Aug 13 2008 11:18:10   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm404x_nm4050_upg.sql-arc   3.2   Aug 18 2008 10:29:50   aedwards  $
 --       Module Name      : $Workfile:   nm404x_nm4050_upg.sql  $
---       Date into PVCS   : $Date:   Aug 13 2008 11:18:10  $
---       Date fetched Out : $Modtime:   Aug 13 2008 11:17:54  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Aug 18 2008 10:29:50  $
+--       Date fetched Out : $Modtime:   Aug 18 2008 10:29:02  $
+--       Version          : $Revision:   3.2  $
 --       
 -------------------------------------------------------------------------
 --
@@ -179,6 +179,17 @@ FROM dual
 SET FEEDBACK ON
 start &&run_file
 SET FEEDBACK OFF
+
+--
+---------------------------------------------------------------------------------------------------
+--                **************** synonym required for packages   ****************
+
+PROMPT MDSYS.SDO_GEOM_METADATA_TABLE synonym
+
+Create Public Synonym sdo_geom_metadata_table for mdsys.sdo_geom_metadata_table;
+
+
+
 --
 ---------------------------------------------------------------------------------------------------
 --                  **************** PACKAGE HEADERS AND BODIES   ****************
