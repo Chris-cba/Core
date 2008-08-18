@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm404x_nm4050_upg.sql-arc   3.2   Aug 18 2008 10:29:50   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm404x_nm4050_upg.sql-arc   3.3   Aug 18 2008 10:42:20   aedwards  $
 --       Module Name      : $Workfile:   nm404x_nm4050_upg.sql  $
---       Date into PVCS   : $Date:   Aug 18 2008 10:29:50  $
---       Date fetched Out : $Modtime:   Aug 18 2008 10:29:02  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Aug 18 2008 10:42:20  $
+--       Date fetched Out : $Modtime:   Aug 18 2008 10:41:58  $
+--       Version          : $Revision:   3.3  $
 --       
 -------------------------------------------------------------------------
 --
@@ -161,7 +161,7 @@ Prompt Triggers...
 SET TERM OFF
 SET DEFINE ON
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||
-'&terminator'||'trg'||'&terminator'||'nm3trgcre.sql' run_file
+'&terminator'||'trg'||'&terminator'||'nm3trg.sql' run_file
 FROM dual
 /
 SET FEEDBACK ON
