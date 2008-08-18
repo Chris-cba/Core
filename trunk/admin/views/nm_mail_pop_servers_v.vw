@@ -1,4 +1,4 @@
-CREATE FORCE VIEW nm_mail_pop_servers_v AS
+CREATE OR REPLACE FORCE VIEW nm_mail_pop_servers_v AS
 SELECT
 --
 -----------------------------------------------------------------------------
