@@ -62,7 +62,7 @@ END append;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION build_sdo_geometry( p_sdo_gtype          IN NUMBER DEFAULT 3002
+FUNCTION build_sdo_geometry( p_sdo_gtype          IN NUMBER DEFAULT 3302
                           ,p_sdo_srid           IN NUMBER DEFAULT NULL
                           ,p_sdo_point          IN mdsys.sdo_point_type DEFAULT null
                           ,p_sdo_elem_info      IN mdsys.sdo_elem_info_array
