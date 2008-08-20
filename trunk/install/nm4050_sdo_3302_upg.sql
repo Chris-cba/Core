@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4050_sdo_3302_upg.sql-arc   3.1   Aug 14 2008 08:44:20   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4050_sdo_3302_upg.sql-arc   3.2   Aug 20 2008 09:40:18   aedwards  $
 --       Module Name      : $Workfile:   nm4050_sdo_3302_upg.sql  $
---       Date into PVCS   : $Date:   Aug 14 2008 08:44:20  $
---       Date fetched Out : $Modtime:   Aug 14 2008 08:42:40  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Aug 20 2008 09:40:18  $
+--       Date fetched Out : $Modtime:   Aug 19 2008 16:21:40  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --------------------------------------------------------------------------------
 --
@@ -15,27 +15,31 @@
 PROMPT
 PROMPT =========================================================================
 PROMPT
-PROMPT Exor 4050 Spatial Data Upgrade - Linear features
+PROMPT Exor 4050 Spatial Data Upgrade - 3D Features
 PROMPT
 PROMPT =========================================================================
 PROMPT
-PROMPT Creating temporary function x_get_max_gtype
+PROMPT Creating temporary function x_is_3d
 
-CREATE OR REPLACE FUNCTION x_get_max_gtype (tab IN VARCHAR2, col IN VARCHAR2)
-   RETURN NUMBER
+CREATE OR REPLACE FUNCTION x_is_3d (tab IN VARCHAR2, col IN VARCHAR2)
+   RETURN VARCHAR2
 IS
-   retval   NUMBER;
+   l_gtype  NUMBER;
 BEGIN
-   EXECUTE IMMEDIATE    'select max( a.'
+   EXECUTE IMMEDIATE    'select a.'
                      || col
-                     || '.sdo_gtype ) from '
+                     || '.sdo_gtype  from '
                      || tab
-                     || ' a'
-                INTO retval;
-
-   RETURN retval;
+                     || ' a where rownum=1'
+                INTO l_gtype;
+   IF to_char(l_gtype) LIKE '3%'
+   THEN 
+     RETURN 'Y';
+   ELSE
+     RETURN 'N';
+   END IF;
 EXCEPTION
-  WHEN OTHERS THEN RETURN NULL;
+  WHEN OTHERS THEN RETURN 'N';
 END;
 /
 
@@ -65,9 +69,9 @@ set serverout on;
 PROMPT
 PROMPT =========================================================================
 PROMPT
-PROMPT Processing spatial data - converting 3002 geometries to 3302
+PROMPT Processing spatial data - 3D geometries
 PROMPT
-PROMPT This process may take some time.
+PROMPT This process may take some time.... please wait
 PROMPT
 PROMPT =========================================================================
 PROMPT
@@ -76,10 +80,11 @@ DECLARE
 --
    TYPE rec_data IS RECORD (table_name  VARCHAR2(30)
                           , column_name VARCHAR2(30)
-                          , gtype       NUMBER
+                          , is_3d       VARCHAR2(1)
                           , index_name  VARCHAR2(30) );
    TYPE tab_data IS TABLE OF rec_data INDEX BY BINARY_INTEGER;
    l_tab_data    tab_data;
+   l_tab_gtypes  nm3type.tab_number;
    lidx          VARCHAR2 (30);
    lg_from       NUMBER;
    lg_to         NUMBER;
@@ -88,25 +93,22 @@ DECLARE
 --
    CURSOR c1
    IS
-      WITH all_gtypes AS
+      WITH all_3d_layers AS
            (SELECT nth_theme_id, nth_feature_table, nth_feature_shape_column,
-                   x_get_max_gtype (nth_feature_table,
-                                    nth_feature_shape_column
-                                  ) gtype
+                   x_is_3d (nth_feature_table,
+                            nth_feature_shape_column) is_3d
               FROM nm_themes_all
              WHERE nth_base_table_theme IS NULL
                AND nth_theme_type = 'SDO'
-               --AND nth_feature_table = 'NM_NIT_CT_SDO'
                AND EXISTS
                  (SELECT 1 FROM user_tables
                    WHERE table_name = nth_feature_table))
       SELECT nth_feature_table
            , nth_feature_shape_column
-           , gtype geom_type
+           , is_3d
            , x_get_index_name ( nth_feature_table, nth_feature_shape_column )
-        FROM all_gtypes
-       WHERE gtype > 3000
-         AND gtype < 3300;
+        FROM all_3d_layers
+       WHERE is_3d = 'Y';
 --
   PROCEDURE sop (text IN nm3type.max_varchar2 ) 
   IS
@@ -114,6 +116,38 @@ DECLARE
   BEGIN
     dbms_output.put_line (text);
   END sop;
+--
+  FUNCTION get_gtypes (tab IN VARCHAR2, col IN VARCHAR2)
+     RETURN nm3type.tab_number
+  IS
+     l_gtypes  nm3type.tab_number;
+  BEGIN
+     l_gtypes.DELETE;
+     EXECUTE IMMEDIATE    'select unique a.'
+                       || col
+                       || '.sdo_gtype from '
+                       || tab
+                       || ' a where a.'||col||'.sdo_gtype > 3000 '
+                       ||   '   and a.'||col||'.sdo_gtype < 3300 '
+     BULK COLLECT INTO l_gtypes;
+     RETURN l_gtypes;
+  EXCEPTION
+    WHEN OTHERS THEN RETURN l_gtypes;
+  END get_gtypes;
+--
+  FUNCTION get_max_gtype (tab IN VARCHAR2, col IN VARCHAR2)
+     RETURN number
+  IS
+     l_gtype  number;
+  BEGIN
+     EXECUTE IMMEDIATE    'select max ( a.'
+                       || col
+                       || '.sdo_gtype ) from '
+                       || tab
+                       || ' a '
+     INTO l_gtype;
+     RETURN l_gtype;
+  END get_max_gtype;
 --
 BEGIN
 --
@@ -129,7 +163,14 @@ BEGIN
     FOR i IN 1..l_tab_data.COUNT
     LOOP
     --
+      DECLARE
+        l_gtype NUMBER;
       BEGIN
+        l_tab_gtypes := get_gtypes ( l_tab_data(i).table_name
+                                   , l_tab_data(i).column_name );
+      --
+        IF l_tab_gtypes.COUNT > 0
+        THEN
       --
           l_op := 'Dropping spatial index';
         --
@@ -137,24 +178,35 @@ BEGIN
           THEN
             EXECUTE IMMEDIATE 'drop index ' ||l_tab_data(i).index_name ;
           END IF;
-      --
-          lg_from := l_tab_data(i).gtype;
-          lg_to   := 300 + l_tab_data(i).gtype;
         --
-          l_op := 'Updating data';
+          FOR g IN 1..l_tab_gtypes.COUNT
+          LOOP
         --
-          EXECUTE IMMEDIATE    'update '
-                            || l_tab_data(i).table_name
-                            || ' a set a.'
-                            || l_tab_data(i).column_name
-                            || '.sdo_gtype = '
-                            || TO_CHAR (lg_to)
-                            || ' where a.'
-                            || l_tab_data(i).column_name
-                            || '.sdo_gtype = '
-                            || TO_CHAR (lg_from);
-        --
-          sop('Processed '||l_tab_data(i).table_name||' - '||SQL%ROWCOUNT||' rows updated');
+
+            BEGIN
+              --
+                l_op := 'Updating data ['||l_tab_gtypes(g)||']';
+              --
+                EXECUTE IMMEDIATE    'update '
+                                  || l_tab_data(i).table_name
+                                  || ' a set a.'
+                                  || l_tab_data(i).column_name
+                                  || '.sdo_gtype = 300 + a.'|| l_tab_data(i).column_name
+                                                            || '.sdo_gtype'
+                                  || ' where a.'||l_tab_data(i).column_name
+                                  || '.sdo_gtype = '||l_tab_gtypes(g);
+              --
+                sop('Processed '||l_tab_data(i).table_name||' ['||l_tab_gtypes(g)||']'
+                         ||' - '||SQL%ROWCOUNT||' rows updated to '||' ['||l_tab_gtypes(g)+300||']');
+              --
+           --
+            EXCEPTION
+              WHEN OTHERS
+              THEN sop ('Error processing '||l_tab_data(i).table_name||' ['||l_tab_gtypes(g)||']'
+                       ||' - '||l_op||' - '||SQLERRM);
+            END;
+          --
+          END LOOP;
         --
           l_op := 'Creating spatial index';
         --
@@ -163,8 +215,11 @@ BEGIN
         --
           l_op := 'Updating NM_THEME_GTYPES';
         --
+          l_gtype := get_max_gtype(l_tab_data(i).table_name,
+                                   l_tab_data(i).column_name);
+        --
           UPDATE nm_theme_gtypes
-             SET ntg_gtype = lg_to
+             SET ntg_gtype = l_gtype
            WHERE ntg_theme_id IN
                   ( SELECT nth_theme_id
                       FROM nm_themes_all
@@ -177,17 +232,21 @@ BEGIN
                          (SELECT nth_theme_id
                             FROM nm_themes_all b
                            WHERE nth_feature_table = l_tab_data(i).table_name
-                             AND nth_feature_shape_column = l_tab_data(i).column_name)
-                  );
-     --
+                             AND nth_feature_shape_column = l_tab_data(i).column_name));
+        --
+        ELSE
+        --
+          sop('No suitable GTypes for update on '||l_tab_data(i).table_name);
+        END IF;
       EXCEPTION
-        WHEN OTHERS
-        THEN sop ('Error processing '||l_tab_data(i).table_name
-                 ||' - '||l_op||' - '||SQLERRM);
+        WHEN OTHERS THEN sop('Error processing '||l_tab_data(i).table_name||' when '||l_op||' - '||SQLERRM);
       END;
     --
     END LOOP;
   --
+  ELSE
+  --
+    sop ('No 3D layers found - nothing processed');
   END IF;
   --
   COMMIT;
@@ -200,7 +259,7 @@ PROMPT
 PROMPT Dropping temporary functions
 PROMPT
 
-DROP FUNCTION x_get_max_gtype;
+DROP FUNCTION x_is_3d;
 DROP FUNCTION x_get_index_name;
 
 PROMPT =========================================================================
