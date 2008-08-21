@@ -141,7 +141,16 @@ FUNCTION can_element_be_reclassed(pi_ne_rec         IN nm_elements%ROWTYPE
 -- Raise error if NOT can_element_be_reclassed
 PROCEDURE check_element_can_be_reclassed(pi_ne_id          IN nm_elements.ne_id%TYPE
     	                                ,pi_effective_date IN DATE);
-
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="ins_doc_assocs">
+-- Insert a record into doc_assocs, for reclassifying asection with an ENQ or DEFECT on it.
+PROCEDURE ins_doc_assocs( pi_new_id doc_assocs.das_rec_id%TYPE
+                        , pi_old_id doc_assocs.das_rec_id%TYPE
+                        , pi_doc_id doc_assocs.das_doc_id%TYPE default null
+                        , pi_table_name doc_assocs.das_table_name%TYPE
+                        );
 --</PROC>
 --
 -----------------------------------------------------------------------------
