@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.2   May 30 2008 10:06:48   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.3   Aug 21 2008 15:11:42   smarshall  $
 --       Module Name      : $Workfile:   nm3reclass.pkb  $
---       Date into PVCS   : $Date:   May 30 2008 10:06:48  $
---       Date fetched Out : $Modtime:   May 30 2008 10:03:14  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Aug 21 2008 15:11:42  $
+--       Date fetched Out : $Modtime:   Aug 21 2008 14:08:02  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : R.A. Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';
@@ -2046,7 +2046,12 @@ BEGIN
       exec_reclass ('stp_network_ops.do_reclassify');
    END IF;
 --
-
+   IF Hig.is_product_licensed(Nm3type.c_enq)
+    THEN
+      exec_reclass ('enqreclass.enq_reclassify');
+   END IF;
+   
+--   
 -- GJ 30/11/05
 -- not actually required cos when NSG streets are reclassified they 
 -- re-use the original NE_ID
@@ -2163,6 +2168,26 @@ BEGIN
   RETURN pi_ne_type IN ('S', 'G');
 
 END ne_type_can_be_reclassed;
+--
+---------------------------------------------------------------------------------------------------
+--
+PROCEDURE ins_doc_assocs( pi_new_id doc_assocs.das_rec_id%TYPE --varchar2
+                        , pi_old_id doc_assocs.das_rec_id%TYPE --varchar2
+                        , pi_doc_id doc_assocs.das_doc_id%TYPE default null --number
+                        , pi_table_name doc_assocs.das_table_name%TYPE
+                        ) IS
+BEGIN         
+if pi_doc_id is null then
+ UPDATE doc_assocs set das_rec_id = pi_new_id
+  WHERE das_table_name = pi_table_name
+    AND das_rec_id = pi_old_id;
+else
+ UPDATE doc_assocs set das_rec_id = pi_new_id
+  WHERE das_table_name = pi_table_name
+    AND das_doc_id = nvl(pi_doc_id, das_doc_id)
+    AND das_rec_id = pi_old_id;
+end if;    
+END ins_doc_assocs;
 --
 ---------------------------------------------------------------------------------------------------
 --
