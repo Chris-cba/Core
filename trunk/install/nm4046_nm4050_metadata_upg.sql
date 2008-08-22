@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_metadata_upg.sql-arc   3.3   Aug 18 2008 10:40:08   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_metadata_upg.sql-arc   3.4   Aug 22 2008 14:59:48   malexander  $
 --       Module Name      : $Workfile:   nm4046_nm4050_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Aug 18 2008 10:40:08  $
---       Date fetched Out : $Modtime:   Aug 18 2008 10:38:10  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Aug 22 2008 14:59:48  $
+--       Date fetched Out : $Modtime:   Aug 22 2008 14:57:24  $
+--       Version          : $Revision:   3.4  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -71,7 +71,7 @@ Insert into HIG_OPTION_LIST
 
 Insert into HIG_OPTION_VALUES
    (HOV_ID, HOV_VALUE)
- select 'USEGRPSEC', 'Y'
+ select 'USEGRPSEC', 'N'
  from dual
  where not exists (select 1 from hig_option_values where hov_id = 'USEGRPSEC');
 
@@ -147,6 +147,57 @@ UPDATE nm_nw_ad_link_all
 
 ALTER TABLE nm_nw_ad_link_all ENABLE ALL TRIGGERS;
 
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Set SDOMPGTYPE option to 3302 from 3002
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Update SDOMPGTYPE product option to 3302 from 3002 for 4050.
+-- This product option may NOT always exist.
+-- 
+------------------------------------------------------------------
+UPDATE hig_option_values
+   SET hov_value = '3302'
+ WHERE hov_id = 'SDOMPGTYPE';
+ 
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New nm_error message 502
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (MICHAEL ALEXANDER)
+-- New message added for test log 64772.  Error raised in form hig4010 standard text form
+-- 
+------------------------------------------------------------------
+Insert Into nm_errors( ner_appl
+                     , ner_id
+                     , ner_her_no
+                     , ner_descr
+                     , ner_cause
+                     )
+                Select 'HIG'
+                     , 502
+                     , Null
+                     , 'Cannot delete record as child records exist.'
+                     , Null
+                From   Dual
+                Where Not Exists( Select 1
+                                  From   nm_errors
+                                  Where  ner_appl = 'HIG'
+                                  And    ner_id   = 502
+                                );
 ------------------------------------------------------------------
 
 
