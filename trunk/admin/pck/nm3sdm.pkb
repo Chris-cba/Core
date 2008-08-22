@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.14   Aug 22 2008 11:59:58   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.15   Aug 22 2008 12:37:38   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Aug 22 2008 11:59:58  $
---       Date fetched Out : $Modtime:   Aug 22 2008 11:59:16  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Aug 22 2008 12:37:38  $
+--       Date fetched Out : $Modtime:   Aug 22 2008 12:36:52  $
+--       PVCS Version     : $Revision:   2.15  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.14  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.15  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -8662,13 +8662,11 @@ end;
          EXCEPTION
             WHEN OTHERS
             THEN
-/*
                Nm_Debug.DEBUG (   'Unable to create theme for '
                                || i.NAME
                                || ' - '
                                || SQLERRM
                               );
-*/
          END;
       END LOOP;
 
