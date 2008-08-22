@@ -138,22 +138,6 @@ PROCEDURE set_diminfo_and_srid( p_themes  IN nm_theme_array,
 --
 -----------------------------------------------------------------------------
 --
---<PROC NAME="CLIP_GEOM">
--- Function to return clipped geometries
-FUNCTION clip_geom( p_geom IN OUT NOCOPY mdsys.sdo_geometry, p_len IN NUMBER, p_st IN NUMBER, p_end IN NUMBER, p_diminfo IN mdsys.sdo_dim_array)
-RETURN mdsys.sdo_geometry;
---</PROC>
---
------------------------------------------------------------------------------
---
---<PROC NAME="locate_pt">
--- Function to return a point from a line and measure
-FUNCTION locate_pt (  p_geom IN OUT NOCOPY mdsys.sdo_geometry, p_diminfo IN mdsys.sdo_dim_array, p_st IN NUMBER )
-RETURN mdsys.sdo_geometry;
---</PROC>
---
------------------------------------------------------------------------------
---
 --<PROC NAME="INS_USGM">
 -- Inserts into usgm
    PROCEDURE ins_usgm (pi_rec_usgm IN user_sdo_geom_metadata%ROWTYPE);
@@ -364,17 +348,10 @@ RETURN mdsys.sdo_geometry;
 --
 -----------------------------------------------------------------------------
 --
---<PROC NAME="REMOVE_REDUNDANT_PTS">
--- This function removes point sthat are within the tolerance from the layer
-  FUNCTION remove_redundant_pts
-           ( p_geom IN MDSYS.SDO_GEOMETRY )
-    RETURN MDSYS.SDO_GEOMETRY;
---</PROC>
---
 -----------------------------------------------------------------------------
+--<PROC NAME="GET_NEAREST_TO_XY";
 -- This function returns the nearest neighbour in the given layer
 -- to the given ordinate pair
---<PROC NAME="GET_NEAREST_TO_XY";
   FUNCTION get_nearest_to_xy
            ( p_layer   IN NUMBER
            , p_pt_geom IN MDSYS.SDO_GEOMETRY )
@@ -787,26 +764,6 @@ FUNCTION get_route_shape( p_ne_id    IN nm_elements.ne_id%TYPE )
 --
 -----------------------------------------------------------------------------
 --
---<PROC NAME="IGNORE_MEASURE">
--- This function returns an equivalent geometry but with a non-9i specific
--- geometry type. This is required due to inadequacies of the client GIS systems.
-  FUNCTION ignore_measure
-           ( p_geom MDSYS.SDO_GEOMETRY )
-    RETURN MDSYS.SDO_GEOMETRY;
---</PROC>
---
------------------------------------------------------------------------------
---
---<PROC NAME="ADD_MEASURE">
--- This function returns the 9i release 2 geometry type for a measured polyline.
-  FUNCTION add_measure
-           ( p_geom MDSYS.SDO_GEOMETRY )
-    RETURN MDSYS.SDO_GEOMETRY;
---</PROC>
---
---
------------------------------------------------------------------------------
---
 --<PROC NAME="GET_2D_PT">
 -- This function returns the 9i release 2 geometry type for a measured polyline.
   FUNCTION get_2d_pt
@@ -1148,17 +1105,6 @@ FUNCTION create_sdo_layer
            , p_pl_array IN nm_placement_array )
     RETURN MDSYS.SDO_GEOMETRY;
 
---</PROC>
---
------------------------------------------------------------------------------
---
---<PROC NAME="GENERALISE"
--- return a geometry representing a generalised version of the original geometry.
-  FUNCTION generalise
-           ( p_geom IN MDSYS.SDO_GEOMETRY
-           , ipt    IN NUMBER
-           , tol    IN NUMBER )
-    RETURN MDSYS.SDO_GEOMETRY;
 --</PROC>
 --
 -----------------------------------------------------------------------------
@@ -1722,7 +1668,6 @@ FUNCTION get_srs_text( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE ) RETURN cs
   PRAGMA RESTRICT_REFERENCES( GET_PLACEMENT_MP_GEOMETRY, WNDS, TRUST );
   PRAGMA RESTRICT_REFERENCES( REVERSE_GEOMETRY, WNDS );
   PRAGMA RESTRICT_REFERENCES( GET_NO_PARTS, WNDS );
-  PRAGMA RESTRICT_REFERENCES( IGNORE_MEASURE, WNDS );
   PRAGMA RESTRICT_REFERENCES( SET_THEME_METADATA, WNDS );
 --</PRAGMA>
 -----------------------------------------------------------------------------
