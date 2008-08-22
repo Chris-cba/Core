@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.13   Aug 22 2008 10:25:28   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.14   Aug 22 2008 11:59:58   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Aug 22 2008 10:25:28  $
---       Date fetched Out : $Modtime:   Aug 22 2008 10:24:34  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Aug 22 2008 11:59:58  $
+--       Date fetched Out : $Modtime:   Aug 22 2008 11:59:16  $
+--       PVCS Version     : $Revision:   2.14  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.13  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.14  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -1309,7 +1309,7 @@ PROCEDURE split_element_shapes (
 --  Nm_Debug.debug_on;
     IF p_base.nta_theme_array(1).nthe_id IS NULL THEN
 --	  Nm_Debug.DEBUG('No base themes');
-     null
+     null;
 	ELSE
  /*
       FOR i IN 1..p_base.nta_theme_array.LAST LOOP
