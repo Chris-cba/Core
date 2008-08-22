@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.3   Jun 04 2008 13:31:32   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.4   Aug 22 2008 10:17:40   rcoupe  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Jun 04 2008 13:31:32  $
---       Date fetched Out : $Modtime:   Jun 03 2008 11:41:40  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Aug 22 2008 10:17:40  $
+--       Date fetched Out : $Modtime:   Aug 22 2008 10:16:06  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -28,9 +28,9 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
    g_element_unit              NM_UNITS.un_unit_id%TYPE;
 --
    g_ausec_status VARCHAR2(3);
-   g_prev_rec_ne_old   nm_elements%ROWTYPE; 
-   g_prev_rec_ne_new_1 nm_elements%ROWTYPE; 
-   g_prev_rec_ne_new_2 nm_elements%ROWTYPE;      
+   g_prev_rec_ne_old   nm_elements%ROWTYPE;
+   g_prev_rec_ne_new_1 nm_elements%ROWTYPE;
+   g_prev_rec_ne_new_2 nm_elements%ROWTYPE;
 --
 ------------------------------------------------------------------------------------------------
 --
@@ -40,7 +40,7 @@ BEGIN
    -- grab current values of globals
    g_prev_rec_ne_old   := g_rec_ne_old;
    g_prev_rec_ne_new_1 := g_rec_ne_new_1;
-   g_prev_rec_ne_new_2 := g_rec_ne_new_2;  
+   g_prev_rec_ne_new_2 := g_rec_ne_new_2;
 
    g_ausec_status := Nm3ausec.get_status;
    Nm3ausec.set_status(Nm3type.c_off);
@@ -102,9 +102,9 @@ PROCEDURE split_element (p_ne_id               IN     nm_elements.ne_id%TYPE    
                         ,p_ne_id_1             IN OUT nm_elements.ne_id%TYPE       -- 1st new ne_id
                         ,p_ne_length_1         IN     NUMBER DEFAULT NULL          -- length of first element - only applicable for datums
                         ,p_ne_id_2             IN OUT nm_elements.ne_id%TYPE       -- 2nd new ne_id
-                        ,p_ne_length_2         IN     NUMBER                       -- length of first element - only applicable for datums						
+                        ,p_ne_length_2         IN     NUMBER                       -- length of first element - only applicable for datums
                         ,p_node                IN     nm_elements.ne_no_start%TYPE -- the node at the split point
-                        ,p_force_inheritance_of_attribs  IN     VARCHAR2                           DEFAULT 'N' -- force inheritance of all attributes on datums						
+                        ,p_force_inheritance_of_attribs  IN     VARCHAR2                           DEFAULT 'N' -- force inheritance of all attributes on datums
                         ,p_ne_unique_1         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
                         ,p_ne_type_1           IN     nm_elements.ne_type%TYPE           DEFAULT NULL
                         ,p_ne_nt_type_1        IN     nm_elements.ne_nt_type%TYPE        DEFAULT NULL
@@ -289,7 +289,7 @@ PROCEDURE split_element (p_ne_id               IN     nm_elements.ne_id%TYPE    
                         ,p_ne_id_1             IN OUT nm_elements.ne_id%TYPE       -- 1st new ne_id
                         ,p_ne_length_1         IN     NUMBER DEFAULT NULL          -- length of first element - only applicable for datums
                         ,p_ne_id_2             IN OUT nm_elements.ne_id%TYPE       -- 2nd new ne_id
-                        ,p_ne_length_2         IN     NUMBER                       -- length of first element - only applicable for datums						
+                        ,p_ne_length_2         IN     NUMBER                       -- length of first element - only applicable for datums
                         ,p_node                IN     nm_elements.ne_no_start%TYPE -- the node at the split point
                         ,p_force_inheritance_of_attribs  IN     VARCHAR2                           DEFAULT 'N' -- force inheritance of all attributes on datums
                         ,p_ne_unique_1         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
@@ -340,7 +340,7 @@ PROCEDURE split_element (p_ne_id               IN     nm_elements.ne_id%TYPE    
        FROM  NM_TYPE_COLUMNS a
       WHERE  ntc_nt_type = c_nt_type
        AND   (p_force_inheritance_of_attribs = 'Y'
-             OR 
+             OR
               (p_force_inheritance_of_attribs = 'N' AND ntc_inherit = 'Y')
               );
 
@@ -367,8 +367,8 @@ PROCEDURE split_element (p_ne_id               IN     nm_elements.ne_id%TYPE    
    PROCEDURE create_element (p_rec_ne IN OUT nm_elements%ROWTYPE) IS
       v_leg_no  nm_node_usages.nnu_leg_no%TYPE;
    BEGIN
-/*   
-     nm_debug.debug('ABOUT TO INSERT AN ELEMENT');   
+/*
+     nm_debug.debug('ABOUT TO INSERT AN ELEMENT');
      nm_debug.debug('p_ne_id='||p_rec_ne.ne_id);
      nm_debug.debug('p_ne_unique='||p_rec_ne.ne_unique);
      nm_debug.debug('p_ne_length='||p_rec_ne.ne_length);
@@ -389,8 +389,8 @@ PROCEDURE split_element (p_ne_id               IN     nm_elements.ne_id%TYPE    
      nm_debug.debug('p_ne_sub_class='||p_rec_ne.ne_sub_class);
      nm_debug.debug('p_ne_nsg_ref='||p_rec_ne.ne_nsg_ref);
      nm_debug.debug('p_ne_version_no='||p_rec_ne.ne_version_no);
-  */                                                        
-   
+  */
+
       Nm3net.insert_element (p_ne_id             => p_rec_ne.ne_id
                             ,p_ne_unique         => p_rec_ne.ne_unique
                             ,p_ne_length         => p_rec_ne.ne_length
@@ -450,7 +450,7 @@ BEGIN
     THEN
       p_ne_id_2 := Nm3net.get_next_ne_id;
    END IF;
-   
+
 --
    g_rec_ne_new_1.ne_id                  := p_ne_id_1;
    g_rec_ne_new_1.ne_unique              := p_ne_unique_1;
@@ -469,7 +469,7 @@ BEGIN
    g_rec_ne_new_1.ne_number              := p_ne_number_1;
    g_rec_ne_new_1.ne_sub_type            := p_ne_sub_type_1;
    g_rec_ne_new_1.ne_group               := p_ne_group_1;
-   
+
    -- if the network type of the new element supports a node type
    -- then set start/end nodes
    IF Nm3net.get_nt(g_rec_ne_new_1.ne_nt_type).nt_node_type IS NOT NULL THEN
@@ -503,11 +503,11 @@ BEGIN
 
    -- if the network type of the new element supports a node type
    -- then set start/end nodes
-   IF Nm3net.get_nt(g_rec_ne_new_2.ne_nt_type).nt_node_type IS NOT NULL THEN   
+   IF Nm3net.get_nt(g_rec_ne_new_2.ne_nt_type).nt_node_type IS NOT NULL THEN
      g_rec_ne_new_2.ne_no_start            := p_node;
      g_rec_ne_new_2.ne_no_end              := NVL(p_ne_no_end_2,g_rec_ne_old.ne_no_end);
    END IF;
-   
+
    g_rec_ne_new_2.ne_sub_class           := p_ne_sub_class_2;
    g_rec_ne_new_2.ne_nsg_ref             := p_ne_nsg_ref_2;
    g_rec_ne_new_2.ne_version_no          := p_ne_version_no_2;
@@ -515,7 +515,7 @@ BEGIN
    do_inheritance;
    --
    create_element (g_rec_ne_new_1);
-   
+
    create_element (g_rec_ne_new_2);
 --
    g_element_unit := Nm3net.get_nt_units(g_rec_ne_new_1.ne_nt_type);
@@ -533,15 +533,15 @@ BEGIN
       l_rec_neh.neh_new_ne_length  := p_ne_length_1;
       l_rec_neh.neh_param_1        := 1;
       l_rec_neh.neh_param_2        := NULL;
-      
+
       --insert history for first new element
       Nm3merge.ins_neh (l_rec_neh);
-      
+
       l_rec_neh.neh_id             := nm3seq.next_neh_id_seq;
       l_rec_neh.neh_ne_id_new      := p_ne_id_2;
       l_rec_neh.neh_new_ne_length  := p_ne_length_2;
       l_rec_neh.neh_param_1        := 2;
-      
+
       --insert history for second new element
       Nm3merge.ins_neh (l_rec_neh);
    END;
@@ -915,7 +915,7 @@ END split_other_products;
 --
 ------------------------------------------------------------------------------------------------
 --
-PROCEDURE check_other_products 
+PROCEDURE check_other_products
                 (p_ne_id             IN nm_elements.ne_id%TYPE
                 ,p_chain             IN NUMBER
                 ,p_effective_date    IN DATE
@@ -932,7 +932,7 @@ BEGIN
     THEN
 --
 --      Nm_Debug.DEBUG('Check STR before splitting');
---  
+--
       l_block :=            'BEGIN'
                  ||CHR(10)||'    strsplit.check_data'
                  ||CHR(10)||'              (p_id        => :p_ne_id'
@@ -952,7 +952,7 @@ BEGIN
 --  Nm_Debug.DEBUG('Check STR finished');
 --
   END IF;
-  
+
   -- Check if MM is installed and check for data
    IF Hig.is_product_licensed(Nm3type.c_mai)
     THEN
@@ -991,7 +991,7 @@ PROCEDURE do_split ( p_ne_id nm_elements.ne_id%TYPE -- the element to split
                     ,p_ne_id_1             IN OUT nm_elements.ne_id%TYPE -- the new element ne_id
                     ,p_ne_id_2             IN OUT nm_elements.ne_id%TYPE        -- the 2nd new element ne_id
                     ,p_node                IN OUT nm_elements.ne_no_start%TYPE  -- the node at the split point
-                    ,p_force_inheritance_of_attribs  IN     VARCHAR2                           DEFAULT 'N' -- force inheritance of all attributes on datums					
+                    ,p_force_inheritance_of_attribs  IN     VARCHAR2                           DEFAULT 'N' -- force inheritance of all attributes on datums
                     ,p_create_node         IN     BOOLEAN DEFAULT FALSE
                     ,p_no_node_name        IN     nm_nodes.no_node_name%TYPE         DEFAULT NULL
                     ,p_no_descr            IN     nm_nodes.no_descr%TYPE             DEFAULT NULL
@@ -1000,7 +1000,7 @@ PROCEDURE do_split ( p_ne_id nm_elements.ne_id%TYPE -- the element to split
                     ,p_np_grid_east        IN     NM_POINTS.np_grid_east%TYPE        DEFAULT NULL
                     ,p_np_grid_north       IN     NM_POINTS.np_grid_north%TYPE       DEFAULT NULL
                     ,p_no_purpose          in     nm_nodes.no_purpose%type default null -- PT 03.06.08
-                    
+
                     ,p_ne_unique_1         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
                     ,p_ne_type_1           IN     nm_elements.ne_type%TYPE           DEFAULT NULL
                     ,p_ne_nt_type_1        IN     nm_elements.ne_nt_type%TYPE        DEFAULT NULL
@@ -1066,7 +1066,28 @@ BEGIN
         Hig.raise_ner(pi_appl               => Nm3type.c_net
                      ,pi_id                 => 362);
       END IF;
-   
+
+      if p_np_grid_east is not null and p_np_grid_north is not null then
+
+        l_grid_east  := p_np_grid_east;
+        l_grid_north := p_np_grid_north;
+
+      else
+
+--        nm_debug.debug_on;
+--        nm_debug.debug('The x and y values are null');
+
+        begin
+          select np_grid_east, np_grid_north
+          into l_grid_east, l_grid_north
+          from nm_points, nm_nodes
+          where np_id = no_np_id
+          and no_node_id = p_node;
+        end;
+
+      end if;
+
+
    ELSE
 
       IF l_no_node_type IS NULL
@@ -1090,14 +1111,14 @@ BEGIN
 
                  l_grid_east  := p_np_grid_east;
                  l_grid_north := p_np_grid_north;
-                                                        
+
               END IF;
          EXCEPTION
            -- Need a meaningful message here
-           WHEN OTHERS THEN 
+           WHEN OTHERS THEN
               NULL;
          END;
-         
+
 
          p_node := create_node_internal
                      (p_no_node_id     => p_node
@@ -1113,18 +1134,18 @@ BEGIN
 
       END IF;
    END IF;
-   
---nm_debug.debug('CREATED A NODE AT THE DATUM SPLIT WITH NODE ID='||p_node);   
+
+--nm_debug.debug('CREATED A NODE AT THE DATUM SPLIT WITH NODE ID='||p_node);
 --
 
 
    split_element (p_ne_id               => p_ne_id
-                 ,p_type_of_split       => 'S'        
+                 ,p_type_of_split       => 'S'
                  ,p_effective_date      => p_effective_date
                  ,p_ne_id_1             => p_ne_id_1
                  ,p_ne_length_1         => p_split_measure
                  ,p_ne_id_2             => p_ne_id_2
-                 ,p_ne_length_2         => g_rec_ne_old.ne_length - p_split_measure						
+                 ,p_ne_length_2         => g_rec_ne_old.ne_length - p_split_measure
                  ,p_node                => p_node
                  ,p_force_inheritance_of_attribs => 'N'
                  ,p_ne_unique_1         => p_ne_unique_1
@@ -1175,7 +1196,7 @@ BEGIN
                                 p_ne_id_1 => p_ne_id_1,
                                 p_ne_id_2 => p_ne_id_2,
                                 p_x => l_grid_east,
-                                p_y => l_grid_north);                        
+                                p_y => l_grid_north);
 --
    split_members (p_ne_id          => p_ne_id
                  ,p_ne_id_1        => p_ne_id_1
@@ -1183,7 +1204,7 @@ BEGIN
                  ,p_split_measure  => p_split_measure
                  ,p_effective_date => p_effective_date
                  );
---                                
+--
    split_other_products (p_ne_id          => p_ne_id
                         ,p_ne_id_1        => p_ne_id_1
                         ,p_ne_id_2        => p_ne_id_2
@@ -1192,12 +1213,12 @@ BEGIN
                         );
 --
    IF Nm3nwad.ad_data_exist(p_ne_id) THEN
-     
+
       Nm3nwad.do_ad_split( pi_old_ne_id  => p_ne_id
                          , pi_new_ne_id1 => p_ne_id_1
                          , pi_new_ne_id2 => p_ne_id_2);
 
-   END IF;                         
+   END IF;
 
    end_date_elements (p_ne_id          => p_ne_id
                      ,p_effective_date => p_effective_date
@@ -1229,7 +1250,7 @@ PROCEDURE do_geo_split
                     ,p_np_grid_east        IN     NM_POINTS.np_grid_east%TYPE        DEFAULT NULL
                     ,p_np_grid_north       IN     NM_POINTS.np_grid_north%TYPE       DEFAULT NULL
                     ,p_no_purpose          in     nm_nodes.no_purpose%type default null -- PT 03.06.08
-                    
+
                     ,p_ne_unique_1         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
                     ,p_ne_type_1           IN     nm_elements.ne_type%TYPE           DEFAULT NULL
                     ,p_ne_nt_type_1        IN     nm_elements.ne_nt_type%TYPE        DEFAULT NULL
@@ -1283,7 +1304,7 @@ BEGIN
 --
    validate_split_position (pi_split_offset     => p_split_measure
                            ,pi_split_at_node    => NULL
-                           ,pi_non_ambig_ne_id  => NULL 
+                           ,pi_non_ambig_ne_id  => NULL
                            ,pi_non_ambig_split_offset => NULL
                            ,pi_effective_date   => p_effective_date);
 --
@@ -1360,7 +1381,7 @@ PROCEDURE set_ne_globals(pi_ne_id IN nm_elements.ne_id%TYPE) IS
 BEGIN
   g_ne_to_split_rec      := Nm3net.get_ne(pi_ne_id => pi_ne_id);
   g_ne_to_split_ngt_rec  := Nm3net.get_gty(pi_gty => g_ne_to_split_rec.ne_gty_group_type);
-  g_ne_to_split_nt_rec   := Nm3net.get_nt (pi_nt_type => g_ne_to_split_rec.ne_nt_type);    
+  g_ne_to_split_nt_rec   := Nm3net.get_nt (pi_nt_type => g_ne_to_split_rec.ne_nt_type);
 END;
 --
 ------------------------------------------------------------------------------------------------
@@ -1401,41 +1422,41 @@ FUNCTION can_element_be_split (pi_ne_rec         IN nm_elements%ROWTYPE
     g_ner_id := p_ner_id;
     g_supplimentary_info := p_supplimentary_info;
  END;
- 
+
 BEGIN
 
   Nm_Debug.proc_start(g_package_name,'can_element_be_split');
 
   IF NVL(pi_effective_date,TRUNC(SYSDATE)) > TRUNC(SYSDATE) THEN
-     set_output_params(Nm3type.c_net 
-                      ,165  
+     set_output_params(Nm3type.c_net
+                      ,165
                       ,NULL);
      RETURN(FALSE);
   END IF;
 
   IF NOT Nm3inv_Security.can_usr_see_all_inv_on_element(pi_ne_rec.ne_id) THEN
-     set_output_params(Nm3type.c_net 
+     set_output_params(Nm3type.c_net
                       ,172  -- User does not have access to all inventory on element
-                      ,NULL);  
-     RETURN(FALSE);
-  END IF;  
-  
-  IF Nm3net.element_has_future_dated_membs(pi_ne_id => pi_ne_rec.ne_id
-                                          ,pi_effective_date => pi_effective_date) THEN
-     set_output_params(Nm3type.c_net 
-                      ,378  -- Element has memberships with a future start date
-                      ,NULL);  
-  
+                      ,NULL);
      RETURN(FALSE);
   END IF;
-  
-  
-  IF Nm3net.element_is_a_datum(pi_ne_type  =>  pi_ne_rec.ne_type) = FALSE 
+
+  IF Nm3net.element_has_future_dated_membs(pi_ne_id => pi_ne_rec.ne_id
+                                          ,pi_effective_date => pi_effective_date) THEN
+     set_output_params(Nm3type.c_net
+                      ,378  -- Element has memberships with a future start date
+                      ,NULL);
+
+     RETURN(FALSE);
+  END IF;
+
+
+  IF Nm3net.element_is_a_datum(pi_ne_type  =>  pi_ne_rec.ne_type) = FALSE
   AND
      Nm3net.element_is_a_group(pi_ne_type  =>  pi_ne_rec.ne_type) = FALSE THEN
-     set_output_params(Nm3type.c_net 
+     set_output_params(Nm3type.c_net
                       ,357  -- Operation can only be performed on datum elements and groups of sections.
-                      ,NULL);  
+                      ,NULL);
      RETURN(FALSE);
   END IF;
 
@@ -1446,7 +1467,7 @@ BEGIN
      -- if a group then the element type must be linear
      --------------------------------------------------
      IF Nm3net.is_nt_linear(p_nt_type => pi_ne_rec.ne_nt_type) = 'N' THEN
-        set_output_params(Nm3type.c_net 
+        set_output_params(Nm3type.c_net
                          ,336 -- Cannot perform operation on non-linear network types"
                          ,NULL);
         RETURN(FALSE);
@@ -1457,21 +1478,21 @@ BEGIN
      -- if a group cannot use auto-inclusion from group onto datum- cos split_group cannot handle that
      -------------------------------------------------------------------------------------------------
 --     l_nt := nm3net.get_nt(pi_ne_rec.ne_nt_type);
- 
+
      IF Nm3net.is_nt_inclusion(pi_ne_rec.ne_nt_type) THEN
-            set_output_params(Nm3type.c_net 
+            set_output_params(Nm3type.c_net
                              ,361  -- cannot split group
                              ,CHR(10)||'Auto-Inclusion detected betwen Network Type '||pi_ne_rec.ne_nt_type||' and datum network.');
             RETURN(FALSE);
      END IF;
-  
+
      -----------------------------------------------------------
      -- if splitting a route then the start and the end point of
      -- the route must be non-ambiguous otherwise working
      -- out the memberships to the left of the split position is
      -- impossible
      -----------------------------------------------------------
-     DECLARE 
+     DECLARE
        ex_invalid_start_point EXCEPTION;
      BEGIN
         IF Nm3lrs.is_location_ambiguous(pi_ne_id     => pi_ne_rec.ne_id
@@ -1479,39 +1500,39 @@ BEGIN
             RAISE ex_invalid_start_point;
         END IF;
      EXCEPTION
-       WHEN OTHERS THEN 
-           set_output_params(Nm3type.c_net 
+       WHEN OTHERS THEN
+           set_output_params(Nm3type.c_net
                             ,361  -- cannot split group
                             ,CHR(10)||'Start point of group is ambiguous.');
            RETURN(FALSE);
      END;
 
-     DECLARE 
+     DECLARE
        ex_invalid_end_point EXCEPTION;
-     BEGIN      
+     BEGIN
         IF Nm3lrs.is_location_ambiguous(pi_ne_id     => pi_ne_rec.ne_id
                                        ,pi_offset    => Nm3net.get_max_slk(pi_ne_rec.ne_id)) THEN
             RAISE ex_invalid_end_point;
         END IF;
      EXCEPTION
-       WHEN OTHERS THEN 
-            set_output_params(Nm3type.c_net 
+       WHEN OTHERS THEN
+            set_output_params(Nm3type.c_net
                              ,361  -- cannot split group
                              ,CHR(10)||'End point of group is ambiguous.');
            RETURN(FALSE);
      END;
 
    END IF; -- datum or group
-   
+
    --
    -- if we've got this far then split can go ahead
    --
    RETURN(TRUE);
-  
-  
+
+
   Nm_Debug.proc_end(g_package_name,'can_element_be_split');
-  
-  
+
+
 END can_element_be_split;
 --
 ------------------------------------------------------------------------------------------------
@@ -1524,7 +1545,7 @@ PROCEDURE check_element_can_be_split(pi_ne_id          IN nm_elements.ne_id%TYPE
 BEGIN
 
   Nm_Debug.proc_start(g_package_name,'check_element_can_be_split');
-  
+
   --
   -- if ne_id supplied then get the whole ne record otherwise
   -- assume we're working with the ne stored in package global rowtype var
@@ -1534,7 +1555,7 @@ BEGIN
   ELSE
     l_ne_to_split_rec := g_ne_to_split_rec;
   END IF;
-  
+
   IF NOT can_element_be_split(pi_ne_rec => l_ne_to_split_rec
                              ,pi_effective_date => pi_effective_date) THEN
           Hig.raise_ner (pi_appl    => g_ner_appl
@@ -1548,39 +1569,39 @@ END check_element_can_be_split;
 --
 ------------------------------------------------------------------------------------------------
 --
-FUNCTION non_ambig_ref_is_valid(pi_route_ne_id            IN nm_elements.ne_id%TYPE 
-                               ,pi_split_offset           IN NUMBER  
-                               ,pi_non_ambig_ne_id        IN nm_elements.ne_id%TYPE     
-                               ,pi_non_ambig_split_offset IN NUMBER                    
+FUNCTION non_ambig_ref_is_valid(pi_route_ne_id            IN nm_elements.ne_id%TYPE
+                               ,pi_split_offset           IN NUMBER
+                               ,pi_non_ambig_ne_id        IN nm_elements.ne_id%TYPE
+                               ,pi_non_ambig_split_offset IN NUMBER
                                ) RETURN BOOLEAN IS
 
  l_non_ambig_ne_id       nm_elements.ne_id%TYPE;
  l_non_ambig_offset      NUMBER;
- 
+
 BEGIN
 
   IF pi_non_ambig_ne_id IS NULL OR pi_non_ambig_split_offset IS NULL THEN
      RETURN(FALSE);
   END IF;
- 
+
     ---------------------------------------------------------------
     -- Get non-ambiguous refs for the route and offset and ensure
     -- that the non-ambig ne_id and offset passed in is in the list
-    ---------------------------------------------------------------	 
+    ---------------------------------------------------------------
     Nm3wrap.get_ambiguous_lrefs(pi_parent_id => pi_route_ne_id
                                ,pi_offset    => pi_split_offset);
-   
+
   FOR i IN 1..Nm3wrap.lref_count LOOP
        Nm3wrap.lref_get_row(pi_index  => i
                            ,po_ne_id  => l_non_ambig_ne_id
                            ,po_offset => l_non_ambig_offset);
-  
- 
+
+
        IF l_non_ambig_ne_id = pi_non_ambig_ne_id AND l_non_ambig_offset = pi_non_ambig_split_offset THEN
          RETURN(TRUE);
        END IF;
   END LOOP;
-  
+
   RETURN(FALSE);
 
 END non_ambig_ref_is_valid;
@@ -1588,8 +1609,8 @@ END non_ambig_ref_is_valid;
 ------------------------------------------------------------------------------------------------
 --
 PROCEDURE validate_split_position (pi_ne_id                  IN nm_elements.ne_id%TYPE DEFAULT NULL
-                                  ,pi_split_offset           IN NUMBER  
-                                  ,pi_non_ambig_ne_id        IN nm_elements.ne_id%TYPE    -- only applicable when splitting a group 
+                                  ,pi_split_offset           IN NUMBER
+                                  ,pi_non_ambig_ne_id        IN nm_elements.ne_id%TYPE    -- only applicable when splitting a group
                                   ,pi_non_ambig_split_offset IN NUMBER                    -- only applicable when splitting a group
                                   ,pi_split_at_node          IN nm_nodes.no_node_id%TYPE
                                   ,pi_effective_date         IN DATE
@@ -1602,18 +1623,18 @@ PROCEDURE validate_split_position (pi_ne_id                  IN nm_elements.ne_i
   WHERE  route_id = cp_ne_id
   AND    node_type != 'T'
   AND    node_id   = pi_split_at_node;
-  
+
   l_nm_route_nodes_rec nm_route_nodes%ROWTYPE;
 
   l_from               NUMBER;
-  l_to                 NUMBER;  
+  l_to                 NUMBER;
   l_overall_length     nm_elements.ne_length%TYPE;
-  
+
   l_ne_rec             nm_elements%ROWTYPE;
-  
+
   l_errors   NUMBER;
   l_err_text VARCHAR2(10000);
-  
+
 BEGIN
 
 
@@ -1628,7 +1649,7 @@ BEGIN
   ELSE
     l_ne_rec := g_ne_to_split_rec;
   END IF;
-  
+
   check_other_products ( p_ne_id          => pi_ne_id
                         ,p_chain          => pi_split_offset
                         ,p_effective_date => pi_effective_date
@@ -1640,19 +1661,19 @@ BEGIN
             Hig.raise_ner (pi_appl    => Nm3type.c_net
                           ,pi_id      => 361  -- element cannot be split
                           ,pi_supplementary_info => l_err_text);
-  
+
   END IF;
 
   -----------------------------------------------------------------------------------
-  -- if splitting at a node then ensure that the node is 
+  -- if splitting at a node then ensure that the node is
   -- a) on the route
-  -- b) is not a terminating node 
+  -- b) is not a terminating node
   --
-  ------------------------------------------------------------------------------------  
+  ------------------------------------------------------------------------------------
   IF Nm3net.element_is_a_group(pi_ne_type => l_ne_rec.ne_type) AND pi_split_at_node IS NOT NULL THEN
-  
-     Nm3net_O.set_g_ne_id_to_restrict_on(pi_ne_id => l_ne_rec.ne_id);     
-  
+
+     Nm3net_O.set_g_ne_id_to_restrict_on(pi_ne_id => l_ne_rec.ne_id);
+
      OPEN c_valid_nodes(l_ne_rec.ne_id);
      FETCH c_valid_nodes INTO l_nm_route_nodes_rec;
      IF c_valid_nodes%NOTFOUND THEN
@@ -1660,32 +1681,32 @@ BEGIN
        Hig.raise_ner (Nm3type.c_net,359);  -- "Group cannot be split at this node."
      END IF;
      CLOSE c_valid_nodes;
-     
+
   ELSIF pi_split_offset IS NOT NULL THEN
 
     ------------------------------------------------------------------------------------
-    -- if splitting at an offset then ensure that the offset is 
+    -- if splitting at an offset then ensure that the offset is
     -- a) within start/end of datum/group length
     -- b) the offset is non-ambiguous
     ------------------------------------------------------------------------------------
     IF Nm3net.element_is_a_group(pi_ne_type  =>  l_ne_rec.ne_type) THEN
        l_from := Nm3net.get_min_slk(pi_ne_id => l_ne_rec.ne_id);
        l_to   := Nm3net.get_max_slk(pi_ne_id => l_ne_rec.ne_id);
-   
+
     ELSIF Nm3net.element_is_a_datum(pi_ne_type  =>  l_ne_rec.ne_type) THEN
        l_from := 0;
        l_to    := Nm3net.Get_Ne_Length(p_ne_id  => l_ne_rec.ne_id);
-    
+
     END IF;
 
-     
+
     IF NVL(pi_split_offset,0) <= l_from OR NVL(pi_split_offset,0) >= l_to THEN
           Hig.raise_ner (pi_appl    => Nm3type.c_net
                         ,pi_id      => 358 -- Split position is invalid.
-                        ,pi_supplementary_info => CHR(10)||CHR(10)||'>'||l_from||CHR(10)||'<'||l_to); 		  
+                        ,pi_supplementary_info => CHR(10)||CHR(10)||'>'||l_from||CHR(10)||'<'||l_to);
     END IF;
 
-    
+
     IF Nm3net.element_is_a_group(pi_ne_type => l_ne_rec.ne_type) THEN
 
 
@@ -1696,38 +1717,38 @@ BEGIN
                                     ) THEN
 
             Hig.raise_ner (pi_appl    => Nm3type.c_net
-                          ,pi_id      => 367);--Group Offset does not coincide with Non-Ambiguous Offset.		  
+                          ,pi_id      => 367);--Group Offset does not coincide with Non-Ambiguous Offset.
 
        END IF;
-   
+
     END IF;
-    
-  END IF;  -- splitting at node or offset	  
+
+  END IF;  -- splitting at node or offset
 
   Nm_Debug.proc_end(g_package_name,'validate_split_position');
-  
+
 END validate_split_position;
 --
 ------------------------------------------------------------------------------------------------
 --
 FUNCTION datum_split_required(pi_ne_id                   IN     nm_elements.ne_id%TYPE
-                             ,pi_split_at_node_id        IN     nm_nodes.no_node_id%TYPE  						
+                             ,pi_split_at_node_id        IN     nm_nodes.no_node_id%TYPE
                              ) RETURN BOOLEAN IS
 
   l_ne_rec nm_elements%ROWTYPE;
   l_ngt_rec nm_group_types%ROWTYPE;
- 
+
 BEGIN
-  
+
   Nm_Debug.proc_start(g_package_name,'datum_split_required');
 
   l_ne_rec  := Nm3net.get_ne( pi_ne_id );
   l_ngt_rec := Nm3net.get_gty(pi_gty => l_ne_rec.ne_gty_group_type);
 
-  
+
     IF   Nm3net.element_is_a_datum (pi_ne_type => l_ne_rec.ne_type) THEN
       RETURN(TRUE);
-    ELSIF  -- if a non-partial group and splitting at an offset		   
+    ELSIF  -- if a non-partial group and splitting at an offset
       Nm3net.element_is_a_group(pi_ne_type => l_ne_rec.ne_type) AND Nm3net.is_gty_partial(pi_gty => l_ngt_rec.ngt_group_type) = 'N' AND pi_split_at_node_id IS NULL THEN
       --
       -- we need to make sure that since we will inherit all datum element
@@ -1743,8 +1764,8 @@ BEGIN
          RETURN(FALSE);
     END IF;
 
-    Nm_Debug.proc_end(g_package_name,'datum_split_required');    
-    
+    Nm_Debug.proc_end(g_package_name,'datum_split_required');
+
 END datum_split_required;
 --
 ------------------------------------------------------------------------------------------------
@@ -1766,14 +1787,14 @@ FUNCTION get_lref_at_node(pi_node_id         IN nm_nodes.no_node_id%TYPE
 
    l_supplmentary_info VARCHAR2(200);
    l_retval nm_lref;
-   
+
 BEGIN
 
   FOR recs IN c1 LOOP
 
    l_retval := recs.lref;
   END LOOP;
-  
+
   RETURN(l_retval);
 
 END get_lref_at_node;
@@ -1785,13 +1806,13 @@ PROCEDURE get_route_split_memberships(pi_route_ne_id             IN     nm_eleme
                                      ,pi_non_ambig_split_offset  IN     NUMBER
                                      ,pi_node_id                 IN     nm_nodes.no_node_id%TYPE
                                      ,po_placement_array_left    IN OUT nm_placement_array
-                                     ,po_placement_array_right   IN OUT nm_placement_array) IS 
+                                     ,po_placement_array_right   IN OUT nm_placement_array) IS
 
 
  l_non_ambig_split_point_lref    nm_lref;  -- nm_lref is an object type
  l_node_split_point_lref1        nm_lref;  -- nm_lref is an object type
- l_node_split_point_lref2        nm_lref;  -- nm_lref is an object type 
-    
+ l_node_split_point_lref2        nm_lref;  -- nm_lref is an object type
+
  l_non_ambig_route_start_lref   nm_lref;  -- nm_lref is an object type
  l_non_ambig_route_end_lref     nm_lref;  -- nm_lref is an object type
 
@@ -1799,30 +1820,30 @@ BEGIN
 
  -- Pre-Requisites for this working
  --
- -- a) Split point must be non-ambiguous       (checked for in validate_split_position) 
+ -- a) Split point must be non-ambiguous       (checked for in validate_split_position)
  -- b) Route start point must be non-ambiguous (checked for in validate_element_can_be_split)
  -- c) Route end point must be non-ambiguous   (checked for in validate_element_can_be_split)
- -- 
+ --
  l_non_ambig_route_start_lref   := Nm3lrs.get_distinct_offset(nm_lref(pi_route_ne_id,Nm3net.get_min_slk(pi_ne_id => pi_route_ne_id)));  -- linear ref that denotes the non-ambiguous start of route
 
- l_non_ambig_route_end_lref     := Nm3lrs.get_distinct_offset(nm_lref(pi_route_ne_id,Nm3net.get_max_slk(pi_route_ne_id)));  -- linear ref that denotes the non-ambiguous end of route  
+ l_non_ambig_route_end_lref     := Nm3lrs.get_distinct_offset(nm_lref(pi_route_ne_id,Nm3net.get_max_slk(pi_route_ne_id)));  -- linear ref that denotes the non-ambiguous end of route
 
  IF pi_node_id IS NOT NULL THEN
- 
+
 
        --Getting before lref for node split point
        l_node_split_point_lref1 :=   get_lref_at_node(pi_node_id         => pi_node_id
                                                      ,pi_ne_id_in        => pi_route_ne_id
                                                      ,pi_before_or_after => 'B');
- 
+
 
        --Getting after lref for node split point
        l_node_split_point_lref2 :=   get_lref_at_node(pi_node_id         => pi_node_id
                                                      ,pi_ne_id_in        => pi_route_ne_id
                                                      ,pi_before_or_after => 'A');
- 
 
-    --Getting left hand placement array 
+
+    --Getting left hand placement array
     po_placement_array_left :=  Nm3pla.get_connected_extent(l_non_ambig_route_start_lref  -- from start of route
                                                            ,l_node_split_point_lref1  -- to lref at node to the right
                                                            ,pi_route_ne_id -- along route
@@ -1830,15 +1851,15 @@ BEGIN
 
 
     --Getting right hand placement array'
-    po_placement_array_right :=  Nm3pla.get_connected_extent(l_node_split_point_lref2  -- from lref at node to the right 
+    po_placement_array_right :=  Nm3pla.get_connected_extent(l_node_split_point_lref2  -- from lref at node to the right
                                                             ,l_non_ambig_route_end_lref  -- to end of route
                                                             ,pi_route_ne_id -- along route
                                                             ,NULL);
 
- 
+
  ELSE
- 
-  
+
+
    --Getting lref for split point
    l_non_ambig_split_point_lref   := nm_lref(pi_non_ambig_ne_id, pi_non_ambig_split_offset);   -- linear ref that denotes the non-ambiguous split point
 
@@ -1854,8 +1875,8 @@ BEGIN
                                                            ,pi_route_ne_id -- along route
                                                            ,NULL);
 
-   
- END IF;   
+
+ END IF;
 
 END get_route_split_memberships;
 --
@@ -1871,13 +1892,13 @@ PROCEDURE split_group_memberships(pi_route_ne_id             IN  nm_elements.ne_
 
   l_placement_array_left    nm_placement_array;
   l_placement_array_right   nm_placement_array;
-  
+
   r_nm_members              nm_members%ROWTYPE;
 
 --
 --
   PROCEDURE end_date_existing_in_members IS
-  
+
   BEGIN
     UPDATE nm_members
     SET    nm_end_date = pi_effective_date
@@ -1886,35 +1907,35 @@ PROCEDURE split_group_memberships(pi_route_ne_id             IN  nm_elements.ne_
 --
 --
   PROCEDURE end_date_existing_of_members IS
-	
-  BEGIN	 
+
+  BEGIN
     UPDATE nm_members
     SET    nm_end_date = pi_effective_date
     WHERE  nm_ne_id_of = pi_route_ne_id;
-  END end_date_existing_of_members; 
+  END end_date_existing_of_members;
 --
 --
   FUNCTION get_nm_members_constants(pi_nm_ne_id_in IN nm_members.nm_ne_id_in%TYPE) RETURN nm_members%ROWTYPE IS
-  
+
     CURSOR c1 IS
     SELECT *
     FROM   nm_members
     WHERE  nm_ne_id_in = pi_nm_ne_id_in;
 
     l_retval c1%ROWTYPE;
-  
-  BEGIN 
-  
+
+  BEGIN
+
     OPEN c1;
     FETCH c1 INTO l_retval;
     CLOSE c1;
 
     RETURN(l_retval);
 
-  END get_nm_members_constants;  
+  END get_nm_members_constants;
 --
--- 
-  PROCEDURE create_new_route_memberships(pi_ne_id             IN nm_elements.ne_id%TYPE 
+--
+  PROCEDURE create_new_route_memberships(pi_ne_id             IN nm_elements.ne_id%TYPE
                                         ,pi_placement_array   IN nm_placement_array) IS
 
 
@@ -1922,20 +1943,20 @@ PROCEDURE split_group_memberships(pi_route_ne_id             IN  nm_elements.ne_
     SELECT  pi_route_ne_id                  nm_ne_id_in
           , pl.pl_ne_id                     nm_ne_id_of
           , pl.pl_start                     nm_begin_mp
-          , pl.pl_end                       nm_end_mp    
+          , pl.pl_end                       nm_end_mp
           , pl.pl_measure                   nm_slk
     FROM TABLE ( pi_placement_array.npa_placement_array ) pl;
 
     CURSOR c_memb2 IS
     SELECT  *
-    FROM nm_members 
+    FROM nm_members
     WHERE nm_ne_id_of = pi_route_ne_id;
-  
+
   BEGIN
- 
+
     FOR i IN c_memb1 LOOP
-  
-  
+
+
      INSERT INTO NM_MEMBERS_ALL  ( nm_ne_id_in
                                   ,nm_ne_id_of
                                   ,nm_type
@@ -1949,7 +1970,7 @@ PROCEDURE split_group_memberships(pi_route_ne_id             IN  nm_elements.ne_
                                   ,nm_admin_unit)
      VALUES  ( pi_ne_id                   -- ne_id of new element
               ,i.nm_ne_id_of
-              ,r_nm_members.nm_type       -- use same value as was on previous membership 
+              ,r_nm_members.nm_type       -- use same value as was on previous membership
               ,r_nm_members.nm_obj_type   -- use same value as was on previous membership
               ,i.nm_begin_mp
               ,pi_effective_date
@@ -1958,7 +1979,7 @@ PROCEDURE split_group_memberships(pi_route_ne_id             IN  nm_elements.ne_
               ,i.nm_slk
               ,r_nm_members.nm_cardinality   -- use same value as was on previous membership
               ,r_nm_members.nm_admin_unit);	 -- use same value as was on previous membership
-  
+
   END LOOP;
 
 --nm_debug.debug('setting up memberships of groups of groups based on the membership of the original element');
@@ -2000,11 +2021,11 @@ PROCEDURE split_group_memberships(pi_route_ne_id             IN  nm_elements.ne_
 
   END LOOP;
 
-  END create_new_route_memberships; 
+  END create_new_route_memberships;
 
 BEGIN
 
- ---------------------------------------------------  
+ ---------------------------------------------------
  -- get placement array of original group memberships
  ----------------------------------------------------
  -- Determining existing group memberships.');
@@ -2018,23 +2039,23 @@ BEGIN
  --
  -- get some constant values from that should be applied on the re-create of memberships
  --
- r_nm_members := get_nm_members_constants(pi_nm_ne_id_in => pi_route_ne_id);  
+ r_nm_members := get_nm_members_constants(pi_nm_ne_id_in => pi_route_ne_id);
 
  end_date_existing_in_members;
-                              
+
  --
  -- create memberships for first new group
  -- encapsulate elements up to the split point
  create_new_route_memberships(pi_ne_id            => pi_ne_id_1
                              ,pi_placement_array  => l_placement_array_left);
- 
+
  --
  -- create memberships for second new group
  -- encapsulate elements after the split point
  create_new_route_memberships(pi_ne_id            => pi_ne_id_2
-                             ,pi_placement_array  => l_placement_array_right);  
- 
- 
+                             ,pi_placement_array  => l_placement_array_right);
+
+
  end_date_existing_of_members;
 
 END split_group_memberships;
@@ -2051,7 +2072,7 @@ PROCEDURE do_split_group(pi_route_ne_id             IN     nm_elements.ne_id%TYP
                         ,pi_split_at_node_id        IN     nm_nodes.no_node_id%TYPE
                         ,pi_create_node             IN     BOOLEAN DEFAULT FALSE
                         ,pi_node_id                 IN OUT nm_nodes.no_node_id%TYPE
-                        ,pi_no_np_id                IN OUT nm_nodes.no_np_id%TYPE												
+                        ,pi_no_np_id                IN OUT nm_nodes.no_np_id%TYPE
                         ,pi_no_node_name            IN     nm_nodes.no_node_name%TYPE         DEFAULT NULL
                         ,pi_no_descr                IN     nm_nodes.no_descr%TYPE             DEFAULT NULL
                         ,pi_no_node_type            IN     nm_nodes.no_node_type%TYPE         DEFAULT NULL
@@ -2099,7 +2120,7 @@ PROCEDURE do_split_group(pi_route_ne_id             IN     nm_elements.ne_id%TYP
 
   l_new_datum_ne_id_1  nm_elements.ne_id%TYPE;   -- the new element ne_id of any datum that is created
   l_new_datum_ne_id_2  nm_elements.ne_id%TYPE;   -- the 2nd new element ne_id of any datum that is created
-  
+
 -- to store original route memberships
   l_placement_array_left    nm_placement_array;
   l_placement_array_right   nm_placement_array;
@@ -2133,14 +2154,14 @@ BEGIN
                     ,p_no_purpose          => pi_no_purpose   -- PT 03.06.08
                     );
  END IF;
- 
- 
+
+
   -----------------------------------------------------------------------------------------------------------
-  -- create 2 new nm_element rowtype variables based on  inherited attribs/those that are passed through from 
+  -- create 2 new nm_element rowtype variables based on  inherited attribs/those that are passed through from
   -----------------------------------------------------------------------------------------------------------
   g_rec_ne_old   := Nm3net.get_ne (pi_route_ne_id);  -- store the ne record of the route to be split
-  
-  l_node_id := NVL(pi_node_id,pi_split_at_node_id);  -- grab a node id if set to determine split point - otherwise offset will still be used  
+
+  l_node_id := NVL(pi_node_id,pi_split_at_node_id);  -- grab a node id if set to determine split point - otherwise offset will still be used
 
 
   split_element (p_ne_id                      => pi_route_ne_id
@@ -2171,24 +2192,24 @@ BEGIN
                 ,p_ne_nsg_ref_1               => pi_ne_nsg_ref_1
                 ,p_ne_version_no_1            => pi_ne_version_no_1
                 ,p_ne_unique_2                => pi_ne_unique_2
-                ,p_ne_type_2                  => pi_ne_type_2           
+                ,p_ne_type_2                  => pi_ne_type_2
                 ,p_ne_nt_type_2               => pi_ne_nt_type_2
-                ,p_ne_descr_2                 => pi_ne_descr_2 
+                ,p_ne_descr_2                 => pi_ne_descr_2
                 ,p_ne_admin_unit_2            => pi_ne_admin_unit_2
                 ,p_ne_gty_group_type_2        => pi_ne_gty_group_type_2
-                ,p_ne_owner_2                 => pi_ne_owner_2 
+                ,p_ne_owner_2                 => pi_ne_owner_2
                 ,p_ne_name_1_2                => pi_ne_name_1_2
                 ,p_ne_name_2_2                => pi_ne_name_2_2
                 ,p_ne_prefix_2                => pi_ne_prefix_2
                 ,p_ne_number_2                => pi_ne_number_2
-                ,p_ne_sub_type_2              => pi_ne_sub_type_2      
+                ,p_ne_sub_type_2              => pi_ne_sub_type_2
                 ,p_ne_group_2                 => pi_ne_group_2
                 ,p_ne_no_start_2              => pi_ne_no_start_2
                 ,p_ne_no_end_2                => pi_ne_no_end_2
                 ,p_ne_sub_class_2             => pi_ne_sub_class_2
                 ,p_ne_nsg_ref_2               => pi_ne_nsg_ref_2
                 ,p_ne_version_no_2            => pi_ne_version_no_2);
- 
+
 
   ----------------------------------------------
   -- end date original memberships for the group
@@ -2199,7 +2220,7 @@ BEGIN
                          ,pi_effective_date          => pi_effective_date
                          ,pi_non_ambig_ne_id         => pi_non_ambig_ne_id
                          ,pi_non_ambig_split_offset  => pi_non_ambig_split_offset
-                         ,pi_node_id                 => l_node_id); 
+                         ,pi_node_id                 => l_node_id);
 
 
   -------------------------------------
@@ -2212,23 +2233,23 @@ BEGIN
 
   -----------------------------------------
   -- Split other products e.g. move defects
-  -----------------------------------------					 
+  -----------------------------------------
    split_other_products (p_ne_id          => pi_route_ne_id
                         ,p_ne_id_1        => pi_ne_id_1
                         ,p_ne_id_2        => pi_ne_id_2
                         ,p_split_measure  => pi_split_offset
                         ,p_effective_date => pi_effective_date
-                        );					 
+                        );
 
   -- moving any network AD associated with the original element
-  
+
    IF Nm3nwad.ad_data_exist(pi_route_ne_id) THEN
-    
+
       Nm3nwad.do_ad_split( pi_old_ne_id  => pi_route_ne_id
                          , pi_new_ne_id1 => pi_ne_id_1
                          , pi_new_ne_id2 => pi_ne_id_2);
 
-   END IF;                         
+   END IF;
 
 
   --End dating original group
@@ -2263,7 +2284,7 @@ PROCEDURE do_split_datum_or_group ( pi_ne_id                  IN     nm_elements
                                    ,pi_ne_id_2                IN OUT nm_elements.ne_id%TYPE  -- the 2nd new element ne_id
                                    ,pi_effective_date         IN     DATE DEFAULT  Nm3user.get_effective_date-- the date the split is effective from
                                    ,pi_split_offset           IN     NUMBER
-                                   ,pi_non_ambig_ne_id        IN     nm_elements.ne_id%TYPE    -- only applicable when splitting a group 
+                                   ,pi_non_ambig_ne_id        IN     nm_elements.ne_id%TYPE    -- only applicable when splitting a group
                                    ,pi_non_ambig_split_offset IN     NUMBER                    -- only applicable when splitting a group
                                    ,pi_split_at_node_id       IN     nm_nodes.no_node_id%TYPE  -- only applicable when splitting a group
 
@@ -2411,7 +2432,7 @@ BEGIN
                         ,pi_ne_type_1               => pi_ne_type_1
                         ,pi_ne_nt_type_1            => pi_ne_nt_type_1
                         ,pi_ne_descr_1              => pi_ne_descr_1
-                        ,pi_ne_admin_unit_1         => pi_ne_admin_unit_1 
+                        ,pi_ne_admin_unit_1         => pi_ne_admin_unit_1
                         ,pi_ne_gty_group_type_1     => pi_ne_gty_group_type_1
                         ,pi_ne_owner_1              => pi_ne_owner_1
                         ,pi_ne_name_1_1             => pi_ne_name_1_1
@@ -2445,9 +2466,9 @@ BEGIN
                         ,pi_ne_version_no_2         => pi_ne_version_no_2);
 
  END IF;
- 
+
  set_for_return;
-  
+
  Nm_Debug.proc_end(g_package_name,'do_split_datum_or_group');
 
 EXCEPTION
@@ -2455,7 +2476,7 @@ EXCEPTION
      set_for_return;
      ROLLBACK;
      RAISE;
- 
+
 END do_split_datum_or_group;
 --
 ------------------------------------------------------------------------------------------------
