@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.6   Jul 30 2008 10:28:28   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.7   Aug 22 2008 10:30:12   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jul 30 2008 10:28:28  $
---       Date fetched Out : $Modtime:   Jul 30 2008 10:26:08  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Aug 22 2008 10:30:12  $
+--       Date fetched Out : $Modtime:   Aug 22 2008 10:29:40  $
+--       PVCS Version     : $Revision:   2.7  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.7  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -71,8 +71,6 @@ FUNCTION get_id             ( p_ptr IN ptr_array, p_value IN INTEGER )  RETURN I
 FUNCTION get_idx_from_id    ( p_ptr IN ptr_num_array, p_id IN INTEGER ) RETURN INTEGER;
 FUNCTION get_idx            ( p_ga IN nm_geom_array, p_id IN INTEGER )  RETURN INTEGER;
 
-
-FUNCTION locate_pt (  p_geom IN mdsys.sdo_geometry, p_st IN NUMBER ) RETURN mdsys.sdo_geometry;
 
 PROCEDURE add_dyn_seg_exception( p_ner          IN INTEGER,
                                  p_job_id       IN INTEGER,
@@ -470,77 +468,6 @@ END;
 --------------------------------------------------------------------------------------------------------------------
 --
 
-FUNCTION Clip_Geom( p_geom IN OUT NOCOPY mdsys.sdo_geometry, p_len IN NUMBER, p_st IN NUMBER, p_end IN NUMBER, p_diminfo IN mdsys.sdo_dim_array)
-RETURN mdsys.sdo_geometry IS
-BEGIN
-  IF p_st = 0 AND p_end = p_len THEN
-    RETURN p_geom;
-  ELSE
-    IF g_clip_type = 'SDO' THEN
-      RETURN sdo_lrs.clip_geom_segment( p_geom, p_diminfo, p_st, p_end );
- ELSE
-      RETURN Sdo_Clip( p_geom, p_st, p_end, p_diminfo );
- END IF;
-  END IF;
-END;
-
---
---------------------------------------------------------------------------------------------------------------------
---
-FUNCTION locate_pt (  p_geom IN OUT NOCOPY mdsys.sdo_geometry, p_diminfo IN mdsys.sdo_dim_array,  p_st IN NUMBER )
-RETURN mdsys.sdo_geometry IS
-k      INTEGER;
-last1  INTEGER := p_geom.sdo_ordinates.LAST;
-retval mdsys.sdo_geometry;
-l_geom mdsys.sdo_geometry;
-BEGIN
-
-  IF Hig.get_sysopt('SDOCLIPTYP') = 'SDO' THEN
-    retval := sdo_lrs.locate_pt( p_geom, p_diminfo, p_st, 0);
-  ELSE
---nm_debug.debug_on;
-
-    FOR i IN 1..last1/3 - 1 LOOP
-
-      k := (i-1)*3;
-
-      IF p_st <= p_geom.sdo_ordinates(k + 6) THEN
-
-
-  --   nm_debug.debug('Start K = '||to_char(k)||' value = '||to_char(p_geom.sdo_ordinates(k + 6)));
-
-        l_geom := mdsys.sdo_geometry( 3302, p_geom.sdo_srid, NULL, mdsys.sdo_elem_info_array(1,2,1),
-                       mdsys.sdo_ordinate_array( p_geom.sdo_ordinates(k+1), p_geom.sdo_ordinates(k+2), p_geom.sdo_ordinates(k+3),
-                                      p_geom.sdo_ordinates(k+4), p_geom.sdo_ordinates(k+5), p_geom.sdo_ordinates(k+6)));
-
-
-  /*
-          nm_debug.debug(to_char( p_geom.sdo_ordinates(k+1))||','||
-                   to_char( p_geom.sdo_ordinates(k+2))||','||
-          to_char( p_geom.sdo_ordinates(k+3))||','||
-              to_char( p_geom.sdo_ordinates(k+4))||','||
-          to_char( p_geom.sdo_ordinates(k+5))||','||
-          to_char( p_geom.sdo_ordinates(k+6)));
-  */
-
-          retval := sdo_lrs.locate_pt( l_geom, p_diminfo, p_st );
-
-        EXIT;
-
-      END IF;
-
-    END LOOP;
-
-  END IF;
-
-  RETURN retval;
-
-END;
-
---
---------------------------------------------------------------------------------------------------------------------
---
-
 FUNCTION Get_Datum_Theme( p_nt IN NM_TYPES.nt_type%TYPE ) RETURN NM_THEMES_ALL.nth_theme_id%TYPE IS
 retval NM_THEMES_ALL.nth_theme_id%TYPE;
 CURSOR c_nth ( c_nt IN NM_TYPES.nt_type%TYPE ) IS
@@ -598,14 +525,14 @@ END;
  END IF;
 
     cur_string := 'select sdo_lrs.project_pt( '||g_usgm.column_name||', :diminfo, '||
-          'mdsys.sdo_geometry( 3001, :srid, null, mdsys.sdo_elem_info_array( 1,1,1), '||
+          'mdsys.sdo_geometry( 2001, :srid, null, mdsys.sdo_elem_info_array( 1,1,1), '||
           'mdsys.sdo_ordinate_array( :x, :y, null )) ) '||
     ' from '||g_usgm.table_name||
     ' where '||g_nth.nth_feature_pk_column||' = :ne_id';
 
 
-    --   nm_debug.debug_on;
-    --   nm_debug.debug( cur_string );
+       nm_debug.debug_on;
+       nm_debug.debug( cur_string );
 
     EXECUTE IMMEDIATE cur_string INTO retval USING g_usgm.diminfo, g_usgm.srid, p_x, p_y, p_ne_id;
     RETURN retval;
@@ -633,7 +560,7 @@ END;
  END IF;
 
     cur_string := 'select sdo_lrs.get_measure( sdo_lrs.project_pt( '||g_usgm.column_name||', :diminfo, '||
-          'mdsys.sdo_geometry( 3001, :srid, null, mdsys.sdo_elem_info_array( 1,1,1), '||
+          'mdsys.sdo_geometry( 2001, :srid, null, mdsys.sdo_elem_info_array( 1,1,1), '||
           'mdsys.sdo_ordinate_array( :x, :y, null )) ), :diminfo ) '||
     ' from '||g_usgm.table_name||
     ' where '||g_nth.nth_feature_pk_column||' = :ne';
@@ -691,7 +618,7 @@ END;
 
  l_geom := Get_Layer_Element_Geometry( p_layer, p_ne_id );
 
- retval := locate_pt( l_geom, g_usgm.diminfo, p_measure);
+ retval := sdo_lrs.locate_pt( l_geom, g_usgm.diminfo, p_measure);
 
 -- cur_string :=  'select sdo_lrs.locate_pt( '||g_usgm.column_name||', :diminfo, :measure, 0 ) '||
 --  cur_string :=  'select locate_pt( '||g_usgm.column_name||', :diminfo, :measure ) '||
@@ -702,7 +629,7 @@ END;
 -- nm_debug.debug(cur_string);
 --
 --     EXECUTE IMMEDIATE cur_string INTO retval using g_usgm.diminfo, p_measure, p_ne_id;
-    RETURN ignore_measure(retval);
+    RETURN retval;
 
   EXCEPTION
     WHEN OTHERS THEN
@@ -1011,7 +938,7 @@ end;
     END IF;
 
 
-    RETURN ignore_measure(l_geom);
+    RETURN l_geom;
 
   END;
 
@@ -1192,50 +1119,6 @@ END;
 --------------------------------------------------------------------------------------------------------------------
 --
 
-FUNCTION remove_redundant_pts( p_geom IN mdsys.sdo_geometry ) RETURN mdsys.sdo_geometry IS
--- assumes 3D, single-part feature, based on pure geometry - no diminfo on which to base the interrogation of proximity - use the other procedure
--- if you know the layer.
-
-retval mdsys.sdo_geometry := mdsys.sdo_geometry( 3002, p_geom.sdo_srid, p_geom.sdo_point,
-                                    mdsys.sdo_elem_info_array(1,2,1),
-                                    mdsys.sdo_ordinate_array(0)) ;
-ret_count INTEGER;
-
-BEGIN
-  IF p_geom.sdo_ordinates.LAST > 3 THEN
-
-    FOR ic IN 1..3 LOOP
-      retval.sdo_ordinates(ic) := p_geom.sdo_ordinates(ic);
-      retval.sdo_ordinates.EXTEND;
-    END LOOP;
-
-    ret_count := 3;
-
-    FOR ic IN 4..p_geom.sdo_ordinates.LAST LOOP
-      ret_count := ret_count + 1;
-
-      IF ret_count <= retval.sdo_ordinates.LAST THEN
-        retval.sdo_ordinates.EXTEND;
-      END IF;
-
-      retval.sdo_ordinates(ret_count) := p_geom.sdo_ordinates(ic);
-
-      IF MOD( ic, 3 ) = 0 THEN
---use the tolerance
-        IF retval.sdo_ordinates( ret_count )     = retval.sdo_ordinates( ret_count - 3) AND
-           retval.sdo_ordinates( ret_count - 1 ) = retval.sdo_ordinates( ret_count - 4) AND
-           retval.sdo_ordinates( ret_count - 2 ) = retval.sdo_ordinates( ret_count - 5) THEN
---         redundant
-          ret_count := ret_count - 3;
-        END IF;
-      END IF;
-    END LOOP;
-    RETURN retval;
-  ELSE
-    RETURN p_geom;
-  END IF;
-END;
-
 --
 --------------------------------------------------------------------------------------------------------------------
 --
@@ -1243,7 +1126,7 @@ END;
 FUNCTION remove_redundant_pts( p_layer IN NUMBER,
         p_geom IN mdsys.sdo_geometry ) RETURN mdsys.sdo_geometry IS
 -- assumes 3D, single-part feature
-retval mdsys.sdo_geometry := mdsys.sdo_geometry( 3002, p_geom.sdo_srid, p_geom.sdo_point,
+retval mdsys.sdo_geometry := mdsys.sdo_geometry( 3302, p_geom.sdo_srid, p_geom.sdo_point,
                                     mdsys.sdo_elem_info_array(1,2,1),
                                     NULL) ;
 
@@ -1666,9 +1549,7 @@ BEGIN
 
   IF is_clipped(p_begin, p_end, l_length ) = 0 THEN
 
---  retval := sdo_lrs.clip_geom_segment( retval, g_usgm.diminfo, p_begin, p_end );
-
-    retval := Clip_Geom( retval, l_length, p_begin, p_end, g_usgm.diminfo );
+    retval := sdo_lrs.clip_geom_segment( retval, g_usgm.diminfo, p_begin, p_end );
 
   END IF;
 
@@ -1837,7 +1718,7 @@ BEGIN
 
 --  need to breal the shape and redefine measures, possibly with new vertices.
 
-    l_pt := locate_pt( p_geom, g_usgm.diminfo, p_measure);
+    l_pt := sdo_lrs.locate_pt( p_geom, g_usgm.diminfo, p_measure);
 
     l_insert_pt := FALSE;
 
@@ -2224,7 +2105,7 @@ BEGIN
 
   END LOOP;
 
-  RETURN Nm3sdo.ignore_measure(retval);
+  RETURN retval;
 END;
 
 --
@@ -2332,9 +2213,7 @@ BEGIN
         IF is_clipped( l_start, l_end, l_length ) = 0 THEN
 --          --   nm_debug.debug('Clipped between '||to_char( l_start )||' and '||to_char(l_end)||' length = '||to_char(l_length));
 
---          l_geom := sdo_lrs.clip_geom_segment( l_geom, g_usgm.diminfo, l_start, l_end );
-
-            l_geom := Clip_Geom( l_geom, l_length, l_start, l_end, g_usgm.diminfo );
+            l_geom := sdo_lrs.clip_geom_segment( l_geom, g_usgm.diminfo, l_start, l_end );
 
         ELSE
 --           --   nm_debug.debug('Not clipped '||to_char( l_start )||' and '||to_char(l_end)||' length = '||to_char(l_length));
@@ -2368,7 +2247,7 @@ BEGIN
 
   END LOOP;
   CLOSE geocur;
-  RETURN ignore_measure(retval);
+  RETURN retval;
 END;
 
 --
@@ -2390,7 +2269,7 @@ BEGIN
 
   Nm3user.set_effective_date(p_date=> l_stored_date );
 
-  RETURN ignore_measure(retval);
+  RETURN retval;
 
 EXCEPTION
   WHEN OTHERS THEN
@@ -2468,7 +2347,7 @@ BEGIN
      NULL;
    END IF;
 
-   RETURN ignore_measure(l_geom);
+   RETURN l_geom;
 END;
 
 
@@ -2529,8 +2408,7 @@ BEGIN
 
 --        nm_debug.debug('Clipped between '||to_char( l_start )||' and '||to_char(l_end)||' length = '||to_char(l_length));
 
---        l_geom := sdo_lrs.clip_geom_segment( l_geom, g_usgm.diminfo, l_start, l_end );
-          l_geom := Clip_Geom( l_geom, l_length, l_start, l_end, g_usgm.diminfo );
+          l_geom := sdo_lrs.clip_geom_segment( l_geom, g_usgm.diminfo, l_start, l_end );
 
         ELSE
 --         nm_debug.debug('Not clipped '||to_char( l_start )||' and '||to_char(l_end)||' length = '||to_char(l_length));
@@ -2557,7 +2435,7 @@ BEGIN
       END IF;
   END LOOP;
   CLOSE geocur;
-  RETURN ignore_measure(retval);
+  RETURN retval;
 END;
 
 --
@@ -2592,14 +2470,14 @@ BEGIN
   l_geom := Get_Layer_Element_Geometry( p_layer, p_ne_id_of);
 
   IF l_geom IS NOT NULL THEN
-    retval := locate_pt( l_geom, g_usgm.diminfo, p_measure );
+    retval := sdo_lrs.locate_pt( l_geom, g_usgm.diminfo, p_measure );
 
     retval := get_2d_pt( retval );
   ELSE
     retval := NULL;
   END IF;
 
-  RETURN ignore_measure(retval);
+  RETURN retval;
 
 END;
 
@@ -2923,14 +2801,14 @@ BEGIN
 
                      IF p_pnt_or_cont = 'C' THEN
 
-                          l_geom :=  Clip_Geom( l_ge.nga(l_g_p).ng_geometry,
-                                  l_len.pa(l_l_p).ptr_value,
-                                  v_pl.npa_placement_array(j).pl_start,
-                   v_pl.npa_placement_array(j).pl_end,
-                     l_usgm.diminfo );
+                          l_geom :=  sdo_lrs.Clip_Geom_segment( l_ge.nga(l_g_p).ng_geometry,
+                                                        l_usgm.diminfo,
+                                                        v_pl.npa_placement_array(j).pl_start,
+                                                        v_pl.npa_placement_array(j).pl_end );
+
                         ELSE
 
-                          l_geom :=  locate_pt( l_ge.nga(l_g_p).ng_geometry,
+                          l_geom :=  sdo_lrs.locate_pt( l_ge.nga(l_g_p).ng_geometry,
                                         l_usgm.diminfo,
                                   v_pl.npa_placement_array(j).pl_start );
 
@@ -2963,7 +2841,7 @@ BEGIN
                       l_time1 := DBMS_UTILITY.GET_TIME;
 
                       IF p_pnt_or_cont = 'C' THEN
-                        l_geom.sdo_gtype := 3002;
+                        l_geom.sdo_gtype := 3302;
                 ELSE
                   l_geom := get_2d_pt( l_geom );
                 END IF;
@@ -3030,7 +2908,7 @@ PROCEDURE create_nt_data( p_nth    IN NM_THEMES_ALL%ROWTYPE,
         p_ta     IN nm_theme_array,
         p_job_id IN NUMBER DEFAULT NULL) IS
 
-l_mp_gtype      NUMBER := TO_NUMBER(NVL(Hig.get_sysopt('SDOMPGTYPE'),'3002'));
+l_mp_gtype      NUMBER := TO_NUMBER(NVL(Hig.get_sysopt('SDOMPGTYPE'),'3302'));
 
 cur_str1        VARCHAR2(2000);
 cur_str2        VARCHAR2(2000);
@@ -3146,7 +3024,7 @@ BEGIN
 
 --          Nm_Debug.DEBUG( 'Time taken to create shape for route '||TO_CHAR(l_ga.nga(i).ng_ne_id )||' is '||TO_CHAR(l_time2-l_time1));
 
-          EXECUTE IMMEDIATE cur_str2 USING l_seq.ia(i), l_ga.nga(i).ng_ne_id, ignore_measure(l_geom), l_effective_date;
+          EXECUTE IMMEDIATE cur_str2 USING l_seq.ia(i), l_ga.nga(i).ng_ne_id, l_geom, l_effective_date;
 
           COMMIT;
         EXCEPTION
@@ -3496,11 +3374,11 @@ BEGIN
 
                     BEGIN
 
-                      l_geom :=  Clip_Geom( l_ge.nga(l_g_p).ng_geometry,
-                              l_len.pa(l_l_p).ptr_value,
-                              v_pl.npa_placement_array(j).pl_start,
-                      v_pl.npa_placement_array(j).pl_end,
-               l_usgm.diminfo );
+                      l_geom :=  sdo_lrs.Clip_Geom_segment( l_ge.nga(l_g_p).ng_geometry,
+                                                    l_usgm.diminfo,
+                                                    v_pl.npa_placement_array(j).pl_start,
+                                                    v_pl.npa_placement_array(j).pl_end );
+
                     EXCEPTION
 
                 WHEN OTHERS THEN
@@ -4073,40 +3951,6 @@ END;
 ----------------------------------------------------------------------------------------------------------
 --
 
--- this function does not 'ignore' the measure it just sets the geometry type to one that will
--- not interpret the third ordinate as a measure.
-
-FUNCTION ignore_measure( p_geom mdsys.sdo_geometry ) RETURN mdsys.sdo_geometry IS
-BEGIN
-  IF p_geom.sdo_gtype = 3302 THEN
-    RETURN mdsys.sdo_geometry(3002, p_geom.sdo_srid, p_geom.sdo_point, p_geom.sdo_elem_info, p_geom.sdo_ordinates );
-  ELSIF p_geom.sdo_gtype = 3301 THEN
-    RETURN mdsys.sdo_geometry(3001, p_geom.sdo_srid, p_geom.sdo_point, p_geom.sdo_elem_info, p_geom.sdo_ordinates );
-  ELSE
-    RETURN p_geom;
-  END IF;
-END;
-
---
------------------------------------------------------------------------------
---
--- this function does not 'add' the measure it just sets the geometry type to one that will
--- interpret the third ordinate as a measure.
-
-FUNCTION add_measure( p_geom mdsys.sdo_geometry ) RETURN mdsys.sdo_geometry IS
-BEGIN
-  IF p_geom.sdo_gtype = 3002 THEN
-    RETURN mdsys.sdo_geometry(3302, p_geom.sdo_srid, p_geom.sdo_point, p_geom.sdo_elem_info, p_geom.sdo_ordinates );
-  ELSIF p_geom.sdo_gtype = 3001 THEN
-    RETURN mdsys.sdo_geometry(3301, p_geom.sdo_srid, p_geom.sdo_point, p_geom.sdo_elem_info, p_geom.sdo_ordinates );
-  ELSE
-    RETURN p_geom;
-  END IF;
-END;
---
------------------------------------------------------------------------------
---
-
 FUNCTION Set_Srid(p_layer IN NUMBER,  p_geom mdsys.sdo_geometry ) RETURN mdsys.sdo_geometry IS
   l_srid NUMBER;
 BEGIN
@@ -4171,11 +4015,11 @@ BEGIN
 
  IF ldim = 3 THEN
       ldis := sdo_lrs.geom_segment_end_measure(p_geom)/2;
-      retval := locate_pt( p_geom, ldis );
+      retval := sdo_lrs.locate_pt( p_geom, ldis );
  ELSIF ldim = 2 THEN
    l_geom := sdo_lrs.convert_to_lrs_geom( p_geom );
       ldis   := sdo_lrs.geom_segment_end_measure(l_geom)/2;
-      retval := locate_pt( l_geom, ldis );
+      retval := sdo_lrs.locate_pt( l_geom, ldis );
  ELSE
       Hig.raise_ner(pi_appl                => Nm3type.c_hig
                     ,pi_id                 => 285
@@ -4307,7 +4151,7 @@ BEGIN
 --    prevent rounding errors - last point should be on the geometry
 --
       IF p_interval*irec <= l_end THEN
-       l_pt_geom := locate_pt( l_geometry, g_usgm.diminfo, p_interval*irec);
+       l_pt_geom := sdo_lrs.locate_pt( l_geometry, g_usgm.diminfo, p_interval*irec);
 
      --   nm_debug.debug('Pt Geom - ('||to_char(l_pt_geom.sdo_ordinates(1))||','||
         --                            to_char(l_pt_geom.sdo_ordinates(2))||')');
@@ -4846,6 +4690,9 @@ BEGIN
 
   IF sdo_lrs.geom_segment_end_measure ( l_geom, g_usgm.diminfo ) != l_length THEN
 
+     nm_debug.debug_on;
+     nm_debug.debug('insert with length = '||to_char(l_length)||' and '||to_char(sdo_lrs.geom_segment_end_measure ( l_geom, g_usgm.diminfo )));
+
      sdo_lrs.redefine_geom_segment( l_geom, g_usgm.diminfo, 0, l_length );
 
   END IF;
@@ -4878,7 +4725,7 @@ BEGIN
 --nm_debug.debug_on;
 --nm_debug.debug(cur_string);
 
-  EXECUTE IMMEDIATE cur_string USING p_ne_id, ignore_measure(l_geom);
+  EXECUTE IMMEDIATE cur_string USING p_ne_id, l_geom;
 
 END;
 
@@ -4995,7 +4842,7 @@ END;
 
         IF irec.nit_pnt_or_cont = 'P' THEN
 
-          l_geom := locate_pt( p_geom, g_usgm.diminfo, irec.nm_begin_mp );
+          l_geom := sdo_lrs.locate_pt( p_geom, g_usgm.diminfo, irec.nm_begin_mp );
           l_geom := mdsys.sdo_geometry( 2001, l_geom.sdo_srid,
                            mdsys.sdo_point_type( l_geom.sdo_ordinates(1),
                                                  l_geom.sdo_ordinates(2), NULL), NULL, NULL);
@@ -5367,193 +5214,7 @@ END;
   END;
 
 --
------------------------------------------------------------------------------
---
-
--- performance probs in an Oracle version led to this being coded. Use base spatial function.
-
-FUNCTION locate_pt (  p_geom IN mdsys.sdo_geometry, p_st IN NUMBER )
-RETURN mdsys.sdo_geometry IS
-k      INTEGER;
-last1  INTEGER := p_geom.sdo_ordinates.LAST;
-retval mdsys.sdo_geometry;
-l_geom mdsys.sdo_geometry := p_geom;
-BEGIN
-
-  IF Hig.get_sysopt('SDOCLIPTYP') = 'SDO' THEN
-    retval := sdo_lrs.locate_pt( p_geom, p_st, 0);
-  ELSE
---nm_debug.debug_on;
-
-    FOR i IN 1..last1/3 - 1 LOOP
-
-      k := (i-1)*3;
-
-      IF p_st <= l_geom.sdo_ordinates(k + 6) THEN
-
-
-  --   nm_debug.debug('Start K = '||to_char(k)||' value = '||to_char(p_geom.sdo_ordinates(k + 6)));
-
-        l_geom := mdsys.sdo_geometry( 3302, p_geom.sdo_srid, NULL, mdsys.sdo_elem_info_array(1,2,1),
-                       mdsys.sdo_ordinate_array( l_geom.sdo_ordinates(k+1), l_geom.sdo_ordinates(k+2), l_geom.sdo_ordinates(k+3),
-                                      l_geom.sdo_ordinates(k+4), l_geom.sdo_ordinates(k+5), l_geom.sdo_ordinates(k+6)));
-
-
-  /*
-          nm_debug.debug(to_char( p_geom.sdo_ordinates(k+1))||','||
-                   to_char( p_geom.sdo_ordinates(k+2))||','||
-          to_char( p_geom.sdo_ordinates(k+3))||','||
-              to_char( p_geom.sdo_ordinates(k+4))||','||
-          to_char( p_geom.sdo_ordinates(k+5))||','||
-          to_char( p_geom.sdo_ordinates(k+6)));
-  */
-
-          retval := sdo_lrs.locate_pt( l_geom, p_st );
-
-        EXIT;
-
-      END IF;
-
-    END LOOP;
-
-  END IF;
-
-  RETURN retval;
-
-END;
---
------------------------------------------------------------------------------
---
-
-FUNCTION generalise( p_geom IN mdsys.sdo_geometry, ipt IN NUMBER, tol IN NUMBER ) RETURN mdsys.sdo_geometry IS
---
--- function generalises the shape by dropping points if they lie off the line between ipt separated points by less than TOL
--- The function iterates over a set of points taken ipt at a time.
-
-llast INTEGER;
-iloop INTEGER;
-lpt   INTEGER;
-mpt   INTEGER;
-npt   INTEGER;
-
-ln_geom mdsys.sdo_geometry;
-pt1_geom mdsys.sdo_geometry;
-pt2_geom mdsys.sdo_geometry;
-
-p_geom_last INTEGER := p_geom.sdo_ordinates.LAST;
-
-ordval mdsys.sdo_ordinate_array;
-retval mdsys.sdo_geometry;
-
-dtol       NUMBER := .00001;
-distance   NUMBER;
-
-loop_count NUMBER := 0;
-
-BEGIN
-
---   nm_debug.debug_on;
---   nm_debug.delete_debug(true);
---   nm_debug.debug('Start of proc - increment = '||to_char(ipt)||' tol = '||to_char(tol));
-
-  ordval := mdsys.sdo_ordinate_array( p_geom.sdo_ordinates(1), p_geom.sdo_ordinates(2), p_geom.sdo_ordinates(3));
-
-  -- nm_debug.debug('Added first point');
-
-  llast := p_geom.sdo_ordinates.LAST/( 3*ipt );
-  IF llast < 1 THEN
-    ordval := mdsys.sdo_ordinate_array( p_geom.sdo_ordinates(1), p_geom.sdo_ordinates(2), p_geom.sdo_ordinates(3),
-                                        p_geom.sdo_ordinates(p_geom_last-2), p_geom.sdo_ordinates(p_geom_last-1),p_geom.sdo_ordinates(p_geom_last));
---    raise_application_error( -20001, 'Not feasible to drop any points');
-
-  ELSE
-
-    iloop := 1;
-    llast := p_geom_last - 3*(ipt + 1) + 1;
-
---    nm_debug.debug('First loop start - ending at '||to_char( p_geom.sdo_ordinates.last));
-
-    WHILE iloop < p_geom_last - 2 AND loop_count < 500 LOOP
-
-      loop_count := loop_count + 1;
-
-      IF (p_geom_last - iloop )-3 < ipt * 3 THEN
-        npt := (p_geom_last - iloop)/3 -1;
---        nm_debug.debug('Last interval'||to_char(npt));
-
-      ELSE
-        npt := ipt;
-      END IF;
-
---      nm_debug.debug('Next interval is only '||to_char(npt));
---      nm_debug.debug('From '||to_char(iloop));
-
-      ln_geom := npt_line( p_geom, 1+(iloop-1)/3, npt );
-
---      nm_debug.debug( 'Computed line - Testing intermediate points');
-
-      FOR icnt IN 1..npt-1 LOOP
-
-        mpt := iloop + (icnt * 3);
-
---        nm_debug.debug('test at ordinate no: '||to_char(mpt));
-
-        pt1_geom := mdsys.sdo_geometry( 2001, p_geom.sdo_srid,
-                       mdsys.sdo_point_type( p_geom.sdo_ordinates(mpt), p_geom.sdo_ordinates(mpt+1), p_geom.sdo_ordinates(mpt+2)), NULL, NULL );
-
---        nm_debug.debug( 'Computed point');
-
-        pt2_geom := SDO_LRS.PROJECT_PT( ln_geom, pt1_geom );
-
-        distance := SDO_GEOM.SDO_DISTANCE( pt1_geom, pt2_geom, dtol );
-        IF distance < tol THEN
---          nm_debug.debug('Ignore - distance = '||to_char(distance));
-          NULL;
-        ELSE
---          nm_debug.debug('Use the point - distance = '||to_char(distance));
-          ordval.EXTEND;
-          ordval( ordval.LAST ) := p_geom.sdo_ordinates(mpt);
-
-          ordval.EXTEND;
-          ordval( ordval.LAST ) := p_geom.sdo_ordinates(mpt+1);
-
-          ordval.EXTEND;
-          ordval( ordval.LAST ) := p_geom.sdo_ordinates(mpt+2);
-
---          nm_debug.debug('The '||to_char(mpt)||' point has been added - reset');
-          iloop := mpt;
-
-          EXIT;
-
-        END IF;
-      END LOOP;
-
-      ordval.EXTEND;
-      ordval( ordval.LAST ) := p_geom.sdo_ordinates(mpt+3);
-
-      ordval.EXTEND;
-      ordval( ordval.LAST ) := p_geom.sdo_ordinates(mpt+4);
-
-      ordval.EXTEND;
-      ordval( ordval.LAST ) := p_geom.sdo_ordinates(mpt+5);
-
---      nm_debug.debug('The '||to_char(mpt+3)||' point has been added - reset');
-
-      iloop := mpt+3;
-
---      nm_debug.debug('Inner loop exhausted, start again at '||to_char(iloop));
-
-    END LOOP;
-
---    nm_debug.debug('Outer loop exhausted - return value');
-  END IF;
-
-  retval := mdsys.sdo_geometry( p_geom.sdo_gtype, p_geom.sdo_srid, p_geom.sdo_point, mdsys.sdo_elem_info_array(1,2,1), ordval );
-  RETURN retval;
-END;
-
 -----------------------------------------------------------------------------------------------
-
 -- this is used primarily in Oracle map viewer
 
 FUNCTION get_centre_and_size( p_geom IN mdsys.sdo_geometry ) RETURN mdsys.sdo_geometry IS
@@ -6366,7 +6027,7 @@ BEGIN
        l_start := l_old_shape.sdo_ordinates(3);
        l_end   := l_old_shape.sdo_ordinates(l_old_shape.sdo_ordinates.LAST);
 
-       l_new_shape := Nm3sdo.ignore_measure(sdo_lrs.convert_to_lrs_geom( l_new_shape, l_start, l_end ));
+       l_new_shape := sdo_lrs.convert_to_lrs_geom( l_new_shape, l_start, l_end );
 
     ELSIF l_old_shape.sdo_gtype = 3003 THEN
 
@@ -6531,7 +6192,7 @@ BEGIN
        l_start := l_old_shape.sdo_ordinates(3);
        l_end   := l_old_shape.sdo_ordinates(l_old_shape.sdo_ordinates.LAST);
 
-       l_new_shape := Nm3sdo.ignore_measure(sdo_lrs.convert_to_lrs_geom( l_new_shape, l_start, l_end ));
+       l_new_shape := sdo_lrs.convert_to_lrs_geom( l_new_shape, l_start, l_end );
 
     ELSIF l_old_shape.sdo_gtype = 3003 THEN
 
@@ -7896,10 +7557,10 @@ BEGIN
 
 
        cur_string := cur_string||')'||
-                   ' select a.'||g_nth.nth_pk_column||',nm3sdo.ignore_measure(sdo_lrs. clip_geom_segment( '||
+                   ' select a.'||g_nth.nth_pk_column||',sdo_lrs.clip_geom_segment( '||
                    'b.'||l_base.nth_feature_shape_column||
                    ', a.'||g_nth.nth_st_chain_column||
-                   ', a.'||g_nth.nth_end_chain_column||', '||TO_CHAR( g_usgm.diminfo(1).sdo_tolerance)||'))';
+                   ', a.'||g_nth.nth_end_chain_column||', '||TO_CHAR( g_usgm.diminfo(1).sdo_tolerance)||')';
 
     END IF;
 
