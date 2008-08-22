@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.12   Aug 01 2008 09:35:24   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.13   Aug 22 2008 10:25:28   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Aug 01 2008 09:35:24  $
---       Date fetched Out : $Modtime:   Aug 01 2008 09:34:44  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Aug 22 2008 10:25:28  $
+--       Date fetched Out : $Modtime:   Aug 22 2008 10:24:34  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.12  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.13  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -397,7 +397,7 @@ AS
          || '''';
 
 --         Nm_Debug.debug_on;
-         Nm_Debug.DEBUG( cur_string );
+--         Nm_Debug.DEBUG( cur_string );
 
       Nm3ddl.create_object_and_syns( l_node_view, cur_string );
 
@@ -768,20 +768,28 @@ l_end    NUMBER;
 
 BEGIN
 
-  Nm_Debug.DEBUG('Split element at xy');
+--  Nm_Debug.DEBUG('Split element at xy');
 
   l_usgm := Nm3sdo.get_theme_metadata( p_layer );
 
   IF Nm3sdo.element_has_shape( p_layer, p_ne_id ) = 'TRUE' THEN
 
-    l_measure := Nm3sdo.get_measure ( p_layer, p_ne_id, p_x, p_y ).lr_offset;
+    if p_measure is null then
+
+      l_measure := Nm3sdo.get_measure ( p_layer, p_ne_id, p_x, p_y ).lr_offset;
+
+    else
+
+      l_measure := p_measure;
+
+    end if;
 
     sdo_lrs.split_geom_segment( l_geom, l_usgm.diminfo, l_measure, p_geom_1, p_geom_2 );
 
     p_geom_1 := sdo_lrs.SCALE_GEOM_SEGMENT( GEOM_SEGMENT => p_geom_1, DIM_ARRAY=> l_usgm.diminfo,
-                  START_MEASURE => 0, END_MEASURE=> p_measure , SHIFT_MEASURE=> 0 );
+                  START_MEASURE => 0, END_MEASURE=> l_measure , SHIFT_MEASURE=> 0 );
 
-    l_end   := Nm3net.get_datum_element_length( p_ne_id ) - p_measure;
+    l_end   := Nm3net.get_datum_element_length( p_ne_id ) - l_measure;
 
     p_geom_2 := sdo_lrs.SCALE_GEOM_SEGMENT( GEOM_SEGMENT => p_geom_2, DIM_ARRAY=> l_usgm.diminfo,
                   START_MEASURE => 0, END_MEASURE=> l_end , SHIFT_MEASURE=> 0 );
@@ -809,17 +817,18 @@ PROCEDURE split_element_shapes (
       l_geom2   MDSYS.SDO_GEOMETRY;
    BEGIN
 
-     Nm_Debug.DEBUG('Split element shapes');
+--     nm_debug.debug_on;
+--     Nm_Debug.DEBUG('Split element shapes');
 
       l_layer := Nm3sdm.get_nt_theme (Nm3get.get_ne (p_ne_id).ne_nt_type);
 
       IF Nm3sdo.element_has_shape (l_layer, p_ne_id) = 'TRUE'
       THEN
-        Nm_Debug.DEBUG('element has shape');
+--        Nm_Debug.DEBUG('element has shape');
 
          IF p_x IS NULL AND p_y IS NULL THEN
 
-           Nm_Debug.DEBUG(' and no xy - use measure of '||p_measure);
+--           Nm_Debug.DEBUG(' and no xy - use measure of '||p_measure);
 
 
             Nm3sdo.split_element_at_measure (p_layer        => l_layer,
@@ -832,7 +841,7 @@ PROCEDURE split_element_shapes (
                                             );
          ELSIF p_x IS NOT NULL AND p_y IS NOT NULL THEN
 
-           Nm_Debug.DEBUG(' and xy - use  '||p_x||','||p_y);
+--           Nm_Debug.DEBUG(' and xy - use  '||p_x||','||p_y);
 
             split_element_at_xy (  p_layer        => l_layer,
                                    p_ne_id        => p_ne_id,
@@ -1299,12 +1308,14 @@ PROCEDURE split_element_shapes (
   BEGIN
 --  Nm_Debug.debug_on;
     IF p_base.nta_theme_array(1).nthe_id IS NULL THEN
-	  Nm_Debug.DEBUG('No base themes');
+--	  Nm_Debug.DEBUG('No base themes');
+     null
 	ELSE
+ /*
       FOR i IN 1..p_base.nta_theme_array.LAST LOOP
         Nm_Debug.DEBUG('Base '||TO_CHAR( p_base.nta_theme_array(i).nthe_id ));
       END LOOP;
-/*
+
       insert into nm_base_themes
 	     ( nbth_theme_id, nbth_base_theme )
       select p_theme_id, t.nthe_id
@@ -1347,7 +1358,7 @@ PROCEDURE split_element_shapes (
       l_name        NM_THEMES_ALL.nth_theme_name%TYPE   := UPPER (p_name);
       l_rec_nnth    NM_NW_THEMES%ROWTYPE;
       l_rec_ntg     NM_THEME_GTYPES%ROWTYPE;
-      l_mp_gtype    NUMBER := TO_NUMBER(NVL(Hig.get_sysopt('SDOMPGTYPE'),'3002'));
+      l_mp_gtype    NUMBER := TO_NUMBER(NVL(Hig.get_sysopt('SDOMPGTYPE'),'3302'));
 
 
 
@@ -1423,7 +1434,7 @@ PROCEDURE split_element_shapes (
       l_rec_ntg.ntg_xml_url := NULL;
 
 
-      l_rec_ntg.ntg_gtype := l_mp_gtype; --'3002';
+      l_rec_ntg.ntg_gtype := l_mp_gtype;
 
 
       Nm3ins.ins_ntg (p_rec_ntg => l_rec_ntg);
@@ -1664,7 +1675,7 @@ PROCEDURE split_element_shapes (
          l_rec_ntg.ntg_gtype := '2001';
       ELSIF pi_nit.nit_pnt_or_cont = 'C'
       THEN
-         l_rec_ntg.ntg_gtype := '3002';
+         l_rec_ntg.ntg_gtype := 3302;
       END IF;
 
       Nm3ins.ins_ntg (p_rec_ntg => l_rec_ntg);
@@ -1861,7 +1872,7 @@ PROCEDURE split_element_shapes (
       l_nth.nth_tolerance              := NVL (l_rec_base_nth.nth_tolerance, 10);
       l_nth.nth_tol_units              := 1;
       --
-      Nm_Debug.DEBUG ('Creating NTH');
+--      Nm_Debug.DEBUG ('Creating NTH');
       BEGIN
          Nm3ins.ins_nth (l_nth);
       EXCEPTION
@@ -1877,7 +1888,7 @@ PROCEDURE split_element_shapes (
       l_rec_nith.nith_nit_id := pi_nit.nit_inv_type;
       l_rec_nith.nith_nth_theme_id := retval;
       --
-      Nm_Debug.DEBUG ('Creating NITH');
+--      Nm_Debug.DEBUG ('Creating NITH');
 
       BEGIN
          Nm3ins.ins_nith (l_rec_nith);
@@ -1891,11 +1902,13 @@ PROCEDURE split_element_shapes (
       END;
 
       --
+/*
       Nm_Debug.DEBUG (   'Creating GType Link - '
                       || l_nth.nth_feature_table
                       || ' - '
                       || l_nth.nth_feature_shape_column
                      );
+*/
       -- Create GTYPE record
       --l_rec_ntg.ntg_gtype    := Nm3sdo.get_table_gtype (l_nth.nth_feature_table,l_nth.nth_feature_shape_column);
       l_rec_ntg.ntg_gtype := get_base_gtype (l_rec_base_nth.nth_theme_id);
@@ -1930,7 +1943,7 @@ PROCEDURE split_element_shapes (
       END;
 
       --
-      Nm_Debug.DEBUG ('Creating GType - DONE');
+--      Nm_Debug.DEBUG ('Creating GType - DONE');
 
 --     IF Hig.get_sysopt('REGSDELAY') = 'Y'
 --     THEN
@@ -2174,12 +2187,12 @@ PROCEDURE split_element_shapes (
       IF Hig.get_sysopt ('REGSDELAY') = 'Y'
       THEN
 --         nm_debug.debug_on;
-         nm_debug.debug('** Creating SDE Layer for - '||l_nth.nth_theme_id);
+--         nm_debug.debug('** Creating SDE Layer for - '||l_nth.nth_theme_id);
          EXECUTE IMMEDIATE (   'begin '
                             || '    nm3sde.register_sde_layer( p_theme_id => '||TO_CHAR( l_nth.nth_theme_id )||');'
                             || 'end;'
                            );
-         nm_debug.debug('** Done creating SDE Layer for - '||l_nth.nth_theme_id);
+--         nm_debug.debug('** Done creating SDE Layer for - '||l_nth.nth_theme_id);
       END IF;
 
       IF p_view_flag = 'N'
@@ -2389,7 +2402,7 @@ PROCEDURE split_element_shapes (
 ---------------------------------------------------------------
       IF b_create_tab
       THEN
-         Nm_Debug.DEBUG ('create table for ' || l_nit.nit_inv_type);
+--         Nm_Debug.DEBUG ('create table for ' || l_nit.nit_inv_type);
          l_tab := get_ona_spatial_table (l_nit.nit_inv_type);
 
          --
@@ -2409,7 +2422,7 @@ PROCEDURE split_element_shapes (
          -- TOLERANCE???
          IF pi_nth_gtype IS NOT NULL
          THEN
-            Nm_Debug.DEBUG ('create sdo layer');
+--            Nm_Debug.DEBUG ('create sdo layer');
             l_dummy :=
                Nm3sdo.create_sdo_layer (pi_table_name       => l_tab,
                                         pi_column_name      => 'GEOLOC',
@@ -2466,7 +2479,7 @@ PROCEDURE split_element_shapes (
       --
       IF pi_nth_theme_id IS NULL
       THEN
-         Nm_Debug.DEBUG ('creating theme for base table');
+--         Nm_Debug.DEBUG ('creating theme for base table');
 ---------------------------------------------------------------
 -- Derive theme name
 ---------------------------------------------------------------
@@ -2509,8 +2522,8 @@ PROCEDURE split_element_shapes (
 --             raise_application_error  (-20009, 'Error creating spatial sequence NTH_'|| l_theme_id|| '_SEQ ');
          END;
       ELSE
-         Nm_Debug.DEBUG ('base table theme exists');
-         Nm_Debug.DEBUG ('create nith');
+--         Nm_Debug.DEBUG ('base table theme exists');
+--         Nm_Debug.DEBUG ('create nith');
          -- Just link the theme to the inv type
          l_rec_nith.nith_nit_id := l_nit.nit_inv_type;
          l_rec_nith.nith_nth_theme_id := pi_nth_theme_id;
@@ -2546,7 +2559,7 @@ PROCEDURE split_element_shapes (
 ---------------------------------------------------------------
 -- Create spatial date view
 ---------------------------------------------------------------
-         Nm_Debug.DEBUG ('create date view');
+--         Nm_Debug.DEBUG ('create date view');
          create_spatial_date_view (l_rec_nth.nth_feature_table,
                                    l_rec_nth.nth_start_date_column,
                                    l_rec_nth.nth_end_date_column
@@ -2559,7 +2572,7 @@ PROCEDURE split_element_shapes (
 -- Create theme for View
 -- ( V_NM_ONA_<ASSET_TYPE>_SDO )
 ---------------------------------------------------------------
-         Nm_Debug.DEBUG ('create theme for date view');
+--         Nm_Debug.DEBUG ('create theme for date view');
          l_theme_id :=
             register_ona_theme
                  (pi_nit                => l_nit,
@@ -2623,7 +2636,7 @@ PROCEDURE split_element_shapes (
       -- Create _DT view for attributes for Asset type
       ---------------------------------------------------------------
       THEN
-        Nm_Debug.DEBUG('Create inv sdo join view');
+--        Nm_Debug.DEBUG('Create inv sdo join view');
         l_view := create_inv_sdo_join_view
                  ( p_nit               => pi_nit_inv_type
                  , p_table             => l_rec_nth_base.nth_feature_table
@@ -2636,7 +2649,7 @@ PROCEDURE split_element_shapes (
         ELSE
           l_dt_view_pk_col := l_rec_nth_base.nth_feature_pk_column;
         END IF;
-        Nm_Debug.DEBUG('Register joined view');
+--        Nm_Debug.DEBUG('Register joined view');
         l_theme_id := register_ona_theme
                       ( pi_nit             => l_nit
                       , p_table_name       => l_view
@@ -2651,7 +2664,7 @@ PROCEDURE split_element_shapes (
                    (p_feature_table => l_view,
                     p_col           => l_rec_nth_base.nth_feature_shape_column)
          THEN
-            Nm_Debug.DEBUG('Register joined view in SDO');
+--            Nm_Debug.DEBUG('Register joined view in SDO');
             l_dummy :=
                Nm3sdo.create_sdo_layer
                   (pi_table_name       => l_view,
@@ -3554,7 +3567,7 @@ end;
       END IF;
 
       --
-      Nm_Debug.DEBUG ('In create spatial table');
+--      Nm_Debug.DEBUG ('In create spatial table');
       --
       b_use_history :=
              l_start_date_column IS NOT NULL AND l_end_date_column IS NOT NULL;
@@ -3656,9 +3669,9 @@ end;
                || p_table
                || '_UK UNIQUE '
                || ' (objectid))';
-            Nm_Debug.DEBUG (cur_string);
-            Nm_Debug.DEBUG (con_string);
-            Nm_Debug.DEBUG (uk_string);
+--            Nm_Debug.DEBUG (cur_string);
+--            Nm_Debug.DEBUG (con_string);
+--            Nm_Debug.DEBUG (uk_string);
 
             EXECUTE IMMEDIATE cur_string;
 
@@ -3835,7 +3848,7 @@ end;
    EXCEPTION
       WHEN OTHERS
       THEN
-         Nm_Debug.DEBUG (cur_string);
+--         Nm_Debug.DEBUG (cur_string);
          RAISE;
    --RAISE_APPLICATION_ERROR (-20201,'Error creating spatial date view '||p_table);
    END;
@@ -4165,7 +4178,7 @@ end;
 --      END IF;
 
 --         Nm_Debug.debug_on;
-         Nm_Debug.DEBUG( cur_string );
+--         Nm_Debug.DEBUG( cur_string );
       Nm3ddl.create_object_and_syns ('V_' || p_table || '_DT', cur_string);
 --  execute immediate cur_string;
   --   nm_debug.debug_off;
@@ -6483,7 +6496,7 @@ end;
          DELETE FROM NM_THEMES_ALL
                WHERE nth_theme_id = p_nth_id;
 
-         Nm_Debug.DEBUG ('Deleted theme ' || p_nth_id);
+--         Nm_Debug.DEBUG ('Deleted theme ' || p_nth_id);
       END IF;
 
 --
@@ -6603,7 +6616,7 @@ end;
 --	  Nm_Debug.debug_on;
 	        FOR i IN 1 .. l_tab_nth_id.COUNT
       LOOP
-Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
+--Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
          Nm3sdm.Drop_Layer (p_nth_id                  => l_tab_nth_id (i),
                             p_keep_feature_table      => l_keep_table
                            );
@@ -6839,7 +6852,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
            AND u.sdo_column_name = nth_feature_shape_column
            AND u.sdo_owner = hig.get_application_owner;
 
-         nm_debug.debug('Inserted '||SQL%ROWCOUNT||' SDO metadata rows');
+--         nm_debug.debug('Inserted '||SQL%ROWCOUNT||' SDO metadata rows');
       --
         FOR i IN
          (SELECT hus_username, nth_feature_table, nth_feature_shape_column
@@ -6971,7 +6984,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
 
         END IF;
 
-        nm_debug.debug('Deleted '||l_tab_owner.COUNT||' SDO metadata rows');
+--        nm_debug.debug('Deleted '||l_tab_owner.COUNT||' SDO metadata rows');
       --
       END delete_sub_sdo_layer;
   --
@@ -6989,12 +7002,12 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
      LOOP
 
        BEGIN
-         nm_debug.debug('Role op for '||i||' is '||Nm3sdm.g_role_op (i));
+--         nm_debug.debug('Role op for '||i||' is '||Nm3sdm.g_role_op (i));
 
          IF Nm3sdm.g_role_op (i) = 'I'
          THEN
 
-           nm_debug.debug('Create '||nm3sdm.g_theme_role (i));
+--           nm_debug.debug('Create '||nm3sdm.g_theme_role (i));
 
            create_sub_sdo_layer
               ( pi_theme_id => nm3sdm.g_theme_role (i)
@@ -7006,7 +7019,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
 
          ELSIF Nm3sdm.g_role_op (i) = 'D'
          THEN
-           nm_debug.debug('Delete '||nm3sdm.g_theme_role (i));
+--           nm_debug.debug('Delete '||nm3sdm.g_theme_role (i));
            delete_sub_sdo_layer
               ( pi_theme_id =>  nm3sdm.g_theme_role (i)
               , pi_role     =>  nm3sdm.g_role_array (i) );
@@ -7079,7 +7092,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
             AND u.sdo_column_name = nth_feature_shape_column
             AND u.sdo_owner = hig.get_application_owner;
      --
-       nm_debug.debug('Inserted '||SQL%ROWCOUNT||' rows for role '||pi_role||' on user '||pi_username);
+--       nm_debug.debug('Inserted '||SQL%ROWCOUNT||' rows for role '||pi_role||' on user '||pi_username);
      --
        FOR i IN
          (SELECT * FROM
@@ -8603,7 +8616,7 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
          WHEN OTHERS
          THEN
             -- couldn't find a column
-            Nm_Debug.DEBUG ('Couldnt derive PK column for ' || pi_table_name);
+--            Nm_Debug.DEBUG ('Couldnt derive PK column for ' || pi_table_name);
             RETURN 'UNKNOWN';
       END get_pk_column;
 --
@@ -8640,25 +8653,27 @@ Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
             l_rec_nth.nth_feature_shape_column := i.geometry_column;
             l_rec_nth.nth_feature_pk_column := l_rec_nth.nth_pk_column;
             Nm3ins.ins_nth (l_rec_nth);
-            Nm_Debug.DEBUG ('Created theme ' || i.NAME);
+--            Nm_Debug.DEBUG ('Created theme ' || i.NAME);
             l_rec_nthr.nthr_theme_id := l_rec_nth.nth_theme_id;
             l_rec_nthr.nthr_role := 'HIG_USER';
             l_rec_nthr.nthr_mode := 'NORMAL';
             Nm3ins.ins_nthr (l_rec_nthr);
-            Nm_Debug.DEBUG ('Created theme role ' || i.NAME);
+--            Nm_Debug.DEBUG ('Created theme role ' || i.NAME);
          EXCEPTION
             WHEN OTHERS
             THEN
+/*
                Nm_Debug.DEBUG (   'Unable to create theme for '
                                || i.NAME
                                || ' - '
                                || SQLERRM
                               );
+*/
          END;
       END LOOP;
 
       --
-      Nm_Debug.debug_off;
+--      Nm_Debug.debug_off;
    --
    END create_msv_themes;
 
@@ -8742,7 +8757,7 @@ PROCEDURE create_msv_feature_views
 --
       IF l_tab_username.COUNT > 0
       AND l_tab_ftabs.COUNT > 0
-      THEN 
+      THEN
   -- Create views for subordiate user(s)
         FOR i IN 1 .. l_tab_username.COUNT
         LOOP
@@ -8896,7 +8911,7 @@ PROCEDURE create_msv_feature_views
       END IF;
    --
 --     nm_debug.debug_on;
-     nm_debug.debug(l_sql);
+--     nm_debug.debug(l_sql);
    --
      -- MJA 24-Sep_2007: using In causing bind errors
      EXECUTE IMMEDIATE l_sql; -- USING IN pi_sub_username;
