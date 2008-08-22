@@ -21,10 +21,10 @@ CREATE OR REPLACE PACKAGE BODY NM3MRG_SDO AS
 --all global package variables here
 --
    g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3mrg_sdo.pkb	1.4 03/08/06"';
-   
+
 -----------------------------------------------------------------------------
 
-   
+
 -----------------------------------------------------------------------------
 --
 FUNCTION get_version RETURN VARCHAR2 IS
@@ -44,7 +44,7 @@ END get_body_version;
 
 procedure generate_mrg_datum_sdo ( p_mrg_job in number ) is
 
-cursor c1 ( c_job_id in number )is 
+cursor c1 ( c_job_id in number )is
   select nsm_mrg_section_id, nsm_ne_id, nsm_begin_mp, nsm_end_mp, nnth_nth_theme_id
   from nm_mrg_sections_all, nm_mrg_section_members, nm_elements_all, nm_linear_types, nm_nw_themes
   where nsm_mrg_job_id = c_job_id
@@ -55,7 +55,7 @@ cursor c1 ( c_job_id in number )is
   and nlt_g_i_d = 'D'
   and nlt_id = nnth_nlt_id
   order by 1;
-  
+
 l_member_id	 nm3type.tab_number;
 l_section_id nm3type.tab_number;
 l_ne_id		 nm3type.tab_number;
@@ -66,7 +66,7 @@ l_nth_id	 nm3type.tab_number;
 l_geometry   mdsys.sdo_geometry;
 
 l_diminfo    mdsys.sdo_dim_array := nm3sdo.get_table_diminfo( 'NM_MRG_GEOMETRY', 'NMG_GEOMETRY');
-  
+
 l_themes 	 nm3type.tab_number;
 l_table  	 nm3type.tab_varchar30;
 
@@ -80,88 +80,88 @@ begin
 
    delete from nm_mrg_geometry
    where nmg_job_id = p_mrg_job;
-   
+
    nm_debug.debug_on;
-   
+
    open c1( p_mrg_job );
-   
+
    fetch c1 bulk collect into l_section_id, l_ne_id, l_begin_mp, l_end_mp, l_nth_id;
-   
+
    close c1;
-   
+
 -- nm_debug.debug('fetched '||to_char(l_section_id.count));
 
    for i in 1..l_section_id.count loop
-   
+
      begin
-   
+
         if i > 1 and l_section_sav = l_section_id(i) then
 --
-          nm3sdo.add_segments( l_geometry, nm3sdo.ignore_measure(nm3sdo.get_layer_fragment_geometry( l_nth_id(i), l_ne_id(i), l_begin_mp(i), l_end_mp(i)) ), l_diminfo);
-		  
-        else 
-		
+          nm3sdo.add_segments( l_geometry, nm3sdo.get_layer_fragment_geometry( l_nth_id(i), l_ne_id(i), l_begin_mp(i), l_end_mp(i)), l_diminfo);
+
+        else
+
 --
-		  if not l_empty then 
-  
+		  if not l_empty then
+
             SELECT nms_id_seq.NEXTVAL INTO l_seq_id FROM dual;
-		        
+
             INSERT INTO NM_MRG_GEOMETRY (
-              NMG_JOB_ID, NMG_SECTION_ID, NMG_GEOMETRY, NMG_ID) 
-            VALUES ( p_mrg_job, l_section_sav, l_geometry, l_seq_id ); 
+              NMG_JOB_ID, NMG_SECTION_ID, NMG_GEOMETRY, NMG_ID)
+            VALUES ( p_mrg_job, l_section_sav, l_geometry, l_seq_id );
 
 			l_empty := TRUE;
-			
+
 		  end if;
 
-          l_geometry := nm3sdo.ignore_measure(nm3sdo.get_layer_fragment_geometry( l_nth_id(i), l_ne_id(i), l_begin_mp(i), l_end_mp(i)) );
-		  
+          l_geometry := nm3sdo.get_layer_fragment_geometry( l_nth_id(i), l_ne_id(i), l_begin_mp(i), l_end_mp(i));
+
 		  if l_geometry.sdo_gtype is not null then
 		    l_empty := FALSE;
-		  end if; 
-		  
+		  end if;
+
 		  l_section_sav := l_section_id(i);
-		  
+
 		end if;
-		
+
      exception
-	    when others then 
-		  
+	    when others then
+
 		  nm_debug.debug( 'failed at member = '||to_char( l_member_id(i)));
-   
+
      end;
-	 
+
    end loop;
-   
+
    if not l_empty then
-   
+
      SELECT nms_id_seq.NEXTVAL INTO l_seq_id FROM dual;
-		        
+
      INSERT INTO NM_MRG_GEOMETRY (
-              NMG_JOB_ID, NMG_SECTION_ID, NMG_GEOMETRY, NMG_ID) 
+              NMG_JOB_ID, NMG_SECTION_ID, NMG_GEOMETRY, NMG_ID)
      VALUES ( p_mrg_job, l_section_sav, l_geometry, l_seq_id );
-	 
-   end if;	  
-   
+
+   end if;
+
 end;
 
 -----------------------------------------------------------------------------
 
 
-procedure create_all_mrg_geometry is 
+procedure create_all_mrg_geometry is
 
   cursor c1 is
     select nsm_mrg_job_id, count(*) from nm_mrg_section_members
     group by nsm_mrg_job_id;
-	
+
 begin
 
   for irec in c1 loop
-  
+
    	generate_mrg_datum_sdo( irec.nsm_mrg_job_id );
-	
+
   end loop;
-  
+
 end;
 
 
@@ -171,13 +171,13 @@ end;
 
 procedure create_spatial_mrg_view ( p_mrg_query_id in number ) is
 
-curstr varchar2(20000); 
+curstr varchar2(20000);
 vname  varchar2(30);
-  
+
 begin
 
   vname := nm3mrg_view.get_mrg_view_name_by_qry_id( p_mrg_query_id );
-    
+
   curstr := 'CREATE or replace VIEW '||vname||'_SDO'||' as '||
              ' SELECT /*+ RULE */ '||
        'g.nmg_id, b.* '||
@@ -186,13 +186,13 @@ begin
   	   ' nm_mrg_geometry g '||
        ' WHERE b.nms_mrg_job_id     = g.nmg_job_id '||
        ' AND  b.nms_mrg_section_id = g.nmg_section_id ';
-	   
+
 nm_debug.debug_on;
 nm_debug.debug( curstr );
-	   
-	   
+
+
    nm3ddl.create_object_and_syns( vname||'_SDO', curstr );
-   
+
 end;
 
 
@@ -205,21 +205,21 @@ cursor get_query_ids is
   from nm_mrg_query_all;
 
 l_qry_tab nm3type.tab_number;
-  
+
 begin
 
   open get_query_ids;
   fetch get_query_ids bulk collect into l_qry_tab;
   close get_query_ids;
-  
+
   for i in 1.. l_qry_tab.count loop
-  
+
     create_spatial_mrg_view( l_qry_tab(i));
-	
+
   end loop;
-  
+
 end;
-  	
+
 -----------------------------------------------------------------------------
 
 function get_mrg_dynamic_theme_query ( p_mrg_job_id in number, p_attrib_name in varchar2 default null ) return varchar2 is
@@ -241,43 +241,43 @@ function get_list( p_table in varchar2, p_attribute in varchar2)  return varchar
 col_tab   nm3type.tab_varchar30;
 datyp_tab nm3type.tab_varchar30;
 
-retlist nm3type.max_varchar2 := null; 
+retlist nm3type.max_varchar2 := null;
 
 begin
 
   open c1 ( p_table, p_attribute );
   fetch c1 bulk collect into col_tab, datyp_tab;
   close c1;
-  
+
 
   nm_debug.debug(' data found - start with '||col_tab(1));
-  
+
   retlist := col_tab(1);
 
   if p_attrib_name is not null then
 
       retlist := retlist||','||col_tab(2);
-	  
+
   else
-	 
-	  retlist := retlist||','||'1';	  
-	  
+
+	  retlist := retlist||','||'1';
+
   end if;
-  	  
+
   return retlist;
-  
-end;  
-  	
+
+end;
+
 begin
 
   curtab :=  nm3mrg_view.get_mrg_view_name_by_job_id( p_mrg_job_id)||'_SDO';
 
   curlist := get_list( curtab, p_attrib_name);
-   
+
   curstr := 'select '||curlist||' from '||curtab||' where '||
             ' nms_mrg_job_id = '||to_char( p_mrg_job_id);
-			
-  return curstr;			
+
+  return curstr;
 
 end;
 
@@ -291,7 +291,7 @@ begin
   if p_theme_name is not null then
     l_theme_name := p_theme_name;
   end if;
-  
+
   insert into gis_data_objects
   ( gdo_session_id, gdo_pk_id, gdo_theme_name, gdo_dynamic_theme, gdo_string )
   select p_session_id, p_job_id, l_theme_name, 'Y', nm3mrg_sdo.get_mrg_dynamic_theme_query(p_job_id, p_attrib_name )
@@ -305,7 +305,7 @@ retval Boolean := FALSE;
 cursor c1 ( c_mrg_job_id in number ) is
   select 1 from dual
   where exists ( select 1 from nm_mrg_geometry
-                 where nmg_job_id = c_mrg_job_id ); 
+                 where nmg_job_id = c_mrg_job_id );
 l_dummy number;
 
 begin
@@ -314,7 +314,7 @@ begin
   fetch c1 into l_dummy;
   retval := c1%found;
   close c1;
-  
+
   return retval;
 
 end;
@@ -334,21 +334,21 @@ begin
   l_nth := nm3sdm.get_theme_from_feature_table('NM_MRG_GEOMETRY');
 
   if l_nth is not null then
-  
+
     l_diminfo := nm3sdo.get_theme_diminfo( l_nth );
-	
+
 	l_tol := l_diminfo(1).sdo_tolerance;
-	
+
   else
-    
+
     Hig.raise_ner (pi_appl         => Nm3type.c_hig,
                    pi_id           => 194,
                    pi_sqlcode      => -20001
                   );
   end if;
-  				  
+
   nm3sdo.register_sdo_table_as_theme(v_name||'_SDO', 'NMG_ID', NULL, 'NMG_GEOMETRY', l_tol );
-  
+
 end;
 
 end;
