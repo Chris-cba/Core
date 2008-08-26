@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.2   Aug 22 2008 14:59:32   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.3   Aug 26 2008 12:00:54   aedwards  $
 --       Module Name      : $Workfile:   nm4046_nm4050_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Aug 22 2008 14:59:32  $
---       Date fetched Out : $Modtime:   Aug 22 2008 14:57:24  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Aug 26 2008 12:00:54  $
+--       Date fetched Out : $Modtime:   Aug 26 2008 11:58:46  $
+--       Version          : $Revision:   3.3  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -130,18 +130,9 @@ SET TERM OFF
 ------------------------------------------------------------------
 -- 
 -- DEVELOPMENT COMMENTS (PRIIDU TANAVA)
--- This sript adds two columns into NM_NW_AD_LINK_ALL, needed in connection with log 711748. The view NM_NW_AD_LINK needs to be recreated too, this should happen during the standard upgraded process.
+-- This script adds two columns into NM_NW_AD_LINK_ALL, needed in connection with log 711748. The view NM_NW_AD_LINK needs to be recreated too, this should happen during the standard upgraded process.
 -- 
 ------------------------------------------------------------------
-/*
-Upgrade script to add de-normalised columns to the nm_nw_ad_link_all table
-
-Author: Rob Coupe, Priidu Tanava
-Date:   December 2007
-
-*/
-
-
 alter table nm_nw_ad_link_all
 disable all triggers
 /
@@ -601,11 +592,11 @@ DECLARE
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.2   Aug 22 2008 14:59:32   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.3   Aug 26 2008 12:00:54   aedwards  $
 --       Module Name      : $Workfile:   nm4046_nm4050_ddl_upg.sql  $
---       Date into SCCS   : $Date:   Aug 22 2008 14:59:32  $
---       Date fetched Out : $Modtime:   Aug 22 2008 14:57:24  $
---       SCCS Version     : $Revision:   3.2  $
+--       Date into SCCS   : $Date:   Aug 26 2008 12:00:54  $
+--       Date fetched Out : $Modtime:   Aug 26 2008 11:58:46  $
+--       SCCS Version     : $Revision:   3.3  $
 --
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2006
@@ -690,11 +681,11 @@ DECLARE
 -----------------------------------------------------------------------------
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.2   Aug 22 2008 14:59:32   malexander  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.3   Aug 26 2008 12:00:54   aedwards  $
 -- Module Name : $Workfile:   nm4046_nm4050_ddl_upg.sql  $
--- Date into PVCS : $Date:   Aug 22 2008 14:59:32  $
--- Date fetched Out : $Modtime:   Aug 22 2008 14:57:24  $
--- PVCS Version : $Revision:   3.2  $
+-- Date into PVCS : $Date:   Aug 26 2008 12:00:54  $
+-- Date fetched Out : $Modtime:   Aug 26 2008 11:58:46  $
+-- PVCS Version : $Revision:   3.3  $
 -- Based on SCCS version :
 -----------------------------------------------------------------------------
 --  Copyright (c) exor corporation ltd, 2004
@@ -709,6 +700,40 @@ END NM_THEMES_ALL_AI_TRG;
 
 
 
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT FBI to police Admin Unit relationships
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Create FBI on NM_ADMIN_GROUPS to prevent multiple parent relationships
+-- 
+------------------------------------------------------------------
+
+PROMPT Create FBI on NM_ADMIN_GROUPS to prevent multiple parent relationships
+
+BEGIN
+  EXECUTE IMMEDIATE
+    'CREATE UNIQUE INDEX nag_single_parent_idx ON nm_admin_groups '||
+     ' ( TO_CHAR(nag_child_admin_unit)||''|''||CASE nag_direct_link '||
+      '    WHEN ''N'' THEN CASE nag_child_admin_unit '||
+                      ' WHEN nag_parent_admin_unit THEN NULL '||
+                      ' ELSE TO_CHAR(nag_parent_admin_unit) END '||
+          ' WHEN ''Y'' THEN TO_CHAR(nag_child_admin_unit) END '||
+         ' ) ';
+EXCEPTION
+  WHEN OTHERS
+  THEN
+    dbms_output.put_line('Create FBI on NM_ADMIN_GROUPS to prevent multiple parent relationships');
+    dbms_output.put_line ('Error occured - '||SQLERRM);
+    dbms_output.put_line ('Please contact Exor Support');
+END;
+/
 ------------------------------------------------------------------
 
 
