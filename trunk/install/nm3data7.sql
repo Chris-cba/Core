@@ -1,30 +1,12 @@
---
------------------------------------------------------------------------------
---
---   PVCS Identifiers :-
---
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.4   Jan 15 2008 10:57:38   gjohnson  $
---       Module Name      : $Workfile:   nm3data7.sql  $
---       Date into PVCS   : $Date:   Jan 15 2008 10:57:38  $
---       Date fetched Out : $Modtime:   Jan 15 2008 10:55:36  $
---       Version          : $Revision:   2.4  $
---
---   Product metadata script
---
------------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2008
------------------------------------------------------------------------------
---
---
 /***************************************************************************
 
 INFO
 ====
-As at Release 4.0.4.0
+As at Release 4.0.5.0
 
 GENERATION DATE
 ===============
-15-JAN-2008 10:55
+28-AUG-2008 09:07
 
 TABLES PROCESSED
 ================
@@ -40,6 +22,7 @@ R
 
 ***************************************************************************/
 
+define sccsid = '%W% %G%'
 set define off;
 set feedback off;
 
@@ -5444,6 +5427,24 @@ SELECT
        ,null
        ,'XML Read error'
        ,'Error suggests XML is not ''well formed''' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 502;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,502
+       ,null
+       ,'Cannot delete record as child records exist.'
+       ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
  WHERE NER_APPL = 'MRWA'
@@ -13453,6 +13454,24 @@ SELECT
        ,453
        ,null
        ,'Invalid module'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 454;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,454
+       ,null
+       ,'This item has no shape available'
        ,'' FROM DUAL;
 --
 --
