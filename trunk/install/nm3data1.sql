@@ -1,30 +1,12 @@
---
------------------------------------------------------------------------------
---
---   PVCS Identifiers :-
---
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.22   Jan 15 2008 10:57:38   gjohnson  $
---       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Jan 15 2008 10:57:38  $
---       Date fetched Out : $Modtime:   Jan 15 2008 10:55:34  $
---       Version          : $Revision:   2.22  $
---
---   Product metadata script
---
------------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2008
------------------------------------------------------------------------------
---
---
 /***************************************************************************
 
 INFO
 ====
-As at Release 4.0.4.0
+As at Release 4.0.5.0
 
 GENERATION DATE
 ===============
-15-JAN-2008 10:55
+28-AUG-2008 09:07
 
 TABLES PROCESSED
 ================
@@ -54,6 +36,7 @@ A
 
 ***************************************************************************/
 
+define sccsid = '%W% %G%'
 set define off;
 set feedback off;
 
@@ -5753,6 +5736,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'HIG'
                     AND  NER_ID = 501);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,502
+       ,null
+       ,'Cannot delete record as child records exist.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 502);
 --
 INSERT INTO NM_ERRORS
        (NER_APPL
@@ -13319,6 +13319,23 @@ SELECT
                    WHERE NER_APPL = 'NET'
                     AND  NER_ID = 453);
 --
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,454
+       ,null
+       ,'This item has no shape available'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 454);
+--
 --
 --********** HIG_DOMAINS **********--
 SET TERM ON
@@ -14462,8 +14479,8 @@ SET TERM OFF
 --
 -- Columns
 -- HCO_DOMAIN                     NOT NULL VARCHAR2(20)
---   HCO_PK (Pos 1)
 --   HCO_FK_HDO (Pos 1)
+--   HCO_PK (Pos 1)
 -- HCO_CODE                       NOT NULL VARCHAR2(20)
 --   HCO_PK (Pos 2)
 -- HCO_MEANING                    NOT NULL VARCHAR2(52)
@@ -22947,6 +22964,27 @@ INSERT INTO HIG_CODES
        )
 SELECT 
         'MODULE_TYPE'
+       ,'APX'
+       ,'APEX Report'
+       ,'Y'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'MODULE_TYPE'
+                    AND  HCO_CODE = 'APX');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'MODULE_TYPE'
        ,'DIS'
        ,'Discoverer report'
        ,'Y'
@@ -30671,15 +30709,15 @@ SET TERM OFF
 -- HOL_NAME                       NOT NULL VARCHAR2(30)
 -- HOL_REMARKS                    NOT NULL VARCHAR2(2000)
 -- HOL_DOMAIN                              VARCHAR2(20)
---   HOL_DATATYPE_DOMAIN_CHK
 --   HOL_HDO_FK (Pos 1)
--- HOL_DATATYPE                   NOT NULL VARCHAR2(8)
---   HOL_DATATYPE_CHK
 --   HOL_DATATYPE_DOMAIN_CHK
+-- HOL_DATATYPE                   NOT NULL VARCHAR2(8)
 --   HOL_MIXED_CASE_DATATYPE_CHK
+--   HOL_DATATYPE_DOMAIN_CHK
+--   HOL_DATATYPE_CHK
 -- HOL_MIXED_CASE                 NOT NULL VARCHAR2(1)
---   HOL_MIXED_CASE_CHK
 --   HOL_MIXED_CASE_DATATYPE_CHK
+--   HOL_MIXED_CASE_CHK
 -- HOL_USER_OPTION                NOT NULL VARCHAR2(1)
 --   HOL_USER_OPTION_CHK
 --
@@ -32675,6 +32713,28 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_USER_OPTION
        )
 SELECT 
+        'USEGRPSEC'
+       ,'NET'
+       ,'Use Group Admin Unit Security'
+       ,'Setting this option to ''N'' will ignore the group members admin unit security.'
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'N' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'USEGRPSEC');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       )
+SELECT 
         'HISTINVLOC'
        ,'NET'
        ,'Enable Historic Asset Location'
@@ -33772,8 +33832,8 @@ SET TERM OFF
 --
 -- Columns
 -- HOV_ID                         NOT NULL VARCHAR2(10)
---   HOV_PK (Pos 1)
 --   HOV_HOL_FK (Pos 1)
+--   HOV_PK (Pos 1)
 -- HOV_VALUE                      NOT NULL VARCHAR2(100)
 --
 --
@@ -34652,6 +34712,16 @@ INSERT INTO HIG_OPTION_VALUES
        ,HOV_VALUE
        )
 SELECT 
+        'USEGRPSEC'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'USEGRPSEC');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
         'USEINVXSP'
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
@@ -34888,9 +34958,9 @@ SET TERM OFF
 --
 -- Columns
 -- HSC_DOMAIN_CODE                NOT NULL VARCHAR2(30)
---   HSC_PK (Pos 1)
---   HSC_UK1 (Pos 1)
 --   HSC_FK_HSD (Pos 1)
+--   HSC_UK1 (Pos 1)
+--   HSC_PK (Pos 1)
 -- HSC_STATUS_CODE                NOT NULL VARCHAR2(10)
 --   HSC_PK (Pos 2)
 -- HSC_STATUS_NAME                NOT NULL VARCHAR2(30)
@@ -35398,11 +35468,11 @@ SET TERM OFF
 --
 -- Columns
 -- HSA_TABLE_NAME                 NOT NULL VARCHAR2(30)
+--   HSA_UPPERCASE_CHK
 --   HSA_PK (Pos 1)
---   HSA_UPPERCASE_CHK
 -- HSA_COLUMN_NAME                NOT NULL VARCHAR2(30)
---   HSA_PK (Pos 2)
 --   HSA_UPPERCASE_CHK
+--   HSA_PK (Pos 2)
 -- HSA_SEQUENCE_NAME              NOT NULL VARCHAR2(30)
 --   HSA_UPPERCASE_CHK
 -- HSA_LAST_REBUILD_DATE                   DATE
@@ -36151,8 +36221,8 @@ SET TERM OFF
 --
 -- Columns
 -- HCCA_CONSTRAINT_NAME           NOT NULL VARCHAR2(30)
---   HCCA_PK (Pos 1)
 --   HCCA_UPPERCASE_CHK
+--   HCCA_PK (Pos 1)
 -- HCCA_TABLE_NAME                NOT NULL VARCHAR2(30)
 --   HCCA_UPPERCASE_CHK
 -- HCCA_NER_APPL                  NOT NULL VARCHAR2(6)
@@ -42913,8 +42983,8 @@ SET TERM OFF
 --
 -- Columns
 -- NCSM_NCS_CODE                  NOT NULL VARCHAR2(20)
---   NCSM_PK (Pos 1)
 --   NCSM_NCS_FK (Pos 1)
+--   NCSM_PK (Pos 1)
 -- NCSM_ASCII_CHARACTER           NOT NULL NUMBER(3)
 --   NCSM_PK (Pos 2)
 --
