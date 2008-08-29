@@ -377,7 +377,13 @@ FUNCTION user_is_higowner(pi_username IN hig_users.hus_username%TYPE DEFAULT USE
 
 FUNCTION user_is_higowner_yn(pi_username IN hig_users.hus_username%TYPE DEFAULT USER) RETURN VARCHAR2;
 
-
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="valid_object_name">
+--
+FUNCTION valid_object_name(p_object_name in varchar2) RETURN boolean;
+--</PROC>
+--
 -----------------------------------------------------------------------------
 --<PRAGMA>
   PRAGMA RESTRICT_REFERENCES( get_version, wnds, wnps );
