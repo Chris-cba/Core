@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.3   Aug 06 2008 15:27:06   bodriscoll  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.4   Sep 01 2008 16:12:08   gjohnson  $
 -- Module Name : $Workfile:   nm3file.pkb  $
--- Date into PVCS : $Date:   Aug 06 2008 15:27:06  $
--- Date fetched Out : $Modtime:   Aug 06 2008 15:22:40  $
--- PVCS Version : $Revision:   2.3  $
+-- Date into PVCS : $Date:   Sep 01 2008 16:12:08  $
+-- Date fetched Out : $Modtime:   Sep 01 2008 16:11:02  $
+-- PVCS Version : $Revision:   2.4  $
 -- Based on SCCS version : 
 --
 --
@@ -962,8 +962,11 @@ begin
     select directory_name
       into l_directory_name
       from all_directories
-     where upper(directory_path) = upper( pi_path ) 
-            ;
+     where upper(directory_path) = upper( pi_path )
+     and rownum = 1; -- GJ 01-SEP-2009 added rownum=1 
+                     -- If common directory path set up for > 1 directory on the same 
+                     -- instance then without the rownum=1 you get a 
+                     -- "ORA-01422: exact fetch returns more than requested number of rows"  
   end if ;
   nm_debug.proc_end(g_package_name,'get_loc_name');
   return l_directory_name ;
