@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.4   Sep 04 2008 09:08:06   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.5   Sep 04 2008 09:11:36   malexander  $
 --       Module Name      : $Workfile:   nm4046_nm4050_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Sep 04 2008 09:08:06  $
---       Date fetched Out : $Modtime:   Aug 26 2008 11:58:46  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Sep 04 2008 09:11:36  $
+--       Date fetched Out : $Modtime:   Sep 04 2008 09:05:02  $
+--       Version          : $Revision:   3.5  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -592,11 +592,11 @@ DECLARE
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.4   Sep 04 2008 09:08:06   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.5   Sep 04 2008 09:11:36   malexander  $
 --       Module Name      : $Workfile:   nm4046_nm4050_ddl_upg.sql  $
---       Date into SCCS   : $Date:   Sep 04 2008 09:08:06  $
---       Date fetched Out : $Modtime:   Aug 26 2008 11:58:46  $
---       SCCS Version     : $Revision:   3.4  $
+--       Date into SCCS   : $Date:   Sep 04 2008 09:11:36  $
+--       Date fetched Out : $Modtime:   Sep 04 2008 09:05:02  $
+--       SCCS Version     : $Revision:   3.5  $
 --
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2006
@@ -681,11 +681,11 @@ DECLARE
 -----------------------------------------------------------------------------
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.4   Sep 04 2008 09:08:06   malexander  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.5   Sep 04 2008 09:11:36   malexander  $
 -- Module Name : $Workfile:   nm4046_nm4050_ddl_upg.sql  $
--- Date into PVCS : $Date:   Sep 04 2008 09:08:06  $
--- Date fetched Out : $Modtime:   Aug 26 2008 11:58:46  $
--- PVCS Version : $Revision:   3.4  $
+-- Date into PVCS : $Date:   Sep 04 2008 09:11:36  $
+-- Date fetched Out : $Modtime:   Sep 04 2008 09:05:02  $
+-- PVCS Version : $Revision:   3.5  $
 -- Based on SCCS version :
 -----------------------------------------------------------------------------
 --  Copyright (c) exor corporation ltd, 2004
