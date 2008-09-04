@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_metadata_upg.sql-arc   3.4   Aug 22 2008 14:59:48   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_metadata_upg.sql-arc   3.5   Sep 04 2008 09:10:30   malexander  $
 --       Module Name      : $Workfile:   nm4046_nm4050_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Aug 22 2008 14:59:48  $
---       Date fetched Out : $Modtime:   Aug 22 2008 14:57:24  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Sep 04 2008 09:10:30  $
+--       Date fetched Out : $Modtime:   Sep 04 2008 09:05:02  $
+--       Version          : $Revision:   3.5  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -198,6 +198,70 @@ Insert Into nm_errors( ner_appl
                                   Where  ner_appl = 'HIG'
                                   And    ner_id   = 502
                                 );
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Further NM_ERRORS
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (GRAEME JOHNSON)
+-- New error messages to support module linking
+-- 
+------------------------------------------------------------------
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,503
+       ,null
+       ,'Link definition is invalid'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 503);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,504
+       ,null
+       ,'Link definition is invalid, wrong calling block parameter name'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 504);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,505
+       ,null
+       ,'Too many link definitions for same block combination'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 505);
 ------------------------------------------------------------------
 
 
