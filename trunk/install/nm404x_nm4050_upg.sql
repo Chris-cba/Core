@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm404x_nm4050_upg.sql-arc   3.3   Aug 18 2008 10:42:20   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm404x_nm4050_upg.sql-arc   3.4   Sep 04 2008 09:42:26   malexander  $
 --       Module Name      : $Workfile:   nm404x_nm4050_upg.sql  $
---       Date into PVCS   : $Date:   Aug 18 2008 10:42:20  $
---       Date fetched Out : $Modtime:   Aug 18 2008 10:41:58  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Sep 04 2008 09:42:26  $
+--       Date fetched Out : $Modtime:   Sep 04 2008 09:29:30  $
+--       Version          : $Revision:   3.4  $
 --       
 -------------------------------------------------------------------------
 --
@@ -49,10 +49,10 @@ FROM hig_products WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP') AND hpr_v
 /
 select  TO_CHAR(sysdate,'DDMONYYYY_HH24MISS')||'.LOG' log_extension from dual
 /
-SELECT 'nm'||replace(hpr_version,'.',Null)||'_nm4050_1&log_extension' logfile1
+SELECT 'nm'||replace(hpr_version,'.',Null)||'_nm4050_1_&log_extension' logfile1
 FROM hig_products WHERE hpr_product = 'NET' 
 /
-SELECT 'nm'||replace(hpr_version,'.',Null)||'_nm4050_2&log_extension' logfile2
+SELECT 'nm'||replace(hpr_version,'.',Null)||'_nm4050_2_&log_extension' logfile2
 FROM hig_products WHERE hpr_product = 'NET' 
 /
 
