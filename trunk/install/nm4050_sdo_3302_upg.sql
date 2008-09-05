@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4050_sdo_3302_upg.sql-arc   3.2   Aug 20 2008 09:40:18   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4050_sdo_3302_upg.sql-arc   3.3   Sep 05 2008 16:04:30   aedwards  $
 --       Module Name      : $Workfile:   nm4050_sdo_3302_upg.sql  $
---       Date into PVCS   : $Date:   Aug 20 2008 09:40:18  $
---       Date fetched Out : $Modtime:   Aug 19 2008 16:21:40  $
---       PVCS Version     : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Sep 05 2008 16:04:30  $
+--       Date fetched Out : $Modtime:   Sep 05 2008 15:48:32  $
+--       PVCS Version     : $Revision:   3.3  $
 --
 --------------------------------------------------------------------------------
 --
@@ -196,8 +196,7 @@ BEGIN
                                   || ' where a.'||l_tab_data(i).column_name
                                   || '.sdo_gtype = '||l_tab_gtypes(g);
               --
-                sop('Processed '||l_tab_data(i).table_name||' ['||l_tab_gtypes(g)||']'
-                         ||' - '||SQL%ROWCOUNT||' rows updated to '||' ['||l_tab_gtypes(g)+300||']');
+                sop('Processed '||l_tab_data(i).table_name||' - '||SQL%ROWCOUNT||' rows updated');
               --
            --
             EXCEPTION
