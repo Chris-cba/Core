@@ -4,12 +4,12 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.8   Aug 07 2008 13:55:26   gjohnson  $
---       Module Name      	: $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   	: $Date:   Aug 07 2008 13:55:26  $
---       Date fetched Out 	: $Modtime:   Aug 07 2008 13:54:58  $
---       PVCS Version     	: $Revision:   2.8  $
---       Based on SCCS version 	: 1.53
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.9   Sep 05 2008 13:54:16   cstrettle  $
+--       Module Name      : $Workfile:   nm3ddl.pkb  $
+--       Date into PVCS   : $Date:   Sep 05 2008 13:54:16  $
+--       Date fetched Out : $Modtime:   Sep 05 2008 12:40:00  $
+--       PVCS Version     : $Revision:   2.9  $
+--       Based on SCCS Version     : 1.5
 --
 --
 --   Author : Jonathan Mills
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '@(#)nm3ddl.pkb	1.53 03/29/07';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
