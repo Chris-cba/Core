@@ -1,14 +1,15 @@
-CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
+create or replace PACKAGE BODY Nm2_Nm3_Migration AS
 --
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.5   Jan 07 2008 15:34:02   Ian Turnbull  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.6   Sep 12 2008 10:48:00   Ian Turnbull  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.6   Sep 12 2008 10:48:00   Ian Turnbull  $
 --       Module Name      : $Workfile:   nm2_nm3_migration.pkb  $
---       Date into PVCS   : $Date:   Jan 07 2008 15:34:02  $
---       Date fetched Out : $Modtime:   Jan 07 2008 15:33:10  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Sep 12 2008 10:48:00  $
+--       Date fetched Out : $Modtime:   Sep 12 2008 10:45:28  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --   Author D.Cope
 --
@@ -23,14 +24,15 @@ CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.6  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm2_nm3_migration';
   g_proc_name    VARCHAR2(50);
   g_log_file                UTL_FILE.FILE_TYPE;
   g_issue_commits           VARCHAR2(1) := 'Y';
   g_debug                   BOOLEAN;
   g_admin_type              CONSTANT nm_admin_units.nau_admin_type%TYPE := 'NETW';
-  g_node_type               CONSTANT NM_NODE_TYPES.nnt_type%TYPE        := 'ROAD';
+--  g_node_type               CONSTANT NM_NODE_TYPES.nnt_type%TYPE        := 'ROAD';
+  g_node_type               CONSTANT NM_NODE_TYPES.nnt_type%TYPE        := 'MAIN';
   g_errors                  PLS_INTEGER;
   g_mig_earliest_date       DATE;
   g_log_file_name           VARCHAR2(200);
@@ -46,6 +48,12 @@ CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
   g_rindex                  PLS_INTEGER;
   inv_item_not_found        EXCEPTION;
 --
+  type old_new_type is table of number index by binary_integer;
+
+
+  old_new_tab old_new_type;
+
+--
 -----------------------------------------------------------------------------
 --
 FUNCTION get_version RETURN VARCHAR2 IS
@@ -59,6 +67,30 @@ FUNCTION get_body_version RETURN VARCHAR2 IS
 BEGIN
    RETURN g_body_sccsid;
 END get_body_version;
+--
+-----------------------------------------------------------------------------
+--
+procedure populate_old_new_tab
+is
+   cursor c1
+   is
+  select *
+  from mig_old_new_ne_id;
+begin
+   for c1rec in c1
+    loop
+       old_new_tab(c1rec.rse_he_id) := c1rec.ne_id;
+   end loop;
+end populate_old_new_tab;
+--
+-----------------------------------------------------------------------------
+--
+function get_new_ne_id(p_rse_he_id number)
+return NUMBER
+is
+begin
+   return old_new_tab(p_rse_he_id);
+end get_new_ne_id;
 --
 -----------------------------------------------------------------------------
 --
@@ -3646,19 +3678,19 @@ PROCEDURE create_network_metamodel IS
   PROCEDURE tidy_data IS
   BEGIN
     append_log_content(pi_text => 'Tidying existing data');
-    DELETE FROM NM_MEMBERS_ALL;
-    DELETE FROM NM_ELEMENTS_ALL;
-    DELETE FROM NM_NODES_ALL;
-    DELETE FROM NM_NODE_USAGES_ALL;
-    DELETE FROM NM_NT_GROUPINGS_ALL;
-    DELETE FROM NM_GROUP_TYPES_ALL;
-    DELETE FROM NM_TYPE_COLUMNS;
-    DELETE FROM NM_TYPE_SUBCLASS;
-    DELETE FROM NM_TYPE_INCLUSION;
-    DELETE FROM NM_NW_THEMES;
-    DELETE FROM NM_LINEAR_TYPES;
-    DELETE FROM NM_TYPES;
-    DELETE FROM NM_TYPES;
+   -- DELETE FROM NM_MEMBERS_ALL;
+  --  DELETE FROM NM_ELEMENTS_ALL;
+ --   DELETE FROM NM_NODES_ALL;
+ --   DELETE FROM NM_NODE_USAGES_ALL;
+ --   DELETE FROM NM_NT_GROUPINGS_ALL;
+ --   DELETE FROM NM_GROUP_TYPES_ALL;
+ --   DELETE FROM NM_TYPE_COLUMNS;
+ --   DELETE FROM NM_TYPE_SUBCLASS;
+  --  DELETE FROM NM_TYPE_INCLUSION;
+  --  DELETE FROM NM_NW_THEMES;
+  --  DELETE FROM NM_LINEAR_TYPES;
+  --  DELETE FROM NM_TYPES;
+  --  DELETE FROM NM_TYPES;
     DELETE FROM HIG_CODES WHERE hco_domain IN ('AGENCY_CODE', 'ROAD_CLASS', 'ROAD_SYS_FLAG');
     DELETE FROM HIG_DOMAINS WHERE hdo_domain IN ('AGENCY_CODE', 'ROAD_CLASS', 'ROAD_SYS_FLAG');
     do_optional_commit;
@@ -3756,7 +3788,8 @@ BEGIN
                         'D'
                        ,'DOT'
                         ,'Y'
-                       ,'ROAD'
+--                       ,'ROAD'
+                       , g_node_type
                        ,'DOT Section'
                        ,g_admin_type
                        ,1
@@ -3801,7 +3834,8 @@ BEGIN
                         'L'
                        ,'LOCAL'
                         ,'Y'
-                       ,'ROAD'
+--                       ,'ROAD'
+                       ,g_node_type
                        ,'LOCAL Section'
                        ,g_admin_type
                        ,1
@@ -4622,18 +4656,18 @@ PROCEDURE create_inventory_metamodel (pi_netw_inv_type IN VARCHAR2 DEFAULT 'NETW
   PROCEDURE tidy_data IS
   BEGIN
      append_log_content(pi_text => 'Tidying existing data');
-	 DELETE FROM NM_NW_AD_LINK_ALL;
-     DELETE FROM NM_NW_AD_TYPES;
-     DELETE FROM NM_INV_ITEMS_ALL;
-     DELETE FROM NM_INV_TYPE_GROUPINGS_ALL;
-     DELETE FROM NM_INV_ATTRI_LOOKUP_ALL;
-     DELETE FROM NM_INV_TYPE_ATTRIBS_ALL;
-     DELETE FROM NM_INV_NW_ALL;
-     DELETE FROM NM_XSP_RESTRAINTS;
-     DELETE FROM NM_NW_XSP;
-     DELETE FROM NM_INV_TYPE_ROLES;
-     DELETE FROM NM_INV_TYPES_ALL;
-     DELETE FROM NM_INV_DOMAINS_ALL;
+	 --DELETE FROM NM_NW_AD_LINK_ALL;
+   --  DELETE FROM NM_NW_AD_TYPES;
+   --  DELETE FROM NM_INV_ITEMS_ALL;
+   --  DELETE FROM NM_INV_TYPE_GROUPINGS_ALL;
+   --  DELETE FROM NM_INV_ATTRI_LOOKUP_ALL;
+   --  DELETE FROM NM_INV_TYPE_ATTRIBS_ALL;
+   --  DELETE FROM NM_INV_NW_ALL;
+   --  DELETE FROM NM_XSP_RESTRAINTS;
+   --  DELETE FROM NM_NW_XSP;
+   --  DELETE FROM NM_INV_TYPE_ROLES;
+   --  DELETE FROM NM_INV_TYPES_ALL;
+   --  DELETE FROM NM_INV_DOMAINS_ALL;
      DELETE FROM NM2_NM3_INV_TYPE_CHANGES;
      do_optional_commit;
      append_log_content(pi_text => 'Done');
@@ -5907,14 +5941,16 @@ PROCEDURE migrate_network IS
            ,no_end_date
            ,no_node_id
       FROM  nm_nodes
-     WHERE  no_node_name = p_node_name;
+     WHERE  no_node_name = p_node_name
+     AND    no_node_type = g_node_type;
      CURSOR cs_no2(p_node_name VARCHAR2) IS
      SELECT ROWID no_rowid
            ,no_start_date
            ,no_end_date
            ,no_node_id
       FROM  NM_NODES_ALL
-     WHERE  no_node_name = p_node_name;
+     WHERE  no_node_name = p_node_name
+     AND    no_node_type = g_node_type;
      l_no_rec cs_no%ROWTYPE;
      l_change BOOLEAN := FALSE;
      l_found  BOOLEAN;
@@ -5976,13 +6012,13 @@ PROCEDURE migrate_network IS
   PROCEDURE tidy_data IS
   BEGIN
     append_log_content(pi_text => 'Tidying Existing Data');
-    EXECUTE IMMEDIATE 'ALTER TRIGGER A_DEL_NM_ELEMENTS DISABLE';
-    EXECUTE IMMEDIATE 'ALTER TRIGGER B_DEL_NM_ELEMENTS DISABLE';
-	DELETE FROM NM_NODE_USAGES_ALL;
-    DELETE FROM NM_ELEMENTS_ALL
-    WHERE ne_type = 'S';
-    EXECUTE IMMEDIATE 'ALTER TRIGGER B_DEL_NM_ELEMENTS ENABLE';
-    EXECUTE IMMEDIATE 'ALTER TRIGGER A_DEL_NM_ELEMENTS ENABLE';
+  --  EXECUTE IMMEDIATE 'ALTER TRIGGER A_DEL_NM_ELEMENTS DISABLE';
+  --  EXECUTE IMMEDIATE 'ALTER TRIGGER B_DEL_NM_ELEMENTS DISABLE';
+	--DELETE FROM NM_NODE_USAGES_ALL;
+   -- DELETE FROM NM_ELEMENTS_ALL
+   -- WHERE ne_type = 'S';
+   -- EXECUTE IMMEDIATE 'ALTER TRIGGER B_DEL_NM_ELEMENTS ENABLE';
+   -- EXECUTE IMMEDIATE 'ALTER TRIGGER A_DEL_NM_ELEMENTS ENABLE';
     append_log_content(pi_text => 'Done');
   END tidy_data;
 BEGIN
@@ -5996,10 +6032,10 @@ BEGIN
   CLOSE datums_to_migrate;
   append_log_content(pi_text => 'Re-building all sequences');
   -- Fix bug in 3110 where the ESU_ID_SEQ was associated with ne_unique
-  DELETE FROM HIG_SEQUENCE_ASSOCIATIONS
-  WHERE hsa_column_name   = 'NE_UNIQUE'
-  AND   hsa_sequence_name = 'ESU_ID_SEQ';
-  Nm3ddl.rebuild_all_sequences;
+--  DELETE FROM HIG_SEQUENCE_ASSOCIATIONS
+--  WHERE hsa_column_name   = 'NE_UNIQUE'
+--  AND   hsa_sequence_name = 'ESU_ID_SEQ';
+--  Nm3ddl.rebuild_all_sequences;
   append_log_content(pi_text => 'Done');
 --
   EXECUTE IMMEDIATE('ALTER TRIGGER NM_NODES_ALL_DT_TRG DISABLE');
@@ -6009,7 +6045,7 @@ BEGIN
      FOR cs_rec IN cs_datums
       LOOP
         Nm3user.set_effective_date(cs_rec.rse_start_date);
-        l_rec_ne.ne_id                  := cs_rec.rse_he_id;
+        l_rec_ne.ne_id                  := get_new_ne_id(p_rse_he_id => cs_rec.rse_he_id); --cs_rec.rse_he_id;
         l_rec_ne.ne_unique              := cs_rec.rse_unique;
         l_rec_ne.ne_type                := cs_rec.rse_type;
         l_rec_ne.ne_nt_type             := cs_rec.rse_sys_flag;
@@ -6044,6 +6080,8 @@ BEGIN
            Nm3net.ins_ne (l_rec_ne);
         EXCEPTION
            WHEN OTHERS THEN
+             append_log_content('S'||cs_rec.rse_pus_node_id_st);
+             append_log_content('E'||cs_rec.rse_pus_node_id_end);
              append_log_content(SQLERRM);
              append_log_content('Was raised during processing of road '||l_rec_ne.ne_unique);
              RAISE;
@@ -6141,13 +6179,13 @@ PROCEDURE migrate_links IS
   PROCEDURE tidy_data IS
   BEGIN
     append_log_content(pi_text => 'Tidying Existing Data');
-    EXECUTE IMMEDIATE ('TRUNCATE TABLE nm_members_all');
-    EXECUTE IMMEDIATE ('TRUNCATE TABLE nm_node_usages_all');
-    EXECUTE IMMEDIATE 'ALTER TRIGGER A_DEL_NM_ELEMENTS DISABLE';
-    DELETE NM_ELEMENTS_ALL;
-    DELETE NM_NODES_ALL;
-    DELETE NM_POINTS;
-    EXECUTE IMMEDIATE 'ALTER TRIGGER A_DEL_NM_ELEMENTS ENABLE';
+    --EXECUTE IMMEDIATE ('TRUNCATE TABLE nm_members_all');
+    --EXECUTE IMMEDIATE ('TRUNCATE TABLE nm_node_usages_all');
+    --EXECUTE IMMEDIATE 'ALTER TRIGGER A_DEL_NM_ELEMENTS DISABLE';
+    --DELETE NM_ELEMENTS_ALL;
+    --DELETE NM_NODES_ALL;
+    --DELETE NM_POINTS;
+    --EXECUTE IMMEDIATE 'ALTER TRIGGER A_DEL_NM_ELEMENTS ENABLE';
     append_log_content(pi_text => 'Done');
   END tidy_data;
 BEGIN
@@ -6190,7 +6228,8 @@ BEGIN
 
   FOR l_rec IN get_nodes LOOP
     l_no.no_node_id    := Nm3seq.next_no_node_id_seq;
-    l_no.no_node_name  := Nm3net.make_node_name('ROAD', l_rec.pus_node_id);
+--    l_no.no_node_name  := Nm3net.make_node_name('ROAD', l_rec.pus_node_id);
+    l_no.no_node_name  := Nm3net.make_node_name(g_node_type, l_rec.pus_node_id);
     l_no.no_start_date := TRUNC(LEAST(nvl(l_rec.pus_end_date,l_rec.pus_start_date), l_rec.pus_start_date));
     l_no.no_end_date   := TRUNC(l_rec.pus_end_date);
     l_no.no_np_id      := l_rec.pus_poi_point_id;
@@ -6231,7 +6270,7 @@ BEGIN
   CLOSE number_of_links;
   start_longop('Links');
   FOR cs_rec IN cs_links LOOP
-    l_rec_ne.ne_id                  := cs_rec.rse_he_id;
+    l_rec_ne.ne_id                  := get_new_ne_id(p_rse_he_id => cs_rec.rse_he_id); --cs_rec.rse_he_id;
     l_rec_ne.ne_unique              := UPPER(cs_rec.rse_unique);
     l_rec_ne.ne_type                := 'G';
     l_rec_ne.ne_descr               := NVL(cs_rec.rse_descr,cs_rec.rse_unique);
@@ -6340,8 +6379,8 @@ PROCEDURE migrate_link_membs IS
    PROCEDURE tidy_data IS
    BEGIN
         append_log_content(pi_text => 'Tidying Existing Data');
-        DELETE FROM NM_MEMBERS_ALL
-        WHERE nm_obj_type IN('LLNK','DLNK');
+       -- DELETE FROM NM_MEMBERS_ALL
+       -- WHERE nm_obj_type IN('LLNK','DLNK');
         append_log_content(pi_text => 'Done');
    END tidy_data;
 BEGIN
@@ -6376,9 +6415,9 @@ BEGIN
          l_orig_st_date         := l_tab_nm_start_date(i);
          l_orig_end_date        := l_tab_nm_end_date(i);
          --
-         l_rec_ne_of            := Nm3get.get_ne_all(pi_ne_id           => l_tab_nm_ne_id_of(i)
+         l_rec_ne_of            := Nm3get.get_ne_all(pi_ne_id           => get_new_ne_id(p_rse_he_id => l_tab_nm_ne_id_of(i))
                                                     ,pi_raise_not_found => FALSE);
-         l_rec_ne_in            := Nm3get.get_ne_all(pi_ne_id           => l_tab_nm_ne_id_in(i)
+         l_rec_ne_in            := Nm3get.get_ne_all(pi_ne_id           => get_new_ne_id(p_rse_he_id => l_tab_nm_ne_id_in(i))
                                                     ,pi_raise_not_found => FALSE);
          -- if either of the of or in ne id's cannot
          -- be found then do not process
@@ -6405,8 +6444,8 @@ BEGIN
           THEN
             l_tab_nm_end_date(i)   := l_rec_ne_of.ne_end_date;
          END IF;
-         l_nm.nm_ne_id_in    := l_tab_nm_ne_id_in(i);
-         l_nm.nm_ne_id_of    := l_tab_nm_ne_id_of(i);
+         l_nm.nm_ne_id_in    := get_new_ne_id(p_rse_he_id => l_tab_nm_ne_id_in(i));
+         l_nm.nm_ne_id_of    := get_new_ne_id(p_rse_he_id => l_tab_nm_ne_id_of(i));
          l_nm.nm_type        := 'G';
          l_nm.nm_obj_type    := l_tab_nm_obj_type(i);
          l_nm.nm_begin_mp    := l_tab_nm_begin_mp(i);
@@ -6512,15 +6551,15 @@ PROCEDURE migrate_other_groups IS
   PROCEDURE tidy_data IS
   BEGIN
     append_log_content(pi_text => 'Tidying existing data');
-    EXECUTE IMMEDIATE 'ALTER TRIGGER A_DEL_NM_ELEMENTS DISABLE';
-    DELETE NM_MEMBERS_ALL WHERE nm_obj_type NOT IN ('LLNK','DLNK') AND nm_type='G';
-    DELETE NM_ELEMENTS_ALL WHERE ne_nt_type IN ( c_linear_group,c_non_linear_group);
-    DELETE NM_GROUP_RELATIONS_ALL;
-    DELETE NM_NT_GROUPINGS_ALL WHERE nng_group_type NOT IN ('LLNK','DLNK');
-    DELETE NM_GROUP_TYPES_ALL WHERE ngt_group_type NOT IN ('LLNK','DLNK');
-    DELETE NM_TYPE_COLUMNS WHERE ntc_nt_type IN ( c_linear_group,c_non_linear_group);
-    DELETE NM_TYPES WHERE nt_type IN ( c_linear_group,c_non_linear_group);
-    EXECUTE IMMEDIATE 'ALTER TRIGGER A_DEL_NM_ELEMENTS ENABLE';
+   -- EXECUTE IMMEDIATE 'ALTER TRIGGER A_DEL_NM_ELEMENTS DISABLE';
+   -- DELETE NM_MEMBERS_ALL WHERE nm_obj_type NOT IN ('LLNK','DLNK') AND nm_type='G';
+   -- DELETE NM_ELEMENTS_ALL WHERE ne_nt_type IN ( c_linear_group,c_non_linear_group);
+   -- DELETE NM_GROUP_RELATIONS_ALL;
+   -- DELETE NM_NT_GROUPINGS_ALL WHERE nng_group_type NOT IN ('LLNK','DLNK');
+   -- DELETE NM_GROUP_TYPES_ALL WHERE ngt_group_type NOT IN ('LLNK','DLNK');
+   -- DELETE NM_TYPE_COLUMNS WHERE ntc_nt_type IN ( c_linear_group,c_non_linear_group);
+   -- DELETE NM_TYPES WHERE nt_type IN ( c_linear_group,c_non_linear_group);
+   -- EXECUTE IMMEDIATE 'ALTER TRIGGER A_DEL_NM_ELEMENTS ENABLE';
     do_optional_commit;
     append_log_content(pi_text => 'Done');
   END tidy_data;
@@ -6838,7 +6877,7 @@ BEGIN
      LOOP
        SAVEPOINT start_of_element;
        BEGIN
-         l_rec_ne.ne_id             := cs_rec.rse_he_id;
+         l_rec_ne.ne_id             := get_new_ne_id(p_rse_he_id => cs_rec.rse_he_id);
          l_rec_ne.ne_unique         := UPPER(cs_rec.rse_unique);
          l_rec_ne.ne_admin_unit     := cs_rec.rse_admin_unit;
          IF l_gog = 'Y' THEN
@@ -6893,8 +6932,8 @@ BEGIN
        LOOP
          SAVEPOINT start_of_member;
          BEGIN
-           l_rec_nm.nm_ne_id_in      := cs_mem.rsm_rse_he_id_in;
-           l_rec_nm.nm_ne_id_of      := cs_mem.rsm_rse_he_id_of;
+           l_rec_nm.nm_ne_id_in      := get_new_ne_id(p_rse_he_id => cs_mem.rsm_rse_he_id_in);
+           l_rec_nm.nm_ne_id_of      := get_new_ne_id(p_rse_he_id => cs_mem.rsm_rse_he_id_of);
            l_rec_nm.nm_type          := 'G';
            l_rec_nm.nm_obj_type      := l_tab_gty_group_type(i);
            l_rec_nm.nm_begin_mp      := NVL(cs_mem.rsm_begin_mp,0);
@@ -6916,6 +6955,10 @@ BEGIN
              Nm3debug.debug_nm(l_rec_nm);
            END IF;
            Nm3ins.ins_nm_all (l_rec_nm);
+           append_log_content('in  : '||l_rec_nm.nm_ne_id_in);
+           append_log_content('of  : '||l_rec_nm.nm_ne_id_of);
+           append_log_content('type: '||l_rec_nm.nm_obj_type);
+		do_commit;  --MGT
            EXCEPTION
            WHEN OTHERS THEN
              append_log_content(SQLERRM);
@@ -7225,7 +7268,7 @@ BEGIN
       l_rec_iit.iit_num_attrib115         := p_rec_iit_nm.iit_item_id;
       --
       l_rec_nit := Nm3inv.get_inv_type (l_rec_iit.iit_inv_type);
-      l_rec_ne  := Nm3net.get_ne_all_rowtype(p_rec_iit_nm.iit_rse_he_id);
+      l_rec_ne  := Nm3net.get_ne_all_rowtype(get_new_ne_id(p_rse_he_id => p_rec_iit_nm.iit_rse_he_id));
       --
       l_rec_iit.iit_admin_unit            := l_rec_ne.ne_admin_unit;
       OPEN  cs_nau (l_rec_iit.iit_admin_unit);
@@ -7297,10 +7340,10 @@ BEGIN
   DELETE /*+ RULE */ NM2_NM3_INV_EXCEPTIONS_LOC
   WHERE  iit_ne_id = p_item_id;
   SAVEPOINT top_of_loop;
-  l_rec_ne   := Nm3get.get_ne_all(p_ne_id);
   l_inv_item := Nm3get.get_iit_all(p_item_id);
+  l_rec_ne := nm3get.get_ne_all(get_new_ne_id(p_rse_he_id => p_ne_id));
   l_rec_nm.nm_ne_id_in    := p_item_id;
-  l_rec_nm.nm_ne_id_of    := p_ne_id;
+  l_rec_nm.nm_ne_id_of    := get_new_ne_id(p_rse_he_id => p_ne_id);
   l_rec_nm.nm_type        := 'I';
   l_rec_nm.nm_obj_type    := l_inv_item.iit_inv_type;
   l_rec_nm.nm_begin_mp    := GREATEST(p_start_mp,0); -- inventory cannot start at a -ve position
@@ -7346,14 +7389,16 @@ BEGIN
        l_inv_loc_exc.iit_start_date := p_start_date;
        l_inv_loc_exc.iit_rse_he_id  := p_ne_id;
        l_inv_loc_exc.iit_begin_mp   := p_start_mp;
-       l_inv_loc_exc.iit_end_mp     := p_end_mp;
+       l_inv_loc_exc.iit_end_mp     := nvl(p_end_mp,p_start_mp);
        l_inv_loc_exc.iit_inv_type   := l_inv_item.iit_inv_type;
-       l_inv_loc_exc.iit_exception  := SUBSTR(Nm3flx.parse_error_message(SQLERRM),1,4000);
+       --l_inv_loc_exc.iit_exception  := SUBSTR(Nm3flx.parse_error_message(SQLERRM),1,4000);
+       l_inv_loc_exc.iit_exception  := SUBSTR(SQLERRM,1,4000);
        insert_location_exception(l_inv_loc_exc);
        Nm3ausec.set_status (Nm3type.c_on);
+       raise;
 END locate_inventory;
 --
------------------------------------------------------------------------------
+------------------------e-----------------------------------------------------
 --
 PROCEDURE pc_inv_mig_nm2_nm3_by_id (p_iit_item_id    NM_INV_ITEMS_ALL.iit_ne_id%TYPE) IS
    CURSOR cs_iit IS
@@ -7462,23 +7507,23 @@ PROCEDURE migrate_inventory IS
   PROCEDURE tidy_data IS
   BEGIN
     append_log_content(pi_text => 'Tidying Existing Data');
-    DELETE NM_MEMBERS_ALL WHERE nm_type = 'I';
-    EXECUTE IMMEDIATE ('ALTER TABLE nm_group_inv_link_all DISABLE CONSTRAINT NGIL_FK_IIT');
-    EXECUTE IMMEDIATE ('ALTER TABLE nm_inv_items_all disable CONSTRAINT IIT_LOCATED_FK');
-    EXECUTE IMMEDIATE ('ALTER TABLE nm_inv_item_groupings_all DISABLE CONSTRAINT IIG_IIT_FK_PARENT');
-    EXECUTE IMMEDIATE ('ALTER TABLE nm_inv_item_groupings_all DISABLE CONSTRAINT IIG_IIT_FK_TOP');
-    EXECUTE IMMEDIATE ('ALTER TABLE nm_nw_ad_link_all DISABLE CONSTRAINT NADL_IIT_NE_ID_FK');
-    EXECUTE IMMEDIATE ('DELETE FROM nm_members_all WHERE nm_type = ''I''');
-    EXECUTE IMMEDIATE ('TRUNCATE TABLE nm_inv_item_groupings_all');
-    EXECUTE IMMEDIATE ('TRUNCATE TABLE nm_nw_ad_link_all');
-    EXECUTE IMMEDIATE ('TRUNCATE TABLE nm_inv_items_all');
-    EXECUTE IMMEDIATE ('TRUNCATE TABLE nm2_nm3_inv_exceptions');
-    EXECUTE IMMEDIATE ('TRUNCATE TABLE nm2_nm3_inv_exceptions_loc');
-    EXECUTE IMMEDIATE ('ALTER TABLE nm_group_inv_link_all ENABLE CONSTRAINT NGIL_FK_IIT');
-    EXECUTE IMMEDIATE ('ALTER TABLE nm_inv_items_all enable CONSTRAINT IIT_LOCATED_FK');
-    EXECUTE IMMEDIATE ('ALTER TABLE nm_inv_item_groupings_all ENABLE CONSTRAINT IIG_IIT_FK_PARENT');
-    EXECUTE IMMEDIATE ('ALTER TABLE nm_inv_item_groupings_all ENABLE CONSTRAINT IIG_IIT_FK_TOP');
-    EXECUTE IMMEDIATE ('ALTER TABLE nm_nw_ad_link_all enABLE CONSTRAINT NADL_IIT_NE_ID_FK');
+--    DELETE NM_MEMBERS_ALL WHERE nm_type = 'I';
+--    EXECUTE IMMEDIATE ('ALTER TABLE nm_group_inv_link_all DISABLE CONSTRAINT NGIL_FK_IIT');
+--    EXECUTE IMMEDIATE ('ALTER TABLE nm_inv_items_all disable CONSTRAINT IIT_LOCATED_FK');
+--    EXECUTE IMMEDIATE ('ALTER TABLE nm_inv_item_groupings_all DISABLE CONSTRAINT IIG_IIT_FK_PARENT');
+--    EXECUTE IMMEDIATE ('ALTER TABLE nm_inv_item_groupings_all DISABLE CONSTRAINT IIG_IIT_FK_TOP');
+--    EXECUTE IMMEDIATE ('ALTER TABLE nm_nw_ad_link_all DISABLE CONSTRAINT NADL_IIT_NE_ID_FK');
+--    EXECUTE IMMEDIATE ('DELETE FROM nm_members_all WHERE nm_type = ''I''');
+--    EXECUTE IMMEDIATE ('TRUNCATE TABLE nm_inv_item_groupings_all');
+--    EXECUTE IMMEDIATE ('TRUNCATE TABLE nm_nw_ad_link_all');
+--    EXECUTE IMMEDIATE ('TRUNCATE TABLE nm_inv_items_all');
+--    EXECUTE IMMEDIATE ('TRUNCATE TABLE nm2_nm3_inv_exceptions');
+--    EXECUTE IMMEDIATE ('TRUNCATE TABLE nm2_nm3_inv_exceptions_loc');
+--    EXECUTE IMMEDIATE ('ALTER TABLE nm_group_inv_link_all ENABLE CONSTRAINT NGIL_FK_IIT');
+--    EXECUTE IMMEDIATE ('ALTER TABLE nm_inv_items_all enable CONSTRAINT IIT_LOCATED_FK');
+--    EXECUTE IMMEDIATE ('ALTER TABLE nm_inv_item_groupings_all ENABLE CONSTRAINT IIG_IIT_FK_PARENT');
+ --   EXECUTE IMMEDIATE ('ALTER TABLE nm_inv_item_groupings_all ENABLE CONSTRAINT IIG_IIT_FK_TOP');
+  --  EXECUTE IMMEDIATE ('ALTER TABLE nm_nw_ad_link_all enABLE CONSTRAINT NADL_IIT_NE_ID_FK');
     append_log_content(pi_text => 'Done');
   END tidy_data;
 BEGIN
@@ -7589,6 +7634,12 @@ BEGIN
  CLOSE get_count_road_dets;
  start_longop(p_what         => 'Road Section Attributes');
 -- Nm3ausec.set_status (Nm3type.c_off);
+
+-- make sure that inv type has correct admin type
+update nm_inv_types_all
+set nit_admin_type = 'NETW'
+where nit_inv_type = 'NETW';
+
  FOR irec IN get_v2_road_dets LOOP
    BEGIN
      SAVEPOINT top_of_loop;
@@ -7598,7 +7649,7 @@ BEGIN
      l_nm.nm_ne_id_in := NULL; -- clearing this out indicates that we are not dealing with the member
      l_iit.iit_ne_id         := Nm3seq.next_ne_id_seq;
      l_iit.iit_inv_type      := pi_netw_inv_type;
-     l_iit.iit_primary_key   := NULL;
+     l_iit.iit_primary_key   := l_iit.iit_ne_id ;
      l_iit.iit_start_date    := TRUNC(irec.rse_start_date);
      l_iit.iit_end_date    := TRUNC(irec.rse_end_date);
      l_iit.iit_admin_unit    := irec.rse_admin_unit;
@@ -7660,6 +7711,9 @@ BEGIN
      l_iit.iit_num_attrib113 := irec.rse_he_id;
      l_iit.iit_num_attrib114 := 0;
      l_iit.iit_num_attrib115 := irec.rse_length;
+     append_log_content('IIT_NE_ID '||l_iit.IIT_NE_ID);
+     append_log_content('IIT_ADMIN_UNIT '||l_iit.IIT_ADMIN_UNIT);
+     append_log_content('irec.rse_he_id '||irec.rse_he_id);
      Nm3ins.ins_iit_all(p_rec_iit_all => l_iit);
 	 SELECT  NAD_ID
 	 INTO l_nadl_row.NAD_ID
@@ -7668,7 +7722,7 @@ BEGIN
 	 AND nad_inv_type=l_iit.iit_inv_type
 	 AND NAD_PRIMARY_AD='Y';
 	 l_nadl_row.NAD_IIT_NE_ID  :=l_iit.iit_ne_id;
-	 l_nadl_row.NAD_NE_ID      :=irec.rse_he_id;
+	 l_nadl_row.NAD_NE_ID      :=get_new_ne_id(p_rse_he_id => irec.rse_he_id);
 	 l_nadl_row.NAD_START_DATE :=l_iit.iit_start_date;
 	 l_nadl_row.NAD_END_DATE   :=l_iit.iit_end_date;
 	 l_nadl_row.NAD_NT_TYPE    :=irec.rse_sys_flag;
@@ -7864,7 +7918,7 @@ BEGIN
 END tidy_up_following_migration;
 --
 -----------------------------------------------------------------------------
---
+--migrate_network_and_inventory
 PROCEDURE migrate_cor_doc_gis(pi_log_file_location   IN VARCHAR2
 		  					 ,pi_v2_higowner 		 IN VARCHAR2
                              ,pi_with_debug          IN BOOLEAN) IS
@@ -7874,7 +7928,7 @@ BEGIN
             ,pi_first_stage        => TRUE
             ,pi_with_debug         => pi_with_debug);
   g_issue_commits := 'N';
-  process_admin_units(pi_v2_higowner);
+ --already hav ethe admin units. process_admin_units(pi_v2_higowner);
   oracle_users_roles_privs;
   process_hig_data;
   process_doc_data;
@@ -7901,6 +7955,8 @@ l_end_Date DATE;
 l_context_date_on_entry DATE := Nm3user.get_effective_date;
 
 l_das_Rec_id doc_Assocs.das_Rec_id%type;
+
+l_new_ne_id  number;
 
 BEGIN
   initialise(pi_log_file_location  => pi_log_file_location
@@ -7944,10 +8000,11 @@ BEGIN
 	    l_start_Date:=TO_DATE('01-JAN-1670','DD-MON-YYYY');
 		l_end_date:=TO_DATE('31-dec-9999','DD-MON-YYYY');
   	    IF l_das_network THEN
-	      SELECT ne_start_Date, ne_end_Date
-		  INTO l_start_date,l_end_Date
+        l_new_ne_id := get_new_ne_id( c1rec.das_rec_id);
+	      SELECT ne_start_Date, ne_end_Date, ne_id
+		  INTO l_start_date,l_end_Date, l_das_rec_id
 		  FROM NM_ELEMENTS_ALL
-		  WHERE ne_id=c1rec.das_rec_id;
+		  WHERE ne_id=l_new_ne_id;
           Nm3user.set_effective_date(l_start_date);
 	    ELSIF l_das_asset THEN
 	      SELECT iit_ne_id,iit_start_Date,iit_end_Date
@@ -7978,6 +8035,7 @@ BEGIN
 	    if l_das_rec_id!=c1rec.das_Rec_id then
 		  null; --this is invnetory and has the id changed - ok to attempt to load more than once
 		else
+      append_log_content(pi_text => l_das_rec_id);
 		  raise;
 		end if;
 
@@ -7985,6 +8043,8 @@ BEGIN
         --asset/netowrk has not been moigrated - cant find the start date
 		--dont migrate the doc assoc
 		  append_log_content(pi_text => 'Not migrating '||c1rec.das_table_name||' REC_ID '||c1rec.das_rec_id||' DOC_ID '||c1rec.das_doc_id||' as item not found');
+     when others then append_log_content(pi_text => l_das_rec_id);
+     raise;
 	  END;
 	END LOOP;
   END LOOP;
@@ -8252,6 +8312,11 @@ PROCEDURE do_spatial_migration(pi_table_name IN user_tables.table_name%TYPE
   l_geom 	  mdsys.sdo_geometry;
   l_diminfo  mdsys.sdo_dim_array;
 
+  cursor c1
+  is
+  select * from worcs_net_map;
+
+
   l_base_srid NUMBER;
   p_x1 NUMBER;
   p_y1 NUMBER;
@@ -8266,6 +8331,20 @@ BEGIN
             ,pi_with_debug         => pi_with_debug);
   g_issue_commits := 'N';
 
+
+  for c1rec in c1
+   loop
+     begin
+       l_ne_id :=  get_new_ne_id(c1rec.rse_he_id);
+       update worcs_net_map
+       set rse_he_id = l_ne_id
+       where rse_he_id = c1rec.rse_he_id;
+     exception when no_data_found then null;
+     end;
+  end loop;
+
+
+  l_ne_id := null;
   SELECT COUNT(*)
   INTO l_number
   FROM user_tab_columns
@@ -8334,7 +8413,7 @@ BEGIN
 
 
   --now update the route theme so we can run all the checks against that.
-
+append_log_content(pi_text => 'update theme');
   UPDATE NM_THEMES_ALL
   SET nth_feature_table='MIGRATION_NET_MAP'
   ,NTH_FEATURE_PK_COLUMN='MIG_NE_ID'
@@ -8352,7 +8431,7 @@ BEGIN
   DELETE FROM MIGRATION_NET_MAP_MP;
 
   --now try and repair any bad data
-
+append_log_content(pi_text =>' inseert into MIGRATION_NET_MAP_MP');
   INSERT INTO MIGRATION_NET_MAP_MP
   (MIG_NE_ID, SHAPE)
   SELECT  MIG_NE_ID, SHAPE
@@ -8367,6 +8446,7 @@ BEGIN
       (SELECT 'x' FROM NM_ELEMENTS_ALL
       WHERE ne_id=mig_ne_id)) LOOP
 	BEGIN
+  append_log_content(pi_text =>'1');
 	  SELECT shape, ne_length,sdo_lrs.geom_segment_end_measure( shape, l_diminfo ),ne_unique,ne_id
 	  INTO l_geom,l_length,l_shape_length,l_unique, l_ne_id
 	  FROM MIGRATION_NET_MAP,NM_ELEMENTS_ALL
@@ -8376,17 +8456,17 @@ BEGIN
       IF l_shape_length!=l_length THEN
         append_log_content(pi_text => '  Shape Length (was '||l_shape_length||') will be updated to Element Length '||l_length||' for '||l_unique||'('||irec.mig_ne_id||')');
       END IF;
-
+append_log_content(pi_text =>'2');
 	  l_geom:=Nm3sdo.remove_redundant_pts(p_layer =>l_layer,p_geom =>l_geom);
-
+append_log_content(pi_text =>'3');
       IF Nm3sdo.get_no_parts(l_geom) > 3 THEN
 	    l_geom:=Make_Single_Part3( l_geom, l_diminfo);
 	  END IF;
-
+append_log_content(pi_text =>'4');
 	  l_geom:=Nm3sdo.rescale_geometry(p_layer =>l_layer
                            			 ,p_ne_id =>l_ne_id
    					                 ,p_geom  =>l_geom);
-
+append_log_content(pi_text =>'5');
    	  l_geom:=Nm3sdo.ignore_measure(l_geom);
 
 
@@ -8403,6 +8483,7 @@ BEGIN
     EXCEPTION
  	  WHEN OTHERS THEN
       Nm_Debug.DEBUG(irec.mig_ne_id);
+      append_log_content(pi_text => irec.mig_ne_id);
       RAISE;
     END;
   END LOOP;
@@ -8494,7 +8575,7 @@ BEGIN
 
   append_log_content(pi_text => '  Deleting Records');
 
-  DELETE FROM NM_POINT_LOCATIONS;
+--  DELETE FROM NM_POINT_LOCATIONS;
 
   append_log_content(pi_text => '  Creating Records');
 
@@ -9219,7 +9300,9 @@ EXCEPTION
 end   resume_invent_migration;
 
 
-
+-- instatiate package procedure
+begin
+populate_old_new_tab;
 
 END Nm2_Nm3_Migration;
 /
