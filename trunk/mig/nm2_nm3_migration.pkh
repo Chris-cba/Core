@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE Nm2_Nm3_Migration AS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid                : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkh-arc   2.1   Jan 03 2008 10:22:28   smarshall  $
---       Module Name           : $Workfile:   nm2_nm3_migration.pkh  $
---       Date into PVCS        : $Date:   Jan 03 2008 10:22:28  $
---       Date fetched Out      : $Modtime:   Jan 03 2008 10:21:16  $
---       PVCS Version          : $Revision:   2.1  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkh-arc   2.2   Sep 12 2008 10:47:28   Ian Turnbull  $
+--       Module Name      : $Workfile:   nm2_nm3_migration.pkh  $
+--       Date into PVCS   : $Date:   Sep 12 2008 10:47:28  $
+--       Date fetched Out : $Modtime:   Sep 12 2008 10:44:22  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on SCCS Version : 1.10
 --
 --
@@ -107,8 +107,8 @@ PROCEDURE migrate_failed_inventory_loc(pi_log_file_location   IN VARCHAR2);
 -----------------------------------------------------------------------------
 --
 --<PRAGMA>
-  PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
-  PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
+  --PRAGMA RESTRICT_REFERENCES(get_version, RNDS, WNPS, WNDS);
+  --PRAGMA RESTRICT_REFERENCES(get_body_version, RNDS, WNPS, WNDS);
 --</PRAGMA>
 --
 -----------------------------------------------------------------------------
@@ -185,6 +185,8 @@ PROCEDURE stop_migration(p_error IN VARCHAR2);
 PROCEDURE do_optional_commit;
 
 PROCEDURE pc_inv_mig_nm2_nm3_by_id (p_iit_item_id    NM_INV_ITEMS_ALL.iit_ne_id%TYPE);
+
+PROCEDURE oracle_users_roles_privs ;
 
 END Nm2_Nm3_Migration;
 /
