@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.4   Jun 13 2008 09:45:00   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.5   Sep 16 2008 18:24:58   ptanava  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Jun 13 2008 09:45:00  $
---       Date fetched Out : $Modtime:   Jun 13 2008 09:28:36  $
---       SCCS Version     : $Revision:   2.4  $
+--       Date into SCCS   : $Date:   Sep 16 2008 18:24:58  $
+--       Date fetched Out : $Modtime:   Sep 16 2008 18:14:38  $
+--       SCCS Version     : $Revision:   2.5  $
 --       Based on --
 --
 --   nm3inv package body
@@ -20,6 +20,9 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 -- 13/06/2008  PT Log 710984: modified get_attribute_value() to not raise >1 assets error
 --              when two assets are touching on the point of interest.
 --              the value that starts at the point is returned
+-- 23/06/2008  PT the above change now depends on sysopt 'ATTRVALUEV' value Y | N default N
+--              only use the new logic if sysopt value is 'Y'
+
 -----------------------------------------------------------------------------
 --      Copyright (c) exor corporation ltd, 2005
 -----------------------------------------------------------------------------
@@ -32,7 +35,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
    g_package_name CONSTANT VARCHAR2(30) := 'nm3inv';
 --
    --<USED BY validate_rec_iit>
-   g_last_inv_type_dyn_val nm_inv_types.nit_inv_type%TYPE;
+   g_last_inv_type_dyn_val NM_INV_TYPES.nit_inv_type%TYPE;
    g_inv_val_tab_varchar   Nm3type.tab_varchar32767;
    --</USED BY validate_rec_iit>
 --
@@ -54,9 +57,9 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_ita_by_attrib_name (pi_inv_type      IN nm_inv_type_attribs.ita_inv_type%TYPE
-                              ,pi_attrib_name IN nm_inv_type_attribs.ita_attrib_name%TYPE
-                             ) RETURN nm_inv_type_attribs%ROWTYPE;
+FUNCTION get_ita_by_attrib_name (pi_inv_type      IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                              ,pi_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                             ) RETURN NM_INV_TYPE_ATTRIBS%ROWTYPE;
 --
 ----------------------------------------------------------------------------------------------
 --
@@ -93,21 +96,21 @@ END get_nt_unique;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_nit_descr(p_inv_type IN nm_inv_types.nit_inv_type%TYPE
-                        ,p_parent_type IN nm_inv_types.nit_inv_type%TYPE DEFAULT NULL)
-         RETURN nm_inv_types.nit_descr%TYPE IS
+FUNCTION get_nit_descr(p_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE
+                        ,p_parent_type IN NM_INV_TYPES.nit_inv_type%TYPE DEFAULT NULL)
+         RETURN NM_INV_TYPES.nit_descr%TYPE IS
 --
   CURSOR c2 IS
     SELECT nit_descr
-    FROM   nm_inv_types
-          ,nm_inv_type_groupings
+    FROM   NM_INV_TYPES
+          ,NM_INV_TYPE_GROUPINGS
     WHERE  nit_inv_type = itg_inv_type
     AND    itg_parent_inv_type = p_parent_type
     AND    nit_inv_type = p_inv_type
     AND    itg_inv_type != itg_parent_inv_type;
 
 --
-   l_retval nm_inv_types.nit_descr%TYPE;
+   l_retval NM_INV_TYPES.nit_descr%TYPE;
 --
 BEGIN
 --
@@ -144,14 +147,14 @@ END get_nit_pnt_or_cont;
 FUNCTION get_top_item_type ( p_type IN VARCHAR2) RETURN VARCHAR2 IS
 CURSOR c1 IS
   SELECT b.itg_parent_inv_type
-  FROM nm_inv_type_groupings b
+  FROM NM_INV_TYPE_GROUPINGS b
     WHERE NOT EXISTS (
-       SELECT 'x' FROM nm_inv_type_groupings c
+       SELECT 'x' FROM NM_INV_TYPE_GROUPINGS c
        WHERE c.itg_inv_type = b.itg_parent_inv_type )
   CONNECT BY PRIOR itg_parent_inv_type = itg_inv_type
   START WITH itg_inv_type = p_type;
 
-  l_retval nm_inv_types.nit_inv_type%TYPE;
+  l_retval NM_INV_TYPES.nit_inv_type%TYPE;
 BEGIN
   OPEN c1;
   FETCH c1 INTO l_retval;
@@ -166,7 +169,7 @@ END get_top_item_type;
 --
 FUNCTION get_inv_type_icon(p_inv_type IN VARCHAR2) RETURN VARCHAR2 IS
 --
-   l_rec_nit nm_inv_types%ROWTYPE;
+   l_rec_nit NM_INV_TYPES%ROWTYPE;
 --
 BEGIN
 --
@@ -181,7 +184,7 @@ END get_inv_type_icon;
 -- Start of functions and procedures required for inventory view creattion
 -- via mai1400
 --
-FUNCTION view_exists ( inv_view_name IN nm_inv_types.nit_view_name%TYPE ) RETURN BOOLEAN IS
+FUNCTION view_exists ( inv_view_name IN NM_INV_TYPES.nit_view_name%TYPE ) RETURN BOOLEAN IS
 --
 BEGIN
 --
@@ -194,7 +197,7 @@ END view_exists;
 --
 -- Check if the existing view is in use within the database.
 --
-FUNCTION view_in_use ( p_view_name IN nm_inv_types.nit_view_name%TYPE ) RETURN BOOLEAN IS
+FUNCTION view_in_use ( p_view_name IN NM_INV_TYPES.nit_view_name%TYPE ) RETURN BOOLEAN IS
 --
    exclusive_mode INTEGER := 6;
    ID             INTEGER := 100;
@@ -226,7 +229,7 @@ END view_in_use;
 ----------------------------------------------------------------------------------------------
 --
 --
-FUNCTION synonym_exists(SYNONYM IN nm_inv_types.nit_view_name%TYPE) RETURN BOOLEAN IS
+FUNCTION synonym_exists(SYNONYM IN NM_INV_TYPES.nit_view_name%TYPE) RETURN BOOLEAN IS
 --
 BEGIN
 --
@@ -242,7 +245,7 @@ END synonym_exists;
 -- problems when creating the view object. ( Such as insufficient privelages ).
 --
 --
-PROCEDURE create_view (p_inventory_type  IN nm_inv_types.nit_inv_type%TYPE
+PROCEDURE create_view (p_inventory_type  IN NM_INV_TYPES.nit_inv_type%TYPE
                       ,p_join_to_network IN BOOLEAN DEFAULT FALSE
                       ) IS
 --
@@ -260,7 +263,7 @@ END create_view;
 --
 ----------------------------------------------------------------------------------------------
 --
-PROCEDURE create_inv_view (p_inventory_type  IN  nm_inv_types.nit_inv_type%TYPE
+PROCEDURE create_inv_view (p_inventory_type  IN  NM_INV_TYPES.nit_inv_type%TYPE
                           ,p_join_to_network IN  BOOLEAN DEFAULT FALSE
                           ,p_view_name       OUT user_views.view_name%TYPE
                           ) IS
@@ -282,7 +285,7 @@ END create_inv_view;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_create_inv_view_text (p_inventory_type   IN nm_inv_types.nit_inv_type%TYPE
+FUNCTION get_create_inv_view_text (p_inventory_type   IN NM_INV_TYPES.nit_inv_type%TYPE
                                   ,p_join_to_network  IN BOOLEAN DEFAULT FALSE
                                   ) RETURN VARCHAR2 IS
 --
@@ -311,7 +314,7 @@ END create_all_inv_views;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION work_out_inv_type_view_name (pi_inv_type         IN nm_inv_types.nit_inv_type%TYPE
+FUNCTION work_out_inv_type_view_name (pi_inv_type         IN NM_INV_TYPES.nit_inv_type%TYPE
                                      ,pi_join_to_network  IN BOOLEAN DEFAULT FALSE
                                      ) RETURN VARCHAR2 IS
 --
@@ -325,7 +328,7 @@ END work_out_inv_type_view_name;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION derive_inv_type_view_name (pi_inv_type IN nm_inv_types.nit_inv_type%TYPE)
+FUNCTION derive_inv_type_view_name (pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE)
  RETURN VARCHAR2 IS
 BEGIN
 --
@@ -337,7 +340,7 @@ END derive_inv_type_view_name;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION derive_nw_inv_type_view_name (pi_inv_type IN nm_inv_types.nit_inv_type%TYPE)
+FUNCTION derive_nw_inv_type_view_name (pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE)
  RETURN VARCHAR2 IS
 BEGIN
 --
@@ -351,7 +354,7 @@ END derive_nw_inv_type_view_name;
 --
 FUNCTION get_iit_pk ( p_item_id IN NUMBER ) RETURN VARCHAR2 IS
 --
-   l_iit_pk nm_inv_items.iit_primary_key%TYPE;
+   l_iit_pk NM_INV_ITEMS.iit_primary_key%TYPE;
 --
 BEGIN
 --
@@ -367,21 +370,21 @@ END get_iit_pk;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_xsp_descr(p_inv_type IN xsp_restraints.xsr_ity_inv_code%TYPE
-                      ,p_x_sect_val IN xsp_restraints.xsr_x_sect_value%TYPE
-                      ,p_nw_type IN xsp_restraints.xsr_nw_type%TYPE
-                      ,p_scl_class IN xsp_restraints.xsr_scl_class%TYPE)
-         RETURN xsp_restraints.xsr_descr%TYPE IS
+FUNCTION get_xsp_descr(p_inv_type IN XSP_RESTRAINTS.xsr_ity_inv_code%TYPE
+                      ,p_x_sect_val IN XSP_RESTRAINTS.xsr_x_sect_value%TYPE
+                      ,p_nw_type IN XSP_RESTRAINTS.xsr_nw_type%TYPE
+                      ,p_scl_class IN XSP_RESTRAINTS.xsr_scl_class%TYPE)
+         RETURN XSP_RESTRAINTS.xsr_descr%TYPE IS
 
   CURSOR c1 IS
     SELECT xsr_descr
-    FROM   xsp_restraints
+    FROM   XSP_RESTRAINTS
     WHERE  xsr_x_sect_value = p_x_sect_val
     AND    xsr_ity_inv_code = p_inv_type
     AND    NVL(xsr_scl_class,Nm3type.c_nvl) = NVL(p_scl_class, NVL(xsr_scl_class,Nm3type.c_nvl))
     AND    xsr_nw_type= NVL(p_nw_type, xsr_nw_type);
 
-  l_retval xsp_restraints.xsr_descr%TYPE;
+  l_retval XSP_RESTRAINTS.xsr_descr%TYPE;
 
 BEGIN
 
@@ -414,7 +417,7 @@ BEGIN
   INSERT INTO NM_INV_TYPE_COLOURS
   ( col_id, ity_inv_code )
   SELECT ROWNUM, nit_inv_type
-  FROM nm_inv_types;
+  FROM NM_INV_TYPES;
 
 EXCEPTION
   WHEN resource_busy THEN
@@ -497,14 +500,14 @@ END build_ita_lov_sql_string;
 --
 -- Procedure to validate and return foreign key value
   PROCEDURE valid_fk_ial
-        ( a_ial_domain  IN      nm_inv_attri_lookup.ial_domain%TYPE
-        , a_ial_value   IN      nm_inv_attri_lookup.ial_value%TYPE
-        , a_ial_meaning IN OUT  nm_inv_attri_lookup.ial_meaning%TYPE
+        ( a_ial_domain  IN      NM_INV_ATTRI_LOOKUP.ial_domain%TYPE
+        , a_ial_value   IN      NM_INV_ATTRI_LOOKUP.ial_value%TYPE
+        , a_ial_meaning IN OUT  NM_INV_ATTRI_LOOKUP.ial_meaning%TYPE
   ) AS
 --
   CURSOR c_ial IS
   SELECT ial_meaning
-   FROM  nm_inv_attri_lookup
+   FROM  NM_INV_ATTRI_LOOKUP
    WHERE ial_domain = a_ial_domain
     AND  ial_value  = a_ial_value;
 --    AND   SYSDATE BETWEEN NVL(ial_start_date,SYSDATE)
@@ -533,16 +536,16 @@ END build_ita_lov_sql_string;
 -- differs in the way date parameters are held to PL/SQL 2.
 --
   PROCEDURE valid_fk_ial
-        ( a_ial_domain  IN      nm_inv_attri_lookup.ial_domain%TYPE
-        , a_ial_value   IN      nm_inv_attri_lookup.ial_value%TYPE
-        , a_ial_meaning IN OUT  nm_inv_attri_lookup.ial_meaning%TYPE
+        ( a_ial_domain  IN      NM_INV_ATTRI_LOOKUP.ial_domain%TYPE
+        , a_ial_value   IN      NM_INV_ATTRI_LOOKUP.ial_value%TYPE
+        , a_ial_meaning IN OUT  NM_INV_ATTRI_LOOKUP.ial_meaning%TYPE
         , a_effective   IN      VARCHAR2
         , a_date_mask   IN      VARCHAR2 := 'DD-MON-YYYY'
   ) AS
 --
   CURSOR c_ial IS
     SELECT ial_meaning
-    FROM nm_inv_attri_lookup nial,nm_inv_domains nid
+    FROM NM_INV_ATTRI_LOOKUP nial,NM_INV_DOMAINS nid
     WHERE nid.id_domain = nial.ial_domain
     AND   nial.ial_domain  = a_ial_domain
     AND   nial.ial_value =    a_ial_value;
@@ -565,9 +568,9 @@ END build_ita_lov_sql_string;
 ----------------------------------------------------------------------------------------------
 --
 PROCEDURE valid_fk_ial
-       (a_ial_domain   IN     nm_inv_attri_lookup.ial_domain%TYPE
+       (a_ial_domain   IN     NM_INV_ATTRI_LOOKUP.ial_domain%TYPE
        ,a_ial_value    IN     NUMBER
-       ,a_ial_meaning  IN OUT nm_inv_attri_lookup.ial_meaning%TYPE
+       ,a_ial_meaning  IN OUT NM_INV_ATTRI_LOOKUP.ial_meaning%TYPE
        ) IS
 BEGIN
 --
@@ -582,13 +585,13 @@ END valid_fk_ial;
 ----------------------------------------------------------------------------------------------
 --
 PROCEDURE valid_fk_ial
-       (a_ial_domain   IN     nm_inv_attri_lookup.ial_domain%TYPE
+       (a_ial_domain   IN     NM_INV_ATTRI_LOOKUP.ial_domain%TYPE
        ,a_ial_value    IN     DATE
-       ,a_ial_meaning  IN OUT nm_inv_attri_lookup.ial_meaning%TYPE
+       ,a_ial_meaning  IN OUT NM_INV_ATTRI_LOOKUP.ial_meaning%TYPE
        ) IS
   CURSOR c_ial IS
   SELECT ial_meaning
-   FROM  nm_inv_attri_lookup
+   FROM  NM_INV_ATTRI_LOOKUP
    WHERE ial_domain                                         = a_ial_domain
     AND  TO_CHAR(Hig.date_convert(ial_value),Nm3type.c_full_date_time_format) = TO_CHAR(a_ial_value,Nm3type.c_full_date_time_format);
   b_notfound BOOLEAN DEFAULT FALSE;
@@ -750,7 +753,7 @@ PROCEDURE validate_flex_inv (p_inv_type               IN  VARCHAR2
                             ,pi_bind_variable_value   IN     VARCHAR2 DEFAULT NULL
                             ) IS
 ----
-   l_rec_nita                  nm_inv_type_attribs%ROWTYPE;
+   l_rec_nita                  NM_INV_TYPE_ATTRIBS%ROWTYPE;
    l_qry Nm3type.max_varchar2;
    l_id     Nm3type.max_varchar2;
 --
@@ -1043,9 +1046,9 @@ END validate_flex_inv;
 ------------------------------------------------------------------------------------------------
 --
 FUNCTION get_inv_type_attr
-             (pi_inv_type    IN nm_inv_type_attribs.ita_inv_type%TYPE
-             ,pi_attrib_name IN nm_inv_type_attribs.ita_attrib_name%TYPE
-             ) RETURN nm_inv_type_attribs%ROWTYPE IS
+             (pi_inv_type    IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+             ,pi_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+             ) RETURN NM_INV_TYPE_ATTRIBS%ROWTYPE IS
 --
 BEGIN
 --
@@ -1058,7 +1061,7 @@ END get_inv_type_attr;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_all_attribs(pi_inv_type IN nm_inv_type_attribs.ita_inv_type%TYPE
+FUNCTION get_all_attribs(pi_inv_type IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
                         ) RETURN attrib_table IS
 --
    l_attrib_tab attrib_table;
@@ -1066,7 +1069,7 @@ FUNCTION get_all_attribs(pi_inv_type IN nm_inv_type_attribs.ita_inv_type%TYPE
 BEGIN
 --
    FOR rec IN (SELECT ita_attrib_name
-                FROM  nm_inv_type_attribs
+                FROM  NM_INV_TYPE_ATTRIBS
                WHERE  ita_inv_type = pi_inv_type
                ORDER BY ita_disp_seq_no
               )
@@ -1080,23 +1083,23 @@ END get_all_attribs;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_attrib_value(p_ne_id       IN nm_inv_items.iit_ne_id%TYPE
-                         ,p_attrib_name IN nm_inv_type_attribs.ita_attrib_name%TYPE
+FUNCTION get_attrib_value(p_ne_id       IN NM_INV_ITEMS.iit_ne_id%TYPE
+                         ,p_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
                          ) RETURN VARCHAR2 IS
 --
-   CURSOR c1 (p_ne_id       nm_inv_items.iit_ne_id%TYPE
-             ,p_attrib_name nm_inv_type_attribs.ita_attrib_name%TYPE
+   CURSOR c1 (p_ne_id       NM_INV_ITEMS.iit_ne_id%TYPE
+             ,p_attrib_name NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
              ) IS
      SELECT ita_format
            ,ita_format_mask
-     FROM   nm_inv_type_attribs
-           ,nm_inv_items
+     FROM   NM_INV_TYPE_ATTRIBS
+           ,NM_INV_ITEMS
      WHERE  ita_inv_type    = iit_inv_type
       AND   iit_ne_id       = p_ne_id
       AND   ita_attrib_name = p_attrib_name;
 --
-   l_format nm_inv_type_attribs.ita_format%TYPE;
-   l_mask   nm_inv_type_attribs.ita_format_mask%TYPE;
+   l_format NM_INV_TYPE_ATTRIBS.ita_format%TYPE;
+   l_mask   NM_INV_TYPE_ATTRIBS.ita_format_mask%TYPE;
    l_retval VARCHAR2(500);
 --
    l_sql_string VARCHAR2(2000);
@@ -1137,18 +1140,18 @@ END get_attrib_value;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_all_attrib_values(p_ne_id IN nm_inv_items.iit_ne_id%TYPE)
+FUNCTION get_all_attrib_values(p_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE)
          RETURN attrib_table IS
 --
    CURSOR c1 IS
      SELECT ita_attrib_name
-     FROM   nm_inv_type_attribs
-           ,nm_inv_items
+     FROM   NM_INV_TYPE_ATTRIBS
+           ,NM_INV_ITEMS
      WHERE  iit_ne_id = p_ne_id
      AND    iit_inv_type = ita_inv_type
      ORDER BY ita_disp_seq_no;
 --
-   l_attrib_name nm_inv_type_attribs.ita_attrib_name%TYPE;
+   l_attrib_name NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE;
    l_attrib_list attrib_table;
    l_attrib_count NUMBER := 0;
 --
@@ -1170,20 +1173,20 @@ END;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_all_attrib_values(p_ne_id IN nm_inv_items.iit_ne_id%TYPE
-                              ,p_inv_type IN nm_inv_items.iit_inv_type%TYPE )
+FUNCTION get_all_attrib_values(p_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE
+                              ,p_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE )
          RETURN attrib_table IS
 --
    CURSOR c1 IS
      SELECT ita_attrib_name
-     FROM   nm_inv_type_attribs
-           ,nm_inv_items
+     FROM   NM_INV_TYPE_ATTRIBS
+           ,NM_INV_ITEMS
      WHERE  iit_ne_id = p_ne_id
      AND    iit_inv_type = p_inv_type
      AND    iit_inv_type = ita_inv_type
      ORDER BY ita_disp_seq_no;
 --
-   l_attrib_name nm_inv_type_attribs.ita_attrib_name%TYPE;
+   l_attrib_name NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE;
    l_attrib_list attrib_table;
    l_attrib_count NUMBER := 0;
 --
@@ -1205,9 +1208,9 @@ END;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_attrib_scrn_text(pi_inv_type    IN nm_inv_type_attribs.ita_inv_type%TYPE
-                             ,pi_attrib_name IN nm_inv_type_attribs.ita_attrib_name%TYPE
-                             ) RETURN nm_inv_type_attribs.ita_scrn_text%TYPE IS
+FUNCTION get_attrib_scrn_text(pi_inv_type    IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                             ,pi_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                             ) RETURN NM_INV_TYPE_ATTRIBS.ita_scrn_text%TYPE IS
 BEGIN
 --
    RETURN Nm3get.get_ita (pi_ita_inv_type    => pi_inv_type
@@ -1219,9 +1222,9 @@ END get_attrib_scrn_text;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_attrib_domain(pi_inv_type    IN nm_inv_type_attribs.ita_inv_type%TYPE
-                          ,pi_attrib_name IN nm_inv_type_attribs.ita_attrib_name%TYPE
-                          ) RETURN nm_inv_type_attribs.ita_id_domain%TYPE IS
+FUNCTION get_attrib_domain(pi_inv_type    IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                          ,pi_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                          ) RETURN NM_INV_TYPE_ATTRIBS.ita_id_domain%TYPE IS
 BEGIN
 --
    RETURN Nm3get.get_ita (pi_ita_inv_type    => pi_inv_type
@@ -1233,9 +1236,9 @@ END get_attrib_domain;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_attrib_format(pi_inv_type    IN nm_inv_type_attribs.ita_inv_type%TYPE
-                          ,pi_attrib_name IN nm_inv_type_attribs.ita_attrib_name%TYPE
-                          ) RETURN nm_inv_type_attribs.ita_format%TYPE IS
+FUNCTION get_attrib_format(pi_inv_type    IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                          ,pi_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                          ) RETURN NM_INV_TYPE_ATTRIBS.ita_format%TYPE IS
 BEGIN
 --
    RETURN Nm3get.get_ita (pi_ita_inv_type    => pi_inv_type
@@ -1247,21 +1250,21 @@ END get_attrib_format;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION attrib_queryable(pi_inv_type    IN nm_inv_type_attribs.ita_inv_type%TYPE
-                         ,pi_attrib_name IN nm_inv_type_attribs.ita_attrib_name%TYPE
+FUNCTION attrib_queryable(pi_inv_type    IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                         ,pi_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
                          ) RETURN BOOLEAN IS
 
-  CURSOR c1(p_inv_type    IN nm_inv_type_attribs.ita_inv_type%TYPE
-           ,p_attrib_name IN nm_inv_type_attribs.ita_attrib_name%TYPE) IS
+  CURSOR c1(p_inv_type    IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+           ,p_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE) IS
     SELECT
       ita_queryable
     FROM
-      nm_inv_type_attribs
+      NM_INV_TYPE_ATTRIBS
     WHERE
       ita_inv_type = p_inv_type
     AND
       ita_attrib_name = p_attrib_name;
-  l_queryable nm_inv_type_attribs.ita_queryable%TYPE;
+  l_queryable NM_INV_TYPE_ATTRIBS.ita_queryable%TYPE;
 
   l_retval BOOLEAN := FALSE;
 
@@ -1278,23 +1281,23 @@ END attrib_queryable;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_top_item_id(p_item_id IN nm_inv_item_groupings.iig_item_id%TYPE)
-         RETURN nm_inv_item_groupings.iig_top_id%TYPE IS
+FUNCTION get_top_item_id(p_item_id IN NM_INV_ITEM_GROUPINGS.iig_item_id%TYPE)
+         RETURN NM_INV_ITEM_GROUPINGS.iig_top_id%TYPE IS
 
   CURSOR c1 IS
     SELECT iig_top_id
-    FROM   nm_inv_item_groupings
+    FROM   NM_INV_ITEM_GROUPINGS
     WHERE  iig_item_id = p_item_id;
 
   CURSOR c2 IS
     SELECT
       iig_top_id
     FROM
-      nm_inv_item_groupings
+      NM_INV_ITEM_GROUPINGS
     WHERE
       iig_top_id = p_item_id;
 
-  l_retval nm_inv_item_groupings.iig_top_id%TYPE;
+  l_retval NM_INV_ITEM_GROUPINGS.iig_top_id%TYPE;
 
 BEGIN
 
@@ -1315,8 +1318,8 @@ END get_top_item_id;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_inv_type(p_ne_id IN nm_inv_items.iit_ne_id%TYPE)
-         RETURN nm_inv_items.iit_inv_type%TYPE IS
+FUNCTION get_inv_type(p_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE)
+         RETURN NM_INV_ITEMS.iit_inv_type%TYPE IS
 BEGIN
 --
    RETURN get_inv_item_all(pi_ne_id => p_ne_id).iit_inv_type;
@@ -1325,13 +1328,13 @@ END get_inv_type;
 --
 ----------------------------------------------------------------------------
 --
-PROCEDURE get_inv_item_details(p_ne_id IN nm_inv_items.iit_ne_id%TYPE
-                              ,p_type IN OUT nm_inv_items.iit_inv_type%TYPE
-                              ,p_descr IN OUT nm_inv_items.iit_descr%TYPE
-                              ,p_primary IN OUT nm_inv_items.iit_primary_key%TYPE
-                              ,p_xsp IN OUT nm_inv_items.iit_x_sect%TYPE) IS
+PROCEDURE get_inv_item_details(p_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE
+                              ,p_type IN OUT NM_INV_ITEMS.iit_inv_type%TYPE
+                              ,p_descr IN OUT NM_INV_ITEMS.iit_descr%TYPE
+                              ,p_primary IN OUT NM_INV_ITEMS.iit_primary_key%TYPE
+                              ,p_xsp IN OUT NM_INV_ITEMS.iit_x_sect%TYPE) IS
 --
-  l_rec_iit nm_inv_items%ROWTYPE;
+  l_rec_iit NM_INV_ITEMS%ROWTYPE;
 --
 BEGIN
 --
@@ -1346,8 +1349,8 @@ END get_inv_item_details;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_inv_primary_key(p_ne_id IN nm_inv_items.iit_ne_id%TYPE)
-         RETURN nm_inv_items.iit_primary_key%TYPE IS
+FUNCTION get_inv_primary_key(p_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE)
+         RETURN NM_INV_ITEMS.iit_primary_key%TYPE IS
 --
 BEGIN
 --
@@ -1357,8 +1360,8 @@ END;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_inv_type (pi_inv_type IN nm_inv_types.nit_inv_type%TYPE
-                      ) RETURN nm_inv_types%ROWTYPE IS
+FUNCTION get_inv_type (pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE
+                      ) RETURN NM_INV_TYPES%ROWTYPE IS
 BEGIN
 --
    RETURN Nm3get.get_nit (pi_nit_inv_type      => pi_inv_type
@@ -1369,7 +1372,7 @@ END get_inv_type;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_inv_type_table_name( p_nit_inv_type nm_inv_types.nit_inv_type%TYPE)
+FUNCTION get_inv_type_table_name( p_nit_inv_type NM_INV_TYPES.nit_inv_type%TYPE)
 RETURN VARCHAR2 IS
 --
 BEGIN
@@ -1380,17 +1383,17 @@ END get_inv_type_table_name;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_inv_ft_details( p_nit_inv_type nm_inv_types.nit_inv_type%TYPE
-                            ,p_nit_table_name IN OUT nm_inv_types.nit_table_name%TYPE
-                            ,p_nit_lr_ne_column_name IN OUT nm_inv_types.nit_lr_ne_column_name%TYPE
-                            ,p_nit_lr_st_chain IN OUT nm_inv_types.nit_lr_st_chain%TYPE
-                            ,p_nit_lr_end_chain IN OUT nm_inv_types.nit_lr_end_chain%TYPE
+FUNCTION get_inv_ft_details( p_nit_inv_type NM_INV_TYPES.nit_inv_type%TYPE
+                            ,p_nit_table_name IN OUT NM_INV_TYPES.nit_table_name%TYPE
+                            ,p_nit_lr_ne_column_name IN OUT NM_INV_TYPES.nit_lr_ne_column_name%TYPE
+                            ,p_nit_lr_st_chain IN OUT NM_INV_TYPES.nit_lr_st_chain%TYPE
+                            ,p_nit_lr_end_chain IN OUT NM_INV_TYPES.nit_lr_end_chain%TYPE
                            ) RETURN BOOLEAN
 IS
 --
    rtrn BOOLEAN := TRUE;
 --
-   l_rec_nit nm_inv_types%ROWTYPE;
+   l_rec_nit NM_INV_TYPES%ROWTYPE;
 --
 BEGIN
    -- Initialise return arguments
@@ -1417,13 +1420,13 @@ END get_inv_ft_details;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION inv_type_has_child(pi_nit_inv_type nm_inv_types.nit_inv_type%TYPE
+FUNCTION inv_type_has_child(pi_nit_inv_type NM_INV_TYPES.nit_inv_type%TYPE
                            ) RETURN BOOLEAN IS
   CURSOR c1 IS
     SELECT
       1
     FROM
-      nm_inv_type_groupings
+      NM_INV_TYPE_GROUPINGS
     WHERE
       itg_parent_inv_type = pi_nit_inv_type;
 
@@ -1450,8 +1453,8 @@ END inv_type_has_child;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_inv_item (pi_ne_id nm_inv_items.iit_ne_id%TYPE
-                      ) RETURN nm_inv_items%ROWTYPE IS
+FUNCTION get_inv_item (pi_ne_id NM_INV_ITEMS.iit_ne_id%TYPE
+                      ) RETURN NM_INV_ITEMS%ROWTYPE IS
 BEGIN
 --
    RETURN Nm3get.get_iit (pi_iit_ne_id       => pi_ne_id
@@ -1462,23 +1465,23 @@ END get_inv_item;
 --
 ----------------------------------------------------------------------------------------------
 --
-PROCEDURE insert_nm_inv_items ( pi_inv_rec nm_inv_items%ROWTYPE ) IS
-   l_rec_iit nm_inv_items%ROWTYPE := pi_inv_rec;
+PROCEDURE insert_nm_inv_items ( pi_inv_rec NM_INV_ITEMS%ROWTYPE ) IS
+   l_rec_iit NM_INV_ITEMS%ROWTYPE := pi_inv_rec;
 BEGIN
    Nm3ins.ins_iit (l_rec_iit);
 END insert_nm_inv_items;
 --
 ----------------------------------------------------------------------------------------------
 --
-   PROCEDURE copy_inv( pi_iit_ne_id nm_inv_items.iit_ne_id%TYPE
-                      ,pi_iit_start_date  nm_inv_items.iit_start_date%TYPE
-                      ,po_iit_ne_id OUT nm_inv_items.iit_ne_id%TYPE
-                      ,pi_primary_key nm_inv_items.iit_primary_key%TYPE DEFAULT NULL
+   PROCEDURE copy_inv( pi_iit_ne_id NM_INV_ITEMS.iit_ne_id%TYPE
+                      ,pi_iit_start_date  NM_INV_ITEMS.iit_start_date%TYPE
+                      ,po_iit_ne_id OUT NM_INV_ITEMS.iit_ne_id%TYPE
+                      ,pi_primary_key NM_INV_ITEMS.iit_primary_key%TYPE DEFAULT NULL
                      )
    IS
-   l_rec_iit nm_inv_items%ROWTYPE;
+   l_rec_iit NM_INV_ITEMS%ROWTYPE;
 --
-   l_iit_primary_key nm_inv_items.iit_primary_key%TYPE := pi_primary_key;
+   l_iit_primary_key NM_INV_ITEMS.iit_primary_key%TYPE := pi_primary_key;
 --
    BEGIN
    --
@@ -1504,9 +1507,9 @@ END insert_nm_inv_items;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_nm_inv_nw (pi_inv_type IN nm_inv_nw.nin_nit_inv_code%TYPE
-                       ,pi_nw_type  IN nm_inv_nw.nin_nw_type%TYPE
-                       ) RETURN nm_inv_nw%ROWTYPE IS
+FUNCTION get_nm_inv_nw (pi_inv_type IN NM_INV_NW.nin_nit_inv_code%TYPE
+                       ,pi_nw_type  IN NM_INV_NW.nin_nw_type%TYPE
+                       ) RETURN NM_INV_NW%ROWTYPE IS
 BEGIN
 --
    RETURN Nm3get.get_nin (pi_nin_nit_inv_code  => pi_inv_type
@@ -1520,9 +1523,9 @@ END get_nm_inv_nw;
 --
 PROCEDURE check_mand IS
 --
-   CURSOR cs_mand (c_inv_type nm_inv_types.nit_inv_type%TYPE) IS
+   CURSOR cs_mand (c_inv_type NM_INV_TYPES.nit_inv_type%TYPE) IS
    SELECT *
-    FROM  nm_inv_type_attribs
+    FROM  NM_INV_TYPE_ATTRIBS
    WHERE  ita_inv_type     = c_inv_type
     AND   ita_mandatory_yn = 'Y';
 --
@@ -1554,8 +1557,8 @@ END check_mand;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION attrib_in_use (pi_inv_type    IN nm_inv_type_attribs.ita_inv_type%TYPE
-                       ,pi_attrib_name IN nm_inv_type_attribs.ita_attrib_name%TYPE
+FUNCTION attrib_in_use (pi_inv_type    IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                       ,pi_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
                        ) RETURN BOOLEAN IS
 BEGIN
 --
@@ -1568,8 +1571,8 @@ END attrib_in_use;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION attrib_in_use_char(pi_inv_type    IN nm_inv_type_attribs.ita_inv_type%TYPE
-                           ,pi_attrib_name IN nm_inv_type_attribs.ita_attrib_name%TYPE
+FUNCTION attrib_in_use_char(pi_inv_type    IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                           ,pi_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
                            ) RETURN VARCHAR2 IS
 BEGIN
   RETURN Nm3flx.boolean_to_char(attrib_in_use(pi_inv_type    => pi_inv_type
@@ -1578,7 +1581,7 @@ END attrib_in_use_char;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_inv_admin_type ( pi_inv_type nm_inv_types.nit_inv_type%TYPE )
+FUNCTION get_inv_admin_type ( pi_inv_type NM_INV_TYPES.nit_inv_type%TYPE )
 RETURN VARCHAR2 IS
 BEGIN
    RETURN Nm3get.get_nit (pi_nit_inv_type    => pi_inv_type
@@ -1588,10 +1591,10 @@ END get_inv_admin_type;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION inv_location_is_mandatory(pi_inv_type IN nm_inv_types.nit_inv_type%TYPE
+FUNCTION inv_location_is_mandatory(pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE
                                   )RETURN BOOLEAN IS
 
-  CURSOR is_loc_mand(p_inv_type IN nm_inv_types.nit_inv_type%TYPE) IS
+  CURSOR is_loc_mand(p_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE) IS
   SELECT 1
    FROM  NM_INV_NW_ALL
   WHERE  nin_loc_mandatory = 'Y'
@@ -1618,7 +1621,7 @@ END inv_location_is_mandatory;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION mand_loc_inv_not_located(pi_ne_id IN nm_inv_items.iit_ne_id%TYPE
+FUNCTION mand_loc_inv_not_located(pi_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE
                                  )RETURN BOOLEAN IS
 --
   l_retval BOOLEAN;
@@ -1667,8 +1670,8 @@ END set_val_flx_inv_func_ret_type;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_inv_item_all(pi_ne_id nm_inv_items.iit_ne_id%TYPE
-                         ) RETURN nm_inv_items%ROWTYPE IS
+FUNCTION get_inv_item_all(pi_ne_id NM_INV_ITEMS.iit_ne_id%TYPE
+                         ) RETURN NM_INV_ITEMS%ROWTYPE IS
 BEGIN
 --
    RETURN Nm3get.get_iit_all (pi_iit_ne_id       => pi_ne_id
@@ -1679,11 +1682,11 @@ END get_inv_item_all;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_inv_type_all(p_ne_id IN nm_inv_items.iit_ne_id%TYPE
-                         ) RETURN nm_inv_items.iit_inv_type%TYPE IS
+FUNCTION get_inv_type_all(p_ne_id IN NM_INV_ITEMS.iit_ne_id%TYPE
+                         ) RETURN NM_INV_ITEMS.iit_inv_type%TYPE IS
 --
 --
-   l_rec_iit nm_inv_items%ROWTYPE;
+   l_rec_iit NM_INV_ITEMS%ROWTYPE;
 --
 BEGIN
 --
@@ -1695,18 +1698,18 @@ END get_inv_type_all;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_itg(pi_inv_type IN nm_inv_types.nit_inv_type%TYPE
-                ) RETURN nm_inv_type_groupings%ROWTYPE IS
+FUNCTION get_itg(pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE
+                ) RETURN NM_INV_TYPE_GROUPINGS%ROWTYPE IS
 
-  CURSOR c_itg(p_inv_type        IN nm_inv_types.nit_inv_type%TYPE) IS
+  CURSOR c_itg(p_inv_type        IN NM_INV_TYPES.nit_inv_type%TYPE) IS
     SELECT
       *
     FROM
-      nm_inv_type_groupings itg
+      NM_INV_TYPE_GROUPINGS itg
     WHERE
       itg.itg_inv_type = p_inv_type;
 
-  l_retval nm_inv_type_groupings%ROWTYPE;
+  l_retval NM_INV_TYPE_GROUPINGS%ROWTYPE;
 
 BEGIN
   OPEN c_itg(p_inv_type => pi_inv_type);
@@ -1724,9 +1727,9 @@ END get_itg;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_ita_by_view_col (pi_inv_type      IN nm_inv_type_attribs.ita_inv_type%TYPE
-                             ,pi_view_col_name IN nm_inv_type_attribs.ita_view_col_name%TYPE
-                             ) RETURN nm_inv_type_attribs%ROWTYPE IS
+FUNCTION get_ita_by_view_col (pi_inv_type      IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                             ,pi_view_col_name IN NM_INV_TYPE_ATTRIBS.ita_view_col_name%TYPE
+                             ) RETURN NM_INV_TYPE_ATTRIBS%ROWTYPE IS
 --
 BEGIN
 --
@@ -1739,9 +1742,9 @@ END get_ita_by_view_col;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_ita_by_attrib_name (pi_inv_type      IN nm_inv_type_attribs.ita_inv_type%TYPE
-                              ,pi_attrib_name IN nm_inv_type_attribs.ita_attrib_name%TYPE
-                             ) RETURN nm_inv_type_attribs%ROWTYPE IS
+FUNCTION get_ita_by_attrib_name (pi_inv_type      IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
+                              ,pi_attrib_name IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
+                             ) RETURN NM_INV_TYPE_ATTRIBS%ROWTYPE IS
 --
 BEGIN
 --
@@ -1753,11 +1756,11 @@ END get_ita_by_attrib_name;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_inv_mode_by_role (pi_inv_type      IN nm_inv_type_attribs.ita_inv_type%TYPE
+FUNCTION get_inv_mode_by_role (pi_inv_type      IN NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
                               ,pi_username      IN user_users.username%TYPE
                               ) RETURN NM_INV_TYPE_ROLES.itr_mode%TYPE IS
 --
-   CURSOR cs_mode (c_inv_type nm_inv_type_attribs.ita_inv_type%TYPE
+   CURSOR cs_mode (c_inv_type NM_INV_TYPE_ATTRIBS.ita_inv_type%TYPE
                   ,c_username user_users.username%TYPE
                   ) IS
    SELECT itr_mode
@@ -1782,7 +1785,7 @@ END get_inv_mode_by_role;
 --
 ----------------------------------------------------------------------------------------------
 --
-PROCEDURE validate_rec_iit (p_rec_iit nm_inv_items%ROWTYPE) IS
+PROCEDURE validate_rec_iit (p_rec_iit NM_INV_ITEMS%ROWTYPE) IS
 --
 BEGIN
 --
@@ -1804,11 +1807,11 @@ PROCEDURE validate_rec_iit IS
 --
    l_mandatory    BOOLEAN;
 --
-   l_rec_nit      nm_inv_types%ROWTYPE;
+   l_rec_nit      NM_INV_TYPES%ROWTYPE;
 --
    CURSOR cs_all_xsp (c_inv_type VARCHAR2) IS
    SELECT DISTINCT xsr_x_sect_value
-    FROM  xsp_restraints
+    FROM  XSP_RESTRAINTS
    WHERE  xsr_ity_inv_code = c_inv_type;
 --
    l_tab_xsp Nm3type.tab_varchar4;
@@ -1904,7 +1907,7 @@ BEGIN
       append (' END IF;');
       --
       FOR cs_rec IN (SELECT *
-                      FROM  nm_inv_type_attribs
+                      FROM  NM_INV_TYPE_ATTRIBS
                      WHERE  ita_inv_type = g_rec_iit.iit_inv_type
                     )
        LOOP
@@ -2054,8 +2057,8 @@ END validate_rec_iit;
 --
 ----------------------------------------------------------------------------------------------
 --
-PROCEDURE ins_nit (p_rec_nit nm_inv_types%ROWTYPE) IS
-   l_rec_nit nm_inv_types%ROWTYPE := p_rec_nit;
+PROCEDURE ins_nit (p_rec_nit NM_INV_TYPES%ROWTYPE) IS
+   l_rec_nit NM_INV_TYPES%ROWTYPE := p_rec_nit;
 BEGIN
 --
    Nm_Debug.proc_start(g_package_name, 'ins_nit');
@@ -2068,8 +2071,8 @@ END ins_nit;
 --
 ----------------------------------------------------------------------------------------------
 --
-PROCEDURE ins_ita (p_rec_ita nm_inv_type_attribs%ROWTYPE) IS
-   l_rec_ita nm_inv_type_attribs%ROWTYPE := p_rec_ita;
+PROCEDURE ins_ita (p_rec_ita NM_INV_TYPE_ATTRIBS%ROWTYPE) IS
+   l_rec_ita NM_INV_TYPE_ATTRIBS%ROWTYPE := p_rec_ita;
 BEGIN
 --
    Nm_Debug.proc_start(g_package_name, 'ins_ita');
@@ -2187,55 +2190,96 @@ BEGIN
       l_before_format  := NULL;
       l_after_format   := NULL;
    END IF;
-
-   l_sql :=              'SELECT '||l_before_format||l_rec_ita.ita_attrib_name||l_after_format||' value';
+   
+    -- the sysopt = 'N' means use old code that will raise error on touching invitems
+    if (nvl(hig.get_sysopt('ATTRVALUEV'),'N') = 'N') then
+       l_sql :=              'SELECT '||l_before_format||l_rec_ita.ita_attrib_name||l_after_format||' '||l_rec_ita.ita_attrib_name;
+       IF l_rec_nit.nit_table_name IS NULL
+        THEN
+             l_sql :=  l_sql
+                  ||CHR(10)||' FROM  nm_inv_items'
+                  ||CHR(10)||'      ,nm_members'
+                  ||CHR(10)||'WHERE  nm_ne_id_of = :ne_id'
+                  ||CHR(10)||' AND   nm_type     = '||Nm3flx.string('I')
+                  ||CHR(10)||' AND   nm_obj_type = :inv_type'
+                  ||CHR(10)||' AND   :mp BETWEEN nm_begin_mp AND nm_end_mp'
+                  ||CHR(10)||' AND   nm_ne_id_in = iit_ne_id';
+          IF l_rec_nit.nit_x_sect_allow_flag = 'Y'
+           THEN
+             l_sql :=  l_sql
+                  ||CHR(10)||' AND   iit_x_sect = :xsp';
+          ELSE
+             l_sql :=  l_sql
+                  ||CHR(10)||' AND   :xsp IS NULL';
+          END IF;
+       ELSE -- This is a foreign table
+             l_sql :=  l_sql
+                  ||CHR(10)||' FROM  '||l_rec_nit.nit_table_name
+                  ||CHR(10)||'WHERE  '||l_rec_nit.nit_lr_ne_column_name||' = :ne_id'
+                  ||CHR(10)||' AND   :inv_type IS NOT NULL'
+                  ||CHR(10)||' AND   :mp BETWEEN '||l_rec_nit.nit_lr_st_chain||' AND '||l_rec_nit.nit_lr_end_chain
+                  ||CHR(10)||' AND   :xsp IS NULL';
+       END IF;
+       
+       OPEN  l_cur FOR  l_sql USING pi_ne_id, pi_inv_type, pi_mp, pi_xsp;
     
-   IF l_rec_nit.nit_table_name IS NULL
-    THEN
-         l_sql :=  l_sql
-              ||chr(10)||',  row_number() over (partition by case when :mp in (nm_begin_mp, nm_end_mp) then ''Y'' end order by nm_begin_mp desc) row_num'
-              ||chr(10)||',  case when :mp in (nm_begin_mp, nm_end_mp) then ''Y'' end is_touching'
-              ||CHR(10)||' FROM  nm_inv_items'
-              ||CHR(10)||'      ,nm_members'
-              ||CHR(10)||'WHERE  nm_ne_id_of = :ne_id'
-              ||CHR(10)||' AND   nm_type     = '||Nm3flx.string('I')
-              ||CHR(10)||' AND   nm_obj_type = :inv_type'
-              ||CHR(10)||' AND   :mp BETWEEN nm_begin_mp AND nm_end_mp'
-              ||CHR(10)||' AND   nm_ne_id_in = iit_ne_id';
-      IF l_rec_nit.nit_x_sect_allow_flag = 'Y'
-       THEN
-         l_sql :=  l_sql
-              ||CHR(10)||' AND   iit_x_sect = :xsp';
-      ELSE
-         l_sql :=  l_sql
-              ||CHR(10)||' AND   :xsp IS NULL';
-      END IF;
-   ELSE -- This is a foreign table
-         l_sql :=  l_sql
-              ||chr(10)||',  row_number() over (partition by case when :mp in ('||l_rec_nit.nit_lr_st_chain||', '
-                  ||l_rec_nit.nit_lr_end_chain||') then ''Y'' end order by '||l_rec_nit.nit_lr_st_chain||' desc) row_num'
-              ||chr(10)||',  case when :mp in ('||l_rec_nit.nit_lr_st_chain||', '||l_rec_nit.nit_lr_end_chain||') then ''Y'' end is_touching'
-              ||CHR(10)||' FROM  '||l_rec_nit.nit_table_name
-              ||CHR(10)||'WHERE  '||l_rec_nit.nit_lr_ne_column_name||' = :ne_id'
-              ||CHR(10)||' AND   :inv_type IS NOT NULL'
-              ||CHR(10)||' AND   :mp BETWEEN '||l_rec_nit.nit_lr_st_chain||' AND '||l_rec_nit.nit_lr_end_chain
-              ||CHR(10)||' AND   :xsp IS NULL';
-   END IF;
-   
-   
-   -- PT 13.06.08 log 710984: this wrapper with the added calculation columns
-   --   filters out the first touching item out of two
-   --   (row_num = 2 because of descending order by)
-   l_sql := 
-                 'select q.value'
-      ||chr(10)||'from ('
-      ||chr(10)||l_sql
-      ||chr(10)||') q'
-      ||chr(10)||'where not (q.row_num = 2 and q.is_touching = ''Y'')';
-      
+    
+    
+    
+    -- use the fix to hide the first value when touching
+    else
+       l_sql :=              'SELECT '||l_before_format||l_rec_ita.ita_attrib_name||l_after_format||' value';
+        
+       IF l_rec_nit.nit_table_name IS NULL
+        THEN
+             l_sql :=  l_sql
+                  ||chr(10)||',  row_number() over (partition by case when :mp in (nm_begin_mp, nm_end_mp) then ''Y'' end order by nm_begin_mp desc) row_num'
+                  ||chr(10)||',  case when :mp in (nm_begin_mp, nm_end_mp) then ''Y'' end is_touching'
+                  ||CHR(10)||' FROM  nm_inv_items'
+                  ||CHR(10)||'      ,nm_members'
+                  ||CHR(10)||'WHERE  nm_ne_id_of = :ne_id'
+                  ||CHR(10)||' AND   nm_type     = '||Nm3flx.string('I')
+                  ||CHR(10)||' AND   nm_obj_type = :inv_type'
+                  ||CHR(10)||' AND   :mp BETWEEN nm_begin_mp AND nm_end_mp'
+                  ||CHR(10)||' AND   nm_ne_id_in = iit_ne_id';
+          IF l_rec_nit.nit_x_sect_allow_flag = 'Y'
+           THEN
+             l_sql :=  l_sql
+                  ||CHR(10)||' AND   iit_x_sect = :xsp';
+          ELSE
+             l_sql :=  l_sql
+                  ||CHR(10)||' AND   :xsp IS NULL';
+          END IF;
+       ELSE -- This is a foreign table
+             l_sql :=  l_sql
+                  ||chr(10)||',  row_number() over (partition by case when :mp in ('||l_rec_nit.nit_lr_st_chain||', '
+                      ||l_rec_nit.nit_lr_end_chain||') then ''Y'' end order by '||l_rec_nit.nit_lr_st_chain||' desc) row_num'
+                  ||chr(10)||',  case when :mp in ('||l_rec_nit.nit_lr_st_chain||', '||l_rec_nit.nit_lr_end_chain||') then ''Y'' end is_touching'
+                  ||CHR(10)||' FROM  '||l_rec_nit.nit_table_name
+                  ||CHR(10)||'WHERE  '||l_rec_nit.nit_lr_ne_column_name||' = :ne_id'
+                  ||CHR(10)||' AND   :inv_type IS NOT NULL'
+                  ||CHR(10)||' AND   :mp BETWEEN '||l_rec_nit.nit_lr_st_chain||' AND '||l_rec_nit.nit_lr_end_chain
+                  ||CHR(10)||' AND   :xsp IS NULL';
+       END IF;
+       
+       -- PT 13.06.08 log 710984: this wrapper with the added calculation columns
+       --   filters out the first touching item out of two
+       --   (row_num = 2 because of descending order by)
+       l_sql := 
+                     'select q.value'
+          ||chr(10)||'from ('
+          ||chr(10)||l_sql
+          ||chr(10)||') q'
+          ||chr(10)||'where not (q.row_num = 2 and q.is_touching = ''Y'')';
+          
+        OPEN  l_cur FOR  l_sql USING pi_mp, pi_mp, pi_ne_id, pi_inv_type, pi_mp, pi_xsp;
+        
+        
+    end if;  -- end of sysopt test
+ 
 
 --
-   OPEN  l_cur FOR  l_sql USING pi_mp, pi_mp, pi_ne_id, pi_inv_type, pi_mp, pi_xsp;
+   
    FETCH l_cur INTO l_retval;
    IF l_cur%NOTFOUND
     THEN
@@ -2274,10 +2318,10 @@ END get_attribute_value;
 ----------------------------------------------------------------------------------------------
 --
 FUNCTION get_attribute_value
-                   (pi_ne_id    IN nm_members.nm_ne_id_of%TYPE
-                   ,pi_mp       IN nm_members.nm_begin_mp%TYPE
-                   ,pi_inv_type IN nm_inv_items.iit_inv_type%TYPE
-                   ,pi_attrib   IN nm_inv_type_attribs.ita_attrib_name%TYPE
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
                    ) RETURN VARCHAR2 IS
 BEGIN
    RETURN get_attribute_value
@@ -2292,11 +2336,11 @@ END get_attribute_value;
 ----------------------------------------------------------------------------------------------
 --
 FUNCTION get_attribute_value_number
-                   (pi_ne_id    IN nm_members.nm_ne_id_of%TYPE
-                   ,pi_mp       IN nm_members.nm_begin_mp%TYPE
-                   ,pi_inv_type IN nm_inv_items.iit_inv_type%TYPE
-                   ,pi_xsp      IN nm_inv_items.iit_x_sect%TYPE
-                   ,pi_attrib   IN nm_inv_type_attribs.ita_attrib_name%TYPE
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_xsp      IN NM_INV_ITEMS.iit_x_sect%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
                    ) RETURN NUMBER IS
 BEGIN
    g_datatype := Nm3type.c_number;
@@ -2313,10 +2357,10 @@ END get_attribute_value_number;
 ----------------------------------------------------------------------------------------------
 --
 FUNCTION get_attribute_value_number
-                   (pi_ne_id    IN nm_members.nm_ne_id_of%TYPE
-                   ,pi_mp       IN nm_members.nm_begin_mp%TYPE
-                   ,pi_inv_type IN nm_inv_items.iit_inv_type%TYPE
-                   ,pi_attrib   IN nm_inv_type_attribs.ita_attrib_name%TYPE
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
                    ) RETURN NUMBER IS
 BEGIN
    RETURN get_attribute_value_number
@@ -2331,11 +2375,11 @@ END get_attribute_value_number;
 ----------------------------------------------------------------------------------------------
 --
 FUNCTION get_attribute_value_date
-                   (pi_ne_id    IN nm_members.nm_ne_id_of%TYPE
-                   ,pi_mp       IN nm_members.nm_begin_mp%TYPE
-                   ,pi_inv_type IN nm_inv_items.iit_inv_type%TYPE
-                   ,pi_xsp      IN nm_inv_items.iit_x_sect%TYPE
-                   ,pi_attrib   IN nm_inv_type_attribs.ita_attrib_name%TYPE
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_xsp      IN NM_INV_ITEMS.iit_x_sect%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
                    ) RETURN DATE IS
 BEGIN
    g_datatype := Nm3type.c_date;
@@ -2353,10 +2397,10 @@ END get_attribute_value_date;
 ----------------------------------------------------------------------------------------------
 --
 FUNCTION get_attribute_value_date
-                   (pi_ne_id    IN nm_members.nm_ne_id_of%TYPE
-                   ,pi_mp       IN nm_members.nm_begin_mp%TYPE
-                   ,pi_inv_type IN nm_inv_items.iit_inv_type%TYPE
-                   ,pi_attrib   IN nm_inv_type_attribs.ita_attrib_name%TYPE
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_attrib_name%TYPE
                    ) RETURN DATE IS
 BEGIN
    RETURN get_attribute_value_date
@@ -2371,11 +2415,11 @@ END get_attribute_value_date;
 ----------------------------------------------------------------------------------------------
 --
 FUNCTION get_attrib_value_view_col
-                   (pi_ne_id    IN nm_members.nm_ne_id_of%TYPE
-                   ,pi_mp       IN nm_members.nm_begin_mp%TYPE
-                   ,pi_inv_type IN nm_inv_items.iit_inv_type%TYPE
-                   ,pi_xsp      IN nm_inv_items.iit_x_sect%TYPE
-                   ,pi_attrib   IN nm_inv_type_attribs.ita_view_col_name%TYPE
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_xsp      IN NM_INV_ITEMS.iit_x_sect%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_view_col_name%TYPE
                    ) RETURN VARCHAR2 IS
 BEGIN
    RETURN get_attribute_value
@@ -2390,10 +2434,10 @@ END get_attrib_value_view_col;
 ----------------------------------------------------------------------------------------------
 --
 FUNCTION get_attrib_value_view_col
-                   (pi_ne_id    IN nm_members.nm_ne_id_of%TYPE
-                   ,pi_mp       IN nm_members.nm_begin_mp%TYPE
-                   ,pi_inv_type IN nm_inv_items.iit_inv_type%TYPE
-                   ,pi_attrib   IN nm_inv_type_attribs.ita_view_col_name%TYPE
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_view_col_name%TYPE
                    ) RETURN VARCHAR2 IS
 BEGIN
    RETURN get_attribute_value
@@ -2407,11 +2451,11 @@ END get_attrib_value_view_col;
 ----------------------------------------------------------------------------------------------
 --
 FUNCTION get_attrib_value_view_col_num
-                   (pi_ne_id    IN nm_members.nm_ne_id_of%TYPE
-                   ,pi_mp       IN nm_members.nm_begin_mp%TYPE
-                   ,pi_inv_type IN nm_inv_items.iit_inv_type%TYPE
-                   ,pi_xsp      IN nm_inv_items.iit_x_sect%TYPE
-                   ,pi_attrib   IN nm_inv_type_attribs.ita_view_col_name%TYPE
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_xsp      IN NM_INV_ITEMS.iit_x_sect%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_view_col_name%TYPE
                    ) RETURN NUMBER IS
 BEGIN
    RETURN get_attribute_value_number
@@ -2426,10 +2470,10 @@ END get_attrib_value_view_col_num;
 ----------------------------------------------------------------------------------------------
 --
 FUNCTION get_attrib_value_view_col_num
-                   (pi_ne_id    IN nm_members.nm_ne_id_of%TYPE
-                   ,pi_mp       IN nm_members.nm_begin_mp%TYPE
-                   ,pi_inv_type IN nm_inv_items.iit_inv_type%TYPE
-                   ,pi_attrib   IN nm_inv_type_attribs.ita_view_col_name%TYPE
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_view_col_name%TYPE
                    ) RETURN NUMBER IS
 BEGIN
    RETURN get_attribute_value_number
@@ -2443,11 +2487,11 @@ END get_attrib_value_view_col_num;
 ----------------------------------------------------------------------------------------------
 --
 FUNCTION get_attrib_value_view_col_date
-                   (pi_ne_id    IN nm_members.nm_ne_id_of%TYPE
-                   ,pi_mp       IN nm_members.nm_begin_mp%TYPE
-                   ,pi_inv_type IN nm_inv_items.iit_inv_type%TYPE
-                   ,pi_xsp      IN nm_inv_items.iit_x_sect%TYPE
-                   ,pi_attrib   IN nm_inv_type_attribs.ita_view_col_name%TYPE
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_xsp      IN NM_INV_ITEMS.iit_x_sect%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_view_col_name%TYPE
                    ) RETURN DATE IS
 BEGIN
    RETURN get_attribute_value_date
@@ -2462,10 +2506,10 @@ END get_attrib_value_view_col_date;
 ----------------------------------------------------------------------------------------------
 --
 FUNCTION get_attrib_value_view_col_date
-                   (pi_ne_id    IN nm_members.nm_ne_id_of%TYPE
-                   ,pi_mp       IN nm_members.nm_begin_mp%TYPE
-                   ,pi_inv_type IN nm_inv_items.iit_inv_type%TYPE
-                   ,pi_attrib   IN nm_inv_type_attribs.ita_view_col_name%TYPE
+                   (pi_ne_id    IN NM_MEMBERS.nm_ne_id_of%TYPE
+                   ,pi_mp       IN NM_MEMBERS.nm_begin_mp%TYPE
+                   ,pi_inv_type IN NM_INV_ITEMS.iit_inv_type%TYPE
+                   ,pi_attrib   IN NM_INV_TYPE_ATTRIBS.ita_view_col_name%TYPE
                    ) RETURN DATE IS
 BEGIN
    RETURN get_attribute_value_date
@@ -2478,7 +2522,7 @@ END get_attrib_value_view_col_date;
 --
 ----------------------------------------------------------------------------------------------
 --
-PROCEDURE delete_inv_items(pi_inv_type        IN nm_inv_types.nit_inv_type%TYPE
+PROCEDURE delete_inv_items(pi_inv_type        IN NM_INV_TYPES.nit_inv_type%TYPE
                           ,pi_cascade         IN BOOLEAN  DEFAULT FALSE
                           ,pi_where           IN VARCHAR2 DEFAULT NULL
                           ,pi_inv_table_alias IN VARCHAR2 DEFAULT 'iit'
@@ -2498,7 +2542,7 @@ PROCEDURE delete_inv_items(pi_inv_type        IN nm_inv_types.nit_inv_type%TYPE
     WHERE
       itg.itg_parent_inv_type = p_parent_type
     AND
-      itg_mandatory = 'n';
+      itg_mandatory = 'N';
 
   l_lock_qry           Nm3type.max_varchar2;
   l_children_exist_qry Nm3type.max_varchar2;
@@ -2671,14 +2715,14 @@ BEGIN
 EXCEPTION
   WHEN e_cascade_and_where
   THEN
-    Hig.raise_ner(pi_appl               => 'net'
+    Hig.raise_ner(pi_appl               => 'NET'
                  ,pi_id                 => 198
                  ,pi_sqlcode            => -20711
                  ,pi_supplementary_info => NULL);
 
   WHEN e_children_and_no_cascade
   THEN
-    Hig.raise_ner(pi_appl               => 'net'
+    Hig.raise_ner(pi_appl               => 'NET'
                  ,pi_id                 => 197
                  ,pi_sqlcode            => -20710
                  ,pi_supplementary_info => '(' || pi_inv_type || ')');
@@ -2745,11 +2789,11 @@ BEGIN
     THEN
       Hig.raise_ner (pi_appl                => Nm3type.c_hig
                     ,pi_id                  => 64
-                    ,pi_supplementary_info  => 'nm_inv_domains : '||l_id_domain
+                    ,pi_supplementary_info  => 'NM_INV_DOMAINS : '||l_id_domain
                     );
    END IF;
 --
-   INSERT INTO nm_inv_domains
+   INSERT INTO NM_INV_DOMAINS
          (id_domain
          ,id_title
          ,id_start_date
@@ -2762,7 +2806,7 @@ BEGIN
     FROM  HIG_DOMAINS
    WHERE  hdo_domain = p_hdo_domain;
 --
-   INSERT INTO nm_inv_attri_lookup
+   INSERT INTO NM_INV_ATTRI_LOOKUP
          (ial_domain
          ,ial_value
          ,ial_dtp_code
@@ -2789,7 +2833,7 @@ END duplicate_hdo_as_id;
 --
 FUNCTION duplicate_hdo_as_id (p_hdo_domain      HIG_DOMAINS.hdo_domain%TYPE
                              ,p_id_start_date   NM_INV_DOMAINS_ALL.id_start_date%TYPE
-                             ,p_optional_prefix nm_inv_types.nit_inv_type%TYPE
+                             ,p_optional_prefix NM_INV_TYPES.nit_inv_type%TYPE
                              ) RETURN NM_INV_DOMAINS_ALL.id_domain%TYPE IS
 --
    CURSOR cs_hdo (c_domain HIG_DOMAINS.hdo_domain%TYPE) IS
@@ -2953,162 +2997,162 @@ PROCEDURE instantiate_flex_cols IS
 --
 BEGIN
 --
-   g_tab_flex_col(3)   := 'iit_primary_key';
-   g_tab_flex_col(12)  := 'iit_foreign_key';
-   g_tab_flex_col(14)  := 'iit_position';
-   g_tab_flex_col(15)  := 'iit_x_coord';
-   g_tab_flex_col(16)  := 'iit_y_coord';
-   g_tab_flex_col(17)  := 'iit_num_attrib16';
-   g_tab_flex_col(18)  := 'iit_num_attrib17';
-   g_tab_flex_col(19)  := 'iit_num_attrib18';
-   g_tab_flex_col(20)  := 'iit_num_attrib19';
-   g_tab_flex_col(21)  := 'iit_num_attrib20';
-   g_tab_flex_col(22)  := 'iit_num_attrib21';
-   g_tab_flex_col(23)  := 'iit_num_attrib22';
-   g_tab_flex_col(24)  := 'iit_num_attrib23';
-   g_tab_flex_col(25)  := 'iit_num_attrib24';
-   g_tab_flex_col(26)  := 'iit_num_attrib25';
-   g_tab_flex_col(27)  := 'iit_chr_attrib26';
-   g_tab_flex_col(28)  := 'iit_chr_attrib27';
-   g_tab_flex_col(29)  := 'iit_chr_attrib28';
-   g_tab_flex_col(30)  := 'iit_chr_attrib29';
-   g_tab_flex_col(31)  := 'iit_chr_attrib30';
-   g_tab_flex_col(32)  := 'iit_chr_attrib31';
-   g_tab_flex_col(33)  := 'iit_chr_attrib32';
-   g_tab_flex_col(34)  := 'iit_chr_attrib33';
-   g_tab_flex_col(35)  := 'iit_chr_attrib34';
-   g_tab_flex_col(36)  := 'iit_chr_attrib35';
-   g_tab_flex_col(37)  := 'iit_chr_attrib36';
-   g_tab_flex_col(38)  := 'iit_chr_attrib37';
-   g_tab_flex_col(39)  := 'iit_chr_attrib38';
-   g_tab_flex_col(40)  := 'iit_chr_attrib39';
-   g_tab_flex_col(41)  := 'iit_chr_attrib40';
-   g_tab_flex_col(42)  := 'iit_chr_attrib41';
-   g_tab_flex_col(43)  := 'iit_chr_attrib42';
-   g_tab_flex_col(44)  := 'iit_chr_attrib43';
-   g_tab_flex_col(45)  := 'iit_chr_attrib44';
-   g_tab_flex_col(46)  := 'iit_chr_attrib45';
-   g_tab_flex_col(47)  := 'iit_chr_attrib46';
-   g_tab_flex_col(48)  := 'iit_chr_attrib47';
-   g_tab_flex_col(49)  := 'iit_chr_attrib48';
-   g_tab_flex_col(50)  := 'iit_chr_attrib49';
-   g_tab_flex_col(51)  := 'iit_chr_attrib50';
-   g_tab_flex_col(52)  := 'iit_chr_attrib51';
-   g_tab_flex_col(53)  := 'iit_chr_attrib52';
-   g_tab_flex_col(54)  := 'iit_chr_attrib53';
-   g_tab_flex_col(55)  := 'iit_chr_attrib54';
-   g_tab_flex_col(56)  := 'iit_chr_attrib55';
-   g_tab_flex_col(57)  := 'iit_chr_attrib56';
-   g_tab_flex_col(58)  := 'iit_chr_attrib57';
-   g_tab_flex_col(59)  := 'iit_chr_attrib58';
-   g_tab_flex_col(60)  := 'iit_chr_attrib59';
-   g_tab_flex_col(61)  := 'iit_chr_attrib60';
-   g_tab_flex_col(62)  := 'iit_chr_attrib61';
-   g_tab_flex_col(63)  := 'iit_chr_attrib62';
-   g_tab_flex_col(64)  := 'iit_chr_attrib63';
-   g_tab_flex_col(65)  := 'iit_chr_attrib64';
-   g_tab_flex_col(66)  := 'iit_chr_attrib65';
-   g_tab_flex_col(67)  := 'iit_chr_attrib66';
-   g_tab_flex_col(68)  := 'iit_chr_attrib67';
-   g_tab_flex_col(69)  := 'iit_chr_attrib68';
-   g_tab_flex_col(70)  := 'iit_chr_attrib69';
-   g_tab_flex_col(71)  := 'iit_chr_attrib70';
-   g_tab_flex_col(72)  := 'iit_chr_attrib71';
-   g_tab_flex_col(73)  := 'iit_chr_attrib72';
-   g_tab_flex_col(74)  := 'iit_chr_attrib73';
-   g_tab_flex_col(75)  := 'iit_chr_attrib74';
-   g_tab_flex_col(76)  := 'iit_chr_attrib75';
-   g_tab_flex_col(77)  := 'iit_num_attrib76';
-   g_tab_flex_col(78)  := 'iit_num_attrib77';
-   g_tab_flex_col(79)  := 'iit_num_attrib78';
-   g_tab_flex_col(80)  := 'iit_num_attrib79';
-   g_tab_flex_col(81)  := 'iit_num_attrib80';
-   g_tab_flex_col(82)  := 'iit_num_attrib81';
-   g_tab_flex_col(83)  := 'iit_num_attrib82';
-   g_tab_flex_col(84)  := 'iit_num_attrib83';
-   g_tab_flex_col(85)  := 'iit_num_attrib84';
-   g_tab_flex_col(86)  := 'iit_num_attrib85';
-   g_tab_flex_col(87)  := 'iit_date_attrib86';
-   g_tab_flex_col(88)  := 'iit_date_attrib87';
-   g_tab_flex_col(89)  := 'iit_date_attrib88';
-   g_tab_flex_col(90)  := 'iit_date_attrib89';
-   g_tab_flex_col(91)  := 'iit_date_attrib90';
-   g_tab_flex_col(92)  := 'iit_date_attrib91';
-   g_tab_flex_col(93)  := 'iit_date_attrib92';
-   g_tab_flex_col(94)  := 'iit_date_attrib93';
-   g_tab_flex_col(95)  := 'iit_date_attrib94';
-   g_tab_flex_col(96)  := 'iit_date_attrib95';
-   g_tab_flex_col(97)  := 'iit_angle';
-   g_tab_flex_col(98)  := 'iit_angle_txt';
-   g_tab_flex_col(99)  := 'iit_class';
-   g_tab_flex_col(100) := 'iit_class_txt';
-   g_tab_flex_col(101) := 'iit_colour';
-   g_tab_flex_col(102) := 'iit_colour_txt';
-   g_tab_flex_col(103) := 'iit_coord_flag';
-   g_tab_flex_col(104) := 'iit_description';
-   g_tab_flex_col(105) := 'iit_diagram';
-   g_tab_flex_col(106) := 'iit_distance';
-   g_tab_flex_col(107) := 'iit_end_chain';
-   g_tab_flex_col(108) := 'iit_gap';
-   g_tab_flex_col(109) := 'iit_height';
-   g_tab_flex_col(110) := 'iit_height_2';
-   g_tab_flex_col(111) := 'iit_id_code';
-   g_tab_flex_col(112) := 'iit_instal_date';
-   g_tab_flex_col(113) := 'iit_invent_date';
-   g_tab_flex_col(114) := 'iit_inv_ownership';
-   g_tab_flex_col(115) := 'iit_itemcode';
-   g_tab_flex_col(116) := 'iit_lco_lamp_config_id';
-   g_tab_flex_col(117) := 'iit_length';
-   g_tab_flex_col(118) := 'iit_material';
-   g_tab_flex_col(119) := 'iit_material_txt';
-   g_tab_flex_col(120) := 'iit_method';
-   g_tab_flex_col(121) := 'iit_method_txt';
---   g_tab_flex_col(122) := 'iit_note';
-   g_tab_flex_col(123) := 'iit_no_of_units';
-   g_tab_flex_col(124) := 'iit_options';
-   g_tab_flex_col(125) := 'iit_options_txt';
-   g_tab_flex_col(126) := 'iit_oun_org_id_elec_board';
-   g_tab_flex_col(127) := 'iit_owner';
-   g_tab_flex_col(128) := 'iit_owner_txt';
--- g_tab_flex_col(129) := 'iit_peo_invent_by_id';
-   g_tab_flex_col(130) := 'iit_photo';
-   g_tab_flex_col(131) := 'iit_power';
-   g_tab_flex_col(132) := 'iit_prov_flag';
-   g_tab_flex_col(133) := 'iit_rev_by';
-   g_tab_flex_col(134) := 'iit_rev_date';
-   g_tab_flex_col(135) := 'iit_type';
-   g_tab_flex_col(136) := 'iit_type_txt';
-   g_tab_flex_col(137) := 'iit_width';
-   g_tab_flex_col(138) := 'iit_xtra_char_1';
-   g_tab_flex_col(139) := 'iit_xtra_date_1';
-   g_tab_flex_col(140) := 'iit_xtra_domain_1';
-   g_tab_flex_col(141) := 'iit_xtra_domain_txt_1';
-   g_tab_flex_col(142) := 'iit_xtra_number_1';
--- g_tab_flex_col(144) := 'iit_det_xsp';
-   g_tab_flex_col(145) := 'iit_offset';
-   g_tab_flex_col(146) := 'iit_x';
-   g_tab_flex_col(147) := 'iit_y';
-   g_tab_flex_col(148) := 'iit_z';
-   g_tab_flex_col(149) := 'iit_num_attrib96';
-   g_tab_flex_col(150) := 'iit_num_attrib97';
-   g_tab_flex_col(151) := 'iit_num_attrib98';
-   g_tab_flex_col(152) := 'iit_num_attrib99';
-   g_tab_flex_col(153) := 'iit_num_attrib100';
-   g_tab_flex_col(154) := 'iit_num_attrib101';
-   g_tab_flex_col(155) := 'iit_num_attrib102';
-   g_tab_flex_col(156) := 'iit_num_attrib103';
-   g_tab_flex_col(157) := 'iit_num_attrib104';
-   g_tab_flex_col(158) := 'iit_num_attrib105';
-   g_tab_flex_col(159) := 'iit_num_attrib106';
-   g_tab_flex_col(160) := 'iit_num_attrib107';
-   g_tab_flex_col(161) := 'iit_num_attrib108';
-   g_tab_flex_col(162) := 'iit_num_attrib109';
-   g_tab_flex_col(163) := 'iit_num_attrib110';
-   g_tab_flex_col(164) := 'iit_num_attrib111';
-   g_tab_flex_col(165) := 'iit_num_attrib112';
-   g_tab_flex_col(166) := 'iit_num_attrib113';
-   g_tab_flex_col(167) := 'iit_num_attrib114';
-   g_tab_flex_col(168) := 'iit_num_attrib115';
+   g_tab_flex_col(3)   := 'IIT_PRIMARY_KEY';
+   g_tab_flex_col(12)  := 'IIT_FOREIGN_KEY';
+   g_tab_flex_col(14)  := 'IIT_POSITION';
+   g_tab_flex_col(15)  := 'IIT_X_COORD';
+   g_tab_flex_col(16)  := 'IIT_Y_COORD';
+   g_tab_flex_col(17)  := 'IIT_NUM_ATTRIB16';
+   g_tab_flex_col(18)  := 'IIT_NUM_ATTRIB17';
+   g_tab_flex_col(19)  := 'IIT_NUM_ATTRIB18';
+   g_tab_flex_col(20)  := 'IIT_NUM_ATTRIB19';
+   g_tab_flex_col(21)  := 'IIT_NUM_ATTRIB20';
+   g_tab_flex_col(22)  := 'IIT_NUM_ATTRIB21';
+   g_tab_flex_col(23)  := 'IIT_NUM_ATTRIB22';
+   g_tab_flex_col(24)  := 'IIT_NUM_ATTRIB23';
+   g_tab_flex_col(25)  := 'IIT_NUM_ATTRIB24';
+   g_tab_flex_col(26)  := 'IIT_NUM_ATTRIB25';
+   g_tab_flex_col(27)  := 'IIT_CHR_ATTRIB26';
+   g_tab_flex_col(28)  := 'IIT_CHR_ATTRIB27';
+   g_tab_flex_col(29)  := 'IIT_CHR_ATTRIB28';
+   g_tab_flex_col(30)  := 'IIT_CHR_ATTRIB29';
+   g_tab_flex_col(31)  := 'IIT_CHR_ATTRIB30';
+   g_tab_flex_col(32)  := 'IIT_CHR_ATTRIB31';
+   g_tab_flex_col(33)  := 'IIT_CHR_ATTRIB32';
+   g_tab_flex_col(34)  := 'IIT_CHR_ATTRIB33';
+   g_tab_flex_col(35)  := 'IIT_CHR_ATTRIB34';
+   g_tab_flex_col(36)  := 'IIT_CHR_ATTRIB35';
+   g_tab_flex_col(37)  := 'IIT_CHR_ATTRIB36';
+   g_tab_flex_col(38)  := 'IIT_CHR_ATTRIB37';
+   g_tab_flex_col(39)  := 'IIT_CHR_ATTRIB38';
+   g_tab_flex_col(40)  := 'IIT_CHR_ATTRIB39';
+   g_tab_flex_col(41)  := 'IIT_CHR_ATTRIB40';
+   g_tab_flex_col(42)  := 'IIT_CHR_ATTRIB41';
+   g_tab_flex_col(43)  := 'IIT_CHR_ATTRIB42';
+   g_tab_flex_col(44)  := 'IIT_CHR_ATTRIB43';
+   g_tab_flex_col(45)  := 'IIT_CHR_ATTRIB44';
+   g_tab_flex_col(46)  := 'IIT_CHR_ATTRIB45';
+   g_tab_flex_col(47)  := 'IIT_CHR_ATTRIB46';
+   g_tab_flex_col(48)  := 'IIT_CHR_ATTRIB47';
+   g_tab_flex_col(49)  := 'IIT_CHR_ATTRIB48';
+   g_tab_flex_col(50)  := 'IIT_CHR_ATTRIB49';
+   g_tab_flex_col(51)  := 'IIT_CHR_ATTRIB50';
+   g_tab_flex_col(52)  := 'IIT_CHR_ATTRIB51';
+   g_tab_flex_col(53)  := 'IIT_CHR_ATTRIB52';
+   g_tab_flex_col(54)  := 'IIT_CHR_ATTRIB53';
+   g_tab_flex_col(55)  := 'IIT_CHR_ATTRIB54';
+   g_tab_flex_col(56)  := 'IIT_CHR_ATTRIB55';
+   g_tab_flex_col(57)  := 'IIT_CHR_ATTRIB56';
+   g_tab_flex_col(58)  := 'IIT_CHR_ATTRIB57';
+   g_tab_flex_col(59)  := 'IIT_CHR_ATTRIB58';
+   g_tab_flex_col(60)  := 'IIT_CHR_ATTRIB59';
+   g_tab_flex_col(61)  := 'IIT_CHR_ATTRIB60';
+   g_tab_flex_col(62)  := 'IIT_CHR_ATTRIB61';
+   g_tab_flex_col(63)  := 'IIT_CHR_ATTRIB62';
+   g_tab_flex_col(64)  := 'IIT_CHR_ATTRIB63';
+   g_tab_flex_col(65)  := 'IIT_CHR_ATTRIB64';
+   g_tab_flex_col(66)  := 'IIT_CHR_ATTRIB65';
+   g_tab_flex_col(67)  := 'IIT_CHR_ATTRIB66';
+   g_tab_flex_col(68)  := 'IIT_CHR_ATTRIB67';
+   g_tab_flex_col(69)  := 'IIT_CHR_ATTRIB68';
+   g_tab_flex_col(70)  := 'IIT_CHR_ATTRIB69';
+   g_tab_flex_col(71)  := 'IIT_CHR_ATTRIB70';
+   g_tab_flex_col(72)  := 'IIT_CHR_ATTRIB71';
+   g_tab_flex_col(73)  := 'IIT_CHR_ATTRIB72';
+   g_tab_flex_col(74)  := 'IIT_CHR_ATTRIB73';
+   g_tab_flex_col(75)  := 'IIT_CHR_ATTRIB74';
+   g_tab_flex_col(76)  := 'IIT_CHR_ATTRIB75';
+   g_tab_flex_col(77)  := 'IIT_NUM_ATTRIB76';
+   g_tab_flex_col(78)  := 'IIT_NUM_ATTRIB77';
+   g_tab_flex_col(79)  := 'IIT_NUM_ATTRIB78';
+   g_tab_flex_col(80)  := 'IIT_NUM_ATTRIB79';
+   g_tab_flex_col(81)  := 'IIT_NUM_ATTRIB80';
+   g_tab_flex_col(82)  := 'IIT_NUM_ATTRIB81';
+   g_tab_flex_col(83)  := 'IIT_NUM_ATTRIB82';
+   g_tab_flex_col(84)  := 'IIT_NUM_ATTRIB83';
+   g_tab_flex_col(85)  := 'IIT_NUM_ATTRIB84';
+   g_tab_flex_col(86)  := 'IIT_NUM_ATTRIB85';
+   g_tab_flex_col(87)  := 'IIT_DATE_ATTRIB86';
+   g_tab_flex_col(88)  := 'IIT_DATE_ATTRIB87';
+   g_tab_flex_col(89)  := 'IIT_DATE_ATTRIB88';
+   g_tab_flex_col(90)  := 'IIT_DATE_ATTRIB89';
+   g_tab_flex_col(91)  := 'IIT_DATE_ATTRIB90';
+   g_tab_flex_col(92)  := 'IIT_DATE_ATTRIB91';
+   g_tab_flex_col(93)  := 'IIT_DATE_ATTRIB92';
+   g_tab_flex_col(94)  := 'IIT_DATE_ATTRIB93';
+   g_tab_flex_col(95)  := 'IIT_DATE_ATTRIB94';
+   g_tab_flex_col(96)  := 'IIT_DATE_ATTRIB95';
+   g_tab_flex_col(97)  := 'IIT_ANGLE';
+   g_tab_flex_col(98)  := 'IIT_ANGLE_TXT';
+   g_tab_flex_col(99)  := 'IIT_CLASS';
+   g_tab_flex_col(100) := 'IIT_CLASS_TXT';
+   g_tab_flex_col(101) := 'IIT_COLOUR';
+   g_tab_flex_col(102) := 'IIT_COLOUR_TXT';
+   g_tab_flex_col(103) := 'IIT_COORD_FLAG';
+   g_tab_flex_col(104) := 'IIT_DESCRIPTION';
+   g_tab_flex_col(105) := 'IIT_DIAGRAM';
+   g_tab_flex_col(106) := 'IIT_DISTANCE';
+   g_tab_flex_col(107) := 'IIT_END_CHAIN';
+   g_tab_flex_col(108) := 'IIT_GAP';
+   g_tab_flex_col(109) := 'IIT_HEIGHT';
+   g_tab_flex_col(110) := 'IIT_HEIGHT_2';
+   g_tab_flex_col(111) := 'IIT_ID_CODE';
+   g_tab_flex_col(112) := 'IIT_INSTAL_DATE';
+   g_tab_flex_col(113) := 'IIT_INVENT_DATE';
+   g_tab_flex_col(114) := 'IIT_INV_OWNERSHIP';
+   g_tab_flex_col(115) := 'IIT_ITEMCODE';
+   g_tab_flex_col(116) := 'IIT_LCO_LAMP_CONFIG_ID';
+   g_tab_flex_col(117) := 'IIT_LENGTH';
+   g_tab_flex_col(118) := 'IIT_MATERIAL';
+   g_tab_flex_col(119) := 'IIT_MATERIAL_TXT';
+   g_tab_flex_col(120) := 'IIT_METHOD';
+   g_tab_flex_col(121) := 'IIT_METHOD_TXT';
+--   g_tab_flex_col(122) := 'IIT_NOTE';
+   g_tab_flex_col(123) := 'IIT_NO_OF_UNITS';
+   g_tab_flex_col(124) := 'IIT_OPTIONS';
+   g_tab_flex_col(125) := 'IIT_OPTIONS_TXT';
+   g_tab_flex_col(126) := 'IIT_OUN_ORG_ID_ELEC_BOARD';
+   g_tab_flex_col(127) := 'IIT_OWNER';
+   g_tab_flex_col(128) := 'IIT_OWNER_TXT';
+-- g_tab_flex_col(129) := 'IIT_PEO_INVENT_BY_ID';
+   g_tab_flex_col(130) := 'IIT_PHOTO';
+   g_tab_flex_col(131) := 'IIT_POWER';
+   g_tab_flex_col(132) := 'IIT_PROV_FLAG';
+   g_tab_flex_col(133) := 'IIT_REV_BY';
+   g_tab_flex_col(134) := 'IIT_REV_DATE';
+   g_tab_flex_col(135) := 'IIT_TYPE';
+   g_tab_flex_col(136) := 'IIT_TYPE_TXT';
+   g_tab_flex_col(137) := 'IIT_WIDTH';
+   g_tab_flex_col(138) := 'IIT_XTRA_CHAR_1';
+   g_tab_flex_col(139) := 'IIT_XTRA_DATE_1';
+   g_tab_flex_col(140) := 'IIT_XTRA_DOMAIN_1';
+   g_tab_flex_col(141) := 'IIT_XTRA_DOMAIN_TXT_1';
+   g_tab_flex_col(142) := 'IIT_XTRA_NUMBER_1';
+-- g_tab_flex_col(144) := 'IIT_DET_XSP';
+   g_tab_flex_col(145) := 'IIT_OFFSET';
+   g_tab_flex_col(146) := 'IIT_X';
+   g_tab_flex_col(147) := 'IIT_Y';
+   g_tab_flex_col(148) := 'IIT_Z';
+   g_tab_flex_col(149) := 'IIT_NUM_ATTRIB96';
+   g_tab_flex_col(150) := 'IIT_NUM_ATTRIB97';
+   g_tab_flex_col(151) := 'IIT_NUM_ATTRIB98';
+   g_tab_flex_col(152) := 'IIT_NUM_ATTRIB99';
+   g_tab_flex_col(153) := 'IIT_NUM_ATTRIB100';
+   g_tab_flex_col(154) := 'IIT_NUM_ATTRIB101';
+   g_tab_flex_col(155) := 'IIT_NUM_ATTRIB102';
+   g_tab_flex_col(156) := 'IIT_NUM_ATTRIB103';
+   g_tab_flex_col(157) := 'IIT_NUM_ATTRIB104';
+   g_tab_flex_col(158) := 'IIT_NUM_ATTRIB105';
+   g_tab_flex_col(159) := 'IIT_NUM_ATTRIB106';
+   g_tab_flex_col(160) := 'IIT_NUM_ATTRIB107';
+   g_tab_flex_col(161) := 'IIT_NUM_ATTRIB108';
+   g_tab_flex_col(162) := 'IIT_NUM_ATTRIB109';
+   g_tab_flex_col(163) := 'IIT_NUM_ATTRIB110';
+   g_tab_flex_col(164) := 'IIT_NUM_ATTRIB111';
+   g_tab_flex_col(165) := 'IIT_NUM_ATTRIB112';
+   g_tab_flex_col(166) := 'IIT_NUM_ATTRIB113';
+   g_tab_flex_col(167) := 'IIT_NUM_ATTRIB114';
+   g_tab_flex_col(168) := 'IIT_NUM_ATTRIB115';
 --
 END instantiate_flex_cols;
 --
@@ -3159,11 +3203,11 @@ END is_column_allowable_for_flex;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_tab_ita (p_inv_type nm_inv_types.nit_inv_type%TYPE) RETURN tab_nita IS
+FUNCTION get_tab_ita (p_inv_type NM_INV_TYPES.nit_inv_type%TYPE) RETURN tab_nita IS
 --
-   CURSOR cs_ita (c_inv_type nm_inv_types.nit_inv_type%TYPE) IS
+   CURSOR cs_ita (c_inv_type NM_INV_TYPES.nit_inv_type%TYPE) IS
    SELECT *
-    FROM  nm_inv_type_attribs
+    FROM  NM_INV_TYPE_ATTRIBS
    WHERE  ita_inv_type = c_inv_type;
 --
    l_tab_ita tab_nita;
@@ -3185,7 +3229,7 @@ END get_tab_ita;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_tab_ita_exclusive (p_inv_type nm_inv_types.nit_inv_type%TYPE) RETURN tab_nita IS
+FUNCTION get_tab_ita_exclusive (p_inv_type NM_INV_TYPES.nit_inv_type%TYPE) RETURN tab_nita IS
 --
    l_tab_ita      tab_nita;
    l_tab_ita_excl tab_nita;
@@ -3198,7 +3242,7 @@ BEGIN
 --
    FOR i IN 1..l_tab_ita.COUNT
     LOOP
-      IF l_tab_ita(i).ita_exclusive = 'y'
+      IF l_tab_ita(i).ita_exclusive = 'Y'
        THEN
          l_tab_ita_excl(l_tab_ita_excl.COUNT+1) := l_tab_ita(i);
       END IF;
@@ -3212,13 +3256,13 @@ END get_tab_ita_exclusive;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION get_tab_ita_displayed (p_inv_type nm_inv_types.nit_inv_type%TYPE) RETURN tab_nita IS
+FUNCTION get_tab_ita_displayed (p_inv_type NM_INV_TYPES.nit_inv_type%TYPE) RETURN tab_nita IS
 --
-   CURSOR cs_ita (c_inv_type nm_inv_types.nit_inv_type%TYPE) IS
+   CURSOR cs_ita (c_inv_type NM_INV_TYPES.nit_inv_type%TYPE) IS
    SELECT *
-    FROM  nm_inv_type_attribs
+    FROM  NM_INV_TYPE_ATTRIBS
    WHERE  ita_inv_type = c_inv_type
-   AND    ita_displayed = 'y'
+   AND    ita_displayed = 'Y'
    ORDER BY ita_disp_seq_no;
 
    l_tab_ita_disp tab_nita;
@@ -3233,7 +3277,7 @@ BEGIN
    CLOSE cs_ita;
 /*
    FOR irec IN cs_ita(p_inv_type) LOOP
-      IF irec.ita_displayed = 'y'
+      IF irec.ita_displayed = 'Y'
        THEN
          l_tab_ita_disp(l_tab_ita_disp.COUNT+1) := irec;
       END IF;
@@ -3248,15 +3292,15 @@ END get_tab_ita_displayed;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION inv_type_is_hierarchical(pi_type           IN nm_inv_types.nit_inv_type%TYPE
+FUNCTION inv_type_is_hierarchical(pi_type           IN NM_INV_TYPES.nit_inv_type%TYPE
                                  ,pi_ignore_derived IN BOOLEAN DEFAULT TRUE
                                  ) RETURN BOOLEAN IS
 
-  c_derived_relation CONSTANT nm_inv_type_groupings.itg_relation%TYPE := 'derived';
+  c_derived_relation CONSTANT NM_INV_TYPE_GROUPINGS.itg_relation%TYPE := 'DERIVED';
 
-  l_nit_rec nm_inv_types%ROWTYPE;
+  l_nit_rec NM_INV_TYPES%ROWTYPE;
 
-  l_relation nm_inv_type_groupings.itg_relation%TYPE;
+  l_relation NM_INV_TYPE_GROUPINGS.itg_relation%TYPE;
 
   l_child BOOLEAN;
 
@@ -3284,7 +3328,7 @@ BEGIN
 
   END;
 
-  l_retval := l_nit_rec.nit_top = 'y'
+  l_retval := l_nit_rec.nit_top = 'Y'
               OR
               (l_child
                AND
@@ -3303,19 +3347,19 @@ END inv_type_is_hierarchical;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION does_child_exist_diff_au_type (pi_inv_type IN nm_inv_types.nit_inv_type%TYPE) RETURN BOOLEAN IS
+FUNCTION does_child_exist_diff_au_type (pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE) RETURN BOOLEAN IS
 --
-   CURSOR cs_hier (c_start_inv_type nm_inv_types.nit_inv_type%TYPE) IS
+   CURSOR cs_hier (c_start_inv_type NM_INV_TYPES.nit_inv_type%TYPE) IS
    SELECT itg_inv_type
          ,LEVEL
-    FROM  nm_inv_type_groupings
+    FROM  NM_INV_TYPE_GROUPINGS
    CONNECT BY PRIOR itg_inv_type  = itg_parent_inv_type
    START WITH itg_parent_inv_type = c_start_inv_type;
 --
    l_tab_inv_type Nm3type.tab_varchar4;
    l_tab_level    Nm3type.tab_number;
 --
-   l_top_au_type  nm_inv_types.nit_admin_type%TYPE;
+   l_top_au_type  NM_INV_TYPES.nit_admin_type%TYPE;
 --
    l_retval       BOOLEAN := FALSE;
 --
@@ -3343,18 +3387,18 @@ END does_child_exist_diff_au_type;
 --
 ----------------------------------------------------------------------------------------------
 --
-FUNCTION is_xsp_valid_on_inv_type (pi_inv_type IN nm_inv_types.nit_inv_type%TYPE
-                                  ,pi_xsp      IN nm_xsp.nwx_x_sect%TYPE
+FUNCTION is_xsp_valid_on_inv_type (pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE
+                                  ,pi_xsp      IN NM_XSP.nwx_x_sect%TYPE
                                   ) RETURN BOOLEAN IS
 --
 --  THIS FUNCTION TAKES NO INTEREST INTO THE NETWORK TYPE OR SUB CLASS, IT IS INTERESTED
 --   PURELY IF THE XSP AND INV TYPE COMBO EXISTS
 --
-   CURSOR cs_xsr (c_inv_type nm_inv_types.nit_inv_type%TYPE
-                 ,c_xsp      nm_xsp.nwx_x_sect%TYPE
+   CURSOR cs_xsr (c_inv_type NM_INV_TYPES.nit_inv_type%TYPE
+                 ,c_xsp      NM_XSP.nwx_x_sect%TYPE
                  ) IS
    SELECT 1
-    FROM  xsp_restraints
+    FROM  XSP_RESTRAINTS
    WHERE  xsr_ity_inv_code = c_inv_type
     AND   xsr_x_sect_value = c_xsp;
 --
@@ -3528,18 +3572,18 @@ END process_g_tab_ita;
   PROCEDURE create_ft_asset_from_table
                ( pi_table_name         IN     user_tables.table_name%TYPE
                , pi_pk_column          IN     user_tab_columns.column_name%TYPE
-               , pi_asset_type         IN     nm_inv_types.nit_inv_type%TYPE
-               , pi_asset_descr        IN     nm_inv_types.nit_descr%TYPE
+               , pi_asset_type         IN     NM_INV_TYPES.nit_inv_type%TYPE
+               , pi_asset_descr        IN     NM_INV_TYPES.nit_descr%TYPE
                , pi_start_date         IN     DATE                                     DEFAULT '01-JAN-1900'
-               , pi_pnt_or_cont        IN     nm_inv_types.nit_pnt_or_cont%TYPE        DEFAULT 'P'
-               , pi_use_xy             IN     nm_inv_types.nit_use_xy%TYPE             DEFAULT 'N'
+               , pi_pnt_or_cont        IN     NM_INV_TYPES.nit_pnt_or_cont%TYPE        DEFAULT 'P'
+               , pi_use_xy             IN     NM_INV_TYPES.nit_use_xy%TYPE             DEFAULT 'N'
                , pi_x_column           IN     user_tab_columns.column_name%TYPE
                , pi_y_column           IN     user_tab_columns.column_name%TYPE
-               , pi_lr_ne_column       IN     nm_inv_types.nit_lr_ne_column_name%TYPE  DEFAULT NULL
-               , pi_lr_st_chain        IN     nm_inv_types.nit_lr_st_chain%TYPE        DEFAULT NULL
-               , pi_lr_end_chain       IN     nm_inv_types.nit_lr_end_chain%TYPE       DEFAULT NULL
+               , pi_lr_ne_column       IN     NM_INV_TYPES.nit_lr_ne_column_name%TYPE  DEFAULT NULL
+               , pi_lr_st_chain        IN     NM_INV_TYPES.nit_lr_st_chain%TYPE        DEFAULT NULL
+               , pi_lr_end_chain       IN     NM_INV_TYPES.nit_lr_end_chain%TYPE       DEFAULT NULL
                , pi_attrib_ltrim       IN     NUMBER                                   DEFAULT 5
-               , pi_admin_type         IN     nm_inv_types.nit_admin_type%TYPE         DEFAULT Nm3get.get_nau( pi_nau_admin_unit => Nm3get.get_hus(pi_hus_username=>USER).hus_admin_unit).nau_admin_type
+               , pi_admin_type         IN     NM_INV_TYPES.nit_admin_type%TYPE         DEFAULT Nm3get.get_nau( pi_nau_admin_unit => Nm3get.get_hus(pi_hus_username=>USER).hus_admin_unit).nau_admin_type
                , pi_role               IN     NM_INV_TYPE_ROLES.itr_hro_role%TYPE      DEFAULT 'HIG_USER'
                , pi_role_mode          IN     NM_INV_TYPE_ROLES.itr_mode%TYPE          DEFAULT 'NORMAL'
                )
@@ -3550,8 +3594,8 @@ END process_g_tab_ita;
                  INDEX BY BINARY_INTEGER;
   -- nm_inv_types_all
     l_tab_utc                 tab_utc;
-    l_rec_nit                 nm_inv_types%ROWTYPE;
-    l_rec_ntc                 nm_inv_type_attribs%ROWTYPE;
+    l_rec_nit                 NM_INV_TYPES%ROWTYPE;
+    l_rec_ntc                 NM_INV_TYPE_ATTRIBS%ROWTYPE;
     l_rec_itr                 NM_INV_TYPE_ROLES%ROWTYPE;
   --
     e_table_doesnt_exist      EXCEPTION;
@@ -3585,8 +3629,8 @@ END process_g_tab_ita;
       SELECT * BULK COLLECT INTO l_tab_utc
         FROM user_tab_columns
        WHERE table_name = pi_table_name
-         AND data_type != 'SDO_GEOMETRY';
-      DBMS_OUTPUT.PUT_LINE('Table = '||l_tab_utc(1).table_name);
+         AND DATA_TYPE != 'SDO_GEOMETRY';
+      DBMS_OUTPUT.PUT_LINE('Table = '||l_Tab_utc(1).table_name);
      EXCEPTION
        WHEN NO_DATA_FOUND
        THEN
