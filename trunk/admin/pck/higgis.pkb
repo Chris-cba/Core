@@ -2,7 +2,7 @@ CREATE OR REPLACE PACKAGE BODY higgis AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)higgis.pkb	1.39 01/26/07
+--       sccsid           : @(#)higgis.pkb 1.39 01/26/07
 --       Module Name      : higgis.pkb
 --       Date into SCCS   : 07/01/26 16:35:41
 --       Date fetched Out : 07/06/13 14:10:34
@@ -12,7 +12,7 @@ CREATE OR REPLACE PACKAGE BODY higgis AS
 --
 --   Author : Rob Coupe
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '"@(#)higgis.pkb	1.39 01/26/07"';
+   g_body_sccsid     CONSTANT  varchar2(80) := '"@(#)higgis.pkb 1.39 01/26/07"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name CONSTANT varchar2(30) := 'higgis';
@@ -262,26 +262,26 @@ END;
    PROCEDURE    update_object_ids( p_theme_id IN number, p_session_id IN number ) IS
 
    CURSOR c1 IS
-	SELECT 'update gis_data_objects set gdo_pk_id = ( select '
+ SELECT 'update gis_data_objects set gdo_pk_id = ( select '
                ||gt_feature_fk_column||' from '||gt_feature_table||
-       		' where '||gt_feature_pk_column||' = gdo_feature_id  )'||
-       		' where gdo_session_id = '||TO_CHAR( p_session_id )
+         ' where '||gt_feature_pk_column||' = gdo_feature_id  )'||
+         ' where gdo_session_id = '||TO_CHAR( p_session_id )
         FROM gis_themes_all
-	WHERE gt_theme_id = p_theme_id;
+ WHERE gt_theme_id = p_theme_id;
 
    cursor_string varchar2(2000);
-   feedback	 number;
+   feedback  number;
 
    BEGIN
-	OPEN c1;
-	FETCH c1 INTO cursor_string;
-	IF c1%NOTFOUND THEN
-	   NULL;
+ OPEN c1;
+ FETCH c1 INTO cursor_string;
+ IF c1%NOTFOUND THEN
+    NULL;
         ELSE
-	   hig.execute_sql( cursor_string, feedback );
-	END IF;
+    hig.execute_sql( cursor_string, feedback );
+ END IF;
 --
---	The gis_data_objects should now hold the PK of the relevant exor object, ready for query.
+-- The gis_data_objects should now hold the PK of the relevant exor object, ready for query.
 --
    END;
 --
@@ -290,26 +290,26 @@ END;
    PROCEDURE    update_feature_ids( p_theme_id IN number, p_session_id IN number ) IS
 
    CURSOR c1 IS
-	SELECT 'update gis_data_objects set gdo_feature_id = ( select '||
+ SELECT 'update gis_data_objects set gdo_feature_id = ( select '||
                 gt_feature_pk_column||' from '||gt_feature_table||
-       		' where '||gt_feature_fk_column||' = gdo_pk_id  )'||
-       		' where gdo_session_id = '||TO_CHAR( p_session_id )
+         ' where '||gt_feature_fk_column||' = gdo_pk_id  )'||
+         ' where gdo_session_id = '||TO_CHAR( p_session_id )
         FROM gis_themes_all
-	WHERE gt_theme_id = p_theme_id;
+ WHERE gt_theme_id = p_theme_id;
 
    cursor_string varchar2(2000);
-   feedback	 number;
+   feedback  number;
 
    BEGIN
-	OPEN c1;
-	FETCH c1 INTO cursor_string;
-	IF c1%NOTFOUND THEN
-	   NULL;
+ OPEN c1;
+ FETCH c1 INTO cursor_string;
+ IF c1%NOTFOUND THEN
+    NULL;
         ELSE
-	   hig.execute_sql( cursor_string, feedback );
-	END IF;
+    hig.execute_sql( cursor_string, feedback );
+ END IF;
 --
---	The gis_data_objects should now hold the PK of the relevant feature object, ready for query in the GIS.
+-- The gis_data_objects should now hold the PK of the relevant feature object, ready for query in the GIS.
 --
    END;
 --
@@ -319,57 +319,57 @@ END;
    function     get_object_id ( p_session_id in number, p_f_id in number ) return number is
 
    cursor c1 is
-	select 'select '||gt_feature_fk_column||' from '||gt_feature_table||
-       		' where '||gt_feature_pk_column||' = '||to_char( p_f_id )
+ select 'select '||gt_feature_fk_column||' from '||gt_feature_table||
+         ' where '||gt_feature_pk_column||' = '||to_char( p_f_id )
         from gis_themes_all,  gis_requests
-	where gt_theme_id = gr_gt_theme_id
-	and   gr_session_id = p_session_id;
+ where gt_theme_id = gr_gt_theme_id
+ and   gr_session_id = p_session_id;
 
    cursor_string varchar2(2000);
-   feedback	 number;
-   retval	 number;
+   feedback  number;
+   retval  number;
 
    begin
-	open c1;
-	fetch c1 into cursor_string;
-	if c1%notfound then
-	   close c1;
-	   dbms_output.put_line('No string!!!');
+ open c1;
+ fetch c1 into cursor_string;
+ if c1%notfound then
+    close c1;
+    dbms_output.put_line('No string!!!');
         else
-	   close c1;
-	   dbms_output.put_line( cursor_string );
-	   retval := higgis.fetch_sql( cursor_string ) ;
-	   dbms_output.put_line( 'returning '||to_char( retval ));
-	end if;
+    close c1;
+    dbms_output.put_line( cursor_string );
+    retval := higgis.fetch_sql( cursor_string ) ;
+    dbms_output.put_line( 'returning '||to_char( retval ));
+ end if;
 --
-	return retval;
+ return retval;
    end;
 
 
    function     get_feature_id ( p_session_id in number, p_id in number ) return number is
 
    cursor c1 is
-	select 'select '||gt_feature_pk_column||' from '||gt_feature_table||
-       		' where '||gt_feature_fk_column||' = '||to_char( p_id )
+ select 'select '||gt_feature_pk_column||' from '||gt_feature_table||
+         ' where '||gt_feature_fk_column||' = '||to_char( p_id )
         from gis_themes_all,  gis_requests
-	where gt_theme_id = gr_gt_theme_id
-	and   gr_session_id = p_session_id;
+ where gt_theme_id = gr_gt_theme_id
+ and   gr_session_id = p_session_id;
 
    cursor_string varchar2(2000);
-   feedback	 number;
-   retval	 number;
+   feedback  number;
+   retval  number;
 
    begin
-	open c1;
-	fetch c1 into cursor_string;
-	if c1%notfound then
-	   close c1;
+ open c1;
+ fetch c1 into cursor_string;
+ if c1%notfound then
+    close c1;
         else
-	   close c1;
-	   retval := higgis.fetch_sql( cursor_string ) ;
-	end if;
+    close c1;
+    retval := higgis.fetch_sql( cursor_string ) ;
+ end if;
 --
-	return retval;
+ return retval;
    end;
 */
 
@@ -378,10 +378,10 @@ END;
 --
    FUNCTION fetch_sql ( p_string IN varchar2 ) RETURN number IS
 
-   get_obj_id		integer;
-   rows_processed 	integer;
-   retval		number;
-   ignore 		integer;
+   get_obj_id  integer;
+   rows_processed  integer;
+   retval  number;
+   ignore   integer;
 
    BEGIN
 
@@ -396,12 +396,12 @@ END;
       ignore := dbms_sql.EXECUTE( get_obj_id );
 
       IF dbms_sql.fetch_rows( get_obj_id ) > 0 THEN
-	dbms_output.put_line( 'Fetched rows');
+ dbms_output.put_line( 'Fetched rows');
         dbms_sql.column_value( get_obj_id,  1, retval );
-	dbms_output.put_line( 'Obj id = '||TO_CHAR( retval ));
+ dbms_output.put_line( 'Obj id = '||TO_CHAR( retval ));
       END IF;
       IF dbms_sql.is_open( get_obj_id ) THEN
-	 dbms_sql.close_cursor( get_obj_id);
+  dbms_sql.close_cursor( get_obj_id);
       END IF;
 
       RETURN retval;
@@ -418,87 +418,87 @@ END;
       where gr_session_id = p_session_id
       and   gr_gt_theme_id = gt_theme_id;
 
-   p_or_c	varchar2(1);
+   p_or_c varchar2(1);
    route_theme  varchar2(1);
 
    cursor c_pt is
-	select 'insert into gis_data_objects '||
+ select 'insert into gis_data_objects '||
         '( gdo_session_id, gdo_pk_id, gdo_rse_he_id, gdo_st_chain, gdo_theme_name, gdo_xsp, gdo_offset ) '||
         'select '||to_char(p_session_id)||','||gt_pk_column||','||gt_rse_fk_column||','||
         gt_st_chain_column||','||
-	''''||gt_theme_name||''''||','||nvl( gt_xsp_column, 'null')||','||nvl( gt_offset_field,'null')||
-  	' from '||gt_table_name||',road_segs,'||'gis_network_requests, gis_routes_link '||
-  	' where gnr_session_id = '||to_char( gr_session_id)||
+ ''''||gt_theme_name||''''||','||nvl( gt_xsp_column, 'null')||','||nvl( gt_offset_field,'null')||
+   ' from '||gt_table_name||',road_segs,'||'gis_network_requests, gis_routes_link '||
+   ' where gnr_session_id = '||to_char( gr_session_id)||
         ' and gnr_route_name = grl_route_name and grl_start < gnr_end'||
-  	' and grl_end   > gnr_start '||
-  	' and '||gt_rse_fk_column||' = grl_rse_he_id '||
-  	' and '||gt_st_chain_column||' + grl_start  >= greatest( gnr_start, grl_start ) '||
-  	' and '||gt_st_chain_column||' + grl_start  <= least( gnr_end, grl_end ) '||
-  	' and grl_rse_he_id = rse_he_id '
-	from gis_themes_all, gis_requests
-	where gr_session_id = p_session_id
-	and gr_gt_theme_id = gt_theme_id;
+   ' and grl_end   > gnr_start '||
+   ' and '||gt_rse_fk_column||' = grl_rse_he_id '||
+   ' and '||gt_st_chain_column||' + grl_start  >= greatest( gnr_start, grl_start ) '||
+   ' and '||gt_st_chain_column||' + grl_start  <= least( gnr_end, grl_end ) '||
+   ' and grl_rse_he_id = rse_he_id '
+ from gis_themes_all, gis_requests
+ where gr_session_id = p_session_id
+ and gr_gt_theme_id = gt_theme_id;
 
    cursor c_cont is
-	select 'insert into gis_data_objects '||
+ select 'insert into gis_data_objects '||
         '( gdo_session_id, gdo_pk_id, gdo_rse_he_id, gdo_st_chain, gdo_end_chain, gdo_theme_name, gdo_xsp, gdo_offset ) '||
         'select '||to_char(p_session_id)||','||gt_pk_column||','||gt_rse_fk_column||','||
         gt_st_chain_column||','||gt_end_chain_column||','||
-	''''||gt_theme_name||''''||','||nvl( gt_xsp_column, 'null')||','||nvl( gt_offset_field,'null')||
-  	' from '||gt_table_name||',road_segs,'||'gis_network_requests, gis_routes_link '||
-  	' where gnr_session_id = '||to_char( gr_session_id)||
+ ''''||gt_theme_name||''''||','||nvl( gt_xsp_column, 'null')||','||nvl( gt_offset_field,'null')||
+   ' from '||gt_table_name||',road_segs,'||'gis_network_requests, gis_routes_link '||
+   ' where gnr_session_id = '||to_char( gr_session_id)||
         ' and gnr_route_name = grl_route_name and grl_start < gnr_end'||
-  	' and grl_end  > gnr_start '||
-  	' and '||gt_rse_fk_column||' = grl_rse_he_id '||
-  	' and ('||gt_st_chain_column||' + grl_start  >= greatest( gnr_start, grl_start ) '||
-  	' and '||gt_st_chain_column||' + grl_start  <= least( gnr_end, grl_end ) )'||
-  	' or ( '||gt_end_chain_column||' +grl_start  >= greatest( gnr_start, grl_start ) '||
-  	' and '||gt_end_chain_column||' + grl_start <= least( gnr_end, grl_end ) )'||
-  	' and grl_rse_he_id = rse_he_id '
-	from gis_themes_all, gis_requests
-	where gr_session_id = p_session_id
-	and gr_gt_theme_id = gt_theme_id;
+   ' and grl_end  > gnr_start '||
+   ' and '||gt_rse_fk_column||' = grl_rse_he_id '||
+   ' and ('||gt_st_chain_column||' + grl_start  >= greatest( gnr_start, grl_start ) '||
+   ' and '||gt_st_chain_column||' + grl_start  <= least( gnr_end, grl_end ) )'||
+   ' or ( '||gt_end_chain_column||' +grl_start  >= greatest( gnr_start, grl_start ) '||
+   ' and '||gt_end_chain_column||' + grl_start <= least( gnr_end, grl_end ) )'||
+   ' and grl_rse_he_id = rse_he_id '
+ from gis_themes_all, gis_requests
+ where gr_session_id = p_session_id
+ and gr_gt_theme_id = gt_theme_id;
 
    cursor c_route is
-	select 'insert into gis_data_objects ( gdo_session_id, gdo_pk_id, gdo_rse_he_id, '||
-	' gdo_theme_name ) '||
-	'select '||to_char(p_session_id)||', rse_he_id, rse_he_id, '||''''||gt_theme_name||''''||
-  	' from road_segs,gis_network_requests, gis_routes_link '||
-  	' where gnr_session_id = '||to_char( gr_session_id)||
+ select 'insert into gis_data_objects ( gdo_session_id, gdo_pk_id, gdo_rse_he_id, '||
+ ' gdo_theme_name ) '||
+ 'select '||to_char(p_session_id)||', rse_he_id, rse_he_id, '||''''||gt_theme_name||''''||
+   ' from road_segs,gis_network_requests, gis_routes_link '||
+   ' where gnr_session_id = '||to_char( gr_session_id)||
         ' and gnr_route_name = grl_route_name and grl_start < gnr_end '||
-  	' and grl_end  > gnr_start '||
-  	' and grl_rse_he_id = rse_he_id '
-	from gis_themes_all, gis_requests
-	where gr_session_id = p_session_id
-	and gr_gt_theme_id = gt_theme_id;
+   ' and grl_end  > gnr_start '||
+   ' and grl_rse_he_id = rse_he_id '
+ from gis_themes_all, gis_requests
+ where gr_session_id = p_session_id
+ and gr_gt_theme_id = gt_theme_id;
 
    cursor_string varchar2(2000);
-   feedback	 number;
+   feedback  number;
 
    begin
-	open c_pt_or_cont;
-	fetch c_pt_or_cont into p_or_c, route_theme;
-	close c_pt_or_cont;
+ open c_pt_or_cont;
+ fetch c_pt_or_cont into p_or_c, route_theme;
+ close c_pt_or_cont;
 
-	dbms_output.put_line( 'Point or continuous - '||p_or_c );
+ dbms_output.put_line( 'Point or continuous - '||p_or_c );
 
-	if route_theme = 'Y'  then
-	  open c_route;
-	  fetch c_route into cursor_string;
-	  close c_route;
-	elsif  p_or_c = 'P' then
-	  open c_pt;
-	  fetch c_pt into cursor_string;
-	  close c_pt;
-	else
-	  open c_cont;
-	  fetch c_cont into cursor_string;
-	  close c_cont;
-	end if;
+ if route_theme = 'Y'  then
+   open c_route;
+   fetch c_route into cursor_string;
+   close c_route;
+ elsif  p_or_c = 'P' then
+   open c_pt;
+   fetch c_pt into cursor_string;
+   close c_pt;
+ else
+   open c_cont;
+   fetch c_cont into cursor_string;
+   close c_cont;
+ end if;
 
-	hig.execute_sql( cursor_string, feedback );
+ hig.execute_sql( cursor_string, feedback );
 --
---	The gis_data_objects should now hold the PK of the relevant exor object, ready for query.
+-- The gis_data_objects should now hold the PK of the relevant exor object, ready for query.
 --
    end;
 */
@@ -507,37 +507,37 @@ END;
 ---------------------------------------------------------------------------
 --
    PROCEDURE pop_ids_from_feature (p_session_id IN number,  p_theme IN varchar2,  p_value IN varchar2) IS
-      v_sql_string		varchar2(2000) := '';
-	v_gt_theme_id		number(9);
-	v_gt_theme_name		varchar2(30) := UPPER(p_theme) ;
-	v_gt_table_name		varchar2(30);
-	v_gt_pk_column		varchar2(30);
-	v_gt_feature_pk_column	varchar2(30);
-	v_gt_feature_fk_column	varchar2(30);
-      CURSOR c1 IS 	SELECT 	gt_theme_id            ,
-						gt_table_name          ,
-						gt_pk_column           ,
-						gt_feature_pk_column,
-						gt_feature_fk_column
-				FROM 		gis_themes_all
-				WHERE  	gt_theme_name      =  v_gt_theme_name ;
+      v_sql_string  varchar2(2000) := '';
+ v_gt_theme_id  number(9);
+ v_gt_theme_name  varchar2(30) := UPPER(p_theme) ;
+ v_gt_table_name  varchar2(30);
+ v_gt_pk_column  varchar2(30);
+ v_gt_feature_pk_column varchar2(30);
+ v_gt_feature_fk_column varchar2(30);
+      CURSOR c1 IS  SELECT  gt_theme_id            ,
+      gt_table_name          ,
+      gt_pk_column           ,
+      gt_feature_pk_column,
+      gt_feature_fk_column
+    FROM   gis_themes_all
+    WHERE   gt_theme_name      =  v_gt_theme_name ;
 
-	v_feedback	number(38);
+ v_feedback number(38);
 
    BEGIN
-	IF NOT c1%isopen THEN
-	      OPEN c1;
-	END IF;
-      FETCH c1 INTO 	v_gt_theme_id	,
-				v_gt_table_name	,
-				v_gt_pk_column	,
-				v_gt_feature_pk_column,
-				v_gt_feature_fk_column;
+ IF NOT c1%isopen THEN
+       OPEN c1;
+ END IF;
+      FETCH c1 INTO  v_gt_theme_id ,
+    v_gt_table_name ,
+    v_gt_pk_column ,
+    v_gt_feature_pk_column,
+    v_gt_feature_fk_column;
 
-	IF  c1%NOTFOUND THEN
-	      CLOSE c1;
-	      RAISE_APPLICATION_ERROR(-20001,'GIS Theme : '||v_gt_theme_name||' does not exist');
-	END IF;
+ IF  c1%NOTFOUND THEN
+       CLOSE c1;
+       RAISE_APPLICATION_ERROR(-20001,'GIS Theme : '||v_gt_theme_name||' does not exist');
+ END IF;
       CLOSE c1;
 
       v_sql_string := v_sql_string || 'INSERT INTO gis_data_objects ( GDO_SESSION_ID, ';
@@ -547,32 +547,32 @@ END;
       v_sql_string := v_sql_string ||         v_gt_pk_column||', ';
       v_sql_string := v_sql_string ||         ''''||v_gt_theme_name||''''||' ';
       v_sql_string := v_sql_string || 'FROM '||v_gt_table_name||' ';
-	DECLARE
-		v_tmp	number;
-	BEGIN
-		v_tmp := p_value;
-	      v_sql_string := v_sql_string || 'WHERE '||v_gt_feature_fk_column||' = '||p_value;
+ DECLARE
+  v_tmp number;
+ BEGIN
+  v_tmp := p_value;
+       v_sql_string := v_sql_string || 'WHERE '||v_gt_feature_fk_column||' = '||p_value;
 
-	EXCEPTION
-		WHEN value_error THEN
-		      v_sql_string := v_sql_string || 'WHERE '||v_gt_feature_fk_column||' = '||''''||p_value||'''';
-	END;
+ EXCEPTION
+  WHEN value_error THEN
+        v_sql_string := v_sql_string || 'WHERE '||v_gt_feature_fk_column||' = '||''''||p_value||'''';
+ END;
 
 --      dbms_output.put_line(v_sql_string );
-	hig.execute_sql(v_sql_string,v_feedback);
+ hig.execute_sql(v_sql_string,v_feedback);
    END;
 --
 ---------------------------------------------------------------------------
 --
    PROCEDURE    pop_ids_from_feature (p_session_id IN number, p_theme_id IN number ,  p_value IN varchar2)IS
-      v_theme_name	varchar2(30);
+      v_theme_name varchar2(30);
    BEGIN
-      SELECT	gt_theme_name
-	INTO		v_theme_name
-	FROM		gis_themes_all
-	WHERE 	gt_theme_id = p_theme_id;
+      SELECT gt_theme_name
+ INTO  v_theme_name
+ FROM  gis_themes_all
+ WHERE  gt_theme_id = p_theme_id;
 
-	pop_ids_from_feature (p_session_id ,  v_theme_name,  p_value ) ;
+ pop_ids_from_feature (p_session_id ,  v_theme_name,  p_value ) ;
    EXCEPTION
       WHEN no_data_found THEN
          NULL;
@@ -925,26 +925,24 @@ END ins_gthr;
 ---------------------------------------------------------------------------
 --
 FUNCTION pk_is_in_theme(pi_theme_id IN gis_themes.gt_theme_id%TYPE
-                       ,pi_pk_val   IN gis_data_objects.gdo_pk_id%TYPE
-                       ) RETURN varchar2 IS
-
-  c_nl CONSTANT varchar2(1) := CHR(10);
-
-  l_gt_rec gis_themes%ROWTYPE;
-
-  l_qry varchar2(32767);
-
-  l_dummy pls_integer;
-
-  l_retval varchar2(10);
-
+                       ,pi_pk_val   IN gis_data_objects.gdo_pk_id%TYPE) 
+  RETURN varchar2 
+IS
+--
+  l_dummy           PLS_INTEGER;
+  l_gt_rec          GIS_THEMES%ROWTYPE;
+  c_nl     CONSTANT VARCHAR2(1) := CHR(10);
+  l_qry             VARCHAR2(32767);
+  l_retval          VARCHAR2(10);
+--
 BEGIN
+--
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'pk_is_in_theme');
-
+--
   --get theme details
   l_gt_rec := get_gt(pi_gt_theme_id => pi_theme_id);
-
+--
   l_qry :=            'SELECT'
            || c_nl || '  1'
            || c_nl || 'FROM'
@@ -961,36 +959,35 @@ BEGIN
     --add where clause from theme
     IF UPPER(SUBSTR(l_gt_rec.gt_where, 1, 5)) = 'WHERE'
     THEN
-      l_qry :=            l_qry
-             || c_nl || '           ' || SUBSTR(l_gt_rec.gt_where, 6);
+      l_qry := l_qry||c_nl||'           '||SUBSTR(l_gt_rec.gt_where, 6);
     ELSE
-      l_qry :=            l_qry
-             || c_nl || '           ' || l_gt_rec.gt_where;
+      l_qry := l_qry||c_nl||'           '||l_gt_rec.gt_where;
     END IF;
-
-    l_qry :=            l_qry
-             || c_nl || '         AND';
+  --
+    l_qry := l_qry||c_nl||'         AND';
+  --
   END IF;
 
   --add pk clause
-  l_qry :=            l_qry
-           || c_nl || '           ' || l_gt_rec.gt_pk_column || ' = :pk_val)';
+  l_qry := l_qry||c_nl||'           '||l_gt_rec.gt_pk_column||' = :pk_val)';
 
   DECLARE
+
     e_table_not_found EXCEPTION;
     PRAGMA EXCEPTION_INIT(e_table_not_found, -942);
+    e_invalid_table EXCEPTION;
+    PRAGMA EXCEPTION_INIT(e_invalid_table, -903);
 
   BEGIN
     EXECUTE IMMEDIATE l_qry INTO l_dummy USING pi_pk_val;
-
     l_retval := nm3type.c_true;
 
   EXCEPTION
-    WHEN no_data_found
+    WHEN NO_DATA_FOUND
     THEN
       l_retval := nm3type.c_false;
 
-    WHEN too_many_rows
+    WHEN TOO_MANY_ROWS
     THEN
       l_retval := nm3type.c_true;
 
@@ -1001,14 +998,17 @@ BEGIN
                    ,pi_supplementary_info =>    CHR(10)
                                              || CHR(10) || l_gt_rec.gt_theme_name
                                              || CHR(10) || l_gt_rec.gt_table_name);
-
-    WHEN others
+    WHEN e_invalid_table
+    THEN
+      l_retval := nm3type.c_false;
+    WHEN OTHERS
     THEN
       hig.raise_ner(pi_appl               => nm3type.c_hig
                    ,pi_id                 => 150
                    ,pi_supplementary_info =>    CHR(10)
                                              || CHR(10) || l_gt_rec.gt_theme_name
                                              || CHR(10) || nm3flx.parse_error_message(pi_msg => SQLERRM));
+
 
   END;
 
@@ -1036,11 +1036,11 @@ BEGIN
                      ,p_procedure_name => 'get_theme_for_module');
 
   l_qry :=            'SELECT'
-					 || c_nl || '  gtf.gtf_gt_theme_id'
-					 || c_nl || 'FROM'
-					 || c_nl || '  gis_theme_functions_all gtf'
-					 || c_nl || 'WHERE'
-					 || c_nl || '  gtf.gtf_hmo_module = :p_module';
+      || c_nl || '  gtf.gtf_gt_theme_id'
+      || c_nl || 'FROM'
+      || c_nl || '  gis_theme_functions_all gtf'
+      || c_nl || 'WHERE'
+      || c_nl || '  gtf.gtf_hmo_module = :p_module';
 
   IF pi_pk_val IS NOT NULL
   THEN
@@ -1477,15 +1477,15 @@ begin
 
       retval := nm3mrg_sdo.get_mrg_dynamic_theme_query( l_gdo.gdo_pk_id );
 
-	else
+ else
 
-	  raise_application_error(-20001, 'This functionality is not available yet' );
+   raise_application_error(-20001, 'This functionality is not available yet' );
 
-	end if;
+ end if;
 
   else
 
-	  raise_application_error(-20001, 'This is not a dynamic theme');
+   raise_application_error(-20001, 'This is not a dynamic theme');
 
   end if;
 
