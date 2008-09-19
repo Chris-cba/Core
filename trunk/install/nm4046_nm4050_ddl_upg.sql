@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.5   Sep 04 2008 09:11:36   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.6   Sep 19 2008 15:46:32   aedwards  $
 --       Module Name      : $Workfile:   nm4046_nm4050_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Sep 04 2008 09:11:36  $
---       Date fetched Out : $Modtime:   Sep 04 2008 09:05:02  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Sep 19 2008 15:46:32  $
+--       Date fetched Out : $Modtime:   Sep 19 2008 15:46:12  $
+--       Version          : $Revision:   3.6  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2007
@@ -315,11 +315,11 @@ ALTER TABLE NM_THEMES_ALL DROP CONSTRAINT NTH_USE_HIST_YN_CHK;
 PROMPT Dropping Constraint on 'NTH_PK'
 ALTER TABLE NM_THEMES_ALL DROP CONSTRAINT NTH_PK;
 
---PROMPT Dropping Index on 'NTH_PK'
---DROP INDEX NTH_PK;
+PROMPT Dropping Index on 'NTH_PK'
+DROP INDEX NTH_PK;
 
---PROMPT Dropping Index on 'NTH_UK'
---DROP INDEX NTH_UK;
+PROMPT Dropping Index on 'NTH_UK'
+DROP INDEX NTH_UK;
 
 PROMPT Dropping Trigger on 'NM_THEMES_ALL_B_IU_TRG'
 DROP TRIGGER NM_THEMES_ALL_B_IU_TRG;
@@ -592,11 +592,11 @@ DECLARE
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.5   Sep 04 2008 09:11:36   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.6   Sep 19 2008 15:46:32   aedwards  $
 --       Module Name      : $Workfile:   nm4046_nm4050_ddl_upg.sql  $
---       Date into SCCS   : $Date:   Sep 04 2008 09:11:36  $
---       Date fetched Out : $Modtime:   Sep 04 2008 09:05:02  $
---       SCCS Version     : $Revision:   3.5  $
+--       Date into SCCS   : $Date:   Sep 19 2008 15:46:32  $
+--       Date fetched Out : $Modtime:   Sep 19 2008 15:46:12  $
+--       SCCS Version     : $Revision:   3.6  $
 --
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2006
@@ -681,11 +681,11 @@ DECLARE
 -----------------------------------------------------------------------------
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.5   Sep 04 2008 09:11:36   malexander  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/install/nm4046_nm4050_ddl_upg.sql-arc   3.6   Sep 19 2008 15:46:32   aedwards  $
 -- Module Name : $Workfile:   nm4046_nm4050_ddl_upg.sql  $
--- Date into PVCS : $Date:   Sep 04 2008 09:11:36  $
--- Date fetched Out : $Modtime:   Sep 04 2008 09:05:02  $
--- PVCS Version : $Revision:   3.5  $
+-- Date into PVCS : $Date:   Sep 19 2008 15:46:32  $
+-- Date fetched Out : $Modtime:   Sep 19 2008 15:46:12  $
+-- PVCS Version : $Revision:   3.6  $
 -- Based on SCCS version :
 -----------------------------------------------------------------------------
 --  Copyright (c) exor corporation ltd, 2004
