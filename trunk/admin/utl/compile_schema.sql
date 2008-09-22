@@ -36,6 +36,7 @@ where  d.d_obj# in
            and owner = name
        )
 /
+
 CREATE INDEX IX1 ON
   TEMP_DEPEND(OBJECT_ID)
 /
@@ -91,6 +92,7 @@ select 'PROMPT Re-Compiling Schema - ignore any errors that are reported during 
 select 'PROMPT ===========================================================================' FROM DUAL;
 select 'PROMPT ' FROM DUAL;
 select 'PROMPT ' FROM DUAL;
+
 select 'PROMPT '||OBJECT_TYPE||' '||OWNER||'.'||OBJECT_NAME
        ||CHR(10)
        ||'ALTER '
@@ -115,6 +117,7 @@ where a.owner     = USER
                      ,'TYPE BODY'
                      )
  AND  object_name <> 'ORD_OBJ_BY_DEPEND'
+ AND  object_name NOT LIKE 'BIN$%'
 order by DLEVEL DESC
         ,OBJECT_TYPE
         ,OBJECT_NAME;
