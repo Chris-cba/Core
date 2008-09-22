@@ -99,7 +99,7 @@ select 'PROMPT '||OBJECT_TYPE||' '||OWNER||'.'||OBJECT_NAME
        ||decode(SUBSTR(OBJECT_TYPE,LENGTH(OBJECT_TYPE)-3,4)
                ,'BODY',SUBSTR(OBJECT_TYPE,1,LENGTH(OBJECT_TYPE)-4)|| OWNER||'.'||OBJECT_NAME || ' compile body' -- To do pack/type bodies
                ,'KAGE',OBJECT_TYPE|| ' '|| OWNER||'.'||OBJECT_NAME || ' compile specification'                  -- to do pack headers
-               ,'TYPE',OBJECT_TYPE|| ' '|| OWNER||'.'||OBJECT_NAME || ' compile specification'                  -- to do type headers
+               ,'TYPE',OBJECT_TYPE|| ' '|| OWNER||'."'||OBJECT_NAME || '" compile specification'                  -- to do type headers
                ,OBJECT_TYPE || ' ' || OWNER||'.'||OBJECT_NAME || ' compile'
                )
        ||';'
