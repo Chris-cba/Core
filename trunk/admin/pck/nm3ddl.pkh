@@ -67,6 +67,25 @@ PROCEDURE create_object_and_syns (p_object_name  IN USER_OBJECTS.object_name%TYP
 --
 -----------------------------------------------------------------------------
 --
+--<PROC NAME="create_object_and_views">
+-- This procedure creates the object specified in p_ddl_text and creates
+--  the relevant views
+--
+PROCEDURE create_object_and_views (p_object_name  IN USER_OBJECTS.object_name%TYPE
+                                  ,p_ddl_text     IN VARCHAR2
+                                  );
+--
+PROCEDURE create_object_and_views (p_object_name  IN USER_OBJECTS.object_name%TYPE
+                                  ,p_ddl_text     IN CLOB
+                                  );
+PROCEDURE create_object_and_views (p_object_name  IN USER_OBJECTS.object_name%TYPE);
+PROCEDURE create_object_and_views (p_object_name  IN USER_OBJECTS.object_name%TYPE
+                                  ,p_tab_ddl_text IN Nm3type.tab_varchar32767
+                                  );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
 --<PROC NAME="use_pub_syn">
 -- This function returns TRUE is the system is configured to use PUBLIC synonyms
 --  otherwise FALSE
@@ -112,6 +131,16 @@ PROCEDURE drop_synonym_for_object (p_object_name IN USER_OBJECTS.object_name%TYP
 -- Possible errors raised are -
 -- -20304  There is no PUBLIC synonym in exisitence for object
 -- -20303  User does not have permission to drop this synonym
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="drop_synonym_for_object">
+PROCEDURE drop_views_for_object (p_object_name IN USER_OBJECTS.object_name%TYPE);
+--</PROC>
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_views_for_object">
+PROCEDURE create_views_for_object (p_object_name IN USER_OBJECTS.object_name%TYPE);
 --</PROC>
 --
 -----------------------------------------------------------------------------
@@ -221,6 +250,12 @@ PROCEDURE revoke_from_object (p_revoke_from   IN VARCHAR2
 FUNCTION does_object_exist (p_object_name IN VARCHAR2
                            ,p_object_type IN VARCHAR2 DEFAULT NULL
                            ) RETURN BOOLEAN;
+
+FUNCTION does_object_exist (p_object_name  IN VARCHAR2
+                           ,p_object_type  IN VARCHAR2 DEFAULT NULL
+                           ,p_object_owner IN VARCHAR2
+                           ) RETURN BOOLEAN;
+
 --
 --</PROC>
 --
