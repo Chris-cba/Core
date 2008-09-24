@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.9   Sep 05 2008 13:54:16   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.10   Sep 24 2008 14:05:34   aedwards  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Sep 05 2008 13:54:16  $
---       Date fetched Out : $Modtime:   Sep 05 2008 12:40:00  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Sep 24 2008 14:05:34  $
+--       Date fetched Out : $Modtime:   Sep 24 2008 13:57:12  $
+--       PVCS Version     : $Revision:   2.10  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.9  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.10  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -221,6 +221,109 @@ END create_object_and_syns;
 --
 -----------------------------------------------------------------------------
 --
+-- AE Create object with views instead of synonyms
+PROCEDURE create_object_and_views (p_object_name IN USER_OBJECTS.object_name%TYPE) IS
+BEGIN
+   create_object_and_views (p_object_name  => p_object_name
+                           ,p_tab_ddl_text => g_tab_varchar
+                           );
+END create_object_and_views;
+--
+-----------------------------------------------------------------------------
+--
+-- AE Create object with views instead of synonyms
+PROCEDURE create_object_and_views (p_object_name  IN USER_OBJECTS.object_name%TYPE
+                                  ,p_tab_ddl_text IN Nm3type.tab_varchar32767
+                                  ) IS
+BEGIN
+--
+   Nm_Debug.proc_start(g_package_name,'create_object_and_views');
+--
+   IF INSTR(UPPER(p_tab_ddl_text(1)),UPPER(p_object_name),1,1) = 0
+    THEN
+      g_syn_exc_code := -20307;
+      g_syn_exc_msg  := 'Text "'||p_object_name||'" not found in DDL String';
+      RAISE g_syn_exception;
+   END IF;
+--
+   execute_tab_varchar (p_tab_ddl_text);
+--
+   create_views_for_object(p_object_name);
+--
+   Nm_Debug.proc_end(g_package_name,'create_object_and_views');
+--
+EXCEPTION
+--
+   WHEN g_syn_exception
+    THEN
+      RAISE_APPLICATION_ERROR(g_syn_exc_code, g_syn_exc_msg);
+--
+END create_object_and_views;
+--
+-----------------------------------------------------------------------------
+--
+-- AE Create object with views instead of synonyms
+PROCEDURE create_object_and_views (p_object_name IN USER_OBJECTS.object_name%TYPE
+                                  ,p_ddl_text    IN VARCHAR2
+                                  ) IS
+BEGIN
+--
+   Nm_Debug.proc_start(g_package_name,'create_object_and_views');
+--
+   IF INSTR(UPPER(p_ddl_text),UPPER(p_object_name),1,1) = 0
+    THEN
+      g_syn_exc_code := -20307;
+      g_syn_exc_msg  := 'Text "'||p_object_name||'" not found in DDL String "'||p_ddl_text||'"';
+      RAISE g_syn_exception;
+   END IF;
+--
+   exec_ddl(p_ddl_text);
+--
+   create_views_for_object(p_object_name);
+--
+   Nm_Debug.proc_end(g_package_name,'create_object_and_views');
+--
+EXCEPTION
+--
+   WHEN g_syn_exception
+    THEN
+      RAISE_APPLICATION_ERROR(g_syn_exc_code, g_syn_exc_msg);
+--
+END create_object_and_views;
+--
+-----------------------------------------------------------------------------
+--
+-- AE Create object with views instead of synonyms
+PROCEDURE create_object_and_views (p_object_name IN USER_OBJECTS.object_name%TYPE
+                                  ,p_ddl_text    IN CLOB
+                                  ) IS
+BEGIN
+--
+   Nm_Debug.proc_start(g_package_name,'create_object_and_views');
+--
+   IF NVL(Nm3clob.lob_instr(p_ddl_text,p_object_name),0) = 0
+    THEN
+      g_syn_exc_code := -20307;
+      g_syn_exc_msg  := 'Text "'||p_object_name||'" not found in DDL String';
+      RAISE g_syn_exception;
+   END IF;
+--
+   Nm3clob.execute_immediate_clob(p_ddl_text);
+--
+   create_views_for_object(p_object_name);
+--
+   Nm_Debug.proc_end(g_package_name,'create_object_and_views');
+--
+EXCEPTION
+--
+   WHEN g_syn_exception
+    THEN
+      RAISE_APPLICATION_ERROR(g_syn_exc_code, g_syn_exc_msg);
+--
+END create_object_and_views;
+--
+-----------------------------------------------------------------------------
+--
 FUNCTION use_pub_syn RETURN BOOLEAN IS
 BEGIN
 --
@@ -242,7 +345,21 @@ IS
    WHERE  owner       = p_owner
     AND   object_name = p_object;
 --
-   l_dummy VARCHAR2(1);
+  CURSOR get_priv_syns_to_create
+           ( cp_object_name IN VARCHAR2 )
+  IS
+    SELECT 'CREATE SYNONYM ' || hus_username || '.' || cp_object_name
+         ||' FOR '||hig.get_application_owner||'.'|| cp_object_name 
+      FROM hig_users, all_users
+     WHERE hus_username != hig.get_application_owner
+       AND username = hus_username
+       AND NOT EXISTS
+         (SELECT 1 FROM dba_synonyms
+           WHERE owner = hus_username
+             AND synonym_name = cp_object_name);
+--
+   l_dummy     VARCHAR2(1);
+   l_tab_ddl   nm3type.tab_varchar32767;
 --
 BEGIN
 --
@@ -298,15 +415,30 @@ BEGIN
    --
       ELSE
    --
-         FOR cs_rec IN cs_users
+--         FOR cs_rec IN cs_users
+--          LOOP
+--            IF NOT check_syn_exists (cs_rec.hus_username,p_object_name)
+--             THEN
+--               syn_exec_ddl ('CREATE SYNONYM '||cs_rec.hus_username||'.'||p_object_name
+--                            ||' FOR '||g_application_owner||'.'||p_object_name
+--                            );
+--            END IF;
+--         END LOOP;
+
+        -- AE 24-SEP-2008
+        -- Rewrite creation of priv synonyms for performance reasons
+        
+        OPEN get_priv_syns_to_create ( p_object_name );
+        FETCH get_priv_syns_to_create BULK COLLECT INTO l_tab_ddl;
+        CLOSE get_priv_syns_to_create;
+      --
+        IF l_tab_ddl.COUNT > 0
+        THEN
+          FOR i IN l_tab_ddl.FIRST .. l_tab_ddl.LAST
           LOOP
-            IF NOT check_syn_exists (cs_rec.hus_username,p_object_name)
-             THEN
-               syn_exec_ddl ('CREATE SYNONYM '||cs_rec.hus_username||'.'||p_object_name
-                            ||' FOR '||g_application_owner||'.'||p_object_name
-                            );
-            END IF;
-         END LOOP;
+            EXECUTE IMMEDIATE l_tab_ddl(i);
+          END LOOP;
+        END IF;
    --
       END IF;
    --
@@ -332,6 +464,18 @@ END create_synonym_for_object;
 --
 PROCEDURE drop_synonym_for_object (p_object_name IN USER_OBJECTS.object_name%TYPE) IS
 --
+  l_tab_ddl   nm3type.tab_varchar32767;
+--
+  CURSOR get_priv_syns_to_drop
+           ( cp_object_name IN VARCHAR2 )
+  IS
+    SELECT 'DROP SYNONYM ' || hus_username || '.' || synonym_name
+      FROM hig_users, all_users, dba_synonyms
+     WHERE hus_username != hig.get_application_owner
+       AND username = hus_username
+       AND owner = hus_username
+       AND synonym_name = cp_object_name;
+--
    PRAGMA autonomous_transaction;
 BEGIN
 --
@@ -345,23 +489,38 @@ BEGIN
          syn_exec_ddl('DROP   PUBLIC SYNONYM '||p_object_name);
       ELSE
          g_syn_exc_code := -20304;
-         g_syn_exc_msg  := 'There is no PUBLIC synonym in exisitence for "'||p_object_name||'"';
+         g_syn_exc_msg  := 'There is no PUBLIC synonym in existence for "'||p_object_name||'"';
          RAISE g_syn_exception;
       END IF;
 --
    ELSE
 --
-      FOR cs_rec IN cs_users
-       LOOP
-         IF check_syn_exists (cs_rec.hus_username,p_object_name)
-          THEN
-            syn_exec_ddl ('DROP   SYNONYM '||cs_rec.hus_username||'.'||p_object_name);
-         END IF;
-      END LOOP;
---
+--      FOR cs_rec IN cs_users
+--       LOOP
+--         IF check_syn_exists (cs_rec.hus_username,p_object_name)
+--          THEN
+--            syn_exec_ddl ('DROP   SYNONYM '||cs_rec.hus_username||'.'||p_object_name);
+--         END IF;
+--      END LOOP;
+
+        -- AE 24-SEP-2008
+        -- Re-write the drop of Private synonyms for performance reasons.
+      --
+        OPEN get_priv_syns_to_drop ( p_object_name );
+        FETCH get_priv_syns_to_drop BULK COLLECT INTO l_tab_ddl;
+        CLOSE get_priv_syns_to_drop;
+      --
+        IF l_tab_ddl.COUNT > 1
+        THEN
+          FOR i IN l_tab_ddl.FIRST .. l_tab_ddl.LAST
+          LOOP
+            EXECUTE IMMEDIATE l_tab_ddl(i);
+          END LOOP;
+        END IF;
+      --
    END IF;
 
-   commit; --sscanlon fix 38046 26-SEP-2006
+   COMMIT; --sscanlon fix 38046 26-SEP-2006
 --
 --   Output a debug message to say leaving procedure
    Nm_Debug.proc_end(g_package_name,'drop_synonym_for_object');
@@ -370,12 +529,98 @@ EXCEPTION
 --
    WHEN g_syn_exception
     THEN
-      commit; --sscanlon fix 38046 26-SEP-2006
+      COMMIT; --sscanlon fix 38046 26-SEP-2006
       RAISE_APPLICATION_ERROR(g_syn_exc_code, g_syn_exc_msg);
 --
 END drop_synonym_for_object;
 --
------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+PROCEDURE drop_views_for_object (p_object_name IN USER_OBJECTS.object_name%TYPE) IS
+--
+   PRAGMA autonomous_transaction;
+BEGIN
+--
+   Nm_Debug.proc_start(g_package_name,'drop_views_for_object');
+--
+   FOR cs_rec IN cs_users
+   LOOP
+     IF does_object_exist(p_object_name  => p_object_name
+                        , p_object_owner => cs_rec.hus_username
+                        , p_object_type  => 'VIEW')
+     THEN
+       exec_ddl ('DROP VIEW '||cs_rec.hus_username||'.'||p_object_name);
+     END IF;
+   END LOOP;
+--
+   COMMIT;
+--
+   Nm_Debug.proc_end(g_package_name,'drop_views_for_object');
+--
+EXCEPTION
+--
+   WHEN g_syn_exception
+    THEN
+      COMMIT;
+      RAISE_APPLICATION_ERROR(g_syn_exc_code, g_syn_exc_msg);
+--
+END drop_views_for_object;
+--
+--------------------------------------------------------------------------------
+--
+PROCEDURE create_views_for_object (p_object_name IN USER_OBJECTS.object_name%TYPE)
+IS
+--
+   PRAGMA autonomous_transaction;
+--
+   CURSOR check_obj_exists (p_owner VARCHAR2, p_object VARCHAR2) IS
+   SELECT 'x'
+    FROM  ALL_OBJECTS
+   WHERE  owner       = p_owner
+    AND   object_name = p_object;
+--
+   l_dummy VARCHAR2(1);
+--
+BEGIN
+--
+--   Output a debug message to say entering procedure
+--
+   Nm_Debug.proc_start(g_package_name,'create_views_for_object');
+--
+   Nm_Debug.DEBUG(p_object_name);
+--
+   OPEN  check_obj_exists(g_application_owner, p_object_name);
+   FETCH check_obj_exists INTO l_dummy;
+   IF check_obj_exists%NOTFOUND
+    THEN
+      CLOSE check_obj_exists;
+      g_syn_exc_code := -20301;
+      g_syn_exc_msg  := 'Object "'||p_object_name||'" does not exist in schema '||g_application_owner;
+      RAISE g_syn_exception;
+   END IF;
+   CLOSE check_obj_exists;
+--
+   FOR cs_rec IN cs_users
+   LOOP
+     exec_ddl ('CREATE OR REPLACE FORCE VIEW '||cs_rec.hus_username||'.'||p_object_name
+                ||' AS SELECT * FROM '||g_application_owner||'.'||p_object_name
+               );
+   END LOOP;
+--
+   COMMIT;
+-- 
+   Nm_Debug.proc_end(g_package_name,'create_views_for_object');
+--
+EXCEPTION
+--
+   WHEN g_syn_exception
+    THEN
+      COMMIT;
+      RAISE_APPLICATION_ERROR(g_syn_exc_code, g_syn_exc_msg);
+--
+END create_views_for_object;
+--
+--------------------------------------------------------------------------------
 --
 PROCEDURE create_all_priv_syns (p_user IN USER_USERS.username%TYPE) IS
 --
@@ -876,6 +1121,19 @@ BEGIN
    RETURN does_object_exist_internal (p_object_name => p_object_name
                                      ,p_object_type => p_object_type
                                      ,p_owner       => g_application_owner
+                                     );
+END does_object_exist;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION does_object_exist (p_object_name  IN VARCHAR2
+                           ,p_object_type  IN VARCHAR2 DEFAULT NULL
+                           ,p_object_owner IN VARCHAR2
+                           ) RETURN BOOLEAN IS
+BEGIN
+   RETURN does_object_exist_internal (p_object_name => p_object_name
+                                     ,p_object_type => p_object_type
+                                     ,p_owner       => p_object_owner
                                      );
 END does_object_exist;
 --
