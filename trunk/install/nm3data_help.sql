@@ -1,21 +1,3 @@
---
------------------------------------------------------------------------------
---
---   PVCS Identifiers :-
---
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data_help.sql-arc   2.1   Nov 21 2007 10:40:52   gjohnson  $
---       Module Name      : $Workfile:   nm3data_help.sql  $
---       Date into PVCS   : $Date:   Nov 21 2007 10:40:52  $
---       Date fetched Out : $Modtime:   Nov 21 2007 10:24:42  $
---       Version          : $Revision:   2.1  $
---
---   Product metadata script
---
------------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
------------------------------------------------------------------------------
---
---
 /***************************************************************************
 
 INFO
@@ -24,7 +6,7 @@ Re-generated to include updated HIG_WEB_CONTXT_HLP entries
 
 GENERATION DATE
 ===============
-21-NOV-2007 10:24
+19-SEP-2008 10:46
 
 TABLES PROCESSED
 ================
@@ -40,6 +22,7 @@ R
 
 ***************************************************************************/
 
+define sccsid = '%W% %G%'
 set define off;
 set feedback off;
 
