@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY hig AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/hig.pkb-arc   2.3   Jan 24 2008 15:31:00   gjohnson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/hig.pkb-arc   2.4   Sep 24 2008 17:21:12   gjohnson  $
 --       Module Name      : $Workfile:   hig.pkb  $
---       Date into SCCS   : $Date:   Jan 24 2008 15:31:00  $
---       Date fetched Out : $Modtime:   Jan 22 2008 17:36:32  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Sep 24 2008 17:21:12  $
+--       Date fetched Out : $Modtime:   Sep 24 2008 17:18:52  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on 1.39
 --
 --
@@ -1640,8 +1640,8 @@ BEGIN
       l_rec_hcca.hcca_ner_appl := nm3type.c_hig;
       l_rec_hcca.hcca_ner_id   := 169;
       l_supplementary_info     := pi_constraint_name;
-   ELSE
-      l_supplementary_info     := l_rec_hcca.hcca_table_name||'.'||l_rec_hcca.hcca_constraint_name;
+--   ELSE
+--      l_supplementary_info     := l_rec_hcca.hcca_table_name||'.'||l_rec_hcca.hcca_constraint_name;
    END IF;
 --
    nm_debug.proc_end(g_package_name,'raise_constraint_violation_ner');
