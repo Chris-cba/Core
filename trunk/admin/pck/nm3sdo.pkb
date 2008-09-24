@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.7   Aug 22 2008 10:30:12   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.8   Sep 24 2008 13:11:36   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Aug 22 2008 10:30:12  $
---       Date fetched Out : $Modtime:   Aug 22 2008 10:29:40  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Sep 24 2008 13:11:36  $
+--       Date fetched Out : $Modtime:   Sep 24 2008 13:10:00  $
+--       PVCS Version     : $Revision:   2.8  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.8  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -4688,10 +4688,10 @@ BEGIN
 
   l_length := Nm3net.Get_Ne_Length( p_ne_id );
 
-  IF sdo_lrs.geom_segment_end_measure ( l_geom, g_usgm.diminfo ) != l_length THEN
+  IF nvl(sdo_lrs.geom_segment_end_measure ( l_geom, g_usgm.diminfo ), -9999) != l_length THEN
 
-     nm_debug.debug_on;
-     nm_debug.debug('insert with length = '||to_char(l_length)||' and '||to_char(sdo_lrs.geom_segment_end_measure ( l_geom, g_usgm.diminfo )));
+--   nm_debug.debug_on;
+--   nm_debug.debug('insert with length = '||to_char(l_length)||' and '||to_char(sdo_lrs.geom_segment_end_measure ( l_geom, g_usgm.diminfo )));
 
      sdo_lrs.redefine_geom_segment( l_geom, g_usgm.diminfo, 0, l_length );
 
