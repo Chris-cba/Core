@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.10.1.0   Aug 01 2008 09:28:46   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.10.1.1   Sep 25 2008 13:25:18   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Aug 01 2008 09:28:46  $
---       Date fetched Out : $Modtime:   Aug 01 2008 09:27:44  $
---       PVCS Version     : $Revision:   2.10.1.0  $
+--       Date into PVCS   : $Date:   Sep 25 2008 13:25:18  $
+--       Date fetched Out : $Modtime:   Sep 25 2008 13:23:42  $
+--       PVCS Version     : $Revision:   2.10.1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.10.1.0  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.10.1.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -963,8 +963,9 @@ PROCEDURE split_element_shapes (
       p_geom    IN   MDSYS.SDO_GEOMETRY
    )
    IS
-      l_layer   NUMBER;
-      l_geom    MDSYS.SDO_GEOMETRY;
+      l_layer       NUMBER;
+      l_old_geom    MDSYS.SDO_GEOMETRY;
+      l_new_geom    MDSYS.SDO_GEOMETRY;
       l_errm    varchar2(100);
    BEGIN
       --nm_debug.debug_on;
@@ -974,9 +975,17 @@ PROCEDURE split_element_shapes (
       IF Nm3sdo.element_has_shape (l_layer, p_ne_id) = 'TRUE'
       THEN
 
-         l_geom := nm3sdo.GET_LAYER_ELEMENT_GEOMETRY( l_layer, p_ne_id );
+         l_old_geom := nm3sdo.GET_LAYER_ELEMENT_GEOMETRY( l_layer, p_ne_id );
+         
+         l_new_geom := p_geom;
 
-         nm3sdo_edit.reshape ( l_layer, p_ne_id, p_geom );
+         if nvl(l_old_geom.sdo_srid, -9999)  != nvl( l_new_geom.sdo_srid, -9999) then
+
+           l_new_geom.sdo_srid := l_old_geom.sdo_srid;
+
+         end if;
+
+         nm3sdo_edit.reshape ( l_layer, p_ne_id, l_new_geom );
 
          commit;
 
@@ -996,8 +1005,8 @@ PROCEDURE split_element_shapes (
 
       exception
         when others then
-          l_errm := sqlerrm;
-          nm3sdo_edit.reshape( l_layer, p_ne_id, p_geom );
+          l_errm := substr(sqlerrm, 1, 100);
+          nm3sdo_edit.reshape( l_layer, p_ne_id, l_old_geom );
           commit;
           raise_application_error( -20001, l_errm );
    END;
@@ -8750,7 +8759,7 @@ PROCEDURE create_msv_feature_views
 --
       IF l_tab_username.COUNT > 0
       AND l_tab_ftabs.COUNT > 0
-      THEN 
+      THEN
   -- Create views for subordiate user(s)
         FOR i IN 1 .. l_tab_username.COUNT
         LOOP
