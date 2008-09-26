@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.5.1.0   Sep 19 2008 13:11:48   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.5.1.1   Sep 26 2008 14:05:34   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Sep 19 2008 13:11:48  $
---       Date fetched Out : $Modtime:   Sep 19 2008 13:09:02  $
---       PVCS Version     : $Revision:   2.5.1.0  $
+--       Date into PVCS   : $Date:   Sep 26 2008 14:05:34  $
+--       Date fetched Out : $Modtime:   Sep 26 2008 14:03:58  $
+--       PVCS Version     : $Revision:   2.5.1.1  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.5.1.0  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.5.1.1  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -3133,7 +3133,7 @@ BEGIN
 
     if irec.ne_id = l_ne_saved then
       begin
-        nm3user.set_effective_date( nvl(irec.member_date, trunc(sysdate)) );
+        nm3user.set_effective_date( nvl(l_date_saved, trunc(sysdate)) );
 
         l_geom  :=    get_route_shape( p_ne_id   => irec.ne_id, -- l_ga.nga(i).ng_ne_id,
                                        p_nt      => l_nt,
