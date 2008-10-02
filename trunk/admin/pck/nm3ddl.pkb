@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.10   Sep 24 2008 14:05:34   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.11   Oct 02 2008 15:43:16   aedwards  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Sep 24 2008 14:05:34  $
---       Date fetched Out : $Modtime:   Sep 24 2008 13:57:12  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Oct 02 2008 15:43:16  $
+--       Date fetched Out : $Modtime:   Oct 02 2008 15:42:00  $
+--       PVCS Version     : $Revision:   2.11  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.10  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.11  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -628,6 +628,44 @@ PROCEDURE create_all_priv_syns (p_user IN USER_USERS.username%TYPE) IS
 --
    l_rec_hus HIG_USERS%ROWTYPE;
 --
+   CURSOR all_objects (cp_user IN VARCHAR2) 
+   IS
+     SELECT object_name
+       FROM ALL_OBJECTS
+      WHERE owner = g_application_owner
+        AND (object_type IN ('TABLE'
+                            ,'VIEW'
+                            ,'FUNCTION'
+                            ,'PACKAGE'
+                            ,'PROCEDURE'
+                            ,'SEQUENCE'
+                            ,'TYPE'
+                            )
+            OR object_name IN ('RSE_HE_ID_SEQ','ROAD_SEG_MEMBS_PARTIAL','ROAD_SEGS_PARTIAL')
+           )
+      AND   object_name NOT IN ('SDE_EXCEPTIONS'
+                               ,'SDE_LOGFILES'
+                               ,'SDE_LOGFILE_DATA'
+                               ,'SDE_LOGFILE_LID_GEN' -- Omit SDE_ tables
+                               ,'INV_TMP'
+                               ,'TEMP_ADMIN_GROUPS'
+                               ,'TEMP_STR5080'
+                               ,'TEMP_STR5084' -- Exclude tables created by HIG1832 (create user)
+                               ,'TEMP_REPLACE_DEFECTS'   -- temp table created for MAI to support network edits
+                               ,'TEMP_UNREPLACE_DEFECTS' -- temp table created for MAI to support network edits
+                               ,'TEMP_UNSPLIT_DEFECTS'   -- temp table created for MAI to support network edits
+                               ,'TEMP_UNMERGE_DEFECTS'   -- temp table created for MAI to support network edits
+                               )
+      AND   object_name NOT LIKE 'BIN$%'       -- AE ommit 10g recycle tables
+      AND NOT EXISTS
+        ( SELECT 1 FROM dba_synonyms
+           WHERE owner = cp_user
+             AND synonym_name = object_name )
+      AND NOT EXISTS
+        ( SELECT 1 FROM dba_views
+           WHERE owner = cp_user
+             AND view_name = object_name );
+--
 BEGIN
 --
    Nm_Debug.proc_start(g_package_name,'create_all_priv_syns');
@@ -649,15 +687,25 @@ BEGIN
     THEN -- do not create syns for highways owner as they own the objects!
       COMMIT; -- still commit for auton transaction
    ELSE
-      FOR cs_rec IN cs_objects
-       LOOP
-         IF NOT check_syn_exists (p_user,cs_rec.object_name)
-          THEN
-            syn_exec_ddl('CREATE SYNONYM '||p_user||'.'||cs_rec.object_name
-                         ||' FOR '||g_application_owner||'.'||cs_rec.object_name
-                        );
-         END IF;
-      END LOOP;
+--      FOR cs_rec IN all_objects ( p_user )
+--       LOOP
+--         IF NOT check_syn_exists (p_user,cs_rec.object_name)
+--          THEN
+--            syn_exec_ddl('CREATE SYNONYM '||p_user||'.'||cs_rec.object_name
+--                         ||' FOR '||g_application_owner||'.'||cs_rec.object_name
+--                        );
+--         END IF;
+--      END LOOP;
+
+     -- AE 02-OCT-2008
+     -- Speed up this process by exluding objects that exist in the driving cursor
+     -- Also, enclose object names in " " so that mixed case types are done.
+     FOR cs_rec IN all_objects ( p_user )
+     LOOP
+       syn_exec_ddl('CREATE SYNONYM '||p_user||'."'||cs_rec.object_name
+                 ||'" FOR '||g_application_owner||'."'||cs_rec.object_name||'"' );
+     END LOOP;
+     
    END IF;
 
    commit; --sscanlon fix 38046 26-SEP-2006
