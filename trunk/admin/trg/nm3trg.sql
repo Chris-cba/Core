@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.4   Aug 05 2008 14:25:20   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.5   Oct 02 2008 09:48:58   aedwards  $
 --       Module Name      : $Workfile:   nm3trg.sql  $
---       Date into PVCS   : $Date:   Aug 05 2008 14:25:20  $
---       Date fetched Out : $Modtime:   Aug 05 2008 14:24:44  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Oct 02 2008 09:48:58  $
+--       Date fetched Out : $Modtime:   Oct 02 2008 09:48:30  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --
 --   Author : Graeme Johnson
@@ -1764,6 +1764,39 @@ PROMPT nm_nw_ad_link_whole_flag_trg.sql
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_nw_ad_link_whole_flag_trg.sql' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT user_sdo_maps_ins_trg.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'user_sdo_maps_ins_trg.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT user_sdo_themes_ins_trg.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'user_sdo_themes_ins_trg.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT user_sdo_styles_ins_trg.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'user_sdo_styles_ins_trg.trg' run_file 
 FROM dual 
 / 
 start '&run_file' 
