@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.11   Oct 02 2008 15:43:16   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.12   Oct 03 2008 09:19:48   aedwards  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Oct 02 2008 15:43:16  $
---       Date fetched Out : $Modtime:   Oct 02 2008 15:42:00  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Oct 03 2008 09:19:48  $
+--       Date fetched Out : $Modtime:   Oct 03 2008 09:19:28  $
+--       PVCS Version     : $Revision:   2.12  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.11  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.12  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -2116,12 +2116,8 @@ IS
 
 
     EXECUTE IMMEDIATE
-      'CREATE OR REPLACE FORCE VIEW '
-      ||UPPER(pi_sub_username)||'.user_sdo_maps (name, description, definition) '||
-      'AS '||
-      '   SELECT NAME, description, definition'||
-      '     FROM MDSYS.sdo_maps_table'||
-     '    WHERE sdo_owner = '||Nm3flx.string(Hig.get_application_owner);
+      'CREATE OR REPLACE FORCE VIEW '||UPPER(pi_sub_username)||'.user_sdo_maps '||
+      'AS '||'   SELECT * FROM '||Hig.get_application_owner||'.user_sdo_maps';
   EXCEPTION
     WHEN OTHERS THEN
       -- raise_application_error(-20001,'Failed to create view USER_SDO_MAPS'||chr(10)||nm3flx.parse_error_message(sqlerrm));
@@ -2148,13 +2144,8 @@ IS
 
 
     EXECUTE IMMEDIATE
-      'CREATE OR REPLACE FORCE VIEW '
-      ||UPPER(pi_sub_username)||'.user_sdo_themes (name, description, base_table, '||
-                                              ' geometry_column, styling_rules ) '||
-      'AS '||
-        ' SELECT name, description, base_table, geometry_column, styling_rules '||
-        '   FROM mdsys.sdo_themes_table '||
-      '    WHERE sdo_owner = '||Nm3flx.string(Hig.get_application_owner);
+      'CREATE OR REPLACE FORCE VIEW '||UPPER(pi_sub_username)||'.user_sdo_themes '||
+      'AS '||'   SELECT * FROM '||Hig.get_application_owner||'.user_sdo_themes';
   EXCEPTION
     WHEN OTHERS THEN
       -- raise_application_error(-20001,'Failed to create view USER_SDO_THEMES'||chr(10)||nm3flx.parse_error_message(sqlerrm));
@@ -2180,13 +2171,8 @@ IS
 
 
     EXECUTE IMMEDIATE
-      'CREATE OR REPLACE FORCE VIEW '
-      ||UPPER(pi_sub_username)||'.user_sdo_styles (name, type, description, definition, '||
-                                              ' image, geometry ) '||
-      'AS '||
-      '   SELECT NAME, TYPE, description, definition, image, geometry'||
-      '     FROM MDSYS.sdo_styles_table '||
-      '    WHERE sdo_owner = '||Nm3flx.string(Hig.get_application_owner);
+      'CREATE OR REPLACE FORCE VIEW '||UPPER(pi_sub_username)||'.user_sdo_styles '||
+      ' AS '||'  SELECT * FROM '||Hig.get_application_owner||'.user_sdo_styles';
   EXCEPTION
     WHEN OTHERS THEN
       -- raise_application_error(-20001,'Failed to create view USER_SDO_STYLES'||chr(10)||nm3flx.parse_error_message(sqlerrm));
