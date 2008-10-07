@@ -91,8 +91,9 @@ FUNCTION get_html (  pc_module       varchar2,
 	AND    hwch_item    IS NULL;
   --
     CURSOR c5 IS
-    SELECT decode(hmo_application, 'ENQ', 'DOC',
-                  hmo_application)
+    SELECT decode(hmo_application, 'ENQ', 'DOC'
+                                 , 'TMA_PR','TMA'
+                                 , hmo_application)
     FROM   hig_modules
     WHERE  hmo_module = pc_module;
   --
