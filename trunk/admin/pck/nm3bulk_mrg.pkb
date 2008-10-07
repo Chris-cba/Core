@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.14   Jun 23 2008 11:36:30   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.15   Oct 07 2008 18:03:32   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Jun 23 2008 11:36:30  $
---       Date fetched Out : $Modtime:   Jun 23 2008 11:21:00  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Oct 07 2008 18:03:32  $
+--       Date fetched Out : $Modtime:   Oct 07 2008 17:59:58  $
+--       PVCS Version     : $Revision:   2.15  $
 --
 --
 --   Author : Priidu Tanava
@@ -49,11 +49,13 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   19.05.08  PT in std_populate() removed the 'No merge results' error
   23.06.08  PT fixed an error in cacluclating group_id in sql_load_datum_criteria_tmp()
                 load_group_datums() now uses explicit hard coded sql for linear groups
+  03.10.08  PT modified sql_load_nm_datum_criteria_tmp() so that partial datums are not cut off by the assigned route
+                this in responce to a problem Sarah Kristulinec brought up in New Brunswick
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.14  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.15  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -256,7 +258,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       ||', p_criteria_rowcount='||p_criteria_rowcount
       ||')');
     nm3dbg.ind;
-  
+
 
     -- nm_mrg_split_results_tmp is global temporary on commit preserve rows
     -- (implicit commit)
@@ -1082,12 +1084,12 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     
     nm3dbg.putln('pt_attr.count='||pt_attr.count||', pt_itd.count='||pt_itd.count);
     nm3dbg.deind;
-  exception
-    when others then
-      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_attrib_metadata('
-        ||'p_nmq_id='||p_nmq_id
-        ||')');
-      raise;
+--  exception
+--    when others then
+--      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_attrib_metadata('
+--        ||'p_nmq_id='||p_nmq_id
+--        ||')');
+--      raise;
       
   end;
   
@@ -1152,6 +1154,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     
     
     -- take care of single datums
+    --  TODO: change needed for 03.10.08 sql_load_nm_datum_criteria_tmp() modification
+    --  need to only insert partial datum if other part is covered by a route
     l_sql_conn :=
             'select'
       ||cr||'   d.datum_id nm_ne_id_in'   -- the datum is the route
@@ -2666,42 +2670,119 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     --  the group id with the highest member count is retunred in the group_id column
     --  if l_group_type has value then the the groups of this type have preference
     --  if two groups have equal highest count of members then the lowest nm_ne_id_in value is returned
+    -- the spitting logic is copied from ins_splits()
+    -- TODO:
+    
     return
             'insert into nm_datum_criteria_tmp ('
       ||cr||'  datum_id, begin_mp, end_mp, group_id'
       ||cr||')'
-      ||cr||'with dc as ('
+      ||cr||'with rc as ('
+      ||cr||'  select'
+      ||cr||'     m.nm_ne_id_of'
+      ||cr||'    ,m.nm_ne_id_in'
+      ||cr||'    ,e.ne_gty_group_type'
+      ||cr||'    ,greatest(m.nm_begin_mp, dc.begin_mp) nm_begin_mp'
+      ||cr||'    ,least(m.nm_end_mp, dc.end_mp) nm_end_mp'
+      ||cr||'  from'
+      ||cr||'     ('
       ||cr||p_elements_sql
+      ||cr||'     ) dc'
+      ||cr||'    ,nm_members m'
+      ||cr||'    ,nm_elements e'
+      ||cr||'    ,nm_group_types_all gt'
+      ||cr||'  where dc.nm_ne_id_of = m.nm_ne_id_of'
+      ||cr||'    and m.nm_ne_id_in = e.ne_id'
+      ||cr||'    and e.ne_gty_group_type = gt.ngt_group_type'
+      ||cr||'    and gt.ngt_linear_flag = ''Y'''
+      ||cr||'    and dc.begin_mp <= m.nm_end_mp'
+      ||cr||'    and dc.end_mp >= m.nm_begin_mp'
       ||cr||')'
-      ||cr||'select'
-      ||cr||'   dc.nm_ne_id_of'
-      ||cr||'  ,dc.begin_mp'
-      ||cr||'  ,dc.end_mp'
-      ||cr||'  ,q2.group_id'
-      ||cr||'from'
-      ||cr||'   dc'
-      ||cr||'  ,('
       ||cr||'select distinct'
-      ||cr||'   q.nm_ne_id_of'
-      ||cr||'  ,first_value(q.nm_ne_id_in) over (partition by q.nm_ne_id_of order by q.gty_order, q.val_count desc, q.nm_ne_id_in) group_id'
+      ||cr||'   q2.nm_ne_id_of'
+      ||cr||'  ,q2.begin_mp'
+      ||cr||'  ,q2.end_mp'
+      ||cr||'  ,first_value(q2.nm_ne_id_in) over (partition by q2.nm_ne_id_of, q2.begin_mp order by q2.gty_order, q2.val_count desc, q2.nm_ne_id_in) group_id'
       ||cr||'from ('
       ||cr||'select'
-      ||cr||'   m.nm_ne_id_of'
+      ||cr||'   q1.*'
       ||cr||'  ,m.nm_ne_id_in'
-      ||cr||'  ,decode(e.ne_gty_group_type, :l_group_type, 1, 2) gty_order'
+      ||cr||'  ,m.ne_gty_group_type'
+      ||cr||'  ,decode(m.ne_gty_group_type, :l_group_type, 1, 2) gty_order'
       ||cr||'  ,count(*) over (partition by m.nm_ne_id_in) val_count'
-      ||cr||'from'
-      ||cr||'   dc'
-      ||cr||'  ,nm_members m'
-      ||cr||'  ,nm_elements e'
-      ||cr||'  ,nm_group_types_all gt'
-      ||cr||'where dc.nm_ne_id_of = m.nm_ne_id_of'
-      ||cr||'  and m.nm_ne_id_in = e.ne_id'
-      ||cr||'  and e.ne_gty_group_type = gt.ngt_group_type'
-      ||cr||'  and gt.ngt_linear_flag = ''Y'''
-      ||cr||') q'
-      ||cr||') q2'
-      ||cr||'where dc.nm_ne_id_of = q2.nm_ne_id_of (+)';
+      ||cr||'from ('
+      ||cr||'select'
+      ||cr||'   m3.nm_ne_id_of, m3.begin_mp, m3.end_mp'
+      ||cr||'from ('
+      ||cr||'select distinct'
+      ||cr||'   m2.nm_ne_id_of'
+      ||cr||'  ,m2.pos begin_mp'
+      ||cr||'  ,lead(m2.pos, 1) over (partition by m2.nm_ne_id_of order by m2.pos, m2.pos2) end_mp'
+      ||cr||'  ,m2.is_point'
+      ||cr||'from ('
+      ||cr||'select distinct'
+      ||cr||'   rc.nm_ne_id_of'
+      ||cr||'  ,rc.nm_begin_mp pos'
+      ||cr||'  ,rc.nm_end_mp pos2'
+      ||cr||'  ,decode(rc.nm_begin_mp, rc.nm_end_mp, 1, 0) is_point'
+      ||cr||'from rc'
+      ||cr||'union all'
+      ||cr||'select distinct'
+      ||cr||'   rc.nm_ne_id_of'
+      ||cr||'  ,rc.nm_end_mp pos'
+      ||cr||'  ,rc.nm_end_mp pos2'
+      ||cr||'  ,decode(rc.nm_begin_mp, rc.nm_end_mp, 1, 0) is_point'
+      ||cr||'from rc'
+      ||cr||') m2'
+      ||cr||') m3'
+      ||cr||'where m3.end_mp is not null'
+      ||cr||'  and (m3.end_mp != m3.begin_mp or m3.is_point = 1)'
+      ||cr||') q1'
+      ||cr||'right outer join'
+      ||cr||'rc m'
+      ||cr||'on q1.nm_ne_id_of = m.nm_ne_id_of'
+      ||cr||'  and q1.begin_mp between m.nm_begin_mp and m.nm_end_mp'
+      ||cr||'  and q1.end_mp between m.nm_begin_mp and m.nm_end_mp'
+      ||cr||') q2';
+      --||cr||'order by q2.nm_ne_id_of, q2.begin_mp, q2.end_mp'
+    
+
+--    return
+--            'insert into nm_datum_criteria_tmp ('
+--      ||cr||'  datum_id, begin_mp, end_mp, group_id'
+--      ||cr||')'
+--      ||cr||'with dc as ('
+--      ||cr||p_elements_sql
+--      ||cr||')'
+--      ||cr||'select'
+--      ||cr||'   dc.nm_ne_id_of'
+--      ||cr||'  ,dc.begin_mp'
+--      ||cr||'  ,dc.end_mp'
+--      ||cr||'  ,q2.group_id'
+--      ||cr||'from'
+--      ||cr||'   dc'
+--      ||cr||'  ,('
+--      ||cr||'select distinct'
+--      ||cr||'   q.nm_ne_id_of'
+--      ||cr||'  ,first_value(q.nm_ne_id_in) over (partition by q.nm_ne_id_of order by q.gty_order, q.val_count desc, q.nm_ne_id_in) group_id'
+--      ||cr||'from ('
+--      ||cr||'select'
+--      ||cr||'   m.nm_ne_id_of'
+--      ||cr||'  ,m.nm_ne_id_in'
+--      ||cr||'  ,decode(e.ne_gty_group_type, :l_group_type, 1, 2) gty_order'
+--      ||cr||'  ,count(*) over (partition by m.nm_ne_id_in) val_count'
+--      ||cr||'from'
+--      ||cr||'   dc'
+--      ||cr||'  ,nm_members m'
+--      ||cr||'  ,nm_elements e'
+--      ||cr||'  ,nm_group_types_all gt'
+--      ||cr||'where dc.nm_ne_id_of = m.nm_ne_id_of'
+--      ||cr||'  and m.nm_ne_id_in = e.ne_id'
+--      ||cr||'  and e.ne_gty_group_type = gt.ngt_group_type'
+--      ||cr||'  and gt.ngt_linear_flag = ''y'''
+--      ||cr||') q'
+--      ||cr||') q2'
+--      ||cr||'where dc.nm_ne_id_of = q2.nm_ne_id_of (+)';
   
       
   end;
