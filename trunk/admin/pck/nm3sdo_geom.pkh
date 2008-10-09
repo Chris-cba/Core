@@ -1,0 +1,22 @@
+create or replace package nm3sdo_geom as
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkh-arc   1.0   Oct 09 2008 12:36:44   rcoupe  $
+--       Module Name      : $Workfile:   nm3sdo_geom.pkh  $
+--       Date into PVCS   : $Date:   Oct 09 2008 12:36:44  $
+--       Date fetched Out : $Modtime:   Oct 09 2008 12:29:56  $
+--       PVCS Version     : $Revision:   1.0  $
+--       Based on
+
+g_sccsid constant varchar2(30) :='"$Revision:   1.0  $"';
+g_srid      number;
+g_tolerance number := nm3sdo.GET_TOL_FROM_UNIT_MASK(1);
+function get_version return varchar2;
+function get_body_version return varchar2;
+function get_feature_type ( p_geom in mdsys.sdo_geometry ) return number;
+function get_area( p_geom in mdsys.sdo_geometry, p_tolerance in number default g_tolerance, p_unit in nm_units.un_unit_id%type default 1 ) return number;
+function get_length ( p_geom in mdsys.sdo_geometry, p_tolerance in number default g_tolerance, p_unit in nm_units.un_unit_id%type default 1 ) return number;
+function get_geom_from_gdo( p_gdo_session_id in number, p_gtype in number ) return mdsys.sdo_geometry;
+function get_geom_from_gdo( p_gdo_session_id in number, p_feature_type in varchar2 ) return mdsys.sdo_geometry;
+end;
+
