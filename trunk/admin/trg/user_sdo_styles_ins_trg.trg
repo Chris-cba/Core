@@ -1,12 +1,19 @@
+BEGIN
+  EXECUTE IMMEDIATE 'DROP TRIGGER USER_SDO_STYLES_INS_TRG';
+EXCEPTION
+  WHEN OTHERS THEN NULL;
+END;
+/
+
 CREATE OR REPLACE TRIGGER USER_SDO_STYLES_INS_TRG
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/user_sdo_styles_ins_trg.trg-arc   3.0   Oct 02 2008 09:44:32   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/user_sdo_styles_ins_trg.trg-arc   3.1   Oct 10 2008 10:37:14   aedwards  $
 --       Module Name      : $Workfile:   user_sdo_styles_ins_trg.trg  $
---       Date into PVCS   : $Date:   Oct 02 2008 09:44:32  $
---       Date fetched Out : $Modtime:   Oct 02 2008 09:43:14  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Oct 10 2008 10:37:14  $
+--       Date fetched Out : $Modtime:   Oct 10 2008 10:34:26  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 INSTEAD OF DELETE OR INSERT OR UPDATE
