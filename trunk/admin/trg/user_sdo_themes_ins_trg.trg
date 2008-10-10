@@ -1,12 +1,19 @@
+BEGIN
+  EXECUTE IMMEDIATE 'DROP TRIGGER USER_SDO_THEMES_INS_TRG';
+EXCEPTION
+  WHEN OTHERS THEN NULL;
+END;
+/
+
 CREATE OR REPLACE TRIGGER USER_SDO_THEMES_INS_TRG
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/user_sdo_themes_ins_trg.trg-arc   3.0   Oct 02 2008 09:44:54   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/user_sdo_themes_ins_trg.trg-arc   3.1   Oct 10 2008 10:37:20   aedwards  $
 --       Module Name      : $Workfile:   user_sdo_themes_ins_trg.trg  $
---       Date into PVCS   : $Date:   Oct 02 2008 09:44:54  $
---       Date fetched Out : $Modtime:   Oct 02 2008 09:40:06  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Oct 10 2008 10:37:20  $
+--       Date fetched Out : $Modtime:   Oct 10 2008 10:34:48  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 INSTEAD OF DELETE OR INSERT OR UPDATE
