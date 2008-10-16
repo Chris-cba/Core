@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.8   Sep 24 2008 13:11:36   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.9   Oct 16 2008 16:06:16   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Sep 24 2008 13:11:36  $
---       Date fetched Out : $Modtime:   Sep 24 2008 13:10:00  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Oct 16 2008 16:06:16  $
+--       Date fetched Out : $Modtime:   Oct 16 2008 16:01:36  $
+--       PVCS Version     : $Revision:   2.9  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.9  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -6330,7 +6330,7 @@ BEGIN
   IF l_lrs_dim > 0 THEN
 
     l_z_or_m := 'M';
-
+    
   ELSE
 
     l_z_or_m := 'Z';
@@ -6360,12 +6360,21 @@ BEGIN
                mdsys.sdo_dim_element( 'X', l_mbr.sdo_ordinates(1), l_mbr.sdo_ordinates(3), l_tol_array(1) ),
                mdsys.sdo_dim_element( 'Y', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(4), l_tol_array(2) ));
 
-   ELSIF l_dim = 3 THEN
+   ELSIF l_dim = 3 and l_lrs_dim = 0 THEN
 
      retval := mdsys.sdo_dim_array(
                mdsys.sdo_dim_element( 'X', l_mbr.sdo_ordinates(1), l_mbr.sdo_ordinates(4), l_tol_array(1) ),
                mdsys.sdo_dim_element( 'Y', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(5), l_tol_array(2) ),
                mdsys.sdo_dim_element( l_z_or_m, l_mbr.sdo_ordinates(3), l_mbr.sdo_ordinates(6), l_tol_array(3) ));
+
+   ELSIF l_dim = 3 and l_lrs_dim = 3 THEN
+
+--   the measure diminfo is not significant, no point attempting to fathom the largest ne_length - just add a big-ish number.
+
+     retval := mdsys.sdo_dim_array(
+               mdsys.sdo_dim_element( 'X', l_mbr.sdo_ordinates(1), l_mbr.sdo_ordinates(3), l_tol_array(1) ),
+               mdsys.sdo_dim_element( 'Y', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(4), l_tol_array(2) ),
+               mdsys.sdo_dim_element( l_z_or_m, 0, 999999999, l_tol_array(3) ));
 
    ELSIF l_mbr.get_dims = 4 THEN
 
@@ -6374,6 +6383,10 @@ BEGIN
                mdsys.sdo_dim_element( 'Y', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(5), l_tol_array(2) ),
                mdsys.sdo_dim_element( 'Z', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(5), l_tol_array(3) ),
                mdsys.sdo_dim_element( 'M', l_mbr.sdo_ordinates(3), l_mbr.sdo_ordinates(6), l_tol_array(4) ));
+               
+   ELSE
+     
+     raise_application_error( -20005, 'Unrecognised geometry type' );                
 
    END IF;
 
