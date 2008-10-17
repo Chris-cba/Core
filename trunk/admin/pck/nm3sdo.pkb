@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.9   Oct 16 2008 16:06:16   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.10   Oct 17 2008 17:13:38   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Oct 16 2008 16:06:16  $
---       Date fetched Out : $Modtime:   Oct 16 2008 16:01:36  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Oct 17 2008 17:13:38  $
+--       Date fetched Out : $Modtime:   Oct 17 2008 17:07:20  $
+--       PVCS Version     : $Revision:   2.10  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.9  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.10  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -6308,10 +6308,15 @@ BEGIN
 
 --Nm_Debug.debug_on;
 
-  curstring := 'select sdo_aggr_mbr('||p_column||') from '||p_table;
---Nm_Debug.DEBUG( curstring );
+  begin
+    curstring := 'select sdo_aggr_mbr('||p_column||') from '||p_table;
+    EXECUTE IMMEDIATE curstring INTO l_mbr;
+  exception
+    when     subscript_beyond_count then
+      raise_application_error( -20006, 'Error in MBR calculation - check the gtypes are consistent');
+  end;
 
-  EXECUTE IMMEDIATE curstring INTO l_mbr;
+--Nm_Debug.DEBUG( curstring );
 
   l_gtype := get_table_gtype( p_table, p_column );
 
@@ -6330,7 +6335,7 @@ BEGIN
   IF l_lrs_dim > 0 THEN
 
     l_z_or_m := 'M';
-    
+
   ELSE
 
     l_z_or_m := 'Z';
@@ -6383,10 +6388,10 @@ BEGIN
                mdsys.sdo_dim_element( 'Y', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(5), l_tol_array(2) ),
                mdsys.sdo_dim_element( 'Z', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(5), l_tol_array(3) ),
                mdsys.sdo_dim_element( 'M', l_mbr.sdo_ordinates(3), l_mbr.sdo_ordinates(6), l_tol_array(4) ));
-               
+
    ELSE
-     
-     raise_application_error( -20005, 'Unrecognised geometry type' );                
+
+     raise_application_error( -20005, 'Unrecognised geometry type' );
 
    END IF;
 
