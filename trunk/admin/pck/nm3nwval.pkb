@@ -1,12 +1,13 @@
 CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3nwval.pkb	1.67 05/02/06
---       Module Name      : nm3nwval.pkb
---       Date into SCCS   : 06/05/02 10:52:00
---       Date fetched Out : 06/09/14 15:11:41
---       SCCS Version     : 1.67
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.1   Oct 22 2008 10:10:00   smarshall  $
+--       Module Name      : $Workfile:   nm3nwval.pkb  $
+--       Date into PVCS   : $Date:   Oct 22 2008 10:10:00  $
+--       Date fetched Out : $Modtime:   Oct 22 2008 10:09:30  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on 1.67
 --
 --
 --   Author : Jonathan Mills
@@ -17,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --      Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3nwval.pkb	1.67 05/02/06"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
@@ -1720,7 +1721,7 @@ PROCEDURE check_members (p_old_nm_ne_id_in   IN     nm_members.nm_ne_id_in%TYPE
            ,ne_gty_group_type
            ,ne_start_date
            ,ne_end_date
-           ,NVL(ne_length,0) ne_length
+           ,NVL(ne_length,999999999999) ne_length --sm 22102008
      FROM NM_ELEMENTS_ALL
      WHERE ne_id = c_nm_ne_id_in;
 --
