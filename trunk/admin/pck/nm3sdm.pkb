@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.17   Oct 28 2008 12:04:36   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.18   Oct 28 2008 12:21:32   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Oct 28 2008 12:04:36  $
---       Date fetched Out : $Modtime:   Oct 28 2008 12:03:14  $
---       PVCS Version     : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Oct 28 2008 12:21:32  $
+--       Date fetched Out : $Modtime:   Oct 28 2008 12:21:08  $
+--       PVCS Version     : $Revision:   2.18  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.17  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.18  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -5171,7 +5171,7 @@ end;
             || ' from nm_nw_ad_link where nad_gty_type = :p_gty_type '
             || ' and nad_inv_type = :obj_type '
             || ' and nad_ne_id = :nm_ne_id_in '
-            || ' and nad_whole_road = :whole_road';
+            || ' and nad_whole_road = :whole_road )';
 
           EXECUTE IMMEDIATE upd_string
                     USING p_nm_end_date, p_nm_ne_id_of, p_nm_obj_type, irec.obj_type, p_nm_ne_id_in, '1';
