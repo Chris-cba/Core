@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.18   Oct 28 2008 12:21:32   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.19   Oct 28 2008 13:57:34   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Oct 28 2008 12:21:32  $
---       Date fetched Out : $Modtime:   Oct 28 2008 12:21:08  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Oct 28 2008 13:57:34  $
+--       Date fetched Out : $Modtime:   Oct 28 2008 13:56:46  $
+--       PVCS Version     : $Revision:   2.19  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.18  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.19  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -4174,7 +4174,7 @@ end;
 
 --         Nm_Debug.debug_on;
 --         Nm_Debug.DEBUG( cur_string );
-      Nm3ddl.create_object_and_syns ('V_' || p_table || '_DT', cur_string);
+--      Nm3ddl.create_object_and_syns ('V_' || p_table || '_DT', cur_string);
 
       -- AE 23-SEP-2008
       -- We will now use views instead of synonyms to provide subordinate user access
@@ -9065,7 +9065,7 @@ BEGIN
   l_ddl_text := 'create or replace view '||l_vw||' as select t.*, v.x, v.y, v.z '||
                 ' from '||l_th.nth_feature_table||' t, table ( sdo_util.getvertices( t.'||l_th.nth_feature_shape_column||' ) ) v ';
 
-  Nm3ddl.create_object_and_syns(l_vw, l_ddl_text );
+--  Nm3ddl.create_object_and_syns(l_vw, l_ddl_text );
 
   -- AE 23-SEP-2008
   -- We will now use views instead of synonyms to provide subordinate user access
