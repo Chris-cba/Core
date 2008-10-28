@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.15.1.0   Oct 28 2008 17:35:04   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.15.1.1   Oct 28 2008 17:44:44   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Oct 28 2008 17:35:04  $
---       Date fetched Out : $Modtime:   Oct 28 2008 17:33:12  $
---       PVCS Version     : $Revision:   2.15.1.0  $
+--       Date into PVCS   : $Date:   Oct 28 2008 17:44:44  $
+--       Date fetched Out : $Modtime:   Oct 28 2008 17:38:02  $
+--       PVCS Version     : $Revision:   2.15.1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.15.1.0  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.15.1.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -6557,11 +6557,11 @@ end;
          IF p_keep_feature_table = 'N'
          THEN
             BEGIN
-               --Nm3ddl.drop_synonym_for_object (l_nth.nth_feature_table);
+               Nm3ddl.drop_synonym_for_object (l_nth.nth_feature_table);
 
                -- AE 23-SEP-2008
                -- Drop views instead of synonyms
-               Nm3ddl.drop_views_for_object (l_nth.nth_feature_table);
+               --Nm3ddl.drop_views_for_object (l_nth.nth_feature_table);
 
             EXCEPTION
                WHEN OTHERS
@@ -9134,11 +9134,11 @@ END;
         no_private_syn_exists EXCEPTION;
         PRAGMA EXCEPTION_INIT ( no_private_syn_exists, -1434 );
       BEGIN
---        Nm3ddl.drop_synonym_for_object(l_view_name);
+        Nm3ddl.drop_synonym_for_object(l_view_name);
 
         -- AE 23-SEP-2008
         -- Drop views instead of synonyms
-        Nm3ddl.drop_views_for_object (l_view_name);
+        --Nm3ddl.drop_views_for_object (l_view_name);
       EXCEPTION
         WHEN no_public_syn_exists THEN
           NULL; -- we don't care - as long as it does not exist now.
