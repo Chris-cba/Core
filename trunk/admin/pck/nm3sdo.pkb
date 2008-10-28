@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.10   Oct 17 2008 17:13:38   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.11   Oct 28 2008 12:05:12   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Oct 17 2008 17:13:38  $
---       Date fetched Out : $Modtime:   Oct 17 2008 17:07:20  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Oct 28 2008 12:05:12  $
+--       Date fetched Out : $Modtime:   Oct 28 2008 11:59:06  $
+--       PVCS Version     : $Revision:   2.11  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.10  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.11  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -531,8 +531,8 @@ END;
     ' where '||g_nth.nth_feature_pk_column||' = :ne_id';
 
 
-       nm_debug.debug_on;
-       nm_debug.debug( cur_string );
+--       nm_debug.debug_on;
+--       nm_debug.debug( cur_string );
 
     EXECUTE IMMEDIATE cur_string INTO retval USING g_usgm.diminfo, g_usgm.srid, p_x, p_y, p_ne_id;
     RETURN retval;
@@ -5197,13 +5197,7 @@ END;
 
   BEGIN
 
-      cur_string := 'select sdo_lrs.convert_to_std_geom( '||
-         ' sdo_aggr_mbr( nm3sdo.get_placement_mp_geometry( :b_layer, :b_pl_array ))) from dual';
-
-      --   nm_debug.debug_on;
-      --   nm_debug.delete_debug(true);
-
-      --   nm_debug.debug( cur_string );
+      cur_string := 'select sdo_aggr_mbr( nm3sdo.get_placement_mp_geometry( :b_layer, :b_pl_array )) from dual';
 
       OPEN lcur FOR cur_string USING p_layer, p_pl_array;
 
@@ -6810,11 +6804,27 @@ lstr VARCHAR2(2000);
 
 get_shape_str VARCHAR2(200);
 
-FUNCTION get_dims( p_theme IN NUMBER ) RETURN INTEGER IS
+function get_dims( p_theme IN NUMBER ) RETURN INTEGER IS
 l_diminfo mdsys.sdo_dim_array := get_theme_diminfo( p_theme );
 BEGIN
 RETURN l_diminfo.LAST;
 END;
+
+
+function is_ad_link_type ( p_inv_type in nm_inv_types.nit_inv_type%type ) return varchar2 is
+retval varchar2(10) := 'FALSE';
+begin
+  select 'TRUE'
+  into retval from nm_nw_ad_types
+  where nad_inv_type = p_inv_type;
+  return retval;
+exception
+  when too_many_rows then
+    return 'TRUE';
+  when no_data_found then
+    return 'FALSE';
+end;
+
 
 BEGIN
 
@@ -6822,7 +6832,7 @@ BEGIN
 
   FOR irec IN c_themes( p_layer ) LOOP
 
-     Nm_Debug.DEBUG('layer = '||TO_CHAR( p_layer )||' affecting '||TO_CHAR( irec.nth_theme_id )||' '||irec.nth_feature_table );
+--     Nm_Debug.DEBUG('layer = '||TO_CHAR( p_layer )||' affecting '||TO_CHAR( irec.nth_theme_id )||' '||irec.nth_feature_table );
 
      IF irec.g_or_i != 'F' THEN
 
@@ -6860,19 +6870,34 @@ BEGIN
 
        ELSE
 
-         lstr := 'insert into '||irec.nth_feature_table||
+         if irec.g_or_i = 'I' and is_ad_link_type( irec.objtype ) = 'FALSE' then
+
+           lstr := 'insert into '||irec.nth_feature_table||
                           ' ( OBJECTID, NE_ID, NE_ID_OF, NM_BEGIN_MP, NM_END_MP, GEOLOC, START_DATE, END_DATE )'||
                           'select '||get_spatial_seq(irec.nth_theme_id)||'.nextval, nm_ne_id_in, nm_ne_id_of, nm_begin_mp, nm_end_mp, '||
                           get_shape_str||','||
                           ' nm_start_date, nm_end_date '||
                           ' from nm_members_all '||
                           ' where nm_ne_id_of = :ne_id '||
-                          ' and nm_obj_type = :objtype'||
-        ' and nm_type = :b_nm_type';
+                          ' and nm_obj_type = :objtype';
 
---         Nm_Debug.DEBUG(lstr );
+         else
 
-         EXECUTE IMMEDIATE lstr USING p_ne_id, irec.objtype, irec.g_or_i;
+           lstr := 'insert into '||irec.nth_feature_table||
+                          ' ( OBJECTID, NE_ID, NE_ID_OF, NM_BEGIN_MP, NM_END_MP, GEOLOC, START_DATE, END_DATE )'||
+                          'select '||get_spatial_seq(irec.nth_theme_id)||'.nextval, nad_iit_ne_id, nm_ne_id_of, nm_begin_mp, nm_end_mp, '||
+                          get_shape_str||','||
+                          ' nm_start_date, nm_end_date '||
+                          ' from nm_members_all, nm_nw_ad_link_all '||
+                          ' where nm_ne_id_of = :ne_id '||
+                          ' and nad_inv_type = :objtype'||
+                          ' and nm_ne_id_in = nad_member_id';
+
+         end if;
+
+--       Nm_Debug.DEBUG(lstr );
+
+         EXECUTE IMMEDIATE lstr USING p_ne_id, irec.objtype;
 
        END IF;
 
