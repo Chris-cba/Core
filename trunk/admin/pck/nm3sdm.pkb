@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.16   Sep 24 2008 14:08:26   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.17   Oct 28 2008 12:04:36   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Sep 24 2008 14:08:26  $
---       Date fetched Out : $Modtime:   Sep 24 2008 13:57:08  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Oct 28 2008 12:04:36  $
+--       Date fetched Out : $Modtime:   Oct 28 2008 12:03:14  $
+--       PVCS Version     : $Revision:   2.17  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.16  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.17  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -239,7 +239,7 @@ AS
 --
 -----------------------------------------------------------------------------
 --
-   FUNCTION get_base_themes( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE) 
+   FUNCTION get_base_themes( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE)
    RETURN nm_theme_array IS
      retval nm_theme_array := Nm3array.init_nm_theme_array;
      CURSOR c_nbth ( c_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE) IS
@@ -401,7 +401,7 @@ AS
       --Nm3ddl.create_object_and_syns( l_node_view, cur_string );
 
       -- AE 23-SEP-2008
-      -- We will now use views instead of synonyms to provide subordinate user access 
+      -- We will now use views instead of synonyms to provide subordinate user access
       -- to spatial objects
       nm3ddl.create_object_and_views (l_node_view, cur_string);
 
@@ -445,7 +445,7 @@ AS
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE make_nt_spatial_layer 
+PROCEDURE make_nt_spatial_layer
             ( pi_nlt_id   IN   NM_LINEAR_TYPES.nlt_id%TYPE,
               p_gen_pt    IN   NUMBER DEFAULT 0,
               p_gen_tol   IN   NUMBER DEFAULT 0,
@@ -594,7 +594,7 @@ PROCEDURE make_nt_spatial_layer
         Nm3sdo.ins_usgm ( l_usgm );
 
         l_theme_name := SUBSTR (l_nlt.nlt_descr, 1, 27) || '_DT';
-        l_theme_id := Nm3sdm.register_lrm_theme 
+        l_theme_id := Nm3sdm.register_lrm_theme
                           (p_nlt_id              => pi_nlt_id,
                            p_base                => l_base_themes,
                            p_table_name          => l_view,
@@ -762,7 +762,7 @@ PROCEDURE make_nt_spatial_layer
 
       l_usgm := Nm3sdo.get_theme_metadata( p_layer );
 
-      IF Nm3sdo.element_has_shape( p_layer, p_ne_id ) = 'TRUE' 
+      IF Nm3sdo.element_has_shape( p_layer, p_ne_id ) = 'TRUE'
       THEN
 
         IF p_measure IS NULL THEN
@@ -790,7 +790,7 @@ PROCEDURE make_nt_spatial_layer
                        ( geom_segment  => p_geom_2
                        , dim_array     => l_usgm.diminfo
                        , start_measure => 0
-                       , end_measure   => l_end 
+                       , end_measure   => l_end
                        , shift_measure => 0 );
       ELSE
 
@@ -839,8 +839,8 @@ PROCEDURE make_nt_spatial_layer
                                              p_geom1        => l_geom1,
                                              p_geom2        => l_geom2
                                             );
-         ELSIF p_x IS NOT NULL 
-           AND p_y IS NOT NULL 
+         ELSIF p_x IS NOT NULL
+           AND p_y IS NOT NULL
          THEN
 
 --           Nm_Debug.DEBUG(' and xy - use  '||p_x||','||p_y);
@@ -1289,7 +1289,7 @@ PROCEDURE make_nt_spatial_layer
      FETCH c_nth BULK COLLECT INTO retval.nta_theme_array;
      CLOSE c_nth;
 
-     IF retval.nta_theme_array.LAST IS NULL 
+     IF retval.nta_theme_array.LAST IS NULL
      THEN
          Hig.raise_ner (pi_appl         => Nm3type.c_hig,
                         pi_id           => 267,
@@ -1365,7 +1365,7 @@ PROCEDURE make_nt_spatial_layer
 
       l_nlt := get_nlt (p_nlt_id);
       g_units := Nm3net.get_nt_units( l_nlt.nlt_nt_type);
- 
+
       IF g_units = 1 THEN
         g_unit_conv := 1;
       ELSE
@@ -1501,7 +1501,7 @@ PROCEDURE make_nt_spatial_layer
       FETCH c_nth BULK COLLECT INTO retval.nta_theme_array;
       CLOSE c_nth;
 
-      IF retval.nta_theme_array.LAST IS NULL 
+      IF retval.nta_theme_array.LAST IS NULL
       THEN
         -- no base theme availible
         Hig.raise_ner (pi_appl         => Nm3type.c_hig,
@@ -2209,7 +2209,7 @@ PROCEDURE make_nt_spatial_layer
       DECLARE
         l_type NUMBER;
       BEGIN
-        IF Nm3net.get_gty_sub_group_allowed( p_gty_type ) = 'Y' 
+        IF Nm3net.get_gty_sub_group_allowed( p_gty_type ) = 'Y'
         THEN
           l_type := 3;
         ELSE
@@ -3827,10 +3827,10 @@ end;
 
       --
       --Nm3ddl.create_object_and_syns( 'V_'||p_table, cur_string );
-      
-      
+
+
       -- AE 23-SEP-2008
-      -- We will now use views instead of synonyms to provide subordinate user access 
+      -- We will now use views instead of synonyms to provide subordinate user access
       -- to spatial objects
       nm3ddl.create_object_and_views ('V_'||p_table, cur_string);
    --
@@ -4022,7 +4022,7 @@ end;
       --Nm3ddl.create_object_and_syns ('V_' || p_table || '_DT', cur_string);
 
       -- AE 23-SEP-2008
-      -- We will now use views instead of synonyms to provide subordinate user access 
+      -- We will now use views instead of synonyms to provide subordinate user access
       -- to spatial objects
       nm3ddl.create_object_and_views ('V_'||p_table||'_DT', cur_string);
 
@@ -4177,7 +4177,7 @@ end;
       Nm3ddl.create_object_and_syns ('V_' || p_table || '_DT', cur_string);
 
       -- AE 23-SEP-2008
-      -- We will now use views instead of synonyms to provide subordinate user access 
+      -- We will now use views instead of synonyms to provide subordinate user access
       -- to spatial objects
       nm3ddl.create_object_and_views ('V_'||p_table||'_DT', cur_string);
 
@@ -4935,15 +4935,31 @@ end;
    IS
 
       CURSOR c_gty_tab (c_gty_type nm_group_types.ngt_group_type%TYPE,
-                        c_ne_id IN nm_elements.ne_id%TYPE )
+                        c_ne_id IN nm_elements.ne_id%TYPE,
+                        c_nm_ne_id_in in nm_members.nm_ne_id_in%type )
       IS
          SELECT nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column, nbth_base_theme
+                nth_feature_fk_column, nbth_base_theme, 'G' I_or_G, c_gty_type obj_type
            FROM NM_THEMES_ALL, NM_AREA_TYPES, NM_AREA_THEMES, NM_BASE_THEMES, NM_NW_THEMES, nm_elements, NM_LINEAR_TYPES
           WHERE nth_theme_id = nath_nth_theme_id
-		    AND nth_theme_id = nbth_theme_id
+            AND nth_theme_id = nbth_theme_id
             AND nath_nat_id = nat_id
             AND nat_gty_group_type = c_gty_type
+            AND nth_theme_type = 'SDO'
+            AND ne_id = c_ne_id
+            AND ne_nt_type = nlt_nt_type
+            AND nnth_nth_theme_id = nbth_base_theme
+            AND nlt_id = nnth_nlt_id
+            AND nth_update_on_edit = 'I'
+         UNION
+         SELECT nth_feature_table, nth_feature_pk_column,
+                nth_feature_fk_column, nbth_base_theme, 'I', nad_inv_type
+           FROM NM_THEMES_ALL, NM_INV_THEMES, NM_BASE_THEMES, NM_NW_THEMES, nm_elements, NM_LINEAR_TYPES, nm_nw_ad_types
+          WHERE nth_theme_id = nith_nth_theme_id
+            AND nth_theme_id = nbth_theme_id
+            AND nad_gty_type = c_gty_type
+            and nad_inv_type = nith_nit_id
+--          and nad_ne_id = c_nm_ne_id_in
             AND nth_theme_type = 'SDO'
             AND ne_id = c_ne_id
             AND ne_nt_type = nlt_nt_type
@@ -4957,9 +4973,10 @@ end;
    BEGIN
 --  nm_debug.debug('Updating shape of '||p_nm_obj_type||' between '||to_char(p_nm_begin_mp)||
 --    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
-      FOR irec IN c_gty_tab (p_nm_obj_type, p_nm_ne_id_of )
+      FOR irec IN c_gty_tab (p_nm_obj_type, p_nm_ne_id_of, p_nm_ne_id_in )
       LOOP
-         upd_string :=
+         if irec.i_or_g = 'G' then
+           upd_string :=
                'update '
             || irec.nth_feature_table
             || ' set geoloc = :newshape, '
@@ -4969,22 +4986,48 @@ end;
             || ' and ne_id_of = :ne_id_of '
             || ' and nm_begin_mp = :nm_begin_mp '
             || ' and end_date is null';
-         l_geom :=
-            Nm3sdo.get_shape_from_nm (irec.nbth_base_theme,
+           l_geom :=
+            sdo_lrs.convert_to_std_geom( Nm3sdo.get_shape_from_nm (irec.nbth_base_theme,
                                       p_nm_ne_id_in,
                                       p_nm_ne_id_of,
                                       p_new_begin_mp,
                                       p_nm_end_mp
-                                     );
-         l_geom := sdo_lrs.convert_to_std_geom (l_geom);
-
-         EXECUTE IMMEDIATE upd_string
+                                     ));
+           EXECUTE IMMEDIATE upd_string
                      USING l_geom,
                            p_new_begin_mp,
                            p_nm_end_mp,
                            p_nm_ne_id_in,
                            p_nm_ne_id_of,
                            p_old_begin_mp;
+        else
+           upd_string :=
+               'update '
+            || irec.nth_feature_table
+            || ' set geoloc = :newshape, '
+            || '     nm_begin_mp = :new_begin_mp,'
+            || '     nm_end_mp   = :new_end_mp '
+            || '  where ne_id in ( select nad_iit_ne_id '
+            ||                   ' from nm_nw_ad_link '
+            ||                   ' where nad_ne_id = :ne_id'
+            ||                   ' and nad_gty_type =  :gty_type '
+            ||                   ' and nad_inv_type =  :obj_type '
+            ||                   ' and nad_whole_road = :whole_road  ) '
+            || ' and ne_id_of = :ne_id_of '
+            || ' and nm_begin_mp = :nm_begin_mp '
+            || ' and end_date is null';
+
+           EXECUTE IMMEDIATE upd_string
+                     USING l_geom,
+                           p_new_begin_mp,
+                           p_nm_end_mp,
+                           p_nm_ne_id_in,
+                           p_nm_obj_type,
+                           irec.obj_type,
+                           '1',
+                           p_nm_ne_id_of,
+                           p_old_begin_mp;
+        end if;
       END LOOP;
    END;
 
@@ -5084,30 +5127,55 @@ end;
       CURSOR c_gty_tab (c_gty_type nm_group_types.ngt_group_type%TYPE)
       IS
          SELECT nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column
+                nth_feature_fk_column, 'G' g_or_i, p_nm_obj_type obj_type
            FROM NM_THEMES_ALL, NM_AREA_TYPES, NM_AREA_THEMES
           WHERE nth_theme_id = nath_nth_theme_id
             AND nath_nat_id = nat_id
             AND nat_gty_group_type = c_gty_type
             AND nth_theme_type = 'SDO'
+            AND nth_update_on_edit = 'I'
+         UNION
+         SELECT nth_feature_table, nth_feature_pk_column,
+                nth_feature_fk_column, 'I' g_or_i, nith_nit_id
+           FROM NM_THEMES_ALL, nm_nw_ad_types, nm_inv_themes
+          WHERE nth_theme_id = nith_nth_theme_id
+            AND nith_nit_id = nad_inv_type
+            AND nad_gty_type = c_gty_type
             AND nth_update_on_edit = 'I';
 
 --allow for many layers of the same asset type
       upd_string   VARCHAR2 (2000);
       l_geom       MDSYS.SDO_GEOMETRY;
+      l_ne_id      number;
    BEGIN
---  nm_debug.debug('Ending shape of '||p_nm_obj_type||' between '||to_char(p_nm_begin_mp)||
---    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
+--   nm_debug.debug_on;
+--   nm_debug.debug('Ending shape of '||p_nm_obj_type||' between '||to_char(p_nm_begin_mp)||
+--                  ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
       FOR irec IN c_gty_tab (p_nm_obj_type)
       LOOP
-         upd_string :=
+          if irec.g_or_i = 'G' then
+           upd_string :=
                'update '
             || irec.nth_feature_table
             || ' set end_date = :end_date where ne_id = :ne_id'
             || ' and ne_id_of = :ne_id_of ';
 
-         EXECUTE IMMEDIATE upd_string
+           EXECUTE IMMEDIATE upd_string
                      USING p_nm_end_date, p_nm_ne_id_in, p_nm_ne_id_of;
+          else
+           upd_string :=
+               'update '
+            || irec.nth_feature_table
+            || ' set end_date = :end_date where ne_id_of = :ne_id_of '
+            || ' and ne_id in ( select nad_iit_ne_id '
+            || ' from nm_nw_ad_link where nad_gty_type = :p_gty_type '
+            || ' and nad_inv_type = :obj_type '
+            || ' and nad_ne_id = :nm_ne_id_in '
+            || ' and nad_whole_road = :whole_road';
+
+          EXECUTE IMMEDIATE upd_string
+                    USING p_nm_end_date, p_nm_ne_id_of, p_nm_obj_type, irec.obj_type, p_nm_ne_id_in, '1';
+         end if;
       END LOOP;
    END;
 
@@ -5372,10 +5440,11 @@ end;
    )
    IS
       CURSOR c_gty_tab (c_gty_type nm_inv_types.nit_inv_type%TYPE,
-                        c_ne_id IN nm_elements.ne_id%TYPE )
+                        c_ne_id IN nm_elements.ne_id%TYPE,
+                        c_nm_ne_id_in in nm_members.nm_ne_id_in%type )
       IS
-         SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column, nbth_base_theme
+         SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column, nth_feature_shape_column,
+                nth_feature_fk_column, nbth_base_theme, 'G' G_or_I, c_gty_type OBJ_TYPE
            FROM NM_THEMES_ALL, NM_AREA_THEMES, NM_AREA_TYPES, NM_BASE_THEMES, NM_NW_THEMES, nm_elements, NM_LINEAR_TYPES
           WHERE nth_theme_id = nath_nth_theme_id
 		    AND nth_theme_id = nbth_theme_id
@@ -5385,59 +5454,50 @@ end;
             AND ne_id = c_ne_id
             AND ne_nt_type = nlt_nt_type
             AND nnth_nth_theme_id = nbth_base_theme
-            AND nlt_id = nnth_nlt_id;
+            AND nlt_id = nnth_nlt_id
+         UNION
+         SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column, nth_feature_shape_column,
+                nth_feature_fk_column, nbth_base_theme, 'I', nad_inv_type
+           FROM NM_THEMES_ALL, NM_INV_THEMES, NM_BASE_THEMES, NM_NW_THEMES, NM_ELEMENTS, NM_LINEAR_TYPES, NM_NW_AD_LINK
+          WHERE nth_theme_id = nith_nth_theme_id
+		          AND nth_theme_id = nbth_theme_id
+            and nad_inv_type = nith_nit_id
+            AND nad_gty_type = c_gty_type
+            AND nth_update_on_edit = 'I'
+            AND ne_id = c_ne_id
+            AND ne_nt_type = nlt_nt_type
+            AND nnth_nth_theme_id = nbth_base_theme
+            AND nlt_id = nnth_nlt_id
+            and nad_ne_id = c_nm_ne_id_in;
+
 
 --allow for many layers of the same group type, only deal with immediate themes
       ins_string   VARCHAR2 (2000);
       l_geom       MDSYS.SDO_GEOMETRY;
       l_objid      NUMBER;
+      l_seq_name   varchar2(30);
    BEGIN
---  nm_debug.debug('Adding shape of '||p_nm_obj_type||' between '||to_char(p_nm_begin_mp)||
---    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of )||' start @ '||
---    to_char( p_nm_start_date, 'DD-MON-YYYY')||' end @ '||to_char( p_nm_end_date, 'DD-MON-YYYY'));
-      FOR irec IN c_gty_tab (p_nm_obj_type, p_nm_ne_id_of)
-      LOOP
---    nm_debug.debug('insert - '||irec.nth_feature_table);
-         IF Nm3sdo.use_surrogate_key = 'N'
-         THEN
-            ins_string :=
-                  'insert into '
-               || irec.nth_feature_table
-               || ' ( ne_id, ne_id_of, nm_begin_mp, nm_end_mp, geoloc, start_date, end_date )'
-               || ' values (:ne_id, :ne_id_of, :nm_begin_mp, :nm_end_mp, :geoloc, :start_date, :end_date )';
-            l_geom :=
-               sdo_lrs.convert_to_std_geom
-                               (Nm3sdo.get_shape_from_nm (irec.nbth_base_theme,
-                                                          p_nm_ne_id_in,
-                                                          p_nm_ne_id_of,
-                                                          p_nm_begin_mp,
-                                                          p_nm_end_mp
-                                                         )
-                               );
+--      nm_debug.debug('Adding shape of '||p_nm_obj_type||' between '||to_char(p_nm_begin_mp)||
+--      ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of )||' start @ '||
+--      to_char( p_nm_start_date, 'DD-MON-YYYY')||' end @ '||to_char( p_nm_end_date, 'DD-MON-YYYY'));
 
-            IF l_geom IS NOT NULL
-            THEN
-               EXECUTE IMMEDIATE ins_string
-                           USING p_nm_ne_id_in,
-                                 p_nm_ne_id_of,
-                                 p_nm_begin_mp,
-                                 p_nm_end_mp,
-                                 l_geom,
-                                 p_nm_start_date,
-                                 p_nm_end_date;
-            END IF;
-         ELSE
-            EXECUTE IMMEDIATE    'select '
+      FOR irec IN c_gty_tab (p_nm_obj_type, p_nm_ne_id_of, p_nm_ne_id_in)
+      LOOP
+--      nm_debug.debug('insert - '||irec.nth_feature_table);
+        if irec.g_or_i = 'G' then
+
+          EXECUTE IMMEDIATE    'select '
                               || Nm3sdo.get_spatial_seq (irec.nth_theme_id)
                               || '.nextval FROM DUAL'
                          INTO l_objid;
 
-            ins_string :=
+          ins_string :=
                   'insert into '
                || irec.nth_feature_table
                || ' ( objectid, ne_id, ne_id_of, nm_begin_mp, nm_end_mp, geoloc, start_date, end_date )'
                || ' values (:objectid, :ne_id, :ne_id_of, :nm_begin_mp, :nm_end_mp, :geoloc, :start_date, :end_date )';
-            l_geom :=
+
+          l_geom :=
                sdo_lrs.convert_to_std_geom
                                (Nm3sdo.get_shape_from_nm (irec.nbth_base_theme,
                                                           p_nm_ne_id_in,
@@ -5447,9 +5507,7 @@ end;
                                                          )
                                );
 
-            IF l_geom IS NOT NULL
-            THEN
-               EXECUTE IMMEDIATE ins_string
+          EXECUTE IMMEDIATE ins_string
                            USING l_objid,
                                  p_nm_ne_id_in,
                                  p_nm_ne_id_of,
@@ -5458,8 +5516,42 @@ end;
                                  l_geom,
                                  p_nm_start_date,
                                  p_nm_end_date;
-            END IF;
-         END IF;
+
+
+        ELSE
+
+          l_seq_name := Nm3sdo.get_spatial_seq (irec.nth_theme_id);
+
+          ins_string := 'insert into '
+              || irec.nth_feature_table
+              ||' ( objectid, ne_id, ne_id_of, nm_begin_mp, nm_end_mp, geoloc, start_date, end_date )'
+              ||' select '||l_seq_name||'.nextval, nad_iit_ne_id, :ne_id_of, :nm_begin_mp, :nm_end_mp, '
+              ||' Nm3sdo.get_shape_from_nm ('||to_char(irec.nbth_base_theme)||', '
+              ||' :group_ne_id, '
+              ||' :ne_id_of, '
+              ||' :nm_begin_mp, '
+              ||' :nm_end_mp ), :start_date, :end_date '
+              ||' from nm_nw_ad_link where nad_ne_id = :group_ne_id '
+              ||' and nad_inv_type = :obj_type '
+              ||' and nad_whole_road = '||''''||'1'||'''';
+
+          EXECUTE IMMEDIATE ins_string
+                           USING p_nm_ne_id_of,
+                                 p_nm_begin_mp,
+                                 p_nm_end_mp,
+                                 p_nm_ne_id_in,
+                                 p_nm_ne_id_of,
+                                 p_nm_begin_mp,
+                                 p_nm_end_mp,
+                                 p_nm_start_date,
+                                 p_nm_end_date,
+                                 p_nm_ne_id_in,
+                                 irec.obj_type;
+
+
+
+        END IF;
+
       END LOOP;
    END;
 
@@ -5484,6 +5576,14 @@ end;
           WHERE nth_theme_id = nath_nth_theme_id
             AND nath_nat_id = nat_id
             AND nat_gty_group_type = c_gty_type
+            AND nth_update_on_edit = 'I'
+         UNION
+         SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column,
+                nth_feature_fk_column
+           FROM NM_THEMES_ALL, nm_nw_ad_types, nm_inv_themes
+          WHERE nth_theme_id = nith_nth_theme_id
+            AND nith_nit_id = nad_inv_type
+            AND nad_gty_type = c_gty_type
             AND nth_update_on_edit = 'I';
 
 --
@@ -6035,7 +6135,7 @@ end;
          --Nm3ddl.create_object_and_syns ('V_' || p_table || '_DT', cur_string);
 
           -- AE 23-SEP-2008
-          -- We will now use views instead of synonyms to provide subordinate user access 
+          -- We will now use views instead of synonyms to provide subordinate user access
           -- to spatial objects
           nm3ddl.create_object_and_views ('V_'||p_table||'_DT', cur_string);
 
@@ -6458,7 +6558,7 @@ end;
          THEN
             BEGIN
                --Nm3ddl.drop_synonym_for_object (l_nth.nth_feature_table);
-               
+
                -- AE 23-SEP-2008
                -- Drop views instead of synonyms
                Nm3ddl.drop_views_for_object (l_nth.nth_feature_table);
@@ -6638,13 +6738,13 @@ end;
       IS
          SELECT nnth_nth_theme_id, DECODE(nth_base_table_theme, NULL, 'A', 'B')
            FROM NM_NW_THEMES, NM_LINEAR_TYPES, NM_THEMES_ALL
-          WHERE nnth_nlt_id = nlt_id 
+          WHERE nnth_nlt_id = nlt_id
             AND nlt_gty_type = c_gty
             AND nnth_nth_theme_id = nth_theme_id
          UNION
          SELECT nath_nth_theme_id, DECODE(nth_base_table_theme, NULL, 'A', 'B')
            FROM NM_AREA_THEMES, NM_AREA_TYPES, NM_THEMES_ALL
-          WHERE nath_nat_id = nat_id 
+          WHERE nath_nat_id = nat_id
             AND nat_gty_group_type = c_gty
             AND nath_nth_theme_id = nth_theme_id
           ORDER BY 2 DESC;
@@ -8968,7 +9068,7 @@ BEGIN
   Nm3ddl.create_object_and_syns(l_vw, l_ddl_text );
 
   -- AE 23-SEP-2008
-  -- We will now use views instead of synonyms to provide subordinate user access 
+  -- We will now use views instead of synonyms to provide subordinate user access
   -- to spatial objects
   nm3ddl.create_object_and_views (l_vw, l_ddl_text);
 
@@ -9035,7 +9135,7 @@ END;
         PRAGMA EXCEPTION_INIT ( no_private_syn_exists, -1434 );
       BEGIN
 --        Nm3ddl.drop_synonym_for_object(l_view_name);
-        
+
         -- AE 23-SEP-2008
         -- Drop views instead of synonyms
         Nm3ddl.drop_views_for_object (l_view_name);
@@ -9053,7 +9153,7 @@ END;
           'BEGIN '||CHR(10)||
           '  Nm3sde.drop_layer_by_table(l_view_name, '||Nm3flx.string('GEOLOC')||');'||CHR(10)||
           'END';
-      EXCEPTION 
+      EXCEPTION
         WHEN OTHERS THEN NULL;
       END;
     --
