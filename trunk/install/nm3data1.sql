@@ -6,7 +6,7 @@ As at Release 4.0.5.1
 
 GENERATION DATE
 ===============
-24-SEP-2008 14:59
+29-OCT-2008 14:51
 
 TABLES PROCESSED
 ================
@@ -17837,6 +17837,153 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
                    WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
                     AND  HCO_CODE = '3007');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'3301'
+       ,'3D Point LRS'
+       ,'Y'
+       ,15
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '3301');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'3302'
+       ,'3D Line LRS'
+       ,'Y'
+       ,16
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '3302');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'3303'
+       ,'3D Polygon LRS'
+       ,'Y'
+       ,17
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '3303');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'3304'
+       ,'3D Collection LRS'
+       ,'Y'
+       ,18
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '3304');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'3305'
+       ,'3D Multi-point LRS'
+       ,'Y'
+       ,19
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '3305');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'3306'
+       ,'3D Multi-line LRS'
+       ,'Y'
+       ,20
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '3306');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'GEOMETRY_TYPE'
+       ,'3307'
+       ,'3D Multi-polygon LRS'
+       ,'Y'
+       ,21
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'GEOMETRY_TYPE'
+                    AND  HCO_CODE = '3307');
 --
 INSERT INTO HIG_CODES
        (HCO_DOMAIN
