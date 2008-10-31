@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.4   Aug 05 2008 13:56:46   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.5   Oct 31 2008 12:25:22   rcoupe  $
 --       Module Name      : $Workfile:   nm3nwad.pkb  $
---       Date into PVCS   : $Date:   Aug 05 2008 13:56:46  $
---       Date fetched Out : $Modtime:   Jul 23 2008 16:06:18  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Oct 31 2008 12:25:22  $
+--       Date fetched Out : $Modtime:   Oct 31 2008 12:24:06  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -36,7 +36,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.4  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.5  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'nm3nwad';
 
@@ -1386,6 +1386,10 @@ IS
 
    l_effective_date     DATE;
 
+   l_rec_iit_prim       NM_INV_ITEMS%ROWTYPE;
+   l_rec_iit_non_prim   NM_INV_ITEMS%ROWTYPE;
+   
+
 BEGIN
 --
    Nm_Debug.proc_start(g_package_name,'do_ad_merge');
@@ -1404,17 +1408,28 @@ BEGIN
 --
    IF l_rec_nadl_prim.nad_id IS NOT NULL
     THEN
+    
+      -- create a copy of the primary ad link asset from ne 1     
+      l_rec_iit_prim    := Nm3get.get_iit (l_rec_nadl_prim.nad_iit_ne_id);
+      l_rec_iit_prim.iit_ne_id := Nm3seq.next_ne_id_seq;
+--
+      IF l_rec_iit_prim.iit_primary_key IS NOT NULL
+       THEN
+         l_rec_iit_prim.iit_primary_key := l_rec_iit_prim.iit_ne_id;
+      END IF;
+
       -- end date the old primary records
       end_date_nadl(pi_rec_nadl       => l_rec_nadl_prim
 	               ,pi_effective_date => l_effective_date);
 
-      l_rec_nadl_prim.nad_ne_id := pi_new_ne_id;
+      -- create the new asset 
+      
+      Nm3ins.ins_iit (l_rec_iit_prim);
+      
       -- create a new primary record using the first onl ne_id
 
-      -- Re-open old AD asset
-      UPDATE NM_INV_ITEMS_ALL
-         SET iit_end_date = NULL
-       WHERE iit_ne_id = l_rec_nadl_prim.nad_iit_ne_id;
+      l_rec_nadl_prim.nad_ne_id     := pi_new_ne_id;
+      l_rec_nadl_prim.nad_iit_ne_id := l_rec_iit_prim.iit_ne_id;
 
       --
       -- derive start date of the AD Link record to be the start date of the new element
@@ -1445,22 +1460,29 @@ BEGIN
          l_rec_nadl_non_prim.nad_ne_id      := l_tab_non_prim_nadl1(i).nad_ne_id;
          l_rec_nadl_non_prim.nad_start_date := l_tab_non_prim_nadl1(i).nad_start_date;
 
+      -- create a copy of the primary ad link asset from ne 1     
+
+         l_rec_iit_non_prim           := Nm3get.get_iit (l_rec_nadl_non_prim.nad_iit_ne_id);
+         l_rec_iit_non_prim.iit_ne_id := Nm3seq.next_ne_id_seq;
+--
+         IF l_rec_iit_non_prim.iit_primary_key IS NOT NULL
+         THEN
+            l_rec_iit_non_prim.iit_primary_key := l_rec_iit_prim.iit_ne_id;
+         END IF;
+
          end_date_nadl(pi_rec_nadl       => l_rec_nadl_non_prim
 		              ,pi_effective_date => l_effective_date);
 
          end_date_nadl(pi_rec_nadl       => l_rec_nadl_prim
 		              ,pi_effective_date => l_effective_date);
 
+         Nm3ins.ins_iit (l_rec_iit_non_prim);
+      
          l_rec_nadl_non_prim.nad_id         := l_tab_non_prim_nadl1(i).nad_id;
-         l_rec_nadl_non_prim.nad_iit_ne_id  := l_tab_non_prim_nadl1(i).nad_iit_ne_id;
+         l_rec_nadl_non_prim.nad_iit_ne_id  := l_rec_iit_non_prim.iit_ne_id; -- l_tab_non_prim_nadl1(i).nad_iit_ne_id;
          l_rec_nadl_non_prim.nad_ne_id      := pi_new_ne_id;
          l_rec_nadl_non_prim.nad_start_date := Nm3user.get_effective_date;
          l_rec_nadl_non_prim.nad_end_date   := NULL;
-
-         -- Re-open old AD asset
-         UPDATE NM_INV_ITEMS_ALL
-            SET iit_end_date = NULL
-          WHERE iit_ne_id = l_tab_non_prim_nadl1(i).nad_iit_ne_id;
 
          Nm3nwad.ins_nadl(l_rec_nadl_non_prim);
 
@@ -1519,6 +1541,8 @@ BEGIN
 
       del_nadl(l_rec_nadl_prim);
 
+      Nm3del.del_iit (l_rec_nadl_prim.nad_iit_ne_id);
+
       l_rec_nadl_prim := Nm3nwad.get_prim_nadl_from_ne_id(pi_old_ne_id1, TRUE);
       un_end_date(l_rec_nadl_prim);
 
@@ -1547,6 +1571,8 @@ BEGIN
 
          del_nadl(l_rec_nadl_non_prim);
 
+         Nm3del.del_iit (l_rec_nadl_non_prim.nad_iit_ne_id);
+         
       END LOOP;
 
    END IF;
@@ -1565,6 +1591,11 @@ BEGIN
       l_rec_nadl_non_prim.nad_start_date := l_tab_non_prim_nadl2(i).nad_start_date;
       l_rec_nadl_non_prim.nad_end_date := l_tab_non_prim_nadl2(i).nad_end_date;
 
+      -- Re-open old AD link
+      UPDATE NM_INV_ITEMS_ALL
+         SET iit_end_date = NULL
+       WHERE iit_ne_id = l_rec_nadl_non_prim.nad_iit_ne_id;
+
       un_end_date(l_rec_nadl_non_prim);
 
    END LOOP;
@@ -1580,6 +1611,11 @@ BEGIN
       l_rec_nadl_non_prim.nad_ne_id := l_tab_non_prim_nadl2(i).nad_ne_id;
       l_rec_nadl_non_prim.nad_start_date := l_tab_non_prim_nadl2(i).nad_start_date;
       l_rec_nadl_non_prim.nad_end_date := l_tab_non_prim_nadl2(i).nad_end_date;
+
+      -- Re-open old AD link
+      UPDATE NM_INV_ITEMS_ALL
+         SET iit_end_date = NULL
+       WHERE iit_ne_id = l_rec_nadl_non_prim.nad_iit_ne_id;
 
       un_end_date(l_rec_nadl_non_prim);
 
