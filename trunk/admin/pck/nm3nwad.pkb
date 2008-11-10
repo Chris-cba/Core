@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.5   Oct 31 2008 12:25:22   rcoupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.6   Nov 10 2008 14:13:20   rcoupe  $
 --       Module Name      : $Workfile:   nm3nwad.pkb  $
---       Date into PVCS   : $Date:   Oct 31 2008 12:25:22  $
---       Date fetched Out : $Modtime:   Oct 31 2008 12:24:06  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Nov 10 2008 14:13:20  $
+--       Date fetched Out : $Modtime:   Nov 10 2008 09:52:18  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -36,7 +36,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.5  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.6  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'nm3nwad';
 
@@ -552,7 +552,7 @@ BEGIN
         l_rec_nadl.nad_start_date  := l_rec_ne.ne_start_date;
         l_rec_nadl.nad_ne_id       := l_rec_ne.ne_id;
         l_rec_nadl.nad_iit_ne_id   := l_tmp_iit;
-        
+
         CASE l_rec_inv.iit_inv_type
         WHEN 'TP21'
         THEN
@@ -618,7 +618,8 @@ BEGIN
          l_rec_nm.nm_type          := 'G';
          l_rec_nm.nm_obj_type      := l_rec_ne.ne_gty_group_type;
          l_rec_nm.nm_begin_mp      := 0;
-         l_rec_nm.nm_start_date    := Nm3user.get_effective_date;
+         l_rec_nm.nm_start_date    := pi_rec_ne.ne_start_date;
+--       l_rec_nm.nm_start_date    := Nm3user.get_effective_date;
          l_rec_nm.nm_end_mp        := Nm3net.Get_Ne_Length(pi_tab_nm(i));
          l_rec_nm.nm_cardinality   := 1;
          l_rec_nm.nm_admin_unit    := Nm3get.get_ne(pi_ne_id => pi_tab_nm(i)).ne_admin_unit;
@@ -1388,7 +1389,7 @@ IS
 
    l_rec_iit_prim       NM_INV_ITEMS%ROWTYPE;
    l_rec_iit_non_prim   NM_INV_ITEMS%ROWTYPE;
-   
+
 
 BEGIN
 --
@@ -1408,8 +1409,8 @@ BEGIN
 --
    IF l_rec_nadl_prim.nad_id IS NOT NULL
     THEN
-    
-      -- create a copy of the primary ad link asset from ne 1     
+
+      -- create a copy of the primary ad link asset from ne 1
       l_rec_iit_prim    := Nm3get.get_iit (l_rec_nadl_prim.nad_iit_ne_id);
       l_rec_iit_prim.iit_ne_id := Nm3seq.next_ne_id_seq;
 --
@@ -1422,10 +1423,10 @@ BEGIN
       end_date_nadl(pi_rec_nadl       => l_rec_nadl_prim
 	               ,pi_effective_date => l_effective_date);
 
-      -- create the new asset 
-      
+      -- create the new asset
+
       Nm3ins.ins_iit (l_rec_iit_prim);
-      
+
       -- create a new primary record using the first onl ne_id
 
       l_rec_nadl_prim.nad_ne_id     := pi_new_ne_id;
@@ -1460,7 +1461,7 @@ BEGIN
          l_rec_nadl_non_prim.nad_ne_id      := l_tab_non_prim_nadl1(i).nad_ne_id;
          l_rec_nadl_non_prim.nad_start_date := l_tab_non_prim_nadl1(i).nad_start_date;
 
-      -- create a copy of the primary ad link asset from ne 1     
+      -- create a copy of the primary ad link asset from ne 1
 
          l_rec_iit_non_prim           := Nm3get.get_iit (l_rec_nadl_non_prim.nad_iit_ne_id);
          l_rec_iit_non_prim.iit_ne_id := Nm3seq.next_ne_id_seq;
@@ -1477,7 +1478,7 @@ BEGIN
 		              ,pi_effective_date => l_effective_date);
 
          Nm3ins.ins_iit (l_rec_iit_non_prim);
-      
+
          l_rec_nadl_non_prim.nad_id         := l_tab_non_prim_nadl1(i).nad_id;
          l_rec_nadl_non_prim.nad_iit_ne_id  := l_rec_iit_non_prim.iit_ne_id; -- l_tab_non_prim_nadl1(i).nad_iit_ne_id;
          l_rec_nadl_non_prim.nad_ne_id      := pi_new_ne_id;
@@ -1572,7 +1573,7 @@ BEGIN
          del_nadl(l_rec_nadl_non_prim);
 
          Nm3del.del_iit (l_rec_nadl_non_prim.nad_iit_ne_id);
-         
+
       END LOOP;
 
    END IF;
