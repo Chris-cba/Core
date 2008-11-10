@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.11   Oct 28 2008 12:05:12   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.12   Nov 10 2008 15:28:52   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Oct 28 2008 12:05:12  $
---       Date fetched Out : $Modtime:   Oct 28 2008 11:59:06  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Nov 10 2008 15:28:52  $
+--       Date fetched Out : $Modtime:   Nov 10 2008 15:04:06  $
+--       PVCS Version     : $Revision:   2.12  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.11  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.12  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -580,24 +580,53 @@ END;
 
   FUNCTION get_xy_from_measure( p_ne_id IN NUMBER, p_measure IN NUMBER)
                              RETURN mdsys.sdo_geometry deterministic IS
-  l_layer NUMBER;
+  l_layer   NUMBER;
+  l_ne      nm_elements_all%rowtype;
+  l_lr      nm_lref;
+
 
   BEGIN
 
-    l_layer := Nm3sdo.Get_Datum_Theme( Nm3get.get_ne_all( p_ne_id ).ne_nt_type );
+    l_ne := nm3get.get_ne( p_ne_id );
 
-    IF l_layer IS NULL THEN
+    if l_ne.ne_gty_group_type is not null then
 
-      RETURN NULL;
+      if NM3NET.IS_GTY_LINEAR(l_ne.ne_gty_group_type) = 'Y' then
+      
+        l_lr := NM3LRS.GET_DISTINCT_OFFSET(nm_lref( p_ne_id, p_measure ), 'N');
 
-    ELSE
+        if l_lr.lr_ne_id is not null then
+        
+          return get_xy_from_measure( l_lr.lr_ne_id, l_lr.lr_offset ); 
+        
+        else
+        
+          return null;
+          
+        end if;
 
-     RETURN get_xy_from_measure( p_layer => l_layer, p_ne_id => p_ne_id, p_measure => p_measure );
+      else
+      
+        return null;
+        
+      end if;
 
-    END IF;
+    else
+  
+      l_layer := Get_Datum_Theme( Nm3get.get_ne_all( p_ne_id ).ne_nt_type );
 
+      IF l_layer IS NULL THEN
+
+        RETURN NULL;
+
+      ELSE
+
+        RETURN nm3sdo.get_xy_from_measure( p_layer => l_layer, p_ne_id => p_ne_id, p_measure => p_measure );
+
+      END IF;
+
+    end if;
   END;
-
 --
 -----------------------------------------------------------------------------
 --
