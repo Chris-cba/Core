@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY invsec AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/invsec.pkb-arc   2.0   Jun 14 2007 09:25:04   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/invsec.pkb-arc   2.1   Nov 10 2008 16:04:10   rcoupe  $
 --       Module Name      : $Workfile:   invsec.pkb  $
---       Date into SCCS   : $Date:   Jun 14 2007 09:25:04  $
---       Date fetched Out : $Modtime:   Jun 14 2007 09:24:34  $
---       SCCS Version     : $Revision:   2.0  $
+--       Date into SCCS   : $Date:   Nov 10 2008 16:04:10  $
+--       Date fetched Out : $Modtime:   Nov 10 2008 16:03:00  $
+--       SCCS Version     : $Revision:   2.1  $
 --       Based on SCCS Version     : 1.12
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY invsec AS
 --	Copyright (c) exor corporation ltd, 2000
 ------------------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.0  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 
    g_package_name  CONSTANT varchar2(30) := 'invsec';
@@ -289,7 +289,8 @@ FUNCTION chk_inv_type_valid_for_role (p_inv_type IN nm_inv_items.iit_inv_type%TY
          ,nm_inv_type_roles
    WHERE  itr_inv_type = p_inv_type
     AND   itr_hro_role = hur_role
-    AND   hur_username = USER;
+    AND   hur_username = USER
+    ORDER BY itr_mode;
 --
 -- Assign FALSE to the return value, then if the cursor is %NOTFOUND then
 --  FALSE will be returned
