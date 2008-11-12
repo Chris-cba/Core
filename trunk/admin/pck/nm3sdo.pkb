@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.12   Nov 10 2008 15:28:52   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.13   Nov 12 2008 10:16:38   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Nov 10 2008 15:28:52  $
---       Date fetched Out : $Modtime:   Nov 10 2008 15:04:06  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Nov 12 2008 10:16:38  $
+--       Date fetched Out : $Modtime:   Nov 12 2008 10:14:36  $
+--       PVCS Version     : $Revision:   2.13  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.12  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.13  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -592,27 +592,27 @@ END;
     if l_ne.ne_gty_group_type is not null then
 
       if NM3NET.IS_GTY_LINEAR(l_ne.ne_gty_group_type) = 'Y' then
-      
+
         l_lr := NM3LRS.GET_DISTINCT_OFFSET(nm_lref( p_ne_id, p_measure ), 'N');
 
         if l_lr.lr_ne_id is not null then
-        
-          return get_xy_from_measure( l_lr.lr_ne_id, l_lr.lr_offset ); 
-        
+
+          return get_xy_from_measure( l_lr.lr_ne_id, l_lr.lr_offset );
+
         else
-        
+
           return null;
-          
+
         end if;
 
       else
-      
+
         return null;
-        
+
       end if;
 
     else
-  
+
       l_layer := Get_Datum_Theme( Nm3get.get_ne_all( p_ne_id ).ne_nt_type );
 
       IF l_layer IS NULL THEN
@@ -9214,7 +9214,8 @@ CURSOR c1 ( c_nt IN ptr_vc_array ) IS
   WHERE nth_theme_id = nnth_nth_theme_id
   AND nnth_nlt_id = nlt_id
   AND t.ptr_value = nlt_nt_type
-  AND nlt_g_i_d = 'D';
+  AND nlt_g_i_d = 'D'
+  AND nth_base_table_theme is null;
 
 BEGIN
   OPEN c1( p_nt );
