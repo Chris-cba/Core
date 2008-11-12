@@ -930,8 +930,8 @@ BEGIN
             END;
          ELSE
             IF g_tab_value(i) IS NOT NULL
-             THEN
-               htp.tabledata(g_tab_value(i));
+             THEN                              
+               htp.tabledata(round(g_tab_value(i),2));
             ELSE
                htp.tabledata(nm3web.c_nbsp);
             END IF;
@@ -1233,7 +1233,9 @@ PROCEDURE build_function_array IS
                        AND   a1.object_name   =  a2.object_name
                        AND   a2.argument_name IN ('PI_VALUE')
                      )
-   GROUP BY object_name, type_name;
+   GROUP BY object_name, type_name
+   ORDER BY object_name, type_name;
+   
    --
 BEGIN
    --
