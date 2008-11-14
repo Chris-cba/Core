@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3web_load AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_load.pkb-arc   2.2   Jul 23 2007 09:18:04   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_load.pkb-arc   2.3   Nov 14 2008 09:32:00   aedwards  $
 --       Module Name      : $Workfile:   nm3web_load.pkb  $
---       Date into PVCS   : $Date:   Jul 23 2007 09:18:04  $
---       Date fetched Out : $Modtime:   Jul 23 2007 08:27:24  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Nov 14 2008 09:32:00  $
+--       Date fetched Out : $Modtime:   Dec 14 2007 06:39:00  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on SCCS version : 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_load AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_load';
@@ -51,73 +51,6 @@ CREATE OR REPLACE PACKAGE BODY nm3web_load AS
    g_checked                         varchar2(8);
    c_checked  CONSTANT               varchar2(8)  := ' CHECKED';
    g_disabled CONSTANT               varchar2(9)  := ' DISABLED';
---
------------------------------------------------------------------------------
-  -- NEW FOUNDLAND CHANGES
------------------------------------------------------------------------------
---
-  g_process_line_status              varchar2(1)  := 'N';
---
-  CURSOR cs_hco_nltw (c_hco_domain hig_codes.hco_domain%TYPE) IS
-   SELECT *
-    FROM  hig_codes
-   WHERE  hco_domain = c_hco_domain
-     AND  hco_code IN ('F','V')
-      OR  EXISTS
-       (SELECT 1 FROM dual
-         WHERE show_pre_process = 'TRUE'
-           AND hco_code = 'Z'
-           AND hco_domain = c_hco_domain)
-      OR EXISTS
-       (SELECT 1 FROM dual
-         WHERE show_pre_process = 'FALSE'
-           AND hco_code = 'L'
-           AND hco_domain = c_hco_domain)
-   ORDER BY hco_seq;
---
------------------------------------------------------------------------------
---
-  FUNCTION show_pre_process RETURN varchar2
-  IS
-  BEGIN
-    IF g_process_line_status = 'N' THEN
-      RETURN 'TRUE';
-    ELSIF g_process_line_status = 'Y' THEN
-      RETURN 'FALSE';
-    END IF;
-  END show_pre_process;
---
------------------------------------------------------------------------------
---
--- Z=line
--- F=Logfiles
--- L=Load
--- V=Validate
---
------------------------------------------------------------------------------
---
-  FUNCTION nlf_is_line (pi_nlf_id IN nm_load_files.nlf_id%TYPE )
-  RETURN BOOLEAN
-  IS
-    l_dummy VARCHAR2(10);
-    CURSOR c1 (cp_nlf_id IN nm_load_files.nlf_id%TYPE) IS
-      SELECT 'exists' FROM nm_load_files
-       WHERE nlf_id = pi_nlf_id
-         AND nlf_unique like '%_LINE';
-  BEGIN
-    OPEN c1(pi_nlf_id);
-    FETCH c1 INTO l_dummy;
-    CLOSE c1;
-    IF l_dummy = 'exists'
-    THEN
-      RETURN TRUE;
-    ELSE
-      RETURN FALSE;
-    END IF;
-  END nlf_is_line;
------------------------------------------------------------------------------
---
-  -- END OF NEW FOUNDLAND CHANGES
 --
 -----------------------------------------------------------------------------
 --
@@ -234,7 +167,6 @@ BEGIN
    htp.p('<TD COLSPAN=2>');
       htp.tableopen(cattributes=>'WIDTH=100%');
       g_checked := c_checked;
-    --
       FOR cs_rec IN cs_hco (c_csv_process_type)
        LOOP
          htp.tablerowopen;
@@ -669,61 +601,26 @@ BEGIN
 --
       htp.tableopen(cattributes=>'WIDTH=100%');
       g_checked := c_checked;
-    --
---      nm_debug.debug_on;
-      nm_debug.debug('File ID = '||p_nlf_id);
-      nm_debug.debug('Batch ID = '||p_nlb_id);
-    --
-      IF nlf_is_line (p_nlf_id)
-      THEN
-        nm_debug.debug('Line');
-        nm_Debug.debug('line status = '||g_process_line_status);
-        g_process_line_status := 'Y';
-      FOR cs_rec IN cs_hco_nltw ('CSV_PROCESS_SUBTYPE')
-           LOOP
-             nm_debug.debug(cs_rec.hco_code||' 0 '||cs_Rec.hco_meaning);
-             IF  (cs_rec.hco_code = c_validate_subtype
-                 AND NOT validation_procs_exist (p_nlf_id)
-                 )
-              OR (cs_rec.hco_code = c_load_subtype
-                  AND l_readonly
-                 )
-              THEN
-                l_attribute := g_disabled;
-             ELSE
-                l_attribute := g_checked;
-                g_checked   := NULL;
-             END IF;
-             htp.tablerowopen;
-             htp.tabledata(htf.small(cs_rec.hco_meaning));
-             htp.tabledata('<INPUT TYPE=RADIO NAME="p_process_subtype" VALUE="'||cs_rec.hco_code||'"'||l_attribute||'>'
-                          );
-             htp.tablerowclose;
-          END LOOP;
-      ELSE
-        nm_debug.debug('Point');
-          FOR cs_rec IN cs_hco ('CSV_PROCESS_SUBTYPE')
-           LOOP
-             IF  (cs_rec.hco_code = c_validate_subtype
-                 AND NOT validation_procs_exist (p_nlf_id)
-                 )
-              OR (cs_rec.hco_code = c_load_subtype
-                  AND l_readonly
-                 )
-              THEN
-                l_attribute := g_disabled;
-             ELSE
-                l_attribute := g_checked;
-                g_checked   := NULL;
-             END IF;
-             htp.tablerowopen;
-             htp.tabledata(htf.small(cs_rec.hco_meaning));
-             htp.tabledata('<INPUT TYPE=RADIO NAME="p_process_subtype" VALUE="'||cs_rec.hco_code||'"'||l_attribute||'>'
-                          );
-             htp.tablerowclose;
-          END LOOP;
-      END IF;
-      --
+      FOR cs_rec IN cs_hco ('CSV_PROCESS_SUBTYPE')
+       LOOP
+         IF  (cs_rec.hco_code = c_validate_subtype
+             AND NOT validation_procs_exist (p_nlf_id)
+             )
+          OR (cs_rec.hco_code = c_load_subtype
+              AND l_readonly
+             )
+          THEN
+            l_attribute := g_disabled;
+         ELSE
+            l_attribute := g_checked;
+            g_checked   := NULL;
+         END IF;
+         htp.tablerowopen;
+         htp.tabledata(htf.small(cs_rec.hco_meaning));
+         htp.tabledata('<INPUT TYPE=RADIO NAME="p_process_subtype" VALUE="'||cs_rec.hco_code||'"'||l_attribute||'>'
+                      );
+         htp.tablerowclose;
+      END LOOP;
       htp.tablerowclose;
       htp.tableclose;
    htp.p('</TD>');
@@ -963,13 +860,18 @@ END process_existing;
         , pi_locate_ref_column  => pi_locate_ref_column
         , po_nlf_id             => l_nlf_id
         , po_nlb_batch_no       => l_nlb_id);
-    g_process_line_status := 'Y';
+
+----    nm_debug.debug('Done process lines data');
+----    
+--    htp.formopen(g_package_name||'.process');
+--    htp.formhidden (cname  => 'p_nlf_id'
+--                   ,cvalue => l_nlf_id);
+--    htp.formhidden (cname  => 'p_process_type'
+--                   ,cvalue => 'P' );
+--    htp.formhidden (cname  => 'p_nlb_id'
+--                   ,cvalue => l_nlb_id);
     nm3web_load.process(p_nlf_id=>l_nlf_id, p_process_type=>'P',p_nlb_id=>l_nlb_id);
-  EXCEPTION
-    WHEN OTHERS
-    THEN 
-      g_process_line_status := 'N';
-      RAISE;
+--    nm_debug.debug('built new call');
   END process_lines;
 --
 -----------------------------------------------------------------------------
