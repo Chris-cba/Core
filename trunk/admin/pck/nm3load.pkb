@@ -1252,6 +1252,140 @@ PROCEDURE produce_logs (p_nlb_batch_no   nm_load_batches.nlb_batch_no%TYPE
 --
    l_produce_server_file boolean := FALSE;
 --
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- 		CUSTOM CODE - Paul Sheedy 12/2007
+--		declaration code start
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Variables used by the xy/route placement logic
+-- added by Paul Sheedy
+
+	t_xyroute_flag		NUMBER	:= 0;
+   	t_other_bad_line		VARCHAR2(32767);
+   	t_other_bad_recordno 	NUMBER;
+--
+--	The next function and procedure were added by Paul Sheedy for the purpose of producing a BAD file
+--	that can be resubmitted for loading while loading via XY and snapping to a
+--	route.  Without this code, one line of output is produced for every two lines
+--	of input - making the bad file unusable for re-loading.  These changes will
+--	only be used if the loading method uses V_LOAD_INV_MEM_ON_ELEMENT_XY.
+
+-- 	Determine method of placement. 1 indicates that XY/Route snapping is used, 0 means it is not.
+
+	FUNCTION is_placement_by_route_xy(p_batchno nm_load_batches.nlb_batch_no%TYPE) RETURN NUMBER IS
+
+	CURSOR cur_routexy(cp_batchno IN NUMBER) IS
+		SELECT 1
+		FROM nm_load_batches a
+			,nm_load_file_destinations b
+			,nm_load_destinations c
+		WHERE a.nlb_batch_no = cp_batchno
+			AND a.nlb_nlf_id = b.nlfd_nlf_id 
+			AND b.nlfd_nld_id = c.nld_id
+			AND c.nld_table_name = 'V_LOAD_INV_MEM_ON_ELEMENT_XY';
+
+	t_return	NUMBER;
+
+	BEGIN
+		t_return	:= 0;
+
+		OPEN cur_routexy(p_batchno);
+		FETCH cur_routexy INTO t_return;
+
+		IF cur_routexy%FOUND THEN
+			t_return	:= 1;
+		END IF;
+
+		CLOSE cur_routexy;
+
+		RETURN t_return;
+
+	EXCEPTION WHEN OTHERS THEN
+		RETURN 0;
+	END is_placement_by_route_xy;
+--
+--	This code will return the second line of input data.  It is invoked only in cases
+--	where the placement method is XY/Route.
+
+	PROCEDURE get_other_bad_line(p_batchno IN NUMBER
+						,p_badrecordno_in  NUMBER
+						,p_badline OUT VARCHAR2
+						,p_badrecordno OUT NUMBER) IS
+
+	CURSOR cur_assettype(cp_batchno IN NUMBER) IS
+		SELECT nlf_unique
+		FROM nm_load_batches a 
+    			, nm_load_files b
+		WHERE a.nlb_batch_no = cp_batchno
+    			and a.nlb_nlf_id = b.nlf_id;
+
+	CURSOR cur_origbatch(p_batchno IN NUMBER, p_asset IN VARCHAR2) IS
+		SELECT max(nlb_batch_no)
+		FROM nm_load_batches 
+		WHERE nlb_batch_no <> p_batchno AND
+			nlb_nlf_id = (SELECT nlf_id FROM nm_load_files WHERE nlf_unique = p_asset); 
+
+	t_tablename			VARCHAR2(50);
+	t_assettype			VARCHAR2(20);
+	t_assettype_line		VARCHAR2(20);
+	t_assettype_short		VARCHAR2(20);
+	t_sql				VARCHAR2(500);
+	t_newbatchno		NUMBER;
+	t_found			BOOLEAN	:= FALSE;
+
+	BEGIN
+		p_badline		:= NULL;
+		p_badrecordno	:= NULL;
+
+		OPEN cur_assettype(p_batchno);
+		FETCH cur_assettype INTO t_assettype;
+		t_found	:= cur_assettype%FOUND;
+		CLOSE cur_assettype;
+
+		IF t_found THEN
+			t_assettype		:= TRIM(t_assettype);
+			IF instr(t_assettype,'_LINE') > 0 THEN
+				t_assettype_line		:= t_assettype;
+				t_assettype_short		:= substr(t_assettype,1,instr(t_assettype,'_LINE')-1);
+			ELSE
+				t_assettype_line		:= t_assettype || '_LINE';
+				t_assettype_short		:= t_assettype;
+			END IF;
+
+			t_tablename		:= 'NM_LD_' || t_assettype_short || '_TMP';
+
+			OPEN cur_origbatch(p_batchno, t_assettype_short);
+			FETCH cur_origbatch INTO t_newbatchno;
+			t_found	:= cur_origbatch%FOUND;
+			CLOSE cur_origbatch;
+
+			IF t_found THEN
+				t_sql	:= 'SELECT nlbs_input_line, nlbs_record_no ' ||
+					' FROM nm_load_batch_status ' ||
+					' WHERE nlbs_nlb_batch_no = ' || t_newbatchno ||
+					' AND nlbs_record_no = ' ||
+					' (SELECT b.record_no ' ||
+					' FROM ' || t_tablename || ' a, ' || t_tablename || ' b ' ||
+					' WHERE a.batch_no = b.batch_no ' ||
+					' AND a.batch_no = ' || t_newbatchno ||
+					' AND a.lfk = b.lfk ' ||
+					' AND a.record_no = ' || p_badrecordno_in ||
+					' AND b.record_no <> ' || p_badrecordno_in || ')'; 
+
+				EXECUTE IMMEDIATE t_sql INTO p_badline, p_badrecordno;
+			END IF;
+		END IF;
+
+	EXCEPTION WHEN OTHERS THEN
+		p_badline		:= NULL;
+		p_badrecordno	:= NULL;
+	END get_other_bad_line;
+--
+-- end of code added by Paul Sheedy for xy/route logic
+-- ------------------------------------------------------------------------------------------------------------------
+-- 		CUSTOM CODE - Paul Sheedy 12/2007
+--		declaration code end
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
    PROCEDURE print_it (p_text varchar2) IS
    BEGIN
       l_tab_log_lines(l_tab_log_lines.COUNT+1) := p_text;
@@ -1324,6 +1458,35 @@ BEGIN
          print_it (TO_CHAR(cs_rec.nlbs_record_no,'999999999')||' '||TO_CHAR(cs_errors%rowcount,'999999999')||' '||cs_rec.nlbs_status||'  '||nm3flx.parse_error_message(cs_rec.nlbs_text));
          l_tab_bad_lines(l_tab_bad_lines.COUNT+1) := cs_rec.nlbs_input_line;
          l_tab_bad_record_no(l_tab_bad_record_no.COUNT+1) := cs_rec.nlbs_record_no;
+	
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- 		CUSTOM CODE - Paul Sheedy 12/2007
+--		execution code start
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Customized code written by Paul Sheedy - adds the second error line to the BAD file so that it can
+-- be used as input for a subsequent load attempt.
+-- This code will only execute if the placement method is xy/route.
+
+	    t_xyroute_flag		:= is_placement_by_route_xy(p_nlb_batch_no);
+	    IF NVL(t_xyroute_flag,0) = 1 THEN
+			BEGIN
+				t_other_bad_line		:= NULL;
+				t_other_bad_recordno	:= NULL;
+
+				get_other_bad_line(cs_rec.nlbs_nlb_batch_no, cs_rec.nlbs_record_no, t_other_bad_line, t_other_bad_recordno);
+
+				IF nvl(t_other_bad_recordno,-1) > -1 THEN
+			         	l_tab_bad_lines(l_tab_bad_lines.COUNT+1) := t_other_bad_line;
+         				l_tab_bad_record_no(l_tab_bad_record_no.COUNT+1) := t_other_bad_recordno;
+				END IF;
+			EXCEPTION WHEN OTHERS THEN
+				NULL;
+			END;
+	    END IF;
+-- ------------------------------------------------------------------------------------------------------------------
+-- 		CUSTOM CODE - Paul Sheedy 12/2007
+--		execution code end
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       END LOOP;
       print_sep;
    END IF;
