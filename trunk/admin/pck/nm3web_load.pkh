@@ -2,11 +2,11 @@ CREATE OR REPLACE package nm3web_load as
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_load.pkh-arc   2.2   Jul 23 2007 09:16:16   aedwards  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_load.pkh-arc   2.3   Nov 14 2008 09:40:10   aedwards  $
 --       Module Name      : $Workfile:   nm3web_load.pkh  $
---       Date into PVCS   : $Date:   Jul 23 2007 09:16:16  $
---       Date fetched Out : $Modtime:   Jul 23 2007 08:26:04  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Nov 14 2008 09:40:10  $
+--       Date fetched Out : $Modtime:   Nov 14 2008 09:39:10  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on SCCS version : 
 --
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE package nm3web_load as
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
 --  g_sccsid is the SCCS ID for the package
    c_continue         CONSTANT  nm_errors.ner_descr%TYPE    := hig.get_ner(nm3type.c_hig,165).ner_descr;
 --</GLOBVAR>
@@ -111,7 +111,7 @@ FUNCTION get_full_download_url (p_filename VARCHAR2) RETURN VARCHAR2;
         , pi_join_column        IN VARCHAR2 DEFAULT 'LFK'
         , pi_locate_ref_column  IN VARCHAR2 DEFAULT 'LOCATEREF');
         
-FUNCTION show_pre_process RETURN varchar2;
+--FUNCTION show_pre_process RETURN varchar2;
 
 
 -----------------------------------------------------------------------------
