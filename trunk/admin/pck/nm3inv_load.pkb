@@ -1,15 +1,14 @@
-CREATE OR REPLACE PACKAGE BODY nm3inv_load AS
+CREATE OR REPLACE PACKAGE BODY Nm3inv_Load AS
 --
 -----------------------------------------------------------------------------
 --
---   PVCS Identifiers :-
+--   SCCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.1   Jul 18 2007 15:29:12   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.2   Nov 14 2008 09:24:08   aedwards  $
 --       Module Name      : $Workfile:   nm3inv_load.pkb  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:29:12  $
---       Date fetched Out : $Modtime:   Jul 17 2007 16:24:40  $
---       PVCS Version     : $Revision:   2.1  $
---
+--       Date into PVCS   : $Date:   Nov 14 2008 09:24:08  $
+--       Date fetched Out : $Modtime:   Nov 14 2008 09:22:46  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --   Author : Jonathan Mills
 --
@@ -21,10 +20,10 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_load AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
-   g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_load';
+   g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3inv_load';
    
    --c_hist_loc_enabled_opt CONSTANT hig_option_list.hol_id%TYPE := 'HISTINVLOC';
    --c_hist_loc_enabled     constant boolean := NVL(hig.get_sysopt(p_option_id => c_hist_loc_enabled_opt), 'N') = 'Y';
@@ -77,14 +76,14 @@ PROCEDURE load_or_val_on_element (p_rec           v_load_inv_mem_on_element%ROWT
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_version RETURN varchar2 IS
+FUNCTION get_version RETURN VARCHAR2 IS
 BEGIN
    RETURN g_sccsid;
 END get_version;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_body_version RETURN varchar2 IS
+FUNCTION get_body_version RETURN VARCHAR2 IS
 BEGIN
    RETURN g_body_sccsid;
 END get_body_version;
@@ -94,14 +93,14 @@ END get_body_version;
 PROCEDURE load_ele_mp_ambig (p_rec v_load_inv_mem_ele_mp_ambig%ROWTYPE) IS
 BEGIN
 --
-   nm_debug.proc_start(g_package_name,'load_ele_mp_ambig');
+   Nm_Debug.proc_start(g_package_name,'load_ele_mp_ambig');
 --
    load_or_val_ele_mp_ambig (p_rec           => p_rec
                             ,p_validate_only => FALSE
                             ,p_use_true      => FALSE
                             );
 --
-   nm_debug.proc_end(g_package_name,'load_ele_mp_ambig');
+   Nm_Debug.proc_end(g_package_name,'load_ele_mp_ambig');
 --
 END load_ele_mp_ambig;
 --
@@ -110,14 +109,14 @@ END load_ele_mp_ambig;
 PROCEDURE validate_ele_mp_ambig (p_rec v_load_inv_mem_ele_mp_ambig%ROWTYPE) IS
 BEGIN
 --
-   nm_debug.proc_start(g_package_name,'validate_ele_mp_ambig');
+   Nm_Debug.proc_start(g_package_name,'validate_ele_mp_ambig');
 --
    load_or_val_ele_mp_ambig (p_rec           => p_rec
                             ,p_validate_only => TRUE
                             ,p_use_true      => FALSE
                             );
 --
-   nm_debug.proc_end(g_package_name,'validate_ele_mp_ambig');
+   Nm_Debug.proc_end(g_package_name,'validate_ele_mp_ambig');
 --
 END validate_ele_mp_ambig;
 --
@@ -127,7 +126,7 @@ PROCEDURE load_ele_mp_true_ambig (p_rec v_load_inv_mem_ele_mp_true_amb%ROWTYPE) 
    l_rec v_load_inv_mem_ele_mp_ambig%ROWTYPE;
 BEGIN
 --
-   nm_debug.proc_start(g_package_name,'load_ele_mp_true_ambig');
+   Nm_Debug.proc_start(g_package_name,'load_ele_mp_true_ambig');
 --
    l_rec.ne_unique               := p_rec.ne_unique;
    l_rec.ne_nt_type              := p_rec.ne_nt_type;
@@ -143,7 +142,7 @@ BEGIN
                             ,p_use_true      => TRUE
                             );
 --
-   nm_debug.proc_end(g_package_name,'load_ele_mp_true_ambig');
+   Nm_Debug.proc_end(g_package_name,'load_ele_mp_true_ambig');
 --
 END load_ele_mp_true_ambig;
 --
@@ -153,7 +152,7 @@ PROCEDURE validate_ele_mp_true_ambig (p_rec v_load_inv_mem_ele_mp_true_amb%ROWTY
    l_rec v_load_inv_mem_ele_mp_ambig%ROWTYPE;
 BEGIN
 --
-   nm_debug.proc_start(g_package_name,'validate_ele_mp_true_ambig');
+   Nm_Debug.proc_start(g_package_name,'validate_ele_mp_true_ambig');
 --
    l_rec.ne_unique               := p_rec.ne_unique;
    l_rec.ne_nt_type              := p_rec.ne_nt_type;
@@ -169,7 +168,7 @@ BEGIN
                             ,p_use_true      => TRUE
                             );
 --
-   nm_debug.proc_end(g_package_name,'validate_ele_mp_true_ambig');
+   Nm_Debug.proc_end(g_package_name,'validate_ele_mp_true_ambig');
 --
 END validate_ele_mp_true_ambig;
 --
@@ -289,14 +288,14 @@ END load_or_val_ele_mp_ambig;
 PROCEDURE load_ele_mp_excl (p_rec v_load_inv_mem_ele_mp_excl%ROWTYPE) IS
 BEGIN
 --
-   nm_debug.proc_start(g_package_name,'load_ele_mp_excl');
+   Nm_Debug.proc_start(g_package_name,'load_ele_mp_excl');
 --
    load_or_val_ele_mp_excl (p_rec           => p_rec
                            ,p_validate_only => FALSE
                            ,p_use_true      => FALSE
                            );
 --
-   nm_debug.proc_end(g_package_name,'load_ele_mp_excl');
+   Nm_Debug.proc_end(g_package_name,'load_ele_mp_excl');
 --
 END load_ele_mp_excl;
 --
@@ -305,14 +304,14 @@ END load_ele_mp_excl;
 PROCEDURE validate_ele_mp_excl (p_rec v_load_inv_mem_ele_mp_excl%ROWTYPE) IS
 BEGIN
 --
-   nm_debug.proc_start(g_package_name,'validate_ele_mp_excl');
+   Nm_Debug.proc_start(g_package_name,'validate_ele_mp_excl');
 --
    load_or_val_ele_mp_excl (p_rec           => p_rec
                            ,p_validate_only => TRUE
                            ,p_use_true      => FALSE
                            );
 --
-   nm_debug.proc_end(g_package_name,'validate_ele_mp_excl');
+   Nm_Debug.proc_end(g_package_name,'validate_ele_mp_excl');
 --
 END validate_ele_mp_excl;
 --
@@ -322,7 +321,7 @@ PROCEDURE load_ele_mp_true_excl (p_rec v_load_inv_mem_ele_mp_true_exc%ROWTYPE) I
    l_rec v_load_inv_mem_ele_mp_excl%ROWTYPE;
 BEGIN
 --
-   nm_debug.proc_start(g_package_name,'load_ele_mp_true_excl');
+   Nm_Debug.proc_start(g_package_name,'load_ele_mp_true_excl');
 --
    l_rec.ne_unique               := p_rec.ne_unique;
    l_rec.ne_nt_type              := p_rec.ne_nt_type;
@@ -338,7 +337,7 @@ BEGIN
                            ,p_use_true      => TRUE
                            );
 --
-   nm_debug.proc_end(g_package_name,'load_ele_mp_true_excl');
+   Nm_Debug.proc_end(g_package_name,'load_ele_mp_true_excl');
 --
 END load_ele_mp_true_excl;
 --
@@ -348,7 +347,7 @@ PROCEDURE validate_ele_mp_true_excl (p_rec v_load_inv_mem_ele_mp_true_exc%ROWTYP
    l_rec v_load_inv_mem_ele_mp_excl%ROWTYPE;
 BEGIN
 --
-   nm_debug.proc_start(g_package_name,'validate_ele_mp_true_excl');
+   Nm_Debug.proc_start(g_package_name,'validate_ele_mp_true_excl');
 --
    l_rec.ne_unique               := p_rec.ne_unique;
    l_rec.ne_nt_type              := p_rec.ne_nt_type;
@@ -364,7 +363,7 @@ BEGIN
                            ,p_use_true      => TRUE
                            );
 --
-   nm_debug.proc_end(g_package_name,'validate_ele_mp_true_excl');
+   Nm_Debug.proc_end(g_package_name,'validate_ele_mp_true_excl');
 --
 END validate_ele_mp_true_excl;
 --
@@ -481,13 +480,13 @@ END load_or_val_ele_mp_excl;
 PROCEDURE load_on_element (p_rec v_load_inv_mem_on_element%ROWTYPE) IS
 BEGIN
 --
-   nm_debug.proc_start(g_package_name,'load_on_element');
+   Nm_Debug.proc_start(g_package_name,'load_on_element');
 --
    load_or_val_on_element (p_rec           => p_rec
                           ,p_validate_only => FALSE
                           );
 --
-   nm_debug.proc_end(g_package_name,'load_on_element');
+   Nm_Debug.proc_end(g_package_name,'load_on_element');
 --
 END load_on_element;
 --
@@ -496,13 +495,13 @@ END load_on_element;
 PROCEDURE validate_on_element (p_rec v_load_inv_mem_on_element%ROWTYPE) IS
 BEGIN
 --
-   nm_debug.proc_start(g_package_name,'validate_on_element');
+   Nm_Debug.proc_start(g_package_name,'validate_on_element');
 --
    load_or_val_on_element (p_rec           => p_rec
                           ,p_validate_only => TRUE
                           );
 --
-   nm_debug.proc_end(g_package_name,'validate_on_element');
+   Nm_Debug.proc_end(g_package_name,'validate_on_element');
 --
 END validate_on_element;
 --
@@ -608,8 +607,8 @@ PROCEDURE get_datum_lref (pi_route_ne_id               IN     nm_elements.ne_id%
                          ,po_datum_offset                 OUT NUMBER
                          ,pi_random_pick_on_ambig_fail IN     BOOLEAN DEFAULT FALSE
                          ) IS
-   c_sub_class CONSTANT   nm_elements.ne_sub_class%TYPE := nm3flx.i_t_e (pi_sub_class = 'S'
-                                                                        ,Null
+   c_sub_class CONSTANT   nm_elements.ne_sub_class%TYPE := Nm3flx.i_t_e (pi_sub_class = 'S'
+                                                                        ,NULL
                                                                         ,pi_sub_class
                                                                         );
 BEGIN
@@ -628,12 +627,12 @@ BEGIN
    BEGIN
       IF pi_use_true
        THEN
-         l_lref       := nm3lrs.get_datum_true_offset (pi_ne_id     => pi_route_ne_id
+         l_lref       := Nm3lrs.get_datum_true_offset (pi_ne_id     => pi_route_ne_id
                                                       ,pi_true      => pi_slk
                                                       ,pi_sub_class => c_sub_class
                                                       );
       ELSE
-         l_lref       := nm3lrs.get_datum_offset(p_parent_lr => nm_lref(pi_route_ne_id,pi_slk));
+         l_lref       := Nm3lrs.get_datum_offset(p_parent_lr => nm_lref(pi_route_ne_id,pi_slk));
       END IF;
       po_datum_ne_id  := l_lref.lr_ne_id;
       po_datum_offset := l_lref.lr_offset;
@@ -669,26 +668,26 @@ PROCEDURE get_ambiguous_lref (pi_route_ne_id               IN     nm_elements.ne
                              ) IS
 --
    l_end_of_section_found BOOLEAN;
-   c_sub_class CONSTANT   nm_elements.ne_sub_class%TYPE := nm3flx.i_t_e (pi_sub_class = 'S'
-                                                                        ,Null
+   c_sub_class CONSTANT   nm_elements.ne_sub_class%TYPE := Nm3flx.i_t_e (pi_sub_class = 'S'
+                                                                        ,NULL
                                                                         ,pi_sub_class
                                                                         );
 --
    l_lref_count           PLS_INTEGER;
    l_child_units          nm_units.un_unit_id%TYPE;
    l_parent_units         nm_units.un_unit_id%TYPE;
-   l_lref_tab             nm3lrs.lref_table;
+   l_lref_tab             Nm3lrs.lref_table;
 --
 BEGIN
 --
-   nm3net.get_group_units (pi_ne_id       => pi_route_ne_id
+   Nm3net.get_group_units (pi_ne_id       => pi_route_ne_id
                           ,po_group_units => l_parent_units
                           ,po_child_units => l_child_units
                           );
 --
    IF pi_use_true
     THEN
-     nm3lrs.get_ambiguous_lrefs_true (p_parent_id    => pi_route_ne_id
+     Nm3lrs.get_ambiguous_lrefs_true (p_parent_id    => pi_route_ne_id
                                      ,p_parent_units => l_parent_units
                                      ,p_datum_units  => l_child_units
                                      ,p_offset       => pi_slk
@@ -696,7 +695,7 @@ BEGIN
                                      ,p_sub_class    => c_sub_class
                                      );
    ELSE
-     nm3lrs.get_ambiguous_lrefs (p_parent_id    => pi_route_ne_id
+     Nm3lrs.get_ambiguous_lrefs (p_parent_id    => pi_route_ne_id
                                 ,p_parent_units => l_parent_units
                                 ,p_datum_units  => l_child_units
                                 ,p_offset       => pi_slk
@@ -709,7 +708,7 @@ BEGIN
  --
    IF    l_lref_count = 0
     THEN
-      hig.raise_ner (pi_appl               => nm3type.c_net
+      Hig.raise_ner (pi_appl               => Nm3type.c_net
                     ,pi_id                 => 85
                     ,pi_supplementary_info => pi_ne_group||':'||pi_slk
                     );
@@ -721,7 +720,7 @@ BEGIN
          po_datum_ne_id  := l_lref_tab(i).r_ne_id;
          po_datum_offset := l_lref_tab(i).r_offset;
  --        nm_debug.debug(i||'. '||nm3net.get_ne_unique(po_datum_ne_id)||':'||po_datum_offset);
-         IF  (NOT pi_is_begin AND po_datum_offset = nm3net.get_datum_element_length (po_datum_ne_id))
+         IF  (NOT pi_is_begin AND po_datum_offset = Nm3net.get_datum_element_length (po_datum_ne_id))
           OR (    pi_is_begin AND po_datum_offset = 0)
           THEN
  --           nm_Debug.debug('match');
@@ -736,7 +735,7 @@ BEGIN
             po_datum_ne_id  := l_lref_tab(1).r_ne_id;
             po_datum_offset := l_lref_tab(1).r_offset;
          ELSE
-            hig.raise_ner (pi_appl               => nm3type.c_net
+            Hig.raise_ner (pi_appl               => Nm3type.c_net
                           ,pi_id                 => 312
                           ,pi_supplementary_info => pi_ne_group||':'||pi_slk
                           );
@@ -807,13 +806,13 @@ END load_or_validate_point_on_ele;
 PROCEDURE load_point_on_ele (p_rec v_load_point_inv_mem_on_ele%ROWTYPE) IS
 BEGIN
 --
-   nm_debug.proc_start(g_package_name,'load_point_on_ele');
+   Nm_Debug.proc_start(g_package_name,'load_point_on_ele');
 --
    load_or_validate_point_on_ele (p_rec           => p_rec
                                  ,p_validate_only => FALSE
                                  );
 --
-   nm_debug.proc_end(g_package_name,'load_point_on_ele');
+   Nm_Debug.proc_end(g_package_name,'load_point_on_ele');
 --
 END load_point_on_ele;
 --
@@ -822,17 +821,325 @@ END load_point_on_ele;
 PROCEDURE validate_point_on_ele (p_rec v_load_point_inv_mem_on_ele%ROWTYPE) IS
 BEGIN
 --
-   nm_debug.proc_start(g_package_name,'validate_point_on_ele');
+   Nm_Debug.proc_start(g_package_name,'validate_point_on_ele');
 --
    load_or_validate_point_on_ele (p_rec           => p_rec
                                  ,p_validate_only => TRUE
                                  );
 --
-   nm_debug.proc_end(g_package_name,'validate_point_on_ele');
+   Nm_Debug.proc_end(g_package_name,'validate_point_on_ele');
 --
 END validate_point_on_ele;
 --
 -----------------------------------------------------------------------------
+
+PROCEDURE load_on_element_xy (p_rec v_load_inv_mem_on_element_xy%ROWTYPE) IS
+
+l_row v_load_inv_mem_on_element%ROWTYPE := translate_xy_to_element( p_rec );
+
+BEGIN
+  load_on_element( l_row );
+END;
+
 --
-END nm3inv_load;
+-----------------------------------------------------------------------------
+--
+PROCEDURE validate_on_element_xy (p_rec v_load_inv_mem_on_element_xy%ROWTYPE) IS
+
+l_row v_load_inv_mem_on_element%ROWTYPE := translate_xy_to_element( p_rec );
+
+BEGIN
+  validate_on_element( l_row );
+END;
+
+-----------------------------------------------------------------------------
+--
+
+FUNCTION translate_xy_to_element 
+             ( p_row IN v_load_inv_mem_on_element_xy%ROWTYPE ) 
+  RETURN v_load_inv_mem_on_element%ROWTYPE IS
+--
+  l_lref       nm_lref;
+  l_route_ne   nm_elements.ne_id%TYPE;
+  retval       v_load_inv_mem_on_element%ROWTYPE;
+--
+BEGIN
+--
+--check the row is consistent
+  IF p_row.begin_x IS NULL 
+  OR p_row.begin_y IS NULL 
+  THEN
+
+    RAISE_APPLICATION_ERROR(-20001,'Error - start xy is required');
+
+  ELSE
+  
+    IF  p_row.end_x IS NOT NULL 
+    AND p_row.end_y IS NOT NULL 
+    THEN
+    
+--    we need both x and y for the ned position of linear data
+      l_route_ne      := nm3net.get_ne_id( p_row.ne_unique, p_row.ne_nt_type );
+      l_lref          := xnltw_get_nearest_on_route(l_route_ne, p_row.begin_x, p_row.begin_y );
+      retval.begin_mp := nm3lrs.get_set_offset(l_route_ne, l_lref.lr_ne_id, l_lref.lr_offset);
+--
+      l_lref := xnltw_get_nearest_on_route(l_route_ne, p_row.end_x, p_row.end_y );
+      retval.end_mp := nm3lrs.get_set_offset(l_route_ne, l_lref.lr_ne_id, l_lref.lr_offset);
+      
+--      IF retval.begin_mp > retval.end_mp
+--      THEN
+--        -- Swap the chainages if they are the wrong way round
+--        DECLARE
+--          l_new_start nm_members.nm_begin_mp%TYPE;
+--          l_new_end   nm_members.nm_end_mp%TYPE;
+--        BEGIN
+--          l_new_start := retval.end_mp;
+--          l_new_end   := retval.begin_mp;
+--          retval.begin_mp := l_new_start;
+--          retval.end_mp   := l_new_end;
+--        END;
+--      END IF;
+
+--    ELSIF p_row.end_x IS NULL 
+--       OR p_row.end_y IS NULL  
+--    THEN
+
+--      RAISE_APPLICATION_ERROR(-20002,'Error - end xy is required');
+
+    ELSE
+    
+--    we have just begin xy - its a point.
+
+      l_route_ne      := nm3net.get_ne_id( p_row.ne_unique, p_row.ne_nt_type );
+      l_lref          := xnltw_get_nearest_on_route(l_route_ne, p_row.begin_x, p_row.begin_y );
+      retval.begin_mp := nm3lrs.get_set_offset(l_route_ne, l_lref.lr_ne_id, l_lref.lr_offset);
+
+    END IF;
+
+  END IF;  
+--
+  retval.ne_unique       := p_row.ne_unique;
+  retval.ne_nt_type      := p_row.ne_nt_type;
+  retval.iit_ne_id       := p_row.iit_ne_id;
+  retval.iit_inv_type    := p_row.iit_inv_type;
+  retval.nm_start_date   := p_row.nm_start_date;
+--
+  --nm_debug.debug_on;
+  nm_debug.debug('Ne ID= '||retval.ne_unique||' - begin = '||retval.begin_mp||' - end = '||retval.end_mp);
+  RETURN retval;
+--
+EXCEPTION
+  WHEN NO_DATA_FOUND
+  THEN RAISE_APPLICATION_ERROR
+    (-20101,'No network found in tolerance '||p_row.ne_unique);
+END translate_xy_to_element;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION xnltw_get_nearest_on_route
+   ( p_ne_id    IN NUMBER
+   , p_x        IN NUMBER
+   , p_y        IN NUMBER )
+RETURN nm_lref 
+IS
+--
+  l_theme_id  nm_themes_all.nth_theme_id%TYPE;
+  l_tol       nm_themes_all.nth_tolerance%TYPE;
+  l_unit      nm_themes_all.nth_tol_units%TYPE;
+  l_geom      mdsys.sdo_geometry;
+  l_ne        nm_elements%ROWTYPE;
+  l_ne_id     nm_elements.ne_id%TYPE;
+  l_dist      NUMBER;
+  retval      nm_lref;
+--
+BEGIN
+--
+  l_ne := Nm3get.get_ne( p_ne_id );
+--
+  SELECT nnth_nth_theme_id, nth_tolerance, nth_tol_units
+    INTO l_theme_id, l_tol, l_unit
+    FROM nm_nw_themes
+       , nm_linear_types
+       , nm_nt_groupings
+       , nm_themes_all
+   WHERE nnth_nlt_id = nlt_id
+     AND nnth_nth_theme_id = nth_theme_id
+     AND nlt_nt_type = nng_nt_type
+     AND nng_group_type = l_ne.ne_gty_group_type
+     AND nlt_g_i_d = 'D';
+--  
+  --nm_debug.debug_on;
+  nm_debug.debug(l_theme_id||' - ');
+  l_ne_id := nm3sdo.get_nearest_to_xy_on_route( l_theme_id, p_ne_id, p_x, p_y );
+--
+  l_dist := nm3sdo.get_distance(l_theme_id, l_ne_id, p_x, p_y );
+--
+  IF l_dist > l_tol 
+  THEN
+    RAISE_APPLICATION_ERROR(-20001,'Cannot find element within tolerance');
+  ELSE
+  --
+    l_geom := nm3sdo.get_projection( l_theme_id, l_ne_id, p_x, p_y);
+  --
+    RETURN nm_lref( l_ne_id
+                  , nm3unit.get_formatted_value( l_geom.sdo_ordinates(3)
+                                              ,  nm3net.get_nt_units_from_ne(l_ne_id)
+                                              )
+                  );
+  --
+  END IF;
+--
+END xnltw_get_nearest_on_route;
+
+--
+-----------------------------------------------------------------------------
+--
+
+PROCEDURE process_line_data 
+        ( pi_asset_type         IN nm_inv_types.nit_inv_type%TYPE
+        , pi_load_file_unique   IN nm_load_files.nlf_unique%TYPE
+        , pi_batch_no           IN nm_load_batches.nlb_batch_no%TYPE
+        , pi_join_column        IN VARCHAR2 DEFAULT 'LFK'
+        , pi_locate_ref_column  IN VARCHAR2 DEFAULT 'LOCATEREF'
+        , po_nlf_id            OUT nm_load_files.nlf_id%TYPE
+        , po_nlb_batch_no      OUT nm_load_batches.nlb_batch_no%TYPE)
+ IS
+   l_rec_nlf            nm_load_files%ROWTYPE;
+   l_rec_nlb            nm_load_batches%ROWTYPE;
+   l_batch_no           pls_integer;
+   l_holding_table      VARCHAR2(30) := 'NM_LD_'||pi_load_file_unique||'_TMP';
+   l_new_holding_table  VARCHAR2(30) := 'NM_LD_'||pi_load_file_unique||'_'||g_line_data_suffix||'_TMP';
+   l_sql_1              nm3type.max_varchar2;
+   l_sql_2              nm3type.max_varchar2;
+   l_rec_batch_retval   nm_load_batches%ROWTYPE;
+--
+-------------------------------------------------------------------------------
+--
+  FUNCTION get_tab_cols ( pi_table  IN VARCHAR2 ) RETURN nm3type.max_varchar2
+  IS
+    l_retval nm3type.max_varchar2;
+  BEGIN
+    FOR i IN 
+      (SELECT column_name||', ' a
+         FROM user_tab_columns
+        WHERE table_name = pi_table
+        ORDER BY column_id)
+    LOOP
+      l_retval := l_retval||i.a;
+    END LOOP;
+    RETURN l_retval;
+  END get_tab_cols;
+--
+-------------------------------------------------------------------------------
+--
+  FUNCTION get_tab_select_cols ( pi_table  IN VARCHAR2 
+                                ,pi_prefix IN VARCHAR2 ) RETURN nm3type.max_varchar2
+  IS
+    l_retval nm3type.max_varchar2;
+  BEGIN
+    FOR i IN 
+      (SELECT pi_prefix||'.'||column_name||', ' a
+         FROM user_tab_columns
+        WHERE table_name = pi_table
+          AND column_name != 'BATCH_NO'
+        ORDER BY column_id)
+    LOOP
+      l_retval := l_retval||i.a;
+    END LOOP;
+    RETURN l_retval;
+  END get_tab_select_cols;
+--
+-------------------------------------------------------------------------------
+--
+BEGIN
+--
+  l_rec_nlf := nm3get.get_nlf(pi_nlf_unique => pi_load_file_unique||'_'||g_line_data_suffix);
+  l_rec_nlb := nm3get.get_nlb(pi_nlb_batch_no => pi_batch_no);
+--
+  l_batch_no := nm3seq.next_rtg_job_id_seq;
+
+--
+
+  INSERT INTO nm_load_batches(nlb_batch_no
+                             ,nlb_nlf_id
+                             ,nlb_filename
+                             ,nlb_record_count)
+  VALUES (  l_batch_no
+           ,l_rec_nlf.nlf_id
+           ,l_rec_nlb.nlb_filename
+           ,l_rec_nlb.nlb_record_count); 
+
+--
+
+  DECLARE
+    l_tab_batch_no   nm3type.tab_number;
+    l_tab_record_no  nm3type.tab_number;
+    l_tab_status     nm3type.tab_varchar32767;
+    l_tab_text       nm3type.tab_varchar32767;
+    l_input_line     nm3type.tab_varchar32767;
+  BEGIN
+    SELECT l_batch_no a
+         , nlbs_record_no
+         , nlbs_status
+         , nlbs_text
+         , nlbs_input_line
+       BULK COLLECT INTO l_tab_batch_no
+                       , l_tab_record_no
+                       , l_tab_status
+                       , l_tab_text
+                       , l_input_line
+      FROM nm_load_batch_status
+     WHERE nlbs_nlb_batch_no = pi_batch_no;
+   --
+    FORALL i IN l_tab_batch_no.FIRST..l_tab_batch_no.LAST
+      INSERT INTO nm_load_batch_status 
+              (nlbs_nlb_batch_no
+              ,nlbs_record_no
+              ,nlbs_status
+              ,nlbs_text
+             ,nlbs_input_line
+             )
+     VALUES ( l_tab_batch_no(i)
+           , l_tab_record_no(i)
+           , l_tab_status(i)
+           , l_tab_text(i)
+           , l_input_line(i) );
+  --
+  END;
+
+--
+
+  l_sql_2 := 'BEGIN '||
+           '  INSERT INTO '||l_new_holding_table||
+           '  ( ';
+  l_sql_2 := l_sql_2 ||get_tab_cols(l_new_holding_table);
+  l_sql_2 := substr(l_sql_2,0,length(l_sql_2)-2);
+  l_sql_2 := l_sql_2||'  ) ';
+  l_sql_2 := l_sql_2||'SELECT '||l_batch_no||', ';
+  l_sql_2 := l_sql_2 ||get_tab_select_cols(l_holding_table,'a');
+  l_sql_2 := substr(l_sql_2,0,length(l_sql_2)-1);
+  l_sql_2 := l_sql_2||'  b.longitude, b.latitude ';
+  l_sql_2 := l_sql_2||'  FROM '||l_holding_table||' a, '||l_holding_table||' b';
+  l_sql_2 := l_sql_2||' WHERE a.'||pi_join_column||' = b.'||pi_join_column;
+  l_sql_2 := l_sql_2||'   AND a.'||pi_locate_ref_column||' = ''S''';
+  l_sql_2 := l_sql_2||'   AND b.'||pi_locate_ref_column||' = ''E''';
+  l_sql_2 := l_sql_2||'   AND a.batch_no = '||pi_batch_no;
+  l_sql_2 := l_sql_2||'   AND b.batch_no = '||pi_batch_no||';';
+  l_sql_2 := l_sql_2||'END;';
+
+--
+  nm_debug.debug(l_sql_2);
+
+--
+  EXECUTE IMMEDIATE l_sql_2;
+--
+  po_nlf_id := l_rec_nlf.nlf_id;
+  po_nlb_batch_no := l_batch_no;
+--
+END process_line_data;
+--
+--------------------------------------------------------------------------------
+--
+--
+END Nm3inv_Load;
 /
