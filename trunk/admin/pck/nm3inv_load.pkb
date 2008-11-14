@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv_Load AS
 --
 --   SCCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.2   Nov 14 2008 09:24:08   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.3   Nov 14 2008 09:43:14   aedwards  $
 --       Module Name      : $Workfile:   nm3inv_load.pkb  $
---       Date into PVCS   : $Date:   Nov 14 2008 09:24:08  $
---       Date fetched Out : $Modtime:   Nov 14 2008 09:22:46  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Nov 14 2008 09:43:14  $
+--       Date fetched Out : $Modtime:   Nov 14 2008 09:42:46  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --   Author : Jonathan Mills
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv_Load AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3inv_load';
@@ -70,9 +70,9 @@ PROCEDURE load_or_val_ele_mp_excl (p_rec           v_load_inv_mem_ele_mp_excl%RO
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE load_or_val_on_element (p_rec           v_load_inv_mem_on_element%ROWTYPE
-                                 ,p_validate_only BOOLEAN
-                                 );
+--PROCEDURE load_or_val_on_element (p_rec           v_load_inv_mem_on_element%ROWTYPE
+--                               ,p_validate_only BOOLEAN
+ --                              );
 --
 -----------------------------------------------------------------------------
 --
