@@ -1,4 +1,4 @@
-create or replace package nm3web_eng_dynseg as
+CREATE OR REPLACE PACKAGE KANSAS.nm3web_eng_dynseg AS
 --<PACKAGE>
 --   SCCS Identifiers :-
 --
@@ -163,8 +163,43 @@ FUNCTION get_body_version RETURN varchar2;
 --
 -----------------------------------------------------------------------------
 --
---<PROC NAME="main">
-PROCEDURE main;
+--<PROC NAME="check_route_length">
+procedure check_route_length (pi_route_length    number default null
+                             ,p_source      IN VARCHAR2
+                             ,p_route       IN VARCHAR2           DEFAULT NULL
+                             ,p_slk_from    IN NUMBER             DEFAULT NULL
+                             ,p_slk_to      IN NUMBER             DEFAULT NULL
+                             ,p_saved_ne_id IN NUMBER             DEFAULT NULL
+                             ,p_nmq_id      IN NUMBER             DEFAULT NULL
+                             ,p_nqr_job_id  IN NUMBER             DEFAULT NULL
+                             ,p_gdo_sess_id IN NUMBER             DEFAULT NULL
+                             ,p_function    IN owa_util.ident_arr DEFAULT g_empty_tab
+                             ,p_inv_type    IN owa_util.ident_arr DEFAULT g_empty_tab
+                             ,p_attrib      IN owa_util.ident_arr DEFAULT g_empty_tab
+                             ,p_xsp         IN owa_util.ident_arr DEFAULT g_empty_tab);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="select_route_error">                    
+procedure select_route_error (p_route          varchar2 default null
+                             ,p_error           varchar2 default null
+                             ,p_route_length    number default null);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="select_route_details">
+procedure select_route_details (p_area_type     varchar2 DEFAULT nm3extent.c_route
+                        ,p_gdo_sess_id    number   DEFAULT NULL
+                        ,p_function_count NUMBER   DEFAULT c_default_func_count
+                        ,p_route          varchar2 default null);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="main">                        
+PROCEDURE MAIN;
 --</PROC>
 --
 -----------------------------------------------------------------------------
@@ -172,7 +207,15 @@ PROCEDURE main;
 PROCEDURE dynseg_define (p_area_type      varchar2 DEFAULT nm3extent.c_route
                         ,p_gdo_sess_id    number   DEFAULT NULL
                         ,p_function_count NUMBER   DEFAULT c_default_func_count
+                        ,p_route          VARCHAR2 DEFAULT NULL
+                        ,pi_route_length  number DEFAULT NULL
+                        ,pi_descr         varchar2 default null
                         );
+procedure select_route_page (p_area_type      varchar2 DEFAULT nm3extent.c_route
+                        ,p_gdo_sess_id    number   DEFAULT NULL
+                        ,p_function_count NUMBER   DEFAULT c_default_func_count
+                        ,p_route          VARCHAR2 DEFAULT NULL
+                        ) ;                        
 --
 -----------------------------------------------------------------------------
 --
@@ -219,5 +262,5 @@ PROCEDURE write_merge_table_entry;
 --
 -----------------------------------------------------------------------------
 --
-end nm3web_eng_dynseg;
+END nm3web_eng_dynseg;
 /
