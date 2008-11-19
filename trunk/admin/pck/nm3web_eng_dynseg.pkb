@@ -1,10 +1,10 @@
-CREATE OR REPLACE PACKAGE BODY nm3web_eng_dynseg AS
+CREATE OR REPLACE PACKAGE BODY KANSAS.nm3web_eng_dynseg AS
 --
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3web_eng_dynseg.pkb	1.23 09/06/02"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3web_eng_dynseg.pkb    1.23 09/06/02"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_eng_dynseg';
@@ -33,7 +33,7 @@ BEGIN
    htp.p('--');
    htp.p('--   SCCS Identifiers :-');
    htp.p('--');
-   htp.p('--       sccsid           : @(#)nm3web_eng_dynseg.pkb	1.23 09/06/02');
+   htp.p('--       sccsid           : @(#)nm3web_eng_dynseg.pkb    1.23 09/06/02');
    htp.p('--       Module Name      : nm3web_eng_dynseg.pkb');
    htp.p('--       Date into SCCS   : 02/09/06 14:12:18');
    htp.p('--       Date fetched Out : 07/07/20 10:19:34');
@@ -45,7 +45,7 @@ BEGIN
    htp.p('--   NM3 Web Engineering DynSeg package body');
    htp.p('--');
    htp.p('-----------------------------------------------------------------------------');
-   htp.p('--	Copyright (c) exor corporation ltd, 2002');
+   htp.p('--    Copyright (c) exor corporation ltd, 2002');
    htp.p('-----------------------------------------------------------------------------');
    htp.p('--');
    htp.p('-->');
@@ -79,9 +79,153 @@ END get_body_version;
 --
 -----------------------------------------------------------------------------
 --
+procedure check_route_length (pi_route_length    number default null
+                             ,p_source      IN VARCHAR2
+                             ,p_route       IN VARCHAR2           DEFAULT NULL
+                             ,p_slk_from    IN NUMBER             DEFAULT NULL
+                             ,p_slk_to      IN NUMBER             DEFAULT NULL
+                             ,p_saved_ne_id IN NUMBER             DEFAULT NULL
+                             ,p_nmq_id      IN NUMBER             DEFAULT NULL
+                             ,p_nqr_job_id  IN NUMBER             DEFAULT NULL
+                             ,p_gdo_sess_id IN NUMBER             DEFAULT NULL
+                             ,p_function    IN owa_util.ident_arr DEFAULT g_empty_tab
+                             ,p_inv_type    IN owa_util.ident_arr DEFAULT g_empty_tab
+                             ,p_attrib      IN owa_util.ident_arr DEFAULT g_empty_tab
+                             ,p_xsp         IN owa_util.ident_arr DEFAULT g_empty_tab)
+is
+begin
+  if p_slk_to > pi_route_length then
+    select_route_error (p_error => 'Route end entered is greater than routes actual end'
+                       ,p_route_length => pi_route_length);
+  elsif p_slk_from < 0 then
+    select_route_error (p_error => 'Route start cannot be less that 0');
+  elsif p_slk_from >= p_slk_to then
+    select_route_error (p_error => 'Route start cannot be greater than route end');
+  else
+    run_dynseg (p_source      => p_source
+               ,p_route       => p_route           
+               ,p_slk_from    => p_slk_from        
+               ,p_slk_to      => p_slk_to          
+               ,p_saved_ne_id => p_saved_ne_id     
+               ,p_nmq_id      => p_nmq_id          
+               ,p_nqr_job_id  => p_nqr_job_id      
+               ,p_gdo_sess_id => p_gdo_sess_id     
+               ,p_function    => p_function
+               ,p_inv_type    => p_inv_type
+               ,p_attrib      => p_attrib
+               ,p_xsp         => p_xsp
+                );
+    
+  end if;                      
+end check_route_length;
+procedure select_route_error (p_route          varchar2 default null
+                             ,p_error           varchar2 default null
+                             ,p_route_length    number default null)
+is
+begin 
+   htp.bodyopen (cattributes=>'onLoad="initialise_form()"');
+--   nm3web.header;
+   htp.P('<!--');
+   htp.P('');
+   htp.P('   Start of the main body of the page');
+   htp.P('');
+   htp.P('-->');
+   htp.P('<DIV ALIGN="CENTER">');
+
+if p_error is null then   
+  htp.formopen(g_package_name||'.select_route_page');
+  htp.tableheader('Invalid route ('||p_route||'), please go back to previous page and re-enter a valid route');
+elsif p_error = 'Route end entered is greater than routes actual end' then
+  htp.formopen(g_package_name||'.dynseg_define', cattributes => 'NAME="dynseg"');--templine
+  htp.tableheader('Route end entered is greater than routes actual end ('||p_route_length||'), please go back to previous page and re-enter a valid route end');
+elsif p_error = 'Route start cannot be less that 0' then
+  htp.formopen(g_package_name||'.dynseg_define', cattributes => 'NAME="dynseg"');--templine
+  htp.tableheader('Route start cannot be less that 0, please go back to previous page and re-enter a valid route start');
+elsif p_error = 'Route start cannot be greater than route end' then
+  htp.formopen(g_package_name||'.dynseg_define', cattributes => 'NAME="dynseg"');--templine
+  htp.tableheader('Route start cannot be greater than route end, please go back to previous page and re-enter a valid route start');
+end if;
+/*  htp.tablerowopen;
+  htp.formsubmit (cvalue=>'Go Back');
+  htp.formclose;*/
+end select_route_error;
+--
+-----------------------------------------------------------------------------
+--
+procedure select_route_details (p_area_type     varchar2 DEFAULT nm3extent.c_route
+                        ,p_gdo_sess_id    number   DEFAULT NULL
+                        ,p_function_count NUMBER   DEFAULT c_default_func_count
+                        ,p_route          varchar2 default null)
+is
+cursor c_route_length ( p_route_unique nm_elements.ne_unique%TYPE
+                      ) is
+  select case nt_linear
+         when 'Y' then 
+           case nvl(ne_gty_group_type,'NULL')
+             when 'NULL' then
+               ne_length
+             else
+               nm3net.get_max_slk(ne_id)
+           end
+         when 'N' then
+           -99
+         end obj_length, ne_descr
+  from nm_elements, nm_types            
+  where upper(ne_unique) = upper(p_route_unique)
+  and ne_nt_type = nt_type;
+
+  l_route_length nm_elements.ne_length%TYPE;
+  l_descr nm_elements.ne_descr%TYPE;
+begin 
+  open c_route_length (p_route);
+  fetch c_route_length into l_route_length, l_descr;
+  if c_route_length%notfound then
+      close c_route_length;
+      select_route_error(p_route);
+    else
+      close c_route_length;
+    dynseg_define (p_area_type      => p_area_type
+                  ,p_gdo_sess_id    => p_gdo_sess_id
+                  ,p_function_count => p_function_count
+                  ,p_route          => p_route
+                  ,pi_route_length  => l_route_length
+                  ,pi_descr         => l_descr);
+  end if;
+end;
+
+procedure select_route_page (p_area_type      varchar2 DEFAULT nm3extent.c_route
+                            ,p_gdo_sess_id    number   DEFAULT NULL
+                            ,p_function_count NUMBER   DEFAULT c_default_func_count
+                            ,p_route          varchar2 default null)
+is
+begin 
+   htp.bodyopen (cattributes=>'onLoad="initialise_form()"');
+--   nm3web.header;
+   htp.P('<!--');
+   htp.P('');
+   htp.P('   Start of the main body of the page');
+   htp.P('');
+   htp.P('-->');
+   htp.P('<DIV ALIGN="CENTER">');
+   
+  htp.formopen(g_package_name||'.select_route_details');--, cattributes => 'NAME="dynseg"');
+  htp.tableheader('Route');
+  htp.p('<TD>');
+  htp.formtext   (cname       => 'p_route'
+                 ,cattributes => 'MAXLENGTH=30 SIZE=30'
+                 ,cvalue      => p_route
+                 );
+  htp.p('</TD>');
+  htp.formsubmit (cvalue=>'Continue');
+  htp.formclose;
+end select_route_page;
+
 PROCEDURE dynseg_define (p_area_type      varchar2 DEFAULT nm3extent.c_route
                         ,p_gdo_sess_id    number   DEFAULT NULL
                         ,p_function_count NUMBER   DEFAULT c_default_func_count
+                        ,p_route          varchar2 default null
+                        ,pi_route_length  number default null
+                        ,pi_descr         varchar2 default null
                         ) IS
    --
    CURSOR cs_inv_types IS
@@ -135,6 +279,10 @@ PROCEDURE dynseg_define (p_area_type      varchar2 DEFAULT nm3extent.c_route
    is_saved        CONSTANT boolean := p_area_type = nm3extent.c_saved;
    is_gis          CONSTANT boolean := p_area_type = nm3extent.c_gis;
    is_merge        CONSTANT boolean := p_area_type = c_merge;
+   l_route_length  number default null;
+   p_user_length number default null;
+   p_route_start number default null;
+   p_route_length number default null;
    --
 BEGIN
 --
@@ -398,7 +546,9 @@ BEGIN
    htp.p('-->');
    htp.p('<DIV ALIGN="CENTER">');
    --
-   htp.formopen(g_package_name||'.run_dynseg', cattributes => 'NAME="dynseg"');
+   htp.formopen(g_package_name||'.check_route_length', cattributes => 'NAME="dynseg"');--templine
+   --htp.formopen(g_package_name||'.run_dynseg');--, cattributes => 'NAME="dynseg"');--templine
+  
    htp.tableopen;
    htp.tablerowopen;
    htp.tableheader('Function');
@@ -425,25 +575,44 @@ BEGIN
    htp.tablerowopen;
    IF is_route
     THEN
-      htp.tableheader('Route');
+      htp.tableheader('Route:', cattributes => 'ALIGN="right"');
       htp.p('<TD>');
-      htp.formtext   (cname       => 'p_route'
+      htp.p(p_route);
+      htp.tablerowopen;
+      htp.tableheader('Route description:', cattributes => 'ALIGN="right"');
+      htp.p('<TD>'||pi_descr||'</TD>');
+      /*htp.formtext   (cname       => 'p_route'
                      ,cattributes => 'MAXLENGTH=30 SIZE=30'
-                     );
+                     ,cvalue      => p_route
+                     );*/
       htp.p('</TD>');
-      htp.tableheader('Route Measures (opt)');
-      htp.p('<TD>From</TD>');
+      htp.tablerowopen;
+      htp.tableheader('Route Measures (opt)', cattributes => 'ALIGN="right"');
+      htp.tablerowopen;
+      htp.p('<TD ALIGN="right">From</TD>');
       htp.p('<TD>');
       htp.formtext   (cname       => 'p_slk_from'
                      ,cattributes => 'SIZE=5'
                      );
       htp.p('</TD>');
-      htp.p('<TD>To</TD>');
+      htp.p('<TD ALIGN="right">To</TD>');
       htp.p('<TD>');
       htp.formtext   (cname       => 'p_slk_to'
                      ,cattributes => 'SIZE=5'
+                     ,cvalue      => pi_route_length
                      );
       htp.p('</TD>');
+      if pi_route_length is not null then
+        htp.formhidden (cname  => 'pi_route_length'
+                       ,cvalue => pi_route_length
+                       );
+      end if;
+      
+      if p_route is not null then                 
+        htp.formhidden (cname  => 'p_route'
+                       ,cvalue => p_route
+                       );
+      end if;                     
    ELSIF is_saved
     THEN
       htp.tableheader('Saved Network Extent');
@@ -484,7 +653,7 @@ BEGIN
                   );
    IF allow_run
     THEN
-      htp.formsubmit (cvalue=>'Run');
+        htp.formsubmit (cvalue=>'Run');
    ELSE
       htp.p('Invalid Area Source "'||l_area_type||'"');
    END IF;
@@ -590,7 +759,7 @@ BEGIN
 
 --   nm3web.header;
    htp.p('<DIV ALIGN="CENTER">');
-   htp.formopen(g_package_name||'.dynseg_define', cattributes => 'NAME="source_def"');
+   htp.formopen(g_package_name||'.select_route_page', cattributes => 'NAME="source_def"');--templine
    htp.tableopen;
    htp.p('<TR>');
    htp.p('<TD COLSPAN=2>'||htf.hr||'</TD>');
