@@ -1,15 +1,15 @@
-create or replace PACKAGE BODY Nm2_Nm3_Migration AS
+CREATE OR REPLACE PACKAGE BODY ATLAS.Nm2_Nm3_Migration AS
 --
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.6   Sep 12 2008 10:48:00   Ian Turnbull  $
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.6   Sep 12 2008 10:48:00   Ian Turnbull  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.7   Nov 21 2008 10:06:44   Ian Turnbull  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.7   Nov 21 2008 10:06:44   Ian Turnbull  $
 --       Module Name      : $Workfile:   nm2_nm3_migration.pkb  $
---       Date into PVCS   : $Date:   Sep 12 2008 10:48:00  $
---       Date fetched Out : $Modtime:   Sep 12 2008 10:45:28  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Nov 21 2008 10:06:44  $
+--       Date fetched Out : $Modtime:   Nov 21 2008 09:52:18  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --   Author D.Cope
 --
@@ -24,7 +24,7 @@ create or replace PACKAGE BODY Nm2_Nm3_Migration AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.6  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.7  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm2_nm3_migration';
   g_proc_name    VARCHAR2(50);
   g_log_file                UTL_FILE.FILE_TYPE;
@@ -91,6 +91,21 @@ is
 begin
    return old_new_tab(p_rse_he_id);
 end get_new_ne_id;
+--
+-----------------------------------------------------------------------------
+--
+function get_new_nau(p_nau number)
+return nm_admin_units.nau_unit_code%TYPE
+is
+begin
+   FOR nau_rec IN (select hau_unit_code
+                   from v2_hig_admin_units
+                   where hau_admin_unit = p_nau) LOOP
+   IF nau_rec.hau_unit_code is not null THEN
+   return nau_rec.hau_unit_code;
+   END IF;
+   END LOOP;
+end get_new_nau;
 --
 -----------------------------------------------------------------------------
 --
@@ -640,26 +655,26 @@ PROCEDURE process_admin_units (pi_v2_higowner VARCHAR2) IS
  BEGIN
     --Deleting existing data
     append_log_content(pi_text => 'Tidying existing data');
-    UPDATE HIG_USERS
-    SET  hus_admin_unit = NULL;
-    DELETE FROM NM_INV_NW_ALL;
-	DELETE FROM NM_ADMIN_GROUPS;
-    DELETE FROM NM_USER_AUS_ALL;
-	DELETE FROM DOC_TEMPLATE_USERS;
-    DELETE FROM DOCS;
-    DELETE FROM HIG_USERS
-    WHERE  hus_is_hig_owner_flag != 'Y';
-    DELETE FROM NM_MEMBERS_ALL;
-    DELETE FROM NM_ELEMENTS_ALL;
-    DELETE FROM NM_ADMIN_UNITS_ALL;
-    DELETE FROM NM_TYPE_SUBCLASS;
-    DELETE FROM NM_TYPE_COLUMNS;
-    DELETE FROM NM_TYPE_INCLUSION;
-    DELETE FROM NM_NT_GROUPINGS_ALL;
-    DELETE FROM NM_TYPES;
-    DELETE FROM NM_AU_TYPES;
-    UPDATE HIG_USERS
-    SET   hus_start_date = g_mig_earliest_date;
+ --   UPDATE HIG_USERS
+ --   SET  hus_admin_unit = NULL;
+ --   DELETE FROM NM_INV_NW_ALL;
+ --	DELETE FROM NM_ADMIN_GROUPS;
+ --   DELETE FROM NM_USER_AUS_ALL;
+ --	DELETE FROM DOC_TEMPLATE_USERS;
+ --   DELETE FROM DOCS;
+ --   DELETE FROM HIG_USERS
+ --   WHERE  hus_is_hig_owner_flag != 'Y';
+ --   DELETE FROM NM_MEMBERS_ALL;
+ --   DELETE FROM NM_ELEMENTS_ALL;
+ --   DELETE FROM NM_ADMIN_UNITS_ALL;
+ --   DELETE FROM NM_TYPE_SUBCLASS;
+ --   DELETE FROM NM_TYPE_COLUMNS;
+ --   DELETE FROM NM_TYPE_INCLUSION;
+ --   DELETE FROM NM_NT_GROUPINGS_ALL;
+ --   DELETE FROM NM_TYPES;
+ --   DELETE FROM NM_AU_TYPES;
+ --   UPDATE HIG_USERS
+ --   SET   hus_start_date = g_mig_earliest_date;
     append_log_content(pi_text => 'Done');
  END tidy_existing_data;
 --
@@ -805,7 +820,7 @@ PROCEDURE process_admin_units (pi_v2_higowner VARCHAR2) IS
         ,nau_end_date
         ,nau_admin_type
         )
-  SELECT hau_admin_unit
+  SELECT nau_admin_unit_seq.nextval
         ,hau_unit_code
         ,hau_level
         ,hau_authority_code
@@ -832,6 +847,7 @@ PROCEDURE process_admin_units (pi_v2_higowner VARCHAR2) IS
    SET  hus_admin_unit = (SELECT nau_admin_unit
                           FROM  nm_admin_units
                           WHERE  nau_level = 1
+                          AND   nau_admin_type = g_admin_type
                          )
 	,hus_user_id=(SELECT hus_user_id FROM v2_hig_users
 	              WHERE hus_username=UPPER(pi_v2_higowner))
@@ -866,10 +882,13 @@ COMMIT;
          ,hag_direct_link
    FROM   v2_hig_admin_groups
    UNION
-   SELECT hau_admin_unit
-         ,hau_admin_unit
-         ,'N'
-   FROM   v2_hig_admin_units;
+   select nau_admin_unit,nau_admin_unit,'N'
+   from nm_admin_units,v2_hig_admin_units
+   where nau_unit_code = hau_unit_code;
+   --SELECT nm3get.get_nau(pi_nau_unit_code => get_new_nau(hau_admin_unit),pi_nau_admin_type => g_admin_type).nau_admin_unit
+   --      ,nm3get.get_nau(pi_nau_unit_code => get_new_nau(hau_admin_unit),pi_nau_admin_type => g_admin_type).nau_admin_unit
+   --      ,'N'
+   --FROM   v2_hig_admin_units;
 ---
    append_log_content(pi_text => 'HIG_USERS (other)');
    FOR irec IN get_other_users LOOP
@@ -892,7 +911,7 @@ COMMIT;
      ELSE
         l_hus.hus_end_date := NULL;
      END IF;
-     l_hus.hus_admin_unit        := irec.hus_admin_unit;
+     l_hus.hus_admin_unit        := nm3get.get_nau(pi_nau_unit_code => get_new_nau(irec.hus_admin_unit),pi_nau_admin_type => g_admin_type).nau_admin_unit;
      l_hus.hus_wor_aur_min       := irec.hus_wor_aur_min;
      l_hus.hus_wor_aur_max       := irec.hus_wor_aur_max;
      IF g_debug THEN
@@ -3016,6 +3035,7 @@ WHERE NOT EXISTS (
 --
 append_log_content(pi_text => 'DOC_LOCATIONS');
 DELETE FROM DOC_TEMPLATE_COLUMNS;
+delete from doc_template_users;
 DELETE FROM DOC_TEMPLATE_GATEWAYS;
 DELETE FROM DOC_LOCATIONS;
 INSERT INTO DOC_LOCATIONS
@@ -5895,8 +5915,15 @@ END create_network_metamodel_inv;
 --
 -----------------------------------------------------------------------------
 --
+
+
+
 PROCEDURE migrate_network IS
   l_rec_ne nm_elements%ROWTYPE;
+
+  
+
+  
   CURSOR datums_to_migrate IS
   SELECT COUNT(*)
   FROM   v2_road_segs
@@ -5918,8 +5945,8 @@ PROCEDURE migrate_network IS
         ,rse_alias
         ,rse_length
         ,rse_max_chain
-        ,Nm3net.make_node_name(g_node_type, rse_pus_node_id_end) rse_pus_node_id_end
-        ,Nm3net.make_node_name(g_node_type, rse_pus_node_id_st) rse_pus_node_id_st
+        ,rse_pus_node_id_end
+        ,rse_pus_node_id_st
         ,rse_road_type
         ,rse_scl_sect_class
         ,rse_status
@@ -5956,6 +5983,9 @@ PROCEDURE migrate_network IS
      l_found  BOOLEAN;
      l_rec_no NM_NODES_ALL%ROWTYPE;
   BEGIN
+--   append_log_content(pi_text => 'Check node dates '||p_node_name||' '||p_node_id||' '||to_char(p_st_date,'dd-mon-yyyy')||' '||p_end_date );
+
+
     OPEN  cs_no(p_node_name);
     FETCH cs_no INTO l_no_rec;
     l_found := cs_no%FOUND;
@@ -6008,6 +6038,8 @@ PROCEDURE migrate_network IS
       Nm3ins.ins_no_all(l_rec_no);
       p_node_id := l_rec_no.no_node_id;
     END IF;
+--       append_log_content(pi_text => 'Done check node dates');
+ 
   END check_node_dates;
   PROCEDURE tidy_data IS
   BEGIN
@@ -6021,6 +6053,23 @@ PROCEDURE migrate_network IS
    -- EXECUTE IMMEDIATE 'ALTER TRIGGER A_DEL_NM_ELEMENTS ENABLE';
     append_log_content(pi_text => 'Done');
   END tidy_data;
+  
+  function v2_v4_node(p_v2_node nm_nodes_all.no_node_name%type)
+  return nm_nodes_all.no_node_id%type is
+  l_v4_node nm_nodes_all.no_node_id%type;
+  begin
+
+--       append_log_content(pi_text => p_v2_node);
+
+    select no_node_id
+    into l_v4_node
+    from nm_nodes_all
+    where no_node_name=Nm3net.make_node_name(g_node_type, p_v2_node)
+    and no_node_type=g_node_type;
+    return l_v4_node;
+  end v2_v4_node;
+--
+  
 BEGIN
 --
   g_proc_name := 'migrate_network';
@@ -6041,9 +6090,12 @@ BEGIN
   EXECUTE IMMEDIATE('ALTER TRIGGER NM_NODES_ALL_DT_TRG DISABLE');
   start_longop(p_what => 'Section Migration');
   BEGIN
+    EXECUTE IMMEDIATE('ALTER TRIGGER NM_ELEMENTS_ALL_AU_CHECK DISABLE');
      append_log_content(pi_text => 'NM_ELEMENTS_ALL');
      FOR cs_rec IN cs_datums
       LOOP
+--             append_log_content(pi_text => 'start loop');
+
         Nm3user.set_effective_date(cs_rec.rse_start_date);
         l_rec_ne.ne_id                  := get_new_ne_id(p_rse_he_id => cs_rec.rse_he_id); --cs_rec.rse_he_id;
         l_rec_ne.ne_unique              := cs_rec.rse_unique;
@@ -6051,7 +6103,7 @@ BEGIN
         l_rec_ne.ne_nt_type             := cs_rec.rse_sys_flag;
         l_rec_ne.ne_descr               := NVL(cs_rec.rse_descr,cs_rec.rse_unique);
         l_rec_ne.ne_length              := cs_rec.rse_length;
-        l_rec_ne.ne_admin_unit          := cs_rec.rse_admin_unit;
+        l_rec_ne.ne_admin_unit          := nm3get.get_nau(pi_nau_unit_code => get_new_nau(cs_rec.rse_admin_unit),pi_nau_admin_type => g_admin_type).nau_admin_unit;
         l_rec_ne.ne_start_date          := TRUNC(cs_rec.rse_start_date);
         l_rec_ne.ne_end_date            := TRUNC(cs_rec.rse_end_date);
         l_rec_ne.ne_gty_group_type      := NULL;
@@ -6069,10 +6121,22 @@ BEGIN
         l_rec_ne.ne_prefix              := cs_rec.rse_sys_flag;
 --
         l_rec_ne.ne_group               := NULL;
-        check_node_dates (cs_rec.rse_pus_node_id_st ,l_rec_ne.ne_start_date,l_rec_ne.ne_end_date,l_rec_ne.ne_no_start);
-        check_node_dates (cs_rec.rse_pus_node_id_end,l_rec_ne.ne_start_date,l_rec_ne.ne_end_date,l_rec_ne.ne_no_end);
+       append_log_content(pi_text => 'v2_v4');
+        
+        l_rec_ne.ne_no_start            :=v2_v4_node(cs_rec.rse_pus_node_id_st);
+        l_rec_ne.ne_no_end              :=v2_v4_node(cs_rec.rse_pus_node_id_end);
+--      append_log_content(pi_text => 'chec node dates');
+
+        check_node_dates (Nm3net.make_node_name(g_node_type,cs_rec.rse_pus_node_id_st) ,l_rec_ne.ne_start_date,l_rec_ne.ne_end_date,l_rec_ne.ne_no_start);
+        check_node_dates (Nm3net.make_node_name(g_node_type,cs_rec.rse_pus_node_id_end),l_rec_ne.ne_start_date,l_rec_ne.ne_end_date,l_rec_ne.ne_no_end);
+
+--       append_log_content(pi_text => 'Done check node dates');
+
+
         l_rec_ne.ne_nsg_ref             := NULL;
         l_rec_ne.ne_version_no          := NULL;
+--       append_log_content(pi_text => 'insert');
+
         BEGIN
            IF g_debug THEN
               Nm3debug.debug_ne(l_rec_ne);
@@ -6080,19 +6144,23 @@ BEGIN
            Nm3net.ins_ne (l_rec_ne);
         EXCEPTION
            WHEN OTHERS THEN
-             append_log_content('S'||cs_rec.rse_pus_node_id_st);
-             append_log_content('E'||cs_rec.rse_pus_node_id_end);
+             append_log_content('Unique '||cs_rec.rse_unique);
+             append_log_content('Start node '||cs_rec.rse_pus_node_id_st||' '||l_rec_ne.ne_no_start);
+             append_log_content('End node '||cs_rec.rse_pus_node_id_end||' '||l_rec_ne.ne_no_end);
              append_log_content(SQLERRM);
              append_log_content('Was raised during processing of road '||l_rec_ne.ne_unique);
              RAISE;
         END;
         g_so_far := g_so_far + 1;
         set_longop_progress(p_what => 'Section Migration');
+  --     append_log_content(pi_text => 'insert done');
+
      END LOOP;
    Nm3user.set_effective_date(c_eff_date);
    EXECUTE IMMEDIATE('ALTER TRIGGER NM_NODES_ALL_DT_TRG ENABLE');
    append_log_content(pi_text => 'Done');
    do_optional_commit;
+   EXECUTE IMMEDIATE('ALTER TRIGGER NM_ELEMENTS_ALL_AU_CHECK ENABLE');
 --
    append_proc_end_to_log;
 --
@@ -6173,7 +6241,9 @@ PROCEDURE migrate_links IS
    CURSOR cs_links IS
    SELECT *
     FROM  v2_road_segs
-   WHERE  rse_gty_group_type = 'LINK';
+   WHERE  rse_gty_group_type = 'LINK'
+ --  and 1=2
+   ;
    l_rec_ne nm_elements%ROWTYPE;
    l_context_date_on_entry DATE := Nm3user.get_effective_date;
   PROCEDURE tidy_data IS
@@ -6194,7 +6264,77 @@ BEGIN
  append_proc_start_to_log;
 --
   tidy_data;
-  append_log_content(pi_text => 'NM_POINTS');
+
+ append_log_content(pi_text => 'NM_POINTS AND NODES');
+
+  FOR l_rec IN 
+    (SELECT np_id_seq.nextval new_point_id, no_node_id_seq.nextval new_node_id, PUS_NODE_ID, PUS_POI_POINT_ID, PUS_START_DATE, PUS_DESCRIPTION, PUS_END_DATE,POI_GRID_EAST, POI_GRID_NORTH,poi_description
+     FROM v2_point_usages
+     ,v2_points
+     WHERE 
+     pus_poi_point_id=poi_point_id
+--and pus_node_id='000112'
+     and (pus_node_id,pus_poi_point_id) IN
+       (SELECT pus_node_id,MIN(pus_poi_point_id)
+        FROM
+         (SELECT pus_node_id, pus_poi_point_id
+          FROM v2_point_usages
+          WHERE (pus_node_id, pus_start_Date) IN
+           (SELECT pus_node_id, MAX(pus_start_Date)
+            FROM v2_point_usages
+            GROUP BY pus_node_id
+           )
+         )
+         GROUP BY pus_node_id
+       ))
+   LOOP
+
+
+    l_po.np_id         := l_rec.new_point_id;
+    l_po.np_grid_east  := l_rec.poi_grid_east;
+    l_po.np_grid_north := l_rec.poi_grid_north;
+    l_po.np_descr      := nvl(l_rec.poi_description,l_po.np_id);
+    IF g_debug THEN
+      Nm3debug.debug_np(l_po);
+    END IF;
+    Nm3ins.ins_np(l_po);
+
+    l_no.no_node_id    := l_rec.new_node_id;
+--    l_no.no_node_name  := Nm3net.make_node_name('ROAD', l_rec.pus_node_id);
+    l_no.no_node_name  := Nm3net.make_node_name(g_node_type, l_rec.pus_node_id);
+    l_no.no_start_date := TRUNC(LEAST(nvl(l_rec.pus_end_date,l_rec.pus_start_date), l_rec.pus_start_date));
+    l_no.no_end_date   := TRUNC(l_rec.pus_end_date);
+    l_no.no_np_id      := l_po.np_id;
+    l_no.no_descr      := NVL(l_rec.pus_description,l_no.no_node_name);
+    l_no.no_node_type  := g_node_type;
+    IF g_debug THEN
+      Nm3debug.debug_no_all(l_no);
+    END IF;
+    
+    Nm3ins.ins_no_all(l_no);
+/*    nm3net.create_or_reuse_point_and_node(
+                                         pi_np_grid_east     =>l_rec.POI_GRID_EAST
+                                        ,pi_np_grid_north    =>l_rec.POI_GRID_north
+										,pi_no_start_date    =>l_no.no_start_Date
+										,pi_no_node_type     =>g_node_type
+										,pi_node_descr       =>l_no.no_descr
+										,po_no_node_id       =>l_no.no_node_id
+										,po_np_id            =>l_no.no_np_id
+										);
+
+-- append_log_content(pi_text => l_no.no_node_name||' '||l_no.no_node_id);
+ 
+   update nm_nodes_all
+   set no_node_name=l_no.no_node_name
+   where no_node_id=l_no.no_node_id
+   and no_node_type=g_node_type;
+*/
+    
+    g_so_far := g_so_far + 1;
+    set_longop_progress('Nodes');
+  END LOOP;
+
+/*  append_log_content(pi_text => 'NM_POINTS');
   OPEN get_number_of_points;
   FETCH get_number_of_points INTO g_total_todo;
   CLOSE get_number_of_points;
@@ -6242,7 +6382,7 @@ BEGIN
     g_so_far := g_so_far + 1;
     set_longop_progress('Nodes');
   END LOOP;
-
+*/
 
 
 /*  FOR irec IN get_all_point_usages LOOP
@@ -6264,6 +6404,7 @@ BEGIN
   END LOOP;
 */
 --
+EXECUTE IMMEDIATE('ALTER TRIGGER NM_ELEMENTS_ALL_AU_CHECK DISABLE');
  append_log_content(pi_text => 'NM_ELEMENTS_ALL');
   OPEN number_of_links;
   FETCH number_of_links INTO g_total_todo;
@@ -6275,7 +6416,7 @@ BEGIN
     l_rec_ne.ne_type                := 'G';
     l_rec_ne.ne_descr               := NVL(cs_rec.rse_descr,cs_rec.rse_unique);
     l_rec_ne.ne_length              := NULL;--cs_rec.rse_length;
-    l_rec_ne.ne_admin_unit          := cs_rec.rse_admin_unit;
+    l_rec_ne.ne_admin_unit          := nm3get.get_nau(pi_nau_unit_code => get_new_nau(cs_rec.rse_admin_unit),pi_nau_admin_type => g_admin_type).nau_admin_unit;
     l_rec_ne.ne_start_date          := TRUNC(cs_rec.rse_start_date);
     IF cs_rec.rse_end_date IS NOT NULL
      AND cs_rec.rse_end_date < cs_rec.rse_start_date
@@ -6328,6 +6469,7 @@ BEGIN
     set_longop_progress('Links');
  END LOOP;
  do_optional_commit;
+ EXECUTE IMMEDIATE('ALTER TRIGGER NM_ELEMENTS_ALL_AU_CHECK ENABLE');
  Nm3user.set_effective_date(l_context_date_on_entry);
 --
  append_proc_end_to_log;
@@ -7928,10 +8070,10 @@ BEGIN
             ,pi_first_stage        => TRUE
             ,pi_with_debug         => pi_with_debug);
   g_issue_commits := 'N';
- --already hav ethe admin units. process_admin_units(pi_v2_higowner);
+ process_admin_units(pi_v2_higowner);
   oracle_users_roles_privs;
   process_hig_data;
-  process_doc_data;
+ process_doc_data;
 --  process_gis_data;  --now do this after the network has been migrated and the spatial table created
   do_commit;
   append_mig_end_to_log;
@@ -8312,10 +8454,10 @@ PROCEDURE do_spatial_migration(pi_table_name IN user_tables.table_name%TYPE
   l_geom 	  mdsys.sdo_geometry;
   l_diminfo  mdsys.sdo_dim_array;
 
-  cursor c1
+/*  cursor c1
   is
   select * from worcs_net_map;
-
+*/
 
   l_base_srid NUMBER;
   p_x1 NUMBER;
@@ -8324,8 +8466,8 @@ PROCEDURE do_spatial_migration(pi_table_name IN user_tables.table_name%TYPE
   p_y2 NUMBER;
   l_base_diminfo mdsys.sdo_dim_array;
 BEGIN
-
-  initialise(pi_log_file_location  => pi_log_file_location
+null;
+/*  initialise(pi_log_file_location  => pi_log_file_location
             ,pi_log_file_name      => 'nm2_nm3_migration_part4_'||TO_CHAR(SYSDATE, 'DDMONYYYY_HH24MISS')||'.log'
             ,pi_first_stage        => FALSE
             ,pi_with_debug         => pi_with_debug);
@@ -8686,7 +8828,7 @@ append_log_content(pi_text =>'5');
   END IF;
 
 */
-
+/*
   Fix_Route_Theme;
 
 
@@ -8700,6 +8842,8 @@ append_log_content(pi_text =>'5');
 --        do_rollback;
 --        close_log;
 --        RAISE_APPLICATION_ERROR(-20001,SQLERRM);
+
+*/
 END do_spatial_migration;
 
 
