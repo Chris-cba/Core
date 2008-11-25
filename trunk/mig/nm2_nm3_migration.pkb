@@ -4,12 +4,12 @@ CREATE OR REPLACE PACKAGE BODY ATLAS.Nm2_Nm3_Migration AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.7   Nov 21 2008 10:06:44   Ian Turnbull  $
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.7   Nov 21 2008 10:06:44   Ian Turnbull  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.8   Nov 25 2008 12:59:24   Ian Turnbull  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.8   Nov 25 2008 12:59:24   Ian Turnbull  $
 --       Module Name      : $Workfile:   nm2_nm3_migration.pkb  $
---       Date into PVCS   : $Date:   Nov 21 2008 10:06:44  $
---       Date fetched Out : $Modtime:   Nov 21 2008 09:52:18  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Nov 25 2008 12:59:24  $
+--       Date fetched Out : $Modtime:   Nov 24 2008 11:00:30  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --   Author D.Cope
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY ATLAS.Nm2_Nm3_Migration AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.7  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.8  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm2_nm3_migration';
   g_proc_name    VARCHAR2(50);
   g_log_file                UTL_FILE.FILE_TYPE;
@@ -8434,10 +8434,6 @@ BEGIN
 
 END;
 
-
-
-
-
 PROCEDURE do_spatial_migration(pi_table_name IN user_tables.table_name%TYPE
                               ,pi_id_col_name IN user_tab_columns.COLUMN_NAME%TYPE
                               ,pi_shape_col_name IN user_tab_columns.COLUMN_NAME%TYPE
@@ -8454,11 +8450,6 @@ PROCEDURE do_spatial_migration(pi_table_name IN user_tables.table_name%TYPE
   l_geom 	  mdsys.sdo_geometry;
   l_diminfo  mdsys.sdo_dim_array;
 
-/*  cursor c1
-  is
-  select * from worcs_net_map;
-*/
-
   l_base_srid NUMBER;
   p_x1 NUMBER;
   p_y1 NUMBER;
@@ -8466,27 +8457,13 @@ PROCEDURE do_spatial_migration(pi_table_name IN user_tables.table_name%TYPE
   p_y2 NUMBER;
   l_base_diminfo mdsys.sdo_dim_array;
 BEGIN
-null;
-/*  initialise(pi_log_file_location  => pi_log_file_location
+
+  initialise(pi_log_file_location  => pi_log_file_location
             ,pi_log_file_name      => 'nm2_nm3_migration_part4_'||TO_CHAR(SYSDATE, 'DDMONYYYY_HH24MISS')||'.log'
             ,pi_first_stage        => FALSE
             ,pi_with_debug         => pi_with_debug);
   g_issue_commits := 'N';
 
-
-  for c1rec in c1
-   loop
-     begin
-       l_ne_id :=  get_new_ne_id(c1rec.rse_he_id);
-       update worcs_net_map
-       set rse_he_id = l_ne_id
-       where rse_he_id = c1rec.rse_he_id;
-     exception when no_data_found then null;
-     end;
-  end loop;
-
-
-  l_ne_id := null;
   SELECT COUNT(*)
   INTO l_number
   FROM user_tab_columns
@@ -8540,7 +8517,9 @@ null;
   --l_sql:='truncate table migration_net_map_rev';
   --EXECUTE IMMEDIATE l_sql;
 
-  L_sql:='insert into MIGRATION_NET_MAP SELECT '||pi_id_col_name||' mig_ne_id ,'||pi_shape_col_name||' shape FROM '||pi_table_name;
+  L_sql:='insert into MIGRATION_NET_MAP SELECT get_new_ne_id('||pi_id_col_name||') mig_ne_id ,'||pi_shape_col_name||' shape FROM '||pi_table_name;
+
+
 
   EXECUTE IMMEDIATE l_sql;
 
@@ -8563,6 +8542,7 @@ append_log_content(pi_text => 'update theme');
   ,NTH_FEATURE_SHAPE_COLUMN='SHAPE'
   WHERE nth_feature_table=pi_table_name
   AND NTH_FEATURE_PK_COLUMN=pi_id_col_name;
+
 
 
   SELECT nth_theme_id
@@ -8588,7 +8568,6 @@ append_log_content(pi_text =>' inseert into MIGRATION_NET_MAP_MP');
       (SELECT 'x' FROM NM_ELEMENTS_ALL
       WHERE ne_id=mig_ne_id)) LOOP
 	BEGIN
-  append_log_content(pi_text =>'1');
 	  SELECT shape, ne_length,sdo_lrs.geom_segment_end_measure( shape, l_diminfo ),ne_unique,ne_id
 	  INTO l_geom,l_length,l_shape_length,l_unique, l_ne_id
 	  FROM MIGRATION_NET_MAP,NM_ELEMENTS_ALL
@@ -8598,18 +8577,18 @@ append_log_content(pi_text =>' inseert into MIGRATION_NET_MAP_MP');
       IF l_shape_length!=l_length THEN
         append_log_content(pi_text => '  Shape Length (was '||l_shape_length||') will be updated to Element Length '||l_length||' for '||l_unique||'('||irec.mig_ne_id||')');
       END IF;
-append_log_content(pi_text =>'2');
+
 	  l_geom:=Nm3sdo.remove_redundant_pts(p_layer =>l_layer,p_geom =>l_geom);
-append_log_content(pi_text =>'3');
+
       IF Nm3sdo.get_no_parts(l_geom) > 3 THEN
 	    l_geom:=Make_Single_Part3( l_geom, l_diminfo);
 	  END IF;
-append_log_content(pi_text =>'4');
+
 	  l_geom:=Nm3sdo.rescale_geometry(p_layer =>l_layer
                            			 ,p_ne_id =>l_ne_id
    					                 ,p_geom  =>l_geom);
-append_log_content(pi_text =>'5');
-   	  l_geom:=Nm3sdo.ignore_measure(l_geom);
+
+--   	  l_geom:=Nm3sdo.ignore_measure(l_geom);
 
 
 
@@ -8717,7 +8696,7 @@ append_log_content(pi_text =>'5');
 
   append_log_content(pi_text => '  Deleting Records');
 
---  DELETE FROM NM_POINT_LOCATIONS;
+  DELETE FROM NM_POINT_LOCATIONS;
 
   append_log_content(pi_text => '  Creating Records');
 
@@ -8828,7 +8807,7 @@ append_log_content(pi_text =>'5');
   END IF;
 
 */
-/*
+
   Fix_Route_Theme;
 
 
@@ -8842,8 +8821,6 @@ append_log_content(pi_text =>'5');
 --        do_rollback;
 --        close_log;
 --        RAISE_APPLICATION_ERROR(-20001,SQLERRM);
-
-*/
 END do_spatial_migration;
 
 
@@ -9322,6 +9299,9 @@ BEGIN
 END Fix_Route_Theme;
 
 
+
+
+
 procedure resume_invent_migration
 (pi_log_file_location IN VARCHAR2
 ,pi_inv_type              IN varchar2
@@ -9379,7 +9359,7 @@ BEGIN
 --
 
    nm2_nm3_migration.initialise(pi_log_file_location  => pi_log_file_location
-              ,pi_log_file_name      => 'worcs_mig_bits'||TO_CHAR(SYSDATE, 'DDMONYYYY_HH24MISS')||'.LOG'
+              ,pi_log_file_name      => 'resume_inventory_'||TO_CHAR(SYSDATE, 'DDMONYYYY_HH24MISS')||'.LOG'
               ,pi_with_debug         => FALSE);
 
    g_proc_name := 'migrate_inventory';
