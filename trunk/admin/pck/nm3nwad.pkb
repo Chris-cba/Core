@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.6   Nov 10 2008 14:13:20   rcoupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.7   Nov 28 2008 12:42:36   rcoupe  $
 --       Module Name      : $Workfile:   nm3nwad.pkb  $
---       Date into PVCS   : $Date:   Nov 10 2008 14:13:20  $
---       Date fetched Out : $Modtime:   Nov 10 2008 09:52:18  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Nov 28 2008 12:42:36  $
+--       Date fetched Out : $Modtime:   Nov 13 2008 15:13:10  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -36,7 +36,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.6  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.7  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'nm3nwad';
 
@@ -612,19 +612,27 @@ BEGIN
    IF pi_tab_nm.COUNT > 0 THEN
       FOR i IN 1..pi_tab_nm.COUNT LOOP
 
-         --nm_debug.debug('Creating membership record : '||to_char(pi_members(i)));
-         l_rec_nm.nm_ne_id_in      := l_rec_ne.ne_id;
-         l_rec_nm.nm_ne_id_of      := pi_tab_nm(i);
-         l_rec_nm.nm_type          := 'G';
-         l_rec_nm.nm_obj_type      := l_rec_ne.ne_gty_group_type;
-         l_rec_nm.nm_begin_mp      := 0;
-         l_rec_nm.nm_start_date    := pi_rec_ne.ne_start_date;
---       l_rec_nm.nm_start_date    := Nm3user.get_effective_date;
-         l_rec_nm.nm_end_mp        := Nm3net.Get_Ne_Length(pi_tab_nm(i));
-         l_rec_nm.nm_cardinality   := 1;
-         l_rec_nm.nm_admin_unit    := Nm3get.get_ne(pi_ne_id => pi_tab_nm(i)).ne_admin_unit;
+         declare
+           l_rec_ne nm_elements%rowtype;
+         begin
 
-         Nm3ins.ins_nm ( l_rec_nm );
+           l_rec_ne := nm3get.get_ne( pi_tab_nm(i) );
+
+           --nm_debug.debug('Creating membership record : '||to_char(pi_members(i)));
+           l_rec_nm.nm_ne_id_in      := l_rec_ne.ne_id;
+           l_rec_nm.nm_ne_id_of      := pi_tab_nm(i);
+           l_rec_nm.nm_type          := 'G';
+           l_rec_nm.nm_obj_type      := l_rec_ne.ne_gty_group_type;
+           l_rec_nm.nm_begin_mp      := 0;
+           l_rec_nm.nm_start_date    := greatest(pi_rec_ne.ne_start_date, l_rec_ne.ne_start_date );
+  --       l_rec_nm.nm_start_date    := Nm3user.get_effective_date;
+           l_rec_nm.nm_end_mp        := Nm3net.Get_Ne_Length(pi_tab_nm(i));
+           l_rec_nm.nm_cardinality   := 1;
+           l_rec_nm.nm_admin_unit    := Nm3get.get_ne(pi_ne_id => pi_tab_nm(i)).ne_admin_unit;
+
+           Nm3ins.ins_nm ( l_rec_nm );
+
+         end;
 
       END LOOP;
    END IF;
