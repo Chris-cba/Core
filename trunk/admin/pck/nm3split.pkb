@@ -1,12 +1,12 @@
-CREATE OR REPLACE PACKAGE BODY Nm3split IS
+CREATE OR REPLACE PACKAGE BODY DORSET.Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.4   Aug 22 2008 10:17:40   rcoupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.5   Nov 28 2008 12:26:12   rcoupe  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Aug 22 2008 10:17:40  $
---       Date fetched Out : $Modtime:   Aug 22 2008 10:16:06  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Nov 28 2008 12:26:12  $
+--       Date fetched Out : $Modtime:   Nov 28 2008 12:25:44  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -1049,6 +1049,37 @@ PROCEDURE do_split ( p_ne_id nm_elements.ne_id%TYPE -- the element to split
    --
    l_grid_east  NUMBER;
    l_grid_north NUMBER;
+
+   l_split_measure number := p_split_measure; -- need to cater for cases where the split is via a pure XY
+
+   l_theme  nm_themes_all.nth_theme_id%type;
+/*
+This is a version of the private function from nm3sdo - needs to be removed asap RAC November 2008
+*/
+FUNCTION Get_Datum_Theme( p_nt IN NM_TYPES.nt_type%TYPE ) RETURN NM_THEMES_ALL.nth_theme_id%TYPE IS
+retval NM_THEMES_ALL.nth_theme_id%TYPE;
+CURSOR c_nth ( c_nt IN NM_TYPES.nt_type%TYPE ) IS
+  SELECT nth_theme_id
+  FROM NM_THEMES_ALL, NM_NW_THEMES, NM_LINEAR_TYPES
+  WHERE nth_theme_id = nnth_nth_theme_id
+  AND   nnth_nlt_id = nlt_id
+  AND   nlt_g_i_d   = 'D'
+  AND   nlt_nt_type = c_nt
+  AND   nth_dependency = 'I'
+  AND   nth_base_table_theme is null;
+
+BEGIN
+  OPEN c_nth(p_nt);
+  FETCH c_nth INTO retval;
+  CLOSE c_nth;
+  RETURN retval;
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    CLOSE c_nth;
+    RETURN NULL;
+END;
+
+---------------------------------------------------------------------------------------------------------
    --
 BEGIN
 --
@@ -1102,7 +1133,7 @@ BEGIN
            --  grid co-ordinates of the point. This code will add the co-ordinates.
            --
            BEGIN
-              IF p_np_grid_east IS NULL AND p_np_grid_north IS NULL THEN
+              IF p_split_measure is not null and p_np_grid_east IS NULL AND p_np_grid_north IS NULL THEN
                 Nm3sdm.get_datum_xy_from_measure( p_ne_id => p_ne_id,
                                                   p_measure => p_split_measure,
                                                   p_x => l_grid_east,
@@ -1139,13 +1170,26 @@ BEGIN
 --
 
 
+   if p_split_measure is null then
+
+     l_theme := Get_Datum_Theme( g_rec_ne_old.ne_nt_type);
+
+     l_split_measure := NM3SDO.GET_MEASURE(l_theme, p_ne_id, l_grid_east, l_grid_north ).lr_offset;
+
+--   l_split_measure := SDO_LRS.FIND_MEASURE(NM3SDO.GET_LAYER_ELEMENT_GEOMETRY(pi_ne_id), nm3sdo.get_2d_pt(pi_np_grid_east, pi_np_grid_north), 0.005 );
+   else
+
+     l_split_measure := p_split_measure;
+
+   end if;
+
    split_element (p_ne_id               => p_ne_id
                  ,p_type_of_split       => 'S'
                  ,p_effective_date      => p_effective_date
                  ,p_ne_id_1             => p_ne_id_1
-                 ,p_ne_length_1         => p_split_measure
+                 ,p_ne_length_1         => l_split_measure
                  ,p_ne_id_2             => p_ne_id_2
-                 ,p_ne_length_2         => g_rec_ne_old.ne_length - p_split_measure
+                 ,p_ne_length_2         => g_rec_ne_old.ne_length - l_split_measure
                  ,p_node                => p_node
                  ,p_force_inheritance_of_attribs => 'N'
                  ,p_ne_unique_1         => p_ne_unique_1
@@ -1192,7 +1236,7 @@ BEGIN
 --
 
    Nm3sdm.split_element_shapes( p_ne_id => p_ne_id,
-                                p_measure => p_split_measure,
+                                p_measure => l_split_measure,
                                 p_ne_id_1 => p_ne_id_1,
                                 p_ne_id_2 => p_ne_id_2,
                                 p_x => l_grid_east,
@@ -1201,14 +1245,14 @@ BEGIN
    split_members (p_ne_id          => p_ne_id
                  ,p_ne_id_1        => p_ne_id_1
                  ,p_ne_id_2        => p_ne_id_2
-                 ,p_split_measure  => p_split_measure
+                 ,p_split_measure  => l_split_measure
                  ,p_effective_date => p_effective_date
                  );
 --
    split_other_products (p_ne_id          => p_ne_id
                         ,p_ne_id_1        => p_ne_id_1
                         ,p_ne_id_2        => p_ne_id_2
-                        ,p_split_measure  => p_split_measure
+                        ,p_split_measure  => l_split_measure
                         ,p_effective_date => p_effective_date
                         );
 --
@@ -1298,7 +1342,6 @@ PROCEDURE do_geo_split
 BEGIN
 --
    Nm_Debug.proc_start(g_package_name,'do_geo_split');
---
 --
    check_element_can_be_split(pi_effective_date => p_effective_date);
 --
@@ -2342,13 +2385,26 @@ PROCEDURE do_split_datum_or_group ( pi_ne_id                  IN     nm_elements
  l_no_node_type nm_node_types.nnt_type%TYPE := Nm3net.get_nt(pi_nt_type => l_datum_nt).nt_node_type;
  l_effective_date DATE := TRUNC(pi_effective_date);
 
+ l_length  number;
+
+
 BEGIN
   Nm_Debug.proc_start(g_package_name,'do_split_datum_or_group');
 --
+
+  if pi_split_offset is null and pi_np_grid_east is not null and pi_np_grid_north is not null then
+
+    l_length := SDO_LRS.FIND_MEASURE(NM3SDO.GET_LAYER_ELEMENT_GEOMETRY(pi_ne_id), nm3sdo.get_2d_pt(pi_np_grid_east, pi_np_grid_north), 0.005 );
+
+  else
+    l_length := pi_split_offset;
+
+  end if;
+
    check_element_can_be_split(pi_effective_date => pi_effective_date);
 --
    validate_split_position (pi_ne_id            => pi_ne_id
-                           ,pi_split_offset     => pi_split_offset
+                           ,pi_split_offset     => l_length --pi_split_offset
                            ,pi_split_at_node    => pi_split_at_node_id
                            ,pi_non_ambig_ne_id  => pi_non_ambig_ne_id
                            ,pi_non_ambig_split_offset => pi_non_ambig_split_offset
@@ -2357,10 +2413,11 @@ BEGIN
    Nm3lock.lock_element_and_members (pi_ne_id);
 --
    set_for_split;
+
  IF Nm3net.element_is_a_datum(pi_ne_type => pi_ne_type) THEN
             do_split(p_ne_id               => pi_ne_id
                     ,p_effective_date      => l_effective_date
-                    ,p_split_measure       => pi_split_offset
+                    ,p_split_measure       => l_length --pi_split_offset
                     ,p_ne_id_1             => pi_ne_id_1
                     ,p_ne_id_2             => pi_ne_id_2
                     ,p_node                => pi_node_id
@@ -2470,13 +2527,13 @@ BEGIN
  set_for_return;
 
  Nm_Debug.proc_end(g_package_name,'do_split_datum_or_group');
-
+/*
 EXCEPTION
   WHEN OTHERS THEN
      set_for_return;
      ROLLBACK;
      RAISE;
-
+*/
 END do_split_datum_or_group;
 --
 ------------------------------------------------------------------------------------------------
