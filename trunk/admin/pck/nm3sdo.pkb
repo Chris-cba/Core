@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.13   Nov 12 2008 10:16:38   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.14   Nov 28 2008 15:10:48   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Nov 12 2008 10:16:38  $
---       Date fetched Out : $Modtime:   Nov 12 2008 10:14:36  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Nov 28 2008 15:10:48  $
+--       Date fetched Out : $Modtime:   Nov 28 2008 15:10:06  $
+--       PVCS Version     : $Revision:   2.14  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.13  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.14  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -6871,9 +6871,9 @@ BEGIN
 
        IF irec.dim_setting = 2 THEN
           get_shape_str := 'sdo_lrs.convert_to_std_geom(nm3sdo.get_shape_from_nm( '||TO_CHAR(p_layer)||', nm_ne_id_in, nm_ne_id_of, nm_begin_mp, nm_end_mp ))';
-    ELSE
-       get_shape_str := 'nm3sdo.get_shape_from_nm( '||TO_CHAR(p_layer)||', nm_ne_id_in, nm_ne_id_of, nm_begin_mp, nm_end_mp )';
-    END IF;
+       ELSE
+          get_shape_str := 'nm3sdo.get_shape_from_nm( '||TO_CHAR(p_layer)||', nm_ne_id_in, nm_ne_id_of, nm_begin_mp, nm_end_mp )';
+       END IF;
 
        EXECUTE IMMEDIATE 'delete from '||irec.nth_feature_table||
                          ' where ne_id_of = :ne_id ' USING p_ne_id;
@@ -6899,7 +6899,8 @@ BEGIN
 
        ELSE
 
-         if irec.g_or_i = 'I' and is_ad_link_type( irec.objtype ) = 'FALSE' then
+         if (irec.g_or_i = 'I' and is_ad_link_type( irec.objtype ) = 'FALSE') OR
+             irec.g_or_i = 'G' then
 
            lstr := 'insert into '||irec.nth_feature_table||
                           ' ( OBJECTID, NE_ID, NE_ID_OF, NM_BEGIN_MP, NM_END_MP, GEOLOC, START_DATE, END_DATE )'||
