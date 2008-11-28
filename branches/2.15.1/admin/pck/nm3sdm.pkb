@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.15.1.3   Nov 28 2008 12:23:00   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.15.1.4   Nov 28 2008 18:04:56   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Nov 28 2008 12:23:00  $
---       Date fetched Out : $Modtime:   Nov 28 2008 12:21:58  $
---       PVCS Version     : $Revision:   2.15.1.3  $
+--       Date into PVCS   : $Date:   Nov 28 2008 18:04:56  $
+--       Date fetched Out : $Modtime:   Nov 28 2008 18:04:18  $
+--       PVCS Version     : $Revision:   2.15.1.4  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.15.1.3  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.15.1.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -5008,6 +5008,14 @@ end;
             || ' and ne_id_of = :ne_id_of '
             || ' and nm_begin_mp = :nm_begin_mp '
             || ' and end_date is null';
+
+           l_geom :=
+             Nm3sdo.get_shape_from_nm (irec.nbth_base_theme,
+                                      p_nm_ne_id_in,
+                                      p_nm_ne_id_of,
+                                      p_new_begin_mp,
+                                      p_nm_end_mp
+                                     );
 
            EXECUTE IMMEDIATE upd_string
                      USING l_geom,
