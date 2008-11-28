@@ -1,12 +1,12 @@
-CREATE OR REPLACE PACKAGE BODY DORSET.Nm3split IS
+CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.5   Nov 28 2008 12:26:12   rcoupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.6   Nov 28 2008 15:21:38   aedwards  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Nov 28 2008 12:26:12  $
---       Date fetched Out : $Modtime:   Nov 28 2008 12:25:44  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Nov 28 2008 15:21:38  $
+--       Date fetched Out : $Modtime:   Nov 28 2008 15:21:16  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY DORSET.Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
