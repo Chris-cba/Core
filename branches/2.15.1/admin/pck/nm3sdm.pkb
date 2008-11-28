@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.15.1.2   Nov 27 2008 17:21:58   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.15.1.3   Nov 28 2008 12:23:00   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Nov 27 2008 17:21:58  $
---       Date fetched Out : $Modtime:   Nov 27 2008 17:19:40  $
---       PVCS Version     : $Revision:   2.15.1.2  $
+--       Date into PVCS   : $Date:   Nov 28 2008 12:23:00  $
+--       Date fetched Out : $Modtime:   Nov 28 2008 12:21:58  $
+--       PVCS Version     : $Revision:   2.15.1.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.15.1.2  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.15.1.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -765,15 +765,7 @@ PROCEDURE make_nt_spatial_layer
       IF Nm3sdo.element_has_shape( p_layer, p_ne_id ) = 'TRUE'
       THEN
 
-        IF p_measure IS NULL THEN
-
-          l_measure := Nm3sdo.get_measure ( p_layer, p_ne_id, p_x, p_y ).lr_offset;
-
-        ELSE
-
-          l_measure := p_measure;
-
-        END IF;
+        l_measure := Nm3sdo.get_measure ( p_layer, p_ne_id, p_x, p_y ).lr_offset;
 
         sdo_lrs.split_geom_segment( l_geom, l_usgm.diminfo, l_measure, p_geom_1, p_geom_2 );
 
@@ -781,10 +773,10 @@ PROCEDURE make_nt_spatial_layer
                        ( geom_segment  => p_geom_1
                        , dim_array     => l_usgm.diminfo
                        , start_measure => 0
-                       , end_measure   => l_measure
+                       , end_measure   => nvl(p_measure,l_measure)
                        , shift_measure => 0 );
 
-        l_end   := Nm3net.get_datum_element_length( p_ne_id ) - l_measure;
+        l_end   := Nm3net.get_datum_element_length( p_ne_id ) - nvl(p_measure,l_measure);
 
         p_geom_2 := sdo_lrs.scale_geom_segment
                        ( geom_segment  => p_geom_2
@@ -5523,35 +5515,37 @@ end;
 
           l_seq_name := Nm3sdo.get_spatial_seq (irec.nth_theme_id);
 
-          l_geom := sdo_lrs.convert_to_std_geom
-                               (Nm3sdo.get_shape_from_nm (irec.nbth_base_theme,
-                                                          p_nm_ne_id_in,
-                                                          p_nm_ne_id_of,
-                                                          p_nm_begin_mp,
-                                                          p_nm_end_mp
-                                                         )
-                               );
+--          l_geom := sdo_lrs.convert_to_std_geom
+--                               (Nm3sdo.get_shape_from_nm (irec.nbth_base_theme,
+--                                                          p_nm_ne_id_in,
+--                                                          p_nm_ne_id_of,
+--                                                          p_nm_begin_mp,
+--                                                          p_nm_end_mp
+--                                                         )
+--                               );
 
           ins_string := 'insert into '
               || irec.nth_feature_table
               ||' ( objectid, ne_id, ne_id_of, nm_begin_mp, nm_end_mp, geoloc, start_date, end_date )'
               ||' select '||l_seq_name||'.nextval, nad_iit_ne_id, :ne_id_of, :nm_begin_mp, :nm_end_mp, '
-              ||' :l_geom '||', '
+              ||' Nm3sdo.get_shape_from_nm ('||to_char(irec.nbth_base_theme)||', '
               ||' :group_ne_id, '
               ||' :ne_id_of, '
               ||' :nm_begin_mp, '
               ||' :nm_end_mp ), :start_date, :end_date '
               ||' from nm_nw_ad_link where nad_ne_id = :group_ne_id '
               ||' and nad_inv_type = :obj_type '
-              ||' and nad_whole_road = '||''''||'1'||'''';
-
-          if l_geom is not null then
+              ||' and nad_whole_road = '||''''||'1'||''''
+              ||' and Nm3sdo.get_shape_from_nm ('||to_char(irec.nbth_base_theme)||', '
+              ||' :group_ne_id, '
+              ||' :ne_id_of, '
+              ||' :nm_begin_mp, '
+              ||' :nm_end_mp ) is not null';
 
           EXECUTE IMMEDIATE ins_string
                            USING p_nm_ne_id_of,
                                  p_nm_begin_mp,
                                  p_nm_end_mp,
-                                 l_geom,
                                  p_nm_ne_id_in,
                                  p_nm_ne_id_of,
                                  p_nm_begin_mp,
@@ -5559,8 +5553,12 @@ end;
                                  p_nm_start_date,
                                  p_nm_end_date,
                                  p_nm_ne_id_in,
-                                 irec.obj_type;
-          end if;
+                                 irec.obj_type,
+                                 p_nm_ne_id_in,
+                                 p_nm_ne_id_of,
+                                 p_nm_begin_mp,
+                                 p_nm_end_mp;
+
 
 
         END IF;
