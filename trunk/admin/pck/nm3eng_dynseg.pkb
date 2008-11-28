@@ -1,11 +1,11 @@
-CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
+CREATE OR REPLACE PACKAGE BODY KANSAS.nm3eng_dynseg AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.4   Dec 17 2007 13:57:52   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.5   Nov 28 2008 10:32:32   rcoupe  $
 --       Module Name      : $Workfile:   nm3eng_dynseg.pkb  $
---       Date into PVCS   : $Date:   Dec 17 2007 13:57:52  $
---       Date fetched Out : $Modtime:   Dec 17 2007 13:56:00  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Nov 28 2008 10:32:32  $
+--       Date fetched Out : $Modtime:   Nov 28 2008 10:30:28  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on sccs version : 1.13
 --
 --   Author : Jonathan Mills
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg';
@@ -55,7 +55,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
    g_bins_run       BOOLEAN := FALSE;
    --
    g_field_is_number BOOLEAN;
-   
+
    --
 --
 -----------------------------------------------------------------------------
@@ -286,7 +286,7 @@ BEGIN
   else
     --
     null;
-    
+
    END IF;
 --
 END populate_stats_arrays;
@@ -317,7 +317,7 @@ FUNCTION get_most_common_value (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_j
                                ) RETURN VARCHAR2 IS
 --
 BEGIN
-  
+
   -- use derived assets preprocessed value
   if pi_nms_mrg_job_id = nm3eng_dynseg_util.get_context_mrg_job_id then
     return nm3eng_dynseg_util.get_chr_value(
@@ -327,7 +327,7 @@ BEGIN
              ,p_xsp             => pi_xsp
              ,p_call_attrib     => pi_view_col
            );
-  
+
   -- original standard processing
   else
     running_for_merge;
@@ -338,9 +338,9 @@ BEGIN
                           ,pi_xsp            => pi_xsp
                           ,pi_view_col       => pi_view_col
                           );
- 
+
     RETURN  g_val_dist_arr.nvda_highest_pct;
-  
+
   end if;
 
 EXCEPTION
@@ -428,7 +428,7 @@ BEGIN
              ,p_xsp             => pi_xsp
              ,p_call_attrib     => pi_view_col
            );
-  
+
   -- original standard processing
   else
    running_for_merge;
@@ -440,7 +440,7 @@ BEGIN
                                  ,pi_view_col       => pi_view_col
                                  );
    RETURN  g_stat_array.nsa_max_x;
-   
+
   end if;
 
 EXCEPTION
@@ -527,7 +527,7 @@ BEGIN
              ,p_xsp             => pi_xsp
              ,p_call_attrib     => pi_view_col
            );
-  
+
   -- original standard processing
   else
     running_for_merge;
@@ -539,7 +539,7 @@ BEGIN
                           ,pi_view_col       => pi_view_col
                           );
     RETURN  g_stat_array.nsa_min_x;
-    
+
   end if;
 
 EXCEPTION
@@ -626,7 +626,7 @@ BEGIN
              ,p_xsp             => pi_xsp
              ,p_call_attrib     => pi_view_col
            );
-  
+
   -- original standard processing
   else
     running_for_merge;
@@ -637,9 +637,9 @@ BEGIN
                           ,pi_xsp            => pi_xsp
                           ,pi_view_col       => pi_view_col
                           );
- 
+
     RETURN g_stat_array.nsa_y_weighted_ave_x;
-   
+
  end if;
 
 EXCEPTION
@@ -725,7 +725,7 @@ BEGIN
              ,p_xsp             => pi_xsp
              ,p_call_attrib     => pi_view_col
            );
-  
+
   -- original standard processing
   else
     running_for_merge;
@@ -736,9 +736,9 @@ BEGIN
                           ,pi_xsp            => pi_xsp
                           ,pi_view_col       => pi_view_col
                           );
- 
+
     RETURN g_stat_array.nsa_median_x;
-  
+
   end if;
 
 EXCEPTION
@@ -825,7 +825,7 @@ BEGIN
              ,p_xsp             => pi_xsp
              ,p_call_attrib     => pi_view_col
            );
-  
+
   -- original standard processing
   else
     running_for_merge;
@@ -837,7 +837,7 @@ BEGIN
                           ,pi_view_col       => pi_view_col
                           );
     RETURN g_stat_array.nsa_mean_x;
-  
+
   end if;
 
 EXCEPTION
@@ -924,7 +924,7 @@ BEGIN
              ,p_xsp             => pi_xsp
              ,p_call_attrib     => pi_view_col
            );
-  
+
   -- original standard processing
   else
     running_for_merge;
@@ -935,9 +935,9 @@ BEGIN
                           ,pi_xsp            => pi_xsp
                           ,pi_view_col       => pi_view_col
                           );
- 
+
     RETURN g_stat_array.nsa_var_x;
-   
+
   end if;
 
 EXCEPTION
@@ -1024,7 +1024,7 @@ BEGIN
              ,p_xsp             => pi_xsp
              ,p_call_attrib     => pi_view_col
            );
-  
+
   -- original standard processing
   else
     running_for_merge;
@@ -1035,9 +1035,9 @@ BEGIN
                           ,pi_xsp            => pi_xsp
                           ,pi_view_col       => pi_view_col
                           );
- 
+
     RETURN g_stat_array.nsa_sd_x;
-   
+
   end if;
 
 EXCEPTION
@@ -1127,7 +1127,7 @@ BEGIN
              ,p_xsp             => pi_xsp
              ,p_call_attrib     => pi_view_col
            );
-  
+
   -- original standard processing
   else
     running_for_merge;
@@ -1139,9 +1139,9 @@ BEGIN
                           ,pi_view_col       => pi_view_col
                           );
     RETURN g_stat_array.nsa_biased_sd_x;
-   
+
   end if;
-  
+
 EXCEPTION
 --
    WHEN g_eng_dynseg_exception
@@ -1233,7 +1233,7 @@ BEGIN
              ,p_xsp             => pi_xsp
              ,p_call_attrib     => pi_view_col
            );
-  
+
   -- original standard processing
   else
     running_for_merge;
@@ -1245,9 +1245,9 @@ BEGIN
                           ,pi_view_col       => pi_view_col
                           );
     RETURN g_stat_array.nsa_biased_var_x;
-    
+
   end if;
-  
+
 EXCEPTION
 --
    WHEN g_eng_dynseg_exception
@@ -1339,7 +1339,7 @@ BEGIN
              ,p_xsp             => pi_xsp
              ,p_call_attrib     => pi_view_col
            );
-  
+
   -- original standard processing
   else
     running_for_merge;
@@ -1351,7 +1351,7 @@ BEGIN
                           ,pi_view_col       => pi_view_col
                           );
     RETURN g_stat_array.nsa_first_x;
-  
+
   end if;
 
 EXCEPTION
@@ -1444,7 +1444,7 @@ BEGIN
              ,p_xsp             => pi_xsp
              ,p_call_attrib     => pi_view_col
            );
-  
+
   -- original standard processing
   else
     running_for_merge;
@@ -1456,7 +1456,7 @@ BEGIN
                           ,pi_view_col       => pi_view_col
                           );
     RETURN g_stat_array.nsa_last_x;
-  
+
   end if;
 
 EXCEPTION
@@ -1548,7 +1548,7 @@ BEGIN
              ,p_xsp             => pi_xsp
              ,p_call_attrib     => pi_view_col
            );
-  
+
   -- original standard processing
   else
     running_for_merge;
@@ -1560,7 +1560,7 @@ BEGIN
                           ,pi_view_col       => pi_view_col
                           );
     RETURN  g_val_dist_arr.nvda_most_numerous;
-  
+
   end if;
 
 EXCEPTION
@@ -2018,7 +2018,7 @@ BEGIN
              ,p_call_attrib     => pi_view_col
              ,p_call_value      => pi_value
            );
-  
+
   -- original standard processing
   else
     running_for_merge;
@@ -2042,7 +2042,7 @@ BEGIN
     END LOOP;
 
     RETURN  l_retval;
-  
+
   end if;
 
 EXCEPTION
@@ -2209,7 +2209,7 @@ END get_sum;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_sum          
+FUNCTION get_sum
                            (pi_nms_mrg_job_id   IN nm_mrg_sections.nms_mrg_job_id%TYPE
                            ,pi_nms_section_id   IN nm_mrg_sections.nms_mrg_section_id%TYPE
                            ,pi_inv_type         IN VARCHAR2
@@ -2226,7 +2226,7 @@ BEGIN
              ,p_xsp             => pi_xsp
              ,p_call_attrib     => pi_view_col
            );
-  
+
   -- original standard processing
   else
    running_for_merge;
@@ -2238,7 +2238,7 @@ BEGIN
                          ,pi_view_col       => pi_view_col
                          );
    RETURN  g_stat_array.nsa_sum_x;
-  
+
   end if;
 
 EXCEPTION
@@ -2318,7 +2318,7 @@ PROCEDURE build_sql (pi_inv_type   IN     VARCHAR2
   l_inv_table_name    varchar2(30) := 'nm_inv_items';
   l_inv_ne_id_col     varchar2(30) := 'iit_ne_id';
   -- PT 24.07.07 end
-  
+
 BEGIN
   nm3dbg.putln(g_package_name||'.build_sql('
     ||'pi_inv_type='||pi_inv_type
@@ -2328,7 +2328,7 @@ BEGIN
     ||', pi_allow_null='||nm3dbg.to_char(pi_allow_null)
     ||')');
   nm3dbg.ind;
-    
+
    IF g_merge_run
     THEN
       l_table_name   := 'nm_mrg_section_members';
@@ -2409,12 +2409,12 @@ BEGIN
       null;
   end;
   -- PT 24.07.07 end
-  
+
   nm3dbg.putln('l_nin_nw_type='||l_nin_nw_type);
-    
+
    IF l_rec_nit.nit_table_name IS NULL or l_nin_nw_type is not null
     THEN
-    
+
       g_sql :=           'SELECT '||l_inv_ne_id_col
               ||CHR(10)||'      ,'||l_nvl_before||'iit.'||l_col_name||l_nvl_after||' '||l_rec_ita.ita_view_col_name
               ||CHR(10)||'      ,GREATEST(nm.nm_begin_mp,nsm.'||l_begin_mp_col||') nm_begin_mp'
@@ -2438,53 +2438,53 @@ BEGIN
               ||CHR(10)||' AND   nm.nm_end_mp          > nsm.'||l_begin_mp_col
               ||CHR(10)||' AND   nm.nm_begin_mp        <= nsm.'||l_end_mp_col
               ||CHR(10)||' AND   nm.nm_ne_id_in         = iit.'||l_inv_ne_id_col;
-         
-      -- PT for standard iit tables restrict type   
+
+      -- PT for standard iit tables restrict type
       if l_rec_nit.nit_table_name is null then
         g_sql := g_sql
           ||chr(10)||' and iit.iit_inv_type = :inv_type';
-          
-      -- ft tables restrict themselves, add the dummy bind variable 
+
+      -- ft tables restrict themselves, add the dummy bind variable
       else
         g_sql := g_sql
           ||chr(10)||' and :inv_type is not null';
-          
+
       end if;
               --||CHR(10)||' AND   nm.nm_type             = '||nm3flx.string('I')
               --||CHR(10)||' AND   nm.nm_obj_type         = :inv_type';
-      
-      
-         
-      -- xsp given and not ft asset   
+
+
+
+      -- xsp given and not ft asset
       IF pi_xsp IS NOT NULL and l_nin_nw_type is null
        THEN
          g_sql := g_sql
               ||CHR(10)||' AND   iit.iit_x_sect         = :xsp';
-      
-      -- xsp not given     
-      ELSif pi_xsp IS NULL then 
+
+      -- xsp not given
+      ELSif pi_xsp IS NULL then
          g_sql := g_sql
               ||CHR(10)||' AND   :xsp IS NULL';
-              
+
       -- xsp given and ft asset
       else
          g_sql := g_sql
               ||CHR(10)||' AND   :xsp IS not NULL';
-        
+
       END IF;
-      
-      
+
+
 --       if pi_xsp is null then
 --         g_sql := g_sql||chr(10)||' and :xsp is null';
---         
+--
 --       elsif l_rec_nit.nit_table_name is null then
 --         g_sql := g_sql||chr(10)||' and iit.iit_x_sect = :xsp';
---         
+--
 --       else
 --         g_sql := g_sql||chr(10)||' and :xsp is not null';
---         
+--
 --       end if;
-        
+
 
    -- PT 24.07.07
    -- the original FT select
@@ -2528,14 +2528,22 @@ BEGIN
     THEN
       g_sql := g_sql
                ||CHR(10)||' ORDER BY nsm_mrg_section_id, nsm_measure';
-   ELSE
+
+   ELSIF l_rec_nit.nit_table_name IS NULL or l_nin_nw_type is not null
+    THEN
+
       g_sql := g_sql
-               ||CHR(10)||' ORDER BY nte_seq_no';
+               ||CHR(10)||' ORDER BY nte_seq_no, GREATEST(nm.nm_begin_mp,nsm.'||l_begin_mp_col||')';
+   ELSE
+
+      g_sql := g_sql
+               ||CHR(10)||' ORDER BY nte_seq_no, GREATEST(ft.'||l_rec_nit.nit_lr_st_chain||',nsm.'||l_begin_mp_col||')';
+
    END IF;
-   
+
    --nm_debug.debug(g_sql);
    --
-   
+
   nm3dbg.deind;
 --
 END build_sql;
@@ -2562,7 +2570,10 @@ PROCEDURE fetch_sql (pi_nms_mrg_job_id IN nm_mrg_sections.nms_mrg_job_id%TYPE   
 --
    l_cur      nm3type.ref_cursor;
 --
+   l_excpt_on_null  varchar2(1);
+
 BEGIN
+
   nm3dbg.putln(g_package_name||'.fetch_sql('
     ||'pi_nms_mrg_job_id='||pi_nms_mrg_job_id
     ||', pi_nms_section_id='||pi_nms_section_id
@@ -2572,8 +2583,11 @@ BEGIN
     ||')');
   nm3dbg.ind;
 --
---   nm_debug.debug('######## '||pi_nms_mrg_job_id||':'||pi_nms_section_id,-1);
+   nm_debug.debug('######## '||pi_nms_mrg_job_id||':'||pi_nms_section_id,-1);
 --
+
+  l_excpt_on_null := NVL(HIG.GET_USER_OR_SYS_OPT( 'EDSNULLEXC' ), 'Y');
+
    g_stat_array   := nm3stats.initialise_statistic_array;
    g_val_dist_arr := initialise_val_dist_array;
 --
@@ -2583,7 +2597,7 @@ BEGIN
 --   nm_debug.debug(pi_nms_mrg_job_id||':'||pi_nms_section_id||':'||pi_inv_type||':'||pi_xsp);
 --   nm_debug.debug_off;
 --
-  
+
    IF g_merge_run
     THEN
       OPEN  l_cur FOR g_sql USING pi_nms_mrg_job_id,pi_nms_section_id,pi_inv_type,pi_xsp;
@@ -2598,6 +2612,9 @@ BEGIN
       --
       EXIT WHEN l_cur%NOTFOUND;
       --
+      if l_excpt_on_null = 'Y' or
+        (l_excpt_on_null = 'N' and l_value is not null ) then
+
       l_length := (l_end_mp-l_begin_mp)*l_cardinality;
       --
       --IF g_field_is_number
@@ -2623,14 +2640,15 @@ BEGIN
          l_tab_length(l_pk) := l_length;
       END IF;
       --
---      nm_debug.debug(g_stat_array.statistic_count||'. x='||l_value||',y='||(l_end_mp-l_begin_mp)*l_cardinality,-1);
+--    nm_debug.debug(g_stat_array.statistic_count||'. x='||l_value||',y='||(l_end_mp-l_begin_mp)*l_cardinality,-1);
+   end if;
       --
    END LOOP;
       --
    CLOSE l_cur;
 --
    l_ind := l_tab_value.FIRST;
-   
+
    nm3dbg.putln('l_tab_value.count='||l_tab_value.count);
 --
    WHILE l_ind IS NOT NULL
@@ -2655,7 +2673,7 @@ exception
         ||' ,pi_inv_type='||pi_inv_type
         ||' ,pi_xsp='||pi_xsp
         ||')');
-      nm_debug.debug(g_sql);
+--      nm_debug.debug(g_sql);
       if not l_debug_on then
         nm_debug.debug_off;
       end if;
@@ -2668,6 +2686,7 @@ END fetch_sql;
 --
 PROCEDURE running_for_merge IS
 BEGIN
+   nm_debug.debug('running merge');
    g_merge_run   := TRUE;
    g_temp_ne_run := FALSE;
 END running_for_merge;
@@ -2676,6 +2695,7 @@ END running_for_merge;
 --
 PROCEDURE running_for_temp_ne IS
 BEGIN
+   nm_debug.debug('running temp_ne');
    g_merge_run   := FALSE;
    g_temp_ne_run := TRUE;
 END running_for_temp_ne;
@@ -2684,6 +2704,7 @@ END running_for_temp_ne;
 --
 PROCEDURE running_stats IS
 BEGIN
+   nm_debug.debug('running stats');
    g_stats_run := TRUE;
    g_bins_run  := FALSE;
 END running_stats;
@@ -2692,6 +2713,7 @@ END running_stats;
 --
 PROCEDURE running_bins IS
 BEGIN
+   nm_debug.debug('running bins');
    g_stats_run := FALSE;
    g_bins_run  := TRUE;
 END running_bins;
