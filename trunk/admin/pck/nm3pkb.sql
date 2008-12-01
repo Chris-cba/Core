@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.9   Oct 02 2008 11:41:54   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.10   Dec 01 2008 17:51:04   aedwards  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   Oct 02 2008 11:41:54  $
---       Date fetched Out : $Modtime:   Oct 02 2008 11:41:00  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Dec 01 2008 17:51:04  $
+--       Date fetched Out : $Modtime:   Dec 01 2008 17:50:30  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --
 --   Author : Graeme Johnson
@@ -1989,6 +1989,18 @@ SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&term
 FROM dual 
 / 
 start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm3msv_sec.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3sdo_geom.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
 --
 --
 --
