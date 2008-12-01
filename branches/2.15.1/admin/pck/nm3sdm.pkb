@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.15.1.4   Nov 28 2008 18:04:56   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.15.1.5   Dec 01 2008 11:36:00   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Nov 28 2008 18:04:56  $
---       Date fetched Out : $Modtime:   Nov 28 2008 18:04:18  $
---       PVCS Version     : $Revision:   2.15.1.4  $
+--       Date into PVCS   : $Date:   Dec 01 2008 11:36:00  $
+--       Date fetched Out : $Modtime:   Dec 01 2008 11:34:50  $
+--       PVCS Version     : $Revision:   2.15.1.5  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.15.1.4  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.15.1.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -5590,7 +5590,7 @@ end;
       CURSOR c_gty_tab (c_gty_type nm_inv_types.nit_inv_type%TYPE)
       IS
          SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column
+                nth_feature_fk_column, 'G' g_or_i
            FROM NM_THEMES_ALL, NM_AREA_THEMES, NM_AREA_TYPES
           WHERE nth_theme_id = nath_nth_theme_id
             AND nath_nat_id = nat_id
@@ -5598,7 +5598,7 @@ end;
             AND nth_update_on_edit = 'I'
          UNION
          SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column,
-                nth_feature_fk_column
+                nth_feature_fk_column, 'I' g_or_i
            FROM NM_THEMES_ALL, nm_nw_ad_types, nm_inv_themes
           WHERE nth_theme_id = nith_nth_theme_id
             AND nith_nit_id = nad_inv_type
@@ -5609,12 +5609,16 @@ end;
       del_string   VARCHAR2 (2000);
       l_geom       MDSYS.SDO_GEOMETRY;
    BEGIN
+--   nm_debug.debug_on;
+--   nm_debug.delete_debug(true);
 --  nm_debug.debug('Removing shape of '||p_nm_obj_type||' between '||to_char(p_nm_begin_mp)||
 --    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
       FOR irec IN c_gty_tab (p_nm_obj_type)
       LOOP
---  nm_debug.debug('delete - '||irec.nth_feature_table);
-         del_string :=
+      
+        if irec.g_or_i = 'G' then
+--        nm_debug.debug('delete - '||irec.nth_feature_table);
+          del_string :=
                'delete from '
             || irec.nth_feature_table
             || ' where ne_id = :ne_id'
@@ -5622,13 +5626,37 @@ end;
             || ' and nm_begin_mp = :ne_begin_mp '
             || ' and start_date = :start_date';
 
---nm_debug.debug( del_string );
-         EXECUTE IMMEDIATE del_string
+          EXECUTE IMMEDIATE del_string
                      USING p_nm_ne_id_in,
                            p_nm_ne_id_of,
                            p_nm_begin_mp,
                            p_nm_start_date;
+
+        else
+      
+          del_string := 'delete from '||irec.nth_feature_table
+             ||         ' where ne_id_of = :ne_id_of '
+             ||         ' and nm_begin_mp = :ne_begin_mp '
+             ||         ' and start_date = :start_date '
+             ||         ' and exists ( select 1 from nm_nw_ad_link l '
+             ||         '              where ne_id = nad_iit_ne_id '
+             ||         '              and nad_ne_id = :ne_id '
+             ||         '              and nad_iit_ne_id = '||irec.nth_feature_pk_column
+             ||         '              and nad_whole_road = :whole_road )';
+
+
+                           
+          EXECUTE IMMEDIATE del_string
+                     USING p_nm_ne_id_of,
+                           p_nm_begin_mp,
+                           p_nm_start_date,
+                           p_nm_ne_id_in,
+                           '1';
+
+        end if;
+
       END LOOP;
+   nm_debug.debug_off;
    END;
 
 --
