@@ -1,14 +1,14 @@
 create or replace package body nm3sdo_geom as
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkb-arc   1.0   Oct 09 2008 12:36:44   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkb-arc   1.1   Dec 01 2008 17:53:24   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_geom.pkb  $
---       Date into PVCS   : $Date:   Oct 09 2008 12:36:44  $
---       Date fetched Out : $Modtime:   Oct 09 2008 12:29:58  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Dec 01 2008 17:53:24  $
+--       Date fetched Out : $Modtime:   Dec 01 2008 17:53:12  $
+--       PVCS Version     : $Revision:   1.1  $
 --       Based on
 
-g_body_sccsid constant varchar2(30) :='"$Revision:   1.0  $"';
+g_body_sccsid constant varchar2(30) :='"$Revision:   1.1  $"';
 
   FUNCTION get_version RETURN VARCHAR2 IS
   BEGIN
@@ -144,3 +144,4 @@ END;
 begin
   g_srid := get_nw_srids;
 end;
+/
