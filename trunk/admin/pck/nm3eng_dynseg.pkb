@@ -1,11 +1,11 @@
-CREATE OR REPLACE PACKAGE BODY KANSAS.nm3eng_dynseg AS
+CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.5   Nov 28 2008 10:32:32   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.6   Dec 02 2008 08:56:32   rcoupe  $
 --       Module Name      : $Workfile:   nm3eng_dynseg.pkb  $
---       Date into PVCS   : $Date:   Nov 28 2008 10:32:32  $
---       Date fetched Out : $Modtime:   Nov 28 2008 10:30:28  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Dec 02 2008 08:56:32  $
+--       Date fetched Out : $Modtime:   Dec 02 2008 08:56:08  $
+--       PVCS Version     : $Revision:   2.6  $
 --       Based on sccs version : 1.13
 --
 --   Author : Jonathan Mills
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE BODY KANSAS.nm3eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg';
