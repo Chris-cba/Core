@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4050_nm4051_metadata_upg.sql-arc   3.1   Nov 14 2008 09:12:34   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4050_nm4051_metadata_upg.sql-arc   3.2   Dec 03 2008 09:48:28   malexander  $
 --       Module Name      : $Workfile:   nm4050_nm4051_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Nov 14 2008 09:12:34  $
---       Date fetched Out : $Modtime:   Nov 14 2008 09:08:42  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Dec 03 2008 09:48:28  $
+--       Date fetched Out : $Modtime:   Dec 03 2008 09:44:58  $
+--       Version          : $Revision:   3.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2008
@@ -340,6 +340,16 @@ BEGIN
 --
 END;
 /
+
+PROMPT Recompile dependent packages
+
+BEGIN
+  EXECUTE IMMEDIATE 'ALTER PACKAGE NM3SDM COMPILE';
+  EXECUTE IMMEDIATE 'ALTER PACKAGE NM3SDM COMPILE BODY';
+END;
+/
+
+
 ------------------------------------------------------------------
 
 
