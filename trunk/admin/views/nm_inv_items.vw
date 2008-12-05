@@ -34,11 +34,11 @@ BEGIN
    append ('--');
    append ('--   PVCS Identifiers :-');
    append ('--');
-   append ('--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/views/nm_inv_items.vw-arc   2.1   Sep 19 2007 14:23:22   ptanava  $');
+   append ('--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/views/nm_inv_items.vw-arc   2.2   Dec 05 2008 14:01:30   aedwards  $');
    append ('--       Module Name      : $Workfile:   nm_inv_items.vw  $');
-   append ('--       Date into PVCS   : $Date:   Sep 19 2007 14:23:22  $');
-   append ('--       Date fetched Out : $Modtime:   Sep 18 2007 11:58:22  $');
-   append ('--       PVCS Version     : $Revision:   2.1  $');
+   append ('--       Date into PVCS   : $Date:   Dec 05 2008 14:01:30  $');
+   append ('--       Date fetched Out : $Modtime:   Dec 05 2008 14:00:52  $');
+   append ('--       PVCS Version     : $Revision:   2.2  $');
    append ('--       Based on SCCS version : 1.6');
    append ('--');
    append ('-----------------------------------------------------------------------------');
@@ -68,7 +68,8 @@ BEGIN
    append (', iit_angle, iit_angle_txt, iit_class, iit_class_txt, iit_colour, iit_colour_txt, iit_coord_flag');
    append (', iit_description, iit_diagram, iit_distance, iit_end_chain, iit_gap, iit_height, iit_height_2');
    append (', iit_id_code, iit_instal_date, iit_invent_date, iit_inv_ownership, iit_itemcode, iit_lco_lamp_config_id');
-   append (', cast(iit_length as number(6)) iit_length');
+--   append (', cast(iit_length as number(6)) iit_length');
+   append (', iit_length');
    append (', iit_material, iit_material_txt');
    append (', iit_method, iit_method_txt, iit_note, iit_no_of_units, iit_options, iit_options_txt');
    append (', iit_oun_org_id_elec_board, iit_owner, iit_owner_txt, iit_peo_invent_by_id, iit_photo');
