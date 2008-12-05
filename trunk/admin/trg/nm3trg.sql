@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.5   Oct 02 2008 09:48:58   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.6   Dec 05 2008 12:03:40   aedwards  $
 --       Module Name      : $Workfile:   nm3trg.sql  $
---       Date into PVCS   : $Date:   Oct 02 2008 09:48:58  $
---       Date fetched Out : $Modtime:   Oct 02 2008 09:48:30  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Dec 05 2008 12:03:40  $
+--       Date fetched Out : $Modtime:   Dec 05 2008 12:02:48  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --
 --   Author : Graeme Johnson
@@ -1770,36 +1770,36 @@ start '&run_file'
 --
 ----------------------------------------------------------------------------------------- 
 --
-SET TERM ON 
-PROMPT user_sdo_maps_ins_trg.trg
-SET TERM OFF
-SET DEFINE ON 
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'user_sdo_maps_ins_trg.trg' run_file 
-FROM dual 
-/ 
-start '&run_file' 
+--SET TERM ON 
+--PROMPT user_sdo_maps_ins_trg.trg
+--SET TERM OFF
+--SET DEFINE ON 
+--SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'user_sdo_maps_ins_trg.trg' run_file 
+--FROM dual 
+--/ 
+--start '&run_file' 
 --
 ----------------------------------------------------------------------------------------- 
 --
-SET TERM ON 
-PROMPT user_sdo_themes_ins_trg.trg
-SET TERM OFF
-SET DEFINE ON 
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'user_sdo_themes_ins_trg.trg' run_file 
-FROM dual 
-/ 
-start '&run_file' 
+--SET TERM ON 
+--PROMPT user_sdo_themes_ins_trg.trg
+--SET TERM OFF
+--SET DEFINE ON 
+--SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'user_sdo_themes_ins_trg.trg' run_file 
+--FROM dual 
+--/ 
+--start '&run_file' 
 --
 ----------------------------------------------------------------------------------------- 
 --
-SET TERM ON 
-PROMPT user_sdo_styles_ins_trg.trg
-SET TERM OFF
-SET DEFINE ON 
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'user_sdo_styles_ins_trg.trg' run_file 
-FROM dual 
-/ 
-start '&run_file' 
+--SET TERM ON 
+--PROMPT user_sdo_styles_ins_trg.trg
+--SET TERM OFF
+--SET DEFINE ON 
+--SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'user_sdo_styles_ins_trg.trg' run_file 
+--FROM dual 
+--/ 
+--start '&run_file' 
 --
 ----------------------------------------------------------------------------------------- 
 --
