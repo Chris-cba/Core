@@ -5,11 +5,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/add_policy.sql-arc   2.0   Jun 14 2007 09:25:04   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/add_policy.sql-arc   2.1   Dec 08 2008 12:15:58   rcoupe  $
 --       Module Name      : $Workfile:   add_policy.sql  $
---       Date into SCCS   : $Date:   Jun 14 2007 09:25:04  $
---       Date fetched Out : $Modtime:   Jun 14 2007 09:24:34  $
---       SCCS Version     : $Revision:   2.0  $
+--       Date into SCCS   : $Date:   Dec 08 2008 12:15:58  $
+--       Date fetched Out : $Modtime:   Dec 08 2008 12:15:02  $
+--       SCCS Version     : $Revision:   2.1  $
 --       Based on SCCS Version     : 1.11
 --
 --   Create Inventory/Merge security policies
@@ -128,7 +128,7 @@ BEGIN
    add_policy (p_policy_name     => 'MRG_QUERY_POLICY_DELETE'
               ,p_object_name     => 'NM_MRG_QUERY_ALL'
               ,p_policy_function => 'nm3mrg_security.mrg_nmq_predicate_delete'
-              ,p_statement_types => 'UPDATE'
+              ,p_statement_types => 'DELETE'
               ,p_static_policy   => TRUE
               );
 --
