@@ -2,13 +2,14 @@ CREATE OR REPLACE PACKAGE BODY nm3web_fav AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3web_fav.pkb	1.2 05/06/04
---       Module Name      : nm3web_fav.pkb
---       Date into SCCS   : 04/05/06 01:30:18
---       Date fetched Out : 07/06/13 14:13:50
---       SCCS Version     : 1.2
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_fav.pkb-arc   2.1   Dec 16 2008 11:17:02   smarshall  $
+--       Module Name      : $Workfile:   nm3web_fav.pkb  $
+--       Date into PVCS   : $Date:   Dec 16 2008 11:17:02  $
+--       Date fetched Out : $Modtime:   Dec 16 2008 11:12:20  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on         : 1.2
 --
 --
 --   Author : Jonathan Mills
@@ -21,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_fav AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3web_fav.pkb	1.2 05/06/04"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_fav';
