@@ -1,12 +1,13 @@
 create or replace package nm3web_map as
 --<PACKAGE>
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3web_map.pkh	1.2 08/07/03
---       Module Name      : nm3web_map.pkh
---       Date into SCCS   : 03/08/07 09:50:02
---       Date fetched Out : 07/06/13 14:13:54
---       SCCS Version     : 1.2
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_map.pkh-arc   2.1   Dec 16 2008 11:16:42   smarshall  $
+--       Module Name      : $Workfile:   nm3web_map.pkh  $
+--       Date into PVCS   : $Date:   Dec 16 2008 11:16:42  $
+--       Date fetched Out : $Modtime:   Dec 16 2008 11:11:38  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on         : 1.2
 --
 --
 --   Author : Jonathan Mills
@@ -18,7 +19,7 @@ create or replace package nm3web_map as
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3web_map.pkh	1.2 08/07/03"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
 --  g_sccsid is the SCCS ID for the package
 --
   c_map_server_sysopt CONSTANT hig_option_list.hol_id%TYPE := 'WEBMAPSERV';

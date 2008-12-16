@@ -2,13 +2,14 @@ CREATE OR REPLACE PACKAGE BODY nm3web_map AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3web_map.pkb	1.4 12/01/04
---       Module Name      : nm3web_map.pkb
---       Date into SCCS   : 04/12/01 16:25:53
---       Date fetched Out : 07/06/13 14:13:53
---       SCCS Version     : 1.4
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_map.pkb-arc   2.1   Dec 16 2008 11:16:42   smarshall  $
+--       Module Name      : $Workfile:   nm3web_map.pkb  $
+--       Date into PVCS   : $Date:   Dec 16 2008 11:16:42  $
+--       Date fetched Out : $Modtime:   Dec 16 2008 11:11:30  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on         : 1.4
 --
 --
 --   Author : Jonathan Mills
@@ -21,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_map AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3web_map.pkb	1.4 12/01/04"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_map';
