@@ -1,12 +1,13 @@
 CREATE OR REPLACE PACKAGE nm3web IS
 --<PACKAGE>
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3web.pkh	1.33 08/09/05
---       Module Name      : nm3web.pkh
---       Date into SCCS   : 05/08/09 13:31:19
---       Date fetched Out : 07/06/13 14:13:47
---       SCCS Version     : 1.33
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web.pkh-arc   2.1   Dec 16 2008 11:16:44   smarshall  $
+--       Module Name      : $Workfile:   nm3web.pkh  $
+--       Date into PVCS   : $Date:   Dec 16 2008 11:16:44  $
+--       Date fetched Out : $Modtime:   Dec 16 2008 11:12:36  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on         : 1.33
 --
 --
 --   Author : Jonathan Mills + Kevin Angus
@@ -18,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3web IS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3web.pkh	1.33 08/09/05"';
+  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
 --  g_sccsid is the SCCS ID for the package
 --
    c_nbsp CONSTANT varchar2(6) := CHR(38)||'nbsp;';
