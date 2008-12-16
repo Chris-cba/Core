@@ -2,13 +2,14 @@ CREATE OR REPLACE PACKAGE BODY nm3web_apd AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3web_apd.pkb	1.2 08/27/02
---       Module Name      : nm3web_apd.pkb
---       Date into SCCS   : 02/08/27 14:44:58
---       Date fetched Out : 07/06/13 14:13:47
---       SCCS Version     : 1.2
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_apd.pkb-arc   2.1   Dec 16 2008 11:06:32   smarshall  $
+--       Module Name      : $Workfile:   nm3web_apd.pkb  $
+--       Date into PVCS   : $Date:   Dec 16 2008 11:06:32  $
+--       Date fetched Out : $Modtime:   Dec 16 2008 11:05:56  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on         : 1.2
 --
 --
 --   Author : Jonathan Mills
@@ -21,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_apd AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3web_apd.pkb	1.2 08/27/02"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_apd';
