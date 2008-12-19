@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.6   Dec 02 2008 08:56:32   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.7   Dec 19 2008 09:48:20   rcoupe  $
 --       Module Name      : $Workfile:   nm3eng_dynseg.pkb  $
---       Date into PVCS   : $Date:   Dec 02 2008 08:56:32  $
---       Date fetched Out : $Modtime:   Dec 02 2008 08:56:08  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Dec 19 2008 09:48:20  $
+--       Date fetched Out : $Modtime:   Dec 19 2008 09:47:06  $
+--       PVCS Version     : $Revision:   2.7  $
 --       Based on sccs version : 1.13
 --
 --   Author : Jonathan Mills
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg';
@@ -2435,8 +2435,10 @@ BEGIN
       END IF;
       g_sql := g_sql
               ||CHR(10)||' AND   nsm.'||l_ne_id_col||'          = nm.nm_ne_id_of'
-              ||CHR(10)||' AND   nm.nm_end_mp          > nsm.'||l_begin_mp_col
+              ||CHR(10)||' AND   nm.nm_end_mp          >= nsm.'||l_begin_mp_col
               ||CHR(10)||' AND   nm.nm_begin_mp        <= nsm.'||l_end_mp_col
+              ||CHR(10)||' and not ( nm.nm_end_mp   = nsm.'||l_begin_mp_col||' and nm.nm_begin_mp < nsm.'||l_begin_mp_col||')'
+              ||CHR(10)||' and not ( nm.nm_begin_mp = nsm.'||l_end_mp_col  ||' and nm.nm_end_mp > nsm.'  ||l_begin_mp_col||')'
               ||CHR(10)||' AND   nm.nm_ne_id_in         = iit.'||l_inv_ne_id_col;
 
       -- PT for standard iit tables restrict type
@@ -2512,11 +2514,16 @@ BEGIN
       END IF;
       g_sql := g_sql
               ||CHR(10)||' AND   nsm.'||l_ne_id_col||'          = ft.'||l_rec_nit.nit_lr_ne_column_name
-              ||CHR(10)||' AND   ft.'||l_rec_nit.nit_lr_end_chain||' > nsm.'||l_begin_mp_col
+              ||CHR(10)||' AND   ft.'||l_rec_nit.nit_lr_end_chain||' >= nsm.'||l_begin_mp_col
               ||CHR(10)||' AND   ft.'||l_rec_nit.nit_lr_st_chain||' <= nsm.'||l_end_mp_col
+              ||CHR(10)||' AND  not ( ft.'||l_rec_nit.nit_lr_end_chain||' = nsm.'||l_begin_mp_col
+              ||CHR(10)||'       and  ft.'||l_rec_nit.nit_lr_st_chain|| '  < nsm.'||l_begin_mp_col||')'
+              ||CHR(10)||' AND  not ( ft.'||l_rec_nit.nit_lr_st_chain||' = nsm.'||l_end_mp_col
+              ||CHR(10)||'       and  ft.'||l_rec_nit.nit_lr_end_chain||'  > nsm.'||l_end_mp_col||' )'
               ||CHR(10)||' AND   :inv_type IS NOT NULL'
               ||CHR(10)||' AND   :xsp      IS NULL';
    END IF;
+   
 --
    IF NOT pi_allow_null
     THEN
