@@ -4,11 +4,11 @@ IS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdo.pkb-arc   3.0   Jan 29 2008 11:41:38   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdo.pkb-arc   3.1   Jan 09 2009 15:17:30   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_gdo.pkb  $
---       Date into PVCS   : $Date:   Jan 29 2008 11:41:38  $
---       Date fetched Out : $Modtime:   Jan 29 2008 11:38:06  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jan 09 2009 15:17:30  $
+--       Date fetched Out : $Modtime:   Jan 09 2009 15:15:02  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --
@@ -18,8 +18,10 @@ IS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) :='"$Revision:   3.0  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) :='"$Revision:   3.1  $"';
   g_package_name CONSTANT varchar2(30)   := 'nm3sdo_gdo';
+  g_srid                  number ;
+  b_srid_set              boolean := FALSE;
 
 --
 -----------------------------------------------------------------------------
@@ -38,6 +40,19 @@ IS
 --
 --------------------------------------------------------------------------------
 --
+  PROCEDURE set_srid IS
+    diminfo mdsys.sdo_dim_array;
+  BEGIN
+    IF NOT b_srid_set
+    THEN
+      nm3sdo.set_diminfo_and_srid( nm3sdo.get_nw_themes, diminfo, g_srid );
+      b_srid_set := TRUE;
+      --g_srid := 999999;
+    END IF;
+  END set_srid;
+--
+--------------------------------------------------------------------------------
+--
   FUNCTION get_geom_from_xys (pi_tab_xys IN tab_xys)
   RETURN sdo_geometry
     -----------------------------------------------------------
@@ -47,7 +62,9 @@ IS
     -----------------------------------------------------------
   IS
     l_ord    sdo_ordinate_array := sdo_ordinate_array(NULL);
-    retval sdo_geometry;
+    retval   sdo_geometry;
+    l_gtype  NUMBER := 2002;  --default to a line for now
+  --
   BEGIN
   --
     IF pi_tab_xys.COUNT = 0
@@ -73,8 +90,10 @@ IS
 
     END LOOP;
   --
-    RETURN mdsys.sdo_geometry( 2002,
-                               NULL,
+    set_srid;
+  --
+    RETURN mdsys.sdo_geometry( l_gtype,
+                               g_srid,
                                NULL, mdsys.sdo_elem_info_array( 1, 2, 1),
                                l_ord);
   --
@@ -117,5 +136,8 @@ IS
 --
 --------------------------------------------------------------------------------
 --
+BEGIN
+  -- instantiate global srid
+  set_srid;
 END nm3sdo_gdo;
 /
