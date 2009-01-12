@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.7   Dec 19 2008 09:48:20   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.8   Jan 12 2009 13:54:12   rcoupe  $
 --       Module Name      : $Workfile:   nm3eng_dynseg.pkb  $
---       Date into PVCS   : $Date:   Dec 19 2008 09:48:20  $
---       Date fetched Out : $Modtime:   Dec 19 2008 09:47:06  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Jan 12 2009 13:54:12  $
+--       Date fetched Out : $Modtime:   Jan 12 2009 13:53:00  $
+--       PVCS Version     : $Revision:   2.8  $
 --       Based on sccs version : 1.13
 --
 --   Author : Jonathan Mills
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg';
@@ -2389,7 +2389,7 @@ BEGIN
    END IF;
 --
    l_col_name    := l_rec_ita.ita_attrib_name;
-   po_dec_places := l_rec_ita.ita_dec_places;
+   po_dec_places := nvl(l_rec_ita.ita_dec_places,0);
 --
   nm3dbg.putln('l_rec_nit.nit_table_name='||l_rec_nit.nit_table_name);
 
@@ -2523,7 +2523,7 @@ BEGIN
               ||CHR(10)||' AND   :inv_type IS NOT NULL'
               ||CHR(10)||' AND   :xsp      IS NULL';
    END IF;
-   
+
 --
    IF NOT pi_allow_null
     THEN
