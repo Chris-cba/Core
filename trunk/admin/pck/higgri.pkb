@@ -1437,7 +1437,14 @@ BEGIN
       IF INSTR(UPPER(l_query), 'ORDER BY') > 0 THEN
          l_query := SUBSTR(l_query, 1, INSTR(UPPER(l_query), 'ORDER BY')-1);
       END IF;
-
+      ----------------------------------------------------------------------------------
+      -- SM 712002 08082008
+      -- DOC0167 has two parameters which have group bys on them and so these also need 
+      -- dropping from the query (see order by reasoning).
+      ----------------------------------------------------------------------------------      
+      IF INSTR(UPPER(l_query), 'GROUP BY') > 0 THEN
+         l_query := SUBSTR(l_query, 1, INSTR(UPPER(l_query), 'GROUP BY')-1);
+      END IF;
       ------------------------------------------------------------
       --put appropraite connector onto query for another condition
       ------------------------------------------------------------
