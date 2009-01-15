@@ -379,52 +379,92 @@ BEGIN
    --nm3extent.debug_temp_extents (l_nte_job_id);
 
    -- Rescale the temp ne
-   declare
-     c_circ_ex_num constant integer := -20207 ;
-     l_original_message varchar(2000) ;
-     l_circular_ex exception ;
-     pragma exception_init( l_circular_ex, -20207 );
-   begin
+   DECLARE
+     c_circ_ex_num      constant INTEGER := -20207 ;
+     l_original_message          VARCHAR(2000) ;
+     l_circular_ex      exception ;
+     l_ne_id            nm_elements.ne_id%TYPE;
+     l_rec_ne           nm_elements%ROWTYPE;
+     PRAGMA EXCEPTION_INIT( l_circular_ex, -20207 );
+   BEGIN
+   -- AE 15 - JAN - 2008
+   --
+   -- Set the global to prevent circular route issues when this code falls into the exception
+   -- Make sure we only do this on a Linear Group of Sections
+   --
+   -- Get the Gaz Query source NE_ID
+     l_ne_id := nm3get.get_ngq(pi_ngq_id => pi_ngq_id, pi_raise_not_found => FALSE ).ngq_source_id;
+   --
+     IF l_ne_id IS NOT NULL
+     THEN
+     -- Get a rowtype of the element (if it is an element)
+       l_rec_ne := nm3get.get_ne ( pi_ne_id           => l_ne_id
+                                ,  pi_raise_not_found => FALSE);
+     --
+       IF l_rec_ne.ne_id IS NOT NULL
+       THEN
+         -- Make sure the element is a Group of Sections, and is Linear
+         IF l_rec_ne.ne_type = 'G'
+         AND nm3get.get_nlt ( pi_nlt_nt_type     => l_rec_ne.ne_nt_type
+                            , pi_nlt_gty_type    => l_rec_ne.ne_gty_group_type
+                            , pi_raise_not_found => FALSE).nlt_id 
+           IS NOT NULL
+         THEN
+        -- Set the global GOS ne_id so that it's used in the circular route exception
+           g_gos_ne_id := l_ne_id;
+       --
+         END IF;
+       --
+       END IF;
+     --
+     END IF;
+     -- AE 15 - JAN - 2008
+     -- end of changes
+
 --     nm_debug.debug('Pre-rescale');
      nm3rsc.rescale_temp_ne(l_nte_job_id);
 --     nm_debug.debug('Post-rescale');
-   exception
-     when l_circular_ex
-     then
-       l_original_message := substr(sqlerrm,1,2000) ;
-       if g_gos_ne_id is not null
-       then
-       begin
-         select distinct(nm_ne_id_of)
-           into l_first_ne
-           from nm_members_all m1
-          where nm_ne_id_in = g_gos_ne_id
-          and not exists
-         ( select 1
-             from nm_members_all m2
-            where nm_ne_id_in = g_gos_ne_id
-              and m2.nm_seq_no < m1.nm_seq_no
+   EXCEPTION
+     WHEN l_circular_ex
+     THEN
+       l_original_message := SUBSTR(SQLERRM,1,2000) ;
+       IF g_gos_ne_id is not null
+       THEN
+       BEGIN
+         SELECT DISTINCT(nm_ne_id_of)
+           INTO l_first_ne
+           -- AE 15-JAN-2009
+           -- Make sure we only look at live members!
+           --FROM nm_members_all m1
+           FROM nm_members m1
+          WHERE nm_ne_id_in = g_gos_ne_id
+          AND NOT EXISTS
+         ( SELECT 1
+             FROM nm_members m2
+            WHERE nm_ne_id_in = g_gos_ne_id
+              AND m2.nm_seq_no < m1.nm_seq_no
           )
+          AND ROWNUM = 1
          ;
-         if l_first_ne is not null
-         then
+         IF l_first_ne IS NOT NULL
+         THEN
 --           nm_debug.debug('Pre-rescale 2');
-           nm3rsc.rescale_temp_ne(l_nte_job_id,null,l_first_ne);
+           nm3rsc.rescale_temp_ne(l_nte_job_id,NULL,l_first_ne);
 --           nm_debug.debug('Post-rescale 2');
-         else
-           raise ;
-         end if;
-       exception
-         when others
-         then
-           l_original_message := substr(l_original_message,
-                                        instr(l_original_message,to_char(c_circ_ex_num) || ':')+6) ;
-           l_original_message := ltrim(l_original_message);
+         ELSE
+           RAISE ;
+         END IF;
+       EXCEPTION
+         WHEN OTHERS
+         THEN
+           l_original_message := SUBSTR(l_original_message,
+                                        INSTR(l_original_message,TO_CHAR(c_circ_ex_num) || ':')+6) ;
+           l_original_message := LTRIM(l_original_message);
            raise_application_error(c_circ_ex_num,l_original_message);
-       end ;
-     else
-       raise ;
-     end if ;
+       END ;
+     ELSE
+       RAISE ;
+     END IF ;
    END ;
    --nm_debug.debug_on ;
 --   nm_debug.debug('point 1');
