@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm3asset.pkb	1.62 06/09/06
---       Module Name      : nm3asset.pkb
---       Date into SCCS   : 06/06/09 15:17:33
---       Date fetched Out : 07/06/13 14:11:02
---       SCCS Version     : 1.62
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.3   Jan 15 2009 14:49:08   aedwards  $
+--       Module Name      : $Workfile:   nm3asset.pkb  $
+--       Date into PVCS   : $Date:   Jan 15 2009 14:49:08  $
+--       Date fetched Out : $Modtime:   Jan 15 2009 14:48:30  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3asset.pkb	1.62 06/09/06"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
