@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.6   Dec 21 2007 15:37:04   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.7   Jan 16 2009 08:15:02   ptanava  $
 --       Module Name      : $Workfile:   nm3eng_dynseg_util.pkb  $
---       Date into PVCS   : $Date:   Dec 21 2007 15:37:04  $
---       Date fetched Out : $Modtime:   Dec 18 2007 16:45:08  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Jan 16 2009 08:15:02  $
+--       Date fetched Out : $Modtime:   Jan 16 2009 08:07:06  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --   Author : Priidu Tanava
 --
@@ -28,10 +28,11 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
               sql%rowcount before commit
   17.10.07 PT removed autonomous transaction
   18.12.07 PT in populate_tmp_table() changed the handling of 0 length in getting nm_length_pct
+  15.01.09 PT in sql_main_q1_wrap() added order by to fix an attribute order inconsitency when q1 is used. (Paul Sheedy)
 */
 
 
-  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
+  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg_util';
   
   cr            constant varchar2(1) := chr(10);
@@ -776,6 +777,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
         ,x.ita_format
       from
          table(cast(nm3eng_dynseg_util.get_sql_build_tbl(p_inv_type) as nm_dynseg_sql_tbl)) x
+      order by 1
     )
     loop
       -- most common value
