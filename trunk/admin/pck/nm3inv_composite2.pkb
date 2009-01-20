@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.8   Aug 12 2008 11:18:00   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.9   Jan 20 2009 15:47:00   ptanava  $
 --       Module Name      : $Workfile:   nm3inv_composite2.pkb  $
---       Date into PVCS   : $Date:   Aug 12 2008 11:18:00  $
---       Date fetched Out : $Modtime:   Aug 12 2008 11:14:06  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Jan 20 2009 15:47:00  $
+--       Date fetched Out : $Modtime:   Jan 20 2009 15:14:20  $
+--       PVCS Version     : $Revision:   2.9  $
 --       Based on sccs version :
 --
 --   Author : Priidu Tanava
@@ -31,9 +31,10 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
   08.08.08 PT in call_rebuild() made the admin unit lookup to go via nm_mail_users
   12.08.08 PT added p_admin_unit_id to ins_iit_tmp_values()
                 added get_admin_unit() local proc to get value corresponding to asset inv type
+  20.01.09 PT in ins_iit_tmp_values() ignore SYS_% columns - these are hidden columns created e.g. for function based indexes
 */
 
-  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.8  $"';
+  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.9  $"';
   g_package_name  constant  varchar2(30) := 'nm3inv_composite2';
   
   cant_serialize exception;
@@ -1232,9 +1233,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
          ,tc.column_name
        from
           (select * from nm_mrg_ita_derivation where nmid_ita_inv_type = p_inv_type) d
-         ,(select column_name, column_id
-          from user_tab_cols
-          where table_name = 'NM_INV_ITEMS_ALL') tc
+         ,( select column_name, column_id
+            from user_tab_cols
+            where table_name = 'NM_INV_ITEMS_ALL'
+              and column_name not like 'SYS_%'
+          ) tc
        where tc.column_name = d.nmid_ita_attrib_name (+)
        order by tc.column_id
     )
