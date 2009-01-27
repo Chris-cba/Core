@@ -994,39 +994,6 @@ EXCEPTION
 END user_is_higowner_yn;
 --
 -----------------------------------------------------------------------------
--- CWS: 07/08/08 
--- This function checks that the entered value is a valid object name
------------------------------------------------------------------------------
-FUNCTION valid_object_name(p_object_name in varchar2) RETURN boolean as
-
-l_dummy integer;
-l_return_value boolean;
-
-cursor Valid_Object_Cursor is
-
-select 1
-from dual D WHERE
-TRIM(translate(UPPER(trim(p_object_name)) ,' ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789'
-                                          ,'%                                     ')) is null
-AND UPPER(substr(trim(p_object_name), 1,1)) in ('A','B','C','D','E','F','G','H'
-                                               ,'I','K','L','M','N','O','P','Q'
-                                               ,'R','S','T','U','V','W','X','Y','Z');
-
-BEGIN
-
-  open Valid_Object_Cursor;
-  fetch Valid_Object_Cursor into l_dummy;
-  if Valid_Object_Cursor%found then
-     l_return_value:= true;
-  else
-     l_return_value:= false;
-  end if;
-  
-     close Valid_Object_Cursor;
-  return l_return_value;
-  end;
---
------------------------------------------------------------------------------
 --
 END nm3user;
 /
