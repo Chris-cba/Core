@@ -1,12 +1,12 @@
-CREATE OR REPLACE PACKAGE KANSAS.nm3web_eng_dynseg AS
+CREATE OR REPLACE PACKAGE nm3web_eng_dynseg AS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkh-arc   2.2   Dec 16 2008 11:17:02   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkh-arc   2.3   Jan 28 2009 13:20:26   jwadsworth  $
 --       Module Name      : $Workfile:   nm3web_eng_dynseg.pkh  $
---       Date into PVCS   : $Date:   Dec 16 2008 11:17:02  $
---       Date fetched Out : $Modtime:   Dec 16 2008 11:12:28  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jan 28 2009 13:20:26  $
+--       Date fetched Out : $Modtime:   Jan 28 2009 13:18:20  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on         : 1.8
 --
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE KANSAS.nm3web_eng_dynseg AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
 --  g_sccsid is the SCCS ID for the package
 --
    g_tab_value          nm3type.tab_varchar32767;
