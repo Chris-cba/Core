@@ -1437,14 +1437,7 @@ BEGIN
       IF INSTR(UPPER(l_query), 'ORDER BY') > 0 THEN
          l_query := SUBSTR(l_query, 1, INSTR(UPPER(l_query), 'ORDER BY')-1);
       END IF;
-      ----------------------------------------------------------------------------------
-      -- SM 712002 08082008
-      -- DOC0167 has two parameters which have group bys on them and so these also need 
-      -- dropping from the query (see order by reasoning).
-      ----------------------------------------------------------------------------------      
-      IF INSTR(UPPER(l_query), 'GROUP BY') > 0 THEN
-         l_query := SUBSTR(l_query, 1, INSTR(UPPER(l_query), 'GROUP BY')-1);
-      END IF;
+
       ------------------------------------------------------------
       --put appropraite connector onto query for another condition
       ------------------------------------------------------------
@@ -1481,6 +1474,7 @@ BEGIN
       -----------------------------------
       IF l_match_type = 'CHAR'
       THEN
+        l_match_val := check_for_quotes(l_match_val); -- 709452 
         l_match_val := nm3flx.string(l_match_val);
     
       ELSIF l_match_type = nm3type.c_date
@@ -1531,9 +1525,9 @@ BEGIN
   
   ELSIF pi_number_of_query_cols = 1 THEN
   
---nm_debug.debug_on;
---nm_debug.debug('THE QUERY IS'||chr(10)||l_query);
---nm_debug.debug_off; 
+nm_debug.debug_on;
+nm_debug.debug('abc THE QUERY IS'||chr(10)||l_query);
+nm_debug.debug_off; 
     ---------------
     --perform query
     ---------------
@@ -1667,7 +1661,43 @@ BEGIN
   
   RETURN l_query;
 END get_gri_param_query;
-
+--
+----------------------------------------------------------------------------------
+--
+FUNCTION check_for_quotes(p_str varchar2) RETURN VARCHAR2 IS
+--
+  l_str_ret    varchar2(1000);
+  l_char       varchar2(500);
+  l_prev_ascii pls_integer;
+--
+BEGIN
+--
+  -- The purpose of this function is to identify an apostrophe within a string and then add an additional single quote if one is found.
+  -- e.g FISHERMAN'S AVENUE becomes FISHERMAN''S AVENUE. This ensures that any dynamic sql that uses such strings work correctly. 
+  -- Currently,the function is called from GRI0200 and SWR1225   
+--
+  for i in 1 .. length(p_str) loop
+  --
+  -- There are two parts to the if statement. 
+  -- The first part checks that each character of a string is in the a-z or A-Z range and that the previous character was a single quote.
+  -- The second part checks that the character before the single quote was also in the a-z or A-Z range. 
+  -- Only when both parts are true is an extra single quote added.      
+  --
+   if (((ascii (substr(p_str,i,1)) between 97 and 122) or (ascii (substr(p_str,i,1)) between 65 and 90) ) and l_prev_ascii = 39 ) 
+        and ((ascii (substr(p_str,i-2,1)) between 97 and 122) or (ascii (substr(p_str,i-2,1)) between 65 and 90))
+     then
+        l_str_ret := substr(p_str,1,i-1)||chr(39)||substr(p_str,i,length(p_str));
+     end if; 
+--
+     if i > 1 then
+        l_prev_ascii := ascii(substr(p_str,i,1)); 
+     end if;
+--
+  end loop;  
+--
+  return l_str_ret;
+--
+END check_for_quotes;
 
 END higgri;
 /
