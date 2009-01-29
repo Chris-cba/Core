@@ -323,6 +323,13 @@ FUNCTION get_last_grr_job_id RETURN gri_report_runs.grr_job_id%TYPE;
 --
 -----------------------------------------------------------------------------
 --
+--<PROC NAME="check_for_quotes">
+-- 
+FUNCTION check_for_quotes(p_str varchar2) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
 --<PROC NAME="get_param_value_details">
 -- This procedure validates a value for pi_param against the given LOV query.
 -- Can be used to validate value or shown depending whether pio_value or
