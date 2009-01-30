@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.15   Oct 07 2008 18:03:32   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.16   Jan 30 2009 17:20:40   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Oct 07 2008 18:03:32  $
---       Date fetched Out : $Modtime:   Oct 07 2008 17:59:58  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Jan 30 2009 17:20:40  $
+--       Date fetched Out : $Modtime:   Jan 30 2009 17:08:38  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 --
 --   Author : Priidu Tanava
@@ -51,11 +51,13 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                 load_group_datums() now uses explicit hard coded sql for linear groups
   03.10.08  PT modified sql_load_nm_datum_criteria_tmp() so that partial datums are not cut off by the assigned route
                 this in responce to a problem Sarah Kristulinec brought up in New Brunswick
+  30.01.09  PT log 718691 changed ins_datum_homo_chunks() to remove nm_type = 'I'
+                this allows FT asset members to be those of a group
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.15  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.16  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -649,7 +651,9 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           l_inv_alias := 'i'||k;
           l_attrib := pt_attr(i).ita_attrib_name;
         end if;
-        s := s||cr||'  ,case when t.nm_type = ''I'' and t.nm_obj_type = '''||pt_attr(i).inv_type||'''';
+        -- PT 30.01.09
+        -- s := s||cr||'  ,case when t.nm_type = ''I'' and t.nm_obj_type = '''||pt_attr(i).inv_type||'''';
+        s := s||cr||'  ,case when t.nm_obj_type = '''||pt_attr(i).inv_type||'''';
         if pt_attr(i).xsp is not null then
           s := s||' and i.iit_x_sect = '''||pt_attr(i).xsp||'''';
         end if;
