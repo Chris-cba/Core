@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.2   Dec 04 2007 21:23:42   ptanava  $
---       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Dec 04 2007 21:23:42  $
---       Date fetched Out : $Modtime:   Dec 04 2007 21:18:30  $
---       PVCS Version     : $Revision:   2.2  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.3   Feb 03 2009 15:30:34   cstrettle  $
+--       Module Name      : $Workfile:   nm0575_fix.pkb  $
+--       Date into PVCS   : $Date:   Feb 03 2009 15:30:34  $
+--       Date fetched Out : $Modtime:   Feb 02 2009 17:24:52  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.2  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.3  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -265,7 +265,37 @@ BEGIN
         null;
         
       end if;
-      
+    -- CWS 02/02/2009 log 718014 Else section added to provide a way or returning details on all assets of the id is null
+    else
+     insert into nm0575_matching_records (
+          asset_category, asset_type, asset_type_descr, asset_count
+        )
+        select
+           t.nit_category asset_category
+          ,t.nit_inv_type asset_type
+          ,t.nit_descr asset_type_descr
+          ,count(*) asset_count
+        from (
+        select
+        distinct i.iit_ne_id, i.iit_inv_type
+        from
+           nm_members m
+          ,nm_inv_items i
+          ,(select column_value from table(cast(get_inv_types_tbl as nm_code_tbl))) xt 
+          ,(select x2.xsp_value from nm0575_possible_xsps x2 where x2.xsp_selected = 'Y'
+            union all select '~~~~' xsp_value from dual) xs
+        where m.nm_ne_id_in = i.iit_ne_id
+          and i.iit_inv_type = xt.column_value
+          and nvl(i.iit_x_sect, '~~~~') = xs.xsp_value
+        ) q
+        ,nm_inv_types t
+        where q.iit_inv_type = t.nit_inv_type
+        group by
+           t.nit_category
+          ,t.nit_inv_type
+          ,t.nit_descr;
+        nm3dbg.putln('insert nm0575_matching_records count: '||sql%rowcount); 
+  
     end if;
   
     m_xsp_changed := false;
