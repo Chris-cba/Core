@@ -329,6 +329,7 @@ BEGIN
                  );
 --
    append ('BEGIN');
+   append ('   nm3inv.bypass_inv_items_all_trgs(TRUE);');
    append ('   FORALL i IN 1..'||g_package_name||'.g_tab_ne_id_updated.COUNT');
    append ('      UPDATE nm_inv_items');
    FOR i IN 1..pi_attrib_name.COUNT
@@ -356,6 +357,7 @@ BEGIN
       END IF;
    END LOOP;
    append ('      WHERE  iit_ne_id = '||g_package_name||'.g_tab_ne_id_updated(i);');
+   append ('   nm3inv.bypass_inv_items_all_trgs(FALSE);');
    append ('END;');
          --
    IF NOT l_some_different
@@ -402,12 +404,22 @@ BEGIN
       END;
    END LOOP;
 --
+nm_debug.debug_on;
+nm_debug.debug('EXECUTING FOLLOWING UPDATE STATEMENT...');
+nm3tab_varchar.debug_tab_varchar(l_block);
+--
    nm3ddl.execute_tab_varchar (l_block);
 --
    po_iit_ne_id_done := g_tab_ne_id_updated;
 --
    nm_debug.proc_end(g_package_name,'global_inventory_update');
 --
+nm_debug.debug_off;
+EXCEPTION
+ WHEN OTHERS THEN
+   nm_debug.debug_off;
+   nm3inv.bypass_inv_items_all_trgs(FALSE);
+   RAISE;
 END global_inventory_update;
 --
 -----------------------------------------------------------------------------
@@ -534,5 +546,24 @@ END create_nqg_records;
 --
 -----------------------------------------------------------------------------
 --
+FUNCTION get_tab_of_updated_items RETURN nm_id_tbl IS
+
+ l_retval nm_id_tbl := nm_id_tbl();
+
+BEGIN
+
+for i in 1..g_tab_ne_id_updated.count loop
+
+ l_retval.extend;
+ l_retval(l_retval.count) := g_tab_ne_id_updated(i);
+end loop;
+
+
+return(l_retval);
+
+
+END get_tab_of_updated_items;
+
+
 END nm3globinv;
 /

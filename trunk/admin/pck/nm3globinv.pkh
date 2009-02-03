@@ -173,18 +173,27 @@ FUNCTION get_c_split RETURN varchar2;
 --  array position does not exist. Given that this array is populated
 --  sequentially, then when an empty position is found then that is the end
 --
-FUNCTION get_next_ne_id_from_tab RETURN nm_inv_items.iit_ne_id%TYPE;
+-- GJ 03-FEB-2009 removed because was being used by NM0510 to construct where
+-- clause, and that logic has been amended which now means this function is no longer required
+-- Left function in the body of the package just in case it is referenced elsewhere 
+
+--FUNCTION get_next_ne_id_from_tab RETURN nm_inv_items.iit_ne_id%TYPE;
 --</PROC>
 --
 -----------------------------------------------------------------------------
---
+--<PROC NAME="get_tab_of_updated_items">
+-- called by NM0510 when building a where clause to restrict the list of asset items that
+-- the module queries back
+FUNCTION get_tab_of_updated_items RETURN nm_id_tbl;
+--</PROC>
+
 --<PRAGMA>
    PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
    PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
    PRAGMA RESTRICT_REFERENCES (get_c_update, rnds, wnds, wnps);
    PRAGMA RESTRICT_REFERENCES (get_c_leave, rnds, wnds, wnps);
    PRAGMA RESTRICT_REFERENCES (get_c_split, rnds, wnds, wnps);
-   PRAGMA RESTRICT_REFERENCES (get_next_ne_id_from_tab, rnds, wnds);
+--   PRAGMA RESTRICT_REFERENCES (get_next_ne_id_from_tab, rnds, wnds);
 --</PRAGMA>
 --
 -----------------------------------------------------------------------------
