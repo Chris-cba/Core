@@ -37,7 +37,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 
 FUNCTION is_reversable ( pi_gty IN nm_group_types_all.ngt_group_type%TYPE ) RETURN boolean;
 FUNCTION get_rescaled_pl RETURN nm_placement_array;
-PROCEDURE empty_route_check( p_ne_id in number, 
+PROCEDURE empty_route_check( p_ne_id in number,
                              p_effective_date in date,
                              p_history in varchar2, p_empty out varchar2);
 
@@ -102,7 +102,7 @@ PROCEDURE rescale_other_products( pi_nm_ne_id_in    IN nm_elements.ne_id%TYPE
 BEGIN
   -- At present only schemes is affected by a rescale performed on a route
   -- but here is a procedure ready for when others are affected
-  
+
   IF hig.is_product_licensed( nm3type.c_stp ) THEN
    -- do str rescale
     EXECUTE IMMEDIATE 'BEGIN'
@@ -163,36 +163,36 @@ BEGIN
 --  l_offset_st := nm3unit.convert_unit( g_route_units, g_datum_units, l_offset_st );
 
   empty_route_check( pi_ne_id, pi_effective_date, pi_shape_history, l_empty_flag );
-  
+
   if l_empty_flag = 'N' then
-  
+
     set_start_points;
-  
+
     connect_route( pi_ne_id, l_offset_st, pi_ne_start );
-  
+
     IF pi_st_element_id IS NULL THEN
       update_route( pi_ne_id, pi_effective_date, pi_use_history );
     ELSE
       update_partial_route( pi_ne_id, pi_effective_date, pi_st_element_id, pi_use_history );
     END IF;
-  
+
     -- AE
     -- RAC - reshape the route because the route measures have changed:
     -- default pi_shape_history to 'Y'
     IF pi_use_history = 'Y' OR
        pi_shape_history = 'Y' THEN
-  
+
       nm3sdm.reshape_route( pi_ne_id, pi_effective_date, 'Y' );
     ELSE
       nm3sdm.reshape_route( pi_ne_id, pi_effective_date, 'N' );
     END IF;
-  
+
   --
      rescale_other_products(pi_nm_ne_id_in    => pi_ne_id
                            ,pi_effective_date => pi_effective_date);
   --
    END IF;
-   
+
    -- Set AU Securuty on and effective_date back to initial value
    nm3ausec.set_status(nm3type.c_on);
    nm3user.set_effective_date (c_initial_effective_date);
@@ -217,10 +217,10 @@ FUNCTION loop_check RETURN boolean IS
   CURSOR c_loop_check IS
     SELECT 1 FROM nm_rescale_write
     WHERE s_ne_id = -1;
-    
+
   CURSOR c_no_members IS
     SELECT 1 FROM nm_rescale_write;
-        
+
 l_loop  boolean;
 l_dummy number;
 
@@ -229,7 +229,7 @@ BEGIN
   FETCH c_loop_check INTO l_dummy;
   l_loop := c_loop_check%NOTFOUND;
   CLOSE c_loop_check;
-    
+
   RETURN l_loop;
 END;
 --
@@ -316,7 +316,7 @@ PROCEDURE connect_route ( pi_ne_id IN nm_elements.ne_id%TYPE,
     SELECT ne_id, ne_length, LEVEL c_level, ne_sub_class, s_ne_id
     FROM nm_rescale_write
     CONNECT BY PRIOR ne_id = s_ne_id
-    START WITH s_ne_id = -1;
+    START WITH s_ne_id = -1 and ne_id = nvl(pi_ne_start, ne_id );
 
   CURSOR c7 IS
     SELECT ne_id, ne_length, LEVEL c_level, ne_sub_class, s_ne_id, nm_begin_mp, nm_end_mp
@@ -354,12 +354,14 @@ BEGIN
 --    The route may be a dual carriageway circular route - set the -1 for all elements
 --    that start at the user-defined start position
 
-      UPDATE nm_rescale_write
-      SET s_ne_id = -1
-      WHERE ne_no_start = ( SELECT ne_no_start
-                            FROM nm_rescale_read
-                            WHERE ne_id = pi_ne_start );
+      IF g_use_sub_class = 'Y' THEN
 
+        UPDATE nm_rescale_write
+        SET s_ne_id = -1
+        WHERE ne_no_start = ( SELECT ne_no_start
+                              FROM nm_rescale_read
+                              WHERE ne_id = pi_ne_start );
+      END IF;
 
 	  ELSE
       nm_debug.debug('circular route with blah ' ) ;
@@ -476,7 +478,7 @@ BEGIN
 
 --insert into nm_rescale_write_temp select * from nm_rescale_write ;
 --commit ;
-        
+
         FOR irec IN c7 LOOP
 
           l_seq_no := l_seq_no + 1;
@@ -781,20 +783,20 @@ CURSOR c1 IS
   FOR UPDATE OF nm_seg_no;
 
 l_empty_flag varchar2(1);
-  
+
 BEGIN
 
   instantiate_data(  pi_ne_id => pi_ne_id
                     ,pi_effective_date => NULL );
 
   empty_route_check( pi_ne_id, nm3user.get_effective_date, 'N', l_empty_flag );
-  
+
   IF l_empty_flag = 'N' THEN
-                   
+
     set_start_points;
-  
+
     connect_route( pi_ne_id, 0, pi_ne_start );
-  
+
     FOR irec IN c1 LOOP
       UPDATE nm_members
       SET nm_seg_no = get_seg_no( irec.nm_ne_id_of ),
@@ -802,12 +804,12 @@ BEGIN
           nm_true   = get_true( irec.nm_ne_id_of )
       WHERE CURRENT OF c1;
     END LOOP;
-  
+
     -- AE Get a new shape for the resequenced route, with no history
     nm3sdm.reshape_route( pi_ne_id, nm3user.get_effective_date, 'Y' );
 
   END IF;
-  
+
 END;
 --
 -----------------------------------------------------------------------------
@@ -981,7 +983,7 @@ CURSOR c1 IS
   FOR UPDATE OF ne_id NOWAIT;
 
 CURSOR c2 IS
-  SELECT /*+ index(n ne_pk) full ( w ) */ n.ne_id ne_id 
+  SELECT /*+ index(n ne_pk) full ( w ) */ n.ne_id ne_id
   FROM nm_elements n, nm_rescale_write w
   WHERE n.ne_id = w.ne_id
   AND n.ne_type = 'D';
@@ -997,7 +999,7 @@ CURSOR c3 ( c_ne_id nm_elements.ne_id%TYPE, c_gty nm_elements.ne_gty_group_type%
 --
 BEGIN
 --
-  
+
   IF is_route( pi_ne_id ) THEN
     --nm_debug.debug('Route');
     g_route_or_inv := 'R';
@@ -1219,7 +1221,7 @@ BEGIN
     AND
       nm.nm_begin_mp = pi_begin_mp;
   END IF;
-  
+
   rescale_other_products(pi_nm_ne_id_in    => pi_ne_id_in
                         ,pi_nm_ne_id_of    => pi_ne_id_of
                         ,pi_nm_begin_mp    => pi_begin_mp
@@ -1279,7 +1281,7 @@ retval nm_placement_array;
 BEGIN
 
   --nm_debug.debug_on ;
-  
+
   if p_route_id is null then
     instantiate_data_from_temp_ne ( p_nte_job_id );
   else
@@ -1564,7 +1566,7 @@ exception
   when cannot_insert_null then
     hig.raise_ner(pi_appl               => nm3type.c_net
                   ,pi_id                => 437 );
-    
+
 END;
 --
 -----------------------------------------------------------------------------
@@ -1709,7 +1711,7 @@ BEGIN
 --nm_debug.debug( 'Performing update');
 
   FOR irec IN c1 LOOP
-    
+
     IF irec.nm_cardinality NOT IN (1, -1) THEN
       IF pi_raise_errors THEN
          RAISE cant_set_cardinality;
@@ -1862,7 +1864,7 @@ BEGIN
     nm.nm_seq_no
   for update of
     ne_length NOWAIT;
-      
+
   nm_debug.proc_end(p_package_name   => g_package_name
                    ,p_procedure_name => 'get_datums_for_resize');
 
@@ -1877,38 +1879,38 @@ PROCEDURE resize_route(pi_ne_id    IN nm_elements_all.ne_id%TYPE
 
   e_invalid_element exception;
   e_partial         exception;
-  
+
   l_ne_rec nm_elements%rowtype;
-  
+
   l_new_length number;
-  
+
   l_current_length number;
-  
+
   l_length_LEFT number;
-  
+
   l_ne_id_arr     nm3type.tab_number;
   l_ne_length_arr nm3type.tab_number;
 
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'resize_route');
-      
+
   l_ne_rec := nm3get.get_ne(pi_ne_id => pi_ne_id);
-                 
+
   IF not nm3net.element_is_a_group(pi_ne_type => l_ne_rec.ne_type)
   then
     raise e_invalid_element;
   end if;
-  
+
   if nm3net.gty_is_partial(pi_gty => l_ne_rec.ne_gty_group_type)
   then
     raise e_partial;
   end if;
-                     
+
   --lock the route and its members
   nm3lock.lock_element_and_members(p_ne_id               => pi_ne_id
                                   ,p_lock_ele_for_update => TRUE);
-  
+
   --set units and such
   set_globals(pi_ne_id);
 
@@ -1922,17 +1924,17 @@ BEGIN
                                         ,p_un_id_out => g_datum_units
                                         ,p_value     => pi_new_size);
     l_length_LEFT := l_new_length;
-    
+
     --get arrays of the datum ids and their lengths
     get_datums_for_resize(pi_ne_id         => pi_ne_id
                          ,po_ne_id_arr     => l_ne_id_arr
                          ,po_ne_length_arr => l_ne_length_arr);
-    
+
     --work out new length for each datum
     for i in 1..l_ne_id_arr.COUNT
     loop
       l_ne_length_arr(I) := nm3unit.get_formatted_value((l_ne_length_arr(I) / l_current_length) * l_new_length, g_datum_units);
-      
+
       l_length_LEFT := l_length_LEFT - l_ne_length_arr(I);
     end loop;
 
@@ -1953,7 +1955,7 @@ BEGIN
                                     ,pi_new_length_to_end => l_ne_length_arr(i));
       end if;
     end loop;
-    
+
     --rescale the route to updates slks
     rescale_route(pi_ne_id          => pi_ne_id
                  ,pi_effective_date => nm3user.get_effective_date
@@ -1962,7 +1964,7 @@ BEGIN
                  ,pi_use_history    => 'N'
                  ,pi_ne_start       => pi_ne_start);
   END IF;
-  
+
   nm_debug.proc_end(p_package_name   => g_package_name
                    ,p_procedure_name => 'resize_route');
 
@@ -1983,7 +1985,7 @@ END resize_route;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE empty_route_check( p_ne_id in number, 
+PROCEDURE empty_route_check( p_ne_id in number,
                              p_effective_date in date,
                              p_history in varchar2, p_empty out varchar2) is
 
@@ -1995,22 +1997,22 @@ begin
 
   select 1 into l_dummy from nm_rescale_write
   where rownum = 1;
-  
+
 exception
 
   when no_data_found then
 
     p_empty := 'Y';
-    
+
 --  no members, need to remove any spatial representation
 
     if p_history = 'Y' then
-    
+
       nm3sdm.reshape_route( p_ne_id, p_effective_date, 'Y' );
     else
       nm3sdm.reshape_route( p_ne_id, p_effective_date, 'N' );
     end if;
-end;          
+end;
 --
 -----------------------------------------------------------------------------
 --
