@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.5   Sep 16 2008 18:24:58   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.6   Feb 04 2009 16:55:12   aedwards  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Sep 16 2008 18:24:58  $
---       Date fetched Out : $Modtime:   Sep 16 2008 18:14:38  $
---       SCCS Version     : $Revision:   2.5  $
+--       Date into SCCS   : $Date:   Feb 04 2009 16:55:12  $
+--       Date fetched Out : $Modtime:   Feb 04 2009 16:51:56  $
+--       SCCS Version     : $Revision:   2.6  $
 --       Based on --
 --
 --   nm3inv package body
@@ -3522,16 +3522,27 @@ BEGIN
   --nm_debug.debug_on ;
   --nm_debug.debug('pi_ita_view_col_name ' || pi_ita_view_col_name);
   --nm_debug.debug_off ;
-	
+
   IF nm3flx.string_contains_special_chars(pi_string => pi_ita_view_col_name)
   THEN
       hig.raise_ner( pi_appl               => 'NET'
-		           , pi_id                 => 30
+                   , pi_id                 => 30
                    , pi_supplementary_info => pi_ita_view_col_name);
-		           -- Value is invalid. Please use only alphanumeric characters with no spaces. 
+                    -- Value is invalid. Please use only alphanumeric characters with no spaces. 
                    --The underscore character "_" can be used for spaces.
    END IF;
-
+--
+-- AE 04-FEB-2009
+-- Check to make sure the view column name isnt a reserved word
+--
+  IF nm3flx.is_reserved_word(p_name => pi_ita_view_col_name)
+  THEN
+    hig.raise_ner(pi_appl               => 'NET'
+                , pi_id                 => 455
+                , pi_supplementary_info => pi_ita_view_col_name);
+                -- The name you have chosen is a reserved word in Oracle - please choose a non-reserved word
+  END IF;
+--
 END check_ita_view_col_name;
 --
 ----------------------------------------------------------------------------------------------
