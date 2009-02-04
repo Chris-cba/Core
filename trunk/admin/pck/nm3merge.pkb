@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.2   Jul 31 2007 10:31:38   sscanlon  $
---       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Jul 31 2007 10:31:38  $
---       Date fetched Out : $Modtime:   Jul 23 2007 15:28:20  $
---       PVCS Version     : $Revision:   2.2  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.3   Feb 04 2009 16:28:06   cstrettle  $
+--       Module Name      : $Workfile:   nm3merge_orig.pkb  $
+--       Date into PVCS   : $Date:   Feb 04 2009 16:28:06  $
+--       Date fetched Out : $Modtime:   Feb 04 2009 16:23:26  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -2213,7 +2213,7 @@ PROCEDURE merge_group_memberships(pi_route_ne_id_1           IN  nm_elements.ne_
      PROCEDURE end_date_existing_IN_members IS
      
      BEGIN
-       UPDATE nm_members_all
+       UPDATE nm_members
        SET    nm_end_date = pi_effective_date
        WHERE  nm_ne_id_in IN (pi_route_ne_id_1,pi_route_ne_id_2);
      END end_date_existing_IN_members;
@@ -2221,7 +2221,7 @@ PROCEDURE merge_group_memberships(pi_route_ne_id_1           IN  nm_elements.ne_
      PROCEDURE end_date_existing_OF_members IS
 
      BEGIN
-       UPDATE nm_members_all
+       UPDATE nm_members
        SET    nm_end_date = pi_effective_date
        WHERE  nm_ne_id_of IN (pi_route_ne_id_1,pi_route_ne_id_2);
      END end_date_existing_OF_members; 
