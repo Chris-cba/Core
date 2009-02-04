@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.19   Oct 28 2008 13:57:34   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.20   Feb 04 2009 15:18:52   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Oct 28 2008 13:57:34  $
---       Date fetched Out : $Modtime:   Oct 28 2008 13:56:46  $
---       PVCS Version     : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Feb 04 2009 15:18:52  $
+--       Date fetched Out : $Modtime:   Feb 04 2009 15:16:08  $
+--       PVCS Version     : $Revision:   2.20  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.19  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.20  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -7740,6 +7740,23 @@ end;
       append (   '    -- Update feature table '
               || LOWER (l_base_table_nth.nth_feature_table)
              );
+    --
+    --
+    -- 04-FEB-2009
+    -- AE Make sure the X and Y columns are not null before updating.. otherwise we'll delete
+    --
+      IF     l_base_table_nth.nth_x_column IS NOT NULL
+         AND l_base_table_nth.nth_y_column IS NOT NULL
+      THEN
+    --
+        append ('--');
+        append (' IF :NEW.'||LOWER (l_base_table_nth.nth_x_column)|| ' IS NOT NULL');
+        append ('    AND :NEW.'||LOWER (l_base_table_nth.nth_y_column)|| ' IS NOT NULL');
+        append (' THEN ');
+    --
+      END IF;
+    --
+      append ('--');
       append ('    UPDATE ' || LOWER (l_base_table_nth.nth_feature_table));
       append (   '       SET '
               || LOWER (l_base_table_nth.nth_feature_pk_column)
@@ -7864,6 +7881,22 @@ end;
          append ('    END IF;' || lf);
       ELSE
          append ('    END IF;' || lf);
+      END IF;
+
+    -- 04-FEB-2009
+    -- AE Make sure the X and Y columns are not null before updating.. otherwise we'll delete
+    --
+      IF     l_base_table_nth.nth_x_column IS NOT NULL
+         AND l_base_table_nth.nth_y_column IS NOT NULL
+      THEN
+    --
+        append ('--');
+        append (' ELSE');
+        append ('--');
+        append ('    del; ');
+        append ('--');
+        append (' END IF; ');
+    --
       END IF;
 
       append (' ');
