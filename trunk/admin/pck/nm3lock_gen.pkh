@@ -5,11 +5,11 @@ CREATE OR REPLACE PACKAGE nm3lock_gen IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock_gen.pkh-arc   2.7   Aug 12 2008 11:01:44   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock_gen.pkh-arc   2.8   Feb 05 2009 11:14:16   malexander  $
 --       Module Name      : $Workfile:   nm3lock_gen.pkh  $
---       Date into PVCS   : $Date:   Aug 12 2008 11:01:44  $
---       Date fetched Out : $Modtime:   Aug 12 2008 10:12:34  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Feb 05 2009 11:14:16  $
+--       Date fetched Out : $Modtime:   Feb 05 2009 11:06:04  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --
 --   Author : Jonathan Mills
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE nm3lock_gen IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.7  $"
+--   nm3get_gen body   : "$Revision:   2.8  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE nm3lock_gen IS
 --
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
+   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
 --  g_sccsid is the SCCS ID for the package
 --
 --</GLOBVAR>
@@ -1790,24 +1790,6 @@ PROCEDURE lock_nau (pi_nau_admin_unit    nm_admin_units.nau_admin_unit%TYPE
                    ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
                    );
 --
---   Function to lock using HAU_UK2 constraint
---
-FUNCTION lock_nau (pi_nau_name          nm_admin_units.nau_name%TYPE
-                  ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
-                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                  ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                  ) RETURN ROWID;
---
---   Procedure to lock using HAU_UK2 constraint
---
-PROCEDURE lock_nau (pi_nau_name          nm_admin_units.nau_name%TYPE
-                   ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
-                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                   );
---
 --   Function to lock using HAU_UK1 constraint
 --
 FUNCTION lock_nau (pi_nau_unit_code     nm_admin_units.nau_unit_code%TYPE
@@ -1820,6 +1802,24 @@ FUNCTION lock_nau (pi_nau_unit_code     nm_admin_units.nau_unit_code%TYPE
 --   Procedure to lock using HAU_UK1 constraint
 --
 PROCEDURE lock_nau (pi_nau_unit_code     nm_admin_units.nau_unit_code%TYPE
+                   ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                   );
+--
+--   Function to lock using HAU_UK2 constraint
+--
+FUNCTION lock_nau (pi_nau_name          nm_admin_units.nau_name%TYPE
+                  ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                  ) RETURN ROWID;
+--
+--   Procedure to lock using HAU_UK2 constraint
+--
+PROCEDURE lock_nau (pi_nau_name          nm_admin_units.nau_name%TYPE
                    ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
@@ -1846,24 +1846,6 @@ PROCEDURE lock_nau_all (pi_nau_admin_unit    nm_admin_units_all.nau_admin_unit%T
                        ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
                        );
 --
---   Function to lock using HAU_UK2 constraint
---
-FUNCTION lock_nau_all (pi_nau_name          nm_admin_units_all.nau_name%TYPE
-                      ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
-                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                      ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                      ) RETURN ROWID;
---
---   Procedure to lock using HAU_UK2 constraint
---
-PROCEDURE lock_nau_all (pi_nau_name          nm_admin_units_all.nau_name%TYPE
-                       ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
-                       ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                       ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                       ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                       );
---
 --   Function to lock using HAU_UK1 constraint
 --
 FUNCTION lock_nau_all (pi_nau_unit_code     nm_admin_units_all.nau_unit_code%TYPE
@@ -1876,6 +1858,24 @@ FUNCTION lock_nau_all (pi_nau_unit_code     nm_admin_units_all.nau_unit_code%TYP
 --   Procedure to lock using HAU_UK1 constraint
 --
 PROCEDURE lock_nau_all (pi_nau_unit_code     nm_admin_units_all.nau_unit_code%TYPE
+                       ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
+                       ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                       ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                       ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                       );
+--
+--   Function to lock using HAU_UK2 constraint
+--
+FUNCTION lock_nau_all (pi_nau_name          nm_admin_units_all.nau_name%TYPE
+                      ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
+                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                      ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                      ) RETURN ROWID;
+--
+--   Procedure to lock using HAU_UK2 constraint
+--
+PROCEDURE lock_nau_all (pi_nau_name          nm_admin_units_all.nau_name%TYPE
                        ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
                        ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                        ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
