@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.7   Nov 28 2008 12:42:36   rcoupe  $
---       Module Name      : $Workfile:   nm3nwad.pkb  $
---       Date into PVCS   : $Date:   Nov 28 2008 12:42:36  $
---       Date fetched Out : $Modtime:   Nov 13 2008 15:13:10  $
---       PVCS Version     : $Revision:   2.7  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.8   Feb 05 2009 17:01:20   rcoupe  $
+--       Module Name      : $Workfile:   nm3nwad2.pkb  $
+--       Date into PVCS   : $Date:   Feb 05 2009 17:01:20  $
+--       Date fetched Out : $Modtime:   Feb 05 2009 16:59:54  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -36,7 +36,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.7  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.8  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'nm3nwad';
 
@@ -1428,6 +1428,7 @@ BEGIN
       END IF;
 
       -- end date the old primary records
+
       end_date_nadl(pi_rec_nadl       => l_rec_nadl_prim
 	               ,pi_effective_date => l_effective_date);
 
@@ -1451,12 +1452,16 @@ BEGIN
 --
    -- now need to loop round on the child records for both old records
    -- making them link to the new record
+
    l_tab_non_prim_nadl1 := Nm3nwad.get_non_prim_nadl_from_ne_id
                              ( pi_nadl_ne_id      => pi_old_ne_id1
                              , pi_end_dated       => FALSE
                              , pi_raise_not_found => FALSE);
 
    l_rec_nadl_prim := Nm3nwad.get_prim_nadl_from_ne_id(pi_old_ne_id2, FALSE);
+
+   end_date_nadl(pi_rec_nadl       => l_rec_nadl_prim
+                ,pi_effective_date => l_effective_date);
 
    IF  l_tab_non_prim_nadl1.COUNT > 0
    AND l_rec_nadl_prim.nad_id     IS NOT NULL
