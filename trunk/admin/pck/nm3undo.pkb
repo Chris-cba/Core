@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.4   Jun 24 2008 11:17:44   rcoupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.5   Feb 05 2009 16:46:40   rcoupe  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Jun 24 2008 11:17:44  $
---       Date fetched Out : $Modtime:   Jun 24 2008 11:11:30  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Feb 05 2009 16:46:40  $
+--       Date fetched Out : $Modtime:   Feb 05 2009 16:41:52  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -61,9 +61,9 @@ BEGIN
   IF NOT hig.is_product_licensed(nm3type.c_stp) THEN
     RAISE product_not_licenced;
   END IF;
-  
+
   CASE p_operation
-    WHEN c_close THEN 
+    WHEN c_close THEN
 --
      EXECUTE IMMEDIATE 'BEGIN' || CHR (10) ||
                        '   stp_network_ops.undo_close(pi_ne_id => :p_ne_id_1);' || CHR (10) ||
@@ -464,7 +464,7 @@ END undo_scheme;
       --
       -- </MAI>
       --
-      
+
       -- Schemes
       undo_scheme(p_ne_id_1   => p_ne_id_1
                  ,p_ne_id_2   => p_ne_id_2
@@ -600,9 +600,9 @@ END undo_scheme;
                   p_ne_id_new2 := l_new;
                   p_ne_id_old2 := NULL;
             ELSIF l_op = 'M' then
-            
+
               open c_hist_from_new( l_new );
-              
+
               fetch c_hist_from_new into l_new, l_old, l_op;
               p_ne_id_new1 := l_new;
               p_ne_id_old1 := l_old;
@@ -611,7 +611,7 @@ END undo_scheme;
               p_ne_id_new2 := NULL;
               p_ne_id_old2 := l_old;
               close c_hist_from_new;
-            
+
             ELSE
                p_ne_id_new2 := NULL;
                p_ne_id_old2 := NULL;
@@ -638,15 +638,15 @@ END undo_scheme;
            fetch c_hist_from_old into l_new, l_old, l_op;
            p_ne_id_new1 := l_new;
            p_ne_id_old1 := l_old;
-           
+
 --      split - need to get the others - there will be two new for one old
- 
+
            fetch c_hist_from_old into l_new, l_old, l_op;
            p_ne_id_new2 := l_new;
            p_ne_id_old2 := NULL;
-           
+
            close c_hist_from_old;
-           
+
          ELSE
             p_ne_id_new2 := NULL;
             p_ne_id_old2 := NULL;
@@ -654,7 +654,7 @@ END undo_scheme;
 
          CLOSE c_hist_from_new;
       END IF;
-   
+
    END;
 
 --
@@ -927,9 +927,9 @@ END undo_scheme;
 
          Nm_Debug.DEBUG ('Checking for AD data to unsplit');
 
-         IF Nm3nwad.ad_data_exist (pi_ne_id,true) 
+         IF Nm3nwad.ad_data_exist (pi_ne_id,true)
          THEN
-            Nm_Debug.DEBUG ('Unsplitting - '||pi_ne_id_1||'-'||pi_ne_id_2||'-'||pi_ne_id); 
+            Nm_Debug.DEBUG ('Unsplitting - '||pi_ne_id_1||'-'||pi_ne_id_2||'-'||pi_ne_id);
             error_loc := 9 ;
             Nm3nwad.do_ad_unsplit (pi_new_ne_id1      => pi_ne_id_1,
                                    pi_new_ne_id2      => pi_ne_id_2,
@@ -963,7 +963,7 @@ END undo_scheme;
             nm_debug.set_level(3);
             nm_debug.debug_on;
             nm_debug.debug('pi_ne_id = ' || pi_ne_id || ', pi_ne_id_1 = ' || pi_ne_id_1 || ', pi_ne_id_2 = ' || pi_ne_id_2);
-            
+
             OPEN cs_nmh (pi_ne_id, pi_ne_id_1, pi_ne_id_2);
 
             FETCH cs_nmh
@@ -975,7 +975,7 @@ END undo_scheme;
 
             -- This is debug code for when you get a 112 or other error
             -- Comment out the forall and comment this in to see where the error is
-/*  
+/*
             for i in 1..l_tab_ne_id_in.count
             loop
                 nm_debug.debug('------ ' || i || ' ------');
@@ -998,9 +998,9 @@ END undo_scheme;
                   AND nm_ne_id_of = l_tab_ne_id_of (i)
                   AND nm_begin_mp = l_tab_begin_mp (i)
                   AND nm_start_date = l_tab_start_date (i);
-            end loop ; 
+            end loop ;
             nm_debug.debug_off;
-*/            
+*/
             FORALL i IN 1 .. l_tab_ne_id_in.COUNT
                UPDATE NM_MEMBERS_ALL
                   SET nm_end_date = l_tab_end_date (i)
@@ -1038,12 +1038,12 @@ END undo_scheme;
 
          -- delete the history
          delete_element_history (pi_ne_id, c_split);
-         
+
          delete_element_history_for_new(pi_ne_id_new => pi_ne_id_1);
          delete_element_history_for_new(pi_ne_id_new => pi_ne_id_2);
-         
+
          error_loc := 12 ;
-         
+
          -- delete the new elements
          delete_element (pi_ne_id_1, pi_ne_id_2);
          error_loc := 13 ;
@@ -1106,10 +1106,10 @@ END undo_scheme;
 
          -- delete the history
          delete_element_history (pi_ne_id, c_split);
-         
+
          delete_element_history_for_new(pi_ne_id_new => pi_ne_id_1);
          delete_element_history_for_new(pi_ne_id_new => pi_ne_id_2);
-         
+
          error_loc := 26 ;
          undo_other_products (p_ne_id_1        => pi_ne_id        -- old ne_id
                                                           ,
@@ -1132,7 +1132,7 @@ END undo_scheme;
          Nm_Debug.DEBUG ('Checking for AD data to unsplit');
          IF Nm3nwad.ad_data_exist (pi_ne_id)
          THEN
-            Nm_Debug.DEBUG ('Unsplitting - '||pi_ne_id_1||'-'||pi_ne_id_2||'-'||pi_ne_id); 
+            Nm_Debug.DEBUG ('Unsplitting - '||pi_ne_id_1||'-'||pi_ne_id_2||'-'||pi_ne_id);
             error_loc := 30 ;
             Nm3nwad.do_ad_unsplit (pi_new_ne_id1      => pi_ne_id_1,
                                    pi_new_ne_id2      => pi_ne_id_2,
@@ -1222,11 +1222,11 @@ END undo_scheme;
          begin
            colon_loc := instr(err_mess,':');
            err_mess := substr(err_mess,1,colon_loc) || ' unsplit step '
-                              || to_char(error_loc) 
+                              || to_char(error_loc)
                               || substr(err_mess,colon_loc+1);
            set_for_return;
            ROLLBACK;
-           Raise_application_error(-20000, err_mess ); 
+           Raise_application_error(-20000, err_mess );
          end ;
    END unsplit;
 
@@ -1403,7 +1403,7 @@ END undo_scheme;
                   AND nm_ne_id_of = l_tab_ne_id_of (i)
                   AND nm_begin_mp = l_tab_begin_mp (i)
                   AND nm_start_date = l_tab_start_date (i);
-            end loop ; 
+            end loop ;
             nm_debug.debug_off;
 --*/
 --/*
@@ -1433,9 +1433,9 @@ END undo_scheme;
             error_loc := 110 ;
             -- delete the history
             delete_element_history (pi_ne_id_2, c_merge);
-            
+
             delete_element_history_for_new(pi_ne_id_new => pi_ne_id);
-            
+
             error_loc := 111 ;
             -- delete nm_elements for v_ne_id
             delete_element (pi_ne_id);
@@ -1502,9 +1502,9 @@ END undo_scheme;
          error_loc := 126 ;
          delete_element_history (pi_ne_id_2, c_merge);
          error_loc := 127 ;
-         
+
          delete_element_history_for_new(pi_ne_id_new => pi_ne_id);
-         
+
          undo_other_products (p_ne_id_1        => pi_ne_id_1,
                               p_ne_id_2        => pi_ne_id_2,
                               p_ne_id_3        => pi_ne_id        -- new ne_id
@@ -1518,8 +1518,8 @@ END undo_scheme;
          error_loc := 128 ;
          Nm3sdm.delete_route_shape (p_ne_id => pi_ne_id);
 
-         IF Nm3nwad.ad_data_exist (pi_ne_id_1)
-         AND Nm3nwad.ad_data_exist (pi_ne_id_2)
+         IF Nm3nwad.ad_data_exist (pi_ne_id_1, TRUE)
+         OR Nm3nwad.ad_data_exist (pi_ne_id_2, TRUE)
          THEN
            error_loc := 129 ;
             Nm3nwad.do_ad_unmerge (pi_new_ne_id       => pi_ne_id,
@@ -1614,11 +1614,11 @@ END undo_scheme;
          begin
            colon_loc := instr(err_mess,':');
            err_mess := substr(err_mess,1,colon_loc) || ' unmerge step '
-                              || to_char(error_loc) 
+                              || to_char(error_loc)
                               || substr(err_mess,colon_loc+1);
            set_for_return;
            ROLLBACK;
-           Raise_application_error(-20000, err_mess ); 
+           Raise_application_error(-20000, err_mess );
          end ;
    END unmerge;
 
@@ -1751,9 +1751,9 @@ END undo_scheme;
 --                           AND iit_inv_type = nm_obj_type);
             -- delete the history
             delete_element_history (p_ne_id, c_replace);
-            
+
             delete_element_history_for_new(pi_ne_id_new => v_ne_id);
-            
+
             -- delete nm_elements v_ne_id
             delete_element (v_ne_id);
 
