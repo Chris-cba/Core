@@ -5,11 +5,11 @@ CREATE OR REPLACE PACKAGE nm3debug IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkh-arc   2.7   Aug 12 2008 11:01:50   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkh-arc   2.8   Feb 05 2009 11:14:14   malexander  $
 --       Module Name      : $Workfile:   nm3debug.pkh  $
---       Date into PVCS   : $Date:   Aug 12 2008 11:01:50  $
---       Date fetched Out : $Modtime:   Aug 12 2008 10:12:34  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Feb 05 2009 11:14:14  $
+--       Date fetched Out : $Modtime:   Feb 05 2009 11:06:04  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --
 --   Author : Jonathan Mills
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE nm3debug IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.7  $"
+--   nm3get_gen body   : "$Revision:   2.8  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE nm3debug IS
 --
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
+   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
 --  g_sccsid is the SCCS ID for the package
 --
 --</GLOBVAR>

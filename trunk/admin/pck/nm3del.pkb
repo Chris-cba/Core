@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3del.pkb-arc   2.7   Aug 12 2008 11:01:50   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3del.pkb-arc   2.8   Feb 05 2009 11:14:14   malexander  $
 --       Module Name      : $Workfile:   nm3del.pkb  $
---       Date into PVCS   : $Date:   Aug 12 2008 11:01:50  $
---       Date fetched Out : $Modtime:   Aug 12 2008 10:12:34  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Feb 05 2009 11:14:14  $
+--       Date fetched Out : $Modtime:   Feb 05 2009 11:06:04  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.7  $"
+--   nm3get_gen body   : "$Revision:   2.8  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3del';
@@ -2806,9 +2806,9 @@ END del_nau;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using HAU_UK2 constraint
+--   Procedure to del using HAU_UK1 constraint
 --
-PROCEDURE del_nau (pi_nau_name          nm_admin_units.nau_name%TYPE
+PROCEDURE del_nau (pi_nau_unit_code     nm_admin_units.nau_unit_code%TYPE
                   ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
@@ -2821,7 +2821,7 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_nau
-                   (pi_nau_name          => pi_nau_name
+                   (pi_nau_unit_code     => pi_nau_unit_code
                    ,pi_nau_admin_type    => pi_nau_admin_type
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
@@ -2841,9 +2841,9 @@ END del_nau;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using HAU_UK1 constraint
+--   Procedure to del using HAU_UK2 constraint
 --
-PROCEDURE del_nau (pi_nau_unit_code     nm_admin_units.nau_unit_code%TYPE
+PROCEDURE del_nau (pi_nau_name          nm_admin_units.nau_name%TYPE
                   ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
@@ -2856,7 +2856,7 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_nau
-                   (pi_nau_unit_code     => pi_nau_unit_code
+                   (pi_nau_name          => pi_nau_name
                    ,pi_nau_admin_type    => pi_nau_admin_type
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
@@ -2909,9 +2909,9 @@ END del_nau_all;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using HAU_UK2 constraint
+--   Procedure to del using HAU_UK1 constraint
 --
-PROCEDURE del_nau_all (pi_nau_name          nm_admin_units_all.nau_name%TYPE
+PROCEDURE del_nau_all (pi_nau_unit_code     nm_admin_units_all.nau_unit_code%TYPE
                       ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
                       ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                       ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
@@ -2924,7 +2924,7 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_nau_all
-                   (pi_nau_name          => pi_nau_name
+                   (pi_nau_unit_code     => pi_nau_unit_code
                    ,pi_nau_admin_type    => pi_nau_admin_type
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
@@ -2944,9 +2944,9 @@ END del_nau_all;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using HAU_UK1 constraint
+--   Procedure to del using HAU_UK2 constraint
 --
-PROCEDURE del_nau_all (pi_nau_unit_code     nm_admin_units_all.nau_unit_code%TYPE
+PROCEDURE del_nau_all (pi_nau_name          nm_admin_units_all.nau_name%TYPE
                       ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
                       ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                       ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
@@ -2959,7 +2959,7 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_nau_all
-                   (pi_nau_unit_code     => pi_nau_unit_code
+                   (pi_nau_name          => pi_nau_name
                    ,pi_nau_admin_type    => pi_nau_admin_type
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode

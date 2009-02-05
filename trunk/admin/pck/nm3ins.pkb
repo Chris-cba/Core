@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.7   Aug 12 2008 11:01:48   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.8   Feb 05 2009 11:14:14   malexander  $
 --       Module Name      : $Workfile:   nm3ins.pkb  $
---       Date into PVCS   : $Date:   Aug 12 2008 11:01:48  $
---       Date fetched Out : $Modtime:   Aug 12 2008 10:12:36  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Feb 05 2009 11:14:14  $
+--       Date fetched Out : $Modtime:   Feb 05 2009 11:06:06  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.7  $"
+--   nm3get_gen body   : "$Revision:   2.8  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
@@ -113,6 +113,8 @@ BEGIN
             ,doc_compl_user_type
             ,doc_date_time_arrived
             ,doc_reason_for_later_arrival
+            ,doc_outcome
+            ,doc_outcome_reason
             )
      VALUES (p_rec_doc.doc_id
             ,p_rec_doc.doc_title
@@ -175,6 +177,8 @@ BEGIN
             ,p_rec_doc.doc_compl_user_type
             ,p_rec_doc.doc_date_time_arrived
             ,p_rec_doc.doc_reason_for_later_arrival
+            ,p_rec_doc.doc_outcome
+            ,p_rec_doc.doc_outcome_reason
             )
    RETURNING doc_id
             ,doc_title
@@ -237,6 +241,8 @@ BEGIN
             ,doc_compl_user_type
             ,doc_date_time_arrived
             ,doc_reason_for_later_arrival
+            ,doc_outcome
+            ,doc_outcome_reason
       INTO   p_rec_doc.doc_id
             ,p_rec_doc.doc_title
             ,p_rec_doc.doc_dcl_code
@@ -297,7 +303,9 @@ BEGIN
             ,p_rec_doc.doc_compl_summons_received
             ,p_rec_doc.doc_compl_user_type
             ,p_rec_doc.doc_date_time_arrived
-            ,p_rec_doc.doc_reason_for_later_arrival;
+            ,p_rec_doc.doc_reason_for_later_arrival
+            ,p_rec_doc.doc_outcome
+            ,p_rec_doc.doc_outcome_reason;
 --
    nm_debug.proc_end(g_package_name,'ins_doc');
 --

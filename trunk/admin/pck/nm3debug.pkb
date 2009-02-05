@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.7   Aug 12 2008 11:01:50   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.8   Feb 05 2009 11:14:14   malexander  $
 --       Module Name      : $Workfile:   nm3debug.pkb  $
---       Date into PVCS   : $Date:   Aug 12 2008 11:01:50  $
---       Date fetched Out : $Modtime:   Aug 12 2008 10:12:36  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Feb 05 2009 11:14:14  $
+--       Date fetched Out : $Modtime:   Feb 05 2009 11:06:06  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.7  $"
+--   nm3get_gen body   : "$Revision:   2.8  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3debug';
@@ -111,6 +111,8 @@ BEGIN
    nm_debug.debug('doc_compl_user_type          : '||pi_rec_doc.doc_compl_user_type,p_level);
    nm_debug.debug('doc_date_time_arrived        : '||pi_rec_doc.doc_date_time_arrived,p_level);
    nm_debug.debug('doc_reason_for_later_arrival : '||pi_rec_doc.doc_reason_for_later_arrival,p_level);
+   nm_debug.debug('doc_outcome                  : '||pi_rec_doc.doc_outcome,p_level);
+   nm_debug.debug('doc_outcome_reason           : '||pi_rec_doc.doc_outcome_reason,p_level);
 --
    nm_debug.proc_end(g_package_name,'debug_doc');
 --
