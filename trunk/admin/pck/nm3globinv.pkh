@@ -173,11 +173,9 @@ FUNCTION get_c_split RETURN varchar2;
 --  array position does not exist. Given that this array is populated
 --  sequentially, then when an empty position is found then that is the end
 --
--- GJ 03-FEB-2009 removed because was being used by NM0510 to construct where
--- clause, and that logic has been amended which now means this function is no longer required
--- Left function in the body of the package just in case it is referenced elsewhere 
+-- GJ 05-FEB-2009 should eventaully be removed cos replaced by get_tab_of_updated_items
 
---FUNCTION get_next_ne_id_from_tab RETURN nm_inv_items.iit_ne_id%TYPE;
+FUNCTION get_next_ne_id_from_tab RETURN nm_inv_items.iit_ne_id%TYPE;
 --</PROC>
 --
 -----------------------------------------------------------------------------
