@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.14   Nov 28 2008 15:10:48   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.15   Feb 06 2009 17:20:06   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Nov 28 2008 15:10:48  $
---       Date fetched Out : $Modtime:   Nov 28 2008 15:10:06  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Feb 06 2009 17:20:06  $
+--       Date fetched Out : $Modtime:   Feb 06 2009 17:19:32  $
+--       PVCS Version     : $Revision:   2.15  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.14  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.15  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -6286,6 +6286,10 @@ BEGIN
       retval := mdsys.sdo_geometry( 3003, NULL, NULL, mdsys.sdo_elem_info_array( 1,3,3),
                         mdsys.sdo_ordinate_array( l_diminfo(1).sdo_lb, l_diminfo(2).sdo_lb, l_diminfo(3).sdo_lb,
                                        l_diminfo(1).sdo_ub, l_diminfo(2).sdo_ub, l_diminfo(3).sdo_ub ));
+  ELSE
+
+      retval := mdsys.sdo_geometry( 2003, NULL, NULL, mdsys.sdo_elem_info_array( 1,3,3),
+                      mdsys.sdo_ordinate_array( l_diminfo(1).sdo_lb,l_diminfo(2).sdo_lb, l_diminfo(1).sdo_ub,l_diminfo(2).sdo_ub ));
 
   END IF;
 
