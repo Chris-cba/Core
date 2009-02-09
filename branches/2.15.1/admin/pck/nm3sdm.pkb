@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.15.1.5   Dec 01 2008 11:36:00   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.15.1.6   Feb 09 2009 11:36:14   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Dec 01 2008 11:36:00  $
---       Date fetched Out : $Modtime:   Dec 01 2008 11:34:50  $
---       PVCS Version     : $Revision:   2.15.1.5  $
+--       Date into PVCS   : $Date:   Feb 09 2009 11:36:14  $
+--       Date fetched Out : $Modtime:   Feb 09 2009 11:29:00  $
+--       PVCS Version     : $Revision:   2.15.1.6  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.15.1.5  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.15.1.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -968,8 +968,9 @@ PROCEDURE make_nt_spatial_layer
       p_geom    IN   MDSYS.SDO_GEOMETRY
    )
    IS
-      l_layer   NUMBER;
-      l_geom    MDSYS.SDO_GEOMETRY;
+      l_layer       NUMBER;
+      l_old_geom    MDSYS.SDO_GEOMETRY;
+      l_new_geom    MDSYS.SDO_GEOMETRY;
    BEGIN
       --nm_debug.debug_on;
       --nm_debug.debug('changing shapes');
@@ -978,9 +979,22 @@ PROCEDURE make_nt_spatial_layer
       IF Nm3sdo.element_has_shape (l_layer, p_ne_id) = 'TRUE'
       THEN
 
-         l_geom := nm3sdo.get_layer_element_geometry( l_layer, p_ne_id );
+         -- AE 09-FEB-2009
+         -- Brought across the code from 2.10.1.1 branch into the mainstream 
+         -- version so that the SRID is set on the reshape
+         
+         -- 4051 version branch
 
-         nm3sdo_edit.reshape ( l_layer, p_ne_id, p_geom );
+         l_old_geom := nm3sdo.get_layer_element_geometry( l_layer, p_ne_id );
+
+         l_new_geom := p_geom;
+
+         IF NVL(l_old_geom.sdo_srid, -9999)  != NVL( l_new_geom.sdo_srid, -9999) 
+         THEN
+           l_new_geom.sdo_srid := l_old_geom.sdo_srid;
+         END IF;
+
+         nm3sdo_edit.reshape ( l_layer, p_ne_id, l_new_geom );
 
          --  nm_debug.debug_on;
          --  nm_debug.debug('changing shapes');
