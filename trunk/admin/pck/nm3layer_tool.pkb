@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.4   Nov 20 2007 09:17:26   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.5   Feb 10 2009 13:54:44   aedwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Nov 20 2007 09:17:26  $
---       Date fetched Out : $Modtime:   Nov 20 2007 09:17:04  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Feb 10 2009 13:54:44  $
+--       Date fetched Out : $Modtime:   Feb 10 2009 13:54:18  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.4  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.5  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -104,7 +104,14 @@ AS
           FROM nm_themes_all
          WHERE nth_table_name = 'DEFECTS' OR nth_pk_column LIKE '%DEFECT_ID%'
       ORDER BY 1;
-
+--
+   CURSOR get_wol_layers
+   IS
+      SELECT   *
+          FROM nm_themes_all
+         WHERE nth_table_name like '%WORK_ORDER_LINES%' 
+            OR nth_pk_column LIKE '%WOL_ID%'
+      ORDER BY 1;
 --
    CURSOR get_enq_layers
    IS
@@ -514,6 +521,14 @@ AS
          FETCH get_defect_layers
          BULK COLLECT INTO l_tab_nth;
          CLOSE get_defect_layers;
+
+      ELSIF pi_layer_type = 'WOL'
+      -- Work Order Layers
+      THEN
+         OPEN get_wol_layers;
+         FETCH get_wol_layers
+         BULK COLLECT INTO l_tab_nth;
+         CLOSE get_wol_layers;
 
       ELSIF pi_layer_type = 'E'
       -- Enquiries Layers
@@ -2880,7 +2895,57 @@ AS
       nm_debug.proc_end (g_package_name, 'create_defect_layer');
    --
    END create_defect_layer;
-
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_WOL_LAYER">
+-- Creates a standard Work Order Lines SDO layer
+  PROCEDURE create_wol_layer
+              ( pi_theme_name    IN nm_themes_all.nth_theme_name%TYPE
+              , pi_asset_type    IN nm_inv_types.nit_inv_type%TYPE
+              , pi_asset_descr   IN nm_inv_types.nit_descr%TYPE)
+  IS
+    l_sql   VARCHAR2 (10000);
+  BEGIN
+  --
+    nm_debug.proc_start (g_package_name, 'create_wol_layer');
+  --
+    IF hig.is_product_licensed (nm3type.c_mai)
+    AND (pi_theme_name IS NOT NULL
+          AND pi_asset_type IS NOT NULL)
+    THEN
+      l_sql :=
+           ' BEGIN '
+        || lf
+        || 'mai_sdo_util.make_base_wol_sdo_layer'
+        || lf
+        || '( pi_theme_name    => :pi_theme_name'
+        || lf
+        || ', pi_asset_type    => :pi_asset_type'
+        || lf
+        || ', pi_asset_descr   => :pi_asset_descr'
+        || lf
+        || ' );'
+        || lf
+        || ' END;';
+      EXECUTE IMMEDIATE l_sql
+                  USING pi_theme_name
+                      , pi_asset_type
+                      , pi_asset_descr
+                      ;
+    END IF;
+  --
+    nm_debug.proc_end (g_package_name, 'create_wol_layer');
+  --
+  END create_wol_layer;
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE drop_wol_layer ( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE )
+  IS
+  BEGIN
+    NULL;
+  END drop_wol_layer;
 --
 -----------------------------------------------------------------------------
 --
