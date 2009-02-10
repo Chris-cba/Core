@@ -4,7 +4,7 @@ CREATE OR REPLACE PACKAGE BODY nm3locator AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm3locator.pkb	1.21 10/10/06
+--       sccsid           : @(#)nm3locator.pkb 1.21 10/10/06
 --       Module Name      : nm3locator.pkb
 --       Date into SCCS   : 06/10/10 15:13:24
 --       Date fetched Out : 07/06/13 14:12:23
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3locator AS
 --   nm3locator body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2004
+-- Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
 --all global package variables here
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3locator AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '@(#)nm3locator.pkb	1.21 10/10/06';
+  g_body_sccsid  CONSTANT varchar2(2000) := '@(#)nm3locator.pkb 1.21 10/10/06';
 
   g_package_name CONSTANT varchar2(30) := 'nm3locator';
 
@@ -1913,8 +1913,9 @@ IS
 BEGIN
   SELECT COUNT(*) INTO l_count
     FROM gis_data_objects
-   WHERE gdo_session_id = pi_gis_session_id;
-  IF l_count > 1
+   WHERE gdo_session_id = pi_gis_session_id
+     AND gdo_seq_no IS NOT NULL;
+  IF l_count > 0
   THEN
     RETURN TRUE;
   ELSE
