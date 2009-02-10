@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.15   Feb 06 2009 17:20:06   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.16   Feb 10 2009 14:49:56   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Feb 06 2009 17:20:06  $
---       Date fetched Out : $Modtime:   Feb 06 2009 17:19:32  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Feb 10 2009 14:49:56  $
+--       Date fetched Out : $Modtime:   Feb 10 2009 14:47:36  $
+--       PVCS Version     : $Revision:   2.16  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.15  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.16  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -9428,7 +9428,7 @@ BEGIN
                 'where sdo_nn( '||nthrow.nth_feature_shape_column||', :p_geom ,'||''''||
                 'SDO_BATCH_SIZE='||TO_CHAR(10)||''''||') = '||''''||'TRUE'||''''||
                 ' and rownum <= 10 '||
-                ' and ft.'||nthrow.nth_pk_column||' = ne_list.ne_id';
+                ' and ft.'||nthrow.nth_feature_pk_column||' = ne_list.ne_id';
 
 --  Nm_Debug.debug_on;
 --  Nm_Debug.DEBUG( cur_string );
