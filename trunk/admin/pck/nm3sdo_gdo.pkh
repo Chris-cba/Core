@@ -4,11 +4,11 @@ IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdo.pkh-arc   3.0   Jan 29 2008 11:41:38   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdo.pkh-arc   3.1   Feb 10 2009 10:06:46   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_gdo.pkh  $
---       Date into PVCS   : $Date:   Jan 29 2008 11:41:38  $
---       Date fetched Out : $Modtime:   Jan 29 2008 11:38:38  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Feb 10 2009 10:06:46  $
+--       Date fetched Out : $Modtime:   Feb 10 2009 10:06:00  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ IS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) :='"$Revision:   3.0  $"';
+  g_sccsid CONSTANT VARCHAR2(2000) :='"$Revision:   3.1  $"';
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------
@@ -58,6 +58,11 @@ FUNCTION get_body_version RETURN varchar2;
 --<PROC NAME="GET_GEOM_FROM_XYS"
   FUNCTION get_geom_from_xys (pi_tab_xys IN tab_xys)
   RETURN sdo_geometry;
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="SET_GTYPE">
+  PROCEDURE set_gtype ( pi_gtype IN nm_theme_gtypes.ntg_gtype%TYPE );
 --</PROC>
 --
 --------------------------------------------------------------------------------
