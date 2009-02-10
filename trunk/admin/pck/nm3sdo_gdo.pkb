@@ -4,11 +4,11 @@ IS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdo.pkb-arc   3.1   Jan 09 2009 15:17:30   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdo.pkb-arc   3.2   Feb 10 2009 10:06:36   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_gdo.pkb  $
---       Date into PVCS   : $Date:   Jan 09 2009 15:17:30  $
---       Date fetched Out : $Modtime:   Jan 09 2009 15:15:02  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Feb 10 2009 10:06:36  $
+--       Date fetched Out : $Modtime:   Feb 10 2009 10:05:14  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --------------------------------------------------------------------------------
 --
@@ -18,11 +18,13 @@ IS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) :='"$Revision:   3.1  $"';
-  g_package_name CONSTANT varchar2(30)   := 'nm3sdo_gdo';
-  g_srid                  number ;
-  b_srid_set              boolean := FALSE;
-
+  g_body_sccsid  CONSTANT VARCHAR2(2000) :='"$Revision:   3.2  $"';
+  g_package_name CONSTANT VARCHAR2(30)   := 'nm3sdo_gdo';
+  g_srid                  NUMBER ;
+  b_srid_set              BOOLEAN := FALSE;
+  g_gtype                 nm_theme_gtypes.ntg_gtype%TYPE;
+  g_diminfo               mdsys.sdo_dim_array;
+  g_tol                   NUMBER := 0.005;
 --
 -----------------------------------------------------------------------------
 --
@@ -41,15 +43,37 @@ IS
 --------------------------------------------------------------------------------
 --
   PROCEDURE set_srid IS
-    diminfo mdsys.sdo_dim_array;
   BEGIN
     IF NOT b_srid_set
     THEN
-      nm3sdo.set_diminfo_and_srid( nm3sdo.get_nw_themes, diminfo, g_srid );
+      nm3sdo.set_diminfo_and_srid( nm3sdo.get_nw_themes, g_diminfo, g_srid );
       b_srid_set := TRUE;
-      --g_srid := 999999;
     END IF;
   END set_srid;
+--
+--------------------------------------------------------------------------------
+--
+  PROCEDURE set_gtype ( pi_gtype IN nm_theme_gtypes.ntg_gtype%TYPE )
+  IS
+  BEGIN
+    IF pi_gtype IS NOT NULL
+    THEN
+      g_gtype := pi_gtype;
+    END IF;
+  END set_gtype;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION validate_polygon ( pi_geometry IN mdsys.sdo_geometry )
+  RETURN nm3type.max_varchar2
+  IS
+  --
+  BEGIN
+    RETURN sdo_geom.validate_geometry_with_context (pi_geometry
+                                                 --, g_diminfo);
+                                                   ,g_tol );
+  --
+  END validate_polygon;
 --
 --------------------------------------------------------------------------------
 --
@@ -58,46 +82,180 @@ IS
     -----------------------------------------------------------
     --  Return an SDO geometry for a collection of XY coords
     --
-    --  Always return as a 2002 simple line geometry
     -----------------------------------------------------------
   IS
-    l_ord    sdo_ordinate_array := sdo_ordinate_array(NULL);
-    retval   sdo_geometry;
-    l_gtype  NUMBER := 2002;  --default to a line for now
+    l_ord    mdsys.sdo_ordinate_array := mdsys.sdo_ordinate_array(NULL);
+    retval   mdsys.sdo_geometry;
+    l_gtype  nm_theme_gtypes.ntg_gtype%TYPE;
+    l_error  nm3type.max_varchar2;
+  --
+  -- Only used for a line shape (sdo_ordinate_array)
+  -- The code uses nm3sdo.get_2d_pt for a Point
+  --
+    FUNCTION wrap_geom ( pi_tab_xys IN tab_xys 
+                       , pi_close   IN BOOLEAN DEFAULT FALSE)
+    RETURN mdsys.sdo_ordinate_array
+    IS
+      l_ord mdsys.sdo_ordinate_array := mdsys.sdo_ordinate_array(NULL);
+    --
+    BEGIN
+    --
+      l_ord.DELETE;
+    --
+      FOR i IN 1..pi_tab_xys.COUNT
+      LOOP
+      --
+        l_ord.EXTEND;
+        l_ord(l_ord.COUNT) := ROUND(pi_tab_xys(i).x_coord,2);
+      --
+        l_ord.EXTEND;
+        l_ord(l_ord.COUNT) := ROUND(pi_tab_xys(i).y_coord,2);
+      --
+      END LOOP;
+    --
+    -- Close the shape i.e. make it into a polygon
+    --
+      IF pi_close
+      AND pi_tab_xys.COUNT >= 3
+      THEN
+      --
+        IF pi_tab_xys(pi_tab_xys.COUNT).x_coord !=
+           pi_tab_xys(pi_tab_xys.COUNT).y_coord
+        THEN
+        --
+        -- If the first set of ordinates are different
+        -- from the last set, then they have to be closed
+        -- to from a polygon
+        --
+        -- Create a new X coordinate, matching the first X coordinate
+          l_ord.EXTEND;
+          l_ord(l_ord.COUNT) := l_ord(l_ord.FIRST);
+        --
+        -- Create a new Y coordinate, matching the first Y coordinate
+          l_ord.EXTEND;
+          l_ord(l_ord.COUNT) := l_ord(l_ord.FIRST+1);
+        END IF; 
+      -- 
+      END IF;
+    --
+      RETURN l_ord;
+    --
+    END wrap_geom;
   --
   BEGIN
   --
+  -- Set the SRID global
+    set_srid;
+  --
     IF pi_tab_xys.COUNT = 0
     THEN
+    -- No coordinates passed so bomb out
       RAISE_APPLICATION_ERROR (-20101,'List of XYs is empty!');
     END IF;
   --
-    FOR i IN 1..pi_tab_xys.COUNT LOOP
-
-      IF i > 1 THEN
-
-         l_ord.EXTEND;
-         l_ord(l_ord.LAST) := pi_tab_xys(i).x_coord;
-
+    IF g_gtype IS NULL
+    THEN
+    --
+    -- This is the path TMA takes - we'll always return a 2002 Line geometry
+    --  
+        l_ord := wrap_geom ( pi_tab_xys => pi_tab_xys );
+    --
+        retval := mdsys.sdo_geometry( 2002,
+                                      g_srid,
+                                      NULL, 
+                                      mdsys.sdo_elem_info_array( 1, 2, 1), -- line
+                                      l_ord);
+    ELSE
+    --
+    -- POINT SHAPE - 2001
+    --
+      IF g_gtype = 2001
+      THEN
+        IF pi_tab_xys.COUNT > 1 -- more than one pair of ordinates
+        THEN
+        --
+          RAISE_APPLICATION_ERROR (-20102,'Too many ordinates passed for a 2001 Point');
+        ELSE
+        --
+          retval := nm3sdo.get_2d_pt(pi_tab_xys(1).x_coord,
+                                     pi_tab_xys(1).y_coord);
+        END IF;
+      --
+      -- LINE SHAPE - 2002
+      --
+      ELSIF g_gtype = 2002
+      THEN
+        IF pi_tab_xys.COUNT < 2 -- less than two pairs of ordinates
+        THEN
+          RAISE_APPLICATION_ERROR (-20103,'Not enough ordinates passed for a 2002 Line');
+        ELSE
+        --
+          l_ord := wrap_geom ( pi_tab_xys => pi_tab_xys );
+        --
+          retval := mdsys.sdo_geometry( g_gtype,
+                                        g_srid,
+                                        NULL,
+                                        mdsys.sdo_elem_info_array( 1, 2, 1), -- line
+                                        l_ord);
+        -- remove any duplicate coords
+          retval := sdo_util.remove_duplicate_vertices
+                        ( retval
+                        , 0.0001);
+        END IF;
+      --
+      -- POLYGON - 2003
+      --
+      ELSIF g_gtype = 2003
+      THEN
+      --
+        IF pi_tab_xys.COUNT < 3 -- less than 3 pairs of ordinates
+        THEN
+        --
+          RAISE_APPLICATION_ERROR (-20104,'Not enough ordinates passed for a 2003 Polygon');
+        ELSE
+        --
+          l_ord := wrap_geom ( pi_tab_xys => pi_tab_xys 
+                             , pi_close   => TRUE ); -- make sure it closes the polygon
+        --
+          retval := mdsys.sdo_geometry( g_gtype,
+                                        g_srid,
+                                        NULL, 
+                                        mdsys.sdo_elem_info_array( 1, 1003, 1), -- external ring
+                                        l_ord);
+        --
+          l_error := validate_polygon (retval);
+        --
+        -- Check for polygon orentation
+        --  The exterior rings are oriented counterclockwise 
+        -- and the interior rings are oriented clockwise.
+        -- Ignore other errors for now
+        --
+          IF SUBSTR (l_error,0,5) = '13367'
+          THEN
+        --   raise_application_error(-20201,'Wrong orientation for exterior ring - must be anti-clockwise');
+           --  retval := reverse_polygon (retval);
+           retval :=  sdo_util.rectify_geometry
+                       (sdo_util.remove_duplicate_vertices
+                         ( retval
+                          , 0.0001)
+                       , 0.0001);
+          ELSIF SUBSTR(l_error,0,5) = '13349'
+          THEN
+            raise_application_error(-20202,'Polygon boundary crosses itself');
+          END IF;
+        --
+        END IF;
+      --
       ELSE
-
-         l_ord(l_ord.LAST) := pi_tab_xys(i).x_coord;
-
+        raise_application_error (-20199,'Geometry Type ['||g_gtype||'] is currently not supported');
       END IF;
-
-      l_ord.EXTEND;
-      l_ord(l_ord.LAST) := pi_tab_xys(i).y_coord;
-
-    END LOOP;
+    --
+    END IF;
   --
-    set_srid;
-  --
-    RETURN mdsys.sdo_geometry( l_gtype,
-                               g_srid,
-                               NULL, mdsys.sdo_elem_info_array( 1, 2, 1),
-                               l_ord);
+    RETURN retval;
   --
   END get_geom_from_xys;
+  --
 --
 --------------------------------------------------------------------------------
 --
@@ -113,31 +271,40 @@ IS
   --
   BEGIN
   --
-    SELECT gdo_seq_no, gdo_x_val, gdo_y_val BULK COLLECT INTO l_tab_xys
+    g_gtype := NULL;
+  --
+    SELECT gdo_seq_no, gdo_x_val, gdo_y_val 
+      BULK COLLECT INTO l_tab_xys
       FROM gis_data_objects
      WHERE gdo_session_id = pi_gdo_session_id
-     ORDER BY gdo_seq_no;
+       AND (gdo_x_val IS NOT NULL AND gdo_y_val IS NOT NULL)
+     ORDER BY gdo_seq_no DESC ;
   --
     IF l_tab_xys.COUNT = 0
     THEN
       RAISE ex_no_data;
     END IF;
   --
-    retval := get_geom_from_xys ( l_tab_xys );
+  -- Set the global gtype if it's been passed in
   --
-    RETURN retval;
+    g_gtype := pi_geometry_type;
+  --
+  -- Return the geometry
+  --
+    RETURN get_geom_from_xys ( l_tab_xys );
   --
   EXCEPTION
     WHEN ex_no_data
     THEN
-      RAISE_APPLICATION_ERROR (-20101,'No data found for session id = '||pi_gdo_session_id);
+      RAISE_APPLICATION_ERROR (-20198,'No data or ordinates found for session id = '||pi_gdo_session_id);
   --
   END get_shape_from_gdo;
 --
 --------------------------------------------------------------------------------
 --
 BEGIN
-  -- instantiate global srid
+-- instantiate global srid
   set_srid;
+--
 END nm3sdo_gdo;
 /
