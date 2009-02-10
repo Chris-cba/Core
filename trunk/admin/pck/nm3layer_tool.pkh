@@ -3,16 +3,16 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.1   Aug 20 2007 16:39:44   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.2   Feb 10 2009 13:55:04   aedwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkh  $
---       Date into PVCS   : $Date:   Aug 20 2007 16:39:44  $
---       Date fetched Out : $Modtime:   Aug 20 2007 14:53:22  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Feb 10 2009 13:55:04  $
+--       Date fetched Out : $Modtime:   Feb 10 2009 13:54:08  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.6
 -------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.1  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
     g_boolean               BOOLEAN        := FALSE;
     g_x_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_X';
     g_y_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_Y';
@@ -506,7 +506,22 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
               , pi_lr_ne_column  IN user_tab_columns.column_name%TYPE
               , pi_lr_st_chain   IN user_tab_columns.column_name%TYPE
               , pi_snapping_trig IN VARCHAR2 DEFAULT 'TRUE');
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_WOL_LAYER">
+-- Creates a standard Work Order Lines SDO layer
+  PROCEDURE create_wol_layer
+              ( pi_theme_name    IN nm_themes_all.nth_theme_name%TYPE
+              , pi_asset_type    IN nm_inv_types.nit_inv_type%TYPE
+              , pi_asset_descr   IN nm_inv_types.nit_descr%TYPE);
 --</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="DROP_WOL_LAYER">
+-- Drops a standard Work Order Lines SDO layer
+  PROCEDURE drop_wol_layer ( pi_theme_id IN nm_themes_all.nth_theme_id%TYPE );
 --
 -----------------------------------------------------------------------------
 --
