@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4051_nm4052_metadata_upg.sql-arc   3.0   Feb 03 2009 17:25:28   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4051_nm4052_metadata_upg.sql-arc   3.1   Feb 10 2009 17:23:58   malexander  $
 --       Module Name      : $Workfile:   nm4051_nm4052_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Feb 03 2009 17:25:28  $
---       Date fetched Out : $Modtime:   Feb 03 2009 17:24:40  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Feb 10 2009 17:23:58  $
+--       Date fetched Out : $Modtime:   Feb 10 2009 17:22:20  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --    Copyright (c) exor corporation ltd, 2009
@@ -40,6 +40,92 @@ BEGIN
 END;
 /
 
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New error message
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- **** COMMENTS TO BE ADDED BY ADRIAN EDWARDS ****
+-- 
+------------------------------------------------------------------
+INSERT INTO nm_errors
+SELECT 'NET'
+      , 455
+      , NULL
+      , 'The name you have chosen is a reserved word in Oracle - please choose a non-reserved word'
+      , NULL
+  FROM dual
+ WHERE NOT EXISTS
+   (SELECT 1 FROM nm_errors
+     WHERE ner_appl = 'NET'
+       AND ner_id = 455);
+--
+INSERT INTO nm_errors
+SELECT 'HIG'
+      , 506
+      , NULL
+      , 'Cannot create Point. Please select a single point from the map to create a Point.'
+      , NULL
+  FROM dual
+ WHERE NOT EXISTS
+   (SELECT 1 FROM nm_errors
+     WHERE ner_appl = 'HIG'
+       AND ner_id = 506);
+--
+INSERT INTO nm_errors
+SELECT 'HIG'
+      , 507
+      , NULL
+      , 'Cannot create Line. Please select two or more points from the map to create a Line.'
+      , NULL
+  FROM dual
+ WHERE NOT EXISTS
+   (SELECT 1 FROM nm_errors
+     WHERE ner_appl = 'HIG'
+       AND ner_id = 507);
+--
+INSERT INTO nm_errors
+SELECT 'HIG'
+      , 508
+      , NULL
+      , 'Cannot create Polygon. Please select three or more points from the map to create a Polygon.'
+      , NULL
+  FROM dual
+ WHERE NOT EXISTS
+   (SELECT 1 FROM nm_errors
+     WHERE ner_appl = 'HIG'
+       AND ner_id = 508);
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT GIS0020 new metadata
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Adding metadata for Work Order Lines layer in MAI
+-- 
+------------------------------------------------------------------
+INSERT INTO nm_layer_tree
+   SELECT   'MAI',
+            'WOL',
+            'Work Order Lines Layer',
+            'M',
+            '20'
+     FROM   DUAL
+    WHERE   NOT EXISTS (SELECT   1
+                          FROM   nm_layer_tree
+                         WHERE   nltr_parent = 'MAI' 
+                           AND nltr_child = 'WOL');
 ------------------------------------------------------------------
 
 
