@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.6   Feb 04 2009 16:55:12   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.7   Feb 11 2009 11:34:32   aedwards  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Feb 04 2009 16:55:12  $
---       Date fetched Out : $Modtime:   Feb 04 2009 16:51:56  $
---       SCCS Version     : $Revision:   2.6  $
+--       Date into SCCS   : $Date:   Feb 11 2009 11:34:32  $
+--       Date fetched Out : $Modtime:   Feb 11 2009 11:31:04  $
+--       SCCS Version     : $Revision:   2.7  $
 --       Based on --
 --
 --   nm3inv package body
@@ -893,12 +893,33 @@ IF l_qry IS NOT NULL THEN
 --
          IF l_rec_nita.ita_units IS NOT NULL
           THEN
-            l_number   := TO_NUMBER(Nm3unit.get_formatted_value
-                                        (p_value   => l_number
-                                        ,p_unit_id => l_rec_nita.ita_units
-                                        )
-                                   );
-            po_meaning := Nm3unit.get_unit_name (p_un_id => l_rec_nita.ita_units);
+          --
+            DECLARE
+              ex_value_error EXCEPTION;
+              PRAGMA EXCEPTION_INIT( ex_value_error, -6502 );
+            BEGIN
+              l_number   := TO_NUMBER(Nm3unit.get_formatted_value
+                                          (p_value   => l_number
+                                          ,p_unit_id => l_rec_nita.ita_units
+                                          )
+                                     );
+              po_meaning := Nm3unit.get_unit_name (p_un_id => l_rec_nita.ita_units);
+            EXCEPTION
+              WHEN ex_value_error
+              THEN
+                -- AE 11-FEB-2009
+                -- Make sure this error is raised when the Field Length/Decimal Places is out of 
+                -- sync with the Unit type defined.
+                -- It used to raise a unhandled Oracle PL/SQL value error
+                Hig.raise_ner (pi_appl               => Nm3type.c_net
+                              ,pi_id                 => 456
+                              ,pi_supplementary_info => '['||l_rec_nita.ita_fld_length||'-'
+                                                           ||l_rec_nita.ita_dec_places
+                                                           ||'] : ['||nm3get.get_un(pi_un_unit_id => l_rec_nita.ita_units
+                                                                    , pi_raise_not_found =>FALSE).un_format_mask||']'
+                              );
+            END;
+         --
          END IF;
 --
          IF l_rec_nita.ita_dec_places IS NOT NULL
