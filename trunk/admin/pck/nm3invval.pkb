@@ -835,13 +835,57 @@ BEGIN
    OPEN  cs_child_iig (p_rec_nii.ne_id, p_rec_nii.start_date, p_rec_nii.end_date);
    FETCH cs_child_iig INTO l_dummy;
    IF cs_child_iig%FOUND
-    THEN
-      CLOSE cs_child_iig;
-      l_ner_id             := 14;
-      l_supplementary_info := l_supplementary_info||' - NM_INV_ITEMS_ALL (child)';
-      RAISE l_has_children;
+   THEN
+       CLOSE cs_child_iig;
+       --Log 696122:Linesh:04-Feb-2009:Start
+       --Commneted the exception rasied now we have to end date all the child records
+       --when the parent gets end dated.
+       --l_ner_id             := 14;
+       --l_supplementary_info := l_supplementary_info||' - NM_INV_ITEMS_ALL (child)';
+       --RAISE l_has_children;
+       IF p_rec_nii.end_date IS NOT NULL
+       THEN
+           UPDATE nm_members
+           SET    nm_end_date = p_rec_nii.end_date
+           WHERE  nm_ne_id_in IN (SELECT  iig_item_id
+                                  FROM    nm_inv_item_groupings iig
+                                         ,nm_inv_items iit
+                                         ,nm_inv_type_groupings itg
+                                  WHERE  iig.iig_item_id       = iit.iit_ne_id
+                                  AND    iit.iit_inv_type      = itg.itg_inv_type
+                                  AND    itg.itg_mandatory     = 'Y'                                    
+                                  CONNECT By PRIOR iig_item_id = iig_parent_id
+                                  START   WITH iig_parent_id   = p_rec_nii.ne_id) ;
+           UPDATE nm_inv_items
+           Set    iit_end_date = p_rec_nii.end_date
+           WHERE  iit_ne_id    IN (SELECT  iig_item_id
+                                   FROM    nm_inv_item_groupings iig
+                                         ,nm_inv_items iit
+                                         ,nm_inv_type_groupings itg
+                                   WHERE  iig.iig_item_id       = iit.iit_ne_id
+                                   AND    iit.iit_inv_type      = itg.itg_inv_type
+                                   AND    itg.itg_mandatory     = 'Y'                                    
+                                   CONNECT By PRIOR iig_item_id = iig_parent_id
+                                   START   WITH iig_parent_id   = p_rec_nii.ne_id ) ;
+
+
+           UPDATE nm_inv_item_groupings
+           SET    iig_end_date = p_rec_nii.end_date
+           WHERE  iig_item_id IN (SELECT  iig_item_id
+                                  FROM    nm_inv_item_groupings iig
+                                         ,nm_inv_items_all iit
+                                         ,nm_inv_type_groupings itg
+                                  WHERE   iig.iig_item_id       = iit.iit_ne_id
+                                  AND     iit.iit_inv_type      = itg.itg_inv_type
+                                  AND     itg.itg_mandatory     = 'Y'                                    
+                                  CONNECT By PRIOR iig_item_id = iig_parent_id
+                                  START   WITH iig_parent_id   = p_rec_nii.ne_id ) ;
+
+       END IF ; 
+   ELSE
+       CLOSE cs_child_iig;
    END IF;
-   CLOSE cs_child_iig;
+   --Log 696122:Linesh:04-Feb-2009:End   
 --
  --nm_debug.debug('cs_child_inv');
    OPEN  cs_child_inv (p_rec_nii.ne_id, p_rec_nii.start_date, p_rec_nii.end_date);
