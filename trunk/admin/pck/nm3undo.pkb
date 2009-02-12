@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.5   Feb 05 2009 16:46:40   rcoupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.6   Feb 12 2009 18:03:06   rcoupe  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Feb 05 2009 16:46:40  $
---       Date fetched Out : $Modtime:   Feb 05 2009 16:41:52  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Feb 12 2009 18:03:06  $
+--       Date fetched Out : $Modtime:   Feb 12 2009 17:58:44  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -1314,8 +1314,8 @@ END undo_scheme;
 
             -- resolve the ad link data
 
-            IF Nm3nwad.ad_data_exist (pi_ne_id_1)
-            or Nm3nwad.ad_data_exist (pi_ne_id_2)
+            IF Nm3nwad.ad_data_exist (pi_ne_id_1, TRUE)
+            or Nm3nwad.ad_data_exist (pi_ne_id_2, TRUE)
             THEN
               error_loc := 1021 ;
                Nm3nwad.do_ad_unmerge (pi_new_ne_id       => pi_ne_id,
@@ -1416,6 +1416,7 @@ END undo_scheme;
                      AND nm_start_date = l_tab_start_date (i);
 --*/
              END;
+/*
 
             IF     Nm3nwad.ad_data_exist (pi_ne_id_1)
                AND Nm3nwad.ad_data_exist (pi_ne_id_2)
@@ -1426,6 +1427,8 @@ END undo_scheme;
                                       pi_old_ne_id2      => pi_ne_id_2
                                      );
             END IF;
+*/            
+            
             error_loc := 109 ;
 
             -- delete the history
