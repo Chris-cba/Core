@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.7   Jan 16 2009 08:15:02   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.8   Feb 13 2009 16:00:50   ptanava  $
 --       Module Name      : $Workfile:   nm3eng_dynseg_util.pkb  $
---       Date into PVCS   : $Date:   Jan 16 2009 08:15:02  $
---       Date fetched Out : $Modtime:   Jan 16 2009 08:07:06  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Feb 13 2009 16:00:50  $
+--       Date fetched Out : $Modtime:   Feb 13 2009 11:27:56  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --   Author : Priidu Tanava
 --
@@ -29,10 +29,14 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
   17.10.07 PT removed autonomous transaction
   18.12.07 PT in populate_tmp_table() changed the handling of 0 length in getting nm_length_pct
   15.01.09 PT in sql_main_q1_wrap() added order by to fix an attribute order inconsitency when q1 is used. (Paul Sheedy)
+  13.01.09 PT in populate_tmp_table added join to group nm_members to get the cardinality for proper first / last order
+                (this is pending a schema change to have the nm_cardinality added to nm_mrg_section_members
+                  unitl then there is restriction that must not be null which means that
+                  all section member datums must be mebmers of a linear route)
 */
 
 
-  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
+  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg_util';
   
   cr            constant varchar2(1) := chr(10);
@@ -317,8 +321,8 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     when 'get_maximum_value'        then return 'max';    -- max()                          g_stat_array.nsa_max_x
     when 'get_minimum_value'        then return 'min';    -- min()                          g_stat_array.nsa_min_x
     when 'get_most_common_value'    then return 'mcv';    -- custom                         g_val_dist_arr.nvda_highest_pct (longest by length)
-    when 'get_first_value'          then return 'first';  -- not implemented                g_stat_array.nsa_first_x (by network connectivity)
-    when 'get_last_value'           then return 'last';   -- not implemented                g_stat_array.nsa_last_x  (by network connectivity)
+    when 'get_first_value'          then return 'first';  -- first_vaulue(by mesure, begin_mp desc) g_stat_array.nsa_first_x (by network connectivity)
+    when 'get_last_value'           then return 'last';   -- first_vaulue(by mesure desc, end_mp desc) g_stat_array.nsa_last_x  (by network connectivity)
     when 'get_value_count'          then return 'count';  -- count() group by value         l_val_dist.nvd_item_count (loop and find)
     when 'get_sum'                  then return 'sum';    -- sum()                          g_stat_array.nsa_sum_x
     when 'get_most_frequent_value'  then return 'mfv';    -- first_value() order by count() desc   g_val_dist_arr.nvda_most_numerous (highest count)
@@ -427,6 +431,8 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     -- assuming section_length cannot be 0 if nm_length is > 0
     ||cr||'  ,decode(qm.nm_length, 0, null, qm.nm_length / qm.section_length) nm_length_pct'
     ||cr||'  ,qm.nsm_measure'
+    ||cr||'  ,qm.begin_mp'
+    ||cr||'  ,qm.end_mp'
     ||cr||'  ,im.*'
     ||cr||'from ('
     ||cr||'select'
@@ -437,6 +443,8 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     ||cr||'  ,mm2.nm_length'
     ||cr||'  ,sum((mm2.max_mp_end - mm2.min_mp_begin) * mm2.row_num) over (partition by mm2.section_id) section_length'
     ||cr||'  ,mm2.nsm_measure'
+    ||cr||'  ,mm2.begin_mp'
+    ||cr||'  ,mm2.end_mp'
     ||cr||'from ('
     ||cr||'select mm.*'
     ||cr||'  ,mm.end_mp - mm.begin_mp nm_length'
@@ -449,13 +457,19 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     ||cr||'  ,m.nm_ne_id_in'
     ||cr||'  ,m.nm_ne_id_of'
     ||cr||'  ,m.nm_obj_type'
-    ||cr||'  ,greatest(m.nm_begin_mp, sm.nsm_begin_mp) begin_mp'
-    ||cr||'  ,least(m.nm_end_mp, sm.nsm_end_mp) end_mp'
+    ||cr||'  ,decode(m2.nm_cardinality, -1, sm.nsm_measure - m.nm_begin_mp, m.nm_begin_mp) begin_mp'
+    ||cr||'  ,decode(m2.nm_cardinality, -1, sm.nsm_measure - m.nm_end_mp, m.nm_end_mp) end_mp'
     ||cr||'  ,sm.nsm_measure'
     ||cr||'from'
     ||cr||'   nm_mrg_section_members sm'
+    ||cr||'  ,nm_mrg_sections_all s'
     ||cr||'  ,nm_members m'
-    ||cr||'where sm.nsm_ne_id = m.nm_ne_id_of'
+    ||cr||'  ,nm_members m2'
+    ||cr||'where sm.nsm_mrg_job_id = s.nms_mrg_job_id'
+    ||cr||'  and sm.nsm_mrg_section_id = s.nms_mrg_section_id'
+    ||cr||'  and sm.nsm_ne_id = m.nm_ne_id_of'
+    ||cr||'  and sm.nsm_ne_id = m2.nm_ne_id_of'
+    ||cr||'  and s.nms_offset_ne_id = m2.nm_ne_id_in'
     ||cr||'  and m.nm_end_mp >= sm.nsm_begin_mp and m.nm_begin_mp <= sm.nsm_end_mp'
     ||cr||'  and not (m.nm_end_mp = sm.nsm_begin_mp and m.nm_begin_mp < sm.nsm_begin_mp)'
     ||cr||'  and not (m.nm_begin_mp = sm.nsm_end_mp and m.nm_end_mp > sm.nsm_end_mp)'
@@ -963,13 +977,13 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
         -- first value
         when l_func_code = 'first' then
           l_value := 'first_value(q.'||l_alias
-            ||') over (partition by q.section_id, q.inv_type'||l_sql_x_sect||' order by q.nsm_measure)';
+            ||') over (partition by q.section_id, q.inv_type'||l_sql_x_sect||' order by q.nsm_measure, q.begin_mp)';
             
             
         -- last value
         when l_func_code = 'last' then
           l_value := 'first_value(q.'||l_alias
-            ||') over (partition by q.section_id, q.inv_type'||l_sql_x_sect||' order by q.nsm_measure desc)';
+            ||') over (partition by q.section_id, q.inv_type'||l_sql_x_sect||' order by q.nsm_measure desc, q.end_mp desc)';
             
               
         -- median (order by middle)
