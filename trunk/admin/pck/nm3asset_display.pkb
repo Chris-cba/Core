@@ -696,7 +696,7 @@ BEGIN
       (narh_placement_begin_mp = narh_placement_end_mp
        AND pi_mp = narh_placement_begin_mp))
    AND
-     iit.iit_ne_id = narh.narh_ne_id_in;
+     iit.iit_ne_id(+) = narh.narh_ne_id_in; -- CWS 697246 13/02/2009 Added so Strip Map functionality works for foreign tables.
 
    po_inv_items_tab.DELETE;
 
