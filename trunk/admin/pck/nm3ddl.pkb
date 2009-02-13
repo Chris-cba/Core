@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.12   Oct 03 2008 09:19:48   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.13   Feb 13 2009 12:37:48   aedwards  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Oct 03 2008 09:19:48  $
---       Date fetched Out : $Modtime:   Oct 03 2008 09:19:28  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Feb 13 2009 12:37:48  $
+--       Date fetched Out : $Modtime:   Feb 13 2009 12:36:56  $
+--       PVCS Version     : $Revision:   2.13  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.12  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.13  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -602,9 +602,13 @@ BEGIN
 --
    FOR cs_rec IN cs_users
    LOOP
-     exec_ddl ('CREATE OR REPLACE FORCE VIEW '||cs_rec.hus_username||'.'||p_object_name
-                ||' AS SELECT * FROM '||g_application_owner||'.'||p_object_name
-               );
+     BEGIN
+       exec_ddl ('CREATE OR REPLACE FORCE VIEW '||cs_rec.hus_username||'.'||p_object_name
+                 ||' AS SELECT * FROM '||g_application_owner||'.'||p_object_name
+                 );
+     EXCEPTION
+       WHEN OTHERS THEN NULL;
+     END;
    END LOOP;
 --
    COMMIT;
