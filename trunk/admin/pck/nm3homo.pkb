@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.5   Feb 16 2009 09:54:20   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.6   Feb 16 2009 12:30:12   lsorathia  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Feb 16 2009 09:54:20  $
---       Date fetched Out : $Modtime:   Feb 16 2009 09:52:26  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Feb 16 2009 12:30:12  $
+--       Date fetched Out : $Modtime:   Feb 16 2009 12:23:26  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --
 --   Author : Jonathan Mills
@@ -26,7 +26,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                              ,end_mp   nm_members.nm_end_mp%TYPE); 
    type t_chunk_arr is table of t_chunk_rec index by pls_integer;
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -952,6 +952,49 @@ BEGIN
                      DECLARE
                         l_pl     NM_PLACEMENT := l_member_arr.npa_placement_array(l_count);
                         l_rec_nm NM_MEMBERS%ROWTYPE := cs_rec;
+                        --Log 713412:Linesh:Start
+                        --Added Following to move the Subordinate Asset Location to that of the Parent
+                        CURSOR  c_child_nm(qp_nm_ne_id_in nm_members.nm_ne_id_in%TYPE)
+                        IS
+                        SELECT Distinct nm_ne_id_in   
+                                       ,nm_ne_id_of   
+                                       ,nm_type  
+                                       ,nm_obj_type   
+                                       ,Null nm_begin_mp   
+                                       ,Null nm_start_date   
+                                       ,Null nm_end_date   
+                                       ,Null nm_end_mp  
+                                       ,nm_slk   
+                                       ,nm_cardinality   
+                                       ,nm_admin_unit   
+                                       ,nm_date_created   
+                                       ,nm_date_modified   
+                                       ,nm_modified_by   
+                                       ,nm_created_by   
+                                       ,nm_seq_no     
+                                       ,nm_seg_no   
+                                       ,nm_true   
+                                       ,nm_end_slk   
+                                       ,nm_end_true
+                        FROM   nm_members_all nm
+                        WHERE  nm_ne_id_in IN (SELECT  iit.iit_ne_id
+                                               FROM    NM_INV_ITEMS iit
+                                                      ,NM_INV_ITEMS iit_p
+                                                      ,NM_INV_TYPE_GROUPINGS
+                                                      ,NM_INV_ITEM_GROUPINGS
+                                               WHERE  iit.iit_ne_id IN (SELECT iig_item_id
+                                                                        FROM   NM_INV_ITEM_GROUPINGS
+                                                                        START WITH iig_parent_id = qp_nm_ne_id_in
+                                                                        CONNECT BY iig_parent_id = PRIOR iig_item_id
+                                                                        )
+                                               AND   iig_parent_id      = iit_p.iit_ne_id
+                                               AND   iig_item_id        = iit.iit_ne_id
+                                               AND   iit.iit_inv_type   = itg_inv_type
+                                               AND   iit_p.iit_inv_type = itg_parent_inv_type
+                                               ) 
+                        AND    nm_type = 'I'       ;                     
+                        l_child_nm_rec NM_MEMBERS%ROWTYPE  ;
+                        --Log 713412:Linesh:End
                      BEGIN
                         l_rec_nm.nm_begin_mp   := l_pl.pl_start;
                         l_rec_nm.nm_end_mp     := l_pl.pl_end;
@@ -960,6 +1003,21 @@ BEGIN
                         xattr_off;
                         nm3net.ins_nm(l_rec_nm);
                         xattr_on;
+                        --Log 713412:Linesh:Start
+                        xattr_off;
+                        Open c_child_nm(l_rec_nm.nm_ne_id_in) ;
+                        Loop
+                             Fetch c_child_nm INTO l_child_nm_rec ;
+                             EXIT WHEN c_child_nm%NOTFOUND;
+                             l_rec_nm := l_child_nm_rec  ;
+                             l_rec_nm.nm_begin_mp    := l_pl.pl_start;
+                             l_rec_nm.nm_end_mp      := l_pl.pl_end;
+                             l_rec_nm.nm_start_date  := p_effective_date;
+                             nm3net.ins_nm(l_rec_nm);
+                        End Loop ;
+                        Close c_child_nm ;            
+                        xattr_on;                        
+                        --Log 713412:Linesh:End
                      EXCEPTION
                         WHEN DUP_VAL_ON_INDEX
                          THEN
