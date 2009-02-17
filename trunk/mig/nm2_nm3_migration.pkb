@@ -1,15 +1,15 @@
-CREATE OR REPLACE PACKAGE BODY ATLAS.Nm2_Nm3_Migration AS
+CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
 --
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.8   Nov 25 2008 12:59:24   Ian Turnbull  $
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.8   Nov 25 2008 12:59:24   Ian Turnbull  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.9   Feb 17 2009 09:45:00   Ian Turnbull  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.9   Feb 17 2009 09:45:00   Ian Turnbull  $
 --       Module Name      : $Workfile:   nm2_nm3_migration.pkb  $
---       Date into PVCS   : $Date:   Nov 25 2008 12:59:24  $
---       Date fetched Out : $Modtime:   Nov 24 2008 11:00:30  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Feb 17 2009 09:45:00  $
+--       Date fetched Out : $Modtime:   Feb 13 2009 17:33:10  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --   Author D.Cope
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY ATLAS.Nm2_Nm3_Migration AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.8  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.9  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm2_nm3_migration';
   g_proc_name    VARCHAR2(50);
   g_log_file                UTL_FILE.FILE_TYPE;
@@ -3459,17 +3459,20 @@ PROCEDURE process_gis_data IS
   l_theme_found BOOLEAN;
   l_ne_nt_count NUMBER;
   l_ne_nt_type NM_ELEMENTS_ALL.ne_nt_type%TYPE;
+
+  l_theme_max number;
+
   PROCEDURE tidy_data IS
   BEGIN
     append_log_content(pi_text => 'Tidying existing data');
-    DELETE FROM NM_NW_THEMES;
+/*    DELETE FROM NM_NW_THEMES;
 	DELETE FROM NM_THEME_GTYPES;
     DELETE FROM NM_THEME_FUNCTIONS_ALL;
     DELETE FROM NM_THEME_ROLES;
     DELETE FROM NM_THEMES_ALL;
     DELETE FROM GIS_PROJECTS;
 	do_optional_commit;
-    append_log_content(pi_text => 'Done');
+*/    append_log_content(pi_text => 'Done');
   END tidy_data;
   PROCEDURE ins_linear_type(p_nt_type IN NM_TYPES.nt_type%TYPE
                            ,p_theme   IN NM_THEMES_ALL.nth_theme_id%TYPE) IS
@@ -3481,6 +3484,8 @@ PROCEDURE process_gis_data IS
   --
   l_nnth        NM_NW_THEMES%ROWTYPE;
   BEGIN
+  
+   
     OPEN get_nlt_id(p_nt_type);
     FETCH get_nlt_id INTO l_nnth.nnth_nlt_id;
     CLOSE get_nlt_id;
@@ -3496,7 +3501,7 @@ BEGIN
  append_proc_start_to_log;
 --
   tidy_data;
-  append_log_content(pi_text => 'GIS_PROJECTS');
+/*  append_log_content(pi_text => 'GIS_PROJECTS');
   INSERT INTO GIS_PROJECTS
       (gp_project
       ,gp_dir_path
@@ -3509,7 +3514,13 @@ BEGIN
         ,gp_dde_init_topic
   FROM   v2_gis_projects;
 --
-  append_log_content(pi_text => 'NM_THEMES_ALL');
+*/  
+
+  select nth_theme_id_seq.nextval
+    into l_theme_max
+    from dual;
+    
+append_log_content(pi_text => 'NM_THEMES_ALL');
   INSERT INTO NM_THEMES_ALL (
        nth_theme_id,
        nth_theme_name,
@@ -3546,7 +3557,7 @@ BEGIN
 --	   NTH_TOL_UNITS
 --     NTH_DYNAMIC_THEME
        )
-SELECT gt_theme_id                                                    nth_theme_id
+SELECT gt_theme_id +l_theme_max                                                   nth_theme_id
       ,gt_theme_name                                                  nth_theme_name
       ,DECODE( gt_route_theme, 'Y', 'NM_ELEMENTS'
 	         , SUBSTR(gt_table_name,INSTR(gt_table_name,'.')+1) )     nth_table_name
@@ -3591,7 +3602,7 @@ SELECT gt_theme_id                                                    nth_theme_
    ,ntf_parameter
    ,ntf_menu_option
    ,ntf_seen_in_gis )
-  SELECT gtf_gt_theme_id
+  SELECT gtf_gt_theme_id+l_theme_max
        , gtf_hmo_module
        , gtf_parameter
        , gtf_menu_option
@@ -3606,7 +3617,7 @@ SELECT gt_theme_id                                                    nth_theme_
    (nthr_theme_id,
     nthr_role,
     nthr_mode )
-  SELECT gthr_theme_id
+  SELECT gthr_theme_id+l_theme_max
         ,gthr_role
         ,gthr_mode
   FROM   v2_gis_theme_roles;
@@ -3618,7 +3629,7 @@ SELECT gt_theme_id                                                    nth_theme_
     NTG_GTYPE,
 	NTG_SEQ_NO,
 	NTG_XML_URL)
-  SELECT gt_theme_id
+  SELECT gt_theme_id+l_theme_max
         ,DECODE(gt_route_Theme,'Y','3002'
 		                      ,DECODE(NVL(gt_end_chain_Column,'POINT'),'POINT','2001','3002'))
         ,1
@@ -3630,7 +3641,7 @@ SELECT gt_theme_id                                                    nth_theme_
 
   INSERT INTO NM_NW_THEMES
   (NNTH_NLT_ID, NNTH_NTH_THEME_ID)
-  SELECT nlt_id,gt_theme_id
+  SELECT nlt_id,gt_theme_id+l_theme_max
   FROM NM_LINEAR_TYPES
   ,v2_gis_themes_all
   WHERE nlt_nt_type IN ('D','L')
@@ -5921,9 +5932,9 @@ END create_network_metamodel_inv;
 PROCEDURE migrate_network IS
   l_rec_ne nm_elements%ROWTYPE;
 
-  
 
-  
+
+
   CURSOR datums_to_migrate IS
   SELECT COUNT(*)
   FROM   v2_road_segs
@@ -6039,7 +6050,7 @@ PROCEDURE migrate_network IS
       p_node_id := l_rec_no.no_node_id;
     END IF;
 --       append_log_content(pi_text => 'Done check node dates');
- 
+
   END check_node_dates;
   PROCEDURE tidy_data IS
   BEGIN
@@ -6053,7 +6064,7 @@ PROCEDURE migrate_network IS
    -- EXECUTE IMMEDIATE 'ALTER TRIGGER A_DEL_NM_ELEMENTS ENABLE';
     append_log_content(pi_text => 'Done');
   END tidy_data;
-  
+
   function v2_v4_node(p_v2_node nm_nodes_all.no_node_name%type)
   return nm_nodes_all.no_node_id%type is
   l_v4_node nm_nodes_all.no_node_id%type;
@@ -6069,7 +6080,7 @@ PROCEDURE migrate_network IS
     return l_v4_node;
   end v2_v4_node;
 --
-  
+
 BEGIN
 --
   g_proc_name := 'migrate_network';
@@ -6090,7 +6101,7 @@ BEGIN
   EXECUTE IMMEDIATE('ALTER TRIGGER NM_NODES_ALL_DT_TRG DISABLE');
   start_longop(p_what => 'Section Migration');
   BEGIN
-    EXECUTE IMMEDIATE('ALTER TRIGGER NM_ELEMENTS_ALL_AU_CHECK DISABLE');
+--    EXECUTE IMMEDIATE('ALTER TRIGGER NM_ELEMENTS_ALL_AU_CHECK DISABLE');
      append_log_content(pi_text => 'NM_ELEMENTS_ALL');
      FOR cs_rec IN cs_datums
       LOOP
@@ -6121,8 +6132,8 @@ BEGIN
         l_rec_ne.ne_prefix              := cs_rec.rse_sys_flag;
 --
         l_rec_ne.ne_group               := NULL;
-       append_log_content(pi_text => 'v2_v4');
-        
+--       append_log_content(pi_text => 'v2_v4');
+
         l_rec_ne.ne_no_start            :=v2_v4_node(cs_rec.rse_pus_node_id_st);
         l_rec_ne.ne_no_end              :=v2_v4_node(cs_rec.rse_pus_node_id_end);
 --      append_log_content(pi_text => 'chec node dates');
@@ -6267,11 +6278,11 @@ BEGIN
 
  append_log_content(pi_text => 'NM_POINTS AND NODES');
 
-  FOR l_rec IN 
+  FOR l_rec IN
     (SELECT np_id_seq.nextval new_point_id, no_node_id_seq.nextval new_node_id, PUS_NODE_ID, PUS_POI_POINT_ID, PUS_START_DATE, PUS_DESCRIPTION, PUS_END_DATE,POI_GRID_EAST, POI_GRID_NORTH,poi_description
      FROM v2_point_usages
      ,v2_points
-     WHERE 
+     WHERE
      pus_poi_point_id=poi_point_id
 --and pus_node_id='000112'
      and (pus_node_id,pus_poi_point_id) IN
@@ -6310,7 +6321,7 @@ BEGIN
     IF g_debug THEN
       Nm3debug.debug_no_all(l_no);
     END IF;
-    
+
     Nm3ins.ins_no_all(l_no);
 /*    nm3net.create_or_reuse_point_and_node(
                                          pi_np_grid_east     =>l_rec.POI_GRID_EAST
@@ -6323,13 +6334,13 @@ BEGIN
 										);
 
 -- append_log_content(pi_text => l_no.no_node_name||' '||l_no.no_node_id);
- 
+
    update nm_nodes_all
    set no_node_name=l_no.no_node_name
    where no_node_id=l_no.no_node_id
    and no_node_type=g_node_type;
 */
-    
+
     g_so_far := g_so_far + 1;
     set_longop_progress('Nodes');
   END LOOP;
@@ -7317,7 +7328,18 @@ BEGIN
       l_rec_iit.iit_end_date              := TRUNC(p_rec_iit_nm.iit_end_date);
       l_rec_iit.iit_prov_flag             := p_rec_iit_nm.iit_prov_flag;
       l_rec_iit.iit_inv_ownership         := p_rec_iit_nm.iit_inv_ownership;
-      l_rec_iit.iit_primary_key           := NVL(p_rec_iit_nm.iit_primary_key,l_rec_iit.iit_ne_id);
+
+      SELECT COUNT(*)
+		INTO l_key_in_use
+		FROM nm_inv_type_attribs_all
+        where ita_attrib_name='IIT_PRIMARY_KEY'
+        and ita_inv_type=l_rec_iit.iit_inv_type;
+      if l_key_in_use=0 then
+        l_rec_iit.iit_primary_key           := l_rec_iit.iit_ne_id;
+      else
+        l_rec_iit.iit_primary_key           := NVL(p_rec_iit_nm.iit_primary_key,l_rec_iit.iit_ne_id);
+      end if;
+--      l_rec_iit.iit_primary_key           := NVL(p_rec_iit_nm.iit_primary_key,l_rec_iit.iit_ne_id);
       l_rec_iit.iit_foreign_key           := p_rec_iit_nm.iit_foreign_key;
       l_rec_iit.iit_num_attrib16          := p_rec_iit_nm.iit_num_attrib16;
       l_rec_iit.iit_num_attrib17          := p_rec_iit_nm.iit_num_attrib17;
@@ -7537,7 +7559,7 @@ BEGIN
        l_inv_loc_exc.iit_exception  := SUBSTR(SQLERRM,1,4000);
        insert_location_exception(l_inv_loc_exc);
        Nm3ausec.set_status (Nm3type.c_on);
-       raise;
+--       raise;
 END locate_inventory;
 --
 ------------------------e-----------------------------------------------------
@@ -7577,19 +7599,23 @@ END pc_inv_mig_nm2_nm3_by_id;
 PROCEDURE pc_inv_mig_nm2_nm3_by_type (p_nit_inv_type NM_INV_ITEMS_ALL.iit_inv_type%TYPE
                                      ,p_nit_sys_flag VARCHAR2
                                      ,p_update_progress BOOLEAN DEFAULT FALSE
+                                     ,p_open_only varchar2 default 'N'
                                      ) IS
    CURSOR cs_iit (c_inv_type nm_inv_types.nit_inv_type%TYPE
                  ,c_sys_flag v2_inv_item_types.ity_sys_flag%TYPE
+                 ,c_open_only varchar2
                  ) IS
    SELECT iit1.iit_item_id
     FROM  v2_inv_items_all iit1
    WHERE  iit1.iit_ity_sys_flag = c_sys_flag
     AND   iit1.iit_ity_inv_code = c_inv_type
+       and ((c_open_only='Y' and iit_end_Date is null)
+      or (c_open_only='Y'))
     ;
    l_tab_item_id Nm3type.tab_number;
    l_count       PLS_INTEGER := 0;
 BEGIN
-   OPEN  cs_iit(get_nm2_inv_code(p_nit_inv_type),p_nit_sys_flag);
+   OPEN  cs_iit(get_nm2_inv_code(p_nit_inv_type),p_nit_sys_flag,upper(p_open_only));
    FETCH cs_iit BULK COLLECT INTO l_tab_item_id;
    CLOSE cs_iit;
    FOR i IN 1..l_tab_item_id.COUNT
@@ -7603,7 +7629,7 @@ BEGIN
       END IF;
       IF MOD(g_so_far, 20000) = 0 OR g_so_far = 1000 THEN -- refresh statistics every 20000 rows or after first 1000
         append_log_content('Refreshing Inventory Statistics');
-        analyse_inventory_tables(1);
+        analyse_inventory_tables(100);
       END IF;
       pc_inv_mig_nm2_nm3_by_id (l_tab_item_id(i));
    END LOOP;
@@ -7612,24 +7638,42 @@ END pc_inv_mig_nm2_nm3_by_type;
 --
 ------------------------------------------------------------------------------------
 --
-PROCEDURE migrate_inventory IS
+PROCEDURE migrate_inventory(p_ukp_only varchar2 default 'A' ,p_open_only varchar2 default 'N') IS
 --
   TYPE l_ref IS REF CURSOR;
 --
    get_inv_types l_ref;
-   l_sql Nm3type.max_varchar2 := 'SELECT ity_inv_code '||
+   l_sql_all Nm3type.max_varchar2 := 'SELECT ity_inv_code '||
                                  '      ,ity_sys_flag '||
                                  'FROM inv_type_translations '||
---	'WHERE ity_inv_Code>=''VG'''||
                                  'CONNECT BY PRIOR ity_inv_code = ity_parent_ity (+)'||
                                  'START WITH ity_parent_ity IS NULL ORDER BY ity_sys_flag,ity_inv_code';
+
+   l_sql_ukp Nm3type.max_varchar2 := 'SELECT ity_inv_code '||
+                                 '      ,ity_sys_flag '||
+                                 'FROM inv_type_translations '||
+'where  exists (select ''x'' from ukpms_view_Definitions where ity_inv_code= UVD_INV_CODE and ity_sys_flag= UVD_SYS_FLAG)'||
+                                 'CONNECT BY PRIOR ity_inv_code = ity_parent_ity (+)'||
+                                 'START WITH ity_parent_ity IS NULL ORDER BY ity_sys_flag,ity_inv_code';
+
+   l_sql_no_ukp Nm3type.max_varchar2 := 'SELECT ity_inv_code '||
+                                 '      ,ity_sys_flag '||
+                                 'FROM inv_type_translations '||
+'where not  exists (select ''x'' from ukpms_view_Definitions where ity_inv_code= UVD_INV_CODE and ity_sys_flag= UVD_SYS_FLAG)'||
+                                 'CONNECT BY PRIOR ity_inv_code = ity_parent_ity (+)'||
+                                 'START WITH ity_parent_ity IS NULL ORDER BY ity_sys_flag,ity_inv_code';
+
+
    l_tab_inv_type Nm3type.tab_varchar4;
    l_tab_sys_flag Nm3type.tab_varchar1;
    l_count_errors PLS_INTEGER;
 --
-   CURSOR get_work_to_do IS
+   CURSOR get_work_to_do(p_inv_type varchar2,p_sys_flag varchar2) IS
    SELECT COUNT(*)
-   FROM v2_inv_items_all;
+   FROM v2_inv_items_all
+   WHERE  iit_ity_sys_flag = p_sys_flag
+    AND   iit_ity_inv_code = p_inv_type
+;
 --
    CURSOR get_errors IS
    SELECT   'Inventory' issue
@@ -7674,23 +7718,45 @@ BEGIN
    append_proc_start_to_log;
 --
    tidy_data;
-   OPEN get_work_to_do;
-   FETCH get_work_to_do INTO g_total_todo;
-   CLOSE get_work_to_do;
-   OPEN  get_inv_types FOR l_sql;
-   FETCH get_inv_types BULK COLLECT INTO l_tab_inv_type, l_tab_sys_flag;
-   CLOSE get_inv_types;
+
+
+   if upper(p_ukp_only) ='A' then
+     OPEN  get_inv_types FOR l_sql_all;
+     FETCH get_inv_types BULK COLLECT INTO l_tab_inv_type, l_tab_sys_flag;
+     CLOSE get_inv_types;
+   elsif upper(p_ukp_only) ='U' then
+     OPEN  get_inv_types FOR l_sql_ukp;
+     FETCH get_inv_types BULK COLLECT INTO l_tab_inv_type, l_tab_sys_flag;
+     CLOSE get_inv_types;
+   elsif upper(p_ukp_only) ='N' then
+     OPEN  get_inv_types FOR l_sql_no_ukp;
+     FETCH get_inv_types BULK COLLECT INTO l_tab_inv_type, l_tab_sys_flag;
+     CLOSE get_inv_types;
+   end if;
+
+   g_total_todo:=0;
+   for i in 1..l_tab_inv_type.count loop
+     OPEN get_work_to_do(l_tab_inv_type(i),l_tab_sys_flag(i));
+     FETCH get_work_to_do INTO g_so_far;
+     CLOSE get_work_to_do;
+     g_total_todo:=g_total_todo+g_so_far;
+     g_so_far:=0;
+   end loop;
+
+
+
+
    -- set up the long op for inventory migration
    start_longop(p_what         => 'Inventory Migration'
                ,p_total_amount => g_total_todo);
    FOR i IN 1..l_tab_inv_type.COUNT
     LOOP
       append_log_content(pi_text => 'Processing Inventory Type ['||l_tab_inv_type(i)||'] on network '||l_tab_sys_flag(i));
-      pc_inv_mig_nm2_nm3_by_type (l_tab_inv_type(i), l_tab_sys_flag(i), TRUE);
+      pc_inv_mig_nm2_nm3_by_type (l_tab_inv_type(i), l_tab_sys_flag(i), TRUE, p_open_only);
    END LOOP;
 --
-   append_log_content('Analysing inventory tables');
-   analyse_inventory_tables(100);
+--   append_log_content('Analysing inventory tables');
+--   analyse_inventory_tables(100);
    --
 --   update_inventory_fk_vals;
    --
@@ -7853,9 +7919,9 @@ where nit_inv_type = 'NETW';
      l_iit.iit_num_attrib113 := irec.rse_he_id;
      l_iit.iit_num_attrib114 := 0;
      l_iit.iit_num_attrib115 := irec.rse_length;
-     append_log_content('IIT_NE_ID '||l_iit.IIT_NE_ID);
-     append_log_content('IIT_ADMIN_UNIT '||l_iit.IIT_ADMIN_UNIT);
-     append_log_content('irec.rse_he_id '||irec.rse_he_id);
+--     append_log_content('IIT_NE_ID '||l_iit.IIT_NE_ID);
+--     append_log_content('IIT_ADMIN_UNIT '||l_iit.IIT_ADMIN_UNIT);
+--     append_log_content('irec.rse_he_id '||irec.rse_he_id);
      Nm3ins.ins_iit_all(p_rec_iit_all => l_iit);
 	 SELECT  NAD_ID
 	 INTO l_nadl_row.NAD_ID
@@ -7873,6 +7939,11 @@ where nit_inv_type = 'NETW';
 	 Nm3nwad.ins_nadl(pi_nadl_rec => l_nadl_row);
      EXCEPTION
      WHEN OTHERS THEN
+
+ --         append_log_content('IIT_NE_ID '||l_iit.IIT_NE_ID);
+ --         append_log_content('IIT_ADMIN_UNIT '||l_iit.IIT_ADMIN_UNIT);
+ --         append_log_content('irec.rse_he_id '||irec.rse_he_id);
+
       l_sqlerrm := SUBSTR(Nm3flx.parse_error_message(SQLERRM),1,4000);
       ROLLBACK TO top_of_loop;
       l_inv_exception.iit_ne_id      := l_iit.iit_ne_id;
@@ -8060,7 +8131,7 @@ BEGIN
 END tidy_up_following_migration;
 --
 -----------------------------------------------------------------------------
---migrate_network_and_inventory
+--igrate_cor_doc_gis
 PROCEDURE migrate_cor_doc_gis(pi_log_file_location   IN VARCHAR2
 		  					 ,pi_v2_higowner 		 IN VARCHAR2
                              ,pi_with_debug          IN BOOLEAN) IS
@@ -8208,7 +8279,11 @@ END migrate_doc_Assocs;
 PROCEDURE migrate_network_and_inventory (pi_log_file_location IN VARCHAR2
                                         ,pi_netw_inv_type     IN VARCHAR2 DEFAULT 'NETW'
                                         ,pi_step              IN NUMBER
-                                        ,pi_with_debug        IN BOOLEAN) IS
+                                        ,pi_with_debug        IN BOOLEAN
+                                        ,pi_ukp_only          in varchar2 default 'A' 
+                                        ,pi_open_only         in varchar2 default 'N'
+                                        
+                                        ) IS
 l_sqlerrm all_errors.text%TYPE;
 BEGIN
     initialise(pi_log_file_location  => pi_log_file_location
@@ -8230,7 +8305,7 @@ BEGIN
     WHEN 7 THEN
       migrate_other_groups;
     WHEN 8 THEN
-      migrate_inventory;
+      migrate_inventory(pi_ukp_only,pi_open_only);
     WHEN 9 THEN
       migrate_network_inv(pi_netw_inv_type   => pi_netw_inv_type);
       tidy_up_following_migration;
@@ -9307,17 +9382,39 @@ procedure resume_invent_migration
 ,pi_inv_type              IN varchar2
 ,pi_sys_Flag              IN varchar2
 ,pi_go_on in boolean
+,pi_ukp_only in varchar2 default 'A'
+,pi_open_only varchar2 default 'N'
 )  is
 
   TYPE l_ref IS REF CURSOR;
 --
    get_inv_types l_ref;
-   l_sql Nm3type.max_varchar2 := 'SELECT ity_inv_code '||
+   l_sql_all Nm3type.max_varchar2 := 'SELECT ity_inv_code '||
                                  '      ,ity_sys_flag '||
                                  'FROM inv_type_translations '||
- 'WHERE ity_inv_Code>'''||pi_inv_type||''''||
+'where ity_inv_Code>'''||pi_inv_type||''''||
                                  'CONNECT BY PRIOR ity_inv_code = ity_parent_ity (+)'||
                                  'START WITH ity_parent_ity IS NULL ORDER BY ity_sys_flag,ity_inv_code';
+
+   l_sql_ukp Nm3type.max_varchar2 := 'SELECT ity_inv_code '||
+                                 '      ,ity_sys_flag '||
+                                 'FROM inv_type_translations '||
+'where  exists (select ''x'' from ukpms_view_Definitions where ity_inv_code= UVD_INV_CODE and ity_sys_flag= UVD_SYS_FLAG)'||
+'and ity_inv_Code>'''||pi_inv_type||''''||
+                                 'CONNECT BY PRIOR ity_inv_code = ity_parent_ity (+)'||
+                                 'START WITH ity_parent_ity IS NULL ORDER BY ity_sys_flag,ity_inv_code';                                 
+
+   l_sql_no_ukp Nm3type.max_varchar2 := 'SELECT ity_inv_code '||
+                                 '      ,ity_sys_flag '||
+                                 'FROM inv_type_translations '||
+'where not  exists (select ''x'' from ukpms_view_Definitions where ity_inv_code= UVD_INV_CODE and ity_sys_flag= UVD_SYS_FLAG)'||
+'and ity_inv_Code>'''||pi_inv_type||''''||
+                                 'CONNECT BY PRIOR ity_inv_code = ity_parent_ity (+)'||
+                                 'START WITH ity_parent_ity IS NULL ORDER BY ity_sys_flag,ity_inv_code';                                 
+                                 
+
+
+
    l_tab_inv_type Nm3type.tab_varchar4;
    l_tab_sys_flag Nm3type.tab_varchar1;
    l_count_errors PLS_INTEGER;
@@ -9352,6 +9449,12 @@ procedure resume_invent_migration
 	and iit_inv_type=nm2_nm3_migration.get_nm3_inv_code(c_inv_type,c_sys_flag))
 	;
 
+   CURSOR get_work_to_do(p_inv_type varchar2,p_sys_flag varchar2) IS
+   SELECT COUNT(*)
+   FROM v2_inv_items_all
+   WHERE  iit_ity_sys_flag = p_sys_flag
+    AND   iit_ity_inv_code = p_inv_type;
+
   l_tab_item_id Nm3type.tab_number;
    l_count       PLS_INTEGER := 0;
 
@@ -9378,7 +9481,7 @@ BEGIN
       END IF;
       IF MOD(l_count, 20000) = 0 OR l_count = 1000 THEN -- refresh statistics every 20000 rows or after first 1000
         nm2_nm3_migration.append_log_content('Refreshing Inventory Statistics');
-        nm2_nm3_migration.analyse_inventory_tables(1);
+        nm2_nm3_migration.analyse_inventory_tables(100);
       END IF;
       nm2_nm3_migration.pc_inv_mig_nm2_nm3_by_id (l_tab_item_id(i));
    END LOOP;
@@ -9389,18 +9492,48 @@ BEGIN
 
   if pi_go_on then
 
-   OPEN  get_inv_types FOR l_sql;
-   FETCH get_inv_types BULK COLLECT INTO l_tab_inv_type, l_tab_sys_flag;
-   CLOSE get_inv_types;
+      if upper(pi_ukp_only) ='A' then
+     OPEN  get_inv_types FOR l_sql_all;
+     FETCH get_inv_types BULK COLLECT INTO l_tab_inv_type, l_tab_sys_flag;
+     CLOSE get_inv_types;
+   elsif upper(pi_ukp_only) ='U' then
+     OPEN  get_inv_types FOR l_sql_ukp;
+     FETCH get_inv_types BULK COLLECT INTO l_tab_inv_type, l_tab_sys_flag;
+     CLOSE get_inv_types;
+   elsif upper(pi_ukp_only) ='N' then
+     OPEN  get_inv_types FOR l_sql_no_ukp;
+     FETCH get_inv_types BULK COLLECT INTO l_tab_inv_type, l_tab_sys_flag;
+     CLOSE get_inv_types;
+   end if;  
+
+   g_total_todo:=0;
+   for i in 1..l_tab_inv_type.count loop
+     OPEN get_work_to_do(l_tab_inv_type(i),l_tab_sys_flag(i));
+     FETCH get_work_to_do INTO g_so_far;
+     CLOSE get_work_to_do;
+     g_total_todo:=g_total_todo+g_so_far;
+     g_so_far:=0;
+   end loop;
+
+
+
+
+   -- set up the long op for inventory migration
+   start_longop(p_what         => 'Inventory Migration'
+               ,p_total_amount => g_total_todo);
+   
+   
+   
+   
    -- set up the long op for inventory migration
    FOR i IN 1..l_tab_inv_type.COUNT
     LOOP
       nm2_nm3_migration.append_log_content(pi_text => 'Processing Inventory Type ['||l_tab_inv_type(i)||'] on network '||l_tab_sys_flag(i));
-      nm2_nm3_migration.pc_inv_mig_nm2_nm3_by_type (l_tab_inv_type(i), l_tab_sys_flag(i), FALSE);
+      nm2_nm3_migration.pc_inv_mig_nm2_nm3_by_type (l_tab_inv_type(i), l_tab_sys_flag(i), FALSE,pi_open_only);
    END LOOP;
 --
-   nm2_nm3_migration.append_log_content('Analysing inventory tables');
-   nm2_nm3_migration.analyse_inventory_tables(100);
+--   nm2_nm3_migration.append_log_content('Analysing inventory tables');
+--   nm2_nm3_migration.analyse_inventory_tables(100);
    --
 --   update_inventory_fk_vals;
    --
