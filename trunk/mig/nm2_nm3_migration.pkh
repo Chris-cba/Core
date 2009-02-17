@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE Nm2_Nm3_Migration AS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkh-arc   2.2   Sep 12 2008 10:47:28   Ian Turnbull  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkh-arc   2.3   Feb 17 2009 09:44:50   Ian Turnbull  $
 --       Module Name      : $Workfile:   nm2_nm3_migration.pkh  $
---       Date into PVCS   : $Date:   Sep 12 2008 10:47:28  $
---       Date fetched Out : $Modtime:   Sep 12 2008 10:44:22  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Feb 17 2009 09:44:50  $
+--       Date fetched Out : $Modtime:   Feb 13 2009 17:32:50  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on SCCS Version : 1.10
 --
 --
@@ -69,7 +69,11 @@ PROCEDURE migrate_doc_assocs(pi_log_file_location   IN VARCHAR2
 PROCEDURE migrate_network_and_inventory (pi_log_file_location IN VARCHAR2
                                         ,pi_netw_inv_type     IN VARCHAR2 DEFAULT 'NETW'
                                         ,pi_step              IN NUMBER
-                                        ,pi_with_debug          IN BOOLEAN DEFAULT FALSE);
+                                        ,pi_with_debug          IN BOOLEAN DEFAULT FALSE
+                                        ,pi_ukp_only          in varchar2 default 'A' 
+                                        ,pi_open_only         in varchar2 default 'N');
+                                        
+
 --</PROC>
 --
 -----------------------------------------------------------------------------
@@ -156,7 +160,10 @@ procedure resume_invent_migration
 (pi_log_file_location IN VARCHAR2
 ,pi_inv_type              IN varchar2
 ,pi_sys_Flag              IN varchar2
-,pi_go_on in boolean);
+,pi_go_on in boolean
+,pi_ukp_only in varchar2 default 'A'  --A=All, U=UKP only, N=Non UKP only
+,pi_open_only varchar2 default 'N' --N=All Assets, Y=open only
+);
 
 PROCEDURE initialise(pi_log_file_location  IN VARCHAR2
                     ,pi_log_file_name      IN VARCHAR2
@@ -172,6 +179,7 @@ PROCEDURE append_log_content(pi_text      IN VARCHAR
 PROCEDURE pc_inv_mig_nm2_nm3_by_type (p_nit_inv_type NM_INV_ITEMS_ALL.iit_inv_type%TYPE
                                      ,p_nit_sys_flag VARCHAR2
                                      ,p_update_progress BOOLEAN DEFAULT FALSE
+                                     ,p_open_only varchar2 default 'N'
                                      )	;
 
 PROCEDURE analyse_inventory_tables (p_percent NUMBER DEFAULT 1);
