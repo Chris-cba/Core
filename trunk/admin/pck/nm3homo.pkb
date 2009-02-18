@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.7   Feb 18 2009 10:22:02   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.8   Feb 18 2009 14:59:58   lsorathia  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Feb 18 2009 10:22:02  $
---       Date fetched Out : $Modtime:   Feb 18 2009 09:55:18  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Feb 18 2009 14:59:58  $
+--       Date fetched Out : $Modtime:   Feb 18 2009 14:56:42  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --
 --   Author : Jonathan Mills
@@ -26,7 +26,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                              ,end_mp   nm_members.nm_end_mp%TYPE); 
    type t_chunk_arr is table of t_chunk_rec index by pls_integer;
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -967,10 +967,10 @@ BEGIN
                                        ,nm_slk   
                                        ,nm_cardinality   
                                        ,nm_admin_unit   
-                                       ,nm_date_created   
-                                       ,nm_date_modified   
-                                       ,nm_modified_by   
-                                       ,nm_created_by   
+                                       ,Null nm_date_created   
+                                       ,Null nm_date_modified   
+                                       ,Null nm_modified_by   
+                                       ,Null nm_created_by   
                                        ,nm_seq_no     
                                        ,nm_seg_no   
                                        ,nm_true   
@@ -1786,10 +1786,10 @@ BEGIN
                                        ,nm_slk   
                                        ,nm_cardinality   
                                        ,nm_admin_unit   
-                                       ,nm_date_created   
-                                       ,nm_date_modified   
-                                       ,nm_modified_by   
-                                       ,nm_created_by   
+                                       ,Null nm_date_created   
+                                       ,Null nm_date_modified   
+                                       ,Null nm_modified_by   
+                                       ,Null nm_created_by   
                                        ,nm_seq_no     
                                        ,nm_seg_no   
                                        ,nm_true   
