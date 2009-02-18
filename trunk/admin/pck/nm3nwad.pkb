@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.8   Feb 05 2009 17:01:20   rcoupe  $
---       Module Name      : $Workfile:   nm3nwad2.pkb  $
---       Date into PVCS   : $Date:   Feb 05 2009 17:01:20  $
---       Date fetched Out : $Modtime:   Feb 05 2009 16:59:54  $
---       PVCS Version     : $Revision:   2.8  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.9   Feb 18 2009 12:54:58   rcoupe  $
+--       Module Name      : $Workfile:   nm3nwad.pkb  $
+--       Date into PVCS   : $Date:   Feb 18 2009 12:54:58  $
+--       Date fetched Out : $Modtime:   Feb 18 2009 12:51:56  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -36,7 +36,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.8  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.9  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'nm3nwad';
 
@@ -619,10 +619,10 @@ BEGIN
            l_rec_ne := nm3get.get_ne( pi_tab_nm(i) );
 
            --nm_debug.debug('Creating membership record : '||to_char(pi_members(i)));
-           l_rec_nm.nm_ne_id_in      := l_rec_ne.ne_id;
+           l_rec_nm.nm_ne_id_in      := pi_rec_ne.ne_id;
            l_rec_nm.nm_ne_id_of      := pi_tab_nm(i);
            l_rec_nm.nm_type          := 'G';
-           l_rec_nm.nm_obj_type      := l_rec_ne.ne_gty_group_type;
+           l_rec_nm.nm_obj_type      := pi_rec_ne.ne_gty_group_type;
            l_rec_nm.nm_begin_mp      := 0;
            l_rec_nm.nm_start_date    := greatest(pi_rec_ne.ne_start_date, l_rec_ne.ne_start_date );
   --       l_rec_nm.nm_start_date    := Nm3user.get_effective_date;
