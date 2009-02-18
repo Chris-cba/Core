@@ -113,7 +113,17 @@ END general_batch_error;
 --
 FUNCTION inventory_changed_since(p_inv_item nm_inv_items.iit_ne_id%TYPE
                                 ,p_since    DATE) RETURN BOOLEAN IS
-  l_existing_inv nm_inv_items%ROWTYPE;
+   --Log 719080:Linesh:18-Feb-2009:Start
+   --The date format is now picked from nm_load_file_cols table
+   CURSOR c_get_date_format
+   IS
+   SELECT nlfc_date_format_mask 
+   FROM   nm_load_file_cols
+   WHERE  nlfc_holding_col = 'IIT_DATE_MODIFIED' ;
+
+   l_dt_format nm_load_file_cols.nlfc_date_format_mask%TYPE ; 
+   --Log 719080:Linesh:18-Feb-2009:End  
+   l_existing_inv nm_inv_items%ROWTYPE;
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'inventory_changed_since');
@@ -122,8 +132,16 @@ BEGIN
   l_existing_inv := nm3get.get_iit(pi_iit_ne_id       => p_inv_item
                                   ,pi_raise_not_found => TRUE);
   
-  IF TO_DATE(TO_CHAR(l_existing_inv.iit_date_modified, nm3mapcapture_int.c_date_format), nm3mapcapture_int.c_date_format) 
-   > TO_DATE(TO_CHAR(p_since, nm3mapcapture_int.c_date_format), nm3mapcapture_int.c_date_format) THEN
+  --Log 719080:Linesh:18-Feb-2009:Start
+  OPEN  c_get_date_format;
+  FETCH c_get_date_format INTO l_dt_format ;
+  CLOSE c_get_date_format ;
+  
+  --IF TO_DATE(TO_CHAR(l_existing_inv.iit_date_modified, nm3mapcapture_int.c_date_format), nm3mapcapture_int.c_date_format) 
+  -- > TO_DATE(TO_CHAR(p_since, nm3mapcapture_int.c_date_format), nm3mapcapture_int.c_date_format) THEN
+  IF TO_DATE(TO_CHAR(l_existing_inv.iit_date_modified, l_dt_format), l_dt_format)  > TO_DATE(TO_CHAR(p_since, l_dt_format), l_dt_format) 
+  THEN
+  --Log 719080:Linesh:18-Feb-2009:End 
      nm_debug.debug('Item changed'||l_existing_inv.iit_date_modified);
      RETURN TRUE;
   ELSE
