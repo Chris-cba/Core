@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.4   Aug 07 2008 14:31:36   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.5   Feb 19 2009 17:00:06   aedwards  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Aug 07 2008 14:31:36  $
---       Date fetched Out : $Modtime:   Aug 07 2008 14:30:50  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Feb 19 2009 17:00:06  $
+--       Date fetched Out : $Modtime:   Feb 19 2009 16:58:40  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -68,15 +68,24 @@ END get_body_version;
 FUNCTION get_sde_version RETURN VARCHAR2 IS
 retval VARCHAR2(255);
 BEGIN
-  SELECT prop_value
-  INTO retval
-  FROM sde.metadata
-  WHERE record_id = 1;
+--  SELECT prop_value
+--  INTO retval
+--  FROM sde.metadata
+--  WHERE record_id = 1;
+--
 
+-- AE  19-FEB-2009
+-- Use SDE.VERSION table instead
+--
+  SELECT major||'.'||minor
+    INTO retval
+    FROM sde.version
+   WHERE rownum=1 ; -- just incase anyone has been hacking about 
+--
   IF SQL%NOTFOUND THEN
     RAISE_APPLICATION_ERROR( -20001, 'Version not found');
   END IF;
-
+--
   RETURN retval;
 END;
 --
@@ -1144,6 +1153,22 @@ IS
 --
    SUBTYPE layer_record_t IS sde.layers%ROWTYPE;
 --
+--1 = SE_INT16_TYPE             2-byte Integer
+--2 = SE_INT32_TYPE             4-byte Integer
+--3 = SE_FLOAT32_TYPE           4-byte Float
+--4 = SE_FLOAT64_TYPE           8-byte Float
+--5 = SE_STRING_TYPE            Null Term. Character Array
+--6 = SE_BLOB_TYPE              Variable Length Data
+--7 = SE_DATE_TYPE              Struct tm Date
+--8 = SE_SHAPE_TYPE             Shape geometry (SE_SHAPE)
+--9 = SE_RASTER_TYPE            Raster
+--10 = SE_XML_TYPE              XML Document
+--11 = SE_INT64_TYPE            8-byte Integer
+--12 = SE_UUID_TYPE             A Universal Unique ID
+--13 = SE_CLOB_TYPE             Character variable length data
+--14 = SE_NSTRING_TYPE UNICODE  Null Term. Character Array
+--15 = SE_NCLOB_TYPE UNICODE    Character Large Object
+--
    CURSOR c1 (c_table IN VARCHAR2)
    IS
       SELECT column_name,
@@ -1220,12 +1245,12 @@ BEGIN
          ELSE
             l_obj_flag := 4;
          END IF;
-
+      --
          IF l_data_type_tab (i) = 4 AND l_data_scale_tab (i) = 0
          THEN
 
      -- cater here for integer columns or number(38) or integer number columns
-     -- integer - set lengh only
+     -- integer - set length only
 
             IF l_data_precision_tab (i) = 38
             THEN                                 -- this is an integer column
@@ -1245,6 +1270,7 @@ BEGIN
                l_data_length_tab (i) := 0;
                l_data_precision_tab (i) := 0;
             END IF;
+      --
          ELSIF l_data_type_tab (i) = 4
            AND l_data_length_tab (i) = 22
            AND l_data_precision_tab (i) IS NULL
@@ -1253,40 +1279,72 @@ BEGIN
             l_data_type_tab (i) := 3;
             l_data_length_tab (i) := 0;
             l_data_precision_tab (i) := 0;
+      --
+      --------------------------------------------------------------------------
+      -- AE  19-FEB-2009
+      -- Quick fix for SDE 9.1 
+      -- Ensure any number with precision and scale is set to an SDE_TYPE of 3
+      --
+         ELSIF l_data_type_tab (i) = 4
+           AND l_data_precision_tab (i) > 0
+           AND l_data_scale_tab (i) > 0
+           AND nm3sde.get_sde_version = '9.1'
+         THEN                                   -- this is a number with scale
+          --
+            l_data_type_tab (i)      := 3;
+            l_data_length_tab (i)    := l_data_precision_tab (i);
+            l_data_precision_tab (i) := l_data_scale_tab (i);
+          -- 
+      --
+      -- AE  19-FEB-2009
+      -- End of changes
+      --------------------------------------------------------------------------
+      --
          ELSIF l_data_type_tab (i) = 4
          THEN
             l_data_length_tab (i) := l_data_scale_tab (i);
-                                                   --l_data_precision_tab(i);
             l_data_precision_tab (i) := l_data_scale_tab (i);
+      --
          ELSIF l_data_type_tab (i) = 7
          THEN
             l_data_length_tab (i) := 0;
          END IF;
-
+      --
          IF l_nullable_tab (i) = 'N'
          THEN
             l_obj_flag := 0;
          ELSE
             l_obj_flag := 4;
          END IF;
-
+      --
          IF l_col_tab (i) = p_rowid
          THEN
             l_obj_flag := 3;
          END IF;
+   --
       END IF;
 
 --    execute immediate '
       INSERT INTO sde.column_registry
-                  (table_name, owner, column_name, sde_type,
-                   column_size, decimal_digits, description,
-                   object_flags, object_id
+                  ( table_name
+                  , owner
+                  , column_name
+                  , sde_type
+                  , column_size
+                  , decimal_digits
+                  , description
+                  , object_flags
+                  , object_id
                   )
-           VALUES (p_table, l_owner, l_col_tab (i), l_data_type_tab (i),
-                   l_data_length_tab (i), l_data_precision_tab (i),
-                                                            --l_data_scale(i),
-                                                                   NULL,
-                   l_obj_flag, l_obj_id
+           VALUES ( p_table
+                  , l_owner
+                  , l_col_tab (i)
+                  , l_data_type_tab (i)
+                  , l_data_length_tab (i)
+                  , l_data_precision_tab (i) --l_data_scale(i)
+                  , NULL
+                  , l_obj_flag
+                  , l_obj_id
                   );
    END LOOP;
 --
