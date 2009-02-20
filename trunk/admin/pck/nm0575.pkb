@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.3   Feb 03 2009 15:30:34   cstrettle  $
---       Module Name      : $Workfile:   nm0575_fix.pkb  $
---       Date into PVCS   : $Date:   Feb 03 2009 15:30:34  $
---       Date fetched Out : $Modtime:   Feb 02 2009 17:24:52  $
---       PVCS Version     : $Revision:   2.3  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.4   Feb 20 2009 14:46:00   lsorathia  $
+--       Module Name      : $Workfile:   nm0575.pkb  $
+--       Date into PVCS   : $Date:   Feb 20 2009 14:46:00  $
+--       Date fetched Out : $Modtime:   Feb 20 2009 14:42:38  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.3  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.4  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -644,6 +644,15 @@ BEGIN
   
   -- close all memberless assets
   if pi_action = 'C' then
+    --Log 717947:Linesh:20-Feb-2009:Start
+    --added this to end the grouping records before end dating the asset
+    forall i in 1 .. t_iit_id.count
+    update nm_inv_item_groupings_all g
+    set g.iig_end_date = l_effective_date
+    where g.iig_item_id = t_iit_id(i)
+    and g.iig_end_date is null ;         
+    --Log 717947:Linesh:20-Feb-2009:End
+
     forall i in 1 .. t_iit_id.count
     update nm_inv_items_all
     set iit_end_date = l_effective_date
@@ -652,6 +661,13 @@ BEGIN
   
   -- delete
   elsif pi_action = 'D' then
+    --Log 717947:Linesh:20-Feb-2009:Start
+    --added this to delete the grouping records before end dating the asset
+    forall i in 1 .. t_iit_id.count
+    delete from nm_inv_item_groupings_all g
+    where g.iig_item_id = t_iit_id(i);
+    --Log 717947:Linesh:20-Feb-2009:End
+   
     forall i in 1 .. t_iit_id.count
     delete from nm_inv_items_all
     where iit_ne_id = t_iit_id(i)
