@@ -827,8 +827,16 @@ BEGIN
                                      ,p_lock_for_update => TRUE
                                      );
 --
+   --Log 696122:Linesh:20-Feb-2009:Start
+   --End date grouping record before end dating the asset.
+   UPDATE nm_inv_item_groupings
+   SET    iig_end_date = p_effective_date
+   WHERE  iig_item_id  = p_iit_ne_id;
+   --Log 696122:Linesh:20-Feb-2009:End
+
+  
    UPDATE nm_inv_items
-    SET   iit_end_date = p_effective_date
+   SET   iit_end_date = p_effective_date
    WHERE  iit_ne_id    = p_iit_ne_id;
 --
    nm3user.set_effective_date (c_init_eff_date);
