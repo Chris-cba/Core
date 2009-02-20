@@ -16,10 +16,32 @@ DECLARE
 --    ON nm_inv_items_all
 --    FOR EACH ROW
 --
+   --Log 717947:Linesh:20-Feb-2009:Start
+   --Added this code to stop the deletion of 
+   --NM_INV_ITEMS_ALL when NM_INV_ITEM_GROUPING_ALL Exists
+   CURSOR c_chk_group_exists(qp_iig_item_id nm_inv_item_groupings_all.iig_item_id%TYPE)
+   IS
+   SELECT Count(0) cnt
+   FROM   nm_inv_item_groupings_all
+   WHERE  iig_item_id = qp_iig_item_id ;
+   l_cnt  Number  ;
+   --Log 717947:Linesh:20-Feb-2009:End
 BEGIN
+   --
    IF nm3ausec.do_locations_exist( :OLD.iit_ne_id )
     THEN
       RAISE_APPLICATION_ERROR(-20001,'Cannot delete NM_INV_ITEMS_ALL records for which NM_MEMBERS_ALL records exist');
    END IF;
+   --Log 717947:Linesh:20-Feb-2009:Start
+   --
+   OPEN  c_chk_group_exists(:OLD.iit_ne_id);
+   FETCH c_chk_group_exists INTO l_cnt ;
+   CLOSE c_chk_group_exists;
+   IF Nvl(l_cnt,0) > 0
+   THEN
+       RAISE_APPLICATION_ERROR(-20001,'Cannot delete NM_INV_ITEMS_ALL records for which NM_INV_ITEM_GROUPINGS_ALL records exist');
+   END IF ;
+   --
+   --Log 717947:Linesh:20-Feb-2009:End
 END nm_inv_items_all_del_mem_chk;
 /
