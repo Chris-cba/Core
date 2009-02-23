@@ -1,4 +1,4 @@
-SCCSID='$Revision:   3.4  $'
+SCCSID='$Revision:   3.5  $'
 ACC=4.0.5.2
 CLM=4.0.5.2
 DOC=4.0.5.2
@@ -22,5 +22,6 @@ IM=4.0.5.2
 AST=4.0.5.2
 WMP=4.0.5.2
 HAI=4.0.5.2
+AVM=4.0.5.2
 
 
