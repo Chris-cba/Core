@@ -3,11 +3,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/sql/disabled_trigger_on_nm_inv_items_all.sql-arc   3.0   Feb 24 2009 15:30:58   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/sql/disabled_trigger_on_nm_inv_items_all.sql-arc   3.1   Feb 24 2009 15:34:30   lsorathia  $
 --       Module Name      : $Workfile:   disabled_trigger_on_nm_inv_items_all.sql  $
---       Date into PVCS   : $Date:   Feb 24 2009 15:30:58  $
+--       Date into PVCS   : $Date:   Feb 24 2009 15:34:30  $
 --       Date fetched Out : $Modtime:   Feb 24 2009 15:29:12  $
---       PVCS Version     : $Revision:   3.0  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --
