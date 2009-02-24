@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.16   Feb 10 2009 14:49:56   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.17   Feb 24 2009 15:20:34   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Feb 10 2009 14:49:56  $
---       Date fetched Out : $Modtime:   Feb 10 2009 14:47:36  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Feb 24 2009 15:20:34  $
+--       Date fetched Out : $Modtime:   Feb 24 2009 15:17:46  $
+--       PVCS Version     : $Revision:   2.17  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.16  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.17  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -1993,15 +1993,15 @@ BEGIN
 
     OPEN geocur FOR cur_string USING p_ne_id;
 
- FETCH geocur BULK COLLECT INTO l_ne_id, l_length, l_start, l_end, l_cardinality, l_slk, l_true, l_end_slk, l_end_true, l_ne_type, l_nt_type;
+    FETCH geocur BULK COLLECT INTO l_ne_id, l_length, l_start, l_end, l_cardinality, l_slk, l_true, l_end_slk, l_end_true, l_ne_type, l_nt_type;
 
- CLOSE geocur;
+    CLOSE geocur;
 
     FOR i IN 1..l_ne_id.COUNT LOOP
 
 --   nm_debug.debug('I = '||to_char(i)||', Type = '||l_nt_type(i));
 
-   j := p_nt.get_idx_from_value( l_nt_type(i) );
+     j := p_nt.get_idx_from_value( l_nt_type(i) );
 
 --   nm_debug.debug( 'Ptr = '||to_char( j ));
 
@@ -2028,30 +2028,32 @@ BEGIN
 
         IF l_part = 'Y' THEN
 
-    IF Nm3sdo.is_clipped( l_start(i), l_end(i), l_length(i) ) = 0 THEN
---          --   nm_debug.debug('Clipped between '||to_char( l_start )||' and '||to_char(l_end)||' length = '||to_char(l_length));
+          IF Nm3sdo.is_clipped( l_start(i), l_end(i), l_length(i) ) = 0 THEN
+--            nm_debug.debug('Clipped between '||to_char( l_start(i) )||' and '||to_char(l_end(i))||' length = '||to_char(l_length(i)));
 
             l_geom_tab(i) := sdo_lrs.clip_geom_segment( l_geom_tab(i), p_diminfo, l_start(i), l_end(i) );
 
 --          nm_debug.debug('End of clip - scale');
 --          l_geom := sdo_lrs.SCALE_GEOM_SEGMENT( l_geom, l_diminfo, 0,  (l_end-l_start), 0);
 --          sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, 0, l_end(i)-l_start(i));
-            sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, 0, NVL(l_end_slk(i)-l_slk(i), 0));
+             sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, nvl(l_slk(i),0), NVL(l_end_slk(i),0));
 --          nm_debug.debug('End of scale');
 
           ELSE
---          nm_debug.debug('Whole element group - no clipping');
+            nm_debug.debug('Whole element group - no clipping');
 
-            sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, 0, NVL(l_end_slk(i)-l_slk(i), 0));
+            sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, nvl(l_slk(i),0), NVL(l_end_slk(i), 0));
+--            sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, 0, NVL(l_end_slk(i)-l_slk(i), 0));
 
---      NULL;
+--         NULL;
 
-    END IF;
+          END IF;
 
         ELSE
---         nm_debug.debug('Not clipped '||to_char( l_start )||' and '||to_char(l_end)||' length = '||to_char(l_length));
+           nm_debug.debug('Not clipped '||to_char( l_slk(i) )||' and '||to_char(l_end_slk(i))||' length = '||to_char(l_length(i)));
            NULL;
-           sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, 0, NVL(l_end_slk(i)-l_slk(i), 0));
+           sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, nvl(l_slk(i),0), NVL(l_end_slk(i), 0));
+--         sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, 0, NVL(l_end_slk(i)-l_slk(i), 0));
 
         END IF;
 
@@ -2072,8 +2074,9 @@ BEGIN
 --      if geocur%rowcount = 1 then
 
         IF retval.sdo_elem_info IS NULL THEN
+          nm_debug.debug('Start '||l_slk(i)||' to '||l_end_slk(i));
 --          sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, NVL(l_slk(i),0), l_end(i)-l_start(i));
-          sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, NVL(l_slk(i),0), NVL(l_end_slk(i),0)-NVL(l_slk(i),0));
+          sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, NVL(l_slk(i),0), NVL(l_end_slk(i), 0));
           retval := l_geom_tab(i);
           l_last_measure := l_end_slk(i);
 --        nm_debug.debug('First one, start at '||to_char(l_slk));
@@ -2086,20 +2089,20 @@ BEGIN
 
 --          there was a break in the route previously - make mp
 
---            nm_debug.debug('First after a db - use MP');
---            retval := add_segments( retval, l_geom );
-              Nm3sdo.add_segments( retval, l_geom_tab(i), p_diminfo );
---            nm_debug.debug('End add seg');
+            nm_debug.debug('First after a db - use MP');
+--          retval := add_segments( retval, l_geom );
+            Nm3sdo.add_segments( retval, l_geom_tab(i), p_diminfo, FALSE );
+--          nm_debug.debug('End add seg');
 
           ELSE
 
---          nm_debug.debug('Test connect');
+            nm_debug.debug('Test connect');
 
             IF sdo_lrs.connected_geom_segments( retval, p_diminfo, l_geom_tab(i), p_diminfo ) = 'TRUE' THEN
 
               l_conn := TRUE;
 
---              nm_debug.debug('concat ');
+                nm_debug.debug('concat ');
 --              retval := sdo_lrs.concatenate_geom_segments( retval, l_diminfo, l_geom, l_diminfo );
 
 --              nm_debug.debug('End concat');
@@ -2136,7 +2139,6 @@ BEGIN
 
   RETURN retval;
 END;
-
 --
 -----------------------------------------------------------------------------------------------------------------
 --
