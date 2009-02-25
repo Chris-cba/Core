@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.16   Jan 30 2009 17:20:40   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.17   Feb 25 2009 17:42:02   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Jan 30 2009 17:20:40  $
---       Date fetched Out : $Modtime:   Jan 30 2009 17:08:38  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Feb 25 2009 17:42:02  $
+--       Date fetched Out : $Modtime:   Feb 25 2009 17:35:34  $
+--       PVCS Version     : $Revision:   2.17  $
 --
 --
 --   Author : Priidu Tanava
@@ -53,11 +53,14 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                 this in responce to a problem Sarah Kristulinec brought up in New Brunswick
   30.01.09  PT log 718691 changed ins_datum_homo_chunks() to remove nm_type = 'I'
                 this allows FT asset members to be those of a group
+  30.01.09  PT log 718691 fixed problem (null mp values) in loading nt_type and all network introduced with the change 03.10.08
+                removed append hint from insert into nm_route_connectivity_tmp - causes internal error on BC large group 2172417
+  25.02.09  PT make use of nvl() instead of explicit null comparisons in std_insert_invitems() for performance
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.16  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.17  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -1133,7 +1136,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                     ,p_ignore_poe => l_ignore_poe
                   );
              
-    l_sql_outer := 'insert /*+ append */ into nm_route_connectivity_tmp ('
+    l_sql_outer := 'insert into nm_route_connectivity_tmp ('
        ||cr||'  nm_ne_id_in, chunk_no, chunk_seq, nm_ne_id_of, nm_begin_mp, nm_end_mp'
        ||cr||', measure, end_measure, nm_slk, nm_end_slk, nt_unit_in, nt_unit_of'
        ||cr||')'
@@ -1818,8 +1821,9 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       i := pt_attr.first;
       while i is not null loop
         j := j + 1;
-        s := s||cr||'  and (('||p_a1||'.nsv_attrib'||j||' is null and '||p_a2||'.nsv_attrib'||j
-          ||' is null) or '||p_a1||'.nsv_attrib'||j||' = '||p_a2||'.nsv_attrib'||j||')';
+        s := s||cr||'  and nvl('||p_a1||'.nsv_attrib'||j||', ''#$'') = nvl('||p_a2||'.nsv_attrib'||j||', ''#$'')';
+--        s := s||cr||'  and (('||p_a1||'.nsv_attrib'||j||' is null and '||p_a2||'.nsv_attrib'||j
+--          ||' is null) or '||p_a1||'.nsv_attrib'||j||' = '||p_a2||'.nsv_attrib'||j||')';
         i := pt_attr.next(i);
       end loop;
       return s;
@@ -2205,7 +2209,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     l_sql         constant varchar2(10000) :=
       sql_load_nm_datum_criteria_tmp(
          p_elements_sql => 
-                '    select e.ne_id nm_ne_id_of, to_number(null) begin_mp, to_number(null) end_mp'
+                '    select e.ne_id nm_ne_id_of, 0 begin_mp, ne_length end_mp'
           ||cr||'    from nm_elements e'
           ||cr||'    where e.ne_nt_type in ('
           ||cr||'      select nt_type from nm_types' 
@@ -2272,7 +2276,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     l_sql constant varchar2(10000) :=
       sql_load_nm_datum_criteria_tmp(
          p_elements_sql => 
-                '    select e.ne_id nm_ne_id_of, to_number(null) begin_mp, to_number(null) end_mp'
+                '    select e.ne_id nm_ne_id_of, 0 begin_mp, ne_length end_mp'
           ||cr||'    from nm_elements e'
           ||cr||'    where e.ne_nt_type in ('
           ||cr||'      select nt_type from nm_types' 
