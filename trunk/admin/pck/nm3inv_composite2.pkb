@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.9   Jan 20 2009 15:47:00   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.10   Feb 26 2009 16:31:54   ptanava  $
 --       Module Name      : $Workfile:   nm3inv_composite2.pkb  $
---       Date into PVCS   : $Date:   Jan 20 2009 15:47:00  $
---       Date fetched Out : $Modtime:   Jan 20 2009 15:14:20  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Feb 26 2009 16:31:54  $
+--       Date fetched Out : $Modtime:   Feb 26 2009 12:18:56  $
+--       PVCS Version     : $Revision:   2.10  $
 --       Based on sccs version :
 --
 --   Author : Priidu Tanava
@@ -32,9 +32,10 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
   12.08.08 PT added p_admin_unit_id to ins_iit_tmp_values()
                 added get_admin_unit() local proc to get value corresponding to asset inv type
   20.01.09 PT in ins_iit_tmp_values() ignore SYS_% columns - these are hidden columns created e.g. for function based indexes
+  25.02.09 PT added nm3net.bypass_members_triggers() to process_from_iit_tmp()
 */
 
-  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.9  $"';
+  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.10  $"';
   g_package_name  constant  varchar2(30) := 'nm3inv_composite2';
   
   cant_serialize exception;
@@ -965,7 +966,8 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     
     p_item_count := 0;
     
-    
+    -- PT 25.02.09
+    nm3net.bypass_nm_members_trgs(pi_mode => true);
 
     -- build the exclusive attribute where string
     --  this is used in enddating/deleting existing members and invitems    
@@ -1163,6 +1165,9 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
         );
       nm3dbg.putln('deleted childless invitem count: '||sql%rowcount);
     end if;
+    
+    -- PT 25.02.09
+    nm3net.bypass_nm_members_trgs(pi_mode => false);
 
     nm3dbg.deind;
   exception
@@ -1175,6 +1180,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
         ||', p_keep_history='||nm3dbg.to_char(p_keep_history)
         ||', i='||i
         ||')');
+      nm3net.bypass_nm_members_trgs(pi_mode => false);
       raise;
   end;
   
