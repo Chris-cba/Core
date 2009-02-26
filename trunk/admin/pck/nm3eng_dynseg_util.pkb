@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.8   Feb 13 2009 16:00:50   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.9   Feb 26 2009 16:27:04   ptanava  $
 --       Module Name      : $Workfile:   nm3eng_dynseg_util.pkb  $
---       Date into PVCS   : $Date:   Feb 13 2009 16:00:50  $
---       Date fetched Out : $Modtime:   Feb 13 2009 11:27:56  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Feb 26 2009 16:27:04  $
+--       Date fetched Out : $Modtime:   Feb 26 2009 16:16:36  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --   Author : Priidu Tanava
 --
@@ -29,14 +29,16 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
   17.10.07 PT removed autonomous transaction
   18.12.07 PT in populate_tmp_table() changed the handling of 0 length in getting nm_length_pct
   15.01.09 PT in sql_main_q1_wrap() added order by to fix an attribute order inconsitency when q1 is used. (Paul Sheedy)
-  13.01.09 PT in populate_tmp_table added join to group nm_members to get the cardinality for proper first / last order
+  13.01.09 PT in populate_tmp_table() added join to group nm_members to get the cardinality for proper first / last order
                 (this is pending a schema change to have the nm_cardinality added to nm_mrg_section_members
                   unitl then there is restriction that must not be null which means that
                   all section member datums must be mebmers of a linear route)
+  25.01.09 PT in in populate_tmp_table() re-applied the checks to ensure the inv datum begin_mp and end_mp
+                are adusted to not reach outside the result section; this has bearing in calculations that use section lengh
 */
 
 
-  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
+  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg_util';
   
   cr            constant varchar2(1) := chr(10);
@@ -457,8 +459,8 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     ||cr||'  ,m.nm_ne_id_in'
     ||cr||'  ,m.nm_ne_id_of'
     ||cr||'  ,m.nm_obj_type'
-    ||cr||'  ,decode(m2.nm_cardinality, -1, sm.nsm_measure - m.nm_begin_mp, m.nm_begin_mp) begin_mp'
-    ||cr||'  ,decode(m2.nm_cardinality, -1, sm.nsm_measure - m.nm_end_mp, m.nm_end_mp) end_mp'
+    ||cr||'  ,decode(m2.nm_cardinality, -1, sm.nsm_measure - greatest(m.nm_begin_mp, sm.nsm_begin_mp), greatest(m.nm_begin_mp, sm.nsm_begin_mp)) begin_mp'
+    ||cr||'  ,decode(m2.nm_cardinality, -1, sm.nsm_measure - least(m.nm_end_mp, sm.nsm_end_mp), least(m.nm_end_mp, sm.nsm_end_mp)) end_mp'
     ||cr||'  ,sm.nsm_measure'
     ||cr||'from'
     ||cr||'   nm_mrg_section_members sm'
