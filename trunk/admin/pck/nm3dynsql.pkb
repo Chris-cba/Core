@@ -2,11 +2,11 @@ CREATE OR REPLACE package body nm3dynsql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.2   Jan 09 2008 10:32:42   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.3   Feb 26 2009 20:53:32   ptanava  $
 --       Module Name      : $Workfile:   nm3dynsql.pkb  $
---       Date into PVCS   : $Date:   Jan 09 2008 10:32:42  $
---       Date fetched Out : $Modtime:   Jan 09 2008 10:28:56  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Feb 26 2009 20:53:32  $
+--       Date fetched Out : $Modtime:   Feb 26 2009 20:51:08  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on sccs version : 
 --
 --
@@ -23,9 +23,13 @@ CREATE OR REPLACE package body nm3dynsql as
                 are connected by more than one element - same direction and lane
   04.10.07  PT changed sql_route_connectivity() to work with the nm_datum_criteria_tmp table
   09.01.08  PT added nm3dbg.deind to sql_route_connectivity()
+  30.01.09  PT in connection with log 718691
+                in sql_route_connectivity replaced references to m.nm_begin_mp and m.nm_end_mp with those of d.begin_mp and d.end_mp
+                this ensures that nm_datum_criteria mp values are observed and avoids overlaps in nm_route_connectivity_tmp
+                requires nm3bulk_mrg 2.17 or later
 */
 
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.2  $"';
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.3  $"';
   g_package_name    constant  varchar2(30) := 'nm3dynsql';
   
   
@@ -255,16 +259,22 @@ CREATE OR REPLACE package body nm3dynsql as
     ||cr||'  ,m.nm_seq_no'
     ||cr||'  ,decode(m.nm_cardinality, 1, e.ne_no_start, e.ne_no_end) cd_start_node'
     ||cr||'  ,decode(m.nm_cardinality, 1, e.ne_no_end, e.ne_no_start) cd_end_node'
-    ||cr||'  ,decode(m.nm_cardinality, 1, m.nm_begin_mp, m.nm_end_mp) cd_begin_mp'
-    ||cr||'  ,decode(m.nm_cardinality, 1, m.nm_end_mp, m.nm_begin_mp) cd_end_mp'
+--    ||cr||'  ,decode(m.nm_cardinality, 1, m.nm_begin_mp, m.nm_end_mp) cd_begin_mp'
+--    ||cr||'  ,decode(m.nm_cardinality, 1, m.nm_end_mp, m.nm_begin_mp) cd_end_mp'
+    ||cr||'  ,decode(m.nm_cardinality, 1, d.begin_mp, d.end_mp) cd_begin_mp'
+    ||cr||'  ,decode(m.nm_cardinality, 1, d.end_mp, d.begin_mp) cd_end_mp'
     ||cr||'  ,case'
-    ||cr||'   when m.nm_cardinality = 1 and m.nm_begin_mp = 0 then 1'
-    ||cr||'   when m.nm_cardinality = -1 and nvl(m.nm_end_mp, e.ne_length) = e.ne_length then 1'
+--    ||cr||'   when m.nm_cardinality = 1 and m.nm_begin_mp = 0 then 1'
+--    ||cr||'   when m.nm_cardinality = -1 and nvl(m.nm_end_mp, e.ne_length) = e.ne_length then 1'
+    ||cr||'   when m.nm_cardinality = 1 and d.begin_mp = 0 then 1'
+    ||cr||'   when m.nm_cardinality = -1 and nvl(d.end_mp, e.ne_length) = e.ne_length then 1'
     ||cr||'   else null'
     ||cr||'   end begin_mp_con'
     ||cr||'  ,case'
-    ||cr||'   when m.nm_cardinality = 1 and nvl(m.nm_end_mp, e.ne_length) = e.ne_length then 1'
-    ||cr||'   when m.nm_cardinality = -1 and m.nm_begin_mp = 0 then 1'
+--    ||cr||'   when m.nm_cardinality = 1 and nvl(m.nm_end_mp, e.ne_length) = e.ne_length then 1'
+--    ||cr||'   when m.nm_cardinality = -1 and m.nm_begin_mp = 0 then 1'
+    ||cr||'   when m.nm_cardinality = 1 and nvl(d.end_mp, e.ne_length) = e.ne_length then 1'
+    ||cr||'   when m.nm_cardinality = -1 and d.begin_mp = 0 then 1'
     ||cr||'   else null'
     ||cr||'   end end_mp_con'
     ||cr||'  ,t.nt_length_unit nt_unit_of'
