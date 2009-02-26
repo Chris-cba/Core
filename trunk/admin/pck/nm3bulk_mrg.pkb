@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.17   Feb 25 2009 17:42:02   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.18   Feb 26 2009 16:34:28   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Feb 25 2009 17:42:02  $
---       Date fetched Out : $Modtime:   Feb 25 2009 17:35:34  $
---       PVCS Version     : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Feb 26 2009 16:34:28  $
+--       Date fetched Out : $Modtime:   Feb 26 2009 11:59:54  $
+--       PVCS Version     : $Revision:   2.18  $
 --
 --
 --   Author : Priidu Tanava
@@ -56,11 +56,12 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   30.01.09  PT log 718691 fixed problem (null mp values) in loading nt_type and all network introduced with the change 03.10.08
                 removed append hint from insert into nm_route_connectivity_tmp - causes internal error on BC large group 2172417
   25.02.09  PT make use of nvl() instead of explicit null comparisons in std_insert_invitems() for performance
+  26.02.09  PT corrected nvl() datatype mismatch introduced in the above change
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.17  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.18  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -1817,11 +1818,19 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     is
       s       varchar2(4000);
       j       binary_integer := 0;
+      l_nval  varchar2(40);
     begin
       i := pt_attr.first;
       while i is not null loop
         j := j + 1;
-        s := s||cr||'  and nvl('||p_a1||'.nsv_attrib'||j||', ''#$'') = nvl('||p_a2||'.nsv_attrib'||j||', ''#$'')';
+        if pt_attr(i).ita_format = 'VARCHAR2' then
+          l_nval := '''#$''';
+        elsif pt_attr(i).ita_format = 'NUMBER' then
+          l_nval := '-999';
+        elsif pt_attr(i).ita_format = 'DATE' then
+          l_nval := 'to_date(''13430101'', ''YYYYMMDD'')';
+        end if;
+        s := s||cr||'  and nvl('||p_a1||'.nsv_attrib'||j||', '||l_nval||') = nvl('||p_a2||'.nsv_attrib'||j||', '||l_nval||')';
 --        s := s||cr||'  and (('||p_a1||'.nsv_attrib'||j||' is null and '||p_a2||'.nsv_attrib'||j
 --          ||' is null) or '||p_a1||'.nsv_attrib'||j||' = '||p_a2||'.nsv_attrib'||j||')';
         i := pt_attr.next(i);
