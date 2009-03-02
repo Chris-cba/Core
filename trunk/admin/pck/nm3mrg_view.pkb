@@ -1,14 +1,12 @@
 create or replace package body nm3mrg_view as
+--   PVCS Identifiers :-
 --
------------------------------------------------------------------------------
---
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3mrg_view.pkb	1.38 04/12/07
---       Module Name      : nm3mrg_view.pkb
---       Date into SCCS   : 07/04/12 11:32:33
---       Date fetched Out : 07/06/13 14:12:52
---       SCCS Version     : 1.38
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkb-arc   2.1   Mar 02 2009 17:17:52   ptanava  $
+--       Module Name      : $Workfile:   nm3mrg_view.pkb  $
+--       Date into PVCS   : $Date:   Mar 02 2009 17:17:52  $
+--       Date fetched Out : $Modtime:   Mar 02 2009 17:06:46  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on SCCS version     : 1.38
 --
 --
 --   Author : Jonathan Mills
@@ -19,9 +17,15 @@ create or replace package body nm3mrg_view as
 -- Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3mrg_view.pkb	1.38 04/12/07"';
---  g_body_sccsid is the SCCS ID for the package body
-   g_package_name     CONSTANT  VARCHAR2(30)   := 'nm3mrg_view';
+
+/* History
+  02.03.09  PT change in build_view() rewrote the logic for _SVL
+                now uses a dedicated sql instead of joining the _sec and _val
+*/
+
+
+   g_body_sccsid      CONSTANT  VARCHAR2(200) := '"$Revision:   2.1  $"';
+   g_package_name     CONSTANT  VARCHAR2(30)  := 'nm3mrg_view';
    
    cr constant varchar2(1) := chr(10);
 --
@@ -162,6 +166,23 @@ PROCEDURE build_view (p_mrg_query_id IN     NUMBER
    l_comma                varchar2(2);
    l_last_xsp             varchar2(20);
    
+  type coldef_type is record (
+     col_name       varchar2(30)
+    ,nsv_name       varchar2(30)
+    ,nsv_formatted  varchar2(100)
+    ,inv_type       varchar2(10)
+    ,xsp            nm_inv_items_all.iit_x_sect%type
+  );
+  type coldef_tbl is table of coldef_type index by pls_integer;
+   
+  t_val  coldef_tbl;
+  t_sec  coldef_tbl;
+  
+  l_rec_xsp       nm3mrg.rec_inv_type_xsp;
+  l_rec_nita      nm_inv_type_attribs%rowtype;
+  l_rec_attrib    nm_mrg_query_attribs%rowtype;
+  l_col_sql       varchar2(1000);
+   
    
    function get_nm3mrg_inv_type(
       p_nmq_id in nm_mrg_query_types_all.nqt_nmq_id%type
@@ -181,7 +202,8 @@ PROCEDURE build_view (p_mrg_query_id IN     NUMBER
       end loop;
       raise no_data_found;
   end;
-   
+  
+
    
 --
 BEGIN
@@ -190,6 +212,7 @@ BEGIN
 --
    g_rec_mrg_query := nm3mrg.select_mrg_query (pi_query_id => p_mrg_query_id);
 --
+  -- this loads the nm3mrg.g_tab_rec_inv_type_xsp table
    nm3mrg.validate_mrg_query(pi_query_id => p_mrg_query_id);
 --
    p_view_name     := get_mrg_view_name_by_qry_id(p_mrg_query_id);
@@ -206,6 +229,106 @@ BEGIN
 --
 -- ####################################################################################
 --
+
+    -- load sec and val column tables
+    for i in 1 .. nm3mrg.g_tab_rec_inv_type_xsp.count loop
+      l_rec_xsp           := nm3mrg.g_tab_rec_inv_type_xsp(i);
+
+      t_sec(i).inv_type   := l_rec_xsp.inv_type;
+      t_sec(i).xsp        := l_rec_xsp.x_sect;
+      t_sec(i).col_name   := l_rec_xsp.inv_type;
+      
+      if t_sec(i).xsp is not null then
+        t_sec(i).col_name := t_sec(i).col_name||'_'||t_sec(i).xsp;
+      end if;
+      t_sec(i).col_name := t_sec(i).col_name||'_QRY_COUNT';
+      
+      
+      -- this loops through all attributes picking out the ones 
+      --  belonging to the outer inv_type_xsp
+      --  j becomes the attribute number
+      for j in 1 .. nm3mrg.g_tab_rec_query_attribs.count loop
+        l_rec_attrib        := nm3mrg.g_tab_rec_query_attribs(j);
+      
+        if l_rec_attrib.nqa_nqt_seq_no = nm3mrg.g_tab_rec_query_types(l_rec_xsp.query_type_id).nqt_seq_no then
+          t_val(j).inv_type := l_rec_xsp.inv_type;
+          t_val(j).xsp := l_rec_xsp.x_sect;
+          l_rec_nita := nm3mrg.get_ita_for_mrg (
+                          p_inv_type => l_rec_xsp.inv_type
+                         ,p_attrib   => l_rec_attrib.nqa_attrib_name
+                       );
+          t_val(j).col_name := sql_view_col_name(
+                                  p_inv_type => l_rec_xsp.inv_type
+                                 ,p_xsp => l_rec_xsp.x_sect
+                                 ,p_view_attri => l_rec_nita.ita_view_attri
+                               );
+                               
+          t_val(j).nsv_name       := 'nsv_attrib'||j;
+          t_val(j).nsv_formatted  := '<a>.nsv_attrib'||j;
+          
+          
+          if l_rec_attrib.nqa_itb_banding_id is null then
+          
+            -- If this has a domain then it must always be VARCHAR2 based
+            --  and allow enough space for "meaning (value)"
+            if l_rec_nita.ita_id_domain is not null then
+              t_val(j).nsv_formatted := 'substr('||t_val(j).nsv_formatted||', 1, 120)';
+                     
+            else
+              if l_rec_nita.ita_format = nm3type.c_varchar and l_rec_nita.ita_fld_length > 0 then
+                t_val(j).nsv_formatted := 'substr('||t_val(j).nsv_formatted
+                  ||', 1, '||l_rec_nita.ita_fld_length||')';
+                
+              elsif l_rec_nita.ita_format = nm3type.c_number then
+                t_val(j).nsv_formatted := 'to_number('||t_val(j).nsv_formatted||')';
+                
+              elsif l_rec_nita.ita_format = nm3type.c_date then
+                t_val(j).nsv_formatted := 'to_date('||t_val(j).nsv_formatted
+                  ||', '||nm3flx.string(nvl(l_rec_nita.ita_format_mask,nm3mrg.g_mrg_date_format))||')';
+                
+              end if;
+              
+            end if;   -- is domain
+  
+          end if;  -- is banding
+          
+        end if;  --  is current inv_type_xsp
+      
+      end loop;  -- attributes
+      
+    end loop;  -- inv_type_xsp's
+    
+    
+
+   FOR l_count IN 1..nm3mrg.g_tab_rec_inv_type_xsp.COUNT
+    LOOP
+      DECLARE
+         l_rec_xsp    nm3mrg.rec_inv_type_xsp := nm3mrg.g_tab_rec_inv_type_xsp(l_count);
+         l_col_name   VARCHAR2(30);
+         l_count_col  VARCHAR2(300);
+      BEGIN
+      
+         l_count_col := 'count(case when v.nsv_inv_type = '''||l_rec_xsp.inv_type||'''';
+         l_col_name := l_rec_xsp.inv_type||'_';
+         --
+         IF l_rec_xsp.x_sect IS NOT NULL
+          THEN
+            l_col_name := l_col_name||l_rec_xsp.x_sect||'_';
+            l_count_col := l_count_col||' and v.nsv_x_sect = '''||l_rec_xsp.x_sect||'''';
+            
+         END IF;
+         --l_count_col := l_col_name;
+         l_count_col := l_count_col||' then 1 end) ';
+         l_col_name := l_col_name||'QRY_COUNT';
+               
+         append('  ,'||l_count_col||' '||l_col_name);
+         
+--
+      END;
+   END LOOP;
+   
+
+
    l_sect_view_name := SUBSTR(p_view_name,1,26)||'_SEC';
    nm3ddl.delete_tab_varchar;
    append('CREATE '||g_object_type||' '||c_highways_owner||'.'||l_sect_view_name||' AS ');
@@ -563,6 +686,9 @@ BEGIN
     exception
       when others then null ;
     end ;
+    
+    
+    
 -- ####################################################################################
 --
 --    Create the V_MRG_xxxxxx_SVL view
@@ -577,51 +703,124 @@ BEGIN
    --append ('SELECT /*+ RULE */');
    append ('select');
    in_view_comment;
-   DECLARE
-      l_tab_alias nm3type.tab_varchar30;
-      l_tab_cols  nm3type.tab_varchar30;
-   BEGIN
-      SELECT the_alias
-            ,LOWER(column_name) column_name
-       BULK  COLLECT
-       INTO  l_tab_alias
-            ,l_tab_cols
-       FROM (SELECT 2 seq
-                   ,'b' the_alias
-                   ,column_name
-                   ,column_id
-              FROM  all_tab_columns b
-             WHERE  b.owner      = c_highways_owner
-              AND   b.table_name = l_val_view_name
-              AND   NOT EXISTS (SELECT 1
-                                 FROM  all_tab_columns c
-                                WHERE  b.owner       = c.owner
-                                 AND   c.table_name  = l_sect_view_name
-                                 AND   c.column_name = b.column_name
-                               )
-              AND   b.column_name != 'NMS_MRG_JOB_ID'
-             UNION ALL
-             SELECT 1 seq
-                   ,'a' the_alias
-                   ,column_name
-                   ,column_id
-              FROM  all_tab_columns a
-             WHERE  a.owner      = c_highways_owner
-              AND   a.table_name = l_sect_view_name
-            )
-      ORDER BY seq, column_id;
-      FOR i IN 1..l_tab_alias.COUNT
-       LOOP
-         append ('      '||nm3flx.i_t_e(i=1,' ',',')||l_tab_alias(i)||'.'||l_tab_cols(i));
-      END LOOP;
-   END;
---
-   append (' FROM  '||l_sect_view_name||' a');
-   append ('      ,'||l_val_view_name||' b');
-   append ('WHERE a.nqr_mrg_job_id     = b.nms_mrg_job_id');
-   append (' AND  a.nms_mrg_section_id = b.nms_mrg_section_id');
---
-   nm3ddl.create_object_and_syns(l_sec_val_view_name);
+   
+    -- sec columns
+    append ('   r.nqr_mrg_job_id');
+    append ('  ,s.nms_mrg_section_id');
+    append ('  ,s.nms_offset_ne_id');
+    append ('  ,s.nms_begin_offset');
+    append ('  ,s.nms_end_offset');
+    append ('  ,r.nqr_date_created');
+    append ('  ,r.nqr_source_id');
+    append ('  ,r.nqr_source');
+    append ('  ,r.nqr_description');
+    append ('  ,r.nqr_admin_unit');
+    append ('  ,decode(s.nms_ne_id_first, s.nms_ne_id_last, decode(s.nms_begin_mp_first, s.nms_end_mp_last, ''P'', ''C''), ''C'') pnt_or_cont');
+    append ('  ,s.nms_ne_id_first');
+    append ('  ,s.nms_begin_mp_first');
+    append ('  ,s.nms_ne_id_last');
+    append ('  ,s.nms_end_mp_last');
+    
+    -- sec columns
+    for i in 1 .. t_sec.count loop
+      append('  ,'||t_sec(i).col_name);
+      
+    end loop;
+    
+    
+    -- val columns
+    for i in 1 .. t_val.count loop
+      append('  ,'||replace(t_val(i).col_name, '<a>', 'rv'));
+      
+    end loop;
+   
+    
+    append ('from');
+         
+   -- the q subquery
+    append ('   (');
+    append ('    select');
+    append ('       q.nsi_mrg_job_id');
+    append ('      ,q.nsi_mrg_section_id');
+    
+    
+    -- sec min() columns
+    for i in 1 .. t_sec.count loop    
+      append('      ,min(q.'||t_sec(i).col_name||') '||t_sec(i).col_name);
+
+    end loop;
+
+
+    -- val case coulumns
+    for i in 1 .. t_val.count loop
+    
+      if t_val(i).xsp is not null then
+        append('      ,min(case when q.nsv_inv_type = '''||t_val(i).inv_type
+          ||''' and q.nsv_x_sect = '''||t_val(i).xsp
+          ||''' then '||replace(t_val(i).nsv_formatted, '<a>', 'q')||' end) '||t_val(i).col_name
+        );
+      --
+      else
+        append('      ,min(case when q.nsv_inv_type = '''||t_val(i).inv_type
+          ||''' and q.nsv_x_sect is null'
+          ||' then '||replace(t_val(i).nsv_formatted, '<a>', 'q')||' end) '||t_val(i).col_name
+        );
+                           
+      end if;
+    
+    end loop;
+    
+    
+    append ('  from');
+    append ('   (');
+    append ('    select');
+    append ('       mi.nsi_mrg_job_id');
+    append ('      ,mi.nsi_mrg_section_id');
+    append ('      ,v.nsv_inv_type');
+    append ('      ,v.nsv_x_sect');
+    
+    
+    -- sec count() columns
+    for i in 1 .. t_sec.count loop
+      append('      ,count(case when v.nsv_inv_type = '''||t_sec(i).inv_type||''' then 1 end)');
+      append('        over (partition by mi.nsi_mrg_job_id, mi.nsi_mrg_section_id) '||t_sec(i).col_name);
+    
+    end loop;
+
+
+    -- val nsv columns
+    for i in 1 .. t_val.count loop
+      append('      ,v.'||t_val(i).nsv_name);
+
+    end loop;
+    
+    
+    -- row_number()
+    append('      ,row_number() over (partition by mi.nsi_mrg_job_id, mi.nsi_mrg_section_id, v.nsv_x_sect, v.nsv_inv_type order by v.nsv_value_id) nsv_rownum');
+
+    append ('    from');
+    append ('        nm_mrg_section_member_inv mi');
+    append ('       ,nm_mrg_section_inv_values_all v');
+    append ('    where mi.nsi_mrg_job_id IN (');
+    append ('          select nqr_mrg_job_id');
+    append ('          from nm_mrg_query_results_all');
+    append ('          where nqr_nmq_id = '||p_mrg_query_id||')');
+    append ('      and mi.nsi_mrg_job_id = v.nsv_mrg_job_id');
+    append ('      and mi.nsi_value_id = v.nsv_value_id');
+    append ('    ) q');
+    append ('    where q.nsv_rownum = 1');
+    append ('    group by q.nsi_mrg_job_id, q.nsi_mrg_section_id');
+    append ('   ) rv');
+    
+    append ('  ,nm_mrg_query_results_all r');
+    append ('  ,nm_mrg_sections_all s');
+    append ('where r.nqr_nmq_id = '||p_mrg_query_id);
+    append ('  and r.nqr_mrg_job_id = s.nms_mrg_job_id');
+    append ('  and rv.nsi_mrg_job_id = s.nms_mrg_job_id');
+    append ('  and rv.nsi_mrg_section_id = s.nms_mrg_section_id');
+    
+    nm3ddl.debug_tab_varchar;
+    nm3ddl.create_object_and_syns(l_sec_val_view_name);
 --
    IF g_create_snapshot
     THEN
