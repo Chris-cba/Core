@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.8   Feb 05 2009 11:14:14   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.9   Mar 02 2009 14:51:44   malexander  $
 --       Module Name      : $Workfile:   nm3ins.pkb  $
---       Date into PVCS   : $Date:   Feb 05 2009 11:14:14  $
---       Date fetched Out : $Modtime:   Feb 05 2009 11:06:06  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Mar 02 2009 14:51:44  $
+--       Date fetched Out : $Modtime:   Mar 02 2009 14:44:14  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.8  $"
+--   nm3get_gen body   : "$Revision:   2.9  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
@@ -8000,6 +8000,7 @@ BEGIN
 --
    p_rec_ita.ita_start_date                 := NVL(p_rec_ita.ita_start_date,TO_DATE('05111605','DDMMYYYY') );
    p_rec_ita.ita_queryable                  := NVL(p_rec_ita.ita_queryable,'N' );
+   p_rec_ita.ita_exclusive                  := NVL(p_rec_ita.ita_exclusive,'N');
    p_rec_ita.ita_keep_history_yn            := NVL(p_rec_ita.ita_keep_history_yn,'N' );
    p_rec_ita.ita_displayed                  := NVL(p_rec_ita.ita_displayed,'Y' );
 --
@@ -8088,6 +8089,7 @@ BEGIN
 --
    p_rec_ita_all.ita_start_date                 := NVL(p_rec_ita_all.ita_start_date,TO_DATE('05111605','DDMMYYYY') );
    p_rec_ita_all.ita_queryable                  := NVL(p_rec_ita_all.ita_queryable,'N' );
+   p_rec_ita_all.ita_exclusive                  := NVL(p_rec_ita_all.ita_exclusive,'N');
    p_rec_ita_all.ita_keep_history_yn            := NVL(p_rec_ita_all.ita_keep_history_yn,'N' );
    p_rec_ita_all.ita_displayed                  := NVL(p_rec_ita_all.ita_displayed,'Y' );
 --
