@@ -136,7 +136,12 @@ PROCEDURE rescale_route( pi_ne_id          IN nm_elements.ne_id%TYPE,
 -- Do we want shape history? Default it for now..
    pi_shape_history VARCHAR2(1) := 'Y';
 --
-l_offset_st number := pi_offset_st;
+-- CWS
+--l_offset_st number := pi_offset_st;
+l_offset_st number;
+l_unit_id number; 
+l_dummy number;
+--
 l_empty_flag varchar2(1);
 
 BEGIN
@@ -146,6 +151,13 @@ BEGIN
    -- Set AU Securuty off and effective_date to value passed
    nm3ausec.set_status(nm3type.c_off);
    nm3user.set_effective_date (pi_effective_date);
+   --
+   -- CWS
+   NM3NET.GET_GROUP_UNITS(pi_ne_id, l_unit_id, l_dummy);
+   -- CWS
+   SELECT NM3UNIT.GET_FORMATTED_VALUE(pi_offset_st, l_unit_id)
+     INTO l_offset_st
+     FROM dual;
    --
 --Must only check the date stuff if history is being made
   --nm_debug.debug('Check rescale');
