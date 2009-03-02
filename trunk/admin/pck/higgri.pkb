@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY higgri AS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30) := 'higgri';
@@ -1437,7 +1437,14 @@ BEGIN
       IF INSTR(UPPER(l_query), 'ORDER BY') > 0 THEN
          l_query := SUBSTR(l_query, 1, INSTR(UPPER(l_query), 'ORDER BY')-1);
       END IF;
-
+      ----------------------------------------------------------------------------------
+      -- SM 712002 08082008
+      -- DOC0167 has two parameters which have group bys on them and so these also need 
+      -- dropping from the query (see order by reasoning).
+      ----------------------------------------------------------------------------------      
+      IF INSTR(UPPER(l_query), 'GROUP BY') > 0 THEN
+         l_query := SUBSTR(l_query, 1, INSTR(UPPER(l_query), 'GROUP BY')-1);
+      END IF;
       ------------------------------------------------------------
       --put appropraite connector onto query for another condition
       ------------------------------------------------------------
