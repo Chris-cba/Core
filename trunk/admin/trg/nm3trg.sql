@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.6   Dec 05 2008 12:03:40   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.7   Mar 03 2009 15:23:40   aedwards  $
 --       Module Name      : $Workfile:   nm3trg.sql  $
---       Date into PVCS   : $Date:   Dec 05 2008 12:03:40  $
---       Date fetched Out : $Modtime:   Dec 05 2008 12:02:48  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Mar 03 2009 15:23:40  $
+--       Date fetched Out : $Modtime:   Mar 03 2009 15:22:54  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --
 --   Author : Graeme Johnson
@@ -527,14 +527,18 @@ start '&run_file'
 --
 ----------------------------------------------------------------------------------------- 
 --
-SET TERM ON 
-PROMPT nm_inv_items_all_a_dt_trg.trg
-SET TERM OFF
-SET DEFINE ON 
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_inv_items_all_a_dt_trg.trg' run_file 
-FROM dual 
-/ 
-start '&run_file' 
+
+--   AE/LS
+--   Trigger dropped for 4053 release
+
+--SET TERM ON 
+--PROMPT nm_inv_items_all_a_dt_trg.trg
+--SET TERM OFF
+--SET DEFINE ON 
+--SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_inv_items_all_a_dt_trg.trg' run_file 
+--FROM dual 
+--/ 
+--start '&run_file' 
 --
 ----------------------------------------------------------------------------------------- 
 --
