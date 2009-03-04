@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.18   Feb 26 2009 16:34:28   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.19   Mar 04 2009 11:11:24   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Feb 26 2009 16:34:28  $
---       Date fetched Out : $Modtime:   Feb 26 2009 11:59:54  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Mar 04 2009 11:11:24  $
+--       Date fetched Out : $Modtime:   Mar 03 2009 17:15:32  $
+--       PVCS Version     : $Revision:   2.19  $
 --
 --
 --   Author : Priidu Tanava
@@ -57,11 +57,14 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                 removed append hint from insert into nm_route_connectivity_tmp - causes internal error on BC large group 2172417
   25.02.09  PT make use of nvl() instead of explicit null comparisons in std_insert_invitems() for performance
   26.02.09  PT corrected nvl() datatype mismatch introduced in the above change
+  03.03.09  PT fixed: ita_format not observed in std_insert_invitems() with potential date corruption
+                moved the nsv_attribxx formatting from the with source into i2 subquery
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
+        add ita_format_mask to ita_mapping_rec
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.18  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.19  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -1253,6 +1256,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     l_section_id        nm_mrg_sections_all.nms_mrg_section_id%type := 0;
     l_nsm_measure       mp_type := 0;
     j           pls_integer := 0;
+    lc_sect     pls_integer := 0;
+    lc_memb     pls_integer := 0;
 
 
   begin
@@ -1331,8 +1336,10 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           -- insert the previous route results into the tables
           forall i in 1 .. t_sect.count
             insert into nm_mrg_sections_all values t_sect(i);
+          lc_sect := lc_sect + sql%rowcount;
           forall i in 1 .. t_memb.count
             insert into nm_mrg_section_members values t_memb(i);
+          lc_memb := lc_memb + sql%rowcount;
           
         end if;
         
@@ -1351,6 +1358,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           r_res.nqr_mrg_section_members_count := 0;
           r_res.nqr_admin_unit := p_admin_unit_id;
           insert into nm_mrg_query_results_all values r_res;
+          nm3dbg.putln('ins nm_mrg_query_results_all (nqr_mrg_job_id='||r_res.nqr_mrg_job_id||'): '||sql%rowcount);
         end if;
         
       end if;
@@ -1458,11 +1466,15 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       where nqr_mrg_job_id = r_res.nqr_mrg_job_id;
       
       -- insert the last route results into the tables
-      forall i in 1 .. t_sect.count
+     forall i in 1 .. t_sect.count
         insert into nm_mrg_sections_all values t_sect(i);
+      lc_sect := lc_sect + sql%rowcount;
       forall i in 1 .. t_memb.count
         insert into nm_mrg_section_members values t_memb(i);
+      lc_memb := lc_memb + sql%rowcount;
       
+      nm3dbg.putln('ins nm_mrg_sections_all: '||lc_sect);
+      nm3dbg.putln('ins nm_mrg_section_members: '||lc_memb);
       
       -- insert all invitems
       std_insert_invitems(
@@ -1631,19 +1643,19 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     l_sql         varchar2(32767);
     i             binary_integer;
     l_splits_cardinality integer;
-    
-    
+
     -- This is used in bulk insert
     --  ,case i.iit_inv_type
     --   when 'RSCS' then i.IIT_MATERIAL
     --   end NSV_ATTRIB1
     function sql_case_cols return varchar2
     is
-      s       varchar2(4000);
+      s           varchar2(4000);
       l_inv_alias varchar(3);
-      l_attrib    varchar2(30);
-      k       binary_integer := 1;
-      j       binary_integer := 0;
+      k           binary_integer := 1;
+      j           binary_integer := 0;
+      l_attrib    varchar2(100);
+
     begin
       i := pt_attr.first;
       while i is not null loop
@@ -1658,16 +1670,18 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           l_inv_alias := 'i'||k;
           l_attrib := pt_attr(i).ita_attrib_name;
         end if;
+        
         s := s||cr||'  ,case t.nm_obj_type'
           ||cr||'    when '''||pt_attr(i).inv_type
           ||''' then '||l_inv_alias||'.'||l_attrib||' end NSV_ATTRIB'||j;
+          
         i := pt_attr.next(i);
       end loop;
       return s;
       
     end;
     
-    
+
     --  ,(select 'XNAA' ft_inv_type, ft2.FT_PK_COL, ft2.NAA_DESCR from XNMDOT_NAA ft2) i2
     --  ,(select  distinct 'SEGM' ft_inv_type, ft8.NE_FT_PK_COL, ft8.GROUP_TYPE, ft8.ROUTE from XNMDOT_V_SEGM ft8) i8
     -- repeate from ins_datum_homo_chunks()
@@ -1743,6 +1757,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     --, nsv_attrib1, nsv_attrib2, nsv_attrib3
     function sql_nsv_attrib_cols(
        p_min in boolean
+      ,p_format in boolean
     ) return varchar2
     is
       s       varchar2(4000);
@@ -1750,6 +1765,9 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       l_min   varchar2(4);
       l_min2  varchar2(1);
       l_cr    varchar2(1);
+      l_attrib  varchar2(100);
+      l_ita_format_mask nm_inv_type_attribs_all.ita_format_mask%type;
+      
     begin
       i := pt_attr.first;
       if p_min then
@@ -1758,12 +1776,34 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       end if;
       while i is not null loop
         j := j + 1;
-        if j mod 5 = 0 then
-          l_cr := cr;
-        else
-          l_cr := null;
+        l_attrib := 'nsv_attrib'||j;
+        
+        if p_format then
+          -- manually select ita_format_mask until it is made part of ita_mapping_rec
+          if pt_attr(i).ita_format in ('NUMBER', 'DATE') then
+            l_ita_format_mask := null;
+            
+            select ta.ita_format_mask
+            into l_ita_format_mask
+            from
+               nm_inv_type_attribs_all ta
+            where ta.ita_inv_type = pt_attr(i).inv_type
+              and ta.ita_attrib_name = nvl2(pt_attr(i).table_name, pt_attr(i).ita_attrib_name, pt_attr(i).iit_attrib_name);
+              
+            if l_ita_format_mask is not null then
+              l_attrib := 'to_char('||l_attrib||', '''||l_ita_format_mask||''') '||l_attrib;
+            end if;
+            
+          end if;
+
         end if;
-        s := s||', '||l_min||'nsv_attrib'||j||l_min2;
+
+        s := s||l_cr||', '||l_min||l_attrib||l_min2;
+        
+        if p_format then
+          l_cr := cr;
+        end if;
+        
         i := pt_attr.next(i);
       end loop;
       return s;
@@ -1824,7 +1864,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       while i is not null loop
         j := j + 1;
         if pt_attr(i).ita_format = 'VARCHAR2' then
-          l_nval := '''#$''';
+          l_nval := '''-999''';
         elsif pt_attr(i).ita_format = 'NUMBER' then
           l_nval := '-999';
         elsif pt_attr(i).ita_format = 'DATE' then
@@ -1872,7 +1912,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     l_sql := 
           'insert into nm_mrg_section_inv_values_tmp('
     ||cr||'  nsi_mrg_section_id, nsv_mrg_job_id, nsv_value_id, nsv_inv_type, nsv_x_sect, nsv_pnt_or_cont'
-    ||cr||sql_nsv_attrib_cols(p_min => false)
+    ||cr||sql_nsv_attrib_cols(p_min => false, p_format => false)
     ||cr||')'
     ||cr||'with src as ('
     ||cr||'select /*+ cardinality(t '||l_splits_cardinality||') */'
@@ -1910,7 +1950,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ||cr||'   i.nm_obj_type'
     ||cr||'  ,i.iit_x_sect'
         ||sql_pnt_or_cont
-    ||cr||sql_nsv_attrib_cols(p_min => false)
+    ||cr||sql_nsv_attrib_cols(p_min => false, p_format => true)
     ||cr||'from'
     ||cr||'   src i'
     ||cr||') i2'
@@ -1937,11 +1977,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     l_sql := 
       'insert into nm_mrg_section_inv_values_all('
     ||cr||'  nsv_mrg_job_id, nsv_value_id, nsv_inv_type, nsv_x_sect, nsv_pnt_or_cont'
-    ||cr||sql_nsv_attrib_cols(p_min => false)
+    ||cr||sql_nsv_attrib_cols(p_min => false, p_format => false)
     ||cr||')'
     ||cr||'select'
     ||cr||'  nsv_mrg_job_id, nsv_value_id, min(nsv_inv_type), min(nsv_x_sect), min(nsv_pnt_or_cont)'
-    ||cr||sql_nsv_attrib_cols(p_min => true)
+    ||cr||sql_nsv_attrib_cols(p_min => true, p_format => false)
     ||cr||'from nm_mrg_section_inv_values_tmp'
     ||cr||'group by nsv_mrg_job_id, nsv_value_id';
     
