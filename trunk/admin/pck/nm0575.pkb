@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.4   Feb 20 2009 14:46:00   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.5   Mar 04 2009 14:22:34   lsorathia  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Feb 20 2009 14:46:00  $
---       Date fetched Out : $Modtime:   Feb 20 2009 14:42:38  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Mar 04 2009 14:22:34  $
+--       Date fetched Out : $Modtime:   Mar 04 2009 14:21:00  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.4  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.5  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -549,29 +549,41 @@ BEGIN
       
       
       -- it is a parent asset
-      if r.iig_parent_id is not null then
+      if r.iig_parent_id is not null then        
         
-        
-        
+        --Log 717947:Linesh:20-Feb-2009:Start
         -- bulk collect all the child item ids
-        select g.iig_item_id, g.iig_top_id
-        bulk collect into t_iig_item_id, t_iig_top_id
-        from nm_inv_item_groupings g
-        connect by prior g.iig_item_id = g.iig_parent_id
-        start with g.iig_parent_id = r.iig_parent_id;
+        --select g.iig_item_id, g.iig_top_id
+        --bulk collect into t_iig_item_id, t_iig_top_id
+        --from nm_inv_item_groupings g
+        --connect by prior g.iig_item_id = g.iig_parent_id
+        --start with g.iig_parent_id = r.iig_parent_id;
+
+        SELECT  iig.iig_item_id, iig.iig_top_id
+        bulk    collect into t_iig_item_id, t_iig_top_id
+        FROM    nm_inv_item_groupings iig
+               ,nm_inv_items_all iit
+               ,nm_inv_type_groupings itg
+        WHERE   iig.iig_item_id       = iit.iit_ne_id
+        AND     iit.iit_inv_type      = itg.itg_inv_type
+        AND     itg.itg_mandatory     = 'Y'                                    
+        CONNECT By PRIOR iig_item_id = iig_parent_id
+        START   WITH iig_parent_id   = r.iig_parent_id ;
+        --Log 717947:Linesh:20-Feb-2009:End
         
         l_child_count := l_child_count + t_iig_item_id.count;
         
         
         -- close the hierarchy definitions
         if pi_action = 'C' then
-          forall i in 1 .. t_iig_item_id.count  
-          update nm_inv_item_groupings_all g
-            set g.iig_end_date = l_effective_date
-          where g.iig_item_id = t_iig_item_id(i)
-            and g.iig_top_id = t_iig_top_id(i)
-            and g.iig_end_date is null;
-        
+          --Log 717947:Linesh:20-Feb-2009:As this now handled through API
+          --forall i in 1 .. t_iig_item_id.count  
+          --update nm_inv_item_groupings_all g
+          --set g.iig_end_date = l_effective_date
+          --where g.iig_item_id = t_iig_item_id(i)
+          --and g.iig_top_id = t_iig_top_id(i)
+          --and g.iig_end_date is null;
+          Null ;     
         else
           forall i in 1 .. t_iig_item_id.count
           delete from nm_inv_item_groupings_all g
@@ -584,12 +596,13 @@ BEGIN
         
         -- close the child placements
         if pi_action = 'C' then
-          forall i in 1 .. t_iig_item_id.count  
-          update nm_members_all m
-            set m.nm_end_date = l_effective_date
-          where m.nm_ne_id_in = t_iig_item_id(i)
-            and m.nm_end_date is null;
-        
+          --Log 717947:Linesh:20-Feb-2009:As this now handled through API
+          --forall i in 1 .. t_iig_item_id.count  
+          --update nm_members_all m
+          --set m.nm_end_date = l_effective_date
+          --where m.nm_ne_id_in = t_iig_item_id(i)
+          --and m.nm_end_date is null;
+          Null ;
         else
           forall i in 1 .. t_iig_item_id.count  
           delete from nm_members_all m
@@ -600,12 +613,13 @@ BEGIN
         
         -- close the child invitem records
         if pi_action = 'C' then
-          forall i in 1 .. t_iig_item_id.count
-          update nm_inv_items_all i
-            set i.iit_end_date = l_effective_date
-          where i.iit_ne_id = t_iig_item_id(i)
-            and i.iit_end_date is null;
-        
+          --Log 717947:Linesh:20-Feb-2009:As this now handled through API
+          --forall i in 1 .. t_iig_item_id.count
+          --update nm_inv_items_all i
+          --set i.iit_end_date = l_effective_date
+          --where i.iit_ne_id = t_iig_item_id(i)
+          --and i.iit_end_date is null;
+          Null ;       
         else
           forall i in 1 .. t_iig_item_id.count  
           delete from nm_inv_items_all i
@@ -666,6 +680,11 @@ BEGIN
     forall i in 1 .. t_iit_id.count
     delete from nm_inv_item_groupings_all g
     where g.iig_item_id = t_iit_id(i);
+
+    forall i in 1 .. t_iit_id.count
+    delete from nm_inv_item_groupings_all g
+    where g.iig_Parent_id = t_iit_id(i);
+
     --Log 717947:Linesh:20-Feb-2009:End
    
     forall i in 1 .. t_iit_id.count
