@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.4   Mar 05 2009 09:52:52   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.5   Mar 06 2009 15:18:04   lsorathia  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Mar 05 2009 09:52:52  $
---       Date fetched Out : $Modtime:   Mar 05 2009 09:51:02  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Mar 06 2009 15:18:04  $
+--       Date fetched Out : $Modtime:   Mar 06 2009 15:10:14  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -313,7 +313,18 @@ PROCEDURE create_asset_on_route_data (pi_ngq_id                     IN     nm_ga
    l_nte_job_id   nm_nw_temp_extents.nte_job_id%TYPE;
    l_tab_rec_ngqi nm3gaz_qry.tab_rec_ngqi;
    l_first_ne     nm_elements.ne_id%type ;
-   l_rec_ngq      nm_gaz_query%ROWTYPE; --Log 713423:Linesh:05-Mar-2009:Added
+   --Log 713423:Linesh:05-Mar-2009:Start
+   l_rec_ngq      nm_gaz_query%ROWTYPE; 
+   l_net_unit     nm_units.un_unit_id%TYPE ;
+   CURSOR c_get_unit (qp_ngq_source_id nm_gaz_query.ngq_source_id%TYPE)
+   IS
+   SELECT nt_length_unit    
+   FROM   nm_elements
+         ,nm_types
+   WHERE  ne_id = qp_ngq_source_id 
+   AND    ne_nt_type   = nt_type ;
+   --Log 713423:Linesh:05-Mar-2009:End
+
 --
 BEGIN
 --
@@ -547,12 +558,16 @@ BEGIN
   AND  pi_reference_item_type      IS NULL
   THEN
       l_rec_ngq := nm3get.get_ngq (pi_ngq_id => pi_ngq_id);
+      OPEN  c_get_unit(l_rec_ngq.ngq_source_id);
+      FETCH c_get_unit INTO l_net_unit ;
+      CLOSE c_get_unit ;
+
       UPDATE nm_assets_on_route_holding
-      SET   narh_end_reference_begin_mp   = narh_placement_begin_mp -  l_rec_ngq.ngq_end_mp
-           ,narh_end_reference_end_mp     = narh_placement_end_mp   -  l_rec_ngq.ngq_end_mp
+      SET   narh_end_reference_begin_mp   = narh_placement_begin_mp -  nm3unit.convert_unit (l_net_unit, pi_reference_units,l_rec_ngq.ngq_end_mp)
+           ,narh_end_reference_end_mp     = narh_placement_end_mp   -  nm3unit.convert_unit (l_net_unit, pi_reference_units,l_rec_ngq.ngq_end_mp)
       WHERE  narh_job_id                  = po_return_arguments.narh_job_id;
   END IF ;
-  --Log 713423:Linesh:05-Mar-2009:Added
+  --Log 713423:Linesh:05-Mar-2009:End
 --   nm_debug.debug('Done');
    nm3user.set_effective_date(c_init_eff_date);
 --
