@@ -1,0 +1,88 @@
+CREATE OR REPLACE PACKAGE nm3sdo_gdr
+AS
+--<PACKAGE>
+--
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdr.pkh-arc   3.1   Mar 10 2009 11:41:02   aedwards  $
+--       Module Name      : $Workfile:   nm3sdo_gdr.pkh  $
+--       Date into PVCS   : $Date:   Mar 10 2009 11:41:02  $
+--       Date fetched Out : $Modtime:   Mar 10 2009 11:40:20  $
+--       PVCS Version     : $Revision:   3.1  $
+--
+--   NM3 Package for GIS_DATA_RESTRICTIONS
+--
+--------------------------------------------------------------------------------
+--
+--</PACKAGE>
+--
+--all global package variables here
+--<GLOBVAR>
+-- g_sccsid is the SCCS_ID
+-- Constants
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.1  $"';
+--
+--</GLOBVAR>
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version
+    RETURN VARCHAR2;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="GET_GDR">
+  FUNCTION get_gdr ( pi_gdr_gdo_session_id IN gis_data_restrictions.gdr_gdo_session_id%TYPE )
+    RETURN gis_data_restrictions%ROWTYPE;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="GET_GDR">
+  FUNCTION get_gdr ( pi_gdr_username     IN gis_data_restrictions.gdr_username%TYPE
+                   , pi_gdr_nth_theme_id IN gis_data_restrictions.gdr_nth_theme_id%TYPE 
+                   , pi_raise_not_found  IN BOOLEAN DEFAULT FALSE )
+    RETURN gis_data_restrictions%ROWTYPE;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="INS_GDR">
+  PROCEDURE ins_gdr ( pi_rec_gdr IN gis_data_restrictions%ROWTYPE );
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="DEL_GDR">
+  PROCEDURE del_gdr ( pi_gdr_gdo_session_id IN gis_data_restrictions.gdr_gdo_session_id%TYPE );
+  PROCEDURE del_gdr ( pi_gdr_username       IN gis_data_restrictions.gdr_username%TYPE );
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="CLEARDOWN_GDR">
+  PROCEDURE cleardown_gdr;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="IS_SUBSELECT_ENABLED">
+  FUNCTION is_subselect_enabled
+  RETURN BOOLEAN;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--
+END nm3sdo_gdr;
+/
