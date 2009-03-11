@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.7   Feb 11 2009 11:34:32   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.8   Mar 11 2009 14:21:20   lsorathia  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Feb 11 2009 11:34:32  $
---       Date fetched Out : $Modtime:   Feb 11 2009 11:31:04  $
---       SCCS Version     : $Revision:   2.7  $
+--       Date into SCCS   : $Date:   Mar 11 2009 14:21:20  $
+--       Date fetched Out : $Modtime:   Mar 11 2009 12:03:56  $
+--       SCCS Version     : $Revision:   2.8  $
 --       Based on --
 --
 --   nm3inv package body
@@ -756,6 +756,7 @@ PROCEDURE validate_flex_inv (p_inv_type               IN  VARCHAR2
    l_rec_nita                  NM_INV_TYPE_ATTRIBS%ROWTYPE;
    l_qry Nm3type.max_varchar2;
    l_id     Nm3type.max_varchar2;
+   l_num_length Varchar2(30) ; -- Log 702388:Linesh:11-Mar-09:Added
 --
 BEGIN
 --
@@ -880,6 +881,27 @@ IF l_qry IS NOT NULL THEN
          END IF;
 --
          l_number := TO_NUMBER(l_value);
+
+         --Added this to validate the Number field
+         -- Log 702388:Linesh:11-Mar-09:Start
+         l_num_length := l_number ;
+         IF l_rec_nita.ita_dec_places IS NOT NULL
+         THEN
+             l_num_length := Replace(l_num_length,'.') ;
+         ELSE
+             IF Instr(l_num_length,'.') > 0
+             THEN
+                 l_num_length := substr(to_char(l_num_length),1,instr(l_num_length,'.')-1) ;
+             END IF;
+         END IF;
+       
+         IF LENGTH(l_num_length) > l_rec_nita.ita_fld_length
+         THEN
+             Hig.raise_ner (pi_appl               => Nm3type.c_net
+                           ,pi_id                 => 457
+                           );
+         END IF ;
+         -- Log 702388:Linesh:11-Mar-09:End
 --
          IF  NVL(l_rec_nita.ita_min,l_number) > l_number
           OR NVL(l_rec_nita.ita_max,l_number) < l_number
@@ -944,7 +966,13 @@ IF l_qry IS NOT NULL THEN
 --
          IF l_rec_nita.ita_format_mask IS NOT NULL
           THEN
-            po_value := LTRIM(TO_CHAR(TO_NUMBER(po_value),l_rec_nita.ita_format_mask));
+              po_value := LTRIM(TO_CHAR(TO_NUMBER(po_value),l_rec_nita.ita_format_mask));
+              IF Replace(po_value,'#') IS NULL
+              THEN
+                  Hig.raise_ner (pi_appl               => Nm3type.c_net
+                                ,pi_id                 => 458
+                                );
+              END IF ;
          END IF;
 --
       END;
@@ -1877,6 +1905,7 @@ BEGIN
       append ('   l_fail         EXCEPTION;');
       append ('   l_notfound     EXCEPTION;');
       append ('   l_missing_mand EXCEPTION;');
+      append ('   l_num_length   Varchar2(30);'); --Log 702388:Linesh:11-Mar-09:Added
       append ('   PRAGMA EXCEPTION_INIT(l_notfound,-20001);');
       append ('BEGIN');
    --
@@ -1936,6 +1965,21 @@ BEGIN
          l_been_in_loop := TRUE;
    --
          append (' l_attr := '||Nm3flx.string(cs_rec.ita_view_col_name)||';');
+         --Added this code to validation the Number Attibute
+         -- Log 702388:Linesh:11-Mar-09:Start
+         IF cs_rec.ita_format = Nm3type.c_number
+         THEN 
+             append (' l_num_length := '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||' ;') ;
+             IF cs_rec.ita_dec_places IS NOT NULL
+             THEN
+                 append (' l_num_length := Replace(l_num_length,''.'');') ;
+             ELSE
+                 append (' IF Instr(l_num_length,''.'') > 0  THEN ');                 
+                 append (' l_num_length := substr(to_char(l_num_length),1,instr(l_num_length,''.'')-1) ; ');
+                 append (' END IF ;') ;
+             END IF;
+         END IF ;
+         -- Log 702388:Linesh:11-Mar-09:End
    --
 
          l_mandatory := cs_rec.ita_mandatory_yn = 'Y';
@@ -2034,6 +2078,11 @@ BEGIN
           THEN
             append (' IF NOT nm3flx.is_numeric('||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||') THEN');
             append ('  l_fail_msg := '||Nm3flx.string('must be numeric')||'; RAISE l_fail;');
+            -- Log 702388:Linesh:11-Mar-09:Start
+            append (' ELSIF LENGTH( l_num_length ) > '||Nvl(cs_rec.ita_fld_length,22)||' THEN');
+            append ('  l_fail_msg := '||Nm3flx.string('cannot be more than precision '||cs_rec.ita_fld_length||' allowed for this column')||'; RAISE l_fail;');
+            -- Log 702388:Linesh:11-Mar-09:End
+
             IF   cs_rec.ita_max IS NOT NULL
              AND cs_rec.ita_min IS NOT NULL
              THEN
