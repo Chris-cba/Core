@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.15.1.0   Mar 10 2009 11:39:32   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.15.1.1   Mar 11 2009 17:27:16   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Mar 10 2009 11:39:32  $
---       Date fetched Out : $Modtime:   Mar 10 2009 11:38:46  $
---       PVCS Version     : $Revision:   2.15.1.0  $
+--       Date into PVCS   : $Date:   Mar 11 2009 17:27:16  $
+--       Date fetched Out : $Modtime:   Mar 11 2009 17:26:30  $
+--       PVCS Version     : $Revision:   2.15.1.1  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.15.1.0  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.15.1.1  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -8646,6 +8646,8 @@ IS
   l_valid          VARCHAR2(30);
   l_geometry       mdsys.sdo_geometry := p_geometry;
 --
+  l_rec_gdr gis_data_restrictions%ROWTYPE;
+
 -------------------------------------------------------------------------------
 --
   FUNCTION is_nw_theme( p_theme IN NUMBER ) RETURN BOOLEAN IS
@@ -8670,6 +8672,10 @@ IS
 BEGIN
 --
   l_tol :=  Nm3sdo.get_table_diminfo( p_nth.nth_feature_table, p_nth.nth_feature_shape_column )(1).sdo_tolerance;
+
+  l_rec_gdr := nm3sdo_gdr.get_gdr(pi_gdr_username     => user 
+                                   ,pi_gdr_nth_theme_id => p_nth.nth_theme_id 
+                                   ,pi_raise_not_found  => FALSE);
 
   l_valid := validate_geometry( l_geometry, NULL, l_tol );
 
@@ -8730,10 +8736,19 @@ BEGIN
 
      END IF;
 
+     IF l_rec_gdr.gdr_gdo_session_id IS NOT NULL
+     THEN
+     
+       cur_string := cur_string||' from '||l_nth.nth_table_name||' t, gis_data_objects g '
+           ||' where gdo_session_id = '||to_char(l_rec_gdr.gdr_gdo_session_id)||' and gdo_pk_id = '||l_nth.nth_feature_pk_column||' and '||
+           ' sdo_within_distance ( t.'||l_nth.nth_feature_shape_column||', :shape, '||
+           ''''||'distance = '||TO_CHAR(p_buffer)||''''||' ) = '||''''||'TRUE'||'''';
 
-     cur_string := cur_string||' from '||l_nth.nth_table_name||' t '
+     else
+       cur_string := cur_string||' from '||l_nth.nth_table_name||' t '
            ||' where sdo_within_distance ( t.'||l_nth.nth_feature_shape_column||', :shape, '||
            ''''||'distance = '||TO_CHAR(p_buffer)||''''||' ) = '||''''||'TRUE'||'''';
+     end if;           
 
   ELSIF p_nth.nth_feature_fk_column IS NULL THEN
 
@@ -8747,14 +8762,20 @@ BEGIN
 
      END IF;
 
+     IF l_rec_gdr.gdr_gdo_session_id IS NOT NULL
+     THEN
 
-     cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f'
-           ||' where sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :shape, '
+     cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f, gis_data_objects g '
+           ||' where g.gdo_session_id = '||to_char(l_rec_gdr.gdr_gdo_session_id)||' and g.gdo_pk_id = '||l_nth.nth_feature_pk_column||' and '
+           ||' and sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :shape, '
            ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
         ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_pk_column;
   ELSE
+  
 
      cur_string := 'select distinct t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', f.'||l_nth.nth_feature_pk_column;
+     
+  end if;
 
   IF l_get_projection THEN
 
@@ -8772,10 +8793,10 @@ BEGIN
 
   END IF;
 
---  Nm_Debug.debug_on;
---  Nm_Debug.DEBUG( cur_string );
+  Nm_Debug.debug_on;
+  Nm_Debug.DEBUG( cur_string );
 
---  nm_debug.debug('Execute statement');
+  nm_debug.debug('Execute statement');
 
   IF l_get_projection THEN
 
