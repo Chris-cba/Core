@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.15.1.1   Mar 11 2009 17:27:16   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.15.1.2   Mar 12 2009 11:07:50   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Mar 11 2009 17:27:16  $
---       Date fetched Out : $Modtime:   Mar 11 2009 17:26:30  $
---       PVCS Version     : $Revision:   2.15.1.1  $
+--       Date into PVCS   : $Date:   Mar 12 2009 11:07:50  $
+--       Date fetched Out : $Modtime:   Mar 12 2009 11:04:20  $
+--       PVCS Version     : $Revision:   2.15.1.2  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.15.1.1  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.15.1.2  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -8622,9 +8622,9 @@ FUNCTION get_objects_in_buffer( p_nth_id        IN NUMBER,
                                 p_buffer        IN NUMBER,
                                 p_buffer_units  IN NUMBER DEFAULT 1,
                                 p_get_projection   VARCHAR2 DEFAULT 'FALSE' )
-  RETURN nm_theme_list 
+  RETURN nm_theme_list
 IS
-  cur_string VARCHAR2(2000);
+  cur_string       nm3type.max_varchar2;
   l_pk_array       nm3type.tab_number;
   l_fk_array       nm3type.tab_number;
   l_label_array    nm3type.tab_varchar4000;  --use this so that the full amount of space is not reserved.
@@ -8643,7 +8643,7 @@ IS
   l_c_unit         INTEGER;
   l_p_unit         INTEGER;
   l_nth            nm_themes_all%ROWTYPE;
-  l_valid          VARCHAR2(30);
+  l_valid          nm3type.max_varchar2;
   l_geometry       mdsys.sdo_geometry := p_geometry;
 --
   l_rec_gdr gis_data_restrictions%ROWTYPE;
@@ -8673,18 +8673,18 @@ BEGIN
 --
   l_tol :=  Nm3sdo.get_table_diminfo( p_nth.nth_feature_table, p_nth.nth_feature_shape_column )(1).sdo_tolerance;
 
-  l_rec_gdr := nm3sdo_gdr.get_gdr(pi_gdr_username     => user 
-                                   ,pi_gdr_nth_theme_id => p_nth.nth_theme_id 
+  l_rec_gdr := nm3sdo_gdr.get_gdr(pi_gdr_username     => user
+                                   ,pi_gdr_nth_theme_id => p_nth.nth_theme_id
                                    ,pi_raise_not_found  => FALSE);
 
   l_valid := validate_geometry( l_geometry, NULL, l_tol );
 
-  IF l_valid != 'TRUE' and l_geometry.sdo_gtype = 2003 
+  IF l_valid != 'TRUE' and l_geometry.sdo_gtype = 2003
   THEN
     l_geometry := sdo_util.rectify_geometry(sdo_util.REMOVE_DUPLICATE_VERTICES( l_geometry, l_tol), l_tol);
     l_valid := validate_geometry( l_geometry, NULL, l_tol );
   END IF;
-    
+
 
   IF l_valid != 'TRUE' THEN
     IF l_valid = 'FALSE' THEN
@@ -8738,7 +8738,7 @@ BEGIN
 
      IF l_rec_gdr.gdr_gdo_session_id IS NOT NULL
      THEN
-     
+
        cur_string := cur_string||' from '||l_nth.nth_table_name||' t, gis_data_objects g '
            ||' where gdo_session_id = '||to_char(l_rec_gdr.gdr_gdo_session_id)||' and gdo_pk_id = '||l_nth.nth_feature_pk_column||' and '||
            ' sdo_within_distance ( t.'||l_nth.nth_feature_shape_column||', :shape, '||
@@ -8748,7 +8748,7 @@ BEGIN
        cur_string := cur_string||' from '||l_nth.nth_table_name||' t '
            ||' where sdo_within_distance ( t.'||l_nth.nth_feature_shape_column||', :shape, '||
            ''''||'distance = '||TO_CHAR(p_buffer)||''''||' ) = '||''''||'TRUE'||'''';
-     end if;           
+     end if;
 
   ELSIF p_nth.nth_feature_fk_column IS NULL THEN
 
@@ -8771,10 +8771,10 @@ BEGIN
            ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
         ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_pk_column;
   ELSE
-  
+
 
      cur_string := 'select distinct t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', f.'||l_nth.nth_feature_pk_column;
-     
+
   end if;
 
   IF l_get_projection THEN
@@ -8860,8 +8860,8 @@ BEGIN
   DECLARE
     l_rec_gdr gis_data_restrictions%ROWTYPE;
   BEGIN
-    l_rec_gdr := nm3sdo_gdr.get_gdr(pi_gdr_username     => user 
-                                   ,pi_gdr_nth_theme_id => p_nth.nth_theme_id 
+    l_rec_gdr := nm3sdo_gdr.get_gdr(pi_gdr_username     => user
+                                   ,pi_gdr_nth_theme_id => p_nth.nth_theme_id
                                    ,pi_raise_not_found  => FALSE);
   --
     IF l_rec_gdr.gdr_gdo_session_id IS NOT NULL
