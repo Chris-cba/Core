@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.3   Feb 04 2009 16:28:06   cstrettle  $
---       Module Name      : $Workfile:   nm3merge_orig.pkb  $
---       Date into PVCS   : $Date:   Feb 04 2009 16:28:06  $
---       Date fetched Out : $Modtime:   Feb 04 2009 16:23:26  $
---       PVCS Version     : $Revision:   2.3  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.4   Mar 12 2009 12:08:02   cstrettle  $
+--       Module Name      : $Workfile:   nm3merge.pkb  $
+--       Date into PVCS   : $Date:   Mar 12 2009 12:08:02  $
+--       Date fetched Out : $Modtime:   Mar 12 2009 12:05:56  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -1666,12 +1666,15 @@ END set_nw_operation_in_progress;
 --
 FUNCTION route_has_valid_SE_nodes(pi_route_ne_id  IN nm_elements.ne_id%TYPE) RETURN BOOLEAN IS
 
+  -- LOG 709697 CWS As groups do not have end nodes defined in 
+  -- nm_elements the cursor now checks if it is a group.
   CURSOR c1 IS
   SELECT 'X'
   FROM   nm_elements 
   WHERE  ne_id = pi_route_ne_id
-  AND    ne_no_end = nm3net.get_end_node(ne_id)
-  AND    ne_no_start = nm3net.get_start_node(ne_id);
+  AND    ((ne_no_end = nm3net.get_end_node(ne_id)
+  AND    ne_no_start = nm3net.get_start_node(ne_id))
+   OR    ne_type = 'G');
   
   v_dummy VARCHAR2(1) := Null;
 
@@ -1860,7 +1863,8 @@ END check_elements_can_be_merged;
 --
 ------------------------------------------------------------------------------------------------
 --
-FUNCTION get_route_common_node(pi_route_ne_id_1          IN nm_elements.ne_id%TYPE
+--709697 CWS CHANGES MADE TO THIS FUNCTION
+/*FUNCTION get_route_common_node(pi_route_ne_id_1          IN nm_elements.ne_id%TYPE
                               ,pi_route_ne_id_2          IN nm_elements.ne_id%TYPE
                                ) RETURN tab_rec_common_nodes IS
 
@@ -1913,6 +1917,94 @@ BEGIN
  
  RETURN(l_tab_rec_common_nodes);
 
+END get_route_common_node;*/
+
+FUNCTION get_route_common_node(pi_route_ne_id_1          IN nm_elements.ne_id%TYPE
+                              ,pi_route_ne_id_2          IN nm_elements.ne_id%TYPE) 
+  RETURN tab_rec_common_nodes IS
+ 
+  CURSOR c_node ( c_route_ne_id_1 IN nm_elements.ne_id%TYPE ) 
+  IS
+    SELECT nt_node_type  
+      FROM nm_types, nm_elements
+     WHERE ne_nt_type = nt_type
+       AND ne_id =  c_route_ne_id_1;
+ 
+  CURSOR c1 IS
+    SELECT ne1.ne_no_end
+          ,'E'
+          ,'S'
+      FROM nm_elements ne1
+          ,nm_elements ne2
+     WHERE ne1.ne_id = pi_route_ne_id_1
+       AND ne2.ne_id = pi_route_ne_id_2
+       AND ne1.ne_no_end = ne2.ne_no_start
+     UNION
+    SELECT ne1.ne_no_start
+         ,'S'
+         ,'E'
+      FROM nm_elements ne1
+          ,nm_elements ne2
+     WHERE ne1.ne_id = pi_route_ne_id_1
+       AND ne2.ne_id = pi_route_ne_id_2
+       AND ne1.ne_no_start = ne2.ne_no_end
+     UNION
+    SELECT ne1.ne_no_end
+          ,'E'
+          ,'E'
+      FROM nm_elements ne1
+          ,nm_elements ne2
+     WHERE ne1.ne_id = pi_route_ne_id_1
+       AND ne2.ne_id = pi_route_ne_id_2
+       AND ne1.ne_no_end = ne2.ne_no_end
+     UNION
+    SELECT ne1.ne_no_start
+          ,'S'
+          ,'S'
+      FROM nm_elements ne1
+          ,nm_elements ne2
+     WHERE ne1.ne_id = pi_route_ne_id_1
+       AND ne2.ne_id = pi_route_ne_id_2
+       AND ne1.ne_no_start = ne2.ne_no_start;
+ 
+  CURSOR c2 IS
+    SELECT nnu1.nnu_no_node_id, nnu1.nnu_node_type, nnu2.nnu_node_type
+  --  nnu1.nnu_ne_id, nnu2.nnu_node_type, nnu2.nnu_ne_id,
+  --       nm3net.route_direction( nnu1.nnu_node_type, m1.nm_cardinality ), nm3net.route_direction( nnu2.nnu_node_type, m2.nm_cardinality )
+      FROM nm_members m1, nm_node_usages nnu1,
+           nm_members m2, nm_node_usages nnu2
+     WHERE nnu1.nnu_ne_id = m1.nm_ne_id_of
+       AND m1.nm_ne_id_in = pi_route_ne_id_1
+       AND nnu2.nnu_ne_id = m2.nm_ne_id_of
+       AND m2.nm_ne_id_in = pi_route_ne_id_2
+       AND nnu1.nnu_no_node_id = nnu2.nnu_no_node_id;
+ 
+  l_node_type nm_node_types.nnt_type%TYPE;
+  l_tab_rec_common_nodes tab_rec_common_nodes;
+--
+BEGIN
+--
+  OPEN c_node(pi_route_ne_id_1);
+  FETCH c_node INTO l_node_type;
+  IF c_node%NOTFOUND THEN
+    l_node_type := NULL;
+  END IF;
+  CLOSE c_node;
+--
+--assume node type is the same for both;
+--
+  IF l_node_type IS NOT NULL THEN
+    OPEN c1;
+    FETCH c1 BULK COLLECT INTO l_tab_rec_common_nodes;
+    CLOSE c1;
+  ELSE
+    OPEN c2;
+    FETCH c2 BULK COLLECT INTO l_tab_rec_common_nodes;
+    CLOSE c2;
+  END IF;
+--
+  RETURN(l_tab_rec_common_nodes);
+--
 END get_route_common_node;
 --
 ------------------------------------------------------------------------------------------------
