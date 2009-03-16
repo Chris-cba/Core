@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.6   Mar 16 2009 09:03:20   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.7   Mar 16 2009 16:24:04   lsorathia  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Mar 16 2009 09:03:20  $
---       Date fetched Out : $Modtime:   Mar 16 2009 09:02:18  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Mar 16 2009 16:24:04  $
+--       Date fetched Out : $Modtime:   Mar 16 2009 16:21:02  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -563,8 +563,8 @@ BEGIN
       CLOSE c_get_unit ;
 
       UPDATE nm_assets_on_route_holding
-      SET   narh_end_reference_begin_mp   = narh_placement_begin_mp -  nm3unit.convert_unit (l_net_unit, pi_reference_units,Nvl(l_rec_ngq.ngq_end_mp,0))
-           ,narh_end_reference_end_mp     = narh_placement_end_mp   -  nm3unit.convert_unit (l_net_unit, pi_reference_units,Nvl(l_rec_ngq.ngq_end_mp,0))
+      SET   narh_end_reference_begin_mp   = narh_placement_begin_mp -  nm3unit.convert_unit (l_net_unit,  Nvl(pi_reference_units,l_net_unit),Nvl(l_rec_ngq.ngq_end_mp,0))
+           ,narh_end_reference_end_mp     = narh_placement_end_mp   -  nm3unit.convert_unit (l_net_unit,  Nvl(pi_reference_units,l_net_unit),Nvl(l_rec_ngq.ngq_end_mp,0))
       WHERE  narh_job_id                  = po_return_arguments.narh_job_id;
   END IF ;
   --Log 713423:Linesh:05-Mar-2009:End
