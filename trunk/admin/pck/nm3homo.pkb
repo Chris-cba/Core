@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.8   Feb 18 2009 14:59:58   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.9   Mar 16 2009 14:25:22   lsorathia  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Feb 18 2009 14:59:58  $
---       Date fetched Out : $Modtime:   Feb 18 2009 14:56:42  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Mar 16 2009 14:25:22  $
+--       Date fetched Out : $Modtime:   Mar 13 2009 13:30:28  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --
 --   Author : Jonathan Mills
@@ -26,7 +26,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                              ,end_mp   nm_members.nm_end_mp%TYPE); 
    type t_chunk_arr is table of t_chunk_rec index by pls_integer;
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -4326,17 +4326,20 @@ BEGIN
         SET  nm_end_date = pi_effective_date
       WHERE  nm_ne_id_in = pi_iit_ne_id;
       xattr_on;
-      IF l_nit_rec.nit_end_loc_only = 'N'
-       THEN
-         UPDATE NM_INV_ITEMS
-          SET   iit_end_date = pi_effective_date
-         WHERE  iit_ne_id    = pi_iit_ne_id;
+      --Log 719384:Linesh:13-Mar-09:End
+      --Stopped end dating of asset when location is end dated 
+      --IF l_nit_rec.nit_end_loc_only = 'N'
+      -- THEN
+      --   UPDATE NM_INV_ITEMS
+      --    SET   iit_end_date = pi_effective_date
+      --   WHERE  iit_ne_id    = pi_iit_ne_id;
          
          -- DC end-date any links to parents from this item
 --          UPDATE NM_INV_ITEM_GROUPINGS
 --          SET    iig_end_date = pi_effective_date
 --          WHERE  iig_item_id = pi_iit_ne_id;
-      END IF;
+      --END IF;
+      --Log 719384:Linesh:13-Mar-09:End
    ELSE
 -- nm_debug.debug('      nm3extent_o.create_temp_ne_from_pl (l_pl_new,l_new_location_temp_ne);');
       nm3extent_o.create_temp_ne_from_pl (l_pl_new,l_new_location_temp_ne);
