@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.5   Feb 19 2009 17:00:06   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.6   Mar 16 2009 17:43:08   rcoupe  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Feb 19 2009 17:00:06  $
---       Date fetched Out : $Modtime:   Feb 19 2009 16:58:40  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Mar 16 2009 17:43:08  $
+--       Date fetched Out : $Modtime:   Mar 16 2009 17:42:30  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -50,6 +50,12 @@ PROCEDURE del_creg( p_table IN VARCHAR2, p_owner IN VARCHAR2);
 
 
 -----------------------------------------------------------------------------
+--
+-- Function to return the srtext for a theme 
+--
+
+function get_srtext ( p_theme_id in NM_THEMES_ALL.nth_theme_id%TYPE ) return varchar2;
+
 --
 FUNCTION get_version RETURN VARCHAR2 IS
 BEGIN
@@ -536,7 +542,7 @@ BEGIN
        l_sref.munits         := 1;
      END IF;
 
-     l_sref.srtext        := NVL(Nm3sdo.get_srs_text( p_theme_id ), 'UNKNOWN');
+     l_sref.srtext        := get_srtext(p_theme_id); -- NVL(Nm3sdo.get_srs_text( p_theme_id ), 'UNKNOWN');
 
      l_sref.description   := NULL;
      l_sref.auth_name     := NULL;
@@ -1893,6 +1899,73 @@ BEGIN
 
    RETURN retval;
 END;
+--
+-------------------------------------------------------------------------------------------------------------------------------
+--
+function get_srtext ( p_theme_id in NM_THEMES_ALL.nth_theme_id%TYPE ) return varchar2 is
+
+cursor c1 ( c_theme_id in NM_THEMES_ALL.nth_theme_id%TYPE ) is
+  select srtext from sde.spatial_references r, sde.layers l, user_sdo_geom_metadata a, user_sdo_geom_metadata b, nm_themes_all t
+  where nth_theme_id = c_theme_id
+  and a.table_name = nth_feature_table
+  and b.srid = a.srid
+  and b.table_name = l.table_name
+  and l.srid = r.srid
+  and l.owner = user
+  group by srtext;
+
+curstr NM3TYPE.MAX_VARCHAR2 := 'select substr(definition, 1, 1024) '
+                              ||' from sde.st_coordinate_systems r, user_sdo_geom_metadata b, nm_themes_all t '
+                              ||'  where nth_theme_id = :theme_id '
+                              ||'  and b.table_name = nth_feature_table '
+                              ||'  and b.srid = r.id ';
+
+l_version varchar2(30) := NM3SDE.GET_SDE_VERSION;
+
+retval sde.spatial_references.srtext%type;
+dummy  sde.spatial_references.srtext%type;
+
+begin
+
+  if l_version = '9.1' then
+  
+    open c1( p_theme_id );
+    fetch c1 into retval;
+    if c1%notfound then
+--    no other themes exist as layers with a valid srtext - all we can do is return UNKNOWN    
+      close c1;
+      retval := 'UNKNOWN';
+    else
+      fetch c1 into dummy;
+      if c1%notfound then
+        -- we have one and only one row returned. Use it.
+        null;
+      else
+--      we have more than one sde srtext for layers that have the same Oracle SRID, choose the first        
+        null;
+      end if;
+
+      close c1;
+    end if;
+    
+  elsif l_version = '9.2' or l_version = '9.3' then
+  
+    begin
+      execute immediate curstr into retval using p_theme_id;
+    exception
+      when no_data_found then
+        retval := 'UNKNOWN';
+      when others then
+        retval := 'UNKNOWN';
+    end;
+    
+  end if;
+  
+  return retval;     
+    
+end;
+
+
 --
 -------------------------------------------------------------------------------------------------------------------------------
 --
