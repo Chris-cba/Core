@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY doc_api AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc_api.pkb-arc   2.0   Jun 14 2007 14:59:48   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc_api.pkb-arc   2.1   Mar 17 2009 10:09:10   cstrettle  $
 --       Module Name      : $Workfile:   doc_api.pkb  $
---       Date into SCCS   : $Date:   Jun 14 2007 14:59:48  $
---       Date fetched Out : $Modtime:   Jun 14 2007 14:59:00  $
---       SCCS Version     : $Revision:   2.0  $
+--       Date into SCCS   : $Date:   Mar 17 2009 10:09:10  $
+--       Date fetched Out : $Modtime:   Mar 17 2009 10:05:14  $
+--       SCCS Version     : $Revision:   2.1  $
 --       Based on SCCS Version     : 1.1
 --
 --
@@ -26,7 +26,7 @@ CREATE OR REPLACE PACKAGE BODY doc_api AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '"$Revision:   2.0  $"';
+  g_body_sccsid   CONSTANT varchar2(2000) := '"$Revision:   2.1  $"';
 
   g_package_name  CONSTANT varchar2(30) := 'doc_api';
   
@@ -122,12 +122,24 @@ begin
   -- 4. Doc class
   if ce_doc_class is not null
   then
-    select count(*)
+-- CWS LOG 719503 16/03/2009
+   /* select count(*)
     into  l_count
     from  doc_class
     where dcl_dtp_code = 'REPT'
     and   dcl_code     = upper(ce_doc_class)
-    ;
+    ;*/
+    --/*
+    Select count(*)--'valid'
+    into  l_count    
+    From doc_class
+    Where dcl_code = upper(ce_doc_class)
+    And exists (select 1 from doc_types
+                where dtp_code = dcl_dtp_code
+                and dtp_allow_complaints = 'N'
+                and dtp_allow_comments = 'N' );
+    --*/
+-- CWS LOG 719503 16/03/2009 END
     if l_count = 0
     then
       raise_application_error(-20001,'Document class does not exist');
