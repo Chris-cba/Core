@@ -4,7 +4,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_eng_dynseg';
@@ -33,11 +33,11 @@ BEGIN
    htp.p('--');
    htp.p('--   PVCS Identifiers :-');
    htp.p('--');
-   htp.p('--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkb-arc   2.4   Dec 16 2008 09:43:58   smarshall  $');
+   htp.p('--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkb-arc   2.5   Mar 17 2009 16:21:50   rcoupe  $');
    htp.p('--       Module Name      : $Workfile:   nm3web_eng_dynseg.pkb  $');
-   htp.p('--       Date into PVCS   : $Date:   Dec 16 2008 09:43:58  $');
-   htp.p('--       Date fetched Out : $Modtime:   Dec 16 2008 09:39:30  $');
-   htp.p('--       PVCS Version     : $Revision:   2.4  $');
+   htp.p('--       Date into PVCS   : $Date:   Mar 17 2009 16:21:50  $');
+   htp.p('--       Date fetched Out : $Modtime:   Mar 17 2009 16:20:40  $');
+   htp.p('--       PVCS Version     : $Revision:   2.5  $');
    htp.p('--       Based on SCCS Version     : 1.23');
    htp.p('--');
    htp.p('--');
@@ -104,26 +104,26 @@ begin
     select_route_error (p_error => 'Route start cannot be greater than route end');
   else
     run_dynseg (p_source      => p_source
-               ,p_route       => p_route           
-               ,p_slk_from    => p_slk_from        
-               ,p_slk_to      => p_slk_to          
-               ,p_saved_ne_id => p_saved_ne_id     
-               ,p_nmq_id      => p_nmq_id          
-               ,p_nqr_job_id  => p_nqr_job_id      
-               ,p_gdo_sess_id => p_gdo_sess_id     
+               ,p_route       => p_route
+               ,p_slk_from    => p_slk_from
+               ,p_slk_to      => p_slk_to
+               ,p_saved_ne_id => p_saved_ne_id
+               ,p_nmq_id      => p_nmq_id
+               ,p_nqr_job_id  => p_nqr_job_id
+               ,p_gdo_sess_id => p_gdo_sess_id
                ,p_function    => p_function
                ,p_inv_type    => p_inv_type
                ,p_attrib      => p_attrib
                ,p_xsp         => p_xsp
                 );
-    
-  end if;                      
+
+  end if;
 end check_route_length;
 procedure select_route_error (p_route          varchar2 default null
                              ,p_error           varchar2 default null
                              ,p_route_length    number default null)
 is
-begin 
+begin
    htp.bodyopen (cattributes=>'onLoad="initialise_form()"');
 --   nm3web.header;
    htp.P('<!--');
@@ -133,7 +133,7 @@ begin
    htp.P('-->');
    htp.P('<DIV ALIGN="CENTER">');
 
-if p_error is null then   
+if p_error is null then
   htp.formopen(g_package_name||'.select_route_page');
   htp.tableheader('Invalid route ('||p_route||'), please go back to previous page and re-enter a valid route');
 elsif p_error = 'Route end entered is greater than routes actual end' then
@@ -161,7 +161,7 @@ is
 cursor c_route_length ( p_route_unique nm_elements.ne_unique%TYPE
                       ) is
   select case nt_linear
-         when 'Y' then 
+         when 'Y' then
            case nvl(ne_gty_group_type,'NULL')
              when 'NULL' then
                ne_length
@@ -171,13 +171,13 @@ cursor c_route_length ( p_route_unique nm_elements.ne_unique%TYPE
          when 'N' then
            -99
          end obj_length, ne_descr
-  from nm_elements, nm_types            
+  from nm_elements, nm_types
   where upper(ne_unique) = upper(p_route_unique)
   and ne_nt_type = nt_type;
 
   l_route_length nm_elements.ne_length%TYPE;
   l_descr nm_elements.ne_descr%TYPE;
-begin 
+begin
   open c_route_length (p_route);
   fetch c_route_length into l_route_length, l_descr;
   if c_route_length%notfound then
@@ -199,7 +199,7 @@ procedure select_route_page (p_area_type      varchar2 DEFAULT nm3extent.c_route
                             ,p_function_count NUMBER   DEFAULT c_default_func_count
                             ,p_route          varchar2 default null)
 is
-begin 
+begin
  if p_area_type != 'ROUTE' then
  	-- SM 16122008
  	-- added this if statement otherwise each of the radio buttons would take the user to the route entry screen
@@ -219,7 +219,7 @@ begin
    htp.P('');
    htp.P('-->');
    htp.P('<DIV ALIGN="CENTER">');
-   
+
   htp.formopen(g_package_name||'.select_route_details');--, cattributes => 'NAME="dynseg"');
   htp.tableheader('Route');
   htp.p('<TD>');
@@ -230,7 +230,7 @@ begin
   htp.p('</TD>');
   htp.formsubmit (cvalue=>'Continue');
   htp.formclose;
-  end if;                  
+  end if;
 end select_route_page;
 
 PROCEDURE dynseg_define (p_area_type      varchar2 DEFAULT nm3extent.c_route
@@ -561,7 +561,7 @@ BEGIN
    --
    htp.formopen(g_package_name||'.check_route_length', cattributes => 'NAME="dynseg"');--templine
    --htp.formopen(g_package_name||'.run_dynseg');--, cattributes => 'NAME="dynseg"');--templine
-  
+
    htp.tableopen;
    htp.tablerowopen;
    htp.tableheader('Function');
@@ -620,12 +620,12 @@ BEGIN
                        ,cvalue => pi_route_length
                        );
       end if;
-      
-      if p_route is not null then                 
+
+      if p_route is not null then
         htp.formhidden (cname  => 'p_route'
                        ,cvalue => p_route
                        );
-      end if;                     
+      end if;
    ELSIF is_saved
     THEN
       htp.tableheader('Saved Network Extent');
@@ -949,6 +949,8 @@ PROCEDURE run_dynseg_arr
    l_stop_time       pls_integer;
    --
    dont_run EXCEPTION;
+
+   l_default_route_as_parent BOOLEAN := FALSE;
    --
 BEGIN
 --
@@ -1034,11 +1036,18 @@ BEGIN
    --
    IF p_source IN (nm3extent.c_route,nm3extent.c_saved,nm3extent.c_gis)
     THEN
+      if p_source = nm3extent.c_route then
+        l_default_route_as_parent := TRUE;
+      else
+        l_default_route_as_parent := FALSE;
+      end if;
+
       nm3extent.create_temp_ne (pi_source_id => l_source_ne_id
                                ,pi_source    => p_source
                                ,pi_begin_mp  => p_slk_from
                                ,pi_end_mp    => p_slk_to
                                ,po_job_id    => l_job_id
+                               ,pi_default_source_as_parent => l_default_route_as_parent
                                );
    --
       l_intermed_time := dbms_utility.get_time;
@@ -1112,7 +1121,7 @@ BEGIN
             END;
          ELSE
             IF g_tab_value(i) IS NOT NULL
-             THEN                              
+             THEN
                htp.tabledata(round(g_tab_value(i),2));
             ELSE
                htp.tabledata(nm3web.c_nbsp);
@@ -1417,7 +1426,7 @@ PROCEDURE build_function_array IS
                      )
    GROUP BY object_name, type_name
    ORDER BY object_name, type_name;
-   
+
    --
 BEGIN
    --
