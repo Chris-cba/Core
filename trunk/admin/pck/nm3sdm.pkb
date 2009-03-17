@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.22   Mar 03 2009 17:25:12   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.23   Mar 17 2009 11:52:18   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Mar 03 2009 17:25:12  $
---       Date fetched Out : $Modtime:   Mar 03 2009 17:23:54  $
---       PVCS Version     : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   Mar 17 2009 11:52:18  $
+--       Date fetched Out : $Modtime:   Mar 17 2009 11:50:54  $
+--       PVCS Version     : $Revision:   2.23  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.22  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.23  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -5112,15 +5112,24 @@ end;
 --    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
       FOR irec IN c_inv_tab (p_nm_obj_type)
       LOOP
+        -- AE - 718333
+        -- Include begin_mp and only operate on open shapes
+        --
          upd_string :=
                'update '
             || irec.nth_feature_table
-            || ' set end_date = :end_date where ne_id = :ne_id'
-            || ' and ne_id_of = :ne_id_of';
-
+            || '  set end_date    = :end_date '
+            || 'where ne_id       = :ne_id '
+            || '  and ne_id_of    = :ne_id_of '
+            || '  and nm_begin_mp = :nm_begin_mp '
+            || '  and end_date IS NULL';
+        -- AE - 718333
+        -- Include begin_mp and only operate on open shapes
+        -- End of changes
+        --
 --    nm_debug.debug('End date string '||upd_string);
          EXECUTE IMMEDIATE upd_string
-                     USING p_nm_end_date, p_nm_ne_id_in, p_nm_ne_id_of;
+                     USING p_nm_end_date, p_nm_ne_id_in, p_nm_ne_id_of, p_nm_begin_mp;
       END LOOP;
    END;
 
@@ -5166,29 +5175,47 @@ end;
 --                  ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
       FOR irec IN c_gty_tab (p_nm_obj_type)
       LOOP
-          if irec.g_or_i = 'G' then
+         IF irec.g_or_i = 'G' 
+         THEN
+      --
+      -- AE - 718333
+      -- Include begin_mp and only operate on open shapes
+      -- 
            upd_string :=
-               'update '
-            || irec.nth_feature_table
-            || ' set end_date = :end_date where ne_id = :ne_id'
-            || ' and ne_id_of = :ne_id_of ';
+               'update '|| irec.nth_feature_table
+            || '  set end_date    = :end_date '
+            || 'where ne_id       = :ne_id '
+            || '  and ne_id_of    = :ne_id_of '
+            || '  and nm_begin_mp = :nm_begin_mp '
+            || '  and end_date IS NULL';
+
+      -- AE - 718333
+      -- Include begin_mp and only operate on open shapes
+      -- End of changes
 
            EXECUTE IMMEDIATE upd_string
-                     USING p_nm_end_date, p_nm_ne_id_in, p_nm_ne_id_of;
-          else
+                     USING p_nm_end_date, p_nm_ne_id_in, p_nm_ne_id_of, p_nm_begin_mp;
+      --
+         ELSE
+      --
            upd_string :=
-               'update '
-            || irec.nth_feature_table
-            || ' set end_date = :end_date where ne_id_of = :ne_id_of '
-            || ' and ne_id in ( select nad_iit_ne_id '
-            || ' from nm_nw_ad_link where nad_gty_type = :p_gty_type '
-            || ' and nad_inv_type = :obj_type '
-            || ' and nad_ne_id = :nm_ne_id_in '
-            || ' and nad_whole_road = :whole_road )';
-
+               'update '|| irec.nth_feature_table
+            || '   set end_date = :end_date '
+            || ' where ne_id_of = :ne_id_of '
+            ||   ' and begin_mp = :nm_begin_mp '
+            ||   ' and end_date IS NULL '
+            ||   ' and ne_id in ( select nad_iit_ne_id '
+                               || ' from nm_nw_ad_link '
+                               ||' where nad_gty_type   = :p_gty_type '
+                                || ' and nad_inv_type   = :obj_type '
+                                || ' and nad_ne_id      = :nm_ne_id_in '
+                                || ' and nad_whole_road = :whole_road )';
+      --
           EXECUTE IMMEDIATE upd_string
                     USING p_nm_end_date, p_nm_ne_id_of, p_nm_obj_type, irec.obj_type, p_nm_ne_id_in, '1';
-         end if;
+      --
+         END IF;
+      --
       END LOOP;
    END;
 
