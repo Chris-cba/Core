@@ -235,7 +235,7 @@ BEGIN
    l_sorted_by_x := l_retval.sort_statistic_array_by_x;
    l_sorted_by_y := l_retval.sort_statistic_array_by_y;
 --
-   IF MOD(l_statistic_arr_count,2) = 0
+   IF MOD(l_statistic_arr_count,2) != 0
     THEN
       -- If the statistic count is odd then the median is the middle one
       l_median_pos            := ROUND((l_statistic_arr_count/2),0);
