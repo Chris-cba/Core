@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.15.1.2   Mar 12 2009 11:07:50   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.15.1.3   Mar 17 2009 14:07:00   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Mar 12 2009 11:07:50  $
---       Date fetched Out : $Modtime:   Mar 12 2009 11:04:20  $
---       PVCS Version     : $Revision:   2.15.1.2  $
+--       Date into PVCS   : $Date:   Mar 17 2009 14:07:00  $
+--       Date fetched Out : $Modtime:   Mar 17 2009 14:06:14  $
+--       PVCS Version     : $Revision:   2.15.1.3  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.15.1.2  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.15.1.3  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -8750,7 +8750,7 @@ BEGIN
            ''''||'distance = '||TO_CHAR(p_buffer)||''''||' ) = '||''''||'TRUE'||'''';
      end if;
 
-  ELSIF p_nth.nth_feature_fk_column IS NULL THEN
+  ELSIF p_nth.nth_feature_fk_column IS NOT NULL THEN
 
      cur_string := 'select t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', f.'||l_nth.nth_feature_pk_column;
 
@@ -8758,7 +8758,7 @@ BEGIN
 
        cur_string := cur_string||', sdo_geom.sdo_distance(f.'||l_nth.nth_feature_shape_column||', :p_geometry, :l_tol )';
 
-    cur_string := cur_string||', sdo_lrs.get_measure( sdo_lrs.project_pt(f.'||l_nth.nth_feature_shape_column||', :p_geometry ))';
+       cur_string := cur_string||', sdo_lrs.get_measure( sdo_lrs.project_pt(f.'||l_nth.nth_feature_shape_column||', :p_geometry ))';
 
      END IF;
 
@@ -8777,11 +8777,11 @@ BEGIN
 
   end if;
 
-  IF l_get_projection THEN
+     IF l_get_projection THEN
 
        cur_string := cur_string||', sdo_geom.sdo_distance(f.'||l_nth.nth_feature_shape_column||', :p_geometry, :l_tol )';
 
-    cur_string := cur_string||', sdo_lrs.get_measure( sdo_lrs.project_pt(f.'||l_nth.nth_feature_shape_column||', :p_geometry ))';
+       cur_string := cur_string||', sdo_lrs.get_measure( sdo_lrs.project_pt(f.'||l_nth.nth_feature_shape_column||', :p_geometry ))';
 
      END IF;
 
@@ -8793,7 +8793,7 @@ BEGIN
 
   END IF;
 
-  Nm_Debug.debug_on;
+  --Nm_Debug.debug_on;
   Nm_Debug.DEBUG( cur_string );
 
   nm_debug.debug('Execute statement');
