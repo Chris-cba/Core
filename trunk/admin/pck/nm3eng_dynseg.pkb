@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.8   Jan 12 2009 13:54:12   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.9   Mar 17 2009 16:25:28   rcoupe  $
 --       Module Name      : $Workfile:   nm3eng_dynseg.pkb  $
---       Date into PVCS   : $Date:   Jan 12 2009 13:54:12  $
---       Date fetched Out : $Modtime:   Jan 12 2009 13:53:00  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Mar 17 2009 16:25:28  $
+--       Date fetched Out : $Modtime:   Mar 17 2009 16:23:36  $
+--       PVCS Version     : $Revision:   2.9  $
 --       Based on sccs version : 1.13
 --
 --   Author : Jonathan Mills
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg';
@@ -2426,8 +2426,14 @@ BEGIN
       IF g_merge_run
        THEN
          g_sql := g_sql
+              ||chr(10)||', nm_members r, nm_mrg_sections';
+         g_sql := g_sql
               ||CHR(10)||'WHERE  nsm.nsm_mrg_job_id     = :mrg_job_id'
-              ||CHR(10)||' AND   nsm.nsm_mrg_section_id = :mrg_section_id';
+              ||CHR(10)||' AND   nsm.nsm_mrg_section_id = :mrg_section_id'
+              ||CHR(10)||' AND   nms_mrg_section_id     = nsm.nsm_mrg_section_id'
+              ||CHR(10)||' AND   r.nm_ne_id_of          = nm.nm_ne_id_of'
+              ||CHR(10)||' AND   nms_mrg_job_id         = nsm.nsm_mrg_job_id'
+              ||CHR(10)||' AND   r.nm_ne_id_in          = nms_offset_ne_id';
       ELSIF g_temp_ne_run
        THEN
          g_sql := g_sql
@@ -2502,11 +2508,19 @@ BEGIN
               ||CHR(10)||'      ,1 nm_cardinality'
               ||CHR(10)||' FROM  '||l_table_name||' nsm'
               ||CHR(10)||'      ,'||l_rec_nit.nit_table_name||' ft';
+
       IF g_merge_run
        THEN
          g_sql := g_sql
+              ||chr(10)||', nm_members r, nm_mrg_sections';
+         g_sql := g_sql
               ||CHR(10)||'WHERE  nsm.nsm_mrg_job_id     = :mrg_job_id'
-              ||CHR(10)||' AND   nsm.nsm_mrg_section_id = :mrg_section_id';
+              ||CHR(10)||' AND   nsm.nsm_mrg_section_id = :mrg_section_id'
+              ||CHR(10)||' AND   nms_mrg_section_id     = nsm.nsm_mrg_section_id'
+              ||CHR(10)||' AND   r.nm_ne_id_of          = nm.nm_ne_id_of'
+              ||CHR(10)||' AND   nms_mrg_job_id         = nsm.nsm_mrg_job_id'
+              ||CHR(10)||' AND   r.nm_ne_id_in          = nms_offset_ne_id';
+       
       ELSIF g_temp_ne_run
        THEN
          g_sql := g_sql
@@ -2534,21 +2548,26 @@ BEGIN
    IF g_merge_run
     THEN
       g_sql := g_sql
-               ||CHR(10)||' ORDER BY nsm_mrg_section_id, nsm_measure';
+               ||CHR(10)||' ORDER BY nsm_mrg_section_id, nsm_measure, decode ( r.nm_cardinality, 1, nm.nm_begin_mp, -1, nm.nm_end_mp*-1 )';
 
    ELSIF l_rec_nit.nit_table_name IS NULL or l_nin_nw_type is not null
     THEN
 
       g_sql := g_sql
-               ||CHR(10)||' ORDER BY nte_seq_no, GREATEST(nm.nm_begin_mp,nsm.'||l_begin_mp_col||')';
+               ||CHR(10)||' ORDER BY nte_seq_no, '
+               ||CHR(10)||' decode( nte_cardinality, 1, GREATEST(nm.nm_begin_mp,nsm.'||l_begin_mp_col||'), -1, LEAST(nm.nm_end_mp,nsm.'||l_end_mp_col||') * -1) ';
    ELSE
 
       g_sql := g_sql
-               ||CHR(10)||' ORDER BY nte_seq_no, GREATEST(ft.'||l_rec_nit.nit_lr_st_chain||',nsm.'||l_begin_mp_col||')';
+               ||CHR(10)||' ORDER BY nte_seq_no, '
+               ||CHR(10)||' decode( nte_cardinality, 1, GREATEST(ft.'||l_rec_nit.nit_lr_st_chain||',nsm.'||l_begin_mp_col||'), -1, LEAST(ft.'||l_rec_nit.nit_lr_end_chain||',nsm.'||l_end_mp_col||') * -1  ';
 
    END IF;
 
-   --nm_debug.debug(g_sql);
+--   nm_debug.debug_on;
+--   nm_debug.delete_debug(true);
+--   nm_debug.debug(g_sql);
+--   nm_debug.debug_off;
    --
 
   nm3dbg.deind;
