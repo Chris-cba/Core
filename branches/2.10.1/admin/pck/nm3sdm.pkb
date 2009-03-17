@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.10.1.1   Sep 25 2008 13:25:18   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.10.1.2   Mar 17 2009 11:24:18   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Sep 25 2008 13:25:18  $
---       Date fetched Out : $Modtime:   Sep 25 2008 13:23:42  $
---       PVCS Version     : $Revision:   2.10.1.1  $
+--       Date into PVCS   : $Date:   Mar 17 2009 11:24:18  $
+--       Date fetched Out : $Modtime:   Mar 17 2009 11:22:54  $
+--       PVCS Version     : $Revision:   2.10.1.2  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.10.1.1  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.10.1.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -5062,15 +5062,31 @@ end;
 --    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
       FOR irec IN c_inv_tab (p_nm_obj_type)
       LOOP
+--         upd_string :=
+--               'update '
+--            || irec.nth_feature_table
+--            || ' set end_date = :end_date where ne_id = :ne_id'
+--            || ' and ne_id_of = :ne_id_of';
+
+        -- AE - 718333
+        -- Include begin_mp and only operate on open shapes
+        --
          upd_string :=
                'update '
             || irec.nth_feature_table
-            || ' set end_date = :end_date where ne_id = :ne_id'
-            || ' and ne_id_of = :ne_id_of';
-
+            || '  set end_date    = :end_date '
+            || 'where ne_id       = :ne_id '
+            || '  and ne_id_of    = :ne_id_of '
+            || '  and nm_begin_mp = :nm_begin_mp '
+            || '  and end_date IS NULL';
+        -- AE - 718333
+        -- Include begin_mp and only operate on open shapes
+        -- End of changes
+        --
 --    nm_debug.debug('End date string '||upd_string);
          EXECUTE IMMEDIATE upd_string
-                     USING p_nm_end_date, p_nm_ne_id_in, p_nm_ne_id_of;
+                     USING p_nm_end_date, p_nm_ne_id_in, p_nm_ne_id_of, p_nm_begin_mp;
+   --
       END LOOP;
    END;
 
@@ -5106,14 +5122,30 @@ end;
 --    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
       FOR irec IN c_gty_tab (p_nm_obj_type)
       LOOP
-         upd_string :=
-               'update '
-            || irec.nth_feature_table
-            || ' set end_date = :end_date where ne_id = :ne_id'
-            || ' and ne_id_of = :ne_id_of ';
+--         upd_string :=
+--               'update '
+--            || irec.nth_feature_table
+--            || ' set end_date = :end_date where ne_id = :ne_id'
+--            || ' and ne_id_of = :ne_id_of ';
+
+ --
+      -- AE - 718333
+      -- Include begin_mp and only operate on open shapes
+      -- 
+           upd_string :=
+               'update '|| irec.nth_feature_table
+            || '  set end_date    = :end_date '
+            || 'where ne_id       = :ne_id '
+            || '  and ne_id_of    = :ne_id_of '
+            || '  and nm_begin_mp = :nm_begin_mp '
+            || '  and end_date IS NULL';
+
+      -- AE - 718333
+      -- Include begin_mp and only operate on open shapes
+      -- End of changes
 
          EXECUTE IMMEDIATE upd_string
-                     USING p_nm_end_date, p_nm_ne_id_in, p_nm_ne_id_of;
+                     USING p_nm_end_date, p_nm_ne_id_in, p_nm_ne_id_of, p_nm_begin_mp;
       END LOOP;
    END;
 
