@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.10   Mar 18 2009 23:42:54   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.11   Mar 18 2009 23:51:34   rcoupe  $
 --       Module Name      : $Workfile:   nm3eng_dynseg.pkb  $
---       Date into PVCS   : $Date:   Mar 18 2009 23:42:54  $
---       Date fetched Out : $Modtime:   Mar 18 2009 23:40:56  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Mar 18 2009 23:51:34  $
+--       Date fetched Out : $Modtime:   Mar 18 2009 23:50:48  $
+--       PVCS Version     : $Revision:   2.11  $
 --       Based on sccs version : 1.13
 --
 --   Author : Jonathan Mills
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.10  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.11  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg';
@@ -2461,8 +2461,6 @@ BEGIN
               --||CHR(10)||' AND   nm.nm_type             = '||nm3flx.string('I')
               --||CHR(10)||' AND   nm.nm_obj_type         = :inv_type';
 
-
-
       -- xsp given and not ft asset
       IF pi_xsp IS NOT NULL and l_nin_nw_type is null
        THEN
@@ -2559,8 +2557,6 @@ BEGIN
                ||CHR(10)||                         ' -1, LEAST(ft.'||l_rec_nit.nit_lr_end_chain||',nsm.'||l_end_mp_col||') * -1)  ';
    
 
--- Else not a merge run, but need to rely on 
-
    ELSIF NOT g_merge_run and l_rec_nit.nit_table_name IS NULL
     THEN
 
@@ -2577,11 +2573,12 @@ BEGIN
 
    END IF;
 
+/*
    nm_debug.debug_on;
    nm_debug.delete_debug(true);
    nm_debug.debug(g_sql);
    nm_debug.debug_off;
-   --
+*/
 
   nm3dbg.deind;
 --
