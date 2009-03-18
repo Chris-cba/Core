@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.8   Mar 11 2009 14:21:20   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.9   Mar 18 2009 11:46:00   lsorathia  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Mar 11 2009 14:21:20  $
---       Date fetched Out : $Modtime:   Mar 11 2009 12:03:56  $
---       SCCS Version     : $Revision:   2.8  $
+--       Date into SCCS   : $Date:   Mar 18 2009 11:46:00  $
+--       Date fetched Out : $Modtime:   Mar 18 2009 11:45:08  $
+--       SCCS Version     : $Revision:   2.9  $
 --       Based on --
 --
 --   nm3inv package body
@@ -756,7 +756,10 @@ PROCEDURE validate_flex_inv (p_inv_type               IN  VARCHAR2
    l_rec_nita                  NM_INV_TYPE_ATTRIBS%ROWTYPE;
    l_qry Nm3type.max_varchar2;
    l_id     Nm3type.max_varchar2;
-   l_num_length Varchar2(30) ; -- Log 702388:Linesh:11-Mar-09:Added
+   l_num_length Varchar2(50) ; -- Log 702388:Linesh:11-Mar-09:Added
+   l_raise_len_error  Boolean ;  -- Log 702388:Linesh:11-Mar-09:Added
+   l_length Number ;-- Log 702388:Linesh:11-Mar-09:Added
+
 --
 BEGIN
 --
@@ -885,22 +888,32 @@ IF l_qry IS NOT NULL THEN
          --Added this to validate the Number field
          -- Log 702388:Linesh:11-Mar-09:Start
          l_num_length := l_number ;
-         IF l_rec_nita.ita_dec_places IS NOT NULL
+         IF Instr(l_num_length,'.') > 0
          THEN
-             l_num_length := Replace(l_num_length,'.') ;
+             l_raise_len_error := Length(substr(to_number(l_num_length),1,Instr(l_num_length,'.')-1)) > l_rec_nita.ita_fld_length ;    
+             l_length := Length(substr(to_number(l_num_length),1,Instr(l_num_length,'.')-1));                  
          ELSE
-             IF Instr(l_num_length,'.') > 0
-             THEN
-                 l_num_length := substr(to_char(l_num_length),1,instr(l_num_length,'.')-1) ;
-             END IF;
-         END IF;
-       
-         IF LENGTH(l_num_length) > l_rec_nita.ita_fld_length
-         THEN
-             Hig.raise_ner (pi_appl               => Nm3type.c_net
-                           ,pi_id                 => 457
-                           );
+             l_raise_len_error := LENGTH(l_num_length) > l_rec_nita.ita_fld_length ;
+             l_length          := LENGTH(l_num_length) ; 
          END IF ;
+         IF l_raise_len_error
+         THEN
+             hig.raise_ner(pi_appl               => 'NET'
+                          ,pi_id                 => 29
+                          ,pi_supplementary_info => 'Length ' || l_length || ' is greater than column length ' || l_rec_nita.ita_fld_length 
+                          );
+         END IF ;
+         IF  l_rec_nita.ita_dec_places IS NOT NULL
+         AND Instr(l_num_length,'.') > 0   
+         THEN
+             IF Length(substr(l_num_length,Instr(l_num_length,'.')+1)) > l_rec_nita.ita_dec_places
+             THEN
+                 hig.raise_ner(pi_appl               => 'NET'
+                   ,pi_id                 => 29
+                   ,pi_supplementary_info => 'Decimal Places ' || Length(substr(l_num_length,Instr(l_num_length,'.')+1)) || ' is greater than column decimal places ' || l_rec_nita.ita_dec_places
+                   );                 
+             END IF ; 
+         END IF ;          
          -- Log 702388:Linesh:11-Mar-09:End
 --
          IF  NVL(l_rec_nita.ita_min,l_number) > l_number
@@ -1905,7 +1918,9 @@ BEGIN
       append ('   l_fail         EXCEPTION;');
       append ('   l_notfound     EXCEPTION;');
       append ('   l_missing_mand EXCEPTION;');
-      append ('   l_num_length   Varchar2(30);'); --Log 702388:Linesh:11-Mar-09:Added
+      append ('   l_num_length      Varchar2(30);'); --Log 702388:Linesh:11-Mar-09:Added
+      append ('   l_raise_len_error Boolean ;');     --Log 702388:Linesh:18-Mar-09:Added
+      append ('   l_length          Number  ;');     --Log 702388:Linesh:18-Mar-09:Added   
       append ('   PRAGMA EXCEPTION_INIT(l_notfound,-20001);');
       append ('BEGIN');
    --
@@ -1970,14 +1985,14 @@ BEGIN
          IF cs_rec.ita_format = Nm3type.c_number
          THEN 
              append (' l_num_length := '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||' ;') ;
-             IF cs_rec.ita_dec_places IS NOT NULL
-             THEN
-                 append (' l_num_length := Replace(l_num_length,''.'');') ;
-             ELSE
-                 append (' IF Instr(l_num_length,''.'') > 0  THEN ');                 
-                 append (' l_num_length := substr(to_char(l_num_length),1,instr(l_num_length,''.'')-1) ; ');
-                 append (' END IF ;') ;
-             END IF;
+             --IF cs_rec.ita_dec_places IS NOT NULL
+             --THEN
+             --    append (' l_num_length := Replace(l_num_length,''.'');') ;
+             --ELSE
+             --    append (' IF Instr(l_num_length,''.'') > 0  THEN ');                 
+             --    append (' l_num_length := substr(to_char(l_num_length),1,instr(l_num_length,''.'')-1) ; ');
+             --    append (' END IF ;') ;
+             --END IF;
          END IF ;
          -- Log 702388:Linesh:11-Mar-09:End
    --
@@ -2079,8 +2094,25 @@ BEGIN
             append (' IF NOT nm3flx.is_numeric('||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||') THEN');
             append ('  l_fail_msg := '||Nm3flx.string('must be numeric')||'; RAISE l_fail;');
             -- Log 702388:Linesh:11-Mar-09:Start
-            append (' ELSIF LENGTH( l_num_length ) > '||Nvl(cs_rec.ita_fld_length,22)||' THEN');
+            append (' ELSIF 1 = 1 THEN ');
+            append (' IF Instr(l_num_length,''.'') > 0  THEN ');
+            append ('  l_raise_len_error := Length(substr(to_number(l_num_length),1,Instr(l_num_length,''.'')-1)) > '||cs_rec.ita_fld_length||' ; ');   
+            append ('  l_length := Length(substr(to_number(l_num_length),1,Instr(l_num_length,''.'')-1));  ');                
+            append (' ELSE ');
+            append ('  l_raise_len_error := LENGTH(l_num_length) > '||cs_rec.ita_fld_length||' ; ');
+            append ('  l_length          := LENGTH(l_num_length) ; ');
+            append (' END IF ; ');
+            append (' IF l_raise_len_error THEN ');
             append ('  l_fail_msg := '||Nm3flx.string('cannot be more than precision '||cs_rec.ita_fld_length||' allowed for this column')||'; RAISE l_fail;');
+            append (' END IF ; ');
+            append (' IF  '||Nvl(cs_rec.ita_dec_places,0)||' > 0 ');
+            append (' AND Instr(l_num_length,''.'') > 0   THEN ');
+            append (' IF Length(substr(l_num_length,Instr(l_num_length,''.'')+1)) > '||cs_rec.ita_dec_places||' THEN ') ;
+            append ('  l_fail_msg := '||Nm3flx.string('cannot be more than precision '||cs_rec.ita_fld_length||' allowed for this column')||'; RAISE l_fail;');                 
+            append (' END IF ; ') ;
+            append (' END IF ; ') ;       
+            --append (' ELSIF LENGTH( l_num_length ) > '||Nvl(cs_rec.ita_fld_length,22)||' THEN');
+            --append ('  l_fail_msg := '||Nm3flx.string('cannot be more than precision '||cs_rec.ita_fld_length||' allowed for this column')||'; RAISE l_fail;');
             -- Log 702388:Linesh:11-Mar-09:End
 
             IF   cs_rec.ita_max IS NOT NULL
