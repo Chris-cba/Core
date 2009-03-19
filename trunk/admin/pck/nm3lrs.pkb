@@ -847,6 +847,7 @@ CURSOR ci( c_obj_type nm_members_all.nm_obj_type%TYPE,
  SELECT nm_ne_id_in, nm_slk, nm_begin_mp, nm_end_mp
  FROM nm_members
  WHERE nm_ne_id_of = c_ne_id
+ AND  nm_ne_id_in = Nvl(nm3net.g_dyn_ne_id,nm_ne_id_in) -- --Log 719614 :Linesh:18-MAr-2009:Pick the correct Route
  AND nm_begin_mp <= c_offset
  AND NVL(nm_end_mp, c_offset+1) >= c_offset
  AND nm_obj_type = c_obj_type
