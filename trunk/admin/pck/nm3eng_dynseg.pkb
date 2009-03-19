@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.11   Mar 18 2009 23:51:34   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.12   Mar 19 2009 16:35:32   rcoupe  $
 --       Module Name      : $Workfile:   nm3eng_dynseg.pkb  $
---       Date into PVCS   : $Date:   Mar 18 2009 23:51:34  $
---       Date fetched Out : $Modtime:   Mar 18 2009 23:50:48  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Mar 19 2009 16:35:32  $
+--       Date fetched Out : $Modtime:   Mar 19 2009 16:33:26  $
+--       PVCS Version     : $Revision:   2.12  $
 --       Based on sccs version : 1.13
 --
 --   Author : Jonathan Mills
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.11  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.12  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg';
@@ -2544,7 +2544,8 @@ BEGIN
    END IF;
    --
    
-   IF g_merge_run and l_rec_nit.nit_table_name is null
+   IF (g_merge_run and l_rec_nit.nit_table_name is null ) OR
+      (g_merge_run and (l_rec_nit.nit_table_name IS NULL or l_nin_nw_type is not null ) )
       THEN
         g_sql := g_sql
                ||CHR(10)||' ORDER BY nsm_mrg_section_id, nsm_measure, decode ( r.nm_cardinality, 1, nm.nm_begin_mp, -1, nm.nm_end_mp*-1 )';
@@ -2557,7 +2558,8 @@ BEGIN
                ||CHR(10)||                         ' -1, LEAST(ft.'||l_rec_nit.nit_lr_end_chain||',nsm.'||l_end_mp_col||') * -1)  ';
    
 
-   ELSIF NOT g_merge_run and l_rec_nit.nit_table_name IS NULL
+   ELSIF (NOT g_merge_run and l_rec_nit.nit_table_name IS NULL ) OR
+         (NOT g_merge_run and (l_rec_nit.nit_table_name IS NULL or l_nin_nw_type is not null ) )
     THEN
 
       g_sql := g_sql
