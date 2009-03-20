@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.9   Mar 18 2009 11:46:00   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.10   Mar 20 2009 16:59:42   lsorathia  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Mar 18 2009 11:46:00  $
---       Date fetched Out : $Modtime:   Mar 18 2009 11:45:08  $
---       SCCS Version     : $Revision:   2.9  $
+--       Date into SCCS   : $Date:   Mar 20 2009 16:59:42  $
+--       Date fetched Out : $Modtime:   Mar 20 2009 16:57:16  $
+--       SCCS Version     : $Revision:   2.10  $
 --       Based on --
 --
 --   nm3inv package body
@@ -2107,7 +2107,7 @@ BEGIN
             append (' END IF ; ');
             append (' IF  '||Nvl(cs_rec.ita_dec_places,0)||' > 0 ');
             append (' AND Instr(l_num_length,''.'') > 0   THEN ');
-            append (' IF Length(substr(l_num_length,Instr(l_num_length,''.'')+1)) > '||cs_rec.ita_dec_places||' THEN ') ;
+            append (' IF Length(substr(l_num_length,Instr(l_num_length,''.'')+1)) > '||Nvl(cs_rec.ita_dec_places,0)||' THEN ') ;
             append ('  l_fail_msg := '||Nm3flx.string('cannot be more than precision '||cs_rec.ita_fld_length||' allowed for this column')||'; RAISE l_fail;');                 
             append (' END IF ; ') ;
             append (' END IF ; ') ;       
