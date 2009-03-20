@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.7.1.0   Feb 06 2009 17:15:02   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.7.1.1   Mar 20 2009 15:06:40   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Feb 06 2009 17:15:02  $
---       Date fetched Out : $Modtime:   Feb 06 2009 17:13:10  $
---       PVCS Version     : $Revision:   2.7.1.0  $
+--       Date into PVCS   : $Date:   Mar 20 2009 15:06:40  $
+--       Date fetched Out : $Modtime:   Mar 20 2009 15:04:44  $
+--       PVCS Version     : $Revision:   2.7.1.1  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.7.1.0  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.7.1.1  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -6312,10 +6312,15 @@ BEGIN
 
 --Nm_Debug.debug_on;
 
-  curstring := 'select sdo_aggr_mbr('||p_column||') from '||p_table;
---Nm_Debug.DEBUG( curstring );
+  begin
+    curstring := 'select sdo_aggr_mbr('||p_column||') from '||p_table;
+    EXECUTE IMMEDIATE curstring INTO l_mbr;
+  exception
+    when     subscript_beyond_count then
+      raise_application_error( -20006, 'Error in MBR calculation - check the gtypes are consistent');
+  end;
 
-  EXECUTE IMMEDIATE curstring INTO l_mbr;
+--Nm_Debug.DEBUG( curstring );
 
   l_gtype := get_table_gtype( p_table, p_column );
 
@@ -6364,12 +6369,21 @@ BEGIN
                mdsys.sdo_dim_element( 'X', l_mbr.sdo_ordinates(1), l_mbr.sdo_ordinates(3), l_tol_array(1) ),
                mdsys.sdo_dim_element( 'Y', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(4), l_tol_array(2) ));
 
-   ELSIF l_dim = 3 THEN
+   ELSIF l_dim = 3 and l_lrs_dim = 0 THEN
 
      retval := mdsys.sdo_dim_array(
                mdsys.sdo_dim_element( 'X', l_mbr.sdo_ordinates(1), l_mbr.sdo_ordinates(4), l_tol_array(1) ),
                mdsys.sdo_dim_element( 'Y', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(5), l_tol_array(2) ),
                mdsys.sdo_dim_element( l_z_or_m, l_mbr.sdo_ordinates(3), l_mbr.sdo_ordinates(6), l_tol_array(3) ));
+
+   ELSIF l_dim = 3 and l_lrs_dim = 3 THEN
+
+--   the measure diminfo is not significant, no point attempting to fathom the largest ne_length - just add a big-ish number.
+
+     retval := mdsys.sdo_dim_array(
+               mdsys.sdo_dim_element( 'X', l_mbr.sdo_ordinates(1), l_mbr.sdo_ordinates(3), l_tol_array(1) ),
+               mdsys.sdo_dim_element( 'Y', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(4), l_tol_array(2) ),
+               mdsys.sdo_dim_element( l_z_or_m, 0, 999999999, l_tol_array(3) ));
 
    ELSIF l_mbr.get_dims = 4 THEN
 
@@ -6378,6 +6392,10 @@ BEGIN
                mdsys.sdo_dim_element( 'Y', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(5), l_tol_array(2) ),
                mdsys.sdo_dim_element( 'Z', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(5), l_tol_array(3) ),
                mdsys.sdo_dim_element( 'M', l_mbr.sdo_ordinates(3), l_mbr.sdo_ordinates(6), l_tol_array(4) ));
+
+   ELSE
+
+     raise_application_error( -20005, 'Unrecognised geometry type' );
 
    END IF;
 
