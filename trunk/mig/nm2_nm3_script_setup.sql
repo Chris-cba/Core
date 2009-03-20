@@ -4,18 +4,16 @@ clear screen
 
 -----------------------------------------------------------------------------
 --
---   SCCS IDENTIFIERS :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm2_nm3_script_setup.sql	1.9 01/26/07
---       Module Name      : nm2_nm3_script_setup.sql
---       Date into SCCS   : 07/01/26 10:26:54
---       Date fetched Out : 07/06/13 14:09:33
---       SCCS Version     : 1.9
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_script_setup.sql-arc   2.2   Mar 20 2009 09:37:30   Ian Turnbull  $
+--       Module Name      : $Workfile:   nm2_nm3_script_setup.sql  $
+--       Date into PVCS   : $Date:   Mar 20 2009 09:37:30  $
+--       Date fetched Out : $Modtime:   Mar 20 2009 09:36:54  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on SCCS version :
 --
 -----------------------------------------------------------------------------
---	Copyright (C) Exor Corporation Ltd, 2004
------------------------------------------------------------------------------
---
 
 PROMPT =================================================================
 PROMPT Migration of Core Highways and Network Manager - Script Generator
