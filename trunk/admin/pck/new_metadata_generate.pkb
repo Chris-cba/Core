@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY new_metadata_generate IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/new_metadata_generate.pkb-arc   3.0   Mar 20 2009 11:21:00   jwadsworth  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/new_metadata_generate.pkb-arc   3.1   Mar 23 2009 09:48:48   jwadsworth  $
 --       Module Name      : $Workfile:   new_metadata_generate.pkb  $
---       Date into PVCS   : $Date:   Mar 20 2009 11:21:00  $
---       Date fetched Out : $Modtime:   Mar 20 2009 11:00:24  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Mar 23 2009 09:48:48  $
+--       Date fetched Out : $Modtime:   Mar 20 2009 17:13:44  $
+--       PVCS Version     : $Revision:   3.1  $
 --       Based on SCCS version : 
 --
 --   Author : Graeme Johnson
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE BODY new_metadata_generate IS
 --	Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(100) :=  :='"$Revision:   3.0  $"';
+   g_body_sccsid     CONSTANT  varchar2(100) :='"$Revision:   3.1  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -539,7 +539,7 @@ nm_debug.debug ('pi_mds_script_output_file  : '||pi_mds_script_output_file);
       nm_debug.debug ('Table Name   - '||l_tab_rec_tables(l_count),4);
       
       process_metadata_script_table (pi_target_name  => pi_mds_script_output_file
-                                    ,pi_target_owner => l_mds_row.mds_schema_owner
+                                    ,pi_target_owner => user --l_mds_row.mds_schema_owner
                                     ,pi_target_mode  => l_mds_row.mds_action
                                     ,pi_table_name   => l_tab_rec_tables(l_count)
                                     );
@@ -557,7 +557,7 @@ nm_debug.debug ('pi_mds_script_output_file  : '||pi_mds_script_output_file);
    blank;
 
 --
---write file
+--write file 
 --
    write_file (location     => pi_location
               ,filename     => pi_mds_script_output_file
@@ -1679,19 +1679,24 @@ BEGIN
   l_next_id := get_next_hwch_id;
 
   nm_debug.debug('Inserting into hig_web_contxt_hlp: '||l_next_id||' '|| pi_module||' '||pi_url);
-          INSERT INTO hig_web_contxt_hlp (hwch_art_id            
-                                            ,hwch_product           
-                                            ,hwch_module            
-                                            ,hwch_block             
-                                            ,hwch_item              
-                                            ,hwch_html_string)
-                                     VALUES( l_next_id
-                                            ,UPPER(pi_product)
-                                            ,pi_module
-                                            ,pi_block
-                                            ,pi_item
-                                            ,pi_url);
 
+ INSERT INTO hig_web_contxt_hlp 
+         (hwch_art_id            
+         ,hwch_product           
+         ,hwch_module            
+         ,hwch_block             
+         ,hwch_item              
+         ,hwch_html_string)
+  SELECT l_next_id
+        ,UPPER(pi_product)
+        ,pi_module
+        ,pi_block
+        ,pi_item
+        ,pi_url
+  FROM DUAL
+  WHERE NOT EXISTS (SELECT 1 FROM hig_web_contxt_hlp
+                     WHERE hwch_product = UPPER(pi_product)
+                       AND hwch_module  = pi_module);
 
 END insert_hwch_rec;
 --
