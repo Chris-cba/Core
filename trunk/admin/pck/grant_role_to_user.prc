@@ -32,7 +32,8 @@ CREATE OR REPLACE PROCEDURE grant_role_to_user
    CURSOR cs_atc (c_grantee varchar2) IS
    SELECT *
     FROM  all_tab_privs
-   WHERE  grantee = c_grantee;
+   WHERE  grantee = c_grantee
+     AND TABLE_NAME NOT LIKE 'BIN$%'; -- CWS 711775 LINE ADDED SO THAT RECYCLING BINS ARE NOT INCLUDED
 --
    CURSOR cs_asc (c_grantee varchar2) IS
    SELECT *
