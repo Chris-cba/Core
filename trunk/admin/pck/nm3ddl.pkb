@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.13   Feb 13 2009 12:37:48   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.14   Mar 24 2009 10:01:46   rcoupe  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Feb 13 2009 12:37:48  $
---       Date fetched Out : $Modtime:   Feb 13 2009 12:36:56  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Mar 24 2009 10:01:46  $
+--       Date fetched Out : $Modtime:   Mar 24 2009 09:59:54  $
+--       PVCS Version     : $Revision:   2.14  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.13  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.14  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -810,7 +810,7 @@ PROCEDURE change_user_password(pi_user       IN VARCHAR2
                               ,pi_new_passwd IN VARCHAR2
                               ) IS
 BEGIN
-  exec_ddl('ALTER USER ' || pi_user || ' IDENTIFIED BY ' || pi_new_passwd);
+  exec_ddl('ALTER USER ' || pi_user || ' IDENTIFIED BY "' || pi_new_passwd||'"');
 END;
 --
 -----------------------------------------------------------------------------
@@ -1551,7 +1551,7 @@ BEGIN
   append(' USER '||p_rec_hus.hus_username,FALSE);
   IF p_password IS NOT NULL
    THEN
-      append('IDENTIFIED BY '||p_password);
+      append('IDENTIFIED BY "'||p_password||'"');
   END IF;
   --
   IF p_default_tablespace IS NOT NULL
