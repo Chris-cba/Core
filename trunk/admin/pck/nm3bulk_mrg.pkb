@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.19   Mar 04 2009 11:11:24   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.20   Mar 25 2009 11:28:10   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Mar 04 2009 11:11:24  $
---       Date fetched Out : $Modtime:   Mar 03 2009 17:15:32  $
---       PVCS Version     : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Mar 25 2009 11:28:10  $
+--       Date fetched Out : $Modtime:   Mar 24 2009 16:08:10  $
+--       PVCS Version     : $Revision:   2.20  $
 --
 --
 --   Author : Priidu Tanava
@@ -59,12 +59,15 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   26.02.09  PT corrected nvl() datatype mismatch introduced in the above change
   03.03.09  PT fixed: ita_format not observed in std_insert_invitems() with potential date corruption
                 moved the nsv_attribxx formatting from the with source into i2 subquery
+  24.03.09  PT in std_run() added order by subclass and slk to get the result sections in connectivity order
+                this now matches the order produced by the old merge query
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
         add ita_format_mask to ita_mapping_rec
+        add nm_route_connect_tmp_ordered view with the next schema change
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.19  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.20  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -1309,7 +1312,27 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ,lag(inv.hash_value, 1, null) over
           (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp) lag_hash_value
       from
-         nm_route_connectivity_tmp qq
+         -- nm_route_connectivity_tmp qq
+         -- nm_route_connect_tmp_ordered qq
+         (
+          select
+             q.nm_ne_id_in
+            ,dense_rank() over (partition by q.nm_ne_id_in order by q.nsc_seq_no, q.min_slk_measure) chunk_no
+            ,q.chunk_seq, q.nm_ne_id_of, q.nm_begin_mp, q.nm_end_mp, q.measure, q.end_measure, q.nm_slk, q.nm_end_slk, q.nt_unit_in, q.nt_unit_of
+          from (
+          select
+             t.*
+            ,min(nvl(t.nm_slk, t.measure)) over (partition by t.nm_ne_id_in, t.chunk_no) min_slk_measure
+            ,decode(e.ne_type, 'D', null, nvl((select case when nsc_seq_no <= 2 then 1 else 2 end
+                from nm_type_subclass
+                where nsc_sub_class = e.ne_sub_class and nsc_nw_type = e.ne_nt_type
+               ), 1)) nsc_seq_no
+          from
+             nm_route_connectivity_tmp t
+            ,nm_elements_all e
+          where t.nm_ne_id_of = e.ne_id
+          ) q 
+         ) qq
         ,nm_mrg_datum_homo_chunks_tmp inv
       where qq.nm_ne_id_of = inv.nm_ne_id_of
         and ((qq.nm_begin_mp < inv.nm_end_mp and qq.nm_end_mp > inv.nm_begin_mp)
