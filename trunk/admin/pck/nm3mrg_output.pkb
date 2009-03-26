@@ -307,9 +307,10 @@ BEGIN
                   IF cs_rec.nmc_disp_dp = 'Y'
                    THEN
                      l_format := '.'||l_format;
-                  ELSIF cs_rec.nmc_dec_places != 0
-                   THEN
-                     l_column_name := 'TRUNC('||l_column_name||'*'||cs_rec.nmc_dec_places||')';
+                  -- Log 698292 Commented multiplication of decimal value
+                  --ELSIF cs_rec.nmc_dec_places != 0
+                  -- THEN
+                  --   l_column_name := 'TRUNC('||l_column_name||'*'||cs_rec.nmc_dec_places||')';
                   END IF;
                   l_format := LPAD(NVL(l_format,g_rec_nmf.nmf_number_lpad),cs_rec.nmc_length,g_rec_nmf.nmf_number_lpad);
                   append ('LTRIM(TO_CHAR('||l_column_name||','||nm3flx.string(l_format)||'),'||nm3flx.string(' ')||')');
@@ -1171,9 +1172,10 @@ BEGIN
             IF l_rec_nmc.nmc_disp_dp = 'Y'
              THEN
                l_format := '.'||l_format;
-            ELSIF l_rec_nmc.nmc_dec_places != 0
-             THEN
-               l_column_name := 'TRUNC('||l_column_name||'*'||l_rec_nmc.nmc_dec_places||')';
+            -- Log 698292 Commented multiplication of decimal value
+            --ELSIF l_rec_nmc.nmc_dec_places != 0
+            -- THEN
+            --   l_column_name := 'TRUNC('||l_column_name||'*'||l_rec_nmc.nmc_dec_places||')';
             END IF;
             l_format := LPAD(NVL(l_format,g_rec_nmf.nmf_number_lpad),l_rec_nmc.nmc_length,g_rec_nmf.nmf_number_lpad);
             IF l_rec_nmc.nmc_display_sign = 'Y'
