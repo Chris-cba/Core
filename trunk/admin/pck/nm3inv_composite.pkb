@@ -1,15 +1,12 @@
 CREATE OR REPLACE PACKAGE BODY nm3inv_composite AS
+--   PVCS Identifiers :-
 --
------------------------------------------------------------------------------
---
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3inv_composite.pkb	1.3 07/31/06
---       Module Name      : nm3inv_composite.pkb
---       Date into SCCS   : 06/07/31 14:30:28
---       Date fetched Out : 07/06/13 14:11:57
---       SCCS Version     : 1.3
---
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite.pkb-arc   2.1   Mar 26 2009 17:11:34   ptanava  $
+--       Module Name      : $Workfile:   nm3inv_composite.pkb  $
+--       Date into PVCS   : $Date:   Mar 26 2009 17:11:34  $
+--       Date fetched Out : $Modtime:   Mar 26 2009 17:10:34  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on SCCS Version: 1.3
 --
 --   Author : Jonathan Mills
 --
@@ -18,12 +15,14 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite AS
 -----------------------------------------------------------------------------
 --   Copyright (c) exor corporation ltd, 2005
 -----------------------------------------------------------------------------
+/* History
+  26.03.09 PT in refresh_nmnd() added logic to call new code in nm3inv_composite2
+            To run old code set option INVCOMP32 = 'Y'
+            requires any version of nm3inv_composite2.pkh
+*/
+
 --
---all global package variables here
---
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3inv_composite.pkb	1.3 07/31/06"';
---  g_body_sccsid is the SCCS ID for the package body
---
+   g_body_sccsid   constant varchar2(200) :='"$Revision:   2.1  $"';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_composite';
 --
    g_mrg_results_table VARCHAR2(30);
@@ -1906,7 +1905,19 @@ PROCEDURE refresh_nmnd (p_nmnd_nit_inv_type  nm_mrg_nit_derivation.nmnd_nit_inv_
    END delete_nmndr;
 --
 BEGIN
---
+
+  -- call new merge code if not flagged to old
+  if nvl(hig.get_sysopt('INVCOMP32'), 'N') != 'Y' then
+    nm3inv_composite2.call_rebuild(
+       p_dbms_job_no  => null
+      ,p_inv_type     => p_nmnd_nit_inv_type 
+      ,p_effective_date => p_effective_date
+    );
+    
+    
+  -- call old code as flagged
+  else
+  
    nm_debug.proc_start (g_package_name,'refresh_nmnd');
 --
    nm3user.set_effective_date (p_effective_date);
@@ -2077,6 +2088,9 @@ BEGIN
 --
    nm_debug.proc_end (g_package_name,'refresh_nmnd');
 --
+
+  end if; --if nvl(hig.get_sysopt('INVCOMP32'), 'N') != 'Y'
+
 EXCEPTION
    WHEN others
     THEN
