@@ -2,12 +2,15 @@ create or replace type body nm_statistic_array is
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm_statistic_array.tyb	1.9 05/03/02
---       Module Name      : nm_statistic_array.tyb
---       Date into SCCS   : 02/05/03 11:21:52
---       Date fetched Out : 07/06/13 17:04:46
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/typ/nm_statistic_array.tyb-arc   2.2   Mar 27 2009 22:00:14   rcoupe  $
+--       Module Name      : $Workfile:   nm_statistic_array.tyb  $
+--       Date into PVCS   : $Date:   Mar 27 2009 22:00:14  $
+--       Date fetched Out : $Modtime:   Mar 27 2009 21:59:02  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on
+
 --       SCCS Version     : 1.9
 --
 --  Author : Jonathan Mills
@@ -22,7 +25,7 @@ create or replace type body nm_statistic_array is
 --
 STATIC FUNCTION get_body_version RETURN VARCHAR2 IS
 BEGIN
-   RETURN '"@(#)nm_statistic_array.tyb	1.9 05/03/02"';
+   RETURN '"$Revision:   2.2  $"';
 END get_body_version;
 --
 ------------------------------------------------------------------------------------------------
