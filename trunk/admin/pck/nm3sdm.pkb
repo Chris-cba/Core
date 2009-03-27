@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.23   Mar 17 2009 11:52:18   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.24   Mar 27 2009 15:43:02   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Mar 17 2009 11:52:18  $
---       Date fetched Out : $Modtime:   Mar 17 2009 11:50:54  $
---       PVCS Version     : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   Mar 27 2009 15:43:02  $
+--       Date fetched Out : $Modtime:   Mar 27 2009 15:42:08  $
+--       PVCS Version     : $Revision:   2.24  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.23  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.24  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -5198,11 +5198,11 @@ end;
       --
          ELSE
       --
-           upd_string :=
+          upd_string :=
                'update '|| irec.nth_feature_table
             || '   set end_date = :end_date '
             || ' where ne_id_of = :ne_id_of '
-            ||   ' and begin_mp = :nm_begin_mp '
+            ||   ' and nm_begin_mp = :nm_begin_mp '
             ||   ' and end_date IS NULL '
             ||   ' and ne_id in ( select nad_iit_ne_id '
                                || ' from nm_nw_ad_link '
@@ -5211,8 +5211,11 @@ end;
                                 || ' and nad_ne_id      = :nm_ne_id_in '
                                 || ' and nad_whole_road = :whole_road )';
       --
+      -- AE 27-MAR-2009
+      -- Pass in nm_begin_mp !! 
+      --
           EXECUTE IMMEDIATE upd_string
-                    USING p_nm_end_date, p_nm_ne_id_of, p_nm_obj_type, irec.obj_type, p_nm_ne_id_in, '1';
+                    USING p_nm_end_date, p_nm_ne_id_of, p_nm_begin_mp, p_nm_obj_type, irec.obj_type, p_nm_ne_id_in, '1';
       --
          END IF;
       --
