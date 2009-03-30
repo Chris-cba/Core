@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.24   Mar 27 2009 15:43:02   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.25   Mar 30 2009 14:52:38   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Mar 27 2009 15:43:02  $
---       Date fetched Out : $Modtime:   Mar 27 2009 15:42:08  $
---       PVCS Version     : $Revision:   2.24  $
+--       Date into PVCS   : $Date:   Mar 30 2009 14:52:38  $
+--       Date fetched Out : $Modtime:   Mar 30 2009 14:51:42  $
+--       PVCS Version     : $Revision:   2.25  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.24  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.25  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -5115,14 +5115,18 @@ end;
         -- AE - 718333
         -- Include begin_mp and only operate on open shapes
         --
+        -- Later change (30-MAR-09) remove the end_date check because this procedure
+        -- is used for un-endating too
          upd_string :=
                'update '
             || irec.nth_feature_table
             || '  set end_date    = :end_date '
             || 'where ne_id       = :ne_id '
             || '  and ne_id_of    = :ne_id_of '
-            || '  and nm_begin_mp = :nm_begin_mp '
-            || '  and end_date IS NULL';
+            || '  and nm_begin_mp = :nm_begin_mp ';
+            
+--            || '  and end_date IS NULL';
+
         -- AE - 718333
         -- Include begin_mp and only operate on open shapes
         -- End of changes
@@ -5181,13 +5185,17 @@ end;
       -- AE - 718333
       -- Include begin_mp and only operate on open shapes
       -- 
+      -- Later change (30-MAR-09) remove the end_date check because this procedure
+      -- is used for un-endating too
+      --
            upd_string :=
                'update '|| irec.nth_feature_table
             || '  set end_date    = :end_date '
             || 'where ne_id       = :ne_id '
             || '  and ne_id_of    = :ne_id_of '
-            || '  and nm_begin_mp = :nm_begin_mp '
-            || '  and end_date IS NULL';
+            || '  and nm_begin_mp = :nm_begin_mp ';
+
+--            || '  and end_date IS NULL';
 
       -- AE - 718333
       -- Include begin_mp and only operate on open shapes
@@ -5198,12 +5206,15 @@ end;
       --
          ELSE
       --
+      -- Later change (30-MAR-09) remove the end_date check because this procedure
+      -- is used for un-endating too
+
           upd_string :=
                'update '|| irec.nth_feature_table
             || '   set end_date = :end_date '
             || ' where ne_id_of = :ne_id_of '
             ||   ' and nm_begin_mp = :nm_begin_mp '
-            ||   ' and end_date IS NULL '
+          --||   ' and end_date IS NULL '
             ||   ' and ne_id in ( select nad_iit_ne_id '
                                || ' from nm_nw_ad_link '
                                ||' where nad_gty_type   = :p_gty_type '
