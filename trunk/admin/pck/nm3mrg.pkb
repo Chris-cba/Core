@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3mrg IS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkb-arc   2.1   Mar 26 2009 17:05:48   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkb-arc   2.2   Mar 30 2009 17:54:54   ptanava  $
 --       Module Name      : $Workfile:   nm3mrg.pkb  $
---       Date into PVCS   : $Date:   Mar 26 2009 17:05:48  $
---       Date fetched Out : $Modtime:   Mar 26 2009 16:32:14  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Mar 30 2009 17:54:54  $
+--       Date fetched Out : $Modtime:   Mar 30 2009 17:53:02  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on SCCS version : 1.60
 --
 --   Author : Jonathan Mills
@@ -13,16 +13,18 @@ CREATE OR REPLACE PACKAGE BODY nm3mrg IS
 --     nm3mrg package. Used for Merge Queries
 --
 ------------------------------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+--  Copyright (c) exor corporation ltd, 2000
 ------------------------------------------------------------------------------------------------
 /* History
   26.03.09 PT in execute_mrg_query() added logic to call new code in nm3bulk_mrg
                 to use old code set option NM3CODE32 = 'Y'
                 requires nm3bulk_mrg.pkh 2.2 or higher (4.0.2.0)
                 TODO: the procedure load_temp_extent_datums() needs to be migrated into nm3bulk_mrg
+  30.03.09 PT modified sql_load_nm_datum_criteria_tmp() to work in two modes: direct / assign group_id
+                the load_temp_extent_datums calls it both modes - as the NTE_ROUTE_NE_ID can be a group_id or datum_id
 */
 
-  g_body_sccsid   constant varchar2(200) :='"$Revision:   2.1  $"';
+  g_body_sccsid   constant varchar2(200) :='"$Revision:   2.2  $"';
   g_package_name     CONSTANT  varchar2(30)   := 'NM3MRG';
 --
   g_mrg_section_id  pls_integer;
@@ -1249,25 +1251,25 @@ BEGIN
    /*
    nm3tab_varchar.append(l_block,'        nm_debug.debug(''----- '' || i || '' ------'' );                                         ' );
    nm3tab_varchar.append(l_block,'        nm_debug.debug(''inv_type    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).inv_type   ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''x_sect      ''||nm3mrg_supplementary.g_tab_cs_distinct(i).x_sect     ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''pnt_or_cont ''||nm3mrg_supplementary.g_tab_cs_distinct(i).pnt_or_cont); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib1     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib1    ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib2     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib2    ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib3     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib3    ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib4     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib4    ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib5     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib5    ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib6     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib6    ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib7     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib7    ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib8     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib8    ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib9     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib9    ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib10    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib10   ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib11    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib11   ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib12    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib12   ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib13    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib13   ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib14    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib14   ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib15    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib15   ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib16    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib16   ); ' );
-	 nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib17    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib17   ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''x_sect      ''||nm3mrg_supplementary.g_tab_cs_distinct(i).x_sect     ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''pnt_or_cont ''||nm3mrg_supplementary.g_tab_cs_distinct(i).pnt_or_cont); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib1     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib1    ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib2     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib2    ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib3     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib3    ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib4     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib4    ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib5     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib5    ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib6     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib6    ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib7     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib7    ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib8     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib8    ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib9     ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib9    ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib10    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib10   ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib11    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib11   ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib12    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib12   ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib13    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib13   ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib14    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib14   ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib15    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib15   ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib16    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib16   ); ' );
+   nm3tab_varchar.append(l_block,'        nm_debug.debug(''attrib17    ''||nm3mrg_supplementary.g_tab_cs_distinct(i).attrib17   ); ' );
    */
    nm3tab_varchar.append(l_block,'     else');
    nm3tab_varchar.append (l_block,'       nm3mrg_supplementary.g_tab_cs_distinct.delete(i) ;');
@@ -2873,10 +2875,16 @@ END get_ita_for_mrg;
   
   -- copy of nm3bulk_mrg body procedure
   --  only needed until load_temp_extent_datums() is ported from here into nm3bulk_mrg
+  --  p_groups_logic 'direct', 'assign'
+  -- the source in p_elements_sql must in both group_logic cases contain the group_id colum (if null then numeric null)
   function sql_load_nm_datum_criteria_tmp(
      p_elements_sql in varchar2
+    ,p_groups_logic in varchar2
   ) return varchar2
   is
+    l_sql_nm_group_types_tbl  varchar2(30);
+    l_sql_group_types_join    varchar2(200);
+    l_sql_members_group_join  varchar2(200);
   begin
   
     -- this selects the member counts for each datum for every linear group that the datum is member of
@@ -2884,87 +2892,106 @@ END get_ita_for_mrg;
     --  if l_group_type has value then the the groups of this type have preference
     --  if two groups have equal highest count of members then the lowest nm_ne_id_in value is returned
     -- the splitting logic is copied from ins_splits()
-    -- TODO:
+    -- TODO: this version of the procudere needs to migrate into nm3bulk_mrg to support group_id values in the source query.
     
-    return
-            'insert into nm_datum_criteria_tmp ('
-      ||cr||'  datum_id, begin_mp, end_mp, group_id'
-      ||cr||')'
-      ||cr||'with rc as ('
-      ||cr||'  select'
-      ||cr||'     m.nm_ne_id_of'
-      ||cr||'    ,m.nm_ne_id_in'
-      ||cr||'    ,e.ne_gty_group_type'
-      ||cr||'    ,greatest(m.nm_begin_mp, dc.begin_mp) nm_begin_mp'
-      ||cr||'    ,least(m.nm_end_mp, dc.end_mp) nm_end_mp'
-      ||cr||'    ,dc.group_id' --
-      ||cr||'  from'
-      ||cr||'     ('
-      ||cr||p_elements_sql
-      ||cr||'     ) dc'
-      ||cr||'    ,nm_members m'
-      ||cr||'    ,nm_elements e'
-      ||cr||'    ,nm_group_types_all gt'
-      ||cr||'  where dc.nm_ne_id_of = m.nm_ne_id_of'
-      ||cr||'    and nvl(dc.group_id, m.nm_ne_id_of) = m.nm_ne_id_of' --
-      ||cr||'    and m.nm_ne_id_in = e.ne_id'
-      ||cr||'    and e.ne_gty_group_type = gt.ngt_group_type'
-      ||cr||'    and gt.ngt_linear_flag = ''Y'''
-      ||cr||'    and dc.begin_mp <= m.nm_end_mp'
-      ||cr||'    and dc.end_mp >= m.nm_begin_mp'
-      ||cr||')'
-      ||cr||'select distinct'
-      ||cr||'   q2.nm_ne_id_of'
-      ||cr||'  ,q2.begin_mp'
-      ||cr||'  ,q2.end_mp'
-      ||cr||'  ,decode(q2.group_id, null'
-      ||cr||'     ,first_value(q2.nm_ne_id_in) over (partition by q2.nm_ne_id_of, q2.begin_mp order by q2.gty_order, q2.val_count desc, q2.nm_ne_id_in)'
-      ||cr||'     ,q2.group_id'
-      ||cr||'   ) group_id' --
-      ||cr||'from ('
-      ||cr||'select'
-      ||cr||'   q1.*'
-      ||cr||'  ,m.nm_ne_id_in'
-      ||cr||'  ,m.ne_gty_group_type'
-      ||cr||'  ,decode(m.ne_gty_group_type, :l_group_type, 1, 2) gty_order'
-      ||cr||'  ,count(*) over (partition by m.nm_ne_id_in) val_count'
-      ||cr||'from ('
-      ||cr||'select'
-      ||cr||'   m3.nm_ne_id_of, m3.begin_mp, m3.end_mp, m3.group_id' --
-      ||cr||'from ('
-      ||cr||'select distinct'
-      ||cr||'   m2.nm_ne_id_of'
-      ||cr||'  ,m2.pos begin_mp'
-      ||cr||'  ,lead(m2.pos, 1) over (partition by m2.nm_ne_id_of order by m2.pos, m2.pos2) end_mp'
-      ||cr||'  ,m2.is_point'
-      ||cr||'  ,m2.group_id' --
-      ||cr||'from ('
-      ||cr||'select distinct'
-      ||cr||'   rc.nm_ne_id_of'
-      ||cr||'  ,rc.nm_begin_mp pos'
-      ||cr||'  ,rc.nm_end_mp pos2'
-      ||cr||'  ,decode(rc.nm_begin_mp, rc.nm_end_mp, 1, 0) is_point'
-      ||cr||'  ,rc.group_id' --
-      ||cr||'from rc'
-      ||cr||'union all'
-      ||cr||'select distinct'
-      ||cr||'   rc.nm_ne_id_of'
-      ||cr||'  ,rc.nm_end_mp pos'
-      ||cr||'  ,rc.nm_end_mp pos2'
-      ||cr||'  ,decode(rc.nm_begin_mp, rc.nm_end_mp, 1, 0) is_point'
-      ||cr||'  ,rc.group_id' --
-      ||cr||'from rc'
-      ||cr||') m2'
-      ||cr||') m3'
-      ||cr||'where m3.end_mp is not null'
-      ||cr||'  and (m3.end_mp != m3.begin_mp or m3.is_point = 1)'
-      ||cr||') q1'
-      ||cr||'right outer join'
-      ||cr||'rc m'
-      ||cr||'on q1.nm_ne_id_of = m.nm_ne_id_of'
-      ||cr||'  and q1.begin_mp between m.nm_begin_mp and m.nm_end_mp'
-      ||cr||'  and q1.end_mp between m.nm_begin_mp and m.nm_end_mp'
-      ||cr||') q2';
+    
+    -- copy the source group_id directly into target
+    if lower(p_groups_logic) = 'direct' then
+      return
+              'insert into nm_datum_criteria_tmp ('
+        ||cr||'  datum_id, begin_mp, end_mp, group_id'
+        ||cr||')'
+        ||cr||'select qx.*'
+        ||cr||'from ('
+        ||cr||p_elements_sql
+        ||cr||') qx'
+        ||cr||'where qx.nm_ne_id_of != qx.group_id';
+      
+      
+    -- calculate the target group_id
+    elsif lower(p_groups_logic) = 'assign' then
+    
+      return
+              'insert into nm_datum_criteria_tmp ('
+        ||cr||'  datum_id, begin_mp, end_mp, group_id'
+        ||cr||')'
+        ||cr||'with rc as ('
+        ||cr||'  select'
+        ||cr||'     m.nm_ne_id_of'
+        ||cr||'    ,m.nm_ne_id_in'
+        ||cr||'    ,e.ne_gty_group_type'
+        ||cr||'    ,greatest(m.nm_begin_mp, dc.begin_mp) nm_begin_mp'
+        ||cr||'    ,least(m.nm_end_mp, dc.end_mp) nm_end_mp'
+        ||cr||'  from'
+        ||cr||'     ('
+        ||cr||'     select qx.*'
+        ||cr||'     from ('
+        ||cr||p_elements_sql
+        ||cr||'     ) qx'
+        ||cr||'     where qx.group_id is null or qx.nm_ne_id_of = qx.group_id'
+        ||cr||'     ) dc'
+        ||cr||'    ,nm_members m'
+        ||cr||'    ,nm_elements e'
+        ||cr||'    ,nm_group_types_all gt'
+        ||cr||'  where dc.nm_ne_id_of = m.nm_ne_id_of'
+        ||cr||'    and m.nm_ne_id_in = e.ne_id'
+        ||cr||'    and e.ne_gty_group_type = gt.ngt_group_type'
+        ||cr||'    and gt.ngt_linear_flag = ''Y'''
+        ||cr||'    and dc.begin_mp <= m.nm_end_mp'
+        ||cr||'    and dc.end_mp >= m.nm_begin_mp'
+        ||cr||')'
+        ||cr||'select distinct'
+        ||cr||'   q2.nm_ne_id_of'
+        ||cr||'  ,q2.begin_mp'
+        ||cr||'  ,q2.end_mp'
+        ||cr||'  ,first_value(q2.nm_ne_id_in) over (partition by q2.nm_ne_id_of, q2.begin_mp order by q2.gty_order, q2.val_count desc, q2.nm_ne_id_in) group_id'
+        ||cr||'from ('
+        ||cr||'select'
+        ||cr||'   q1.*'
+        ||cr||'  ,m.nm_ne_id_in'
+        ||cr||'  ,m.ne_gty_group_type'
+        ||cr||'  ,decode(m.ne_gty_group_type, :l_group_type, 1, 2) gty_order'
+        ||cr||'  ,count(*) over (partition by m.nm_ne_id_in) val_count'
+        ||cr||'from ('
+        ||cr||'select'
+        ||cr||'   m3.nm_ne_id_of, m3.begin_mp, m3.end_mp'
+        ||cr||'from ('
+        ||cr||'select distinct'
+        ||cr||'   m2.nm_ne_id_of'
+        ||cr||'  ,m2.pos begin_mp'
+        ||cr||'  ,lead(m2.pos, 1) over (partition by m2.nm_ne_id_of order by m2.pos, m2.pos2) end_mp'
+        ||cr||'  ,m2.is_point'
+        ||cr||'from ('
+        ||cr||'select distinct'
+        ||cr||'   rc.nm_ne_id_of'
+        ||cr||'  ,rc.nm_begin_mp pos'
+        ||cr||'  ,rc.nm_end_mp pos2'
+        ||cr||'  ,decode(rc.nm_begin_mp, rc.nm_end_mp, 1, 0) is_point'
+        ||cr||'from rc'
+        ||cr||'union all'
+        ||cr||'select distinct'
+        ||cr||'   rc.nm_ne_id_of'
+        ||cr||'  ,rc.nm_end_mp pos'
+        ||cr||'  ,rc.nm_end_mp pos2'
+        ||cr||'  ,decode(rc.nm_begin_mp, rc.nm_end_mp, 1, 0) is_point'
+        ||cr||'from rc'
+        ||cr||') m2'
+        ||cr||') m3'
+        ||cr||'where m3.end_mp is not null'
+        ||cr||'  and (m3.end_mp != m3.begin_mp or m3.is_point = 1)'
+        ||cr||') q1'
+        ||cr||'right outer join'
+        ||cr||'rc m'
+        ||cr||'on q1.nm_ne_id_of = m.nm_ne_id_of'
+        ||cr||'  and q1.begin_mp between m.nm_begin_mp and m.nm_end_mp'
+        ||cr||'  and q1.end_mp between m.nm_begin_mp and m.nm_end_mp'
+        ||cr||') q2';
+        
+    else
+      raise subscript_outside_limit;
+        
+    end if;
+
   end;
   
   -- copy of nm3bulk_mrg body procedure
@@ -2997,16 +3024,16 @@ END get_ita_for_mrg;
     ,p_sqlcount out pls_integer
   )
   is
-    l_sql     constant varchar2(10000) :=
-      sql_load_nm_datum_criteria_tmp(
-         p_elements_sql => 
-                '    select d.nte_ne_id_of nm_ne_id_of, min(d.nte_begin_mp) begin_mp, max(d.nte_end_mp) end_mp'
-          ||cr||'     ,min(decode(d.nte_route_ne_id, d.nte_ne_id_of, null, d.nte_route_ne_id)) group_id'
-          ||cr||'    from nm_nw_temp_extents d'
-          ||cr||'    where d.nte_job_id = :p_nte_job_id'
-          ||cr||'    group by d.nte_ne_id_of'
-      );
+    l_sql varchar2(32767);
+    l_elements_sql constant varchar2(2000) := 
+              '    select d.nte_ne_id_of nm_ne_id_of, min(d.nte_begin_mp) begin_mp, max(d.nte_end_mp) end_mp'
+        ||cr||'     ,min(decode(d.nte_route_ne_id, d.nte_ne_id_of, null, d.nte_route_ne_id)) group_id'
+        ||cr||'    from nm_nw_temp_extents d'
+        ||cr||'    where d.nte_job_id = :p_nte_job_id'
+        ||cr||'    group by d.nte_ne_id_of';
     l_group_type nm_group_types.ngt_group_type%type;
+    l_sqlcount_direct pls_integer;
+    l_sqlcount_assign pls_integer;
     
   begin
     nm3dbg.putln(g_package_name||'.load_temp_extent_datums('
@@ -3032,9 +3059,8 @@ END get_ita_for_mrg;
         raise_application_error(-20000, 'Invalid temp extent: multiple routes specified for same member');
     end;
     
-    -- todo: test nte_route_ne_id is linear
     
-    
+    -- test nte_route_ne_id is linear
     ensure_group_type_linear(
        p_group_type_in  => p_group_type
       ,p_group_type_out => l_group_type
@@ -3042,21 +3068,48 @@ END get_ita_for_mrg;
     
     execute immediate 'truncate table nm_datum_criteria_tmp';
     
+    -- the NTE_ROUTE_NE_ID may be a true group_id, or datum_id.
+    -- we load it both ways
+    
+    -- 1. direct groups load
+    l_sql := sql_load_nm_datum_criteria_tmp(
+       p_elements_sql => l_elements_sql
+      ,p_groups_logic => 'direct'
+    );
+    nm3dbg.putln(l_sql);
+    execute immediate l_sql
+    using
+       p_nte_job_id;
+      --,l_group_type;
+    l_sqlcount_direct := sql%rowcount;
+    commit;
+    nm3dbg.putln('nm_mrg_section_member_inv direct: '||l_sqlcount_direct);
+    
+    
+    -- 2. assign groups load
+    l_sql := sql_load_nm_datum_criteria_tmp(
+       p_elements_sql => l_elements_sql
+      ,p_groups_logic => 'assign'
+    );
     nm3dbg.putln(l_sql);
     execute immediate l_sql
     using
        p_nte_job_id
       ,l_group_type;
-    p_sqlcount := sql%rowcount;
+    l_sqlcount_assign := sql%rowcount;
     commit;
+    nm3dbg.putln('nm_mrg_section_member_inv assign: '||l_sqlcount_assign);
     
-    nm3dbg.putln('nm_mrg_section_member_inv rowcount='||p_sqlcount);
+    p_sqlcount := l_sqlcount_direct + l_sqlcount_assign;
+    
     nm3dbg.deind;
   exception
     when others then
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_temp_extent_datums('
         ||'p_nte_job_id='||p_nte_job_id
         ||', l_group_type='||l_group_type
+        ||', l_sqlcount_direct='||l_sqlcount_direct
+        ||', l_sqlcount_assign='||l_sqlcount_assign
         ||')');
       raise;
   
