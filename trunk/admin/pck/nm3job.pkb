@@ -1,18 +1,16 @@
---l_inv_category := nm3inv.get_inv_type(pi_inv_type => l_inv_type).nit_category;
-
-  l_inv_category := NM3GET.GET_NIT_ALL(pi_nit_inv_type => l_inv_type ).nit_category;
-
 CREATE OR REPLACE PACKAGE BODY nm3job AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3job.pkb	1.19 08/11/06
---       Module Name      : nm3job.pkb
---       Date into SCCS   : 06/08/11 12:07:33
---       Date fetched Out : 07/06/13 14:12:16
---       SCCS Version     : 1.19
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3job.pkb-arc   2.2   Mar 31 2009 10:33:32   rcoupe  $
+--       Module Name      : $Workfile:   nm3job.pkb  $
+--       Date into PVCS   : $Date:   Mar 31 2009 10:33:32  $
+--       Date fetched Out : $Modtime:   Mar 31 2009 10:33:14  $
+--       PVCS Version     : $Revision:   2.2  $
+
+--       Based on SCCS Version     : 1.19
 --
 --
 --   Author : Jonathan Mills
@@ -25,8 +23,9 @@ CREATE OR REPLACE PACKAGE BODY nm3job AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3job.pkb	1.19 08/11/06"';
---  g_body_sccsid is the SCCS ID for the package body
+-- g_body_sccsid is the SCCS ID for the package body
+
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3job';
 
