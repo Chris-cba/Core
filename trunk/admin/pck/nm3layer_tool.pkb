@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.5   Feb 10 2009 13:54:44   aedwards  $
---       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Feb 10 2009 13:54:44  $
---       Date fetched Out : $Modtime:   Feb 10 2009 13:54:18  $
---       Version          : $Revision:   2.5  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.6   Mar 31 2009 17:30:06   cstrettle  $
+--       Module Name      : $Workfile:   nm3layer_tool_25.pkb  $
+--       Date into PVCS   : $Date:   Mar 31 2009 17:30:06  $
+--       Date fetched Out : $Modtime:   Mar 31 2009 17:28:26  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.5  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.6  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -1976,19 +1976,26 @@ AS
       l_nth_base_table_theme   nm_themes_all.nth_base_table_theme%TYPE;
    --
    BEGIN
---      nm_debug.debug_on;
+      nm_debug.debug_on;
       nm_debug.debug('Where clause = '||pi_where_clause);
       --
       l_rec_nth_base := nm3get.get_nth (pi_nth_theme_id => pi_base_theme);
       --
       l_where := LTRIM (pi_where_clause);
       --
+      -- CWS 715704 
       IF SUBSTR(l_where,1,5) = nm3type.c_where
+      -- REMOVE "OR" VALUE FROM BEGINNING OF THE WHERE STATEMENT TO PREVENT AN ERROR I.E. WHERE WHERE <<FIELD NAME>>
       THEN
         l_where := replace(l_where,nm3type.c_where,' ');
-      ELSIF SUBSTR(l_where,1,5) = nm3type.c_and_operator
+      ELSIF SUBSTR(l_where,1,3) = nm3type.c_and_operator
+      -- REMOVE "AND" VALUE FROM BEGINNING OF THE WHERE STATEMENT TO PREVENT AN ERROR I.E. WHERE AND <<FIELD NAME>>
       THEN
         l_where := replace(l_where,nm3type.c_and_operator,' ');
+      ELSIF SUBSTR(l_where,1,2) = nm3type.c_or_operator
+      -- REMOVE "OR" VALUE FROM BEGINNING OF THE WHERE STATEMENT TO PREVENT AN ERROR I.E. WHERE OR <<FIELD NAME>>
+      THEN
+        l_where := replace(l_where,nm3type.c_or_operator,' ');
       END IF;
       --
       --nm_debug.debug('Processed Where clause = '||l_where);
@@ -2006,7 +2013,7 @@ AS
            || ' a '
            || lf
            || ' WHERE '||l_where;--replace(l_where,nm3type.c_and_operator,' ');
---      nm_debug.debug(l_view_sql);
+      nm_debug.debug(l_view_sql);
       --
       EXECUTE IMMEDIATE l_view_sql;
 
