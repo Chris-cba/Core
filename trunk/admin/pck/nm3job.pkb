@@ -1,3 +1,7 @@
+--l_inv_category := nm3inv.get_inv_type(pi_inv_type => l_inv_type).nit_category;
+
+  l_inv_category := NM3GET.GET_NIT_ALL(pi_nit_inv_type => l_inv_type ).nit_category;
+
 CREATE OR REPLACE PACKAGE BODY nm3job AS
 --
 -----------------------------------------------------------------------------
@@ -385,7 +389,7 @@ BEGIN
                          );
 --
    l_npe_job_id := nm3extent.create_npe_from_nte (l_nte_job_id);
-   
+
    nm3extent.lock_persistent_extent_datums(pi_npe_job_id => l_npe_job_id);
 --
    UPDATE nm_job_control
@@ -1524,7 +1528,7 @@ BEGIN
       l_rec_njo.njo_njc_job_id       := l_rec_njc.njc_job_id;
       l_rec_njo.njo_status           := get_c_not_started;
       ins_njo (l_rec_njo);
-      
+
       FOR j IN 1..pi_tab_rec_njv.COUNT
        LOOP
          l_rec_njv := pi_tab_rec_njv (j);
@@ -1797,7 +1801,7 @@ END validate_njo;
 -----------------------------------------------------------------------------
 --
 FUNCTION get_active_nw_locking_jobs RETURN nm3type.tab_number IS
-  
+
   l_retval nm3type.tab_number;
 
 BEGIN
@@ -1818,12 +1822,12 @@ BEGIN
     njc.njc_npe_job_id IS NOT NULL
   AND
     njc.njc_status NOT IN (c_not_started, c_complete);
-      
+
   nm_debug.proc_end(p_package_name   => g_package_name
                    ,p_procedure_name => 'get_active_nw_locking_jobs');
-    
+
   RETURN l_retval;
-    
+
 END get_active_nw_locking_jobs;
 --
 -----------------------------------------------------------------------------
@@ -1835,22 +1839,25 @@ FUNCTION get_active_inv_locking_jobs(pi_iit_ne_id IN nm_inv_items.iit_ne_id%TYPE
   l_inv_type nm_inv_types.nit_inv_type%TYPE;
 
   l_inv_category nm_inv_types.nit_category%TYPE;
-  
+
   l_retval nm3type.tab_number;
 
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'get_active_inv_locking_jobs');
-  
+
   IF pi_inv_type IS NOT NULL
   THEN
     l_inv_type := pi_inv_type;
   ELSE
     l_inv_type := nm3inv.get_inv_type_all(p_ne_id => pi_iit_ne_id);
   END IF;
-  
-  l_inv_category := nm3inv.get_inv_type(pi_inv_type => l_inv_type).nit_category;
-  
+
+--RAC swapped get_inv_type for nm3get.get_nit_all to cater for recalibrate - which operates on all member data included end-dated ones.
+--l_inv_category := nm3inv.get_inv_type(pi_inv_type => l_inv_type).nit_category;
+
+  l_inv_category := NM3GET.GET_NIT_ALL(pi_nit_inv_type => l_inv_type ).nit_category;
+
   --get jobs that lock this inv category
   SELECT
     njc.njc_job_id
@@ -1865,12 +1872,12 @@ BEGIN
     njc.njc_status NOT IN (c_not_started, c_complete)
   AND
     njt.njt_inv_lock = l_inv_category;
-    
+
   nm_debug.proc_end(p_package_name   => g_package_name
                    ,p_procedure_name => 'get_active_inv_locking_jobs');
-    
+
   RETURN l_retval;
-    
+
 END get_active_inv_locking_jobs;
 --
 -----------------------------------------------------------------------------
@@ -1878,15 +1885,15 @@ END get_active_inv_locking_jobs;
 FUNCTION job_is_affecting_element(pi_njc_job_id IN nm_job_control.njc_job_id%TYPE
                                  ,pi_ne_id      IN nm_elements.ne_id%TYPE
                                  ) RETURN boolean IS
-                                 
+
   l_dummy pls_integer;
-  
+
   l_retval boolean;
 
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'job_is_affecting_element');
-  
+
   BEGIN
     SELECT
        1
@@ -1903,21 +1910,21 @@ BEGIN
                npe.npe_job_id = pi_njc_job_id
              AND
                npe.npe_ne_id_of = pi_ne_id);
-             
+
     l_retval := TRUE;
-  
+
   EXCEPTION
     WHEN no_data_found
     THEN
       l_retval := FALSE;
-      
+
     END;
-  
+
   nm_debug.proc_end(p_package_name   => g_package_name
                    ,p_procedure_name => 'job_is_affecting_element');
-  
+
   RETURN l_retval;
-  
+
 END job_is_affecting_element;
 --
 -----------------------------------------------------------------------------
@@ -1925,15 +1932,15 @@ END job_is_affecting_element;
 FUNCTION job_is_affecting_inv_item(pi_njc_job_id IN nm_job_control.njc_job_id%TYPE
                                   ,pi_iit_ne_id  IN nm_inv_items.iit_ne_id%TYPE
                                   ) RETURN boolean IS
-                                 
+
   l_dummy pls_integer;
-  
+
   l_retval boolean;
 
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'job_is_affecting_inv_item');
-  
+
   BEGIN
     SELECT
       1
@@ -1950,21 +1957,21 @@ BEGIN
                til.til_njc_job_id = pi_njc_job_id
              AND
                til.til_iit_ne_id = pi_iit_ne_id);
-    
+
     l_retval := TRUE;
-                 
+
   EXCEPTION
     WHEN no_data_found
     THEN
       l_retval := FALSE;
-      
+
   END;
-  
+
   nm_debug.proc_end(p_package_name   => g_package_name
                    ,p_procedure_name => 'v');
-  
+
   RETURN l_retval;
-  
+
 END job_is_affecting_inv_item;
 --
 -----------------------------------------------------------------------------
@@ -1973,27 +1980,27 @@ PROCEDURE check_job_element_lock(pi_ne_id IN nm_elements.ne_id%TYPE
                                 ) IS
 
   e_item_locked EXCEPTION;
-  
+
   l_job_id_tab nm3type.tab_number;
 
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'check_job_element_lock');
-  
+
   l_job_id_tab := get_active_nw_locking_jobs;
-    
+
   FOR l_i IN 1..l_job_id_tab.COUNT
   LOOP
     IF job_is_affecting_element(pi_njc_job_id => l_job_id_tab(l_i)
                                ,pi_ne_id      => pi_ne_id)
-    THEN      
+    THEN
       RAISE e_item_locked;
     END IF;
   END LOOP;
-  
+
   nm_debug.proc_end(p_package_name   => g_package_name
                    ,p_procedure_name => 'check_job_element_lock');
-  
+
 EXCEPTION
   WHEN e_item_locked
   THEN
@@ -2009,13 +2016,13 @@ PROCEDURE check_job_inv_item_lock(pi_iit_ne_id IN nm_inv_items.iit_ne_id%TYPE
                                  ) IS
 
   e_item_locked EXCEPTION;
-  
+
   l_job_id_tab nm3type.tab_number;
 
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'check_job_inv_item_lock');
-  
+
 
   l_job_id_tab := get_active_inv_locking_jobs(pi_iit_ne_id => pi_iit_ne_id
                                              ,pi_inv_type  => pi_inv_type);
@@ -2024,14 +2031,14 @@ BEGIN
   LOOP
     IF job_is_affecting_inv_item(pi_njc_job_id => l_job_id_tab(l_i)
                                 ,pi_iit_ne_id  => pi_iit_ne_id)
-    THEN      
+    THEN
       RAISE e_item_locked;
     END IF;
   END LOOP;
 
   nm_debug.proc_end(p_package_name   => g_package_name
                    ,p_procedure_name => 'check_job_inv_item_lock');
-  
+
 EXCEPTION
   WHEN e_item_locked
   THEN
@@ -2048,19 +2055,19 @@ PROCEDURE check_job_member_lock(pi_nm_type     IN nm_members.nm_type%TYPE
                                ) IS
 
   e_item_locked EXCEPTION;
-  
+
   l_job_id_tab nm3type.tab_number;
-  
+
   l_dummy pls_integer;
 
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'check_job_member_lock');
-  
+
   IF pi_nm_type = 'G'
   THEN
     check_job_element_lock(pi_ne_id => pi_nm_ne_id_of);
-  
+
   ELSIF pi_nm_type = 'I'
   THEN
     IF nm3homo.g_homo_touch_flag
@@ -2068,16 +2075,16 @@ BEGIN
       check_job_inv_item_lock(pi_iit_ne_id => pi_nm_ne_id_in);
     END IF;
   END IF;
-  
+
   nm_debug.proc_end(p_package_name   => g_package_name
                    ,p_procedure_name => 'check_job_member_lock');
- 
+
 EXCEPTION
   WHEN e_item_locked
   THEN
     hig.raise_ner(pi_appl => nm3type.c_net
                  ,pi_id   => 280);
-                   
+
 END check_job_member_lock;
 --
 -----------------------------------------------------------------------------
