@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.4   Oct 26 2007 09:08:22   sscanlon  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.5   Apr 02 2009 10:52:00   cstrettle  $
 --       Module Name      	: $Workfile:   nm3inv_view.pkb  $
---       Date into PVCS   	: $Date:   Oct 26 2007 09:08:22  $
---       Date fetched Out 	: $Modtime:   Oct 26 2007 09:00:02  $
---       PVCS Version     	: $Revision:   2.4  $
+--       Date into PVCS   	: $Date:   Apr 02 2009 10:52:00  $
+--       Date fetched Out 	: $Modtime:   Apr 02 2009 10:50:24  $
+--       PVCS Version     	: $Revision:   2.5  $
 --       Based on SCCS version 	: 1.56
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --      Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.4      $';
+   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.5      $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
 --all global package variables here
@@ -585,6 +585,13 @@ END get_create_inv_view_text;
 ----------------------------------------------------------------------------------------------
 --
 PROCEDURE create_all_inv_views IS
+
+--TYPE l_TYPE_ROLES_REC IS RECORD
+--(NM_INV_TYPE_ROLES%rowtype);
+
+TYPE l_TYPE_ROLES_TAB IS
+table of NM_INV_TYPE_ROLES%rowtype;
+
 BEGIN
 --
    nm_debug.proc_start(g_package_name,'create_all_inv_views');
@@ -1142,6 +1149,17 @@ PROCEDURE create_ft_inv_for_nt_type (pi_nt_type                  IN varchar2
 --
    l_tab_vc   nm3type.tab_varchar32767;
 --
+-- CWS 703001
+    TYPE l_TYPE_ROLES_TAB IS
+    table of NM_INV_TYPE_ROLES%rowtype;
+--
+    TYPE l_TYPE_ATTRIBS_TAB IS
+    table of nm_inv_type_attribs_all%rowtype;
+--
+    l_TYPE_ATTRIBS l_TYPE_ATTRIBS_TAB:= l_TYPE_ATTRIBS_TAB();
+--
+    l_TYPE_ROLES l_TYPE_ROLES_TAB:= l_TYPE_ROLES_TAB();
+--
    PROCEDURE add_data (p_col_name   varchar2
                       ,p_alias      varchar2
                       ,p_static_col boolean DEFAULT TRUE
@@ -1290,9 +1308,25 @@ BEGIN
                          ,pi_id                 => 246
                          ,pi_supplementary_info => l_nit_category||' != '||c_nit_category
                          );
-         END IF;
+         END IF;                
+-- CWS 703001
+--
+         SELECT * BULK COLLECT 
+         INTO l_TYPE_ROLES 
+         FROM NM_INV_TYPE_ROLES
+         WHERE  itr_inv_type = l_inv_type;
+         --
+         SELECT * BULK COLLECT 
+         INTO l_TYPE_ATTRIBS 
+         FROM nm_inv_type_attribs_all
+         WHERE  ita_inv_type = l_inv_type;
+         --
+         delete FROM NM_INV_TYPE_ROLES
+         WHERE  itr_inv_type = l_inv_type;
+         --
          DELETE FROM nm_inv_type_attribs_all
          WHERE  ita_inv_type = l_inv_type;
+         
          DELETE FROM nm_inv_types_all
          WHERE  nit_inv_type = l_inv_type;
       ELSE
@@ -1437,6 +1471,13 @@ BEGIN
    --
    nm3inv.ins_nit (l_rec_nit);
    nm3inv.ins_tab_ita (l_tab_nita);
+     
+   -- CWS 703001
+   FOR i in 1..l_TYPE_ROLES.count LOOP
+   INSERT INTO NM_INV_TYPE_ROLES 
+   values l_TYPE_ROLES(i);
+   end loop;
+   
    COMMIT;
 --
    nm_debug.proc_end(g_package_name, 'create_ft_inv_for_nt_type');
