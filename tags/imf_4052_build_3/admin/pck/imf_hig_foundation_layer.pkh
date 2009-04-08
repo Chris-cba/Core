@@ -1,0 +1,41 @@
+CREATE OR REPLACE PACKAGE imf_hig_foundation_layer
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/imf_hig_foundation_layer.pkh-arc   3.0   Apr 08 2009 16:17:16   smarshall  $
+--       Module Name      : $Workfile:   imf_hig_foundation_layer.pkh  $
+--       Date into PVCS   : $Date:   Apr 08 2009 16:17:16  $
+--       Date fetched Out : $Modtime:   Apr 08 2009 16:16:38  $
+--       Version          : $Revision:   3.0  $
+-------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+end imf_hig_foundation_layer;
+/
