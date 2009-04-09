@@ -1,11 +1,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/imf_hig_install.sql-arc   3.0   Apr 08 2009 16:23:48   smarshall  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/imf_hig_install.sql-arc   3.1   Apr 09 2009 14:24:24   smarshall  $
 --       Module Name      : $Workfile:   imf_hig_install.sql  $
---       Date into PVCS   : $Date:   Apr 08 2009 16:23:48  $
---       Date fetched Out : $Modtime:   Apr 08 2009 16:23:32  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Apr 09 2009 14:24:24  $
+--       Date fetched Out : $Modtime:   Apr 09 2009 14:24:12  $
+--       Version          : $Revision:   3.1  $
 -------------------------------------------------------------------------
 --
 SET echo OFF
@@ -33,14 +33,14 @@ START '&run_file'
 --
 -------------------------------------------------------------------------
 --
-SET TERM ON
-PROMPT View Constraints...
-SET TERM OFF
-SET DEFINE ON
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'imf_hig_views.con' run_file
-FROM dual
-/
-START '&run_file'
+--SET TERM ON
+--PROMPT View Constraints...
+--SET TERM OFF
+--SET DEFINE ON
+--SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'imf_hig_views.con' run_file
+--FROM dual
+--/
+--START '&run_file'
 --
 -------------------------------------------------------------------------
 --
