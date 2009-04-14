@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3web_eng_dynseg AS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkh-arc   2.3   Jan 28 2009 13:20:26   jwadsworth  $
---       Module Name      : $Workfile:   nm3web_eng_dynseg.pkh  $
---       Date into PVCS   : $Date:   Jan 28 2009 13:20:26  $
---       Date fetched Out : $Modtime:   Jan 28 2009 13:18:20  $
---       PVCS Version     : $Revision:   2.3  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkh-arc   2.4   Apr 14 2009 10:31:16   cstrettle  $
+--       Module Name      : $Workfile:   nm3web_eng_dynseg_head_fix.PKH  $
+--       Date into PVCS   : $Date:   Apr 14 2009 10:31:16  $
+--       Date fetched Out : $Modtime:   Apr 14 2009 10:30:06  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on         : 1.8
 --
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3web_eng_dynseg AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
 --  g_sccsid is the SCCS ID for the package
 --
    g_tab_value          nm3type.tab_varchar32767;
@@ -211,6 +211,8 @@ PROCEDURE dynseg_define (p_area_type      varchar2 DEFAULT nm3extent.c_route
                         ,p_route          VARCHAR2 DEFAULT NULL
                         ,pi_route_length  number DEFAULT NULL
                         ,pi_descr         varchar2 default null
+                        ,pi_route_min     number default null
+                        ,pi_route_max     number default null
                         );
 procedure select_route_page (p_area_type      varchar2 DEFAULT nm3extent.c_route
                         ,p_gdo_sess_id    number   DEFAULT NULL
