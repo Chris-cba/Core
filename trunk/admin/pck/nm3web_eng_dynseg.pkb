@@ -4,7 +4,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_eng_dynseg';
@@ -33,11 +33,11 @@ BEGIN
    htp.p('--');
    htp.p('--   PVCS Identifiers :-');
    htp.p('--');
-   htp.p('--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkb-arc   2.5   Mar 17 2009 16:21:50   rcoupe  $');
-   htp.p('--       Module Name      : $Workfile:   nm3web_eng_dynseg.pkb  $');
-   htp.p('--       Date into PVCS   : $Date:   Mar 17 2009 16:21:50  $');
-   htp.p('--       Date fetched Out : $Modtime:   Mar 17 2009 16:20:40  $');
-   htp.p('--       PVCS Version     : $Revision:   2.5  $');
+   htp.p('--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkb-arc   2.6   Apr 14 2009 10:17:10   cstrettle  $');
+   htp.p('--       Module Name      : $Workfile:   nm3web_eng_dynseg_25.pkb  $');
+   htp.p('--       Date into PVCS   : $Date:   Apr 14 2009 10:17:10  $');
+   htp.p('--       Date fetched Out : $Modtime:   Apr 09 2009 17:44:00  $');
+   htp.p('--       PVCS Version     : $Revision:   2.6  $');
    htp.p('--       Based on SCCS Version     : 1.23');
    htp.p('--');
    htp.p('--');
@@ -95,7 +95,9 @@ procedure check_route_length (pi_route_length    number default null
                              ,p_xsp         IN owa_util.ident_arr DEFAULT g_empty_tab)
 is
 begin
-  if p_slk_to > pi_route_length then
+
+--cws
+  if p_slk_to > pi_route_length+p_slk_from then
     select_route_error (p_error => 'Route end entered is greater than routes actual end'
                        ,p_route_length => pi_route_length);
   elsif p_slk_from < 0 then
@@ -119,6 +121,7 @@ begin
 
   end if;
 end check_route_length;
+--
 procedure select_route_error (p_route          varchar2 default null
                              ,p_error           varchar2 default null
                              ,p_route_length    number default null)
@@ -137,12 +140,15 @@ if p_error is null then
   htp.formopen(g_package_name||'.select_route_page');
   htp.tableheader('Invalid route ('||p_route||'), please go back to previous page and re-enter a valid route');
 elsif p_error = 'Route end entered is greater than routes actual end' then
+   
   htp.formopen(g_package_name||'.dynseg_define', cattributes => 'NAME="dynseg"');--templine
   htp.tableheader('Route end entered is greater than routes actual end ('||p_route_length||'), please go back to previous page and re-enter a valid route end');
 elsif p_error = 'Route start cannot be less that 0' then
+--
   htp.formopen(g_package_name||'.dynseg_define', cattributes => 'NAME="dynseg"');--templine
   htp.tableheader('Route start cannot be less that 0, please go back to previous page and re-enter a valid route start');
 elsif p_error = 'Route start cannot be greater than route end' then
+--
   htp.formopen(g_package_name||'.dynseg_define', cattributes => 'NAME="dynseg"');--templine
   htp.tableheader('Route start cannot be greater than route end, please go back to previous page and re-enter a valid route start');
 end if;
@@ -160,37 +166,49 @@ procedure select_route_details (p_area_type     varchar2 DEFAULT nm3extent.c_rou
 is
 cursor c_route_length ( p_route_unique nm_elements.ne_unique%TYPE
                       ) is
-  select case nt_linear
-         when 'Y' then
-           case nvl(ne_gty_group_type,'NULL')
-             when 'NULL' then
-               ne_length
-             else
-               nm3net.get_max_slk(ne_id)
-           end
-         when 'N' then
-           -99
-         end obj_length, ne_descr
-  from nm_elements, nm_types
+  select ne_id     
+        ,ne_descr
+        ,nt_linear
+  from nm_elements, nm_types 
   where upper(ne_unique) = upper(p_route_unique)
   and ne_nt_type = nt_type;
 
   l_route_length nm_elements.ne_length%TYPE;
   l_descr nm_elements.ne_descr%TYPE;
+  l_start nm_members.nm_slk%type;
+  l_end nm_members.nm_slk%type;
+  l_ne_id nm_elements.ne_id%type;
+  l_linear NM_TYPES.NT_LINEAR%type;
 begin
   open c_route_length (p_route);
-  fetch c_route_length into l_route_length, l_descr;
+  fetch c_route_length into l_ne_id, l_descr, l_linear;
   if c_route_length%notfound then
       close c_route_length;
       select_route_error(p_route);
     else
       close c_route_length;
+
+  IF l_linear = 'Y' then 
+    l_route_length:= trim(nm3unit.get_formatted_value(nm3net.get_max_slk(l_ne_id)
+                                      ,NM3GET.GET_NT(PI_NT_TYPE => 
+                                                      (NM3GET.GET_NE(pi_ne_id => l_ne_id).NE_NT_TYPE)
+                                                    ).NT_LENGTH_UNIT));
+    l_start:= nm3net.get_min_slk(l_ne_id);
+    l_end:= nm3net.get_max_slk(l_ne_id);                                          
+  ELSIF l_linear = 'N' then
+    l_route_length:= -99;
+    l_start:= -99;
+    l_end:= -99;
+  END IF;
+--   
     dynseg_define (p_area_type      => p_area_type
                   ,p_gdo_sess_id    => p_gdo_sess_id
                   ,p_function_count => p_function_count
                   ,p_route          => p_route
                   ,pi_route_length  => l_route_length
-                  ,pi_descr         => l_descr);
+                  ,pi_descr         => l_descr
+                  ,pi_route_min     => l_start
+                  ,pi_route_max     => l_end);
   end if;
 end;
 
@@ -199,11 +217,13 @@ procedure select_route_page (p_area_type      varchar2 DEFAULT nm3extent.c_route
                             ,p_function_count NUMBER   DEFAULT c_default_func_count
                             ,p_route          varchar2 default null)
 is
+
 begin
  if p_area_type != 'ROUTE' then
  	-- SM 16122008
  	-- added this if statement otherwise each of the radio buttons would take the user to the route entry screen
  	-- when this isn't requried.
+   
      dynseg_define (p_area_type      => p_area_type
                   ,p_gdo_sess_id    => p_gdo_sess_id
                   ,p_function_count => p_function_count
@@ -219,14 +239,22 @@ begin
    htp.P('');
    htp.P('-->');
    htp.P('<DIV ALIGN="CENTER">');
-
-  htp.formopen(g_package_name||'.select_route_details');--, cattributes => 'NAME="dynseg"');
+   
+  htp.formopen(g_package_name||'.select_route_details', cattributes => 'NAME="dynseg"');
   htp.tableheader('Route');
   htp.p('<TD>');
   htp.formtext   (cname       => 'p_route'
                  ,cattributes => 'MAXLENGTH=30 SIZE=30'
                  ,cvalue      => p_route
+                 );              
+  HTP.FORMHIDDEN (cname       => 'p_function_count'
+                 ,cattributes => 'MAXLENGTH=30 SIZE=0'
+                 ,cvalue      => p_function_count
                  );
+  HTP.FORMHIDDEN (cname       => 'p_area_type'
+                 ,cattributes => 'MAXLENGTH=30 SIZE=0'
+                 ,cvalue      => p_area_type
+                 );                                    
   htp.p('</TD>');
   htp.formsubmit (cvalue=>'Continue');
   htp.formclose;
@@ -239,6 +267,8 @@ PROCEDURE dynseg_define (p_area_type      varchar2 DEFAULT nm3extent.c_route
                         ,p_route          varchar2 default null
                         ,pi_route_length  number default null
                         ,pi_descr         varchar2 default null
+                        ,pi_route_min     number default null
+                        ,pi_route_max     number default null
                         ) IS
    --
    CURSOR cs_inv_types IS
@@ -560,7 +590,8 @@ BEGIN
    htp.p('<DIV ALIGN="CENTER">');
    --
    htp.formopen(g_package_name||'.check_route_length', cattributes => 'NAME="dynseg"');--templine
-   --htp.formopen(g_package_name||'.run_dynseg');--, cattributes => 'NAME="dynseg"');--templine
+   
+   htp.formopen(g_package_name||'.run_dynseg');--, cattributes => 'NAME="dynseg"');--templine
 
    htp.tableopen;
    htp.tablerowopen;
@@ -570,6 +601,7 @@ BEGIN
    htp.tableheader('XSP');
    htp.tableheader('Attribute');
    htp.tablerowclose;
+
    FOR i IN 1..p_function_count
     LOOP
       htp.p('<!-- '||TO_CHAR(i-1)||' -->');
@@ -606,13 +638,14 @@ BEGIN
       htp.p('<TD>');
       htp.formtext   (cname       => 'p_slk_from'
                      ,cattributes => 'SIZE=5'
+                     ,cvalue      => pi_route_min
                      );
       htp.p('</TD>');
       htp.p('<TD ALIGN="right">To</TD>');
       htp.p('<TD>');
       htp.formtext   (cname       => 'p_slk_to'
                      ,cattributes => 'SIZE=5'
-                     ,cvalue      => pi_route_length
+                     ,cvalue      => pi_route_max
                      );
       htp.p('</TD>');
       if pi_route_length is not null then
@@ -769,7 +802,7 @@ BEGIN
    htp.bodyopen;
 
    nm3web.module_startup(pi_module => c_this_module);
-
+   
 --   nm3web.header;
    htp.p('<DIV ALIGN="CENTER">');
    htp.formopen(g_package_name||'.select_route_page', cattributes => 'NAME="source_def"');--templine
