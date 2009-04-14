@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY new_metadata_generate IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/new_metadata_generate.pkb-arc   3.1   Mar 23 2009 09:48:48   jwadsworth  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/new_metadata_generate.pkb-arc   3.2   Apr 14 2009 16:14:52   aedwards  $
 --       Module Name      : $Workfile:   new_metadata_generate.pkb  $
---       Date into PVCS   : $Date:   Mar 23 2009 09:48:48  $
---       Date fetched Out : $Modtime:   Mar 20 2009 17:13:44  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 14 2009 16:14:52  $
+--       Date fetched Out : $Modtime:   Apr 14 2009 16:13:30  $
+--       PVCS Version     : $Revision:   3.2  $
 --       Based on SCCS version : 
 --
 --   Author : Graeme Johnson
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE BODY new_metadata_generate IS
 --	Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(100) :='"$Revision:   3.1  $"';
+   g_body_sccsid     CONSTANT  varchar2(100) :='"$Revision:   3.2  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -274,27 +274,50 @@ PROCEDURE generate (filelist     IN owa_util.vc_arr
    l_current_debug_status boolean := nm_debug.is_debug_on;
 
    l_mds_row metadata_scripts%ROWTYPE;
-   
+   l_sqlerrm nm3type.tab_varchar4000;
+   l_unc     VARCHAR2(500);
+
+  CURSOR get_unc_path IS
+    SELECT mdo_option_value 
+      FROM metadata_options
+     WHERE mdo_option_id = 'UNCPATH';
 --
 BEGIN
 --
-   IF NOT l_current_debug_status
-    THEN
-      nm_debug.delete_debug(TRUE);
-      nm_debug.debug_on;
-   END IF;
+  OPEN get_unc_path; 
+  FETCH get_unc_path INTO l_unc;
+  CLOSE get_unc_path;
+--
+--  nm_debug.debug_on;
+--
+--   IF NOT l_current_debug_status
+--    THEN
+--      nm_debug.delete_debug(TRUE);
+----      nm_debug.debug_on;
+--   END IF;
+--
+
 --
    nm_debug.proc_start(g_package_name,'generate');
 --
    FOR l_count IN 1..filelist.COUNT
     LOOP
-      nm_debug.debug('      processing '||filelist(l_count));
-	  process_individual_script(filelist(l_count)
-	                           ,file_location
-							   ,script_header);
+     -- nm_debug.debug('      processing '||filelist(l_count));
+      BEGIN
+        process_individual_script(filelist(l_count)
+                                 ,file_location
+                                 ,script_header);
+        l_sqlerrm(l_count) := 'Success';
+      EXCEPTION
+        WHEN OTHERS
+        THEN
+          l_sqlerrm(l_count) := SQLERRM;
+      END;
    END LOOP;
 --
+
    commit;
+
 --
 /*
    generate_resv_repl_scripts(filelist       => filelist
@@ -302,10 +325,11 @@ BEGIN
                              ,script_header  => script_header);
 */
 --
-   IF NOT l_current_debug_status
-    THEN
-      nm_debug.debug_off;
-   END IF;
+
+--   IF NOT l_current_debug_status
+--    THEN
+--      nm_debug.debug_off;
+--   END IF;
 
    htp.p('<HTML>');
    html_stylesheet;
@@ -325,19 +349,22 @@ BEGIN
    htp.p('<tr BGCOLOR="orange"> ');
    htp.p('   <td align="CENTER" colspan="1" CLASS="big_title">');
 --   htp.p('   <b> '||file_location||'</b>');
-      htp.p('<a href="'||file_location||'" TARGET="_BLANK">'||file_location||'</a');
+      htp.p('<a href="'||l_unc||'" TARGET="_BLANK">'||l_unc||'</a');
    htp.p('   </td>');
    htp.p('</tr>');   
-   
- 
+
+-- 
    FOR l_count IN 1..filelist.COUNT
     LOOP
       htp.p('<tr> ');	
-      htp.p('   <td align="LEFT" colspan="1" CLASS="table_val">');
-      htp.p('<a href="'||file_location||filelist(l_count)||'" TARGET="_BLANK">'||filelist(l_count)||'</a');
+      htp.p('   <td align="LEFT" colspan="2" CLASS="table_val">');
+        htp.p('<a href="'||l_unc||filelist(l_count)||'" TARGET="_BLANK">'||filelist(l_count)
+            ||'</a');
+        htp.p('<b> &nbsp &nbsp : &nbsp &nbsp '||l_sqlerrm(l_count)||' </b>');
       htp.p('   </td>');
-      htp.p('</tr> ');	  	    	  
+      htp.p('</tr> ');
    END LOOP;
+
 /*
       htp.p('<tr> ');	
       htp.p('   <td align="LEFT" colspan="1" CLASS="table_val">');
@@ -358,7 +385,6 @@ BEGIN
 
    nm_debug.proc_end(g_package_name,'generate');
 
-   
 --
 END generate;
 --
@@ -460,11 +486,11 @@ PROCEDURE process_individual_script (pi_mds_script_output_file  IN metadata_scri
 BEGIN
 --
    nm_debug.proc_start(g_package_name,'process_individual_script');
-   nm_debug.debug('start process_individual_script');
+   --nm_debug.debug('start process_individual_script');
 --
 --   nm_debug.debug ('pi_mds_script_output_file  : '||pi_mds_script_output_file,1);
 --
-nm_debug.debug ('pi_mds_script_output_file  : '||pi_mds_script_output_file);
+--nm_debug.debug ('pi_mds_script_output_file  : '||pi_mds_script_output_file);
 
    g_tab_file_content.delete;
    --
@@ -479,7 +505,7 @@ nm_debug.debug ('pi_mds_script_output_file  : '||pi_mds_script_output_file);
   l_tab_rec_tables := get_script_tables(pi_mds_script_output_file);
    
 --
-   nm_debug.debug('-- Output the rows from the parfile for this target',4);
+--   nm_debug.debug('-- Output the rows from the parfile for this target',4);
 
    -- nm_debug.debug('Before SCCSID write');
    append_file_content('/***************************************************************************');
@@ -536,10 +562,11 @@ nm_debug.debug ('pi_mds_script_output_file  : '||pi_mds_script_output_file);
          
    FOR l_count IN 1..l_tab_rec_tables.COUNT
     LOOP
-      nm_debug.debug ('Table Name   - '||l_tab_rec_tables(l_count),4);
+--      nm_debug.debug ('Table Name   - '||l_tab_rec_tables(l_count),4);
       
       process_metadata_script_table (pi_target_name  => pi_mds_script_output_file
-                                    ,pi_target_owner => user --l_mds_row.mds_schema_owner
+                                    --,pi_target_owner => user --l_mds_row.mds_schema_owner
+                                    ,pi_target_owner => l_mds_row.mds_schema_owner
                                     ,pi_target_mode  => l_mds_row.mds_action
                                     ,pi_table_name   => l_tab_rec_tables(l_count)
                                     );
@@ -566,9 +593,8 @@ nm_debug.debug ('pi_mds_script_output_file  : '||pi_mds_script_output_file);
               );   
    
 --
-   nm_debug.debug('end process_individual_script');
+--   nm_debug.debug('end process_individual_script');
    nm_debug.proc_end(g_package_name,'process_individual_script');
---
 END process_individual_script;
 --
 -----------------------------------------------------------------------------
@@ -610,11 +636,12 @@ PROCEDURE process_metadata_script_table (pi_target_name  IN metadata_scripts.MDS
 --
 BEGIN
 --
+--nm_debug.debug_on;
    nm_debug.proc_start(g_package_name,'process_metadata_script_table');
 --
-nm_debug.debug('pi_table_name='||pi_table_name);
-nm_debug.debug('pi_target_owner='||pi_target_owner);
-nm_debug.debug('1');
+--nm_debug.debug('pi_table_name='||pi_table_name);
+--nm_debug.debug('pi_target_owner='||pi_target_owner);
+--nm_debug.debug('1');
 
    blank;
    append_file_content('--********** '||pi_table_name||' **********--');
@@ -623,7 +650,7 @@ nm_debug.debug('1');
    append_file_content('PROMPT '||lower(pi_table_name));   
    append_file_content('SET TERM OFF');   
    blank;
-nm_debug.debug('2');   
+--nm_debug.debug('2');   
 --
    l_tab_insert_statement.DELETE;
 --
@@ -700,7 +727,7 @@ nm_debug.debug('3 '||pi_target_owner||' '||pi_table_name);
    l_tab_insert_statement(l_tab_insert_statement.COUNT+1) := LPAD(')',8,' ');
    
  
-nm_debug.debug('4 ');   
+--nm_debug.debug('4 ');   
 --
    blank;
 --   append_file_content('-- Constraints');
@@ -732,7 +759,7 @@ nm_debug.debug('4 ');
                 )
     LOOP
 --
-nm_debug.debug('5');
+--nm_debug.debug('5');
      append_file_content('-- '||cs_rec.constraint_name||' - '||cs_rec.constraint_type);
 --
      IF    cs_rec.constraint_type = 'Check'
@@ -750,14 +777,14 @@ nm_debug.debug('5');
    
 */   
 --
-nm_debug.debug('6');
+--nm_debug.debug('6');
    blank;
 --
    l_sql_string := 'SELECT ROWIDTOCHAR(ROWID) FROM '||pi_target_owner||'.'||pi_table_name;
 --
    OPEN  cs_dyn_sql FOR l_sql_string;
 --
-nm_debug.debug('7');
+--nm_debug.debug('7');
    LOOP
 --
       FETCH cs_dyn_sql INTO l_rowid;
@@ -790,7 +817,7 @@ nm_debug.debug('7');
   -- nm_debug.debug('      -- Output the INSERT statement');
       -- Output the INSERT statement
 --
-      nm_debug.debug('   FOR l_count IN 1..l_tab_insert_statement.COUNT',4);
+--      nm_debug.debug('   FOR l_count IN 1..l_tab_insert_statement.COUNT',4);
       FOR l_count IN 1..l_tab_insert_statement.COUNT
        LOOP
          append_file_content(l_tab_insert_statement(l_count));
@@ -832,7 +859,6 @@ nm_debug.debug('7');
 
       l_sql_string := l_sql_string||'||'||string(';')||CHR(10)||' FROM '||pi_target_owner||'.'||pi_table_name||' WHERE ROWID = CHARTOROWID('||string(l_rowid)||')';
 --
---nm_dbug
 --   nm_debug.debug(l_sql_string);
          NM_DEBUG.DEBUG('l_sql_string #2 '||l_sql_string);
 
@@ -1138,10 +1164,10 @@ PROCEDURE internal_write_file (location     IN     varchar2
 --
 BEGIN
 --
-   nm_debug.debug(location);
-   nm_debug.debug(filename);
-   nm_debug.debug(max_linesize);
-   nm_debug.debug(write_mode);
+--   nm_debug.debug(location);
+--   nm_debug.debug(filename);
+--   nm_debug.debug(max_linesize);
+--   nm_debug.debug(write_mode);
    l_file := fopen (location,filename,write_mode,max_linesize);
 --
    l_count := all_lines.first;
@@ -1365,7 +1391,7 @@ PROCEDURE file_selection(pi_table_name IN VARCHAR2 DEFAULT NULL) IS
    ORDER BY decode(hpr_product,'NET',1
                               ,'NSG',2
                               ,'TMA',3
-                              ,4); -- order by most 'popular' products first
+                              ,hpr_product_name,4); -- order by most 'popular' products first
 
 
    CURSOR c2 (pi_hpr_product metadata_scripts.mds_hpr_product%TYPE) IS
@@ -1382,8 +1408,14 @@ PROCEDURE file_selection(pi_table_name IN VARCHAR2 DEFAULT NULL) IS
 
    v_checked VARCHAR2(1);
    
+   l_hostname   VARCHAR2(1000);
   
 BEGIN
+  
+  -- Get the hostname
+  SELECT host_name INTO l_hostname FROM v$instance;
+
+
    htp.p('<HTML>');
    html_stylesheet;     
    htp.p(' <script language="JavaScript">');
@@ -1471,7 +1503,7 @@ BEGIN
    htp.p('  <TABLE WIDTH="50%" BORDER="0" CELLSPACING="0" CELLPADDING="2" ALIGN="LEFT" VALIGN="TOP" BGCOLOR="#ffe1aa">');
 
    htp.tablerowopen;   
-   htp.p('<TD CLASS="table_val_highlighted"> Generate Scripts Into</TD>');
+   htp.p('<TD CLASS="table_val_highlighted"> Generate Scripts Into ('||l_hostname||') </TD>');
    htp.p('<TD CLASS="table_val_highlighted"> Script Header Text</TD>');   
    htp.tablerowclose;
 
@@ -1573,7 +1605,7 @@ END file_selection;
     l_hmo_application webhelp_hig_modules.hmo_application%TYPE;
     --
   BEGIN
-      nm_debug.debug('get_module_app = '||pi_module_name);
+--      nm_debug.debug('get_module_app = '||pi_module_name);
 	  OPEN c1;
 	  FETCH c1
 	  INTO l_hmo_application;
@@ -1593,19 +1625,20 @@ END file_selection;
   
   BEGIN
 
-     nm_debug.debug('start get_help_url '||pi_string||' ** '||c_url_tag);
+--     nm_debug.debug('start get_help_url '||pi_string||' ** '||c_url_tag);
+
      IF  INSTR(pi_string,c_url_tag) != 0 THEN
 
-  			   l_retval := SUBSTR(pi_string,INSTR(pi_string,c_url_tag)+c_url_tag_length,LENGTH(pi_string));
-			   
-			   l_retval := REPLACE(l_retval,'">',Null);
-   
-               RETURN('/'||LOWER(pi_product_directory)||'/WebHelp/'||LOWER(pi_product_directory)||'.htm#'||LOWER(l_retval));
+       l_retval := SUBSTR(pi_string,INSTR(pi_string,c_url_tag)+c_url_tag_length,LENGTH(pi_string));
+       l_retval := REPLACE(l_retval,'">',Null);
+
+       RETURN('/'||LOWER(pi_product_directory)||'/WebHelp/'||LOWER(pi_product_directory)||'.htm#'||LOWER(l_retval));
+
      ELSE
-	     RETURN(Null);			   			   
+	     RETURN(Null);
      END IF;
   
-     nm_debug.debug('end get_help_url');
+     --nm_debug.debug('end get_help_url');
 
   END get_help_url;
 --
@@ -1678,7 +1711,7 @@ BEGIN
 
   l_next_id := get_next_hwch_id;
 
-  nm_debug.debug('Inserting into hig_web_contxt_hlp: '||l_next_id||' '|| pi_module||' '||pi_url);
+  --nm_debug.debug('Inserting into hig_web_contxt_hlp: '||l_next_id||' '|| pi_module||' '||pi_url);
 
  INSERT INTO hig_web_contxt_hlp 
          (hwch_art_id            
@@ -1709,7 +1742,7 @@ PROCEDURE insert_default_product_url(pi_product IN  hig_web_contxt_hlp.hwch_prod
 
 BEGIN
 
-   nm_debug.debug('call insert_hwch_rec #1'); 
+   --nm_debug.debug('call insert_hwch_rec #1'); 
    insert_hwch_rec(pi_product => pi_product
                   ,pi_module  => Null
                   ,pi_url     => l_default_url);
@@ -1739,7 +1772,7 @@ PROCEDURE process_robohelp_file(pi_product IN hig_products.hpr_product%TYPE
      				  
 BEGIN
 
- nm_debug.debug('start process_robohelp_file '||pi_product||' '||pi_filename);
+ --nm_debug.debug('start process_robohelp_file '||pi_product||' '||pi_filename);
 
  l_tab_contents.DELETE;
 
@@ -1766,11 +1799,11 @@ BEGIN
    l_url    := Null; 
 
 
-   nm_debug.debug('l_tab_contents contains '||l_tab_contents.count||' records - '||i);
+--   nm_debug.debug('l_tab_contents contains '||l_tab_contents.count||' records - '||i);
    IF i != l_tab_contents.COUNT THEN  -- don't bother checking last entry of file cos can't get next line to read url
 
      
-    nm_debug.debug('l_tab_contents(i),c_name_tag = '||l_tab_contents(i)||' ** '||c_name_tag);
+    --nm_debug.debug('l_tab_contents(i),c_name_tag = '||l_tab_contents(i)||' ** '||c_name_tag);
     
     IF INSTR(l_tab_contents(i),c_name_tag) != 0 THEN  -- if this is a line that could contain a name tag to a module then go further
 
@@ -1779,19 +1812,19 @@ BEGIN
        l_tab_words := get_words_from_string(pi_string                => l_tab_contents(i)
 	                           ,pi_start_from_position   => INSTR(l_tab_contents(i),c_name_tag) + c_name_tag_length);
 
-       nm_debug.debug('l_tab_words = '||l_tab_words.count||' '||pi_product);							   
+       --nm_debug.debug('l_tab_words = '||l_tab_words.count||' '||pi_product);							   
        FOR x IN 1..l_tab_words.COUNT LOOP
 
 	     l_module_app := get_module_app(l_tab_words(x));
          
-         nm_debug.debug('l_module_app = '||l_module_app);
+         --nm_debug.debug('l_module_app = '||l_module_app);
 
          IF l_module_app IS NOT NULL THEN  -- check to see if the word is a hig module 
 		  
 		    l_module := l_tab_words(x);
-            nm_debug.debug('l_module = '||l_module||' file name = '||pi_filename);
+            --nm_debug.debug('l_module = '||l_module||' file name = '||pi_filename);
 			l_url    := get_help_url(l_tab_contents(i+1),pi_product_directory);  -- read the possible URL from the next line 
-            nm_debug.debug('l_url = '||l_url);
+            --nm_debug.debug('l_url = '||l_url);
 		 
          END IF;				 
 	         
@@ -1801,11 +1834,11 @@ BEGIN
 
     END IF;
 
-    nm_debug.debug('l_module = '||l_module||' l_url = '||l_url||' l_module_app = '||l_module_app); 
+    --nm_debug.debug('l_module = '||l_module||' l_url = '||l_url||' l_module_app = '||l_module_app); 
 
 	IF l_module IS NOT NULL AND l_url IS NOT NULL and l_module_app IS NOT NULL THEN
 	
-          nm_debug.debug('call insert_hwch_rec #2 '||l_module_app||' '||l_module||' '||l_url); 
+          --nm_debug.debug('call insert_hwch_rec #2 '||l_module_app||' '||l_module||' '||l_url); 
           insert_hwch_rec(pi_product => l_module_app
                          ,pi_module  => l_module
 						 ,pi_url     => l_url);
@@ -1814,7 +1847,7 @@ BEGIN
 
     
    END LOOP;
-    nm_debug.debug('end process_robohelp_file');
+    --nm_debug.debug('end process_robohelp_file');
 
 END process_robohelp_file;
 --
@@ -1832,8 +1865,8 @@ PROCEDURE refresh_hwch_for_all_products IS
  l_default_location VARCHAR2(100) :=get_mdo('DFLTDIR').mdo_option_value||'HTMLhelp\';
 
 BEGIN
-   nm_debug.debug_on;
-   nm_debug.debug('start refresh_hwch_for_all_products');
+--   nm_debug.debug_on;
+--   nm_debug.debug('start refresh_hwch_for_all_products');
 
    htp.p('<HTML>');
    html_stylesheet;     
@@ -1852,7 +1885,7 @@ BEGIN
  FOR i IN c1 LOOP
 
 
-    nm_debug.debug(i.hpr_product||' call insert_default_product_url - dir = '||i.product_directory);
+  --  nm_debug.debug(i.hpr_product||' call insert_default_product_url - dir = '||i.product_directory);
     insert_default_product_url(pi_product           => i.hpr_product
 	                          ,pi_product_directory => i.product_directory);
 							  
@@ -1860,13 +1893,13 @@ BEGIN
  
  FOR i IN c1 LOOP 							  
 
-    nm_debug.debug(i.hpr_product||' call process_robohelp_file toc.hhc - dfl loc = '||l_default_location||i.product_directory);
+--    nm_debug.debug(i.hpr_product||' call process_robohelp_file toc.hhc - dfl loc = '||l_default_location||i.product_directory);
     process_robohelp_file(pi_product           => i.hpr_product 
 	                     ,pi_product_directory => i.product_directory
                          ,pi_location          => l_default_location||i.product_directory
                          ,pi_filename          => 'toc.hhc');
 						 
-    nm_debug.debug(i.hpr_product||' call process_robohelp_file index.hhk - dfl loc = '||l_default_location||i.product_directory);
+--    nm_debug.debug(i.hpr_product||' call process_robohelp_file index.hhk - dfl loc = '||l_default_location||i.product_directory);
 
     process_robohelp_file(pi_product           => i.hpr_product 
 	                     ,pi_product_directory => i.product_directory	
@@ -1887,14 +1920,14 @@ BEGIN
 		   where mdst.mdst_table_name = 'HIG_WEB_CONTXT_HLP'
 		   and   mdst.mdst_mds_script_output_file = mds.mds_script_output_file) LOOP
 		   
-     nm_debug.debug('call process_individual_script');
+--     nm_debug.debug('call process_individual_script');
      process_individual_script (pi_mds_script_output_file  => i.mds_script_output_file
                                ,pi_location                => get_mdo('DFLTDIR').mdo_option_value
 		  				       ,pi_script_header           => 'Re-generated to include updated HIG_WEB_CONTXT_HLP entries');
 
  END LOOP;							    		   
 
- nm_debug.debug('end refresh_hwch_for_all_products');
+-- nm_debug.debug('end refresh_hwch_for_all_products');
 
 END refresh_hwch_for_all_products;
 --
