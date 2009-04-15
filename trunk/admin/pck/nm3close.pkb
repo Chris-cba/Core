@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.2   Aug 05 2008 14:30:14   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.3   Apr 15 2009 10:58:06   lsorathia  $
 --       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   Aug 05 2008 14:30:14  $
---       Date fetched Out : $Modtime:   Jul 31 2008 08:57:56  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 15 2009 10:58:06  $
+--       Date fetched Out : $Modtime:   Apr 15 2009 10:21:48  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -978,6 +978,16 @@ BEGIN
                  ,pi_end_date_datums => pi_end_date_datums);
 
   END LOOP;
+  
+  --Log 716050:LS:15-apr-2009
+  --This will end date the distance break element when the route is closed
+  UPDATE  nm_elements
+  SET     ne_end_date = pi_effective_date
+  WHERE   ne_id IN  (SELECT nm_ne_id_of 
+                     FROM   nm_members_all  
+                     WHERE  nm_ne_id_in = pi_route_id)
+  AND     ne_type= 'D' ;
+  --
 --
 --
 --  RAC - if the group is linear, it may have a shape - just reshape it
