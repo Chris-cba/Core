@@ -4,7 +4,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_eng_dynseg';
@@ -45,6 +45,33 @@ BEGIN
    htp.p('<link rel="stylesheet" href="'||NVL(hig.get_sysopt('NM3WEBCSS'),get_download_url('exor.css'))||'">');
 END do_css_link;
 --
+--------------------------------------------------------------------------------
+--
+PROCEDURE raise_error (p_error IN VARCHAR2)
+IS
+BEGIN
+
+   do_css_link;
+   htp.bodyopen (cattributes=>'onLoad="initialise_form()"');
+--   nm3web.header;
+   htp.P('<!--');
+   htp.P('');
+   htp.P('   Start of the main body of the page');
+   htp.P('');
+   htp.P('-->');
+   htp.P('<DIV ALIGN="CENTER">');
+
+  IF p_error IS NOT NULL
+  THEN
+    htp.formopen(g_package_name||'.dynseg_define', cattributes => 'NAME="dynseg"');--templine
+    htp.tableheader(p_error);
+  END IF;
+
+  htp.p('<br><br>');
+  htp.p('<b><u><a HREF="javascript:history.back();"> Back </a></u></b>');
+
+end raise_error;
+--
 -----------------------------------------------------------------------------
 --
 PROCEDURE sccs_tags IS
@@ -55,11 +82,11 @@ BEGIN
    htp.p('--');
    htp.p('--   PVCS Identifiers :-');
    htp.p('--');
-   htp.p('--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkb-arc   2.8   Apr 20 2009 14:33:44   cstrettle  $');
-   htp.p('--       Module Name      : $Workfile:   nm3web_eng_dynseg_fix.pkb  $');
-   htp.p('--       Date into PVCS   : $Date:   Apr 20 2009 14:33:44  $');
-   htp.p('--       Date fetched Out : $Modtime:   Apr 20 2009 14:20:56  $');
-   htp.p('--       PVCS Version     : $Revision:   2.8  $');
+   htp.p('--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkb-arc   2.9   Apr 20 2009 16:18:18   aedwards  $');
+   htp.p('--       Module Name      : $Workfile:   nm3web_eng_dynseg.pkb  $');
+   htp.p('--       Date into PVCS   : $Date:   Apr 20 2009 16:18:18  $');
+   htp.p('--       Date fetched Out : $Modtime:   Apr 20 2009 16:15:28  $');
+   htp.p('--       PVCS Version     : $Revision:   2.9  $');
    htp.p('--       Based on SCCS Version     : 1.23');
    htp.p('--');
    htp.p('--');
@@ -120,29 +147,47 @@ is
 l_end number;
 l_start number;
 l_ne_id varchar2(20);
+b_success BOOLEAN := TRUE;
 
 begin
 
-  select max(ne_id)
-  into l_ne_id
-  from nm_elements
-  where upper(ne_unique) = upper(p_route);
+  -- Saved Extent - Source = SAVED 
+  -- Route        - Source = ROUTE
+  -- Merge        - Source = MERGE   
 
-   l_end:= trim(nm3unit.get_formatted_value(nm3net.get_max_slk(l_ne_id)
-                                      ,NM3GET.GET_NT(PI_NT_TYPE => 
-                                                      (NM3GET.GET_NE(pi_ne_id => l_ne_id).NE_NT_TYPE)
-                                                    ).NT_LENGTH_UNIT));
-    l_start:= nm3net.get_min_slk(l_ne_id);                                          
+-- AE Only validate against a Route source
 
-  if p_slk_to > l_end then
-    select_route_error (p_error => C_ROUTE_TOO_BIG
-                       ,p_route_length => l_end);
-  elsif p_slk_from < l_start then
-    select_route_error (p_error => C_ROUTE_TOO_SMALL
-                       ,p_route_length => l_start);
-  elsif p_slk_from >= p_slk_to then
-    select_route_error (p_error => C_ROUTE_START_END);
-  else
+  IF p_source = nm3extent.c_route
+  THEN
+
+    select max(ne_id)
+    into l_ne_id
+    from nm_elements
+    where upper(ne_unique) = upper(p_route);
+
+     l_end:= trim(nm3unit.get_formatted_value(nm3net.get_max_slk(l_ne_id)
+                                        ,NM3GET.GET_NT(PI_NT_TYPE => 
+                                                        (NM3GET.GET_NE(pi_ne_id => l_ne_id).NE_NT_TYPE)
+                                                      ).NT_LENGTH_UNIT));
+      l_start:= nm3net.get_min_slk(l_ne_id);
+
+    if p_slk_to > l_end then
+      select_route_error (p_error => C_ROUTE_TOO_BIG
+                         ,p_route_length => l_end);
+      b_success := FALSE;
+    elsif p_slk_from < l_start then
+      select_route_error (p_error => C_ROUTE_TOO_SMALL
+                         ,p_route_length => l_start);
+      b_success := FALSE;
+    elsif p_slk_from >= p_slk_to then
+      select_route_error (p_error => C_ROUTE_START_END);
+      b_success := FALSE;
+    end if;
+--
+  END IF;
+--
+  IF b_success
+  THEN
     run_dynseg (p_source      => p_source
                ,p_route       => p_route
                ,p_slk_from    => p_slk_from
@@ -156,8 +201,8 @@ begin
                ,p_attrib      => p_attrib
                ,p_xsp         => p_xsp
                 );
+  END IF;
 
-  end if;
 end check_route_length;
 --
 procedure select_route_error (p_route          varchar2 default null
@@ -642,9 +687,9 @@ BEGIN
    --
    --
    --cws p_area_type check
-   IF p_area_type = 'ROUTE' THEN
+ --  IF p_area_type = 'ROUTE' THEN
    htp.formopen(g_package_name||'.check_route_length', cattributes => 'NAME="dynseg"');
-   END IF;
+ --  END IF;
    
    htp.formopen(g_package_name||'.run_dynseg');--, cattributes => 'NAME="dynseg"');--templine
 
@@ -820,20 +865,20 @@ BEGIN
    htp.bodyclose;
    htp.htmlclose;
 --
-EXCEPTION
---
-  WHEN nm3web.g_you_should_not_be_here THEN NULL;
---
-  WHEN others
-   THEN
---     htp.p('</SCRIPT>');
---     htp.p('<SCRIPT>');
---     htp.p('   alert("'||nm3flx.parse_error_message(SQLERRM)||'")');
---     htp.p('   history.go(-1);');
---     htp.p('</SCRIPT>');
---     htp.bodyclose;
---     htp.htmlclose;
-     nm3web.failure(SQLERRM);
+--EXCEPTION
+----
+--  WHEN nm3web.g_you_should_not_be_here THEN NULL;
+----
+--  WHEN others
+--   THEN
+----     htp.p('</SCRIPT>');
+----     htp.p('<SCRIPT>');
+----     htp.p('   alert("'||nm3flx.parse_error_message(SQLERRM)||'")');
+----     htp.p('   history.go(-1);');
+----     htp.p('</SCRIPT>');
+----     htp.bodyclose;
+----     htp.htmlclose;
+--     nm3web.failure(SQLERRM);
    --
 END dynseg_define;
 --
@@ -992,7 +1037,7 @@ BEGIN
    END LOOP;
 --
    IF l_count > 0 THEN
-   run_dynseg_arr
+     run_dynseg_arr
               (p_source       => p_source
               ,p_route        => UPPER(p_route)
               ,p_slk_from     => p_slk_from
@@ -1006,7 +1051,7 @@ BEGIN
               ,p_tab_xsp      => l_tab_xsp
               );
    ELSE
-   select_route_error (p_error => c_func_no_vals);
+     select_route_error (p_error => c_func_no_vals);
    END IF;
 --
 END run_dynseg;
@@ -1056,7 +1101,7 @@ BEGIN
     OR (p_source = c_merge           AND p_nqr_job_id  IS NULL)
     OR (p_source = nm3extent.c_gis   AND p_gdo_sess_id IS NULL)
     THEN
-      nm3web.failure(hig.raise_and_catch_ner(nm3type.c_net,310));
+   --   nm3web.failure(hig.raise_and_catch_ner(nm3type.c_net,310));
 --      htp.p('<SCRIPT>');
 --      htp.p('   alert("'||||'")');
 --      htp.p('   history.go(-1);');
@@ -1344,19 +1389,13 @@ EXCEPTION
     OR  nm3web.g_you_should_not_be_here
     THEN
       ROLLBACK;
+      raise_error(hig.raise_and_catch_ner(nm3type.c_net,310));
 --
   WHEN others
    THEN
      ROLLBACK;
---     htp.p('</SCRIPT>');
---     htp.p('<SCRIPT>');
---     htp.p('   alert("'||nm3flx.parse_error_message(SQLERRM)||'")');
---     htp.p('   history.go(-1);');
---     htp.p('</SCRIPT>');
---     htp.bodyclose;
---     htp.htmlclose;
-     nm3web.failure(SQLERRM);
---
+     raise_error(SQLERRM);
+
 END run_dynseg_arr;
 --
 -----------------------------------------------------------------------------
