@@ -4,7 +4,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_eng_dynseg';
@@ -55,11 +55,11 @@ BEGIN
    htp.p('--');
    htp.p('--   PVCS Identifiers :-');
    htp.p('--');
-   htp.p('--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkb-arc   2.7   Apr 20 2009 11:36:54   cstrettle  $');
-   htp.p('--       Module Name      : $Workfile:   nm3web_eng_dynseg_26_tester1.pkb  $');
-   htp.p('--       Date into PVCS   : $Date:   Apr 20 2009 11:36:54  $');
-   htp.p('--       Date fetched Out : $Modtime:   Apr 20 2009 11:33:22  $');
-   htp.p('--       PVCS Version     : $Revision:   2.7  $');
+   htp.p('--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkb-arc   2.8   Apr 20 2009 14:33:44   cstrettle  $');
+   htp.p('--       Module Name      : $Workfile:   nm3web_eng_dynseg_fix.pkb  $');
+   htp.p('--       Date into PVCS   : $Date:   Apr 20 2009 14:33:44  $');
+   htp.p('--       Date fetched Out : $Modtime:   Apr 20 2009 14:20:56  $');
+   htp.p('--       PVCS Version     : $Revision:   2.8  $');
    htp.p('--       Based on SCCS Version     : 1.23');
    htp.p('--');
    htp.p('--');
@@ -640,7 +640,11 @@ BEGIN
    htp.p('-->');
    htp.p('<DIV ALIGN="CENTER">');
    --
-   htp.formopen(g_package_name||'.check_route_length', cattributes => 'NAME="dynseg"');--templine
+   --
+   --cws p_area_type check
+   IF p_area_type = 'ROUTE' THEN
+   htp.formopen(g_package_name||'.check_route_length', cattributes => 'NAME="dynseg"');
+   END IF;
    
    htp.formopen(g_package_name||'.run_dynseg');--, cattributes => 'NAME="dynseg"');--templine
 
