@@ -4,7 +4,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web_eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web_eng_dynseg';
@@ -22,6 +22,28 @@ CREATE OR REPLACE PACKAGE BODY nm3web_eng_dynseg AS
 --
    c_nm_val_dist_arr CONSTANT VARCHAR2(30) := 'NM_VALUE_DISTRIBUTION_ARRAY';
    c_nm_val_dist     CONSTANT VARCHAR2(30) := 'NM_VALUE_DISTRIBUTION';
+   
+ --  g_css CONSTANT varchar2(2000) := NVL(hig.get_sysopt('NM3WEBCSS'),get_download_url('exor.css'));
+   
+   -- Error message constants
+   c_func_no_vals    CONSTANT VARCHAR2(30) := 'Function has no values';
+   c_route_too_big   CONSTANT VARCHAR2(60) := 'Route end entered is greater than routes actual end';
+   c_route_too_small CONSTANT VARCHAR2(60) := 'Route start cannot be less than the routes actual beginning';
+   c_route_start_end CONSTANT VARCHAR2(60) := 'Route start cannot be greater than route end';
+
+FUNCTION get_download_url( pi_name varchar2 ) RETURN varchar2 IS
+BEGIN
+   RETURN nm3flx.i_t_e (hig.get_sysopt ('WEBDOCPATH') IS NOT NULL
+                       ,hig.get_sysopt ('WEBDOCPATH')||'/'
+                       ,g_package_name||'.process_download?pi_name='
+                       )||nm3web.string_to_url(pi_name);
+END get_download_url;
+
+
+PROCEDURE do_css_link IS
+BEGIN
+   htp.p('<link rel="stylesheet" href="'||NVL(hig.get_sysopt('NM3WEBCSS'),get_download_url('exor.css'))||'">');
+END do_css_link;
 --
 -----------------------------------------------------------------------------
 --
@@ -33,11 +55,11 @@ BEGIN
    htp.p('--');
    htp.p('--   PVCS Identifiers :-');
    htp.p('--');
-   htp.p('--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkb-arc   2.6   Apr 14 2009 10:17:10   cstrettle  $');
-   htp.p('--       Module Name      : $Workfile:   nm3web_eng_dynseg_25.pkb  $');
-   htp.p('--       Date into PVCS   : $Date:   Apr 14 2009 10:17:10  $');
-   htp.p('--       Date fetched Out : $Modtime:   Apr 09 2009 17:44:00  $');
-   htp.p('--       PVCS Version     : $Revision:   2.6  $');
+   htp.p('--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web_eng_dynseg.pkb-arc   2.7   Apr 20 2009 11:36:54   cstrettle  $');
+   htp.p('--       Module Name      : $Workfile:   nm3web_eng_dynseg_26_tester1.pkb  $');
+   htp.p('--       Date into PVCS   : $Date:   Apr 20 2009 11:36:54  $');
+   htp.p('--       Date fetched Out : $Modtime:   Apr 20 2009 11:33:22  $');
+   htp.p('--       PVCS Version     : $Revision:   2.7  $');
    htp.p('--       Based on SCCS Version     : 1.23');
    htp.p('--');
    htp.p('--');
@@ -94,16 +116,32 @@ procedure check_route_length (pi_route_length    number default null
                              ,p_attrib      IN owa_util.ident_arr DEFAULT g_empty_tab
                              ,p_xsp         IN owa_util.ident_arr DEFAULT g_empty_tab)
 is
+
+l_end number;
+l_start number;
+l_ne_id varchar2(20);
+
 begin
 
---cws
-  if p_slk_to > pi_route_length+p_slk_from then
-    select_route_error (p_error => 'Route end entered is greater than routes actual end'
-                       ,p_route_length => pi_route_length);
-  elsif p_slk_from < 0 then
-    select_route_error (p_error => 'Route start cannot be less that 0');
+  select max(ne_id)
+  into l_ne_id
+  from nm_elements
+  where upper(ne_unique) = upper(p_route);
+
+   l_end:= trim(nm3unit.get_formatted_value(nm3net.get_max_slk(l_ne_id)
+                                      ,NM3GET.GET_NT(PI_NT_TYPE => 
+                                                      (NM3GET.GET_NE(pi_ne_id => l_ne_id).NE_NT_TYPE)
+                                                    ).NT_LENGTH_UNIT));
+    l_start:= nm3net.get_min_slk(l_ne_id);                                          
+
+  if p_slk_to > l_end then
+    select_route_error (p_error => C_ROUTE_TOO_BIG
+                       ,p_route_length => l_end);
+  elsif p_slk_from < l_start then
+    select_route_error (p_error => C_ROUTE_TOO_SMALL
+                       ,p_route_length => l_start);
   elsif p_slk_from >= p_slk_to then
-    select_route_error (p_error => 'Route start cannot be greater than route end');
+    select_route_error (p_error => C_ROUTE_START_END);
   else
     run_dynseg (p_source      => p_source
                ,p_route       => p_route
@@ -127,6 +165,8 @@ procedure select_route_error (p_route          varchar2 default null
                              ,p_route_length    number default null)
 is
 begin
+
+   do_css_link;
    htp.bodyopen (cattributes=>'onLoad="initialise_form()"');
 --   nm3web.header;
    htp.P('<!--');
@@ -139,19 +179,28 @@ begin
 if p_error is null then
   htp.formopen(g_package_name||'.select_route_page');
   htp.tableheader('Invalid route ('||p_route||'), please go back to previous page and re-enter a valid route');
-elsif p_error = 'Route end entered is greater than routes actual end' then
+elsif p_error = C_ROUTE_TOO_BIG then
    
   htp.formopen(g_package_name||'.dynseg_define', cattributes => 'NAME="dynseg"');--templine
   htp.tableheader('Route end entered is greater than routes actual end ('||p_route_length||'), please go back to previous page and re-enter a valid route end');
-elsif p_error = 'Route start cannot be less that 0' then
+elsif p_error = C_ROUTE_TOO_SMALL then
 --
   htp.formopen(g_package_name||'.dynseg_define', cattributes => 'NAME="dynseg"');--templine
-  htp.tableheader('Route start cannot be less that 0, please go back to previous page and re-enter a valid route start');
-elsif p_error = 'Route start cannot be greater than route end' then
+  htp.tableheader('Route start cannot be less than the routes actual beginning ('||p_route_length||'), please go back to previous page and re-enter a valid route start');
+elsif p_error = C_ROUTE_START_END then
 --
   htp.formopen(g_package_name||'.dynseg_define', cattributes => 'NAME="dynseg"');--templine
   htp.tableheader('Route start cannot be greater than route end, please go back to previous page and re-enter a valid route start');
+
+elsif p_error = c_func_no_vals then
+
+  htp.formopen(g_package_name||'.dynseg_define', cattributes => 'NAME="dynseg"');--templine
+  htp.tableheader('None of your functions have values, please go back to previous page and enter a value for at least one function');
 end if;
+
+htp.p('<br><br>');
+htp.p('<b><u><a HREF="javascript:history.back();"> Back </a></u></b>');
+
 /*  htp.tablerowopen;
   htp.formsubmit (cvalue=>'Go Back');
   htp.formclose;*/
@@ -219,6 +268,7 @@ procedure select_route_page (p_area_type      varchar2 DEFAULT nm3extent.c_route
 is
 
 begin
+
  if p_area_type != 'ROUTE' then
  	-- SM 16122008
  	-- added this if statement otherwise each of the radio buttons would take the user to the route entry screen
@@ -232,6 +282,7 @@ begin
                   ,pi_descr         => l_descr*/);
  else
    htp.bodyopen (cattributes=>'onLoad="initialise_form()"');
+   do_css_link;
 --   nm3web.header;
    htp.P('<!--');
    htp.P('');
@@ -929,8 +980,6 @@ PROCEDURE run_dynseg (p_source      IN VARCHAR2
 --
 BEGIN
 --
---   nm_debug.delete_debug(TRUE);
---   nm_debug.debug_on;
    l_i := p_function.FIRST;
    WHILE l_i IS NOT NULL
     LOOP
@@ -938,6 +987,7 @@ BEGIN
       l_i := p_function.next(l_i);
    END LOOP;
 --
+   IF l_count > 0 THEN
    run_dynseg_arr
               (p_source       => p_source
               ,p_route        => UPPER(p_route)
@@ -951,6 +1001,9 @@ BEGIN
               ,p_tab_attrib   => l_tab_attrib
               ,p_tab_xsp      => l_tab_xsp
               );
+   ELSE
+   select_route_error (p_error => c_func_no_vals);
+   END IF;
 --
 END run_dynseg;
 --
