@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.18   Mar 12 2009 12:20:10   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.19   Apr 21 2009 11:50:02   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Mar 12 2009 12:20:10  $
---       Date fetched Out : $Modtime:   Mar 12 2009 12:19:18  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Apr 21 2009 11:50:02  $
+--       Date fetched Out : $Modtime:   Apr 21 2009 11:48:44  $
+--       PVCS Version     : $Revision:   2.19  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.18  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.19  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -5679,20 +5679,29 @@ BEGIN
 
      l_type := MOD( MOD(l_type, 1000),100);
 
-     IF l_type = 1 THEN
+-- AE 21-APR-2009 
+-- Dont return MULTI% for multipart shapes so that Mapviewer can apply the styles
+-- properly. TFL use multipart shapes for polygons and mapviewer doesnt style them
+
+     IF l_type IN (1,5) THEN
        RETURN 'POINT';
-     ELSIF l_type = 2 THEN
+     ELSIF l_type IN (2,6) THEN
        RETURN 'LINE' ;
-     ELSIF l_type = 3 THEN
+     ELSIF l_type IN (3, 7) THEN
        RETURN 'POLYGON';
      ELSIF l_type = 4 THEN
        RETURN 'COLLECTION';
-     ELSIF l_type = 5 THEN
-       RETURN 'MULTIPOINT';
-     ELSIF l_type = 6 THEN
-       RETURN 'MULTILINE';
-     ELSIF l_type = 7 THEN
-       RETURN 'MULTIPOLYGON';
+
+--     ELSIF l_type = 5 THEN
+--       RETURN 'MULTIPOINT';
+--     ELSIF l_type = 6 THEN
+--       RETURN 'MULTILINE';
+--     ELSIF l_type = 7 THEN
+--       RETURN 'MULTIPOLYGON';
+
+-- AE 21-APR-2009 
+-- Changes complete.
+
      ELSE
        RETURN 'UNKNOWN';
 
