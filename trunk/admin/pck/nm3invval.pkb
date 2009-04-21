@@ -17,7 +17,8 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3invval.pkb	1.30 10/02/06"';
+   --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3invval.pkb	1.30 10/02/06"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -414,6 +415,65 @@ PROCEDURE process_insert_for_child (pi_rec_nii rec_nii) IS
    l_found_more_than_1 BOOLEAN;
 --
    l_rec_iig    nm_inv_item_groupings%ROWTYPE;
+   
+   --Log 697651:LS:21/04/09
+   --Added this check to stop creation of duplicate Child if It is Exclusive and relationship is AT
+   FUNCTION does_relation_exist (p_inv_type IN VARCHAR2
+                             ,p_relation IN VARCHAR2
+                             ) RETURN BOOLEAN IS
+   --
+   CURSOR cs_itg (c_inv_type VARCHAR2
+                 ,c_relation VARCHAR2
+                 ) IS
+   SELECT 1
+   FROM  dual
+   WHERE  EXISTS (SELECT 1
+                   FROM  NM_INV_TYPE_GROUPINGS
+                  WHERE  itg_inv_type = c_inv_type
+                   AND   itg_relation = c_relation
+                 );
+   --
+   l_dummy  BINARY_INTEGER;
+   l_retval BOOLEAN;
+   --
+   BEGIN
+   --
+      OPEN  cs_itg (p_inv_type,p_relation);
+      FETCH cs_itg INTO l_dummy;
+      l_retval := cs_itg%FOUND;
+      CLOSE cs_itg;
+   --
+      RETURN l_retval;
+   --
+   END does_relation_exist;
+   FUNCTION has_parent (pi_iit_ne_id IN NUMBER,pi_inv_type Varchar2,pi_xsp Varchar2) RETURN BOOLEAN IS
+   --
+      CURSOR cs_iig (c_parent_id NUMBER,c_inv_type VARCHAR2,c_xsp Varchar2) IS
+      SELECT 1
+      FROM  dual
+      WHERE EXISTS (SELECT 1
+                    FROM  NM_INV_ITEM_GROUPINGS iig,NM_INV_TYPE_GROUPINGS itg,nm_inv_items iit
+                    WHERE  iig_item_id             = iit.iit_ne_id
+                    AND    itg.itg_inv_type        = c_inv_type
+                    AND    itg.itg_inv_type        = iit.iit_inv_type
+                    AND    Nvl(iit.iit_x_sect,'*') = Nvl(c_xsp,'*')
+                    AND    iig_parent_id = c_parent_id
+                   );
+   --
+      l_retval BOOLEAN;
+      l_dummy  BINARY_INTEGER;
+   --
+   BEGIN
+   --
+      OPEN  cs_iig (pi_iit_ne_id,pi_inv_type,pi_xsp );
+      FETCH cs_iig INTO l_dummy;
+      l_retval := cs_iig%FOUND;
+      CLOSE cs_iig;
+   --
+      RETURN l_retval;
+   --
+   END has_parent;
+   --Log 697651:LS:21/04/09
 --
 BEGIN
    --
@@ -432,6 +492,17 @@ BEGIN
    END IF;
    CLOSE cs_get_parent;
    --
+   --Log 697651:LS:21/04/09
+   IF   does_relation_exist(pi_rec_nii.inv_type,c_at_relation)
+   AND  has_parent (l_rec_parent.iit_ne_id,pi_rec_nii.inv_type,nm3get.get_iit(pi_rec_nii.ne_id).iit_x_sect)
+   AND  nm3get.get_nit(nm3get.get_iit(l_rec_parent.iit_ne_id).iit_inv_type).nit_exclusive = 'Y'
+   THEN
+       hig.raise_ner (pi_appl => nm3type.c_net
+                     ,pi_id   => 106
+                    );
+   END IF;
+   --Log 697651:LS:21/04/09
+
    IF NOT l_found
     THEN
       hig.raise_ner (pi_appl               => nm3type.c_net
