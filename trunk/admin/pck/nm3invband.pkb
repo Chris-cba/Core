@@ -21,7 +21,9 @@ create or replace package body nm3invband as
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3invband.pkb	1.3 04/19/01"';
+   --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3invband.pkb	1.3 04/19/01"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
+
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3invband';
@@ -167,8 +169,11 @@ BEGIN
          l_current_rec_itd := l_tab_rec_itd(l_count);
          l_next_rec_itd    := l_tab_rec_itd(l_count+1);
 --
-         IF  l_current_rec_itd.itd_band_min_value >= l_current_rec_itd.itd_band_max_value
-          OR l_next_rec_itd.itd_band_min_value    >= l_next_rec_itd.itd_band_max_value
+         -- LOG 697138:LS23/04/09 
+         -- Allowed the min/max baning to have same value
+         -- Removed the equal sign
+         IF  l_current_rec_itd.itd_band_min_value > l_current_rec_itd.itd_band_max_value
+         OR l_next_rec_itd.itd_band_min_value     > l_next_rec_itd.itd_band_max_value
           THEN
             --
             -- If the current MIN is NOT < current MAX
