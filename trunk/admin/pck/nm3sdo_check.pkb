@@ -4,16 +4,16 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.6   Jul 17 2008 15:30:08   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.7   Apr 23 2009 12:06:56   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_check.pkb  $
---       Date into PVCS   : $Date:   Jul 17 2008 15:30:08  $
+--       Date into PVCS   : $Date:   Apr 23 2009 12:06:56  $
 --       Date fetched Out : $Modtime:   Jul 17 2008 15:29:20  $
---       PVCS Version     : $Revision:   2.6  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --------------------------------------------------------------------------------
 --
   g_package_name          CONSTANT varchar2(30)    := 'nm3sdo_check';
-  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.6  $"';
+  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.7  $"';
   lf                      CONSTANT VARCHAR2(30)    := chr(10);
   g_write_to_file                  BOOLEAN         := FALSE;
   l_results                        nm3type.tab_varchar32767;
@@ -999,6 +999,33 @@ AS
         put(l_results(i));
       END LOOP;
     END IF;
+  --
+  ------------------------------------------------------------------------------
+  --
+    put(lf);
+    put('  ====================================================================');
+    put('  =  Themes that are immediate update on edit but does not have NE_ID_OF column');
+    put('  ====================================================================');
+    put(lf);
+  --
+    SELECT '    FAIL : Theme : '||nth_theme_name||' ['||nth_theme_id||'] has update on edit set to immediate but does not have NE_ID_OF column'
+      BULK COLLECT INTO l_results 
+      FROM nm_themes_all
+     WHERE nth_update_on_edit = 'I'
+       AND NOT EXISTS ( SELECT 1 FROM user_tab_columns
+                         WHERE column_name = 'NE_ID_OF'
+                           AND table_name = nth_feature_table );
+  --
+  --
+    IF l_results.COUNT = 0
+    THEN
+      put('    PASS : All Themes that are immediate update on edit have NE_ID_OF column');
+    ELSE 
+      FOR i IN 1..l_results.COUNT LOOP
+        put(l_results(i));
+      END LOOP;
+    END IF;
+  --
   --
   ------------------------------------------------------------------------------
   --
