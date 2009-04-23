@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.19   Apr 21 2009 11:50:02   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.20   Apr 23 2009 17:07:56   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Apr 21 2009 11:50:02  $
---       Date fetched Out : $Modtime:   Apr 21 2009 11:48:44  $
---       PVCS Version     : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Apr 23 2009 17:07:56  $
+--       Date fetched Out : $Modtime:   Apr 23 2009 15:13:22  $
+--       PVCS Version     : $Revision:   2.20  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.19  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.20  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -9902,7 +9902,7 @@ retval nm_theme_list := Nm3array.init_nm_theme_list;
 BEGIN
   --curstr := 'select nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  :new_name, a.ntd_distance, a.ntd_measure, :new_descr )   '||
 curstr := 'select /*+cardinality( a '||to_char( p_ntl.ntl_theme_list.last)||') */ '||
-          ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  a.ntd_name, a.ntd_distance, a.ntd_measure, :new_descr )   '||
+          ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  '||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr )   '||
                   ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||
                  ' where a.ntd_pk_id  = '||p_nth.nth_feature_pk_column||' order by  a.ntd_distance';
 
