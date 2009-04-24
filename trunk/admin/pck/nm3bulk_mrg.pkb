@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.20   Mar 25 2009 11:28:10   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.21   Apr 24 2009 11:24:34   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Mar 25 2009 11:28:10  $
---       Date fetched Out : $Modtime:   Mar 24 2009 16:08:10  $
---       PVCS Version     : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Apr 24 2009 11:24:34  $
+--       Date fetched Out : $Modtime:   Apr 01 2009 21:06:18  $
+--       PVCS Version     : $Revision:   2.21  $
 --
 --
 --   Author : Priidu Tanava
@@ -61,17 +61,21 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                 moved the nsv_attribxx formatting from the with source into i2 subquery
   24.03.09  PT in std_run() added order by subclass and slk to get the result sections in connectivity order
                 this now matches the order produced by the old merge query
+  01.04.09  PT in load_attrib_metadata() applied qta.nqa_attrib_name default to iit_attrib_name
+                this should fix the problem when colums like IIT_END_DATE are specified in NM_MRG_QUERY_ATTRIBS but not in NM_INV_TYPE_ATTRIBS
+                the m_mrg_date_format (value copied from nm3mrg.g_mrg_date_format) is used for undeclared date columns
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
         add ita_format_mask to ita_mapping_rec
         add nm_route_connect_tmp_ordered view with the next schema change
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.20  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.21  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
   qt  constant varchar2(1) := chr(39);  -- single quote
+  m_mrg_date_format constant varchar2(15) := 'DD-MON-YYYY';
   
   subtype id_type is number(9);
   subtype hash_type is varchar2(20);
@@ -968,6 +972,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     k   binary_integer := 0;
     l_where_attrib varchar2(30);
     l_nmq_inner_outer_join nm_mrg_query_all.nmq_inner_outer_join%type;
+    l_hig_owner constant varchar2(30) := hig.get_application_owner;
     
   begin
     nm3dbg.putln(g_package_name||'.load_attrib_metadata('
@@ -991,8 +996,14 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
          qta.nqt_inv_type
         ,qta.nqt_inv_type||'_'||nvl(ta.ita_view_attri, qta.nqa_attrib_name) mrg_attrib_name
         ,nvl2(t.nit_table_name, nvl(ta.ita_attrib_name, qta.nqa_attrib_name), ta.ita_view_attri) ita_attrib_name
-        ,nvl(fta.iit_attrib_name, ta.ita_attrib_name) iit_attrib_name
-        ,nvl(ta.ita_format, 'VARCHAR2') ita_format
+        ,nvl(nvl(fta.iit_attrib_name, ta.ita_attrib_name), qta.nqa_attrib_name) iit_attrib_name
+        ,nvl(decode(ta.ita_format, null
+          ,(select data_type from all_tab_cols
+            where owner = l_hig_owner
+              and table_name = 'NM_INV_ITEMS_ALL'
+              and column_name = qta.nqa_attrib_name)
+          , ta.ita_format
+         ), 'VARCHAR2') ita_format
         ,t.nit_table_name
         ,decode(t.nit_table_name, null, null
           ,nvl((select 'Y' from nm_inv_nw
@@ -1800,28 +1811,39 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       while i is not null loop
         j := j + 1;
         l_attrib := 'nsv_attrib'||j;
+        l_ita_format_mask := null;
         
         if p_format then
           -- manually select ita_format_mask until it is made part of ita_mapping_rec
           if pt_attr(i).ita_format in ('NUMBER', 'DATE') then
-            l_ita_format_mask := null;
             
-            select ta.ita_format_mask
-            into l_ita_format_mask
-            from
-               nm_inv_type_attribs_all ta
-            where ta.ita_inv_type = pt_attr(i).inv_type
-              and ta.ita_attrib_name = nvl2(pt_attr(i).table_name, pt_attr(i).ita_attrib_name, pt_attr(i).iit_attrib_name);
-              
-            if l_ita_format_mask is not null then
-              l_attrib := 'to_char('||l_attrib||', '''||l_ita_format_mask||''') '||l_attrib;
+            -- some columns like iit_end_date are not declared in nm_inv_type_attribs_all
+            begin
+              select ta.ita_format_mask
+              into l_ita_format_mask
+              from
+                 nm_inv_type_attribs_all ta
+              where ta.ita_inv_type = pt_attr(i).inv_type
+                and ta.ita_attrib_name = nvl2(pt_attr(i).table_name, pt_attr(i).ita_attrib_name, pt_attr(i).iit_attrib_name);
+            exception
+              when no_data_found then null;
+            end;
+            
+            if pt_attr(i).ita_format = 'DATE' then
+              l_ita_format_mask := m_mrg_date_format;
             end if;
-            
+                          
           end if;
 
         end if;
+        
+        if l_ita_format_mask is not null then
+          s := s||l_cr||', '||l_min||'to_char('||l_attrib||', '''||l_ita_format_mask||''')'||l_min2||' '||l_attrib;
+          
+        else
+          s := s||l_cr||', '||l_min||l_attrib||l_min2;
 
-        s := s||l_cr||', '||l_min||l_attrib||l_min2;
+        end if;
         
         if p_format then
           l_cr := cr;
@@ -1893,6 +1915,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         elsif pt_attr(i).ita_format = 'DATE' then
           l_nval := 'to_date(''13430101'', ''YYYYMMDD'')';
         end if;
+        
         s := s||cr||'  and nvl('||p_a1||'.nsv_attrib'||j||', '||l_nval||') = nvl('||p_a2||'.nsv_attrib'||j||', '||l_nval||')';
 --        s := s||cr||'  and (('||p_a1||'.nsv_attrib'||j||' is null and '||p_a2||'.nsv_attrib'||j
 --          ||' is null) or '||p_a1||'.nsv_attrib'||j||' = '||p_a2||'.nsv_attrib'||j||')';
@@ -1973,7 +1996,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ||cr||'   i.nm_obj_type'
     ||cr||'  ,i.iit_x_sect'
         ||sql_pnt_or_cont
-    ||cr||sql_nsv_attrib_cols(p_min => false, p_format => true)
+    ||cr||sql_nsv_attrib_cols(p_min => false, p_format => false)
     ||cr||'from'
     ||cr||'   src i'
     ||cr||') i2'
@@ -2004,7 +2027,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ||cr||')'
     ||cr||'select'
     ||cr||'  nsv_mrg_job_id, nsv_value_id, min(nsv_inv_type), min(nsv_x_sect), min(nsv_pnt_or_cont)'
-    ||cr||sql_nsv_attrib_cols(p_min => true, p_format => false)
+    ||cr||sql_nsv_attrib_cols(p_min => true, p_format => true)
     ||cr||'from nm_mrg_section_inv_values_tmp'
     ||cr||'group by nsv_mrg_job_id, nsv_value_id';
     
@@ -2032,7 +2055,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.std_insert_invitems('
         ||'p_mrg_job_id='||p_mrg_job_id
         ||', pt_attr.count='||pt_attr.count
-        ||', p_splits_rowcount='||p_splits_rowcount 
+        ||', p_splits_rowcount='||p_splits_rowcount
+        ||', l_splits_cardinality='||l_splits_cardinality
         ||')');
       raise;
 
