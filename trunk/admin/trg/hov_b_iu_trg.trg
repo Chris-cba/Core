@@ -29,9 +29,17 @@ DECLARE
    l_rec_hol            hig_option_list%ROWTYPE;
    c_hov_value CONSTANT hig_option_values.hov_value%TYPE := :NEW.hov_value;
 --
+--
+   CURSOR cs_hol(pi_hol_id in hig_option_list.hol_id%type) IS
+   SELECT /*+ INDEX (hol HOL_PK) */ *
+    FROM  hig_option_list hol
+   WHERE  hol.hol_id = pi_hol_id;
+--
 BEGIN
 --
-   l_rec_hol := nm3get.get_hol (pi_hol_id => :NEW.hov_id);
+   OPEN  cs_hol(pi_hol_id => :NEW.hov_id);
+   FETCH cs_hol INTO l_rec_hol;
+   CLOSE cs_hol; 
 --
    IF l_rec_hol.hol_domain IS NOT NULL
     THEN
