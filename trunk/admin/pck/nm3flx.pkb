@@ -2,15 +2,15 @@ CREATE OR REPLACE PACKAGE BODY nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.4   Jan 22 2008 15:59:30   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.5   Apr 24 2009 13:06:28   lsorathia  $
 --       Module Name      : $Workfile:   nm3flx.pkb  $
---       Date into PVCS   : $Date:   Jan 22 2008 15:59:30  $
---       Date fetched Out : $Modtime:   Jan 22 2008 15:58:54  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Apr 24 2009 13:06:28  $
+--       Date fetched Out : $Modtime:   Apr 24 2009 12:19:02  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.47
 -------------------------------------------------------------------------
 --
-  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.4  $';
+  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.5  $';
 
    g_package_name    CONSTANT varchar2(30) := 'nm3flx';
 -- Package variables
@@ -1652,7 +1652,8 @@ FUNCTION is_reserved_word (p_name varchar2) RETURN boolean IS
 --
    CURSOR cs_resv (c_word varchar2) IS
    SELECT 1
-    FROM  v$reserved_words
+   --FROM  v$reserved_words  -- LS 24/04/09 Replace the data dictionary view with Exor view to handle exclusion of Reserve Words
+   FROM  nm_reserve_words_vw
    WHERE  keyword = c_word;
 --
    l_dummy  binary_integer;
