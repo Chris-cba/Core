@@ -30,7 +30,8 @@ CREATE OR REPLACE PACKAGE nm3nwval AS
                                    ,ne_group      nm_elements.ne_group%TYPE);
 
   --g_sccsid is the SCCS ID for the package
-  g_sccsid      CONSTANT  varchar2(80) := '"@(#)nm3nwval.pkh	1.28 05/02/06"';
+  --g_sccsid      CONSTANT  varchar2(80) := '"@(#)nm3nwval.pkh	1.28 05/02/06"';
+  g_sccsid      CONSTANT  varchar2(80) := '"$Revision:   2.2  $"';
 --
 -- Global variables used for dynamic sql
    g_dyn_rec_ne nm_elements%ROWTYPE;
