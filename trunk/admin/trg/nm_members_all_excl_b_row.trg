@@ -7,11 +7,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_members_all_excl_b_row.trg-arc   2.1   Aug 31 2007 16:26:30   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_members_all_excl_b_row.trg-arc   2.2   Apr 28 2009 10:19:30   lsorathia  $
 --       Module Name      : $Workfile:   nm_members_all_excl_b_row.trg  $
---       Date into SCCS   : $Date:   Aug 31 2007 16:26:30  $
---       Date fetched Out : $Modtime:   Aug 31 2007 15:25:50  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Apr 28 2009 10:19:30  $
+--       Date fetched Out : $Modtime:   Apr 27 2009 13:08:00  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on 
 --
 -----------------------------------------------------------------------------
@@ -42,6 +42,7 @@ BEGIN
        l_rec_excl.nm_ne_id_of                                   := :NEW.nm_ne_id_of;
        l_rec_excl.nm_begin_mp                                   := :NEW.nm_begin_mp;
        l_rec_excl.nm_end_mp                                     := :NEW.nm_end_mp;
+       l_rec_excl.nm_start_date                                 := :NEW.nm_start_date; -- LS passed this date in the array for end dating members for exclusive groups
        nm3nwval.g_tab_rec_excl(nm3nwval.g_tab_rec_excl.COUNT+1) := l_rec_excl;
     END IF;
   --
