@@ -42,6 +42,7 @@ CREATE OR REPLACE PACKAGE nm3nwval AS
       ,nm_ne_id_of   nm_members.nm_ne_id_of%TYPE
       ,nm_begin_mp   nm_members.nm_begin_mp%TYPE
       ,nm_end_mp     nm_members.nm_end_mp%TYPE
+      ,nm_start_date nm_members.nm_start_date%TYPE -- LS added the members start date in the array
       );
 --
    TYPE tab_rec_excl IS TABLE OF rec_excl INDEX BY binary_integer;
