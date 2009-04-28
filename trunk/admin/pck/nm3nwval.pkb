@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.1   Oct 22 2008 10:10:00   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.2   Apr 28 2009 10:21:00   lsorathia  $
 --       Module Name      : $Workfile:   nm3nwval.pkb  $
---       Date into PVCS   : $Date:   Oct 22 2008 10:10:00  $
---       Date fetched Out : $Modtime:   Oct 22 2008 10:09:30  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Apr 28 2009 10:21:00  $
+--       Date fetched Out : $Modtime:   Apr 28 2009 09:37:02  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on 1.67
 --
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --      Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
@@ -2078,9 +2078,21 @@ BEGIN
                                        ,p_nm_end_mp   => l_rec_excl.nm_end_mp
                                        )
           THEN
-            g_nwval_exc_code := -20051;
-            g_nwval_exc_msg  := 'Membership is not exclusive';
-            RAISE g_nwval_exception;
+              --LS allows override of group based on the production option set
+              IF hig.get_sysopt('GRPXCLOVWR') = 'Y'  -- LS based on product options exclusive grouping is allowed
+              THEN
+                  UPDATE nm_members
+                  SET    nm_end_date = l_rec_excl.nm_start_date
+                  WHERE  nm_ne_id_of = l_rec_excl.nm_ne_id_of
+                  AND    nm_obj_type = ( select ne_gty_group_type from nm_elements where ne_id = l_rec_excl.nm_ne_id_in )
+                  AND    nm_ne_id_in != l_rec_excl.nm_ne_id_in;              
+                  --g_nwval_exc_code := -20051;
+                  --g_nwval_exc_msg  := 'Membership is not exclusive';
+                  --RAISE g_nwval_exception;
+              ELSE
+                  hig.raise_ner(pi_appl    => nm3type.c_net
+                               ,pi_id      => 41);
+              END IF;
          END IF;
 --
       END LOOP;
