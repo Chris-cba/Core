@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.20   Apr 23 2009 17:07:56   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.21   Apr 28 2009 09:08:40   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Apr 23 2009 17:07:56  $
---       Date fetched Out : $Modtime:   Apr 23 2009 15:13:22  $
---       PVCS Version     : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Apr 28 2009 09:08:40  $
+--       Date fetched Out : $Modtime:   Apr 28 2009 09:08:00  $
+--       PVCS Version     : $Revision:   2.21  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.20  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.21  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -8667,6 +8667,14 @@ BEGIN
   l_tol :=  Nm3sdo.get_table_diminfo( p_nth.nth_feature_table, p_nth.nth_feature_shape_column )(1).sdo_tolerance;
 
   l_valid := validate_geometry( p_geometry, NULL, l_tol );
+
+-- AE 28-APR-2009
+-- Rectify the polygon and validate again.
+  IF l_valid != 'TRUE' AND l_geometry.sdo_gtype = 2003
+  THEN
+    l_geometry := sdo_util.rectify_geometry(sdo_util.remove_duplicate_vertices( l_geometry, l_tol), l_tol);
+    l_valid := validate_geometry( l_geometry, NULL, l_tol );
+  END IF;
 
   IF l_valid != 'TRUE' THEN
 
