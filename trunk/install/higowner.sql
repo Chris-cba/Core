@@ -1,5 +1,5 @@
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.3      $"';
+define sccsid = '"$Revision::   2.4      $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
@@ -430,7 +430,16 @@ DECLARE
    
       -- Cannot grant quota on temporary tablespace for 10gR2
 
-     IF NOT l_oracle10gr2 OR l_oracle11gr1 THEN
+       IF l_oracle10gr2 OR l_oracle11gr1 THEN
+
+         EXECUTE IMMEDIATE 'CREATE USER '|| p_user
+              || CHR(10) ||' IDENTIFIED BY '||p_pass
+              || CHR(10) ||' DEFAULT TABLESPACE '||p_deftab
+              || CHR(10) ||' QUOTA UNLIMITED ON '||p_deftab
+              || CHR(10) ||' TEMPORARY TABLESPACE '||p_tmptab
+              || CHR(10) ||' QUOTA 0K ON SYSTEM';
+        ELSE
+          -- Assume its 9i or below
 
          EXECUTE IMMEDIATE 'CREATE USER '|| p_user
               || CHR(10) ||' IDENTIFIED BY '||p_pass
@@ -439,16 +448,6 @@ DECLARE
               || CHR(10) ||' TEMPORARY TABLESPACE '||p_tmptab
               || CHR(10) ||' QUOTA UNLIMITED ON '||p_tmptab
               || CHR(10) ||' QUOTA 0K ON SYSTEM';
-       
-	   ELSE */
-	  
-         EXECUTE IMMEDIATE 'CREATE USER '|| p_user
-              || CHR(10) ||' IDENTIFIED BY '||p_pass
-              || CHR(10) ||' DEFAULT TABLESPACE '||p_deftab
-              || CHR(10) ||' QUOTA UNLIMITED ON '||p_deftab
-              || CHR(10) ||' TEMPORARY TABLESPACE '||p_tmptab
-              || CHR(10) ||' QUOTA 0K ON SYSTEM';
-
 	END IF;		  
 
    END create_user;
@@ -497,7 +496,7 @@ DECLARE
      EXECUTE IMMEDIATE 'GRANT DROP ANY SYNONYM TO  ' || p_user;                 -- Added by GJ 17-MAY-2007     
      IF l_oracle9i
      OR l_oracle10gr1
-	 OR l_oracle10gr2 
+     OR l_oracle10gr2 
      OR l_oracle11gr1
      THEN
        EXECUTE IMMEDIATE 'grant select any dictionary to '    || p_user || ' with admin option';
