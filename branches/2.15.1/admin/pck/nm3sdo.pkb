@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.15.1.3   Mar 17 2009 14:07:00   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.15.1.4   Apr 28 2009 12:25:56   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Mar 17 2009 14:07:00  $
---       Date fetched Out : $Modtime:   Mar 17 2009 14:06:14  $
---       PVCS Version     : $Revision:   2.15.1.3  $
+--       Date into PVCS   : $Date:   Apr 28 2009 12:25:56  $
+--       Date fetched Out : $Modtime:   Apr 28 2009 12:25:04  $
+--       PVCS Version     : $Revision:   2.15.1.4  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.15.1.3  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.15.1.4  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -5257,6 +5257,11 @@ BEGIN
   l_mbr   := get_mbr( p_geom );
 
   l_dim   := p_geom.get_dims;
+  
+  if p_geom.get_lrs_dim > 0 then
+    l_dim := 2;
+  end if;
+
   l_gtype := p_geom.get_gtype;
 
 
