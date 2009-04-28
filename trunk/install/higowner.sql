@@ -1,5 +1,5 @@
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.2      $"';
+define sccsid = '"$Revision::   2.3      $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
@@ -55,6 +55,7 @@ DECLARE
   l_oracle9i    boolean;
   l_oracle10gr1 boolean;
   l_oracle10gr2 boolean;
+  l_oracle11gr1 boolean;
 --
  
   FUNCTION db_is_9i RETURN boolean IS
@@ -140,6 +141,34 @@ DECLARE
       RETURN FALSE;
 
   END db_is_10gr2;
+  
+  FUNCTION db_is_11gr1 RETURN boolean IS
+
+    l_dummy pls_integer;
+
+  BEGIN
+    SELECT
+      1
+    INTO
+      l_dummy
+    FROM
+      dual
+    WHERE
+      EXISTS(SELECT
+               1
+             FROM
+               v$version
+             WHERE
+               UPPER(banner) LIKE '%11.1%');
+
+    RETURN TRUE;
+
+  EXCEPTION
+    WHEN no_data_found
+    THEN
+      RETURN FALSE;
+
+  END db_is_11gr1;
 
    PROCEDURE check_listener_locks IS
 --   
@@ -401,7 +430,7 @@ DECLARE
    
       -- Cannot grant quota on temporary tablespace for 10gR2
 
-      IF NOT l_oracle10gr2 THEN
+     IF NOT l_oracle10gr2 OR l_oracle11gr1 THEN
 
          EXECUTE IMMEDIATE 'CREATE USER '|| p_user
               || CHR(10) ||' IDENTIFIED BY '||p_pass
@@ -411,7 +440,7 @@ DECLARE
               || CHR(10) ||' QUOTA UNLIMITED ON '||p_tmptab
               || CHR(10) ||' QUOTA 0K ON SYSTEM';
        
-	   ELSE
+	   ELSE */
 	  
          EXECUTE IMMEDIATE 'CREATE USER '|| p_user
               || CHR(10) ||' IDENTIFIED BY '||p_pass
@@ -420,7 +449,7 @@ DECLARE
               || CHR(10) ||' TEMPORARY TABLESPACE '||p_tmptab
               || CHR(10) ||' QUOTA 0K ON SYSTEM';
 
-	   END IF;		  
+	END IF;		  
 
    END create_user;
 --
@@ -469,6 +498,7 @@ DECLARE
      IF l_oracle9i
      OR l_oracle10gr1
 	 OR l_oracle10gr2 
+     OR l_oracle11gr1
      THEN
        EXECUTE IMMEDIATE 'grant select any dictionary to '    || p_user || ' with admin option';
        EXECUTE IMMEDIATE 'grant execute on sys.dbms_pipe to ' || p_user || ' with grant option';
@@ -845,6 +875,7 @@ BEGIN
  l_oracle9i  := db_is_9i;
  l_oracle10gr1 := db_is_10gr1;
  l_oracle10gr2 := db_is_10gr2;
+ l_oracle11gr1 := db_is_11gr1;
 --
  check_listener_locks;
 -- 
