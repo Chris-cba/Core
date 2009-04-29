@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.15.1.4   Apr 28 2009 12:25:56   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.15.1.5   Apr 29 2009 14:03:50   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Apr 28 2009 12:25:56  $
---       Date fetched Out : $Modtime:   Apr 28 2009 12:25:04  $
---       PVCS Version     : $Revision:   2.15.1.4  $
+--       Date into PVCS   : $Date:   Apr 29 2009 14:03:50  $
+--       Date fetched Out : $Modtime:   Apr 29 2009 13:14:08  $
+--       PVCS Version     : $Revision:   2.15.1.5  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.15.1.4  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.15.1.5  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -5257,7 +5257,7 @@ BEGIN
   l_mbr   := get_mbr( p_geom );
 
   l_dim   := p_geom.get_dims;
-  
+
   if p_geom.get_lrs_dim > 0 then
     l_dim := 2;
   end if;
@@ -8730,7 +8730,7 @@ BEGIN
   END IF;
 
   IF l_nth.nth_feature_table = l_nth.nth_table_name THEN
-
+  
      cur_string := 'select t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', t.'||l_nth.nth_pk_column;
 
      IF l_get_projection THEN
@@ -8741,7 +8741,7 @@ BEGIN
 
      END IF;
 
-     IF l_rec_gdr.gdr_gdo_session_id IS NOT NULL
+     IF l_rec_gdr.gdr_gdo_session_id IS NOT NULL and not l_get_projection
      THEN
 
        cur_string := cur_string||' from '||l_nth.nth_table_name||' t, gis_data_objects g '
@@ -8767,20 +8767,26 @@ BEGIN
 
      END IF;
 
-     IF l_rec_gdr.gdr_gdo_session_id IS NOT NULL
+     IF l_rec_gdr.gdr_gdo_session_id IS NOT NULL and not l_get_projection
      THEN
 
-     cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f, gis_data_objects g '
-           ||' where g.gdo_session_id = '||to_char(l_rec_gdr.gdr_gdo_session_id)||' and g.gdo_pk_id = '||l_nth.nth_feature_pk_column||' and '
-           ||' and sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :shape, '
-           ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
-        ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_pk_column;
-  ELSE
+       cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f, gis_data_objects g '
+             ||' where g.gdo_session_id = '||to_char(l_rec_gdr.gdr_gdo_session_id)||' and g.gdo_pk_id = t.'||l_nth.nth_feature_pk_column
+             ||' and sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :shape, '
+             ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
+             ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_pk_column;
+     ELSE
 
+       cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f'
+             ||' where sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :p_geometry, '
+             ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
+             ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_fk_column;
+
+     END IF;
+     
+   ELSE
 
      cur_string := 'select distinct t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', f.'||l_nth.nth_feature_pk_column;
-
-  end if;
 
      IF l_get_projection THEN
 
@@ -8790,18 +8796,30 @@ BEGIN
 
      END IF;
 
+     IF l_rec_gdr.gdr_gdo_session_id IS NOT NULL and not l_get_projection
+     THEN
 
-     cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f'
-           ||' where sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :p_geometry, '
-           ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
-        ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_fk_column;
+       cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f, gis_data_objects g '
+             ||' where g.gdo_session_id = '||to_char(l_rec_gdr.gdr_gdo_session_id)||' and g.gdo_pk_id = t.'||l_nth.nth_feature_pk_column
+             ||' and sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :shape, '
+             ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
+             ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_pk_column;
+
+     ELSE
+     
+       cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f'
+             ||' where sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :p_geometry, '
+             ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
+             ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_fk_column;
+
+     END IF;
 
   END IF;
+  
+--Nm_Debug.debug_on;
+--Nm_Debug.DEBUG( cur_string );
 
-  --Nm_Debug.debug_on;
-  Nm_Debug.DEBUG( cur_string );
-
-  nm_debug.debug('Execute statement');
+--nm_debug.debug('Execute statement');
 
   IF l_get_projection THEN
 
@@ -8821,7 +8839,6 @@ BEGIN
 
       IF Nm3net.is_nt_datum( Nm3net.Get_Nt_Type( l_pk_array(i) ) )  = 'N' THEN
 
-
 --      make sure we are dealing in correct units. The shape lengths are in datum units.
 
         Nm3net.get_group_units( l_pk_array(i), l_p_unit, l_c_unit );
@@ -8840,8 +8857,8 @@ BEGIN
       ELSE
         retval := nm_theme_list ( nm_theme_list_type ( nm_theme_detail ( l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), NULL, NULL, l_nth.nth_theme_name)));
       END IF;
- ELSE
---   nm_debug.debug(' count = '||to_char(i)||' - adding new detail');
+    ELSE
+--    nm_debug.debug(' count = '||to_char(i)||' - adding new detail');
 
       IF l_get_projection THEN
         retval := retval.add_detail( l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), l_dist_array(i), l_meas_array(i), l_nth.nth_theme_name);
@@ -8849,7 +8866,7 @@ BEGIN
        retval := retval.add_detail( l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), NULL, NULL, l_nth.nth_theme_name);
       END IF;
 
- END IF;
+    END IF;
 
   END LOOP;
 
@@ -8859,23 +8876,23 @@ BEGIN
   END IF;
 --
 --
--- Warwickshire enhancement - 719187
--- Join to GIS_DATA_RESTRICTIONS if appropriate.
---
-  DECLARE
-    l_rec_gdr gis_data_restrictions%ROWTYPE;
-  BEGIN
-    l_rec_gdr := nm3sdo_gdr.get_gdr(pi_gdr_username     => user
-                                   ,pi_gdr_nth_theme_id => p_nth.nth_theme_id
-                                   ,pi_raise_not_found  => FALSE);
-  --
-    IF l_rec_gdr.gdr_gdo_session_id IS NOT NULL
-    THEN
-      retval := join_gdo_array( l_rec_gdr.gdr_gdo_session_id
-                              , retval  );
-    END IF;
-  --
-  END;
+---- Warwickshire enhancement - 719187 - this code is replaced by the use of GDO in the main predicate.
+---- Join to GIS_DATA_RESTRICTIONS if appropriate.
+----
+--  DECLARE
+--    l_rec_gdr gis_data_restrictions%ROWTYPE;
+--  BEGIN
+--    l_rec_gdr := nm3sdo_gdr.get_gdr(pi_gdr_username     => user
+--                                   ,pi_gdr_nth_theme_id => p_nth.nth_theme_id
+--                                   ,pi_raise_not_found  => FALSE);
+--  --
+--    IF l_rec_gdr.gdr_gdo_session_id IS NOT NULL
+--    THEN
+--      retval := join_gdo_array( l_rec_gdr.gdr_gdo_session_id
+--                              , retval  );
+--    END IF;
+--  --
+--  END;
 --
 -- End of Warwickshire enhancement - 719187
 --
