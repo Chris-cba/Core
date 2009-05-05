@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.21   Apr 24 2009 11:24:34   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.22   May 05 2009 15:34:52   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Apr 24 2009 11:24:34  $
---       Date fetched Out : $Modtime:   Apr 01 2009 21:06:18  $
---       PVCS Version     : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   May 05 2009 15:34:52  $
+--       Date fetched Out : $Modtime:   May 05 2009 15:29:48  $
+--       PVCS Version     : $Revision:   2.22  $
 --
 --
 --   Author : Priidu Tanava
@@ -64,13 +64,15 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   01.04.09  PT in load_attrib_metadata() applied qta.nqa_attrib_name default to iit_attrib_name
                 this should fix the problem when colums like IIT_END_DATE are specified in NM_MRG_QUERY_ATTRIBS but not in NM_INV_TYPE_ATTRIBS
                 the m_mrg_date_format (value copied from nm3mrg.g_mrg_date_format) is used for undeclared date columns
+  05.05.09  PT in std_populate() fixed a bug in merging connecting chunks:
+                added lag_datum_gap = 0 check, plus extra check to not merge point chunks
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
         add ita_format_mask to ita_mapping_rec
         add nm_route_connect_tmp_ordered view with the next schema change
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.21  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.22  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -1322,6 +1324,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp) lag_chunk_seq
         ,lag(inv.hash_value, 1, null) over
           (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp) lag_hash_value
+        ,lag(qq.nm_end_mp - inv.nm_end_mp, 1, 0) over
+          (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp) lag_datum_gap
       from
          -- nm_route_connectivity_tmp qq
          -- nm_route_connect_tmp_ordered qq
@@ -1397,14 +1401,18 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         
       end if;
       
-      
-      
+      -- PT 05.05.09
+      --  the lag_datum_gap = 0 is a nautrual single check for inv chunk connectivity
+      --  to produce same results as old code the point chunks must not connect
+      --  this code still connects a previous point chunk to next continuous chunk
+      --  in reality this doesn't happen unless same asset type is both point and continuous
       
       -- same section 
       if r.nm_ne_id_in = r.lag_nm_ne_id_in        -- new route
         and r.chunk_no = r.lag_chunk_no           -- new route chunk
         and r.hash_value = r.lag_hash_value       -- different inv attribute values
-        and r.begin_mp <= r.nm_begin_mp           -- gap between same inv attribute values
+        and r.lag_datum_gap = 0                   -- prevous chunk does not reach the datum end
+        and r.begin_mp < r.end_mp                 -- do not connect point chunks (differ from old code results)
         and r.chunk_seq - r.lag_chunk_seq <= 1    -- gap between chunk sequences
         
       then
