@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.23   May 06 2009 15:24:48   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.24   May 07 2009 17:07:56   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   May 06 2009 15:24:48  $
---       Date fetched Out : $Modtime:   May 06 2009 10:09:00  $
---       PVCS Version     : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   May 07 2009 17:07:56  $
+--       Date fetched Out : $Modtime:   May 07 2009 15:06:52  $
+--       PVCS Version     : $Revision:   2.24  $
 --
 --
 --   Author : Priidu Tanava
@@ -72,13 +72,15 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                 added $ suffix to the FT pk column
                in get_where_sql() fixed date formating for where condition values
                in std_run() added hig.raise_ner 120 "No query types defined."
+  07.05.09  PT in ins_route_connectivity() added nm_cardinality - requires NM_ROUTE_CONNECTIVITY_TMP with NM_CARDINALITY column
+                nm_cardinality is now used by std_populate() to order pieces within datum according to route cardinality
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
         add ita_format_mask to ita_mapping_rec
         add nm_route_connect_tmp_ordered view with the next schema change
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.23  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.24  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -1177,11 +1179,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
              
     l_sql_outer := 'insert into nm_route_connectivity_tmp ('
        ||cr||'  nm_ne_id_in, chunk_no, chunk_seq, nm_ne_id_of, nm_begin_mp, nm_end_mp'
-       ||cr||', measure, end_measure, nm_slk, nm_end_slk, nt_unit_in, nt_unit_of'
+       ||cr||', measure, end_measure, nm_slk, nm_end_slk, nm_cardinality, nt_unit_in, nt_unit_of'
        ||cr||')'
        ||cr||'select'
        ||cr||'  nm_ne_id_in, chunk_no, chunk_seq, nm_ne_id_of, nm_begin_mp, nm_end_mp'
-       ||cr||', measure, end_measure, nm_slk, nm_end_slk, nt_unit_in, nt_unit_of'
+       ||cr||', measure, end_measure, nm_slk, nm_end_slk, nm_cardinality, nt_unit_in, nt_unit_of'
        ||cr||'from (';
        
     l_sql := l_sql_outer
@@ -1214,6 +1216,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       ||cr||'  ,d.end_mp end_measure'
       ||cr||'  ,cast(null as number) nm_slk'
       ||cr||'  ,cast(null as number) nm_end_slk'
+      ||cr||'  ,1 nm_cardinality'
       ||cr||'  ,-1 nt_unit_in'
       ||cr||'  ,-1 nt_unit_of'
       ||cr||'from'
@@ -1346,11 +1349,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ,lag(qq.chunk_no, 1, null) over
           (partition by qq.nm_ne_id_in order by qq.chunk_no) lag_chunk_no
         ,lag(qq.chunk_seq, 1, null) over
-          (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp) lag_chunk_seq
+          (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq) lag_chunk_seq
         ,lag(inv.hash_value, 1, null) over
-          (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp) lag_hash_value
+          (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality) lag_hash_value
         ,lag(qq.nm_end_mp - inv.nm_end_mp, 1, 0) over
-          (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp) lag_datum_gap
+          (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality) lag_datum_gap
       from
          -- nm_route_connectivity_tmp qq
          -- nm_route_connect_tmp_ordered qq
@@ -1358,7 +1361,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           select
              q.nm_ne_id_in
             ,dense_rank() over (partition by q.nm_ne_id_in order by q.nsc_seq_no, q.min_slk_measure) chunk_no
-            ,q.chunk_seq, q.nm_ne_id_of, q.nm_begin_mp, q.nm_end_mp, q.measure, q.end_measure, q.nm_slk, q.nm_end_slk, q.nt_unit_in, q.nt_unit_of
+            ,q.chunk_seq, q.nm_ne_id_of, q.nm_begin_mp, q.nm_end_mp, q.measure, q.end_measure
+            ,q.nm_slk, q.nm_end_slk, nvl(q.nm_cardinality, 1) nm_cardinality, q.nt_unit_in, q.nt_unit_of
           from (
           select
              t.*
@@ -1378,10 +1382,28 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         and ((qq.nm_begin_mp < inv.nm_end_mp and qq.nm_end_mp > inv.nm_begin_mp)
           or ((qq.nm_begin_mp = qq.nm_end_mp or inv.nm_begin_mp = inv.nm_end_mp)
             and (qq.nm_begin_mp = inv.nm_end_mp or qq.nm_end_mp = inv.nm_begin_mp)))
-      order by 1, 2, 3, 5
+      order by
+         qq.nm_ne_id_in
+        ,qq.chunk_no
+        ,qq.chunk_seq
+        ,greatest(inv.nm_begin_mp, qq.nm_begin_mp) * qq.nm_cardinality
     )
     loop
       j := j + 1;
+      
+--      nm3dbg.putln('r('||j||'): '
+--        ||'nm_ne_id_of='||r.nm_ne_id_of
+--        --||', lag_nm_ne_id_in='||r.lag_nm_ne_id_in
+--        --||', chunk_no='||r.chunk_no
+--        --||', lag_chunk_no='||r.lag_chunk_no
+--        ||', hash_value='||r.hash_value
+--        ||', lag_hash_value='||r.lag_hash_value
+--        ||', lag_datum_gap='||r.lag_datum_gap
+--        ||', begin_mp='||r.begin_mp
+--        ||', end_mp='||r.end_mp
+--        ||', chunk_seq='||r.chunk_seq
+--        ||', lag_chunk_seq='||r.lag_chunk_seq
+--        );
       
       -- same route
       if r.nm_ne_id_in = r.lag_nm_ne_id_in then null;
@@ -1446,7 +1468,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       
       -- new section
       else
-        --nm3dbg.putln('new section i='||i);
+--        nm3dbg.putln('new section i='||i);
       
         -- start new section
         i             := t_sect.count + 1;
