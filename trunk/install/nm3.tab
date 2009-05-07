@@ -1,10 +1,10 @@
 -- PVCS Identifiers :-
 --
--- sccsid                : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.10   Feb 27 2009 11:37:56   aedwards  $
+-- sccsid                : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.11   May 07 2009 15:53:54   ptanava  $
 -- Module Name           : $Workfile:   nm3.tab  $
--- Date into PVCS        : $Date:   Feb 27 2009 11:37:56  $
--- Date fetched Out      : $Modtime:   Feb 27 2009 11:36:58  $
--- PVCS Version          : $Revision:   2.10  $
+-- Date into PVCS        : $Date:   May 07 2009 15:53:54  $
+-- Date fetched Out      : $Modtime:   May 07 2009 15:52:02  $
+-- PVCS Version          : $Revision:   2.11  $
 --
 -- Generated for Oracle 9i on Fri Jun 06  10:03:09 2008 by Server Generator 9.0.2.94.12
  
@@ -7202,6 +7202,7 @@ CREATE GLOBAL TEMPORARY TABLE NM_ROUTE_CONNECTIVITY_TMP
  ,MEASURE NUMBER
  ,END_MEASURE NUMBER
  ,NM_SLK NUMBER
+ ,NM_CARDINALITY NUMBER(38)
  ,NM_END_SLK NUMBER
  ,NT_UNIT_IN NUMBER(9)
  ,NT_UNIT_OF NUMBER(9)
