@@ -64,3 +64,31 @@ EXCEPTION
 END;
 /
 
+CREATE OR REPLACE TRIGGER hig_user_contacts_all_who
+ BEFORE insert OR update
+ ON hig_user_contacts_all  FOR each row
+ 
+DECLARE
+   l_sysdate DATE;
+   l_user    VARCHAR2(30);
+   
+BEGIN
+   
+   SELECT sysdate
+         ,user
+    INTO  l_sysdate
+         ,l_user
+    FROM  dual;
+--
+   IF inserting
+    THEN
+      :new.HUC_DATE_CREATED  := l_sysdate;
+      :new.HUC_CREATED_BY    := l_user;
+   END IF;
+--
+   :new.HUC_DATE_MODIFIED := l_sysdate;
+   :new.HUC_MODIFIED_BY   := l_user;
+--
+END hig_user_contacts_all_who;
+/
+
