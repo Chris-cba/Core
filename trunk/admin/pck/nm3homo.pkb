@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.9   Mar 16 2009 14:25:22   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.10   May 08 2009 13:21:10   lsorathia  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Mar 16 2009 14:25:22  $
---       Date fetched Out : $Modtime:   Mar 13 2009 13:30:28  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   May 08 2009 13:21:10  $
+--       Date fetched Out : $Modtime:   May 08 2009 11:44:04  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --
 --   Author : Jonathan Mills
@@ -26,7 +26,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
                              ,end_mp   nm_members.nm_end_mp%TYPE); 
    type t_chunk_arr is table of t_chunk_rec index by pls_integer;
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -524,9 +524,44 @@ BEGIN
       IF   does_relation_exist(l_rec_nit.nit_inv_type,nm3invval.c_at_relation)
        AND has_parent (l_rec_iit.iit_ne_id)
        THEN
-         g_homo_exc_code := -20518;
-         g_homo_exc_msg  := 'Cannot locate Inventory records which are in a Child AT relationship';
-         RAISE g_homo_exception;
+           g_homo_exc_code := -20518;
+           g_homo_exc_msg  := 'Cannot locate Inventory records which are in a Child AT relationship';
+           RAISE g_homo_exception;
+      END IF;
+   --
+   --
+   -- ####################################################################################
+   --  Do not allow location chnage of Child IN records which have a parent
+   -- ####################################################################################
+   --
+      IF   does_relation_exist(l_rec_nit.nit_inv_type,nm3invval.c_in_relation)
+       AND has_parent (l_rec_iit.iit_ne_id)
+       THEN  
+           DECLARE
+            l_ne_id NUMBER ;
+            CURSOR  c_parent_id IS
+            SELECT  iig_parent_id 
+            FROM    nm_inv_item_groupings iig
+            WHERE   iig_item_id = l_rec_iit.iit_ne_id ;
+            l_parent_iit_id nm_inv_items.iit_ne_id%TYPE ;
+           BEGIN
+           --
+              OPEN   c_parent_id;
+              FETCH  c_parent_id INTO l_parent_iit_id ;
+              CLOSE  c_parent_id;
+              --
+              SELECT ne_id INTO l_ne_id
+              FROM   
+                 (SELECT x.pl_ne_id ne_id
+                  FROM   table( NM3PLA.SUBTRACT_PL_FROM_PL( l_new_inv_pl_arr, NM3PLA.GET_PLACEMENT_FROM_NE( l_parent_iit_id )).npa_placement_array) x
+                  )
+              WHERE  ne_id IS NOT NULL;                     
+              Raise_Application_Error(-20010,'Cannot locate Child Asset outside the bounds of Parent Location');
+           --
+           EXCEPTION
+               WHEN no_data_found 
+               THEN null;
+           END ;        
       END IF;
    --
    --  #############################################################################
@@ -3997,10 +4032,12 @@ BEGIN
                            ,iit.iit_admin_unit
                            ,iit.iit_inv_type
                            ,itg_relation
+                           ,nin_loc_mandatory -- LOG 713421
                       FROM  NM_INV_ITEMS iit
                            ,NM_INV_ITEMS iit_p
                            ,NM_INV_TYPE_GROUPINGS
                            ,NM_INV_ITEM_GROUPINGS
+                           ,nm_inv_nw   nin    -- LOG 713421         
                      WHERE  iit.iit_ne_id IN (SELECT iig_item_id
                                                FROM  NM_INV_ITEM_GROUPINGS
                                               START WITH iig_parent_id = p_ne_id
@@ -4010,7 +4047,8 @@ BEGIN
                       AND   iig_item_id        = iit.iit_ne_id
                       AND   iit.iit_inv_type   = itg_inv_type
                       AND   iit_p.iit_inv_type = itg_parent_inv_type
-                     FOR UPDATE OF iit.iit_ne_id NOWAIT
+                      AND   iit.iit_inv_type   = nin_nit_inv_code(+)  -- LOG 713421
+                      FOR UPDATE OF iit.iit_ne_id NOWAIT
                     ) -- Get details of all the inv which is located lower in the hierarchy
        LOOP
          --
@@ -4021,36 +4059,131 @@ BEGIN
             IF    cs_rec.itg_relation  = nm3invval.c_none_relation
              THEN  -- If it's a NONE relation when we aren't bothered for moving
                RAISE couldnt_care_less;
-            ELSIF cs_rec.itg_relation != nm3invval.c_at_relation
-             THEN
-               g_homo_exc_code := -20511;
-               g_homo_exc_msg  := 'There are child inventory records which would be affected';
-               RAISE g_homo_exception;
+            --LOG 713421
+            --ELSIF cs_rec.itg_relation != nm3invval.c_at_relation
+            ELSIF cs_rec.itg_relation NOT IN ( nm3invval.c_at_relation,nm3invval.c_in_relation)
+            THEN
+                g_homo_exc_code := -20511;
+                g_homo_exc_msg  := 'There are child inventory records which would be affected';
+                RAISE g_homo_exception;
             END IF;
+            IF  cs_rec.itg_relation = nm3invval.c_in_relation
+            THEN
+                IF NVL(hig.get_sysopt(p_option_id => 'INVCHIINED'), 'N') = 'Y'
+                THEN
+                --                 
+                   IF  NVL(cs_rec.nin_loc_mandatory,'N')     = 'Y'
+                   THEN
+                       DECLARE
+                       --
+                          l_ne_id Number  ;
+                       BEGIN
+                       --
+                          SELECT ne_id INTO l_ne_id
+                          FROM
+                              (SELECT  x.pl_ne_id ne_id
+                               FROM    table(nm3pla.get_ne_intersection( p_ne_id, cs_rec.iit_ne_id).npa_placement_array)  x 
+                              )
+                          WHERE ne_id IS NOT NULL;
+                       EXCEPTION
+                          WHEN no_data_found 
+                          THEN
+                              g_homo_exc_code := -20511;
+                              g_homo_exc_msg  := 'Cannot locate Child Asset outside the bounds of Parent Location';
+                              RAISE g_homo_exception;
+                       ENd ;
+                       DECLARE
+                       --
+                          l_ne_id Number  ;
+                       BEGIN
+                       --                          
+                          SELECT ne_id INTO l_ne_id
+                          FROM
+                              (SELECT x.pl_ne_id ne_id
+                               from  table( NM3PLA.SUBTRACT_PL_FROM_PL( nm3pla.get_ne_intersection( p_ne_id, cs_rec.iit_ne_id ), NM3PLA.GET_PLACEMENT_FROM_NE( p_ne_id )).npa_placement_array) x
+                               )
+                          WHERE ne_id IS NOT NULL;   
+
+                          g_homo_exc_code := -20511;
+                          g_homo_exc_msg  := 'Cannot locate Child Asset outside the bounds of Parent Location';
+                          RAISE g_homo_exception;                         
+                       EXCEPTION
+                          WHEN no_data_found 
+                          THEN
+                              Null ;
+                       END ;
+                   ELSE
+                       DECLARE
+                       --
+                          l_ne_id Number  ;
+                       BEGIN
+                       --
+                          SELECT ne_id INTO l_ne_id
+                          FROM
+                              (SELECT  x.pl_ne_id ne_id
+                               FROM    table(nm3pla.get_ne_intersection( p_ne_id, cs_rec.iit_ne_id).npa_placement_array)  x 
+                              )
+                          WHERE ne_id IS NOT NULL;
+                       EXCEPTION
+                          WHEN no_data_found 
+                          THEN
+                              UPDATE nm_members
+                              SET    nm_end_date = p_effective_date
+                              WHERE  nm_ne_id_in = cs_rec.iit_ne_id ;
+                       END ;
+                       DECLARE
+                       --
+                          l_ne_id Number  ;
+                       BEGIN
+                       --                          
+                          SELECT ne_id INTO l_ne_id
+                          FROM
+                              (SELECT x.pl_ne_id ne_id
+                               from  table( NM3PLA.SUBTRACT_PL_FROM_PL( nm3pla.get_ne_intersection( p_ne_id, cs_rec.iit_ne_id ), NM3PLA.GET_PLACEMENT_FROM_NE( p_ne_id )).npa_placement_array) x
+                               )
+                          WHERE ne_id IS NOT NULL;   
+
+                          UPDATE nm_members
+                          SET    nm_end_date = p_effective_date
+                          WHERE  nm_ne_id_in = cs_rec.iit_ne_id ;                         
+                       EXCEPTION
+                          WHEN no_data_found 
+                          THEN
+                              Null ;
+                       END ;                       
+                   END IF ;
+                ELSE 
+                    g_homo_exc_code := -20511;
+                    g_homo_exc_msg  := 'Cannot locate Asset records which are in a Child IN relationship';
+                    RAISE g_homo_exception;
+                END IF ;
             --
-            --  Lock it's existing location records
-            l_tab_rowid.DELETE;
-            OPEN  cs_lock (cs_rec.iit_ne_id);
-            FETCH cs_lock BULK COLLECT INTO l_tab_rowid;
-            CLOSE cs_lock;
-            --
-            --  End date it's existing location
-            xattr_off;
-            FORALL i IN 1..l_tab_rowid.COUNT
-             UPDATE NM_MEMBERS
-              SET   nm_end_date    = p_effective_date
-             WHERE  ROWID          = l_tab_rowid(i);
-            xattr_on;
-            --
-            -- Create it's new location as a copy of the new one
-            nm3invval.pc_duplicate_members
+            ELSE    
+               --
+               --  Lock it's existing location records
+               l_tab_rowid.DELETE;
+               OPEN  cs_lock (cs_rec.iit_ne_id);
+               FETCH cs_lock BULK COLLECT INTO l_tab_rowid;
+               CLOSE cs_lock;
+               --
+               --  End date it's existing location
+               xattr_off;
+               FORALL i IN 1..l_tab_rowid.COUNT
+               UPDATE NM_MEMBERS
+               SET   nm_end_date    = p_effective_date
+               WHERE  ROWID          = l_tab_rowid(i);
+               xattr_on;
+               --
+               -- Create it's new location as a copy of the new one
+               nm3invval.pc_duplicate_members
                      (pi_parent_ne_id     => p_ne_id
                      ,pi_child_ne_id      => cs_rec.iit_ne_id
                      ,pi_child_inv_type   => cs_rec.iit_inv_type
                      ,pi_child_admin_unit => cs_rec.iit_admin_unit
                      ,pi_child_start_date => p_effective_date
                      );
-            --
+               --
+            END IF ; 
          EXCEPTION
             WHEN couldnt_care_less
              THEN
