@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_users_utility.pkh-arc   3.0   Apr 06 2009 10:30:34   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_users_utility.pkh-arc   3.1   May 08 2009 15:36:14   bodriscoll  $
 --       Module Name      : $Workfile:   hig_users_utility.pkh  $
---       Date into PVCS   : $Date:   Apr 06 2009 10:30:34  $
---       Date fetched Out : $Modtime:   Apr 02 2009 16:24:28  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   May 08 2009 15:36:14  $
+--       Date fetched Out : $Modtime:   Apr 28 2009 16:55:48  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
 --</GLOBVAR>
 --
 Type l_huc_rec IS Record (
@@ -83,6 +83,14 @@ RETURN    hig_user_details_vw.HUD_huc_telephone_1%TYPE;
 --
 FUNCTION  get_primary_contact(pi_hus_username hig_users.hus_username%TYPE DEFAULT User)
 RETURN    hig_user_details_vw.HUD_huc_telephone_1%TYPE;
+--
+FUNCTION  get_telephone_no(pi_hus_user_id hig_users.hus_user_id%TYPE
+                          ,pi_tel_type    hig_user_contacts_all.huc_tel_type_1%TYPE)
+RETURN    hig_user_contacts_all.huc_telephone_1%TYPE;
+--
+FUNCTION  get_telephone_no(pi_hus_username hig_users.hus_username%TYPE 
+                          ,pi_tel_type    hig_user_contacts_all.huc_tel_type_1%TYPE)
+RETURN    hig_user_contacts_all.huc_telephone_1%TYPE;
 --
 END hig_users_utility;
 /

@@ -5,9 +5,9 @@ AS
 --
 --       PVCS id          : $Header   //vm_latest/archives/nm3/admin/pck/hig_user_utility.pkb-arc   3.0 Mar 31 2009 10:10:10   Linesh Sorathia  $
 --       Module Name      : $Workfile:   hig_users_utility.pkb  $
---       Date into PVCS   : $Date:   Apr 06 2009 10:34:14  $
---       Date fetched Out : $Modtime:   Apr 02 2009 16:25:46  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   May 08 2009 15:36:14  $
+--       Date fetched Out : $Modtime:   Apr 29 2009 10:50:22  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.0  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.1  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_users_utility';
 --
@@ -180,6 +180,66 @@ BEGIN
    RETURN l_primary_contact;
 --
 END get_primary_contact;
+--
+FUNCTION get_telephone_no(pi_hus_user_id hig_users.hus_user_id%TYPE
+                         ,pi_tel_type    hig_user_contacts_all.huc_tel_type_1%TYPE)
+                          RETURN hig_user_contacts_all.huc_telephone_1%TYPE
+IS
+--
+   CURSOR c_get_tel_no
+   IS
+   SELECT CASE  
+              WHEN huc_tel_type_1 = pi_tel_type THEN huc_telephone_1
+              WHEN huc_tel_type_2 = pi_tel_type THEN huc_telephone_2
+              WHEN huc_tel_type_3 = pi_tel_type THEN huc_telephone_3
+              WHEN huc_tel_type_4 = pi_tel_type THEN huc_telephone_4
+          END tel_no
+   FROM   hig_user_contacts_all
+   WHERE  huc_hus_user_id = pi_hus_user_id ;
+   
+   l_tel_no hig_user_contacts_all.huc_telephone_1%TYPE ;
+
+--
+BEGIN
+--
+   OPEN  c_get_tel_no;
+   FETCH c_get_tel_no INTO l_tel_no;
+   CLOSE c_get_tel_no;
+   
+   RETURN l_tel_no;
+--
+END get_telephone_no;
+--
+FUNCTION get_telephone_no(pi_hus_username hig_users.hus_username%TYPE 
+                         ,pi_tel_type     hig_user_contacts_all.huc_tel_type_1%TYPE)
+                          RETURN hig_user_contacts_all.huc_telephone_1%TYPE
+IS
+--
+CURSOR c_get_tel_no
+   IS
+   SELECT CASE  
+              WHEN huc_tel_type_1 = pi_tel_type THEN huc_telephone_1
+              WHEN huc_tel_type_2 = pi_tel_type THEN huc_telephone_2
+              WHEN huc_tel_type_3 = pi_tel_type THEN huc_telephone_3
+              WHEN huc_tel_type_4 = pi_tel_type THEN huc_telephone_4
+          END tel_no
+   FROM   hig_user_contacts_all
+   WHERE  huc_hus_user_id = (SELECT hus_user_id 
+                             FROM   hig_users 
+                             WHERE  hus_username = pi_hus_username) ;
+                             
+   l_tel_no hig_user_contacts_all.huc_telephone_1%TYPE ;
+
+--
+BEGIN
+--
+   OPEN  c_get_tel_no;
+   FETCH c_get_tel_no INTO l_tel_no;
+   CLOSE c_get_tel_no;
+   
+   RETURN l_tel_no;
+--
+END get_telephone_no;
 --
 END hig_users_utility ;
 /
