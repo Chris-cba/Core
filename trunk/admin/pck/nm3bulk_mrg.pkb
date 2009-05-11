@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.24   May 07 2009 17:07:56   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.25   May 11 2009 14:46:04   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   May 07 2009 17:07:56  $
---       Date fetched Out : $Modtime:   May 07 2009 15:06:52  $
---       PVCS Version     : $Revision:   2.24  $
+--       Date into PVCS   : $Date:   May 11 2009 14:46:04  $
+--       Date fetched Out : $Modtime:   May 11 2009 14:23:46  $
+--       PVCS Version     : $Revision:   2.25  $
 --
 --
 --   Author : Priidu Tanava
@@ -74,13 +74,18 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                in std_run() added hig.raise_ner 120 "No query types defined."
   07.05.09  PT in ins_route_connectivity() added nm_cardinality - requires NM_ROUTE_CONNECTIVITY_TMP with NM_CARDINALITY column
                 nm_cardinality is now used by std_populate() to order pieces within datum according to route cardinality
+  11.05.09  PT in std_populate() modified query to translate the first and last mp references according to route cardinality
+                made end_mp equal to begin_mp for point sections to avoid gap caused by unit conversion rounding
+               added $ suffix to the FT pk column also in std_insert_invitems()
+               fixed the std_populate() query: wrong value in lag_nm_ne_id_in introduced with changes to section order
+               fixed a problem in ins_datum_homo_chunks(): chunks incorrectly merged when point placements are involved
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
         add ita_format_mask to ita_mapping_rec
         add nm_route_connect_tmp_ordered view with the next schema change
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.24  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.25  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -823,16 +828,26 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ||cr||'select'
     --||cr||'   rownum rnum'
     ||cr||'   row_number() over (partition by q3.nm_ne_id_of order by q3.nm_begin_mp) rnum'
-    ||cr||'  ,to_number(decode(q3.nm_begin_mp'
-    ||cr||'     ,lag(q3.nm_end_mp, 1) over (partition by q3.nm_ne_id_of, q3.hash_value order by q3.nm_begin_mp)'
-    ||cr||'     ,null'
-    ||cr||'     ,q3.nm_begin_mp'
-    ||cr||'   )) begin_mp'
-    ||cr||'  ,to_number(decode(q3.nm_end_mp'
-    ||cr||'     ,lead(q3.nm_begin_mp, 1) over (partition by q3.nm_ne_id_of, q3.hash_value order by q3.nm_begin_mp)'
-    ||cr||'     ,null'
-    ||cr||'     ,q3.nm_end_mp'
-    ||cr||'   )) end_mp'
+    ||cr||'  ,case q3.nm_begin_mp||''-''||q3.hash_value'
+    ||cr||'   when lag(q3.nm_end_mp||''-''||q3.hash_value, 1)'
+    ||cr||'    over (partition by q3.nm_ne_id_of order by q3.nm_begin_mp) then null'
+    ||cr||'   else q3.nm_begin_mp'
+    ||cr||'   end begin_mp'
+    ||cr||'  ,case q3.nm_end_mp||''-''||q3.hash_value'
+    ||cr||'   when lead(q3.nm_begin_mp||''-''||q3.hash_value, 1)'
+    ||cr||'    over (partition by q3.nm_ne_id_of order by q3.nm_begin_mp) then null'
+    ||cr||'   else q3.nm_end_mp'
+    ||cr||'   end end_mp'
+--    ||cr||'  ,to_number(decode(q3.nm_begin_mp'
+--    ||cr||'     ,lag(q3.nm_end_mp, 1) over (partition by q3.nm_ne_id_of, q3.hash_value order by q3.nm_begin_mp)'
+--    ||cr||'     ,null'
+--    ||cr||'     ,q3.nm_begin_mp'
+--    ||cr||'   )) begin_mp'
+--    ||cr||'  ,to_number(decode(q3.nm_end_mp'
+--    ||cr||'     ,lead(q3.nm_begin_mp, 1) over (partition by q3.nm_ne_id_of, q3.hash_value order by q3.nm_begin_mp)'
+--    ||cr||'     ,null'
+--    ||cr||'     ,q3.nm_end_mp'
+--    ||cr||'   )) end_mp'
     ||cr||'  ,q3.*'
     ||cr||'from ('
     ||cr||'select'
@@ -1327,37 +1342,52 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     --  (each route can have many distinct connected chunks
     --    because of breaks in connectivity)
     -- cunk_seq is the order by of the pieces within chunk
-    for r in (
-      select
-         qq.nm_ne_id_in
-        ,qq.chunk_no
-        ,qq.chunk_seq
-        ,qq.nm_ne_id_of
-        ,greatest(inv.nm_begin_mp, qq.nm_begin_mp) begin_mp
-        ,least(inv.nm_end_mp, qq.nm_end_mp) end_mp
-        ,inv.hash_value
-        ,qq.nm_begin_mp
-        ,qq.nm_end_mp
-        ,qq.nt_unit_in
-        ,qq.nt_unit_of
-        ,qq.measure
-        ,qq.end_measure
-        ,qq.nm_slk
-        ,qq.nm_end_slk
-        ,lag(qq.nm_ne_id_in, 1, null) over
-          (order by qq.nm_ne_id_in) lag_nm_ne_id_in
-        ,lag(qq.chunk_no, 1, null) over
-          (partition by qq.nm_ne_id_in order by qq.chunk_no) lag_chunk_no
-        ,lag(qq.chunk_seq, 1, null) over
-          (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq) lag_chunk_seq
-        ,lag(inv.hash_value, 1, null) over
-          (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality) lag_hash_value
-        ,lag(qq.nm_end_mp - inv.nm_end_mp, 1, 0) over
-          (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality) lag_datum_gap
-      from
-         -- nm_route_connectivity_tmp qq
-         -- nm_route_connect_tmp_ordered qq
-         (
+    for r in (        
+        select
+           q3.nm_ne_id_in
+          ,q3.chunk_no
+          ,q3.chunk_seq
+          ,q3.nm_ne_id_of
+          ,q3.inv_begin_mp
+          ,q3.inv_end_mp
+          ,q3.nm_inv_begin_mp
+          ,q3.nm_inv_end_mp
+          ,q3.hash_value
+          ,q3.nm_begin_mp
+          ,q3.nm_end_mp
+          ,q3.nt_unit_in
+          ,q3.nt_unit_of
+          ,q3.measure
+          ,q3.end_measure
+          ,q3.nm_slk
+          ,q3.nm_end_slk
+          ,q3.lag_nm_ne_id_in
+          ,q3.lag_chunk_no
+          ,q3.lag_chunk_seq
+          ,lag(q3.hash_value, 1, null) over
+            (partition by q3.nm_ne_id_in, q3.chunk_no order by q3.chunk_seq, q3.inv_begin_mp) lag_hash_value
+          ,lag(q3.nm_end_mp - q3.inv_end_mp, 1, 0) over
+            (partition by q3.nm_ne_id_in, q3.chunk_no order by q3.chunk_seq, q3.inv_begin_mp) lag_datum_gap
+        from (
+        select q2.*
+          ,decode(q2.nm_cardinality, 1, q2.begin_mp, q2.nm_end_mp - q2.end_mp) inv_begin_mp
+          ,decode(q2.nm_cardinality, 1, q2.end_mp, q2.nm_end_mp - q2.begin_mp) inv_end_mp
+        from (
+        select
+           qq.*
+          ,greatest(inv.nm_begin_mp, qq.nm_begin_mp) begin_mp
+          ,least(inv.nm_end_mp, qq.nm_end_mp) end_mp
+          ,lag(qq.nm_ne_id_in, 1, null) over
+            (order by qq.nm_ne_id_in, qq.chunk_no, qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality) lag_nm_ne_id_in
+          ,lag(qq.chunk_no, 1, null) over
+            (partition by qq.nm_ne_id_in order by qq.chunk_no) lag_chunk_no
+          ,lag(qq.chunk_seq, 1, null) over
+            (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq) lag_chunk_seq
+          ,inv.hash_value
+          ,inv.nm_begin_mp nm_inv_begin_mp
+          ,inv.nm_end_mp nm_inv_end_mp
+        from
+          (
           select
              q.nm_ne_id_in
             ,dense_rank() over (partition by q.nm_ne_id_in order by q.nsc_seq_no, q.min_slk_measure) chunk_no
@@ -1375,18 +1405,20 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
              nm_route_connectivity_tmp t
             ,nm_elements_all e
           where t.nm_ne_id_of = e.ne_id
-          ) q 
-         ) qq
-        ,nm_mrg_datum_homo_chunks_tmp inv
-      where qq.nm_ne_id_of = inv.nm_ne_id_of
-        and ((qq.nm_begin_mp < inv.nm_end_mp and qq.nm_end_mp > inv.nm_begin_mp)
-          or ((qq.nm_begin_mp = qq.nm_end_mp or inv.nm_begin_mp = inv.nm_end_mp)
-            and (qq.nm_begin_mp = inv.nm_end_mp or qq.nm_end_mp = inv.nm_begin_mp)))
-      order by
-         qq.nm_ne_id_in
-        ,qq.chunk_no
-        ,qq.chunk_seq
-        ,greatest(inv.nm_begin_mp, qq.nm_begin_mp) * qq.nm_cardinality
+          ) q
+          ) qq
+          ,nm_mrg_datum_homo_chunks_tmp inv
+        where qq.nm_ne_id_of = inv.nm_ne_id_of
+          and ((qq.nm_begin_mp < inv.nm_end_mp and qq.nm_end_mp > inv.nm_begin_mp)
+            or ((qq.nm_begin_mp = qq.nm_end_mp or inv.nm_begin_mp = inv.nm_end_mp)
+              and (qq.nm_begin_mp = inv.nm_end_mp or qq.nm_end_mp = inv.nm_begin_mp)))
+        ) q2
+        ) q3
+        order by
+           q3.nm_ne_id_in
+          ,q3.chunk_no
+          ,q3.chunk_seq
+          ,q3.inv_begin_mp
     )
     loop
       j := j + 1;
@@ -1399,8 +1431,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --        ||', hash_value='||r.hash_value
 --        ||', lag_hash_value='||r.lag_hash_value
 --        ||', lag_datum_gap='||r.lag_datum_gap
---        ||', begin_mp='||r.begin_mp
---        ||', end_mp='||r.end_mp
+--        ||', inv_begin_mp='||r.inv_begin_mp
+--        ||', inv_end_mp='||r.inv_end_mp
 --        ||', chunk_seq='||r.chunk_seq
 --        ||', lag_chunk_seq='||r.lag_chunk_seq
 --        );
@@ -1459,7 +1491,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         and r.chunk_no = r.lag_chunk_no           -- new route chunk
         and r.hash_value = r.lag_hash_value       -- different inv attribute values
         and r.lag_datum_gap = 0                   -- prevous chunk does not reach the datum end
-        and r.begin_mp < r.end_mp                 -- do not connect point chunks (differ from old code results)
+        and r.inv_begin_mp < r.inv_end_mp         -- do not connect point chunks (differ from old code results)
         and r.chunk_seq - r.lag_chunk_seq <= 1    -- gap between chunk sequences
         
       then
@@ -1482,20 +1514,20 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         
         -- begin offset
         if r.nt_unit_in = r.nt_unit_of then
-          t_sect(i).nms_begin_offset  := nvl(r.nm_slk, r.measure) + (r.begin_mp - r.nm_begin_mp);
+          t_sect(i).nms_begin_offset  := nvl(r.nm_slk, r.measure) + (r.inv_begin_mp - r.nm_begin_mp);
         else
           if r.nm_slk is null then
             t_sect(i).nms_begin_offset  := nm3unit.convert_unit(
-                r.nt_unit_of, r.nt_unit_in, r.measure + (r.begin_mp - r.nm_begin_mp));
+                r.nt_unit_of, r.nt_unit_in, r.measure + (r.inv_begin_mp - r.nm_begin_mp));
           else
             t_sect(i).nms_begin_offset  := r.nm_slk + nm3unit.convert_unit(
-                r.nt_unit_of, r.nt_unit_in, (r.begin_mp - r.nm_begin_mp));
+                r.nt_unit_of, r.nt_unit_in, (r.inv_begin_mp - r.nm_begin_mp));
           end if;      
         end if;
 
         t_sect(i).nms_end_offset      := null;
         t_sect(i).nms_ne_id_first     := r.nm_ne_id_of;
-        t_sect(i).nms_begin_mp_first  := r.begin_mp;
+        t_sect(i).nms_begin_mp_first  := r.inv_begin_mp; --r.inv_begin_mp;
         t_sect(i).nms_ne_id_last      := null;
         t_sect(i).nms_end_mp_last     := null;
         t_sect(i).nms_in_results      := 'Y';
@@ -1506,19 +1538,23 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       
       -- carry forward the section end values
       t_sect(i).nms_ne_id_last  := r.nm_ne_id_of;
-      t_sect(i).nms_end_mp_last := r.end_mp;
+      t_sect(i).nms_end_mp_last := r.inv_end_mp; --r.inv_end_mp;
       
       -- end offset
-      if r.nt_unit_in = r.nt_unit_of then
-        t_sect(i).nms_end_offset  := nvl(r.nm_end_slk, r.end_measure) - (r.nm_end_mp - r.end_mp);
+      --  special case point section, use begin value
+      if r.nm_inv_begin_mp = r.nm_inv_end_mp then
+        t_sect(i).nms_end_offset := t_sect(i).nms_begin_offset;
+      -- standard section, calcualte
+      elsif r.nt_unit_in = r.nt_unit_of then
+        t_sect(i).nms_end_offset  := nvl(r.nm_end_slk, r.end_measure) - (r.nm_end_mp - r.inv_end_mp);
       else
         if r.nm_end_slk is null then
           t_sect(i).nms_end_offset  := nm3unit.convert_unit(
-              r.nt_unit_of, r.nt_unit_in, r.end_measure - (r.nm_end_mp - r.end_mp));
+              r.nt_unit_of, r.nt_unit_in, r.end_measure - (r.nm_end_mp - r.inv_end_mp));
         else
           t_sect(i).nms_end_offset  := r.nm_end_slk - nm3unit.convert_unit(
-              r.nt_unit_of, r.nt_unit_in, (r.nm_end_mp - r.end_mp));
-        end if;      
+              r.nt_unit_of, r.nt_unit_in, (r.nm_end_mp - r.inv_end_mp));
+        end if;
       end if;
     
       
@@ -1527,11 +1563,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       t_memb(k).nsm_mrg_job_id      := t_sect(i).nms_mrg_job_id;
       t_memb(k).nsm_mrg_section_id  := t_sect(i).nms_mrg_section_id;
       t_memb(k).nsm_ne_id           := r.nm_ne_id_of;
-      t_memb(k).nsm_begin_mp        := r.begin_mp;
-      t_memb(k).nsm_end_mp          := r.end_mp;
+      t_memb(k).nsm_begin_mp        := r.nm_inv_begin_mp; --r.inv_begin_mp;
+      t_memb(k).nsm_end_mp          := r.nm_inv_end_mp; --r.inv_end_mp;
       t_memb(k).nsm_measure         := l_nsm_measure;
       
-      l_nsm_measure := l_nsm_measure + (r.end_mp - r.begin_mp);
+      l_nsm_measure := l_nsm_measure + (r.nm_inv_end_mp - r.nm_inv_begin_mp);
       
       
     end loop;
@@ -1807,7 +1843,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           if pt_attr(i).seq = 1 then
             k := k + 1;
             s_tmp := '    ,(select distinct '''||pt_attr(i).inv_type||''' ft_inv_type, '
-              ||'ft'||k||'.'||pt_attr(i).table_pk_column||', ft'||k||'.'||pt_attr(i).ita_attrib_name;
+              --||'ft'||k||'.'||pt_attr(i).table_pk_column||', ft'||k||'.'||pt_attr(i).ita_attrib_name;
+              ||'ft'||k||'.'||pt_attr(i).table_pk_column||' '||pt_attr(i).table_pk_column||'$, ft'||k||'.'||pt_attr(i).ita_attrib_name;
             s_tmp_tbl := pt_attr(i).table_name;
               
           -- add column to existing
@@ -1842,7 +1879,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         if pt_attr(i).seq = 1 and pt_attr(i).table_name is not null then
           k := k + 1;
           s := s||cr||'    and t.nm_obj_type = i'||k||'.ft_inv_type (+)'
-                ||cr||'    and t.nm_ne_id_in = i'||k||'.'||pt_attr(i).table_pk_column||' (+)';
+                ||cr||'    and t.nm_ne_id_in = i'||k||'.'||pt_attr(i).table_pk_column||'$ (+)';
         end if;
         i := pt_attr.next(i);
       end loop;
