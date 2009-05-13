@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.25   May 11 2009 14:46:04   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.26   May 13 2009 13:45:00   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   May 11 2009 14:46:04  $
---       Date fetched Out : $Modtime:   May 11 2009 14:23:46  $
---       PVCS Version     : $Revision:   2.25  $
+--       Date into PVCS   : $Date:   May 13 2009 13:45:00  $
+--       Date fetched Out : $Modtime:   May 13 2009 13:37:24  $
+--       PVCS Version     : $Revision:   2.26  $
 --
 --
 --   Author : Priidu Tanava
@@ -79,13 +79,14 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                added $ suffix to the FT pk column also in std_insert_invitems()
                fixed the std_populate() query: wrong value in lag_nm_ne_id_in introduced with changes to section order
                fixed a problem in ins_datum_homo_chunks(): chunks incorrectly merged when point placements are involved
+  13.05.09  PT added xsp as default splitting agent in ins_datum_homo_chunks()
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
         add ita_format_mask to ita_mapping_rec
         add nm_route_connect_tmp_ordered view with the next schema change
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.25  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.26  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -861,16 +862,17 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ||cr||'  ,count(distinct q2.nm_obj_type) obj_type_count'
     ||cr||'from ('
     ||cr||'select'
-    ||cr||'  to_char(dbms_utility.get_hash_value('
+    ||cr||'  to_char(dbms_utility.get_hash_value(q.xsp$||'',''||'
         ||sql_hascode_cols('q')
     ||cr||'    ,0, 262144))'
-    ||cr||'  ||''_''||dbms_utility.get_hash_value('
+    ||cr||'  ||''_''||dbms_utility.get_hash_value(q.xsp$||'',''||'
         ||sql_hascode_cols('q')||'||'',xxx'''
     ||cr||'    ,0, 262144) hash_value'
     ||cr||'  ,q.*'
     ||cr||'from ('
     ||cr||'select /*+ cardinality(t '||l_cardinality||') */'
     ||cr||'   t.*'
+    ||cr||'  ,i.iit_x_sect xsp$'
         ||sql_case_cols
     ||cr||'from'
     ||cr||'   nm_mrg_split_results_tmp t'
