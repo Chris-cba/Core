@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.26   May 13 2009 13:45:00   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.27   May 15 2009 13:14:14   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   May 13 2009 13:45:00  $
---       Date fetched Out : $Modtime:   May 13 2009 13:37:24  $
---       PVCS Version     : $Revision:   2.26  $
+--       Date into PVCS   : $Date:   May 15 2009 13:14:14  $
+--       Date fetched Out : $Modtime:   May 15 2009 13:09:20  $
+--       PVCS Version     : $Revision:   2.27  $
 --
 --
 --   Author : Priidu Tanava
@@ -80,13 +80,14 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                fixed the std_populate() query: wrong value in lag_nm_ne_id_in introduced with changes to section order
                fixed a problem in ins_datum_homo_chunks(): chunks incorrectly merged when point placements are involved
   13.05.09  PT added xsp as default splitting agent in ins_datum_homo_chunks()
+  15.05.09  PT in std_populate() fixed the first missing section problem caused by bad ordering in analytic functions
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
         add ita_format_mask to ita_mapping_rec
         add nm_route_connect_tmp_ordered view with the next schema change
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.26  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.27  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -1367,9 +1368,9 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           ,q3.lag_chunk_no
           ,q3.lag_chunk_seq
           ,lag(q3.hash_value, 1, null) over
-            (partition by q3.nm_ne_id_in, q3.chunk_no order by q3.chunk_seq, q3.inv_begin_mp) lag_hash_value
+            (partition by q3.nm_ne_id_in, q3.chunk_no order by q3.chunk_seq, q3.inv_begin_mp, q3.inv_end_mp) lag_hash_value
           ,lag(q3.nm_end_mp - q3.inv_end_mp, 1, 0) over
-            (partition by q3.nm_ne_id_in, q3.chunk_no order by q3.chunk_seq, q3.inv_begin_mp) lag_datum_gap
+            (partition by q3.nm_ne_id_in, q3.chunk_no order by q3.chunk_seq, q3.inv_begin_mp, q3.inv_end_mp) lag_datum_gap
         from (
         select q2.*
           ,decode(q2.nm_cardinality, 1, q2.begin_mp, q2.nm_end_mp - q2.end_mp) inv_begin_mp
@@ -1380,11 +1381,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           ,greatest(inv.nm_begin_mp, qq.nm_begin_mp) begin_mp
           ,least(inv.nm_end_mp, qq.nm_end_mp) end_mp
           ,lag(qq.nm_ne_id_in, 1, null) over
-            (order by qq.nm_ne_id_in, qq.chunk_no, qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality) lag_nm_ne_id_in
+            (order by qq.nm_ne_id_in, qq.chunk_no, qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality, inv.nm_end_mp * qq.nm_cardinality) lag_nm_ne_id_in
           ,lag(qq.chunk_no, 1, null) over
-            (partition by qq.nm_ne_id_in order by qq.chunk_no) lag_chunk_no
+            (partition by qq.nm_ne_id_in order by qq.chunk_no, qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality, inv.nm_end_mp * qq.nm_cardinality) lag_chunk_no
           ,lag(qq.chunk_seq, 1, null) over
-            (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq) lag_chunk_seq
+            (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality, inv.nm_end_mp * qq.nm_cardinality) lag_chunk_seq
           ,inv.hash_value
           ,inv.nm_begin_mp nm_inv_begin_mp
           ,inv.nm_end_mp nm_inv_end_mp
@@ -2084,6 +2085,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ||cr||'where m.nsm_mrg_job_id = :p_mrg_job_id'
     ||cr||'  and m.nsm_ne_id = t.nm_ne_id_of'
     ||cr||'  and ((t.nm_begin_mp < m.nsm_end_mp and t.nm_end_mp > m.nsm_begin_mp)'
+--    ||cr||'    or (t.nm_begin_mp = t.nm_end_mp and t.nm_begin_mp = m.nsm_begin_mp and t.nm_begin_mp = m.nsm_end_mp))'
     ||cr||'    or ((t.nm_begin_mp = t.nm_end_mp or m.nsm_begin_mp = m.nsm_end_mp)'
     ||cr||'      and (t.nm_begin_mp = m.nsm_end_mp or t.nm_end_mp = m.nsm_begin_mp)))'
     ||cr||'  and t.iit_rowid = i.rowid (+)'
