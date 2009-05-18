@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.10   May 08 2009 13:21:10   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.11   May 18 2009 11:11:30   lsorathia  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   May 08 2009 13:21:10  $
---       Date fetched Out : $Modtime:   May 08 2009 11:44:04  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   May 18 2009 11:11:30  $
+--       Date fetched Out : $Modtime:   May 18 2009 10:53:08  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --
 --   Author : Jonathan Mills
@@ -25,8 +25,22 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    type t_chunk_rec is record(begin_mp nm_members.nm_begin_mp%type
                              ,end_mp   nm_members.nm_end_mp%TYPE); 
    type t_chunk_arr is table of t_chunk_rec index by pls_integer;
+
+   -- Log 713421
+   TYPE l_child_ne IS RECORD (iit_ne_id        nm_inv_items.iit_ne_id%TYPE
+                             ,child_obj_type   nm_inv_items.iit_inv_type%TYPE
+                             ,parent_obj_type  nm_inv_items.iit_inv_type%TYPE
+                             ,child_location   nm_inv_nw.nin_loc_mandatory%TYPE
+                             ,rel_mandatory    nm_inv_type_groupings.itg_mandatory%TYPE
+                             ,itg_relation     nm_inv_type_groupings.itg_relation%TYPE) ;
+   l_child_ne_rec  l_child_ne ;
+   TYPE l_child_ne_table IS TABLE OF l_child_ne INDEX BY BINARY_INTEGER;
+   l_child_ne_tab l_child_ne_table ;
+   l_par_iit_tab  nm3type.tab_rec_iit ;
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
+   -- Log 713421
+   
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -52,6 +66,8 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    c_xattr_status BOOLEAN := nm3inv_xattr.g_xattr_active;
    
    g_debug_on boolean := FALSE;
+
+
 --
 -----------------------------------------------------------------------------
 --
@@ -171,6 +187,7 @@ PROCEDURE homo_update_old (p_temp_ne_id_in  IN     NUMBER
                       ,p_warning_msg       OUT VARCHAR2
                       ) IS
 --
+   
    CURSOR cs_affected_inv
                 (p_nte_job_id NUMBER
                 ,p_inv_type   VARCHAR2
@@ -530,38 +547,128 @@ BEGIN
       END IF;
    --
    --
+   -- LOG 713421
    -- ####################################################################################
    --  Do not allow location chnage of Child IN records which have a parent
    -- ####################################################################################
    --
-      IF   does_relation_exist(l_rec_nit.nit_inv_type,nm3invval.c_in_relation)
-       AND has_parent (l_rec_iit.iit_ne_id)
-       THEN  
-           DECLARE
-            l_ne_id NUMBER ;
-            CURSOR  c_parent_id IS
-            SELECT  iig_parent_id 
-            FROM    nm_inv_item_groupings iig
-            WHERE   iig_item_id = l_rec_iit.iit_ne_id ;
-            l_parent_iit_id nm_inv_items.iit_ne_id%TYPE ;
-           BEGIN
-           --
-              OPEN   c_parent_id;
-              FETCH  c_parent_id INTO l_parent_iit_id ;
-              CLOSE  c_parent_id;
-              --
-              SELECT ne_id INTO l_ne_id
-              FROM   
-                 (SELECT x.pl_ne_id ne_id
-                  FROM   table( NM3PLA.SUBTRACT_PL_FROM_PL( l_new_inv_pl_arr, NM3PLA.GET_PLACEMENT_FROM_NE( l_parent_iit_id )).npa_placement_array) x
-                  )
-              WHERE  ne_id IS NOT NULL;                     
-              Raise_Application_Error(-20010,'Cannot locate Child Asset outside the bounds of Parent Location');
-           --
-           EXCEPTION
-               WHEN no_data_found 
-               THEN null;
-           END ;        
+      IF   (does_relation_exist(l_rec_nit.nit_inv_type,nm3invval.c_in_relation)
+           OR 
+           does_relation_exist(l_rec_nit.nit_inv_type,nm3invval.c_derived_relation) )
+      AND  has_parent (l_rec_iit.iit_ne_id)
+      THEN
+          DECLARE
+             l_found_par Boolean ;
+             c_pl CONSTANT NM_PLACEMENT := l_new_inv_pl_arr.npa_placement_array(1);
+             l_ne_id NUMBER ;
+             CURSOR  c_parent IS
+             SELECT  iig_parent_id ,
+                     iit.iit_inv_type 
+             FROM    nm_inv_item_groupings iig,
+                     nm_inv_items          iit
+             WHERE   iig_item_id   =   l_rec_iit.iit_ne_id
+             AND     iig_parent_id = iit.iit_ne_id ;
+             l_parent_rec c_parent%ROWTYPE ;
+             l_iit_rec nm_inv_items%ROWTYPE := nm3get.get_iit(l_rec_iit.iit_ne_id);
+             --
+             CURSOR c_child_loc IS
+             SELECT nin_loc_mandatory 
+             FROM   nm_inv_nw
+             WHERE  nin_nit_inv_code = l_iit_rec.iit_inv_type ;
+             l_loc_man nm_inv_nw.nin_loc_mandatory%TYPE;
+             --
+             CURSOR c_get_rel_mandatory IS
+             SELECT  itg_mandatory
+                    ,itg_relation
+             FROM    nm_inv_type_groupings
+             WHERE   itg_inv_type = l_iit_rec.iit_inv_type ;
+             l_rel_mandatory  c_get_rel_mandatory%ROWTYPE ;
+          BEGIN
+             l_found_par := False;
+             OPEN   c_parent;
+             FETCH  c_parent INTO l_parent_rec ;
+             CLOSE  c_parent;
+             --
+             OPEN   c_child_loc;
+             FETCH  c_child_loc INTO l_loc_man ;
+             CLOSE  c_child_loc;
+             --
+             OPEN   c_get_rel_mandatory;
+             FETCH  c_get_rel_mandatory INTO l_rel_mandatory ;
+             CLOSE  c_get_rel_mandatory;
+             --
+             FOR i in (SELECT * 
+                       FROM   nm_members
+                             ,nm_inv_items
+                       WHERE  nm_obj_type = l_parent_rec.iit_inv_type
+                       AND    nm_ne_id_in = iit_ne_id
+                       AND    (nm_ne_id_of,Nvl(iit_x_sect,'-')) IN (SELECT x.pl_ne_id,Nvl(l_iit_rec.iit_x_sect,'-')
+                                                                    FROM   table(l_new_inv_pl_arr.npa_placement_array) x)
+                 )
+             LOOP
+                 DECLARE
+                    --
+                    l_ne_id Number  ;
+                 BEGIN
+                    --  
+                    SELECT ne_id INTO l_ne_id
+                    FROM
+                        (SELECT x.pl_ne_id ne_id
+                         from  table( NM3PLA.SUBTRACT_PL_FROM_PL(l_new_inv_pl_arr, NM3PLA.GET_PLACEMENT_FROM_NE( i.nm_ne_id_in )).npa_placement_array) x
+                         )
+                    WHERE ne_id IS NOT NULL;   
+                    --               
+                    EXCEPTION
+                        WHEN NO_DATA_FOUND
+                        THEN
+                            l_found_par   := TRUE ;
+                            DECLARE
+                               --
+                               l_iig_rec     nm_inv_item_groupings%ROWTYPE ;
+                               --
+                            BEGIN
+                               --
+                               IF l_parent_rec.iig_parent_id != i.nm_ne_id_in
+                               THEN 
+                                   Update nm_inv_item_groupings
+                                   SET    iig_end_date = p_effective_date
+                                   WHERE  iig_item_id  = l_rec_iit.iit_ne_id ;
+                                   --
+                                   l_iig_rec.iig_top_id     := nm3invval.get_iig_top_id(i.nm_ne_id_in) ;
+                                   l_iig_rec.iig_item_id    := l_rec_iit.iit_ne_id ;
+                                   l_iig_rec.iig_parent_id  := i.nm_ne_id_in ;
+                                   l_iig_rec.iig_start_date := p_effective_date ;
+                                   nm3ins.ins_iig(l_iig_rec);                   
+                               END IF;
+                               --
+                           END ;
+                        WHEN Others
+                        THEN 
+                            Null ;
+                 END ;        
+             END LOOP ;
+             IF NOT l_found_par 
+             THEN                 
+                 IF  Nvl(l_loc_man,'N')                     = 'N'                   
+                 AND NVL(l_rel_mandatory.itg_mandatory,'N') = 'N'
+                 THEN
+                     UPDATE nm_inv_item_groupings
+                     SET    iig_end_date  = p_effective_date
+                     WHERE  iig_item_id   = l_rec_iit.iit_ne_id ;
+                 ELSIF Nvl(l_loc_man,'N')                     = 'Y'                   
+                 AND   NVL(l_rel_mandatory.itg_mandatory,'N') = 'N'
+                 AND   l_rel_mandatory.itg_relation           = nm3invval.c_derived_relation
+                 THEN
+                     UPDATE nm_inv_item_groupings
+                     SET    iig_end_date  = p_effective_date
+                     WHERE  iig_item_id   = l_rec_iit.iit_ne_id ;
+                 ELSE
+                     g_homo_exc_code   := -20511;
+                     g_homo_exc_msg    := 'Cannot locate Child Asset outside the bounds of Parent Location';
+                     RAISE g_homo_exception;
+                 END IF ;
+             END IF ;
+         END ;
       END IF;
    --
    --  #############################################################################
@@ -1025,6 +1132,7 @@ BEGIN
                                                AND   iig_parent_id      = iit_p.iit_ne_id
                                                AND   iig_item_id        = iit.iit_ne_id
                                                AND   iit.iit_inv_type   = itg_inv_type
+                                               AND   itg_relation = 'AT'                --LOG 713421
                                                AND   iit_p.iit_inv_type = itg_parent_inv_type
                                                ) 
                         AND    nm_type = 'I'       ;                     
@@ -1233,6 +1341,187 @@ BEGIN
    deal_with_hierarchical (p_ne_id          => l_rec_iit.iit_ne_id
                           ,p_effective_date => p_effective_date
                           );
+   -- LOG 713421
+   FOR j in 1..l_child_ne_tab.count 
+   LOOP
+       l_child_ne_rec := l_child_ne_tab(j) ;
+       DECLARE
+          l_found_par Boolean ;
+       BEGIN
+         l_found_par := False;
+         FOR i in (SELECT * 
+                   FROM   nm_members
+                         ,nm_inv_items 
+                   WHERE  nm_obj_type = l_child_ne_rec.parent_obj_type 
+                   AND    nm_ne_id_in = iit_ne_id
+                   AND    (nm_ne_id_of,Nvl(iit_x_sect,'-')) IN (SELECT nm_ne_id_of,Nvl(iit_x_sect,'-') 
+                                                                FROM   nm_members 
+                                                                      ,nm_inv_items    
+                                                                WHERE  nm_obj_type = l_child_ne_rec.child_obj_type  
+                                                                AND    nm_ne_id_in = l_child_ne_rec.iit_ne_id 
+                                                                AND    nm_ne_id_in = iit_ne_id))
+         LOOP
+             DECLARE
+               --
+               l_ne_id Number  ;
+               BEGIN
+                  --  
+                  SELECT ne_id INTO l_ne_id
+                  FROM
+                      (SELECT x.pl_ne_id ne_id
+                       from  table( NM3PLA.SUBTRACT_PL_FROM_PL( NM3PLA.GET_PLACEMENT_FROM_NE( l_child_ne_rec.iit_ne_id ), NM3PLA.GET_PLACEMENT_FROM_NE( i.nm_ne_id_in )).npa_placement_array) x
+                       )
+                  WHERE ne_id IS NOT NULL;   
+                  --               
+             EXCEPTION
+                 WHEN NO_DATA_FOUND
+                 THEN
+                     l_found_par   := TRUE ;
+                     DECLARE
+                        --
+                        l_iig_rec     nm_inv_item_groupings%ROWTYPE ;
+                        CURSOR  c_parent IS
+                        SELECT  iig_parent_id ,
+                                iit.iit_inv_type 
+                        FROM    nm_inv_item_groupings iig,
+                                nm_inv_items          iit
+                        WHERE   iig_item_id   =   l_child_ne_rec.iit_ne_id
+                        AND     iig_parent_id = iit.iit_ne_id ;
+                        l_rec  c_parent%ROWTYPE ; 
+                        --
+                     BEGIN
+                        --
+                        OPEN   c_parent;
+                        FETCH  c_parent INTO l_rec ;
+                        CLOSE  c_parent;
+                        
+                        IF l_rec.iig_parent_id != i.nm_ne_id_in
+                        THEN
+                            Update nm_inv_item_groupings
+                            SET    iig_end_date = p_effective_date
+                            WHERE  iig_item_id  = l_child_ne_rec.iit_ne_id ;
+                            --
+                            l_iig_rec.iig_top_id     := nm3invval.get_iig_top_id(i.nm_ne_id_in) ;
+                            l_iig_rec.iig_item_id    := l_child_ne_rec.iit_ne_id ;
+                            l_iig_rec.iig_parent_id  := i.nm_ne_id_in ;
+                            l_iig_rec.iig_start_date := p_effective_date ;
+                            nm3ins.ins_iig(l_iig_rec);                   
+                        END IF ;
+                        --
+                     END ;
+             END ;       
+         END LOOP ;
+         IF NOT l_found_par 
+         THEN
+             IF  l_child_ne_rec.child_location  = 'N'
+             AND l_child_ne_rec.rel_mandatory   = 'N'
+             AND l_child_ne_rec.itg_relation    = nm3invval.c_derived_relation 
+             THEN
+                 UPDATE nm_inv_item_groupings
+                 SET    iig_end_date = p_effective_date
+                 WHERE  iig_item_id  = l_child_ne_rec.iit_ne_id ;
+             ELSIF l_child_ne_rec.child_location  = 'N'
+             AND   l_child_ne_rec.rel_mandatory   = 'N'
+             AND   l_child_ne_rec.itg_relation    = nm3invval.c_in_relation
+             THEN
+                 UPDATE nm_members
+                 SET    nm_end_date = p_effective_date
+                 WHERE  nm_ne_id_in  = l_child_ne_rec.iit_ne_id ;
+             ELSIF l_child_ne_rec.child_location  = 'Y'
+             AND   l_child_ne_rec.rel_mandatory   = 'N'
+             THEN
+                 UPDATE nm_inv_item_groupings
+                 SET    iig_end_date = p_effective_date
+                 WHERE  iig_item_id  = l_child_ne_rec.iit_ne_id ;
+             ELSIF l_child_ne_rec.child_location  = 'N'
+             AND   l_child_ne_rec.rel_mandatory   = 'Y'
+             THEN
+                 UPDATE nm_members
+                 SET    nm_end_date = p_effective_date
+                 WHERE  nm_ne_id_in  = l_child_ne_rec.iit_ne_id ;
+             ELSE
+                 g_homo_exc_code   := -20511;
+                 g_homo_exc_msg    := 'Cannot locate Child Asset outside the bounds of Parent Location';
+                 RAISE g_homo_exception;
+             END IF ;
+
+         END IF ;
+      END ;
+   END LOOP ;
+   l_child_ne_tab.delete ;
+   DECLARE
+      l_par_iit_rec nm_inv_items%ROWTYPE ;
+   BEGIN
+      FOR i in 1..l_par_iit_tab.count
+      LOOP
+          l_par_iit_rec  := l_par_iit_tab(i);
+          FOR j IN (SELECT  DISTINCT iit_ne_id 
+                    FROM    nm_inv_items iit
+                           ,nm_members nm
+                    WHERE   iit.iit_ne_id = nm.nm_ne_id_in 
+                    AND     nm.nm_ne_id_of IN (SELECT nm_ne_id_of 
+                                               FROM    nm_members 
+                                               WHERE   nm_ne_id_in = l_par_iit_rec.iit_ne_id)        
+                    AND     EXISTS (SELECT 'x' 
+                                    FROM   nm_inv_type_groupings 
+                                    WHERE  itg_parent_inv_type = l_par_iit_rec.iit_inv_type  
+                                    AND    itg_inv_type = iit.iit_inv_type 
+                                    AND    ((itg_relation = nm3invval.c_derived_relation)
+                                            OR 
+                                           (itg_relation = nm3invval.c_in_relation
+                                           AND 'Y' IN  (SELECT nin_loc_mandatory FROM nm_inv_nw WHERE nin_nit_inv_code = iit.iit_inv_type  ))
+                                           )
+                                   )
+                    AND   NOT EXISTS (SELECT 'x' FROM nm_inv_item_groupings WHERE iig_item_ID = iit.iit_ne_id)
+                    )      
+          LOOP
+              DECLARE
+              --
+                 l_ne_id Number  ;
+              BEGIN
+                 --  
+                 SELECT ne_id INTO l_ne_id
+                 FROM
+                     (SELECT x.pl_ne_id ne_id
+                      from  table( NM3PLA.SUBTRACT_PL_FROM_PL( NM3PLA.GET_PLACEMENT_FROM_NE( j.iit_ne_id ), NM3PLA.GET_PLACEMENT_FROM_NE( l_par_iit_rec.iit_ne_id )).npa_placement_array) x
+                      )
+                 WHERE ne_id IS NOT NULL;   
+                 --               
+              EXCEPTION
+                  WHEN NO_DATA_FOUND
+                  THEN
+                      DECLARE
+                         --
+                         l_iig_rec     nm_inv_item_groupings%ROWTYPE ;
+                         CURSOR  c_parent IS
+                         SELECT  iig_parent_id ,
+                                 iit.iit_inv_type 
+                         FROM    nm_inv_item_groupings iig,
+                                 nm_inv_items          iit
+                         WHERE   iig_item_id   =   l_child_ne_rec.iit_ne_id
+                         AND     iig_parent_id = iit.iit_ne_id ;
+                         l_rec  c_parent%ROWTYPE ; 
+                         --
+                      BEGIN
+                         --
+                         OPEN   c_parent;
+                         FETCH  c_parent INTO l_rec ;
+                         CLOSE  c_parent;                       
+                         --
+                         l_iig_rec.iig_top_id     := nm3invval.get_iig_top_id(l_par_iit_rec.iit_ne_id) ;
+                         l_iig_rec.iig_item_id    := j.iit_ne_id ;
+                         l_iig_rec.iig_parent_id  := l_par_iit_rec.iit_ne_id ;
+                         l_iig_rec.iig_start_date := p_effective_date ;
+                         nm3ins.ins_iig(l_iig_rec);                   
+                         --
+                      END ;
+              END ;
+          END LOOP;      
+      END LOOP;
+   END  ;
+   l_par_iit_tab.delete ;
+   -- LOG 713421
+
 --
    IF  l_rec_nit.nit_contiguous        = 'Y'
     OR l_rec_nit.nit_multiple_allowed != 'Y'
@@ -1844,6 +2133,7 @@ BEGIN
                                                AND   iig_parent_id      = iit_p.iit_ne_id
                                                AND   iig_item_id        = iit.iit_ne_id
                                                AND   iit.iit_inv_type   = itg_inv_type
+                                               AND   itg_relation       = 'AT'                --LOG 713421
                                                AND   iit_p.iit_inv_type = itg_parent_inv_type
                                                ) 
                         AND    nm_type = 'I'       ;                     
@@ -3833,6 +4123,7 @@ BEGIN
       deal_with_hierarchical(p_ne_id          => l_rec_iit.iit_ne_id
                             ,p_effective_date => l_date_to_process);
       
+
       --check for holes
       --get temp ne for location at this date
       db('  create nte for this date');
@@ -4021,18 +4312,23 @@ PROCEDURE deal_with_hierarchical (p_ne_id          NUMBER
    FOR UPDATE OF nm_end_date NOWAIT;
 --
    l_tab_rowid nm3type.tab_rowid;
+   l_rec nm_inv_items%ROWTYPE; -- Log 713421
 --
 BEGIN
 --
    nm_debug.proc_start(g_package_name,'deal_with_hierarchical');
 --
+   l_rec := nm3get.get_iit(p_ne_id);                 -- Log 713421
+   l_par_iit_tab(l_par_iit_tab.count+1) := l_rec ;   -- Log 713421
    IF has_children (p_ne_id)
     THEN
       FOR cs_rec IN (SELECT iit.iit_ne_id
                            ,iit.iit_admin_unit
                            ,iit.iit_inv_type
                            ,itg_relation
-                           ,nin_loc_mandatory -- LOG 713421
+                           ,nin_loc_mandatory             -- LOG 713421
+                           ,iit_p.iit_inv_type parent_obj -- LOG 713421
+                           ,itg_mandatory                 -- LOG 713421
                       FROM  NM_INV_ITEMS iit
                            ,NM_INV_ITEMS iit_p
                            ,NM_INV_TYPE_GROUPINGS
@@ -4055,108 +4351,88 @@ BEGIN
          DECLARE
             couldnt_care_less EXCEPTION;
          BEGIN
-         --
+         --          
             IF    cs_rec.itg_relation  = nm3invval.c_none_relation
              THEN  -- If it's a NONE relation when we aren't bothered for moving
                RAISE couldnt_care_less;
             --LOG 713421
             --ELSIF cs_rec.itg_relation != nm3invval.c_at_relation
-            ELSIF cs_rec.itg_relation NOT IN ( nm3invval.c_at_relation,nm3invval.c_in_relation)
+            ELSIF cs_rec.itg_relation NOT IN ( nm3invval.c_at_relation,nm3invval.c_in_relation,nm3invval.c_derived_relation)
             THEN
                 g_homo_exc_code := -20511;
                 g_homo_exc_msg  := 'There are child inventory records which would be affected';
                 RAISE g_homo_exception;
             END IF;
-            IF  cs_rec.itg_relation = nm3invval.c_in_relation
+            -- LOG 713421
+            IF  cs_rec.itg_relation IN ( nm3invval.c_in_relation,nm3invval.c_derived_relation)
             THEN
-                IF NVL(hig.get_sysopt(p_option_id => 'INVCHIINED'), 'N') = 'Y'
-                THEN
-                --                 
-                   IF  NVL(cs_rec.nin_loc_mandatory,'N')     = 'Y'
-                   THEN
+                DECLARE
+                --
+                  l_cnt Number ;
+                  l_check_fur Boolean := False;
+                BEGIN
+                --
+                   SELECT  count(0) 
+                   INTO    l_cnt 
+                   FROM    nm_members 
+                   WHERE   nm_ne_id_in = cs_rec.iit_ne_id ;
+                   IF l_cnt > 0
+                   THEN 
                        DECLARE
                        --
                           l_ne_id Number  ;
                        BEGIN
-                       --
+                         --
                           SELECT ne_id INTO l_ne_id
                           FROM
                               (SELECT  x.pl_ne_id ne_id
                                FROM    table(nm3pla.get_ne_intersection( p_ne_id, cs_rec.iit_ne_id).npa_placement_array)  x 
-                              )
+                               )
                           WHERE ne_id IS NOT NULL;
                        EXCEPTION
-                          WHEN no_data_found 
-                          THEN
-                              g_homo_exc_code := -20511;
-                              g_homo_exc_msg  := 'Cannot locate Child Asset outside the bounds of Parent Location';
-                              RAISE g_homo_exception;
-                       ENd ;
-                       DECLARE
-                       --
-                          l_ne_id Number  ;
-                       BEGIN
-                       --                          
-                          SELECT ne_id INTO l_ne_id
-                          FROM
-                              (SELECT x.pl_ne_id ne_id
-                               from  table( NM3PLA.SUBTRACT_PL_FROM_PL( nm3pla.get_ne_intersection( p_ne_id, cs_rec.iit_ne_id ), NM3PLA.GET_PLACEMENT_FROM_NE( p_ne_id )).npa_placement_array) x
-                               )
-                          WHERE ne_id IS NOT NULL;   
-
-                          g_homo_exc_code := -20511;
-                          g_homo_exc_msg  := 'Cannot locate Child Asset outside the bounds of Parent Location';
-                          RAISE g_homo_exception;                         
-                       EXCEPTION
-                          WHEN no_data_found 
-                          THEN
-                              Null ;
+                          WHEN Others  
+                          THEN        
+                              l_check_fur := TRUE ;
+                              l_child_ne_rec.iit_ne_id       := cs_rec.iit_ne_id;
+                              l_child_ne_rec.child_location  := NVL(cs_rec.nin_loc_mandatory,'N');
+                              l_child_ne_rec.child_obj_type  := cs_rec.iit_inv_type ;
+                              l_child_ne_rec.parent_obj_type := cs_rec.parent_obj ;
+                              l_child_ne_rec.rel_mandatory   := Nvl(cs_rec.itg_mandatory,'N') ;
+                              l_child_ne_rec.itg_relation    := cs_rec.itg_relation ;
+                              l_child_ne_tab(l_child_ne_tab.count+1) :=l_child_ne_rec;
                        END ;
-                   ELSE
-                       DECLARE
-                       --
-                          l_ne_id Number  ;
-                       BEGIN
-                       --
-                          SELECT ne_id INTO l_ne_id
-                          FROM
-                              (SELECT  x.pl_ne_id ne_id
-                               FROM    table(nm3pla.get_ne_intersection( p_ne_id, cs_rec.iit_ne_id).npa_placement_array)  x 
-                              )
-                          WHERE ne_id IS NOT NULL;
-                       EXCEPTION
-                          WHEN no_data_found 
-                          THEN
-                              UPDATE nm_members
-                              SET    nm_end_date = p_effective_date
-                              WHERE  nm_ne_id_in = cs_rec.iit_ne_id ;
-                       END ;
-                       DECLARE
-                       --
-                          l_ne_id Number  ;
-                       BEGIN
-                       --                          
-                          SELECT ne_id INTO l_ne_id
-                          FROM
-                              (SELECT x.pl_ne_id ne_id
-                               from  table( NM3PLA.SUBTRACT_PL_FROM_PL( nm3pla.get_ne_intersection( p_ne_id, cs_rec.iit_ne_id ), NM3PLA.GET_PLACEMENT_FROM_NE( p_ne_id )).npa_placement_array) x
-                               )
-                          WHERE ne_id IS NOT NULL;   
-
-                          UPDATE nm_members
-                          SET    nm_end_date = p_effective_date
-                          WHERE  nm_ne_id_in = cs_rec.iit_ne_id ;                         
-                       EXCEPTION
-                          WHEN no_data_found 
-                          THEN
-                              Null ;
-                       END ;                       
+                       IF NOT l_check_fur
+                       THEN
+                           DECLARE
+                           --
+                              l_ne_id Number  ;
+                           BEGIN
+                              --  
+                              SELECT ne_id INTO l_ne_id
+                              FROM
+                                  (SELECT x.pl_ne_id ne_id
+                                   FROM   table( NM3PLA.SUBTRACT_PL_FROM_PL( nm3pla.get_ne_intersection( p_ne_id, cs_rec.iit_ne_id ), NM3PLA.GET_PLACEMENT_FROM_NE( p_ne_id )).npa_placement_array) x
+                                   )
+                              WHERE ne_id IS NOT NULL;   
+                              --
+                              l_child_ne_rec.iit_ne_id       := cs_rec.iit_ne_id;
+                              l_child_ne_rec.child_location  := NVL(cs_rec.nin_loc_mandatory,'N');
+                              l_child_ne_rec.child_obj_type  := cs_rec.iit_inv_type ;
+                              l_child_ne_rec.parent_obj_type := cs_rec.parent_obj ;
+                              l_child_ne_rec.rel_mandatory   := Nvl(cs_rec.itg_mandatory,'N') ;
+                              l_child_ne_rec.itg_relation    := cs_rec.itg_relation ;
+                              l_child_ne_tab(l_child_ne_tab.count+1) :=l_child_ne_rec;
+                           EXCEPTION
+                               WHEN No_Data_Found 
+                               THEN
+                                   Null ;
+                               WHEN Others
+                               THEN
+                               Raise ;
+                           END ;
+                       END IF ;
                    END IF ;
-                ELSE 
-                    g_homo_exc_code := -20511;
-                    g_homo_exc_msg  := 'Cannot locate Asset records which are in a Child IN relationship';
-                    RAISE g_homo_exception;
-                END IF ;
+                END ;   
             --
             ELSE    
                --
@@ -4314,13 +4590,17 @@ PROCEDURE end_inv_location_by_temp_ne (pi_iit_ne_id            IN     NM_INV_ITE
 -- DC cursor changed to select from nm_inv_items_all
 -- as the inventory item will be end-dated before this cursor is called
 -- if the location to be end-dated spans the entirety of the inventory location
+   -- LOG 713421
    CURSOR cs_children(p_iit_ne_id NM_INV_ITEMS.iit_ne_id%TYPE) IS
-     SELECT iig.iig_item_id  child_id
-           ,iit_inv_type
-      FROM  NM_INV_ITEM_GROUPINGS_ALL iig
-           ,NM_INV_ITEMS_ALL 
-     WHERE  iig.iig_parent_id = p_iit_ne_id
-      AND   iig.iig_item_id   = iit_ne_id;
+   SELECT  iig.iig_item_id  child_id
+          ,iit_inv_type
+          ,nin.nin_loc_mandatory
+   FROM    NM_INV_ITEM_GROUPINGS iig
+          ,NM_INV_ITEMS
+          ,nm_inv_nw nin
+   WHERE   iig.iig_parent_id = p_iit_ne_id
+   AND     iig.iig_item_id   = iit_ne_id
+   AND     iit_inv_type = nin.nin_nit_inv_code(+);
 --
    c_initial_effective_date CONSTANT DATE := nm3user.get_effective_date;
 --
@@ -4501,11 +4781,29 @@ BEGIN
     --
             l_rec_itg := nm3inv.get_itg(pi_inv_type => l_rec.iit_inv_type);
     --
-            IF  l_rec_itg.itg_mandatory = 'N'
-             OR l_rec_itg.itg_relation  = nm3invval.c_none_relation
-             THEN
+            -- LOG 713421
+            IF  l_rec_itg.itg_relation  = nm3invval.c_none_relation
+            THEN
                RAISE no_end_date;
             END IF;
+            IF  l_rec_itg.itg_relation  IN (nm3invval.c_derived_relation,nm3invval.c_in_relation)                
+            AND Nvl(l_rec.nin_loc_mandatory,'N') = 'Y'
+            AND Nvl(l_rec_itg.itg_mandatory,'N') = 'N'
+            THEN
+                UPDATE nm_inv_item_groupings
+                SET    iig_end_date = pi_effective_date
+                WHERE  iig_item_id  = l_rec.child_id ;
+                RAISE no_end_date;    
+            ELSIF l_rec_itg.itg_relation  = (nm3invval.c_derived_relation)                
+            AND   Nvl(l_rec.nin_loc_mandatory,'N') = 'Y'
+            AND   Nvl(l_rec_itg.itg_mandatory,'N') = 'Y'
+            THEN
+                UPDATE nm_inv_item_groupings
+                SET    iig_end_date = pi_effective_date
+                WHERE  iig_item_id  = l_rec.child_id ;
+            END IF;
+            -- LOG 713421
+         
 --          nm_debug.debug('############# '||'Doing it!');
     --
             end_inv_location_by_temp_ne (pi_iit_ne_id        => l_rec.child_id
