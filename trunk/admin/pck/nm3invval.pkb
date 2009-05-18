@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -----------------------------------------------------------------------------
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3invval.pkb	1.30 10/02/06"';
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -295,12 +295,14 @@ BEGIN
        AND l_rec_nii.trigger_mode = c_insert_mode
        THEN
          process_insert_for_child (l_rec_nii);
-      ELSIF l_rec_nii.is_parent
-       AND  l_rec_nii.trigger_mode = c_update_mode
-       AND  l_rec_nii.end_date IS NOT NULL
-       THEN
-         process_enddate_upd_for_parent (l_rec_nii);
       END IF;
+      -- 713421 
+      --      ELSIF l_rec_nii.is_parent
+      --       AND  l_rec_nii.trigger_mode = c_update_mode
+      --       AND  l_rec_nii.end_date IS NOT NULL
+      --       THEN
+      --         process_enddate_upd_for_parent (l_rec_nii);
+      --      END IF;
       IF   l_rec_nii.trigger_mode = c_update_mode
        AND l_rec_nii.end_date IS NOT NULL
        THEN
@@ -903,6 +905,7 @@ BEGIN
    -- Check for children
    --
  --nm_debug.debug('cs_child_iig');
+
    OPEN  cs_child_iig (p_rec_nii.ne_id, p_rec_nii.start_date, p_rec_nii.end_date);
    FETCH cs_child_iig INTO l_dummy;
    IF cs_child_iig%FOUND
@@ -916,42 +919,41 @@ BEGIN
        --RAISE l_has_children;
        IF p_rec_nii.end_date IS NOT NULL
        THEN
-           UPDATE nm_members
-           SET    nm_end_date = p_rec_nii.end_date
-           WHERE  nm_ne_id_in IN (SELECT  iig_item_id
-                                  FROM    nm_inv_item_groupings iig
-                                         ,nm_inv_items iit
-                                         ,nm_inv_type_groupings itg
-                                  WHERE  iig.iig_item_id       = iit.iit_ne_id
-                                  AND    iit.iit_inv_type      = itg.itg_inv_type
-                                  AND    itg.itg_mandatory     = 'Y'                                    
-                                  CONNECT By PRIOR iig_item_id = iig_parent_id
-                                  START   WITH iig_parent_id   = p_rec_nii.ne_id) ;
-           UPDATE nm_inv_items
-           Set    iit_end_date = p_rec_nii.end_date
-           WHERE  iit_ne_id    IN (SELECT  iig_item_id
-                                   FROM    nm_inv_item_groupings iig
-                                         ,nm_inv_items iit
-                                         ,nm_inv_type_groupings itg
-                                   WHERE  iig.iig_item_id       = iit.iit_ne_id
-                                   AND    iit.iit_inv_type      = itg.itg_inv_type
-                                   AND    itg.itg_mandatory     = 'Y'                                    
-                                   CONNECT By PRIOR iig_item_id = iig_parent_id
-                                   START   WITH iig_parent_id   = p_rec_nii.ne_id ) ;
+           -- LOG 713421
+           FOR l_rec IN (SELECT  iig_item_id
+                                ,itg_mandatory
+                                ,itg_relation
+                         FROM    nm_inv_item_groupings iig
+                                ,nm_inv_items iit
+                                ,nm_inv_type_groupings itg
+                         WHERE   iig.iig_item_id       = iit.iit_ne_id
+                         AND     iit.iit_inv_type      = itg.itg_inv_type
+                         CONNECT By PRIOR iig_item_id  = iig_parent_id
+                         START   WITH iig_parent_id    = p_rec_nii.ne_id 
+                        )
+           LOOP
+               IF  NVL(l_rec.itg_mandatory,'N')  = 'Y'
+               THEN
+                   UPDATE nm_members
+                   SET    nm_end_date = p_rec_nii.end_date
+                   WHERE  nm_ne_id_in = l_rec.iig_item_id
+                   AND    nm_type     = 'I' ;
 
+                   UPDATE nm_inv_item_groupings
+                   SET    iig_end_date = p_rec_nii.end_date
+                   WHERE  iig_item_id  = l_rec.iig_item_id ;
 
-           UPDATE nm_inv_item_groupings
-           SET    iig_end_date = p_rec_nii.end_date
-           WHERE  iig_item_id IN (SELECT  iig_item_id
-                                  FROM    nm_inv_item_groupings iig
-                                         ,nm_inv_items_all iit
-                                         ,nm_inv_type_groupings itg
-                                  WHERE   iig.iig_item_id       = iit.iit_ne_id
-                                  AND     iit.iit_inv_type      = itg.itg_inv_type
-                                  AND     itg.itg_mandatory     = 'Y'                                    
-                                  CONNECT By PRIOR iig_item_id = iig_parent_id
-                                  START   WITH iig_parent_id   = p_rec_nii.ne_id ) ;
-
+                   UPDATE nm_inv_items
+                   SET    iit_end_date = p_rec_nii.end_date
+                   WHERE  iit_ne_id    = l_rec.iig_item_id ;
+               ELSIF NVL(l_rec.itg_mandatory,'N')  = 'N'
+               THEN
+                   UPDATE nm_inv_item_groupings
+                   SET    iig_end_date = p_rec_nii.end_date
+                   WHERE  iig_item_id  = l_rec.iig_item_id ;                     
+               END IF ;  
+           END LOOP;
+           -- LOG 713421
        END IF ; 
    ELSE
        CLOSE cs_child_iig;
