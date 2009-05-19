@@ -1,56 +1,38 @@
---
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data5.sql-arc   2.1   Oct 16 2007 16:57:26   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data5.sql-arc   2.2   May 19 2009 11:17:06   jwadsworth  $
 --       Module Name      : $Workfile:   nm3data5.sql  $
---       Date into PVCS   : $Date:   Oct 16 2007 16:57:26  $
---       Date fetched Out : $Modtime:   Oct 16 2007 16:50:40  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 19 2009 11:17:06  $
+--       Date fetched Out : $Modtime:   May 19 2009 11:05:24  $
+--       Version          : $Revision:   2.2  $
+--       Table Owner      : NM3_METADATA
+--       Generation Date  : 19-MAY-2009 11:05
 --
 --   Product metadata script
+--   As at Release 4.1.0.0
+--
+--   Copyright (c) exor corporation ltd, 2009
+--
+--   TABLES PROCESSED
+--   ================
+--   DOC_CLASS
+--   DOC_MEDIA
+--   DOC_LOCATIONS
+--   DOC_TEMPLATE_GATEWAYS
+--   DOC_TEMPLATE_COLUMNS
+--   DOC_ENQUIRY_TYPES
+--   HIG_USERS
+--   HIG_USER_FAVOURITES
+--   HIG_SYSTEM_FAVOURITES
+--   NM_LOAD_DESTINATIONS
+--   NM_LOAD_DESTINATION_DEFAULTS
+--   NM_UPLOAD_FILE_GATEWAYS
+--   NM_UPLOAD_FILE_GATEWAY_COLS
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
------------------------------------------------------------------------------
---
---
-/***************************************************************************
 
-INFO
-====
-As at Release 4.0.2.0
-
-GENERATION DATE
-===============
-16-OCT-2007 16:50
-
-TABLES PROCESSED
-================
-DOC_CLASS
-DOC_MEDIA
-DOC_LOCATIONS
-DOC_TEMPLATE_GATEWAYS
-DOC_TEMPLATE_COLUMNS
-DOC_ENQUIRY_TYPES
-HIG_USERS
-HIG_USER_FAVOURITES
-HIG_SYSTEM_FAVOURITES
-NM_LOAD_DESTINATIONS
-NM_LOAD_DESTINATION_DEFAULTS
-NM_UPLOAD_FILE_GATEWAYS
-NM_UPLOAD_FILE_GATEWAY_COLS
-
-TABLE OWNER
-===========
-NM3_METADATA
-
-MODE (A-Append R-Refresh)
-========================
-A
-
-***************************************************************************/
 
 set define off;
 set feedback off;
@@ -59,26 +41,20 @@ set feedback off;
 -- START OF GENERATED METADATA --
 ---------------------------------
 
+
+----------------------------------------------------------------------------------------
+-- DOC_CLASS
 --
---********** DOC_CLASS **********--
+-- select * from nm3_metadata.doc_class
+-- order by dcl_dtp_code
+--         ,dcl_code
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT doc_class
 SET TERM OFF
---
--- Columns
--- DCL_CODE                       NOT NULL VARCHAR2(4)
---   DCL_PK (Pos 2)
--- DCL_NAME                       NOT NULL VARCHAR2(30)
---   DCL_UK1 (Pos 2)
--- DCL_DESCR                               VARCHAR2(254)
--- DCL_START_DATE                          DATE
--- DCL_END_DATE                            DATE
--- DCL_DTP_CODE                   NOT NULL VARCHAR2(4)
---   DCL_PK (Pos 1)
---   DCL_UK1 (Pos 1)
---   DCL_FK_DTP (Pos 1)
---
---
+
 INSERT INTO DOC_CLASS
        (DCL_CODE
        ,DCL_NAME
@@ -403,30 +379,22 @@ SELECT
                     AND  DCL_CODE = 'WOLF');
 --
 --
---********** DOC_MEDIA **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- DOC_MEDIA
+--
+-- select * from nm3_metadata.doc_media
+-- order by dmd_id
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT doc_media
 SET TERM OFF
---
--- Columns
--- DMD_ID                         NOT NULL NUMBER(9)
---   DMD_PK (Pos 1)
--- DMD_NAME                       NOT NULL VARCHAR2(30)
---   DMD_UK (Pos 1)
--- DMD_DESCR                               VARCHAR2(254)
--- DMD_DISPLAY_COMMAND                     VARCHAR2(254)
--- DMD_SCAN_COMMAND                        VARCHAR2(254)
--- DMD_IMAGE_COMMAND1                      VARCHAR2(254)
--- DMD_IMAGE_COMMAND2                      VARCHAR2(254)
--- DMD_IMAGE_COMMAND3                      VARCHAR2(254)
--- DMD_IMAGE_COMMAND4                      VARCHAR2(254)
--- DMD_IMAGE_COMMAND5                      VARCHAR2(254)
--- DMD_FILE_EXTENSION                      VARCHAR2(4)
--- DMD_START_DATE                          DATE
--- DMD_END_DATE                            DATE
--- DMD_ICON                                VARCHAR2(80)
---
---
+
 INSERT INTO DOC_MEDIA
        (DMD_ID
        ,DMD_NAME
@@ -529,27 +497,397 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM DOC_MEDIA
                    WHERE DMD_ID = 2);
 --
+INSERT INTO DOC_MEDIA
+       (DMD_ID
+       ,DMD_NAME
+       ,DMD_DESCR
+       ,DMD_DISPLAY_COMMAND
+       ,DMD_SCAN_COMMAND
+       ,DMD_IMAGE_COMMAND1
+       ,DMD_IMAGE_COMMAND2
+       ,DMD_IMAGE_COMMAND3
+       ,DMD_IMAGE_COMMAND4
+       ,DMD_IMAGE_COMMAND5
+       ,DMD_FILE_EXTENSION
+       ,DMD_START_DATE
+       ,DMD_END_DATE
+       ,DMD_ICON
+       )
+SELECT 
+        3
+       ,'WORD_TEMPLATES'
+       ,'Microsoft Word Works Order Templates'
+       ,'c:\Program Files\Microsoft Office\Office\winword'
+       ,''
+       ,'winword'
+       ,''
+       ,''
+       ,''
+       ,''
+       ,'DOT'
+       ,null
+       ,null
+       ,'doc_icon.gif' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM DOC_MEDIA
+                   WHERE DMD_ID = 3);
 --
---********** DOC_LOCATIONS **********--
+INSERT INTO DOC_MEDIA
+       (DMD_ID
+       ,DMD_NAME
+       ,DMD_DESCR
+       ,DMD_DISPLAY_COMMAND
+       ,DMD_SCAN_COMMAND
+       ,DMD_IMAGE_COMMAND1
+       ,DMD_IMAGE_COMMAND2
+       ,DMD_IMAGE_COMMAND3
+       ,DMD_IMAGE_COMMAND4
+       ,DMD_IMAGE_COMMAND5
+       ,DMD_FILE_EXTENSION
+       ,DMD_START_DATE
+       ,DMD_END_DATE
+       ,DMD_ICON
+       )
+SELECT 
+        4
+       ,'EXCEL_DOCUMENTS'
+       ,'Microsoft Excel Docs'
+       ,'c:\Program Files\Microsoft Office\Office\excel'
+       ,''
+       ,'excel'
+       ,''
+       ,''
+       ,''
+       ,''
+       ,'XLS'
+       ,null
+       ,null
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM DOC_MEDIA
+                   WHERE DMD_ID = 4);
+--
+INSERT INTO DOC_MEDIA
+       (DMD_ID
+       ,DMD_NAME
+       ,DMD_DESCR
+       ,DMD_DISPLAY_COMMAND
+       ,DMD_SCAN_COMMAND
+       ,DMD_IMAGE_COMMAND1
+       ,DMD_IMAGE_COMMAND2
+       ,DMD_IMAGE_COMMAND3
+       ,DMD_IMAGE_COMMAND4
+       ,DMD_IMAGE_COMMAND5
+       ,DMD_FILE_EXTENSION
+       ,DMD_START_DATE
+       ,DMD_END_DATE
+       ,DMD_ICON
+       )
+SELECT 
+        5
+       ,'ADOBE_DOCUMENTS'
+       ,'Adobe Docs'
+       ,'C:\Program Files\Adobe\Reader 8.0\Reader\AcroRd32'
+       ,''
+       ,'AcroRd32'
+       ,''
+       ,''
+       ,''
+       ,''
+       ,'PDF'
+       ,null
+       ,null
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM DOC_MEDIA
+                   WHERE DMD_ID = 5);
+--
+INSERT INTO DOC_MEDIA
+       (DMD_ID
+       ,DMD_NAME
+       ,DMD_DESCR
+       ,DMD_DISPLAY_COMMAND
+       ,DMD_SCAN_COMMAND
+       ,DMD_IMAGE_COMMAND1
+       ,DMD_IMAGE_COMMAND2
+       ,DMD_IMAGE_COMMAND3
+       ,DMD_IMAGE_COMMAND4
+       ,DMD_IMAGE_COMMAND5
+       ,DMD_FILE_EXTENSION
+       ,DMD_START_DATE
+       ,DMD_END_DATE
+       ,DMD_ICON
+       )
+SELECT 
+        6
+       ,'JPEG_IMAGES'
+       ,'Jpeg images'
+       ,'C:\Program Files\Internet Explorer\IEXPLORE.EXE'
+       ,''
+       ,'iexplore'
+       ,''
+       ,''
+       ,''
+       ,''
+       ,'JPG'
+       ,null
+       ,null
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM DOC_MEDIA
+                   WHERE DMD_ID = 6);
+--
+INSERT INTO DOC_MEDIA
+       (DMD_ID
+       ,DMD_NAME
+       ,DMD_DESCR
+       ,DMD_DISPLAY_COMMAND
+       ,DMD_SCAN_COMMAND
+       ,DMD_IMAGE_COMMAND1
+       ,DMD_IMAGE_COMMAND2
+       ,DMD_IMAGE_COMMAND3
+       ,DMD_IMAGE_COMMAND4
+       ,DMD_IMAGE_COMMAND5
+       ,DMD_FILE_EXTENSION
+       ,DMD_START_DATE
+       ,DMD_END_DATE
+       ,DMD_ICON
+       )
+SELECT 
+        7
+       ,'GIF_IMAGES'
+       ,'GIF images'
+       ,'C:\Program Files\Internet Explorer\IEXPLORE.EXE'
+       ,''
+       ,'iexplore'
+       ,''
+       ,''
+       ,''
+       ,''
+       ,'GIF'
+       ,null
+       ,null
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM DOC_MEDIA
+                   WHERE DMD_ID = 7);
+--
+INSERT INTO DOC_MEDIA
+       (DMD_ID
+       ,DMD_NAME
+       ,DMD_DESCR
+       ,DMD_DISPLAY_COMMAND
+       ,DMD_SCAN_COMMAND
+       ,DMD_IMAGE_COMMAND1
+       ,DMD_IMAGE_COMMAND2
+       ,DMD_IMAGE_COMMAND3
+       ,DMD_IMAGE_COMMAND4
+       ,DMD_IMAGE_COMMAND5
+       ,DMD_FILE_EXTENSION
+       ,DMD_START_DATE
+       ,DMD_END_DATE
+       ,DMD_ICON
+       )
+SELECT 
+        8
+       ,'BMP_IMAGES'
+       ,'BMP Images'
+       ,'C:\Program Files\Internet Explorer\IEXPLORE.EXE'
+       ,''
+       ,'iexplore'
+       ,''
+       ,''
+       ,''
+       ,''
+       ,'BMP'
+       ,null
+       ,null
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM DOC_MEDIA
+                   WHERE DMD_ID = 8);
+--
+INSERT INTO DOC_MEDIA
+       (DMD_ID
+       ,DMD_NAME
+       ,DMD_DESCR
+       ,DMD_DISPLAY_COMMAND
+       ,DMD_SCAN_COMMAND
+       ,DMD_IMAGE_COMMAND1
+       ,DMD_IMAGE_COMMAND2
+       ,DMD_IMAGE_COMMAND3
+       ,DMD_IMAGE_COMMAND4
+       ,DMD_IMAGE_COMMAND5
+       ,DMD_FILE_EXTENSION
+       ,DMD_START_DATE
+       ,DMD_END_DATE
+       ,DMD_ICON
+       )
+SELECT 
+        9
+       ,'CSV_FILES'
+       ,'Comma Separated Files'
+       ,'c:\Program Files\Microsoft Office\Office\excel'
+       ,''
+       ,'excel'
+       ,''
+       ,''
+       ,''
+       ,''
+       ,'CSV'
+       ,null
+       ,null
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM DOC_MEDIA
+                   WHERE DMD_ID = 9);
+--
+INSERT INTO DOC_MEDIA
+       (DMD_ID
+       ,DMD_NAME
+       ,DMD_DESCR
+       ,DMD_DISPLAY_COMMAND
+       ,DMD_SCAN_COMMAND
+       ,DMD_IMAGE_COMMAND1
+       ,DMD_IMAGE_COMMAND2
+       ,DMD_IMAGE_COMMAND3
+       ,DMD_IMAGE_COMMAND4
+       ,DMD_IMAGE_COMMAND5
+       ,DMD_FILE_EXTENSION
+       ,DMD_START_DATE
+       ,DMD_END_DATE
+       ,DMD_ICON
+       )
+SELECT 
+        10
+       ,'OUTLOOK_MESSGES'
+       ,'Outlook Messages'
+       ,'C:\Program Files\Internet Explorer\IEXPLORE.EXE'
+       ,''
+       ,'iexplore'
+       ,''
+       ,''
+       ,''
+       ,''
+       ,'MSG'
+       ,null
+       ,null
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM DOC_MEDIA
+                   WHERE DMD_ID = 10);
+--
+INSERT INTO DOC_MEDIA
+       (DMD_ID
+       ,DMD_NAME
+       ,DMD_DESCR
+       ,DMD_DISPLAY_COMMAND
+       ,DMD_SCAN_COMMAND
+       ,DMD_IMAGE_COMMAND1
+       ,DMD_IMAGE_COMMAND2
+       ,DMD_IMAGE_COMMAND3
+       ,DMD_IMAGE_COMMAND4
+       ,DMD_IMAGE_COMMAND5
+       ,DMD_FILE_EXTENSION
+       ,DMD_START_DATE
+       ,DMD_END_DATE
+       ,DMD_ICON
+       )
+SELECT 
+        11
+       ,'WEBPAGES'
+       ,'Webpages'
+       ,'C:\Program Files\Internet Explorer\IEXPLORE.EXE'
+       ,''
+       ,'iexplore'
+       ,''
+       ,''
+       ,''
+       ,''
+       ,'HTML'
+       ,null
+       ,null
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM DOC_MEDIA
+                   WHERE DMD_ID = 11);
+--
+INSERT INTO DOC_MEDIA
+       (DMD_ID
+       ,DMD_NAME
+       ,DMD_DESCR
+       ,DMD_DISPLAY_COMMAND
+       ,DMD_SCAN_COMMAND
+       ,DMD_IMAGE_COMMAND1
+       ,DMD_IMAGE_COMMAND2
+       ,DMD_IMAGE_COMMAND3
+       ,DMD_IMAGE_COMMAND4
+       ,DMD_IMAGE_COMMAND5
+       ,DMD_FILE_EXTENSION
+       ,DMD_START_DATE
+       ,DMD_END_DATE
+       ,DMD_ICON
+       )
+SELECT 
+        12
+       ,'TEXT_DOCS'
+       ,'Text docs'
+       ,'C:\windows\notepad'
+       ,''
+       ,'notepad'
+       ,''
+       ,''
+       ,''
+       ,''
+       ,'TXT'
+       ,null
+       ,null
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM DOC_MEDIA
+                   WHERE DMD_ID = 12);
+--
+INSERT INTO DOC_MEDIA
+       (DMD_ID
+       ,DMD_NAME
+       ,DMD_DESCR
+       ,DMD_DISPLAY_COMMAND
+       ,DMD_SCAN_COMMAND
+       ,DMD_IMAGE_COMMAND1
+       ,DMD_IMAGE_COMMAND2
+       ,DMD_IMAGE_COMMAND3
+       ,DMD_IMAGE_COMMAND4
+       ,DMD_IMAGE_COMMAND5
+       ,DMD_FILE_EXTENSION
+       ,DMD_START_DATE
+       ,DMD_END_DATE
+       ,DMD_ICON
+       )
+SELECT 
+        13
+       ,'DWF_FILES'
+       ,'DWF Files'
+       ,'"C:\Program Files\Autodesk\Autodesk Design Review\DesignReview"'
+       ,''
+       ,''
+       ,''
+       ,''
+       ,''
+       ,''
+       ,'DWF'
+       ,null
+       ,null
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM DOC_MEDIA
+                   WHERE DMD_ID = 13);
+--
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- DOC_LOCATIONS
+--
+-- select * from nm3_metadata.doc_locations
+-- order by dlc_id
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT doc_locations
 SET TERM OFF
---
--- Columns
--- DLC_ID                         NOT NULL NUMBER(9)
---   DLC_PK (Pos 1)
--- DLC_NAME                       NOT NULL VARCHAR2(30)
---   DLC_UK (Pos 1)
--- DLC_PATHNAME                   NOT NULL VARCHAR2(4000)
--- DLC_DMD_ID                     NOT NULL NUMBER(9)
---   DLC_FK_DMD (Pos 1)
--- DLC_DESCR                               VARCHAR2(254)
--- DLC_START_DATE                          DATE
--- DLC_END_DATE                            DATE
--- DLC_APPS_PATHNAME                       VARCHAR2(4000)
--- DLC_URL_PATHNAME                        VARCHAR2(4000)
---
---
+
 INSERT INTO DOC_LOCATIONS
        (DLC_ID
        ,DLC_NAME
@@ -575,25 +913,22 @@ SELECT
                    WHERE DLC_ID = 2);
 --
 --
---********** DOC_TEMPLATE_GATEWAYS **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- DOC_TEMPLATE_GATEWAYS
+--
+-- select * from nm3_metadata.doc_template_gateways
+-- order by dtg_template_name
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT doc_template_gateways
 SET TERM OFF
---
--- Columns
--- DTG_DMD_ID                     NOT NULL NUMBER(9)
---   DTG_FK_DMD (Pos 1)
--- DTG_OLE_TYPE                   NOT NULL VARCHAR2(30)
--- DTG_TABLE_NAME                 NOT NULL VARCHAR2(30)
---   DTG_FK_DGT (Pos 1)
--- DTG_TEMPLATE_NAME              NOT NULL VARCHAR2(30)
---   DTG_PK (Pos 1)
--- DTG_DLC_ID                     NOT NULL NUMBER(9)
---   DTG_FK_DLC (Pos 1)
--- DTG_TEMPLATE_DESCR                      VARCHAR2(100)
--- DTG_POST_RUN_PROCEDURE                  VARCHAR2(100)
---
---
+
 INSERT INTO DOC_TEMPLATE_GATEWAYS
        (DTG_DMD_ID
        ,DTG_OLE_TYPE
@@ -655,25 +990,23 @@ SELECT
                    WHERE DTG_TEMPLATE_NAME = 'TEMPLATE_W97');
 --
 --
---********** DOC_TEMPLATE_COLUMNS **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- DOC_TEMPLATE_COLUMNS
+--
+-- select * from nm3_metadata.doc_template_columns
+-- order by dtc_template_name
+--         ,dtc_col_alias
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT doc_template_columns
 SET TERM OFF
---
--- Columns
--- DTC_TEMPLATE_NAME              NOT NULL VARCHAR2(30)
---   DTC_PK (Pos 1)
---   DTC_FK_DTG (Pos 1)
--- DTC_COL_NAME                   NOT NULL VARCHAR2(250)
--- DTC_COL_TYPE                   NOT NULL VARCHAR2(9)
--- DTC_COL_ALIAS                  NOT NULL VARCHAR2(30)
---   DTC_PK (Pos 2)
--- DTC_COL_SEQ                    NOT NULL NUMBER(4)
--- DTC_USED_IN_PROC                        VARCHAR2(1)
--- DTC_IMAGE_FILE                          VARCHAR2(1)
--- DTC_FUNCTION                            VARCHAR2(1)
---
---
+
 INSERT INTO DOC_TEMPLATE_COLUMNS
        (DTC_TEMPLATE_NAME
        ,DTC_COL_NAME
@@ -17603,61 +17936,41 @@ SELECT
                     AND  DTC_COL_ALIAS = 'W99');
 --
 --
---********** DOC_ENQUIRY_TYPES **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- DOC_ENQUIRY_TYPES
+--
+-- select * from nm3_metadata.doc_enquiry_types
+-- order by det_dtp_code
+--         ,det_dcl_code
+--         ,det_code
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT doc_enquiry_types
 SET TERM OFF
---
--- Columns
--- DET_DTP_CODE                   NOT NULL VARCHAR2(4)
---   DET_PK (Pos 1)
---   DET_UNQ (Pos 1)
---   DET_FK_DTP (Pos 1)
---   DET_FK_DCL (Pos 1)
--- DET_DCL_CODE                   NOT NULL VARCHAR2(4)
---   DET_PK (Pos 2)
---   DET_UNQ (Pos 2)
---   DET_FK_DCL (Pos 2)
--- DET_CODE                       NOT NULL VARCHAR2(4)
---   DET_PK (Pos 3)
---   DET_UNQ (Pos 3)
--- DET_NAME                       NOT NULL VARCHAR2(30)
---   DET_UNQ (Pos 4)
--- DET_DESCR                               VARCHAR2(254)
--- DET_START_DATE                          DATE
--- DET_END_DATE                            DATE
--- DET_CON_ID                              NUMBER(9)
+
 --
 --
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_USERS
 --
---********** HIG_USERS **********--
+-- select * from nm3_metadata.hig_users
+-- order by hus_user_id
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT hig_users
 SET TERM OFF
---
--- Columns
--- HUS_USER_ID                    NOT NULL NUMBER(9)
---   HIG_USERS_PK (Pos 1)
--- HUS_INITIALS                   NOT NULL VARCHAR2(3)
--- HUS_NAME                       NOT NULL VARCHAR2(30)
--- HUS_USERNAME                            VARCHAR2(30)
---   HUS_UK (Pos 1)
--- HUS_JOB_TITLE                           VARCHAR2(10)
--- HUS_AGENT_CODE                          VARCHAR2(4)
--- HUS_WOR_FLAG                            VARCHAR2(1)
--- HUS_WOR_VALUE_MIN                       NUMBER(9)
--- HUS_WOR_VALUE_MAX                       NUMBER(9)
--- HUS_START_DATE                          DATE
--- HUS_END_DATE                            DATE
--- HUS_ADMIN_UNIT                          NUMBER(9)
--- HUS_UNRESTRICTED                        VARCHAR2(1)
---   AVCON_3268_HUS_U_000
---   AVCON_3268_HUS_U_001
--- HUS_WOR_AUR_MIN                         NUMBER(9)
--- HUS_WOR_AUR_MAX                         NUMBER(9)
--- HUS_IS_HIG_OWNER_FLAG          NOT NULL VARCHAR2(1)
---
---
+
 INSERT INTO HIG_USERS
        (HUS_USER_ID
        ,HUS_INITIALS
@@ -17697,25 +18010,24 @@ SELECT
                    WHERE HUS_USER_ID = 1);
 --
 --
---********** HIG_USER_FAVOURITES **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_USER_FAVOURITES
+--
+-- select * from nm3_metadata.hig_user_favourites
+-- order by huf_user_id
+--         ,huf_parent
+--         ,huf_child
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT hig_user_favourites
 SET TERM OFF
---
--- Columns
--- HUF_USER_ID                    NOT NULL NUMBER(38)
---   HUF_PK (Pos 1)
--- HUF_PARENT                     NOT NULL VARCHAR2(30)
---   HUF_PK (Pos 2)
---   HUF_CONNECT_LOOP_CHK
--- HUF_CHILD                      NOT NULL VARCHAR2(30)
---   HUF_PK (Pos 3)
---   HUF_CONNECT_LOOP_CHK
--- HUF_DESCR                      NOT NULL VARCHAR2(80)
--- HUF_TYPE                       NOT NULL VARCHAR2(1)
---   AVCON_5327_HUF_T_000
---
---
+
 INSERT INTO HIG_USER_FAVOURITES
        (HUF_USER_ID
        ,HUF_PARENT
@@ -17735,25 +18047,24 @@ SELECT
                     AND  HUF_CHILD = 'FAVOURITES');
 --
 --
---********** HIG_SYSTEM_FAVOURITES **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_SYSTEM_FAVOURITES
+--
+-- select * from nm3_metadata.hig_system_favourites
+-- order by hsf_user_id
+--         ,hsf_parent
+--         ,hsf_child
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT hig_system_favourites
 SET TERM OFF
---
--- Columns
--- HSF_USER_ID                    NOT NULL NUMBER(9)
---   HSF_PK (Pos 1)
---   HSF_HUS_FK (Pos 1)
--- HSF_PARENT                     NOT NULL VARCHAR2(30)
---   HSF_PK (Pos 2)
---   HSF_CONNECT_LOOP_CHK
--- HSF_CHILD                      NOT NULL VARCHAR2(30)
---   HSF_PK (Pos 3)
---   HSF_CONNECT_LOOP_CHK
--- HSF_DESCR                      NOT NULL VARCHAR2(80)
--- HSF_TYPE                       NOT NULL VARCHAR2(1)
---
---
+
 INSERT INTO HIG_SYSTEM_FAVOURITES
        (HSF_USER_ID
        ,HSF_PARENT
@@ -17773,24 +18084,22 @@ SELECT
                     AND  HSF_CHILD = 'FAVOURITES');
 --
 --
---********** NM_LOAD_DESTINATIONS **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- NM_LOAD_DESTINATIONS
+--
+-- select * from nm3_metadata.nm_load_destinations
+-- order by nld_id
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT nm_load_destinations
 SET TERM OFF
---
--- Columns
--- NLD_ID                         NOT NULL NUMBER(9)
---   NLD_PK (Pos 1)
--- NLD_TABLE_NAME                 NOT NULL VARCHAR2(30)
---   NLD_TABLE_NAME_CHK
---   NLD_UK1 (Pos 1)
--- NLD_TABLE_SHORT_NAME           NOT NULL VARCHAR2(5)
---   NLD_TABLE_SHORT_NAME_CHK
---   NLD_UK2 (Pos 1)
--- NLD_INSERT_PROC                NOT NULL VARCHAR2(61)
--- NLD_VALIDATION_PROC                     VARCHAR2(61)
---
---
+
 INSERT INTO NM_LOAD_DESTINATIONS
        (NLD_ID
        ,NLD_TABLE_NAME
@@ -20480,21 +20789,23 @@ SELECT
                    WHERE NLD_ID = 1174);
 --
 --
---********** NM_LOAD_DESTINATION_DEFAULTS **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- NM_LOAD_DESTINATION_DEFAULTS
+--
+-- select * from nm3_metadata.nm_load_destination_defaults
+-- order by nldd_nld_id
+--         ,nldd_column_name
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT nm_load_destination_defaults
 SET TERM OFF
---
--- Columns
--- NLDD_NLD_ID                    NOT NULL NUMBER(9)
---   NLDD_PK (Pos 1)
---   NLDD_NLD_FK (Pos 1)
--- NLDD_COLUMN_NAME               NOT NULL VARCHAR2(30)
---   NLDD_COLUMN_NAME_CHK
---   NLDD_PK (Pos 2)
--- NLDD_VALUE                     NOT NULL VARCHAR2(100)
---
---
+
 INSERT INTO NM_LOAD_DESTINATION_DEFAULTS
        (NLDD_NLD_ID
        ,NLDD_COLUMN_NAME
@@ -21133,17 +21444,22 @@ SELECT
                     AND  NLDD_COLUMN_NAME = 'IIT_NE_ID');
 --
 --
---********** NM_UPLOAD_FILE_GATEWAYS **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- NM_UPLOAD_FILE_GATEWAYS
+--
+-- select * from nm3_metadata.nm_upload_file_gateways
+-- order by nufg_table_name
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT nm_upload_file_gateways
 SET TERM OFF
---
--- Columns
--- NUFG_TABLE_NAME                NOT NULL VARCHAR2(30)
---   NUFG_TABLE_NAME_UPPER_CHK
---   NUFG_PK (Pos 1)
---
---
+
 INSERT INTO NM_UPLOAD_FILE_GATEWAYS
        (NUFG_TABLE_NAME
        )
@@ -21169,26 +21485,23 @@ SELECT
                    WHERE NUFG_TABLE_NAME = 'NM_MRG_QUERY_RESULTS');
 --
 --
---********** NM_UPLOAD_FILE_GATEWAY_COLS **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- NM_UPLOAD_FILE_GATEWAY_COLS
+--
+-- select * from nm3_metadata.nm_upload_file_gateway_cols
+-- order by nufgc_nufg_table_name
+--         ,nufgc_seq
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT nm_upload_file_gateway_cols
 SET TERM OFF
---
--- Columns
--- NUFGC_NUFG_TABLE_NAME          NOT NULL VARCHAR2(30)
---   NUFGC_PK (Pos 1)
---   NUFGC_UK (Pos 1)
---   NUFGC_NUFG_FK (Pos 1)
--- NUFGC_SEQ                      NOT NULL NUMBER(1)
---   NUFGC_SEQ_CHK
---   NUFGC_PK (Pos 2)
--- NUFGC_COLUMN_NAME              NOT NULL VARCHAR2(30)
---   NUFGC_COLUMN_NAME_UPPER_CHK
---   NUFGC_UK (Pos 2)
--- NUFGC_COLUMN_DATATYPE          NOT NULL VARCHAR2(8)
---   NUFGC_COLUMN_DATATYPE_CHK
---
---
+
 INSERT INTO NM_UPLOAD_FILE_GATEWAY_COLS
        (NUFGC_NUFG_TABLE_NAME
        ,NUFGC_SEQ
@@ -21234,6 +21547,10 @@ SELECT
                    WHERE NUFGC_NUFG_TABLE_NAME = 'NM_MRG_QUERY_RESULTS'
                     AND  NUFGC_SEQ = 1);
 --
+--
+--
+----------------------------------------------------------------------------------------
+
 --
 COMMIT;
 --
