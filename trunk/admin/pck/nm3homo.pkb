@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.11   May 18 2009 11:11:30   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.12   May 21 2009 14:12:04   lsorathia  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   May 18 2009 11:11:30  $
---       Date fetched Out : $Modtime:   May 18 2009 10:53:08  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   May 21 2009 14:12:04  $
+--       Date fetched Out : $Modtime:   May 21 2009 13:56:38  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --
 --   Author : Jonathan Mills
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    
    -- Log 713421
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.12  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -555,19 +555,21 @@ BEGIN
       IF   (does_relation_exist(l_rec_nit.nit_inv_type,nm3invval.c_in_relation)
            OR 
            does_relation_exist(l_rec_nit.nit_inv_type,nm3invval.c_derived_relation) )
-      AND  has_parent (l_rec_iit.iit_ne_id)
+--      AND  has_parent (l_rec_iit.iit_ne_id)
       THEN
           DECLARE
              l_found_par Boolean ;
              c_pl CONSTANT NM_PLACEMENT := l_new_inv_pl_arr.npa_placement_array(1);
              l_ne_id NUMBER ;
              CURSOR  c_parent IS
-             SELECT  iig_parent_id ,
-                     iit.iit_inv_type 
+             SELECT  Nvl(iig_parent_id,0) iig_parent_id,
+                     itg_parent_inv_type iit_inv_type 
              FROM    nm_inv_item_groupings iig,
-                     nm_inv_items          iit
-             WHERE   iig_item_id   =   l_rec_iit.iit_ne_id
-             AND     iig_parent_id = iit.iit_ne_id ;
+                     nm_inv_items          iit,
+                     nm_inv_type_groupings itg
+             WHERE   iit.iit_ne_id    =   l_rec_iit.iit_ne_id
+             AND     iig_parent_id(+) =   iit.iit_ne_id 
+             AND     itg_inv_type     =   iit.iit_inv_type;
              l_parent_rec c_parent%ROWTYPE ;
              l_iit_rec nm_inv_items%ROWTYPE := nm3get.get_iit(l_rec_iit.iit_ne_id);
              --
@@ -597,7 +599,7 @@ BEGIN
              FETCH  c_get_rel_mandatory INTO l_rel_mandatory ;
              CLOSE  c_get_rel_mandatory;
              --
-             FOR i in (SELECT * 
+             FOR i in (SELECT distinct nm_ne_id_in
                        FROM   nm_members
                              ,nm_inv_items
                        WHERE  nm_obj_type = l_parent_rec.iit_inv_type
@@ -637,8 +639,18 @@ BEGIN
                                    l_iig_rec.iig_top_id     := nm3invval.get_iig_top_id(i.nm_ne_id_in) ;
                                    l_iig_rec.iig_item_id    := l_rec_iit.iit_ne_id ;
                                    l_iig_rec.iig_parent_id  := i.nm_ne_id_in ;
-                                   l_iig_rec.iig_start_date := p_effective_date ;
-                                   nm3ins.ins_iig(l_iig_rec);                   
+                                   l_iig_rec.iig_start_date := p_effective_date ;                                                      
+                                   BEGIN
+                                      nm3ins.ins_iig(l_iig_rec);  
+                                   EXCEPTION
+                                       WHEN dup_val_on_index
+                                       THEN
+                                           UPDATE nm_inv_item_groupings_all
+                                           SET    iig_end_date = NULL
+                                           WHERE  iig_item_id    = l_rec_iit.iit_ne_id
+                                           AND    iig_parent_id  = i.nm_ne_id_in
+                                           AND    iig_start_date = p_effective_date ;
+                                   END ;
                                END IF;
                                --
                            END ;
@@ -1349,7 +1361,7 @@ BEGIN
           l_found_par Boolean ;
        BEGIN
          l_found_par := False;
-         FOR i in (SELECT * 
+         FOR i in (SELECT Distinct nm_ne_id_in 
                    FROM   nm_members
                          ,nm_inv_items 
                    WHERE  nm_obj_type = l_child_ne_rec.parent_obj_type 
@@ -1405,7 +1417,17 @@ BEGIN
                             l_iig_rec.iig_item_id    := l_child_ne_rec.iit_ne_id ;
                             l_iig_rec.iig_parent_id  := i.nm_ne_id_in ;
                             l_iig_rec.iig_start_date := p_effective_date ;
-                            nm3ins.ins_iig(l_iig_rec);                   
+                            BEGIN
+                               nm3ins.ins_iig(l_iig_rec);                   
+                            EXCEPTION
+                                WHEN dup_val_on_index
+                                THEN
+                                    UPDATE nm_inv_item_groupings_all
+                                    SET    iig_end_date = NULL
+                                    WHERE  iig_item_id    = l_child_ne_rec.iit_ne_id
+                                    AND    iig_parent_id  = i.nm_ne_id_in
+                                    AND    iig_start_date = p_effective_date ;
+                            END ;  
                         END IF ;
                         --
                      END ;
@@ -1511,8 +1533,18 @@ BEGIN
                          l_iig_rec.iig_top_id     := nm3invval.get_iig_top_id(l_par_iit_rec.iit_ne_id) ;
                          l_iig_rec.iig_item_id    := j.iit_ne_id ;
                          l_iig_rec.iig_parent_id  := l_par_iit_rec.iit_ne_id ;
-                         l_iig_rec.iig_start_date := p_effective_date ;
-                         nm3ins.ins_iig(l_iig_rec);                   
+                         l_iig_rec.iig_start_date := p_effective_date ;                                            
+                         BEGIN
+                            nm3ins.ins_iig(l_iig_rec);                  
+                         EXCEPTION
+                             WHEN dup_val_on_index
+                             THEN
+                                 UPDATE nm_inv_item_groupings_all
+                                 SET    iig_end_date = NULL
+                                 WHERE  iig_item_id    = j.iit_ne_id
+                                 AND    iig_parent_id  = l_par_iit_rec.iit_ne_id
+                                 AND    iig_start_date = p_effective_date ;
+                         END ;
                          --
                       END ;
               END ;
