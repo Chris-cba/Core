@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.6   Mar 31 2009 17:30:06   cstrettle  $
---       Module Name      : $Workfile:   nm3layer_tool_25.pkb  $
---       Date into PVCS   : $Date:   Mar 31 2009 17:30:06  $
---       Date fetched Out : $Modtime:   Mar 31 2009 17:28:26  $
---       Version          : $Revision:   2.6  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.7   May 22 2009 15:07:34   cstrettle  $
+--       Module Name      : $Workfile:   nm3layer_tool.pkb  $
+--       Date into PVCS   : $Date:   May 22 2009 15:07:34  $
+--       Date fetched Out : $Modtime:   May 22 2009 14:49:00  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.6  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.7  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -2471,6 +2471,30 @@ AS
       nm_debug.proc_end (g_package_name, 'drop_node_layer');
    --
    END drop_node_layer;
+--
+-----------------------------------------------------------------------------
+--
+     FUNCTION get_spatial_index (pi_table_name  IN nm_themes_all.nth_feature_table%TYPE
+                               , pi_column_name IN nm_themes_all.nth_feature_shape_column%TYPE)
+       RETURN user_indexes.index_name%TYPE
+     IS
+     --
+     l_spatial_ind_name VARCHAR2(100);
+     --
+     BEGIN
+       SELECT user_indexes.index_name 
+         INTO l_spatial_ind_name
+         FROM user_indexes, user_ind_columns
+        WHERE user_indexes.table_name = pi_table_name
+          AND user_indexes.index_Type = 'DOMAIN'
+          AND user_indexes.table_name =  user_ind_columns.table_name
+          AND user_ind_columns.column_name = pi_column_name;
+     RETURN l_spatial_ind_name;     
+     EXCEPTION
+       WHEN NO_DATA_FOUND
+       THEN
+         RAISE ex_no_spdix;
+     END get_spatial_index;
 
 --
 -----------------------------------------------------------------------------
@@ -2488,6 +2512,212 @@ AS
    --
    END create_node_layer;
 
+
+   PROCEDURE refresh_gty_layer ( pi_gty_type IN NM_GROUP_TYPES.ngt_group_type%type
+                               , pi_linear   IN BOOLEAN
+                               , pi_job_id   IN NUMBER DEFAULT NULL)
+   IS
+   
+   -- Linear cursor
+    cursor cur_linear ( p_gty_type NM_GROUP_TYPES.ngt_group_type%type
+                      , p_nlt_nt_type nm_linear_types.nlt_nt_type%type) is 
+     select nm_themes_all.*
+       from nm_themes_all, nm_nw_themes, nm_linear_types
+      where nth_theme_id = nnth_nth_theme_id
+        and nnth_nlt_id = nlt_id
+        and nlt_gty_type = p_gty_type
+        and nlt_nt_type = p_nlt_nt_type
+        and nth_base_table_theme IS NULL;
+     
+     rec_linear             cur_linear%ROWTYPE;
+     l_sequence_name        nm_themes_all.nth_sequence_name%type;
+     l_feature_table        NM_THEMES_ALL.NTH_FEATURE_TABLE%type;
+     l_Feature_shape_column NM_THEMES_ALL.NTH_FEATURE_SHAPE_COLUMN%type;
+    
+    -- Non-linear cursor
+    cursor cur_non_linear ( p_gty_type NM_GROUP_TYPES.ngt_group_type%type) is 
+    
+     select nm_themes_all.nth_sequence_name
+          , NM_THEMES_ALL.NTH_FEATURE_TABLE 
+          , NM_THEMES_ALL.nth_Feature_shape_column
+       from nm_area_types, nm_area_themes, nm_themes_all
+      where nath_nat_id = nat_id
+        and nath_nth_theme_id = nth_theme_id
+        and nat_gty_group_type = p_gty_type
+        and nth_base_table_theme IS NULL;
+
+     l_ngt_nt_type      varchar2(20);
+     l_nlt_id           NM_LINEAR_TYPES.NLT_ID%type;    
+     dummy_ta           nm_theme_array;
+     l_spatial_ind_name VARCHAR2(100);
+   --  
+   BEGIN
+   --
+    IF pi_linear THEN
+    --
+       l_ngt_nt_type:= nm3get.get_ngt(pi_ngt_group_type => pi_gty_type).ngt_nt_type;
+    --   
+       OPEN cur_linear( pi_gty_type
+                      , l_ngt_nt_type);
+       FETCH cur_linear
+       INTO rec_linear;
+       CLOSE cur_linear;
+    --   
+      l_feature_table := rec_linear.nth_feature_table;
+    --
+       IF rec_linear.nth_feature_table IS NOT NULL THEN
+          execute immediate 'truncate table ' || rec_linear.nth_feature_table;
+       ELSE          
+          RAISE_APPLICATION_ERROR ( -20101
+                                  , 'Cannot refresh this layer - there is no linear base Theme available');
+       END IF;       
+    --   
+       l_nlt_id:= nm3get.get_nlt(l_ngt_nt_type, pi_gty_type).nlt_id;
+    -- 
+       l_spatial_ind_name := get_spatial_index ( pi_table_name  => rec_linear.nth_feature_table
+                                               , pi_column_name => rec_linear.nth_Feature_shape_column);  
+    -- 
+       IF l_spatial_ind_name is not null THEN       
+         BEGIN   
+           execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=deferred'')';
+         EXCEPTION
+         WHEN OTHERS THEN
+           NULL; -- IF THE INDEX IS ALREADY DEFERRED CARRY ON.
+         END;
+       END IF;
+    --   
+       nm3sdo.create_nt_data( p_nth     => rec_linear
+                            , p_nlt_id  => l_nlt_id
+                            , p_ta      => dummy_ta
+                            , p_job_id  => pi_job_id);
+    --   
+       IF l_spatial_ind_name is not null THEN       
+       execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=synchronize'')';
+       END IF;
+    --
+    ELSE --If it is non linear
+    --
+       OPEN cur_non_linear(pi_gty_type);
+       FETCH cur_non_linear
+       INTO l_sequence_name, l_feature_table, l_feature_shape_column;
+       CLOSE cur_non_linear;
+    --
+       IF l_feature_table IS NOT NULL THEN
+          execute immediate 'truncate table ' || l_feature_table;
+       ELSE
+          RAISE_APPLICATION_ERROR ( -20102
+                                  , 'Cannot refresh this layer - there is no non-linear base Theme available');
+       END IF;
+    --  Find the name of the spatial index
+       l_spatial_ind_name := get_spatial_index ( pi_table_name  => l_feature_table
+                                               , pi_column_name => l_feature_shape_column);
+    --  
+       if l_spatial_ind_name is not null then
+       BEGIN
+         execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=deferred'')';
+       EXCEPTION
+       WHEN OTHERS THEN
+         NULL;-- IF THE INDEX IS ALREADY DEFERRED CARRY ON.
+       END;
+       end if;
+    --   
+       nm3sdo.create_non_linear_data( p_table_name => l_feature_table
+                                    , p_gty_type   => pi_gty_type
+                                    , p_seq_name   => l_sequence_name
+                                    , p_job_id     => pi_job_id);
+    -- 
+       if l_spatial_ind_name is not null then  
+         execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=synchronize'')';
+       end if;
+    --
+    END IF; 
+  --
+   EXCEPTION
+     WHEN ex_no_spdix
+     THEN
+       RAISE_APPLICATION_ERROR ( -20103
+                                , 'Cannot derive spatial index for ' || l_feature_table);     
+     WHEN OTHERS 
+     THEN       
+       RAISE;
+   END; 
+--
+-----------------------------------------------------------------------------
+--
+   PROCEDURE refresh_asset_layer( pi_inv_type IN nm_inv_types.nit_inv_type%TYPE
+                                , pi_job_id   IN NUMBER DEFAULT NULL)
+   IS 
+   
+   -- CURSOR FOR ASSET LAYERS
+    cursor cur_asset_layer ( p_inv_type nm_inv_types.nit_inv_type%type) is 
+     select NTH_FEATURE_TABLE, NTH_SEQUENCE_NAME, NIT_PNT_OR_CONT, nth_Feature_shape_column
+      from nm_themes_all, Nm_inv_themes , nm_inv_types
+      where nth_theme_id = nith_nth_theme_id
+        and nith_nit_id = nit_inv_type
+        and nit_inv_type =  p_inv_type
+        and nth_base_table_theme IS NULL
+        and nth_Dependency = 'D' ;
+     
+     
+     
+     l_sequence_name        nm_themes_all.nth_sequence_name%type;
+     l_feature_table        nm_themes_all.nth_feature_table%type;
+     l_pnt_or_cont          nm_inv_types.nit_pnt_or_cont%type;
+     l_Feature_shape_column NM_THEMES_ALL.NTH_FEATURE_SHAPE_COLUMN%type;     
+     l_spatial_ind_name VARCHAR2(100);
+          
+     l_ngt_nt_type      varchar2(20);
+     l_nlt_id           NM_LINEAR_TYPES.NLT_ID%type;    
+   
+   BEGIN
+    --
+       OPEN cur_asset_layer( pi_inv_type);
+       FETCH cur_asset_layer
+       INTO l_feature_table, l_sequence_name, l_pnt_or_cont, l_Feature_shape_column;
+       CLOSE cur_asset_layer;
+    --   
+       IF l_feature_table IS NOT NULL THEN
+          execute immediate 'truncate table ' || l_feature_table;
+       ELSE          
+          RAISE_APPLICATION_ERROR ( -20101
+                                  , 'Cannot refresh this layer - there is no asset base Theme available');
+          NULL;
+       END IF;
+    --      
+    --  Find the name of the spatial index 
+        l_spatial_ind_name := get_spatial_index ( pi_table_name  => l_feature_table
+                                                , pi_column_name => l_Feature_shape_column); 
+    --    
+       IF l_spatial_ind_name is not null THEN       
+         BEGIN
+           execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=deferred'')';
+         EXCEPTION
+         WHEN OTHERS THEN
+           NULL;-- IF THE INDEX IS ALREADY DEFERRED CARRY ON.
+         END;         
+       END IF;
+    --   
+       nm3sdo.create_inv_data
+            ( p_table_name  => l_feature_table
+            , p_inv_type    => pi_inv_type 
+            , p_seq_name    => l_sequence_name
+            , p_pnt_or_cont => l_pnt_or_cont
+            , p_job_id      => pi_job_id
+            );                            
+   -- 
+      IF l_spatial_ind_name is not null THEN       
+        execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=synchronize'')';
+      END IF;         
+   --
+   EXCEPTION
+     WHEN ex_no_spdix
+     THEN
+      RAISE_APPLICATION_ERROR ( -20103
+                                , 'Cannot derive spatial index for ' || l_feature_table);
+     WHEN OTHERS 
+     THEN
+       RAISE;
+   END;   
 --
 -----------------------------------------------------------------------------
 --
