@@ -3,16 +3,16 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.2   Feb 10 2009 13:55:04   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.3   May 22 2009 15:07:48   cstrettle  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkh  $
---       Date into PVCS   : $Date:   Feb 10 2009 13:55:04  $
---       Date fetched Out : $Modtime:   Feb 10 2009 13:54:08  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   May 22 2009 15:07:48  $
+--       Date fetched Out : $Modtime:   May 22 2009 14:48:50  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.6
 -------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.3  $';
     g_boolean               BOOLEAN        := FALSE;
     g_x_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_X';
     g_y_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_Y';
@@ -247,6 +247,11 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
   TYPE tab_msv_theme_details        IS TABLE OF rec_msv_theme_details
     INDEX BY BINARY_INTEGER;
 --</TYPES>
+
+--
+  ex_no_spdix        EXCEPTION;
+--
+
 --
 -----------------------------------------------------------------------------
 --
@@ -453,6 +458,15 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 --
 -----------------------------------------------------------------------------
 --
+--<PROC NAME="REFRESH_GTY_LAYER">
+-- Create SDO node layer for a given type
+ PROCEDURE refresh_gty_layer ( pi_gty_type IN NM_GROUP_TYPES.ngt_group_type%type
+                               , pi_linear   IN BOOLEAN
+                               , pi_job_id   IN NUMBER DEFAULT NULL);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
 /*
    **************************
      ASSET RELATED FUNCTIONS
@@ -484,6 +498,14 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 
   FUNCTION get_y_column
   RETURN user_tab_columns.column_name%TYPE;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REFRESH_ASSET_LAYER">
+-- Refreshes the asset spatial data when called from the GIS0020 form.
+   PROCEDURE refresh_asset_layer( pi_inv_type IN nm_inv_types.nit_inv_type%TYPE
+                                , pi_job_id   IN NUMBER DEFAULT NULL);
+--</PROC>                                
 --
 -----------------------------------------------------------------------------
 --
@@ -687,14 +709,14 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 --</PROC>
 -----------------------------------------------------------------------------
 --
---<PROC NAME="england_wales_asd_in_use">
+--<PROC NAME="ENGLAND_WALES_ASD_IN_USE">
 -- function called from GIS0020 to determined if certain NSG ASD record type should be processed
 FUNCTION england_wales_asd_in_use RETURN BOOLEAN;
 --</PROC>
 --
 -----------------------------------------------------------------------------
 --
---<PROC NAME="scotland_asd_in_use">
+--<PROC NAME="SCOTLAND_ASD_IN_USE">
 -- function called from GIS0020 to determined if certain NSG ASD record type should be processed
 FUNCTION scotland_asd_in_use RETURN BOOLEAN;
 --</PROC>
@@ -748,6 +770,15 @@ FUNCTION scotland_asd_in_use RETURN BOOLEAN;
   PROCEDURE drop_spatial_index
                ( pi_index_name         IN     user_indexes.index_name%TYPE
                , pi_raise_not_found    IN     BOOLEAN DEFAULT FALSE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SPATIAL_INDEX">
+-- Returns the name of a spatial index given the table and shape column
+     FUNCTION get_spatial_index (pi_table_name  IN nm_themes_all.nth_feature_table%TYPE
+                               , pi_column_name IN nm_themes_all.nth_feature_shape_column%TYPE)
+       RETURN user_indexes.index_name%TYPE;
 --</PROC>
 --
 -----------------------------------------------------------------------------
