@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.12   May 21 2009 14:12:04   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.13   May 26 2009 11:57:56   lsorathia  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   May 21 2009 14:12:04  $
---       Date fetched Out : $Modtime:   May 21 2009 13:56:38  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   May 26 2009 11:57:56  $
+--       Date fetched Out : $Modtime:   May 26 2009 11:57:10  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --
 --   Author : Jonathan Mills
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    
    -- Log 713421
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.12  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.13  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -1111,25 +1111,25 @@ BEGIN
                         CURSOR  c_child_nm(qp_nm_ne_id_in nm_members.nm_ne_id_in%TYPE)
                         IS
                         SELECT Distinct nm_ne_id_in   
-                                       ,nm_ne_id_of   
+                                       ,Null nm_ne_id_of   
                                        ,nm_type  
                                        ,nm_obj_type   
                                        ,Null nm_begin_mp   
                                        ,Null nm_start_date   
                                        ,Null nm_end_date   
                                        ,Null nm_end_mp  
-                                       ,nm_slk   
-                                       ,nm_cardinality   
-                                       ,nm_admin_unit   
+                                       ,Null nm_slk   
+                                       ,Null nm_cardinality   
+                                       ,Null nm_admin_unit   
                                        ,Null nm_date_created   
                                        ,Null nm_date_modified   
                                        ,Null nm_modified_by   
                                        ,Null nm_created_by   
-                                       ,nm_seq_no     
-                                       ,nm_seg_no   
-                                       ,nm_true   
-                                       ,nm_end_slk   
-                                       ,nm_end_true
+                                       ,Null nm_seq_no     
+                                       ,Null nm_seg_no   
+                                       ,Null nm_true   
+                                       ,Null nm_end_slk   
+                                       ,Null nm_end_true
                         FROM   nm_members_all nm
                         WHERE  nm_ne_id_in IN (SELECT  iit.iit_ne_id
                                                FROM    NM_INV_ITEMS iit
@@ -1164,10 +1164,10 @@ BEGIN
                         Loop
                              Fetch c_child_nm INTO l_child_nm_rec ;
                              EXIT WHEN c_child_nm%NOTFOUND;
-                             l_rec_nm := l_child_nm_rec  ;
-                             l_rec_nm.nm_begin_mp    := l_pl.pl_start;
-                             l_rec_nm.nm_end_mp      := l_pl.pl_end;
-                             l_rec_nm.nm_start_date  := p_effective_date;
+                             l_rec_nm               := l_rec_nm ;
+                             l_rec_nm.nm_ne_id_in   := l_child_nm_rec.nm_ne_id_in ;
+                             l_rec_nm.nm_type       := l_child_nm_rec.nm_type ;    
+                             l_rec_nm.nm_obj_type   := l_child_nm_rec.nm_obj_type ;
                              nm3net.ins_nm(l_rec_nm);
                         End Loop ;
                         Close c_child_nm ;            
@@ -2132,25 +2132,25 @@ BEGIN
                         CURSOR  c_child_nm(qp_nm_ne_id_in nm_members.nm_ne_id_in%TYPE)
                         IS
                         SELECT Distinct nm_ne_id_in   
-                                       ,nm_ne_id_of   
+                                       ,Null nm_ne_id_of   
                                        ,nm_type  
                                        ,nm_obj_type   
                                        ,Null nm_begin_mp   
                                        ,Null nm_start_date   
                                        ,Null nm_end_date   
                                        ,Null nm_end_mp  
-                                       ,nm_slk   
-                                       ,nm_cardinality   
-                                       ,nm_admin_unit   
+                                       ,Null nm_slk   
+                                       ,Null nm_cardinality   
+                                       ,Null nm_admin_unit   
                                        ,Null nm_date_created   
                                        ,Null nm_date_modified   
                                        ,Null nm_modified_by   
                                        ,Null nm_created_by   
-                                       ,nm_seq_no     
-                                       ,nm_seg_no   
-                                       ,nm_true   
-                                       ,nm_end_slk   
-                                       ,nm_end_true
+                                       ,Null nm_seq_no     
+                                       ,Null nm_seg_no   
+                                       ,Null nm_true   
+                                       ,Null nm_end_slk   
+                                       ,Null nm_end_true
                         FROM   nm_members_all nm
                         WHERE  nm_ne_id_in IN (SELECT  iit.iit_ne_id
                                                FROM    NM_INV_ITEMS iit
@@ -2185,10 +2185,10 @@ BEGIN
                         Loop
                              Fetch c_child_nm INTO l_child_nm_rec ;
                              EXIT WHEN c_child_nm%NOTFOUND;
-                             l_rec_nm := l_child_nm_rec  ;
-                             l_rec_nm.nm_begin_mp   := l_pl.pl_start;
-                             l_rec_nm.nm_end_mp     := l_pl.pl_end;
-                             l_rec_nm.nm_start_date := pi_effective_date;
+                             l_rec_nm               := l_rec_nm ;
+                             l_rec_nm.nm_ne_id_in   := l_child_nm_rec.nm_ne_id_in ;
+                             l_rec_nm.nm_type       := l_child_nm_rec.nm_type ;    
+                             l_rec_nm.nm_obj_type   := l_child_nm_rec.nm_obj_type ;
                              nm3net.ins_nm(l_rec_nm);
                         End Loop ;
                         Close c_child_nm ;            
