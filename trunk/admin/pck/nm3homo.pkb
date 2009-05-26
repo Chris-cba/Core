@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.13   May 26 2009 11:57:56   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.14   May 26 2009 12:09:22   lsorathia  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   May 26 2009 11:57:56  $
---       Date fetched Out : $Modtime:   May 26 2009 11:57:10  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   May 26 2009 12:09:22  $
+--       Date fetched Out : $Modtime:   May 26 2009 12:07:32  $
+--       PVCS Version     : $Revision:   2.14  $
 --
 --
 --   Author : Jonathan Mills
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    
    -- Log 713421
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.13  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.14  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -1104,8 +1104,9 @@ BEGIN
                   FOR l_count IN 1..l_member_arr.npa_placement_array.COUNT
                    LOOP
                      DECLARE
-                        l_pl     NM_PLACEMENT := l_member_arr.npa_placement_array(l_count);
-                        l_rec_nm NM_MEMBERS%ROWTYPE := cs_rec;
+                        l_pl         NM_PLACEMENT := l_member_arr.npa_placement_array(l_count);
+                        l_rec_nm     NM_MEMBERS%ROWTYPE := cs_rec;
+                        l_rec_chi_nm NM_MEMBERS%ROWTYPE ;
                         --Log 713412:Linesh:Start
                         --Added Following to move the Subordinate Asset Location to that of the Parent
                         CURSOR  c_child_nm(qp_nm_ne_id_in nm_members.nm_ne_id_in%TYPE)
@@ -1164,11 +1165,11 @@ BEGIN
                         Loop
                              Fetch c_child_nm INTO l_child_nm_rec ;
                              EXIT WHEN c_child_nm%NOTFOUND;
-                             l_rec_nm               := l_rec_nm ;
-                             l_rec_nm.nm_ne_id_in   := l_child_nm_rec.nm_ne_id_in ;
-                             l_rec_nm.nm_type       := l_child_nm_rec.nm_type ;    
-                             l_rec_nm.nm_obj_type   := l_child_nm_rec.nm_obj_type ;
-                             nm3net.ins_nm(l_rec_nm);
+                             l_rec_chi_nm           := l_rec_nm ;
+                             l_rec_chi_nm.nm_ne_id_in   := l_child_nm_rec.nm_ne_id_in ;
+                             l_rec_chi_nm.nm_type       := l_child_nm_rec.nm_type ;    
+                             l_rec_chi_nm.nm_obj_type   := l_child_nm_rec.nm_obj_type ;
+                             nm3net.ins_nm(l_rec_chi_nm);
                         End Loop ;
                         Close c_child_nm ;            
                         xattr_on;                        
@@ -2127,6 +2128,7 @@ BEGIN
                      DECLARE
                         l_pl     NM_PLACEMENT := l_member_arr.npa_placement_array(l_count);
                         l_rec_nm NM_MEMBERS%ROWTYPE := cs_rec;
+                        l_rec_chi_nm NM_MEMBERS%ROWTYPE ;
                         --Log 713412:Linesh:Start
                         --Added Following to move the Subordinate Asset Location to that of the Parent
                         CURSOR  c_child_nm(qp_nm_ne_id_in nm_members.nm_ne_id_in%TYPE)
@@ -2185,10 +2187,10 @@ BEGIN
                         Loop
                              Fetch c_child_nm INTO l_child_nm_rec ;
                              EXIT WHEN c_child_nm%NOTFOUND;
-                             l_rec_nm               := l_rec_nm ;
-                             l_rec_nm.nm_ne_id_in   := l_child_nm_rec.nm_ne_id_in ;
-                             l_rec_nm.nm_type       := l_child_nm_rec.nm_type ;    
-                             l_rec_nm.nm_obj_type   := l_child_nm_rec.nm_obj_type ;
+                             l_rec_chi_nm             := l_rec_nm ;
+                             l_rec_chi_nm.nm_ne_id_in := l_child_nm_rec.nm_ne_id_in ;
+                             l_rec_chi_nm.nm_type     := l_child_nm_rec.nm_type ;    
+                             l_rec_chi_nm.nm_obj_type := l_child_nm_rec.nm_obj_type ;
                              nm3net.ins_nm(l_rec_nm);
                         End Loop ;
                         Close c_child_nm ;            
