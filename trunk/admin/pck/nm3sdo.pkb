@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.21   Apr 28 2009 09:08:40   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.22   May 28 2009 17:17:06   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Apr 28 2009 09:08:40  $
---       Date fetched Out : $Modtime:   Apr 28 2009 09:08:00  $
---       PVCS Version     : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   May 28 2009 17:17:06  $
+--       Date fetched Out : $Modtime:   May 28 2009 17:09:46  $
+--       PVCS Version     : $Revision:   2.22  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.21  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.22  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -91,6 +91,10 @@ FUNCTION Get_Parts ( p_shape IN mdsys.sdo_geometry ) RETURN nm_geom_array;
 FUNCTION compare_pt ( p_geom1 mdsys.sdo_geometry, p_geom2 mdsys.sdo_geometry, tol IN NUMBER ) RETURN VARCHAR2;
 
 function local_join_ptr_array( p_pa in ptr_array, p_table in varchar2, p_key in varchar2 ) return ptr_array;
+--
+PROCEDURE add_segments_m ( p_geom1 IN OUT NOCOPY mdsys.sdo_geometry, p_geom2 IN mdsys.sdo_geometry,
+                           p_diminfo IN mdsys.sdo_dim_array,
+                           p_conn IN BOOLEAN DEFAULT FALSE );
 --
 -----------------------------------------------------------------------------
 --
@@ -1097,6 +1101,68 @@ end;
 
   END;
 
+
+--
+--------------------------------------------------------------------------------------------------------------------
+--
+
+  PROCEDURE add_segments_m ( p_geom1 IN OUT NOCOPY mdsys.sdo_geometry, p_geom2 IN mdsys.sdo_geometry,
+                             p_diminfo IN mdsys.sdo_dim_array,
+                             p_conn IN BOOLEAN DEFAULT FALSE
+         )  IS
+
+
+  l_meas NUMBER := p_geom1.sdo_ordinates(p_geom1.sdo_ordinates.LAST);
+  last_1 INTEGER := p_geom1.sdo_ordinates.LAST;
+
+  start_ic INTEGER := 1;
+
+  BEGIN
+
+     IF NOT p_conn OR (
+            ABS(p_geom1.sdo_ordinates( last_1 - 2 ) - p_geom2.sdo_ordinates(1)) > p_diminfo(1).sdo_tolerance OR
+            ABS(p_geom1.sdo_ordinates( last_1 - 1 ) - p_geom2.sdo_ordinates(2)) > p_diminfo(2).sdo_tolerance)  THEN
+
+  --   either intentionally not connected, or connected but no common ordinates
+  --   so make multi-part
+  --   but what when the geometry being added is MP
+
+       p_geom1.sdo_elem_info.EXTEND;
+       p_geom1.sdo_elem_info(p_geom1.sdo_elem_info.LAST) := p_geom1.sdo_ordinates.LAST + 1;
+
+       p_geom1.sdo_elem_info.EXTEND;
+       p_geom1.sdo_elem_info(p_geom1.sdo_elem_info.LAST) := 2;
+
+       p_geom1.sdo_elem_info.EXTEND;
+       p_geom1.sdo_elem_info(p_geom1.sdo_elem_info.LAST) := 1;
+
+     END IF;
+
+  -- skip the first three ordinates - ignore the measure because datum measures don't count.
+
+     IF p_conn AND
+        ABS(p_geom1.sdo_ordinates( last_1 - 2 ) - p_geom2.sdo_ordinates(1)) < p_diminfo(1).sdo_tolerance  AND
+        ABS(p_geom1.sdo_ordinates( last_1 - 1 ) - p_geom2.sdo_ordinates(2)) < p_diminfo(2).sdo_tolerance THEN
+        start_ic := 4;
+     ELSE
+        start_ic := 1;
+     END IF;
+
+     FOR ic IN start_ic..p_geom2.sdo_ordinates.LAST LOOP
+
+        p_geom1.sdo_ordinates.EXTEND;
+
+        IF MOD( ic, 3) = 0 THEN
+          p_geom1.sdo_ordinates( p_geom1.sdo_ordinates.LAST )  := p_geom2.sdo_ordinates(ic);-- + l_meas;
+        ELSE
+          p_geom1.sdo_ordinates( p_geom1.sdo_ordinates.LAST )  := p_geom2.sdo_ordinates(ic);
+        END IF;
+
+     END LOOP;
+
+  END;
+
+
 --
 --------------------------------------------------------------------------------------------------------------------
 --
@@ -1852,6 +1918,37 @@ END ;
 ---------------------------------------------------------------------------------------------------------------------
 --
 
+procedure redefine_geom_segment1( p_geom in out nocopy mdsys.sdo_geometry, p_diminfo mdsys.sdo_dim_array, 
+                                                  p_start in number, p_end in number, dummy in integer ) is
+
+l_dp         integer;
+
+l_old_end    number := sdo_lrs.GEOM_SEGMENT_END_MEASURE( p_geom);
+l_old_start  number := sdo_lrs.GEOM_SEGMENT_START_MEASURE( p_geom);
+l_new_length number := p_end - p_start;
+l_old_length number := l_old_end - l_old_start;
+
+begin
+
+  if p_diminfo.last < 3 then
+    raise_application_error( -20001, 'Invalid dimension for handling measures');
+  end if;
+  
+  l_dp := greatest(Nm3unit.get_rounding( p_diminfo(3).sdo_tolerance ) -1, 0);
+  
+
+  for i in 1..p_geom.sdo_ordinates.last loop
+    if mod(i, 3) = 0 then
+      p_geom.sdo_ordinates(i) := p_start + round( ( (p_geom.sdo_ordinates(i) - l_old_start)/l_old_length ), l_dp) * l_new_length;
+    end if;
+  end loop;
+  
+end; 
+                      
+--
+---------------------------------------------------------------------------------------------------------------------
+--
+
 FUNCTION get_route_shape( p_ne_id    IN nm_elements.ne_id%TYPE,
                           p_nt       IN ptr_vc_array,
         p_th       IN ptr_array,
@@ -1916,6 +2013,8 @@ l_part   VARCHAR2(1);
 
 BEGIN
 
+--nm_debug.debug_on;
+
   IF p_part IS NULL THEN
     l_part  := Nm3net.is_gty_partial( Nm3get.get_ne_all( p_ne_id ).ne_gty_group_type );
   ELSE
@@ -1945,7 +2044,7 @@ BEGIN
 
   END IF;
 
---  nm_debug.debug(l_action);
+--nm_debug.debug(l_action);
 
 --  for i in 1..l_th.pa.last loop
 --    nm_debug.debug('Type = '||l_nt.pa(i).ptr_value );
@@ -1997,21 +2096,23 @@ BEGIN
 
     CLOSE geocur;
 
+
     FOR i IN 1..l_ne_id.COUNT LOOP
 
 --   nm_debug.debug('I = '||to_char(i)||', Type = '||l_nt_type(i));
 
      j := p_nt.get_idx_from_value( l_nt_type(i) );
 
---   nm_debug.debug( 'Ptr = '||to_char( j ));
+     nm_debug.debug( 'Ptr = '||to_char( j ));
 
       l_th_id := p_th.pa(j).ptr_value;
 
       l_geom_tab(i) := Nm3sdo.Get_Layer_Element_Geometry( l_th_id, l_ne_id(i) );
 
---   nm_debug.debug( 'Id '||to_char(l_ne_id(i))||' is type '||l_nt_type(i)||' and theme '||to_char(l_th_id));
+--    nm_debug.debug( 'Id '||to_char(l_ne_id(i))||' is type '||l_nt_type(i)||' and theme '||to_char(l_th_id));
 
     END LOOP;
+
 
 --  end if;
 
@@ -2022,40 +2123,46 @@ BEGIN
 
       IF l_geom_tab(i).sdo_elem_info IS NOT NULL THEN
 
---      nm_debug.debug('NE = '||to_char(l_ne_id(i))||' Eleme info is not null - proceed');
+--        nm_debug.debug('NE = '||to_char(l_ne_id(i))||' Elem info is not null - proceed');
 
 --      first clip the shape if necessary and rescale it to start at the true distance?
 
         IF l_part = 'Y' THEN
 
           IF Nm3sdo.is_clipped( l_start(i), l_end(i), l_length(i) ) = 0 THEN
---            nm_debug.debug('Clipped between '||to_char( l_start(i) )||' and '||to_char(l_end(i))||' length = '||to_char(l_length(i)));
+  --          nm_debug.debug('Clipped between '||to_char( l_start(i) )||' and '||to_char(l_end(i))||' length = '||to_char(l_length(i)));
 
             l_geom_tab(i) := sdo_lrs.clip_geom_segment( l_geom_tab(i), p_diminfo, l_start(i), l_end(i) );
 
 --          nm_debug.debug('End of clip - scale');
 --          l_geom := sdo_lrs.SCALE_GEOM_SEGMENT( l_geom, l_diminfo, 0,  (l_end-l_start), 0);
 --          sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, 0, l_end(i)-l_start(i));
-             sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, nvl(l_slk(i),0), NVL(l_end_slk(i),0));
+--          sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, nvl(l_slk(i),0), NVL(l_end_slk(i),0));
 --          nm_debug.debug('End of scale');
 
-          ELSE
-            nm_debug.debug('Whole element group - no clipping');
+--          ELSE
+--            nm_debug.debug('Whole element group - no clipping');
 
-            sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, nvl(l_slk(i),0), NVL(l_end_slk(i), 0));
+--            sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, nvl(l_slk(i),0), NVL(l_end_slk(i), 0));
 --            sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, 0, NVL(l_end_slk(i)-l_slk(i), 0));
 
 --         NULL;
 
           END IF;
 
+--        sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, nvl(l_slk(i),0), NVL(l_end_slk(i),0));
+
         ELSE
-           nm_debug.debug('Not clipped '||to_char( l_slk(i) )||' and '||to_char(l_end_slk(i))||' length = '||to_char(l_length(i)));
+--           nm_debug.debug('Not clipped '||to_char( l_slk(i) )||' and '||to_char(l_end_slk(i))||' length = '||to_char(l_length(i)));
            NULL;
-           sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, nvl(l_slk(i),0), NVL(l_end_slk(i), 0));
+--         sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, nvl(l_slk(i),0), NVL(l_end_slk(i), 0));
 --         sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, 0, NVL(l_end_slk(i)-l_slk(i), 0));
 
         END IF;
+
+--      sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, nvl(l_slk(i),0), NVL(l_end_slk(i), 0));
+
+        redefine_geom_segment1( l_geom_tab(i), p_diminfo, nvl(l_slk(i),0), NVL(l_end_slk(i), 0), 0);
 
         IF l_cardinality(i) < 0 THEN
 
@@ -2074,9 +2181,9 @@ BEGIN
 --      if geocur%rowcount = 1 then
 
         IF retval.sdo_elem_info IS NULL THEN
-          nm_debug.debug('Start '||l_slk(i)||' to '||l_end_slk(i));
+--          nm_debug.debug('Start '||l_slk(i)||' to '||l_end_slk(i));
 --          sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, NVL(l_slk(i),0), l_end(i)-l_start(i));
-          sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, NVL(l_slk(i),0), NVL(l_end_slk(i), 0));
+--          sdo_lrs.redefine_geom_segment( l_geom_tab(i), p_diminfo, NVL(l_slk(i),0), NVL(l_end_slk(i), 0));
           retval := l_geom_tab(i);
           l_last_measure := l_end_slk(i);
 --        nm_debug.debug('First one, start at '||to_char(l_slk));
@@ -2091,7 +2198,10 @@ BEGIN
 
             nm_debug.debug('First after a db - use MP');
 --          retval := add_segments( retval, l_geom );
-            Nm3sdo.add_segments( retval, l_geom_tab(i), p_diminfo, FALSE );
+            add_segments_m( retval, l_geom_tab(i), p_diminfo, FALSE );
+
+--          retval := sdo_lrs.concatenate_geom_segments( retval, p_diminfo, l_geom_tab(i), p_diminfo );
+
 --          nm_debug.debug('End add seg');
 
           ELSE
@@ -2102,15 +2212,18 @@ BEGIN
 
               l_conn := TRUE;
 
-                nm_debug.debug('concat ');
+--                nm_debug.debug('concat ');
 --              retval := sdo_lrs.concatenate_geom_segments( retval, l_diminfo, l_geom, l_diminfo );
 
 --              nm_debug.debug('End concat');
 
             END IF;
 
---          retval := add_segments( retval, l_geom, l_conn );
-            Nm3sdo.add_segments( retval, l_geom_tab(i), p_diminfo, l_conn );
+            add_segments_m( retval, l_geom_tab(i), p_diminfo, l_conn );
+
+--          retval := sdo_lrs.concatenate_geom_segments( retval, p_diminfo, l_geom_tab(i), p_diminfo );
+
+--          Nm3sdo.add_segments( retval, l_geom_tab(i), p_diminfo, l_conn );
 --          nm_debug.debug('Not connected - MP');
 --          retval := add_segments( retval, l_geom );
 --              --   nm_debug.debug('End add seg');
@@ -2936,10 +3049,10 @@ END;
 
 PROCEDURE create_nt_data( p_nth    IN NM_THEMES_ALL%ROWTYPE,
                           p_nlt_id IN NM_LINEAR_TYPES.nlt_id%TYPE,
-        p_ta     IN nm_theme_array,
-        p_job_id IN NUMBER DEFAULT NULL) IS
+                          p_ta     IN nm_theme_array,
+                          p_job_id IN NUMBER DEFAULT NULL) IS
 
-l_mp_gtype      NUMBER := TO_NUMBER(NVL(Hig.get_sysopt('SDOMPGTYPE'),'3302'));
+l_mp_gtype      NUMBER := TO_NUMBER(NVL(Hig.get_sysopt('SDOMPGTYPE'),'3002'));
 
 cur_str1        VARCHAR2(2000);
 cur_str2        VARCHAR2(2000);
@@ -2969,7 +3082,14 @@ l_time3        NUMBER;
 
 l_part   VARCHAR2(1);
 
+l_id integer := 0;
+l_ne_saved number := -999;
+l_date_saved date := to_date('01-jan-1650','DD-MON-YYYY');
 
+
+l_date nm3type.tab_date;
+
+/*
 CURSOR  get_routes ( c_nt IN NM_LINEAR_TYPES.nlt_nt_type%TYPE, c_gty IN NM_LINEAR_TYPES.NLT_GTY_TYPE%TYPE ) IS
   SELECT nm_geom(ne_id, NULL)
   FROM nm_elements
@@ -2977,32 +3097,38 @@ CURSOR  get_routes ( c_nt IN NM_LINEAR_TYPES.nlt_nt_type%TYPE, c_gty IN NM_LINEA
   AND   ne_gty_group_type = c_gty
   AND EXISTS ( SELECT 1 FROM nm_members
                WHERE nm_ne_id_in = ne_id );
+*/
 
-FUNCTION get_seq_values(p_seq_name IN VARCHAR2, p_geom_array IN nm_geom_array)  RETURN int_array IS
-retval     int_array := Nm3array.init_int_array;
-l_seq_str  VARCHAR2(2000);
-l_ref_cur  Nm3type.ref_cursor;
+cursor get_routes (c_nt in nm_linear_types.nlt_nt_type%type,
+                   c_gty in nm_linear_types.nlt_gty_type%type ) is
+with route_data as
+( select nm_ne_id_in ne_id, nm_start_date start_date, nm_end_date end_date
+from nm_members_all, nm_elements_all
+where nm_obj_type = c_gty
+and nm_ne_id_in = ne_id
+--and ne_id = 114223
+and ne_nt_type = c_nt
+and ne_gty_group_type = c_gty
+group by nm_ne_id_in, nm_start_date, nm_end_date
+)
+select ne_id, start_date member_date
+from route_data
+union
+select ne_id, end_date member_date
+from route_data
+order by 1, 2;
+
+l_seq_str varchar2(2000);
+
 BEGIN
 
-  l_seq_str := 'select '||p_nth.nth_sequence_name||'.nextval from table ( :p_g_array.nga )';
 
-  OPEN l_ref_cur FOR l_seq_str USING p_geom_array;
-  FETCH l_ref_cur BULK COLLECT INTO retval.ia;
-  CLOSE l_ref_cur;
-
-  RETURN retval;
-END;
-
-
-
-BEGIN
-
---Nm_Debug.debug_on;
---Nm_Debug.DEBUG('background stuff retrieval');
+  Nm_Debug.debug_on;
+  Nm_Debug.DEBUG('background stuff retrieval');
 
     l_nt   := get_base_nt( p_nlt_id => p_nlt_id );
 
- l_th := get_base_themes( l_nt );
+    l_th := get_base_themes( l_nt );
 
     l_nlt     := Nm3get.get_nlt( p_nlt_id );
 
@@ -3014,72 +3140,61 @@ BEGIN
 
     Nm3sdo.set_diminfo_and_srid( p_themes  => make_tha_from_ptr( l_th ),
                                  p_diminfo => l_diminfo,
-              p_srid    => l_srid );
+                                 p_srid    => l_srid );
 
+    l_seq_str := 'select '||p_nth.nth_sequence_name||'.nextval from dual';
 
     cur_str2 := 'insert into '||p_nth.nth_feature_table||
-                '(objectid, ne_id, geoloc, start_date ) '||
-       ' values ( :l_objectid, :lne, :lgeom, :start_date )';
+                '(objectid, ne_id, geoloc, start_date, end_date) '||
+                ' values ( :l_objectid, :lne, :lgeom, :start_date, :end_date )';
 
---Nm_Debug.DEBUG('all background stuff is retrieved');
-
-    OPEN get_routes( l_nlt.nlt_nt_type, l_nlt.nlt_gty_type);
-
-    FETCH get_routes BULK COLLECT INTO l_ga.nga LIMIT l_limit;
-
---Nm_Debug.DEBUG('Batch fetched ');
-
-    WHILE l_ga.nga.LAST IS NOT NULL AND l_ga.nga.LAST > 0 LOOP
-
-   l_seq := get_seq_values( p_nth.nth_sequence_name, l_ga );
-
---Nm_Debug.DEBUG('Loop over nes');
-
-      FOR i IN 1.. l_ga.nga.LAST LOOP
-
-        BEGIN
-
-          l_time1 := DBMS_UTILITY.GET_TIME;
+    nm_debug.DEBUG('all background stuff is retrieved');
 
 
---        l_ga.nga(i).ng_geometry
-          l_geom  :=    get_route_shape( p_ne_id   => l_ga.nga(i).ng_ne_id,
-                                         p_nt      => l_nt,
-                                  p_th      => l_th,
-                                p_nth_tab => l_nth_row_tab,
-                                p_diminfo => l_diminfo,
-                                p_srid    => l_srid,
-           p_part    => l_part );
+    for irec in get_routes ( l_nlt.nlt_nt_type, l_nlt.nlt_gty_type )loop
 
-          l_time2 := DBMS_UTILITY.GET_TIME;
+    execute immediate l_seq_str into l_id;
 
---          Nm_Debug.DEBUG( 'Time taken to create shape for route '||TO_CHAR(l_ga.nga(i).ng_ne_id )||' is '||TO_CHAR(l_time2-l_time1));
+    if irec.ne_id = l_ne_saved then
+      begin
+        nm3user.set_effective_date( nvl(l_date_saved, trunc(sysdate)) );
 
-          EXECUTE IMMEDIATE cur_str2 USING l_seq.ia(i), l_ga.nga(i).ng_ne_id, l_geom, l_effective_date;
+        nm_debug.debug('Loop it = '||get_routes%rowcount||' retrieve shape, date is '||to_char(nm3user.get_effective_date));
+        
+        l_geom  :=    get_route_shape( p_ne_id   => irec.ne_id, -- l_ga.nga(i).ng_ne_id,
+                                       p_nt      => l_nt,
+                                       p_th      => l_th,
+                                       p_nth_tab => l_nth_row_tab,
+                                       p_diminfo => l_diminfo,
+                                       p_srid    => l_srid,
+                                       p_part    => l_part );
+
+--      l_geom := nm3sdo.get_route_shape(irec.ne_id);
+
+        begin
+          EXECUTE IMMEDIATE cur_str2 USING l_id, irec.ne_id, l_geom, l_date_saved, irec.member_date;
 
           COMMIT;
         EXCEPTION
-    WHEN OTHERS THEN
-      IF p_job_id IS NULL THEN
---         Nm_Debug.DEBUG('Failed on NE_ID = '||TO_CHAR( l_ga.nga(i).ng_ne_id )||' - Error = '||SQLERRM );
-             NULL;
-   ELSE
-
-        add_dyn_seg_exception( 282, p_job_id, l_ga.nga(i).ng_ne_id, NULL, NULL, NULL, NULL, NULL, SQLERRM );
+          WHEN OTHERS THEN
+            IF p_job_id IS NULL THEN
+             Nm_Debug.DEBUG('Failed on NE_ID = '||TO_CHAR( irec.ne_id )||' - Error = '||SQLERRM );
+            ELSE
+             add_dyn_seg_exception( 282, p_job_id, irec.ne_id, NULL, NULL, NULL, NULL, NULL, SQLERRM );
             END IF;
-     END;
+        END;
 
+        l_ne_saved := irec.ne_id;
+        l_date_saved := irec.member_date;
 
-      END LOOP;
-
-      FETCH get_routes BULK COLLECT INTO l_ga.nga LIMIT l_limit;
-
---Nm_Debug.DEBUG('Batch fetched ');
-
- END LOOP;
-
-
-END;
+      end;
+    else
+      l_ne_saved := irec.ne_id;
+      l_date_saved := irec.member_date;
+      -- this is the first row at a known start date
+    end if;
+  end loop;
+end;
 
 --
 ------------------------------------------------------------------------------------------------------------------------
