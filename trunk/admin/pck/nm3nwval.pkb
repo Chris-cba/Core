@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.3   Jun 01 2009 09:14:52   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.4   Jun 01 2009 13:52:16   lsorathia  $
 --       Module Name      : $Workfile:   nm3nwval.pkb  $
---       Date into PVCS   : $Date:   Jun 01 2009 09:14:52  $
---       Date fetched Out : $Modtime:   May 29 2009 16:52:48  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jun 01 2009 13:52:16  $
+--       Date fetched Out : $Modtime:   Jun 01 2009 13:32:04  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on 1.67
 --
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --      Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
@@ -3379,11 +3379,29 @@ BEGIN
       
     IF l_rec.ntc_updatable = 'N'
     THEN
-        OPEN  c_get_nav(l_rec.ntc_nt_type,l_rec.ntc_column_name);
-        FETCH c_get_nav INTO l_found;
-        IF  c_get_nav%NOTFOUND  
+        IF nm3_bulk_attrib_upd.l_allow_attrib_upd = 'Y'
         THEN
-            CLOSE c_get_nav;
+            OPEN  c_get_nav(l_rec.ntc_nt_type,l_rec.ntc_column_name);
+            FETCH c_get_nav INTO l_found;
+            IF  c_get_nav%NOTFOUND  
+            THEN
+                CLOSE c_get_nav;
+                l_plsql :=            'BEGIN'
+                        || c_nl || '  nm3nwval.g_dyn_vals_different := NVL(nm3nwval.g_dyn_ne_flex_cols_old_rec.' || l_rec.ntc_column_name || ', nm3type.c_nvl) <> NVL(nm3nwval.g_dyn_ne_flex_cols_new_rec.' || l_rec.ntc_column_name || ', nm3type.c_nvl);'
+                        || c_nl || 'END;';
+
+                EXECUTE IMMEDIATE l_plsql;
+                IF g_dyn_vals_different
+                THEN
+                    Hig.raise_ner(pi_appl               => Nm3type.c_net
+                                 ,pi_id                 => 338
+                                 ,pi_supplementary_info => l_rec.ntc_prompt);
+           
+               END IF;
+            ELSE
+                CLOSE c_get_nav;
+            END IF ;
+        ELSE
             l_plsql :=            'BEGIN'
                     || c_nl || '  nm3nwval.g_dyn_vals_different := NVL(nm3nwval.g_dyn_ne_flex_cols_old_rec.' || l_rec.ntc_column_name || ', nm3type.c_nvl) <> NVL(nm3nwval.g_dyn_ne_flex_cols_new_rec.' || l_rec.ntc_column_name || ', nm3type.c_nvl);'
                     || c_nl || 'END;';
@@ -3396,8 +3414,6 @@ BEGIN
                              ,pi_supplementary_info => l_rec.ntc_prompt);
            
             END IF;
-        ELSE
-            CLOSE c_get_nav;
         END IF ;
     END IF;
   END LOOP;
