@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.2   Apr 28 2009 10:21:00   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.3   Jun 01 2009 09:14:52   lsorathia  $
 --       Module Name      : $Workfile:   nm3nwval.pkb  $
---       Date into PVCS   : $Date:   Apr 28 2009 10:21:00  $
---       Date fetched Out : $Modtime:   Apr 28 2009 09:37:02  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jun 01 2009 09:14:52  $
+--       Date fetched Out : $Modtime:   May 29 2009 16:52:48  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on 1.67
 --
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --      Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
@@ -2078,21 +2078,9 @@ BEGIN
                                        ,p_nm_end_mp   => l_rec_excl.nm_end_mp
                                        )
           THEN
-              --LS allows override of group based on the production option set
-              IF hig.get_sysopt('GRPXCLOVWR') = 'Y'  -- LS based on product options exclusive grouping is allowed
-              THEN
-                  UPDATE nm_members
-                  SET    nm_end_date = l_rec_excl.nm_start_date
-                  WHERE  nm_ne_id_of = l_rec_excl.nm_ne_id_of
-                  AND    nm_obj_type = ( select ne_gty_group_type from nm_elements where ne_id = l_rec_excl.nm_ne_id_in )
-                  AND    nm_ne_id_in != l_rec_excl.nm_ne_id_in;              
-                  --g_nwval_exc_code := -20051;
-                  --g_nwval_exc_msg  := 'Membership is not exclusive';
-                  --RAISE g_nwval_exception;
-              ELSE
-                  hig.raise_ner(pi_appl    => nm3type.c_net
-                               ,pi_id      => 41);
-              END IF;
+            g_nwval_exc_code := -20051;
+            g_nwval_exc_msg  := 'Membership is not exclusive';
+            RAISE g_nwval_exception;
          END IF;
 --
       END LOOP;
@@ -3367,7 +3355,18 @@ PROCEDURE check_ne_flex_cols_updatable(pi_ne_nt_type           IN nm_elements.ne
                                       ) IS
 
   l_plsql Nm3type.max_varchar2;
-
+  -- Bulk network update changes
+  -- Added this code to ignore the not updateable flag
+  -- when updated from nm3_bulk_attrib_upd
+  CURSOR c_get_nav(qp_nt_type  nm_attrib_view_vw.nav_nt_type%TYPE
+                  ,qp_col_name nm_attrib_view_vw.nav_col_name%TYPE)
+  IS 
+  SELECT 'x'
+  FROM   nm_attrib_view_vw 
+  WHERE  nav_nt_type       = qp_nt_type
+  AND    nav_col_name      = qp_col_name 
+  AND    nav_col_updatable = 'Y' ;
+  l_found Varchar2(1);
 BEGIN
   Nm_Debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'check_ne_flex_cols_updatable');
@@ -3377,20 +3376,29 @@ BEGIN
 
   FOR l_rec IN cs_ntc(c_nt_type => pi_ne_nt_type)
   LOOP
+      
     IF l_rec.ntc_updatable = 'N'
     THEN
-      l_plsql :=            'BEGIN'
-                 || c_nl || '  nm3nwval.g_dyn_vals_different := NVL(nm3nwval.g_dyn_ne_flex_cols_old_rec.' || l_rec.ntc_column_name || ', nm3type.c_nvl) <> NVL(nm3nwval.g_dyn_ne_flex_cols_new_rec.' || l_rec.ntc_column_name || ', nm3type.c_nvl);'
-                 || c_nl || 'END;';
+        OPEN  c_get_nav(l_rec.ntc_nt_type,l_rec.ntc_column_name);
+        FETCH c_get_nav INTO l_found;
+        IF  c_get_nav%NOTFOUND  
+        THEN
+            CLOSE c_get_nav;
+            l_plsql :=            'BEGIN'
+                    || c_nl || '  nm3nwval.g_dyn_vals_different := NVL(nm3nwval.g_dyn_ne_flex_cols_old_rec.' || l_rec.ntc_column_name || ', nm3type.c_nvl) <> NVL(nm3nwval.g_dyn_ne_flex_cols_new_rec.' || l_rec.ntc_column_name || ', nm3type.c_nvl);'
+                    || c_nl || 'END;';
 
-      EXECUTE IMMEDIATE l_plsql;
-
-      IF g_dyn_vals_different
-      THEN
-          Hig.raise_ner(pi_appl               => Nm3type.c_net
-                       ,pi_id                 => 338
-                       ,pi_supplementary_info => l_rec.ntc_prompt);
-      END IF;
+            EXECUTE IMMEDIATE l_plsql;
+            IF g_dyn_vals_different
+            THEN
+                Hig.raise_ner(pi_appl               => Nm3type.c_net
+                             ,pi_id                 => 338
+                             ,pi_supplementary_info => l_rec.ntc_prompt);
+           
+            END IF;
+        ELSE
+            CLOSE c_get_nav;
+        END IF ;
     END IF;
   END LOOP;
 
