@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.0   Jun 01 2009 09:22:18   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.1   Jun 01 2009 13:50:20   lsorathia  $
 --       Module Name      : $Workfile:   nm3_bulk_attrib_upd.pkb  $
---       Date into PVCS   : $Date:   Jun 01 2009 09:22:18  $
---       Date fetched Out : $Modtime:   Jun 01 2009 09:10:08  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jun 01 2009 13:50:20  $
+--       Date fetched Out : $Modtime:   Jun 01 2009 13:48:18  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.0  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.1  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_bulk_attrib_upd';
 --
@@ -77,10 +77,7 @@ IS
    l_child_col_value  Varchar2(4000) ;
    l_ne_old_tab       l_ne_old_tab_type ;  
    l_nti_rec          nm_type_inclusion%ROWTYPE ; 
-   l_parent_ne_id_old nm_elements.ne_id%TYPE ;
---   l_parent_ne_id_new nm_elements.ne_id%TYPE ;
    l_parent_rec       nm_elements%ROWTYPE ;  
-   d number ;
 --
    CURSOR   c_nad (qp_nt_type  nm_nw_ad_types.nad_nt_type%TYPE
                   ,qp_qty_type nm_nw_ad_types.nad_gty_type%TYPE) IS
@@ -197,14 +194,6 @@ BEGIN
                END IF;
            ELSIF l_chi_inc = 'Y'
            THEN
-               Execute Immediate ' SELECT ne_id '||
-                                 ' FROM   nm_elements ne      '|| 
-                                 ' WHERE  ne.ne_nt_type = :1 '||
-                                 ' AND    rownum = 1 '|| 
-                                 ' AND    '||l_nti_rec.nti_parent_column||' IN ( '||
-                                          ' SELECT '||l_child_col_name||
-                                          ' FROM   nm_elements ne,table(cast(nm3_bulk_attrib_upd.get_ne_array(:2) as nm_ne_id_array)) x  '||
-                                          ' WHERE  ne.ne_id = x.ne_id )' INTO l_parent_ne_id_old Using l_nti_rec.nti_nw_parent_type,pi_ne_id_array ;
                Execute Immediate ' SELECT * '||
                                  ' FROM   nm_elements ne      '|| 
                                  ' WHERE  ne.ne_nt_type = :1 '||
@@ -217,41 +206,28 @@ BEGIN
                                  ' WHERE ne_id = :a ' Using l_ne_tab(i) ;
                IF l_nti_rec.nti_auto_include = 'Y'
                THEN
-/*
-                       SELECT l_parent_rec.ne_id, nm_ne_id_of, nm_type, nm_obj_type, nm_begin_mp, 
-                              Trunc(sysdate), nm_end_date, nm_end_mp, nm_slk, nm_cardinality, 
-                              nm_admin_unit, nm_date_created, nm_date_modified, nm_modified_by, nm_created_by, 
-                              nm_seq_no, nm_seg_no, nm_true, nm_end_slk, nm_end_true 
-                              BULK COLLECT INTO l_nm_tab
-                       FROM   nm_members nm,table(cast(get_ne_array(pi_ne_id_array) as nm_ne_id_array)) x  
-                       WHERE  nm_obj_type = l_parent_rec.ne_gty_group_type
-                       AND    nm.nm_ne_id_of =  x.ne_id ;   
-*/
-                       SELECT l_parent_rec.ne_id, x.ne_id, 'G', l_parent_rec.ne_gty_group_type, 0, 
-                              Trunc(sysdate), null, 0, 0, 1, 
-                              l_parent_rec.ne_admin_unit, null,null,null,null, 
-                              Null,Null,Null, 0, Null 
-                              BULK COLLECT INTO l_nm_tab
-                       FROM   (Select x.* FROM table(cast(get_ne_array(pi_ne_id_array) as nm_ne_id_array)) x) x
-                       WHERE   x.ne_id IS NOT NULL;
-                       
-                       FORALL i in 1..l_ne_tab.Count
-                       UPDATE  nm_members 
-                       SET     nm_end_date = TRUNC(SYSDATE) 
-                       WHERE   nm_ne_id_of = l_ne_tab(i) 
-                       AND     nm_obj_type = l_parent_rec.ne_gty_group_type ;
+                   SELECT l_parent_rec.ne_id, x.ne_id, 'G', l_parent_rec.ne_gty_group_type, 0, 
+                          Trunc(sysdate), null, 0, 0, 1, 
+                          l_parent_rec.ne_admin_unit, null,null,null,null, 
+                          Null,Null,Null, 0, Null 
+                          BULK COLLECT INTO l_nm_tab
+                   FROM   (Select x.* FROM table(cast(get_ne_array(pi_ne_id_array) as nm_ne_id_array)) x) x
+                   WHERE   x.ne_id IS NOT NULL;
+                      
+                   FORALL i in 1..l_ne_tab.Count
+                   UPDATE  nm_members 
+                   SET     nm_end_date = TRUNC(SYSDATE) 
+                   WHERE   nm_ne_id_of = l_ne_tab(i) 
+                   AND     nm_obj_type = l_parent_rec.ne_gty_group_type ;
                               
                    FORALL i in 1..l_nm_tab.Count
                    INSERT INTO nm_members values l_nm_tab(i) ;
                ELSE
-                   IF l_parent_ne_id_old IS NOT NULL
-                   THEN
-                       FORALL i in 1..l_ne_tab.Count
-                       UPDATE  nm_members 
-                       SET     nm_end_date = TRUNC(SYSDATE) 
-                       WHERE   nm_ne_id_of = l_ne_tab(i) 
-                       AND     nm_ne_id_in = l_parent_ne_id_old ;
-                   END IF ;
+                   FORALL i in 1..l_ne_tab.Count
+                   UPDATE  nm_members 
+                   SET     nm_end_date = TRUNC(SYSDATE) 
+                   WHERE   nm_ne_id_of = l_ne_tab(i) 
+                   AND     nm_obj_type = l_parent_rec.ne_gty_group_type ;
                END IF ;
            END IF ;   
        ELSE
