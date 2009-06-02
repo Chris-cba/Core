@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.1   Jun 01 2009 13:50:20   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.2   Jun 02 2009 09:24:28   lsorathia  $
 --       Module Name      : $Workfile:   nm3_bulk_attrib_upd.pkb  $
---       Date into PVCS   : $Date:   Jun 01 2009 13:50:20  $
---       Date fetched Out : $Modtime:   Jun 01 2009 13:48:18  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jun 02 2009 09:24:28  $
+--       Date fetched Out : $Modtime:   Jun 02 2009 09:11:24  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.1  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.2  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_bulk_attrib_upd';
 --
@@ -561,7 +561,7 @@ BEGIN
               x.ne_id, 
               'G', 
               l_group_type, 
-              nm_begin_mp, 
+              Nvl(nm_begin_mp,0), 
               Trunc(Sysdate), 
               Null, 
               Nvl(nm_end_mp,0), 
@@ -619,7 +619,7 @@ BEGIN
                       x.ne_id, 
                       'G', 
                       l_group_type, 
-                      nm_begin_mp, 
+                      Nvl(nm_begin_mp,0), 
                       Trunc(Sysdate), 
                       Null, 
                       Nvl(nm_end_mp,0), 
