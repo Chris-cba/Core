@@ -1,14 +1,12 @@
 CREATE OR REPLACE PACKAGE BODY NM3MRG_SDO AS
+--   PVCS Identifiers :-
 --
------------------------------------------------------------------------------
---
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3mrg_sdo.pkb	1.4 03/08/06
---       Module Name      : nm3mrg_sdo.pkb
---       Date into SCCS   : 06/03/08 14:38:50
---       Date fetched Out : 07/06/13 14:12:46
---       SCCS Version     : 1.4
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_sdo.pkb-arc   2.2   Jun 04 2009 11:38:24   ptanava  $
+--       Module Name      : $Workfile:   nm3mrg_sdo.pkb  $
+--       Date into PVCS   : $Date:   Jun 04 2009 11:38:24  $
+--       Date fetched Out : $Modtime:   Jun 04 2009 11:37:20  $
+--       PVCS Version     : $Revision:   2.2  $ 
+--       Based on SCCS Version     : 1.4
 --
 --   Author : Rob Coupe
 --
@@ -18,9 +16,11 @@ CREATE OR REPLACE PACKAGE BODY NM3MRG_SDO AS
 --	Copyright (c) exor corporation ltd, 2005
 -----------------------------------------------------------------------------
 --
---all global package variables here
---
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3mrg_sdo.pkb	1.4 03/08/06"';
+/* History
+  04.06.09  PT in create_spatial_mrg_view() removed the RULE hint
+*/
+
+   g_body_sccsid     constant  varchar2(200) := '"$Revision:   2.2  $"';
 
 -----------------------------------------------------------------------------
 
@@ -179,7 +179,7 @@ begin
   vname := nm3mrg_view.get_mrg_view_name_by_qry_id( p_mrg_query_id );
 
   curstr := 'CREATE or replace VIEW '||vname||'_SDO'||' as '||
-             ' SELECT /*+ RULE */ '||
+             ' SELECT '||
        'g.nmg_id, b.* '||
 	   ' ,g.nmg_geometry '||
        ' FROM  '||vname||'_VAL b, '||
