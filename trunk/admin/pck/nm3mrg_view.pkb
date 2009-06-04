@@ -1,11 +1,11 @@
 create or replace package body nm3mrg_view as
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkb-arc   2.1   Mar 02 2009 17:17:52   ptanava  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkb-arc   2.2   Jun 04 2009 09:25:56   ptanava  $
 --       Module Name      : $Workfile:   nm3mrg_view.pkb  $
---       Date into PVCS   : $Date:   Mar 02 2009 17:17:52  $
---       Date fetched Out : $Modtime:   Mar 02 2009 17:06:46  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jun 04 2009 09:25:56  $
+--       Date fetched Out : $Modtime:   Jun 04 2009 09:23:52  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on SCCS version     : 1.38
 --
 --
@@ -21,10 +21,11 @@ create or replace package body nm3mrg_view as
 /* History
   02.03.09  PT change in build_view() rewrote the logic for _SVL
                 now uses a dedicated sql instead of joining the _sec and _val
+  04.06.09  PT in V_MRG_xxxxxx removed RULE hint and optimized unit conversion
 */
 
 
-   g_body_sccsid      CONSTANT  VARCHAR2(200) := '"$Revision:   2.1  $"';
+   g_body_sccsid      CONSTANT  VARCHAR2(200) := '"$Revision:   2.2  $"';
    g_package_name     CONSTANT  VARCHAR2(30)  := 'nm3mrg_view';
    
    cr constant varchar2(1) := chr(10);
@@ -840,7 +841,7 @@ BEGIN
    nm3ddl.delete_tab_varchar;
    append ('CREATE VIEW '||c_highways_owner||'.'||p_view_name||' AS ');
    --append ('SELECT /*+ INDEX (NM_MRG_QUERY_RESULTS NMQR_NMQ_FK_IND) */'); -- NM_MRG_SECTION_MEMBERS NMSM_PK,
-   append ('SELECT /*+ RULE */');
+   append ('SELECT');
    in_view_comment;
    append ('       a.*');
    append ('      ,pe.ne_unique offset_ne_unique');
@@ -865,39 +866,66 @@ BEGIN
    append ('      --');
    append ('      -- Get the NSM (section members) offsets relative to the route');
    append ('      --');
-   append ('      ,a.nms_begin_offset + DECODE(c.nsm_measure');
-   append ('                                  ,0,0');
-   append ('                                  ,nm3unit.convert_unit(nm3net.get_nt_units(ce.ne_nt_type)');
-   append ('                                                       ,nm3net.get_nt_units(pe.ne_nt_type)');
-   append ('                                                       ,c.nsm_measure');
-   append ('                                                       )');
-   append ('                                  ) nsm_begin_offset');
-   append ('      ,a.nms_begin_offset + nm3unit.convert_unit(nm3net.get_nt_units(ce.ne_nt_type)');
-   append ('                                                ,nm3net.get_nt_units(pe.ne_nt_type)');
-   append ('                                                ,c.nsm_measure+(c.nsm_end_mp-c.nsm_begin_mp)');
-   append ('                                                ) nsm_end_offset');
+   --
+   append('       ,a.nms_begin_offset');
+   append('        + decode(c.nsm_measure,0, 0');
+   append('         ,decode(tc.nt_length_unit, tp.nt_length_unit, c.nsm_measure');
+   append('            ,nm3unit.convert_unit(tc.nt_length_unit, tp.nt_length_unit, c.nsm_measure))');
+   append('        ) nsm_begin_offset');
+   append('       ,a.nms_begin_offset');
+   append('        + decode(tc.nt_length_unit, tp.nt_length_unit, c.nsm_measure + (c.nsm_end_mp - c.nsm_begin_mp)');
+   append('          ,nm3unit.convert_unit(tc.nt_length_unit, tp.nt_length_unit, c.nsm_measure + (c.nsm_end_mp - c.nsm_begin_mp))');
+   append('        ) nsm_end_offset');
+--   append('       ');
+--   append('       ');
+--   append('       ');
+--   append ('      ,a.nms_begin_offset + DECODE(c.nsm_measure');
+--   append ('                                  ,0,0');
+--   append ('                                  ,nm3unit.convert_unit(nm3net.get_nt_units(ce.ne_nt_type)');
+--   append ('                                                       ,nm3net.get_nt_units(pe.ne_nt_type)');
+--   append ('                                                       ,c.nsm_measure');
+--   append ('                                                       )');
+--   append ('                                  ) nsm_begin_offset');
+--   append ('      ,a.nms_begin_offset + nm3unit.convert_unit(nm3net.get_nt_units(ce.ne_nt_type)');
+--   append ('                                                ,nm3net.get_nt_units(pe.ne_nt_type)');
+--   append ('                                                ,c.nsm_measure+(c.nsm_end_mp-c.nsm_begin_mp)');
+--   append ('                                                ) nsm_end_offset');
    IF g_include_true
     THEN
-      append ('      ,a.begin_offset_true + DECODE(c.nsm_measure');
-      append ('                                   ,0,0');
-      append ('                                   ,nm3unit.convert_unit(nm3net.get_nt_units(ce.ne_nt_type)');
-      append ('                                                        ,nm3net.get_nt_units(pe.ne_nt_type)');
-      append ('                                                        ,c.nsm_measure');
-      append ('                                                        )');
-      append ('                                   ) nsm_begin_offset_true');
-      append ('      ,a.begin_offset_true + nm3unit.convert_unit(nm3net.get_nt_units(ce.ne_nt_type)');
-      append ('                                                 ,nm3net.get_nt_units(pe.ne_nt_type)');
-      append ('                                                 ,c.nsm_measure+(c.nsm_end_mp-c.nsm_begin_mp)');
-      append ('                                                 ) nsm_end_offset_true');
+       append('       ,a.begin_offset_true');
+       append('        + decode(c.nsm_measure,0, 0');
+       append('         ,decode(tc.nt_length_unit, tp.nt_length_unit, c.nsm_measure');
+       append('            ,nm3unit.convert_unit(tc.nt_length_unit, tp.nt_length_unit, c.nsm_measure))');
+       append('        ) nsm_begin_offset_true');
+       append('       ,a.begin_offset_true');
+       append('        + decode(tc.nt_length_unit, tp.nt_length_unit, c.nsm_measure + (c.nsm_end_mp - c.nsm_begin_mp)');
+       append('          ,nm3unit.convert_unit(tc.nt_length_unit, tp.nt_length_unit, c.nsm_measure + (c.nsm_end_mp - c.nsm_begin_mp))');
+       append('        ) nsm_end_offset_true');
+--      append ('      ,a.begin_offset_true + DECODE(c.nsm_measure');
+--      append ('                                   ,0,0');
+--      append ('                                   ,nm3unit.convert_unit(nm3net.get_nt_units(ce.ne_nt_type)');
+--      append ('                                                        ,nm3net.get_nt_units(pe.ne_nt_type)');
+--      append ('                                                        ,c.nsm_measure');
+--      append ('                                                        )');
+--      append ('                                   ) nsm_begin_offset_true');
+--      append ('      ,a.begin_offset_true + nm3unit.convert_unit(nm3net.get_nt_units(ce.ne_nt_type)');
+--      append ('                                                 ,nm3net.get_nt_units(pe.ne_nt_type)');
+--      append ('                                                 ,c.nsm_measure+(c.nsm_end_mp-c.nsm_begin_mp)');
+--      append ('                                                 ) nsm_end_offset_true');
    END IF;
    append (' FROM  '||l_sec_val_view_name||' a');
    append ('      ,nm_mrg_section_members c');
    append ('      ,nm_elements            pe');
    append ('      ,nm_elements            ce');
+   append ('      ,nm_types tp');
+   append ('      ,nm_types tc');
    append ('WHERE a.nqr_mrg_job_id     = c.nsm_mrg_job_id');
    append (' AND  a.nms_mrg_section_id = c.nsm_mrg_section_id');
    append (' AND  a.nms_offset_ne_id   = pe.ne_id');
    append (' AND  c.nsm_ne_id          = ce.ne_id');
+   append ('  and pe.ne_nt_type = tp.nt_type');
+   append ('  and ce.ne_nt_type = tc.nt_type');
+   
 --
    nm3ddl.create_object_and_syns(p_view_name);
 --
