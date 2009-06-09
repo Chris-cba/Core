@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.26   Apr 03 2009 16:29:08   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.27   Jun 09 2009 09:17:28   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Apr 03 2009 16:29:08  $
---       Date fetched Out : $Modtime:   Apr 03 2009 16:28:36  $
---       PVCS Version     : $Revision:   2.26  $
+--       Date into PVCS   : $Date:   Jun 09 2009 09:17:28  $
+--       Date fetched Out : $Modtime:   Jun 09 2009 09:16:34  $
+--       PVCS Version     : $Revision:   2.27  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.26  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.27  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -766,17 +766,13 @@ PROCEDURE make_nt_spatial_layer
       IF Nm3sdo.element_has_shape( p_layer, p_ne_id ) = 'TRUE'
       THEN
 
-        IF p_measure IS NULL THEN
-
-          l_measure := Nm3sdo.get_measure ( p_layer, p_ne_id, p_x, p_y ).lr_offset;
-
-        ELSE
-
-          l_measure := p_measure;
-
-        END IF;
+        l_measure := Nm3sdo.get_measure ( p_layer, p_ne_id, p_x, p_y ).lr_offset;
 
         sdo_lrs.split_geom_segment( l_geom, l_usgm.diminfo, l_measure, p_geom_1, p_geom_2 );
+
+        if p_measure is not null then
+          l_measure := p_measure;
+        end if;
 
         p_geom_1 := sdo_lrs.scale_geom_segment
                        ( geom_segment  => p_geom_1
@@ -989,14 +985,14 @@ PROCEDURE make_nt_spatial_layer
       THEN
 
          -- AE 09-FEB-2009
-         -- Brought across the code from 2.10.1.1 branch into the mainstream 
+         -- Brought across the code from 2.10.1.1 branch into the mainstream
          -- version so that the SRID is set on the reshape
 
          l_old_geom := nm3sdo.get_layer_element_geometry( l_layer, p_ne_id );
 
          l_new_geom := p_geom;
 
-         IF NVL(l_old_geom.sdo_srid, -9999)  != NVL( l_new_geom.sdo_srid, -9999) 
+         IF NVL(l_old_geom.sdo_srid, -9999)  != NVL( l_new_geom.sdo_srid, -9999)
          THEN
            l_new_geom.sdo_srid := l_old_geom.sdo_srid;
          END IF;
@@ -5135,7 +5131,7 @@ end;
             || 'where ne_id       = :ne_id '
             || '  and ne_id_of    = :ne_id_of '
             || '  and nm_begin_mp = :nm_begin_mp ';
-            
+
 --            || '  and end_date IS NULL';
 
         -- AE - 718333
@@ -5190,12 +5186,12 @@ end;
 --                  ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
       FOR irec IN c_gty_tab (p_nm_obj_type)
       LOOP
-         IF irec.g_or_i = 'G' 
+         IF irec.g_or_i = 'G'
          THEN
       --
       -- AE - 718333
       -- Include begin_mp and only operate on open shapes
-      -- 
+      --
       -- Later change (30-MAR-09) remove the end_date check because this procedure
       -- is used for un-endating too
       --
@@ -5234,7 +5230,7 @@ end;
                                 || ' and nad_whole_road = :whole_road )';
       --
       -- AE 27-MAR-2009
-      -- Pass in nm_begin_mp !! 
+      -- Pass in nm_begin_mp !!
       --
           EXECUTE IMMEDIATE upd_string
                     USING p_nm_end_date, p_nm_ne_id_of, p_nm_begin_mp, p_nm_obj_type, irec.obj_type, p_nm_ne_id_in, '1';
