@@ -26,7 +26,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_update AS
   -----------
   --g_body_sccsid is the SCCS ID for the package body
   --g_body_sccsid  CONSTANT varchar2(2000) := '"@(#)nm3inv_update.pkb	1.5 04/27/06"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.1  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.2  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3inv_update';
 
@@ -405,6 +405,7 @@ PROCEDURE date_track_update_item (pi_iit_ne_id_old IN     nm_inv_items.iit_ne_id
    l_tab_iit_ne_id_old nm3type.tab_number;
    l_count                   PLS_INTEGER := 0;
    l_rec_iit_child           nm_inv_items%ROWTYPE;
+   l_rec_iit_child_end_dated nm_inv_items%ROWTYPE; -- LS added
 --
    -- MApcapture test for larimer
    -- Commneted this code to handle the child based on the relationship
@@ -501,10 +502,15 @@ BEGIN
       l_count                           := l_count + 1;
       l_rec_iit_child                   := cs_rec;
       l_tab_iit_ne_id_old(l_count)      := cs_rec.iit_ne_id;
-      l_rec_iit_child.iit_ne_id         := nm3net.get_next_ne_id;
+      l_rec_iit_child.iit_ne_id         := nm3net.get_next_ne_id ;                  
       l_rec_iit_child.iit_start_date    := pio_rec_iit.iit_start_date;
       l_rec_iit_child.iit_foreign_key   := pio_rec_iit.iit_primary_key;
       l_tab_rec_iit_child(l_count)      := l_rec_iit_child;
+      -- LS added
+      l_rec_iit_child_end_dated         := cs_rec;
+      l_rec_iit_child_end_dated.iit_start_date    := pio_rec_iit.iit_start_date;
+      l_rec_iit_child_end_dated.iit_foreign_key   := pio_rec_iit.iit_primary_key;      
+      nm3mapcapture_ins_inv.l_iit_tab(nm3mapcapture_ins_inv.l_iit_tab.Count+1)    := l_rec_iit_child_end_dated; --  LS Hierarchical asset changes
    END LOOP ;
    --  
 --
@@ -539,10 +545,14 @@ BEGIN
                        ,p_effective_date => pio_rec_iit.iit_start_date
                        );
 --
-   FOR i IN 1..l_tab_rec_iit_child.COUNT
-    LOOP
-      nm3ins.ins_iit_all  (p_rec_iit_all => l_tab_rec_iit_child(i));
-   END LOOP;
+   -- Stopped creating of child asset when called from mapcapture
+   IF Nvl(nm3mapcapture_ins_inv.l_mapcap_run,'N') = 'N'
+   THEN 
+       FOR i IN 1..l_tab_rec_iit_child.COUNT
+       LOOP
+           nm3ins.ins_iit_all  (p_rec_iit_all => l_tab_rec_iit_child(i));
+       END LOOP;
+   END IF ;
 --
    set_for_return;
 --
