@@ -21,7 +21,8 @@ CREATE OR REPLACE PACKAGE BODY nm3mapcapture_int AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3mapcapture_int.pkb	1.12 01/08/04"';
+   --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3mapcapture_int.pkb	1.12 01/08/04"';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mapcapture_int';
@@ -742,6 +743,7 @@ l_nlf                  nm_load_files%ROWTYPE;
 l_files_in_batch       nm3file.file_list;
 l_inv_type             nm_inv_types_all.nit_inv_type%TYPE;
 l_csv_loader_batch_num pls_integer;
+l_end_dated_iit_loaded Boolean := False;
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'load_batch');
@@ -749,7 +751,13 @@ BEGIN
   -- first check that we can load the batch
   -- check the edif date
   IF lock_the_batch_for_loading(pi_batch) 
-  AND check_edif_date(pi_batch) THEN 
+  AND check_edif_date(pi_batch) 
+  THEN    
+    --
+    -- LS made changes to deal with hierarchical asset
+    nm3mapcapture_ins_inv.l_mapcap_run  := 'Y'  ;
+    nm3mapcapture_ins_inv.l_iit_ne_tab.delete;
+    nm3mapcapture_ins_inv.l_iit_tab.delete;
     
     -- we have a batch to load
     l_files_in_batch := get_files_in_batch(pi_batch);
@@ -772,17 +780,84 @@ BEGIN
       load_from_holding(pi_csv_batch_no => l_csv_loader_batch_num);
 
     END LOOP;
-
+    DECLARE
+    --
+       l_iit_in_batch nm_inv_items.iit_ne_id%TYPE ;
+       l_iit_rec nm_inv_items%ROWTYPE ;
+       l_found Boolean := False ;
+    --
+    BEGIN
+    --
+       FOR i in 1..nm3mapcapture_ins_inv.l_iit_tab.count
+       LOOP
+           l_iit_rec := nm3mapcapture_ins_inv.l_iit_tab(i);
+           l_found := False ;
+           FOR j in 1..nm3mapcapture_ins_inv.l_iit_ne_tab.count
+           LOOP
+               l_iit_in_batch := nm3mapcapture_ins_inv.l_iit_ne_tab(j);
+               IF l_iit_rec.iit_ne_id =  l_iit_in_batch
+               THEN
+                   l_found := TRUE;
+                   Exit;
+               END IF ;    
+           END LOOP ;
+           IF NOT l_found 
+           THEN
+               l_iit_rec.iit_ne_id  := nm3net.get_next_ne_id;
+               nm3inv.insert_nm_inv_items (l_iit_rec);
+               Commit;
+           END IF ;
+           l_end_dated_iit_loaded := TRUE;
+       END LOOP ;
+    END ;
+    nm3mapcapture_ins_inv.l_iit_ne_tab.delete;
+    nm3mapcapture_ins_inv.l_iit_tab.delete;
+    nm3mapcapture_ins_inv.l_mapcap_run  := 'N'  ;
+    --
     clear_batch(pi_batch            => pi_batch
                ,pi_batch_data_files => l_files_in_batch);
-  END IF;
-   
+  END IF;   
   send_error_email(pi_batch);
 
   nm_debug.proc_end(p_package_name   => g_package_name
                    ,p_procedure_name => 'load_batch');
 EXCEPTION
   WHEN OTHERS THEN
+    IF NOT l_end_dated_iit_loaded
+    THEN
+        DECLARE
+        --
+           l_iit_in_batch nm_inv_items.iit_ne_id%TYPE ;
+           l_iit_rec nm_inv_items%ROWTYPE ;
+           l_found Boolean := False ;
+        --
+        BEGIN
+        --
+           FOR i in 1..nm3mapcapture_ins_inv.l_iit_tab.count
+           LOOP
+               l_iit_rec := nm3mapcapture_ins_inv.l_iit_tab(i);
+               l_found := False ;
+               FOR j in 1..nm3mapcapture_ins_inv.l_iit_ne_tab.count
+               LOOP
+                   l_iit_in_batch := nm3mapcapture_ins_inv.l_iit_ne_tab(j);
+                   IF l_iit_rec.iit_ne_id =  l_iit_in_batch
+                   THEN
+                       l_found := TRUE;
+                       Exit;
+                   END IF ;    
+               END LOOP ;
+               IF NOT l_found 
+               THEN
+                   l_iit_rec.iit_ne_id  := nm3net.get_next_ne_id;
+                   nm3inv.insert_nm_inv_items (l_iit_rec);
+                   Commit;
+               END IF ;
+           END LOOP ;
+        END ;
+        nm3mapcapture_ins_inv.l_iit_ne_tab.delete;
+        nm3mapcapture_ins_inv.l_iit_tab.delete;
+        nm3mapcapture_ins_inv.l_mapcap_run  := 'N'  ;
+    END IF ;
     catch_error(p_appl   => nm3type.c_hig
                ,p_error  => 207
                ,p_supp   => sqlerrm
