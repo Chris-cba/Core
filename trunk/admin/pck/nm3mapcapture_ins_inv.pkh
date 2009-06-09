@@ -18,11 +18,19 @@ CREATE OR REPLACE PACKAGE nm3mapcapture_ins_inv AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3mapcapture_ins_inv.pkh	1.2 10/23/03"';
+  --g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3mapcapture_ins_inv.pkh	1.2 10/23/03"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_sccsid is the SCCS ID for the package
 --
   g_inv                     nm_inv_items_all%ROWTYPE;
   g_date_track_attr_changed boolean DEFAULT FALSE;
+  -- LS Hierarchical Asset Changes
+  TYPE         l_iit_tab_type    IS TABLE OF nm_inv_items%ROWTYPE INDEX BY BINARY_INTEGER;
+  l_iit_tab    l_iit_tab_type ;
+  TYPE         l_iit_ne_tab_type IS TABLE OF nm_inv_items.iit_ne_id%TYPE INDEX BY BINARY_INTEGER;
+  l_iit_ne_tab l_iit_ne_tab_type ;
+  l_mapcap_run Varchar2(1) ;   
+  --
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------
