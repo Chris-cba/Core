@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.22   May 28 2009 17:17:06   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.23   Jun 11 2009 11:43:02   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   May 28 2009 17:17:06  $
---       Date fetched Out : $Modtime:   May 28 2009 17:09:46  $
---       PVCS Version     : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   Jun 11 2009 11:43:02  $
+--       Date fetched Out : $Modtime:   Jun 11 2009 11:38:22  $
+--       PVCS Version     : $Revision:   2.23  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.22  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.23  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -8715,73 +8715,77 @@ BEGIN
 END;
 
 
+
 --
 ----------------------------------------------------------------------------
 --
 
+FUNCTION get_objects_in_buffer( p_nth_id         IN NUMBER,
+                                p_geometry       IN mdsys.sdo_geometry,
+                                p_buffer         IN NUMBER,
+                                p_buffer_units   IN NUMBER DEFAULT 1,
+                                p_get_projection IN VARCHAR2 DEFAULT 'FALSE',
+                                p_gdo_session_id IN gis_data_objects.gdo_session_id%TYPE DEFAULT NULL )
+  RETURN nm_theme_list 
+IS
 
-FUNCTION Get_Objects_In_Buffer( p_nth_id IN NUMBER,
-                                p_geometry IN mdsys.sdo_geometry,
-            p_buffer IN NUMBER,
-        p_buffer_units IN NUMBER DEFAULT 1,
-        p_get_projection VARCHAR2 DEFAULT 'FALSE' )
-      RETURN nm_theme_list IS
+-- AE 11-JUN-2009 
+-- Added p_gdo_session_id parameter for sub-selections based on gis_data_objects
+-- p_gdo_session_id is now picked up in the dynamic sql predicates if populated
 
 
-cur_string VARCHAR2(2000);
+  cur_string            nm3type.max_varchar2;
+  l_pk_array            nm3type.tab_number;
+  l_fk_array            nm3type.tab_number;
+  l_label_array         nm3type.tab_varchar4000;  --use this so that the full amount of space is not reserved.
+  l_dist_array          nm3type.tab_number;
+  l_meas_array          nm3type.tab_number;
+  l_feat_pk             nm3type.tab_number;
+  l_l_ref               nm_lref := nm_lref(NULL, NULL);
 
-l_pk_array     Nm3type.tab_number;
-l_fk_array     Nm3type.tab_number;
-l_label_array  Nm3type.tab_varchar4000;  --use this so that the full amount of space is not reserved.
-l_dist_array   Nm3type.tab_number;
-l_meas_array   Nm3type.tab_number;
-l_feat_pk      Nm3type.tab_number;
+  retval                nm_theme_list := nm_theme_list( nm_theme_list_type ( nm_theme_detail ( NULL, NULL, NULL, NULL, NULL, NULL, NULL)));
+  l_detail              nm_theme_detail;
 
-l_l_ref        nm_lref := nm_lref(NULL, NULL);
+  p_nth                 nm_themes_all%ROWTYPE := nm3get.get_nth( p_nth_id );
+  l_dim                 mdsys.sdo_dim_array := nm3sdo.get_theme_diminfo( p_nth_id );
+  l_tol                 NUMBER ;
 
-retval         nm_theme_list := nm_theme_list( nm_theme_list_type ( nm_theme_detail ( NULL, NULL, NULL, NULL, NULL, NULL, NULL)));
-l_detail       nm_theme_detail;
+  lcur                  nm3type.ref_cursor;
+  ic                    BINARY_INTEGER;
 
-p_nth NM_THEMES_ALL%ROWTYPE := Nm3get.get_nth( p_nth_id );
-l_dim          mdsys.sdo_dim_array := Nm3sdo.Get_Theme_Diminfo( p_nth_id );
-l_tol          NUMBER ;
+  l_get_projection      BOOLEAN := FALSE;
+  l_c_unit              INTEGER;
+  l_p_unit              INTEGER;
 
-lcur           Nm3type.ref_cursor;
-ic             BINARY_INTEGER;
-
-l_get_projection BOOLEAN := FALSE;
-l_geometry       mdsys.sdo_geometry;
-l_c_unit        INTEGER;
-l_p_unit        INTEGER;
-
-l_nth   nm_themes_all%ROWTYPE;
-l_valid VARCHAR2(30);
+  l_nth                 nm_themes_all%ROWTYPE;
+  l_valid               nm3type.max_varchar2;
+  l_geometry            mdsys.sdo_geometry := p_geometry;
 
 --l_distance    number;
 --l_measure     number;
 
-FUNCTION is_nw_theme( p_theme IN NUMBER ) RETURN BOOLEAN IS
-CURSOR c1( c_theme IN NUMBER ) IS
-  SELECT 1 FROM NM_NW_THEMES
-  WHERE nnth_nth_theme_id = c_theme;
-dummy  INTEGER;
-retval BOOLEAN;
-BEGIN
-  OPEN c1( p_theme );
-  FETCH c1 INTO dummy;
-  retval := c1%FOUND;
-  CLOSE c1;
-  RETURN retval;
-EXCEPTION
-  WHEN OTHERS THEN
-    RETURN FALSE;
-END;
+  FUNCTION is_nw_theme( p_theme IN NUMBER ) RETURN BOOLEAN IS
+  CURSOR c1( c_theme IN NUMBER ) IS
+    SELECT 1 FROM NM_NW_THEMES
+    WHERE nnth_nth_theme_id = c_theme;
+  dummy  INTEGER;
+  retval BOOLEAN;
+  BEGIN
+    OPEN c1( p_theme );
+    FETCH c1 INTO dummy;
+    retval := c1%FOUND;
+    CLOSE c1;
+    RETURN retval;
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN FALSE;
+  END is_nw_theme;
 
 BEGIN
 
   l_tol :=  Nm3sdo.get_table_diminfo( p_nth.nth_feature_table, p_nth.nth_feature_shape_column )(1).sdo_tolerance;
 
-  l_valid := validate_geometry( p_geometry, NULL, l_tol );
+  l_valid := validate_geometry( l_geometry, NULL, l_tol );
 
 -- AE 28-APR-2009
 -- Rectify the polygon and validate again.
@@ -8792,22 +8796,15 @@ BEGIN
   END IF;
 
   IF l_valid != 'TRUE' THEN
-
     IF l_valid = 'FALSE' THEN
-
        RAISE_APPLICATION_ERROR(-20001, 'Invalid Geometry');
-
     ELSE
-
        RAISE_APPLICATION_ERROR(-20001, 'Invalid Geometry - error code '||TO_CHAR(l_valid));
-
     END IF;
-
   END IF;
 
 
   IF p_get_projection = 'TRUE' THEN
-
     IF NOT is_nw_theme( p_nth_id ) THEN
       Hig.raise_ner(pi_appl                => Nm3type.c_hig
                     ,pi_id                 => 291
@@ -8815,7 +8812,7 @@ BEGIN
                     );
 --    RAISE_APPLICATION_ERROR( -20001, 'Theme is not a linear referencing layer - cannot return projections');
 
-    ELSIF p_geometry.sdo_gtype != 2001 THEN
+    ELSIF l_geometry.sdo_gtype != 2001 THEN
       Hig.raise_ner(pi_appl                => Nm3type.c_hig
                     ,pi_id                 => 292
                     ,pi_sqlcode            => -20001
@@ -8824,22 +8821,17 @@ BEGIN
 
     ELSE
       l_get_projection := ( p_get_projection = 'TRUE');
-
     END IF;
-
   END IF;
-
 
   l_nth := p_nth;
 
   IF p_nth.nth_base_table_theme IS NOT NULL THEN
-
     l_nth := Nm3get.get_nth( l_nth.nth_base_table_theme);
-
   END IF;
 
   IF l_nth.nth_feature_table = l_nth.nth_table_name THEN
-
+  
      cur_string := 'select t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', t.'||l_nth.nth_pk_column;
 
      IF l_get_projection THEN
@@ -8850,12 +8842,21 @@ BEGIN
 
      END IF;
 
+     IF p_gdo_session_id IS NOT NULL AND NOT l_get_projection
+     THEN
 
-     cur_string := cur_string||' from '||l_nth.nth_table_name||' t '
-           ||' where sdo_within_distance ( t.'||l_nth.nth_feature_shape_column||', :shape, '||
+       cur_string := cur_string||' from '||l_nth.nth_table_name||' t, gis_data_objects g '
+           ||' where gdo_session_id = '||to_char(p_gdo_session_id)||' and gdo_pk_id = '||l_nth.nth_feature_pk_column||' and '||
+           ' sdo_within_distance ( t.'||l_nth.nth_feature_shape_column||', :shape, '||
            ''''||'distance = '||TO_CHAR(p_buffer)||''''||' ) = '||''''||'TRUE'||'''';
 
-  ELSIF p_nth.nth_feature_fk_column IS NULL THEN
+     else
+       cur_string := cur_string||' from '||l_nth.nth_table_name||' t '
+           ||' where sdo_within_distance ( t.'||l_nth.nth_feature_shape_column||', :shape, '||
+           ''''||'distance = '||TO_CHAR(p_buffer)||''''||' ) = '||''''||'TRUE'||'''';
+     end if;
+
+  ELSIF p_nth.nth_feature_fk_column IS NOT NULL THEN
 
      cur_string := 'select t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', f.'||l_nth.nth_feature_pk_column;
 
@@ -8863,47 +8864,71 @@ BEGIN
 
        cur_string := cur_string||', sdo_geom.sdo_distance(f.'||l_nth.nth_feature_shape_column||', :p_geometry, :l_tol )';
 
-    cur_string := cur_string||', sdo_lrs.get_measure( sdo_lrs.project_pt(f.'||l_nth.nth_feature_shape_column||', :p_geometry ))';
+       cur_string := cur_string||', sdo_lrs.get_measure( sdo_lrs.project_pt(f.'||l_nth.nth_feature_shape_column||', :p_geometry ))';
 
      END IF;
 
+     IF p_gdo_session_id IS NOT NULL and not l_get_projection
+     THEN
 
-     cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f'
-           ||' where sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :shape, '
-           ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
-        ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_pk_column;
-  ELSE
+       cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f, gis_data_objects g '
+             ||' where g.gdo_session_id = '||to_char(p_gdo_session_id)||' and g.gdo_pk_id = t.'||l_nth.nth_feature_pk_column
+             ||' and sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :shape, '
+             ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
+             ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_pk_column;
+     ELSE
+
+       cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f'
+             ||' where sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :p_geometry, '
+             ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
+             ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_fk_column;
+
+     END IF;
+     
+   ELSE
 
      cur_string := 'select distinct t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', f.'||l_nth.nth_feature_pk_column;
 
-  IF l_get_projection THEN
+     IF l_get_projection THEN
 
        cur_string := cur_string||', sdo_geom.sdo_distance(f.'||l_nth.nth_feature_shape_column||', :p_geometry, :l_tol )';
 
-    cur_string := cur_string||', sdo_lrs.get_measure( sdo_lrs.project_pt(f.'||l_nth.nth_feature_shape_column||', :p_geometry ))';
+       cur_string := cur_string||', sdo_lrs.get_measure( sdo_lrs.project_pt(f.'||l_nth.nth_feature_shape_column||', :p_geometry ))';
 
      END IF;
 
+     IF p_gdo_session_id IS NOT NULL and not l_get_projection
+     THEN
 
-     cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f'
-           ||' where sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :p_geometry, '
-           ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
-        ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_fk_column;
+       cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f, gis_data_objects g '
+             ||' where g.gdo_session_id = '||to_char(p_gdo_session_id)||' and g.gdo_pk_id = t.'||l_nth.nth_feature_pk_column
+             ||' and sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :shape, '
+             ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
+             ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_pk_column;
+
+     ELSE
+     
+       cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f'
+             ||' where sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :p_geometry, '
+             ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
+             ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_fk_column;
+
+     END IF;
 
   END IF;
+  
+--Nm_Debug.debug_on;
+--Nm_Debug.DEBUG( cur_string );
 
---  Nm_Debug.debug_on;
---  Nm_Debug.DEBUG( cur_string );
-
---  nm_debug.debug('Execute statement');
+--nm_debug.debug('Execute statement');
 
   IF l_get_projection THEN
 
-    EXECUTE IMMEDIATE cur_string BULK COLLECT INTO l_pk_array, l_label_array, l_fk_array, l_feat_pk, l_dist_array, l_meas_array USING p_geometry, l_tol, p_geometry, p_geometry;
+    EXECUTE IMMEDIATE cur_string BULK COLLECT INTO l_pk_array, l_label_array, l_fk_array, l_feat_pk, l_dist_array, l_meas_array USING l_geometry, l_tol, l_geometry, l_geometry;
 
   ELSE
 
-    EXECUTE IMMEDIATE cur_string BULK COLLECT INTO l_pk_array, l_label_array, l_fk_array, l_feat_pk USING p_geometry;
+    EXECUTE IMMEDIATE cur_string BULK COLLECT INTO l_pk_array, l_label_array, l_fk_array, l_feat_pk USING l_geometry;
 
   END IF;
 
@@ -8914,7 +8939,6 @@ BEGIN
     IF l_get_projection THEN
 
       IF Nm3net.is_nt_datum( Nm3net.Get_Nt_Type( l_pk_array(i) ) )  = 'N' THEN
-
 
 --      make sure we are dealing in correct units. The shape lengths are in datum units.
 
@@ -8934,8 +8958,8 @@ BEGIN
       ELSE
         retval := nm_theme_list ( nm_theme_list_type ( nm_theme_detail ( l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), NULL, NULL, l_nth.nth_theme_name)));
       END IF;
- ELSE
---   nm_debug.debug(' count = '||to_char(i)||' - adding new detail');
+    ELSE
+--    nm_debug.debug(' count = '||to_char(i)||' - adding new detail');
 
       IF l_get_projection THEN
         retval := retval.add_detail( l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), l_dist_array(i), l_meas_array(i), l_nth.nth_theme_name);
@@ -8943,7 +8967,7 @@ BEGIN
        retval := retval.add_detail( l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), NULL, NULL, l_nth.nth_theme_name);
       END IF;
 
- END IF;
+    END IF;
 
   END LOOP;
 
@@ -8954,8 +8978,7 @@ BEGIN
 
   RETURN retval;
 
-END;
-
+END get_objects_in_buffer;
 
 --
 ----------------------------------------------------------------------------
