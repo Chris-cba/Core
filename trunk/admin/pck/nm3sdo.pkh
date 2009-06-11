@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE Nm3sdo AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm3sdo.pkh	1.21 01/31/07
---       Module Name      : nm3sdo.pkh
---       Date into SCCS   : 07/01/31 13:45:09
---       Date fetched Out : 07/06/13 14:13:30
---       SCCS Version     : 1.21
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkh-arc   2.3   Jun 11 2009 11:41:24   aedwards  $
+--       Module Name      : $Workfile:   nm3sdo.pkh  $
+--       Date into PVCS   : $Date:   Jun 11 2009 11:41:24  $
+--       Date fetched Out : $Modtime:   Jun 11 2009 11:38:22  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --   Author : Rob Coupe
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE Nm3sdo AS
 --<GLOBVAR>
 -- g_sccsid is the SCCS_ID
 -- Constants
-  g_sccsid           CONSTANT VARCHAR2(80) := '@(#)nm3sdo.pkh	1.21 01/31/07';
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   2.3  $"';
   single_shape_inv   CONSTANT VARCHAR2(3)  := NVL( Hig.get_sysopt('SDOSINGSHP'), 'N');
   use_surrogate_key  CONSTANT VARCHAR2(1)  := NVL( Hig.get_sysopt('SDOSURKEY'),'N');
   def_pt_zoom        CONSTANT NUMBER       := NVL( TO_NUMBER( Hig.get_sysopt('SDOPTZOOM' )), 100);
@@ -1580,12 +1580,16 @@ FUNCTION get_distance_between_parts( p_geom IN mdsys.sdo_geometry ) RETURN NUMBE
 -----------------------------------------------------------------------------
 --<PROC NAME="GET_OBJECTS_IN_BUFFER"
 --return all objects from all snapping themes within the buffer
-FUNCTION get_objects_in_buffer( p_nth_id IN NUMBER,
-                                p_geometry IN mdsys.sdo_geometry,
-	 						    p_buffer IN NUMBER,
-								p_buffer_units IN NUMBER DEFAULT 1,
-								p_get_projection VARCHAR2 DEFAULT 'FALSE' )
-						RETURN nm_theme_list;
+
+-- AE 11-JUN-2009 - added p_gdo_session_id parameter for sub-selections based on gis_data_objects
+
+FUNCTION get_objects_in_buffer( p_nth_id         IN NUMBER,
+                                p_geometry       IN mdsys.sdo_geometry,
+                                p_buffer         IN NUMBER,
+                                p_buffer_units   IN NUMBER DEFAULT 1,
+                                p_get_projection IN VARCHAR2 DEFAULT 'FALSE',
+                                p_gdo_session_id IN gis_data_objects.gdo_session_id%TYPE DEFAULT NULL )
+  RETURN nm_theme_list;
 --
 --</PROC>
 -----------------------------------------------------------------------------
