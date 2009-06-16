@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.4   Sep 01 2008 16:12:08   gjohnson  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.5   Jun 16 2009 11:38:34   aedwards  $
 -- Module Name : $Workfile:   nm3file.pkb  $
--- Date into PVCS : $Date:   Sep 01 2008 16:12:08  $
--- Date fetched Out : $Modtime:   Sep 01 2008 16:11:02  $
--- PVCS Version : $Revision:   2.4  $
+-- Date into PVCS : $Date:   Jun 16 2009 11:38:34  $
+-- Date fetched Out : $Modtime:   Jun 16 2009 11:40:26  $
+-- PVCS Version : $Revision:   2.5  $
 -- Based on SCCS version : 
 --
 --
@@ -400,6 +400,42 @@ BEGIN
    nm_debug.proc_end(g_package_name,'get_file');
 --
 END get_file;
+--
+-----------------------------------------------------------------------------
+--
+-- This procedure will return the contents of the given filename in a clob
+-- Useful for XML when all data is on one line
+--
+PROCEDURE get_file_as_clob (location     IN     VARCHAR2       DEFAULT c_default_location
+                           ,filename     IN     VARCHAR2
+                           ,output          OUT CLOB
+                           )
+IS
+  v_lob     CLOB := EMPTY_CLOB();
+  l_bfile   BFILE;
+  amt       NUMBER;
+BEGIN
+--
+  nm_debug.proc_start(g_package_name,'get_file_as_clob');
+--
+  -- location is an Oracle DIR 
+  l_bfile := BFILENAME(location, filename);
+  -- initialise the clob
+  nm3clob.create_clob (p_clob => v_lob);
+  -- get the file length
+  amt := dbms_lob.getlength( l_bfile );
+  -- open the bfile as a readonly lob
+  dbms_lob.fileopen( l_bfile ,dbms_lob.file_readonly);
+  -- load the lob from the bfile
+  dbms_lob.loadfromfile( v_lob, l_bfile ,amt);
+  -- close the bfile
+  dbms_lob.fileclose( l_bfile );
+  -- return the clob
+  output := v_lob;
+--
+  nm_debug.proc_end(g_package_name,'get_file_as_clob');
+--
+END get_file_as_clob;
 --
 -----------------------------------------------------------------------------
 --
