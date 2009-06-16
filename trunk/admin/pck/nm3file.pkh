@@ -186,7 +186,7 @@ PROCEDURE put     (FILE   IN utl_file.file_type
 --
 --<PROC NAME="get_file">
 -- This procedure will return the contents of the given filename in the all_lines
---  PL/SQL table
+--  PL/SQL table 
 --
 PROCEDURE get_file (location     IN     VARCHAR2       DEFAULT c_default_location
                    ,filename     IN     VARCHAR2
@@ -194,6 +194,18 @@ PROCEDURE get_file (location     IN     VARCHAR2       DEFAULT c_default_locatio
                    ,all_lines       OUT nm3type.tab_varchar32767
                    ,add_cr    IN BOOLEAN DEFAULT FALSE
                    );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_file_as_clob">
+-- This procedure will return the contents of the given filename in a clob
+-- Useful for XML when all data is on one line
+--
+PROCEDURE get_file_as_clob (location     IN     VARCHAR2       DEFAULT c_default_location
+                           ,filename     IN     VARCHAR2
+                           ,output          OUT CLOB
+                           );
 --</PROC>
 --
 -----------------------------------------------------------------------------
