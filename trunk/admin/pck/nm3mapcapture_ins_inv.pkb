@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mapcapture_ins_inv AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3mapcapture_ins_inv.pkb	1.15 09/09/05"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mapcapture_ins_inv';
@@ -622,31 +622,34 @@ BEGIN
 --
   --
   -- LS Added this code to hanlde the child asset which have been added as a result of parent been replaced
-  nm3mapcapture_ins_inv.l_iit_ne_tab(nm3mapcapture_ins_inv.l_iit_ne_tab.count+1) := p_inv_rec.ne_id; -- add ls
-  DECLARE
+  IF g_inv.iit_ne_id != -1 
+  THEN
+      nm3mapcapture_ins_inv.l_iit_ne_tab(nm3mapcapture_ins_inv.l_iit_ne_tab.count+1) := p_inv_rec.ne_id; -- add ls
+      DECLARE
+      --
+         l_iit_rec nm_inv_items%ROWTYPE ;   
+      --
+      BEGIN
+      --
+         l_iit_rec := nm3get.get_iit( g_inv.iit_ne_id);       
+      --
+      EXCEPTION
+          WHEN OTHERS
+          THEN
+              BEGIN
+              --
+                 l_iit_rec := nm3get.get_iit_all( g_inv.iit_ne_id);
+                 g_inv.iit_ne_id := -1 ;
+              --
+              EXCEPTION
+                  WHEN OTHERS
+                  THEN
+                      RAISE_APPLICATION_ERROR(-20000, hig.raise_and_catch_ner(pi_appl => nm3type.c_hig
+                                                                             ,pi_id   => 67));
+              END ;
+      END ;
   --
-     l_iit_rec nm_inv_items%ROWTYPE ;   
-  --
-  BEGIN
-  --
-     l_iit_rec := nm3get.get_iit( g_inv.iit_ne_id);       
-  --
-  EXCEPTION
-      WHEN OTHERS
-      THEN
-          BEGIN
-          --
-             l_iit_rec := nm3get.get_iit_all( g_inv.iit_ne_id);
-             g_inv.iit_ne_id := -1 ;
-          --
-          EXCEPTION
-              WHEN OTHERS
-              THEN
-                  RAISE_APPLICATION_ERROR(-20000, hig.raise_and_catch_ner(pi_appl => nm3type.c_hig
-                                                                         ,pi_id   => 67));
-          END ;
-  END ;
-  --
+  END IF ;
  
   nm3extent.create_temp_ne
       (pi_source_id => p_inv_rec.ne_id
