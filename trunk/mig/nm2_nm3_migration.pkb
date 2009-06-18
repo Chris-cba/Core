@@ -1,15 +1,15 @@
-CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
+CREATE OR REPLACE PACKAGE BODY ATLAS.Nm2_Nm3_Migration AS
 --
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.10   Jun 18 2009 08:42:40   Ian Turnbull  $
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.10   Jun 18 2009 08:42:40   Ian Turnbull  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.11   Jun 18 2009 13:58:46   Ian Turnbull  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.11   Jun 18 2009 13:58:46   Ian Turnbull  $
 --       Module Name      : $Workfile:   nm2_nm3_migration.pkb  $
---       Date into PVCS   : $Date:   Jun 18 2009 08:42:40  $
---       Date fetched Out : $Modtime:   Jun 17 2009 13:20:22  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jun 18 2009 13:58:46  $
+--       Date fetched Out : $Modtime:   Jun 18 2009 13:05:20  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --   Author D.Cope
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.10  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.11  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm2_nm3_migration';
   g_proc_name    VARCHAR2(50);
   g_log_file                UTL_FILE.FILE_TYPE;
@@ -47,6 +47,9 @@ CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
   g_slno                    PLS_INTEGER;
   g_rindex                  PLS_INTEGER;
   inv_item_not_found        EXCEPTION;
+    g_theme_max number;
+
+  
 --
   type old_new_type is table of number index by binary_integer;
 
@@ -971,31 +974,31 @@ COMMIT;
                     WHERE  hpr_g.hpr_product = hpr_r.hpr_product
                    );
 -- update hig_products with v2 hig product settings
-UPDATE HIG_PRODUCTS v3
-SET    (v3.hpr_product_name
-      ,v3.hpr_path_name
-      ,v3.hpr_key
-      ,v3.hpr_sequence
-      ,v3.hpr_image
-      ,v3.hpr_image_type
-      ,v3.hpr_user_menu
-      ,v3.hpr_launchpad_icon) =
-      (SELECT DECODE(v2.hpr_product, 'STP', 'structural projects v2', v2.hpr_product_name)
-             ,v2.hpr_path_name
-             ,DECODE(v2.hpr_key, NULL, v3.hpr_key, v2.hpr_key) hpr_key -- for some street works customers NET may not be licenced
-             ,v2.hpr_sequence
-             ,v2.hpr_image
-             ,v2.hpr_image_type
-             ,v2.hpr_user_menu
-             ,v2.hpr_launchpad_icon
-       FROM   v2_hig_products v2
-       WHERE  DECODE(v3.hpr_product, 'STP', 'PMS', v3.hpr_product) = DECODE(v2.hpr_product, 'STP', 'PMS', v2.hpr_product)
-       AND    v2.hpr_product != 'PMS')
-       WHERE EXISTS (SELECT 1
-                     FROM   v2_hig_products v2_check
-                     WHERE  v2_check.hpr_product = v3.hpr_product)
-
-
+/*  UPDATE HIG_PRODUCTS v3
+  SET    (hpr_product_name
+        ,hpr_path_name
+        ,hpr_key
+        ,hpr_sequence
+        ,hpr_image
+        ,hpr_image_type
+        ,hpr_user_menu
+        ,hpr_launchpad_icon) =
+        (SELECT DECODE(hpr_product, 'STP', 'structural projects v2', hpr_product_name)
+               ,hpr_path_name
+               ,DECODE(v2.hpr_key, NULL, v3.hpr_key, v2.hpr_key) hpr_key -- for some street works customers NET may not be licenced
+               ,hpr_sequence
+               ,hpr_image
+               ,hpr_image_type
+               ,hpr_user_menu
+               ,hpr_launchpad_icon
+         FROM   v2_hig_products v2
+         WHERE  DECODE(v3.hpr_product, 'STP', 'PMS', v3.hpr_product) = DECODE(v2.hpr_product, 'STP', 'PMS', v2.hpr_product)
+         AND    v2.hpr_product != 'PMS'
+         )
+         WHERE EXISTS (SELECT 1
+                       FROM   v2_hig_products v2_check
+                       WHERE  DECODE(v2_check.hpr_product, 'STP', 'PMS', v2_check.hpr_product) = v3.hpr_product);
+*/
 --  now update the PMS code. It was Pavement Manager in V2 but in V3 its STP v2
   UPDATE HIG_PRODUCTS
   SET    hpr_product_name = 'structural projects v2'
@@ -3483,7 +3486,6 @@ PROCEDURE process_gis_data IS
   l_ne_nt_count NUMBER;
   l_ne_nt_type NM_ELEMENTS_ALL.ne_nt_type%TYPE;
 
-  l_theme_max number;
 
   PROCEDURE tidy_data IS
   BEGIN
@@ -3507,8 +3509,8 @@ PROCEDURE process_gis_data IS
   --
   l_nnth        NM_NW_THEMES%ROWTYPE;
   BEGIN
-  
-   
+
+
     OPEN get_nlt_id(p_nt_type);
     FETCH get_nlt_id INTO l_nnth.nnth_nlt_id;
     CLOSE get_nlt_id;
@@ -3537,12 +3539,12 @@ BEGIN
         ,gp_dde_init_topic
   FROM   v2_gis_projects;
 --
-*/  
+*/
 
   select nth_theme_id_seq.nextval
-    into l_theme_max
+    into g_theme_max
     from dual;
-    
+
 append_log_content(pi_text => 'NM_THEMES_ALL');
   INSERT INTO NM_THEMES_ALL (
        nth_theme_id,
@@ -3580,7 +3582,7 @@ append_log_content(pi_text => 'NM_THEMES_ALL');
 --	   NTH_TOL_UNITS
 --     NTH_DYNAMIC_THEME
        )
-SELECT gt_theme_id +l_theme_max                                                   nth_theme_id
+SELECT gt_theme_id +g_theme_max                                                   nth_theme_id
       ,gt_theme_name                                                  nth_theme_name
       ,DECODE( gt_route_theme, 'Y', 'NM_ELEMENTS'
 	         , SUBSTR(gt_table_name,INSTR(gt_table_name,'.')+1) )     nth_table_name
@@ -3625,7 +3627,7 @@ SELECT gt_theme_id +l_theme_max                                                 
    ,ntf_parameter
    ,ntf_menu_option
    ,ntf_seen_in_gis )
-  SELECT gtf_gt_theme_id+l_theme_max
+  SELECT gtf_gt_theme_id+g_theme_max
        , gtf_hmo_module
        , gtf_parameter
        , gtf_menu_option
@@ -3640,7 +3642,7 @@ SELECT gt_theme_id +l_theme_max                                                 
    (nthr_theme_id,
     nthr_role,
     nthr_mode )
-  SELECT gthr_theme_id+l_theme_max
+  SELECT gthr_theme_id+g_theme_max
         ,gthr_role
         ,gthr_mode
   FROM   v2_gis_theme_roles;
@@ -3652,7 +3654,7 @@ SELECT gt_theme_id +l_theme_max                                                 
     NTG_GTYPE,
 	NTG_SEQ_NO,
 	NTG_XML_URL)
-  SELECT gt_theme_id+l_theme_max
+  SELECT gt_theme_id+g_theme_max
         ,DECODE(gt_route_Theme,'Y','3002'
 		                      ,DECODE(NVL(gt_end_chain_Column,'POINT'),'POINT','2001','3002'))
         ,1
@@ -3664,7 +3666,7 @@ SELECT gt_theme_id +l_theme_max                                                 
 
   INSERT INTO NM_NW_THEMES
   (NNTH_NLT_ID, NNTH_NTH_THEME_ID)
-  SELECT nlt_id,gt_theme_id+l_theme_max
+  SELECT nlt_id,gt_theme_id+g_theme_max
   FROM NM_LINEAR_TYPES
   ,v2_gis_themes_all
   WHERE nlt_nt_type IN ('D','L')
@@ -8303,9 +8305,9 @@ PROCEDURE migrate_network_and_inventory (pi_log_file_location IN VARCHAR2
                                         ,pi_netw_inv_type     IN VARCHAR2 DEFAULT 'NETW'
                                         ,pi_step              IN NUMBER
                                         ,pi_with_debug        IN BOOLEAN
-                                        ,pi_ukp_only          in varchar2 default 'A' 
+                                        ,pi_ukp_only          in varchar2 default 'A'
                                         ,pi_open_only         in varchar2 default 'N'
-                                        
+
                                         ) IS
 l_sqlerrm all_errors.text%TYPE;
 BEGIN
@@ -9214,7 +9216,7 @@ END Spatial_data_fixes;
 */
 --
 
- PROCEDURE Fix_Route_Theme IS
+ PROCEDURE Fix_Route_Theme  IS
 
 l_nth_row NM_THEMES_ALL%ROWTYPE;
 l_nth_theme_id NM_THEMES_ALL.NTH_THEME_ID%TYPE;
@@ -9226,7 +9228,7 @@ BEGIN
 
   append_log_content(pi_text => 'Updating Themes');
 
-  SELECT gt_theme_id
+  SELECT gt_theme_id+g_theme_max
   INTO l_nth_orig_id
   FROM v2_gis_themes_all
   WHERE gt_route_Theme='Y';
@@ -9425,7 +9427,7 @@ procedure resume_invent_migration
 'where  exists (select ''x'' from ukpms_view_Definitions where ity_inv_code= UVD_INV_CODE and ity_sys_flag= UVD_SYS_FLAG)'||
 'and ity_inv_Code>'''||pi_inv_type||''''||
                                  'CONNECT BY PRIOR ity_inv_code = ity_parent_ity (+)'||
-                                 'START WITH ity_parent_ity IS NULL ORDER BY ity_sys_flag,ity_inv_code';                                 
+                                 'START WITH ity_parent_ity IS NULL ORDER BY ity_sys_flag,ity_inv_code';
 
    l_sql_no_ukp Nm3type.max_varchar2 := 'SELECT ity_inv_code '||
                                  '      ,ity_sys_flag '||
@@ -9433,8 +9435,8 @@ procedure resume_invent_migration
 'where not  exists (select ''x'' from ukpms_view_Definitions where ity_inv_code= UVD_INV_CODE and ity_sys_flag= UVD_SYS_FLAG)'||
 'and ity_inv_Code>'''||pi_inv_type||''''||
                                  'CONNECT BY PRIOR ity_inv_code = ity_parent_ity (+)'||
-                                 'START WITH ity_parent_ity IS NULL ORDER BY ity_sys_flag,ity_inv_code';                                 
-                                 
+                                 'START WITH ity_parent_ity IS NULL ORDER BY ity_sys_flag,ity_inv_code';
+
 
 
 
@@ -9527,7 +9529,7 @@ BEGIN
      OPEN  get_inv_types FOR l_sql_no_ukp;
      FETCH get_inv_types BULK COLLECT INTO l_tab_inv_type, l_tab_sys_flag;
      CLOSE get_inv_types;
-   end if;  
+   end if;
 
    g_total_todo:=0;
    for i in 1..l_tab_inv_type.count loop
@@ -9544,10 +9546,10 @@ BEGIN
    -- set up the long op for inventory migration
    start_longop(p_what         => 'Inventory Migration'
                ,p_total_amount => g_total_todo);
-   
-   
-   
-   
+
+
+
+
    -- set up the long op for inventory migration
    FOR i IN 1..l_tab_inv_type.COUNT
     LOOP
