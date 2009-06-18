@@ -26,7 +26,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_update AS
   -----------
   --g_body_sccsid is the SCCS ID for the package body
   --g_body_sccsid  CONSTANT varchar2(2000) := '"@(#)nm3inv_update.pkb	1.5 04/27/06"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.2  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.3  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3inv_update';
 
@@ -428,7 +428,7 @@ PROCEDURE date_track_update_item (pi_iit_ne_id_old IN     nm_inv_items.iit_ne_id
                                );
   */
   CURSOR  cs_child_assets(c_iit_ne_id nm_inv_items.iit_ne_id%TYPE) IS
-   SELECT  iit.*
+   SELECT  level,iit.iit_ne_id
    FROM    nm_inv_item_groupings iig
           ,nm_inv_items iit
           ,nm_inv_type_groupings itg
@@ -436,7 +436,10 @@ PROCEDURE date_track_update_item (pi_iit_ne_id_old IN     nm_inv_items.iit_ne_id
    AND    iit.iit_inv_type      = itg.itg_inv_type
    AND    itg.itg_mandatory     = 'Y'                                    
    CONNECT By PRIOR iig_item_id = iig_parent_id
-   START   WITH iig_parent_id   = c_iit_ne_id ;
+   START   WITH iig_parent_id   = c_iit_ne_id 
+   ORDER BY level;
+
+   l_iit_rec nm_inv_items%ROWTYPE ; 
 --
    PROCEDURE set_for_return IS
    BEGIN
@@ -479,9 +482,10 @@ BEGIN
    /*
    FOR cs_rec IN cs_children (pi_iit_ne_id_old)
     LOOP
+      l_iit_rec                         := nm3get.get_iit(cs_rec.iit_ne_id)
       l_count                           := l_count + 1;
-      l_rec_iit_child                   := cs_rec;
-      l_tab_iit_ne_id_old(l_count)      := cs_rec.iit_ne_id;
+      l_rec_iit_child                   := l_iit_rec;
+      l_tab_iit_ne_id_old(l_count)      := l_iit_rec.iit_ne_id;
       l_rec_iit_child.iit_ne_id         := nm3net.get_next_ne_id;
       l_rec_iit_child.iit_start_date    := pio_rec_iit.iit_start_date;
       l_rec_iit_child.iit_foreign_key   := pio_rec_iit.iit_primary_key;
@@ -499,17 +503,24 @@ BEGIN
    */
    FOR cs_rec IN cs_child_assets (pi_iit_ne_id_old)
     LOOP
+      l_iit_rec                         := nm3get.get_iit(cs_rec.iit_ne_id) ;
       l_count                           := l_count + 1;
-      l_rec_iit_child                   := cs_rec;
-      l_tab_iit_ne_id_old(l_count)      := cs_rec.iit_ne_id;
+      l_rec_iit_child                   := l_iit_rec;
+      l_tab_iit_ne_id_old(l_count)      := l_iit_rec.iit_ne_id;
       l_rec_iit_child.iit_ne_id         := nm3net.get_next_ne_id ;                  
       l_rec_iit_child.iit_start_date    := pio_rec_iit.iit_start_date;
-      l_rec_iit_child.iit_foreign_key   := pio_rec_iit.iit_primary_key;
       l_tab_rec_iit_child(l_count)      := l_rec_iit_child;
       -- LS added
-      l_rec_iit_child_end_dated         := cs_rec;
-      l_rec_iit_child_end_dated.iit_start_date    := pio_rec_iit.iit_start_date;
-      l_rec_iit_child_end_dated.iit_foreign_key   := pio_rec_iit.iit_primary_key;      
+      l_rec_iit_child_end_dated         := l_iit_rec;
+      l_rec_iit_child_end_dated.iit_start_date   := pio_rec_iit.iit_start_date;
+      IF cs_rec.level =  1
+      THEN
+          l_rec_iit_child.iit_foreign_key           := pio_rec_iit.iit_primary_key;
+          l_rec_iit_child_end_dated.iit_foreign_key := pio_rec_iit.iit_primary_key;       
+      --ELSE
+      --    l_rec_iit_child.iit_foreign_key            := l_iit_rec.iit_primary_key;
+      --    l_rec_iit_child_end_dated.iit_foreign_key  := l_iit_rec.iit_primary_key;
+      END IF ;
       nm3mapcapture_ins_inv.l_iit_tab(nm3mapcapture_ins_inv.l_iit_tab.Count+1)    := l_rec_iit_child_end_dated; --  LS Hierarchical asset changes
    END LOOP ;
    --  
