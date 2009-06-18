@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE Nm2_Nm3_Migration AS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkh-arc   2.3   Feb 17 2009 09:44:50   Ian Turnbull  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkh-arc   2.4   Jun 18 2009 08:42:40   Ian Turnbull  $
 --       Module Name      : $Workfile:   nm2_nm3_migration.pkh  $
---       Date into PVCS   : $Date:   Feb 17 2009 09:44:50  $
---       Date fetched Out : $Modtime:   Feb 13 2009 17:32:50  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jun 18 2009 08:42:40  $
+--       Date fetched Out : $Modtime:   Jun 16 2009 15:06:44  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on SCCS Version : 1.10
 --
 --
@@ -195,6 +195,9 @@ PROCEDURE do_optional_commit;
 PROCEDURE pc_inv_mig_nm2_nm3_by_id (p_iit_item_id    NM_INV_ITEMS_ALL.iit_ne_id%TYPE);
 
 PROCEDURE oracle_users_roles_privs ;
+
+-- MGT ADDED 16/6/2009
+function get_new_ne_id(p_rse_he_id number) return NUMBER;
 
 END Nm2_Nm3_Migration;
 /

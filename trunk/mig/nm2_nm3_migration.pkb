@@ -4,12 +4,12 @@ CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.9   Feb 17 2009 09:45:00   Ian Turnbull  $
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.9   Feb 17 2009 09:45:00   Ian Turnbull  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.10   Jun 18 2009 08:42:40   Ian Turnbull  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.10   Jun 18 2009 08:42:40   Ian Turnbull  $
 --       Module Name      : $Workfile:   nm2_nm3_migration.pkb  $
---       Date into PVCS   : $Date:   Feb 17 2009 09:45:00  $
---       Date fetched Out : $Modtime:   Feb 13 2009 17:33:10  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Jun 18 2009 08:42:40  $
+--       Date fetched Out : $Modtime:   Jun 17 2009 13:20:22  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --   Author D.Cope
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.9  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.10  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm2_nm3_migration';
   g_proc_name    VARCHAR2(50);
   g_log_file                UTL_FILE.FILE_TYPE;
@@ -630,7 +630,12 @@ PROCEDURE process_admin_units (pi_v2_higowner VARCHAR2) IS
         ,'NORMAL' nua_mode
   FROM   HIG_USERS
         ,NM_ADMIN_UNITS_ALL
-  WHERE  hus_admin_unit = nau_admin_unit;
+  WHERE  hus_admin_unit = nau_admin_unit
+  AND   NOT EXISTS (SELECT 1
+                      FROM  NM_USER_AUS_ALL
+                      WHERE  NUA_USER_ID = hus_user_id
+		      AND    NUA_ADMIN_UNIT = hus_admin_unit
+                      );
 
   CURSOR get_other_users IS
   SELECT hus_user_id
@@ -837,7 +842,12 @@ PROCEDURE process_admin_units (pi_v2_higowner VARCHAR2) IS
         ,g_mig_earliest_date
         ,hau_end_date
         ,g_admin_type
-   FROM  v2_hig_admin_units;
+   FROM  v2_hig_admin_units
+   WHERE NOT EXISTS (SELECT 1
+                      FROM  NM_ADMIN_UNITS_ALL
+                      WHERE  nau_unit_code = hau_unit_code
+                      );
+
 --
    append_log_content(pi_text => 'HIG_USERS (highways owner)');
    DELETE FROM NM_MAIL_USERS;
@@ -881,10 +891,22 @@ COMMIT;
          ,hag_child_admin_unit
          ,hag_direct_link
    FROM   v2_hig_admin_groups
+   WHERE NOT EXISTS (SELECT 1
+                      FROM  NM_ADMIN_GROUPS
+                      WHERE NAG_PARENT_ADMIN_UNIT = hag_parent_admin_unit
+		      AND   NAG_CHILD_ADMIN_UNIT = hag_child_admin_unit
+		      AND   NAG_DIRECT_LINK = hag_direct_link
+                      )
    UNION
    select nau_admin_unit,nau_admin_unit,'N'
    from nm_admin_units,v2_hig_admin_units
-   where nau_unit_code = hau_unit_code;
+   where nau_unit_code = hau_unit_code
+   AND NOT EXISTS (SELECT 1
+                      FROM  NM_ADMIN_GROUPS
+                      WHERE NAG_PARENT_ADMIN_UNIT = nau_admin_unit
+		      AND   NAG_CHILD_ADMIN_UNIT = nau_admin_unit
+		      AND   NAG_DIRECT_LINK = 'N'
+                      );
    --SELECT nm3get.get_nau(pi_nau_unit_code => get_new_nau(hau_admin_unit),pi_nau_admin_type => g_admin_type).nau_admin_unit
    --      ,nm3get.get_nau(pi_nau_unit_code => get_new_nau(hau_admin_unit),pi_nau_admin_type => g_admin_type).nau_admin_unit
    --      ,'N'
@@ -949,30 +971,31 @@ COMMIT;
                     WHERE  hpr_g.hpr_product = hpr_r.hpr_product
                    );
 -- update hig_products with v2 hig product settings
-  UPDATE HIG_PRODUCTS v3
-  SET    (hpr_product_name
-        ,hpr_path_name
-        ,hpr_key
-        ,hpr_sequence
-        ,hpr_image
-        ,hpr_image_type
-        ,hpr_user_menu
-        ,hpr_launchpad_icon) =
-        (SELECT DECODE(hpr_product, 'STP', 'structural projects v2', hpr_product_name)
-               ,hpr_path_name
-               ,DECODE(v2.hpr_key, NULL, v3.hpr_key, v2.hpr_key) hpr_key -- for some street works customers NET may not be licenced
-               ,hpr_sequence
-               ,hpr_image
-               ,hpr_image_type
-               ,hpr_user_menu
-               ,hpr_launchpad_icon
-         FROM   v2_hig_products v2
-         WHERE  DECODE(v3.hpr_product, 'STP', 'PMS', v3.hpr_product) = DECODE(v2.hpr_product, 'STP', 'PMS', v2.hpr_product)
-         AND    v2.hpr_product != 'PMS'
-         )
-         WHERE EXISTS (SELECT 1
-                       FROM   v2_hig_products v2_check
-                       WHERE  DECODE(v2_check.hpr_product, 'STP', 'PMS', v2_check.hpr_product) = v3.hpr_product);
+UPDATE HIG_PRODUCTS v3
+SET    (v3.hpr_product_name
+      ,v3.hpr_path_name
+      ,v3.hpr_key
+      ,v3.hpr_sequence
+      ,v3.hpr_image
+      ,v3.hpr_image_type
+      ,v3.hpr_user_menu
+      ,v3.hpr_launchpad_icon) =
+      (SELECT DECODE(v2.hpr_product, 'STP', 'structural projects v2', v2.hpr_product_name)
+             ,v2.hpr_path_name
+             ,DECODE(v2.hpr_key, NULL, v3.hpr_key, v2.hpr_key) hpr_key -- for some street works customers NET may not be licenced
+             ,v2.hpr_sequence
+             ,v2.hpr_image
+             ,v2.hpr_image_type
+             ,v2.hpr_user_menu
+             ,v2.hpr_launchpad_icon
+       FROM   v2_hig_products v2
+       WHERE  DECODE(v3.hpr_product, 'STP', 'PMS', v3.hpr_product) = DECODE(v2.hpr_product, 'STP', 'PMS', v2.hpr_product)
+       AND    v2.hpr_product != 'PMS')
+       WHERE EXISTS (SELECT 1
+                     FROM   v2_hig_products v2_check
+                     WHERE  v2_check.hpr_product = v3.hpr_product)
+
+
 --  now update the PMS code. It was Pavement Manager in V2 but in V3 its STP v2
   UPDATE HIG_PRODUCTS
   SET    hpr_product_name = 'structural projects v2'
@@ -8592,7 +8615,7 @@ BEGIN
   --l_sql:='truncate table migration_net_map_rev';
   --EXECUTE IMMEDIATE l_sql;
 
-  L_sql:='insert into MIGRATION_NET_MAP SELECT get_new_ne_id('||pi_id_col_name||') mig_ne_id ,'||pi_shape_col_name||' shape FROM '||pi_table_name;
+  L_sql:='insert into MIGRATION_NET_MAP SELECT nm2_nm3_migration.get_new_ne_id('||pi_id_col_name||') mig_ne_id ,'||pi_shape_col_name||' shape FROM '||pi_table_name;
 
 
 
