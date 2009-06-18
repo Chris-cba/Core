@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mapcapture_int AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3mapcapture_int.pkb	1.12 01/08/04"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mapcapture_int';
@@ -804,8 +804,14 @@ BEGIN
            IF NOT l_found 
            THEN
                l_iit_rec.iit_ne_id  := nm3net.get_next_ne_id;
-               nm3inv.insert_nm_inv_items (l_iit_rec);
-               Commit;
+               BEGIN
+                  nm3ins.ins_iit_all (l_iit_rec);
+                  Commit;
+               EXCEPTION
+                  WHEN OTHERS 
+                  THEN
+                      nm_debug.debug('Error While loading Mandatory Child records '||SQLERRM||' Primary Key - '||l_iit_rec.iit_primary_key||' Start Date '||l_iit_rec.iit_start_date) ;           
+               END ;
            END IF ;
            l_end_dated_iit_loaded := TRUE;
        END LOOP ;
@@ -849,8 +855,14 @@ EXCEPTION
                IF NOT l_found 
                THEN
                    l_iit_rec.iit_ne_id  := nm3net.get_next_ne_id;
-                   nm3inv.insert_nm_inv_items (l_iit_rec);
-                   Commit;
+                   BEGIN
+                      nm3ins.ins_iit_all (l_iit_rec);
+                      Commit;
+                   EXCEPTION
+                       WHEN OTHERS 
+                       THEN
+                           nm_debug.debug('Error While loading Mandatory Child records '||SQLERRM||' Primary Key - '||l_iit_rec.iit_primary_key||' Start Date '||l_iit_rec.iit_start_date) ;           
+                   END ;
                END IF ;
            END LOOP ;
         END ;
