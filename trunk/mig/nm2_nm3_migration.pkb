@@ -1,15 +1,15 @@
-CREATE OR REPLACE PACKAGE BODY ATLAS.Nm2_Nm3_Migration AS
+CREATE OR REPLACE PACKAGE BODY Nm2_Nm3_Migration AS
 --
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.11   Jun 18 2009 13:58:46   Ian Turnbull  $
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.11   Jun 18 2009 13:58:46   Ian Turnbull  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.12   Jun 23 2009 14:03:06   Ian Turnbull  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/mig/nm2_nm3_migration.pkb-arc   2.12   Jun 23 2009 14:03:06   Ian Turnbull  $
 --       Module Name      : $Workfile:   nm2_nm3_migration.pkb  $
---       Date into PVCS   : $Date:   Jun 18 2009 13:58:46  $
---       Date fetched Out : $Modtime:   Jun 18 2009 13:05:20  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Jun 23 2009 14:03:06  $
+--       Date fetched Out : $Modtime:   Jun 23 2009 14:02:28  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --   Author D.Cope
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY ATLAS.Nm2_Nm3_Migration AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.11  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.12  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm2_nm3_migration';
   g_proc_name    VARCHAR2(50);
   g_log_file                UTL_FILE.FILE_TYPE;
