@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.7   Mar 16 2009 16:24:04   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.8   Jun 25 2009 14:19:42   cstrettle  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Mar 16 2009 16:24:04  $
---       Date fetched Out : $Modtime:   Mar 16 2009 16:21:02  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Jun 25 2009 14:19:42  $
+--       Date fetched Out : $Modtime:   Jun 25 2009 14:18:34  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -2889,6 +2889,9 @@ PROCEDURE add_rest_of_chunk_of_cont_item (pi_narh_job_id       nm_assets_on_rout
    l_route_units    nm_units.un_unit_id%TYPE;
    l_nte_job_id     nm_nw_temp_extents.nte_job_id%TYPE;
 --
+   l_first_ne     nm_elements.ne_id%type ;
+
+
    l_length_of_partial number;
 --
 BEGIN
@@ -2917,8 +2920,56 @@ BEGIN
                                      ,po_job_id     => l_nte_job_id
                                      );
             --
-            nm3rsc.rescale_temp_ne (l_nte_job_id);
-   --
+            
+             DECLARE
+               c_circ_ex_num      constant INTEGER := -20207 ;
+               l_original_message          VARCHAR(2000) ;
+               l_circular_ex      exception ;
+               l_ne_id            nm_elements.ne_id%TYPE;
+               l_rec_ne           nm_elements%ROWTYPE;
+               PRAGMA EXCEPTION_INIT( l_circular_ex, -20207 );
+             -- CWS 709250
+             BEGIN             
+               nm3rsc.rescale_temp_ne (l_nte_job_id);
+             EXCEPTION
+               WHEN l_circular_ex
+               THEN
+                 l_original_message := SUBSTR(SQLERRM,1,2000) ;
+                 IF g_gos_ne_id is not null
+                 THEN
+                 BEGIN
+                   SELECT DISTINCT(nm_ne_id_of)
+                     INTO l_first_ne
+                     FROM nm_members m1
+                    WHERE nm_ne_id_in = g_gos_ne_id
+                    AND NOT EXISTS
+                   ( SELECT 1
+                       FROM nm_members m2
+                      WHERE nm_ne_id_in = g_gos_ne_id
+                        AND m2.nm_seq_no < m1.nm_seq_no
+                    )
+                    AND ROWNUM = 1
+                   ;
+                   IF l_first_ne IS NOT NULL
+                   THEN
+                     nm3rsc.rescale_temp_ne(l_nte_job_id,NULL,l_first_ne);
+                   ELSE
+                     RAISE ;
+                   END IF;
+                 EXCEPTION
+                   WHEN OTHERS
+                   THEN
+                     l_original_message := SUBSTR(l_original_message,
+                                                  INSTR(l_original_message,TO_CHAR(c_circ_ex_num) || ':')+6) ;
+                     l_original_message := LTRIM(l_original_message);
+                     
+                     raise_application_error(c_circ_ex_num,l_original_message);
+                 END ;
+               ELSE
+                 RAISE ;
+               END IF ;
+             END ;         
+            
             g_tab_nte_entire_route := nm3extent.get_tab_nte (l_nte_job_id);
             --
             sort_out_rest_for_begin_or_end (pi_narh_job_id  => pi_narh_job_id
