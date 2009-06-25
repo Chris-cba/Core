@@ -1,17 +1,13 @@
 CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --
------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
------------------------------------------------------------------------------
---
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3rsc.pkb	1.73 05/22/07
---       Module Name      : nm3rsc.pkb
---       Date into SCCS   : 07/05/22 16:22:22
---       Date fetched Out : 07/06/13 14:13:21
---       SCCS Version     : 1.73
---
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.3   Jun 25 2009 14:21:26   rcoupe  $
+--       Module Name      : $Workfile:   nm3rsc.pkb  $
+--       Date into PVCS   : $Date:   Jun 25 2009 14:21:26  $
+--       Date fetched Out : $Modtime:   Jun 25 2009 14:18:46  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --   Author : R.A. Coupe
 --
@@ -23,7 +19,8 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3rsc.pkb	1.73 05/22/07"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.3  $"';
+
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'NM3RSC';
@@ -139,7 +136,7 @@ PROCEDURE rescale_route( pi_ne_id          IN nm_elements.ne_id%TYPE,
 -- CWS
 --l_offset_st number := pi_offset_st;
 l_offset_st number;
-l_unit_id number; 
+l_unit_id number;
 l_dummy number;
 --
 l_empty_flag varchar2(1);
@@ -582,8 +579,9 @@ PROCEDURE set_start_points IS
 
 BEGIN
   FOR irec IN c1 LOOP
+    l_s_ne_id := get_start_element( irec.ne_id );
     UPDATE nm_rescale_write
-    SET s_ne_id = get_start_element( irec.ne_id )
+    SET s_ne_id = l_s_ne_id
     WHERE CURRENT OF c1;
   END LOOP;
 END;
@@ -594,7 +592,7 @@ FUNCTION get_start_element( pi_ne_id IN number ) RETURN number IS
 
 CURSOR c1 IS
   SELECT b.nnu_ne_id
-  FROM nm_node_usages a, nm_rescale_read a1, nm_node_usages b, nm_rescale_read b1
+  FROM nm_node_usages a, nm_rescale_read a1, nm_node_usages b, nm_rescale_write b1
   WHERE a.nnu_ne_id = a1.ne_id
   AND   b.nnu_no_node_id = a.nnu_no_node_id
   AND   b.nnu_ne_id != a.nnu_ne_id
@@ -606,7 +604,7 @@ CURSOR c1 IS
 
 CURSOR c2 IS
   SELECT b.nnu_ne_id
-  FROM nm_node_usages a, nm_rescale_read a1, nm_node_usages b, nm_rescale_read b1
+  FROM nm_node_usages a, nm_rescale_read a1, nm_node_usages b, nm_rescale_write b1
   WHERE a.nnu_ne_id = a1.ne_id
   AND   b.nnu_no_node_id = a.nnu_no_node_id
   AND   b.nnu_ne_id != a.nnu_ne_id
@@ -614,7 +612,7 @@ CURSOR c2 IS
   AND   b.nnu_node_type = DECODE( b1.nm_cardinality, 1, 'E', -1, 'S', 'E' )
   AND   a.nnu_node_type = DECODE( a1.nm_cardinality, 1, 'S', -1, 'E', 'S' )
   AND   a1.ne_id = pi_ne_id
-  order by nm3net.route_direction( b.nnu_no_node_id, b1.nm_cardinality ) desc;
+  order by b1.s_ne_id, nm3net.route_direction( b.nnu_no_node_id, b1.nm_cardinality ) desc;
 
 
 CURSOR c3 IS
