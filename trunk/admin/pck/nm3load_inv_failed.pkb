@@ -25,7 +25,8 @@ CREATE OR REPLACE PACKAGE BODY NM3LOAD_INV_FAILED AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"@(#)nm3load_inv_failed.pkb	1.9 11/17/03"';
+  --g_body_sccsid  CONSTANT varchar2(2000) := '"@(#)nm3load_inv_failed.pkb	1.9 11/17/03"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
 
   g_package_name CONSTANT varchar2(30) := 'NM3LOAD_INV_FAILED';
 --
