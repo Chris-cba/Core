@@ -325,7 +325,12 @@ BEGIN
 --
    l_rec_nlf      := get_nlf (p_nlf_id);
    l_table_name   := get_holding_table_name (p_nlf_id);
-   g_batch_no     := nm3pbi.get_job_id;
+   IF Nvl(nm3mapcapture_ins_inv.l_mapcap_run,'N') = 'N'   
+   THEN
+       g_batch_no     := nm3pbi.get_job_id;
+   ELSe
+       g_batch_no     := nm3mapcapture_ins_inv.l_batch_no;
+   END IF;
    g_nlf_id       := p_nlf_id;
    g_filename     := p_file_name;
    l_delim        := 'CHR('||ASCII(l_rec_nlf.nlf_delimiter)||')';
@@ -383,6 +388,7 @@ BEGIN
    append ('   l_holding_varchar2 nm3type.max_varchar2;');
    append ('   l_holding_date     DATE;');
    append ('   l_holding_number   NUMBER;');
+   append ('   l_record_seq       NUMBER;');
    append ('   l_nlb_rowid        ROWID;');
    append ('   l_rec_count        BINARY_INTEGER := 0;');
    append ('   c_commit_threshold CONSTANT NUMBER := '||get_commit_threshold||';');
@@ -407,7 +413,7 @@ BEGIN
    END LOOP;
    append ('         )');
    append ('         VALUES ('||g_package_name||'.g_batch_no');
-   append ('                ,l_rec_no(i)');
+   append ('                ,l_rec_no(i) ');
    FOR i IN 1..l_tab_rec_nlfc.COUNT
     LOOP
       l_rec_nlfc := l_tab_rec_nlfc(i);
@@ -458,8 +464,14 @@ BEGIN
    append ('    LOOP');
    append ('      BEGIN');
    append ('         '||g_package_name||'.g_single_line := '||g_package_name||'.g_tab_lines(i);');
-   append ('         l_rec_count               := l_rec_count + 1;');
-   append ('         l_rec_no(l_rec_count)     := i;');
+   append ('         l_rec_count               := l_rec_count + 1 ;');
+   append ('         IF Nvl(nm3mapcapture_ins_inv.l_mapcap_run,'||nm3flx.string('N')||') = '||nm3flx.string('Y')||' THEN ');
+   append ('         nm3mapcapture_ins_inv.l_recod_no  := Nvl(nm3mapcapture_ins_inv.l_recod_no,0) +1 ;');
+   append ('         l_record_seq := nm3mapcapture_ins_inv.l_recod_no ; ');
+   append ('         ELSE ');
+   append ('         l_record_seq := i ; ');
+   append ('         END IF ;');
+   append ('         l_rec_no(l_rec_count)     := l_record_seq ; ');
    append ('         l_tab_status(l_rec_count) := '||nm3flx.string('H')||';');
    append ('         l_tab_error(l_rec_count)  := Null;');
    append ('         l_tab_lines(l_rec_count)  := '||g_package_name||'.g_single_line;');
