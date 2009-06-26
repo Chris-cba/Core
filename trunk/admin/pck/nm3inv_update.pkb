@@ -26,7 +26,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_update AS
   -----------
   --g_body_sccsid is the SCCS ID for the package body
   --g_body_sccsid  CONSTANT varchar2(2000) := '"@(#)nm3inv_update.pkb	1.5 04/27/06"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.3  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.4  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3inv_update';
 
@@ -509,8 +509,7 @@ BEGIN
       l_tab_iit_ne_id_old(l_count)      := l_iit_rec.iit_ne_id;
       l_rec_iit_child.iit_ne_id         := nm3net.get_next_ne_id ;                  
       l_rec_iit_child.iit_start_date    := pio_rec_iit.iit_start_date;
-      l_tab_rec_iit_child(l_count)      := l_rec_iit_child;
-      -- LS added
+      l_tab_rec_iit_child(l_count)      := l_rec_iit_child;     
       l_rec_iit_child_end_dated         := l_iit_rec;
       l_rec_iit_child_end_dated.iit_start_date   := pio_rec_iit.iit_start_date;
       IF cs_rec.level =  1
