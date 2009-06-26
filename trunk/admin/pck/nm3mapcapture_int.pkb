@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mapcapture_int AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3mapcapture_int.pkb	1.12 01/08/04"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mapcapture_int';
@@ -586,6 +586,9 @@ BEGIN
       
       l_ret_files(l_ret_files.COUNT+1) := remove_file_extension(l_files(i));
       nm_debug.debug(l_ret_files(l_ret_files.LAST)||' is ready for loading');
+      nm3mapcapture_ins_inv.l_mapcap_run  := 'Y'  ;
+      nm3mapcapture_ins_inv.l_batch_no := nm3pbi.get_job_id ;
+      nm3mapcapture_ins_inv.l_recod_no := 0 ;
     END IF;
     
   END LOOP;
@@ -774,50 +777,12 @@ BEGIN
       l_csv_loader_batch_num := nm3load.transfer_to_holding(p_nlf_id       => l_nlf.nlf_id 
                                                            ,p_file_name    => l_files_in_batch(i_file)
                                                            ,p_batch_source => 'S');
-
-      -- we have now loaded the batch into the holding table
-      nm_debug.debug('Attempting Second stage Load');
-      load_from_holding(pi_csv_batch_no => l_csv_loader_batch_num);
-
+    
     END LOOP;
-    DECLARE
-    --
-       l_iit_in_batch nm_inv_items.iit_ne_id%TYPE ;
-       l_iit_rec nm_inv_items%ROWTYPE ;
-       l_found Boolean := False ;
-    --
-    BEGIN
-    --
-       FOR i in 1..nm3mapcapture_ins_inv.l_iit_tab.count
-       LOOP
-           l_iit_rec := nm3mapcapture_ins_inv.l_iit_tab(i);
-           l_found := False ;
-           FOR j in 1..nm3mapcapture_ins_inv.l_iit_ne_tab.count
-           LOOP
-               l_iit_in_batch := nm3mapcapture_ins_inv.l_iit_ne_tab(j);
-               IF l_iit_rec.iit_ne_id =  l_iit_in_batch
-               THEN
-                   l_found := TRUE;
-                   Exit;
-               END IF ;    
-           END LOOP ;
-           IF NOT l_found 
-           THEN
-               l_iit_rec.iit_ne_id  := nm3net.get_next_ne_id;
-               BEGIN
-                  nm3ins.ins_iit_all (l_iit_rec);
-                  Commit;
-               EXCEPTION
-                  WHEN OTHERS 
-                  THEN
-                      nm_debug.debug('Error While loading Mandatory Child records '||SQLERRM||' Primary Key - '||l_iit_rec.iit_primary_key||' Start Date '||l_iit_rec.iit_start_date) ;           
-               END ;
-           END IF ;
-           l_end_dated_iit_loaded := TRUE;
-       END LOOP ;
-    END ;
-    nm3mapcapture_ins_inv.l_iit_ne_tab.delete;
-    nm3mapcapture_ins_inv.l_iit_tab.delete;
+    -- we have now loaded the batch into the holding table
+    nm_debug.debug('Attempting Second stage Load');
+    --load_from_holding(pi_csv_batch_no => l_csv_loader_batch_num);
+    nm3mapcapture_ins_inv.run_batch(nm3mapcapture_ins_inv.l_batch_no);
     nm3mapcapture_ins_inv.l_mapcap_run  := 'N'  ;
     --
     clear_batch(pi_batch            => pi_batch
@@ -828,48 +793,8 @@ BEGIN
   nm_debug.proc_end(p_package_name   => g_package_name
                    ,p_procedure_name => 'load_batch');
 EXCEPTION
-  WHEN OTHERS THEN
-    IF NOT l_end_dated_iit_loaded
-    THEN
-        DECLARE
-        --
-           l_iit_in_batch nm_inv_items.iit_ne_id%TYPE ;
-           l_iit_rec nm_inv_items%ROWTYPE ;
-           l_found Boolean := False ;
-        --
-        BEGIN
-        --
-           FOR i in 1..nm3mapcapture_ins_inv.l_iit_tab.count
-           LOOP
-               l_iit_rec := nm3mapcapture_ins_inv.l_iit_tab(i);
-               l_found := False ;
-               FOR j in 1..nm3mapcapture_ins_inv.l_iit_ne_tab.count
-               LOOP
-                   l_iit_in_batch := nm3mapcapture_ins_inv.l_iit_ne_tab(j);
-                   IF l_iit_rec.iit_ne_id =  l_iit_in_batch
-                   THEN
-                       l_found := TRUE;
-                       Exit;
-                   END IF ;    
-               END LOOP ;
-               IF NOT l_found 
-               THEN
-                   l_iit_rec.iit_ne_id  := nm3net.get_next_ne_id;
-                   BEGIN
-                      nm3ins.ins_iit_all (l_iit_rec);
-                      Commit;
-                   EXCEPTION
-                       WHEN OTHERS 
-                       THEN
-                           nm_debug.debug('Error While loading Mandatory Child records '||SQLERRM||' Primary Key - '||l_iit_rec.iit_primary_key||' Start Date '||l_iit_rec.iit_start_date) ;           
-                   END ;
-               END IF ;
-           END LOOP ;
-        END ;
-        nm3mapcapture_ins_inv.l_iit_ne_tab.delete;
-        nm3mapcapture_ins_inv.l_iit_tab.delete;
-        nm3mapcapture_ins_inv.l_mapcap_run  := 'N'  ;
-    END IF ;
+  WHEN OTHERS THEN     
+    nm3mapcapture_ins_inv.l_mapcap_run  := 'N'  ;
     catch_error(p_appl   => nm3type.c_hig
                ,p_error  => 207
                ,p_supp   => sqlerrm
