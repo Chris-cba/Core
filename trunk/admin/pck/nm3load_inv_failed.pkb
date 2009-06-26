@@ -575,7 +575,12 @@ BEGIN
     END LOOP;
     
     -- now redo the load
-    nm3load.load_batch(p_batch_no => pi_batch_no);
+    IF Nvl(nm3mapcapture_ins_inv.l_mapcap_run,'N') = 'N'  
+    THEN
+        nm3load.load_batch(p_batch_no => pi_batch_no);
+    ELSE
+        nm3mapcapture_ins_inv.run_batch(pi_batch_no);
+    END IF ;
     -- and tell us of the results
     nm3load.produce_log_email(p_nlb_batch_no   => pi_batch_no
                              ,p_produce_as_htp => FALSE
