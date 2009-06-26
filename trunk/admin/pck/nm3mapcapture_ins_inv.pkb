@@ -22,10 +22,12 @@ CREATE OR REPLACE PACKAGE BODY nm3mapcapture_ins_inv AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3mapcapture_ins_inv.pkb	1.15 09/09/05"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mapcapture_ins_inv';
+   TYPE  l_iit_id_type IS TABLE OF NUMBER INDEX BY BINARY_INTEGER ;
+   l_iit_id_tab1    l_iit_id_type ;
 --  
 --
 -----------------------------------------------------------------------------
@@ -254,7 +256,197 @@ BEGIN
                    ,p_procedure_name => 'date_track_attributes');
 END date_track_attributes;
 --
------------------------------------------------------------------------------
+PROCEDURE populate_child_items(pi_batch_no   nm_load_batch_status.nlbs_nlb_batch_no%TYPE
+                              ,pi_iit_ne_id  nm_inv_items.iit_ne_id%TYPE)
+IS
+--
+   CURSOR c_get_batch(qp_iit_ne_id nm_inv_items.iit_ne_id%TYPE)
+   IS
+   SELECT 'x'
+   FROM   nm_ld_mc_all_inv_tmp 
+   WHERE  batch_no = pi_batch_no
+   AND    iit_ne_id =  qp_iit_ne_id ;
+   l_get_batch c_get_batch%ROWTYPE; 
+   l_iit_rec nm_inv_items%ROWTYPE;
+   type l_iig_tab_type is table of NM_INV_ITEM_GROUPINGS%ROWTYPE ;
+   l_iig_rec NM_INV_ITEM_GROUPINGS%ROWTYPE;
+   l_iig_tab1    l_iig_tab_type;
+   l_iit_id_tab  l_iit_id_type;   
+   l_found Boolean ;
+BEGIN             
+--
+   l_iit_id_tab1.delete ;
+   SELECT iig.* 
+          BULK COLLECT INTO l_iig_tab1 
+   FROM   NM_INV_ITEM_GROUPINGS  iig
+   CONNECT BY iig_parent_id = PRIOR iig_item_id
+   START WITH iig_parent_id = pi_iit_ne_id
+   ORDER BY level ;
+   FOR i IN 1..l_iig_tab1.Count
+   loop
+       l_iig_rec :=l_iig_tab1(i) ; 
+       IF nm3get.get_itg(nm3get.get_iit(l_iig_rec.iig_item_id).iit_inv_type,nm3get.get_iit(l_iig_rec.iig_parent_id).iit_inv_type).itg_mandatory = 'Y'
+       THEN
+           OPEN  c_get_batch (l_iig_rec.iig_item_id);
+           FETCH c_get_batch INTO l_get_batch;
+           IF c_get_batch%FOUND
+           THEN
+               CLOSE c_get_batch;
+               l_iit_id_tab(l_iit_id_tab.count+1) := l_iig_rec.iig_item_id;
+               FOR j in (SELECT  iig.*  
+                         FROM   NM_INV_ITEM_GROUPINGS  iig
+                         CONNECT BY iig_parent_id = PRIOR iig_item_id
+                         START WITH iig_parent_id = l_iig_rec.iig_item_id
+                         ORDER BY level )
+               LOOP
+                   IF nm3get.get_itg(nm3get.get_iit(j.iig_item_id).iit_inv_type,nm3get.get_iit(j.iig_parent_id).iit_inv_type).itg_mandatory = 'Y'
+                   THEN           
+                       OPEN  c_get_batch (j.iig_item_id);
+                       FETCH c_get_batch INTO l_get_batch;
+                       IF c_get_batch%NOTFOUND
+                       THEN        
+                            CLOSE c_get_batch;
+                           l_iit_id_tab(l_iit_id_tab.count+1) := j.iig_item_id;
+                       ELSE
+                           CLOSE c_get_batch ;    
+                       END IF ;
+                   END if ;
+               END LOOP;    
+           ELSE
+               CLOSE c_get_batch;    
+           END IF ;                
+      END IF ;     
+   END LOOP;
+   FOR i IN 1..l_iig_tab1.count
+   LOOP
+       l_iig_rec :=l_iig_tab1(i);
+       IF nm3get.get_itg(nm3get.get_iit(l_iig_rec.iig_item_id).iit_inv_type,nm3get.get_iit(l_iig_rec.iig_parent_id).iit_inv_type).itg_mandatory = 'Y'
+       THEN
+           l_found := FALSE ;          
+           FOR i IN 1..l_iit_id_tab.count
+           LOOP
+               IF l_iig_rec.iig_item_id = l_iit_id_tab(i)
+               THEN 
+                   l_found := TRUE ;
+                   Exit;
+               END If ;    
+           END LOOP;
+           IF NOT l_found
+           THEN
+                l_iit_id_tab1(l_iit_id_tab1.count+1) := l_iig_rec.iig_item_id;
+           END IF;
+      END If ;            
+   END LOOP;
+--
+EXCEPTION
+   WHEN OTHERS
+   THEN
+       Null;
+END populate_child_items;
+--
+PROCEDURE populate_enddated_child_items(pi_batch_no   nm_load_batch_status.nlbs_nlb_batch_no%TYPE
+                              ,pi_iit_ne_id  nm_inv_items.iit_ne_id%TYPE)
+IS
+--
+   CURSOR c_get_batch(qp_iit_ne_id nm_inv_items.iit_ne_id%TYPE)
+   IS
+   SELECT 'x'
+   FROM   nm_ld_mc_all_inv_tmp 
+   WHERE  batch_no = pi_batch_no
+   AND    iit_ne_id =  qp_iit_ne_id ;
+   l_get_batch c_get_batch%ROWTYPE; 
+   l_iit_rec nm_inv_items%ROWTYPE;
+   type l_iig_tab_type is table of NM_INV_ITEM_GROUPINGS%ROWTYPE ;
+   l_iig_rec NM_INV_ITEM_GROUPINGS%ROWTYPE;
+   l_iig_tab1    l_iig_tab_type;
+   l_iit_id_tab  l_iit_id_type;   
+   l_found Boolean ;
+   l_found_iit Boolean ;
+BEGIN             
+--
+   l_iit_id_tab1.delete ;
+   SELECT iig.* 
+          BULK COLLECT INTO l_iig_tab1 
+   FROM   NM_INV_ITEM_GROUPINGS_all  iig
+   CONNECT BY iig_parent_id = PRIOR iig_item_id
+   START WITH iig_parent_id = pi_iit_ne_id
+   ORDER BY level ;
+   FOR i IN 1..l_iig_tab1.Count
+   loop
+       l_iig_rec :=l_iig_tab1(i) ; 
+       IF nm3get.get_itg(nm3get.get_iit_all(l_iig_rec.iig_item_id).iit_inv_type,nm3get.get_iit_all(l_iig_rec.iig_parent_id).iit_inv_type).itg_mandatory = 'Y'
+       THEN
+           OPEN  c_get_batch (l_iig_rec.iig_item_id);
+           FETCH c_get_batch INTO l_get_batch;
+           IF c_get_batch%FOUND
+           THEN
+               CLOSE c_get_batch;
+               l_iit_id_tab(l_iit_id_tab.count+1) := l_iig_rec.iig_item_id;
+               FOR j in (SELECT  iig.*  
+                         FROM   NM_INV_ITEM_GROUPINGS_all  iig
+                         CONNECT BY iig_parent_id = PRIOR iig_item_id
+                         START WITH iig_parent_id = l_iig_rec.iig_item_id
+                         ORDER BY level )
+               LOOP
+                   IF nm3get.get_itg(nm3get.get_iit_all(j.iig_item_id).iit_inv_type,nm3get.get_iit_all(j.iig_parent_id).iit_inv_type).itg_mandatory = 'Y'
+                   THEN           
+                       OPEN  c_get_batch (j.iig_item_id);
+                       FETCH c_get_batch INTO l_get_batch;
+                       IF c_get_batch%NOTFOUND
+                       THEN        
+                            CLOSE c_get_batch;
+                           l_iit_id_tab(l_iit_id_tab.count+1) := j.iig_item_id;
+                       ELSE
+                           CLOSE c_get_batch ;    
+                       END IF ;
+                   END if ;
+               END LOOP;    
+           ELSE
+               CLOSE c_get_batch;    
+           END IF ;                
+      END IF ;     
+   END LOOP;
+   FOR i IN 1..l_iig_tab1.count
+   LOOP
+       l_iig_rec :=l_iig_tab1(i);
+       IF nm3get.get_itg(nm3get.get_iit_all(l_iig_rec.iig_item_id).iit_inv_type,nm3get.get_iit_all(l_iig_rec.iig_parent_id).iit_inv_type).itg_mandatory = 'Y'
+       THEN
+           l_found := FALSE ;          
+           FOR i IN 1..l_iit_id_tab.count
+           LOOP
+               IF l_iig_rec.iig_item_id = l_iit_id_tab(i)
+               THEN 
+                   l_found := TRUE ;
+                   Exit;
+               END If ;    
+           END LOOP;
+           IF NOT l_found
+           THEN
+               FOR j IN 1..nm3mapcapture_ins_inv.l_iit_tab.Count
+               LOOP
+                   l_found_iit := FALSE;
+                   l_iit_rec   :=  nm3mapcapture_ins_inv.l_iit_tab(j);
+                   IF  l_iig_rec.iig_item_id = l_iit_rec.iit_ne_id
+                   THEN
+                       l_found_iit := TRUE;
+                       EXIT;
+                   END IF ;
+               END LOOP;
+               IF l_found_iit 
+               THEN
+                   l_iit_id_tab1(l_iit_id_tab1.count+1) := l_iig_rec.iig_item_id;
+               END IF ;
+           END IF;
+      END If ;            
+   END LOOP;
+--
+EXCEPTION
+   WHEN OTHERS
+   THEN
+       Null;
+END populate_enddated_child_items;
+-------------------------
+----------------------------------------------------
 --
 PROCEDURE update_changed_attributes IS
 
@@ -438,10 +630,14 @@ PROCEDURE ins_inv (p_inv_rec IN nm_ld_mc_all_inv_tmp%ROWTYPE) IS
    l_warning_code      VARCHAR2(80);
    l_warning_msg       nm3type.max_varchar2;
    l_effective_date    DATE    := TRUNC(p_inv_rec.NLM_INVENT_DATE);
+
+   -- LS
+   l_iit_tab nm3type.tab_rec_iit ;
+   l_iit_rec nm_inv_items%ROWTYPE ;
 --
 BEGIN
    nm_debug.proc_start(p_package_name   => g_package_name
-                      ,p_procedure_name => 'ins_inv');
+                      ,p_procedure_name => 'ins_inv');   
   
   -- set the items survey date to be the effective date
   nm3user.set_effective_date(l_effective_date);
@@ -624,7 +820,6 @@ BEGIN
   -- LS Added this code to hanlde the child asset which have been added as a result of parent been replaced
   IF g_inv.iit_ne_id != -1 
   THEN
-      nm3mapcapture_ins_inv.l_iit_ne_tab(nm3mapcapture_ins_inv.l_iit_ne_tab.count+1) := p_inv_rec.ne_id; -- add ls
       DECLARE
       --
          l_iit_rec nm_inv_items%ROWTYPE ;   
@@ -640,6 +835,7 @@ BEGIN
               --
                  l_iit_rec := nm3get.get_iit_all( g_inv.iit_ne_id);
                  g_inv.iit_ne_id := -1 ;
+                 populate_enddated_child_items(p_inv_rec.batch_no,p_inv_rec.iit_ne_id);
               --
               EXCEPTION
                   WHEN OTHERS
@@ -670,8 +866,29 @@ BEGIN
     END IF;
     
     nm3inv.insert_nm_inv_items (g_inv);
---
-
+    --
+    IF p_inv_rec.iit_ne_id != -1
+    THEN
+        FOR i IN 1..l_iit_id_tab1.Count
+        LOOP                  
+            IF l_iit_id_tab1(i) IS NOT NULL
+            THEN
+                l_iit_rec := nm3get.get_iit_all(l_iit_id_tab1(i));
+                l_iit_rec.iit_ne_id  := nm3net.get_next_ne_id;
+                l_iit_rec.iit_start_date := l_effective_date; 
+                l_iit_rec.iit_end_date := Null; 
+                BEGIN
+                   nm3ins.ins_iit_all (l_iit_rec);
+                EXCEPTION
+                WHEN OTHERS 
+                THEN
+                    nm_debug.debug('Error While loading Mandatory Child records '||SQLERRM||' Primary Key - '||l_iit_rec.iit_primary_key||' Start Date '||l_iit_rec.iit_start_date) ;   
+                    Raise ;        
+                END ;
+            END IF ;
+       END LOOP;
+       l_iit_id_tab1.delete;
+    END IF ;
   ELSE
     
     -- has inventory item been changed since the item was output to MapCapture
@@ -691,17 +908,42 @@ BEGIN
                          ,p_lock_for_update => TRUE);
 
     IF p_inv_rec.nlm_action_code = 'R' OR
-       date_track_attributes(p_iit_id => p_inv_rec.iit_ne_id) THEN
-      
-      nm_debug.debug('End Dating');
-      -- need new start date, start date should be the survey date
-
-      g_inv.iit_ne_id       := NULL;
-      g_inv.iit_start_date  := l_effective_date;
-      
-      nm3inv_update.date_track_update_item(pi_iit_ne_id_old => p_inv_rec.iit_ne_id
-                                          ,pio_rec_iit      => g_inv);
-
+       date_track_attributes(p_iit_id => p_inv_rec.iit_ne_id) 
+    THEN
+        IF p_inv_rec.iit_end_date IS NULL
+        THEN
+            nm_debug.debug('End Dating');
+            -- need new start date, start date should be the survey date
+            g_inv.iit_ne_id       := NULL;
+            g_inv.iit_start_date  := l_effective_date;            
+            populate_child_items(p_inv_rec.batch_no,p_inv_rec.iit_ne_id);
+            nm3inv_update.date_track_update_item(pi_iit_ne_id_old => p_inv_rec.iit_ne_id
+                                                ,pio_rec_iit      => g_inv);
+            BEGIN                   
+            -- 
+               FOR i IN 1..l_iit_id_tab1.Count
+               LOOP                  
+                   IF l_iit_id_tab1(i) IS NOT NULL
+                   THEN
+                       l_iit_rec := nm3get.get_iit_all(l_iit_id_tab1(i));
+                       l_iit_rec.iit_ne_id  := nm3net.get_next_ne_id;
+                       l_iit_rec.iit_start_date := l_effective_date; 
+                       l_iit_rec.iit_end_date := Null; 
+                       BEGIN
+                          nm3ins.ins_iit_all (l_iit_rec);
+                       EXCEPTION
+                       WHEN OTHERS 
+                       THEN
+                           nm_debug.debug('Error While loading Mandatory Child records '||SQLERRM||' Primary Key - '||l_iit_rec.iit_primary_key||' Start Date '||l_iit_rec.iit_start_date) ;   
+                           Raise ;        
+                       END ;
+                   END IF ;
+               END LOOP;  
+               l_iit_id_tab1.delete;       
+            END ;
+        ELSE
+            update_changed_attributes;
+        END IF ;
     ELSE
       -- just update the record
       update_changed_attributes;
@@ -759,6 +1001,80 @@ EXCEPTION
 END ins_inv;
 --
 -----------------------------------------------------------------------------
+--
+PROCEDURE update_child_records (pi_iit_primary_key NM_LD_MC_ALL_INV_TMP.iit_primary_key%TYPE
+                               ,pi_batch_no     NM_LD_MC_ALL_INV_TMP.batch_no%TYPE)
+IS
+   PRAGMA autonomous_transaction;
+BEGIN
+   UPDATE nm_load_batch_status
+   SET    nlbs_status = 'E'
+         ,nlbs_text = 'Parent failed'
+   WHERE  nlbs_nlb_batch_no = pi_batch_no 
+   AND    nlbs_record_no IN (SELECT record_no from NM_LD_MC_ALL_INV_TMP a
+                             WHERE  iit_primary_key     != pi_iit_primary_key
+                             AND batch_no                = pi_batch_no 
+                             CONNECT BY iit_foreign_key  = prior  iit_primary_key
+                             START WITH iit_primary_key  = pi_iit_primary_key);
+   COMMIT;
+END update_child_records ;
+--
+PROCEDURE run_batch(pi_batch_no nm_load_batch_status.nlbs_nlb_batch_no%TYPE)
+IS
+--
+   l_cnt Number := 0 ;
+--
+BEGIN 
+--
+   nm3mapcapture_ins_inv.l_mapcap_run := 'Y' ;
+   nm3mapcapture_ins_inv.l_iit_tab.Delete;
+   For i IN (SELECT tab.*
+             FROM  NM_LD_MC_ALL_INV_TMP tab
+                  ,nm_load_batch_status nlbs
+             WHERE  tab.batch_no           = pi_batch_no 
+             AND   nlbs.nlbs_nlb_batch_no  = tab.batch_no
+             AND   nlbs.nlbs_record_no     = tab.record_no
+             AND   nlbs.nlbs_status       IN ('H','V')
+             ORDER BY tab.batch_no, tab.record_no)
+   LOOP
+   --
+      l_cnt := l_cnt + 1 ;
+      SavePoint tmp1;
+      DECLARE
+      --
+         CURSOR c_nlbs
+         IS
+         SELECT 'x' 
+         FROM   nm_load_batch_status 
+         WHERE  nlbs_nlb_batch_no = pi_batch_no
+         AND    nlbs_record_no    = i.record_no 
+         AND    nlbs_status       = 'E' ;
+         l_nlbs c_nlbs%ROWTYPE ; 
+      BEGIN
+      --
+         OPEN  c_nlbs;
+         FETCH c_nlbs INTO l_nlbs ; 
+         IF c_nlbs%NOTFOUND
+         THEN
+             NM3MAPCAPTURE_INS_INV.INS_INV(i);
+             nm3load.update_status(pi_batch_no,i.record_no ,'I',Null);
+             IF MOD (l_cnt,NVL(hig.get_sysopt('PCOMMIT'),100)) = 0
+             THEN
+                 COMMIT;
+             END IF;
+         End if; 
+      EXCEPTION
+      WHEN OTHERS THEN
+          Rollback to tmp1; 
+          nm3load.update_status(pi_batch_no,i.record_no ,'E',SUBSTR(SQLERRM,1,4000)); 
+          update_child_records(i.iit_primary_key,pi_batch_no) ;          
+      END  ;
+   END LOOP ;
+   COMMIT;
+   nm3mapcapture_ins_inv.l_mapcap_run := 'N' ;   
+   nm3mapcapture_ins_inv.l_iit_tab.Delete;
+--
+END run_batch ;
 --
 END nm3mapcapture_ins_inv;
 /
