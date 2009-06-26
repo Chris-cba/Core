@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3mapcapture_ins_inv AS
 --</PACKAGE>
 --<GLOBVAR>
   --g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3mapcapture_ins_inv.pkh	1.2 10/23/03"';
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 --
   g_inv                     nm_inv_items_all%ROWTYPE;
@@ -30,6 +30,8 @@ CREATE OR REPLACE PACKAGE nm3mapcapture_ins_inv AS
   TYPE         l_iit_ne_tab_type IS TABLE OF nm_inv_items.iit_ne_id%TYPE INDEX BY BINARY_INTEGER;
   l_iit_ne_tab l_iit_ne_tab_type ;
   l_mapcap_run Varchar2(1) ;   
+  l_batch_no   Number ;
+  l_recod_no   Number := 0 ;
   --
 --</GLOBVAR>
 --
@@ -59,6 +61,13 @@ PROCEDURE ins_inv (p_inv_rec IN nm_ld_mc_all_inv_tmp%ROWTYPE);
    PRAGMA RESTRICT_REFERENCES (get_version, wnds);
    PRAGMA RESTRICT_REFERENCES (get_body_version, wnds);
 --</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="run_batch">
+-- Insert or Update Inventory loaded from MapCapture
+PROCEDURE run_batch(pi_batch_no nm_load_batch_status.nlbs_nlb_batch_no%TYPE);
+--</PROC>
 --
 -----------------------------------------------------------------------------
 --
