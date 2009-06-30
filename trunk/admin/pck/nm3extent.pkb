@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.1   Aug 16 2007 17:17:42   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extent.pkb-arc   2.2   Jun 30 2009 09:21:38   lsorathia  $
 --       Module Name      : $Workfile:   nm3extent.pkb  $
---       Date into SCCS   : $Date:   Aug 16 2007 17:17:42  $
---       Date fetched Out : $Modtime:   Aug 16 2007 16:02:14  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Jun 30 2009 09:21:38  $
+--       Date fetched Out : $Modtime:   Jun 26 2009 17:05:26  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on 
 --
 --
@@ -872,6 +872,9 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
 
      l_parent_units NM_UNITS.un_unit_id%TYPE;
      l_child_units  NM_UNITS.un_unit_id%TYPE;
+  
+     -- LS 
+     l_nm_lref      nm_lref ;
   --
   BEGIN
   --
@@ -954,39 +957,49 @@ CREATE OR REPLACE PACKAGE BODY Nm3extent IS
            IF pi_begin_mp = pi_end_mp
            THEN
              --point on the route
-             Nm3net.get_group_units(pi_ne_id       => pi_route_ne_id
-                                   ,po_group_units => l_parent_units
-                                   ,po_child_units => l_child_units);
+             --Nm3net.get_group_units(pi_ne_id       => pi_route_ne_id
+             --                      ,po_group_units => l_parent_units
+             --                      ,po_child_units => l_child_units);
 
-             Nm3lrs.get_ambiguous_lrefs(p_parent_id    => pi_route_ne_id
-                                       ,p_parent_units => l_parent_units
-                                       ,p_datum_units  => l_child_units
-                                       ,p_offset       => pi_begin_mp
-                                       ,p_lrefs        => l_lref_tab);
+             --Nm3lrs.get_ambiguous_lrefs(p_parent_id    => pi_route_ne_id
+             --                          ,p_parent_units => l_parent_units
+             --                          ,p_datum_units  => l_child_units
+             --                          ,p_offset       => pi_begin_mp
+             --                          ,p_lrefs        => l_lref_tab);
 
-             IF l_lref_tab.COUNT = 1
-             THEN
-               l_pl_arr := Nm3pla.initialise_placement_array(pi_ne_id   => l_lref_tab(1).r_ne_id
-                                                            ,pi_start   => l_lref_tab(1).r_offset
-                                                            ,pi_end     => l_lref_tab(1).r_offset
-                                                            ,pi_measure => 0);
+             --IF l_lref_tab.COUNT = 1
+             --THEN
+             --  l_pl_arr := Nm3pla.initialise_placement_array(pi_ne_id   => l_lref_tab(1).r_ne_id
+             --                                               ,pi_start   => l_lref_tab(1).r_offset
+             --                                               ,pi_end     => l_lref_tab(1).r_offset
+             --                                               ,pi_measure => 0);
 
-               l_insert_using_pl_arr := TRUE;
+             --  l_insert_using_pl_arr := TRUE;
 
-             ELSIF l_lref_tab.COUNT > 1
-             THEN
+             --ELSIF l_lref_tab.COUNT > 1
+             --THEN
                --route reference is ambiguous
-               Hig.raise_ner(pi_appl               => Nm3type.c_net
-                            ,pi_id                 => 312
-                            ,pi_supplementary_info => Nm3net.get_ne_unique(p_ne_id => pi_route_ne_id)
-                                                      || ':' || pi_begin_mp);
-             ELSE
+             --  Hig.raise_ner(pi_appl               => Nm3type.c_net
+             --               ,pi_id                 => 312
+             --               ,pi_supplementary_info => Nm3net.get_ne_unique(p_ne_id => pi_route_ne_id)
+             --                                        || ':' || pi_begin_mp);
+             --ELSE
+               --no datum reference found
+             l_nm_lref := NM3LRS.GET_DISTINCT_OFFSET(nm_lref(pi_route_ne_id, pi_begin_mp)) ;
+             IF l_nm_lref.lr_ne_id IS NULL
+             THEN
                --no datum reference found
                Hig.raise_ner(pi_appl               => Nm3type.c_net
                             ,pi_id                 => 85
                             ,pi_supplementary_info => Nm3net.get_ne_unique(p_ne_id => pi_route_ne_id)
                                                       || ':' || pi_begin_mp);
              END IF;
+             l_pl_arr := Nm3pla.initialise_placement_array(pi_ne_id   => l_nm_lref.lr_ne_id
+                                                          ,pi_start   => l_nm_lref.lr_offset
+                                                          ,pi_end     => l_nm_lref.lr_offset
+                                                          ,pi_measure => 0);
+
+             l_insert_using_pl_arr := TRUE;
            ELSE
              --continuous extent
              l_pl_arr := Nm3pla.get_sub_placement (nm_placement(pi_route_ne_id,pi_begin_mp,pi_end_mp,0));
