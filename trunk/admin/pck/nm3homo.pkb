@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.14   May 26 2009 12:09:22   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.15   Jun 30 2009 10:19:38   lsorathia  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   May 26 2009 12:09:22  $
---       Date fetched Out : $Modtime:   May 26 2009 12:07:32  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Jun 30 2009 10:19:38  $
+--       Date fetched Out : $Modtime:   Jun 30 2009 10:18:12  $
+--       PVCS Version     : $Revision:   2.15  $
 --
 --
 --   Author : Jonathan Mills
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    
    -- Log 713421
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.14  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.15  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -264,6 +264,8 @@ PROCEDURE homo_update_old (p_temp_ne_id_in  IN     NUMBER
    c_nte_id_for_unchanged_locs CONSTANT NM_NW_TEMP_EXTENTS.nte_job_id%TYPE := nm3net.get_next_nte_id;
    c_nte_id                    CONSTANT NM_NW_TEMP_EXTENTS.nte_job_id%TYPE := nm3net.get_next_nte_id;
    l_remnant_job_id                     NM_NW_TEMP_EXTENTS.nte_job_id%TYPE;
+ 
+   l_tolerance_flag            Boolean := FALSE ;
 --
    PROCEDURE reset_for_return IS
    BEGIN
@@ -471,6 +473,49 @@ BEGIN
          END IF;
          RAISE skip_rest_of_val;
       END IF;
+
+      -- LS Added this code to compare the new location in the route unit 
+      -- Due to the unit conversion, the  datum and route will show some difference.
+      DECLARE
+      --
+         Cursor c_get_ori_route
+         IS
+         SELECT  * 
+         FROM    nm_members 
+         WHERE   nm_ne_id_in = l_rec_iit.iit_ne_id
+         AND     nm_obj_type = l_rec_iit.iit_inv_type;
+         l_ori_route_rec c_get_ori_route%ROWTYPE;
+         CURSOR c_get_tmp_ext
+         IS
+         SELECT  * 
+         FROM    NM_NW_TEMP_EXTENTS
+         WHERE   nte_job_id = p_temp_ne_id_in ;
+         l_c_get_tmp_ext c_get_tmp_ext%ROWTYPE; 
+         l_ne_rec nm_elements%ROWTYPe ;
+         l_parent_id nm_elements.ne_id%TYPE;
+      BEGIN
+      --
+         IF l_rec_nit.nit_pnt_or_cont = 'P'
+         THEN
+             OPEN  c_get_tmp_ext;
+             FETCH c_get_tmp_ext INTO l_c_get_tmp_ext;
+             CLOSE c_get_tmp_ext;
+             l_ne_rec := nm3get.get_ne(l_c_get_tmp_ext.nte_route_ne_id);
+             OPEN  c_get_ori_route ;
+             FETCH c_get_ori_route INTO l_ori_route_rec;
+             CLOSE c_get_ori_route;
+             l_parent_id := Nm3net.get_parent_ne_id(l_ori_route_rec.nm_ne_id_of,Nm3net.get_parent_type(Nm3net.Get_Nt_Type(l_ori_route_rec.nm_ne_id_of))) ;
+             IF nm3lrs.get_set_offset(l_c_get_tmp_ext.nte_route_ne_id,l_c_get_tmp_ext.nte_ne_id_of,l_c_get_tmp_ext.nte_begin_mp) = 
+                nm3lrs.get_set_offset(l_parent_id,l_ori_route_rec.nm_ne_id_of,l_ori_route_rec.nm_begin_mp) 
+             THEN  
+                 l_tolerance_flag := TRUE;
+                 RAISE skip_rest_of_val;
+             ELSE
+                 l_tolerance_flag := FALSE;
+             END IF;
+          END IF;
+      END ;
+ 
       nm3extent_o.create_temp_ne_from_pl (l_new_inv_pl_arr, l_remnant_job_id);
 --      nm_debug.debug('Remnant Temp Extent');
 -- nm3extent.debug_temp_extents(l_remnant_job_id);
@@ -911,18 +956,21 @@ BEGIN
 --   End date location of the inventory being placed
 --  #############################################################################
 --
-   xattr_off;
-   UPDATE NM_MEMBERS nm
+IF NOT  l_tolerance_flag
+THEN
+    xattr_off;
+    UPDATE NM_MEMBERS nm
     SET   nm.nm_end_date = p_effective_date
-   WHERE  nm.nm_ne_id_in = p_iit_ne_id
+    WHERE  nm.nm_ne_id_in = p_iit_ne_id
     AND NOT EXISTS (SELECT 1
-                     FROM  NM_NW_TEMP_EXTENTS nte
+                    FROM  NM_NW_TEMP_EXTENTS nte
                     WHERE  nte.nte_job_id   = c_nte_id_for_unchanged_locs
-                     AND   nte.nte_ne_id_of = nm.nm_ne_id_of
-                     AND   nte.nte_begin_mp = nm.nm_begin_mp
-                     AND   nte.nte_end_mp   = nm.nm_end_mp
+                    AND   nte.nte_ne_id_of = nm.nm_ne_id_of
+                    AND   nte.nte_begin_mp = nm.nm_begin_mp
+                    AND   nte.nte_end_mp   = nm.nm_end_mp
                    );
    xattr_on;
+END IF ;
    nm3extent.g_combine_temp_ne_called := FALSE;
 --
 --  #############################################################################
