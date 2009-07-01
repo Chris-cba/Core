@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.15   Jun 30 2009 10:19:38   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.16   Jul 01 2009 15:24:02   lsorathia  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Jun 30 2009 10:19:38  $
---       Date fetched Out : $Modtime:   Jun 30 2009 10:18:12  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Jul 01 2009 15:24:02  $
+--       Date fetched Out : $Modtime:   Jul 01 2009 15:21:40  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 --
 --   Author : Jonathan Mills
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    
    -- Log 713421
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.15  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.16  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -497,6 +497,7 @@ BEGIN
       --
          IF l_rec_nit.nit_pnt_or_cont = 'P'
          THEN
+             l_tolerance_flag := FALSE ;
              OPEN  c_get_tmp_ext;
              FETCH c_get_tmp_ext INTO l_c_get_tmp_ext;
              CLOSE c_get_tmp_ext;
@@ -504,16 +505,20 @@ BEGIN
              OPEN  c_get_ori_route ;
              FETCH c_get_ori_route INTO l_ori_route_rec;
              CLOSE c_get_ori_route;
-             l_parent_id := Nm3net.get_parent_ne_id(l_ori_route_rec.nm_ne_id_of,Nm3net.get_parent_type(Nm3net.Get_Nt_Type(l_ori_route_rec.nm_ne_id_of))) ;
-             IF nm3lrs.get_set_offset(l_c_get_tmp_ext.nte_route_ne_id,l_c_get_tmp_ext.nte_ne_id_of,l_c_get_tmp_ext.nte_begin_mp) = 
-                nm3lrs.get_set_offset(l_parent_id,l_ori_route_rec.nm_ne_id_of,l_ori_route_rec.nm_begin_mp) 
-             THEN  
-                 l_tolerance_flag := TRUE;
-                 RAISE skip_rest_of_val;
-             ELSE
-                 l_tolerance_flag := FALSE;
+             IF  l_ori_route_rec.nm_ne_id_of IS NOT NULL             
+             AND l_c_get_tmp_ext.nte_route_ne_id IS NOT NULL
+             THEN
+                 l_parent_id := Nm3net.get_parent_ne_id(l_ori_route_rec.nm_ne_id_of,Nm3net.get_parent_type(Nm3net.Get_Nt_Type(l_ori_route_rec.nm_ne_id_of))) ;
+                 IF nm3lrs.get_set_offset(l_c_get_tmp_ext.nte_route_ne_id,l_c_get_tmp_ext.nte_ne_id_of,l_c_get_tmp_ext.nte_begin_mp) = 
+                    nm3lrs.get_set_offset(l_parent_id,l_ori_route_rec.nm_ne_id_of,l_ori_route_rec.nm_begin_mp) 
+                 THEN  
+                     l_tolerance_flag := TRUE;
+                     RAISE skip_rest_of_val;
+                 ELSE
+                     l_tolerance_flag := FALSE;
+                 END IF;
              END IF;
-          END IF;
+         END IF;
       END ;
  
       nm3extent_o.create_temp_ne_from_pl (l_new_inv_pl_arr, l_remnant_job_id);
