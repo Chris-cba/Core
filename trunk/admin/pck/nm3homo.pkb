@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.16   Jul 01 2009 15:24:02   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.17   Jul 02 2009 16:14:28   lsorathia  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Jul 01 2009 15:24:02  $
---       Date fetched Out : $Modtime:   Jul 01 2009 15:21:40  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Jul 02 2009 16:14:28  $
+--       Date fetched Out : $Modtime:   Jul 02 2009 15:32:08  $
+--       PVCS Version     : $Revision:   2.17  $
 --
 --
 --   Author : Jonathan Mills
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    
    -- Log 713421
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.16  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.17  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -264,8 +264,7 @@ PROCEDURE homo_update_old (p_temp_ne_id_in  IN     NUMBER
    c_nte_id_for_unchanged_locs CONSTANT NM_NW_TEMP_EXTENTS.nte_job_id%TYPE := nm3net.get_next_nte_id;
    c_nte_id                    CONSTANT NM_NW_TEMP_EXTENTS.nte_job_id%TYPE := nm3net.get_next_nte_id;
    l_remnant_job_id                     NM_NW_TEMP_EXTENTS.nte_job_id%TYPE;
- 
-   l_tolerance_flag            Boolean := FALSE ;
+
 --
    PROCEDURE reset_for_return IS
    BEGIN
@@ -473,53 +472,6 @@ BEGIN
          END IF;
          RAISE skip_rest_of_val;
       END IF;
-
-      -- LS Added this code to compare the new location in the route unit 
-      -- Due to the unit conversion, the  datum and route will show some difference.
-      DECLARE
-      --
-         Cursor c_get_ori_route
-         IS
-         SELECT  * 
-         FROM    nm_members 
-         WHERE   nm_ne_id_in = l_rec_iit.iit_ne_id
-         AND     nm_obj_type = l_rec_iit.iit_inv_type;
-         l_ori_route_rec c_get_ori_route%ROWTYPE;
-         CURSOR c_get_tmp_ext
-         IS
-         SELECT  * 
-         FROM    NM_NW_TEMP_EXTENTS
-         WHERE   nte_job_id = p_temp_ne_id_in ;
-         l_c_get_tmp_ext c_get_tmp_ext%ROWTYPE; 
-         l_ne_rec nm_elements%ROWTYPe ;
-         l_parent_id nm_elements.ne_id%TYPE;
-      BEGIN
-      --
-         IF l_rec_nit.nit_pnt_or_cont = 'P'
-         THEN
-             l_tolerance_flag := FALSE ;
-             OPEN  c_get_tmp_ext;
-             FETCH c_get_tmp_ext INTO l_c_get_tmp_ext;
-             CLOSE c_get_tmp_ext;
-             l_ne_rec := nm3get.get_ne(l_c_get_tmp_ext.nte_route_ne_id);
-             OPEN  c_get_ori_route ;
-             FETCH c_get_ori_route INTO l_ori_route_rec;
-             CLOSE c_get_ori_route;
-             IF  l_ori_route_rec.nm_ne_id_of IS NOT NULL             
-             AND l_c_get_tmp_ext.nte_route_ne_id IS NOT NULL
-             THEN
-                 l_parent_id := Nm3net.get_parent_ne_id(l_ori_route_rec.nm_ne_id_of,Nm3net.get_parent_type(Nm3net.Get_Nt_Type(l_ori_route_rec.nm_ne_id_of))) ;
-                 IF nm3lrs.get_set_offset(l_c_get_tmp_ext.nte_route_ne_id,l_c_get_tmp_ext.nte_ne_id_of,l_c_get_tmp_ext.nte_begin_mp) = 
-                    nm3lrs.get_set_offset(l_parent_id,l_ori_route_rec.nm_ne_id_of,l_ori_route_rec.nm_begin_mp) 
-                 THEN  
-                     l_tolerance_flag := TRUE;
-                     RAISE skip_rest_of_val;
-                 ELSE
-                     l_tolerance_flag := FALSE;
-                 END IF;
-             END IF;
-         END IF;
-      END ;
  
       nm3extent_o.create_temp_ne_from_pl (l_new_inv_pl_arr, l_remnant_job_id);
 --      nm_debug.debug('Remnant Temp Extent');
@@ -635,6 +587,7 @@ BEGIN
              FROM    nm_inv_type_groupings
              WHERE   itg_inv_type = l_iit_rec.iit_inv_type ;
              l_rel_mandatory  c_get_rel_mandatory%ROWTYPE ;
+             l_nit_rec nm_inv_types%ROWTYPE := nm3get.get_nit(l_iit_rec.iit_inv_type) ;
           BEGIN
              l_found_par := False;
              OPEN   c_parent;
@@ -647,15 +600,16 @@ BEGIN
              --
              OPEN   c_get_rel_mandatory;
              FETCH  c_get_rel_mandatory INTO l_rel_mandatory ;
-             CLOSE  c_get_rel_mandatory;
+             CLOSE  c_get_rel_mandatory;              
              --
              FOR i in (SELECT distinct nm_ne_id_in
                        FROM   nm_members
                              ,nm_inv_items
                        WHERE  nm_obj_type = l_parent_rec.iit_inv_type
                        AND    nm_ne_id_in = iit_ne_id
-                       AND    (nm_ne_id_of,Nvl(iit_x_sect,'-')) IN (SELECT x.pl_ne_id,Nvl(l_iit_rec.iit_x_sect,'-')
-                                                                    FROM   table(l_new_inv_pl_arr.npa_placement_array) x)
+                       AND Decode(l_nit_rec.NIT_X_SECT_ALLOW_FLAG,'Y',Nvl(iit_x_sect,'-'),'-') = Decode(l_nit_rec.NIT_X_SECT_ALLOW_FLAG,'Y',Nvl(l_iit_rec.iit_x_sect,'-'),'-')
+                       AND    nm_ne_id_of IN (SELECT x.pl_ne_id
+                                              FROM   table(l_new_inv_pl_arr.npa_placement_array) x)
                  )
              LOOP
                  DECLARE
@@ -961,8 +915,6 @@ BEGIN
 --   End date location of the inventory being placed
 --  #############################################################################
 --
-IF NOT  l_tolerance_flag
-THEN
     xattr_off;
     UPDATE NM_MEMBERS nm
     SET   nm.nm_end_date = p_effective_date
@@ -975,7 +927,7 @@ THEN
                     AND   nte.nte_end_mp   = nm.nm_end_mp
                    );
    xattr_on;
-END IF ;
+
    nm3extent.g_combine_temp_ne_called := FALSE;
 --
 --  #############################################################################
@@ -1413,6 +1365,7 @@ END IF ;
        l_child_ne_rec := l_child_ne_tab(j) ;
        DECLARE
           l_found_par Boolean ;
+          l_nit_rec nm_inv_types%ROWTYPE := nm3get.get_nit(l_child_ne_rec.child_obj_type ) ;
        BEGIN
          l_found_par := False;
          FOR i in (SELECT Distinct nm_ne_id_in 
@@ -1420,7 +1373,7 @@ END IF ;
                          ,nm_inv_items 
                    WHERE  nm_obj_type = l_child_ne_rec.parent_obj_type 
                    AND    nm_ne_id_in = iit_ne_id
-                   AND    (nm_ne_id_of,Nvl(iit_x_sect,'-')) IN (SELECT nm_ne_id_of,Nvl(iit_x_sect,'-') 
+                   AND    (nm_ne_id_of,Decode(l_nit_rec.NIT_X_SECT_ALLOW_FLAG,'Y',Nvl(iit_x_sect,'-'),'-')) IN (SELECT nm_ne_id_of,Decode(l_nit_rec.NIT_X_SECT_ALLOW_FLAG,'Y',Nvl(iit_x_sect,'-'),'-') 
                                                                 FROM   nm_members 
                                                                       ,nm_inv_items    
                                                                 WHERE  nm_obj_type = l_child_ne_rec.child_obj_type  
@@ -4400,12 +4353,14 @@ PROCEDURE deal_with_hierarchical (p_ne_id          NUMBER
 --
    l_tab_rowid nm3type.tab_rowid;
    l_rec nm_inv_items%ROWTYPE; -- Log 713421
+   l_nit_rec nm_inv_types%ROWTYPE ;
 --
 BEGIN
 --
    nm_debug.proc_start(g_package_name,'deal_with_hierarchical');
 --
    l_rec := nm3get.get_iit(p_ne_id);                 -- Log 713421
+   l_nit_rec := nm3get.get_nit(l_rec.iit_inv_type) ;
    l_par_iit_tab(l_par_iit_tab.count+1) := l_rec ;   -- Log 713421
    IF has_children (p_ne_id)
     THEN
@@ -4452,6 +4407,7 @@ BEGIN
             END IF;
             -- LOG 713421
             IF  cs_rec.itg_relation IN ( nm3invval.c_in_relation,nm3invval.c_derived_relation)
+            AND l_nit_rec.nit_pnt_or_cont = 'C'
             THEN
                 DECLARE
                 --
