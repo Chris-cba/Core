@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lrs AS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3lrs.pkb	1.45 09/25/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lrs';
@@ -460,8 +460,8 @@ CURSOR c1 (c_parent_units number
           ,c_offset       number
           ,c_ne_id        number
           ,c_use_db       varchar2) IS
-  SELECT nm_ne_id_of, nm_cardinality, ne_no_start, ne_no_end,nm_slk,
-         --nm3unit.convert_unit(c_parent_units, nm3net.get_nt_units( nm3net.get_nt_type( ne_id )), nm_slk), 
+  SELECT nm_ne_id_of, nm_cardinality, ne_no_start, ne_no_end,
+         nm3unit.convert_unit(c_parent_units, nm3net.get_nt_units( nm3net.get_nt_type( ne_id )), nm_slk), 
          ne_length,
 		 nm_begin_mp, NVL(nm_end_mp, ne_length), ne_type
   FROM nm_members, nm_elements
@@ -564,14 +564,12 @@ BEGIN
 
   IF l1_cardinal = 1 THEN
 
-    --l_offset := nm3unit.convert_unit( l_parent_units, l_child_units, p_parent_lr.lr_offset) - l1_slk + l1_begin_mp;
-    l_offset := nm3unit.convert_unit( l_parent_units, l_child_units, (p_parent_lr.lr_offset-l1_slk)) -  l1_begin_mp;
+    l_offset := nm3unit.convert_unit( l_parent_units, l_child_units, p_parent_lr.lr_offset) - l1_slk + l1_begin_mp;    
     --dbms_output.put_line( 'offset = '||TO_CHAR( l_offset ));
     retval := nm_lref( l1_ne_id, l_offset );
 
   ELSE
-    --l_offset := l1_slk - nm3unit.convert_unit( l_parent_units, l_child_units, p_parent_lr.lr_offset ) + l1_end_mp;
-    l_offset := nm3unit.convert_unit( l_parent_units, l_child_units, (l1_slk -p_parent_lr.lr_offset) ) + l1_end_mp ;
+    l_offset := l1_slk - nm3unit.convert_unit( l_parent_units, l_child_units, p_parent_lr.lr_offset ) + l1_end_mp;
     retval := nm_lref( l1_ne_id, l_offset);
   END IF;
 
