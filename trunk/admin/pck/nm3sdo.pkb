@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.23   Jun 11 2009 11:43:02   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.24   Jul 02 2009 16:48:38   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jun 11 2009 11:43:02  $
---       Date fetched Out : $Modtime:   Jun 11 2009 11:38:22  $
---       PVCS Version     : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   Jul 02 2009 16:48:38  $
+--       Date fetched Out : $Modtime:   Jul 02 2009 16:47:40  $
+--       PVCS Version     : $Revision:   2.24  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.23  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.24  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -1918,7 +1918,7 @@ END ;
 ---------------------------------------------------------------------------------------------------------------------
 --
 
-procedure redefine_geom_segment1( p_geom in out nocopy mdsys.sdo_geometry, p_diminfo mdsys.sdo_dim_array, 
+procedure redefine_geom_segment1( p_geom in out nocopy mdsys.sdo_geometry, p_diminfo mdsys.sdo_dim_array,
                                                   p_start in number, p_end in number, dummy in integer ) is
 
 l_dp         integer;
@@ -1928,23 +1928,33 @@ l_old_start  number := sdo_lrs.GEOM_SEGMENT_START_MEASURE( p_geom);
 l_new_length number := p_end - p_start;
 l_old_length number := l_old_end - l_old_start;
 
+
+divide_by_zero exception;
+pragma exception_init( divide_by_zero, -1476);
+
+
+
 begin
 
   if p_diminfo.last < 3 then
     raise_application_error( -20001, 'Invalid dimension for handling measures');
   end if;
-  
+
   l_dp := greatest(Nm3unit.get_rounding( p_diminfo(3).sdo_tolerance ) -1, 0);
-  
 
   for i in 1..p_geom.sdo_ordinates.last loop
     if mod(i, 3) = 0 then
-      p_geom.sdo_ordinates(i) := p_start + round( ( (p_geom.sdo_ordinates(i) - l_old_start)/l_old_length ), l_dp) * l_new_length;
+      begin
+        p_geom.sdo_ordinates(i) := p_start +  round( ( (p_geom.sdo_ordinates(i) - l_old_start)* l_new_length/l_old_length ), l_dp);
+      exception
+        when divide_by_zero then
+        null;  -- leave the ordinate the same
+      end;
     end if;
   end loop;
-  
-end; 
-                      
+
+end;
+
 --
 ---------------------------------------------------------------------------------------------------------------------
 --
@@ -2088,7 +2098,7 @@ BEGIN
                              '  from nm_elements a, nm_members '||
                              '  where nm_ne_id_in = :c_ne_id '||
                              '  and   nm_ne_id_of = a.ne_id '||
-                             '  order by nm_seq_no ';
+                             '  order by nm_seq_no, nm_slk  ';
 
     OPEN geocur FOR cur_string USING p_ne_id;
 
@@ -2103,7 +2113,7 @@ BEGIN
 
      j := p_nt.get_idx_from_value( l_nt_type(i) );
 
-     nm_debug.debug( 'Ptr = '||to_char( j ));
+--     nm_debug.debug( 'Ptr = '||to_char( j ));
 
       l_th_id := p_th.pa(j).ptr_value;
 
@@ -2196,7 +2206,7 @@ BEGIN
 
 --          there was a break in the route previously - make mp
 
-            nm_debug.debug('First after a db - use MP');
+--          nm_debug.debug('First after a db - use MP');
 --          retval := add_segments( retval, l_geom );
             add_segments_m( retval, l_geom_tab(i), p_diminfo, FALSE );
 
@@ -2206,7 +2216,7 @@ BEGIN
 
           ELSE
 
-            nm_debug.debug('Test connect');
+--          nm_debug.debug('Test connect');
 
             IF sdo_lrs.connected_geom_segments( retval, p_diminfo, l_geom_tab(i), p_diminfo ) = 'TRUE' THEN
 
@@ -3159,8 +3169,8 @@ BEGIN
       begin
         nm3user.set_effective_date( nvl(l_date_saved, trunc(sysdate)) );
 
-        nm_debug.debug('Loop it = '||get_routes%rowcount||' retrieve shape, date is '||to_char(nm3user.get_effective_date));
-        
+--      nm_debug.debug('Loop it = '||get_routes%rowcount||' retrieve shape, date is '||to_char(nm3user.get_effective_date));
+
         l_geom  :=    get_route_shape( p_ne_id   => irec.ne_id, -- l_ga.nga(i).ng_ne_id,
                                        p_nt      => l_nt,
                                        p_th      => l_th,
@@ -5794,7 +5804,7 @@ BEGIN
 
      l_type := MOD( MOD(l_type, 1000),100);
 
--- AE 21-APR-2009 
+-- AE 21-APR-2009
 -- Dont return MULTI% for multipart shapes so that Mapviewer can apply the styles
 -- properly. TFL use multipart shapes for polygons and mapviewer doesnt style them
 
@@ -5814,7 +5824,7 @@ BEGIN
 --     ELSIF l_type = 7 THEN
 --       RETURN 'MULTIPOLYGON';
 
--- AE 21-APR-2009 
+-- AE 21-APR-2009
 -- Changes complete.
 
      ELSE
@@ -8715,10 +8725,10 @@ BEGIN
 END;
 
 
-
 --
 ----------------------------------------------------------------------------
 --
+
 
 FUNCTION get_objects_in_buffer( p_nth_id         IN NUMBER,
                                 p_geometry       IN mdsys.sdo_geometry,
@@ -8979,6 +8989,7 @@ BEGIN
   RETURN retval;
 
 END get_objects_in_buffer;
+
 
 --
 ----------------------------------------------------------------------------
