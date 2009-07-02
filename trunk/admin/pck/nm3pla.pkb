@@ -16,7 +16,8 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 --   Copyright (c) exor corporation ltd, 2000
 -------------------------------------------------------------------------------------------
 -- Global variables - tree definitions etc.
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb	1.61 11/29/06"';
+   --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb	1.61 11/29/06"';
+   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2(30) := 'nm3pla';
@@ -3462,7 +3463,8 @@ BEGIN
           THEN
             IF    l_pl.pl_start  = l_pl.pl_end
              AND  pi_pl.pl_start = pi_pl.pl_end
-             AND  l_pl.pl_start  = l_pl.pl_start
+             --AND  l_pl.pl_start  = l_pl.pl_start
+             AND  l_pl.pl_start  = pi_pl.pl_start
              THEN
                -- If this is a point and the one in the array is a point then remove it
                NULL;
