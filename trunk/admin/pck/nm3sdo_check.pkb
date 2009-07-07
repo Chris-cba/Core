@@ -4,16 +4,16 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.7   Apr 23 2009 12:06:56   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.8   Jul 07 2009 09:53:02   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_check.pkb  $
---       Date into PVCS   : $Date:   Apr 23 2009 12:06:56  $
---       Date fetched Out : $Modtime:   Jul 17 2008 15:29:20  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Jul 07 2009 09:53:02  $
+--       Date fetched Out : $Modtime:   Jul 07 2009 09:52:08  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --------------------------------------------------------------------------------
 --
   g_package_name          CONSTANT varchar2(30)    := 'nm3sdo_check';
-  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.7  $"';
+  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.8  $"';
   lf                      CONSTANT VARCHAR2(30)    := chr(10);
   g_write_to_file                  BOOLEAN         := FALSE;
   l_results                        nm3type.tab_varchar32767;
@@ -1276,18 +1276,25 @@ AS
           IF l_curr_value IS NOT NULL
           THEN
           --
-          -- Get the current table MAX value of OBJECTID
-            EXECUTE IMMEDIATE 'SELECT MAX(objectid) FROM '||i.nth_feature_table
-               INTO l_table_value;
-          --
-          -- Compare and raise
-            IF l_table_value > l_curr_value
-            THEN
-              b_found := TRUE;
-              put ( '    FAIL : Theme '||i.nth_theme_name||' ['||i.nth_feature_table||'] - '
+            BEGIN
+            -- Get the current table MAX value of OBJECTID
+              EXECUTE IMMEDIATE 'SELECT MAX(objectid) FROM '||i.nth_feature_table INTO l_table_value;
+            --
+            -- Compare and raise
+              IF l_table_value > l_curr_value
+              THEN
+                b_found := TRUE;
+                put ( '    FAIL : Theme '||i.nth_theme_name||' ['||i.nth_feature_table||'] - '
+                                         ||i.nth_sequence_name||' ['||l_curr_value||
+                                        '] is less than the max OBJECTID - ['||l_table_value||']');
+              END IF;
+            --
+            EXCEPTION
+              WHEN OTHERS THEN
+                put ( '    FAIL : Theme '||i.nth_theme_name||' ['||i.nth_feature_table||'] - '
                                        ||i.nth_sequence_name||' ['||l_curr_value||
-                                      '] is less than the max OBJECTID - ['||l_table_value||']');
-            END IF;
+                                      ' FAILED '||SQLERRM||']');
+            END;
           --
           END IF;
         EXCEPTION
