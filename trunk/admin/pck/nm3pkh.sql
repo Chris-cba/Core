@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.10   Dec 01 2008 17:58:34   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.11   Jul 10 2009 11:05:14   aedwards  $
 --       Module Name      : $Workfile:   nm3pkh.sql  $
---       Date into PVCS   : $Date:   Dec 01 2008 17:58:34  $
---       Date fetched Out : $Modtime:   Dec 01 2008 17:57:46  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jul 10 2009 11:05:14  $
+--       Date fetched Out : $Modtime:   Jul 10 2009 11:04:54  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --
 --   Author : Graeme Johnson
@@ -2196,7 +2196,28 @@ start '&run_file'
 --
 ----------------------------------------------------------------------------------------- 
 --
-
+SET TERM ON 
+PROMPT nm3data.pkh
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3data.pkh' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm3jobs.pkh
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3jobs.pkh' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
 --
 -- New PACKAGE HEADERS above here
 --
