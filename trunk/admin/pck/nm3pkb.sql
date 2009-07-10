@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.11   Dec 01 2008 17:58:34   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.12   Jul 10 2009 11:04:20   aedwards  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   Dec 01 2008 17:58:34  $
---       Date fetched Out : $Modtime:   Dec 01 2008 17:58:10  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Jul 10 2009 11:04:20  $
+--       Date fetched Out : $Modtime:   Jul 10 2009 11:04:02  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --
 --   Author : Graeme Johnson
@@ -1997,6 +1997,28 @@ PROMPT nm3sdo_geom.pkw
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3sdo_geom.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm3data.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3data.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT nm3jobs.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3jobs.pkw' run_file
 FROM dual 
 / 
 start '&run_file'
