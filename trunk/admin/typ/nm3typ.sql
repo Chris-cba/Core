@@ -630,7 +630,21 @@ WHEN others THEN
 END;
 /
 
+BEGIN
+ execute immediate ('DROP TYPE nm_ne_id_array');
+EXCEPTION
+WHEN others THEN
+  Null;
+END;
+/
 
+BEGIN
+ execute immediate ('DROP TYPE nm_ne_id_type');
+EXCEPTION
+WHEN others THEN
+  Null;
+END;
+/
 
 --
 --------------------------------------------------------------------------------------------
@@ -1876,7 +1890,32 @@ start '&&run_file'
 --
 --------------------------------------------------------------------------------------------
 --
-
+set term on
+prompt nm_ne_id_type header
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'nm_ne_id_type.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt nm_ne_id_array header
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'nm_ne_id_array.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
 
 -- *************************************************************************************************************
 -- * new types above here                                                                                      *
