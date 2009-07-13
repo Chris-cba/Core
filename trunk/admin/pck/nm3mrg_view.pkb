@@ -1,11 +1,11 @@
 create or replace package body nm3mrg_view as
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkb-arc   2.2   Jun 04 2009 09:25:56   ptanava  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkb-arc   2.3   Jul 13 2009 16:17:26   ptanava  $
 --       Module Name      : $Workfile:   nm3mrg_view.pkb  $
---       Date into PVCS   : $Date:   Jun 04 2009 09:25:56  $
---       Date fetched Out : $Modtime:   Jun 04 2009 09:23:52  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 13 2009 16:17:26  $
+--       Date fetched Out : $Modtime:   Jul 13 2009 16:13:32  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on SCCS version     : 1.38
 --
 --
@@ -22,10 +22,11 @@ create or replace package body nm3mrg_view as
   02.03.09  PT change in build_view() rewrote the logic for _SVL
                 now uses a dedicated sql instead of joining the _sec and _val
   04.06.09  PT in V_MRG_xxxxxx removed RULE hint and optimized unit conversion
+  13.07.09  PT fixed missing xsp columns in _SVL by fixing t_val loading at the start of _SEC - not all xsp's per type were loaded
 */
 
 
-   g_body_sccsid      CONSTANT  VARCHAR2(200) := '"$Revision:   2.2  $"';
+   g_body_sccsid      CONSTANT  VARCHAR2(200) := '"$Revision:   2.3  $"';
    g_package_name     CONSTANT  VARCHAR2(30)  := 'nm3mrg_view';
    
    cr constant varchar2(1) := chr(10);
@@ -183,6 +184,9 @@ PROCEDURE build_view (p_mrg_query_id IN     NUMBER
   l_rec_nita      nm_inv_type_attribs%rowtype;
   l_rec_attrib    nm_mrg_query_attribs%rowtype;
   l_col_sql       varchar2(1000);
+  
+  j               pls_integer := 0;
+  l_unique_cols   varchar2(4000);
    
    
    function get_nm3mrg_inv_type(
@@ -247,11 +251,11 @@ BEGIN
       
       -- this loops through all attributes picking out the ones 
       --  belonging to the outer inv_type_xsp
-      --  j becomes the attribute number
-      for j in 1 .. nm3mrg.g_tab_rec_query_attribs.count loop
-        l_rec_attrib        := nm3mrg.g_tab_rec_query_attribs(j);
+      for k in 1 .. nm3mrg.g_tab_rec_query_attribs.count loop
+        l_rec_attrib        := nm3mrg.g_tab_rec_query_attribs(k);
       
         if l_rec_attrib.nqa_nqt_seq_no = nm3mrg.g_tab_rec_query_types(l_rec_xsp.query_type_id).nqt_seq_no then
+          j := j + 1;
           t_val(j).inv_type := l_rec_xsp.inv_type;
           t_val(j).xsp := l_rec_xsp.x_sect;
           l_rec_nita := nm3mrg.get_ita_for_mrg (
@@ -264,8 +268,8 @@ BEGIN
                                  ,p_view_attri => l_rec_nita.ita_view_attri
                                );
                                
-          t_val(j).nsv_name       := 'nsv_attrib'||j;
-          t_val(j).nsv_formatted  := '<a>.nsv_attrib'||j;
+          t_val(j).nsv_name       := 'nsv_attrib'||k;
+          t_val(j).nsv_formatted  := '<a>.nsv_attrib'||k;
           
           
           if l_rec_attrib.nqa_itb_banding_id is null then
@@ -791,8 +795,12 @@ BEGIN
 
     -- val nsv columns
     for i in 1 .. t_val.count loop
-      append('      ,v.'||t_val(i).nsv_name);
-
+      -- PT 13.07.09: each value only once here
+      if nvl(instr(l_unique_cols, ','||t_val(i).nsv_name||','), 0) = 0 then
+        l_unique_cols := l_unique_cols||','||t_val(i).nsv_name||',';
+        append('      ,v.'||t_val(i).nsv_name);
+      end if;
+      
     end loop;
     
     
