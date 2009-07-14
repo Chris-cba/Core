@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.0   Jul 14 2009 10:27:18   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.1   Jul 14 2009 10:29:10   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 14 2009 10:27:18  $
---       Date fetched Out : $Modtime:   Jul 14 2009 09:32:42  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 14 2009 10:29:10  $
+--       Date fetched Out : $Modtime:   Jul 14 2009 10:28:40  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -204,11 +204,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.0   Jul 14 2009 10:27:18   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.1   Jul 14 2009 10:29:10   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 14 2009 10:27:18  $
---       Date fetched Out : $Modtime:   Jul 14 2009 09:32:42  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 14 2009 10:29:10  $
+--       Date fetched Out : $Modtime:   Jul 14 2009 10:28:40  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -253,11 +253,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.0   Jul 14 2009 10:27:18   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.1   Jul 14 2009 10:29:10   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 14 2009 10:27:18  $
---       Date fetched Out : $Modtime:   Jul 14 2009 09:32:42  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 14 2009 10:29:10  $
+--       Date fetched Out : $Modtime:   Jul 14 2009 10:28:40  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 -- 
@@ -552,11 +552,11 @@ BEGIN
    l_tab_comments(1)  := '--';
    l_tab_comments(2)  := '--   SCCS Identifiers :-';
    l_tab_comments(3)  := '--';
-   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.0   Jul 14 2009 10:27:18   aedwards  $';
+   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.1   Jul 14 2009 10:29:10   aedwards  $';
    l_tab_comments(5)  := '--       Module Name                : $Workfile:   nm4054_nm4100_ddl_upg.sql  $';
-   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jul 14 2009 10:27:18  $';
-   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jul 14 2009 09:32:42  $';
-   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   3.0  $';
+   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jul 14 2009 10:29:10  $';
+   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jul 14 2009 10:28:40  $';
+   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   3.1  $';
    l_tab_comments(9)  := '--';
    l_tab_comments(10) := '--   table_name_WHO trigger';
    l_tab_comments(11) := '--';
@@ -580,7 +580,7 @@ BEGIN
                          or utc.column_name like '%DATE_MODIFIED'
                         )
                     AND ut.object_name not like 'BIN%'        --sscanlon fix 11JAN2008, fix for 10g installs
-                    AND ut.object_name like 'NM_GAZ_QUERY_%_SAVED'
+                    AND ut.object_name like 'NM_GAZ_QUERY%SAVED'
                   GROUP BY utc.TABLE_NAME
                   HAVING COUNT(*) = 4
                  )
@@ -678,11 +678,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.0   Jul 14 2009 10:27:18   aedwards  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.1   Jul 14 2009 10:29:10   aedwards  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Jul 14 2009 10:27:18  $
-    --       Date fetched Out : $Modtime:   Jul 14 2009 09:32:42  $
-    --       Version          : $Revision:   3.0  $
+    --       Date into PVCS   : $Date:   Jul 14 2009 10:29:10  $
+    --       Date fetched Out : $Modtime:   Jul 14 2009 10:28:40  $
+    --       Version          : $Revision:   3.1  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
              ngqs_ngq_id,
@@ -732,11 +732,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.0   Jul 14 2009 10:27:18   aedwards  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.1   Jul 14 2009 10:29:10   aedwards  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Jul 14 2009 10:27:18  $
-    --       Date fetched Out : $Modtime:   Jul 14 2009 09:32:42  $
-    --       Version          : $Revision:   3.0  $
+    --       Date into PVCS   : $Date:   Jul 14 2009 10:29:10  $
+    --       Date fetched Out : $Modtime:   Jul 14 2009 10:28:40  $
+    --       Version          : $Revision:   3.1  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
           * 
@@ -760,11 +760,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.0   Jul 14 2009 10:27:18   aedwards  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.1   Jul 14 2009 10:29:10   aedwards  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Jul 14 2009 10:27:18  $
-    --       Date fetched Out : $Modtime:   Jul 14 2009 09:32:42  $
-    --       Version          : $Revision:   3.0  $
+    --       Date into PVCS   : $Date:   Jul 14 2009 10:29:10  $
+    --       Date fetched Out : $Modtime:   Jul 14 2009 10:28:40  $
+    --       Version          : $Revision:   3.1  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
              ngqas_ngq_id       vngqas_ngqa_ngq_id,
