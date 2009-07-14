@@ -9,11 +9,11 @@ SET serveroutput ON
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/exor_core_user_creation.sql-arc   3.1   Jul 14 2009 11:10:08   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/exor_core_user_creation.sql-arc   3.2   Jul 14 2009 12:03:54   lsorathia  $
 --       Module Name      : $Workfile:   exor_core_user_creation.sql  $
---       Date into PVCS   : $Date:   Jul 14 2009 11:10:08  $
---       Date fetched Out : $Modtime:   Jul 14 2009 11:08:32  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 14 2009 12:03:54  $
+--       Date fetched Out : $Modtime:   Jul 14 2009 12:00:50  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 1.1
 --       This scripts creates new user EXOR_CORE 
 -------------------------------------------------------------------------
@@ -47,3 +47,9 @@ EXCEPTION
        Null; 
 END ;
 /
+
+SET verify On;
+SET feedback On
+
+
+
