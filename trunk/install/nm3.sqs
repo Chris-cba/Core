@@ -1,13 +1,16 @@
--- PVCS Identifiers :-
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
--- sccsid                : $Header:   //vm_latest/archives/nm3/install/nm3.sqs-arc   2.4   Dec 21 2007 15:33:10   Chris Parkinson  $
--- Module Name           : $Workfile:   nm3.sqs  $
--- Date into PVCS        : $Date:   Dec 21 2007 15:33:10  $
--- Date fetched Out      : $Modtime:   Dec 21 2007 15:29:44  $
--- PVCS Version          : $Revision:   2.4  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.sqs-arc   2.5   Jul 14 2009 15:24:52   rcoupe  $
+--       Module Name      : $Workfile:   nm3.sqs  $
+--       Date into PVCS   : $Date:   Jul 14 2009 15:24:52  $
+--       Date fetched Out : $Modtime:   Jul 14 2009 15:24:32  $
+--       PVCS Version     : $Revision:   2.5  $
 --
--- Generated for Oracle 9i on Fri Dec 21  14:34:40 2007 by Server Generator 9.0.2.94.12
- 
+--------------------------------------------------------------------------------
+--
+-- Generated for Oracle 10g on Tue Jul 14  14:54:42 2009 by Server Generator 10.1.2.9.28
+
 PROMPT Creating Sequence 'BATCH_ID_SEQ'
 CREATE SEQUENCE BATCH_ID_SEQ
  NOMAXVALUE
@@ -177,6 +180,16 @@ CREATE SEQUENCE HDFK_ID_SEQ
 
 PROMPT Creating Sequence 'HDT_ID_SEQ'
 CREATE SEQUENCE HDT_ID_SEQ
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'HIG_HUS_ID_SEQ'
+CREATE SEQUENCE HIG_HUS_ID_SEQ
+ INCREMENT BY 1
+ START WITH 1
  NOMAXVALUE
  NOMINVALUE
  NOCYCLE
