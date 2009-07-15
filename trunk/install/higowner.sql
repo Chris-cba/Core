@@ -1,5 +1,5 @@
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.6      $"';
+define sccsid = '"$Revision::   2.7      $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
@@ -694,7 +694,7 @@ DECLARE
 
 -- AE Create new indexes for 41
 --    
-     EXECUTE IMMEDIATE 'CREATE UNIQUE INDEX NAG_SINGLE_PARENT_IDX ON NM_ADMIN_GROUPS'
+     EXECUTE IMMEDIATE 'CREATE UNIQUE INDEX '||p_user||'.NAG_SINGLE_PARENT_IDX ON '||p_user||'.NM_ADMIN_GROUPS'
                      ||' (TO_CHAR(NAG_CHILD_ADMIN_UNIT)||''|''||CASE NAG_DIRECT_LINK WHEN ''N'' THEN CASE NAG_CHILD_ADMIN_UNIT '
                      ||' WHEN NAG_PARENT_ADMIN_UNIT THEN NULL ELSE TO_CHAR(NAG_PARENT_ADMIN_UNIT) END  WHEN ''Y'' THEN TO_CHAR(NAG_CHILD_ADMIN_UNIT) END)';
 --
