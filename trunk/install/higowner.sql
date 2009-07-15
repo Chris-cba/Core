@@ -1,5 +1,5 @@
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.5      $"';
+define sccsid = '"$Revision::   2.6      $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
@@ -691,6 +691,12 @@ DECLARE
 -- one is not required for HAG_FK1_HAU because NAG_PARENT_ADMIN_UNIT is indexed already as the leading column in HAG_PK primary key
 --
      EXECUTE IMMEDIATE 'CREATE INDEX '||p_user||'.HAG_FK2_HAU_IND ON '||p_user||'.NM_ADMIN_GROUPS(NAG_CHILD_ADMIN_UNIT)';
+
+-- AE Create new indexes for 41
+--    
+     EXECUTE IMMEDIATE 'CREATE UNIQUE INDEX NAG_SINGLE_PARENT_IDX ON NM_ADMIN_GROUPS'
+                     ||' (TO_CHAR(NAG_CHILD_ADMIN_UNIT)||''|''||CASE NAG_DIRECT_LINK WHEN ''N'' THEN CASE NAG_CHILD_ADMIN_UNIT '
+                     ||' WHEN NAG_PARENT_ADMIN_UNIT THEN NULL ELSE TO_CHAR(NAG_PARENT_ADMIN_UNIT) END  WHEN ''Y'' THEN TO_CHAR(NAG_CHILD_ADMIN_UNIT) END)';
 --
    END create_tables;
 --
