@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.9   Jul 14 2009 15:23:14   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.10   Jul 15 2009 14:49:40   rcoupe  $
 --       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   Jul 14 2009 15:23:14  $
---       Date fetched Out : $Modtime:   Jul 14 2009 15:22:48  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Jul 15 2009 14:49:40  $
+--       Date fetched Out : $Modtime:   Jul 15 2009 14:49:26  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Tue Jul 14  14:54:42 2009 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Wed Jul 15  14:41:12 2009 by Server Generator 10.1.2.9.28
 
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
@@ -1310,6 +1310,11 @@ CREATE INDEX NXV_NXIC_FK_IND ON NM_X_VAL_CONDITIONS
 PROMPT Creating Index 'NXV_NXR_FK_IND'
 CREATE INDEX NXV_NXR_FK_IND ON NM_X_VAL_CONDITIONS
  (NXV_RULE_ID)
+/
+
+PROMPT Creating Index 'RPA_PK_IDX'
+CREATE INDEX RPA_PK_IDX ON REPORT_PARAMS
+ (REP_SESSIONID)
 /
 
 
