@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.3   Jun 19 2008 15:25:48   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.4   Jul 15 2009 10:03:12   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Jun 19 2008 15:25:48  $
---       Date fetched Out : $Modtime:   Jun 19 2008 15:22:34  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Jul 15 2009 10:03:12  $
+--       Date fetched Out : $Modtime:   Jul 14 2009 14:21:10  $
+--       SCCS Version     : $Revision:   2.4  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.3  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.4  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_lock';
 --
 -----------------------------------------------------------------------------
@@ -675,6 +675,17 @@ BEGIN
               USING pi_pk, nvl(pi_start_dt,nm3user.get_effective_date), pi_shape;
             --
             ELSE
+              nm_debug.debug_on;
+              FOR i IN (
+                  SELECT id,
+                         x ,
+                         y 
+                    FROM table (sdo_util.getvertices (pi_shape)))
+              LOOP
+                nm_debug.debug('sdoedit X = '||i.x );
+                nm_debug.debug('sdoedit Y = '||i.y );
+              END LOOP;
+            --
               EXECUTE IMMEDIATE lstr
               USING pi_pk, pi_shape;
             END IF;

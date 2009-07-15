@@ -5,11 +5,11 @@ AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkh-arc   2.3   Jun 19 2008 15:25:00   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkh-arc   2.4   Jul 15 2009 10:03:12   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkh  $
---       Date into SCCS   : $Date:   Jun 19 2008 15:25:00  $
---       Date fetched Out : $Modtime:   Jun 19 2008 15:23:06  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Jul 15 2009 10:03:12  $
+--       Date fetched Out : $Modtime:   Jul 14 2009 14:21:08  $
+--       SCCS Version     : $Revision:   2.4  $
 --
 --  Author :  R Coupe
 --            A Edwards
@@ -22,7 +22,7 @@ AS
 --
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.3  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.4  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 -----------------------------------------------------------------------------
@@ -173,7 +173,7 @@ PROCEDURE add_shape
          ( pi_nth_id IN NUMBER
          , pi_pk     IN NUMBER
          , pi_fk     IN NUMBER
-         , pi_shape  IN mdsys.sdo_geometry 
+         , pi_shape  IN mdsys.sdo_geometry
          , pi_start_dt IN DATE DEFAULT NULL);
 --
 -----------------------------------------------------------------------------

@@ -1,22 +1,71 @@
-create or replace package nm3sdo_geom as
+CREATE OR REPLACE PACKAGE nm3sdo_geom 
+AS
+--
+--------------------------------------------------------------------------------
+--
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkh-arc   1.1   Dec 01 2008 17:52:56   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkh-arc   1.2   Jul 15 2009 10:03:12   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_geom.pkh  $
---       Date into PVCS   : $Date:   Dec 01 2008 17:52:56  $
---       Date fetched Out : $Modtime:   Dec 01 2008 17:52:40  $
---       PVCS Version     : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jul 15 2009 10:03:12  $
+--       Date fetched Out : $Modtime:   Jul 14 2009 14:21:20  $
+--       PVCS Version     : $Revision:   1.2  $
 --       Based on
-
-g_sccsid constant varchar2(30) :='"$Revision:   1.1  $"';
-g_srid      number;
-g_tolerance number := nm3sdo.GET_TOL_FROM_UNIT_MASK(1);
-function get_version return varchar2;
-function get_body_version return varchar2;
-function get_feature_type ( p_geom in mdsys.sdo_geometry ) return number;
-function get_area( p_geom in mdsys.sdo_geometry, p_tolerance in number default g_tolerance, p_unit in nm_units.un_unit_id%type default 1 ) return number;
-function get_length ( p_geom in mdsys.sdo_geometry, p_tolerance in number default g_tolerance, p_unit in nm_units.un_unit_id%type default 1 ) return number;
-function get_geom_from_gdo( p_gdo_session_id in number, p_gtype in number ) return mdsys.sdo_geometry;
-function get_geom_from_gdo( p_gdo_session_id in number, p_feature_type in varchar2 ) return mdsys.sdo_geometry;
-end;
+--
+--------------------------------------------------------------------------------
+--
+  g_sccsid    CONSTANT VARCHAR2(30) :='"$Revision:   1.2  $"';
+  g_srid               NUMBER;
+  g_tolerance          NUMBER := nm3sdo.get_tol_from_unit_mask(1);
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_version 
+    RETURN VARCHAR2;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_body_version 
+    RETURN VARCHAR2;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_feature_type ( p_geom IN mdsys.sdo_geometry ) 
+    RETURN NUMBER;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_area( p_geom      IN mdsys.sdo_geometry
+                   , p_tolerance IN NUMBER DEFAULT g_tolerance
+                   , p_unit      IN nm_units.un_unit_id%TYPE DEFAULT 1 ) 
+    RETURN NUMBER;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_length ( p_geom      IN mdsys.sdo_geometry
+                      , p_tolerance IN NUMBER DEFAULT g_tolerance
+                      , p_unit      IN nm_units.un_unit_id%TYPE DEFAULT 1 ) 
+    RETURN NUMBER;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_geom_from_gdo ( p_gdo_session_id IN NUMBER
+                             , p_gtype          IN NUMBER ) 
+    RETURN mdsys.sdo_geometry;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_geom_from_gdo ( p_gdo_session_id IN NUMBER
+                             , p_feature_type   IN VARCHAR2 ) 
+    RETURN mdsys.sdo_geometry;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_geom_from_xys ( p_tab_xys IN nm3sdo_gdo.tab_xys
+                             , p_gtype   IN VARCHAR2 ) 
+    RETURN mdsys.sdo_geometry;
+--
+--------------------------------------------------------------------------------
+--
+END nm3sdo_geom;
 /
