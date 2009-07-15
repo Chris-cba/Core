@@ -4,11 +4,11 @@ IS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdo.pkb-arc   3.2   Feb 10 2009 10:06:36   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdo.pkb-arc   3.3   Jul 15 2009 10:03:10   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_gdo.pkb  $
---       Date into PVCS   : $Date:   Feb 10 2009 10:06:36  $
---       Date fetched Out : $Modtime:   Feb 10 2009 10:05:14  $
---       PVCS Version     : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Jul 15 2009 10:03:10  $
+--       Date fetched Out : $Modtime:   Jul 14 2009 14:21:18  $
+--       PVCS Version     : $Revision:   3.3  $
 --
 --------------------------------------------------------------------------------
 --
@@ -18,7 +18,7 @@ IS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) :='"$Revision:   3.2  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) :='"$Revision:   3.3  $"';
   g_package_name CONSTANT VARCHAR2(30)   := 'nm3sdo_gdo';
   g_srid                  NUMBER ;
   b_srid_set              BOOLEAN := FALSE;
@@ -84,63 +84,9 @@ IS
     --
     -----------------------------------------------------------
   IS
-    l_ord    mdsys.sdo_ordinate_array := mdsys.sdo_ordinate_array(NULL);
     retval   mdsys.sdo_geometry;
     l_gtype  nm_theme_gtypes.ntg_gtype%TYPE;
     l_error  nm3type.max_varchar2;
-  --
-  -- Only used for a line shape (sdo_ordinate_array)
-  -- The code uses nm3sdo.get_2d_pt for a Point
-  --
-    FUNCTION wrap_geom ( pi_tab_xys IN tab_xys 
-                       , pi_close   IN BOOLEAN DEFAULT FALSE)
-    RETURN mdsys.sdo_ordinate_array
-    IS
-      l_ord mdsys.sdo_ordinate_array := mdsys.sdo_ordinate_array(NULL);
-    --
-    BEGIN
-    --
-      l_ord.DELETE;
-    --
-      FOR i IN 1..pi_tab_xys.COUNT
-      LOOP
-      --
-        l_ord.EXTEND;
-        l_ord(l_ord.COUNT) := ROUND(pi_tab_xys(i).x_coord,2);
-      --
-        l_ord.EXTEND;
-        l_ord(l_ord.COUNT) := ROUND(pi_tab_xys(i).y_coord,2);
-      --
-      END LOOP;
-    --
-    -- Close the shape i.e. make it into a polygon
-    --
-      IF pi_close
-      AND pi_tab_xys.COUNT >= 3
-      THEN
-      --
-        IF pi_tab_xys(pi_tab_xys.COUNT).x_coord !=
-           pi_tab_xys(pi_tab_xys.COUNT).y_coord
-        THEN
-        --
-        -- If the first set of ordinates are different
-        -- from the last set, then they have to be closed
-        -- to from a polygon
-        --
-        -- Create a new X coordinate, matching the first X coordinate
-          l_ord.EXTEND;
-          l_ord(l_ord.COUNT) := l_ord(l_ord.FIRST);
-        --
-        -- Create a new Y coordinate, matching the first Y coordinate
-          l_ord.EXTEND;
-          l_ord(l_ord.COUNT) := l_ord(l_ord.FIRST+1);
-        END IF; 
-      -- 
-      END IF;
-    --
-      RETURN l_ord;
-    --
-    END wrap_geom;
   --
   BEGIN
   --
@@ -158,13 +104,15 @@ IS
     --
     -- This is the path TMA takes - we'll always return a 2002 Line geometry
     --  
-        l_ord := wrap_geom ( pi_tab_xys => pi_tab_xys );
-    --
-        retval := mdsys.sdo_geometry( 2002,
-                                      g_srid,
-                                      NULL, 
-                                      mdsys.sdo_elem_info_array( 1, 2, 1), -- line
-                                      l_ord);
+--        l_ord := wrap_geom ( pi_tab_xys => pi_tab_xys );
+--    --
+--        retval := mdsys.sdo_geometry( 2002,
+--                                      g_srid,
+--                                      NULL, 
+--                                      mdsys.sdo_elem_info_array( 1, 2, 1), -- line
+--                                      l_ord);
+        retval := nm3sdo_geom.get_geom_from_xys ( p_tab_xys => pi_tab_xys
+                                                , p_gtype   => 2002);
     ELSE
     --
     -- POINT SHAPE - 2001
@@ -190,13 +138,15 @@ IS
           RAISE_APPLICATION_ERROR (-20103,'Not enough ordinates passed for a 2002 Line');
         ELSE
         --
-          l_ord := wrap_geom ( pi_tab_xys => pi_tab_xys );
-        --
-          retval := mdsys.sdo_geometry( g_gtype,
-                                        g_srid,
-                                        NULL,
-                                        mdsys.sdo_elem_info_array( 1, 2, 1), -- line
-                                        l_ord);
+--          l_ord := wrap_geom ( pi_tab_xys => pi_tab_xys );
+--        --
+--          retval := mdsys.sdo_geometry( g_gtype,
+--                                        g_srid,
+--                                        NULL,
+--                                        mdsys.sdo_elem_info_array( 1, 2, 1), -- line
+--                                        l_ord);
+            retval := nm3sdo_geom.get_geom_from_xys ( p_tab_xys => pi_tab_xys
+                                                    , p_gtype   => 2002);
         -- remove any duplicate coords
           retval := sdo_util.remove_duplicate_vertices
                         ( retval
@@ -214,15 +164,17 @@ IS
           RAISE_APPLICATION_ERROR (-20104,'Not enough ordinates passed for a 2003 Polygon');
         ELSE
         --
-          l_ord := wrap_geom ( pi_tab_xys => pi_tab_xys 
-                             , pi_close   => TRUE ); -- make sure it closes the polygon
+--          l_ord := wrap_geom ( pi_tab_xys => pi_tab_xys 
+--                             , pi_close   => TRUE ); -- make sure it closes the polygon
+--        --
+--          retval := mdsys.sdo_geometry( g_gtype,
+--                                        g_srid,
+--                                        NULL, 
+--                                        mdsys.sdo_elem_info_array( 1, 1003, 1), -- external ring
+--                                        l_ord);
         --
-          retval := mdsys.sdo_geometry( g_gtype,
-                                        g_srid,
-                                        NULL, 
-                                        mdsys.sdo_elem_info_array( 1, 1003, 1), -- external ring
-                                        l_ord);
-        --
+          retval := nm3sdo_geom.get_geom_from_xys ( p_tab_xys => pi_tab_xys
+                                                  , p_gtype   => 2003);
           l_error := validate_polygon (retval);
         --
         -- Check for polygon orentation
