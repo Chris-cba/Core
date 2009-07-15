@@ -1,16 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.12   Jul 14 2009 15:26:14   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.13   Jul 15 2009 14:52:50   rcoupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Jul 14 2009 15:26:14  $
---       Date fetched Out : $Modtime:   Jul 14 2009 15:25:48  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Jul 15 2009 14:52:50  $
+--       Date fetched Out : $Modtime:   Jul 15 2009 14:52:18  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Tue Jul 14  14:54:40 2009 by Server Generator 10.1.2.9.28
-
+-- Generated for Oracle 10g on Wed Jul 15  14:41:10 2009 by Server Generator 10.1.2.9.28
 
 
 PROMPT Creating Table 'ANALYSE_ALL_TABS_LOG'
