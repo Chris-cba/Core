@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.1   Jul 14 2009 10:29:10   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.2   Jul 16 2009 10:36:30   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 14 2009 10:29:10  $
---       Date fetched Out : $Modtime:   Jul 14 2009 10:28:40  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 16 2009 10:36:30  $
+--       Date fetched Out : $Modtime:   Jul 16 2009 10:34:46  $
+--       Version          : $Revision:   3.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -35,6 +35,11 @@ SET TERM OFF
 -- HIG USER DETAIL Changes for TMA
 -- 
 ------------------------------------------------------------------
+BEGIN
+--
+DECLARE
+       already_exists Exception;
+       pragma exception_init(already_exists,-00955);
 BEGIN
  EXECUTE IMMEDIATE ('CREATE TABLE hig_user_contacts_all '||
                     ' ( '||
@@ -64,42 +69,75 @@ BEGIN
                     ' huc_CREATED_BY     VARCHAR2(30) NOT NULL  '||
                     ')');
 EXCEPTION
-  WHEN others THEN 
-   Null;
+When already_exists 
+Then 
+         Null;
+WHEN others
+THEN
+         Raise;
 END;
-/
 
+DECLARE
+       already_exists Exception;
+       pragma exception_init(already_exists,-02260);
 BEGIN
  EXECUTE IMMEDIATE ('Alter table hig_user_contacts_all Add (Constraint huc_pk Primary key (huc_id) ) ');
 EXCEPTION
-  WHEN others THEN 
-   Null;
+When already_exists 
+     Then 
+         Null;
+WHEN others
+     THEN
+        Raise;
 END;
-/
 
+
+DECLARE
+       already_exists Exception;
+       pragma exception_init(already_exists,-02275);
 BEGIN
  EXECUTE IMMEDIATE ('Alter table hig_user_contacts_all Add (Constraint huc_has_fk Foreign Key (huc_hus_user_id) References hig_users (hus_user_id) ON DELETE CASCADE) ');
 EXCEPTION
-  WHEN others THEN 
-   Null;
+When already_exists 
+     Then 
+         Null;
+WHEN others
+     THEN
+        Raise;
 END;
-/
 
+DECLARE
+       already_exists Exception;
+       pragma exception_init(already_exists,-00955);
 BEGIN
  EXECUTE IMMEDIATE ('Create Index huc_hus_fk_ind On hig_user_contacts_all (huc_hus_user_id) ');
 EXCEPTION
-  WHEN others THEN 
-   Null;
+When already_exists 
+Then 
+         Null;
+WHEN others
+THEN
+         Raise;
 END;
-/
 
+
+DECLARE
+       already_exists Exception;
+       pragma exception_init(already_exists,-00955);
 BEGIN
  EXECUTE IMMEDIATE ('Create sequence hig_hus_id_seq Increment by 1 Start With 1 Nocache ');
 EXCEPTION
-  WHEN others THEN 
-   Null;
+When already_exists 
+Then 
+         Null;
+WHEN others
+THEN
+         Raise;
 END;
+--
+ENd ;
 /
+
 
 
 ------------------------------------------------------------------
@@ -113,11 +151,9 @@ SET TERM OFF
 ------------------------------------------------------------------
 -- 
 -- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
--- **** COMMENTS TO BE ADDED BY ADRIAN EDWARDS ****
+-- Drop Trigger NM_INV_ITEMS_INSTEAD_IU
 -- 
 ------------------------------------------------------------------
-PROMPT Drop Trigger NM_INV_ITEMS_INSTEAD_IU
-
 DECLARE
   ex_not_exists exception;
   pragma exception_init(ex_not_exists,-4080);
@@ -150,8 +186,6 @@ SET TERM OFF
 -- Drop unique constraint IIG_UK
 -- 
 ------------------------------------------------------------------
-PROMPT Drop CONSTRAINT IIG_UK
-
 DECLARE
   ex_not_exists exception;
   pragma exception_init(ex_not_exists,-4080);
@@ -177,15 +211,38 @@ SET TERM OFF
 ------------------------------------------------------------------
 -- 
 -- DEVELOPMENT COMMENTS (LINESH SORATHIA)
--- Objects required for nietwork bulk attrib update
+-- Objects required for network bulk attribs update
 -- 
 ------------------------------------------------------------------
-CREATE OR REPLACE TYPE nm_ne_id_type AS OBJECT(ne_id NUMBER)
+DECLARE
+       already_exists Exception;
+       pragma exception_init(already_exists,-00955);
+Begin
+   Execute Immediate 'CREATE TYPE nm_ne_id_type AS OBJECT(ne_id NUMBER)';
+Exception
+When already_exists 
+Then 
+         Null;
+WHEN others
+THEN
+         Raise;
+ENd ;
 /
  
-CREATE OR REPLACE TYPE nm_ne_id_array IS TABLE OF nm_ne_id_type 
+DECLARE
+       already_exists Exception;
+       pragma exception_init(already_exists,-00955);
+Begin
+   Execute Immediate 'CREATE TYPE nm_ne_id_array IS TABLE OF nm_ne_id_type';
+Exception
+When already_exists 
+Then 
+         Null;
+WHEN others
+THEN
+         Raise;
+End ;
 /
-
 
 CREATE OR REPLACE FORCE VIEW nm_elements_view_vw (
 nev_ne_id,
@@ -204,11 +261,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.1   Jul 14 2009 10:29:10   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.2   Jul 16 2009 10:36:30   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 14 2009 10:29:10  $
---       Date fetched Out : $Modtime:   Jul 14 2009 10:28:40  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 16 2009 10:36:30  $
+--       Date fetched Out : $Modtime:   Jul 16 2009 10:34:46  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -253,11 +310,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.1   Jul 14 2009 10:29:10   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.2   Jul 16 2009 10:36:30   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 14 2009 10:29:10  $
---       Date fetched Out : $Modtime:   Jul 14 2009 10:28:40  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 16 2009 10:36:30  $
+--       Date fetched Out : $Modtime:   Jul 16 2009 10:34:46  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 -- 
@@ -315,7 +372,7 @@ SET TERM OFF
 ------------------------------------------------------------------
 -- 
 -- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
--- **** COMMENTS TO BE ADDED BY ADRIAN EDWARDS ****
+-- Create Saved Locator Searches objects
 -- 
 ------------------------------------------------------------------
 PROMPT Creating Table 'NM_GAZ_QUERY_ATTRIBS_SAVED'
@@ -552,11 +609,11 @@ BEGIN
    l_tab_comments(1)  := '--';
    l_tab_comments(2)  := '--   SCCS Identifiers :-';
    l_tab_comments(3)  := '--';
-   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.1   Jul 14 2009 10:29:10   aedwards  $';
+   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.2   Jul 16 2009 10:36:30   aedwards  $';
    l_tab_comments(5)  := '--       Module Name                : $Workfile:   nm4054_nm4100_ddl_upg.sql  $';
-   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jul 14 2009 10:29:10  $';
-   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jul 14 2009 10:28:40  $';
-   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   3.1  $';
+   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jul 16 2009 10:36:30  $';
+   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jul 16 2009 10:34:46  $';
+   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   3.2  $';
    l_tab_comments(9)  := '--';
    l_tab_comments(10) := '--   table_name_WHO trigger';
    l_tab_comments(11) := '--';
@@ -580,7 +637,7 @@ BEGIN
                          or utc.column_name like '%DATE_MODIFIED'
                         )
                     AND ut.object_name not like 'BIN%'        --sscanlon fix 11JAN2008, fix for 10g installs
-                    AND ut.object_name like 'NM_GAZ_QUERY%SAVED'
+                    AND ut.object_name like 'NM_GAZ_QUERY_%_SAVED'
                   GROUP BY utc.TABLE_NAME
                   HAVING COUNT(*) = 4
                  )
@@ -678,11 +735,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.1   Jul 14 2009 10:29:10   aedwards  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.2   Jul 16 2009 10:36:30   aedwards  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Jul 14 2009 10:29:10  $
-    --       Date fetched Out : $Modtime:   Jul 14 2009 10:28:40  $
-    --       Version          : $Revision:   3.1  $
+    --       Date into PVCS   : $Date:   Jul 16 2009 10:36:30  $
+    --       Date fetched Out : $Modtime:   Jul 16 2009 10:34:46  $
+    --       Version          : $Revision:   3.2  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
              ngqs_ngq_id,
@@ -732,11 +789,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.1   Jul 14 2009 10:29:10   aedwards  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.2   Jul 16 2009 10:36:30   aedwards  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Jul 14 2009 10:29:10  $
-    --       Date fetched Out : $Modtime:   Jul 14 2009 10:28:40  $
-    --       Version          : $Revision:   3.1  $
+    --       Date into PVCS   : $Date:   Jul 16 2009 10:36:30  $
+    --       Date fetched Out : $Modtime:   Jul 16 2009 10:34:46  $
+    --       Version          : $Revision:   3.2  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
           * 
@@ -760,11 +817,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.1   Jul 14 2009 10:29:10   aedwards  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.2   Jul 16 2009 10:36:30   aedwards  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Jul 14 2009 10:29:10  $
-    --       Date fetched Out : $Modtime:   Jul 14 2009 10:28:40  $
-    --       Version          : $Revision:   3.1  $
+    --       Date into PVCS   : $Date:   Jul 16 2009 10:36:30  $
+    --       Date fetched Out : $Modtime:   Jul 16 2009 10:34:46  $
+    --       Version          : $Revision:   3.2  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
              ngqas_ngq_id       vngqas_ngqa_ngq_id,
@@ -785,6 +842,345 @@ AS
              ngqvs_ngqt_seq_no,
              ngqvs_ngqa_seq_no,
              ngqvs_sequence;
+/
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Hierarchical Asset Changes
+Hierarchical asets changes
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (LINESH SORATHIA)
+-- Changes made to handle hierarchacal asset work with different relationships likes AT IN AND DERIVED
+-- 
+------------------------------------------------------------------
+Begin
+   DECLARE
+       non_exists Exception;
+       pragma exception_init(non_exists,-02443);
+   BEGIN
+     EXECUTE IMMEDIATE('ALTER TABLE NM_INV_ITEM_GROUPINGS_ALL DROP CONSTRAINT IIG_UK');
+   EXCEPTION
+     When non_exists 
+     Then 
+         Null;
+     WHEN others
+     THEN
+        Raise;
+   END;
+
+   DECLARE
+       non_exists Exception;
+       pragma exception_init(non_exists,-02443);
+   BEGIN
+     EXECUTE IMMEDIATE('ALTER TABLE NM_INV_ITEM_GROUPINGS_ALL DROP CONSTRAINT IIG_PK');
+   EXCEPTION
+     When non_exists 
+     Then 
+         Null;
+     WHEN others
+     THEN
+        Raise;
+   END;
+
+   DECLARE
+       non_exists Exception;
+       pragma exception_init(non_exists,-01418);
+   BEGIN
+     EXECUTE IMMEDIATE('DROP INDEX  IIG_PK');
+   EXCEPTION
+     When non_exists 
+     Then 
+         Null;
+     WHEN others
+     THEN
+        Raise;
+   END;
+
+   DECLARE
+       non_exists Exception;
+       pragma exception_init(non_exists,-01418);
+   BEGIN
+     EXECUTE IMMEDIATE('DROP INDEX  IIG_UK');
+   EXCEPTION
+     When non_exists 
+     Then 
+         Null;
+     WHEN others
+     THEN
+        Raise;
+   END;
+
+ 
+   DECLARE
+       already_exists Exception;
+       pragma exception_init(already_exists,-02260);
+   BEGIN     
+     EXECUTE IMMEDIATE('ALTER TABLE NM_INV_ITEM_GROUPINGS_ALL ADD (CONSTRAINT  IIG_PK PRIMARY KEY  ( IIG_ITEM_ID,IIG_PARENT_ID,IIG_START_DATE))');
+   EXCEPTION
+     When already_exists 
+     Then 
+         Null;
+     WHEN others
+     THEN
+        Raise;
+   END;
+
+
+   DECLARE
+       already_exists Exception;
+       pragma exception_init(already_exists,-00955);
+   BEGIN
+     EXECUTE IMMEDIATE('CREATE INDEX IIG_IIT_FK_TOP_ID_IND ON NM_INV_ITEM_GROUPINGS_ALL (IIG_TOP_ID)');
+   EXCEPTION
+     When already_exists 
+     Then 
+         Null;
+     WHEN others
+     THEN
+         Raise;
+   END;
+
+   DECLARE
+       non_exists Exception;
+       pragma exception_init(non_exists,-02443);
+   BEGIN
+     EXECUTE IMMEDIATE('ALTER TABLE nm_load_batch_status DROP CONSTRAINT nlbs_nlb_fk');
+   EXCEPTION
+     When non_exists 
+     Then 
+         Null;
+     WHEN others
+     THEN
+        Raise;
+   END;
+
+   DECLARE
+       non_exists Exception;
+       pragma exception_init(non_exists,-02443);
+   BEGIN
+     EXECUTE IMMEDIATE('ALTER TABLE nm_load_batches DROP CONSTRAINT nlb_pk');
+   EXCEPTION
+     When non_exists 
+     Then 
+         Null;
+     WHEN others
+     THEN
+        Raise;
+   END;
+
+   DECLARE
+       non_exists Exception;
+       pragma exception_init(non_exists,-01418);
+   BEGIN
+     EXECUTE IMMEDIATE('DROP INDEX nlb_pk');
+   EXCEPTION
+     When non_exists 
+     Then 
+         Null;
+     WHEN others
+     THEN
+        Raise;
+   END;
+
+   DECLARE
+       already_exists Exception;
+       pragma exception_init(already_exists,-02260);
+   BEGIN
+     EXECUTE IMMEDIATE('ALTER TABLE nm_load_batches ADD ( CONSTRAINT  nlb_pk  primary key  (nlb_batch_no,nlb_filename))');
+   EXCEPTION
+     When already_exists 
+     Then 
+         Null;
+     WHEN others
+     THEN
+        Raise;
+   END;
+End ;
+/
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Drop NM_THEMES_ALL_405 table
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Drop NM_THEMES_ALL_405 - Created in a previous upgrade, needs to be dropped.
+-- 
+------------------------------------------------------------------
+DECLARE
+  ex_not_exists exception;
+  pragma exception_init(ex_not_exists,-942);
+BEGIN
+  EXECUTE IMMEDIATE('DROP TABLE NM_THEMES_ALL_405');
+EXCEPTION
+  WHEN ex_not_exists THEN
+     NULL;
+  WHEN OTHERS THEN
+    RAISE;
+END;
+/
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Increase HOV_VALUE to 2000
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Increase HOV_VALUE to 2000 characters.
+-- 
+------------------------------------------------------------------
+ALTER TABLE hig_option_values MODIFY hov_value VARCHAR2(2000)
+/
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Add NM_CARDINALITY to NM_ROUTE_CONECTIVITY_TMP
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Add new column NM_CARDINALITY to NM_ROUTE_CONNECTIVITY
+-- 
+------------------------------------------------------------------
+ALTER TABLE NM_ROUTE_CONNECTIVITY_TMP ADD NM_CARDINALITY NUMBER(38)
+/
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT NM_ELEMENT_HISTORY
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Replace Unique index on NM_ELEMENT_HISTORY with a non-unique one to handle opereration on the same date.
+-- 
+------------------------------------------------------------------
+DECLARE
+  ex_not_exist  EXCEPTION;
+  PRAGMA EXCEPTION_INIT(ex_not_exist,-1418);
+BEGIN
+  BEGIN
+    EXECUTE IMMEDIATE 'DROP INDEX NEH_NE_ID_OLD_NEW_IND';
+  EXCEPTION
+    WHEN ex_not_exist THEN NULL;
+  END;
+  EXECUTE IMMEDIATE 'CREATE INDEX NEH_NE_ID_OLD_NEW_IND '||
+                    ' ON NM_ELEMENT_HISTORY (NEH_NE_ID_OLD,NEH_NE_ID_NEW)';
+END;
+/
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Disabled PK on NM_MRG_QUERY_RESULTS_TEMP2
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Disabled PK on NM_MRG_QUERY_RESULTS_TEMP2 - Created for consistency
+-- 
+------------------------------------------------------------------
+ALTER TABLE NM_MRG_QUERY_RESULTS_TEMP2
+ ADD (CONSTRAINT NMQRT2_PK PRIMARY KEY 
+  (NE_ID)
+  DISABLE)
+/
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Disabled PK on REPORT_PARAMS
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Disabled PK on REPORT_PARAMS - Created for consistency
+-- 
+------------------------------------------------------------------
+ALTER TABLE REPORT_PARAMS
+ ADD (CONSTRAINT RPA_PK PRIMARY KEY 
+  (REP_SESSIONID)
+  DISABLE)
+/
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Recreate Check Constraints for HIGOWNER generated tables
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Recreate check constraints created as AVCON with named constraints from Designer
+-- 
+------------------------------------------------------------------
+BEGIN
+  FOR i IN 
+    ( SELECT * FROM user_constraints
+       WHERE constraint_name LIKE 'AVCON%' )
+  LOOP
+    EXECUTE IMMEDIATE 'ALTER TABLE '||i.table_name||' DROP CONSTRAINT '||i.constraint_name;
+  END LOOP;
+END;
+/
+
+PROMPT Creating Check Constraint on 'NM_USER_AUS_ALL'
+ALTER TABLE NM_USER_AUS_ALL
+ ADD (CONSTRAINT NUA_MODE_CHK CHECK (nua_mode IN ( 'NORMAL' , 'READONLY' )))
+/
+
+PROMPT Creating Check Constraint on 'HIG_USERS'
+ALTER TABLE HIG_USERS
+ ADD (CONSTRAINT HUS_IS_HIG_OWNER_FLAG_CHK CHECK (HUS_IS_HIG_OWNER_FLAG IN ( 'Y' , 'N' )))
+/
+
+PROMPT Creating Check Constraint on 'HIG_USERS'
+ALTER TABLE HIG_USERS
+ ADD (CONSTRAINT HUS_UNRESTRICTED_CHK CHECK (HUS_UNRESTRICTED IN ( 'Y' , 'N' )))
+/
+
+PROMPT Creating Check Constraint on 'NM_ADMIN_GROUPS'
+ALTER TABLE NM_ADMIN_GROUPS
+ ADD (CONSTRAINT NAG_DIRECT_LINK_CHK CHECK (NAG_DIRECT_LINK IN ('Y', 'N')))
 /
 
 
