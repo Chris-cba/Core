@@ -1,5 +1,5 @@
 -- SCCS ID Keyword, do not remove
-define sccsid = '"$Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.8   Jul 16 2009 09:58:18   aedwards  $"'
+define sccsid = '"$Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.9   Jul 16 2009 10:00:56   aedwards  $"'
 
 REM Copyright (c) Exor Corporation Ltd, 2008
 
@@ -400,6 +400,22 @@ BEGIN
   nm3sdm.make_all_datum_layers_dt;
 END;
 /
+--
+---------------------------------------------------------------------------------------------------
+--                  ****************   CREATE JOBS  *******************
+--
+--
+SET TERM ON
+PROMPT Create table maintenance Jobs
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'nm3jobs.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                     ****************   RE-BUILD SEQUENCES  *******************
