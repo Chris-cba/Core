@@ -5,18 +5,18 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkb-arc   1.2   Jul 15 2009 10:04:02   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkb-arc   1.3   Jul 16 2009 11:27:10   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_geom.pkb  $
---       Date into PVCS   : $Date:   Jul 15 2009 10:04:02  $
---       Date fetched Out : $Modtime:   Jul 14 2009 14:21:22  $
---       PVCS Version     : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jul 16 2009 11:27:10  $
+--       Date fetched Out : $Modtime:   Jul 16 2009 11:26:34  $
+--       PVCS Version     : $Revision:   1.3  $
 --       Based on
 --
 --------------------------------------------------------------------------------
 --
-  g_body_sccsid    CONSTANT VARCHAR2(30) :='"$Revision:   1.2  $"';
+  g_body_sccsid    CONSTANT VARCHAR2(30) :='"$Revision:   1.3  $"';
   g_tab_xys                 nm3sdo_gdo.tab_xys;
-  g_tab_nm_coords           nm_coords_array := NEW nm_coords_array();
+ -- g_tab_nm_coords           nm_coords_array := NEW nm_coords_array();
 --
 --------------------------------------------------------------------------------
 --
@@ -162,7 +162,7 @@ AS
     retval mdsys.sdo_geometry;
   BEGIN
     g_tab_xys.DELETE;
-    g_tab_nm_coords.DELETE;
+    --g_tab_nm_coords.DELETE;
     g_tab_xys := p_tab_xys;
     nm_debug.debug_on;
     RETURN get_geom_from_gdo( p_gdo_session_id => -999999
