@@ -1,5 +1,5 @@
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.8      $"';
+define sccsid = '"$Revision::   2.9      $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
@@ -401,7 +401,7 @@ DECLARE
   --
     IF l_oracle9i OR l_oracle10gr1 OR l_oracle10gr2 OR l_oracle11gr1
     THEN
-      EXECUTE IMMEDIATE 'grant create job to  '                  || p_user || ' with grant option'; -- Added by AE - 10-07-2009
+      EXECUTE IMMEDIATE 'grant create job to  '                  || p_user || ' with admin option'; -- Added by AE - 10-07-2009
       EXECUTE IMMEDIATE 'grant execute on sys.dbms_scheduler to '|| p_user || ' with grant option'; -- Added by AE - 10-07-2009
       EXECUTE IMMEDIATE 'grant select any dictionary to '        || p_user || ' with admin option';
       EXECUTE IMMEDIATE 'grant execute on sys.dbms_pipe to '     || p_user || ' with grant option';
