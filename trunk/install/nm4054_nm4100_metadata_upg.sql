@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.0   Jul 14 2009 10:27:18   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.1   Jul 16 2009 10:36:28   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Jul 14 2009 10:27:18  $
---       Date fetched Out : $Modtime:   Jul 14 2009 09:32:42  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 16 2009 10:36:28  $
+--       Date fetched Out : $Modtime:   Jul 16 2009 10:34:46  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -275,11 +275,35 @@ SET TERM OFF
 ------------------------------------------------------------------
 -- 
 -- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
--- **** COMMENTS TO BE ADDED BY ADRIAN EDWARDS ****
+-- Jobs to drop data in tables
 -- 
 ------------------------------------------------------------------
---
+DECLARE
+  ex_no_exists       EXCEPTION;
+  PRAGMA             EXCEPTION_INIT (ex_no_exists,-27475);
 BEGIN
+--
+  BEGIN
+    nm3jobs.drop_job ( pi_job_name => 'CLEAROUT_GDO_DATA'
+                     , pi_force    => TRUE );
+  EXCEPTION
+    WHEN ex_no_exists THEN NULL;
+  END;
+--
+  BEGIN
+    nm3jobs.drop_job ( pi_job_name => 'CLEAROUT_NGQI_DATA'
+                     , pi_force    => TRUE );
+  EXCEPTION
+    WHEN ex_no_exists THEN NULL;
+  END;
+--
+  BEGIN
+    nm3jobs.drop_job ( pi_job_name => 'CLEAROUT_ND_DATA'
+                     , pi_force    => TRUE );
+  EXCEPTION
+    WHEN ex_no_exists THEN NULL;
+  END;
+--
   nm3jobs.create_job
               ( pi_job_name   => 'CLEAROUT_GDO_DATA'
               , pi_job_action => 'BEGIN nm3data.cleardown_gdo; END;'
@@ -296,6 +320,206 @@ BEGIN
               , pi_comments   => 'Created by nm3jobs at '||SYSDATE );
 END;
 /
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Hig user details
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (LINESH SORATHIA)
+-- Hig User Details Metadata
+-- 
+------------------------------------------------------------------
+INSERT INTO HIG_MODULES
+       (HMO_MODULE
+       ,HMO_TITLE
+       ,HMO_FILENAME
+       ,HMO_MODULE_TYPE
+       ,HMO_FASTPATH_OPTS
+       ,HMO_FASTPATH_INVALID
+       ,HMO_USE_GRI
+       ,HMO_APPLICATION
+       ,HMO_MENU
+       )
+SELECT 
+        'HIG1834'
+       ,'Hig User Contact Details'
+       ,'hig1834'
+       ,'FMX'
+       ,''
+       ,'N'
+       ,'N'
+       ,'HIG'
+       ,'FORM' FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
+                   WHERE HMO_MODULE = 'HIG1834');
+                   
+--
+
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_SECURITY'
+       ,'HIG1834'
+       ,'User Contact Details'
+       ,'M'
+       ,2.1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_SECURITY'
+                    AND  HSTF_CHILD = 'HIG1834');
+                    
+--
+
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE,HMR_MODE
+       )
+SELECT 
+        'HIG1834'
+       ,'HIG_ADMIN'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'HIG1834'
+                    AND  HMR_ROLE = 'HIG_ADMIN');
+
+                    
+--
+
+INSERT INTO HIG_DOMAINS
+       (HDO_DOMAIN
+       ,HDO_PRODUCT
+       ,HDO_TITLE
+       ,HDO_CODE_LENGTH
+       )
+SELECT 
+        'USER_CONTACT_TYPES'
+       ,'HIG'
+       ,'User Contact Types'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_DOMAINS
+                   WHERE HDO_DOMAIN = 'USER_CONTACT_TYPES');
+                    
+--
+
+-- 
+
+-- 
+------------------------------------------------------------------
+Prompt Inserting into hig_codes for USER_CONTACT_TYPES domain
+--
+
+Insert Into Hig_Codes
+(
+Hco_Domain,
+Hco_Code,
+Hco_Meaning,
+Hco_System,
+Hco_Seq,
+Hco_Start_Date,
+Hco_End_Date
+)
+Select  'USER_CONTACT_TYPES',
+        'Work',
+        'Work Number',
+        'N',
+        10,
+        To_Date('01-JAN-1900','dd-mon-yyyy'),
+        Null 
+From    Dual
+Where   Not Exists (Select   Null 
+                    From     Hig_Codes   Hc
+                    Where    hc.Hco_Domain  = 'USER_CONTACT_TYPES'
+                    And      hc.Hco_Code    = 'Work'
+                    );
+--
+
+Insert Into Hig_Codes
+(
+Hco_Domain,
+Hco_Code,
+Hco_Meaning,
+Hco_System,
+Hco_Seq,
+Hco_Start_Date,
+Hco_End_Date
+)
+Select  'USER_CONTACT_TYPES',
+        'Mobile',
+        'Mobile Number',
+        'N',
+        20,
+        To_Date('01-JAN-1900','dd-mon-yyyy'),
+        Null 
+From    Dual
+Where   Not Exists (Select   Null 
+                    From     Hig_Codes   Hc
+                    Where    hc.Hco_Domain  = 'USER_CONTACT_TYPES'
+                    And      hc.Hco_Code    = 'Mobile'
+                    );
+--
+
+Insert Into Hig_Codes
+(
+Hco_Domain,
+Hco_Code,
+Hco_Meaning,
+Hco_System,
+Hco_Seq,
+Hco_Start_Date,
+Hco_End_Date
+)
+Select  'USER_CONTACT_TYPES',
+        'Home',
+        'Home Number',
+        'N',
+        30,
+        To_Date('01-JAN-1900','dd-mon-yyyy'),
+        Null 
+From    Dual
+Where   Not Exists (Select   Null 
+                    From     Hig_Codes   Hc
+                    Where    hc.Hco_Domain  = 'USER_CONTACT_TYPES'
+                    And      hc.Hco_Code    = 'Home'
+                    );
+--
+
+Insert Into Hig_Codes
+(
+Hco_Domain,
+Hco_Code,
+Hco_Meaning,
+Hco_System,
+Hco_Seq,
+Hco_Start_Date,
+Hco_End_Date
+)
+Select  'USER_CONTACT_TYPES',
+        'Fax',
+        'Fax Number',
+        'N',
+        40,
+        To_Date('01-JAN-1900','dd-mon-yyyy'),
+        Null 
+From    Dual
+Where   Not Exists (Select   Null 
+                    From     Hig_Codes   Hc
+                    Where    hc.Hco_Domain  = 'USER_CONTACT_TYPES'
+                    And      hc.Hco_Code    = 'Fax'
+                    );
+--
+
+
 ------------------------------------------------------------------
 
 
