@@ -1,5 +1,5 @@
 -- SCCS ID Keyword, do not remove
-define sccsid = '"$Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.7   Aug 06 2008 12:07:22   malexander  $"'
+define sccsid = '"$Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.8   Jul 16 2009 09:58:18   aedwards  $"'
 
 REM Copyright (c) Exor Corporation Ltd, 2008
 
@@ -179,34 +179,6 @@ from dual
 /
 SET FEEDBACK ON
 start '&&run_file'
-SET FEEDBACK OFF
---
----------------------------------------------------------------------------------------------------
---                        **************** DROP CHECK CONSTRAINTS   ****************
-SET TERM ON
-PROMPT Dropping Check Constraints...
-SET TERM OFF
-SET DEFINE ON
-SELECT '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'drop_nm3_cons.sql' run_file
-FROM dual
-/
-SET FEEDBACK ON
-start &&run_file
-SET FEEDBACK OFF
---
----------------------------------------------------------------------------------------------------
---                        **************** CREATE CHECK CONSTRAINTS   ****************
-SET TERM ON
-PROMPT Creating Check Constraints...
-SET TERM OFF
-SET DEFINE ON
-SELECT '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'create_nm3_check_cons.sql' run_file
-FROM dual
-/
-SET FEEDBACK ON
-start &&run_file
 SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
