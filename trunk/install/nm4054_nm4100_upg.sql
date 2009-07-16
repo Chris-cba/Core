@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_upg.sql-arc   3.2   Jul 16 2009 11:20:00   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_upg.sql-arc   3.3   Jul 16 2009 15:58:52   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_upg.sql  $
---       Date into PVCS   : $Date:   Jul 16 2009 11:20:00  $
+--       Date into PVCS   : $Date:   Jul 16 2009 15:58:52  $
 --       Date fetched Out : $Modtime:   Jul 16 2009 10:43:44  $
---       Version          : $Revision:   3.2  $
+--       Version          : $Revision:   3.3  $
 --
 --   Product upgrade script
 --
