@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.2   Jul 16 2009 10:36:30   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.3   Jul 16 2009 15:59:30   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 16 2009 10:36:30  $
---       Date fetched Out : $Modtime:   Jul 16 2009 10:34:46  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Jul 16 2009 15:59:30  $
+--       Date fetched Out : $Modtime:   Jul 16 2009 15:57:24  $
+--       Version          : $Revision:   3.3  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -261,11 +261,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.2   Jul 16 2009 10:36:30   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.3   Jul 16 2009 15:59:30   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 16 2009 10:36:30  $
---       Date fetched Out : $Modtime:   Jul 16 2009 10:34:46  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Jul 16 2009 15:59:30  $
+--       Date fetched Out : $Modtime:   Jul 16 2009 15:57:24  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -310,11 +310,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.2   Jul 16 2009 10:36:30   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.3   Jul 16 2009 15:59:30   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 16 2009 10:36:30  $
---       Date fetched Out : $Modtime:   Jul 16 2009 10:34:46  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Jul 16 2009 15:59:30  $
+--       Date fetched Out : $Modtime:   Jul 16 2009 15:57:24  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 -- 
@@ -540,14 +540,15 @@ ALTER TABLE NM_GAZ_QUERY_ATTRIBS_SAVED ADD (CONSTRAINT
 
 PROMPT Creating Foreign Key on 'NM_GAZ_QUERY_TYPES_SAVED'
 ALTER TABLE NM_GAZ_QUERY_TYPES_SAVED ADD (CONSTRAINT
- NGQTS_NGQS_FK FOREIGN KEY 
+ NGQTS_FK_NGQS FOREIGN KEY
   (NGQTS_NGQ_ID) REFERENCES NM_GAZ_QUERY_SAVED
   (NGQS_NGQ_ID) ON DELETE CASCADE)
 /
 
+
 PROMPT Creating Foreign Key on 'NM_GAZ_QUERY_TYPES_SAVED'
 ALTER TABLE NM_GAZ_QUERY_TYPES_SAVED ADD (CONSTRAINT
- NGQTS_NIT_FK FOREIGN KEY 
+ NGQTS_FK_NIT FOREIGN KEY 
   (NGQTS_ITEM_TYPE) REFERENCES NM_INV_TYPES_ALL
   (NIT_INV_TYPE) ON DELETE CASCADE)
 /
@@ -609,11 +610,11 @@ BEGIN
    l_tab_comments(1)  := '--';
    l_tab_comments(2)  := '--   SCCS Identifiers :-';
    l_tab_comments(3)  := '--';
-   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.2   Jul 16 2009 10:36:30   aedwards  $';
+   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.3   Jul 16 2009 15:59:30   aedwards  $';
    l_tab_comments(5)  := '--       Module Name                : $Workfile:   nm4054_nm4100_ddl_upg.sql  $';
-   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jul 16 2009 10:36:30  $';
-   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jul 16 2009 10:34:46  $';
-   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   3.2  $';
+   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jul 16 2009 15:59:30  $';
+   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jul 16 2009 15:57:24  $';
+   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   3.3  $';
    l_tab_comments(9)  := '--';
    l_tab_comments(10) := '--   table_name_WHO trigger';
    l_tab_comments(11) := '--';
@@ -735,11 +736,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.2   Jul 16 2009 10:36:30   aedwards  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.3   Jul 16 2009 15:59:30   aedwards  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Jul 16 2009 10:36:30  $
-    --       Date fetched Out : $Modtime:   Jul 16 2009 10:34:46  $
-    --       Version          : $Revision:   3.2  $
+    --       Date into PVCS   : $Date:   Jul 16 2009 15:59:30  $
+    --       Date fetched Out : $Modtime:   Jul 16 2009 15:57:24  $
+    --       Version          : $Revision:   3.3  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
              ngqs_ngq_id,
@@ -789,11 +790,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.2   Jul 16 2009 10:36:30   aedwards  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.3   Jul 16 2009 15:59:30   aedwards  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Jul 16 2009 10:36:30  $
-    --       Date fetched Out : $Modtime:   Jul 16 2009 10:34:46  $
-    --       Version          : $Revision:   3.2  $
+    --       Date into PVCS   : $Date:   Jul 16 2009 15:59:30  $
+    --       Date fetched Out : $Modtime:   Jul 16 2009 15:57:24  $
+    --       Version          : $Revision:   3.3  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
           * 
@@ -817,11 +818,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.2   Jul 16 2009 10:36:30   aedwards  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.3   Jul 16 2009 15:59:30   aedwards  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Jul 16 2009 10:36:30  $
-    --       Date fetched Out : $Modtime:   Jul 16 2009 10:34:46  $
-    --       Version          : $Revision:   3.2  $
+    --       Date into PVCS   : $Date:   Jul 16 2009 15:59:30  $
+    --       Date fetched Out : $Modtime:   Jul 16 2009 15:57:24  $
+    --       Version          : $Revision:   3.3  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
              ngqas_ngq_id       vngqas_ngqa_ngq_id,
@@ -851,13 +852,12 @@ AS
 ------------------------------------------------------------------
 SET TERM ON
 PROMPT Hierarchical Asset Changes
-Hierarchical asets changes
 SET TERM OFF
 
 ------------------------------------------------------------------
 -- 
 -- DEVELOPMENT COMMENTS (LINESH SORATHIA)
--- Changes made to handle hierarchacal asset work with different relationships likes AT IN AND DERIVED
+-- Changes made to handle hierarchical asset work with different relationships likes AT IN AND DERIVED
 -- 
 ------------------------------------------------------------------
 Begin
@@ -1023,7 +1023,7 @@ DECLARE
   ex_not_exists exception;
   pragma exception_init(ex_not_exists,-942);
 BEGIN
-  EXECUTE IMMEDIATE('DROP TABLE NM_THEMES_ALL_405');
+  EXECUTE IMMEDIATE('DROP TABLE NM_THEMES_405');
 EXCEPTION
   WHEN ex_not_exists THEN
      NULL;
@@ -1181,6 +1181,31 @@ ALTER TABLE HIG_USERS
 PROMPT Creating Check Constraint on 'NM_ADMIN_GROUPS'
 ALTER TABLE NM_ADMIN_GROUPS
  ADD (CONSTRAINT NAG_DIRECT_LINK_CHK CHECK (NAG_DIRECT_LINK IN ('Y', 'N')))
+/
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New Column ITA_INSPECTABLE
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- New column ITA_INSPECTABLE
+-- 
+------------------------------------------------------------------
+ALTER TABLE NM_INV_TYPE_ATTRIBS_ALL 
+ADD ITA_INSPECTABLE VARCHAR2(1)
+/
+
+ALTER TABLE NM_INV_TYPE_ATTRIBS_ALL 
+ADD (CONSTRAINT ITA_INSP_YN_CHK
+     CHECK (ITA_INSPECTABLE IN ('Y','N'))
+    )
 /
 
 
