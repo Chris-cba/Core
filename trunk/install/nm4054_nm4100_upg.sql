@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_upg.sql-arc   3.0   Jul 16 2009 10:38:04   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_upg.sql-arc   3.1   Jul 16 2009 10:44:10   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_upg.sql  $
---       Date into PVCS   : $Date:   Jul 16 2009 10:38:04  $
---       Date fetched Out : $Modtime:   Apr 06 2009 09:30:16  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 16 2009 10:44:10  $
+--       Date fetched Out : $Modtime:   Jul 16 2009 10:43:44  $
+--       Version          : $Revision:   3.1  $
 --
 --   Product upgrade script
 --
@@ -236,6 +236,22 @@ SET TERM ON
 Prompt Creating Synonyms That Do Not Exist...
 SET TERM OFF
 EXECUTE nm3ddl.refresh_all_synonyms;
+--
+---------------------------------------------------------------------------------------------------
+--                  ****************   CREATE JOBS  *******************
+--
+--
+SET TERM ON
+PROMPT Create table maintenance Jobs
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'nm3jobs.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   ROLES   *******************
