@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.1   Jul 16 2009 10:36:28   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.2   Jul 16 2009 11:19:58   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Jul 16 2009 10:36:28  $
---       Date fetched Out : $Modtime:   Jul 16 2009 10:34:46  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jul 16 2009 11:19:58  $
+--       Date fetched Out : $Modtime:   Jul 16 2009 11:13:00  $
+--       Version          : $Revision:   3.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -262,8 +262,10 @@ SET TERM OFF
 -- Add privs to create a scheduled job to Highways owner
 -- 
 ------------------------------------------------------------------
-grant create job to user;
-grant execute on DBMS_SCHEDULER to user;
+BEGIN
+  EXECUTE IMMEDIATE 'grant create job to '||user;
+END;
+/
 ------------------------------------------------------------------
 
 
