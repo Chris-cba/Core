@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.11   Jul 15 2009 14:48:02   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.12   Jul 16 2009 15:33:02   rcoupe  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Jul 15 2009 14:48:02  $
---       Date fetched Out : $Modtime:   Jul 15 2009 14:47:24  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Jul 16 2009 15:33:02  $
+--       Date fetched Out : $Modtime:   Jul 16 2009 15:32:26  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Wed Jul 15  14:41:12 2009 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Thu Jul 16  15:23:27 2009 by Server Generator 10.1.2.9.28
 
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -1079,8 +1079,7 @@ ALTER TABLE NM_INV_ITEMS_ALL
 PROMPT Creating Primary Key on 'NM_INV_ITEM_GROUPINGS_ALL'
 ALTER TABLE NM_INV_ITEM_GROUPINGS_ALL
  ADD (CONSTRAINT IIG_PK PRIMARY KEY
-  (IIG_TOP_ID
-  ,IIG_ITEM_ID
+  (IIG_ITEM_ID
   ,IIG_PARENT_ID
   ,IIG_START_DATE))
 /
@@ -5952,3 +5951,5 @@ ALTER TABLE NM_X_VAL_CONDITIONS ADD (CONSTRAINT
   (NXV_RULE_ID) REFERENCES NM_X_RULES
   (NXR_RULE_ID))
 /
+
+
