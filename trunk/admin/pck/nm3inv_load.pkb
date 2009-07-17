@@ -4,23 +4,23 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv_Load AS
 --
 --   SCCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.3   Nov 14 2008 09:43:14   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.4   Jul 17 2009 18:16:42   malexander  $
 --       Module Name      : $Workfile:   nm3inv_load.pkb  $
---       Date into PVCS   : $Date:   Nov 14 2008 09:43:14  $
---       Date fetched Out : $Modtime:   Nov 14 2008 09:42:46  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jul 17 2009 18:16:42  $
+--       Date fetched Out : $Modtime:   Jul 17 2009 18:15:28  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --   Author : Jonathan Mills
 --
 --   NM3 Inventory Load package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+--  Copyright (c) exor corporation ltd, 2002
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3inv_load';
@@ -1054,7 +1054,7 @@ PROCEDURE process_line_data
 BEGIN
 --
   l_rec_nlf := nm3get.get_nlf(pi_nlf_unique => pi_load_file_unique||'_'||g_line_data_suffix);
-  l_rec_nlb := nm3get.get_nlb(pi_nlb_batch_no => pi_batch_no);
+  l_rec_nlb := nm3load.get_nlb(p_nlb_batch_no => pi_batch_no);
 --
   l_batch_no := nm3seq.next_rtg_job_id_seq;
 
