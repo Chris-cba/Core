@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.5   Jun 16 2009 11:38:34   aedwards  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.6   Jul 17 2009 11:19:36   gjohnson  $
 -- Module Name : $Workfile:   nm3file.pkb  $
--- Date into PVCS : $Date:   Jun 16 2009 11:38:34  $
--- Date fetched Out : $Modtime:   Jun 16 2009 11:40:26  $
--- PVCS Version : $Revision:   2.5  $
+-- Date into PVCS : $Date:   Jul 17 2009 11:19:36  $
+-- Date fetched Out : $Modtime:   Jul 17 2009 11:17:54  $
+-- PVCS Version : $Revision:   2.6  $
 -- Based on SCCS version : 
 --
 --
@@ -1327,5 +1327,77 @@ end check_directory_valid ;
 --
 -----------------------------------------------------------------------------
 --
+FUNCTION dos_or_unix_plaform RETURN VARCHAR2 IS
+
+ CURSOR c1 IS
+ SELECT CASE WHEN INSTR(UPPER(platform_name),'WINDOW') > 0 THEN 
+             'DOS' 
+        ELSE 
+            'UNIX' 
+        END dos_or_unix
+ FROM   v$database;
+ 
+ l_retval VARCHAR2(4);        
+
+BEGIN
+
+ OPEN c1;
+ FETCH c1 INTO l_retval;
+ RETURN l_retval;
+
+END dos_or_unix_plaform;
+--
+-----------------------------------------------------------------------------------
+--
+FUNCTION dos_or_unix_file(pi_file_name             IN VARCHAR2
+                         ,pi_directory             IN VARCHAR2) RETURN VARCHAR2 IS
+                          
+
+  l_file    UTL_FILE.file_type;
+  l_buffer  RAW(32767) := '';
+  l_instr_index number;
+  
+BEGIN
+
+
+  l_file := utl_file.fopen(location => pi_directory, filename => pi_file_name, open_mode => 'RB',max_linesize => 32767);
+  
+  UTL_FILE.GET_RAW(l_file, l_buffer, 32767);
+  UTL_FILE.FCLOSE(l_file);
+  
+  if instr(l_buffer,'0D0A') > 0 then
+    RETURN('DOS');
+  elsif instr(l_buffer,'0A') > 0 then
+    RETURN('UNIX');
+  else
+    RETURN('UNKNOWN');
+  end if;
+  
+END dos_or_unix_file;
+--
+-----------------------------------------------------------------------------------
+--
+FUNCTION external_table_record_delim(pi_file_format IN VARCHAR2) RETURN VARCHAR2 IS
+
+  l_dos_delimiter     varchar2(10)    := '0X''0D0A'''; 
+  l_unix_delimiter    varchar2(10)    := '0X''0A''';
+  l_unknown_delimiter varchar2(10)   := 'NEWLINE';
+
+
+BEGIN
+
+
+  IF UPPER(pi_file_format) = 'DOS' THEN
+    RETURN (l_dos_delimiter);
+  ELSIF UPPER(pi_file_format) = 'UNIX' THEN
+    RETURN (l_unix_delimiter);
+  ELSE
+    RETURN (l_unknown_delimiter);
+  END IF;
+
+END external_table_record_delim;
+
+
+
 END nm3file;
 /

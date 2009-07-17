@@ -449,6 +449,40 @@ procedure check_directory_valid( pi_dir_name in varchar2 ) ;
 --</PROC>
 --
 -----------------------------------------------------------------------------
+--<PROC NAME="dos_or_unix_plaform">
+-- Read the v$database view and determine whether or not the platform is DOS or UNIX
+FUNCTION dos_or_unix_plaform RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="dos_or_unix_file">
+-- Read first line of file and depending on carriage return character return DOS or UNIX or UNKNOWN  
+FUNCTION dos_or_unix_file(pi_file_name             IN VARCHAR2
+                         ,pi_directory             IN VARCHAR2) RETURN VARCHAR2;
+--</PROC>
+-----------------------------------------------------------------------------
+--<PROC NAME="external_table_record_delim">
+--
+-- This routine returns you the string of characters to act as a record delimiter in an external table
+-- depending on format of file (established via call to dos_or_unix_file
+--
+-- i.e.
+--
+--  0X'0D0A' dos
+--  0X'0A'   unix
+--  NEWLINE   anything else
+--
+FUNCTION external_table_record_delim(pi_file_format IN VARCHAR2) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+
+
+
+
+
+
+
 
 
 --
