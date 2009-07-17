@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.12   Jul 16 2009 15:33:02   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.13   Jul 17 2009 18:32:00   rcoupe  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Jul 16 2009 15:33:02  $
---       Date fetched Out : $Modtime:   Jul 16 2009 15:32:26  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Jul 17 2009 18:32:00  $
+--       Date fetched Out : $Modtime:   Jul 17 2009 18:31:08  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Thu Jul 16  15:23:27 2009 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Fri Jul 17  18:26:28 2009 by Server Generator 10.1.2.9.28
 
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -2187,13 +2187,6 @@ ALTER TABLE NM_INV_ITEMS_ALL
   (IIT_PRIMARY_KEY
   ,IIT_INV_TYPE
   ,IIT_START_DATE))
-/
-
-PROMPT Creating Unique Key on 'NM_INV_ITEM_GROUPINGS_ALL'
-ALTER TABLE NM_INV_ITEM_GROUPINGS_ALL
- ADD (CONSTRAINT IIG_UK UNIQUE
-  (IIG_ITEM_ID
-  ,IIG_PARENT_ID))
 /
 
 PROMPT Creating Unique Key on 'NM_INV_TYPE_ATTRIBS_ALL'
