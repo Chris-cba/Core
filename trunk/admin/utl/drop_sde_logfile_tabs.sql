@@ -1,11 +1,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/drop_sde_logfile_tabs.sql-arc   1.0   Jul 06 2009 17:04:42   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/drop_sde_logfile_tabs.sql-arc   3.0   Jul 17 2009 10:57:00   malexander  $
 --       Module Name      : $Workfile:   drop_sde_logfile_tabs.sql  $
---       Date into PVCS   : $Date:   Jul 06 2009 17:04:42  $
+--       Date into PVCS   : $Date:   Jul 17 2009 10:57:00  $
 --       Date fetched Out : $Modtime:   Jul 06 2009 16:58:44  $
---       Version          : $Revision:   1.0  $
+--       Version          : $Revision:   3.0  $
 -------------------------------------------------------------------------
 --
 --
