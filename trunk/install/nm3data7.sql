@@ -1,28 +1,27 @@
-/***************************************************************************
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.6   Jul 20 2009 13:54:36   aedwards  $
+--       Module Name      : $Workfile:   nm3data7.sql  $
+--       Date into PVCS   : $Date:   Jul 20 2009 13:54:36  $
+--       Date fetched Out : $Modtime:   Jul 20 2009 13:52:32  $
+--       Version          : $Revision:   2.6  $
+--       Table Owner      : NM3_METADATA
+--       Generation Date  : 20-JUL-2009 13:52
+--
+--   Product metadata script
+--   As at Release 4.1.0.0
+--
+--   Copyright (c) exor corporation ltd, 2009
+--
+--   TABLES PROCESSED
+--   ================
+--   NM_ERRORS
+--
+-----------------------------------------------------------------------------
 
-INFO
-====
-As at Release 4.0.5.0
 
-GENERATION DATE
-===============
-28-AUG-2008 09:07
-
-TABLES PROCESSED
-================
-NM_ERRORS
-
-TABLE OWNER
-===========
-NM3_METADATA
-
-MODE (A-Append R-Refresh)
-========================
-R
-
-***************************************************************************/
-
-define sccsid = '%W% %G%'
 set define off;
 set feedback off;
 
@@ -30,22 +29,20 @@ set feedback off;
 -- START OF GENERATED METADATA --
 ---------------------------------
 
+
+----------------------------------------------------------------------------------------
+-- NM_ERRORS
 --
---********** NM_ERRORS **********--
+-- select * from nm3_metadata.nm_errors
+-- order by ner_appl
+--         ,ner_id
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT nm_errors
 SET TERM OFF
---
--- Columns
--- NER_APPL                       NOT NULL VARCHAR2(6)
---   NER_PK (Pos 1)
--- NER_ID                         NOT NULL NUMBER(4)
---   NER_PK (Pos 2)
--- NER_HER_NO                              NUMBER(4)
--- NER_DESCR                      NOT NULL VARCHAR2(200)
--- NER_CAUSE                               VARCHAR2(1000)
---
---
+
 DELETE FROM NM_ERRORS
  WHERE NER_APPL = 'HIG'
   AND  NER_ID = 1;
@@ -5444,6 +5441,114 @@ SELECT
        ,502
        ,null
        ,'Cannot delete record as child records exist.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 503;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,503
+       ,null
+       ,'Link definition is invalid'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 504;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,504
+       ,null
+       ,'Link definition is invalid, wrong calling block parameter name'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 505;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,505
+       ,null
+       ,'Too many link definitions for same block combination'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 506;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,506
+       ,null
+       ,'Cannot create Point. Please select a single point from the map to create a Point.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 507;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,507
+       ,null
+       ,'Cannot create Line. Please select two or more points from the map to create a Line.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 508;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,508
+       ,null
+       ,'Cannot create Polygon. Please select three or more points from the map to create a Polygon.'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
@@ -13474,6 +13579,136 @@ SELECT
        ,'This item has no shape available'
        ,'' FROM DUAL;
 --
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 455;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,455
+       ,null
+       ,'The name you have chosen is a reserved word in Oracle - please choose a non-reserved word'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 456;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,456
+       ,null
+       ,'Mismatch between field length definition and unit type '
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 457;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,457
+       ,null
+       ,'Value larger than the precision allowed for this column'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 458;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,458
+       ,null
+       ,'Value is of invalid format'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 459;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,459
+       ,null
+       ,'Warning - Location of this item is mandatory'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 460;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,460
+       ,null
+       ,'This selected Group Type is Exclusive. The selected Network Elements will be End Dated from existing Groups of this type. Do you wish to continue?'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 461;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,461
+       ,null
+       ,'One or more of the selected Network Elements are already members of a Group of this type. Do you want to End Date existing Group Memberships for affected Elements?'
+       ,'' FROM DUAL;
+--
+--
+--
+----------------------------------------------------------------------------------------
+
 --
 COMMIT;
 --

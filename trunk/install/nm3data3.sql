@@ -1,46 +1,28 @@
---
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.8   Jan 10 2008 18:10:10   sscanlon  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.9   Jul 20 2009 13:54:36   aedwards  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Jan 10 2008 18:10:10  $
---       Date fetched Out : $Modtime:   Jan 10 2008 17:16:00  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Jul 20 2009 13:54:36  $
+--       Date fetched Out : $Modtime:   Jul 20 2009 13:52:28  $
+--       Version          : $Revision:   2.9  $
+--       Table Owner      : NM3_METADATA
+--       Generation Date  : 20-JUL-2009 13:52
 --
 --   Product metadata script
+--   As at Release 4.1.0.0
+--
+--   Copyright (c) exor corporation ltd, 2009
+--
+--   TABLES PROCESSED
+--   ================
+--   HIG_ROLES
+--   HIG_MODULE_ROLES
+--   HIG_MODULE_KEYWORDS
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2008
------------------------------------------------------------------------------
---
---
-/***************************************************************************
 
-INFO
-====
-As at Release 4.0.4.0
-
-GENERATION DATE
-===============
-10-JAN-2008 17:15
-
-TABLES PROCESSED
-================
-HIG_ROLES
-HIG_MODULE_ROLES
-HIG_MODULE_KEYWORDS
-
-TABLE OWNER
-===========
-NM3_METADATA
-
-MODE (A-Append R-Refresh)
-========================
-A
-
-***************************************************************************/
 
 set define off;
 set feedback off;
@@ -49,20 +31,19 @@ set feedback off;
 -- START OF GENERATED METADATA --
 ---------------------------------
 
+
+----------------------------------------------------------------------------------------
+-- HIG_ROLES
 --
---********** HIG_ROLES **********--
+-- select * from nm3_metadata.hig_roles
+-- order by hro_role
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT hig_roles
 SET TERM OFF
---
--- Columns
--- HRO_ROLE                       NOT NULL VARCHAR2(30)
---   HIG_ROLES_PK (Pos 1)
--- HRO_PRODUCT                    NOT NULL VARCHAR2(6)
---   HRO_HPR_FK (Pos 1)
--- HRO_DESCR                               VARCHAR2(2000)
---
---
+
 INSERT INTO HIG_ROLES
        (HRO_ROLE
        ,HRO_PRODUCT
@@ -134,6 +115,18 @@ SELECT
        ,'Document Manager Updates' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_ROLES
                    WHERE HRO_ROLE = 'DOC_USER');
+--
+INSERT INTO HIG_ROLES
+       (HRO_ROLE
+       ,HRO_PRODUCT
+       ,HRO_DESCR
+       )
+SELECT 
+        'GIS_SUPERUSER'
+       ,'HIG'
+       ,'GIS Super User Administration Role' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_ROLES
+                   WHERE HRO_ROLE = 'GIS_SUPERUSER');
 --
 INSERT INTO HIG_ROLES
        (HRO_ROLE
@@ -232,21 +225,23 @@ SELECT
                    WHERE HRO_ROLE = 'WEB_USER');
 --
 --
---********** HIG_MODULE_ROLES **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_MODULE_ROLES
+--
+-- select * from nm3_metadata.hig_module_roles
+-- order by hmr_module
+--         ,hmr_role
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT hig_module_roles
 SET TERM OFF
---
--- Columns
--- HMR_MODULE                     NOT NULL VARCHAR2(30)
---   HMR_PK (Pos 1)
---   HMR_HMO_FK (Pos 1)
--- HMR_ROLE                       NOT NULL VARCHAR2(30)
---   HMR_PK (Pos 2)
---   HMR_HRO_FK (Pos 1)
--- HMR_MODE                       NOT NULL VARCHAR2(10)
---
---
+
 INSERT INTO HIG_MODULE_ROLES
        (HMR_MODULE
        ,HMR_ROLE
@@ -916,6 +911,19 @@ INSERT INTO HIG_MODULE_ROLES
        ,HMR_MODE
        )
 SELECT 
+        'HIG1834'
+       ,'HIG_ADMIN'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'HIG1834'
+                    AND  HMR_ROLE = 'HIG_ADMIN');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
         'HIG1836'
        ,'HIG_ADMIN'
        ,'NORMAL' FROM DUAL
@@ -1540,6 +1548,19 @@ INSERT INTO HIG_MODULE_ROLES
        ,HMR_MODE
        )
 SELECT 
+        'MAPBUILDER'
+       ,'GIS_SUPERUSER'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'MAPBUILDER'
+                    AND  HMR_ROLE = 'GIS_SUPERUSER');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
         'NET1100'
        ,'HIG_ADMIN'
        ,'NORMAL' FROM DUAL
@@ -1741,6 +1762,19 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'NM0115'
                     AND  HMR_ROLE = 'NET_USER');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'NM0116'
+       ,'NET_ADMIN'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'NM0116'
+                    AND  HMR_ROLE = 'NET_ADMIN');
 --
 INSERT INTO HIG_MODULE_ROLES
        (HMR_MODULE
@@ -2978,21 +3012,24 @@ SELECT
                     AND  HMR_ROLE = 'HIG_ADMIN');
 --
 --
---********** HIG_MODULE_KEYWORDS **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_MODULE_KEYWORDS
+--
+-- select * from nm3_metadata.hig_module_keywords
+-- order by hmk_hmo_module
+--         ,hmk_keyword
+--         ,hmk_owner
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT hig_module_keywords
 SET TERM OFF
---
--- Columns
--- HMK_HMO_MODULE                 NOT NULL VARCHAR2(30)
---   HMK_PK (Pos 1)
---   HMK_HMO_FK (Pos 1)
--- HMK_KEYWORD                    NOT NULL VARCHAR2(30)
---   HMK_PK (Pos 2)
--- HMK_OWNER                      NOT NULL NUMBER(38)
---   HMK_PK (Pos 3)
---
---
+
 INSERT INTO HIG_MODULE_KEYWORDS
        (HMK_HMO_MODULE
        ,HMK_KEYWORD
@@ -4323,6 +4360,10 @@ SELECT
                     AND  HMK_KEYWORD = 'EXTENDED LOV'
                     AND  HMK_OWNER = 1);
 --
+--
+--
+----------------------------------------------------------------------------------------
+
 --
 COMMIT;
 --

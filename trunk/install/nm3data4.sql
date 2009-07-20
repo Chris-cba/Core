@@ -1,47 +1,30 @@
---
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data4.sql-arc   2.1   Oct 04 2007 17:59:20   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data4.sql-arc   2.2   Jul 20 2009 13:54:36   aedwards  $
 --       Module Name      : $Workfile:   nm3data4.sql  $
---       Date into PVCS   : $Date:   Oct 04 2007 17:59:20  $
---       Date fetched Out : $Modtime:   Oct 04 2007 17:53:40  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jul 20 2009 13:54:36  $
+--       Date fetched Out : $Modtime:   Jul 20 2009 13:52:28  $
+--       Version          : $Revision:   2.2  $
+--       Table Owner      : NM3_METADATA
+--       Generation Date  : 20-JUL-2009 13:52
 --
 --   Product metadata script
+--   As at Release 4.1.0.0
+--
+--   Copyright (c) exor corporation ltd, 2009
+--
+--   TABLES PROCESSED
+--   ================
+--   DOC_TYPES
+--   GROUP_TYPE_ROLES
+--   INTERVALS
+--   HIG_REPORT_STYLES
+--   NM_SPECIAL_CHARS
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
------------------------------------------------------------------------------
---
---
-/***************************************************************************
 
-INFO
-====
-As at Release 4.0.2.0
-
-GENERATION DATE
-===============
-04-OCT-2007 17:53
-
-TABLES PROCESSED
-================
-DOC_TYPES
-GROUP_TYPE_ROLES
-INTERVALS
-HIG_REPORT_STYLES
-
-TABLE OWNER
-===========
-NM3_METADATA
-
-MODE (A-Append R-Refresh)
-========================
-A
-
-***************************************************************************/
 
 set define off;
 set feedback off;
@@ -50,24 +33,19 @@ set feedback off;
 -- START OF GENERATED METADATA --
 ---------------------------------
 
+
+----------------------------------------------------------------------------------------
+-- DOC_TYPES
 --
---********** DOC_TYPES **********--
+-- select * from nm3_metadata.doc_types
+-- order by dtp_code
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT doc_types
 SET TERM OFF
---
--- Columns
--- DTP_CODE                       NOT NULL VARCHAR2(4)
---   DTP_PK (Pos 1)
--- DTP_NAME                       NOT NULL VARCHAR2(30)
---   DTP_UK (Pos 1)
--- DTP_DESCR                               VARCHAR2(254)
--- DTP_ALLOW_COMMENTS             NOT NULL VARCHAR2(1)
--- DTP_ALLOW_COMPLAINTS           NOT NULL VARCHAR2(1)
--- DTP_START_DATE                          DATE
--- DTP_END_DATE                            DATE
---
---
+
 INSERT INTO DOC_TYPES
        (DTP_CODE
        ,DTP_NAME
@@ -269,18 +247,23 @@ SELECT
                    WHERE DTP_CODE = 'UKNW');
 --
 --
---********** GROUP_TYPE_ROLES **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- GROUP_TYPE_ROLES
+--
+-- select * from nm3_metadata.group_type_roles
+-- order by gtr_role
+--         ,gtr_gty_group_type
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT group_type_roles
 SET TERM OFF
---
--- Columns
--- GTR_ROLE                       NOT NULL VARCHAR2(30)
---   GTR_PK (Pos 1)
--- GTR_GTY_GROUP_TYPE             NOT NULL VARCHAR2(4)
---   GTR_PK (Pos 2)
---
---
+
 INSERT INTO GROUP_TYPE_ROLES
        (GTR_ROLE
        ,GTR_GTY_GROUP_TYPE
@@ -568,27 +551,22 @@ SELECT
                     AND  GTR_GTY_GROUP_TYPE = 'TOWN');
 --
 --
---********** INTERVALS **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- INTERVALS
+--
+-- select * from nm3_metadata.intervals
+-- order by int_code
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT intervals
 SET TERM OFF
---
--- Columns
--- INT_CODE                       NOT NULL VARCHAR2(4)
---   INT_PK (Pos 1)
--- INT_TRANSLATION                NOT NULL VARCHAR2(20)
--- INT_DAYS                                NUMBER(3)
--- INT_DESCR                               VARCHAR2(40)
--- INT_FREQ_PER_MONTH                      NUMBER(2)
--- INT_FREQ_PER_WEEK                       NUMBER(2)
--- INT_FREQ_PER_YEAR                       NUMBER(2)
--- INT_HRS                                 NUMBER(2)
--- INT_MONTHS                              NUMBER(2)
--- INT_YRS                                 NUMBER(2)
--- INT_START_DATE                          DATE
--- INT_END_DATE                            DATE
---
---
+
 INSERT INTO INTERVALS
        (INT_CODE
        ,INT_TRANSLATION
@@ -1730,26 +1708,22 @@ SELECT
                    WHERE INT_CODE = '999');
 --
 --
---********** HIG_REPORT_STYLES **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_REPORT_STYLES
+--
+-- select * from nm3_metadata.hig_report_styles
+-- order by hrs_style_name
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT hig_report_styles
 SET TERM OFF
---
--- Columns
--- HRS_STYLE_NAME                 NOT NULL VARCHAR2(30)
---   HRS_PK (Pos 1)
--- HRS_HEADER_FILL_COLOUR                  VARCHAR2(30)
--- HRS_BODY_FILL_COLOUR_1                  VARCHAR2(30)
--- HRS_BODY_FILL_COLOUR_2                  VARCHAR2(30)
--- HRS_BODY_FILL_COLOUR_H                  VARCHAR2(30)
--- HRS_HEADER_FONT_COLOUR                  VARCHAR2(30)
--- HRS_BODY_FONT_COLOUR_1                  VARCHAR2(30)
--- HRS_BODY_FONT_COLOUR_2                  VARCHAR2(30)
--- HRS_BODY_FONT_COLOUR_H                  VARCHAR2(30)
--- HRS_IMAGE_NAME                          VARCHAR2(256)
--- HRS_FOOTER_TEXT                         VARCHAR2(256)
---
---
+
 INSERT INTO HIG_REPORT_STYLES
        (HRS_STYLE_NAME
        ,HRS_HEADER_FILL_COLOUR
@@ -1806,6 +1780,651 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_REPORT_STYLES
                    WHERE HRS_STYLE_NAME = 'EXOR_DEFAULT');
 --
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- NM_SPECIAL_CHARS
+--
+-- select * from nm3_metadata.nm_special_chars
+-- order by nsch_ascii_character
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT nm_special_chars
+SET TERM OFF
+
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        32 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 32);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        33 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 33);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        34 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 34);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        35 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 35);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        36 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 36);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        37 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 37);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        38 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 38);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        39 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 39);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        40 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 40);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        41 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 41);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        42 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 42);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        43 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 43);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        44 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 44);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        45 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 45);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        46 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 46);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        47 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 47);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        58 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 58);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        59 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 59);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        60 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 60);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        61 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 61);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        62 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 62);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        63 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 63);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        64 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 64);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        91 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 91);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        92 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 92);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        93 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 93);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        94 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 94);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        96 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 96);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        123 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 123);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        124 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 124);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        125 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 125);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        126 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 126);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        127 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 127);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        128 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 128);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        129 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 129);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        130 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 130);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        131 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 131);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        132 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 132);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        133 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 133);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        134 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 134);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        135 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 135);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        136 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 136);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        137 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 137);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        138 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 138);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        139 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 139);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        140 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 140);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        141 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 141);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        142 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 142);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        143 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 143);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        144 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 144);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        145 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 145);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        146 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 146);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        147 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 147);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        148 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 148);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        149 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 149);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        150 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 150);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        151 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 151);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        152 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 152);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        153 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 153);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        154 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 154);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        155 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 155);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        156 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 156);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        157 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 157);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        158 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 158);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        159 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 159);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        160 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 160);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        161 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 161);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        162 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 162);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        163 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 163);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        164 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 164);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        165 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 165);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        166 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 166);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        167 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 167);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        168 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 168);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        169 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 169);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        170 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 170);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        171 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 171);
+--
+INSERT INTO NM_SPECIAL_CHARS
+       (NSCH_ASCII_CHARACTER
+       )
+SELECT 
+        172 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_SPECIAL_CHARS
+                   WHERE NSCH_ASCII_CHARACTER = 172);
+--
+--
+--
+----------------------------------------------------------------------------------------
+
 --
 COMMIT;
 --

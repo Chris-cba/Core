@@ -1,46 +1,27 @@
---
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.2   Jan 29 2008 12:25:44   jwadsworth  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.3   Jul 20 2009 13:54:36   aedwards  $
 --       Module Name      : $Workfile:   nm3data8.sql  $
---       Date into PVCS   : $Date:   Jan 29 2008 12:25:44  $
---       Date fetched Out : $Modtime:   Jan 29 2008 11:51:16  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 20 2009 13:54:36  $
+--       Date fetched Out : $Modtime:   Jul 20 2009 13:52:34  $
+--       Version          : $Revision:   2.3  $
+--       Table Owner      : NM3_METADATA
+--       Generation Date  : 20-JUL-2009 13:52
 --
 --   Product metadata script
+--   As at Release 4.1.0.0
+--
+--   Copyright (c) exor corporation ltd, 2009
+--
+--   TABLES PROCESSED
+--   ================
+--   USER_SDO_STYLES
+--   NM_LAYER_TREE
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2008
------------------------------------------------------------------------------
---
---
-/***************************************************************************
 
-INFO
-====
-As at Release 4.0.4.0
-
-GENERATION DATE
-===============
-29-JAN-2008 11:51
-
-TABLES PROCESSED
-================
-USER_SDO_STYLES
-NM_LAYER_TREE
-NM_THEMES_VISIBLE
-
-TABLE OWNER
-===========
-NM3_METADATA
-
-MODE (A-Append R-Refresh)
-========================
-A
-
-***************************************************************************/
 
 set define off;
 set feedback off;
@@ -49,20 +30,19 @@ set feedback off;
 -- START OF GENERATED METADATA --
 ---------------------------------
 
+
+----------------------------------------------------------------------------------------
+-- USER_SDO_STYLES
 --
---********** USER_SDO_STYLES **********--
+-- select * from nm3_metadata.user_sdo_styles
+-- order by name
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT user_sdo_styles
 SET TERM OFF
---
--- Columns
--- NAME                           NOT NULL VARCHAR2(32)
---   USER_SDO_STYLES_PK (Pos 1)
--- TYPE                                    VARCHAR2(32)
--- DESCRIPTION                             VARCHAR2(4000)
--- DEFINITION                              CLOB
---
---
+
 INSERT INTO USER_SDO_STYLES
        (NAME
        ,TYPE
@@ -666,23 +646,22 @@ SELECT
                    WHERE NAME = 'V.COLOR SERIES 2');
 --
 --
---********** NM_LAYER_TREE **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- NM_LAYER_TREE
+--
+-- select * from nm3_metadata.nm_layer_tree
+-- order by nltr_child
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT nm_layer_tree
 SET TERM OFF
---
--- Columns
--- NLTR_PARENT                    NOT NULL VARCHAR2(100)
---   NLTR_PARENT_CHILD_CHK
--- NLTR_CHILD                     NOT NULL VARCHAR2(100)
---   NLTR_PK (Pos 1)
---   NLTR_PARENT_CHILD_CHK
--- NLTR_DESCR                     NOT NULL VARCHAR2(250)
--- NLTR_TYPE                      NOT NULL VARCHAR2(1)
---   NLTR_TYPE_CHK
--- NLTR_ORDER                              NUMBER(22)
---
---
+
 INSERT INTO NM_LAYER_TREE
        (NLTR_PARENT
        ,NLTR_CHILD
@@ -1083,17 +1062,26 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_LAYER_TREE
                    WHERE NLTR_CHILD = 'SWR');
 --
+INSERT INTO NM_LAYER_TREE
+       (NLTR_PARENT
+       ,NLTR_CHILD
+       ,NLTR_DESCR
+       ,NLTR_TYPE
+       ,NLTR_ORDER
+       )
+SELECT 
+        'MAI'
+       ,'WOL'
+       ,'Work Order Lines Layer'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LAYER_TREE
+                   WHERE NLTR_CHILD = 'WOL');
 --
---********** NM_THEMES_VISIBLE **********--
-SET TERM ON
-PROMPT nm_themes_visible
-SET TERM OFF
---
--- Columns
--- NTV_NTH_THEME_ID               NOT NULL NUMBER(9)
--- NTV_VISIBLE                    NOT NULL VARCHAR2(1)
 --
 --
+----------------------------------------------------------------------------------------
+
 --
 COMMIT;
 --
