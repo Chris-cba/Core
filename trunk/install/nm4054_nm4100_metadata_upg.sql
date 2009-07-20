@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.4   Jul 20 2009 12:30:24   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.5   Jul 20 2009 16:24:46   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Jul 20 2009 12:30:24  $
---       Date fetched Out : $Modtime:   Jul 20 2009 12:25:42  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Jul 20 2009 16:24:46  $
+--       Date fetched Out : $Modtime:   Jul 20 2009 16:23:28  $
+--       Version          : $Revision:   3.5  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -805,7 +805,7 @@ INSERT INTO nm_layer_tree
 
 ------------------------------------------------------------------
 SET TERM ON
-PROMPT update hig_option_list & hig_option_values
+PROMPT Update hig_option_list and hig_option_values
 SET TERM OFF
 
 ------------------------------------------------------------------
