@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.3   Jul 16 2009 15:59:30   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.4   Jul 20 2009 12:30:24   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 16 2009 15:59:30  $
---       Date fetched Out : $Modtime:   Jul 16 2009 15:57:24  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Jul 20 2009 12:30:24  $
+--       Date fetched Out : $Modtime:   Jul 20 2009 12:25:42  $
+--       Version          : $Revision:   3.4  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -168,198 +168,6 @@ EXCEPTION
     RAISE;
 END;
 /
-
-------------------------------------------------------------------
-
-
-------------------------------------------------------------------
-SET TERM ON
-PROMPT Drop Unique Constraint IIG_UK
-SET TERM OFF
-
-------------------------------------------------------------------
--- ASSOCIATED PROBLEM MANAGER LOG#
--- 713421  New Mexico Department of Transportation
--- 
--- 
--- DEVELOPMENT COMMENTS (LINESH SORATHIA)
--- Drop unique constraint IIG_UK
--- 
-------------------------------------------------------------------
-DECLARE
-  ex_not_exists exception;
-  pragma exception_init(ex_not_exists,-4080);
-BEGIN
- EXECUTE IMMEDIATE('ALTER TABLE NM_INV_ITEM_GROUPINGS_ALL DROP CONSTRAINT IIG_UK');
-EXCEPTION
- WHEN ex_not_exists 
- THEN
-    NULL;
- WHEN OTHERS 
- THEN
-    RAISE;
-END;
-/
-------------------------------------------------------------------
-
-
-------------------------------------------------------------------
-SET TERM ON
-PROMPT Bulk Attribute Update
-SET TERM OFF
-
-------------------------------------------------------------------
--- 
--- DEVELOPMENT COMMENTS (LINESH SORATHIA)
--- Objects required for network bulk attribs update
--- 
-------------------------------------------------------------------
-DECLARE
-       already_exists Exception;
-       pragma exception_init(already_exists,-00955);
-Begin
-   Execute Immediate 'CREATE TYPE nm_ne_id_type AS OBJECT(ne_id NUMBER)';
-Exception
-When already_exists 
-Then 
-         Null;
-WHEN others
-THEN
-         Raise;
-ENd ;
-/
- 
-DECLARE
-       already_exists Exception;
-       pragma exception_init(already_exists,-00955);
-Begin
-   Execute Immediate 'CREATE TYPE nm_ne_id_array IS TABLE OF nm_ne_id_type';
-Exception
-When already_exists 
-Then 
-         Null;
-WHEN others
-THEN
-         Raise;
-End ;
-/
-
-CREATE OR REPLACE FORCE VIEW nm_elements_view_vw (
-nev_ne_id,
-nev_ne_unique ,
-nev_ne_descr,
-nev_ne_type,
-nev_ne_nt_type ,
-nev_admin_unit_descr ,
-nev_ne_start_date ,
-nev_ne_gty_group_type,
-nev_ne_admin_unit
-)
-AS
-SELECT 
---
--------------------------------------------------------------------------
---   PVCS Identifiers :-
---
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.3   Jul 16 2009 15:59:30   aedwards  $
---       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 16 2009 15:59:30  $
---       Date fetched Out : $Modtime:   Jul 16 2009 15:57:24  $
---       Version          : $Revision:   3.3  $
---       Based on SCCS version : 
--------------------------------------------------------------------------
---
-ne_id
-      ,ne_unique 
-      ,ne_descr
-      ,ne_type
-      ,ne_nt_type 
-      ,nau_unit_code ||' - '||nau_name
-      ,ne_start_date 
-      ,ne_gty_group_type
-      ,ne_admin_unit
-FROM   nm_elements ne
-      ,nm_admin_units nau
-WHERE  ne.ne_admin_unit = nau.nau_admin_unit
-/
-
-
-CREATE OR REPLACE FORCE VIEW nm_attrib_view_vw (
-nav_disp_ord,
-nav_nt_type ,
-nav_inv_type,
-nav_col_name,
-nav_col_type ,
-nav_col_length ,
-nav_col_mandatory ,
-nav_col_domain,
-nav_col_updatable,
-nav_col_prompt,
-nav_col_format,
-nav_col_seq_no,
-nav_gty_type ,
-nav_parent_type_inc,
-nav_child_type_inc,
-nav_child_col,
-nav_parent_col
-)
-AS
-SELECT
---
---
--------------------------------------------------------------------------
---   PVCS Identifiers :-
---
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.3   Jul 16 2009 15:59:30   aedwards  $
---       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jul 16 2009 15:59:30  $
---       Date fetched Out : $Modtime:   Jul 16 2009 15:57:24  $
---       Version          : $Revision:   3.3  $
---       Based on SCCS version : 
--------------------------------------------------------------------------
--- 
-1 disp_ord,
-       ntc_nt_type ,
-       Null ,
-       ntc_column_name ,
-       ntc_column_type ,
-       ntc_str_length ,
-       ntc_mandatory ,
-       ntc_domain,
-       nm3_bulk_attrib_upd.check_col_upd(ntc_column_name,ntc_nt_type),
-       ntc_prompt,
-       ntc_format,
-       ntc_seq_no,
-       Null ,
-       nm3_bulk_attrib_upd.parent_inclusion_type(ntc_column_name,ntc_nt_type) parent_type_inc,
-       nm3_bulk_attrib_upd.child_inclusion_type(ntc_column_name,ntc_nt_type)  child_type_inc,
-       (SELECT nti_child_column FROM nm_type_inclusion WHERE  nti_nw_parent_type = ntc_nt_type 
-                                                     ) child_col,
-       (SELECT nti_parent_column FROM nm_type_inclusion WHERE  nti_nw_child_type = ntc_nt_type AND nti_child_column = ntc_column_name 
-                                                     ) parent_col
-FROM   nm_type_columns ntc
-union
-select 2 disp_ord,
-       ita_inv_type,
-       nad_nt_type ,
-       ita_attrib_name,
-       ita_format,
-       ita_fld_length,
-       ita_mandatory_yn,
-       ita_id_domain,'Y' ,
-       ita_scrn_text,
-       ita_format,
-       ita_disp_seq_no ,
-       nad_gty_type   ,
-       Null ,
-       Null,
-       Null,
-       Null 
-FROM   nm_inv_type_attribs ita,nm_nw_ad_types nad
-WHERE  ita.ita_inv_type =  nad.nad_inv_type
-AND    nad_primary_ad   = 'Y'
-/
-
 
 ------------------------------------------------------------------
 
@@ -610,11 +418,11 @@ BEGIN
    l_tab_comments(1)  := '--';
    l_tab_comments(2)  := '--   SCCS Identifiers :-';
    l_tab_comments(3)  := '--';
-   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.3   Jul 16 2009 15:59:30   aedwards  $';
+   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.4   Jul 20 2009 12:30:24   aedwards  $';
    l_tab_comments(5)  := '--       Module Name                : $Workfile:   nm4054_nm4100_ddl_upg.sql  $';
-   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jul 16 2009 15:59:30  $';
-   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jul 16 2009 15:57:24  $';
-   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   3.3  $';
+   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jul 20 2009 12:30:24  $';
+   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jul 20 2009 12:25:42  $';
+   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   3.4  $';
    l_tab_comments(9)  := '--';
    l_tab_comments(10) := '--   table_name_WHO trigger';
    l_tab_comments(11) := '--';
@@ -736,11 +544,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.3   Jul 16 2009 15:59:30   aedwards  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.4   Jul 20 2009 12:30:24   aedwards  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Jul 16 2009 15:59:30  $
-    --       Date fetched Out : $Modtime:   Jul 16 2009 15:57:24  $
-    --       Version          : $Revision:   3.3  $
+    --       Date into PVCS   : $Date:   Jul 20 2009 12:30:24  $
+    --       Date fetched Out : $Modtime:   Jul 20 2009 12:25:42  $
+    --       Version          : $Revision:   3.4  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
              ngqs_ngq_id,
@@ -790,11 +598,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.3   Jul 16 2009 15:59:30   aedwards  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.4   Jul 20 2009 12:30:24   aedwards  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Jul 16 2009 15:59:30  $
-    --       Date fetched Out : $Modtime:   Jul 16 2009 15:57:24  $
-    --       Version          : $Revision:   3.3  $
+    --       Date into PVCS   : $Date:   Jul 20 2009 12:30:24  $
+    --       Date fetched Out : $Modtime:   Jul 20 2009 12:25:42  $
+    --       Version          : $Revision:   3.4  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
           * 
@@ -818,11 +626,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.3   Jul 16 2009 15:59:30   aedwards  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.4   Jul 20 2009 12:30:24   aedwards  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Jul 16 2009 15:59:30  $
-    --       Date fetched Out : $Modtime:   Jul 16 2009 15:57:24  $
-    --       Version          : $Revision:   3.3  $
+    --       Date into PVCS   : $Date:   Jul 20 2009 12:30:24  $
+    --       Date fetched Out : $Modtime:   Jul 20 2009 12:25:42  $
+    --       Version          : $Revision:   3.4  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
              ngqas_ngq_id       vngqas_ngqa_ngq_id,
@@ -1138,6 +946,9 @@ ALTER TABLE REPORT_PARAMS
   DISABLE)
 /
 
+CREATE INDEX RPA_PK_IDX ON REPORT_PARAMS
+ (REP_SESSIONID)
+/
 
 ------------------------------------------------------------------
 
@@ -1206,6 +1017,47 @@ ALTER TABLE NM_INV_TYPE_ATTRIBS_ALL
 ADD (CONSTRAINT ITA_INSP_YN_CHK
      CHECK (ITA_INSPECTABLE IN ('Y','N'))
     )
+/
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Drop GDO PK
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Consolidate changes to GDO table
+-- 
+------------------------------------------------------------------
+DECLARE
+  non_exists Exception;
+  pragma exception_init(non_exists,-02443);
+BEGIN
+  EXECUTE IMMEDIATE 
+    'ALTER TABLE GIS_DATA_OBJECTS DROP CONSTRAINT GDOBJ_PK';
+EXCEPTION
+  WHEN NON_EXISTS THEN NULL;
+  WHEN OTHERS THEN RAISE;
+END;
+/
+
+DECLARE
+  non_exists Exception;
+  pragma exception_init(non_exists,-955);
+BEGIN
+  EXECUTE IMMEDIATE 
+    'CREATE INDEX GDO_IDX ON GIS_DATA_OBJECTS '
+     ||' (GDO_SESSION_ID '
+     ||' ,GDO_PK_ID)';
+EXCEPTION
+  WHEN NON_EXISTS THEN NULL;
+  WHEN OTHERS THEN RAISE;
+END;
 /
 
 
