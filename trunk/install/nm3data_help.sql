@@ -1,28 +1,27 @@
-/***************************************************************************
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data_help.sql-arc   2.3   Jul 20 2009 13:55:40   aedwards  $
+--       Module Name      : $Workfile:   nm3data_help.sql  $
+--       Date into PVCS   : $Date:   Jul 20 2009 13:55:40  $
+--       Date fetched Out : $Modtime:   Jul 20 2009 13:55:02  $
+--       Version          : $Revision:   2.3  $
+--       Table Owner      : NM3_METADATA
+--       Generation Date  : 20-JUL-2009 13:55
+--
+--   Product metadata script
+--   As at Release 4.1.0.0
+--
+--   Copyright (c) exor corporation ltd, 2009
+--
+--   TABLES PROCESSED
+--   ================
+--   HIG_WEB_CONTXT_HLP
+--
+-----------------------------------------------------------------------------
 
-INFO
-====
-Re-generated to include updated HIG_WEB_CONTXT_HLP entries
 
-GENERATION DATE
-===============
-19-SEP-2008 10:46
-
-TABLES PROCESSED
-================
-HIG_WEB_CONTXT_HLP
-
-TABLE OWNER
-===========
-NM3_METADATA
-
-MODE (A-Append R-Refresh)
-========================
-R
-
-***************************************************************************/
-
-define sccsid = '%W% %G%'
 set define off;
 set feedback off;
 
@@ -36,22 +35,19 @@ delete from hig_web_contxt_hlp;
 -- START OF GENERATED METADATA --
 ---------------------------------
 
+
+----------------------------------------------------------------------------------------
+-- HIG_WEB_CONTXT_HLP
 --
---********** HIG_WEB_CONTXT_HLP **********--
+-- select * from nm3_metadata.hig_web_contxt_hlp
+-- order by hwch_art_id
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT hig_web_contxt_hlp
 SET TERM OFF
---
--- Columns
--- HWCH_ART_ID                    NOT NULL NUMBER(22)
---   HWCH_PK (Pos 1)
--- HWCH_PRODUCT                   NOT NULL VARCHAR2(6)
--- HWCH_MODULE                             VARCHAR2(30)
--- HWCH_BLOCK                              VARCHAR2(30)
--- HWCH_ITEM                               VARCHAR2(30)
--- HWCH_HTML_STRING               NOT NULL VARCHAR2(200)
---
---
+
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 1;
 --
@@ -8260,6 +8256,10 @@ SELECT
        ,''
        ,'/tm/WebHelp/tm.htm#tmdisplaying_traffic_data_on_a_map.htm' FROM DUAL;
 --
+--
+--
+----------------------------------------------------------------------------------------
+
 --
 COMMIT;
 --
