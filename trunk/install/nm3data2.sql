@@ -1,36 +1,35 @@
-/***************************************************************************
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.16   Jul 20 2009 13:54:34   aedwards  $
+--       Module Name      : $Workfile:   nm3data2.sql  $
+--       Date into PVCS   : $Date:   Jul 20 2009 13:54:34  $
+--       Date fetched Out : $Modtime:   Jul 20 2009 13:52:26  $
+--       Version          : $Revision:   2.16  $
+--       Table Owner      : NM3_METADATA
+--       Generation Date  : 20-JUL-2009 13:52
+--
+--   Product metadata script
+--   As at Release 4.1.0.0
+--
+--   Copyright (c) exor corporation ltd, 2009
+--
+--   TABLES PROCESSED
+--   ================
+--   DOC_GATEWAYS
+--   DOC_GATE_SYNS
+--   GRI_MODULES
+--   GRI_PARAMS
+--   GRI_MODULE_PARAMS
+--   GRI_PARAM_DEPENDENCIES
+--   GRI_PARAM_LOOKUP
+--   HIG_ERRORS
+--   HIG_STANDARD_FAVOURITES
+--
+-----------------------------------------------------------------------------
 
-INFO
-====
-As at Release 4.0.5.1
 
-GENERATION DATE
-===============
-26-SEP-2008 14:55
-
-TABLES PROCESSED
-================
-DOC_GATEWAYS
-DOC_GATE_SYNS
-GRI_MODULES
-GRI_PARAMS
-GRI_MODULE_PARAMS
-GRI_PARAM_DEPENDENCIES
-GRI_PARAM_LOOKUP
-HIG_ERRORS
-HIG_STANDARD_FAVOURITES
-
-TABLE OWNER
-===========
-NM3_METADATA
-
-MODE (A-Append R-Refresh)
-========================
-A
-
-***************************************************************************/
-
-define sccsid = '%W% %G%'
 set define off;
 set feedback off;
 
@@ -38,26 +37,19 @@ set feedback off;
 -- START OF GENERATED METADATA --
 ---------------------------------
 
+
+----------------------------------------------------------------------------------------
+-- DOC_GATEWAYS
 --
---********** DOC_GATEWAYS **********--
+-- select * from nm3_metadata.doc_gateways
+-- order by dgt_table_name
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT doc_gateways
 SET TERM OFF
---
--- Columns
--- DGT_TABLE_NAME                 NOT NULL VARCHAR2(30)
---   DGT_PK (Pos 1)
--- DGT_TABLE_DESCR                NOT NULL VARCHAR2(30)
---   DGT_UK1 (Pos 1)
--- DGT_PK_COL_NAME                NOT NULL VARCHAR2(30)
--- DGT_LOV_DESCR_LIST                      VARCHAR2(254)
--- DGT_LOV_FROM_LIST                       VARCHAR2(254)
--- DGT_LOV_JOIN_CONDITION                  VARCHAR2(254)
--- DGT_EXPAND_MODULE                       VARCHAR2(30)
--- DGT_START_DATE                          DATE
--- DGT_END_DATE                            DATE
---
---
+
 INSERT INTO DOC_GATEWAYS
        (DGT_TABLE_NAME
        ,DGT_TABLE_DESCR
@@ -299,19 +291,23 @@ SELECT
                    WHERE DGT_TABLE_NAME = 'ROAD_SEGMENTS_ALL');
 --
 --
---********** DOC_GATE_SYNS **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- DOC_GATE_SYNS
+--
+-- select * from nm3_metadata.doc_gate_syns
+-- order by dgs_dgt_table_name
+--         ,dgs_table_syn
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT doc_gate_syns
 SET TERM OFF
---
--- Columns
--- DGS_DGT_TABLE_NAME             NOT NULL VARCHAR2(30)
---   DGS_PK (Pos 1)
---   DGS_FK_DGT (Pos 1)
--- DGS_TABLE_SYN                  NOT NULL VARCHAR2(30)
---   DGS_PK (Pos 2)
---
---
+
 INSERT INTO DOC_GATE_SYNS
        (DGS_DGT_TABLE_NAME
        ,DGS_TABLE_SYN
@@ -434,27 +430,22 @@ SELECT
                     AND  DGS_TABLE_SYN = 'ROAD_SEGS');
 --
 --
---********** GRI_MODULES **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- GRI_MODULES
+--
+-- select * from nm3_metadata.gri_modules
+-- order by grm_module
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT gri_modules
 SET TERM OFF
---
--- Columns
--- GRM_MODULE                     NOT NULL VARCHAR2(30)
---   GRM_PK (Pos 1)
---   GRM_FK_HMO (Pos 1)
--- GRM_MODULE_TYPE                NOT NULL VARCHAR2(3)
--- GRM_MODULE_PATH                NOT NULL VARCHAR2(240)
--- GRM_FILE_TYPE                  NOT NULL VARCHAR2(3)
--- GRM_TAG_FLAG                   NOT NULL VARCHAR2(1)
--- GRM_TAG_TABLE                           VARCHAR2(30)
--- GRM_TAG_COLUMN                          VARCHAR2(30)
--- GRM_TAG_WHERE                           VARCHAR2(2000)
--- GRM_LINESIZE                   NOT NULL NUMBER(4)
--- GRM_PAGESIZE                   NOT NULL NUMBER(4)
--- GRM_PRE_PROCESS                         VARCHAR2(4000)
---
---
+
 INSERT INTO GRI_MODULES
        (GRM_MODULE
        ,GRM_MODULE_TYPE
@@ -988,26 +979,22 @@ SELECT
                    WHERE GRM_MODULE = 'NM0580');
 --
 --
---********** GRI_PARAMS **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- GRI_PARAMS
+--
+-- select * from nm3_metadata.gri_params
+-- order by gp_param
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT gri_params
 SET TERM OFF
---
--- Columns
--- GP_PARAM                       NOT NULL VARCHAR2(30)
---   GP_PK (Pos 1)
--- GP_PARAM_TYPE                  NOT NULL VARCHAR2(6)
--- GP_TABLE                                VARCHAR2(80)
--- GP_COLUMN                               VARCHAR2(80)
--- GP_DESCR_COLUMN                         VARCHAR2(80)
--- GP_SHOWN_COLUMN                         VARCHAR2(80)
--- GP_SHOWN_TYPE                           VARCHAR2(6)
--- GP_DESCR_TYPE                           VARCHAR2(6)
--- GP_ORDER                                VARCHAR2(80)
--- GP_CASE                                 VARCHAR2(6)
--- GP_GAZ_RESTRICTION                      VARCHAR2(6)
---
---
+
 INSERT INTO GRI_PARAMS
        (GP_PARAM
        ,GP_PARAM_TYPE
@@ -2689,40 +2676,23 @@ SELECT
                    WHERE GP_PARAM = 'XSP');
 --
 --
---********** GRI_MODULE_PARAMS **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- GRI_MODULE_PARAMS
+--
+-- select * from nm3_metadata.gri_module_params
+-- order by gmp_module
+--         ,gmp_param
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT gri_module_params
 SET TERM OFF
---
--- Columns
--- GMP_MODULE                     NOT NULL VARCHAR2(30)
---   GMP_PK (Pos 1)
---   GMP_FK_GRM (Pos 1)
--- GMP_PARAM                      NOT NULL VARCHAR2(30)
---   GMP_PK (Pos 2)
---   GMP_FK_GP (Pos 1)
--- GMP_SEQ                        NOT NULL NUMBER(4)
--- GMP_PARAM_DESCR                NOT NULL VARCHAR2(100)
--- GMP_MANDATORY                  NOT NULL VARCHAR2(1)
--- GMP_NO_ALLOWED                 NOT NULL NUMBER(4)
--- GMP_WHERE                               VARCHAR2(2000)
--- GMP_TAG_RESTRICTION            NOT NULL VARCHAR2(1)
--- GMP_TAG_WHERE                           VARCHAR2(2000)
--- GMP_DEFAULT_TABLE                       VARCHAR2(30)
--- GMP_DEFAULT_COLUMN                      VARCHAR2(80)
--- GMP_DEFAULT_WHERE                       VARCHAR2(2000)
--- GMP_VISIBLE                    NOT NULL VARCHAR2(1)
--- GMP_GAZETTEER                  NOT NULL VARCHAR2(1)
--- GMP_LOV                        NOT NULL VARCHAR2(1)
--- GMP_VAL_GLOBAL                          VARCHAR2(30)
--- GMP_WILDCARD                   NOT NULL VARCHAR2(1)
--- GMP_HINT_TEXT                           VARCHAR2(80)
--- GMP_ALLOW_PARTIAL              NOT NULL VARCHAR2(1)
--- GMP_BASE_TABLE                          VARCHAR2(30)
--- GMP_BASE_TABLE_COLUMN                   VARCHAR2(30)
--- GMP_OPERATOR                            VARCHAR2(5)
---
---
+
 INSERT INTO GRI_MODULE_PARAMS
        (GMP_MODULE
        ,GMP_PARAM
@@ -5223,24 +5193,24 @@ SELECT
                     AND  GMP_PARAM = 'A_NUMBER');
 --
 --
---********** GRI_PARAM_DEPENDENCIES **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- GRI_PARAM_DEPENDENCIES
+--
+-- select * from nm3_metadata.gri_param_dependencies
+-- order by gpd_module
+--         ,gpd_dep_param
+--         ,gpd_indep_param
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT gri_param_dependencies
 SET TERM OFF
---
--- Columns
--- GPD_MODULE                     NOT NULL VARCHAR2(30)
---   GPD_PK (Pos 1)
---   GPD_FK_GMP2 (Pos 1)
---   GPD_FK_GMP1 (Pos 1)
--- GPD_DEP_PARAM                  NOT NULL VARCHAR2(30)
---   GPD_PK (Pos 2)
---   GPD_FK_GMP1 (Pos 2)
--- GPD_INDEP_PARAM                NOT NULL VARCHAR2(30)
---   GPD_PK (Pos 3)
---   GPD_FK_GMP2 (Pos 2)
---
---
+
 INSERT INTO GRI_PARAM_DEPENDENCIES
        (GPD_MODULE
        ,GPD_DEP_PARAM
@@ -5326,20 +5296,23 @@ SELECT
                     AND  GPD_INDEP_PARAM = 'REGION_OF_INTEREST');
 --
 --
---********** GRI_PARAM_LOOKUP **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- GRI_PARAM_LOOKUP
+--
+-- select * from nm3_metadata.gri_param_lookup
+-- order by gpl_param
+--         ,gpl_value
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT gri_param_lookup
 SET TERM OFF
---
--- Columns
--- GPL_PARAM                      NOT NULL VARCHAR2(30)
---   GPL_PK (Pos 1)
---   GPL_FK_GP (Pos 1)
--- GPL_VALUE                      NOT NULL VARCHAR2(100)
---   GPL_PK (Pos 2)
--- GPL_DESCR                               VARCHAR2(100)
---
---
+
 INSERT INTO GRI_PARAM_LOOKUP
        (GPL_PARAM
        ,GPL_VALUE
@@ -5588,28 +5561,23 @@ SELECT
                     AND  GPL_VALUE = 'B');
 --
 --
---********** HIG_ERRORS **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_ERRORS
+--
+-- select * from nm3_metadata.hig_errors
+-- order by her_appl
+--         ,her_no
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT hig_errors
 SET TERM OFF
---
--- Columns
--- HER_APPL                       NOT NULL VARCHAR2(6)
---   HER_PK (Pos 1)
---   HER_FK_HPR (Pos 1)
--- HER_NO                         NOT NULL NUMBER(4)
---   HER_PK (Pos 2)
--- HER_TYPE                       NOT NULL VARCHAR2(1)
--- HER_DESCR                      NOT NULL VARCHAR2(100)
--- HER_ACTION_1                            VARCHAR2(80)
--- HER_ACTION_2                            VARCHAR2(80)
--- HER_ACTION_3                            VARCHAR2(80)
--- HER_ACTION_4                            VARCHAR2(80)
--- HER_ACTION_5                            VARCHAR2(80)
--- HER_ACTION_6                            VARCHAR2(80)
--- HER_ACTION_7                            VARCHAR2(80)
---
---
+
 INSERT INTO HIG_ERRORS
        (HER_APPL
        ,HER_NO
@@ -80344,23 +80312,23 @@ SELECT
                     AND  HER_NO = 1);
 --
 --
---********** HIG_STANDARD_FAVOURITES **********--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_STANDARD_FAVOURITES
+--
+-- select * from nm3_metadata.hig_standard_favourites
+-- order by hstf_parent
+--         ,hstf_child
+--
+----------------------------------------------------------------------------------------
+
 SET TERM ON
 PROMPT hig_standard_favourites
 SET TERM OFF
---
--- Columns
--- HSTF_PARENT                    NOT NULL VARCHAR2(30)
---   HSTF_PK (Pos 1)
---   HSTF_CONNECT_LOOP_CHK
--- HSTF_CHILD                     NOT NULL VARCHAR2(30)
---   HSTF_PK (Pos 2)
---   HSTF_CONNECT_LOOP_CHK
--- HSTF_DESCR                     NOT NULL VARCHAR2(80)
--- HSTF_TYPE                      NOT NULL VARCHAR2(1)
--- HSTF_ORDER                              NUMBER(22)
---
---
+
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
        ,HSTF_CHILD
@@ -84440,6 +84408,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'HIG_SECURITY'
                     AND  HSTF_CHILD = 'HIG1832');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_SECURITY'
+       ,'HIG1834'
+       ,'User Contact Details'
+       ,'M'
+       ,2.1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_SECURITY'
+                    AND  HSTF_CHILD = 'HIG1834');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -89141,6 +89126,23 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        ,HSTF_ORDER
        )
 SELECT 
+        'NET_NET_MANAGEMENT'
+       ,'NM0116'
+       ,'Bulk Network Update'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'NET_NET_MANAGEMENT'
+                    AND  HSTF_CHILD = 'NM0116');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
         'NET_NET_REPORTS'
        ,'NM0150'
        ,'Network Nodes Report'
@@ -89455,295 +89457,6 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'NET_REF'
                     AND  HSTF_CHILD = 'NM0700');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG'
-       ,'NSG_ADMINISTRATION'
-       ,'Administration'
-       ,'F'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG'
-                    AND  HSTF_CHILD = 'NSG_ADMINISTRATION');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG'
-       ,'NSG_DATA'
-       ,'Data'
-       ,'F'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG'
-                    AND  HSTF_CHILD = 'NSG_DATA');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG'
-       ,'NSG_IMPORT_EXPORT'
-       ,'Import/Export'
-       ,'F'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG'
-                    AND  HSTF_CHILD = 'NSG_IMPORT_EXPORT');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_ADMINISTRATION'
-       ,'NSG0120'
-       ,'Administer User Districts'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_ADMINISTRATION'
-                    AND  HSTF_CHILD = 'NSG0120');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_ADMINISTRATION'
-       ,'NSG0130'
-       ,'My Districts'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_ADMINISTRATION'
-                    AND  HSTF_CHILD = 'NSG0130');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA'
-       ,'NSG0010'
-       ,'NSG Gazetteer'
-       ,'M'
-       ,10 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA'
-                    AND  HSTF_CHILD = 'NSG0010');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA'
-       ,'NSG0060'
-       ,'Locations'
-       ,'M'
-       ,20 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA'
-                    AND  HSTF_CHILD = 'NSG0060');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA'
-       ,'NSG0070'
-       ,'Highways Authorities'
-       ,'M'
-       ,30 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA'
-                    AND  HSTF_CHILD = 'NSG0070');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA'
-       ,'NSG0080'
-       ,'Naming Authorities'
-       ,'M'
-       ,40 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA'
-                    AND  HSTF_CHILD = 'NSG0080');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA'
-       ,'NSG0090'
-       ,'Configure ASD'
-       ,'M'
-       ,50 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA'
-                    AND  HSTF_CHILD = 'NSG0090');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA'
-       ,'NSG0110'
-       ,'Organisations and Districts'
-       ,'M'
-       ,25 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA'
-                    AND  HSTF_CHILD = 'NSG0110');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA'
-       ,'NSG_DATA_ADMIN'
-       ,'Administration'
-       ,'F'
-       ,50 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA'
-                    AND  HSTF_CHILD = 'NSG_DATA_ADMIN');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA_ADMIN'
-       ,'NSG0015'
-       ,'Reset Street Coordinates'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA_ADMIN'
-                    AND  HSTF_CHILD = 'NSG0015');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_DATA_ADMIN'
-       ,'NSG0025'
-       ,'Generate ASD Placements'
-       ,'M'
-       ,2 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_DATA_ADMIN'
-                    AND  HSTF_CHILD = 'NSG0025');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_IMPORT_EXPORT'
-       ,'NSG0020'
-       ,'Export'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_IMPORT_EXPORT'
-                    AND  HSTF_CHILD = 'NSG0020');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_IMPORT_EXPORT'
-       ,'NSG0040'
-       ,'NSG File Manager'
-       ,'M'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_IMPORT_EXPORT'
-                    AND  HSTF_CHILD = 'NSG0040');
---
-INSERT INTO HIG_STANDARD_FAVOURITES
-       (HSTF_PARENT
-       ,HSTF_CHILD
-       ,HSTF_DESCR
-       ,HSTF_TYPE
-       ,HSTF_ORDER
-       )
-SELECT 
-        'NSG_IMPORT_EXPORT'
-       ,'NSG0100'
-       ,'Loader Log Report'
-       ,'M'
-       ,3 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
-                   WHERE HSTF_PARENT = 'NSG_IMPORT_EXPORT'
-                    AND  HSTF_CHILD = 'NSG0100');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
@@ -95202,6 +94915,10 @@ SELECT
                    WHERE HSTF_PARENT = 'VM_VAL'
                     AND  HSTF_CHILD = 'VM1044');
 --
+--
+--
+----------------------------------------------------------------------------------------
+
 --
 COMMIT;
 --
