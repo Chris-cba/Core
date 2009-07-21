@@ -1,5 +1,5 @@
 -- SCCS ID Keyword, do not remove
-define sccsid = '"$Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.9   Jul 16 2009 10:00:56   aedwards  $"'
+define sccsid = '"$Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.10   Jul 21 2009 16:38:14   malexander  $"'
 
 REM Copyright (c) Exor Corporation Ltd, 2008
 
@@ -431,11 +431,11 @@ SET TERM ON
 Prompt Setting The Version Number...
 SET TERM OFF
 BEGIN
-      hig2.upgrade('HIG','nm3_install.sql','Installed','4.0.5.0');
-      hig2.upgrade('NET','nm3_install.sql','Installed','4.0.5.0');
-      hig2.upgrade('DOC','nm3_install.sql','Installed','4.0.5.0');
-      hig2.upgrade('AST','nm3_install.sql','Installed','4.0.5.0');
-      hig2.upgrade('WMP','nm3_install.sql','Installed','4.0.5.0');
+      hig2.upgrade('HIG','nm3_install.sql','Installed','4.1.0.0');
+      hig2.upgrade('NET','nm3_install.sql','Installed','4.1.0.0');
+      hig2.upgrade('DOC','nm3_install.sql','Installed','4.1.0.0');
+      hig2.upgrade('AST','nm3_install.sql','Installed','4.1.0.0');
+      hig2.upgrade('WMP','nm3_install.sql','Installed','4.1.0.0');
 END;
 /
 COMMIT;
