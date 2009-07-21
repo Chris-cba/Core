@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm405x_nm4100_upg.sql-arc   3.0   Jul 21 2009 11:42:16   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm405x_nm4100_upg.sql-arc   3.1   Jul 21 2009 12:57:24   malexander  $
 --       Module Name      : $Workfile:   nm405x_nm4100_upg.sql  $
---       Date into PVCS   : $Date:   Jul 21 2009 11:42:16  $
---       Date fetched Out : $Modtime:   Jul 21 2009 10:49:02  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 21 2009 12:57:24  $
+--       Date fetched Out : $Modtime:   Jul 21 2009 12:57:02  $
+--       Version          : $Revision:   3.1  $
 --
 --   Product upgrade script
 --
@@ -38,22 +38,22 @@ col      logfile2 new_value logfile2 noprint
 set term off
 
 SELECT 'Y' five_two_to_4100
-FROM hig_products WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP') AND hpr_version = '4.0.5.0'
+FROM hig_products WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP') AND hpr_version = '4.0.5.2'
 UNION
 SELECT 'N' five_two_to_4100
-FROM hig_products WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP') AND hpr_version != '4.0.5.0'
+FROM hig_products WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP') AND hpr_version != '4.0.5.2'
 /
 SELECT 'Y' five_three_to_4100
-FROM hig_products WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP') AND hpr_version IN ('4.0.5.0','4.0.5.2')
+FROM hig_products WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP') AND hpr_version IN ('4.0.5.2','4.0.5.3')
 UNION
 SELECT 'N' five_three_to_4100
-FROM hig_products WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP') AND hpr_version NOT IN ('4.0.5.0','4.0.5.2')
+FROM hig_products WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP') AND hpr_version NOT IN ('4.0.5.2','4.0.5.3')
 /
 SELECT 'Y' five_four_to_4100
-FROM hig_products WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP') AND hpr_version IN ('4.0.5.0','4.0.5.2','4.0.5.3')
+FROM hig_products WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP') AND hpr_version IN ('4.0.5.2','4.0.5.3','4.0.5.4')
 UNION
 SELECT 'N' five_four_to_4100
-FROM hig_products WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP') AND hpr_version NOT IN ('4.0.5.0','4.0.5.2','4.0.5.3')
+FROM hig_products WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP') AND hpr_version NOT IN ('4.0.5.2','4.0.5.3','4.0.5.4')
 /
 select  TO_CHAR(sysdate,'DDMONYYYY_HH24MISS')||'.LOG' log_extension from dual
 /
