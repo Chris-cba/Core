@@ -1,11 +1,11 @@
 create or replace package body nm3mrg_view as
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkb-arc   2.3   Jul 13 2009 16:17:26   ptanava  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkb-arc   2.4   Jul 22 2009 11:30:30   ptanava  $
 --       Module Name      : $Workfile:   nm3mrg_view.pkb  $
---       Date into PVCS   : $Date:   Jul 13 2009 16:17:26  $
---       Date fetched Out : $Modtime:   Jul 13 2009 16:13:32  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jul 22 2009 11:30:30  $
+--       Date fetched Out : $Modtime:   Jul 22 2009 11:31:48  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on SCCS version     : 1.38
 --
 --
@@ -23,10 +23,11 @@ create or replace package body nm3mrg_view as
                 now uses a dedicated sql instead of joining the _sec and _val
   04.06.09  PT in V_MRG_xxxxxx removed RULE hint and optimized unit conversion
   13.07.09  PT fixed missing xsp columns in _SVL by fixing t_val loading at the start of _SEC - not all xsp's per type were loaded
+  22.07.09  PT modified _SVL to include begin_offset_true and end_offset_true with MRGVIEWTRU option - these are used by the main view
 */
 
 
-   g_body_sccsid      CONSTANT  VARCHAR2(200) := '"$Revision:   2.3  $"';
+   g_body_sccsid      CONSTANT  VARCHAR2(200) := '"$Revision:   2.4  $"';
    g_package_name     CONSTANT  VARCHAR2(30)  := 'nm3mrg_view';
    
    cr constant varchar2(1) := chr(10);
@@ -715,6 +716,11 @@ BEGIN
     append ('  ,s.nms_offset_ne_id');
     append ('  ,s.nms_begin_offset');
     append ('  ,s.nms_end_offset');
+    -- PT 22.07.09
+    if g_include_true then
+      append ('  ,nm3mrg_view.get_true(s.nms_offset_ne_id, s.nms_ne_id_first, s.nms_begin_mp_first) begin_offset_true');
+      append ('  ,nm3mrg_view.get_true(s.nms_offset_ne_id, s.nms_ne_id_last, s.nms_end_mp_last) end_offset_true');
+    end if;
     append ('  ,r.nqr_date_created');
     append ('  ,r.nqr_source_id');
     append ('  ,r.nqr_source');
@@ -934,7 +940,9 @@ BEGIN
    append ('  and pe.ne_nt_type = tp.nt_type');
    append ('  and ce.ne_nt_type = tc.nt_type');
    
---
+
+   
+   nm3ddl.debug_tab_varchar;
    nm3ddl.create_object_and_syns(p_view_name);
 --
    nm3ddl.grant_on_object
