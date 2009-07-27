@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.28   Jun 03 2009 15:04:10   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.29   Jul 27 2009 09:45:08   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Jun 03 2009 15:04:10  $
---       Date fetched Out : $Modtime:   Jun 03 2009 13:51:48  $
---       PVCS Version     : $Revision:   2.28  $
+--       Date into PVCS   : $Date:   Jul 27 2009 09:45:08  $
+--       Date fetched Out : $Modtime:   Jul 27 2009 09:42:16  $
+--       PVCS Version     : $Revision:   2.29  $
 --
 --
 --   Author : Priidu Tanava
@@ -83,13 +83,15 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   15.05.09  PT in std_populate() fixed the first missing section problem caused by bad ordering in analytic functions
   03.06.09  PT fixed a problem in load_attrb_metadata() where attribute order was not identical with the one in result views
                 this was caused by columns e.g. IIT_END_DATE not being specified in nm_inv_type_attribs
+  24.07.09  PT log 721736 changed load_group_datums() for single datums so that route is no longer assigned
+                datum references, instead of route references, are now put into NMS_BEGIN_OFFSET and NMS_END_OFFSET
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
         add ita_format_mask to ita_mapping_rec
         add nm_route_connect_tmp_ordered view with the next schema change
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.28  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.29  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -2202,6 +2204,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       ||')');
       
     l_ne_type := nm3net.get_ne_type(p_group_id);
+    nm3dbg.putln('l_ne_type='||l_ne_type);
     
     execute immediate 'truncate table nm_datum_criteria_tmp';
     
@@ -2245,13 +2248,20 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 
     -- datum or distance breake
     when l_ne_type in ('S','D') then
-      l_sql :=
-        sql_load_nm_datum_criteria_tmp(
-           p_elements_sql => 
-                  '    select ne_id nm_ne_id_of, 0 begin_mp, ne_length end_mp'
-            ||cr||'    from nm_elements'
-            ||cr||'    where ne_id = :p_group_id' 
-        );
+      insert into nm_datum_criteria_tmp(
+        datum_id, begin_mp, end_mp, group_id
+      )
+      select ne_id nm_ne_id_of, 0 begin_mp, ne_length end_mp, null
+      from nm_elements
+      where ne_id = p_group_id;
+      p_sqlcount := sql%rowcount;
+--      l_sql :=
+--        sql_load_nm_datum_criteria_tmp(
+--           p_elements_sql => 
+--                  '    select ne_id nm_ne_id_of, 0 begin_mp, ne_length end_mp'
+--            ||cr||'    from nm_elements'
+--            ||cr||'    where ne_id = :p_group_id' 
+--        );
     
     -- group of groups
     when l_ne_type = 'P' then
