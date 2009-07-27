@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.24   Jul 02 2009 16:48:38   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.25   Jul 27 2009 16:53:10   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jul 02 2009 16:48:38  $
---       Date fetched Out : $Modtime:   Jul 02 2009 16:47:40  $
---       PVCS Version     : $Revision:   2.24  $
+--       Date into PVCS   : $Date:   Jul 27 2009 16:53:10  $
+--       Date fetched Out : $Modtime:   Jul 27 2009 16:52:24  $
+--       PVCS Version     : $Revision:   2.25  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.24  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.25  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -3062,7 +3062,7 @@ PROCEDURE create_nt_data( p_nth    IN NM_THEMES_ALL%ROWTYPE,
                           p_ta     IN nm_theme_array,
                           p_job_id IN NUMBER DEFAULT NULL) IS
 
-l_mp_gtype      NUMBER := TO_NUMBER(NVL(Hig.get_sysopt('SDOMPGTYPE'),'3002'));
+l_mp_gtype      NUMBER := TO_NUMBER(NVL(Hig.get_sysopt('SDOMPGTYPE'),'3302'));
 
 cur_str1        VARCHAR2(2000);
 cur_str2        VARCHAR2(2000);
@@ -8736,10 +8736,10 @@ FUNCTION get_objects_in_buffer( p_nth_id         IN NUMBER,
                                 p_buffer_units   IN NUMBER DEFAULT 1,
                                 p_get_projection IN VARCHAR2 DEFAULT 'FALSE',
                                 p_gdo_session_id IN gis_data_objects.gdo_session_id%TYPE DEFAULT NULL )
-  RETURN nm_theme_list 
+  RETURN nm_theme_list
 IS
 
--- AE 11-JUN-2009 
+-- AE 11-JUN-2009
 -- Added p_gdo_session_id parameter for sub-selections based on gis_data_objects
 -- p_gdo_session_id is now picked up in the dynamic sql predicates if populated
 
@@ -8841,7 +8841,7 @@ BEGIN
   END IF;
 
   IF l_nth.nth_feature_table = l_nth.nth_table_name THEN
-  
+
      cur_string := 'select t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', t.'||l_nth.nth_pk_column;
 
      IF l_get_projection THEN
@@ -8894,7 +8894,7 @@ BEGIN
              ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_fk_column;
 
      END IF;
-     
+
    ELSE
 
      cur_string := 'select distinct t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', f.'||l_nth.nth_feature_pk_column;
@@ -8917,7 +8917,7 @@ BEGIN
              ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_pk_column;
 
      ELSE
-     
+
        cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f'
              ||' where sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :p_geometry, '
              ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
@@ -8926,7 +8926,7 @@ BEGIN
      END IF;
 
   END IF;
-  
+
 --Nm_Debug.debug_on;
 --Nm_Debug.DEBUG( cur_string );
 
@@ -10058,10 +10058,24 @@ curstr VARCHAR2(2000);
 retval nm_theme_list := Nm3array.init_nm_theme_list;
 BEGIN
   --curstr := 'select nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  :new_name, a.ntd_distance, a.ntd_measure, :new_descr )   '||
-curstr := 'select /*+cardinality( a '||to_char( p_ntl.ntl_theme_list.last)||') */ '||
-          ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  '||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr )   '||
-                  ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||
-                 ' where a.ntd_pk_id  = '||p_nth.nth_feature_pk_column||' order by  a.ntd_distance';
+
+  if p_nth.nth_table_name = p_nth.nth_feature_table then
+
+    curstr := 'select /*+cardinality( a '||to_char( p_ntl.ntl_theme_list.last)||') */ '||
+              ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  '||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr )   '||
+              ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||
+              ' where a.ntd_pk_id  = '||p_nth.nth_feature_pk_column||' order by  a.ntd_distance';
+
+  else
+                
+    curstr := 'select /*+cardinality( a '||to_char( p_ntl.ntl_theme_list.last)||') */ '||
+              ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  '||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr )   '||
+              ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||' f,'||p_nth.nth_table_name||' t'||
+              ' where a.ntd_pk_id  = f.'||p_nth.nth_feature_pk_column||
+              ' and   f.'||p_nth.nth_feature_fk_column||' =  t.'||p_nth.nth_pk_column||
+              ' order by  a.ntd_distance';
+              
+  end if;
 
   EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.ntl_theme_list
     --USING p_nth.nth_theme_id, p_nth.nth_theme_name, p_nth.nth_theme_name, p_ntl;
