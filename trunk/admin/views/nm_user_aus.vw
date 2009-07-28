@@ -15,6 +15,7 @@ SELECT
 --
        *
  FROM  nm_user_aus_all
-WHERE  nua_start_date <= (select nm3context.get_effective_date from dual)
- AND   NVL(nua_end_date,TO_DATE('99991231','YYYYMMDD')) > (select nm3context.get_effective_date from dual)
+WHERE  --nua_start_date <= (select nm3context.get_effective_date from dual)
+-- AND   NVL(nua_end_date,TO_DATE('99991231','YYYYMMDD')) > (select nm3context.get_effective_date from dual)
+nua_end_date IS NULL
 /
