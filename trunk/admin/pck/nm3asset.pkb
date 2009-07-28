@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.8   Jun 25 2009 14:19:42   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.9   Jul 28 2009 10:05:34   aedwards  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Jun 25 2009 14:19:42  $
---       Date fetched Out : $Modtime:   Jun 25 2009 14:18:34  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Jul 28 2009 10:05:34  $
+--       Date fetched Out : $Modtime:   Jul 28 2009 10:04:52  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -3801,6 +3801,50 @@ BEGIN
   l_narsh_rec.narsh_source_descr               := l_roi_details_rec.roi_descr;
   l_narsh_rec.narsh_source_min_offset          := l_roi_details_rec.roi_min_mp;
   l_narsh_rec.narsh_source_max_offset          := l_roi_details_rec.roi_max_mp;
+--
+-- Derive the Datum unit type if it's not been set in the Form
+-- It appears to allow Non-Linear groups, so the ordering will be meaningless, but this
+-- will at least let it run
+--
+  IF l_roi_details_rec.roi_datum_units IS NULL
+  THEN
+  --
+    BEGIN
+      SELECT nt_length_unit INTO l_roi_details_rec.roi_datum_units FROM nm_types
+        WHERE nt_type = ( 
+          SELECT UNIQUE ne_nt_type
+            FROM nm_elements
+           WHERE ne_id IN (
+              SELECT nm_ne_id_of FROM nm_members
+               WHERE nm_ne_id_in = (SELECT ne_id FROM nm_elements
+                                     WHERE ne_unique = nm3net.get_ne_unique (l_ngq_rec.ngq_source_id))));
+    EXCEPTION
+      WHEN NO_DATA_FOUND 
+      -- Default to meters
+      THEN l_roi_details_rec.roi_datum_units := 1;
+    END;
+  --
+  END IF;
+--
+-- Derive the Route unit type if it's not been set in the Form
+-- It appears to allow Non-Linear groups, so the ordering will be meaningless, but this
+-- will at least let it run
+--
+  IF l_roi_details_rec.roi_units IS NULL
+  THEN
+  --
+    BEGIN
+      SELECT nt_length_unit INTO l_roi_details_rec.roi_units
+        FROM nm_types
+       WHERE nt_type = (SELECT ne_nt_type FROM nm_elements
+                         WHERE ne_unique  = nm3net.get_ne_unique (l_ngq_rec.ngq_source_id) );
+    EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN l_roi_details_rec.roi_units := l_roi_details_rec.roi_datum_units;
+    END;
+  --
+  END IF;
+--
   l_narsh_rec.narsh_source_length              := nm3unit.convert_unit(p_un_id_in  => l_roi_details_rec.roi_datum_units
                                                                       ,p_un_id_out => l_roi_details_rec.roi_units
                                                                       ,p_value     => nm3net.get_ne_length(p_ne_id => l_narsh_rec.narsh_source_id));
