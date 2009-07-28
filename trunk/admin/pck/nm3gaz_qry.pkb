@@ -19,7 +19,8 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb	1.45 05/26/06"';
+   --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb	1.45 05/26/06"';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -1448,9 +1449,12 @@ END get_users_lov_sql;
 --
 -----------------------------------------------------------------------------
 --
+-- LOG  721524
+-- LOV  columns had different datatype 
+-- changed hus_user_id to to_char
 FUNCTION get_user_id_lov_sql RETURN varchar2 IS
 BEGIN
-   RETURN            'SELECT hus_username lup_meaning, hus_name lup_description, hus_user_id lup_value'
+   RETURN            'SELECT To_Char(hus_user_id) lup_value,hus_username lup_meaning, hus_name lup_descr'
           ||CHR(10)||' FROM  hig_users'
           ||CHR(10)||'ORDER BY hus_name';
 END get_user_id_lov_sql;
