@@ -24,11 +24,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/nm_attrib_view_vw.vw-arc   3.0   Jun 01 2009 09:52:14   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/nm_attrib_view_vw.vw-arc   3.1   Jul 29 2009 15:03:36   lsorathia  $
 --       Module Name      : $Workfile:   nm_attrib_view_vw.vw  $
---       Date into PVCS   : $Date:   Jun 01 2009 09:52:14  $
---       Date fetched Out : $Modtime:   Jun 01 2009 09:44:58  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jul 29 2009 15:03:36  $
+--       Date fetched Out : $Modtime:   Jul 29 2009 15:01:14  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 -- 
@@ -54,8 +54,8 @@ SELECT
 FROM   nm_type_columns ntc
 union
 select 2 disp_ord,
-       ita_inv_type,
        nad_nt_type ,
+       ita_inv_type,
        ita_attrib_name,
        ita_format,
        ita_fld_length,
