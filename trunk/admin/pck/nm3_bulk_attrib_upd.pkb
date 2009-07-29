@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.3   Jun 04 2009 15:38:22   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.4   Jul 29 2009 15:46:10   lsorathia  $
 --       Module Name      : $Workfile:   nm3_bulk_attrib_upd.pkb  $
---       Date into PVCS   : $Date:   Jun 04 2009 15:38:22  $
---       Date fetched Out : $Modtime:   Jun 03 2009 15:54:30  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Jul 29 2009 15:46:10  $
+--       Date fetched Out : $Modtime:   Jul 29 2009 15:45:32  $
+--       Version          : $Revision:   3.4  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.3  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.4  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_bulk_attrib_upd';
 --
@@ -84,9 +84,9 @@ IS
                   ,qp_qty_type nm_nw_ad_types.nad_gty_type%TYPE) IS
    SELECT  * 
    FROM    nm_nw_ad_types
-   WHERE   nad_nt_type    = qp_nt_type
-   AND     nad_gty_type   = NVl(qp_qty_type,nad_gty_type)
-   AND     nad_primary_ad = 'Y' ;
+   WHERE   nad_nt_type     = qp_nt_type
+   AND     Nvl(nad_gty_type,'$$')  = NVl(qp_qty_type,Nvl(nad_gty_type,'$$'))
+   AND     nad_primary_ad  = 'Y' ;
    l_nad_rec c_nad%ROWTYPE ; 
  
    CURSOR get_parent_gty (qp_nt_type    nm_types.nt_type%TYPE)
