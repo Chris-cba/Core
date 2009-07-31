@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.4   Jul 29 2009 15:46:10   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.5   Jul 31 2009 15:49:52   lsorathia  $
 --       Module Name      : $Workfile:   nm3_bulk_attrib_upd.pkb  $
---       Date into PVCS   : $Date:   Jul 29 2009 15:46:10  $
---       Date fetched Out : $Modtime:   Jul 29 2009 15:45:32  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Jul 31 2009 15:49:52  $
+--       Date fetched Out : $Modtime:   Jul 31 2009 14:44:16  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.4  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.5  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_bulk_attrib_upd';
 --
@@ -226,12 +226,14 @@ BEGIN
                    IF l_nti_rec.nti_auto_include = 'Y'
                    THEN
                        SELECT l_parent_rec.ne_id, x.ne_id, 'G', l_parent_rec.ne_gty_group_type, 0, 
-                              Trunc(sysdate), null, 0, 0, 1, 
+                              Trunc(sysdate), null, ne.ne_length, null, 1, 
                               l_parent_rec.ne_admin_unit, null,null,null,null, 
                               Null,Null,Null, 0, Null 
                               BULK COLLECT INTO l_nm_tab
-                       FROM   (Select x.* FROM table(cast(get_ne_array(pi_ne_id_array) as nm_ne_id_array)) x) x
-                       WHERE   x.ne_id IS NOT NULL;
+                       FROM   (Select x.* FROM table(cast(get_ne_array(pi_ne_id_array) as nm_ne_id_array)) x) x,
+                               nm_elements ne
+                       WHERE   x.ne_id IS NOT NULL
+                       AND     ne.ne_id = x.ne_id;
                       
                        FORALL i in 1..l_ne_tab.Count
                        UPDATE  nm_members 
