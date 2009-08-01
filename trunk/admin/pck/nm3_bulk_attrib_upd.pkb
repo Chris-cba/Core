@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.5   Jul 31 2009 15:49:52   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.6   Aug 02 2009 00:29:20   lsorathia  $
 --       Module Name      : $Workfile:   nm3_bulk_attrib_upd.pkb  $
---       Date into PVCS   : $Date:   Jul 31 2009 15:49:52  $
---       Date fetched Out : $Modtime:   Jul 31 2009 14:44:16  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Aug 02 2009 00:29:20  $
+--       Date fetched Out : $Modtime:   Aug 02 2009 00:28:02  $
+--       Version          : $Revision:   3.6  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.5  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.6  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_bulk_attrib_upd';
 --
@@ -223,8 +223,8 @@ BEGIN
                                      l_sql_el_attrib|| 
                                      ' WHERE ne_id = :a ' Using l_ne_tab(i) ;
                    -- Update child attributes                   
-                   IF l_nti_rec.nti_auto_include = 'Y'
-                   THEN
+                   ---IF l_nti_rec.nti_auto_include = 'Y'
+                   --THEN
                        SELECT l_parent_rec.ne_id, x.ne_id, 'G', l_parent_rec.ne_gty_group_type, 0, 
                               Trunc(sysdate), null, ne.ne_length, null, 1, 
                               l_parent_rec.ne_admin_unit, null,null,null,null, 
@@ -243,13 +243,13 @@ BEGIN
                               
                        FORALL i in 1..l_nm_tab.Count
                        INSERT INTO nm_members values l_nm_tab(i) ;
-                   ELSE
-                       FORALL i in 1..l_ne_tab.Count
-                       UPDATE  nm_members 
-                       SET     nm_end_date = TRUNC(SYSDATE) 
-                       WHERE   nm_ne_id_of = l_ne_tab(i) 
-                       AND     nm_obj_type = l_parent_rec.ne_gty_group_type ;
-                   END IF ;
+                   --ELSE
+                   --    FORALL i in 1..l_ne_tab.Count
+                   --    UPDATE  nm_members 
+                   --    SET     nm_end_date = TRUNC(SYSDATE) 
+                   --    WHERE   nm_ne_id_of = l_ne_tab(i) 
+                   --    AND     nm_obj_type = l_parent_rec.ne_gty_group_type ;
+                   --END IF ;
                ELSE
                    OPEN  get_parent_gty(l_nti_rec.nti_nw_parent_type);
                    FETCH get_parent_gty INTO l_gty_rec;
