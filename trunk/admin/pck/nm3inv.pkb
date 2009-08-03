@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.10   Mar 20 2009 16:59:42   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.11   Aug 03 2009 15:44:20   cstrettle  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Mar 20 2009 16:59:42  $
---       Date fetched Out : $Modtime:   Mar 20 2009 16:57:16  $
---       SCCS Version     : $Revision:   2.10  $
+--       Date into SCCS   : $Date:   Aug 03 2009 15:44:20  $
+--       Date fetched Out : $Modtime:   Aug 03 2009 15:43:00  $
+--       SCCS Version     : $Revision:   2.11  $
 --       Based on --
 --
 --   nm3inv package body
@@ -3803,7 +3803,8 @@ END process_g_tab_ita;
      l_rec_nit.nit_replaceable       := 'Y';
      l_rec_nit.nit_exclusive         := 'N';
      l_rec_nit.nit_category          := 'F';
-     l_rec_nit.nit_descr             := pi_table_name||' - Foreign Table asset type';
+     -- CWS TEST 0108036 description parameter was being ignored. Description is now added if it is not null
+     l_rec_nit.nit_descr             := nvl(pi_asset_descr, pi_table_name||' - Foreign Table asset type');
      l_rec_nit.nit_linear            := 'N';
      l_rec_nit.nit_use_xy            := pi_use_xy;
      l_rec_nit.nit_multiple_allowed  := 'Y';
