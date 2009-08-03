@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.7   May 22 2009 15:07:34   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.8   Aug 03 2009 15:33:18   cstrettle  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   May 22 2009 15:07:34  $
---       Date fetched Out : $Modtime:   May 22 2009 14:49:00  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Aug 03 2009 15:33:18  $
+--       Date fetched Out : $Modtime:   Aug 03 2009 15:29:40  $
+--       Version          : $Revision:   2.8  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.7  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.8  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -179,6 +179,18 @@ AS
           FROM nm_themes_all
          WHERE nth_feature_table like '%NM_NIT_'||upper(cp_type)||'%'
       ORDER BY 1;
+--
+   CURSOR get_tma_layers(p_table_name IN VARCHAR2)
+   IS
+     SELECT * 
+       FROM nm_themes_all
+      WHERE NTH_FEATURE_TABLE like '%' || p_table_name || '%';
+      
+      /*
+     SELECT * 
+       FROM nm_themes_all
+      WHERE NTH_TABLE_NAME = p_table_name;
+      */
 --
    CURSOR get_spatial_index_details (cp_table_name IN VARCHAR2)
    IS
@@ -585,6 +597,13 @@ AS
          FETCH get_nsgn_asd_layers
          BULK COLLECT INTO l_tab_nth;
          CLOSE get_nsgn_asd_layers;
+-- CWS TMA GIS0020 CHANGE 28/07/09
+      ELSIF pi_layer_type = 'TMA'
+      THEN
+         OPEN get_tma_layers (p_table_name => pi_type );
+         FETCH get_tma_layers
+         BULK COLLECT INTO l_tab_nth;
+         CLOSE get_tma_layers;
 
       ELSIF pi_layer_type = 'STP'
       AND hig.is_product_licensed ('STP')
