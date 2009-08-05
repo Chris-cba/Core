@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.8   Jul 13 2009 09:32:14   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.9   Aug 05 2009 16:10:02   lsorathia  $
 --       Module Name      : $Workfile:   nm3trg.sql  $
---       Date into PVCS   : $Date:   Jul 13 2009 09:32:14  $
---       Date fetched Out : $Modtime:   Jul 13 2009 09:31:02  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Aug 05 2009 16:10:02  $
+--       Date fetched Out : $Modtime:   Aug 05 2009 16:09:14  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --
 --   Author : Graeme Johnson
@@ -1808,26 +1808,26 @@ start '&run_file'
 ----------------------------------------------------------------------------------------- 
 --
 --
---SET TERM ON 
---PROMPT nm_gaz_query_b_upd.trg
---SET TERM OFF
---SET DEFINE ON 
---SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_gaz_query_b_upd.trg' run_file 
---FROM dual 
---/ 
---start '&run_file' 
+SET TERM ON 
+PROMPT nm_gaz_query_b_upd.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_gaz_query_b_upd.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
 --
 ----------------------------------------------------------------------------------------- 
 --
 --
---SET TERM ON 
---PROMPT nm_gaz_query_b_ins.trg
---SET TERM OFF
---SET DEFINE ON 
---SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_gaz_query_b_ins.trg' run_file 
---FROM dual 
---/ 
---start '&run_file' 
+SET TERM ON 
+PROMPT nm_gaz_query_b_ins.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_gaz_query_b_ins.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
 --
 ----------------------------------------------------------------------------------------- 
 --
