@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.9   Jul 28 2009 10:05:34   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.10   Aug 06 2009 11:44:02   aedwards  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Jul 28 2009 10:05:34  $
---       Date fetched Out : $Modtime:   Jul 28 2009 10:04:52  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Aug 06 2009 11:44:02  $
+--       Date fetched Out : $Modtime:   Aug 06 2009 11:43:02  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.10  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -561,6 +561,13 @@ BEGIN
       OPEN  c_get_unit(l_rec_ngq.ngq_source_id);
       FETCH c_get_unit INTO l_net_unit ;
       CLOSE c_get_unit ;
+   --
+   -- AE If ROI units are null then use the underlying datum units
+   --
+      IF l_net_unit IS NULL
+      THEN
+        l_net_unit := nm3get.get_nt(pi_nt_type=>nm3net.get_datum_nt(l_rec_ngq.ngq_source_id)).nt_length_unit;
+      END IF;
 
       UPDATE nm_assets_on_route_holding
       SET   narh_end_reference_begin_mp   = narh_placement_begin_mp -  nm3unit.convert_unit (l_net_unit,  Nvl(pi_reference_units,l_net_unit),Nvl(l_rec_ngq.ngq_end_mp,0))
@@ -573,12 +580,12 @@ BEGIN
 --
    nm_debug.proc_end (g_package_name,'create_asset_on_route_data');
 --
-EXCEPTION
-----
-   WHEN others
-    THEN
-      nm3user.set_effective_date(c_init_eff_date);
-      RAISE;
+--EXCEPTION
+------
+--   WHEN others
+--    THEN
+--      nm3user.set_effective_date(c_init_eff_date);
+--      RAISE;
 --
 END create_asset_on_route_data;
 --
@@ -3809,20 +3816,7 @@ BEGIN
   IF l_roi_details_rec.roi_datum_units IS NULL
   THEN
   --
-    BEGIN
-      SELECT nt_length_unit INTO l_roi_details_rec.roi_datum_units FROM nm_types
-        WHERE nt_type = ( 
-          SELECT UNIQUE ne_nt_type
-            FROM nm_elements
-           WHERE ne_id IN (
-              SELECT nm_ne_id_of FROM nm_members
-               WHERE nm_ne_id_in = (SELECT ne_id FROM nm_elements
-                                     WHERE ne_unique = nm3net.get_ne_unique (l_ngq_rec.ngq_source_id))));
-    EXCEPTION
-      WHEN NO_DATA_FOUND 
-      -- Default to meters
-      THEN l_roi_details_rec.roi_datum_units := 1;
-    END;
+    l_roi_details_rec.roi_datum_units := nm3get.get_nt(pi_nt_type=>nm3net.get_datum_nt(l_ngq_rec.ngq_source_id)).nt_length_unit;
   --
   END IF;
 --
@@ -3833,15 +3827,12 @@ BEGIN
   IF l_roi_details_rec.roi_units IS NULL
   THEN
   --
-    BEGIN
-      SELECT nt_length_unit INTO l_roi_details_rec.roi_units
-        FROM nm_types
-       WHERE nt_type = (SELECT ne_nt_type FROM nm_elements
-                         WHERE ne_unique  = nm3net.get_ne_unique (l_ngq_rec.ngq_source_id) );
-    EXCEPTION
-      WHEN NO_DATA_FOUND
-      THEN l_roi_details_rec.roi_units := l_roi_details_rec.roi_datum_units;
-    END;
+    l_roi_details_rec.roi_units := nm3get.get_nt ( pi_nt_type         => nm3get.get_ne(l_ngq_rec.ngq_source_id).ne_nt_type
+                                                 , pi_raise_not_found => FALSE ).nt_length_unit;
+    IF l_roi_details_rec.roi_units IS NULL
+    THEN
+      l_roi_details_rec.roi_units := l_roi_details_rec.roi_datum_units;
+    END IF;
   --
   END IF;
 --
