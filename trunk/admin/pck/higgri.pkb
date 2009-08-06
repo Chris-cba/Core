@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY higgri AS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30) := 'higgri';
@@ -1669,11 +1669,12 @@ BEGIN
   -- Task  0107234 
   -- LS 06/09 Build the lov SQL only if the Parameter has lov flag is checked 
   -- else return dummy sql 
-  IF Nvl(nm3get.get_gmp(pi_module,pi_param).gmp_lov,'N') = 'N'
+  IF Nvl(nm3get.get_gmp(pi_module,pi_param).gmp_lov,'N')       = 'Y'
+  OR Nvl(nm3get.get_gmp(pi_module,pi_param).gmp_gazetteer,'N') = 'Y'
   THEN
-      RETURN  'SELECT 1 FROM DUAL WHERE 1=1' ;
-  ELSE
       RETURN l_query;
+  ELSE
+      RETURN  'SELECT 1 FROM DUAL WHERE 1=1' ;
   END IF ;
 --
 END get_gri_param_query;
