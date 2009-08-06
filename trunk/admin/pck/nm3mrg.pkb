@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3mrg IS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkb-arc   2.2   Mar 30 2009 17:54:54   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkb-arc   2.3   Aug 06 2009 09:56:54   rcoupe  $
 --       Module Name      : $Workfile:   nm3mrg.pkb  $
---       Date into PVCS   : $Date:   Mar 30 2009 17:54:54  $
---       Date fetched Out : $Modtime:   Mar 30 2009 17:53:02  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Aug 06 2009 09:56:54  $
+--       Date fetched Out : $Modtime:   Aug 06 2009 09:56:08  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on SCCS version : 1.60
 --
 --   Author : Jonathan Mills
@@ -16,6 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mrg IS
 --  Copyright (c) exor corporation ltd, 2000
 ------------------------------------------------------------------------------------------------
 /* History
+  06.08.09 RC Changed the default on the system option MRGCODE32 (Not NM3CODE32 as below) to work on old code if no option.
   26.03.09 PT in execute_mrg_query() added logic to call new code in nm3bulk_mrg
                 to use old code set option NM3CODE32 = 'Y'
                 requires nm3bulk_mrg.pkh 2.2 or higher (4.0.2.0)
@@ -24,13 +25,13 @@ CREATE OR REPLACE PACKAGE BODY nm3mrg IS
                 the load_temp_extent_datums calls it both modes - as the NTE_ROUTE_NE_ID can be a group_id or datum_id
 */
 
-  g_body_sccsid   constant varchar2(200) :='"$Revision:   2.2  $"';
+  g_body_sccsid   constant varchar2(200) :='"$Revision:   2.3  $"';
   g_package_name     CONSTANT  varchar2(30)   := 'NM3MRG';
 --
   g_mrg_section_id  pls_integer;
 --
   c_mrg_au_type CONSTANT hig_options.hop_value%TYPE := hig.get_sysopt('MRGAUTYPE');
-  
+
   cr  constant varchar2(1) := chr(10);
 --
 ------------------------------------------------------------------------------------------------
@@ -83,13 +84,13 @@ PROCEDURE deal_with_individual_point
                         ,pi_ne_id        IN nm_mrg_members.nm_ne_id_of%TYPE
                         ,pi_begin_mp     IN nm_mrg_members.nm_begin_mp%TYPE
                         );
-                        
+
   procedure load_temp_extent_datums(
      p_group_type in nm_group_types.ngt_group_type%type
     ,p_nte_job_id in nm_nw_temp_extents.nte_job_id%type
     ,p_sqlcount out pls_integer
   );
-  
+
 --
 -----Global Procedures -------------------------------------------------------------------------
 --
@@ -150,28 +151,28 @@ PROCEDURE execute_mrg_query
    SELECT COUNT(*)
     FROM  nm_mrg_section_members
    WHERE  nsm_mrg_job_id = p_mrg_job_id;
-   
+
     l_sqlcount  pls_integer;
     r_longops   nm3sql.longops_rec;
 --
 BEGIN
 
   -- the MRGCODE32 product option can be used to let the old code run
-  if nvl(hig.get_sysopt('MRGCODE32'), 'N') != 'Y' then
-    
+  if nvl(hig.get_sysopt('MRGCODE32'), 'Y') != 'Y' then
+
     -- populate nm_datum_criteria_tmp from temp extent
     load_temp_extent_datums(
        p_group_type => null
       ,p_nte_job_id => pi_nte_job_id
       ,p_sqlcount   => l_sqlcount
     );
-    
+
     -- load nm_route_connectivity_tmp
     nm3bulk_mrg.ins_route_connectivity(
        p_criteria_rowcount  => l_sqlcount
       ,p_ignore_poe         => null -- MRGPOE option will be used
     );
-    
+
     -- run the merge
     nm3bulk_mrg.std_run(
        p_nmq_id         => pi_query_id
@@ -182,8 +183,8 @@ BEGIN
       ,p_mrg_job_id     => po_result_job_id
       ,p_longops_rec    => r_longops
     );
-  
-  
+
+
   -- use old logic as flagged
   else
 
@@ -345,7 +346,7 @@ BEGIN
    DELETE FROM nm_mrg_query_results_temp2;
    commit ;
    nm_debug.proc_end(g_package_name,'execute_mrg_query');
-   
+
   end if;
 --   nm_debug.debug_off;
 --
@@ -2872,7 +2873,7 @@ BEGIN
 --
 END get_ita_for_mrg;
 
-  
+
   -- copy of nm3bulk_mrg body procedure
   --  only needed until load_temp_extent_datums() is ported from here into nm3bulk_mrg
   --  p_groups_logic 'direct', 'assign'
@@ -2886,15 +2887,15 @@ END get_ita_for_mrg;
     l_sql_group_types_join    varchar2(200);
     l_sql_members_group_join  varchar2(200);
   begin
-  
+
     -- this selects the member counts for each datum for every linear group that the datum is member of
     --  the group id with the highest member count is retunred in the group_id column
     --  if l_group_type has value then the the groups of this type have preference
     --  if two groups have equal highest count of members then the lowest nm_ne_id_in value is returned
     -- the splitting logic is copied from ins_splits()
     -- TODO: this version of the procudere needs to migrate into nm3bulk_mrg to support group_id values in the source query.
-    
-    
+
+
     -- copy the source group_id directly into target
     if lower(p_groups_logic) = 'direct' then
       return
@@ -2906,11 +2907,11 @@ END get_ita_for_mrg;
         ||cr||p_elements_sql
         ||cr||') qx'
         ||cr||'where qx.nm_ne_id_of != qx.group_id';
-      
-      
+
+
     -- calculate the target group_id
     elsif lower(p_groups_logic) = 'assign' then
-    
+
       return
               'insert into nm_datum_criteria_tmp ('
         ||cr||'  datum_id, begin_mp, end_mp, group_id'
@@ -2986,14 +2987,14 @@ END get_ita_for_mrg;
         ||cr||'  and q1.begin_mp between m.nm_begin_mp and m.nm_end_mp'
         ||cr||'  and q1.end_mp between m.nm_begin_mp and m.nm_end_mp'
         ||cr||') q2';
-        
+
     else
       raise subscript_outside_limit;
-        
+
     end if;
 
   end;
-  
+
   -- copy of nm3bulk_mrg body procedure
   --  only needed until load_temp_extent_datums() is ported from here into nm3bulk_mrg
   procedure ensure_group_type_linear(
@@ -3015,7 +3016,7 @@ END get_ita_for_mrg;
         ||')');
   end;
 
-  
+
   -- load datum criteria for a single temp extent
   --  todo: this procedure needs to be put into nm3bulk_mrg with the next signature change
   procedure load_temp_extent_datums(
@@ -3025,7 +3026,7 @@ END get_ita_for_mrg;
   )
   is
     l_sql varchar2(32767);
-    l_elements_sql constant varchar2(2000) := 
+    l_elements_sql constant varchar2(2000) :=
               '    select d.nte_ne_id_of nm_ne_id_of, min(d.nte_begin_mp) begin_mp, max(d.nte_end_mp) end_mp'
         ||cr||'     ,min(decode(d.nte_route_ne_id, d.nte_ne_id_of, null, d.nte_route_ne_id)) group_id'
         ||cr||'    from nm_nw_temp_extents d'
@@ -3034,14 +3035,14 @@ END get_ita_for_mrg;
     l_group_type nm_group_types.ngt_group_type%type;
     l_sqlcount_direct pls_integer;
     l_sqlcount_assign pls_integer;
-    
+
   begin
     nm3dbg.putln(g_package_name||'.load_temp_extent_datums('
       ||'p_group_type='||p_group_type
       ||', p_nte_job_id='||p_nte_job_id
       ||')');
     nm3dbg.ind;
-    
+
     -- test for overlapping routes on same member
     declare
       l_dup_route_count integer;
@@ -3058,19 +3059,19 @@ END get_ita_for_mrg;
       when too_many_rows then
         raise_application_error(-20000, 'Invalid temp extent: multiple routes specified for same member');
     end;
-    
-    
+
+
     -- test nte_route_ne_id is linear
     ensure_group_type_linear(
        p_group_type_in  => p_group_type
       ,p_group_type_out => l_group_type
     );
-    
+
     execute immediate 'truncate table nm_datum_criteria_tmp';
-    
+
     -- the NTE_ROUTE_NE_ID may be a true group_id, or datum_id.
     -- we load it both ways
-    
+
     -- 1. direct groups load
     l_sql := sql_load_nm_datum_criteria_tmp(
        p_elements_sql => l_elements_sql
@@ -3084,8 +3085,8 @@ END get_ita_for_mrg;
     l_sqlcount_direct := sql%rowcount;
     commit;
     nm3dbg.putln('nm_mrg_section_member_inv direct: '||l_sqlcount_direct);
-    
-    
+
+
     -- 2. assign groups load
     l_sql := sql_load_nm_datum_criteria_tmp(
        p_elements_sql => l_elements_sql
@@ -3099,9 +3100,9 @@ END get_ita_for_mrg;
     l_sqlcount_assign := sql%rowcount;
     commit;
     nm3dbg.putln('nm_mrg_section_member_inv assign: '||l_sqlcount_assign);
-    
+
     p_sqlcount := l_sqlcount_direct + l_sqlcount_assign;
-    
+
     nm3dbg.deind;
   exception
     when others then
@@ -3112,9 +3113,9 @@ END get_ita_for_mrg;
         ||', l_sqlcount_assign='||l_sqlcount_assign
         ||')');
       raise;
-  
+
   end;
-  
+
 --
 ------------------------------------------------------------------------------------------------
 --
