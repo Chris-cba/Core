@@ -3,16 +3,16 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.3   May 22 2009 15:07:48   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.4   Aug 06 2009 13:14:30   cstrettle  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkh  $
---       Date into PVCS   : $Date:   May 22 2009 15:07:48  $
---       Date fetched Out : $Modtime:   May 22 2009 14:48:50  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Aug 06 2009 13:14:30  $
+--       Date fetched Out : $Modtime:   Aug 06 2009 13:09:58  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.6
 -------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.3  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.4  $';
     g_boolean               BOOLEAN        := FALSE;
     g_x_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_X';
     g_y_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_Y';
@@ -684,6 +684,7 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
               , pi_asset_type      IN   nm_inv_types.nit_inv_type%TYPE
               , pi_asset_descr     IN   nm_inv_types.nit_descr%TYPE
               , pi_snapping_trig   IN   VARCHAR2 DEFAULT 'TRUE');
+--</PROC>
 --
 -----------------------------------------------------------------------------
 
@@ -722,11 +723,27 @@ FUNCTION scotland_asd_in_use RETURN BOOLEAN;
 --</PROC>
 --
 -----------------------------------------------------------------------------
-
-
-
-
 --
+-----------------------------------------------------------------------------
+--
+/*
+   **************************
+     TMA RELATED FUNCTIONS
+   **************************
+*/
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_TMA_LAYER">
+--
+  PROCEDURE create_tma_layer( p_theme_type varchar2
+                            , p_layer_name nm_themes_all.nth_theme_name%TYPE
+                            , p_asset_type nm_inv_types.nit_inv_type%TYPE
+                            , p_asset_type_descr nm_inv_types.nit_descr%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+
 /*
    **************************
      GENERAL PROCS/FUNCTIONS
