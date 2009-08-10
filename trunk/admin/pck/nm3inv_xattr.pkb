@@ -698,7 +698,6 @@ BEGIN
         ELSE
 
           trap_indep_end_date( nm3inv_xattr.g_tab_loc_item_xattr(xrec).iit_ne_id );
-/*
 
           FOR obrec IN c_get_dep_types_at_end_date( nm3inv_xattr.g_tab_loc_item_xattr(xrec).iit_inv_type) LOOP
 --
@@ -719,7 +718,6 @@ BEGIN
             END IF;
 --
           END LOOP;
-*/
 
         END IF;
 
