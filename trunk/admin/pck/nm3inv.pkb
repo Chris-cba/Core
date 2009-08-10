@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.11   Aug 03 2009 15:44:20   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.12   Aug 10 2009 11:10:44   aedwards  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Aug 03 2009 15:44:20  $
---       Date fetched Out : $Modtime:   Aug 03 2009 15:43:00  $
---       SCCS Version     : $Revision:   2.11  $
+--       Date into SCCS   : $Date:   Aug 10 2009 11:10:44  $
+--       Date fetched Out : $Modtime:   Aug 10 2009 11:09:56  $
+--       SCCS Version     : $Revision:   2.12  $
 --       Based on --
 --
 --   nm3inv package body
@@ -51,9 +51,6 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
    g_tab_flex_col Nm3type.tab_varchar30;
    --</USED TO keep a list of all cols in NM_INV_ITEMS which are valid for begin flexible>
    --;
-
-
-
 --
 ----------------------------------------------------------------------------------------------
 --
@@ -3649,33 +3646,67 @@ END check_ita_view_col_name;
 --
 ----------------------------------------------------------------------------------------------
 --
-PROCEDURE process_g_tab_ita IS
-
+PROCEDURE check_ngqs ( pi_ita_inv IN nm3inv.g_tab_ita%TYPE )
+IS
+-- Remove any NM_GAZ_QUERY_ATTRIBS_SAVED records which are now invalid
+-- as a result of changes to the NM_INV_TYPE_ATTRIBS
 BEGIN
-
-
- FOR i IN 1..g_tab_ita.COUNT LOOP
-
-   check_ita_id_domain(pi_ita_id_domain => g_tab_ita(i).ita_id_domain
-                      ,pi_ita_format    => g_tab_ita(i).ita_format);
-
-   check_ita_query(pi_ita_query       => g_tab_ita(i).ita_query
-                  ,pi_ita_inv_type    => g_tab_ita(i).ita_inv_type
-                  ,pi_ita_attrib_name => g_tab_ita(i).ita_attrib_name);
-
-   check_ita_domain_query_excl(pi_ita_id_domain  => g_tab_ita(i).ita_id_domain
-                              ,pi_ita_query      => g_tab_ita(i).ita_query);
-
-
-   check_disp_width( pi_ita_disp_width => g_tab_ita(i).ita_disp_width
-                   , pi_ita_displayed  => g_tab_ita(i).ita_displayed
-                   , pi_ita_fld_length => g_tab_ita(i).ita_fld_length
-                   ) ;
-
-   check_ita_view_col_name ( pi_ita_view_col_name => g_tab_ita(i).ita_view_col_name );
-
- END LOOP;
-
+--
+  FOR i IN 1..pi_ita_inv.COUNT LOOP
+  --
+    DELETE nm_gaz_query_attribs_saved
+     WHERE ngqas_nit_type = pi_ita_inv(i).ita_inv_type
+       AND NOT EXISTS
+       ( SELECT 1 FROM nm_inv_type_attribs
+          WHERE ita_inv_type = ngqas_nit_type
+            AND ngqas_attrib_name = ita_attrib_name );
+  --
+  END LOOP;
+END check_ngqs;
+--
+----------------------------------------------------------------------------------------------
+--
+PROCEDURE process_g_tab_ita 
+IS
+BEGIN
+--
+  IF g_tab_ita.COUNT > 0
+  THEN
+--
+    FOR i IN 1..g_tab_ita.COUNT LOOP
+    --
+    -- Check Domain
+      check_ita_id_domain
+         ( pi_ita_id_domain => g_tab_ita(i).ita_id_domain
+         , pi_ita_format    => g_tab_ita(i).ita_format);
+    --
+      check_ita_query
+         ( pi_ita_query       => g_tab_ita(i).ita_query
+         , pi_ita_inv_type    => g_tab_ita(i).ita_inv_type
+         , pi_ita_attrib_name => g_tab_ita(i).ita_attrib_name);
+    --
+      check_ita_domain_query_excl
+         ( pi_ita_id_domain  => g_tab_ita(i).ita_id_domain
+         , pi_ita_query      => g_tab_ita(i).ita_query);
+    --
+      check_disp_width
+         ( pi_ita_disp_width => g_tab_ita(i).ita_disp_width
+         , pi_ita_displayed  => g_tab_ita(i).ita_displayed
+         , pi_ita_fld_length => g_tab_ita(i).ita_fld_length) ;
+    --
+      check_ita_view_col_name ( pi_ita_view_col_name => g_tab_ita(i).ita_view_col_name );
+    --
+    END LOOP;
+  --
+  -- Remove any NM_GAZ_QUERY_ATTRIBS_SAVED records which are now invalid
+  -- as a result of changes to the NM_INV_TYPE_ATTRIBS 
+  -- This cannot be done by cascading keys due to Locator using attribs which
+  -- are fixed and not part of the inventory metamodel
+    check_ngqs
+      ( pi_ita_inv => g_tab_ita );
+  --
+  END IF;
+--
 END process_g_tab_ita;
 --
 ----------------------------------------------------------------------------------------------
