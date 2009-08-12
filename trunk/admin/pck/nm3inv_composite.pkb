@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3inv_composite AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite.pkb-arc   2.1   Mar 26 2009 17:11:34   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite.pkb-arc   2.2   Aug 12 2009 10:44:12   rcoupe  $
 --       Module Name      : $Workfile:   nm3inv_composite.pkb  $
---       Date into PVCS   : $Date:   Mar 26 2009 17:11:34  $
---       Date fetched Out : $Modtime:   Mar 26 2009 17:10:34  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Aug 12 2009 10:44:12  $
+--       Date fetched Out : $Modtime:   Aug 12 2009 10:30:22  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on SCCS Version: 1.3
 --
 --   Author : Jonathan Mills
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite AS
 */
 
 --
-   g_body_sccsid   constant varchar2(200) :='"$Revision:   2.1  $"';
+   g_body_sccsid   constant varchar2(200) :='"$Revision:   2.2  $"';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_composite';
 --
    g_mrg_results_table VARCHAR2(30);
@@ -1906,22 +1906,26 @@ PROCEDURE refresh_nmnd (p_nmnd_nit_inv_type  nm_mrg_nit_derivation.nmnd_nit_inv_
 --
 BEGIN
 
-  -- call new merge code if not flagged to old
-  if nvl(hig.get_sysopt('INVCOMP32'), 'N') != 'Y' then
+  -- call new merge code if not flagged to old - RAC  changed default to call old when no option available
+  if nvl(hig.get_sysopt('INVCOMP32'), 'Y') != 'Y' then
     nm3inv_composite2.call_rebuild(
        p_dbms_job_no  => null
-      ,p_inv_type     => p_nmnd_nit_inv_type 
+      ,p_inv_type     => p_nmnd_nit_inv_type
       ,p_effective_date => p_effective_date
     );
-    
-    
+
+
   -- call old code as flagged
   else
-  
+
    nm_debug.proc_start (g_package_name,'refresh_nmnd');
 --
    nm3user.set_effective_date (p_effective_date);
 --
+-- RAC - move call to get_nmnd to allow reference to it.
+--
+   l_rec_nmnd := get_nmnd (pi_nmnd_nit_inv_type => p_nmnd_nit_inv_type);
+
    l_ft_only := nmq_is_only_ft_inv (l_rec_nmnd.nmnd_nmq_id);
 --
    l_refresh := l_rec_nmnd.nmnd_last_refresh_date > c_bonfire_night -- If never been refreshed
