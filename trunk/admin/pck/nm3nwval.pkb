@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.5   Jun 12 2009 10:10:24   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.6   13 Aug 2009 10:44:42   kdawson  $
 --       Module Name      : $Workfile:   nm3nwval.pkb  $
---       Date into PVCS   : $Date:   Jun 12 2009 10:10:24  $
---       Date fetched Out : $Modtime:   Jun 12 2009 10:07:44  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   13 Aug 2009 10:44:42  $
+--       Date fetched Out : $Modtime:   06 Aug 2009 10:22:12  $
+--       PVCS Version     : $Revision:   2.6  $
 --       Based on 1.67
 --
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --      Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
@@ -1126,6 +1126,7 @@ BEGIN
                    );
    END IF;
 --
+   IF p_ne_type != 'D' THEN 	-- KD 06/08/09 721802
    DECLARE
       l_rec_nau   nm_admin_units%ROWTYPE;
       l_rec_nsty  NM_AU_SUB_TYPES%ROWTYPE;
@@ -1165,6 +1166,7 @@ BEGIN
 
 
    END;
+   END IF;
 --
    --      NE_START_DATE
    IF p_ne_start_date IS NULL
