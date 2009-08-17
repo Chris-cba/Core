@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.10   Aug 06 2009 11:44:02   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.11   Aug 17 2009 10:56:26   aedwards  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Aug 06 2009 11:44:02  $
---       Date fetched Out : $Modtime:   Aug 06 2009 11:43:02  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Aug 17 2009 10:56:26  $
+--       Date fetched Out : $Modtime:   Aug 17 2009 10:54:58  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.10  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.11  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -331,6 +331,27 @@ BEGIN
 
    nm_debug.proc_start (g_package_name,'create_asset_on_route_data');
 --
+   -- AE Task 0108227   
+   -- Prevent AoaR being run on Group of Groups
+   DECLARE
+     l_ne_id  nm_elements.ne_id%TYPE;
+     l_rec_ne nm_elements%ROWTYPE;
+   BEGIN
+     l_ne_id := nm3get.get_ngq(pi_ngq_id => pi_ngq_id, pi_raise_not_found => FALSE ).ngq_source_id;
+   --
+     IF l_ne_id IS NOT NULL
+     THEN
+       l_rec_ne := nm3get.get_ne_all (pi_ne_id           => l_ne_id
+                                     ,pi_raise_not_found => FALSE );
+       IF l_rec_ne.ne_id IS NOT NULL
+       THEN
+         IF l_rec_ne.ne_type =  'P'
+         THEN
+           hig.raise_ner ('NET',51);
+         END IF;
+       END IF;
+     END IF;
+   END;
 
    nm3user.set_effective_date(pi_effective_date);
    g_maximum_mp := 0;
@@ -346,7 +367,7 @@ BEGIN
                 ,pi_reference_item_type      => pi_reference_item_type
                 ,pi_reference_item_id        => pi_reference_item_id
                 );
-			
+
 --
    -- Execute the gazeteer query. This will return a list of items which meet the
    --  criteria which exist in the specified area
@@ -355,7 +376,7 @@ BEGIN
    l_ngqi_job_id := nm3gaz_qry.perform_query (pi_ngq_id         => pi_ngq_id
                                              ,pi_effective_date => pi_effective_date
                                              );
-											 
+
 --
    -- Get the temp extent which gaz qry has just created
    l_nte_job_id   := nm3gaz_qry.get_g_nte_job_id;
