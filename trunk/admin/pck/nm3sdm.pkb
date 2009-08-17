@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.28   Aug 10 2009 09:01:26   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.29   Aug 17 2009 09:16:50   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Aug 10 2009 09:01:26  $
---       Date fetched Out : $Modtime:   Jun 09 2009 09:16:34  $
---       PVCS Version     : $Revision:   2.28  $
+--       Date into PVCS   : $Date:   Aug 17 2009 09:16:50  $
+--       Date fetched Out : $Modtime:   Aug 17 2009 09:15:56  $
+--       PVCS Version     : $Revision:   2.29  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.28  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.29  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -46,6 +46,7 @@ AS
                                           ,ptr_vc( 2, 'NM0535' ) -- BAU
                                           ,ptr_vc( 2, 'NM0590' ) -- Asset Maintenance
                                           ,ptr_vc( 2, 'NM0560' ) -- Assets on a Route -- AE 4053
+                                          ,ptr_vc( 2, 'NM0573' ) -- Asset Grid - AE 4100
 ));
 
 --
