@@ -121,26 +121,51 @@ PROCEDURE build_types_list(pi_narh_job_id    IN     nm_assets_on_route_holding.n
                           ) IS
 
   c_nl       CONSTANT varchar2(1) := CHR(10);
+  l_tab_dummy  nm3type.tab_number;
 
-  c_type_col CONSTANT varchar2(100) := 'narh.narh_nm_obj_type';
-  c_xsp_col  CONSTANT varchar2(100) := 'narh.narh_item_x_sect';
+  c_type_col CONSTANT varchar2(100) := 'narh_nm_obj_type';
+  c_xsp_col  CONSTANT varchar2(100) := 'narh_item_x_sect';
 
-  l_sql nm3type.max_varchar2 :=            'BEGIN'
-                                || c_nl || '  SELECT'
-                                || c_nl || '    narh.narh_nm_obj_type,'
-                                || c_nl || '    narh.narh_item_x_sect'
-                                || c_nl || '  BULK COLLECT INTO'
-                                || c_nl || '    nm3asset_display.g_inv_types_tab,'
-                                || c_nl || '    nm3asset_display.g_inv_xsps_tab'
-                                || c_nl || '  FROM'
-                                || c_nl || '    nm_assets_on_route_holding narh'
-                                || c_nl || '  WHERE'
-                                || c_nl || '    narh.narh_job_id = :p_narh_job_id'
-                                || c_nl || '  AND'
-                                || c_nl || '    narh.narh_item_type_type = :p_item_type_type'
-                                || c_nl || '  GROUP BY';
+  l_sql nm3type.max_varchar2 := ' SELECT narh_nm_obj_type, '
+                     || c_nl || '        narh_item_x_sect '
+                     || c_nl || '   FROM ( '
+                     || c_nl || '  SELECT'
+                     || c_nl || '    narh.narh_nm_obj_type, '
+                     || c_nl || '    narh.narh_item_x_sect, '
+                     || c_nl || '    narh.narh_ne_id_of_begin '
+                     || c_nl || '  FROM'
+                     || c_nl || '    nm_assets_on_route_holding narh'
+                     || c_nl || '  WHERE'
+                     || c_nl || '    narh.narh_job_id = :p_narh_job_id'
+                     || c_nl || '  AND'
+                     || c_nl || '    narh.narh_item_type_type = :p_item_type_type'
+                     || c_nl || '  ) , nm_nw_xsp'
+                     || c_nl || 'WHERE nwx_x_sect = narh_item_x_sect '
+                     || c_nl || '  AND nwx_nw_type = nm3net.get_nt_type ( narh_ne_id_of_begin ) '
+                     || c_nl || '  AND nwx_nsc_sub_class = nm3net.get_sub_class ( narh_ne_id_of_begin ) '
+                     || c_nl || 'GROUP BY ';
+
+-- Old
+--  c_type_col CONSTANT varchar2(100) := 'narh.narh_nm_obj_type';
+--  c_xsp_col  CONSTANT varchar2(100) := 'narh.narh_item_x_sect';
+
+--  l_sql nm3type.max_varchar2 :=            'BEGIN'
+--                                || c_nl || '  SELECT'
+--                                || c_nl || '    narh.narh_nm_obj_type,'
+--                                || c_nl || '    narh.narh_item_x_sect'
+--                                || c_nl || '  BULK COLLECT INTO'
+--                                || c_nl || '    nm3asset_display.g_inv_types_tab,'
+--                                || c_nl || '    nm3asset_display.g_inv_xsps_tab'
+--                                || c_nl || '  FROM'
+--                                || c_nl || '    nm_assets_on_route_holding narh'
+--                                || c_nl || '  WHERE'
+--                                || c_nl || '    narh.narh_job_id = :p_narh_job_id'
+--                                || c_nl || '  AND'
+--                                || c_nl || '    narh.narh_item_type_type = :p_item_type_type'
+--                                || c_nl || '  GROUP BY';
 
 BEGIN
+
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'build_types_list');
 
@@ -148,25 +173,25 @@ BEGIN
 
   IF pi_group_by_xsp
   THEN
-    l_sql :=            l_sql
-             || c_nl || '  ' || c_xsp_col  || ','
-             || c_nl || '  ' || c_type_col;
+    l_sql := l_sql|| c_nl || '  ' || c_xsp_col  || ','
+                  || c_nl || '  ' || c_type_col;
   ELSE
-    l_sql :=            l_sql
-             || c_nl || '  ' || c_type_col  || ','
-             || c_nl || '  ' || c_xsp_col;
+    l_sql := l_sql|| c_nl || '  ' || c_type_col  || ','
+                  || c_nl || '  ' || c_xsp_col;
   END IF;
 
-  l_sql :=            l_sql || ';'
-           || c_nl || 'END;';
+  l_sql := l_sql || ' '  || c_nl || ', nwx_seq';
 
-  EXECUTE IMMEDIATE l_sql USING pi_narh_job_id,
-                                nm3gaz_qry.get_ngqt_item_type_type_inv;
+  l_sql := l_sql || c_nl || 'ORDER BY nwx_seq ';
+
+  EXECUTE IMMEDIATE l_sql
+  BULK COLLECT INTO nm3asset_display.g_inv_types_tab, nm3asset_display.g_inv_xsps_tab
+  USING pi_narh_job_id, nm3gaz_qry.get_ngqt_item_type_type_inv;
 
   FOR l_i IN 1..g_inv_types_tab.COUNT
   LOOP
     g_types_list_tab(l_i).inv_type   := g_inv_types_tab(l_i);
-    g_types_list_tab(l_i).xsp        := g_inv_xsps_tab(l_i);
+    g_types_list_tab(l_i).xsp        := g_inv_xsps_tab (l_i);
     g_types_list_tab(l_i).label_text := g_inv_types_tab(l_i) || ' ' || g_inv_xsps_tab(l_i);
   END LOOP;
 
@@ -213,7 +238,7 @@ PROCEDURE build_ref_item_data_for_window(pi_narh_job_id         IN     nm_assets
 
   l_ref_item_chunks tab_rec_mp;
 
-BEGIN  
+BEGIN
   get_ref_item_mp(pi_narh_job_id   => pi_narh_job_id
                  ,pi_inv_type      => pi_ref_type
                  ,pi_ref_item_id   => pi_current_ref_item_id
@@ -221,9 +246,9 @@ BEGIN
                  ,pi_range_begin   => pi_measure_start
                  ,pi_range_end     => pi_measure_end
                  ,po_tab_rec_mp    => l_ref_item_chunks);
-                 
+
   FOR l_i IN 1..l_ref_item_chunks.COUNT
-  LOOP    
+  LOOP
     po_ref_items_data_tab(l_i).current_ref := l_ref_item_chunks(l_i).is_ref_item;
     po_ref_items_data_tab(l_i).start_x     := (l_ref_item_chunks(l_i).begin_mp - pi_measure_start) * pi_x_scale_factor;
     po_ref_items_data_tab(l_i).end_x       := (l_ref_item_chunks(l_i).end_mp - pi_measure_start) * pi_x_scale_factor;
@@ -291,7 +316,7 @@ BEGIN
       po_ditem_data_tab(l_index).end_y       := l_types_count;
     END LOOP;
   END LOOP;
-  
+
   IF pi_ref_type IS NOT NULL
   THEN
     build_ref_item_data_for_window(pi_narh_job_id         => pi_narh_job_id
