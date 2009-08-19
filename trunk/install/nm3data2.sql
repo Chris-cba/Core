@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.16   Jul 20 2009 13:54:34   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.17   Aug 19 2009 10:59:04   aedwards  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Jul 20 2009 13:54:34  $
---       Date fetched Out : $Modtime:   Jul 20 2009 13:52:26  $
---       Version          : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Aug 19 2009 10:59:04  $
+--       Date fetched Out : $Modtime:   Aug 19 2009 10:57:46  $
+--       Version          : $Revision:   2.17  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 20-JUL-2009 13:52
+--       Generation Date  : 19-AUG-2009 10:57
 --
 --   Product metadata script
 --   As at Release 4.1.0.0
@@ -90324,6 +90324,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'PROW_REFERENCE'
                     AND  HSTF_CHILD = 'PROW6292');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'PROW_REFERENCE'
+       ,'PROW6294'
+       ,'Maintain Closure Types'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'PROW_REFERENCE'
+                    AND  HSTF_CHILD = 'PROW6294');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT
