@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.13   Jul 17 2009 18:32:00   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.14   Aug 19 2009 16:25:06   rcoupe  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Jul 17 2009 18:32:00  $
---       Date fetched Out : $Modtime:   Jul 17 2009 18:31:08  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Aug 19 2009 16:25:06  $
+--       Date fetched Out : $Modtime:   Aug 19 2009 16:23:28  $
+--       PVCS Version     : $Revision:   2.14  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Fri Jul 17  18:26:28 2009 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Wed Aug 19  16:24:00 2009 by Server Generator 10.1.2.9.28
 
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -4672,15 +4672,6 @@ ALTER TABLE NM_EVENT_LOG ADD (CONSTRAINT
  NEL_NET_FK FOREIGN KEY
   (NEL_NET_TYPE) REFERENCES NM_EVENT_TYPES
   (NET_TYPE))
-/
-
-PROMPT Creating Foreign Key on 'NM_GAZ_QUERY_ATTRIBS_SAVED'
-ALTER TABLE NM_GAZ_QUERY_ATTRIBS_SAVED ADD (CONSTRAINT
- NGQAS_ITA_FK FOREIGN KEY
-  (NGQAS_NIT_TYPE
-  ,NGQAS_ATTRIB_NAME) REFERENCES NM_INV_TYPE_ATTRIBS_ALL
-  (ITA_INV_TYPE
-  ,ITA_VIEW_COL_NAME) ON DELETE CASCADE)
 /
 
 PROMPT Creating Foreign Key on 'NM_GAZ_QUERY_ATTRIBS_SAVED'
