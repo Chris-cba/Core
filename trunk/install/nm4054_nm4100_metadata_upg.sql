@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.5   Jul 20 2009 16:24:46   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.6   Aug 19 2009 10:57:08   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Jul 20 2009 16:24:46  $
---       Date fetched Out : $Modtime:   Jul 20 2009 16:23:28  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Aug 19 2009 10:57:08  $
+--       Date fetched Out : $Modtime:   Aug 19 2009 10:55:40  $
+--       Version          : $Revision:   3.6  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -237,15 +237,15 @@ SET TERM OFF
 update hig_option_list
 set hol_remarks = 'This option must contain a list of numeric values in the range 1 to 7.
 They define the days of the week which constitute the weekend in a particular country, for use in working day calculations.  The following convention must be adopted:
-1=Sunday 2=Monday ... 7=Saturday.
-Therefore in the UK this option will contain the value 1,7
+7=Sunday 2=Monday ... 6=Saturday.
+Therefore in the UK this option will contain the value 6,7
 In the Inspection Loader (MAI2200), when repairs are loaded a repair due date calculation takes place. This may be based on working days or calendar days as indicated by the defect priority rules.
 In Maintain Defects (MAI3806) a similar calculation takes place when a repair is created.'
 where HOL_ID = 'WEEKEND'
 and HOL_PRODUCT = 'HIG';
 
 update hig_option_values
-set hov_value = '1, 7'
+set hov_value = '6, 7'
 where hov_id = 'WEEKEND';
 
 ------------------------------------------------------------------
@@ -786,6 +786,8 @@ SET TERM OFF
 -- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
 -- Consolidate the MAI addtion from previous releases.
 -- 
+-- Change CST: Metadata is required to show the new TMA tabs in the GIS0020.
+-- 
 ------------------------------------------------------------------
 INSERT INTO nm_layer_tree
    SELECT   'MAI',
@@ -799,6 +801,37 @@ INSERT INTO nm_layer_tree
                          WHERE   nltr_parent = 'MAI' 
                            AND nltr_child = 'WOL');
 
+INSERT INTO NM_LAYER_TREE ( NLTR_PARENT
+                          , NLTR_CHILD
+                          , NLTR_DESCR
+                          , NLTR_TYPE
+                          , NLTR_ORDER)
+(SELECT 'ROOT'
+      , 'TMA'
+      , 'Traffic Management Act'
+      , 'F'
+      , 130 
+FROM DUAL
+WHERE NOT EXISTS (SELECT 'X'
+                    FROM nm_layer_tree
+                   WHERE NLTR_PARENT = 'ROOT'
+                     AND NLTR_CHILD = 'TMA'));
+
+INSERT INTO NM_LAYER_TREE ( NLTR_PARENT
+                          , NLTR_CHILD
+                          , NLTR_DESCR
+                          , NLTR_TYPE
+                          , NLTR_ORDER)
+(SELECT 'TMA'
+     , 'TM1'
+     , 'TMA Layer'
+     , 'M'
+     , 10 
+FROM DUAL
+WHERE NOT EXISTS (SELECT 'X'
+                    FROM nm_layer_tree
+                   WHERE NLTR_PARENT = 'TMA'
+                     AND NLTR_CHILD = 'TM1'));
 
 ------------------------------------------------------------------
 
@@ -826,6 +859,236 @@ Insert into HIG_OPTION_VALUES
    (HOV_ID, HOV_VALUE)
  Values
    ('GRPXCLOVWR', 'N');
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Remove redundant module
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (GRAEME JOHNSON)
+-- Remove module originally used to implement cross references between NSG streets
+-- 
+------------------------------------------------------------------
+delete from hig_module_roles
+where hmr_module = 'NM0600'
+/
+delete from hig_modules
+where hmo_module = 'NM0600'
+/
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Correct Non Linear Network types with Units set
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Nullify units on Non Linear network types
+-- 
+------------------------------------------------------------------
+SET serveroutput ON
+DECLARE
+  CURSOR get_faulty
+  IS
+    SELECT nt_type, nt_unique, nt_length_unit FROM nm_types
+     WHERE nt_length_unit IS NOT NULL
+       AND nt_linear = 'N';
+  l_tab_nt_unique nm3type.tab_varchar30;
+  l_tab_nt_type   nm3type.tab_varchar4;
+  l_tab_nt_unit   nm3type.tab_number;
+BEGIN
+--
+  dbms_output.put_line ('==============================================================');
+  dbms_output.put_line ('Checking for faulty non-linear network types using Unit Types');
+  dbms_output.put_line ('==============================================================');
+--
+   OPEN get_faulty;
+  FETCH get_faulty 
+   BULK COLLECT INTO l_tab_nt_type, l_tab_nt_unique, l_tab_nt_unit;
+  CLOSE get_faulty;
+--
+  IF l_tab_nt_type.COUNT > 0
+  THEN
+  --
+    FOR i IN 1..l_tab_nt_type.COUNT LOOP
+    -- nm_units
+      dbms_output.put_line ('Idenfified '||l_tab_nt_unique(i)
+                         ||' illegally using unit type '
+                         ||nm3get.get_un(l_tab_nt_unit(i)).un_unit_name);
+    --
+    END LOOP;
+  --
+    FORALL z IN 1..l_tab_nt_type.COUNT
+      UPDATE nm_types
+         SET nt_length_unit = NULL
+       WHERE nt_type = l_tab_nt_type(z);
+    dbms_output.put_line(SQL%ROWCOUNT||' network types corrected'); 
+  --
+  ELSE
+    dbms_output.put_line ('No faulty non-linear network types found');
+  END IF;
+  dbms_output.put_line ('==============================================================');
+--
+END;
+/
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Resequence ita_inv_type
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
+-- Resequencing the ita_inv_type so that several are not set to 99 and set the  ita_inspectable on the basis of the ita_inv_type field
+-- 
+------------------------------------------------------------------
+DECLARE
+
+CURSOR cur_inv_type_list IS  SELECT DISTINCT ita_inv_type ita_inv_type
+                               FROM nm_inv_type_attribs_all 
+                              WHERE ita_disp_seq_no = 99;
+
+  PROCEDURE resequence_inv_type(p_inv_type IN VARCHAR2) IS
+  
+    v_nn_count number(10);
+    v_max_seq_no number(10);
+
+    CURSOR cur_nn_atts is  select ita_inv_type
+                                , ita_attrib_name
+                             from NM_INV_TYPE_ATTRIBS_ALL
+                            where ita_inv_type = p_inv_type
+                              and ita_disp_seq_no = 99;
+
+
+  BEGIN
+
+  -- Get the number of 99 attributes
+    SELECT COUNT(*) 
+    INTO v_nn_count
+    FROM nm_inv_type_attribs_all 
+    WHERE ita_inv_type = p_inv_type
+      AND ita_disp_seq_no = 99;
+
+    -- Only continue if there are 99 values to change.
+    IF v_nn_count > 0 THEN
+
+
+    --Get the highest none 99 value 
+    SELECT NVL(MAX(ita_disp_seq_no), 0)
+     INTO v_max_seq_no
+     FROM nm_inv_type_attribs_all
+     WHERE ita_inv_type = p_inv_type
+     AND ita_disp_seq_no <> 99;
+    
+    FOR rec_nn_atts IN cur_nn_atts 
+    
+    LOOP
+        v_max_seq_no:= v_max_seq_no + 1;
+        IF v_max_seq_no = 99 THEN
+          v_max_seq_no:= v_max_seq_no + 1;
+        END IF;
+    
+        UPDATE nm_inv_type_attribs_all
+           SET ita_disp_seq_no = v_max_seq_no
+         WHERE ita_inv_type = rec_nn_atts.ita_inv_type
+           AND ita_attrib_name = rec_nn_atts.ita_attrib_name;
+      END LOOP;
+    
+    END IF;
+
+  END;
+
+BEGIN
+
+  EXECUTE IMMEDIATE  'UPDATE nm_inv_type_attribs_all 
+                                             SET ita_inspectable = DECODE(ita_disp_seq_no
+                                                                                              ,99 ,''N''
+                                                                                              ,''Y'')
+                                       WHERE ita_inspectable IS NULL';
+
+  FOR rec_inv_type_list IN cur_inv_type_list 
+  LOOP
+  --
+    resequence_inv_type(p_inv_type => rec_inv_type_list.ita_inv_type);
+  --
+  END LOOP;
+
+END;
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Asset Grid Theme Functions upgrade
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 108213
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Add Asset Grid NM0573 to all existing Asset themes
+-- 
+------------------------------------------------------------------
+INSERT INTO nm_theme_functions_all
+SELECT nth_theme_id
+     , hmo_module
+     , 'GIS_SESSION_ID'
+     , hmo_title 
+     , 'Y'
+  FROM nm_themes_all
+     , nm_inv_themes
+     , hig_modules
+ WHERE nith_nth_theme_id = nth_theme_id
+   AND hmo_module = 'NM0573'
+   AND NOT EXISTS
+     (SELECT 'exists' 
+        FROM nm_theme_functions_all
+       WHERE ntf_nth_theme_id = nth_theme_id
+         AND ntf_hmo_module = hmo_module
+         AND ntf_parameter = 'GIS_SESSION_ID');
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Trim Hig Code Meanings
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED PROBLEM MANAGER LOG#
+-- 722177  Exor Corporation Ltd
+-- 
+-- ASSOCIATED DEVELOPMENT TASK
+-- 108290
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Make sure there are no leading/trailing spaces in HIG_CODE meanings
+-- 
+------------------------------------------------------------------
+UPDATE hig_codes
+   SET hco_meaning = TRIM(hco_meaning);
+
 ------------------------------------------------------------------
 
 
