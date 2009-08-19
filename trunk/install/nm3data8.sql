@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.3   Jul 20 2009 13:54:36   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.4   Aug 19 2009 10:59:06   aedwards  $
 --       Module Name      : $Workfile:   nm3data8.sql  $
---       Date into PVCS   : $Date:   Jul 20 2009 13:54:36  $
---       Date fetched Out : $Modtime:   Jul 20 2009 13:52:34  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Aug 19 2009 10:59:06  $
+--       Date fetched Out : $Modtime:   Aug 19 2009 10:57:52  $
+--       Version          : $Revision:   2.4  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 20-JUL-2009 13:52
+--       Generation Date  : 19-AUG-2009 10:57
 --
 --   Product metadata script
 --   As at Release 4.1.0.0
@@ -1061,6 +1061,38 @@ SELECT
        ,80 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_LAYER_TREE
                    WHERE NLTR_CHILD = 'SWR');
+--
+INSERT INTO NM_LAYER_TREE
+       (NLTR_PARENT
+       ,NLTR_CHILD
+       ,NLTR_DESCR
+       ,NLTR_TYPE
+       ,NLTR_ORDER
+       )
+SELECT 
+        'TMA'
+       ,'TM1'
+       ,'TMA Layer'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LAYER_TREE
+                   WHERE NLTR_CHILD = 'TM1');
+--
+INSERT INTO NM_LAYER_TREE
+       (NLTR_PARENT
+       ,NLTR_CHILD
+       ,NLTR_DESCR
+       ,NLTR_TYPE
+       ,NLTR_ORDER
+       )
+SELECT 
+        'ROOT'
+       ,'TMA'
+       ,'Traffic Management Act'
+       ,'F'
+       ,130 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LAYER_TREE
+                   WHERE NLTR_CHILD = 'TMA');
 --
 INSERT INTO NM_LAYER_TREE
        (NLTR_PARENT
