@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.28   Jul 20 2009 13:54:34   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.29   Aug 19 2009 10:59:02   aedwards  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Jul 20 2009 13:54:34  $
---       Date fetched Out : $Modtime:   Jul 20 2009 13:52:20  $
---       Version          : $Revision:   2.28  $
+--       Date into PVCS   : $Date:   Aug 19 2009 10:59:02  $
+--       Date fetched Out : $Modtime:   Aug 19 2009 10:57:38  $
+--       Version          : $Revision:   2.29  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 20-JUL-2009 13:52
+--       Generation Date  : 19-AUG-2009 10:57
 --
 --   Product metadata script
 --   As at Release 4.1.0.0
@@ -30425,30 +30425,6 @@ INSERT INTO HIG_MODULES
        ,HMO_MENU
        )
 SELECT 
-        'NM0600'
-       ,'Maintain Element XRefs'
-       ,'nm0600'
-       ,'FMX'
-       ,''
-       ,'N'
-       ,'N'
-       ,'NET'
-       ,'FORM' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
-                   WHERE HMO_MODULE = 'NM0600');
---
-INSERT INTO HIG_MODULES
-       (HMO_MODULE
-       ,HMO_TITLE
-       ,HMO_FILENAME
-       ,HMO_MODULE_TYPE
-       ,HMO_FASTPATH_OPTS
-       ,HMO_FASTPATH_INVALID
-       ,HMO_USE_GRI
-       ,HMO_APPLICATION
-       ,HMO_MENU
-       )
-SELECT 
         'NM0700'
        ,'Maintain Additional Data'
        ,'nm0700'
@@ -34276,7 +34252,7 @@ SELECT
         'WEEKEND'
        ,'HIG'
        ,'Weekend Day Numbers'
-       ,'This option must contain a list of numeric values in the range 1 to 7.'||CHR(10)||'They define the days of the week which constitute the weekend in a particular country, for use in working day calculations.  The following convention must be adopted:'||CHR(10)||'1=Sunday 2=Monday ... 7=Saturday.'||CHR(10)||'Therefore in the UK this option will contain the value 1,7'||CHR(10)||'In the Inspection Loader (MAI2200), when repairs are loaded a repair due date calculation takes place. This may be based on working days or calendar days as indicated by the defect priority rules.'||CHR(10)||'In Maintain Defects (MAI3806) a similar calculation takes place when a repair is created.'
+       ,'This option must contain a list of numeric values in the range 1 to 7.'||CHR(10)||'They define the days of the week which constitute the weekend in a particular country, for use in working day calculations.  The following convention must be adopted:'||CHR(10)||'7=Sunday 2=Monday ... 6=Saturday.'||CHR(10)||'Therefore in the UK this option will contain the value 6,7'||CHR(10)||'In the Inspection Loader (MAI2200), when repairs are loaded a repair due date calculation takes place. This may be based on working days or calendar days as indicated by the defect priority rules.'||CHR(10)||'In Maintain Defects (MAI3806) a similar calculation takes place when a repair is created.'
        ,''
        ,'VARCHAR2'
        ,'N'
@@ -35491,7 +35467,7 @@ INSERT INTO HIG_OPTION_VALUES
        )
 SELECT 
         'WEEKEND'
-       ,'1, 7' FROM DUAL
+       ,'6, 7' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
                    WHERE HOV_ID = 'WEEKEND');
 --
