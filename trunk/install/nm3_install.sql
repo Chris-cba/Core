@@ -1,5 +1,5 @@
 -- SCCS ID Keyword, do not remove
-define sccsid = '"$Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.13   Aug 21 2009 16:33:12   aedwards  $"'
+define sccsid = '"$Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.14   Aug 21 2009 17:04:58   aedwards  $"'
 
 REM Copyright (c) Exor Corporation Ltd, 2008
 
@@ -321,6 +321,20 @@ SET DEFINE ON
 create public synonym xmldom for sys.xmldom;
 create public synonym xmlparser for sys.xmlparser;
 create public synonym xslprocessor for sys.xslprocessor;
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   ROLES  *******************
+SET TERM ON
+Prompt Updating HIG_USER_ROLES...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'hig_user_roles.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start &&run_file
+SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                ****************   CREATE SDO VIEWS  *******************
