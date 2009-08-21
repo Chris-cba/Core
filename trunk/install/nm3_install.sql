@@ -1,5 +1,5 @@
 -- SCCS ID Keyword, do not remove
-define sccsid = '"$Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.10   Jul 21 2009 16:38:14   malexander  $"'
+define sccsid = '"$Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.11   Aug 21 2009 15:21:04   aedwards  $"'
 
 REM Copyright (c) Exor Corporation Ltd, 2008
 
@@ -411,6 +411,22 @@ SET TERM OFF
 SET DEFINE ON
 select '&exor_base'||'nm3'||'&terminator'||'install'||
         '&terminator'||'nm3jobs.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                ****************   CREATE SDO VIEWS  *******************
+--
+--
+SET TERM ON
+PROMPT Create User SDO Views
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'create_usdo.sql' run_file
 from dual
 /
 SET FEEDBACK ON
