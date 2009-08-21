@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.6   Aug 19 2009 10:57:08   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.7   Aug 21 2009 12:30:14   malexander  $
 --       Module Name      : $Workfile:   nm4054_nm4100_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Aug 19 2009 10:57:08  $
---       Date fetched Out : $Modtime:   Aug 19 2009 10:55:40  $
---       Version          : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   Aug 21 2009 12:30:14  $
+--       Date fetched Out : $Modtime:   Aug 21 2009 12:24:58  $
+--       Version          : $Revision:   3.7  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -847,18 +847,37 @@ SET TERM OFF
 -- Update hig_option_list and hig_option_values
 -- 
 ------------------------------------------------------------------
-  Insert into HIG_OPTION_LIST
-   (HOL_ID, HOL_PRODUCT, HOL_NAME, HOL_REMARKS, HOL_DATATYPE, HOL_MIXED_CASE,
-      HOL_USER_OPTION)
- Values
-   ('GRPXCLOVWR', 'NET', 'Exclusive Group type Override',
-      'When value is set to ''Y'' this will allow user to override the Exclusive Group Type.'
-      , 'VARCHAR2', 'N', 'N');
-
-Insert into HIG_OPTION_VALUES
-   (HOV_ID, HOV_VALUE)
- Values
-   ('GRPXCLOVWR', 'N');
+Insert Into hig_option_list( hol_id
+                           , hol_product
+                           , hol_name
+                           , hol_remarks
+                           , hol_datatype
+                           , hol_mixed_case
+                           , hol_user_option
+                           )
+                      Select 'GRPXCLOVWR'
+                           , 'NET'
+                           , 'Exclusive Group type Override'
+                           , 'When value is set to ''Y'' this will allow user to override the Exclusive Group Type.'
+                           , 'VARCHAR2'
+                           , 'N'
+                           , 'N'
+                      From   Dual
+                      Where Not Exists( Select 1
+                                        From   hig_option_list
+                                        Where  hol_id = 'GRPXCLOVWR'
+                                      );
+                                      
+Insert Into hig_option_values( hov_id
+                             , hov_value
+                             )
+                        Select 'GRPXCLOVWR'
+                             , 'N'
+                        From   Dual
+                        Where Not Exists( Select 1
+                                          From   hig_option_values
+                                          Where  hov_id = 'GRPXCLOVWR'
+                                        );
 ------------------------------------------------------------------
 
 
@@ -1026,6 +1045,7 @@ BEGIN
   END LOOP;
 
 END;
+/
 ------------------------------------------------------------------
 
 
