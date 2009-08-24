@@ -1,6 +1,14 @@
--- SCCS ID Keyword, do not remove
-define sccsid = '"$Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.14   Aug 21 2009 17:04:58   aedwards  $"'
-
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.15   Aug 24 2009 15:48:22   malexander  $
+--       Module Name      : $Workfile:   nm3_install.sql  $
+--       Date into PVCS   : $Date:   Aug 24 2009 15:48:22  $
+--       Date fetched Out : $Modtime:   Aug 24 2009 15:48:12  $
+--       PVCS Version     : $Revision:   2.15  $
+--
+--------------------------------------------------------------------------------
+--
 REM Copyright (c) Exor Corporation Ltd, 2008
 
 set echo off
