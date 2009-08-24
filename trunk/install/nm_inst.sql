@@ -1,5 +1,14 @@
-define sccsid :='"$Revision:   2.0  $"';
-
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_inst.sql-arc   2.1   Aug 24 2009 15:47:22   malexander  $
+--       Module Name      : $Workfile:   nm_inst.sql  $
+--       Date into PVCS   : $Date:   Aug 24 2009 15:47:22  $
+--       Date fetched Out : $Modtime:   Aug 24 2009 15:46:48  $
+--       PVCS Version     : $Revision:   2.1  $
+--
+--------------------------------------------------------------------------------
+--
 -- Check that the user isn't sys or system
 WHENEVER SQLERROR EXIT
 BEGIN
