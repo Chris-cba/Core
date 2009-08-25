@@ -5,16 +5,16 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkb-arc   1.3   Jul 16 2009 11:27:10   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkb-arc   1.4   Aug 25 2009 09:03:34   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_geom.pkb  $
---       Date into PVCS   : $Date:   Jul 16 2009 11:27:10  $
---       Date fetched Out : $Modtime:   Jul 16 2009 11:26:34  $
---       PVCS Version     : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Aug 25 2009 09:03:34  $
+--       Date fetched Out : $Modtime:   Aug 25 2009 09:03:04  $
+--       PVCS Version     : $Revision:   1.4  $
 --       Based on
 --
 --------------------------------------------------------------------------------
 --
-  g_body_sccsid    CONSTANT VARCHAR2(30) :='"$Revision:   1.3  $"';
+  g_body_sccsid    CONSTANT VARCHAR2(30) :='"$Revision:   1.4  $"';
   g_tab_xys                 nm3sdo_gdo.tab_xys;
  -- g_tab_nm_coords           nm_coords_array := NEW nm_coords_array();
 --
@@ -164,7 +164,7 @@ AS
     g_tab_xys.DELETE;
     --g_tab_nm_coords.DELETE;
     g_tab_xys := p_tab_xys;
-    nm_debug.debug_on;
+    --nm_debug.debug_on;
     RETURN get_geom_from_gdo( p_gdo_session_id => -999999
                             , p_gtype          => p_gtype );
   END get_geom_from_xys;
@@ -272,9 +272,13 @@ AS
           RAISE ex_invalid_gtype_for_gdo;
         ELSE
           l_elem := mdsys.sdo_elem_info_array( 1, 1003, 1 );
-          l_ords.EXTEND(2);
-          l_ords(l_ords.LAST-1) := l_ords(1);
-          l_ords(l_ords.LAST)   := l_ords(2);
+          IF l_ords(l_ords.LAST) != l_ords(2)
+          AND l_ords(l_ords.LAST-1) != l_ords(1)
+          THEN
+            l_ords.EXTEND(2);
+            l_ords(l_ords.LAST-1) := l_ords(1);
+            l_ords(l_ords.LAST)   := l_ords(2);
+          END IF;
         END IF;
       ELSE
         RAISE ex_unsupported_gtype;
@@ -282,6 +286,7 @@ AS
     --
 
     --
+
       RETURN sdo_util.rectify_geometry
              ( sdo_util.remove_duplicate_vertices
                 ( mdsys.sdo_geometry( p_gtype
@@ -291,6 +296,7 @@ AS
                                     , l_ords )
                 , 0.0001)
              , 0.0001);
+
     END IF;  
   --
   EXCEPTION
