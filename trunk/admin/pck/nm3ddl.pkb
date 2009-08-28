@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.14   Mar 24 2009 10:01:46   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.15   Aug 28 2009 11:13:02   aedwards  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Mar 24 2009 10:01:46  $
---       Date fetched Out : $Modtime:   Mar 24 2009 09:59:54  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Aug 28 2009 11:13:02  $
+--       Date fetched Out : $Modtime:   Aug 28 2009 11:12:30  $
+--       PVCS Version     : $Revision:   2.15  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -17,13 +17,13 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --   NM3 DDL package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+-- Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.14  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.15  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -883,9 +883,13 @@ BEGIN
 --
    FOR cs_rec IN cs_missing_synonyms
    LOOP
-       syn_exec_ddl('CREATE PUBLIC SYNONYM '||cs_rec.object_name
-                      ||' FOR '||g_application_owner||'.'||cs_rec.object_name
-                     );
+       BEGIN
+         syn_exec_ddl('CREATE PUBLIC SYNONYM '||cs_rec.object_name
+                        ||' FOR '||g_application_owner||'.'||cs_rec.object_name
+                       );
+       EXCEPTION
+         WHEN OTHERS THEN NULL;
+       END;
    END LOOP;
 
    commit;
@@ -949,9 +953,13 @@ BEGIN
 --
    FOR cs_rec IN cs_missing_synonyms
    LOOP
-      syn_exec_ddl('CREATE SYNONYM '||cs_rec.hus_username||'.'||cs_rec.object_name
-                         ||' FOR '||g_application_owner||'.'||cs_rec.object_name
-                  );
+       BEGIN
+         syn_exec_ddl('CREATE SYNONYM '||cs_rec.hus_username||'.'||cs_rec.object_name
+                           ||' FOR '||g_application_owner||'.'||cs_rec.object_name
+                     );
+       EXCEPTION
+         WHEN OTHERS THEN NULL;
+       END;
    END LOOP;
 
    commit; --sscanlon fix 38046 26-SEP-2006
@@ -1394,7 +1402,7 @@ PROCEDURE create_user (p_rec_hus            IN OUT HIG_USERS%ROWTYPE
 --
   CURSOR c3( c_obj_name VARCHAR2 ) IS
     SELECT 1
-     FROM ALL_OBJECTS		-- caters for user objects and synonyms
+     FROM ALL_OBJECTS  -- caters for user objects and synonyms
     WHERE owner = g_application_owner
     AND    object_name = c_obj_name
     UNION
@@ -1425,19 +1433,19 @@ PROCEDURE create_user (p_rec_hus            IN OUT HIG_USERS%ROWTYPE
    --users could create a user who's user name already exists on the same database
    --but in a different schema.  This fix will stop this from happening.
    --see other lines of code added as pasr of this fix by searching for:
-   --	'sscanlon fix 704527 28AUG2007'
+   -- 'sscanlon fix 704527 28AUG2007'
    CURSOR cs_hig_user_exists (c_username VARCHAR2) IS
    SELECT 1
      FROM  HIG_USERS
     WHERE  hus_username = c_username;
 
    l_dummy PLS_INTEGER;
-   l_dummy2 PLS_INTEGER;	--sscanlon fix 704527 28AUG2007, new variable added to be used below
+   l_dummy2 PLS_INTEGER; --sscanlon fix 704527 28AUG2007, new variable added to be used below
 
 --
-   l_user_already_exists 	    BOOLEAN;
-   l_hig_user_already_exists 	BOOLEAN;  --sscanlon fix 704527 28AUG2007 new boolean added to be used below
-   l_found               	    BOOLEAN;
+   l_user_already_exists      BOOLEAN;
+   l_hig_user_already_exists  BOOLEAN;  --sscanlon fix 704527 28AUG2007 new boolean added to be used below
+   l_found                    BOOLEAN;
 --
    l_tab_vc Nm3type.tab_varchar32767;
 --
@@ -1521,16 +1529,16 @@ BEGIN
   --
   --sscanlon fix 704527 28AUG2007
     IF l_user_already_exists THEN
-	  OPEN cs_hig_user_exists (p_rec_hus.hus_username);
-	  FETCH cs_hig_user_exists INTO l_dummy2;
-	  l_hig_user_already_exists := cs_hig_user_exists%FOUND;
-	  CLOSE cs_hig_user_exists;
-	--
-	  IF NOT l_hig_user_already_exists THEN
-	    hig.raise_ner(pi_appl => 'HIG'
-	    , pi_id => 445
-	    , pi_supplementary_info => ' Username: '||p_rec_hus.hus_username);
-	  END IF;
+   OPEN cs_hig_user_exists (p_rec_hus.hus_username);
+   FETCH cs_hig_user_exists INTO l_dummy2;
+   l_hig_user_already_exists := cs_hig_user_exists%FOUND;
+   CLOSE cs_hig_user_exists;
+ --
+   IF NOT l_hig_user_already_exists THEN
+     hig.raise_ner(pi_appl => 'HIG'
+     , pi_id => 445
+     , pi_supplementary_info => ' Username: '||p_rec_hus.hus_username);
+   END IF;
     END IF;
   --end of sscanlon fix 704527 28AUG2007
   --
@@ -1628,8 +1636,8 @@ BEGIN
 ----
 ---- This table is required for mai5021 - Trapezium Rule Report
 ----
---	open c4;
---	fetch c4 into l_exists;
+-- open c4;
+-- fetch c4 into l_exists;
 --  if c4%found then
 --     proc_input := 'CREATE TABLE '||p_rec_hus.hus_username||'.INV_TMP'
 --                 ||' as select * from inv_tmp where rownum < 1';
@@ -1773,7 +1781,7 @@ BEGIN
     BULK  COLLECT
     INTO  l_tab_seq
     FROM  HIG_SEQUENCE_ASSOCIATIONS
-	     , all_tables
+      , all_tables
    WHERE table_name = hsa_table_name
    and   owner = g_application_owner
    GROUP BY hsa_sequence_name;
@@ -2261,7 +2269,7 @@ END create_all_styles_view;
 --
 PROCEDURE get_pck_referenced_col_diffs(pi_package_name    IN VARCHAR2
                                       ,pi_schema1         IN VARCHAR2
-			 						  ,pi_schema2         IN VARCHAR2) IS
+            ,pi_schema2         IN VARCHAR2) IS
   CURSOR c1 IS
   SELECT a.*
   FROM   all_tab_columns a
@@ -2278,7 +2286,7 @@ PROCEDURE get_pck_referenced_col_diffs(pi_package_name    IN VARCHAR2
                    and b.column_name  = a.column_name
                    and b.column_id    = a.column_id
                    and b.data_type    = a.data_type
-  			       )
+            )
   order by table_name, column_name;
 
   tab_lines nm3type.tab_varchar32767;
