@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.15   Aug 24 2009 15:48:22   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.16   Aug 28 2009 09:53:34   aedwards  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Aug 24 2009 15:48:22  $
---       Date fetched Out : $Modtime:   Aug 24 2009 15:48:12  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Aug 28 2009 09:53:34  $
+--       Date fetched Out : $Modtime:   Aug 28 2009 09:52:44  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 --------------------------------------------------------------------------------
 --
@@ -331,20 +331,6 @@ create public synonym xmlparser for sys.xmlparser;
 create public synonym xslprocessor for sys.xslprocessor;
 --
 ---------------------------------------------------------------------------------------------------
---                        ****************   ROLES  *******************
-SET TERM ON
-Prompt Updating HIG_USER_ROLES...
-SET TERM OFF
-SET DEFINE ON
-select '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'hig_user_roles.sql' run_file
-from dual
-/
-SET FEEDBACK ON
-start &&run_file
-SET FEEDBACK OFF
---
----------------------------------------------------------------------------------------------------
 --                ****************   CREATE SDO VIEWS  *******************
 --
 --
@@ -398,6 +384,58 @@ BEGIN
   nm3user.instantiate_user;
 END;
 /
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   META-DATA  *******************
+SET TERM ON
+PROMPT Meta-Data - Create Products ..
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'nm3data1.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start &&run_file
+SET FEEDBACK OFF
+
+SET TERM ON
+PROMPT Meta-Data - Create Reporting Metadata ..
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'nm3data2.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start &&run_file
+SET FEEDBACK OFF
+
+SET TERM ON
+PROMPT Meta-Data - Create Roles ..
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'nm3data3.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start &&run_file
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   ROLES  *******************
+SET TERM ON
+Prompt Updating HIG_USER_ROLES...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'hig_user_roles.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start &&run_file
+SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   META-DATA  *******************
