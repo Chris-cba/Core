@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.16   Aug 28 2009 09:53:34   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.17   Aug 28 2009 10:48:18   malexander  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Aug 28 2009 09:53:34  $
---       Date fetched Out : $Modtime:   Aug 28 2009 09:52:44  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Aug 28 2009 10:48:18  $
+--       Date fetched Out : $Modtime:   Aug 28 2009 10:25:48  $
+--       PVCS Version     : $Revision:   2.17  $
 --
 --------------------------------------------------------------------------------
 --
@@ -267,6 +267,17 @@ start '&&run_file'
 SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
+--                        ****************   INIT CONTEXT *******************
+SET TERM ON
+prompt Set Context Values...
+SET TERM OFF
+SET DEFINE ON
+exec nm3context.initialise_context;
+
+commit;
+/
+--
+---------------------------------------------------------------------------------------------------
 --                         ****************   POLICIES  *******************
 SET TERM ON
 prompt Policies...
@@ -307,17 +318,6 @@ from dual
 SET FEEDBACK ON
 start '&&run_file'
 SET FEEDBACK OFF
---
----------------------------------------------------------------------------------------------------
---                        ****************   INIT CONTEXT *******************
-SET TERM ON
-prompt Set Context Values...
-SET TERM OFF
-SET DEFINE ON
-exec nm3context.initialise_context;
-
-commit;
-/
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   XML SYNONYMS *******************
