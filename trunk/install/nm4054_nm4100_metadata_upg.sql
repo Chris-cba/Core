@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.7   Aug 21 2009 12:30:14   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.8   Sep 01 2009 11:48:38   aedwards  $
 --       Module Name      : $Workfile:   nm4054_nm4100_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Aug 21 2009 12:30:14  $
---       Date fetched Out : $Modtime:   Aug 21 2009 12:24:58  $
---       Version          : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   Sep 01 2009 11:48:38  $
+--       Date fetched Out : $Modtime:   Sep 01 2009 11:47:02  $
+--       Version          : $Revision:   3.8  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -1031,6 +1031,8 @@ CURSOR cur_inv_type_list IS  SELECT DISTINCT ita_inv_type ita_inv_type
 
 BEGIN
 
+  EXECUTE IMMEDIATE 'ALTER TABLE nm_inv_type_attribs_all DISABLE ALL TRIGGERS';
+
   EXECUTE IMMEDIATE  'UPDATE nm_inv_type_attribs_all 
                                              SET ita_inspectable = DECODE(ita_disp_seq_no
                                                                                               ,99 ,''N''
@@ -1043,6 +1045,8 @@ BEGIN
     resequence_inv_type(p_inv_type => rec_inv_type_list.ita_inv_type);
   --
   END LOOP;
+
+  EXECUTE IMMEDIATE 'ALTER TABLE nm_inv_type_attribs_all ENABLE ALL TRIGGERS';
 
 END;
 /
@@ -1067,10 +1071,10 @@ SET TERM OFF
 -- 
 ------------------------------------------------------------------
 INSERT INTO nm_theme_functions_all
-SELECT nth_theme_id
+SELECT UNIQUE nth_theme_id
      , hmo_module
      , 'GIS_SESSION_ID'
-     , hmo_title 
+     , UPPER(hmo_title) 
      , 'Y'
   FROM nm_themes_all
      , nm_inv_themes
@@ -1081,8 +1085,8 @@ SELECT nth_theme_id
      (SELECT 'exists' 
         FROM nm_theme_functions_all
        WHERE ntf_nth_theme_id = nth_theme_id
-         AND ntf_hmo_module = hmo_module
-         AND ntf_parameter = 'GIS_SESSION_ID');
+         AND ntf_hmo_module   = 'NM0573'
+         AND ntf_parameter    = 'GIS_SESSION_ID');
 ------------------------------------------------------------------
 
 
