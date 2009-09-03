@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.6   Feb 12 2009 18:03:06   rcoupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.7   Sep 03 2009 09:59:26   drawat  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Feb 12 2009 18:03:06  $
---       Date fetched Out : $Modtime:   Feb 12 2009 17:58:44  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Sep 03 2009 09:59:26  $
+--       Date fetched Out : $Modtime:   Sep 02 2009 17:38:08  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -121,6 +121,7 @@ END undo_scheme;
    )
    IS
    BEGIN
+
       Nm_Debug.proc_start (g_package_name, 'UNDO_OTHER_PRODUCTS');
 
       -- check product install
@@ -464,7 +465,6 @@ END undo_scheme;
       --
       -- </MAI>
       --
-
       -- Schemes
       undo_scheme(p_ne_id_1   => p_ne_id_1
                  ,p_ne_id_2   => p_ne_id_2
@@ -506,7 +506,67 @@ END undo_scheme;
       --
       -- </PROW>
       --
+
+      --
+      -- <UKP>
+      --
+      IF Hig.is_product_licensed (Nm3type.c_ukp)
+      THEN
+         -- undo the action
+         IF p_operation = c_split
+         THEN
+
+            EXECUTE IMMEDIATE 'BEGIN'
+                || CHR (10)|| '   ukpsplit.undo_split( p_rse_original => :p_ne_id_1 '
+                || CHR (10)|| '                       ,p_rse_split1   => :p_ne_id_2 '
+                || CHR (10)|| '                       ,p_rse_split2   => :p_ne_id_3);'
+                || CHR (10)|| 'END;'
+            USING IN p_ne_id_1, p_ne_id_2, p_ne_id_3;
+--
+         ELSIF p_operation = c_merge     
+         THEN
+
+            EXECUTE IMMEDIATE 'BEGIN'
+                || CHR (10)|| '   ukpmerge.check_undo_merge( p_merged_rse    => :p_ne_id_3 '
+                || CHR (10)|| '                             ,p_actioned_date => :p_op_date );'
+                || CHR (10)|| 'END;'
+            USING IN p_ne_id_3, p_op_date;
+
+            EXECUTE IMMEDIATE 'BEGIN'
+                || CHR (10)|| '   ukpmerge.undo_merge( p_merged_rse => :p_ne_id_3 '
+                || CHR (10)|| '                       ,p_old_rse_1  => :p_ne_id_1 '
+                || CHR (10)|| '                       ,p_old_rse_2  => :p_ne_id_2 );'
+                || CHR (10)|| 'END;'
+            USING IN p_ne_id_3, p_ne_id_1, p_ne_id_2;
+
+         ELSIF p_operation = c_replace
+         THEN
+         
+            EXECUTE IMMEDIATE 'BEGIN'
+                || CHR (10)|| '   ukprepl.undo_replace( p_new_rse      => :p_ne_id_1'
+                || CHR (10)|| '                        ,p_original_rse => :p_ne_id_2);'
+                || CHR (10)|| 'END;'
+            USING IN p_ne_id_1, p_ne_id_2;
+
+         ELSIF p_operation = c_close
+         THEN
+
+            EXECUTE IMMEDIATE 'BEGIN'
+                || CHR (10)|| '   ukpclose.undo_close( p_rse     => :p_ne_id_1'
+                || CHR (10)|| '                       ,p_op_date => :p_op_date);'
+                || CHR (10)|| 'END;'
+            USING IN p_ne_id_1, p_op_date;
+            
+         END IF;
+
+      END IF;
+
+      -- check product install
+      -- </UKP>
+      --
+
       Nm_Debug.proc_end (g_package_name, 'UNDO_OTHER_PRODUCTS');
+
    END undo_other_products;
 
 --
