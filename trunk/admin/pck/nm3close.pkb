@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.3   Apr 15 2009 10:58:06   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.4   Sep 03 2009 09:54:46   drawat  $
 --       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   Apr 15 2009 10:58:06  $
---       Date fetched Out : $Modtime:   Apr 15 2009 10:21:48  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Sep 03 2009 09:54:46  $
+--       Date fetched Out : $Modtime:   Sep 02 2009 17:34:44  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -265,6 +265,17 @@ BEGIN
                 ||CHR(10)||'   stp_network_ops.do_close(pi_ne_id          => :pi_ne_id'
                 ||CHR(10)||'                           ,pi_effective_date => :pi_effective_date'
                 ||CHR(10)||'                           );'
+                ||CHR(10)||'END;'
+         USING IN  p_ne_id
+                  ,p_effective_date;
+   END IF;
+
+   IF hig.is_product_licensed( nm3type.c_ukp ) THEN
+     -- do ukp replace
+         EXECUTE IMMEDIATE 'BEGIN'
+                ||CHR(10)||'   ukpclose.close(p_rse     => :pi_ne_id'
+                ||CHR(10)||'                 ,p_op_date => :pi_effective_date'
+                ||CHR(10)||'                 );'
                 ||CHR(10)||'END;'
          USING IN  p_ne_id
                   ,p_effective_date;
