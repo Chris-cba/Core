@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.3   Aug 21 2008 15:11:42   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.4   Sep 03 2009 09:56:30   drawat  $
 --       Module Name      : $Workfile:   nm3reclass.pkb  $
---       Date into PVCS   : $Date:   Aug 21 2008 15:11:42  $
---       Date fetched Out : $Modtime:   Aug 21 2008 14:08:02  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Sep 03 2009 09:56:30  $
+--       Date fetched Out : $Modtime:   Sep 03 2009 09:38:54  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --
 --   Author : R.A. Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';
@@ -2049,6 +2049,17 @@ BEGIN
    IF Hig.is_product_licensed(Nm3type.c_enq)
     THEN
       exec_reclass ('enqreclass.enq_reclassify');
+   END IF;
+--
+   IF Hig.is_product_licensed(Nm3type.c_ukp)
+    THEN
+      /* Not using exec_reclass because there is no need for a date */
+      EXECUTE IMMEDIATE
+                   'BEGIN'
+        ||CHR(10)||'   ukpreclass.reclassify( p_original_rse => :pi_old_ne_id '
+        ||CHR(10)||'                         ,p_new_rse => :pi_new_ne_id); '
+        ||CHR(10)||'END;'
+      USING IN pi_old_ne_id,pi_new_ne_id;
    END IF;
    
 --   
