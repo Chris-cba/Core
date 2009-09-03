@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.6   Nov 28 2008 15:21:38   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.7   Sep 03 2009 09:57:16   drawat  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Nov 28 2008 15:21:38  $
---       Date fetched Out : $Modtime:   Nov 28 2008 15:21:16  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Sep 03 2009 09:57:16  $
+--       Date fetched Out : $Modtime:   Aug 10 2009 17:36:46  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -907,6 +907,23 @@ BEGIN
                ,p_ne_id_1
                ,p_ne_id_2
                ,p_effective_date;
+  END IF;
+  -- Check if UKPMS is installed and do split
+   IF Hig.is_product_licensed(Nm3type.c_ukp)
+    THEN
+    
+      l_block :=            'BEGIN'
+                 ||CHR(10)||'    ukpsplit.split( p_rse_original => :p_ne_id'
+                 ||CHR(10)||'                   ,p_rse_split1   => :p_ne_id_1'
+                 ||CHR(10)||'                   ,p_rse_split2   => :p_ne_id_2'
+                 ||CHR(10)||'                   ,p_measure      => :p_split_measure'
+                 ||CHR(10)||'                  );'
+                 ||CHR(10)||'END;';
+      EXECUTE IMMEDIATE l_block
+       USING IN p_ne_id
+               ,p_ne_id_1
+               ,p_ne_id_2
+               ,p_split_measure;
   END IF;
 --
    Nm_Debug.proc_end(g_package_name,'split_other_products');
