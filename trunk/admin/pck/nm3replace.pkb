@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.1   Jul 18 2007 15:19:48   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.2   Sep 03 2009 09:56:44   drawat  $
 --       Module Name      : $Workfile:   nm3replace.pkb  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:19:48  $
---       Date fetched Out : $Modtime:   Jun 29 2007 14:39:32  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Sep 03 2009 09:56:44  $
+--       Date fetched Out : $Modtime:   Aug 13 2009 16:18:40  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --   Author : ITurnbull
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3replace';
 ------------------------------------------------------------------------------------------------
@@ -455,7 +455,20 @@ END get_body_version;
       
     end if;    
     
+      -- Check if UKPMS is installed and do replace 
+      IF hig.is_product_licensed(nm3type.c_ukp) THEN
+      
+         -- do ukpms replace
+         EXECUTE IMMEDIATE
+            'BEGIN' || CHR(10) ||
+            '     ukprepl.replace( p_original_rse => :p_ne_id' || CHR(10) ||
+            '                     ,p_new_rse      => :p_ne_id_new' || CHR(10) ||
+            '                    );' || CHR(10) ||
+            ' END;'
+             USING IN p_ne_id
+                     ,p_ne_id_new;
 
+      END IF;
 	  
    END replace_other_products;
 --
