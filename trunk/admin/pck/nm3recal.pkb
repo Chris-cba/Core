@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.3   Dec 05 2007 15:31:44   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.4   Sep 03 2009 09:56:16   drawat  $
 --       Module Name      : $Workfile:   nm3recal.pkb  $
---       Date into PVCS   : $Date:   Dec 05 2007 15:31:44  $
---       Date fetched Out : $Modtime:   Dec 05 2007 15:26:18  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Sep 03 2009 09:56:16  $
+--       Date fetched Out : $Modtime:   Sep 02 2009 11:07:00  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --
 --   Author : Jonathan Mills
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
   PT 05.12.07 mairecal.recal_data() brough in line with the others in recalibrate_other_products()
 */
 
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
    g_package_name    CONSTANT  varchar2(30) := 'nm3recal';
 --
    g_tab_rec_nm      nm3type.tab_rec_nm;
@@ -782,6 +782,26 @@ BEGIN
 --                ,pi_new_datum_length;
    END IF;
 --
+   IF hig.is_product_licensed( nm3type.c_ukp )
+   THEN
+      -- dyn_recal is not used as the new datum length is needed
+      EXECUTE IMMEDIATE 'BEGIN'
+             ||CHR(10)||'  ukprecal.recalibrate '
+             ||CHR(10)||'  ( p_rse            => :pi_ne_id '
+             ||CHR(10)||'   ,p_start_point    => :pi_recal_start_point '
+             ||CHR(10)||'   ,p_length_ratio   => :pi_length_ratio '
+             ||CHR(10)||'   ,p_new_length     => :pi_new_datum_length '
+             ||CHR(10)||'   ,p_decimal_places => :pi_dec_places '
+             ||CHR(10)||'  ); '
+             ||CHR(10)||'END;'
+       USING IN pi_ne_id
+               ,pi_recal_start_point
+               ,pi_length_ratio
+               ,pi_new_datum_length
+               ,pi_dec_places;
+
+   END IF;
+--
 END recalibrate_other_products;
 --
 -----------------------------------------------------------------------------
@@ -835,6 +855,11 @@ BEGIN
        USING IN pi_ne_id
                ,pi_shift_start_mp
                ,pi_shift_distance;
+   END IF;
+--
+   IF hig.is_product_licensed( nm3type.c_ukp )
+   THEN
+      dyn_shift('ukprecal.shift');
    END IF;
 --
 END shift_other_products;
