@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.9   Feb 26 2009 16:27:04   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.10   Sep 07 2009 07:56:56   ptanava  $
 --       Module Name      : $Workfile:   nm3eng_dynseg_util.pkb  $
---       Date into PVCS   : $Date:   Feb 26 2009 16:27:04  $
---       Date fetched Out : $Modtime:   Feb 26 2009 16:16:36  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Sep 07 2009 07:56:56  $
+--       Date fetched Out : $Modtime:   Sep 02 2009 20:45:48  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --   Author : Priidu Tanava
 --
@@ -35,10 +35,12 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
                   all section member datums must be mebmers of a linear route)
   25.01.09 PT in in populate_tmp_table() re-applied the checks to ensure the inv datum begin_mp and end_mp
                 are adusted to not reach outside the result section; this has bearing in calculations that use section lengh
+  02.09.09 PT in populate_tmp_table() fixed begin_mp/end_mp handling with negative cardinality
+                  also added cardinality performance hint for section members
 */
 
 
-  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
+  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.10  $"';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg_util';
   
   cr            constant varchar2(1) := chr(10);
@@ -376,6 +378,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     l_sql_ft_tables         varchar2(32767);
     l_sql_main_calls        varchar2(32767);
     l_iit_ft_union          varchar2(20);
+    l_sm_cardinality        pls_integer;
     
   begin
     nm3dbg.putln(g_package_name||'.populate_tmp_table('
@@ -419,6 +422,15 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
       
     end if;
     
+    
+    -- let optimizer know the section members count
+    -- low count avoids full scan on nm_members_all
+    select nm3sql.get_rounded_cardinality(qr.nqr_mrg_section_members_count)
+    into l_sm_cardinality
+    from nm_mrg_query_results_all qr
+    where qr.nqr_mrg_job_id = p_mrg_job_id;
+    nm3dbg.putln('l_sm_cardinality='||l_sm_cardinality);
+    
   
     l_sql := 
           'select q2.*'
@@ -433,8 +445,8 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     -- assuming section_length cannot be 0 if nm_length is > 0
     ||cr||'  ,decode(qm.nm_length, 0, null, qm.nm_length / qm.section_length) nm_length_pct'
     ||cr||'  ,qm.nsm_measure'
-    ||cr||'  ,qm.begin_mp'
-    ||cr||'  ,qm.end_mp'
+    --||cr||'  ,qm.begin_mp'
+    --||cr||'  ,qm.end_mp'
     ||cr||'  ,im.*'
     ||cr||'from ('
     ||cr||'select'
@@ -445,8 +457,8 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     ||cr||'  ,mm2.nm_length'
     ||cr||'  ,sum((mm2.max_mp_end - mm2.min_mp_begin) * mm2.row_num) over (partition by mm2.section_id) section_length'
     ||cr||'  ,mm2.nsm_measure'
-    ||cr||'  ,mm2.begin_mp'
-    ||cr||'  ,mm2.end_mp'
+    --||cr||'  ,mm2.begin_mp'
+    --||cr||'  ,mm2.end_mp'
     ||cr||'from ('
     ||cr||'select mm.*'
     ||cr||'  ,mm.end_mp - mm.begin_mp nm_length'
@@ -454,24 +466,28 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     ||cr||'  ,max(mm.end_mp) over (partition by mm.section_id, mm.nm_ne_id_of) max_mp_end'
     ||cr||'  ,decode(row_number() over (partition by mm.section_id, mm.nm_ne_id_of order by 1), 1, 1, 0) row_num'
     ||cr||'from ('
-    ||cr||'select distinct'
+    ||cr||'select /*+ cardinality(sm '||l_sm_cardinality||') */ distinct'
     ||cr||'   sm.nsm_mrg_section_id section_id'
     ||cr||'  ,m.nm_ne_id_in'
     ||cr||'  ,m.nm_ne_id_of'
     ||cr||'  ,m.nm_obj_type'
-    ||cr||'  ,decode(m2.nm_cardinality, -1, sm.nsm_measure - greatest(m.nm_begin_mp, sm.nsm_begin_mp), greatest(m.nm_begin_mp, sm.nsm_begin_mp)) begin_mp'
-    ||cr||'  ,decode(m2.nm_cardinality, -1, sm.nsm_measure - least(m.nm_end_mp, sm.nsm_end_mp), least(m.nm_end_mp, sm.nsm_end_mp)) end_mp'
+    --||cr||'  ,decode(m2.nm_cardinality, -1, sm.nsm_measure - least(m.nm_end_mp, sm.nsm_end_mp), greatest(m.nm_begin_mp, sm.nsm_begin_mp)) begin_mp'
+    --||cr||'  ,decode(m2.nm_cardinality, -1, sm.nsm_measure - greatest(m.nm_begin_mp, sm.nsm_begin_mp), least(m.nm_end_mp, sm.nsm_end_mp)) end_mp'
+    ||cr||'  ,decode(m2.nm_cardinality, -1, e.ne_length - least(m.nm_end_mp, sm.nsm_end_mp), greatest(m.nm_begin_mp, sm.nsm_begin_mp)) begin_mp'
+    ||cr||'  ,decode(m2.nm_cardinality, -1, e.ne_length - greatest(m.nm_begin_mp, sm.nsm_begin_mp), least(m.nm_end_mp, sm.nsm_end_mp)) end_mp'
     ||cr||'  ,sm.nsm_measure'
     ||cr||'from'
     ||cr||'   nm_mrg_section_members sm'
     ||cr||'  ,nm_mrg_sections_all s'
     ||cr||'  ,nm_members m'
     ||cr||'  ,nm_members m2'
+    ||cr||'  ,nm_elements_all e'
     ||cr||'where sm.nsm_mrg_job_id = s.nms_mrg_job_id'
     ||cr||'  and sm.nsm_mrg_section_id = s.nms_mrg_section_id'
     ||cr||'  and sm.nsm_ne_id = m.nm_ne_id_of'
     ||cr||'  and sm.nsm_ne_id = m2.nm_ne_id_of'
     ||cr||'  and s.nms_offset_ne_id = m2.nm_ne_id_in'
+    ||cr||'  and sm.nsm_ne_id = e.ne_id'
     ||cr||'  and m.nm_end_mp >= sm.nsm_begin_mp and m.nm_begin_mp <= sm.nsm_end_mp'
     ||cr||'  and not (m.nm_end_mp = sm.nsm_begin_mp and m.nm_begin_mp < sm.nsm_begin_mp)'
     ||cr||'  and not (m.nm_begin_mp = sm.nsm_end_mp and m.nm_end_mp > sm.nsm_end_mp)'
