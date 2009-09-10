@@ -1,5 +1,20 @@
 CREATE OR replace force view frm50_enabled_roles ( ROLE,
-flag ) AS SELECT urp.granted_role ROLE,
+flag ) AS SELECT 
+-----------------------------------------------------------------------------
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)translation.sql	1.41 11/10/06
+--       Module Name      : translation.sql
+--       Date into SCCS   : 06/11/10 11:55:59
+--       Date fetched Out : 07/06/13 13:59:30
+--       SCCS Version     : 1.41
+--
+-- Translation View
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2005
+-----------------------------------------------------------------------------
+urp.granted_role ROLE,
        SUM(DISTINCT DECODE(rrp.granted_role,
    			'ORAFORMS$OSC',2,
      			'ORAFORMS$BGM',4,
