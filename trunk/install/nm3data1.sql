@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.29   Aug 19 2009 10:59:02   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.30   Sep 10 2009 15:06:38   malexander  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Aug 19 2009 10:59:02  $
---       Date fetched Out : $Modtime:   Aug 19 2009 10:57:38  $
---       Version          : $Revision:   2.29  $
+--       Date into PVCS   : $Date:   Sep 10 2009 15:06:38  $
+--       Date fetched Out : $Modtime:   Sep 10 2009 15:03:34  $
+--       Version          : $Revision:   2.30  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 19-AUG-2009 10:57
+--       Generation Date  : 10-SEP-2009 15:03
 --
 --   Product metadata script
 --   As at Release 4.1.0.0
@@ -43150,20 +43150,6 @@ SELECT
        ,64 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
                    WHERE HCCA_CONSTRAINT_NAME = 'TIM_TEMP_PK');
---
-INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
-       (HCCA_CONSTRAINT_NAME
-       ,HCCA_TABLE_NAME
-       ,HCCA_NER_APPL
-       ,HCCA_NER_ID
-       )
-SELECT 
-        'TNRR_UK'
-       ,'TMA_NOTICE_REVIEW_RULES'
-       ,'HIG'
-       ,145 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CHECK_CONSTRAINT_ASSOCS
-                   WHERE HCCA_CONSTRAINT_NAME = 'TNRR_UK');
 --
 INSERT INTO HIG_CHECK_CONSTRAINT_ASSOCS
        (HCCA_CONSTRAINT_NAME
