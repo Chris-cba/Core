@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.2   Sep 15 2009 16:28:02   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.3   Sep 15 2009 16:58:52   malexander  $
 --       Module Name      : $Workfile:   higroles.sql  $
---       Date into PVCS   : $Date:   Sep 15 2009 16:28:02  $
---       Date fetched Out : $Modtime:   Sep 15 2009 16:27:24  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Sep 15 2009 16:58:52  $
+--       Date fetched Out : $Modtime:   Sep 15 2009 16:53:34  $
+--       Version          : $Revision:   2.3  $
 --
 -------------------------------------------------------------------------
 --  Copyright (c) exor corporation ltd, 2009
@@ -30,7 +30,7 @@ DECLARE
   role_exists Exception;
   Pragma Exception_Init(role_exists, -1921); 
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE ROLE hig_admin'
+  EXECUTE IMMEDIATE 'CREATE ROLE hig_admin';
   NULL;
 EXCEPTION
 WHEN role_exists
@@ -83,7 +83,7 @@ DECLARE
   role_exists Exception;
   Pragma Exception_Init(role_exists, -1921); 
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE ROLE hig_user'
+  EXECUTE IMMEDIATE 'CREATE ROLE hig_user';
   NULL;
 EXCEPTION
 WHEN role_exists
@@ -132,7 +132,7 @@ DECLARE
   role_exists Exception;
   Pragma Exception_Init(role_exists, -1921); 
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE ROLE hig_readonly'
+  EXECUTE IMMEDIATE 'CREATE ROLE hig_readonly';
   NULL;
 EXCEPTION
 WHEN role_exists
@@ -164,7 +164,7 @@ DECLARE
   role_exists Exception;
   Pragma Exception_Init(role_exists, -1921); 
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE ROLE doc_admin'
+  EXECUTE IMMEDIATE 'CREATE ROLE doc_admin';
   NULL;
 EXCEPTION
 WHEN role_exists
@@ -199,7 +199,7 @@ DECLARE
   role_exists Exception;
   Pragma Exception_Init(role_exists, -1921); 
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE ROLE doc_user
+  EXECUTE IMMEDIATE 'CREATE ROLE doc_user';
   NULL;
 EXCEPTION
 WHEN role_exists
@@ -232,7 +232,7 @@ DECLARE
   role_exists Exception;
   Pragma Exception_Init(role_exists, -1921); 
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE ROLE doc_readonly'
+  EXECUTE IMMEDIATE 'CREATE ROLE doc_readonly';
   NULL;
 EXCEPTION
 WHEN role_exists
@@ -241,7 +241,6 @@ THEN
 END;
 /
 
-CREATE ROLE doc_readonly;
 BEGIN
    EXECUTE IMMEDIATE 'grant doc_readonly to '||USER;
    EXECUTE IMMEDIATE 'grant doc_readonly to '||USER||' with admin option';
@@ -265,7 +264,7 @@ DECLARE
   role_exists Exception;
   Pragma Exception_Init(role_exists, -1921); 
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE ROLE net_admin'
+  EXECUTE IMMEDIATE 'CREATE ROLE net_admin';
   NULL;
 EXCEPTION
 WHEN role_exists
@@ -300,7 +299,7 @@ DECLARE
   role_exists Exception;
   Pragma Exception_Init(role_exists, -1921); 
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE ROLE net_user'
+  EXECUTE IMMEDIATE 'CREATE ROLE net_user';
   NULL;
 EXCEPTION
 WHEN role_exists
@@ -336,7 +335,7 @@ DECLARE
   role_exists Exception;
   Pragma Exception_Init(role_exists, -1921); 
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE ROLE net_readonly'
+  EXECUTE IMMEDIATE 'CREATE ROLE net_readonly';
   NULL;
 EXCEPTION
 WHEN role_exists
@@ -385,7 +384,7 @@ DECLARE
   role_exists Exception;
   Pragma Exception_Init(role_exists, -1921); 
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE ROLE doc0201'
+  EXECUTE IMMEDIATE 'CREATE ROLE doc0201';
   NULL;
 EXCEPTION
 WHEN role_exists
@@ -406,7 +405,7 @@ DECLARE
   role_exists Exception;
   Pragma Exception_Init(role_exists, -1921); 
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE ROLE doc0202'
+  EXECUTE IMMEDIATE 'CREATE ROLE doc0202';
   NULL;
 EXCEPTION
 WHEN role_exists
@@ -427,7 +426,7 @@ DECLARE
   role_exists Exception;
   Pragma Exception_Init(role_exists, -1921); 
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE ROLE sdm_user'
+  EXECUTE IMMEDIATE 'CREATE ROLE sdm_user';
   NULL;
 EXCEPTION
 WHEN role_exists
@@ -436,7 +435,6 @@ THEN
 END;
 /
 
-CREATE ROLE sdm_user;
 BEGIN
    EXECUTE IMMEDIATE 'grant sdm_user to '||USER;
    EXECUTE IMMEDIATE 'grant sdm_user to '||USER||' with admin option';
@@ -445,7 +443,7 @@ END;
 
 GRANT CREATE TABLE TO sdm_user;
 GRANT CREATE SEQUENCE TO sdm_user;
-GRANT CREATE TRIGGER TO sdm_user
+GRANT CREATE TRIGGER TO sdm_user;
 
 prompt CREATE ROLE web_user;
 DECLARE
