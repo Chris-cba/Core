@@ -1,15 +1,23 @@
-
+--
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.2   Sep 15 2009 16:28:02   malexander  $
+--       Module Name      : $Workfile:   higroles.sql  $
+--       Date into PVCS   : $Date:   Sep 15 2009 16:28:02  $
+--       Date fetched Out : $Modtime:   Sep 15 2009 16:27:24  $
+--       Version          : $Revision:   2.2  $
+--
+-------------------------------------------------------------------------
+--  Copyright (c) exor corporation ltd, 2009
+-------------------------------------------------------------------------
+--
+--
+rem --------------------------------------------------------------------------
 REM **************************************************************************
-rem	copyright (c) 1996 exor corporation.
-rem
 rem	this script creates an INITIAL SET OF ROLES AND PRIVILEGES, which
 rem	may be used WHEN creating NEW oracle highways users.
 REM **************************************************************************
-
-REM SCCS ID Keyword, do no remove
-define sccsid = '@(#)higroles.sql	1.10 05/17/07';
-
-rem --------------------------------------------------------------------------
 rem	CREATE a ROLE FOR granting TO the highways administrator.
 
 -- get the user
@@ -17,7 +25,19 @@ SET define ON
 
 SET feedback OFF
 prompt CREATE ROLE hig_admin;
-CREATE ROLE hig_admin;
+
+DECLARE
+  role_exists Exception;
+  Pragma Exception_Init(role_exists, -1921); 
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE ROLE hig_admin'
+  NULL;
+EXCEPTION
+WHEN role_exists
+THEN 
+  Null;
+END;
+/
 -- Grant the role to the user, with admin option
 
 BEGIN
@@ -58,7 +78,20 @@ rem --------------------------------------------------------------------------
 rem	CREATE a ROLE FOR granting TO highways users who may UPDATE core data
 
 prompt CREATE ROLE hig_user;
-CREATE ROLE hig_user;
+
+DECLARE
+  role_exists Exception;
+  Pragma Exception_Init(role_exists, -1921); 
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE ROLE hig_user'
+  NULL;
+EXCEPTION
+WHEN role_exists
+THEN 
+  Null;
+END;
+/
+
 BEGIN
    EXECUTE IMMEDIATE 'grant hig_user to '||USER;
    EXECUTE IMMEDIATE 'grant hig_user to '||USER||' with admin option';
@@ -94,7 +127,20 @@ rem --------------------------------------------------------------------------
 rem	CREATE a ROLE FOR granting TO readonly highways users.
 
 prompt CREATE ROLE hig_readonly;
-CREATE ROLE hig_readonly;
+
+DECLARE
+  role_exists Exception;
+  Pragma Exception_Init(role_exists, -1921); 
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE ROLE hig_readonly'
+  NULL;
+EXCEPTION
+WHEN role_exists
+THEN 
+  Null;
+END;
+/
+
 BEGIN
    EXECUTE IMMEDIATE 'grant hig_readonly to '||USER;
    EXECUTE IMMEDIATE 'grant hig_readonly to '||USER||' with admin option';
@@ -113,7 +159,20 @@ rem --------------------------------------------------------------------------
 rem	CREATE a ROLE FOR granting TO the document data administator
 
 prompt CREATE ROLE doc_admin;
-CREATE ROLE doc_admin;
+
+DECLARE
+  role_exists Exception;
+  Pragma Exception_Init(role_exists, -1921); 
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE ROLE doc_admin'
+  NULL;
+EXCEPTION
+WHEN role_exists
+THEN 
+  Null;
+END;
+/
+
 BEGIN
    EXECUTE IMMEDIATE 'grant doc_admin to '||USER;
    EXECUTE IMMEDIATE 'grant doc_admin to '||USER||' with admin option';
@@ -135,7 +194,20 @@ rem --------------------------------------------------------------------------
 rem	CREATE a ROLE FOR granting TO NORMAL document manager users
 
 prompt CREATE ROLE doc_user;
-CREATE ROLE doc_user;
+
+DECLARE
+  role_exists Exception;
+  Pragma Exception_Init(role_exists, -1921); 
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE ROLE doc_user
+  NULL;
+EXCEPTION
+WHEN role_exists
+THEN 
+  Null;
+END;
+/
+
 BEGIN
    EXECUTE IMMEDIATE 'grant doc_user to '||USER;
    EXECUTE IMMEDIATE 'grant doc_user to '||USER||' with admin option';
@@ -156,7 +228,19 @@ GRANT CREATE SESSION TO doc_user;
 rem --------------------------------------------------------------------------
 rem	CREATE a ROLE FOR granting TO readonly document manager users
 
-prompt CREATE ROLE doc_readonly;
+DECLARE
+  role_exists Exception;
+  Pragma Exception_Init(role_exists, -1921); 
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE ROLE doc_readonly'
+  NULL;
+EXCEPTION
+WHEN role_exists
+THEN 
+  Null;
+END;
+/
+
 CREATE ROLE doc_readonly;
 BEGIN
    EXECUTE IMMEDIATE 'grant doc_readonly to '||USER;
@@ -176,7 +260,20 @@ rem --------------------------------------------------------------------------
 rem	CREATE a ROLE FOR granting TO the network data administrator
 
 prompt CREATE ROLE net_admin;
-CREATE ROLE net_admin;
+
+DECLARE
+  role_exists Exception;
+  Pragma Exception_Init(role_exists, -1921); 
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE ROLE net_admin'
+  NULL;
+EXCEPTION
+WHEN role_exists
+THEN 
+  Null;
+END;
+/
+
 BEGIN
    EXECUTE IMMEDIATE 'grant net_admin to '||USER;
    EXECUTE IMMEDIATE 'grant net_admin to '||USER||' with admin option';
@@ -198,7 +295,20 @@ rem --------------------------------------------------------------------------
 rem	CREATE a ROLE FOR granting TO NORMAL network manager users
 
 prompt CREATE ROLE net_user;
-CREATE ROLE net_user;
+
+DECLARE
+  role_exists Exception;
+  Pragma Exception_Init(role_exists, -1921); 
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE ROLE net_user'
+  NULL;
+EXCEPTION
+WHEN role_exists
+THEN 
+  Null;
+END;
+/
+
 BEGIN
    EXECUTE IMMEDIATE 'grant net_user to '||USER;
    EXECUTE IMMEDIATE 'grant net_user to '||USER||' with admin option';
@@ -221,7 +331,20 @@ rem --------------------------------------------------------------------------
 rem	CREATE a ROLE FOR granting TO readonly network manager users
 
 prompt CREATE ROLE net_readonly;
-CREATE ROLE net_readonly;
+
+DECLARE
+  role_exists Exception;
+  Pragma Exception_Init(role_exists, -1921); 
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE ROLE net_readonly'
+  NULL;
+EXCEPTION
+WHEN role_exists
+THEN 
+  Null;
+END;
+/
+
 BEGIN
    EXECUTE IMMEDIATE 'grant net_readonly to '||USER;
    EXECUTE IMMEDIATE 'grant net_readonly to '||USER||' with admin option';
@@ -256,13 +379,42 @@ rem These roles can now be assigned to Oracle users.
 rem --------------------------------------------------------------------------
 rem     Create roles for new document management forms OLE Stuff
 
-CREATE ROLE doc0201;
+prompt CREATE ROLE doc0201;
+
+DECLARE
+  role_exists Exception;
+  Pragma Exception_Init(role_exists, -1921); 
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE ROLE doc0201'
+  NULL;
+EXCEPTION
+WHEN role_exists
+THEN 
+  Null;
+END;
+/
+
 BEGIN
    EXECUTE IMMEDIATE 'grant doc0201 to '||USER;
    EXECUTE IMMEDIATE 'grant doc0201 to '||USER||' with admin option';
 END;
 /
-CREATE ROLE doc0202;
+
+prompt CREATE ROLE doc0202;
+
+DECLARE
+  role_exists Exception;
+  Pragma Exception_Init(role_exists, -1921); 
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE ROLE doc0202'
+  NULL;
+EXCEPTION
+WHEN role_exists
+THEN 
+  Null;
+END;
+/
+
 BEGIN
    EXECUTE IMMEDIATE 'grant doc0202 to '||USER;
    EXECUTE IMMEDIATE 'grant doc0202 to '||USER||' with admin option';
@@ -270,6 +422,20 @@ END;
 /
 
 prompt CREATE ROLE sdm_user;
+
+DECLARE
+  role_exists Exception;
+  Pragma Exception_Init(role_exists, -1921); 
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE ROLE sdm_user'
+  NULL;
+EXCEPTION
+WHEN role_exists
+THEN 
+  Null;
+END;
+/
+
 CREATE ROLE sdm_user;
 BEGIN
    EXECUTE IMMEDIATE 'grant sdm_user to '||USER;
