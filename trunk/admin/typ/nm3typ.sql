@@ -1,4 +1,20 @@
-define sccsid = '@(#)nm3typ.sql	1.19 02/02/07'
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.4   Sep 15 2009 15:40:08   malexander  $
+--       Module Name      : $Workfile:   nm3typ.sql  $
+--       Date into PVCS   : $Date:   Sep 15 2009 15:40:08  $
+--       Date fetched Out : $Modtime:   Sep 15 2009 15:38:02  $
+--       Version          : $Revision:   2.4  $
+--
+--   Product upgrade script
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2009
+-----------------------------------------------------------------------------
+--
 --
 set echo off
 set term off
@@ -56,7 +72,7 @@ WHEN others THEN
 END;
 /
 BEGIN
- execute immediate ('DROP TYPE BODY USER_HIST_ITEM');
+ execute immediate ('DROP TYPE USER_HIST_ITEM FORCE');
 EXCEPTION
 WHEN others THEN
   Null;
@@ -252,7 +268,14 @@ WHEN others THEN
 END;
 /
 BEGIN
- execute immediate ('DROP TYPE BODY USER_HIST_MODULE');
+ execute immediate ('DROP TYPE USER_HIST_MODULE FORCE');
+EXCEPTION
+WHEN others THEN
+  Null;
+END;
+/
+BEGIN
+ execute immediate ('DROP TYPE USER_HIST_MODULES FORCE');
 EXCEPTION
 WHEN others THEN
   Null;
