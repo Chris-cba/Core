@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.6   Aug 02 2009 00:29:20   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkb-arc   3.7   Sep 15 2009 16:18:18   lsorathia  $
 --       Module Name      : $Workfile:   nm3_bulk_attrib_upd.pkb  $
---       Date into PVCS   : $Date:   Aug 02 2009 00:29:20  $
---       Date fetched Out : $Modtime:   Aug 02 2009 00:28:02  $
---       Version          : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   Sep 15 2009 16:18:18  $
+--       Date fetched Out : $Modtime:   Sep 15 2009 16:17:44  $
+--       Version          : $Revision:   3.7  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.6  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.7  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3_bulk_attrib_upd';
 --
@@ -598,34 +598,29 @@ BEGIN
            AND    nm_obj_type = l_group_type 
            AND    nm_type     = 'G' ;
        END IF ;
-       SELECT Distinct 
-              l_grp_ne_id,
+       SELECT l_grp_ne_id,
               x.ne_id, 
               'G', 
               l_group_type, 
-              Nvl(nm_begin_mp,0), 
+              0, 
               Trunc(Sysdate), 
               Null, 
-              Nvl(nm_end_mp,0), 
-              Nvl(nm_slk,0), 
-              nm_cardinality, 
+              ne_length, 
+              Null, 
+              1, 
               l_admin_unit, 
               Null, 
               Null, 
               Null, 
               Null, 
-              nm_seq_no, 
-              nm_seg_no, 
-              nm_true, 
-              Nvl(nm_end_slk,0), 
-              nm_end_true    
+              Null, 
+              Null, 
+              Null, 
+              Null, 
+              Null    
               BULK COLLECT INTO l_nm_rec   
-       FROM  nm_members nm,
-             (SELECT * FROM (table(cast(nm3_bulk_attrib_upd.get_ne_array(nm3_bulk_attrib_upd.l_ne_id_array) as nm_ne_id_array)) )
-              WHERE  ne_id IS NOT NULL) x 
-       WHERE  nm.nm_ne_id_of(+)       = x.ne_id
-       AND    Nvl(nm.nm_type,'G')     = 'G' 
-       AND    Nvl(nm.nm_ne_id_in,'1') = Nvl((select max(nm_ne_id_in) from nm_members where nm_ne_id_of(+) = ne_id and nm_type = 'G'),'1');        
+       FROM  (SELECT ne.* FROM nm_elements ne, (table(cast(nm3_bulk_attrib_upd.get_ne_array(nm3_bulk_attrib_upd.l_ne_id_array) as nm_ne_id_array)) ne1 )
+              WHERE   ne.ne_id = ne1.ne_id ) x  ;        
 
        FORALL i IN 1..l_nm_rec.Count
        INSERT INTO NM_MEMBERS VALUES l_nm_rec(i);
@@ -656,38 +651,34 @@ BEGIN
                    END IF ;
                END IF ;
            END IF ;       
-               SELECT Distinct 
-                      l_grp_ne_id,
-                      x.ne_id, 
-                      'G', 
-                      l_group_type, 
-                      Nvl(nm_begin_mp,0), 
-                      Trunc(Sysdate), 
-                      Null, 
-                      Nvl(nm_end_mp,0), 
-                      Nvl(nm_slk,0), 
-                      nm_cardinality, 
-                      l_admin_unit, 
-                      Null, 
-                      Null, 
-                      Null, 
-                      Null, 
-                      nm_seq_no, 
-                      nm_seg_no, 
-                      nm_true, 
-                      Nvl(nm_end_slk,0), 
-                      nm_end_true    
-                      BULK  COLLECT INTO l_nm_rec   
-               FROM   nm_members nm,
-                      (SELECT * FROM (table(cast(nm3_bulk_attrib_upd.get_ne_array(nm3_bulk_attrib_upd.l_ne_id_array) as nm_ne_id_array)) )
-                      WHERE  ne_id IS NOT NULL) x 
-               WHERE  nm.nm_ne_id_of(+)   = x.ne_id
-               AND    Nvl(nm.nm_type,'G') = 'G' 
-               AND    Nvl(nm.nm_ne_id_in,'1') = Nvl((select max(nm_ne_id_in) from nm_members where nm_ne_id_of(+) = ne_id and nm_type = 'G'),'1');       
+           SELECT l_grp_ne_id,
+                  x.ne_id, 
+                  'G', 
+                  l_group_type, 
+                  0, 
+                  Trunc(Sysdate), 
+                  Null, 
+                  ne_length, 
+                  Null, 
+                  1, 
+                  l_admin_unit, 
+                  Null, 
+                  Null, 
+                  Null, 
+                  Null, 
+                  Null, 
+                  Null, 
+                  Null, 
+                  Null, 
+                  Null    
+                 BULK  COLLECT INTO l_nm_rec   
+           FROM  nm_members nm,
+                 (SELECT ne.* FROM nm_elements ne,(table(cast(nm3_bulk_attrib_upd.get_ne_array(nm3_bulk_attrib_upd.l_ne_id_array) as nm_ne_id_array)) ne1 )
+           WHERE   ne.ne_id = ne1.ne_id) x ;       
  
-               FORALL i IN 1..l_nm_rec.Count
-               INSERT INTO NM_MEMBERS VALUES l_nm_rec(i);
-           END LOOP;
+           FORALL i IN 1..l_nm_rec.Count
+           INSERT INTO NM_MEMBERS VALUES l_nm_rec(i);
+       END LOOP;
    END IF ;   
 -- 
 END Update_groups_members;
