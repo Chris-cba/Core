@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.17   Aug 28 2009 10:48:18   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.18   Sep 15 2009 17:13:40   malexander  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Aug 28 2009 10:48:18  $
---       Date fetched Out : $Modtime:   Aug 28 2009 10:25:48  $
---       PVCS Version     : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Sep 15 2009 17:13:40  $
+--       Date fetched Out : $Modtime:   Sep 15 2009 17:12:58  $
+--       PVCS Version     : $Revision:   2.18  $
 --
 --------------------------------------------------------------------------------
 --
@@ -326,9 +326,13 @@ SET TERM ON
 prompt XML Synonyms...
 SET TERM OFF
 SET DEFINE ON
-create public synonym xmldom for sys.xmldom;
-create public synonym xmlparser for sys.xmlparser;
-create public synonym xslprocessor for sys.xslprocessor;
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'xml_synonyms.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                ****************   CREATE SDO VIEWS  *******************
