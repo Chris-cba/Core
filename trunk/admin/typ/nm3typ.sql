@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.4   Sep 15 2009 15:40:08   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.5   Sep 18 2009 10:28:00   malexander  $
 --       Module Name      : $Workfile:   nm3typ.sql  $
---       Date into PVCS   : $Date:   Sep 15 2009 15:40:08  $
---       Date fetched Out : $Modtime:   Sep 15 2009 15:38:02  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Sep 18 2009 10:28:00  $
+--       Date fetched Out : $Modtime:   Sep 18 2009 10:25:02  $
+--       Version          : $Revision:   2.5  $
 --
 --   Product upgrade script
 --
@@ -21,7 +21,47 @@ set term off
 set verify off
 --
 --------------------------------------------------------------------------------------------
+-- Short term solution to get around errors on type replace in upgrade
+-- Note that should an amended type of the types defined below be used
+-- the temporary solution is invalid.
 --
+undefine user_hist_item_ex
+undefine user_hist_module_ex
+undefine user_hist_modules_ex
+
+Select 'Y' user_hist_item_ex
+From   user_types
+Where  type_name = 'USER_HIST_ITEM'
+Union
+Select 'N' user_hist_item_ex
+From   Dual 
+Where Not Exists (Select 1
+                  From   user_types
+                  Where  type_name = 'USER_HIST_ITEM'
+                 )
+/                         
+Select 'Y' user_hist_module_ex
+From   user_types
+Where  type_name = 'USER_HIST_MODULE'
+Union
+Select 'N' user_hist_module_ex
+From   Dual 
+Where Not Exists (Select 1
+                  From   user_types
+                  Where  type_name = 'USER_HIST_MODULE'
+                 )
+/        
+Select 'Y' user_hist_modules_ex
+From   user_types
+Where  type_name = 'USER_HIST_MODULES'
+Union
+Select 'N' user_hist_modules_ex
+From   Dual 
+Where Not Exists (Select 1
+                  From   user_types
+                  Where  type_name = 'USER_HIST_MODULES'
+                 )
+/
 --
 ---------------------------------------------------------------------
 -- Drop existing types in appropriate order
@@ -72,7 +112,7 @@ WHEN others THEN
 END;
 /
 BEGIN
- execute immediate ('DROP TYPE USER_HIST_ITEM FORCE');
+ execute immediate ('DROP TYPE BODY USER_HIST_ITEM');
 EXCEPTION
 WHEN others THEN
   Null;
@@ -268,14 +308,14 @@ WHEN others THEN
 END;
 /
 BEGIN
- execute immediate ('DROP TYPE USER_HIST_MODULE FORCE');
+ execute immediate ('DROP TYPE BODY USER_HIST_MODULE');
 EXCEPTION
 WHEN others THEN
   Null;
 END;
 /
 BEGIN
- execute immediate ('DROP TYPE USER_HIST_MODULES FORCE');
+ execute immediate ('DROP TYPE BODY USER_HIST_MODULES');
 EXCEPTION
 WHEN others THEN
   Null;
@@ -777,6 +817,12 @@ set feedback off
 select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
         '&terminator'||'user_hist_module.tyh' run_file
 from dual
+where '&user_hist_module_ex' = 'N'
+UNION
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'dummy' run_file
+FROM dual
+WHERE '&user_hist_module_ex' = 'Y'
 /
 start '&&run_file'
 --
@@ -803,6 +849,12 @@ set feedback off
 select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
         '&terminator'||'user_hist_modules.tyh' run_file
 from dual
+where '&user_hist_modules_ex' = 'N'
+UNION
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'dummy' run_file
+FROM dual
+WHERE '&user_hist_modules_ex' = 'Y'
 /
 start '&&run_file'
 --
@@ -816,6 +868,12 @@ set feedback off
 select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
         '&terminator'||'user_hist_item.tyh' run_file
 from dual
+where '&user_hist_item_ex' = 'N'
+UNION
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'dummy' run_file
+FROM dual
+WHERE '&user_hist_item_ex' = 'Y'
 /
 start '&&run_file'
 --
