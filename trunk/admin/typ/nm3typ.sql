@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.5   Sep 18 2009 10:28:00   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.6   Sep 18 2009 10:51:54   malexander  $
 --       Module Name      : $Workfile:   nm3typ.sql  $
---       Date into PVCS   : $Date:   Sep 18 2009 10:28:00  $
---       Date fetched Out : $Modtime:   Sep 18 2009 10:25:02  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Sep 18 2009 10:51:54  $
+--       Date fetched Out : $Modtime:   Sep 18 2009 10:51:30  $
+--       Version          : $Revision:   2.6  $
 --
 --   Product upgrade script
 --
@@ -28,6 +28,10 @@ set verify off
 undefine user_hist_item_ex
 undefine user_hist_module_ex
 undefine user_hist_modules_ex
+
+col user_hist_item_ex    new_value user_hist_item_ex    noprint
+col user_hist_module_ex  new_value user_hist_module_ex  noprint
+col user_hist_modules_ex new_value user_hist_modules_ex noprint
 
 Select 'Y' user_hist_item_ex
 From   user_types
