@@ -2,14 +2,14 @@ CREATE OR REPLACE PACKAGE BODY nm3api_inv AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3api_inv.pkb	1.6 12/18/03
---       Module Name      : nm3api_inv.pkb
---       Date into SCCS   : 03/12/18 11:58:15
---       Date fetched Out : 07/06/13 14:10:56
---       SCCS Version     : 1.6
---
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_inv.pkb-arc   2.3   Sep 22 2009 12:08:10   cstrettle  $
+--       Module Name      : $Workfile:   nm3api_inv.pkb  $
+--       Date into PVCS   : $Date:   Sep 22 2009 12:08:10  $
+--       Date fetched Out : $Modtime:   Sep 22 2009 12:02:54  $
+--       PVCS Version     : $Revision:   2.3  $
+--       Based on 
 --
 --   Author : Jonathan Mills
 --
@@ -21,7 +21,11 @@ CREATE OR REPLACE PACKAGE BODY nm3api_inv AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+
+  --g_body_sccsid is the SCCS ID for the package body
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
+  
+--   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3api_inv.pkb	1.6 12/18/03"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3api_inv';
@@ -144,12 +148,10 @@ PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYP
                                 ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
                                 ,p_element_ne_unique  IN     nm_elements.ne_unique%TYPE
                                 ,p_element_ne_nt_type IN     nm_elements.ne_nt_type%TYPE      DEFAULT NULL
-                                ) IS   
+                                ) IS
 BEGIN
 --
    nm_debug.proc_start (g_package_name,'create_inventory_item');
-   -- Added savepoint to rollback back the inventory if error is occured while creating location
-   Savepoint roll_inv ; -- LS 08-mar-09
 --
    create_inventory_item (p_rec_iit           => p_rec_iit
                          ,p_effective_date    => p_effective_date
@@ -164,12 +166,6 @@ BEGIN
 --
    nm_debug.proc_end (g_package_name,'create_inventory_item');
 --
--- LS 08-mar-09
-EXCEPTION
-   WHEN OTHERS THEN
-   Rollback to roll_inv;
-   Raise_Application_error(-20001,SQLERRM);   
-   --
 END create_inventory_item;
 --
 -----------------------------------------------------------------------------
@@ -181,8 +177,6 @@ PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYP
 BEGIN
 --
    nm_debug.proc_start (g_package_name,'create_inventory_item');
-   -- Added savepoint to rollback back the inventory if error is occured while creating location
-   Savepoint roll_inv ; -- LS 08-mar-09
 --
    create_inventory_item (p_rec_iit           => p_rec_iit
                          ,p_effective_date    => p_effective_date
@@ -195,14 +189,7 @@ BEGIN
                );
 --
    nm_debug.proc_end (g_package_name,'create_inventory_item');
-
 --
--- LS 08-mar-09
-EXCEPTION
-   WHEN OTHERS THEN
-   Rollback to roll_inv;
-   Raise_Application_error(-20001,SQLERRM);   
-   --
 END create_inventory_item;
 --
 -----------------------------------------------------------------------------
@@ -217,8 +204,6 @@ PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYP
 BEGIN
 --
    nm_debug.proc_start (g_package_name,'create_inventory_item');
-   -- Added savepoint to rollback back the inventory if error is occured while creating location
-   Savepoint roll_inv ; -- LS 08-mar-09
 --
    create_inventory_item (p_rec_iit           => p_rec_iit
                          ,p_effective_date    => p_effective_date
@@ -235,12 +220,6 @@ BEGIN
 --
    nm_debug.proc_end (g_package_name,'create_inventory_item');
 --
--- LS 08-mar-09
-EXCEPTION
-   WHEN OTHERS THEN
-   Rollback to roll_inv;
-   Raise_Application_error(-20001,SQLERRM);   
-   --
 END create_inventory_item;
 --
 -----------------------------------------------------------------------------
@@ -255,8 +234,6 @@ PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYP
 BEGIN
 --
    nm_debug.proc_start (g_package_name,'create_inventory_item');
-   -- Added savepoint to rollback back the inventory if error is occured while creating location
-   Savepoint roll_inv ; -- LS 08-mar-09
 --
    create_inventory_item (p_rec_iit        => p_rec_iit
                          ,p_effective_date => p_effective_date
@@ -272,12 +249,6 @@ BEGIN
 --
    nm_debug.proc_end (g_package_name,'create_inventory_item');
 --
--- LS 08-mar-09
-EXCEPTION
-   WHEN OTHERS THEN
-   Rollback to roll_inv;
-   Raise_Application_error(-20001,SQLERRM);   
-   --
 END create_inventory_item;
 --
 -----------------------------------------------------------------------------
@@ -289,8 +260,6 @@ PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYP
 BEGIN
 --
    nm_debug.proc_start (g_package_name,'create_inventory_item');
-   -- Added savepoint to rollback back the inventory if error is occured while creating location
-   Savepoint roll_inv ; -- LS 08-mar-09
 --
    create_inventory_item (p_rec_iit        => p_rec_iit
                          ,p_effective_date => p_effective_date
@@ -304,12 +273,6 @@ BEGIN
 --
    nm_debug.proc_end (g_package_name,'create_inventory_item');
 --
--- LS 08-mar-09
-EXCEPTION
-   WHEN OTHERS THEN
-   Rollback to roll_inv;
-   Raise_Application_error(-20001,SQLERRM);   
-   --
 END create_inventory_item;
 --
 -----------------------------------------------------------------------------
@@ -327,8 +290,6 @@ PROCEDURE create_inventory_item (p_rec_iit                 IN OUT nm_inv_items%R
 BEGIN
 --
    nm_debug.proc_start (g_package_name,'create_inventory_item');
-   -- Added savepoint to rollback back the inventory if error is occured while creating location
-   Savepoint roll_inv ; -- LS 08-mar-09
 --
    create_inventory_item (p_rec_iit        => p_rec_iit
                          ,p_effective_date => p_effective_date
@@ -348,12 +309,6 @@ BEGIN
 --
    nm_debug.proc_end (g_package_name,'create_inventory_item');
 --
--- LS 08-mar-09
-EXCEPTION
-   WHEN OTHERS THEN
-   Rollback to roll_inv;
-   Raise_Application_error(-20001,SQLERRM);   
-   --
 END create_inventory_item;
 --
 -----------------------------------------------------------------------------
@@ -365,8 +320,6 @@ PROCEDURE create_inventory_item (p_rec_iit                 IN OUT nm_inv_items%R
 BEGIN
 --
    nm_debug.proc_start (g_package_name,'create_inventory_item');
-   -- Added savepoint to rollback back the inventory if error is occured while creating location
-   Savepoint roll_inv ; -- LS 08-mar-09
 --
    create_inventory_item (p_rec_iit        => p_rec_iit
                          ,p_effective_date => p_effective_date
@@ -379,12 +332,6 @@ BEGIN
                );
 --
    nm_debug.proc_end (g_package_name,'create_inventory_item');
--- LS 08-mar-09
-EXCEPTION
-   WHEN OTHERS THEN
-   Rollback to roll_inv;
-   Raise_Application_error(-20001,SQLERRM);   
-   --
 --
 END create_inventory_item;
 --
@@ -397,8 +344,6 @@ PROCEDURE create_inventory_item (p_rec_iit                 IN OUT nm_inv_items%R
 BEGIN
 --
    nm_debug.proc_start (g_package_name,'create_inventory_item');
-   -- Added savepoint to rollback back the inventory if error is occured while creating location
-   Savepoint roll_inv ; -- LS 08-mar-09
 --
    create_inventory_item (p_rec_iit        => p_rec_iit
                          ,p_effective_date => p_effective_date
@@ -412,12 +357,6 @@ BEGIN
 --
    nm_debug.proc_end (g_package_name,'create_inventory_item');
 --
--- LS 08-mar-09
-EXCEPTION
-   WHEN OTHERS THEN
-   Rollback to roll_inv;
-   Raise_Application_error(-20001,SQLERRM);   
-   --
 END create_inventory_item;
 --
 -----------------------------------------------------------------------------
