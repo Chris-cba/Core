@@ -1110,7 +1110,7 @@ BEGIN
                               ||'WHERE nat_audit_id = :nat_audit_id'
                               ||' AND  nat_old_or_new = :nat_old_or_new'
              INTO g_tab_inv_types(g_rec_nat_to_use.nat_audit_id)
-             USING TO_CHAR(g_rec_nat_to_use.nat_audit_id), g_rec_nat_to_use.nat_old_or_new;
+             USING g_rec_nat_to_use.nat_audit_id, g_rec_nat_to_use.nat_old_or_new;
             EXIT;
          END IF;
       END LOOP;
