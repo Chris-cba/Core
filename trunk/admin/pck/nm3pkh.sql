@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.14   Jul 20 2009 11:44:24   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.15   Sep 23 2009 16:08:28   aedwards  $
 --       Module Name      : $Workfile:   nm3pkh.sql  $
---       Date into PVCS   : $Date:   Jul 20 2009 11:44:24  $
---       Date fetched Out : $Modtime:   Jul 20 2009 11:43:38  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Sep 23 2009 16:08:28  $
+--       Date fetched Out : $Modtime:   Sep 23 2009 16:08:06  $
+--       PVCS Version     : $Revision:   2.15  $
 --
 --
 --   Author : Graeme Johnson
@@ -33,7 +33,14 @@ FROM dual
 /                                                                                                                                                                                                                                                         
 start '&run_file'                                                                                                                                                                                                                                         
 
-
+SET TERM ON                                                                                                                                                                                                                                               
+PROMPT get_theme_srid.prw                                                                                                                                                                                                                             
+SET TERM OFF                                                                                                                                                                                                                                              
+SET DEFINE ON                                                                                                                                                                                                                                             
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'get_theme_srid.prw' run_file                                                                                                                                
+FROM dual                                                                                                                                                                                                                                                 
+/                                                                                                                                                                                                                                                         
+start '&run_file'  
 
 
 --
