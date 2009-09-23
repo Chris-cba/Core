@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.25   Jul 27 2009 16:53:10   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.26   Sep 23 2009 16:02:36   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jul 27 2009 16:53:10  $
---       Date fetched Out : $Modtime:   Jul 27 2009 16:52:24  $
---       PVCS Version     : $Revision:   2.25  $
+--       Date into PVCS   : $Date:   Sep 23 2009 16:02:36  $
+--       Date fetched Out : $Modtime:   Sep 23 2009 16:01:38  $
+--       PVCS Version     : $Revision:   2.26  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.25  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.26  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -3133,7 +3133,7 @@ l_seq_str varchar2(2000);
 BEGIN
 
 
-  Nm_Debug.debug_on;
+--  Nm_Debug.debug_on;
   Nm_Debug.DEBUG('background stuff retrieval');
 
     l_nt   := get_base_nt( p_nlt_id => p_nlt_id );
@@ -8855,8 +8855,15 @@ BEGIN
      IF p_gdo_session_id IS NOT NULL AND NOT l_get_projection
      THEN
 
+--       cur_string := cur_string||' from '||l_nth.nth_table_name||' t, gis_data_objects g '
+--           ||' where gdo_session_id = '||to_char(p_gdo_session_id)||' and gdo_pk_id = '||l_nth.nth_feature_pk_column||' and '||
+--           ' sdo_within_distance ( t.'||l_nth.nth_feature_shape_column||', :shape, '||
+--           ''''||'distance = '||TO_CHAR(p_buffer)||''''||' ) = '||''''||'TRUE'||'''';
+
+-- AE 4100
+
        cur_string := cur_string||' from '||l_nth.nth_table_name||' t, gis_data_objects g '
-           ||' where gdo_session_id = '||to_char(p_gdo_session_id)||' and gdo_pk_id = '||l_nth.nth_feature_pk_column||' and '||
+           ||' where gdo_session_id = '||to_char(p_gdo_session_id)||' and gdo_pk_id = '||l_nth.nth_pk_column||' and '||
            ' sdo_within_distance ( t.'||l_nth.nth_feature_shape_column||', :shape, '||
            ''''||'distance = '||TO_CHAR(p_buffer)||''''||' ) = '||''''||'TRUE'||'''';
 
@@ -8881,8 +8888,17 @@ BEGIN
      IF p_gdo_session_id IS NOT NULL and not l_get_projection
      THEN
 
+--       cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f, gis_data_objects g '
+--             ||' where g.gdo_session_id = '||to_char(p_gdo_session_id)||' and g.gdo_pk_id = t.'||l_nth.nth_feature_pk_column
+--             ||' and sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :shape, '
+--             ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
+--             ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_pk_column;
+
+
+-- AE 4100
+
        cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f, gis_data_objects g '
-             ||' where g.gdo_session_id = '||to_char(p_gdo_session_id)||' and g.gdo_pk_id = t.'||l_nth.nth_feature_pk_column
+             ||' where g.gdo_session_id = '||to_char(p_gdo_session_id)||' and g.gdo_pk_id = t.'||l_nth.nth_pk_column
              ||' and sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :shape, '
              ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
              ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_pk_column;
@@ -8910,8 +8926,16 @@ BEGIN
      IF p_gdo_session_id IS NOT NULL and not l_get_projection
      THEN
 
+--       cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f, gis_data_objects g '
+--             ||' where g.gdo_session_id = '||to_char(p_gdo_session_id)||' and g.gdo_pk_id = t.'||l_nth.nth_feature_pk_column
+--             ||' and sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :shape, '
+--             ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
+--             ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_pk_column;
+
+-- AE 4100
+
        cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f, gis_data_objects g '
-             ||' where g.gdo_session_id = '||to_char(p_gdo_session_id)||' and g.gdo_pk_id = t.'||l_nth.nth_feature_pk_column
+             ||' where g.gdo_session_id = '||to_char(p_gdo_session_id)||' and g.gdo_pk_id = t.'||l_nth.nth_pk_column
              ||' and sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :shape, '
              ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
              ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_pk_column;
@@ -8974,7 +8998,7 @@ BEGIN
       IF l_get_projection THEN
         retval := retval.add_detail( l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), l_dist_array(i), l_meas_array(i), l_nth.nth_theme_name);
       ELSE
-       retval := retval.add_detail( l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), NULL, NULL, l_nth.nth_theme_name);
+        retval := retval.add_detail( l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), NULL, NULL, l_nth.nth_theme_name);
       END IF;
 
     END IF;
@@ -10068,14 +10092,26 @@ BEGIN
 
   else
                 
+--    curstr := 'select /*+cardinality( a '||to_char( p_ntl.ntl_theme_list.last)||') */ '||
+--              ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  '||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr )   '||
+--              ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||' f,'||p_nth.nth_table_name||' t'||
+--              ' where a.ntd_pk_id  = f.'||p_nth.nth_feature_pk_column||
+--              ' and   f.'||p_nth.nth_feature_fk_column||' =  t.'||p_nth.nth_pk_column||
+--              ' order by  a.ntd_distance';
+
+-- AE 4100
+
     curstr := 'select /*+cardinality( a '||to_char( p_ntl.ntl_theme_list.last)||') */ '||
-              ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  '||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr )   '||
+              ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  t.'||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr )   '||
               ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||' f,'||p_nth.nth_table_name||' t'||
               ' where a.ntd_pk_id  = f.'||p_nth.nth_feature_pk_column||
-              ' and   f.'||p_nth.nth_feature_fk_column||' =  t.'||p_nth.nth_pk_column||
+              ' and   f.'||NVL(p_nth.nth_feature_fk_column,p_nth.nth_feature_pk_column)||' =  t.'||p_nth.nth_pk_column||
               ' order by  a.ntd_distance';
               
   end if;
+
+--  nm_debug.debug_on;
+--  nm_debug.debug(curstr);
 
   EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.ntl_theme_list
     --USING p_nth.nth_theme_id, p_nth.nth_theme_name, p_nth.nth_theme_name, p_ntl;
