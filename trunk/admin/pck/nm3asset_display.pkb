@@ -4,7 +4,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset_display AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm3asset_display.pkb	1.4 11/14/02
+--       sccsid           : @(#)nm3asset_display.pkb 1.4 11/14/02
 --       Module Name      : nm3asset_display.pkb
 --       Date into SCCS   : 02/11/14 15:29:57
 --       Date fetched Out : 07/06/13 14:11:03
@@ -16,18 +16,18 @@ CREATE OR REPLACE PACKAGE BODY nm3asset_display AS
 --   nm3asset_display body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+-- Copyright (c) exor corporation ltd, 2002
 -----------------------------------------------------------------------------
 --
   -----------
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"@(#)nm3asset_display.pkb	1.4 11/14/02"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"@(#)nm3asset_display.pkb 1.4 11/14/02"';
 
-  g_package_name CONSTANT varchar2(30) := 'nm3asset_display';
+  g_package_name CONSTANT VARCHAR2(30) := 'nm3asset_display';
 
-  c_nl CONSTANT varchar2(1) := CHR(10);
+  c_nl CONSTANT VARCHAR2(1) := CHR(10);
 
   -----------
   --variables
@@ -121,33 +121,13 @@ PROCEDURE build_types_list(pi_narh_job_id    IN     nm_assets_on_route_holding.n
                           ) IS
 
   c_nl       CONSTANT varchar2(1) := CHR(10);
-  l_tab_dummy  nm3type.tab_number;
 
-  c_type_col CONSTANT varchar2(100) := 'narh_nm_obj_type';
-  c_xsp_col  CONSTANT varchar2(100) := 'narh_item_x_sect';
-
-  l_sql nm3type.max_varchar2 := ' SELECT narh_nm_obj_type, '
-                     || c_nl || '        narh_item_x_sect '
-                     || c_nl || '   FROM ( '
-                     || c_nl || '  SELECT'
-                     || c_nl || '    narh.narh_nm_obj_type, '
-                     || c_nl || '    narh.narh_item_x_sect, '
-                     || c_nl || '    narh.narh_ne_id_of_begin '
-                     || c_nl || '  FROM'
-                     || c_nl || '    nm_assets_on_route_holding narh'
-                     || c_nl || '  WHERE'
-                     || c_nl || '    narh.narh_job_id = :p_narh_job_id'
-                     || c_nl || '  AND'
-                     || c_nl || '    narh.narh_item_type_type = :p_item_type_type'
-                     || c_nl || '  ) , nm_nw_xsp'
-                     || c_nl || 'WHERE nwx_x_sect = narh_item_x_sect '
-                     || c_nl || '  AND nwx_nw_type = nm3net.get_nt_type ( narh_ne_id_of_begin ) '
-                     || c_nl || '  AND nwx_nsc_sub_class = nm3net.get_sub_class ( narh_ne_id_of_begin ) '
-                     || c_nl || 'GROUP BY ';
-
--- Old
---  c_type_col CONSTANT varchar2(100) := 'narh.narh_nm_obj_type';
---  c_xsp_col  CONSTANT varchar2(100) := 'narh.narh_item_x_sect';
+  c_type_col CONSTANT varchar2(100) := 'narh.narh_nm_obj_type';
+  c_xsp_col  CONSTANT varchar2(100) := 'narh.narh_item_x_sect';
+  
+  l_tab_orderby    nm3type.tab_number;
+  l_tab_screenseq  nm3type.tab_number;
+  l_tab_nittype    nm3type.tab_varchar4;
 
 --  l_sql nm3type.max_varchar2 :=            'BEGIN'
 --                                || c_nl || '  SELECT'
@@ -164,8 +144,27 @@ PROCEDURE build_types_list(pi_narh_job_id    IN     nm_assets_on_route_holding.n
 --                                || c_nl || '    narh.narh_item_type_type = :p_item_type_type'
 --                                || c_nl || '  GROUP BY';
 
-BEGIN
+  l_sql nm3type.max_varchar2 :=            'SELECT'
+                                || c_nl || '    narh.narh_nm_obj_type,'
+                                || c_nl || '    narh.narh_item_x_sect,'
+                                || c_nl || '    NVL(min( nwx_seq ),-1) nwx_seq,'
+                                || c_nl || '    nit_screen_seq, '
+                                || c_nl || '    nit_inv_type '
+                                || c_nl || '  FROM'
+                                || c_nl || '    nm_assets_on_route_holding narh'
+                                || c_nl || '  , nm_nw_xsp '
+                                || c_nl || '  , nm_inv_types '
+                                || c_nl || '  WHERE'
+                                || c_nl || '    narh.narh_job_id = :p_narh_job_id'
+                                || c_nl || '  AND'
+                                || c_nl || '    narh.narh_item_type_type = :p_item_type_type'
+                                || c_nl || '  AND'
+                                || c_nl || '    narh_item_x_sect = nwx_x_sect (+)'
+                                || c_nl || '  AND'
+                                || c_nl || '    narh_item_type = nit_inv_type'
+                                || c_nl || '  GROUP BY';
 
+BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'build_types_list');
 
@@ -173,26 +172,37 @@ BEGIN
 
   IF pi_group_by_xsp
   THEN
-    l_sql := l_sql|| c_nl || '  ' || c_xsp_col  || ','
-                  || c_nl || '  ' || c_type_col;
+    l_sql :=            l_sql
+             || c_nl || '  ' || c_xsp_col  || ','
+             || c_nl || '  ' || c_type_col;
   ELSE
-    l_sql := l_sql|| c_nl || '  ' || c_type_col  || ','
-                  || c_nl || '  ' || c_xsp_col;
+    l_sql :=            l_sql
+             || c_nl || '  ' || c_type_col  || ','
+             || c_nl || '  ' || c_xsp_col;
   END IF;
-
-  l_sql := l_sql || ' '  || c_nl || ', nwx_seq';
-
-  l_sql := l_sql || c_nl || 'ORDER BY nwx_seq ';
-
+  l_sql :=  l_sql ||' ,nit_screen_seq, nit_inv_type';
+  l_sql :=  l_sql ||' ORDER BY nwx_seq NULLS FIRST, nit_screen_seq, nit_inv_type';
+  
+ -- l_sql :=            l_sql || ';'
+        --   || c_nl || 'END;';
+--
   EXECUTE IMMEDIATE l_sql
-  BULK COLLECT INTO nm3asset_display.g_inv_types_tab, nm3asset_display.g_inv_xsps_tab
-  USING pi_narh_job_id, nm3gaz_qry.get_ngqt_item_type_type_inv;
-
+     BULK COLLECT 
+     INTO nm3asset_display.g_inv_types_tab
+        , nm3asset_display.g_inv_xsps_tab
+        , l_tab_orderby
+        , l_tab_screenseq
+        , l_tab_nittype
+    USING pi_narh_job_id,
+          nm3gaz_qry.get_ngqt_item_type_type_inv;
+--
   FOR l_i IN 1..g_inv_types_tab.COUNT
   LOOP
+  --
     g_types_list_tab(l_i).inv_type   := g_inv_types_tab(l_i);
-    g_types_list_tab(l_i).xsp        := g_inv_xsps_tab (l_i);
+    g_types_list_tab(l_i).xsp        := g_inv_xsps_tab(l_i);
     g_types_list_tab(l_i).label_text := g_inv_types_tab(l_i) || ' ' || g_inv_xsps_tab(l_i);
+  --
   END LOOP;
 
   po_types_list_tab := g_types_list_tab;
