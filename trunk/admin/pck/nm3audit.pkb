@@ -2,13 +2,14 @@ CREATE OR REPLACE PACKAGE BODY nm3audit AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3audit.pkb	1.12 01/11/06
---       Module Name      : nm3audit.pkb
---       Date into SCCS   : 06/01/11 13:06:47
---       Date fetched Out : 07/06/13 14:11:07
---       SCCS Version     : 1.12
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3audit.pkb-arc   2.2   28 Sep 2009 09:59:04   kdawson  $
+--       Module Name      : $Workfile:   nm3audit.pkb  $
+--       Date into PVCS   : $Date:   28 Sep 2009 09:59:04  $
+--       Date fetched Out : $Modtime:   28 Sep 2009 09:57:52  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on SCCS version : 
 --
 --
 --   Author : Jonathan Mills
@@ -19,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3audit AS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3audit.pkb	1.12 01/11/06"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3audit';
