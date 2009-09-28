@@ -1,12 +1,13 @@
 CREATE OR REPLACE PACKAGE nm3audit AS
 --<PACKAGE>
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3audit.pkh	1.5 01/11/06
---       Module Name      : nm3audit.pkh
---       Date into SCCS   : 06/01/11 13:07:22
---       Date fetched Out : 07/06/13 14:11:07
---       SCCS Version     : 1.5
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3audit.pkh-arc   2.1   28 Sep 2009 10:04:30   kdawson  $
+--       Module Name      : $Workfile:   nm3audit.pkh  $
+--       Date into PVCS   : $Date:   28 Sep 2009 10:04:30  $
+--       Date fetched Out : $Modtime:   28 Sep 2009 10:03:38  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on SCCS version : 
 --
 --
 --   Author : Jonathan Mills
@@ -18,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3audit AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3audit.pkh	1.5 01/11/06"';
+  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
