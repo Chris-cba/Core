@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.5   Aug 19 2009 10:57:08   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.6   Sep 29 2009 10:51:32   malexander  $
 --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Aug 19 2009 10:57:08  $
---       Date fetched Out : $Modtime:   Aug 19 2009 10:55:38  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Sep 29 2009 10:51:32  $
+--       Date fetched Out : $Modtime:   Sep 29 2009 10:47:30  $
+--       Version          : $Revision:   3.6  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -409,11 +409,11 @@ BEGIN
    l_tab_comments(1)  := '--';
    l_tab_comments(2)  := '--   SCCS Identifiers :-';
    l_tab_comments(3)  := '--';
-   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.5   Aug 19 2009 10:57:08   aedwards  $';
+   l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.6   Sep 29 2009 10:51:32   malexander  $';
    l_tab_comments(5)  := '--       Module Name                : $Workfile:   nm4054_nm4100_ddl_upg.sql  $';
-   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Aug 19 2009 10:57:08  $';
-   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Aug 19 2009 10:55:38  $';
-   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   3.5  $';
+   l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Sep 29 2009 10:51:32  $';
+   l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Sep 29 2009 10:47:30  $';
+   l_tab_comments(8)  := '--       PVCS Version               : $Revision:   3.6  $';
    l_tab_comments(9)  := '--';
    l_tab_comments(10) := '--   table_name_WHO trigger';
    l_tab_comments(11) := '--';
@@ -437,7 +437,7 @@ BEGIN
                          or utc.column_name like '%DATE_MODIFIED'
                         )
                     AND ut.object_name not like 'BIN%'        --sscanlon fix 11JAN2008, fix for 10g installs
-                    AND ut.object_name like 'NM_GAZ_QUERY_%_SAVED'
+                    AND ut.object_name like 'NM_GAZ_QUERY%SAVED'   -- CWS 02/09/09 previous value missed the NM_GAZ_QUERY_SAVED table
                   GROUP BY utc.TABLE_NAME
                   HAVING COUNT(*) = 4
                  )
@@ -535,11 +535,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.5   Aug 19 2009 10:57:08   aedwards  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.6   Sep 29 2009 10:51:32   malexander  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Aug 19 2009 10:57:08  $
-    --       Date fetched Out : $Modtime:   Aug 19 2009 10:55:38  $
-    --       Version          : $Revision:   3.5  $
+    --       Date into PVCS   : $Date:   Sep 29 2009 10:51:32  $
+    --       Date fetched Out : $Modtime:   Sep 29 2009 10:47:30  $
+    --       Version          : $Revision:   3.6  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
              ngqs_ngq_id,
@@ -589,11 +589,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.5   Aug 19 2009 10:57:08   aedwards  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.6   Sep 29 2009 10:51:32   malexander  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Aug 19 2009 10:57:08  $
-    --       Date fetched Out : $Modtime:   Aug 19 2009 10:55:38  $
-    --       Version          : $Revision:   3.5  $
+    --       Date into PVCS   : $Date:   Sep 29 2009 10:51:32  $
+    --       Date fetched Out : $Modtime:   Sep 29 2009 10:47:30  $
+    --       Version          : $Revision:   3.6  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
           * 
@@ -617,11 +617,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.5   Aug 19 2009 10:57:08   aedwards  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_ddl_upg.sql-arc   3.6   Sep 29 2009 10:51:32   malexander  $
     --       Module Name      : $Workfile:   nm4054_nm4100_ddl_upg.sql  $
-    --       Date into PVCS   : $Date:   Aug 19 2009 10:57:08  $
-    --       Date fetched Out : $Modtime:   Aug 19 2009 10:55:38  $
-    --       Version          : $Revision:   3.5  $
+    --       Date into PVCS   : $Date:   Sep 29 2009 10:51:32  $
+    --       Date fetched Out : $Modtime:   Sep 29 2009 10:47:30  $
+    --       Version          : $Revision:   3.6  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
              ngqas_ngq_id       vngqas_ngqa_ngq_id,
@@ -910,12 +910,22 @@ SET TERM OFF
 -- Disabled PK on NM_MRG_QUERY_RESULTS_TEMP2 - Created for consistency
 -- 
 ------------------------------------------------------------------
+Declare
+  nonex_constr Exception;
+  Pragma Exception_Init( nonex_constr, -2443);
+Begin
+  Execute Immediate('ALTER TABLE NM_MRG_QUERY_RESULTS_TEMP2 DROP CONSTRAINT NMQRT2_PK');
+Exception When nonex_constr
+          Then
+            Null;
+End;
+/
+
 ALTER TABLE NM_MRG_QUERY_RESULTS_TEMP2
  ADD (CONSTRAINT NMQRT2_PK PRIMARY KEY 
   (NE_ID)
   DISABLE)
 /
-
 
 ------------------------------------------------------------------
 
@@ -931,16 +941,37 @@ SET TERM OFF
 -- Disabled PK on REPORT_PARAMS - Created for consistency
 -- 
 ------------------------------------------------------------------
+Declare
+  nonex_constr Exception;
+  Pragma Exception_Init( nonex_constr, -2443);
+Begin
+  Execute Immediate('ALTER TABLE REPORT_PARAMS DROP CONSTRAINT RPA_PK');
+Exception When nonex_constr
+          Then
+            Null;
+End;
+/
+
 ALTER TABLE REPORT_PARAMS
  ADD (CONSTRAINT RPA_PK PRIMARY KEY 
   (REP_SESSIONID)
   DISABLE)
 /
 
+Declare
+  no_index_ex Exception;
+  Pragma Exception_Init( no_index_ex, -1418);
+Begin
+  Execute Immediate('DROP INDEX RPA_PK_IDX');
+Exception When no_index_ex
+          Then
+            Null;
+End;
+/
+
 CREATE INDEX RPA_PK_IDX ON REPORT_PARAMS
  (REP_SESSIONID)
 /
-
 ------------------------------------------------------------------
 
 
@@ -1051,6 +1082,94 @@ EXCEPTION
 END;
 /
 
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Drop GDR
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Drop redundant table GIS_DATA_RESTRICTIONS and NM3SDO_GDR package
+-- 
+------------------------------------------------------------------
+-- Drop GIS_DATA_RESTRICTIONS table
+
+DECLARE
+  not_exists EXCEPTION;
+  PRAGMA EXCEPTION_INIT(not_exists,-00942);
+BEGIN
+  EXECUTE IMMEDIATE 'DROP TABLE GIS_DATA_RESTRICTIONS';
+EXCEPTION
+  WHEN NOT_EXISTS THEN NULL;
+END;
+/
+
+-- Drop synonym for GIS_DATA_RESTRICTIONS table
+
+BEGIN
+  nm3ddl.drop_synonym_for_object('GIS_DATA_RESTRICTIONS');
+END;
+/
+
+-- Drop package nm3sdo_gdr
+
+DECLARE
+  not_exists EXCEPTION;
+  PRAGMA EXCEPTION_INIT(not_exists,-04043);
+BEGIN
+  EXECUTE IMMEDIATE 'DROP PACKAGE NM3SDO_GDR';
+EXCEPTION
+  WHEN NOT_EXISTS THEN NULL;
+END;
+/
+
+-- Drop synonym for  nm3sdo_gdr
+
+BEGIN
+  nm3ddl.drop_synonym_for_object('NM3SDO_GDR');
+END;
+/
+
+
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Drop NM_SPECIAL_CHARS
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Drop redundant table NM_SPECIAL_CHARS
+-- 
+------------------------------------------------------------------
+-- Drop NM_SPECIAL_CHARS table
+
+DECLARE
+  not_exists EXCEPTION;
+  PRAGMA EXCEPTION_INIT(not_exists,-00942);
+BEGIN
+  EXECUTE IMMEDIATE 'DROP TABLE NM_SPECIAL_CHARS';
+EXCEPTION
+  WHEN NOT_EXISTS THEN NULL;
+END;
+/
+
+-- Drop synonym for NM_SPECIAL_CHARS table
+
+BEGIN
+  nm3ddl.drop_synonym_for_object('NM_SPECIAL_CHARS');
+END;
+/
 
 ------------------------------------------------------------------
 
