@@ -3,16 +3,16 @@ create or replace package body nm3node as
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3node.pkb-arc   3.0   Oct 01 2009 14:58:20   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3node.pkb-arc   3.1   Oct 02 2009 15:07:18   rcoupe  $
 --       Module Name      : $Workfile:   nm3node.pkb  $
---       Date into PVCS   : $Date:   Oct 01 2009 14:58:20  $
---       Date fetched Out : $Modtime:   Oct 01 2009 14:56:06  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Oct 02 2009 15:07:18  $
+--       Date fetched Out : $Modtime:   Oct 02 2009 15:06:46  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --
 -- g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   3.0  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   3.1  $"';
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3node';
 
@@ -34,7 +34,26 @@ procedure update_element
                 ,p_new_ne            IN     nm_elements%ROWTYPE
                 ,p_new_ne_id         OUT    nm_elements.ne_id%TYPE
                 ) IS
+l_start_no nm_nodes%rowtype;
+l_end_no   nm_nodes%rowtype;
+
 begin
+
+  l_start_no := NM3GET.GET_NO( p_new_ne.ne_no_start );
+  l_end_no   := NM3GET.GET_NO( p_new_ne.ne_no_end );
+
+  if l_start_no.no_start_date > p_new_ne.ne_start_date then
+    update nm_nodes
+    set no_start_date = p_new_ne.ne_start_date
+    where no_node_id = p_new_ne.ne_no_start;
+  end if;
+
+  if l_end_no.no_start_date > p_new_ne.ne_start_date then
+    update nm_nodes
+    set no_start_date = p_new_ne.ne_start_date
+    where no_node_id = p_new_ne.ne_no_end;
+  end if;
+
   update  nm_elements_all
   set NE_UNIQUE          = p_new_ne.NE_UNIQUE,
       NE_TYPE            = p_new_ne.NE_TYPE,
