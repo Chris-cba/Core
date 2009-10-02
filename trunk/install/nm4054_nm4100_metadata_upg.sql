@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.9   Sep 29 2009 10:51:34   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.10   Oct 02 2009 17:23:04   malexander  $
 --       Module Name      : $Workfile:   nm4054_nm4100_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Sep 29 2009 10:51:34  $
---       Date fetched Out : $Modtime:   Sep 29 2009 10:47:32  $
---       Version          : $Revision:   3.9  $
+--       Date into PVCS   : $Date:   Oct 02 2009 17:23:04  $
+--       Date fetched Out : $Modtime:   Oct 02 2009 17:21:46  $
+--       Version          : $Revision:   3.10  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -234,6 +234,11 @@ SET TERM OFF
 -- Correction to WEEKEND metadata
 -- 
 ------------------------------------------------------------------
+UPDATE hig_options
+   SET hop_datatype = 'VARCHAR2'
+ WHERE hop_id = 'WEEKEND'
+   AND hop_product = 'HIG';
+
 update hig_option_list
 set hol_remarks = 'This option must contain a list of numeric values in the range 1 to 7.
 They define the days of the week which constitute the weekend in a particular country, for use in working day calculations.  The following convention must be adopted:
