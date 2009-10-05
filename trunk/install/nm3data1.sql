@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.30   Sep 10 2009 15:06:38   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.31   Oct 05 2009 17:09:54   aedwards  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Sep 10 2009 15:06:38  $
---       Date fetched Out : $Modtime:   Sep 10 2009 15:03:34  $
---       Version          : $Revision:   2.30  $
+--       Date into PVCS   : $Date:   Oct 05 2009 17:09:54  $
+--       Date fetched Out : $Modtime:   Oct 05 2009 17:06:50  $
+--       Version          : $Revision:   2.31  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 10-SEP-2009 15:03
+--       Generation Date  : 05-OCT-2009 17:06
 --
 --   Product metadata script
 --   As at Release 4.1.0.0
@@ -31156,78 +31156,6 @@ SELECT
        ,'' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
                    WHERE HMO_MODULE = 'NMWEB7057');
---
-INSERT INTO HIG_MODULES
-       (HMO_MODULE
-       ,HMO_TITLE
-       ,HMO_FILENAME
-       ,HMO_MODULE_TYPE
-       ,HMO_FASTPATH_OPTS
-       ,HMO_FASTPATH_INVALID
-       ,HMO_USE_GRI
-       ,HMO_APPLICATION
-       ,HMO_MENU
-       )
-SELECT 
-        'NSG0020'
-       ,'NSG Export'
-       ,'nsg0020'
-       ,'FMX'
-       ,''
-       ,'N'
-       ,'N'
-       ,'NSG'
-       ,'FORM' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
-                   WHERE HMO_MODULE = 'NSG0020');
---
-INSERT INTO HIG_MODULES
-       (HMO_MODULE
-       ,HMO_TITLE
-       ,HMO_FILENAME
-       ,HMO_MODULE_TYPE
-       ,HMO_FASTPATH_OPTS
-       ,HMO_FASTPATH_INVALID
-       ,HMO_USE_GRI
-       ,HMO_APPLICATION
-       ,HMO_MENU
-       )
-SELECT 
-        'NSG0021'
-       ,'NSG Export Log'
-       ,'nsg0021'
-       ,'FMX'
-       ,''
-       ,'N'
-       ,'N'
-       ,'NSG'
-       ,'FORM' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
-                   WHERE HMO_MODULE = 'NSG0021');
---
-INSERT INTO HIG_MODULES
-       (HMO_MODULE
-       ,HMO_TITLE
-       ,HMO_FILENAME
-       ,HMO_MODULE_TYPE
-       ,HMO_FASTPATH_OPTS
-       ,HMO_FASTPATH_INVALID
-       ,HMO_USE_GRI
-       ,HMO_APPLICATION
-       ,HMO_MENU
-       )
-SELECT 
-        'TMA0010'
-       ,'Contacts'
-       ,'tma0010'
-       ,'FMX'
-       ,''
-       ,'N'
-       ,'N'
-       ,'TMA'
-       ,'FORM' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
-                   WHERE HMO_MODULE = 'TMA0010');
 --
 --
 --
