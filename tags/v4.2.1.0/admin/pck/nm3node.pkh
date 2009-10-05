@@ -1,0 +1,32 @@
+CREATE OR REPLACE PACKAGE nm3node AS
+--<PACKAGE>
+--
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3node.pkh-arc   3.1   Oct 05 2009 11:25:50   rcoupe  $
+--       Module Name      : $Workfile:   nm3node.pkh  $
+--       Date into PVCS   : $Date:   Oct 05 2009 11:25:50  $
+--       Date fetched Out : $Modtime:   Oct 05 2009 11:25:28  $
+--       PVCS Version     : $Revision:   3.1  $
+--
+--------------------------------------------------------------------------------
+--
+-- Copyright (c) exor corporation ltd, 2009
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   3.1  $"';
+--  g_sccsid is the SCCS ID for the package
+
+FUNCTION get_version RETURN VARCHAR2;
+
+FUNCTION get_body_version RETURN VARCHAR2;
+
+procedure update_element
+                (p_old_ne_id         IN     nm_elements.ne_id%TYPE
+                ,p_new_ne            IN     nm_elements%ROWTYPE
+                ,p_new_ne_id         OUT    nm_elements.ne_id%TYPE
+                );
+end nm3node;
+/
