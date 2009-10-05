@@ -3,16 +3,16 @@ create or replace package body nm3node as
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3node.pkb-arc   3.1   Oct 02 2009 15:07:18   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3node.pkb-arc   3.2   Oct 05 2009 11:24:44   rcoupe  $
 --       Module Name      : $Workfile:   nm3node.pkb  $
---       Date into PVCS   : $Date:   Oct 02 2009 15:07:18  $
---       Date fetched Out : $Modtime:   Oct 02 2009 15:06:46  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Oct 05 2009 11:24:44  $
+--       Date fetched Out : $Modtime:   Oct 05 2009 11:24:18  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --------------------------------------------------------------------------------
 --
 -- g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   3.1  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   3.2  $"';
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3node';
 
@@ -81,3 +81,4 @@ begin
 end;
 
 end nm3node;
+/
