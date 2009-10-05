@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.3.1.0   Sep 23 2009 12:33:38   rcoupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.3.1.1   Oct 05 2009 17:42:32   rcoupe  $
 --       Module Name      : $Workfile:   nm3reclass.pkb  $
---       Date into PVCS   : $Date:   Sep 23 2009 12:33:38  $
---       Date fetched Out : $Modtime:   Sep 23 2009 12:32:00  $
---       PVCS Version     : $Revision:   2.3.1.0  $
+--       Date into PVCS   : $Date:   Oct 05 2009 17:42:32  $
+--       Date fetched Out : $Modtime:   Oct 05 2009 17:42:08  $
+--       PVCS Version     : $Revision:   2.3.1.1  $
 --
 --
 --   Author : R.A. Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3.1.0  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3.1.1  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';
@@ -2080,7 +2080,7 @@ FUNCTION does_nt_scl_change_break_xsp (p_ne_id_of     nm_members.nm_ne_id_of%TYP
    SELECT /*+FULL (NIT) INDEX( M, NM_OBJ_TYPE_NE_ID_OF_IND) */ 1
     FROM  nm_inv_items
          ,nm_inv_types nit
-         ,nm_members
+         ,nm_members M
    WHERE  nm_ne_id_of = c_ne_id_of
     AND   nm_ne_id_in = iit_ne_id
     AND   iit_inv_type = nit.nit_inv_type
