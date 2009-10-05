@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.30   Sep 24 2009 10:21:38   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.31   Oct 05 2009 11:33:06   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Sep 24 2009 10:21:38  $
---       Date fetched Out : $Modtime:   Sep 24 2009 10:21:04  $
---       PVCS Version     : $Revision:   2.30  $
+--       Date into PVCS   : $Date:   Oct 05 2009 11:33:06  $
+--       Date fetched Out : $Modtime:   Oct 05 2009 11:32:30  $
+--       PVCS Version     : $Revision:   2.31  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.30  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.31  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -1402,8 +1402,10 @@ PROCEDURE make_nt_spatial_layer
       l_nth.nth_pk_column := 'NE_ID';
     --
     -- Task ID 0107889 - Set Label Column to NE_ID for Group layer base table themes
+    -- 05/10/09 AE Further restrict on the non DT theme 
     --
       IF p_base_table_nth IS NULL
+      OR l_nth.nth_theme_name NOT LIKE '%DT'
       THEN
         l_nth.nth_label_column := 'NE_ID';
       ELSE
@@ -2151,8 +2153,10 @@ PROCEDURE make_nt_spatial_layer
       l_nth.nth_pk_column := 'NE_ID';
     --
     -- Task ID 0107889 - Set Label Column to NE_ID for Group layer base table themes
+    -- 05/10/09 AE Further restrict on the non DT theme 
     --
       IF p_base_table_nth IS NULL
+      OR l_nth.nth_theme_name NOT LIKE '%DT'
       THEN
         l_nth.nth_label_column := 'NE_ID';
       ELSE
