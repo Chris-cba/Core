@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.26   Sep 23 2009 16:02:36   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.27   Oct 06 2009 16:57:12   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Sep 23 2009 16:02:36  $
---       Date fetched Out : $Modtime:   Sep 23 2009 16:01:38  $
---       PVCS Version     : $Revision:   2.26  $
+--       Date into PVCS   : $Date:   Oct 06 2009 16:57:12  $
+--       Date fetched Out : $Modtime:   Oct 06 2009 16:56:10  $
+--       PVCS Version     : $Revision:   2.27  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.26  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.27  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -4882,6 +4882,13 @@ BEGIN
 --nm_debug.debug(cur_string);
 
   EXECUTE IMMEDIATE cur_string USING p_ne_id, l_geom;
+
+  --
+  -- Task 0108237
+  -- AE Change affected shapes to generate autoincluded group shapes.
+  --
+  nm3sdo.change_affected_shapes (p_layer      => g_nth.nth_theme_id,
+                                 p_ne_id      => p_ne_id);
 
 END;
 
