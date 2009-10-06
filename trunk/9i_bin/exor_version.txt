@@ -1,14 +1,4 @@
--------------------------------------------------------------------------
---   PVCS Identifiers :-
---
---       PVCS id          : $Header:   //vm_latest/archives/nm3/9i_bin/exor_version.txt-arc   3.6   Sep 28 2009 14:32:24   malexander  $
---       Module Name      : $Workfile:   exor_version.txt  $
---       Date into PVCS   : $Date:   Sep 28 2009 14:32:24  $
---       Date fetched Out : $Modtime:   Sep 28 2009 14:31:10  $
---       Version          : $Revision:   3.6  $
---       Based on SCCS version : 
--------------------------------------------------------------------------
---
+SCCSID='$Revision:   3.7  $'
 ACC=4.1.0.0
 CLM=4.1.0.0
 DOC=4.1.0.0
