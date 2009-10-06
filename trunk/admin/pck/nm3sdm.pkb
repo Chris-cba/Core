@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.31   Oct 05 2009 11:33:06   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.32   Oct 06 2009 16:59:26   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Oct 05 2009 11:33:06  $
---       Date fetched Out : $Modtime:   Oct 05 2009 11:32:30  $
---       PVCS Version     : $Revision:   2.31  $
+--       Date into PVCS   : $Date:   Oct 06 2009 16:59:26  $
+--       Date fetched Out : $Modtime:   Oct 06 2009 16:58:40  $
+--       PVCS Version     : $Revision:   2.32  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.31  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.32  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -5531,7 +5531,7 @@ end;
                 nth_feature_fk_column, nbth_base_theme, 'G' G_or_I, c_gty_type OBJ_TYPE
            FROM NM_THEMES_ALL, NM_AREA_THEMES, NM_AREA_TYPES, NM_BASE_THEMES, NM_NW_THEMES, nm_elements, NM_LINEAR_TYPES
           WHERE nth_theme_id = nath_nth_theme_id
-		    AND nth_theme_id = nbth_theme_id
+            AND nth_theme_id = nbth_theme_id
             AND nath_nat_id = nat_id
             AND nat_gty_group_type = c_gty_type
             AND nth_update_on_edit = 'I'
@@ -5544,7 +5544,7 @@ end;
                 nth_feature_fk_column, nbth_base_theme, 'I', nad_inv_type
            FROM NM_THEMES_ALL, NM_INV_THEMES, NM_BASE_THEMES, NM_NW_THEMES, NM_ELEMENTS, NM_LINEAR_TYPES, NM_NW_AD_LINK
           WHERE nth_theme_id = nith_nth_theme_id
-		          AND nth_theme_id = nbth_theme_id
+            AND nth_theme_id = nbth_theme_id
             and nad_inv_type = nith_nit_id
             AND nad_gty_type = c_gty_type
             AND nth_update_on_edit = 'I'
@@ -5591,15 +5591,23 @@ end;
                                                          )
                                );
 
-          EXECUTE IMMEDIATE ins_string
-                           USING l_objid,
-                                 p_nm_ne_id_in,
-                                 p_nm_ne_id_of,
-                                 p_nm_begin_mp,
-                                 p_nm_end_mp,
-                                 l_geom,
-                                 p_nm_start_date,
-                                 p_nm_end_date;
+          --
+          -- Task 0108237
+          -- AE don't process this insert if the shape is null
+          --
+
+          IF l_geom IS NOT NULL
+          THEN
+            EXECUTE IMMEDIATE ins_string
+                        USING l_objid,
+                              p_nm_ne_id_in,
+                              p_nm_ne_id_of,
+                              p_nm_begin_mp,
+                              p_nm_end_mp,
+                              l_geom,
+                              p_nm_start_date,
+                              p_nm_end_date;
+          END IF;
 
 
         ELSE
