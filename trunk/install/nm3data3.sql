@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.10   Aug 19 2009 10:59:04   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.11   Oct 07 2009 12:11:40   aedwards  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Aug 19 2009 10:59:04  $
---       Date fetched Out : $Modtime:   Aug 19 2009 10:57:46  $
---       Version          : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Oct 07 2009 12:11:40  $
+--       Date fetched Out : $Modtime:   Oct 07 2009 12:10:54  $
+--       Version          : $Revision:   2.11  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 19-AUG-2009 10:57
+--       Generation Date  : 07-OCT-2009 12:09
 --
 --   Product metadata script
 --   As at Release 4.1.0.0
@@ -2984,19 +2984,6 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'NMWEB7057'
                     AND  HMR_ROLE = 'WEB_USER');
---
-INSERT INTO HIG_MODULE_ROLES
-       (HMR_MODULE
-       ,HMR_ROLE
-       ,HMR_MODE
-       )
-SELECT 
-        'TMA0010'
-       ,'HIG_ADMIN'
-       ,'NORMAL' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
-                   WHERE HMR_MODULE = 'TMA0010'
-                    AND  HMR_ROLE = 'HIG_ADMIN');
 --
 --
 --
