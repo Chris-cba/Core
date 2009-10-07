@@ -1,4 +1,40 @@
-CREATE OR replace force view nm_inv_type_attribs AS
+CREATE OR replace force view nm_inv_type_attribs 
+(
+  ita_inv_type
+, ita_attrib_name
+, ita_dynamic_attrib
+, ita_disp_seq_no
+, ita_mandatory_yn
+, ita_format
+, ita_fld_length
+, ita_dec_places
+, ita_scrn_text
+, ita_id_domain
+, ita_validate_yn
+, ita_dtp_code
+, ita_max
+, ita_min
+, ita_view_attri
+, ita_view_col_name
+, ita_start_date
+, ita_end_date
+, ita_queryable
+, ita_ukpms_param_no
+, ita_units
+, ita_format_mask
+, ita_exclusive
+, ita_keep_history_yn
+, ita_date_created
+, ita_date_modified
+, ita_modified_by
+, ita_created_by
+, ita_query
+, ita_displayed
+, ita_disp_width
+, ita_inspectable
+, ita_case
+)
+AS
 SELECT
 --
 --   SCCS Identifiers :-
@@ -13,9 +49,40 @@ SELECT
 --	Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-       *
- FROM  nm_inv_type_attribs_all
-WHERE  ita_start_date <= (select nm3context.get_effective_date from dual)
- AND   NVL(ita_end_date,TO_DATE('99991231','YYYYMMDD')) > (select nm3context.get_effective_date from dual)
-
+        ita_inv_type
+			, ita_attrib_name
+			, ita_dynamic_attrib
+			, ita_disp_seq_no
+			, ita_mandatory_yn
+			, ita_format
+			, ita_fld_length
+			, ita_dec_places
+			, ita_scrn_text
+			, ita_id_domain
+			, ita_validate_yn
+			, ita_dtp_code
+			, ita_max
+			, ita_min
+			, ita_view_attri
+			, ita_view_col_name
+			, ita_start_date
+			, ita_end_date
+			, ita_queryable
+			, ita_ukpms_param_no
+			, ita_units
+			, ita_format_mask
+			, ita_exclusive
+			, ita_keep_history_yn
+			, ita_date_created
+			, ita_date_modified
+			, ita_modified_by
+			, ita_created_by
+			, ita_query
+			, ita_displayed
+			, ita_disp_width
+			, ita_inspectable
+			, ita_case
+  FROM  nm_inv_type_attribs_all
+ WHERE  ita_start_date <= (select nm3context.get_effective_date from dual)
+   AND  NVL(ita_end_date,TO_DATE('99991231','YYYYMMDD')) > (select nm3context.get_effective_date from dual)
 /
