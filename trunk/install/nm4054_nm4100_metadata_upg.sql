@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.10   Oct 02 2009 17:23:04   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.11   Oct 12 2009 15:06:20   malexander  $
 --       Module Name      : $Workfile:   nm4054_nm4100_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Oct 02 2009 17:23:04  $
---       Date fetched Out : $Modtime:   Oct 02 2009 17:21:46  $
---       Version          : $Revision:   3.10  $
+--       Date into PVCS   : $Date:   Oct 12 2009 15:06:20  $
+--       Date fetched Out : $Modtime:   Oct 12 2009 15:05:10  $
+--       Version          : $Revision:   3.11  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -1039,10 +1039,9 @@ BEGIN
   EXECUTE IMMEDIATE 'ALTER TABLE nm_inv_type_attribs_all DISABLE ALL TRIGGERS';
 
   EXECUTE IMMEDIATE  'UPDATE nm_inv_type_attribs_all 
-                                             SET ita_inspectable = DECODE(ita_disp_seq_no
-                                                                                              ,99 ,''N''
-                                                                                              ,''Y'')
-                                       WHERE ita_inspectable IS NULL';
+                         SET ita_inspectable = ''N''
+                       WHERE ita_inspectable = ''Y''
+                         AND ita_disp_seq_no = 99';
 
   FOR rec_inv_type_list IN cur_inv_type_list 
   LOOP
@@ -1055,6 +1054,8 @@ BEGIN
 
 END;
 /
+
+
 ------------------------------------------------------------------
 
 
