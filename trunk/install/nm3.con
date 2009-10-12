@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.14   Aug 19 2009 16:25:06   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.15   Oct 12 2009 14:25:56   cstrettle  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Aug 19 2009 16:25:06  $
---       Date fetched Out : $Modtime:   Aug 19 2009 16:23:28  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Oct 12 2009 14:25:56  $
+--       Date fetched Out : $Modtime:   Oct 12 2009 14:24:46  $
+--       PVCS Version     : $Revision:   2.15  $
 --
 --------------------------------------------------------------------------------
 --
@@ -3128,6 +3128,11 @@ ALTER TABLE NM_INV_TYPE_ATTRIBS_ALL
 PROMPT Creating Check Constraint on 'NM_INV_TYPE_ATTRIBS_ALL'
 ALTER TABLE NM_INV_TYPE_ATTRIBS_ALL
  ADD (CONSTRAINT ITA_START_DATE_TCHK CHECK (ITA_START_DATE=TRUNC(ITA_START_DATE)))
+/
+
+PROMPT Creating Check Constraint on 'NM_INV_TYPE_ATTRIBS_ALL'
+ALTER TABLE nm_inv_type_attribs_all 
+ ADD (CONSTRAINT ITA_CASE_CHK CHECK ((ITA_FORMAT IS NULL AND ITA_CASE IN ('UPPER','LOWER', 'MIXED')) OR ITA_FORMAT IS NOT NULL AND ITA_CASE IN ('UPPER')))
 /
 
 PROMPT Creating Check Constraint on 'NM_INV_TYPE_GROUPINGS_ALL'
