@@ -5,11 +5,11 @@ CREATE OR REPLACE PACKAGE nm3get IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkh-arc   2.8   Feb 05 2009 11:14:16   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkh-arc   2.9   Oct 12 2009 15:58:46   malexander  $
 --       Module Name      : $Workfile:   nm3get.pkh  $
---       Date into PVCS   : $Date:   Feb 05 2009 11:14:16  $
---       Date fetched Out : $Modtime:   Feb 05 2009 11:06:04  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Oct 12 2009 15:58:46  $
+--       Date fetched Out : $Modtime:   Oct 12 2009 15:43:52  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --
 --   Author : Jonathan Mills
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE nm3get IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.8  $"
+--   nm3get_gen body   : "$Revision:   2.9  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE nm3get IS
 --
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
+   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
 --  g_sccsid is the SCCS ID for the package
 --
 --</GLOBVAR>
@@ -1824,14 +1824,15 @@ PRAGMA RESTRICT_REFERENCES (get_iit_all, WNPS, WNDS);
 --
 --   Function to get using IIG_PK constraint
 --
-FUNCTION get_iig (pi_iig_top_id        nm_inv_item_groupings.iig_top_id%TYPE
-                 ,pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
+FUNCTION get_iig (pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
+                 ,pi_iig_parent_id     nm_inv_item_groupings.iig_parent_id%TYPE
+                 ,pi_iig_start_date    nm_inv_item_groupings.iig_start_date%TYPE
                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                  ) RETURN nm_inv_item_groupings%ROWTYPE;
 PRAGMA RESTRICT_REFERENCES (get_iig, WNPS, WNDS);
 --
---   Function to get using IIG_UK constraint
+--   Function to get using IIG_PK constraint (without start date for Datetrack View)
 --
 FUNCTION get_iig (pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
                  ,pi_iig_parent_id     nm_inv_item_groupings.iig_parent_id%TYPE
@@ -1839,6 +1840,7 @@ FUNCTION get_iig (pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                  ) RETURN nm_inv_item_groupings%ROWTYPE;
 PRAGMA RESTRICT_REFERENCES (get_iig, WNPS, WNDS);
+--</PROC>
 --
 -----------------------------------------------------------------------------
 --
@@ -1846,17 +1848,9 @@ PRAGMA RESTRICT_REFERENCES (get_iig, WNPS, WNDS);
 --
 --   Function to get using IIG_PK constraint
 --
-FUNCTION get_iig_all (pi_iig_top_id        nm_inv_item_groupings_all.iig_top_id%TYPE
-                     ,pi_iig_item_id       nm_inv_item_groupings_all.iig_item_id%TYPE
-                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                     ) RETURN nm_inv_item_groupings_all%ROWTYPE;
-PRAGMA RESTRICT_REFERENCES (get_iig_all, WNPS, WNDS);
---
---   Function to get using IIG_UK constraint
---
 FUNCTION get_iig_all (pi_iig_item_id       nm_inv_item_groupings_all.iig_item_id%TYPE
                      ,pi_iig_parent_id     nm_inv_item_groupings_all.iig_parent_id%TYPE
+                     ,pi_iig_start_date    nm_inv_item_groupings_all.iig_start_date%TYPE
                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                      ) RETURN nm_inv_item_groupings_all%ROWTYPE;
@@ -2269,6 +2263,7 @@ PRAGMA RESTRICT_REFERENCES (get_nlt, WNPS, WNDS);
 --   Function to get using NLB_PK constraint
 --
 FUNCTION get_nlb (pi_nlb_batch_no      nm_load_batches.nlb_batch_no%TYPE
+                 ,pi_nlb_filename      nm_load_batches.nlb_filename%TYPE
                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                  ) RETURN nm_load_batches%ROWTYPE;

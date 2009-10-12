@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock_gen.pkb-arc   2.8   Feb 05 2009 11:14:16   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock_gen.pkb-arc   2.9   Oct 12 2009 15:58:46   malexander  $
 --       Module Name      : $Workfile:   nm3lock_gen.pkb  $
---       Date into PVCS   : $Date:   Feb 05 2009 11:14:16  $
---       Date fetched Out : $Modtime:   Feb 05 2009 11:06:04  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Oct 12 2009 15:58:46  $
+--       Date fetched Out : $Modtime:   Oct 12 2009 15:43:54  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.8  $"
+--   nm3get_gen body   : "$Revision:   2.9  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lock_gen';
@@ -11929,8 +11929,9 @@ END lock_iit_all;
 --
 --   Function to lock using IIG_PK constraint
 --
-FUNCTION lock_iig (pi_iig_top_id        nm_inv_item_groupings.iig_top_id%TYPE
-                  ,pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
+FUNCTION lock_iig (pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
+                  ,pi_iig_parent_id     nm_inv_item_groupings.iig_parent_id%TYPE
+                  ,pi_iig_start_date    nm_inv_item_groupings.iig_start_date%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -11939,8 +11940,9 @@ FUNCTION lock_iig (pi_iig_top_id        nm_inv_item_groupings.iig_top_id%TYPE
    CURSOR cs_iig IS
    SELECT /*+ INDEX (iig IIG_PK) */ ROWID
     FROM  nm_inv_item_groupings iig
-   WHERE  iig.iig_top_id  = pi_iig_top_id
-    AND   iig.iig_item_id = pi_iig_item_id
+   WHERE  iig.iig_item_id    = pi_iig_item_id
+    AND   iig.iig_parent_id  = pi_iig_parent_id
+    AND   iig.iig_start_date = pi_iig_start_date
    FOR UPDATE NOWAIT;
 --
    l_found         BOOLEAN;
@@ -11963,8 +11965,9 @@ BEGIN
                     ,pi_id                 => 67
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'nm_inv_item_groupings (IIG_PK)'
-                                              ||CHR(10)||'iig_top_id  => '||pi_iig_top_id
-                                              ||CHR(10)||'iig_item_id => '||pi_iig_item_id
+                                              ||CHR(10)||'iig_item_id    => '||pi_iig_item_id
+                                              ||CHR(10)||'iig_parent_id  => '||pi_iig_parent_id
+                                              ||CHR(10)||'iig_start_date => '||pi_iig_start_date
                     );
    END IF;
 --
@@ -11980,8 +11983,9 @@ EXCEPTION
                     ,pi_id                 => 33
                     ,pi_sqlcode            => pi_locked_sqlcode
                     ,pi_supplementary_info => 'nm_inv_item_groupings (IIG_PK)'
-                                              ||CHR(10)||'iig_top_id  => '||pi_iig_top_id
-                                              ||CHR(10)||'iig_item_id => '||pi_iig_item_id
+                                              ||CHR(10)||'iig_item_id    => '||pi_iig_item_id
+                                              ||CHR(10)||'iig_parent_id  => '||pi_iig_parent_id
+                                              ||CHR(10)||'iig_start_date => '||pi_iig_start_date
                     );
 --
 END lock_iig;
@@ -11991,8 +11995,9 @@ END lock_iig;
 --
 --   Procedure to lock using IIG_PK constraint
 --
-PROCEDURE lock_iig (pi_iig_top_id        nm_inv_item_groupings.iig_top_id%TYPE
-                   ,pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
+PROCEDURE lock_iig (pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
+                   ,pi_iig_parent_id     nm_inv_item_groupings.iig_parent_id%TYPE
+                   ,pi_iig_start_date    nm_inv_item_groupings.iig_start_date%TYPE
                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                    ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -12005,8 +12010,9 @@ BEGIN
    nm_debug.proc_start(g_package_name,'lock_iig');
 --
    l_rowid := lock_iig
-                   (pi_iig_top_id        => pi_iig_top_id
-                   ,pi_iig_item_id       => pi_iig_item_id
+                   (pi_iig_item_id       => pi_iig_item_id
+                   ,pi_iig_parent_id     => pi_iig_parent_id
+                   ,pi_iig_start_date    => pi_iig_start_date
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    );
@@ -12018,7 +12024,7 @@ END lock_iig;
 -----------------------------------------------------------------------------
 --
 --
---   Function to lock using IIG_UK constraint
+--   Function to lock using IIG_PK constraint (without start date for Datetrack View)
 --
 FUNCTION lock_iig (pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
                   ,pi_iig_parent_id     nm_inv_item_groupings.iig_parent_id%TYPE
@@ -12028,7 +12034,7 @@ FUNCTION lock_iig (pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
                   ) RETURN ROWID IS
 --
    CURSOR cs_iig IS
-   SELECT /*+ INDEX (iig IIG_UK) */ ROWID
+   SELECT /*+ INDEX (iig IIG_PK) */ ROWID
     FROM  nm_inv_item_groupings iig
    WHERE  iig.iig_item_id   = pi_iig_item_id
     AND   iig.iig_parent_id = pi_iig_parent_id
@@ -12053,7 +12059,7 @@ BEGIN
       hig.raise_ner (pi_appl               => nm3type.c_hig
                     ,pi_id                 => 67
                     ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_inv_item_groupings (IIG_UK)'
+                    ,pi_supplementary_info => 'nm_inv_item_groupings (IIG_PK)'
                                               ||CHR(10)||'iig_item_id   => '||pi_iig_item_id
                                               ||CHR(10)||'iig_parent_id => '||pi_iig_parent_id
                     );
@@ -12070,7 +12076,7 @@ EXCEPTION
       hig.raise_ner (pi_appl               => nm3type.c_hig
                     ,pi_id                 => 33
                     ,pi_sqlcode            => pi_locked_sqlcode
-                    ,pi_supplementary_info => 'nm_inv_item_groupings (IIG_UK)'
+                    ,pi_supplementary_info => 'nm_inv_item_groupings (IIG_PK)'
                                               ||CHR(10)||'iig_item_id   => '||pi_iig_item_id
                                               ||CHR(10)||'iig_parent_id => '||pi_iig_parent_id
                     );
@@ -12080,7 +12086,7 @@ END lock_iig;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to lock using IIG_UK constraint
+--   Procedure to lock using IIG_PK constraint (without start date for Datetrack View)
 --
 PROCEDURE lock_iig (pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
                    ,pi_iig_parent_id     nm_inv_item_groupings.iig_parent_id%TYPE
@@ -12111,8 +12117,9 @@ END lock_iig;
 --
 --   Function to lock using IIG_PK constraint
 --
-FUNCTION lock_iig_all (pi_iig_top_id        nm_inv_item_groupings_all.iig_top_id%TYPE
-                      ,pi_iig_item_id       nm_inv_item_groupings_all.iig_item_id%TYPE
+FUNCTION lock_iig_all (pi_iig_item_id       nm_inv_item_groupings_all.iig_item_id%TYPE
+                      ,pi_iig_parent_id     nm_inv_item_groupings_all.iig_parent_id%TYPE
+                      ,pi_iig_start_date    nm_inv_item_groupings_all.iig_start_date%TYPE
                       ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                       ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                       ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -12121,8 +12128,9 @@ FUNCTION lock_iig_all (pi_iig_top_id        nm_inv_item_groupings_all.iig_top_id
    CURSOR cs_iig_all IS
    SELECT /*+ INDEX (iig_all IIG_PK) */ ROWID
     FROM  nm_inv_item_groupings_all iig_all
-   WHERE  iig_all.iig_top_id  = pi_iig_top_id
-    AND   iig_all.iig_item_id = pi_iig_item_id
+   WHERE  iig_all.iig_item_id    = pi_iig_item_id
+    AND   iig_all.iig_parent_id  = pi_iig_parent_id
+    AND   iig_all.iig_start_date = pi_iig_start_date
    FOR UPDATE NOWAIT;
 --
    l_found         BOOLEAN;
@@ -12145,8 +12153,9 @@ BEGIN
                     ,pi_id                 => 67
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'nm_inv_item_groupings_all (IIG_PK)'
-                                              ||CHR(10)||'iig_top_id  => '||pi_iig_top_id
-                                              ||CHR(10)||'iig_item_id => '||pi_iig_item_id
+                                              ||CHR(10)||'iig_item_id    => '||pi_iig_item_id
+                                              ||CHR(10)||'iig_parent_id  => '||pi_iig_parent_id
+                                              ||CHR(10)||'iig_start_date => '||pi_iig_start_date
                     );
    END IF;
 --
@@ -12162,8 +12171,9 @@ EXCEPTION
                     ,pi_id                 => 33
                     ,pi_sqlcode            => pi_locked_sqlcode
                     ,pi_supplementary_info => 'nm_inv_item_groupings_all (IIG_PK)'
-                                              ||CHR(10)||'iig_top_id  => '||pi_iig_top_id
-                                              ||CHR(10)||'iig_item_id => '||pi_iig_item_id
+                                              ||CHR(10)||'iig_item_id    => '||pi_iig_item_id
+                                              ||CHR(10)||'iig_parent_id  => '||pi_iig_parent_id
+                                              ||CHR(10)||'iig_start_date => '||pi_iig_start_date
                     );
 --
 END lock_iig_all;
@@ -12173,99 +12183,9 @@ END lock_iig_all;
 --
 --   Procedure to lock using IIG_PK constraint
 --
-PROCEDURE lock_iig_all (pi_iig_top_id        nm_inv_item_groupings_all.iig_top_id%TYPE
-                       ,pi_iig_item_id       nm_inv_item_groupings_all.iig_item_id%TYPE
-                       ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                       ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                       ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                       ) IS
---
-   l_rowid ROWID;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_iig_all');
---
-   l_rowid := lock_iig_all
-                   (pi_iig_top_id        => pi_iig_top_id
-                   ,pi_iig_item_id       => pi_iig_item_id
-                   ,pi_raise_not_found   => pi_raise_not_found
-                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
-                   );
---
-   nm_debug.proc_end(g_package_name,'lock_iig_all');
---
-END lock_iig_all;
---
------------------------------------------------------------------------------
---
---
---   Function to lock using IIG_UK constraint
---
-FUNCTION lock_iig_all (pi_iig_item_id       nm_inv_item_groupings_all.iig_item_id%TYPE
-                      ,pi_iig_parent_id     nm_inv_item_groupings_all.iig_parent_id%TYPE
-                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                      ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                      ) RETURN ROWID IS
---
-   CURSOR cs_iig_all IS
-   SELECT /*+ INDEX (iig_all IIG_UK) */ ROWID
-    FROM  nm_inv_item_groupings_all iig_all
-   WHERE  iig_all.iig_item_id   = pi_iig_item_id
-    AND   iig_all.iig_parent_id = pi_iig_parent_id
-   FOR UPDATE NOWAIT;
---
-   l_found         BOOLEAN;
-   l_retval        ROWID;
-   l_record_locked EXCEPTION;
-   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_iig_all');
---
-   OPEN  cs_iig_all;
-   FETCH cs_iig_all INTO l_retval;
-   l_found := cs_iig_all%FOUND;
-   CLOSE cs_iig_all;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_inv_item_groupings_all (IIG_UK)'
-                                              ||CHR(10)||'iig_item_id   => '||pi_iig_item_id
-                                              ||CHR(10)||'iig_parent_id => '||pi_iig_parent_id
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'lock_iig_all');
---
-   RETURN l_retval;
---
-EXCEPTION
---
-   WHEN l_record_locked
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 33
-                    ,pi_sqlcode            => pi_locked_sqlcode
-                    ,pi_supplementary_info => 'nm_inv_item_groupings_all (IIG_UK)'
-                                              ||CHR(10)||'iig_item_id   => '||pi_iig_item_id
-                                              ||CHR(10)||'iig_parent_id => '||pi_iig_parent_id
-                    );
---
-END lock_iig_all;
---
------------------------------------------------------------------------------
---
---
---   Procedure to lock using IIG_UK constraint
---
 PROCEDURE lock_iig_all (pi_iig_item_id       nm_inv_item_groupings_all.iig_item_id%TYPE
                        ,pi_iig_parent_id     nm_inv_item_groupings_all.iig_parent_id%TYPE
+                       ,pi_iig_start_date    nm_inv_item_groupings_all.iig_start_date%TYPE
                        ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                        ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                        ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -12280,6 +12200,7 @@ BEGIN
    l_rowid := lock_iig_all
                    (pi_iig_item_id       => pi_iig_item_id
                    ,pi_iig_parent_id     => pi_iig_parent_id
+                   ,pi_iig_start_date    => pi_iig_start_date
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    );
@@ -15200,6 +15121,7 @@ END lock_nlt;
 --   Function to lock using NLB_PK constraint
 --
 FUNCTION lock_nlb (pi_nlb_batch_no      nm_load_batches.nlb_batch_no%TYPE
+                  ,pi_nlb_filename      nm_load_batches.nlb_filename%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -15209,6 +15131,7 @@ FUNCTION lock_nlb (pi_nlb_batch_no      nm_load_batches.nlb_batch_no%TYPE
    SELECT /*+ INDEX (nlb NLB_PK) */ ROWID
     FROM  nm_load_batches nlb
    WHERE  nlb.nlb_batch_no = pi_nlb_batch_no
+    AND   nlb.nlb_filename = pi_nlb_filename
    FOR UPDATE NOWAIT;
 --
    l_found         BOOLEAN;
@@ -15232,6 +15155,7 @@ BEGIN
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'nm_load_batches (NLB_PK)'
                                               ||CHR(10)||'nlb_batch_no => '||pi_nlb_batch_no
+                                              ||CHR(10)||'nlb_filename => '||pi_nlb_filename
                     );
    END IF;
 --
@@ -15248,6 +15172,7 @@ EXCEPTION
                     ,pi_sqlcode            => pi_locked_sqlcode
                     ,pi_supplementary_info => 'nm_load_batches (NLB_PK)'
                                               ||CHR(10)||'nlb_batch_no => '||pi_nlb_batch_no
+                                              ||CHR(10)||'nlb_filename => '||pi_nlb_filename
                     );
 --
 END lock_nlb;
@@ -15258,6 +15183,7 @@ END lock_nlb;
 --   Procedure to lock using NLB_PK constraint
 --
 PROCEDURE lock_nlb (pi_nlb_batch_no      nm_load_batches.nlb_batch_no%TYPE
+                   ,pi_nlb_filename      nm_load_batches.nlb_filename%TYPE
                    ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                    ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                    ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -15271,6 +15197,7 @@ BEGIN
 --
    l_rowid := lock_nlb
                    (pi_nlb_batch_no      => pi_nlb_batch_no
+                   ,pi_nlb_filename      => pi_nlb_filename
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    );

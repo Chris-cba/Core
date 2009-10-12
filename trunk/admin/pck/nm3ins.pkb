@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.9   Mar 02 2009 14:51:44   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.10   Oct 12 2009 15:58:46   malexander  $
 --       Module Name      : $Workfile:   nm3ins.pkb  $
---       Date into PVCS   : $Date:   Mar 02 2009 14:51:44  $
---       Date fetched Out : $Modtime:   Mar 02 2009 14:44:14  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Oct 12 2009 15:58:46  $
+--       Date fetched Out : $Modtime:   Oct 12 2009 15:43:54  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.9  $"
+--   nm3get_gen body   : "$Revision:   2.10  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
@@ -7602,8 +7602,9 @@ BEGIN
             );
 --
    p_rec_iig := nm3get.get_iig
-                   (pi_iig_top_id        => p_rec_iig.iig_top_id
-                   ,pi_iig_item_id       => p_rec_iig.iig_item_id
+                   (pi_iig_item_id       => p_rec_iig.iig_item_id
+                   ,pi_iig_parent_id     => p_rec_iig.iig_parent_id
+                   ,pi_iig_start_date    => p_rec_iig.iig_start_date
                    ,pi_raise_not_found   => FALSE
                    );
 --
@@ -8000,7 +8001,7 @@ BEGIN
 --
    p_rec_ita.ita_start_date                 := NVL(p_rec_ita.ita_start_date,TO_DATE('05111605','DDMMYYYY') );
    p_rec_ita.ita_queryable                  := NVL(p_rec_ita.ita_queryable,'N' );
-   p_rec_ita.ita_exclusive                  := NVL(p_rec_ita.ita_exclusive,'N');
+   p_rec_ita.ita_exclusive                  := NVL(p_rec_ita.ita_exclusive,'N' );
    p_rec_ita.ita_keep_history_yn            := NVL(p_rec_ita.ita_keep_history_yn,'N' );
    p_rec_ita.ita_displayed                  := NVL(p_rec_ita.ita_displayed,'Y' );
 --
@@ -8036,6 +8037,7 @@ BEGIN
             ,ita_query
             ,ita_displayed
             ,ita_disp_width
+            ,ita_inspectable
             )
      VALUES (p_rec_ita.ita_inv_type
             ,p_rec_ita.ita_attrib_name
@@ -8068,6 +8070,7 @@ BEGIN
             ,p_rec_ita.ita_query
             ,p_rec_ita.ita_displayed
             ,p_rec_ita.ita_disp_width
+            ,p_rec_ita.ita_inspectable
             );
 --
    p_rec_ita := nm3get.get_ita
@@ -8089,7 +8092,7 @@ BEGIN
 --
    p_rec_ita_all.ita_start_date                 := NVL(p_rec_ita_all.ita_start_date,TO_DATE('05111605','DDMMYYYY') );
    p_rec_ita_all.ita_queryable                  := NVL(p_rec_ita_all.ita_queryable,'N' );
-   p_rec_ita_all.ita_exclusive                  := NVL(p_rec_ita_all.ita_exclusive,'N');
+   p_rec_ita_all.ita_exclusive                  := NVL(p_rec_ita_all.ita_exclusive,'N' );
    p_rec_ita_all.ita_keep_history_yn            := NVL(p_rec_ita_all.ita_keep_history_yn,'N' );
    p_rec_ita_all.ita_displayed                  := NVL(p_rec_ita_all.ita_displayed,'Y' );
 --
@@ -8125,6 +8128,7 @@ BEGIN
             ,ita_query
             ,ita_displayed
             ,ita_disp_width
+            ,ita_inspectable
             )
      VALUES (p_rec_ita_all.ita_inv_type
             ,p_rec_ita_all.ita_attrib_name
@@ -8157,6 +8161,7 @@ BEGIN
             ,p_rec_ita_all.ita_query
             ,p_rec_ita_all.ita_displayed
             ,p_rec_ita_all.ita_disp_width
+            ,p_rec_ita_all.ita_inspectable
             )
    RETURNING ita_inv_type
             ,ita_attrib_name
@@ -8189,6 +8194,7 @@ BEGIN
             ,ita_query
             ,ita_displayed
             ,ita_disp_width
+            ,ita_inspectable
       INTO   p_rec_ita_all.ita_inv_type
             ,p_rec_ita_all.ita_attrib_name
             ,p_rec_ita_all.ita_dynamic_attrib
@@ -8219,7 +8225,8 @@ BEGIN
             ,p_rec_ita_all.ita_created_by
             ,p_rec_ita_all.ita_query
             ,p_rec_ita_all.ita_displayed
-            ,p_rec_ita_all.ita_disp_width;
+            ,p_rec_ita_all.ita_disp_width
+            ,p_rec_ita_all.ita_inspectable;
 --
    nm_debug.proc_end(g_package_name,'ins_ita_all');
 --
