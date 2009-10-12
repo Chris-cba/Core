@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.13   Jul 15 2009 14:52:50   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.14   Oct 12 2009 13:15:12   rcoupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Jul 15 2009 14:52:50  $
---       Date fetched Out : $Modtime:   Jul 15 2009 14:52:18  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Oct 12 2009 13:15:12  $
+--       Date fetched Out : $Modtime:   Oct 12 2009 13:13:56  $
+--       PVCS Version     : $Revision:   2.14  $
 --
 --------------------------------------------------------------------------------
 --
@@ -3213,7 +3213,7 @@ CREATE TABLE NM_INV_TYPE_ATTRIBS_ALL
  ,ITA_QUERY VARCHAR2(240)
  ,ITA_DISPLAYED VARCHAR2(1) DEFAULT 'Y' NOT NULL
  ,ITA_DISP_WIDTH NUMBER(3)
- ,ITA_INSPECTABLE VARCHAR2(1)
+ ,ITA_INSPECTABLE VARCHAR2(1) DEFAULT 'Y' NOT NULL
  )
 /
 
