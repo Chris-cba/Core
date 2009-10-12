@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3del.pkb-arc   2.8   Feb 05 2009 11:14:14   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3del.pkb-arc   2.9   Oct 12 2009 15:58:44   malexander  $
 --       Module Name      : $Workfile:   nm3del.pkb  $
---       Date into PVCS   : $Date:   Feb 05 2009 11:14:14  $
---       Date fetched Out : $Modtime:   Feb 05 2009 11:06:04  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Oct 12 2009 15:58:44  $
+--       Date fetched Out : $Modtime:   Oct 12 2009 15:43:54  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.8  $"
+--   nm3get_gen body   : "$Revision:   2.9  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3del IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3del';
@@ -4848,8 +4848,9 @@ END del_iit_all;
 --
 --   Procedure to del using IIG_PK constraint
 --
-PROCEDURE del_iig (pi_iig_top_id        nm_inv_item_groupings.iig_top_id%TYPE
-                  ,pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
+PROCEDURE del_iig (pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
+                  ,pi_iig_parent_id     nm_inv_item_groupings.iig_parent_id%TYPE
+                  ,pi_iig_start_date    nm_inv_item_groupings.iig_start_date%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -4861,8 +4862,9 @@ BEGIN
 --
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_iig
-                   (pi_iig_top_id        => pi_iig_top_id
-                   ,pi_iig_item_id       => pi_iig_item_id
+                   (pi_iig_item_id       => pi_iig_item_id
+                   ,pi_iig_parent_id     => pi_iig_parent_id
+                   ,pi_iig_start_date    => pi_iig_start_date
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
@@ -4881,7 +4883,7 @@ END del_iig;
 -----------------------------------------------------------------------------
 --
 --
---   Procedure to del using IIG_UK constraint
+--   Procedure to del using IIG_PK constraint (without start date for Datetrack View)
 --
 PROCEDURE del_iig (pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
                   ,pi_iig_parent_id     nm_inv_item_groupings.iig_parent_id%TYPE
@@ -4918,43 +4920,9 @@ END del_iig;
 --
 --   Procedure to del using IIG_PK constraint
 --
-PROCEDURE del_iig_all (pi_iig_top_id        nm_inv_item_groupings_all.iig_top_id%TYPE
-                      ,pi_iig_item_id       nm_inv_item_groupings_all.iig_item_id%TYPE
-                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                      ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
-                      ) IS
-   l_rowid ROWID;
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'del_iig_all');
---
-   -- Lock the row first
-   l_rowid := nm3lock_gen.lock_iig_all
-                   (pi_iig_top_id        => pi_iig_top_id
-                   ,pi_iig_item_id       => pi_iig_item_id
-                   ,pi_raise_not_found   => pi_raise_not_found
-                   ,pi_not_found_sqlcode => pi_not_found_sqlcode
-                   ,pi_locked_sqlcode    => pi_locked_sqlcode
-                   );
---
-   IF l_rowid IS NOT NULL
-    THEN
-      DELETE nm_inv_item_groupings_all iig_all
-      WHERE ROWID = l_rowid;
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'del_iig_all');
---
-END del_iig_all;
---
------------------------------------------------------------------------------
---
---
---   Procedure to del using IIG_UK constraint
---
 PROCEDURE del_iig_all (pi_iig_item_id       nm_inv_item_groupings_all.iig_item_id%TYPE
                       ,pi_iig_parent_id     nm_inv_item_groupings_all.iig_parent_id%TYPE
+                      ,pi_iig_start_date    nm_inv_item_groupings_all.iig_start_date%TYPE
                       ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                       ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                       ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -4968,6 +4936,7 @@ BEGIN
    l_rowid := nm3lock_gen.lock_iig_all
                    (pi_iig_item_id       => pi_iig_item_id
                    ,pi_iig_parent_id     => pi_iig_parent_id
+                   ,pi_iig_start_date    => pi_iig_start_date
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode
@@ -6107,6 +6076,7 @@ END del_nlt;
 --   Procedure to del using NLB_PK constraint
 --
 PROCEDURE del_nlb (pi_nlb_batch_no      nm_load_batches.nlb_batch_no%TYPE
+                  ,pi_nlb_filename      nm_load_batches.nlb_filename%TYPE
                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
@@ -6119,6 +6089,7 @@ BEGIN
    -- Lock the row first
    l_rowid := nm3lock_gen.lock_nlb
                    (pi_nlb_batch_no      => pi_nlb_batch_no
+                   ,pi_nlb_filename      => pi_nlb_filename
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
                    ,pi_locked_sqlcode    => pi_locked_sqlcode

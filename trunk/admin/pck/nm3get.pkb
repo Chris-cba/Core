@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkb-arc   2.8   Feb 05 2009 11:14:16   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkb-arc   2.9   Oct 12 2009 15:58:44   malexander  $
 --       Module Name      : $Workfile:   nm3get.pkb  $
---       Date into PVCS   : $Date:   Feb 05 2009 11:14:16  $
---       Date fetched Out : $Modtime:   Feb 05 2009 11:06:04  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Oct 12 2009 15:58:44  $
+--       Date fetched Out : $Modtime:   Oct 12 2009 15:43:54  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.8  $"
+--   nm3get_gen body   : "$Revision:   2.9  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3get';
@@ -6340,8 +6340,9 @@ END get_iit_all;
 --
 --   Function to get using IIG_PK constraint
 --
-FUNCTION get_iig (pi_iig_top_id        nm_inv_item_groupings.iig_top_id%TYPE
-                 ,pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
+FUNCTION get_iig (pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
+                 ,pi_iig_parent_id     nm_inv_item_groupings.iig_parent_id%TYPE
+                 ,pi_iig_start_date    nm_inv_item_groupings.iig_start_date%TYPE
                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                  ) RETURN nm_inv_item_groupings%ROWTYPE IS
@@ -6349,8 +6350,9 @@ FUNCTION get_iig (pi_iig_top_id        nm_inv_item_groupings.iig_top_id%TYPE
    CURSOR cs_iig IS
    SELECT /*+ INDEX (iig IIG_PK) */ *
     FROM  nm_inv_item_groupings iig
-   WHERE  iig.iig_top_id  = pi_iig_top_id
-    AND   iig.iig_item_id = pi_iig_item_id;
+   WHERE  iig.iig_item_id    = pi_iig_item_id
+    AND   iig.iig_parent_id  = pi_iig_parent_id
+    AND   iig.iig_start_date = pi_iig_start_date;
 --
    l_found  BOOLEAN;
    l_retval nm_inv_item_groupings%ROWTYPE;
@@ -6370,8 +6372,9 @@ BEGIN
                     ,pi_id                 => 67
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'nm_inv_item_groupings (IIG_PK)'
-                                              ||CHR(10)||'iig_top_id  => '||pi_iig_top_id
-                                              ||CHR(10)||'iig_item_id => '||pi_iig_item_id
+                                              ||CHR(10)||'iig_item_id    => '||pi_iig_item_id
+                                              ||CHR(10)||'iig_parent_id  => '||pi_iig_parent_id
+                                              ||CHR(10)||'iig_start_date => '||pi_iig_start_date
                     );
    END IF;
 --
@@ -6384,7 +6387,7 @@ END get_iig;
 -----------------------------------------------------------------------------
 --
 --
---   Function to get using IIG_UK constraint
+--   Function to get using IIG_PK constraint (without start date for Datetrack View)
 --
 FUNCTION get_iig (pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
                  ,pi_iig_parent_id     nm_inv_item_groupings.iig_parent_id%TYPE
@@ -6393,7 +6396,7 @@ FUNCTION get_iig (pi_iig_item_id       nm_inv_item_groupings.iig_item_id%TYPE
                  ) RETURN nm_inv_item_groupings%ROWTYPE IS
 --
    CURSOR cs_iig IS
-   SELECT /*+ INDEX (iig IIG_UK) */ *
+   SELECT /*+ INDEX (iig IIG_PK) */ *
     FROM  nm_inv_item_groupings iig
    WHERE  iig.iig_item_id   = pi_iig_item_id
     AND   iig.iig_parent_id = pi_iig_parent_id;
@@ -6415,7 +6418,7 @@ BEGIN
       hig.raise_ner (pi_appl               => nm3type.c_hig
                     ,pi_id                 => 67
                     ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_inv_item_groupings (IIG_UK)'
+                    ,pi_supplementary_info => 'nm_inv_item_groupings (IIG_PK)'
                                               ||CHR(10)||'iig_item_id   => '||pi_iig_item_id
                                               ||CHR(10)||'iig_parent_id => '||pi_iig_parent_id
                     );
@@ -6432,8 +6435,9 @@ END get_iig;
 --
 --   Function to get using IIG_PK constraint
 --
-FUNCTION get_iig_all (pi_iig_top_id        nm_inv_item_groupings_all.iig_top_id%TYPE
-                     ,pi_iig_item_id       nm_inv_item_groupings_all.iig_item_id%TYPE
+FUNCTION get_iig_all (pi_iig_item_id       nm_inv_item_groupings_all.iig_item_id%TYPE
+                     ,pi_iig_parent_id     nm_inv_item_groupings_all.iig_parent_id%TYPE
+                     ,pi_iig_start_date    nm_inv_item_groupings_all.iig_start_date%TYPE
                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                      ) RETURN nm_inv_item_groupings_all%ROWTYPE IS
@@ -6441,8 +6445,9 @@ FUNCTION get_iig_all (pi_iig_top_id        nm_inv_item_groupings_all.iig_top_id%
    CURSOR cs_iig_all IS
    SELECT /*+ INDEX (iig_all IIG_PK) */ *
     FROM  nm_inv_item_groupings_all iig_all
-   WHERE  iig_all.iig_top_id  = pi_iig_top_id
-    AND   iig_all.iig_item_id = pi_iig_item_id;
+   WHERE  iig_all.iig_item_id    = pi_iig_item_id
+    AND   iig_all.iig_parent_id  = pi_iig_parent_id
+    AND   iig_all.iig_start_date = pi_iig_start_date;
 --
    l_found  BOOLEAN;
    l_retval nm_inv_item_groupings_all%ROWTYPE;
@@ -6462,54 +6467,9 @@ BEGIN
                     ,pi_id                 => 67
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'nm_inv_item_groupings_all (IIG_PK)'
-                                              ||CHR(10)||'iig_top_id  => '||pi_iig_top_id
-                                              ||CHR(10)||'iig_item_id => '||pi_iig_item_id
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'get_iig_all');
---
-   RETURN l_retval;
---
-END get_iig_all;
---
------------------------------------------------------------------------------
---
---
---   Function to get using IIG_UK constraint
---
-FUNCTION get_iig_all (pi_iig_item_id       nm_inv_item_groupings_all.iig_item_id%TYPE
-                     ,pi_iig_parent_id     nm_inv_item_groupings_all.iig_parent_id%TYPE
-                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                     ) RETURN nm_inv_item_groupings_all%ROWTYPE IS
---
-   CURSOR cs_iig_all IS
-   SELECT /*+ INDEX (iig_all IIG_UK) */ *
-    FROM  nm_inv_item_groupings_all iig_all
-   WHERE  iig_all.iig_item_id   = pi_iig_item_id
-    AND   iig_all.iig_parent_id = pi_iig_parent_id;
---
-   l_found  BOOLEAN;
-   l_retval nm_inv_item_groupings_all%ROWTYPE;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'get_iig_all');
---
-   OPEN  cs_iig_all;
-   FETCH cs_iig_all INTO l_retval;
-   l_found := cs_iig_all%FOUND;
-   CLOSE cs_iig_all;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_inv_item_groupings_all (IIG_UK)'
-                                              ||CHR(10)||'iig_item_id   => '||pi_iig_item_id
-                                              ||CHR(10)||'iig_parent_id => '||pi_iig_parent_id
+                                              ||CHR(10)||'iig_item_id    => '||pi_iig_item_id
+                                              ||CHR(10)||'iig_parent_id  => '||pi_iig_parent_id
+                                              ||CHR(10)||'iig_start_date => '||pi_iig_start_date
                     );
    END IF;
 --
@@ -7994,6 +7954,7 @@ END get_nlt;
 --   Function to get using NLB_PK constraint
 --
 FUNCTION get_nlb (pi_nlb_batch_no      nm_load_batches.nlb_batch_no%TYPE
+                 ,pi_nlb_filename      nm_load_batches.nlb_filename%TYPE
                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                  ) RETURN nm_load_batches%ROWTYPE IS
@@ -8001,7 +7962,8 @@ FUNCTION get_nlb (pi_nlb_batch_no      nm_load_batches.nlb_batch_no%TYPE
    CURSOR cs_nlb IS
    SELECT /*+ INDEX (nlb NLB_PK) */ *
     FROM  nm_load_batches nlb
-   WHERE  nlb.nlb_batch_no = pi_nlb_batch_no;
+   WHERE  nlb.nlb_batch_no = pi_nlb_batch_no
+    AND   nlb.nlb_filename = pi_nlb_filename;
 --
    l_found  BOOLEAN;
    l_retval nm_load_batches%ROWTYPE;
@@ -8022,6 +7984,7 @@ BEGIN
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'nm_load_batches (NLB_PK)'
                                               ||CHR(10)||'nlb_batch_no => '||pi_nlb_batch_no
+                                              ||CHR(10)||'nlb_filename => '||pi_nlb_filename
                     );
    END IF;
 --
