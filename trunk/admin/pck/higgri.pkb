@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY higgri AS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30) := 'higgri';
@@ -1527,7 +1527,9 @@ BEGIN
     ELSE
   	     pio_value := l_tab_value(1);
 	     pio_shown := l_tab_shown(1);
-	     pio_descr := l_tab_descr(1);
+		 --pio_descr := l_tab_descr(1);
+		 -- KD task 0108516 15/10/2009
+	     pio_descr := substr(l_tab_descr(1),1,100);
 	END IF;
   
   ELSIF pi_number_of_query_cols = 1 THEN
