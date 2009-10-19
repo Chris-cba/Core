@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.10   Oct 12 2009 15:58:46   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.11   Oct 19 2009 11:08:28   malexander  $
 --       Module Name      : $Workfile:   nm3ins.pkb  $
---       Date into PVCS   : $Date:   Oct 12 2009 15:58:46  $
---       Date fetched Out : $Modtime:   Oct 12 2009 15:43:54  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Oct 19 2009 11:08:28  $
+--       Date fetched Out : $Modtime:   Oct 19 2009 11:04:02  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.10  $"
+--   nm3get_gen body   : "$Revision:   2.11  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
@@ -8004,6 +8004,7 @@ BEGIN
    p_rec_ita.ita_exclusive                  := NVL(p_rec_ita.ita_exclusive,'N' );
    p_rec_ita.ita_keep_history_yn            := NVL(p_rec_ita.ita_keep_history_yn,'N' );
    p_rec_ita.ita_displayed                  := NVL(p_rec_ita.ita_displayed,'Y' );
+   p_rec_ita.ita_inspectable                := NVL(p_rec_ita.ita_inspectable,'Y' );
 --
    INSERT INTO nm_inv_type_attribs
             (ita_inv_type
@@ -8095,6 +8096,7 @@ BEGIN
    p_rec_ita_all.ita_exclusive                  := NVL(p_rec_ita_all.ita_exclusive,'N' );
    p_rec_ita_all.ita_keep_history_yn            := NVL(p_rec_ita_all.ita_keep_history_yn,'N' );
    p_rec_ita_all.ita_displayed                  := NVL(p_rec_ita_all.ita_displayed,'Y' );
+   p_rec_ita_all.ita_inspectable                := NVL(p_rec_ita_all.ita_inspectable,'Y' );
 --
    INSERT INTO nm_inv_type_attribs_all
             (ita_inv_type
