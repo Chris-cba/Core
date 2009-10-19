@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.11   Oct 12 2009 15:06:20   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4054_nm4100_metadata_upg.sql-arc   3.12   Oct 19 2009 10:29:56   malexander  $
 --       Module Name      : $Workfile:   nm4054_nm4100_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Oct 12 2009 15:06:20  $
---       Date fetched Out : $Modtime:   Oct 12 2009 15:05:10  $
---       Version          : $Revision:   3.11  $
+--       Date into PVCS   : $Date:   Oct 19 2009 10:29:56  $
+--       Date fetched Out : $Modtime:   Oct 19 2009 10:26:46  $
+--       Version          : $Revision:   3.12  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -1118,6 +1118,26 @@ SET TERM OFF
 ------------------------------------------------------------------
 UPDATE hig_codes
    SET hco_meaning = TRIM(hco_meaning);
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT GIS0020 metadata
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Set Customer Layer item to be the last in the tree
+-- 
+------------------------------------------------------------------
+UPDATE nm_layer_tree
+   SET nltr_order = 10000
+ WHERE nltr_parent = 'ROOT'
+   AND nltr_child = 'CUS';
+
 
 ------------------------------------------------------------------
 
