@@ -24,15 +24,15 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/nm_attrib_view_vw.vw-arc   3.1   Jul 29 2009 15:03:36   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/nm_attrib_view_vw.vw-arc   3.2   Oct 20 2009 12:07:18   aedwards  $
 --       Module Name      : $Workfile:   nm_attrib_view_vw.vw  $
---       Date into PVCS   : $Date:   Jul 29 2009 15:03:36  $
---       Date fetched Out : $Modtime:   Jul 29 2009 15:01:14  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Oct 20 2009 12:07:18  $
+--       Date fetched Out : $Modtime:   Oct 20 2009 12:06:10  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 -- 
-1 disp_ord,
+       1 disp_ord,
        ntc_nt_type ,
        Null ,
        ntc_column_name ,
@@ -52,6 +52,7 @@ SELECT
        (SELECT nti_parent_column FROM nm_type_inclusion WHERE  nti_nw_child_type = ntc_nt_type AND nti_child_column = ntc_column_name 
                                                      ) parent_col
 FROM   nm_type_columns ntc
+WHERE  ntc_displayed = 'Y'
 union
 select 2 disp_ord,
        nad_nt_type ,
