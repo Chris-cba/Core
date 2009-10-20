@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.22.1.1   Jul 27 2009 16:59:40   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.22.1.2   Oct 20 2009 22:19:16   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jul 27 2009 16:59:40  $
---       Date fetched Out : $Modtime:   Jul 27 2009 16:59:14  $
---       PVCS Version     : $Revision:   2.22.1.1  $
+--       Date into PVCS   : $Date:   Oct 20 2009 22:19:16  $
+--       Date fetched Out : $Modtime:   Oct 20 2009 22:18:38  $
+--       PVCS Version     : $Revision:   2.22.1.2  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.22.1.1  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.22.1.2  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -38,18 +38,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
             , y2 IN NUMBER )
     RETURN NUMBER;
 
-  FUNCTION strip_user_elem_info
-            ( p_elem_info IN mdsys.sdo_elem_info_array )
-    RETURN mdsys.sdo_elem_info_array;
 --
-  FUNCTION modify_user_elem_info
-            ( p_elem_info IN mdsys.sdo_elem_info_array )
-    RETURN mdsys.sdo_elem_info_array;
---
-  FUNCTION strip_user_parts
-            ( p_geom IN mdsys.sdo_geometry )
-    RETURN mdsys.sdo_geometry;
-
   FUNCTION Sdo_Clip (  p_geom IN  mdsys.sdo_geometry,  p_st IN NUMBER, p_end IN NUMBER, p_diminfo IN mdsys.sdo_dim_array )
     RETURN mdsys.sdo_geometry;
 
@@ -694,11 +683,6 @@ END;
   l_geom mdsys.sdo_geometry;
   retval NUMBER;
   BEGIN
-    l_geom := strip_user_parts( p_geometry );
-
-  --  nm_debug.debug_on;
-  --  nm_debug.debug('elem 1 = '||to_char( l_geom.sdo_elem_info(1)));
-
     IF l_geom.sdo_elem_info IS NULL THEN
       retval := l_geom.sdo_point.x;
     ELSE
@@ -715,7 +699,6 @@ END;
   l_geom mdsys.sdo_geometry;
   retval NUMBER;
   BEGIN
-    l_geom := strip_user_parts( p_geometry) ;
     IF l_geom.sdo_elem_info IS NULL THEN
       retval := l_geom.sdo_point.y;
     ELSE
@@ -4228,7 +4211,7 @@ END;
 --
 
 FUNCTION get_2d_pt( p_geom mdsys.sdo_geometry ) RETURN mdsys.sdo_geometry IS
-l_geom mdsys.sdo_geometry := strip_user_parts( p_geom );
+l_geom mdsys.sdo_geometry := p_geom;
 ltype NUMBER := Nm3sdo.get_type_from_gtype(p_geom.sdo_gtype);
 BEGIN
 
@@ -5395,9 +5378,7 @@ BEGIN
   IF l_gtype = 1 THEN
     IF p_geom.sdo_elem_info IS NOT NULL THEN
 
-      l_geom := strip_user_parts( p_geom );
-
-      RETURN mdsys.sdo_geometry( 3001, l_geom.sdo_srid, mdsys.sdo_point_type( l_geom.sdo_ordinates(1), l_geom.sdo_ordinates(2), def_pt_zoom),
+      RETURN mdsys.sdo_geometry( 3001, p_geom.sdo_srid, mdsys.sdo_point_type( p_geom.sdo_ordinates(1), p_geom.sdo_ordinates(2), def_pt_zoom),
          NULL, NULL);
     ELSE
       l_point := p_geom.sdo_point;
@@ -7990,8 +7971,6 @@ BEGIN
       EXIT WHEN geocur%rowcount > p_row;
     END IF;
 
-    l_geom := strip_user_parts( l_geom );
-
     l_parts := get_no_parts(l_geom)/3;
 --  nm_debug.debug( 'Parts = '||to_char(l_parts) );
 
@@ -8124,142 +8103,7 @@ END;
 ---------------------------------------------------------------------------------------------------------------------------------
 --
 
-FUNCTION strip_user_elem_info( p_elem_info IN mdsys.sdo_elem_info_array )
-     RETURN mdsys.sdo_elem_info_array IS
 
-
-l_ret mdsys.sdo_elem_info_array;
-l_ind INTEGER;
-l_new INTEGER;
-
-BEGIN
-
-  l_ret := mdsys.sdo_elem_info_array();
-  l_new := 0;
-
-  IF p_elem_info IS NULL THEN
-    l_ret := NULL;
-  ELSE
-
-    FOR i IN 1..p_elem_info.LAST/3 LOOP
-
-      l_ind := 3*(i-1) + 2;
-
-      IF p_elem_info(l_ind) >  0 THEN
-
-        l_new := l_new+1;
-        l_ret.EXTEND;
-        l_ret(l_ret.LAST) := p_elem_info( l_ind -1 );
-        l_ret.EXTEND;
-        l_ret(l_ret.LAST) := p_elem_info( l_ind );
-        l_ret.EXTEND;
-        l_ret(l_ret.LAST) := p_elem_info( l_ind+1 );
-
-      END IF;
-    END LOOP;
-  END IF;
-
-  RETURN l_ret;
-END;
-
---
----------------------------------------------------------------------------------------------------------------------------------
---
-FUNCTION strip_user_parts ( p_geom IN mdsys.sdo_geometry ) RETURN mdsys.sdo_geometry IS
-
-l_ret mdsys.sdo_geometry;
-l_ord mdsys.sdo_ordinate_array;
-l_dim INTEGER := p_geom.get_dims;        --dimension of geometry
-l_new INTEGER;                           --index to the new ordinates
-l_start INTEGER;
-l_last  INTEGER;
-l_last_ord_ind INTEGER;                           --index to the last original ordinates in part
-
-l_elem_info mdsys.sdo_elem_info_array := p_geom.sdo_elem_info;
-l_new_elem_info mdsys.sdo_elem_info_array;
-
-BEGIN
-
-  l_new_elem_info := strip_user_elem_info( l_elem_info);
-
-  l_ord := mdsys.sdo_ordinate_array();
-
-  IF p_geom.sdo_elem_info IS NULL OR   --Either the geometry uses the point type or no restriction.
-     l_new_elem_info IS NULL THEN
-    RETURN p_geom;
-  END IF;
-
-  l_last := l_new_elem_info.LAST/3;
-
-  FOR i IN 1..l_last LOOP
-
-    l_start := l_new_elem_info((i-1)*3 + 1);
-
-    IF i = l_last THEN
-
-      l_last_ord_ind := p_geom.sdo_ordinates.LAST;
-
-    ELSE
-
-      l_last_ord_ind := l_last + 1;
-
-    END IF;
-
-    FOR j IN l_start..l_last_ord_ind LOOP
-
-      l_ord.EXTEND;
-      l_ord(l_ord.LAST) := p_geom.sdo_ordinates(j);
-
-    END LOOP;
-
-  END LOOP;
-
-  l_ret := mdsys.sdo_geometry ( p_geom.sdo_gtype,
-                                p_geom.sdo_srid, p_geom.sdo_point,
-                                modify_user_elem_info( l_elem_info), l_ord );
-
-  RETURN l_ret;
-END;
-
---
----------------------------------------------------------------------------------------------------------------------------------
---
-
-FUNCTION modify_user_elem_info( p_elem_info IN mdsys.sdo_elem_info_array )
-     RETURN mdsys.sdo_elem_info_array IS
-
-l_ret mdsys.sdo_elem_info_array;
-l_ind INTEGER;
-l_new INTEGER;
-
-BEGIN
-
-  l_ret := mdsys.sdo_elem_info_array();
-  l_new := 0;
-
-  IF p_elem_info IS NULL THEN
-    l_ret := NULL;
-  ELSE
-    FOR i IN 1..p_elem_info.LAST/3 LOOP
-
-      l_ind := 3*i - 1;
-
-      IF p_elem_info(l_ind) >  0 THEN
-
-        l_new := l_new+1;
-        l_ret.EXTEND;
-        l_ret(l_ret.LAST) := l_new;
-        l_ret.EXTEND;
-        l_ret(l_ret.LAST) := p_elem_info( l_ind );
-        l_ret.EXTEND;
-        l_ret(l_ret.LAST) := p_elem_info( l_ind+1 );
-
-      END IF;
-    END LOOP;
-  END IF;
-
-  RETURN l_ret;
-END;
 --
 ----------------------------------------------------------------------------
 --
