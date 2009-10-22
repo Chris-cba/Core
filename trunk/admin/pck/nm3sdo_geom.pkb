@@ -5,16 +5,16 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkb-arc   1.4   Aug 25 2009 09:03:34   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkb-arc   1.5   Oct 22 2009 11:37:10   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_geom.pkb  $
---       Date into PVCS   : $Date:   Aug 25 2009 09:03:34  $
---       Date fetched Out : $Modtime:   Aug 25 2009 09:03:04  $
---       PVCS Version     : $Revision:   1.4  $
+--       Date into PVCS   : $Date:   Oct 22 2009 11:37:10  $
+--       Date fetched Out : $Modtime:   Oct 22 2009 11:36:04  $
+--       PVCS Version     : $Revision:   1.5  $
 --       Based on
 --
 --------------------------------------------------------------------------------
 --
-  g_body_sccsid    CONSTANT VARCHAR2(30) :='"$Revision:   1.4  $"';
+  g_body_sccsid    CONSTANT VARCHAR2(30) :='"$Revision:   1.5  $"';
   g_tab_xys                 nm3sdo_gdo.tab_xys;
  -- g_tab_nm_coords           nm_coords_array := NEW nm_coords_array();
 --
@@ -80,6 +80,7 @@ AS
     RETURN NUMBER 
   IS
     l_valid VARCHAR2(10);
+    unitstr VARCHAR2(100);
   BEGIN
   -- Validate geometry
     l_valid := sdo_geom.validate_geometry_with_context( p_geom, p_tolerance );
@@ -88,8 +89,17 @@ AS
     THEN
       IF get_feature_type( p_geom ) = 3 
       THEN
+      -- Task 0108550
+      -- Make sure the data is returned in Meters for Mapviewer consistency
+      -- if a SRID is set
+        IF p_geom.sdo_srid is NULL 
+         THEN 
+           unitstr := NULL;
+        ELSE
+           unitstr := 'UNIT=SQ_METER';
+        END IF;
       --
-        RETURN nm3unit.get_formatted_value(sdo_geom.sdo_area( p_geom, p_tolerance ), 1);
+        RETURN nm3unit.get_formatted_value(sdo_geom.sdo_area( p_geom, p_tolerance, unitstr ), 1 );
       --
       ELSE
       --
@@ -116,7 +126,8 @@ AS
     RETURN NUMBER 
   IS
     l_valid VARCHAR2(10);
-    l_type NUMBER;
+    l_type  NUMBER;
+    unitstr VARCHAR2(100);
   BEGIN
   -- Validate geometry
     l_valid := sdo_geom.validate_geometry_with_context( p_geom, p_tolerance );
@@ -126,15 +137,25 @@ AS
     --
       l_type := get_feature_type( p_geom );
     --
+    -- Task 0108550
+    -- Make sure the data is returned in Meters for Mapviewer consistency
+    -- if a SRID is set
+      IF p_geom.sdo_srid is NULL 
+      THEN 
+        unitstr := NULL;
+      ELSE
+        unitstr := 'UNIT=METER';
+      END IF;
+    --
       IF l_type = 3 
       THEN
       --
-        RETURN nm3unit.get_formatted_value(sdo_geom.sdo_length(sdo_util.polygontoline(p_geom), p_tolerance ), 1);
+        RETURN nm3unit.get_formatted_value(sdo_geom.sdo_length(sdo_util.polygontoline(p_geom), p_tolerance, unitstr ), 1);
       -- 
       ELSIF l_type = 2 
       THEN
       --
-        RETURN nm3unit.get_formatted_value(sdo_geom.sdo_length(p_geom, p_tolerance ), 1);
+        RETURN nm3unit.get_formatted_value(sdo_geom.sdo_length(p_geom, p_tolerance, unitstr ), 1);
       --
       ELSE
         raise_application_error( -20003, 'Geometry is not of an appropriate type' );
@@ -150,7 +171,7 @@ AS
   EXCEPTION
     WHEN OTHERS 
     THEN 
-      RETURN -1;   
+      RETURN -1;    
   END get_length;
 --
 --------------------------------------------------------------------------------
