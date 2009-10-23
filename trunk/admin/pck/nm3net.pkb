@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY Nm3net AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkb-arc   2.3   Jun 04 2008 13:33:18   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkb-arc   2.4   Oct 23 2009 12:23:50   rcoupe  $
 --       Module Name      : $Workfile:   nm3net.pkb  $
---       Date into SCCS   : $Date:   Jun 04 2008 13:33:18  $
---       Date fetched Out : $Modtime:   Jun 03 2008 11:14:50  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Oct 23 2009 12:23:50  $
+--       Date fetched Out : $Modtime:   Oct 23 2009 12:20:40  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on 
 --
 --
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3net AS
 --              (create_or_reuse_point_and_node() also creates nodes, this sets null no_purpose)
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(200) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(200) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
   g_package_name CONSTANT  VARCHAR2(30) := 'nm3net';
 --
@@ -519,9 +519,17 @@ FUNCTION get_datum_nt(pi_gty IN nm_group_types.ngt_group_type%TYPE
 --
 --###################################################################################
   CURSOR c_nng(p_gty nm_group_types.ngt_group_type%TYPE) IS
-    SELECT nng_nt_type
-    FROM nm_nt_groupings
-    WHERE nng_group_type = p_gty;
+    with children as (SELECT   ngr_child_group_type
+                      FROM     nm_group_relations
+                      CONNECT BY   PRIOR ngr_child_group_type = ngr_parent_group_type
+                      START WITH   ngr_parent_group_type = p_gty
+                      UNION
+                      SELECT   nng_nt_type
+                        FROM   nm_nt_groupings
+                       WHERE   nng_group_type = p_gty )
+     select unique nng_nt_type from children, nm_nt_groupings
+     where ngr_child_group_type = nng_group_type;
+
 
   l_retval NM_TYPES.nt_type%TYPE;
 
