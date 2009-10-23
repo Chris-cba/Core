@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.2   Jul 29 2008 22:05:48   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ausec.pkb-arc   2.3   Oct 23 2009 12:57:36   rcoupe  $
 --       Module Name      : $Workfile:   nm3ausec.pkb  $
---       Date into PVCS   : $Date:   Jul 29 2008 22:05:48  $
---       Date fetched Out : $Modtime:   Jul 29 2008 22:04:26  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Oct 23 2009 12:57:36  $
+--       Date fetched Out : $Modtime:   Oct 23 2009 12:56:46  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on
 --
 --   Author : Rob Coupe
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ausec AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -163,15 +163,16 @@ PROCEDURE check_each_au IS
 --               WHERE nag_child_admin_unit  = c.nm_admin_unit
 --                AND  nag_parent_admin_unit = st1.nast_au_id )
 --     AND c.nm_ne_id_in != st1.nast_ne_id;
+--
    CURSOR c1 (c_use_group_security in varchar2 )  IS
      SELECT /*+ RULE*/ c.nm_admin_unit
      FROM  nm_members          c
-          ,nm_au_security_temp st1
-    WHERE  nm3ausec.get_au_type(c.nm_admin_unit) = st1.nast_admin_type            -- We must check for the same au type
+          ,nm_au_security_temp st1, nm_admin_units a
+    WHERE  c.nm_admin_unit = a.nau_admin_unit
+     AND   a.nau_admin_type = st1.nast_admin_type            -- We must check for the same au type
      AND   c.nm_ne_id_of = st1.nast_ne_of                                -- at the location provided from before trg
      and (  ( c_use_group_security='N' and st1.NAST_NM_TYPE = 'I' and   c.nm_type = 'I' )
           or c_use_group_security = 'Y' )
-
      --
      -- it's either IN the range of current inv
      --
