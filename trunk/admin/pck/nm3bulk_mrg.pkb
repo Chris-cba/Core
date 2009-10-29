@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.29   Jul 27 2009 09:45:08   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.30   Oct 29 2009 23:13:32   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Jul 27 2009 09:45:08  $
---       Date fetched Out : $Modtime:   Jul 27 2009 09:42:16  $
---       PVCS Version     : $Revision:   2.29  $
+--       Date into PVCS   : $Date:   Oct 29 2009 23:13:32  $
+--       Date fetched Out : $Modtime:   Oct 29 2009 23:10:20  $
+--       PVCS Version     : $Revision:   2.30  $
 --
 --
 --   Author : Priidu Tanava
@@ -18,7 +18,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 -----------------------------------------------------------------------------
 --   Copyright (c) exor corporation ltd, 2006
 -----------------------------------------------------------------------------
-
 /* History
   17.04.07  PT change in std_populate(), now uses slk values to
                 calculate begin and end offsets
@@ -71,7 +70,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                in ins_datum_homo_chunks() corrected ambiguous column error - happens when FT primary key is splitting attribute
                 added $ suffix to the FT pk column
                in get_where_sql() fixed date formating for where condition values
-               in std_run() added hig.raise_ner 120 "No query types defined."
+No query types defined.
   07.05.09  PT in ins_route_connectivity() added nm_cardinality - requires NM_ROUTE_CONNECTIVITY_TMP with NM_CARDINALITY column
                 nm_cardinality is now used by std_populate() to order pieces within datum according to route cardinality
   11.05.09  PT in std_populate() modified query to translate the first and last mp references according to route cardinality
@@ -85,13 +84,14 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                 this was caused by columns e.g. IIT_END_DATE not being specified in nm_inv_type_attribs
   24.07.09  PT log 721736 changed load_group_datums() for single datums so that route is no longer assigned
                 datum references, instead of route references, are now put into NMS_BEGIN_OFFSET and NMS_END_OFFSET
+  29.10.09  PT logs 723109 and 722950: increased the varchar2 buffer size inside ins_datum_homo_chunks() sql string functions
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
         add ita_format_mask to ita_mapping_rec
         add nm_route_connect_tmp_ordered view with the next schema change
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.29  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.30  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -295,8 +295,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       ||', p_criteria_rowcount='||p_criteria_rowcount
       ||')');
     nm3dbg.ind;
-
-
     -- nm_mrg_split_results_tmp is global temporary on commit preserve rows
     -- (implicit commit)
     execute immediate
@@ -353,9 +351,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                 ||l_sql_tmp||')';
           l_or := cr||'      or ';
           l_sql_tmp := null;
-
-
-
         
         -- it is a foreign table
         else
@@ -429,7 +424,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     else
       l_where_and := ' and ';
     end if;
-
     
     -- build the ft table sources
     for i in 1 .. t_ft.count loop
@@ -446,10 +440,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
             'External assets placed on the network must have a true primary key: '||t_ft(i).inv_type);
         end if;
             
-
         a1 := 'm'||i;
         a2 := 'i'||i;
-
         l_sql_ft := l_sql_ft
               ||l_union_all
           ||cr||'select'||l_sql_cardinality
@@ -481,7 +473,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
             'Cannot run merge query. The inventory type '||t_ft(i).inv_type
               ||' is not attatched to network.');
         end if;
-
         l_sql_ft := l_sql_ft
               ||l_union_all
           ||cr||'select'||l_sql_cardinality
@@ -507,7 +498,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       
     end loop;
     
-
     l_sql := 'insert /*+ append */ into nm_mrg_split_results_tmp'
     ||cr||'with mrg as ('
         ||l_sql_members
@@ -562,7 +552,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     execute immediate l_sql;
     p_rowcount_out := sql%rowcount;
     commit;
-
     
     nm3dbg.putln('nm_mrg_split_results_tmp count: '||p_rowcount_out);
     nm3dbg.deind;
@@ -619,7 +608,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
        p_alias in varchar2
     ) return varchar2
     is
-      s varchar2(4000);
+      s varchar2(32767);
       l_cr varchar2(20) := cr||'           ';
       l_band_value  number(4);
       l_case        varchar2(4000);
@@ -666,7 +655,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     --  ,case when t.nm_type = 'I' and t.nm_obj_type = 'FA' then i.IIT_NUM_ATTRIB100 end FA_NHS
     function sql_case_cols return varchar2
     is
-      s       varchar2(4000);
+      s       varchar2(32767);
       l_inv_alias varchar(3);
       l_attrib    varchar2(30);
       k       binary_integer := 1;
@@ -699,14 +688,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       return s;
       
     end;
-
-
-
     --  ,(select 'XNAA' ft_inv_type, ft2.FT_PK_COL, ft2.NAA_DESCR from XNMDOT_NAA ft2) i2
     --  ,(select  distinct 'SEGM' ft_inv_type, ft8.NE_FT_PK_COL, ft8.GROUP_TYPE, ft8.ROUTE from XNMDOT_V_SEGM ft8) i8
     function sql_ft_sources return varchar2
     is
-      s       varchar2(4000);
+      s       varchar2(32767);
       k       binary_integer := 1;
       s_tmp   varchar2(1000);
       s_tmp_tbl varchar2(30);
@@ -751,12 +737,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       
       return s;
     end;
-
     --  and t.nm_obj_type = i2.ft_inv_type (+)
     --  and t.nm_ne_id_in = i2.ne_id (+)
     function sql_ft_outer_joins return varchar2
     is
-      s       varchar2(4000);
+      s       varchar2(32767);
       k       binary_integer := 1;
       l_cr    varchar2(10) := '  ,';
     begin
@@ -772,7 +757,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       return s;
     end;
     
-
   -- main procedure body starts here
   begin
     nm3dbg.putln(g_package_name||'.ins_datum_homo_chunks('
@@ -787,7 +771,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     -- nm_mrg_datum_homo_chunks_tmp is global temporary on commit preserve rows
     execute immediate 
       'truncate table nm_mrg_datum_homo_chunks_tmp';
-
     
     l_cardinality := nm3sql.get_rounded_cardinality(p_splits_rowcount);
     
@@ -926,10 +909,8 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||', p_splits_rowcount='||p_splits_rowcount
         ||')');
       raise;
-
   end;
   
-
   
   
   function get_where_sql(
@@ -1152,7 +1133,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         end loop;
           
       end if;
-
     end loop;
     
     nm3dbg.putln('pt_attr.count='||pt_attr.count||', pt_itd.count='||pt_itd.count);
@@ -1179,7 +1159,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     l_sql_conn    varchar2(10000);
     l_sqlcount    pls_integer;
     l_ignore_poe  boolean := p_ignore_poe;
-
     
   begin
     nm3dbg.putln(g_package_name||'.ins_route_connectivity('
@@ -1321,8 +1300,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     j           pls_integer := 0;
     lc_sect     pls_integer := 0;
     lc_memb     pls_integer := 0;
-
-
   begin
     nm3dbg.putln(g_package_name||'.std_populate('
       ||'p_nmq_id='||p_nmq_id
@@ -1338,7 +1315,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       p_mrg_job_id := nm3seq.next_rtg_job_id_seq;
       
     end if;
-
     
     -- init static vaules
     r_res.nqr_nmq_id := p_nmq_id;
@@ -1534,7 +1510,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
                 r.nt_unit_of, r.nt_unit_in, (r.inv_begin_mp - r.nm_begin_mp));
           end if;      
         end if;
-
         t_sect(i).nms_end_offset      := null;
         t_sect(i).nms_ne_id_first     := r.nm_ne_id_of;
         t_sect(i).nms_begin_mp_first  := r.inv_begin_mp; --r.inv_begin_mp;
@@ -1542,7 +1517,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         t_sect(i).nms_end_mp_last     := null;
         t_sect(i).nms_in_results      := 'Y';
         t_sect(i).nms_orig_sect_id    := l_chunk_no;
-
       end if;
       
       
@@ -1786,7 +1760,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     l_sql         varchar2(32767);
     i             binary_integer;
     l_splits_cardinality integer;
-
     -- This is used in bulk insert
     --  ,case i.iit_inv_type
     --   when 'RSCS' then i.IIT_MATERIAL
@@ -1798,7 +1771,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       k           binary_integer := 1;
       j           binary_integer := 0;
       l_attrib    varchar2(100);
-
     begin
       i := pt_attr.first;
       while i is not null loop
@@ -1824,7 +1796,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       
     end;
     
-
     --  ,(select 'XNAA' ft_inv_type, ft2.FT_PK_COL, ft2.NAA_DESCR from XNMDOT_NAA ft2) i2
     --  ,(select  distinct 'SEGM' ft_inv_type, ft8.NE_FT_PK_COL, ft8.GROUP_TYPE, ft8.ROUTE from XNMDOT_V_SEGM ft8) i8
     -- repeate from ins_datum_homo_chunks()
@@ -1845,7 +1816,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           s_tmp := null;
           s_tmp_tbl := null;
         end if;
-
         -- it is an FT
         if pt_attr(i).table_name is not null then
         
@@ -1896,7 +1866,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       return s;
     end;
     
-
     
     --, nsv_attrib1, nsv_attrib2, nsv_attrib3
     function sql_nsv_attrib_cols(
@@ -1941,9 +1910,7 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           if pt_attr(i).ita_format = 'DATE' then
             l_ita_format_mask := nvl(l_ita_format_mask, m_mrg_date_format);
           end if;
-
         end if;
-
         
         -- date, number conversion
         --  conversions into nm_mrg_section_inv_values_tmp are done with database default format
@@ -1955,7 +1922,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         -- no conversion
         else
           s := s||l_cr||', '||l_attrib;
-
         end if;
         
         if p_format then
@@ -2126,12 +2092,10 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     ||cr||'  and i3.nm_obj_type = m1.nm_obj_type'
     ||cr||'  and ((i3.iit_x_sect is null and m1.iit_x_sect is null) or i3.iit_x_sect = m1.iit_x_sect)'
         ||sql_nsv_attrib_join('i3','m1');
-
     nm3dbg.putln(l_sql);
     execute immediate l_sql using p_mrg_job_id, p_mrg_job_id, p_mrg_job_id;
     
     nm3dbg.putln('nm_mrg_section_inv_values_tmp rowcount='||sql%rowcount);
-
     
     
     -- 2. insert the item values
@@ -2180,7 +2144,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         ||', l_splits_cardinality='||l_splits_cardinality
         ||')');
       raise;
-
   end;
   
   
@@ -2245,7 +2208,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           );
       
       end if;
-
     -- datum or distance breake
     when l_ne_type in ('S','D') then
       insert into nm_datum_criteria_tmp(
@@ -2285,7 +2247,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     
     end case;
     
-
     if l_sql is not null then
       nm3dbg.putln(l_sql);
       execute immediate l_sql
@@ -2312,7 +2273,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   end;
   
   
-
   
   -- load datum criteria for a single saved extent
   procedure load_extent_datums(
@@ -2365,7 +2325,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   
   end;
   
-
   
   -- load datum criteria for a single group type
   --  the group type can be linear or non-linear
@@ -2420,7 +2379,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       
   end;
   
-
   -- load datum criteria for one network type
   --  the type must be linear datum type
   procedure load_nt_type_datums(
@@ -2452,7 +2410,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     nm3dbg.ind;
     
     execute immediate 'truncate table nm_datum_criteria_tmp';
-
     -- check that the type given is linear datum type
     begin
       select nt_type into l_nt_type
@@ -2509,7 +2466,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
           ||cr||'        and nt_linear = ''Y'''
           ||cr||'    )'
       );
-
   begin
     nm3dbg.putln(g_package_name||'.load_all_network_datums('
       ||'p_group_type='||p_group_type
@@ -2572,14 +2528,12 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       ||')');
     nm3dbg.ind;
     
-
     -- reset the cached id tables
     mt_datum_id := new nm_id_tbl();
     mt_group_id := new nm_id_tbl();
     mt_gg_id    := new nm_id_tbl();
     mt_nse_id   := new nm_id_tbl();
       
-
     -- 1 saved extents
     if pt_nse.count > 0 then
       mt_nse_id := pt_nse;
@@ -2602,7 +2556,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   
     -- 2 routes and single datums
     if pt_ne.count > 0 then
-
       -- divide the datum and group elements into different tables
       while i is not null loop
         l_ne_type := nm3net.get_ne_type(pt_ne(i));
@@ -2627,7 +2580,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
         i := pt_ne.next(i);
       end loop;
       
-
       -- 2.1 datums (and distance breaks)
       if mt_datum_id.count > 0 then
         l_inner_sql := l_inner_sql
@@ -2707,7 +2659,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       sql_load_nm_datum_criteria_tmp(
          p_elements_sql => l_inner_sql
       );
-
     execute immediate 'truncate table nm_datum_criteria_tmp';
     
     ensure_group_type_linear(
@@ -2736,7 +2687,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     
   end;
   
-
   
   
   -- this builds the effective date where clause for dynamic sql
@@ -2779,7 +2729,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   
   
   
-
   
   -- debug to_string
   function to_string_ita_mapping_rec(
@@ -2822,7 +2771,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       ||', band_description='||p_rec.itd_band_description
       ||')';
   end;
-
   
   
   function to_string_nm_obj_type_tbl(
@@ -2854,7 +2802,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     l_count       integer := nm3sql.get_id_tbl_count;
     l_cardinality integer := nm3sql.get_rounded_cardinality(l_count);
     l_sql_q_where varchar2(100);
-
   begin
     nm3dbg.putln(g_package_name||'.process_datums_group_type('
       ||'p_group_type_in='||p_group_type_in
@@ -2862,7 +2809,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
     nm3dbg.ind;
     
     raise_application_error(-20999, 'Dead plsql code');
-
   end;
   
   
@@ -2979,7 +2925,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
       ||cr||') q2';
       --||cr||'order by q2.nm_ne_id_of, q2.begin_mp, q2.end_mp'
     
-
 --    return
 --            'insert into nm_datum_criteria_tmp ('
 --      ||cr||'  datum_id, begin_mp, end_mp, group_id'
@@ -3021,7 +2966,6 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
   end;
   
   
-
   
   -- this tries to select rowid from an FT table
   --  if succeeds then the table has a proper preserved pk
