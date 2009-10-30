@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.5   Sep 03 2009 09:55:22   drawat  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.6   Oct 30 2009 17:16:14   drawat  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Sep 03 2009 09:55:22  $
---       Date fetched Out : $Modtime:   Aug 19 2009 15:41:52  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Oct 30 2009 17:16:14  $
+--       Date fetched Out : $Modtime:   Oct 30 2009 15:58:12  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -784,14 +784,12 @@ BEGIN
                   ||CHR(10)||'   ukpmerge.merge( p_rse            => :p_ne_id_new'
                   ||CHR(10)||'                  ,p_rse_1          => :p_ne_id_1'
                   ||CHR(10)||'                  ,p_rse_2          => :p_ne_id_2'
-                  ||CHR(10)||'                  ,p_effective_date => :p_effective_date'
                   ||CHR(10)||'                 );'
                   ||CHR(10)||'END;';
        EXECUTE IMMEDIATE l_block
         USING IN p_ne_id_new
                 ,p_ne_id_1
-                ,p_ne_id_2
-		,p_effective_date;
+                ,p_ne_id_2;
    END IF;
 --
    nm_debug.proc_end(g_package_name,'merge_other_products');
