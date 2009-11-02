@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.10   Sep 07 2009 07:56:56   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg_util.pkb-arc   2.11   Nov 02 2009 21:36:24   ptanava  $
 --       Module Name      : $Workfile:   nm3eng_dynseg_util.pkb  $
---       Date into PVCS   : $Date:   Sep 07 2009 07:56:56  $
---       Date fetched Out : $Modtime:   Sep 02 2009 20:45:48  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Nov 02 2009 21:36:24  $
+--       Date fetched Out : $Modtime:   Nov 02 2009 21:35:34  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --   Author : Priidu Tanava
 --
@@ -37,10 +37,11 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
                 are adusted to not reach outside the result section; this has bearing in calculations that use section lengh
   02.09.09 PT in populate_tmp_table() fixed begin_mp/end_mp handling with negative cardinality
                   also added cardinality performance hint for section members
+  02.11.09 PT log 722941, put being_mp, end_mp back into the sql in populate_tmp_table(), needed by first_value(), last_value()
 */
 
 
-  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.10  $"';
+  g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.11  $"';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg_util';
   
   cr            constant varchar2(1) := chr(10);
@@ -445,8 +446,8 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     -- assuming section_length cannot be 0 if nm_length is > 0
     ||cr||'  ,decode(qm.nm_length, 0, null, qm.nm_length / qm.section_length) nm_length_pct'
     ||cr||'  ,qm.nsm_measure'
-    --||cr||'  ,qm.begin_mp'
-    --||cr||'  ,qm.end_mp'
+    ||cr||'  ,qm.begin_mp'
+    ||cr||'  ,qm.end_mp'
     ||cr||'  ,im.*'
     ||cr||'from ('
     ||cr||'select'
@@ -457,8 +458,8 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg_util AS
     ||cr||'  ,mm2.nm_length'
     ||cr||'  ,sum((mm2.max_mp_end - mm2.min_mp_begin) * mm2.row_num) over (partition by mm2.section_id) section_length'
     ||cr||'  ,mm2.nsm_measure'
-    --||cr||'  ,mm2.begin_mp'
-    --||cr||'  ,mm2.end_mp'
+    ||cr||'  ,mm2.begin_mp'
+    ||cr||'  ,mm2.end_mp'
     ||cr||'from ('
     ||cr||'select mm.*'
     ||cr||'  ,mm.end_mp - mm.begin_mp nm_length'
