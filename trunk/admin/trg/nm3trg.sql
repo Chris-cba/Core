@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.9   Aug 05 2009 16:10:02   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.10   Nov 03 2009 10:58:02   aedwards  $
 --       Module Name      : $Workfile:   nm3trg.sql  $
---       Date into PVCS   : $Date:   Aug 05 2009 16:10:02  $
---       Date fetched Out : $Modtime:   Aug 05 2009 16:09:14  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Nov 03 2009 10:58:02  $
+--       Date fetched Out : $Modtime:   Nov 03 2009 10:57:16  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --
 --   Author : Graeme Johnson
@@ -1831,7 +1831,29 @@ start '&run_file'
 --
 ----------------------------------------------------------------------------------------- 
 --
-
+--
+SET TERM ON 
+PROMPT nm_nt_gps_trg.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_nt_gps_trg.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+-----------------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT nm_ngr_ngt_trg.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_ngr_ngt_trg.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+-----------------------------------------------------------------------------------------
+--
 --
 -- new triggers above this
 SET TERM ON
