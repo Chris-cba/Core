@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.30   Oct 29 2009 23:13:32   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.31   Nov 04 2009 16:41:38   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Oct 29 2009 23:13:32  $
---       Date fetched Out : $Modtime:   Oct 29 2009 23:10:20  $
---       PVCS Version     : $Revision:   2.30  $
+--       Date into PVCS   : $Date:   Nov 04 2009 16:41:38  $
+--       Date fetched Out : $Modtime:   Nov 04 2009 16:40:28  $
+--       PVCS Version     : $Revision:   2.31  $
 --
 --
 --   Author : Priidu Tanava
@@ -84,14 +84,16 @@ No query types defined.
                 this was caused by columns e.g. IIT_END_DATE not being specified in nm_inv_type_attribs
   24.07.09  PT log 721736 changed load_group_datums() for single datums so that route is no longer assigned
                 datum references, instead of route references, are now put into NMS_BEGIN_OFFSET and NMS_END_OFFSET
-  29.10.09  PT logs 723109 and 722950: increased the varchar2 buffer size inside ins_datum_homo_chunks() sql string functions
+  29.10.09  PT logs 723109 and 722950: increased the varchar2 buffer size inside
+                ins_datum_homo_chunks() and std_insert_invitems() sql string functions
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
         add ita_format_mask to ita_mapping_rec
         add nm_route_connect_tmp_ordered view with the next schema change
+        in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.30  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.31  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -581,7 +583,6 @@ No query types defined.
   is
     i                 binary_integer;
     l_sql             varchar2(32767);
-    l_invitems_where  varchar2(32767);
     l_cardinality     integer;
     l_sql_inner_join  varchar2(100);
     l_inv_type_count  number(4) := 0;
@@ -604,7 +605,7 @@ No query types defined.
     --       when q.RCON_LAYER between 6 and 1000 then '3'
     --       else null end
     --||','||q.AD_IIT_ID_CODE
-    function sql_hascode_cols(
+    function sql_hashcode_cols(
        p_alias in varchar2
     ) return varchar2
     is
@@ -649,6 +650,17 @@ No query types defined.
         i := pt_attr.next(i);
       end loop;
       return s;
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.sql_hashcode_cols('
+        ||'p_alias='||p_alias
+        ||', l_band_value='||l_band_value
+        ||', l_case='||l_case
+        ||', i='||i
+        ||', length(s)='||length(s)
+        ||', s='||s
+        ||')');
+      raise;
     end;
     
     
@@ -686,17 +698,27 @@ No query types defined.
         i := pt_attr.next(i);
       end loop;
       return s;
-      
+    exception
+      when others then
+        nm3dbg.puterr(sqlerrm||': '||g_package_name||'.sql_case_cols('
+          ||'l_inv_alias='||l_inv_alias
+          ||', l_attrib='||l_attrib
+          ||', k='||k
+          ||', i='||i
+          ||', length(s)='||length(s)
+          ||', s='||s
+          ||')');
+        raise;
     end;
+    
     --  ,(select 'XNAA' ft_inv_type, ft2.FT_PK_COL, ft2.NAA_DESCR from XNMDOT_NAA ft2) i2
     --  ,(select  distinct 'SEGM' ft_inv_type, ft8.NE_FT_PK_COL, ft8.GROUP_TYPE, ft8.ROUTE from XNMDOT_V_SEGM ft8) i8
     function sql_ft_sources return varchar2
     is
       s       varchar2(32767);
       k       binary_integer := 1;
-      s_tmp   varchar2(1000);
+      s_tmp   varchar2(4000);
       s_tmp_tbl varchar2(30);
-      l_distinct varchar2(10);
       
     begin
       i := pt_attr.first;
@@ -734,9 +756,21 @@ No query types defined.
       if s_tmp is not null then
         s := s||cr||s_tmp||' from '||s_tmp_tbl||' ft'||k||') i'||k;
       end if; 
-      
+
       return s;
+    exception
+      when others then
+        nm3dbg.puterr(sqlerrm||': '||g_package_name||'.sql_ft_sources('
+          ||'s_tmp_tbl='||s_tmp_tbl
+          ||', s_tmp='||s_tmp
+          ||', k='||k
+          ||', i='||i
+          ||', length(s)='||length(s)
+          ||', s='||s
+          ||')');
+        raise;
     end;
+    
     --  and t.nm_obj_type = i2.ft_inv_type (+)
     --  and t.nm_ne_id_in = i2.ne_id (+)
     function sql_ft_outer_joins return varchar2
@@ -755,6 +789,16 @@ No query types defined.
         i := pt_attr.next(i);
       end loop;
       return s;
+    exception
+      when others then
+        nm3dbg.puterr(sqlerrm||': '||g_package_name||'.sql_ft_outer_joins('
+          ||'l_cr='||l_cr
+          ||', k='||k
+          ||', i='||i
+          ||', length(s)='||length(s)
+          ||', s='||s
+          ||')');
+        raise;
     end;
     
   -- main procedure body starts here
@@ -851,10 +895,10 @@ No query types defined.
     ||cr||'from ('
     ||cr||'select'
     ||cr||'  to_char(dbms_utility.get_hash_value(q.xsp$||'',''||'
-        ||sql_hascode_cols('q')
+        ||sql_hashcode_cols('q')
     ||cr||'    ,0, 262144))'
     ||cr||'  ||''_''||dbms_utility.get_hash_value(q.xsp$||'',''||'
-        ||sql_hascode_cols('q')||'||'',xxx'''
+        ||sql_hashcode_cols('q')||'||'',xxx'''
     ||cr||'    ,0, 262144) hash_value'
     ||cr||'  ,q.*'
     ||cr||'from ('
@@ -907,10 +951,13 @@ No query types defined.
         ||', pt_itd.count='||pt_itd.count
         ||', p_inner_join='||nm3flx.boolean_to_char(p_inner_join)
         ||', p_splits_rowcount='||p_splits_rowcount
+        ||', l_inv_type_count='||l_inv_type_count
+        ||', l_sql_inner_join='||l_sql_inner_join
+        ||', l_cardinality='||l_cardinality
+        ||', i='||i
         ||')');
       raise;
   end;
-  
   
   
   function get_where_sql(
@@ -1654,6 +1701,7 @@ No query types defined.
       ||', p_nmq_descr='||p_nmq_descr
       ||', p_ignore_poe='||nm3flx.boolean_to_char(p_ignore_poe)
       ||', p_criteria_rowcount='||p_criteria_rowcount
+      ||', l_effective_date='||l_effective_date
       ||')');
     nm3dbg.ind;
     
@@ -1766,7 +1814,7 @@ No query types defined.
     --   end NSV_ATTRIB1
     function sql_case_cols return varchar2
     is
-      s           varchar2(4000);
+      s           varchar2(32767);
       l_inv_alias varchar(3);
       k           binary_integer := 1;
       j           binary_integer := 0;
@@ -1801,11 +1849,10 @@ No query types defined.
     -- repeate from ins_datum_homo_chunks()
     function sql_ft_sources return varchar2
     is
-      s           varchar2(4000);
+      s           varchar2(32767);
       k           binary_integer := 1;
       s_tmp       varchar2(1000);
       s_tmp_tbl   varchar2(30);
-      l_distinct  varchar2(10);
     begin
       i := pt_attr.first;
       while i is not null loop
@@ -1850,7 +1897,7 @@ No query types defined.
     --  and t.nm_ne_id_in = i2.ne_id (+)
     function sql_ft_outer_joins return varchar2
     is
-      s       varchar2(4000);
+      s       varchar2(32767);
       k       binary_integer := 1;
       l_cr    varchar2(10) := '  ,';
     begin
@@ -1872,7 +1919,7 @@ No query types defined.
        p_format in boolean
     ) return varchar2
     is
-      s         varchar2(4000);
+      s         varchar2(32767);
       j         binary_integer := 0;
       l_conversion varchar2(20);
       l_cr      varchar2(1);
@@ -1939,9 +1986,9 @@ No query types defined.
     --   end pnt_or_cont
     function sql_pnt_or_cont return varchar2
     is
-      s         varchar2(4000);
-      s_pnt     varchar2(4000);
-      s_cont    varchar2(4000);
+      s         varchar2(32767);
+      s_pnt     varchar2(32767);
+      s_cont    varchar2(32767);
       l_pnt_comma varchar2(1);
       l_cont_comma varchar2(1);
       j         binary_integer := 0;
@@ -1980,7 +2027,7 @@ No query types defined.
       ,p_a2 in varchar2
     ) return varchar2
     is
-      s       varchar2(4000);
+      s       varchar2(32767);
       j       binary_integer := 0;
       l_nval  varchar2(40);
     begin
