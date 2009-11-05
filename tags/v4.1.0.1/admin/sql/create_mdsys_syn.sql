@@ -1,0 +1,13 @@
+--
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/sql/create_mdsys_syn.sql-arc   3.0   Nov 05 2009 15:31:28   aedwards  $
+--       Module Name      : $Workfile:   create_mdsys_syn.sql  $
+--       Date into PVCS   : $Date:   Nov 05 2009 15:31:28  $
+--       Date fetched Out : $Modtime:   Nov 05 2009 15:29:40  $
+--       PVCS Version     : $Revision:   3.0  $
+--
+--------------------------------------------------------------------------------
+--
+CREATE OR REPLACE PUBLIC SYNONYM sdo_geom_metadata_table FOR mdsys.sdo_geom_metadata_table;
