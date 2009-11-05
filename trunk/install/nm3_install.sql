@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.19   Nov 05 2009 10:18:54   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.20   Nov 05 2009 11:11:52   malexander  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Nov 05 2009 10:18:54  $
---       Date fetched Out : $Modtime:   Nov 05 2009 10:17:40  $
---       PVCS Version     : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Nov 05 2009 11:11:52  $
+--       Date fetched Out : $Modtime:   Nov 05 2009 11:11:16  $
+--       PVCS Version     : $Revision:   2.20  $
 --
 --------------------------------------------------------------------------------
 --
@@ -258,10 +258,7 @@ SET TERM ON
 prompt MDSYS.SDO_GEOM_METADATA_TABLE synonym
 SET TERM OFF
 SET DEFINE ON
-SET FEEDBACK ON
 Create Public Synonym sdo_geom_metadata_table for mdsys.sdo_geom_metadata_table;
-/
-SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                         ****************   ROLES  *******************
