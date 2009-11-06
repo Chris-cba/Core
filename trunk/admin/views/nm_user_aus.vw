@@ -1,13 +1,14 @@
 CREATE OR replace force view nm_user_aus AS
 SELECT
 --
---   SCCS Identifiers :-
+-----------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm_user_aus.vw	1.3 03/24/05
---       Module Name      : nm_user_aus.vw
---       Date into SCCS   : 05/03/24 16:27:21
---       Date fetched Out : 07/06/13 17:08:22
---       SCCS Version     : 1.3
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/views/nm_user_aus.vw-arc   2.2   Nov 06 2009 13:39:54   aedwards  $
+--       Module Name      : $Workfile:   nm_user_aus.vw  $
+--       Date into PVCS   : $Date:   Nov 06 2009 13:39:54  $
+--       Date fetched Out : $Modtime:   Nov 06 2009 13:39:24  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2001
