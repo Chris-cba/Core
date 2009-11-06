@@ -1,0 +1,110 @@
+:Base HIG.hlp>main
+:Title Exor V4.0
+1 Copyright=Copyright@HIG.hlp>main
+1 Company Overview=IDH_company_overview@HIG.hlp>main
+1 Getting Help
+2 Getting Help=IDH_getting_help@HIG.hlp
+2 Change the font size in a Help Topic=IDH_change_the_font_size_in_a_help_topic@HIG.hlp>proc1
+2 Print a Help Topic=IDH_print_a_help_topic@HIG.hlp>proc1
+2 Notational Conventions=IDH_notational_conventions@HIG.hlp
+2 Field Characteristics=IDH_field_characteristics@HIG.hlp
+1 Using Exor
+2 User Preferences - HIG1840=User_Preferences_HIG1840@HIG.hlp>main
+2 Menus
+3 Launchpad=Favourites@HIG.hlp
+3 Fastpath=IDH_fastpath@HIG.hlp
+2 Change Password - HIG1833
+3 Module Details=IDH_change_password___hig1833@HIG.hlp>main
+2 Forms
+3 Using a highways form=IDH_using_a_highways_form@HIG.hlp
+3 Function Buttons=IDH_function_buttons@HIG.hlp
+3 Function Keys=IDH_function_keys@HIG.hlp
+3 Message and Status Lines=IDH_message_and_status_lines@HIG.hlp
+3 Alert Box=IDH_alert_box@HIG.hlp
+3 Using Multiple Forms=IDH_multiple_forms@HIG.hlp
+2 Querying back existing data
+3 Overview=IDH_querying_back_existing_data___overview@HIG.hlp
+3 Using Query=IDH_using_query@HIG.hlp
+3 Query methods=IDH_query_methods@HIG.hlp
+3 Count Query Hits=IDH_count_query_hits@HIG.hlp
+3 Reviewing Records=IDH_reviewing_records@HIG.hlp
+3 Wildcards=IDH_wildcards@HIG.hlp
+3 Query Where=IDH_query_where@HIG.hlp
+2 List of Values
+3 Overview=IDH_list_of_values___overview@HIG.hlp
+3 Using List of Values=IDH_using_list_of_values@HIG.hlp
+3 Restricting the content of a list=IDH_restricting_the_content_of_the_list@HIG.hlp
+2 Dates
+3 Dates=IDH_dates@HIG.hlp
+2 Reports
+3 Running Reports=IDH_running_reports@HIG.hlp
+3 Report Previewer=IDH_report_previewer@HIG.hlp
+1 Security Metadata
+2 Admin Unit Security Concepts
+3 Concepts=IDH_admin_unit_security@HIG.hlp>main
+2 Admin Units - HIG1860
+3 Details=IDH_admin_units___hig1860@HIG.hlp>main
+2 Users and Roles - an Overview
+3 Users and Roles - an Overview=IDH_users_and_roles___an_overview@HIG.hlp
+3 Users - HIG1832
+4 Details=IDH_users___hig1832@HIG.hlp>main
+3 Roles - HIG1836
+4 Details=IDH_roles___hig1836@HIG.hlp>main
+2 Modules - HIG1880
+3 Modules - HIG1880=Modules_-_HIG1880@HIG.hlp
+2 Products - HIG1890
+3 Details=Products_-_HIG1890@HIG.hlp
+1 Reference Metadata
+2 Domains - HIG9120
+3 Details=IDH_domains___hig9120@HIG.hlp>main
+2 Product Options - HIG9130
+3 Product Options=IDH_hig9130___product_options@HIG.hlp>main
+3 Product Option List - HIG9135=IDH_product_option_list___hig9135@HIG.hlp
+2 User Options - HIG1838
+3 Details=IDH_user_options___hig1838@HIG.hlp>main
+2 User Option Administration - HIG1837
+3 Details=IDH_user_option_administration___hig1837@HIG.hlp>main
+2 Highways V3 Errors - HIG9185
+3 Details=IDH_v3_errors___hig9185@HIG.hlp>main
+2 Units and Conversions - HIG1820
+3 Details=IDH_units_and_conversions___hig1820@HIG.hlp>main
+1 GRI Data (Generic Reporting Interface)
+2 GRI Introduction=IDH_generic_reporting_interface_modules@HIG.hlp>main
+2 GRI Modules - GRI0220
+3 Details=IDH_gri_modules___gri0220@HIG.hlp>main
+2 GRI Parameters - GRI0230
+3 Details=IDH_gri_parameters___gri0230@HIG.hlp>main
+2 GRI Module Parameters - GRI0240
+3 Details=IDH_gri_module_parameters___gri0240@HIG.hlp>main
+2 GRI Parameter Dependencies - GRI0250
+3 Details=IDH_gri_parameter_dependencies___gri0250@HIG.hlp>main
+2 Report Styles - HIG1850
+3 Details=IDH_report_styles___hig1850@HIG.hlp>main
+2 Discoverer API Definition - HIG1950
+3 Details=IDH_discoverer_api_definition___hig9150@HIG.hlp>main
+2 Exor Listeners
+3 What are the Exor listeners?=IDH_what_are_the_exor_listeners@HIG.hlp>main
+1 GIS Data
+2 Create a Spatial Layer from the Asset Metamodel Form=Create_Layer_from_Asset_Metamodel_NM0410_Module@HIG.hlp>main
+2 Projects - GIS0005
+2 GIS Themes - GIS0010
+3 GIS Themes - Topics=GIS_Themes_Topics@HIG.hlp>proc1
+3 Details=IDH_themes___gis0010@HIG.hlp>main
+1 CSV Data Loaders
+2 Introduction and Process Flow=IDH_csv_data_loaders@HIG.hlp>main
+2 CSV Loader Destination Table - HIG2010
+3 Module Details=IDH_csv_loader_destination_table___hig2010@HIG.hlp>main
+2 CSV Loader File Definition Table - HIG2020
+3 Module Details=IDH_csv_loader_file_definitions_table@HIG.hlp>main
+2 Load / Process Data
+3 Module Details=IDH_load_process_data___higweb2030@HIG.hlp>main
+3 Batch Housekeeping=IDH_batch_housekeeping@HIG.hlp
+1 Creating a User Configurable Menu
+1 Resource Files
+2 Generation and Use=IDH_resource_file_generation_and_use@HIG.hlp>main
+2 Using the Resource Files=IDH_using_the_resource_files@HIG.hlp>main
+2 Registry Shortcuts and Batch File=IDH_registry_shortcuts_and_batch_file@HIG.hlp>main
+1 MapCapture Inventory Loader Configuration
+2 Configuration Details=Setting_Up_Map_Capture_Inventory_Loader@HIG.hlp
+1 NM3 email Setup and Configuration
+2 Configuration Details=NM3_Mail_Installation_and_Configuration@HIG.hlp

@@ -1,0 +1,77 @@
+:Base DOC.hlp>main
+:Title Exor V4.0
+1 Copyright=IDH_copyright
+1 enquiry manager
+2 Introductory Information
+3 Overview=IDH_public_enquiry_manager___overview
+3 Prerequisites - public enquiry manager=IDH_prerequisites___public_enquiry_manager
+3 Understanding Enquiry Status Codes=Understanding_Enquiry_Status_Codes>main
+3 Product Options=IDH_product_options___public_enquiry_manager
+2 Enquiries - DOC0150
+3 Module Details=Enquiries_DOC0150>main
+3 Querying Existing Enquiries=Querying_Existing_Enquiries>main
+3 Viewing an Enquiry within Locator=Viewing_an_Enquiry_within_Locator>main
+3 Query an Enquiry using a Locator Search=Query_an_Enquiry_using_a_Locator_Search>main
+3 Creating a New Enquiry=Creating_a_New_Enquiry>main
+3 Locating an Enquiry=Locating_an_Enquiry>main
+3 Raising an Enquiry against an Asset=Raising_an_Enquiry_against_an_Asset>main
+3 Create a New Asset from Enquiries - DOC0150=Create_a_New_Asset_from_Enquiries_-_DOC0150>main
+3 Enquiry History=Enquiry_History>main
+3 Enquiry Summary=Enquiry_Summary>main
+3 Enquiry Actions=Enquiry_Actions>main
+3 Street Furniture and Motor Vehicle Damage=Street_Furniture_and_Motor_Vehicle_Damage>main
+3 Damage Costs=Damage_Costs>main
+3 Associated Data=Associated_Data>main
+3 Current Defects=Current_Defects>main
+3 Raise Defects=Raise_Defects>main
+3 Raising a Notice In the Street Works Register=Raising_a_Notice_In_the_Street_Works_Register>main
+2 Raising a Notice In the Street Works Register
+3 Details=Raising_a_Notice_In_the_Street_Works_Register>main
+2 Enquiry Priorities - DOC0132
+3 Enquiry Priorities=IDH_enquiry_priorities__doc0132
+2 Document Types/Classes - DOC0110
+3 Details=IDH_document_types___overview
+2 Enquiry Standard Actions - DOC0155
+3 Details=IDH_enquiry_standard_actions__doc0155
+2 Enquiry Standard Costs - DOC0156
+3 Enquiry Standard Costs=IDH_enquiry_standard_costs__doc0156
+2 Contacts - HIG1815
+3 Overview=IDH_contacts___hig1815
+3 Retrieving Contact Details=IDH_contacts___retrieving_contact_details
+3 Person Window=IDH_contacts__hig1815___person_window
+3 Organisations Window=IDH_contacts__hig1815___organisations
+2 Enquiry Redirection - DOC0157
+3 Enquiry Redirection and Prioritisation=IDH_enquiry_redirection_and_prioritisation>main
+2 Enquiry/Defect Priorities - MAI1325
+3 Enquiry/Defect Priorities=IDH_enquiry_defect_priorities___mai1325
+2 Enquiry Treatment Types - MAI1320
+3 Enquiry/Treatment Types=IDH_enquiry_treatment_types___mai1320
+2 Enquiry Reports
+3 Enquiry List - DOC0166=IDH_n1_enquiry_list___doc0166
+3 Enquiry Details - DOC0160=IDH_n1_enquiry_details___doc0160
+3 Acknowledgements - DOC0162=IDH_n1_acknowledgements___doc0162
+3 Summary by Status - DOC0164=IDH_summary_by_status___doc0164
+3 Summary by Type - DOC0165=IDH_summary_by_type___doc0165
+3 Batch Enquiry Printing - DOC0205=IDH_batch_enquiry_printing___doc0205
+3 Outstanding Enquiry Actions - DOC0167=IDH_outstanding_enquiry_actions___doc0167
+1 document manager
+2 Introductory Information
+3 Overview=IDH_document__manager___overview
+3 Prerequisites - document manager=IDH_prerequisites___document_manager
+2 Media Types - DOC0118
+3 Details=IDH_media_types___overview
+2 Document Types/ Classes/Types - DOC0110
+3 Details=IDH_document_types___overview
+2 Document Gateways - DOC1030
+3 Details=IDH_document_gateways___overview
+2 Keywords - DOC0116
+2 Documents - DOC0100
+3 Details=IDH_documents___overview
+2 Circulation By Person - DOC0114
+3 Details=IDH_circulation_by_person___overview
+2 Circulation by Document - DOC0115
+3 Details=IDH_circulation_by_document___overview
+2 Document Manger Interface
+3 Overview=IDH_document_manager_interface___overview
+3 Document Associations - DOC0120
+4 Details=IDH_document_associations___overview
