@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.31   Nov 04 2009 16:41:38   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32   Nov 10 2009 15:59:50   cstrettle  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Nov 04 2009 16:41:38  $
---       Date fetched Out : $Modtime:   Nov 04 2009 16:40:28  $
---       PVCS Version     : $Revision:   2.31  $
+--       Date into PVCS   : $Date:   Nov 10 2009 15:59:50  $
+--       Date fetched Out : $Modtime:   Nov 10 2009 15:58:06  $
+--       PVCS Version     : $Revision:   2.32  $
 --
 --
 --   Author : Priidu Tanava
@@ -93,7 +93,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.31  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -1833,11 +1833,19 @@ No query types defined.
           l_inv_alias := 'i'||k;
           l_attrib := pt_attr(i).ita_attrib_name;
         end if;
-        
-        s := s||cr||'  ,case t.nm_obj_type'
+        -- CWS test 0108614 03/11/2009
+        -- Change made to prevent the year 1949 appearing as 2049 in the Merge Query Module.
+        IF pt_attr(i).ita_format = 'DATE' 
+        THEN 
+          s := s||cr||'  ,case t.nm_obj_type'
+          ||cr||'    when '''||pt_attr(i).inv_type
+          ||''' then to_char('||l_inv_alias||'.'||l_attrib||', '''|| nm3user.get_user_date_mask ||''') end NSV_ATTRIB'||j;
+        ELSE
+          s := s||cr||'  ,case t.nm_obj_type'
           ||cr||'    when '''||pt_attr(i).inv_type
           ||''' then '||l_inv_alias||'.'||l_attrib||' end NSV_ATTRIB'||j;
-          
+        END IF;   
+        --  
         i := pt_attr.next(i);
       end loop;
       return s;
