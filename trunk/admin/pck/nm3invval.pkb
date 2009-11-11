@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -----------------------------------------------------------------------------
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3invval.pkb	1.30 10/02/06"';
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -498,6 +498,17 @@ BEGIN
    IF   does_relation_exist(pi_rec_nii.inv_type,c_at_relation)
    AND  has_parent (l_rec_parent.iit_ne_id,pi_rec_nii.inv_type,nm3get.get_iit(pi_rec_nii.ne_id).iit_x_sect)
    AND  nm3get.get_nit(nm3get.get_iit(l_rec_parent.iit_ne_id).iit_inv_type).nit_exclusive = 'Y'
+
+   -- AE
+   -- Task 0108660 / ECDM Log 722948
+   -- Allow more than one Child asset to be located with a mandatory AT relationship
+   -- if the Parent is exclusive, but the Child asset type is not.
+   --
+   AND  nm3get.get_nit(pi_rec_nii.inv_type).nit_exclusive = 'Y'
+   --
+   -- AE Changes Complete.
+   --
+
    THEN
        hig.raise_ner (pi_appl => nm3type.c_net
                      ,pi_id   => 106
