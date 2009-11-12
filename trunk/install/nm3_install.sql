@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.20   Nov 05 2009 11:11:52   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.21   Nov 12 2009 15:59:44   malexander  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Nov 05 2009 11:11:52  $
---       Date fetched Out : $Modtime:   Nov 05 2009 11:11:16  $
---       PVCS Version     : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Nov 12 2009 15:59:44  $
+--       Date fetched Out : $Modtime:   Nov 12 2009 15:59:02  $
+--       PVCS Version     : $Revision:   2.21  $
 --
 --------------------------------------------------------------------------------
 --
@@ -173,6 +173,21 @@ from dual
 /
 SET FEEDBACK ON
 start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                        **************** APPLICATION CONTEXTS ****************
+--   
+SET TERM ON
+Prompt Application Contexts...
+--SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'admin'||
+        '&terminator'||'ctx'||'&terminator'||'nm3ctx.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start &&run_file
 SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
