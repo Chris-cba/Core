@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.6   Oct 30 2009 17:16:14   drawat  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.7   Nov 12 2009 09:26:56   aedwards  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Oct 30 2009 17:16:14  $
---       Date fetched Out : $Modtime:   Oct 30 2009 15:58:12  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Nov 12 2009 09:26:56  $
+--       Date fetched Out : $Modtime:   Nov 12 2009 09:25:36  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -944,12 +944,12 @@ BEGIN
      l_flip_cardinality_of_2  := 'Y';
      g_ne_id_to_flip := p_ne_id_2;
      l_starting_ne_id := p_ne_id_2; -- used by merge members to determine how to determine the new overall measures	 	 
-     
- END IF;
 
+ END IF;
+--
    g_ne_1_datum_length := nm3net.get_datum_element_length(p_ne_id_1);
    g_ne_2_datum_length := nm3net.get_datum_element_length(p_ne_id_2);
-   
+--
    g_starting_ne_id := l_starting_ne_id;
 --
    merge_elements (p_ne_id_1               => p_ne_id_1
@@ -1406,7 +1406,7 @@ PROCEDURE merge_members (p_ne_id_1        nm_elements.ne_id%TYPE
    AND NOT (    nm_type = 'G' 
             AND nm_ne_id_of = c_ne_id_of_2 
             AND nm3net.is_gty_partial(nm_obj_type) = 'N'
-		   )  -- KA/GJ 694396 filter out non-partial group memberships of the second original datum which we are effectively ignoring. 
+           )  -- KA/GJ 694396 filter out non-partial group memberships of the second original datum which we are effectively ignoring. 
    GROUP BY nm_ne_id_in;
 --
    l_tab_affected      nm3type.tab_number;
@@ -1511,8 +1511,8 @@ PROCEDURE merge_members_by_in (p_ne_id_of_1       nm_elements.ne_id%TYPE
                l_cardinality                 := cs_rec.nm_cardinality;
             END IF;
             --
-		  
-		    IF l_is_group
+
+         IF l_is_group
              THEN
                l_gty_is_partial := nm3net.gty_is_partial (cs_rec.nm_obj_type);
             ELSIF l_is_inv
@@ -1532,7 +1532,7 @@ PROCEDURE merge_members_by_in (p_ne_id_of_1       nm_elements.ne_id%TYPE
          l_rec_nm.nm_start_date           := p_effective_date;
          l_rec_nm.nm_cardinality          := l_cardinality;
 
-		     IF l_is_group
+         IF l_is_group
            AND NOT l_gty_is_partial
          THEN
            IF cs_rec.nm_ne_id_of = p_ne_id_of_2
@@ -1551,7 +1551,7 @@ PROCEDURE merge_members_by_in (p_ne_id_of_1       nm_elements.ne_id%TYPE
          ELSE
            l_rec_nm.nm_begin_mp             := l_rec_nm.nm_begin_mp + p_len_to_add;
            l_rec_nm.nm_end_mp               := l_rec_nm.nm_end_mp   + p_len_to_add;
-		     END IF;	
+         END IF;	
          --
          IF NOT l_ignore_member
          THEN
@@ -1597,13 +1597,18 @@ BEGIN
    duplicate_members_local (p_ne_id_of_1, p_datum_length_1);
    duplicate_members_local (p_ne_id_of_2, p_datum_length_2);
 --
-   IF p_starting_ne_id = p_ne_id_of_1 THEN 
+   IF p_starting_ne_id = p_ne_id_of_1 
+   THEN
+   --
      populate_data_local (p_ne_id_of_1, p_datum_length_1, 0);
      populate_data_local (p_ne_id_of_2, p_datum_length_2, p_datum_length_1);
+   --
    ELSE
+   --
      populate_data_local (p_ne_id_of_1, p_datum_length_1, p_datum_length_2);
      populate_data_local (p_ne_id_of_2, p_datum_length_2, 0);
-   END IF;	    	 
+   --
+   END IF;
 --
    IF l_tab_rec_nm.EXISTS(1)
     THEN
@@ -1613,15 +1618,43 @@ BEGIN
       l_tab_rec_nm_final(1) := l_tab_rec_nm(1);
       FOR i IN 2..l_tab_rec_nm.COUNT
        LOOP
+       --
+--         nm_debug.debug('### l_tab_rec_nm(i-1).nm_begin_mp = '||l_tab_rec_nm(i-1).nm_begin_mp);
+--         nm_debug.debug('### l_tab_rec_nm(i-1).nm_end_mp   = '||l_tab_rec_nm(i-1).nm_end_mp);
+--         nm_debug.debug('### l_tab_rec_nm(i-1).nm_cardinality   = '||l_tab_rec_nm(i-1).nm_cardinality);
+--         nm_debug.debug('### l_tab_rec_nm(i).nm_begin_mp = '||l_tab_rec_nm(i).nm_begin_mp);
+--         nm_debug.debug('### l_tab_rec_nm(i).nm_end_mp   = '||l_tab_rec_nm(i).nm_end_mp);
+--         nm_debug.debug('### l_tab_rec_nm(i).nm_cardinality   = '||l_tab_rec_nm(i).nm_cardinality);
+       --
          IF l_tab_rec_nm(i).nm_begin_mp = l_tab_rec_nm(i-1).nm_end_mp
           THEN
-            -- Tweak this record to extend the nm_end_mp
+          -- Tweak this record to extend the nm_end_mp
+          --
             l_tab_rec_nm_final(l_tab_rec_nm_final.COUNT).nm_end_mp  := l_tab_rec_nm(i).nm_end_mp;
+          --
             IF l_tab_rec_nm_final(l_tab_rec_nm_final.COUNT).nm_cardinality = -1
              THEN
                l_tab_rec_nm_final(l_tab_rec_nm_final.COUNT).nm_slk  := l_tab_rec_nm(i).nm_slk;
                l_tab_rec_nm_final(l_tab_rec_nm_final.COUNT).nm_true := l_tab_rec_nm(i).nm_true;
             END IF;
+         --
+         -- Task 0108613
+         -- Deal merging of partial members with differing cardinalities
+         --
+         ELSIF l_tab_rec_nm(i).nm_end_mp = l_tab_rec_nm(i-1).nm_begin_mp
+         THEN
+         --
+           l_tab_rec_nm_final(l_tab_rec_nm_final.COUNT).nm_begin_mp  := l_tab_rec_nm(i).nm_begin_mp;
+           l_tab_rec_nm_final(l_tab_rec_nm_final.COUNT).nm_end_mp    := l_tab_rec_nm(i-1).nm_end_mp;
+         --
+           IF l_tab_rec_nm_final(l_tab_rec_nm_final.COUNT).nm_cardinality = 1
+           THEN
+              l_tab_rec_nm_final(l_tab_rec_nm_final.COUNT).nm_slk       := l_tab_rec_nm(i).nm_slk;
+              l_tab_rec_nm_final(l_tab_rec_nm_final.COUNT).nm_true      := l_tab_rec_nm(i).nm_true;
+           END IF;
+         --
+         -- Task 0108613 Complete
+         --
          ELSE
             -- there's a gap, so add a new one
             l_tab_rec_nm_final(l_tab_rec_nm_final.COUNT+1)          := l_tab_rec_nm(i);
