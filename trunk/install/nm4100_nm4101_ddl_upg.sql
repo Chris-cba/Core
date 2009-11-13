@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4100_nm4101_ddl_upg.sql-arc   3.0   Nov 12 2009 16:40:30   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4100_nm4101_ddl_upg.sql-arc   3.1   Nov 13 2009 11:41:40   malexander  $
 --       Module Name      : $Workfile:   nm4100_nm4101_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Nov 12 2009 16:40:30  $
---       Date fetched Out : $Modtime:   Nov 12 2009 16:36:42  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Nov 13 2009 11:41:40  $
+--       Date fetched Out : $Modtime:   Nov 13 2009 11:38:00  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -56,6 +56,21 @@ EXCEPTION
 END;
 /
 
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Create MDSYS.SDO_GEOM_METADATA_TABLE synonym
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Create MDSYS.SDO_GEOM_METADATA_TABLE synonym
+-- 
+------------------------------------------------------------------
+Create Or Replace Public Synonym sdo_geom_metadata_table for mdsys.sdo_geom_metadata_table;
 ------------------------------------------------------------------
 
 
