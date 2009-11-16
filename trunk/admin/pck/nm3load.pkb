@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3load AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3load.pkb	1.26 03/08/05"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3load';
@@ -397,7 +397,7 @@ BEGIN
    append ('   PROCEDURE commit_and_lock IS');
    append ('   BEGIN');
    append ('      COMMIT;');
-   append ('      nm3lock_gen.lock_nlb ('||g_package_name||'.g_batch_no);');
+   append ('      nm3lock_gen.lock_nlb ('||g_package_name||'.g_batch_no,'''||g_filename||''');');
    append ('   END commit_and_lock;');
    append ('--');
    append ('   PROCEDURE bulk_insert_arrays IS');
@@ -914,7 +914,7 @@ BEGIN
    append ('   PROCEDURE commit_and_lock IS');
    append ('   BEGIN');
    append ('      COMMIT;');
-   append ('      nm3lock_gen.lock_nlb ('||g_package_name||'.g_batch_no);');
+   append ('      nm3lock_gen.lock_nlb ('||g_package_name||'.g_batch_no,'''||l_rec_nlb.nlb_filename||''');');
    append ('   END commit_and_lock;');
    append ('--');
    append ('BEGIN');
