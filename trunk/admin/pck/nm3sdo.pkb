@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.28   Oct 22 2009 13:53:50   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.29   Nov 17 2009 17:06:12   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Oct 22 2009 13:53:50  $
---       Date fetched Out : $Modtime:   Oct 22 2009 13:52:48  $
---       PVCS Version     : $Revision:   2.28  $
+--       Date into PVCS   : $Date:   Nov 17 2009 17:06:12  $
+--       Date fetched Out : $Modtime:   Nov 17 2009 16:50:38  $
+--       PVCS Version     : $Revision:   2.29  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.28  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.29  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -5412,7 +5412,7 @@ BEGIN
 
   IF l_gtype = 1 THEN
     IF p_geom.sdo_elem_info IS NOT NULL THEN
-  
+
   -- Task 0108546
   -- No longer used
   --      l_geom := strip_user_parts( p_geom );
@@ -8010,7 +8010,7 @@ BEGIN
 --    nm_debug.debug('Row sample = '||to_char(geocur%rowcount));
       EXIT WHEN geocur%rowcount > p_row;
     END IF;
-  
+
     -- Task 0108546
     -- No longer used
     --l_geom := strip_user_parts( l_geom );
@@ -8978,7 +8978,7 @@ BEGIN
        cur_string := cur_string||' from '||l_nth.nth_table_name||' t, '||l_nth.nth_feature_table||' f'
              ||' where sdo_within_distance ( f.'||l_nth.nth_feature_shape_column||', :p_geometry, '
              ||''''||'distance = '||TO_CHAR(p_buffer)||''''||') = '||''''||'TRUE'||''''
-             ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_fk_column;
+             ||' and t.'||l_nth.nth_pk_column||' = f.'||l_nth.nth_feature_pk_column;
 
      END IF;
 
@@ -10124,7 +10124,7 @@ BEGIN
               ' where a.ntd_pk_id  = '||p_nth.nth_feature_pk_column||' order by  a.ntd_distance';
 
   else
-                
+
 --    curstr := 'select /*+cardinality( a '||to_char( p_ntl.ntl_theme_list.last)||') */ '||
 --              ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  '||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr )   '||
 --              ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||' f,'||p_nth.nth_table_name||' t'||
@@ -10140,7 +10140,7 @@ BEGIN
               ' where a.ntd_pk_id  = f.'||p_nth.nth_feature_pk_column||
               ' and   f.'||NVL(p_nth.nth_feature_fk_column,p_nth.nth_feature_pk_column)||' =  t.'||p_nth.nth_pk_column||
               ' order by  a.ntd_distance';
-              
+
   end if;
 
 --  nm_debug.debug_on;
