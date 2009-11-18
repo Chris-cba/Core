@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3homo_Gis AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_gis.pkb-arc   2.2   Jan 27 2008 09:02:34   jwadsworth  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_gis.pkb-arc   2.3   Nov 18 2009 11:34:38   aedwards  $
 -- Module Name : $Workfile:   nm3homo_gis.pkb  $
--- Date into PVCS : $Date:   Jan 27 2008 09:02:34  $
--- Date fetched Out : $Modtime:   Jan 27 2008 09:01:56  $
--- PVCS Version : $Revision:   2.2  $
+-- Date into PVCS : $Date:   Nov 18 2009 11:34:38  $
+-- Date fetched Out : $Modtime:   Nov 18 2009 11:33:42  $
+-- PVCS Version : $Revision:   2.3  $
 -- Based on SCCS version : 
 --   Author : Jonathan Mills
 --
@@ -194,6 +194,12 @@ IS
   b_ft_asset BOOLEAN := FALSE;
   b_located  BOOLEAN := FALSE;
 --
+-- AE Task 
+-- Round the asset attributes
+  TYPE tab_ita IS TABLE OF nm_inv_type_attribs%ROWTYPE INDEX BY BINARY_INTEGER;
+  l_tab_ita    tab_ita; 
+--/ AE Task
+--
   CURSOR get_asset_type ( cp_theme_id IN nm_themes_all.nth_theme_id%TYPE)
   IS
     SELECT DISTINCT(nith_nit_id)
@@ -314,13 +320,73 @@ BEGIN
 --
 -- Get inv type record
   l_rec_nit := Nm3get.get_nit ( pi_nit_inv_type => l_inv_type );
+
+-- AE Task 0108730
+-- Round the vertices on the shape
+
+  l_geom   := pi_shape;
+
+  DECLARE
+    l_x_dp  nm_inv_type_attribs.ita_dec_places%TYPE;
+    l_y_dp  nm_inv_type_attribs.ita_dec_places%TYPE;
+  BEGIN
+  --
+    IF l_rec_nit.nit_use_xy = 'Y'
+    THEN
+    --
+      SELECT * BULK COLLECT INTO l_tab_ita
+        FROM nm_inv_type_attribs
+       WHERE ita_inv_type = l_rec_nit.nit_inv_type;
+    --
+      IF l_tab_ita.COUNT > 0
+      THEN
+      --
+        FOR i IN 1..l_tab_ita.COUNT
+        LOOP
+        --
+          IF l_tab_ita(i).ita_attrib_name = 'IIT_X'
+          AND l_tab_ita(i).ita_dec_places IS NOT NULL
+          THEN
+            l_x_dp := l_tab_ita(i).ita_dec_places;
+          END IF;
+        --
+          IF l_tab_ita(i).ita_attrib_name = 'IIT_Y'
+          AND l_tab_ita(i).ita_dec_places IS NOT NULL
+          THEN
+            l_y_dp := l_tab_ita(i).ita_dec_places;
+          END IF;
+        --
+        END LOOP;
+      --
+      END IF;
+    --
+    END IF;
+--  --
+--    nm_debug.debug_on;
+--    nm_debug.debug('Setting X and Y to - '||ROUND (l_geom.sdo_point.x,l_x_dp)||' : '||ROUND (l_geom.sdo_point.y,l_y_dp));
+  --
+  -- set the srid
+    l_geom := Nm3sdo.get_2d_pt(l_geom);
+  --
+    IF l_x_dp IS NOT NULL
+    THEN
+      l_geom.sdo_point.x := ROUND (l_geom.sdo_point.x,l_x_dp);
+    END IF;
+  --
+    IF l_y_dp IS NOT NULL
+    THEN
+      l_geom.sdo_point.y := ROUND (l_geom.sdo_point.y,l_y_dp);
+    END IF;
+  --
+  END;
+
+-- / AE Task 0108730 finished.
 --
   IF pi_theme_rec.nth_dependency = 'I'
   THEN
   --
     Nm_Debug.DEBUG('Independant layer');
     l_gtype  := get_theme_gtype ( pi_theme_rec.nth_theme_id );
-    l_geom   := pi_shape;
   -- nm_theme_gtypes
     IF l_gtype IS NOT NULL
     THEN
@@ -356,7 +422,6 @@ BEGIN
       IF l_rec_nit.nit_use_xy = 'Y'
       AND l_geom.sdo_gtype = 2001
       THEN
-        l_geom := Nm3sdo.get_2d_pt(pi_shape);
         Nm3sdo_Edit.update_xy
            ( pi_table_name => c_asset_table
            , pi_pk_column  => pi_theme_rec.nth_pk_column
@@ -386,7 +451,6 @@ BEGIN
       IF l_rec_nit.nit_use_xy = 'Y'
       AND l_geom.sdo_gtype = 2001
       THEN
-        l_geom := Nm3sdo.get_2d_pt(pi_shape);
         Nm3sdo_Edit.update_xy
           ( pi_table_name => c_asset_table
           , pi_pk_column  => pi_theme_rec.nth_pk_column
