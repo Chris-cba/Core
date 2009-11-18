@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3homo_Gis AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_gis.pkb-arc   2.3   Nov 18 2009 11:34:38   aedwards  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_gis.pkb-arc   2.4   Nov 18 2009 11:42:08   aedwards  $
 -- Module Name : $Workfile:   nm3homo_gis.pkb  $
--- Date into PVCS : $Date:   Nov 18 2009 11:34:38  $
--- Date fetched Out : $Modtime:   Nov 18 2009 11:33:42  $
--- PVCS Version : $Revision:   2.3  $
+-- Date into PVCS : $Date:   Nov 18 2009 11:42:08  $
+-- Date fetched Out : $Modtime:   Nov 18 2009 11:41:46  $
+-- PVCS Version : $Revision:   2.4  $
 -- Based on SCCS version : 
 --   Author : Jonathan Mills
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3homo_Gis AS
 --
 --all global package variables here
 --
-   g_body_sccsid      CONSTANT   VARCHAR2(2000) := '@(#)nm3homo_gis.pkb	1.24 08/03/06';
+   g_body_sccsid      CONSTANT   VARCHAR2(2000) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name     CONSTANT   VARCHAR2(30)   := 'nm3homo_gis';
