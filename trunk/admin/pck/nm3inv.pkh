@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkh-arc   2.1   Aug 31 2007 15:58:42   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkh-arc   2.2   Nov 19 2009 10:21:20   aedwards  $
 --       Module Name      : $Workfile:   nm3inv.pkh  $
---       Date into SCCS   : $Date:   Aug 31 2007 15:58:42  $
---       Date fetched Out : $Modtime:   Aug 31 2007 14:38:38  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Nov 19 2009 10:21:20  $
+--       Date fetched Out : $Modtime:   Nov 19 2009 10:21:00  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on 
 --
 --   nm3inv package header
@@ -1152,6 +1152,25 @@ FUNCTION bypass_inv_items_all_trgs RETURN BOOLEAN;
 -- MJA add 31-Aug-07
 -- Sets global g_bypass_inv_items_all_trgs true or false.
 PROCEDURE bypass_inv_items_all_trgs ( pi_mode IN BOOLEAN );
+--</PROC>
+--
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="get_ita_case">
+-- Return the case of an attribute from ita_case
+  FUNCTION get_ita_case ( pi_asset_type   IN  nm_inv_type_attribs.ita_inv_type%TYPE
+                        , pi_attrib_name  IN  nm_inv_type_attribs.ita_attrib_name%TYPE ) 
+    RETURN nm_inv_type_attribs.ita_case%TYPE;
+--</PROC>
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="format_with_ita_case">
+-- Return the varchar2 value after upper/lowering it depending on ita_case
+  FUNCTION format_with_ita_case ( pi_asset_type   IN  nm_inv_type_attribs.ita_inv_type%TYPE
+                                , pi_attrib_name  IN  nm_inv_type_attribs.ita_attrib_name%TYPE
+                                , pi_value        IN  VARCHAR2 ) 
+    RETURN VARCHAR2;
 --</PROC>
 --
 ----------------------------------------------------------------------------------------------
