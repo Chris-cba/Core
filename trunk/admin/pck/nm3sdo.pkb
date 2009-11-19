@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.29   Nov 17 2009 17:06:12   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.30   Nov 19 2009 17:06:48   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Nov 17 2009 17:06:12  $
---       Date fetched Out : $Modtime:   Nov 17 2009 16:50:38  $
---       PVCS Version     : $Revision:   2.29  $
+--       Date into PVCS   : $Date:   Nov 19 2009 17:06:48  $
+--       Date fetched Out : $Modtime:   Nov 19 2009 17:05:36  $
+--       PVCS Version     : $Revision:   2.30  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.29  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.30  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -695,7 +695,7 @@ END;
 --
 
   FUNCTION get_x_from_pt_geometry ( p_geometry IN mdsys.sdo_geometry ) RETURN NUMBER IS
-  l_geom mdsys.sdo_geometry;
+--  l_geom mdsys.sdo_geometry;
   retval NUMBER;
   BEGIN
   -- Task 0108546
@@ -705,10 +705,10 @@ END;
   --  nm_debug.debug_on;
   --  nm_debug.debug('elem 1 = '||to_char( l_geom.sdo_elem_info(1)));
 
-    IF l_geom.sdo_elem_info IS NULL THEN
-      retval := l_geom.sdo_point.x;
+    IF p_geometry.sdo_elem_info IS NULL THEN
+      retval := p_geometry.sdo_point.x;
     ELSE
-      retval := l_geom.sdo_ordinates(1);
+      retval := p_geometry.sdo_ordinates(1);
     END IF;
     RETURN retval;
   END;
@@ -718,16 +718,16 @@ END;
 --
 
   FUNCTION get_y_from_pt_geometry ( p_geometry IN mdsys.sdo_geometry ) RETURN NUMBER IS
-  l_geom mdsys.sdo_geometry;
+--  l_geom mdsys.sdo_geometry;
   retval NUMBER;
   BEGIN
     -- Task 0108546
     -- No longer used
     --l_geom := strip_user_parts( p_geometry) ;
-    IF l_geom.sdo_elem_info IS NULL THEN
-      retval := l_geom.sdo_point.y;
+    IF p_geometry.sdo_elem_info IS NULL THEN
+      retval := p_geometry.sdo_point.y;
     ELSE
-      retval := l_geom.sdo_ordinates(2);
+      retval := p_geometry.sdo_ordinates(2);
     END IF;
     RETURN retval;
   END;
@@ -4236,7 +4236,7 @@ END;
 --
 
 FUNCTION get_2d_pt( p_geom mdsys.sdo_geometry ) RETURN mdsys.sdo_geometry IS
-l_geom mdsys.sdo_geometry;
+--l_geom mdsys.sdo_geometry;
   -- Task 0108546
   -- No longer used
   --:= strip_user_parts( p_geom );
@@ -4245,20 +4245,20 @@ BEGIN
 
   IF ltype = 1 THEN  -- a point - test how data is stored
     IF p_geom.sdo_point IS NULL THEN
-      RETURN mdsys.sdo_geometry( 2001, l_geom.sdo_srid,
-                    mdsys.sdo_point_type( l_geom.sdo_ordinates(1),  l_geom.sdo_ordinates(2), NULL ), NULL, NULL);
+      RETURN mdsys.sdo_geometry( 2001, p_geom.sdo_srid,
+                    mdsys.sdo_point_type( p_geom.sdo_ordinates(1),  p_geom.sdo_ordinates(2), NULL ), NULL, NULL);
     ELSE
-      RETURN mdsys.sdo_geometry( 2001, l_geom.sdo_srid,
-                    mdsys.sdo_point_type( l_geom.sdo_point.x,  l_geom.sdo_point.y, NULL ), NULL, NULL);
+      RETURN mdsys.sdo_geometry( 2001, p_geom.sdo_srid,
+                    mdsys.sdo_point_type( p_geom.sdo_point.x,  p_geom.sdo_point.y, NULL ), NULL, NULL);
     END IF;
 
   ELSIF ltype = 2 THEN -- line - always use ordinate array
 
-    RETURN get_2d_pt(Nm3sdo.get_midpoint( l_geom ));
+    RETURN get_2d_pt(Nm3sdo.get_midpoint( p_geom ));
 
   ELSIF ltype = 3 THEN -- polygon - always use ordinate array, exception when the sdo_point is used. (mapinfo often stores the centroid)
 
-    RETURN get_2d_pt(sdo_geom.sdo_centroid( l_geom, .001 ));
+    RETURN get_2d_pt(sdo_geom.sdo_centroid( p_geom, .001 ));
 
   ELSE
 
@@ -5386,7 +5386,7 @@ END;
 -- this is used primarily in Oracle map viewer
 
 FUNCTION get_centre_and_size( p_geom IN mdsys.sdo_geometry ) RETURN mdsys.sdo_geometry IS
-l_geom mdsys.sdo_geometry;
+--l_geom mdsys.sdo_geometry;
 l_mbr  mdsys.sdo_geometry;
 l_x    NUMBER;
 l_y    NUMBER;
@@ -5418,7 +5418,7 @@ BEGIN
   --      l_geom := strip_user_parts( p_geom );
 
 
-      RETURN mdsys.sdo_geometry( 3001, l_geom.sdo_srid, mdsys.sdo_point_type( l_geom.sdo_ordinates(1), l_geom.sdo_ordinates(2), def_pt_zoom),
+      RETURN mdsys.sdo_geometry( 3001, p_geom.sdo_srid, mdsys.sdo_point_type( p_geom.sdo_ordinates(1), p_geom.sdo_ordinates(2), def_pt_zoom),
          NULL, NULL);
     ELSE
       l_point := p_geom.sdo_point;
