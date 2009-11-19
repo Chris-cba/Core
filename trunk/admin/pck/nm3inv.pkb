@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.13   Nov 19 2009 10:14:48   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.14   Nov 19 2009 10:19:52   aedwards  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Nov 19 2009 10:14:48  $
---       Date fetched Out : $Modtime:   Nov 19 2009 10:13:10  $
---       SCCS Version     : $Revision:   2.13  $
+--       Date into SCCS   : $Date:   Nov 19 2009 10:19:52  $
+--       Date fetched Out : $Modtime:   Nov 19 2009 10:18:22  $
+--       SCCS Version     : $Revision:   2.14  $
 --       Based on --
 --
 --   nm3inv package body
@@ -2091,6 +2091,17 @@ BEGIN
             append (' IF LENGTH('||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||') > '||cs_rec.ita_fld_length||' THEN');
             append ('  l_fail_msg := '||Nm3flx.string('cannot be more than '||cs_rec.ita_fld_length||' chars in length')||'; RAISE l_fail;');
             append (' END IF;');
+            
+            -- Task 0108242
+            -- AE Perform Case validation
+            
+            append (' ');
+            append (' g_rec_iit.'||cs_rec.ita_attrib_name||' := '
+                                 ||'nm3inv.format_with_ita_case ( pi_asset_type   => '||nm3flx.string(cs_rec.ita_inv_type)||
+                                                              ' , pi_attrib_name  => '||nm3flx.string(cs_rec.ita_attrib_name)||
+                                                              ' , pi_value        => '||'g_rec_iit.'||cs_rec.ita_attrib_name||');');
+            append (' ');
+
          ELSIF cs_rec.ita_format = Nm3type.c_date
           AND  INSTR(cs_rec.ita_attrib_name,cs_rec.ita_format,1,1) = 0
           THEN
@@ -4033,6 +4044,49 @@ Begin
   g_bypass_inv_items_all_trgs := pi_mode;
   --
 End bypass_inv_items_all_trgs;
+--
+----------------------------------------------------------------------------------
+--
+-- Return the case of an attribute from ita_case
+  FUNCTION get_ita_case ( pi_asset_type   IN  nm_inv_type_attribs.ita_inv_type%TYPE
+                        , pi_attrib_name  IN  nm_inv_type_attribs.ita_attrib_name%TYPE ) 
+    RETURN nm_inv_type_attribs.ita_case%TYPE
+  IS
+    CURSOR get_case
+             ( cp_asset_type   IN  nm_inv_type_attribs.ita_inv_type%TYPE
+             , cp_attrib_name  IN  nm_inv_type_attribs.ita_attrib_name%TYPE )
+    IS
+      SELECT DECODE (ita_case,'NONE',NULL,ita_case) FROM nm_inv_type_attribs
+       WHERE ita_inv_type = cp_asset_type
+         AND ita_attrib_name = cp_attrib_name;
+  --
+    retval  nm_inv_type_attribs.ita_case%TYPE;
+  BEGIN
+  --
+    OPEN  get_case ( pi_asset_type, pi_attrib_name );
+    FETCH get_case INTO retval;
+    CLOSE get_case;
+  --
+    RETURN retval;
+  --
+  END get_ita_case;
+--
+----------------------------------------------------------------------------------
+--
+-- Return the varchar2 value after upper/lowering it depending on ita_case
+  FUNCTION format_with_ita_case ( pi_asset_type   IN  nm_inv_type_attribs.ita_inv_type%TYPE
+                                , pi_attrib_name  IN  nm_inv_type_attribs.ita_attrib_name%TYPE
+                                , pi_value        IN  VARCHAR2 ) 
+    RETURN VARCHAR2
+  IS
+    retval nm3type.max_varchar2;
+  BEGIN
+    EXECUTE IMMEDIATE 'SELECT '||get_ita_case (pi_asset_type, pi_attrib_name)
+                         ||'( '||nm3flx.string(pi_value)||' )'||
+                        ' FROM DUAL'
+    INTO retval;
+    RETURN retval;
+  END format_with_ita_case;
 --
 ----------------------------------------------------------------------------------
 --
