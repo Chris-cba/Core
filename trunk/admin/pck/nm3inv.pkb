@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.12   Aug 10 2009 11:10:44   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.13   Nov 19 2009 10:14:48   aedwards  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Aug 10 2009 11:10:44  $
---       Date fetched Out : $Modtime:   Aug 10 2009 11:09:56  $
---       SCCS Version     : $Revision:   2.12  $
+--       Date into SCCS   : $Date:   Nov 19 2009 10:14:48  $
+--       Date fetched Out : $Modtime:   Nov 19 2009 10:13:10  $
+--       SCCS Version     : $Revision:   2.13  $
 --       Based on --
 --
 --   nm3inv package body
@@ -1981,6 +1981,21 @@ BEGIN
          -- Log 702388:Linesh:11-Mar-09:Start
          IF cs_rec.ita_format = Nm3type.c_number
          THEN 
+          -- AE
+          -- Task 0108730 / 0108765
+          -- Round the value before continuing
+            append  (' ');
+          --
+            IF cs_rec.ita_dec_places IS NOT NULL
+            THEN
+              append  ('   '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name
+                            ||' := ROUND('||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||','||cs_rec.ita_dec_places||');');
+            END IF;
+          --
+            append  (' ');
+          -- AE
+          -- Task 0108730 / 0108765
+          -- Finished
              append (' l_num_length := '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||' ;') ;
              --IF cs_rec.ita_dec_places IS NOT NULL
              --THEN
