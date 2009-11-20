@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.22.1.2   Oct 20 2009 22:19:16   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.22.1.3   Nov 20 2009 11:21:46   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Oct 20 2009 22:19:16  $
---       Date fetched Out : $Modtime:   Oct 20 2009 22:18:38  $
---       PVCS Version     : $Revision:   2.22.1.2  $
+--       Date into PVCS   : $Date:   Nov 20 2009 11:21:46  $
+--       Date fetched Out : $Modtime:   Nov 20 2009 11:20:16  $
+--       PVCS Version     : $Revision:   2.22.1.3  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.22.1.2  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.22.1.3  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -680,13 +680,12 @@ END;
 --
 
   FUNCTION get_x_from_pt_geometry ( p_geometry IN mdsys.sdo_geometry ) RETURN NUMBER IS
-  l_geom mdsys.sdo_geometry;
   retval NUMBER;
   BEGIN
-    IF l_geom.sdo_elem_info IS NULL THEN
-      retval := l_geom.sdo_point.x;
+    IF p_geometry.sdo_elem_info IS NULL THEN
+      retval := p_geometry.sdo_point.x;
     ELSE
-      retval := l_geom.sdo_ordinates(1);
+      retval := p_geometry.sdo_ordinates(1);
     END IF;
     RETURN retval;
   END;
@@ -696,13 +695,12 @@ END;
 --
 
   FUNCTION get_y_from_pt_geometry ( p_geometry IN mdsys.sdo_geometry ) RETURN NUMBER IS
-  l_geom mdsys.sdo_geometry;
   retval NUMBER;
   BEGIN
-    IF l_geom.sdo_elem_info IS NULL THEN
-      retval := l_geom.sdo_point.y;
+    IF p_geometry.sdo_elem_info IS NULL THEN
+      retval := p_geometry.sdo_point.y;
     ELSE
-      retval := l_geom.sdo_ordinates(2);
+      retval := p_geometry.sdo_ordinates(2);
     END IF;
     RETURN retval;
   END;
@@ -5351,7 +5349,7 @@ END;
 -- this is used primarily in Oracle map viewer
 
 FUNCTION get_centre_and_size( p_geom IN mdsys.sdo_geometry ) RETURN mdsys.sdo_geometry IS
-l_geom mdsys.sdo_geometry;
+
 l_mbr  mdsys.sdo_geometry;
 l_x    NUMBER;
 l_y    NUMBER;
