@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY Nm3net AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkb-arc   2.4   Oct 23 2009 12:23:50   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkb-arc   2.5   Nov 25 2009 10:03:06   rcoupe  $
 --       Module Name      : $Workfile:   nm3net.pkb  $
---       Date into SCCS   : $Date:   Oct 23 2009 12:23:50  $
---       Date fetched Out : $Modtime:   Oct 23 2009 12:20:40  $
---       SCCS Version     : $Revision:   2.4  $
+--       Date into SCCS   : $Date:   Nov 25 2009 10:03:06  $
+--       Date fetched Out : $Modtime:   Nov 25 2009 09:56:44  $
+--       SCCS Version     : $Revision:   2.5  $
 --       Based on 
 --
 --
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3net AS
 --              (create_or_reuse_point_and_node() also creates nodes, this sets null no_purpose)
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(200) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(200) := '"$Revision:   2.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
   g_package_name CONSTANT  VARCHAR2(30) := 'nm3net';
 --
@@ -524,7 +524,7 @@ FUNCTION get_datum_nt(pi_gty IN nm_group_types.ngt_group_type%TYPE
                       CONNECT BY   PRIOR ngr_child_group_type = ngr_parent_group_type
                       START WITH   ngr_parent_group_type = p_gty
                       UNION
-                      SELECT   nng_nt_type
+                      SELECT   nng_group_type
                         FROM   nm_nt_groupings
                        WHERE   nng_group_type = p_gty )
      select unique nng_nt_type from children, nm_nt_groupings
@@ -541,7 +541,7 @@ BEGIN
   IF c_nng%NOTFOUND
   THEN
     CLOSE c_nng;
-      RAISE_APPLICATION_ERROR( -20030, 'Group type has no datum.');
+    RAISE_APPLICATION_ERROR( -20030, 'Group type has no datum.');
   ELSE
     CLOSE c_nng;
   END IF;
