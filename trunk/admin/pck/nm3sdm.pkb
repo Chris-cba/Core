@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.32   Oct 06 2009 16:59:26   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.33   Dec 02 2009 15:57:22   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Oct 06 2009 16:59:26  $
---       Date fetched Out : $Modtime:   Oct 06 2009 16:58:40  $
---       PVCS Version     : $Revision:   2.32  $
+--       Date into PVCS   : $Date:   Dec 02 2009 15:57:22  $
+--       Date fetched Out : $Modtime:   Dec 02 2009 08:55:38  $
+--       PVCS Version     : $Revision:   2.33  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.32  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.33  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -181,7 +181,7 @@ AS
 --
    PROCEDURE create_base_themes(
       p_theme_id    IN NUMBER,
-	  p_base        IN nm_theme_array );
+   p_base        IN nm_theme_array );
 --
    FUNCTION user_is_unrestricted RETURN BOOLEAN;
 --
@@ -200,7 +200,7 @@ AS
      SELECT f.ptr_value module, hmo_title
      FROM HIG_MODULES, TABLE ( c_pa.pa ) f
      WHERE f.ptr_value = hmo_module
-	 AND   NVL(c_excl, -999) != DECODE( c_excl, NULL, 0, f.ptr_id );
+  AND   NVL(c_excl, -999) != DECODE( c_excl, NULL, 0, f.ptr_id );
 
    BEGIN
 --    failure of 9i to perform insert in an efficient way using ptrs - needs simple loop
@@ -1202,7 +1202,7 @@ PROCEDURE make_nt_spatial_layer
 
       Nm3ins.ins_ntg (p_rec_ntg => l_rec_ntg);
 
-	  COMMIT;
+   COMMIT;
 
       IF Hig.get_sysopt ('REGSDELAY') = 'Y'
       THEN
@@ -1306,7 +1306,7 @@ PROCEDURE make_nt_spatial_layer
                         pi_sqlcode      => -20003,
                         pi_supplementary_info => TO_CHAR( p_nlt_id )
                        );
---	   raise_application_error (-20001, 'No themes for linear type '||to_char( p_nlt_id ));
+--    raise_application_error (-20001, 'No themes for linear type '||to_char( p_nlt_id ));
      ELSE
        RETURN retval;
      END IF;
@@ -1329,9 +1329,9 @@ PROCEDURE make_nt_spatial_layer
       END LOOP;
 
       insert into nm_base_themes
-	     ( nbth_theme_id, nbth_base_theme )
+      ( nbth_theme_id, nbth_base_theme )
       select p_theme_id, t.nthe_id
-	  from table ( p_base.nta_theme_array ) t;
+   from table ( p_base.nta_theme_array ) t;
 */
 
       FOR i IN 1..p_base.nta_theme_array.LAST LOOP
@@ -2272,7 +2272,136 @@ PROCEDURE make_nt_spatial_layer
       CLOSE c1;
       RETURN retval;
    END;
-
+--
+-----------------------------------------------------------------------------
+--
+-- Task 0108731
+-- 
+  FUNCTION register_ona_base_theme 
+    ( pi_asset_type IN nm_inv_types.nit_inv_type%TYPE
+    , pi_gtype      IN nm_theme_gtypes.ntg_gtype%TYPE
+    , pi_s_date_col IN user_tab_columns.column_name%TYPE DEFAULT NULL
+    , pi_e_date_col IN user_tab_columns.column_name%TYPE DEFAULT NULL)
+  RETURN nm_themes_all%ROWTYPE
+  IS
+    l_rec_nit    nm_inv_types%ROWTYPE;
+    l_rec_nth    nm_themes_all%ROWTYPE;
+    l_rec_nthr   nm_theme_roles%ROWTYPE;
+    l_rec_ntg    nm_theme_gtypes%ROWTYPE;
+  --
+    FUNCTION derive_shape_col
+             ( pi_table_name IN user_tab_cols.table_name%TYPE )
+    RETURN user_tab_cols.column_name%TYPE
+    IS
+      l_retval user_tab_cols.column_name%TYPE;
+    BEGIN
+     SELECT column_name INTO l_retval
+        FROM user_tab_cols
+       WHERE table_name = pi_table_name
+         AND data_type = 'SDO_GEOMETRY';
+      RETURN l_retval;
+    EXCEPTION
+     WHEN OTHERS
+     THEN RETURN 'UNKNOWN';
+    END derive_shape_col;
+  --
+  BEGIN
+  --
+   l_rec_nit := nm3get.get_nit (pi_nit_inv_type => pi_asset_type);
+  --
+    l_rec_nth.nth_theme_id   := nm3seq.next_nth_theme_id_seq;
+    l_rec_nth.nth_theme_name := UPPER(SUBSTR(l_rec_nit.nit_inv_type||'-'
+                                ||l_rec_nit.nit_descr, 1, 26)||'_TAB');
+  --
+    IF l_rec_nit.nit_category = 'F'
+     THEN
+     -- foreign table asset type
+      l_rec_nth.nth_table_name             := l_rec_nit.nit_table_name;
+      l_rec_nth.nth_pk_column              := l_rec_nit.nit_foreign_pk_column;
+      l_rec_nth.nth_label_column           := l_rec_nit.nit_foreign_pk_column;
+      l_rec_nth.nth_feature_table          := l_rec_nit.nit_table_name;
+      l_rec_nth.nth_feature_pk_column      := l_rec_nit.nit_foreign_pk_column;
+      l_rec_nth.nth_feature_shape_column   := derive_shape_col (l_rec_nit.nit_table_name);
+    ELSE
+     -- nm_inv_items_all asset type
+     l_rec_nth.nth_table_name             := l_rec_nit.nit_view_name;
+     l_rec_nth.nth_pk_column              := 'IIT_NE_ID';
+     l_rec_nth.nth_label_column           := 'IIT_NE_ID';
+     l_rec_nth.nth_feature_table          := nm3sdm.get_ona_spatial_table (l_rec_nit.nit_inv_type);
+     l_rec_nth.nth_feature_pk_column      := 'NE_ID';
+     l_rec_nth.nth_feature_shape_column   := 'GEOLOC';
+    END IF;
+  --
+    l_rec_nth.nth_dependency               := 'I';
+    l_rec_nth.nth_update_on_edit           := 'N';
+  --
+    IF l_rec_nit.nit_use_xy = 'Y'
+     THEN
+    l_rec_nth.nth_x_column               := 'IIT_X';
+    l_rec_nth.nth_y_column               := 'IIT_Y';
+    END IF;
+  --
+    l_rec_nth.nth_hpr_product              := 'NET';
+    l_rec_nth.nth_storage                  := 'S';
+    l_rec_nth.nth_location_updatable       := 'Y';
+    l_rec_nth.nth_tolerance                := 10;
+    l_rec_nth.nth_tol_units                := 1;
+    l_rec_nth.nth_snap_to_theme            := 'N';
+    l_rec_nth.nth_lref_mandatory           := 'N';
+    l_rec_nth.nth_theme_type               := 'SDO';
+  -- 
+    IF l_rec_nit.nit_table_name IS NULL
+      THEN
+      l_rec_nth.nth_use_history            := 'Y';
+      l_rec_nth.nth_start_date_column      := NVL(pi_s_date_col,'START_DATE');
+      l_rec_nth.nth_end_date_column        := NVL(pi_e_date_col,'END_DATE');
+    ELSE
+      IF (pi_s_date_col IS NOT NULL
+        AND pi_e_date_col IS NOT NULL)
+      THEN
+        l_rec_nth.nth_use_history            := 'Y';
+        l_rec_nth.nth_start_date_column      := pi_s_date_col;
+        l_rec_nth.nth_end_date_column        := pi_e_date_col;
+      ELSE
+        l_rec_nth.nth_use_history            := 'N';
+        l_rec_nth.nth_start_date_column      := NULL;
+        l_rec_nth.nth_end_date_column        := NULL;
+      END IF;
+    END IF;
+  -- Insert new theme
+    nm3ins.ins_nth (l_rec_nth);
+  -- Insert theme gtype
+    l_rec_ntg.ntg_theme_id                 := l_rec_nth.nth_theme_id;
+    l_rec_ntg.ntg_gtype                    := pi_gtype;
+    l_rec_ntg.ntg_seq_no                   := 1;
+    nm3ins.ins_ntg (l_rec_ntg);
+  --
+    RETURN l_rec_nth;
+  --
+  END register_ona_base_theme;
+--
+---------------------------------------------------------------------------------------------------
+--
+-- Task 0108731
+--
+  PROCEDURE make_ona_inv_spatial_layer (
+      pi_nit_inv_type   IN nm_inv_types.nit_inv_type%TYPE,
+      pi_nth_gtype      IN nm_theme_gtypes.ntg_gtype%TYPE    DEFAULT NULL,
+      pi_s_date_col     IN user_tab_columns.column_name%TYPE DEFAULT NULL,
+      pi_e_date_col     IN user_tab_columns.column_name%TYPE DEFAULT NULL)
+   IS
+   BEGIN
+   --
+     make_ona_inv_spatial_layer 
+        ( pi_nit_inv_type => pi_nit_inv_type
+        , pi_nth_theme_id => register_ona_base_theme
+                               ( pi_nit_inv_type
+                                ,pi_nth_gtype
+                                ,pi_s_date_col
+                                ,pi_e_date_col).nth_theme_id
+        , pi_nth_gtype    => pi_nth_gtype );
+   --
+   END make_ona_inv_spatial_layer;
 --
 ---------------------------------------------------------------------------------------------------
 --
@@ -2366,16 +2495,21 @@ PROCEDURE make_nt_spatial_layer
       PROCEDURE populate_xy_sdo_data
          ( pi_asset_type IN nm_inv_types.nit_inv_type%TYPE )
       IS
-         l_rec_iit nm_inv_items%ROWTYPE;
+--         l_rec_iit nm_inv_items%ROWTYPE;
+--      BEGIN
+--        FOR i IN (SELECT * FROM nm_inv_items
+--                  WHERE iit_inv_type = pi_asset_type)
+--        LOOP
+--          BEGIN
+--            Nm3sdo_Edit.process_inv_xy_update (i);
+--          EXCEPTION WHEN OTHERS THEN NULL;
+--          END;
+--        END LOOP;
       BEGIN
-        FOR i IN (SELECT * FROM nm_inv_items
-                  WHERE iit_inv_type = pi_asset_type)
-        LOOP
-          BEGIN
-            Nm3sdo_Edit.process_inv_xy_update (i);
-          EXCEPTION WHEN OTHERS THEN NULL;
-          END;
-        END LOOP;
+        -- Task 0108731
+        -- Populate the XY data using the Asset type rather than 
+        -- row by row
+        nm3sdo_edit.process_inv_xy_update(pi_inv_type=>pi_asset_type);
       END populate_xy_sdo_data;
       --
       PROCEDURE populate_nm_base_themes
@@ -2595,30 +2729,22 @@ PROCEDURE make_nt_spatial_layer
          l_theme_id :=
             register_ona_theme
                  (pi_nit                => l_nit,
-                  p_table_name          =>    'V_'
-                                           || l_rec_nth_base.nth_feature_table,
+                  p_table_name          => 'V_'||l_rec_nth_base.nth_feature_table,
                   p_spatial_column      => l_rec_nth_base.nth_feature_shape_column,
-                  p_fk_column           => l_rec_nth_base.nth_feature_pk_column
-                                                                               --            , p_name           => rtrim(l_rec_nth_base.nth_theme_name,'_TAB')||'_VW'
-            ,
+                  p_fk_column           => l_rec_nth_base.nth_feature_pk_column,
                   p_view_flag           => 'Y',
                   p_pk_column           => l_rec_nth_base.nth_feature_pk_column,
-                  p_base_table_nth      => l_rec_nth_base.nth_theme_id
-                 );
+                  p_base_table_nth      => l_rec_nth_base.nth_theme_id );
 
          IF NOT Nm3sdo.is_table_regd
-                         (p_feature_table      =>    'V_'
-                                                  || l_rec_nth_base.nth_feature_table,
-                          p_col                => l_rec_nth_base.nth_feature_shape_column
-                         )
+                  (p_feature_table      =>    'V_'|| l_rec_nth_base.nth_feature_table,
+                   p_col                => l_rec_nth_base.nth_feature_shape_column )
          THEN
             l_dummy :=
                Nm3sdo.create_sdo_layer
-                  (pi_table_name       =>    'V_'
-                                          || l_rec_nth_base.nth_feature_table,
+                  (pi_table_name       => 'V_'|| l_rec_nth_base.nth_feature_table,
                    pi_column_name      => l_rec_nth_base.nth_feature_shape_column,
-                   pi_gtype            => pi_nth_gtype
-                  );
+                   pi_gtype            => pi_nth_gtype );
          END IF;
 
          --
@@ -2631,8 +2757,7 @@ PROCEDURE make_nt_spatial_layer
                            );
             EXCEPTION
                WHEN OTHERS
-               THEN
-                  NULL;
+               THEN NULL;
             END;
          END IF;
       --
@@ -2688,8 +2813,7 @@ PROCEDURE make_nt_spatial_layer
                Nm3sdo.create_sdo_layer
                   (pi_table_name       => l_view,
                    pi_column_name      => l_rec_nth_base.nth_feature_shape_column,
-                   pi_gtype            => pi_nth_gtype
-                  );
+                   pi_gtype            => pi_nth_gtype );
          END IF;
 
          --
@@ -2722,6 +2846,9 @@ PROCEDURE make_nt_spatial_layer
 ---------------------------------------------------------------
       IF l_nit.nit_use_xy = 'Y'
       THEN
+        -- Task 0108731
+        -- Populate the XY data using the Asset type rather than 
+        -- row by row
         populate_xy_sdo_data ( pi_asset_type => l_nit.nit_inv_type );
       END IF;
 
@@ -2772,7 +2899,7 @@ PROCEDURE make_nt_spatial_layer
    (
       pi_nit_inv_type   IN   nm_inv_types.nit_inv_type%TYPE,
       pi_create_flag    IN   VARCHAR2 DEFAULT 'TRUE',
-	  p_job_id          IN   NUMBER DEFAULT NULL
+   p_job_id          IN   NUMBER DEFAULT NULL
    )
    IS
       l_nit                nm_inv_types%ROWTYPE;
@@ -2792,10 +2919,10 @@ PROCEDURE make_nt_spatial_layer
 
       l_theme_name         NM_THEMES_ALL.nth_theme_name%TYPE;
 
-	  l_diminfo            mdsys.sdo_dim_array;
-	  l_srid               NUMBER;
+   l_diminfo            mdsys.sdo_dim_array;
+   l_srid               NUMBER;
 
-	  l_usgm               user_sdo_geom_metadata%ROWTYPE;
+   l_usgm               user_sdo_geom_metadata%ROWTYPE;
 
    BEGIN
   -- AE check to make sure user is unrestricted
@@ -2818,11 +2945,11 @@ PROCEDURE make_nt_spatial_layer
 
       l_base_themes := Get_Inv_Base_Themes( pi_nit_inv_type );
 
-	  Nm3sdo.set_diminfo_and_srid( l_base_themes, l_diminfo, l_srid );
+   Nm3sdo.set_diminfo_and_srid( l_base_themes, l_diminfo, l_srid );
 
       IF l_nit.nit_pnt_or_cont = 'P' THEN
 
-	    l_diminfo := sdo_lrs.convert_to_std_dim_array(l_diminfo);
+     l_diminfo := sdo_lrs.convert_to_std_dim_array(l_diminfo);
 
       END IF;
 
@@ -2856,11 +2983,11 @@ PROCEDURE make_nt_spatial_layer
 -- Set the registration of metadata
 ---------------------------------------------------------------
       l_usgm.table_name  := l_tab;
-	  l_usgm.column_name := 'GEOLOC';
-	  l_usgm.diminfo     := l_diminfo;
-	  l_usgm.srid        := l_srid;
+   l_usgm.column_name := 'GEOLOC';
+   l_usgm.diminfo     := l_diminfo;
+   l_usgm.srid        := l_srid;
 
-	  Nm3sdo.ins_usgm ( l_usgm );
+   Nm3sdo.ins_usgm ( l_usgm );
 
 
 ---------------------------------------------------------------
@@ -2919,8 +3046,8 @@ PROCEDURE make_nt_spatial_layer
          Nm3sdo.create_inv_data (p_table_name      => l_tab,
                                  p_inv_type        => pi_nit_inv_type,
                                  p_seq_name        => l_inv_seq,
-								 p_pnt_or_cont     => l_nit.nit_pnt_or_cont,
-								 p_job_id          => p_job_id
+         p_pnt_or_cont     => l_nit.nit_pnt_or_cont,
+         p_job_id          => p_job_id
                                         );
 
       END IF;
@@ -4490,7 +4617,7 @@ end;
          SELECT nbth_base_theme
            FROM NM_THEMES_ALL, NM_INV_THEMES a, NM_BASE_THEMES
           WHERE a.nith_nth_theme_id = nth_theme_id
-		    AND nth_theme_id = nbth_theme_id
+      AND nth_theme_id = nbth_theme_id
             AND a.nith_nit_id = c_obj_type
             AND nth_feature_table = get_inv_spatial_table (c_obj_type);
 
@@ -5717,7 +5844,7 @@ end;
       IS
          SELECT nth_theme_id, nth_feature_table, nth_feature_pk_column,
                 nth_feature_fk_column, nth_feature_shape_column
-	     FROM NM_THEMES_ALL,
+      FROM NM_THEMES_ALL,
                 NM_NW_THEMES,
                 user_tables,
                 NM_LINEAR_TYPES,
@@ -6094,7 +6221,7 @@ end;
       p_nt_type              IN   NM_TYPES.nt_type%TYPE,
       p_gty_type             IN   nm_group_types.ngt_group_type%TYPE,
       linear_flag_override   IN   VARCHAR2   DEFAULT 'N',
-	  p_job_id               IN   NUMBER     DEFAULT NULL
+   p_job_id               IN   NUMBER     DEFAULT NULL
    )
    AS
       l_nlt    NM_LINEAR_TYPES.nlt_id%TYPE;
@@ -6131,7 +6258,7 @@ end;
    PROCEDURE create_non_linear_group_layer (
       p_nt_type    IN   NM_TYPES.nt_type%TYPE,
       p_gty_type   IN   nm_group_types.ngt_group_type%TYPE,
-	  p_job_id     IN   NUMBER DEFAULT NULL
+   p_job_id     IN   NUMBER DEFAULT NULL
    )
    AS
 -- l_gty    nm_group_types%rowtype := nm3get.get_gty( p_gty_type );
@@ -6140,10 +6267,10 @@ end;
       l_seq              VARCHAR2 (30);
 
       l_base_themes      NM_THEME_ARRAY;
-	  l_diminfo          MDSYS.SDO_DIM_ARRAY;
-	  l_srid             NUMBER;
+   l_diminfo          MDSYS.SDO_DIM_ARRAY;
+   l_srid             NUMBER;
 
-	  l_usgm             user_sdo_geom_metadata%ROWTYPE;
+   l_usgm             user_sdo_geom_metadata%ROWTYPE;
 
       lcur               Nm3type.ref_cursor;
       cur_string1        VARCHAR2 (2000);
@@ -6245,7 +6372,7 @@ end;
 
 --    Nm_Debug.DEBUG('base themes found, get diminfo ');
 
-  	  Nm3sdo.set_diminfo_and_srid( l_base_themes, l_diminfo, l_srid );
+     Nm3sdo.set_diminfo_and_srid( l_base_themes, l_diminfo, l_srid );
 
       l_diminfo := sdo_lrs.convert_to_std_dim_array(l_diminfo);
 
@@ -6789,8 +6916,8 @@ end;
          SELECT nith_nth_theme_id
            FROM NM_INV_THEMES, NM_THEMES_ALL
           WHERE nith_nit_id = c_nit
-		  AND   nth_theme_id = nith_nth_theme_id
-		  ORDER BY DECODE(nth_base_table_theme, NULL, 'B', 'A') ;
+    AND   nth_theme_id = nith_nth_theme_id
+    ORDER BY DECODE(nth_base_table_theme, NULL, 'B', 'A') ;
 
       l_tab_nth_id   Nm3type.tab_number;
       l_keep_table   VARCHAR2 (1);
@@ -6809,8 +6936,8 @@ end;
 
       CLOSE c1;
 
---	  Nm_Debug.debug_on;
-	        FOR i IN 1 .. l_tab_nth_id.COUNT
+--   Nm_Debug.debug_on;
+         FOR i IN 1 .. l_tab_nth_id.COUNT
       LOOP
 --Nm_Debug.DEBUG('drop '||TO_CHAR(l_tab_nth_id (i)));
          Nm3sdm.Drop_Layer (p_nth_id                  => l_tab_nth_id (i),
@@ -7607,7 +7734,7 @@ end;
       append ('--');
       append ('--   SCCS Identifiers :- ');
       append ('--');
-      append ('--       sccsid           : @(#)nm3sdm.pkb	1.25 06/10/05');
+      append ('--       sccsid           : @(#)nm3sdm.pkb 1.25 06/10/05');
       append ('--       Module Name      : nm3sdm.pkb');
       append ('--       Date into SCCS   : 05/06/10 09:15:36');
       append ('--       Date fetched Out : 05/06/21 09:36:13');
