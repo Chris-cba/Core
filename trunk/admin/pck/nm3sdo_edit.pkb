@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.4   Jul 15 2009 10:03:12   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.5   Dec 02 2009 15:57:20   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Jul 15 2009 10:03:12  $
---       Date fetched Out : $Modtime:   Jul 14 2009 14:21:10  $
---       SCCS Version     : $Revision:   2.4  $
+--       Date into SCCS   : $Date:   Dec 02 2009 15:57:20  $
+--       Date fetched Out : $Modtime:   Dec 02 2009 08:55:22  $
+--       SCCS Version     : $Revision:   2.5  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.4  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.5  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_lock';
 --
 -----------------------------------------------------------------------------
@@ -583,7 +583,7 @@ BEGIN
 
    lstr := lstr || 'update ' || l_nth.nth_feature_table || lf;
    lstr := lstr || '   set ' || l_nth.nth_feature_shape_column || ' = :pi_shape'|| lf;
-   lstr := lstr || '   where ' || l_nth.nth_feature_pk_column || ' = :pi_pk';
+   lstr := lstr || ' where ' || l_nth.nth_feature_pk_column    || ' = :pi_pk';
 
 --   Nm_Debug.debug_on;
    Nm_Debug.DEBUG (lstr);
@@ -856,6 +856,7 @@ BEGIN
            , pi_pk       => l_rec_iit.iit_ne_id
            , pi_fk       => NULL
            , pi_shape    => l_geom
+           , pi_start_dt => l_rec_iit.iit_start_date
            );
         -- theme checks
         END IF;
@@ -866,6 +867,283 @@ BEGIN
   --g_tab_inv loop
   END LOOP;
 --
+END process_inv_xy_update;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE process_inv_xy_update
+         ( pi_inv_type IN nm_inv_types.nit_inv_type%TYPE )
+IS
+--
+-- Task 0108731
+-- Process the entire asset type in bulk 
+-- for the intial creation and refreshing
+-- of the layer
+--
+  l_nth            nm_themes_all%ROWTYPE;
+  l_nit            nm_inv_types%ROWTYPE;
+  l_x_dp           nm_inv_type_attribs.ita_dec_places%TYPE;
+  l_y_dp           nm_inv_type_attribs.ita_dec_places%TYPE;
+  lstr             nm3type.max_varchar2;
+  lf               VARCHAR2(10) := chr(10);
+  l_spatial_index  user_indexes.index_name%TYPE;
+  l_srid           NUMBER;
+  b_defer          BOOLEAN := FALSE;
+  g_nte_job_id     NM_NW_TEMP_EXTENTS.nte_job_id%TYPE;
+--
+  CURSOR c1 IS
+    SELECT sdo_srid
+      FROM mdsys.sdo_geom_metadata_table
+         , nm_themes_all
+         , TABLE ( nm3sdo.get_nw_themes().nta_theme_array ) t
+     WHERE sdo_table_name = nth_feature_table
+       AND sdo_column_name = nth_feature_shape_column
+       AND sdo_owner = hig.get_application_owner
+       AND nth_theme_id = t.nthe_id;
+--
+  FUNCTION is_located ( pi_inv_type IN nm_inv_types.nit_inv_type%TYPE) RETURN BOOLEAN
+  IS
+    l_rec_nin nm_inv_nw%ROWTYPE;
+  BEGIN
+    SELECT * INTO l_rec_nin FROM nm_inv_nw
+    WHERE nin_nit_inv_code = pi_inv_type
+      AND ROWNUM = 1;
+    RETURN TRUE;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN RETURN FALSE;
+  END is_located;
+--
+BEGIN
+--
+-- Get the Base table Theme
+  SELECT nm_themes_all.* INTO l_nth
+    FROM nm_themes_all, nm_theme_gtypes, nm_inv_types, nm_inv_themes
+   WHERE nith_nth_theme_id        = nth_theme_id
+     AND nth_dependency           = 'I'
+     AND nth_base_table_theme     IS NULL
+     AND nth_location_updatable   = 'Y'
+     AND nth_theme_type           = nm3sdo.c_sdo
+     AND nth_x_column             IS NOT NULL
+     AND nth_y_column             IS NOT NULL
+     AND ntg_theme_id             = nth_theme_id
+     AND ntg_gtype                = 2001
+     AND nit_inv_type             = nith_nit_id
+     AND nit_use_xy               = 'Y'
+     AND nith_nit_id              = pi_inv_type;
+--
+-- Get the srid
+  OPEN c1;
+  FETCH c1 INTO l_srid;
+  CLOSE c1;
+--
+-- Get the DPs for the attributes
+  SELECT x.ita_dec_places, y.ita_dec_places INTO l_x_dp, l_y_dp
+    FROM nm_inv_type_attribs x, nm_inv_type_attribs y
+   WHERE x.ita_inv_type = pi_inv_type
+     AND y.ita_inv_type = pi_inv_type
+     AND x.ita_attrib_name = 'IIT_X'
+     AND y.ita_attrib_name = 'IIT_Y';
+--
+  BEGIN
+    SELECT index_name INTO l_spatial_index FROM all_indexes
+     WHERE owner = hig.get_application_owner
+       AND index_type = 'DOMAIN'
+       AND table_name = l_nth.nth_feature_table;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN l_spatial_index := NULL;
+  END;
+--
+-------------------------------------------------------------------------------
+--
+-- Drop the index to aim performance of the insert.
+-- It is quicker to drop / insert / recreate rather than insering with index in place.
+--
+-- Seems to be quicker than defer the index
+--
+-------------------------------------------------------------------------------
+--
+  IF l_spatial_index IS NOT NULL 
+  THEN
+    BEGIN
+      IF b_defer
+      THEN
+        EXECUTE IMMEDIATE 'ALTER INDEX ' || l_spatial_index || ' PARAMETERS (''index_status=deferred'')';
+      ELSE
+        EXECUTE IMMEDIATE 'DROP INDEX '||l_spatial_index;
+      END IF;
+    EXCEPTION
+    WHEN OTHERS THEN
+      NULL;-- IF THE INDEX IS ALREADY DEFERRED CARRY ON.
+    END;         
+  END IF;
+--
+  lstr := 'INSERT /*+ APPEND */ into ' || l_nth.nth_feature_table || lf;
+  lstr := lstr || '       ( ' || l_nth.nth_feature_pk_column || ',';
+--
+ -- Get the sequence name
+  IF l_nth.nth_sequence_name IS NOT NULL THEN
+     lstr := lstr || ' OBJECTID ,';
+  END IF;
+--
+ -- Does the table need dates?
+  IF l_nth.nth_use_history = 'Y'
+  AND l_nth.nth_start_date_column IS NOT NULL
+  AND l_nth.nth_end_date_column   IS NOT NULL
+  THEN
+     lstr := lstr ||' '||l_nth.nth_start_date_column||', ';
+     lstr := lstr ||' '||l_nth.nth_end_date_column||', ';
+  END IF;
+--
+  lstr := lstr || l_nth.nth_feature_shape_column || ')' || lf;
+  --lstr := lstr || '     values (:pk_id, ';
+  lstr := lstr || '     select iit_ne_id, ';
+--
+ -- Set the sequence name
+  IF l_nth.nth_sequence_name IS NOT NULL THEN
+     lstr := lstr ||' '||l_nth.nth_sequence_name||'.nextval, ';
+  END IF;
+--
+ -- Set the start/end date columns
+  IF l_nth.nth_use_history = 'Y'
+  AND l_nth.nth_start_date_column IS NOT NULL
+  AND l_nth.nth_end_date_column   IS NOT NULL
+  THEN
+     lstr := lstr ||'  iit_start_date, ';
+     lstr := lstr ||'  iit_end_date, ';
+  END IF;
+--
+  lstr := lstr || ' mdsys.sdo_geometry( 2001, :l_srid, mdsys.sdo_point_type( iit_x, iit_y, NULL), NULL, NULL)';
+  lstr := lstr ||'   FROM nm_inv_items_all i';
+  lstr := lstr ||'  WHERE iit_inv_type = '||nm3flx.string(pi_inv_type);
+  lstr := lstr ||'    AND NOT EXISTS ';
+  lstr := lstr ||'      (SELECT 1 FROM '||l_nth.nth_feature_table||' s ';
+  lstr := lstr ||'       WHERE i.iit_ne_id = s.'||l_nth.nth_feature_pk_column;
+  lstr := lstr ||'        AND i.iit_start_date = s.'||l_nth.nth_start_date_column||')';
+--
+--  nm_debug.debug_on;
+--  nm_debug.debug(lstr);
+--
+  EXECUTE IMMEDIATE lstr USING IN l_srid;
+--
+-------------------------------------------------------------------------------
+-- Create the index - this will fail if it already exists so suppress the errors 
+-- 
+-- Deferring is slower
+-------------------------------------------------------------------------------
+--
+  IF l_spatial_index IS NOT NULL
+  THEN
+    IF b_defer
+    THEN
+      EXECUTE IMMEDIATE 'ALTER INDEX ' || l_spatial_index || ' PARAMETERS (''index_status=synchronize'')';
+    ELSE
+      nm3sdo.create_spatial_idx(l_nth.nth_feature_table, l_nth.nth_feature_shape_column);
+    END IF;
+  END IF;
+--
+-------------------------------------------------------------------------------
+--                       Generate Members Locations
+-------------------------------------------------------------------------------
+--
+  IF is_located ( pi_inv_type => pi_inv_type)
+  THEN
+  --
+    DECLARE
+    --
+      TYPE rec_lrefs IS RECORD ( iit_ne_id nm_inv_items.iit_ne_id%TYPE
+                               , iit_start_date nm_inv_items.iit_start_date%TYPE
+                               , lref      nm_lref );
+      TYPE tab_lrefs IS TABLE OF rec_lrefs INDEX BY BINARY_INTEGER;
+    --
+      l_tab_lrefs    tab_lrefs;
+      limit_in       INTEGER := 1000;
+      count_lrefs    INTEGER := 0;
+      l_unit         nm_units.un_unit_id%TYPE;
+    --
+      l_theme_list   nm_theme_array := nm3array.init_nm_theme_array;
+    --
+      CURSOR get_lrefs (theme_id IN NUMBER)
+      IS
+        SELECT iit_ne_id, iit_start_date, nm3sdo.get_nearest_nw_to_xy(iit_x, iit_y)
+--        SELECT iit_ne_id
+--             , nm3sdo.get_nearest_lref
+--                   ( theme_id
+--                   , mdsys.sdo_geometry ( 2001
+--                                       , l_srid
+--                                       , mdsys.sdo_point_type( iit_x, iit_y, NULL)
+--                                       , NULL
+--                                       , NULL)
+--                                        )
+          FROM nm_inv_items_all a
+         WHERE iit_inv_type = pi_inv_type
+           AND iit_x IS NOT NULL
+           AND NOT EXISTS
+            (SELECT 1 FROM nm_members
+              WHERE iit_ne_id = nm_ne_id_in
+                AND nm_obj_type = pi_inv_type);
+    --
+    BEGIN
+    --
+      --nm_debug.debug_on;
+    --
+      OPEN get_lrefs (l_nth.nth_theme_id);
+    --
+      LOOP
+      --
+        FETCH get_lrefs BULK COLLECT INTO l_tab_lrefs LIMIT limit_in;
+      --
+        FOR i IN 1..l_tab_lrefs.COUNT
+        LOOP
+        --
+          BEGIN
+          --
+          -- This is all very slow and ineffecient - we need to re-write this in the future.
+          --
+            l_unit := NVL(nm3get.get_nt
+                             ( pi_nt_type         => nm3get.get_ne
+                                                       ( pi_ne_id            => l_tab_lrefs(i).lref.lr_ne_id
+                                                       , pi_raise_not_found  => FALSE ).ne_nt_type
+                             , pi_raise_not_found => FALSE).nt_length_unit,1);
+          --
+            l_tab_lrefs(i).lref.lr_offset := nm3unit.get_formatted_value(l_tab_lrefs(i).lref.lr_offset,l_unit);
+          --
+            nm3extent.create_temp_ne
+              ( l_tab_lrefs(i).lref.lr_ne_id
+              , nm3extent.c_route
+              , l_tab_lrefs(i).lref.lr_offset
+              , l_tab_lrefs(i).lref.lr_offset
+              , g_nte_job_id );
+          --
+            nm3homo.homo_update
+              ( p_temp_ne_id_in  => g_nte_job_id
+              , p_iit_ne_id      => l_tab_lrefs(i).iit_ne_id
+              -- Task 0108731
+              -- Use asset start date
+              , p_effective_date => l_tab_lrefs(i).iit_start_date);
+              --, p_effective_date => nm3user.get_effective_date);
+          --
+          EXCEPTION
+            WHEN OTHERS THEN nm_debug.debug('Locating '||SQLERRM);
+          END;
+        --
+        END LOOP;
+      --
+        EXIT WHEN l_tab_lrefs.COUNT = 0; 
+      --
+      END LOOP;
+    --
+      CLOSE get_lrefs;
+    --
+    END;
+  --
+  END IF;
+--
+-------------------------------------------------------------------------------
+--                 Generate Members Locations Finished
+-------------------------------------------------------------------------------
+--
+--EXCEPTION
+--  WHEN NO_DATA_FOUND THEN NULL;
 END process_inv_xy_update;
 --
 -----------------------------------------------------------------------------
@@ -881,18 +1159,17 @@ PROCEDURE update_xy
  )
 IS
    nl   CONSTANT VARCHAR2(1)  := CHR(10);
-
    lstr VARCHAR2(2000);
 BEGIN
-  lstr := 'BEGIN'
-||nl||'   UPDATE '||pi_table_name
-||nl||'    SET   '||pi_x_column ||' = '||pi_x_value
-||nl||'         ,'||pi_y_column ||' = '||pi_y_value
-||nl||'   WHERE  '||pi_pk_column||' = '||pi_pk_value||';'
-||nl||'END;';
+   lstr := 'BEGIN'
+     ||nl||'   UPDATE '||pi_table_name
+     ||nl||'    SET   '||pi_x_column ||' = '||pi_x_value
+     ||nl||'         ,'||pi_y_column ||' = '||pi_y_value
+     ||nl||'   WHERE  '||pi_pk_column||' = '||pi_pk_value||';'
+     ||nl||'END;';
 
-Nm_Debug.DEBUG( lstr );
-EXECUTE IMMEDIATE lstr;
+  Nm_Debug.DEBUG( lstr );
+  EXECUTE IMMEDIATE lstr;
 END update_xy;
 --
 -----------------------------------------------------------------------------
@@ -909,14 +1186,14 @@ IS
    nl   CONSTANT VARCHAR2(1)  := CHR(10);
 BEGIN
    EXECUTE IMMEDIATE
-      'BEGIN'
-||nl||'  UPDATE '||pi_table_name
-||nl||'     SET '||pi_rse_column||' = '||pi_lref_value.lr_ne_id
-||nl||'       , '||pi_st_chain||' = '
-                 ||Nm3unit.get_formatted_value( pi_lref_value.lr_offset
-                 , Nm3net.get_nt_units_from_ne(pi_lref_value.lr_ne_id))
-||nl||'   WHERE '||pi_pk_column||' = '||pi_pk_value||';'
-||nl||'END;';
+         'BEGIN'
+   ||nl||'  UPDATE '||pi_table_name
+   ||nl||'     SET '||pi_rse_column||' = '||pi_lref_value.lr_ne_id
+   ||nl||'       , '||pi_st_chain||' = '
+                    ||Nm3unit.get_formatted_value( pi_lref_value.lr_offset
+                    , Nm3net.get_nt_units_from_ne(pi_lref_value.lr_ne_id))
+   ||nl||'   WHERE '||pi_pk_column||' = '||pi_pk_value||';'
+   ||nl||'END;';
 END update_point_lref;
 --
 -----------------------------------------------------------------------------

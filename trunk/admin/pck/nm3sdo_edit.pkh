@@ -5,11 +5,11 @@ AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkh-arc   2.4   Jul 15 2009 10:03:12   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkh-arc   2.5   Dec 02 2009 15:57:20   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkh  $
---       Date into SCCS   : $Date:   Jul 15 2009 10:03:12  $
---       Date fetched Out : $Modtime:   Jul 14 2009 14:21:08  $
---       SCCS Version     : $Revision:   2.4  $
+--       Date into SCCS   : $Date:   Dec 02 2009 15:57:20  $
+--       Date fetched Out : $Modtime:   Dec 02 2009 08:55:26  $
+--       SCCS Version     : $Revision:   2.5  $
 --
 --  Author :  R Coupe
 --            A Edwards
@@ -22,7 +22,7 @@ AS
 --
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.4  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.5  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 -----------------------------------------------------------------------------
@@ -181,9 +181,16 @@ PROCEDURE add_shape
 -- Used to regenerate any shapes and do any snapping for Assets trapped
 -- in the global package array.
 PROCEDURE process_inv_xy_update
-         ( pi_rec_iit IN NM_INV_ITEMS_ALL%ROWTYPE);
+         ( pi_rec_iit IN NM_INV_ITEMS_ALL%ROWTYPE );
+--
+-- Performs the update for the global array in memory populated by the trigger
 --
 PROCEDURE process_inv_xy_update;
+--
+-- Performs the update for the whole asset type - can be used with Refresh too.
+--
+PROCEDURE process_inv_xy_update
+         ( pi_inv_type IN nm_inv_types.nit_inv_type%TYPE );
 --
 -----------------------------------------------------------------------------
 --
