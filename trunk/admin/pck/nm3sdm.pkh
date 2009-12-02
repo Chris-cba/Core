@@ -413,7 +413,7 @@ PROCEDURE split_element_shapes (
   PROCEDURE make_inv_spatial_layer
              ( pi_nit_inv_type  IN nm_inv_types.nit_inv_type%TYPE,
                pi_create_flag   IN VARCHAR2 DEFAULT 'TRUE',
-			   p_job_id         IN NUMBER   DEFAULT NULL
+               p_job_id         IN NUMBER   DEFAULT NULL
               );
 --</PROC>
 --
@@ -425,6 +425,16 @@ PROCEDURE split_element_shapes (
               , pi_nth_theme_id  IN NM_THEMES_ALL.nth_theme_id%TYPE DEFAULT NULL
               , pi_create_flag   IN VARCHAR2                        DEFAULT 'TRUE'
               , pi_nth_gtype     IN NM_THEME_GTYPES.ntg_gtype%TYPE  DEFAULT NULL );
+--</PROC>
+--
+---------------------------------------------------------------------------------------------------
+--
+--<PROC NAME="MAKE_ONA_INV_SPATIAL_LAYER">
+  PROCEDURE make_ona_inv_spatial_layer 
+              ( pi_nit_inv_type IN nm_inv_types.nit_inv_type%TYPE
+              , pi_nth_gtype    IN nm_theme_gtypes.ntg_gtype%TYPE    DEFAULT NULL
+              , pi_s_date_col   IN user_tab_columns.column_name%TYPE DEFAULT NULL
+              , pi_e_date_col   IN user_tab_columns.column_name%TYPE DEFAULT NULL );
 --</PROC>
 --
 -----------------------------------------------------------------------------
