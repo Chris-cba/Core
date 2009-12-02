@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.9   Aug 06 2009 13:15:10   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.10   Dec 02 2009 15:57:22   aedwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Aug 06 2009 13:15:10  $
---       Date fetched Out : $Modtime:   Aug 06 2009 13:09:56  $
---       Version          : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Dec 02 2009 15:57:22  $
+--       Date fetched Out : $Modtime:   Dec 02 2009 08:55:48  $
+--       Version          : $Revision:   2.10  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.9  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.10  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -2666,76 +2666,88 @@ AS
    PROCEDURE refresh_asset_layer( pi_inv_type IN nm_inv_types.nit_inv_type%TYPE
                                 , pi_job_id   IN NUMBER DEFAULT NULL)
    IS 
-   
    -- CURSOR FOR ASSET LAYERS
-    cursor cur_asset_layer ( p_inv_type nm_inv_types.nit_inv_type%type) is 
-     select NTH_FEATURE_TABLE, NTH_SEQUENCE_NAME, NIT_PNT_OR_CONT, nth_Feature_shape_column
-      from nm_themes_all, Nm_inv_themes , nm_inv_types
-      where nth_theme_id = nith_nth_theme_id
-        and nith_nit_id = nit_inv_type
-        and nit_inv_type =  p_inv_type
-        and nth_base_table_theme IS NULL
-        and nth_Dependency = 'D' ;
-     
-     
-     
-     l_sequence_name        nm_themes_all.nth_sequence_name%type;
-     l_feature_table        nm_themes_all.nth_feature_table%type;
-     l_pnt_or_cont          nm_inv_types.nit_pnt_or_cont%type;
-     l_Feature_shape_column NM_THEMES_ALL.NTH_FEATURE_SHAPE_COLUMN%type;     
-     l_spatial_ind_name VARCHAR2(100);
-          
-     l_ngt_nt_type      varchar2(20);
-     l_nlt_id           NM_LINEAR_TYPES.NLT_ID%type;    
-   
+     CURSOR cur_asset_layer ( p_inv_type nm_inv_types.nit_inv_type%TYPE) 
+     IS 
+       SELECT nth_feature_table, nth_sequence_name
+            , nit_pnt_or_cont, nth_feature_shape_column
+         FROM nm_themes_all, Nm_inv_themes , nm_inv_types
+        WHERE nth_theme_id         = nith_nth_theme_id
+          AND nith_nit_id          = nit_inv_type
+          AND nit_inv_type         =  p_inv_type
+          AND nth_base_table_theme IS NULL
+          AND nth_dependency       = 'D' ;
+   --
+     l_sequence_name          nm_themes_all.nth_sequence_name%TYPE;
+     l_feature_table          nm_themes_all.nth_feature_table%TYPE;
+     l_pnt_or_cont            nm_inv_types.nit_pnt_or_cont%TYPE;
+     l_Feature_shape_column   nm_themes_all.nth_feature_shape_column%TYPE;
+     l_spatial_ind_name       VARCHAR2(100);
+     l_ngt_nt_type            VARCHAR2(20);
+     l_nlt_id                 nm_linear_types.nlt_id%TYPE;
+   --
    BEGIN
     --
-       OPEN cur_asset_layer( pi_inv_type);
-       FETCH cur_asset_layer
-       INTO l_feature_table, l_sequence_name, l_pnt_or_cont, l_Feature_shape_column;
-       CLOSE cur_asset_layer;
-    --   
-       IF l_feature_table IS NOT NULL THEN
-          execute immediate 'truncate table ' || l_feature_table;
-       ELSE          
-          RAISE_APPLICATION_ERROR ( -20101
-                                  , 'Cannot refresh this layer - there is no asset base Theme available');
-          NULL;
+      IF nm3get.get_nit(pi_nit_inv_type => pi_inv_type ).nit_table_name IS NULL
+      THEN
+    --
+        IF nm3get.get_nit(pi_nit_inv_type => pi_inv_type ).nit_use_xy != 'Y'
+        THEN
+    --
+          OPEN cur_asset_layer( pi_inv_type);
+          FETCH cur_asset_layer
+          INTO l_feature_table, l_sequence_name, l_pnt_or_cont, l_feature_shape_column;
+          CLOSE cur_asset_layer;
+       --   
+          IF l_feature_table IS NOT NULL 
+          THEN
+             EXECUTE IMMEDIATE 'truncate table ' || l_feature_table;
+          ELSE          
+             RAISE_APPLICATION_ERROR ( -20101
+                                     , 'Cannot refresh this layer - there is no asset base Theme available');
+          END IF;
+       --      
+       --  Find the name of the spatial index 
+           l_spatial_ind_name := get_spatial_index ( pi_table_name  => l_feature_table
+                                                   , pi_column_name => l_Feature_shape_column); 
+       --    
+          IF l_spatial_ind_name IS NOT NULL 
+          THEN       
+            BEGIN
+              EXECUTE IMMEDIATE 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=deferred'')';
+            EXCEPTION
+            WHEN OTHERS THEN
+              NULL;-- IF THE INDEX IS ALREADY DEFERRED CARRY ON.
+            END;         
+          END IF;
+       --
+          nm3sdo.create_inv_data
+               ( p_table_name  => l_feature_table
+               , p_inv_type    => pi_inv_type 
+               , p_seq_name    => l_sequence_name
+               , p_pnt_or_cont => l_pnt_or_cont
+               , p_job_id      => pi_job_id
+               );                            
+      --
+         IF l_spatial_ind_name IS NOT NULL 
+         THEN
+           EXECUTE IMMEDIATE 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=synchronize'')';
+         END IF;
+     --
+       ELSE-- Use XY offnetwork asset layer
+         nm3sdo_edit.process_inv_xy_update(pi_inv_type=>pi_inv_type);
        END IF;
-    --      
-    --  Find the name of the spatial index 
-        l_spatial_ind_name := get_spatial_index ( pi_table_name  => l_feature_table
-                                                , pi_column_name => l_Feature_shape_column); 
-    --    
-       IF l_spatial_ind_name is not null THEN       
-         BEGIN
-           execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=deferred'')';
-         EXCEPTION
-         WHEN OTHERS THEN
-           NULL;-- IF THE INDEX IS ALREADY DEFERRED CARRY ON.
-         END;         
-       END IF;
-    --   
-       nm3sdo.create_inv_data
-            ( p_table_name  => l_feature_table
-            , p_inv_type    => pi_inv_type 
-            , p_seq_name    => l_sequence_name
-            , p_pnt_or_cont => l_pnt_or_cont
-            , p_job_id      => pi_job_id
-            );                            
-   -- 
-      IF l_spatial_ind_name is not null THEN       
-        execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=synchronize'')';
-      END IF;         
+     --
+     END IF;
    --
    EXCEPTION
      WHEN ex_no_spdix
      THEN
-      RAISE_APPLICATION_ERROR ( -20103
-                                , 'Cannot derive spatial index for ' || l_feature_table);
-     WHEN OTHERS 
-     THEN
-       RAISE;
+      raise_application_error ( -20103
+                              , 'Cannot derive spatial index for ' || l_feature_table);
+--     WHEN OTHERS 
+--     THEN
+--       RAISE;
    END;   
 --
 -----------------------------------------------------------------------------
