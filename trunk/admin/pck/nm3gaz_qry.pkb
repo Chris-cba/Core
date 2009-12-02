@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb	1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -897,9 +897,15 @@ BEGIN
          ELSE
              append_all  (p_index,null);
          END IF;
-         
-         append_all  (p_index,c_table_alias||'.'||LOWER(l_rec_ngqa.ngqa_attrib_name),FALSE);
-         
+        -- CWS 21/10/09 Task 0108242
+        l_attrib_datatype := get_attrib_datatype (p_rec_ngqt,l_rec_ngqa.ngqa_attrib_name);
+        --
+        IF g_ignore_case AND l_attrib_datatype LIKE '%CHAR%' THEN
+          append_all  (p_index,'UPPER(' || c_table_alias||'.'||l_rec_ngqa.ngqa_attrib_name || ')',FALSE);
+        ELSE 
+          append_all  (p_index,c_table_alias||'.'||LOWER(l_rec_ngqa.ngqa_attrib_name),FALSE);
+        END IF;
+        --
          IF l_rec_ngqa.ngqa_attrib_name IN ('IIT_NOTE','IIT_DESCR')
          THEN
              append_all  (p_index,l_close_for_upper,FALSE);
@@ -923,7 +929,7 @@ BEGIN
          END IF;
          l_start := l_open_bracket_for_in;
          l_values_found := FALSE;
-         l_attrib_datatype := get_attrib_datatype (p_rec_ngqt,l_rec_ngqa.ngqa_attrib_name);
+         --l_attrib_datatype := get_attrib_datatype (p_rec_ngqt,l_rec_ngqa.ngqa_attrib_name);
          FOR j IN 1..g_tab_rec_ngqv.COUNT
           LOOP
             l_rec_ngqv := g_tab_rec_ngqv(j);
@@ -936,8 +942,13 @@ BEGIN
                THEN
                    append_all  (p_index,l_upper||l_open_for_upper,FALSE);
                END IF;
-               append_all  (p_index,l_start||nm3pbi.fn_convert_attrib_value(l_rec_ngqv.ngqv_value,l_attrib_datatype),FALSE);
-               
+               -- CWS 21/10/09 Task 0108242
+               IF g_ignore_case AND l_attrib_datatype LIKE '%CHAR%' THEN
+                 append_all  (p_index,l_start|| 'UPPER('||nm3pbi.fn_convert_attrib_value(l_rec_ngqv.ngqv_value,l_attrib_datatype) || ')',FALSE);
+               ELSE
+                 append_all  (p_index,l_start||nm3pbi.fn_convert_attrib_value(l_rec_ngqv.ngqv_value,l_attrib_datatype),FALSE);
+               END IF;
+               --
                IF l_rec_ngqa.ngqa_attrib_name IN ('IIT_NOTE','IIT_DESCR')
                THEN
                    append_all  (p_index,l_close_for_upper,FALSE);
@@ -952,7 +963,9 @@ BEGIN
             append_all  (p_index,l_close_bracket_for_in,FALSE);
          END IF;
 --
-
+      NM_DEBUG.DEBUG_ON;
+      NM_DEBUG.DEBUG(g_tab_flexible_where(p_index));
+      NM_DEBUG.DEBUG_OFF;
       IF l_rec_ngqa.ngqa_attrib_name = 'IIT_PRIMARY_KEY'
          AND  NOT nm3inv.attrib_in_use(pi_inv_type => p_rec_ngqt.ngqt_item_type_type
                                        ,pi_attrib_name => 'IIT_PRIMARY_KEY')THEN
@@ -2115,6 +2128,7 @@ PROCEDURE get_ngqv_lov_meaning (pi_ngqt_item_type_type IN     nm_gaz_query_types
                                ) IS
 --
    l_lov_sql_string nm3type.max_varchar2;
+   dummy varchar2(2000);
 --
 BEGIN
 --
@@ -2162,9 +2176,14 @@ BEGIN
                                      ,po_meaning               => po_description
                                      ,pi_validate_domain_dates => FALSE
                                      );
+           IF po_meaning IS NULL THEN
+             po_meaning     := pi_value;
+           END IF;
+         --
          EXCEPTION
             WHEN others
              THEN
+             dummy:=dummy || ' error ';
                po_meaning     := pi_value;
                po_description := NULL;
          END;
@@ -3968,6 +3987,21 @@ BEGIN
   END IF;            
 
 END set_ngq_source_etc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE set_ignore_case(p_value  IN  BOOLEAN) IS
+BEGIN
+   g_ignore_case := p_value;
+END;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_ignore_case 
+RETURN BOOLEAN IS
+BEGIN
+   RETURN g_ignore_case;
+END;
 --
 -----------------------------------------------------------------------------
 --
