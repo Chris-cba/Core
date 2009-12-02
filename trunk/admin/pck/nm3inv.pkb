@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.14   Nov 19 2009 10:19:52   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.15   Dec 02 2009 16:58:24   cstrettle  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Nov 19 2009 10:19:52  $
---       Date fetched Out : $Modtime:   Nov 19 2009 10:18:22  $
---       SCCS Version     : $Revision:   2.14  $
+--       Date into SCCS   : $Date:   Dec 02 2009 16:58:24  $
+--       Date fetched Out : $Modtime:   Dec 02 2009 16:57:08  $
+--       SCCS Version     : $Revision:   2.15  $
 --       Based on --
 --
 --   nm3inv package body
@@ -4056,7 +4056,7 @@ End bypass_inv_items_all_trgs;
              ( cp_asset_type   IN  nm_inv_type_attribs.ita_inv_type%TYPE
              , cp_attrib_name  IN  nm_inv_type_attribs.ita_attrib_name%TYPE )
     IS
-      SELECT DECODE (ita_case,'NONE',NULL,ita_case) FROM nm_inv_type_attribs
+      SELECT DECODE (ita_case,'MIXED',NULL,ita_case) FROM nm_inv_type_attribs
        WHERE ita_inv_type = cp_asset_type
          AND ita_attrib_name = cp_attrib_name;
   --
