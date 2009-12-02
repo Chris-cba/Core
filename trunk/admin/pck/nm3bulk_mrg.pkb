@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32   Nov 10 2009 15:59:50   cstrettle  $
---       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Nov 10 2009 15:59:50  $
---       Date fetched Out : $Modtime:   Nov 10 2009 15:58:06  $
---       PVCS Version     : $Revision:   2.32  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.33   Dec 02 2009 15:01:20   cstrettle  $
+--       Module Name      : $Workfile:   nm3bulk_mrg_fix.pkb  $
+--       Date into PVCS   : $Date:   Dec 02 2009 15:01:20  $
+--       Date fetched Out : $Modtime:   Dec 02 2009 14:52:46  $
+--       PVCS Version     : $Revision:   2.33  $
 --
 --
 --   Author : Priidu Tanava
@@ -93,7 +93,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.33  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -334,16 +334,17 @@ No query types defined.
           if pt_attr(i).xsp is not null then
             l_sql_tmp := ' and i.iit_x_sect = '||qt||pt_attr(i).xsp||qt;
           end if;
-          
-          -- add other criteria
+                    -- add other criteria
           --  for this do a secondary loop thorough all attributes
           for j in 1 .. pt_attr.count loop
             if pt_attr(j).inv_type = pt_attr(i).inv_type then
               if pt_attr(j).where_sql is not null then
-                l_sql_tmp := l_sql_tmp
-                  ||' and i.'||pt_attr(j).where_sql;
+                  -- CWS 23/OCT/2009 
+                    l_sql_tmp := l_sql_tmp
+                    ||' and '||pt_attr(j).where_sql;
               end if;
             end if;
+          
           
           end loop;
           
@@ -958,8 +959,8 @@ No query types defined.
         ||')');
       raise;
   end;
-  
-  
+ 
+
   function get_where_sql(
      p_operator in nm_mrg_query_attribs.nqa_condition%type
     ,p_ita_format in nm_inv_type_attribs_all.ita_format%type
@@ -991,43 +992,71 @@ No query types defined.
       q2 := ''', '''||m_mrg_date_format||''')';
       
     end if;
-  
-  
-    case
-    when p_operator is null then
-      return null;
-      
-    when p_operator in ('IN','NOT IN') then
-      select q1||nqv_value||q2 value
-      bulk collect into t
-      from nm_mrg_query_values
-      where nqv_nmq_id = p_nmq_id
-        and nqv_nqt_seq_no = p_nqt_seq_no
-        and nqv_attrib_name = p_attrib_name
-      order by nqv_sequence;
-      for i in 1 .. t.count loop
-        l_sql := l_sql||l_comma||t(i);
-        l_comma := ', ';
-      end loop;
-      l_sql := p_attrib_name||' '||lower(p_operator)||' ('||l_sql||')';
-    
-    when p_operator in ('BETWEEN', 'NOT BETWEEN') then
-      l_sql := p_attrib_name||' '||lower(p_operator)||' '||q1||p_value1||q2||' and '||q1||p_value2||q2;
-    
-    when p_operator in ('IS NULL', 'IS NOT NULL') then
-      l_sql := p_attrib_name||' '||lower(p_operator);
-    
-    else
-      l_sql := p_attrib_name||' '||lower(p_operator)||' '||q1||p_value1||q2;
-    
-    end case;
+     -- CWS 23/OCT/2009 
+     if nm3gaz_qry.get_ignore_case and p_ita_format = 'VARCHAR2' then  
+        case
+        when p_operator is null then
+          return null;
+          
+        when p_operator in ('IN','NOT IN') then
+          select q1||nqv_value||q2 value
+          bulk collect into t
+          from nm_mrg_query_values
+          where nqv_nmq_id = p_nmq_id
+            and nqv_nqt_seq_no = p_nqt_seq_no
+            and nqv_attrib_name = p_attrib_name
+          order by nqv_sequence;
+          for i in 1 .. t.count loop
+            l_sql := l_sql||l_comma|| ' UPPER(' ||t(i) || ') ';
+            l_comma := ', ';
+          end loop;
+          l_sql := ' UPPER(i.'|| p_attrib_name||') '||lower(p_operator)||' ('||l_sql||')';
+        
+        when p_operator in ('BETWEEN', 'NOT BETWEEN') then
+          l_sql := ' UPPER(i.'||p_attrib_name||') '||lower(p_operator)||' UPPER( '||q1||p_value1||q2||') and UPPER('||q1||p_value2||q2||') ';
+        
+        when p_operator in ('IS NULL', 'IS NOT NULL') then
+          l_sql := ' i.'||p_attrib_name||' '||lower(p_operator);
+        
+        else
+          l_sql := ' UPPER(i.'||p_attrib_name||') '||lower(p_operator)||' UPPER( '||q1||p_value1||q2||') ';
+        end case;     
+     
+     else
+        case
+        when p_operator is null then
+          return null;
+          
+        when p_operator in ('IN','NOT IN') then
+          select q1||nqv_value||q2 value
+          bulk collect into t
+          from nm_mrg_query_values
+          where nqv_nmq_id = p_nmq_id
+            and nqv_nqt_seq_no = p_nqt_seq_no
+            and nqv_attrib_name = p_attrib_name
+          order by nqv_sequence;
+          for i in 1 .. t.count loop
+            l_sql := l_sql||l_comma||t(i);
+            l_comma := ', ';
+          end loop;
+          l_sql := ' i.'||p_attrib_name||' '||lower(p_operator)||' ('||l_sql||')';
+        
+        when p_operator in ('BETWEEN', 'NOT BETWEEN') then
+          l_sql := ' i.'||p_attrib_name||' '||lower(p_operator)||' '||q1||p_value1||q2||' and '||q1||p_value2||q2;
+        
+        when p_operator in ('IS NULL', 'IS NOT NULL') then
+          l_sql := ' i.'||p_attrib_name||' '||lower(p_operator);
+        
+        else
+          l_sql := ' i.'||p_attrib_name||' '||lower(p_operator)||' '||q1||p_value1||q2;
+        
+        end case;
+    end if;
     
     return l_sql;
     
   end;
-  
- 
-  
+   
   -- this loads the column mapping to translate a MRG.attribte_name into a IIT_column_name.
   --  Full mapping is given for FT columns.
   -- loaded once per whole processing
