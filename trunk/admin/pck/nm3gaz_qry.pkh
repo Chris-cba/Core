@@ -73,6 +73,7 @@ CREATE OR REPLACE PACKAGE nm3gaz_qry AS
    TYPE tab_rec_gaz_restriction IS TABLE OF rec_gaz_restriction INDEX BY BINARY_INTEGER;
 --
    g_use_date_based_views  BOOLEAN := TRUE;
+   g_ignore_case           BOOLEAN DEFAULT FALSE;
 --   
 --
 --</GLOBVAR>
@@ -876,6 +877,16 @@ PROCEDURE set_ngq_source_etc(pi_ne_id               IN  nm_elements_all.ne_id%TY
                             ,po_ngq_source_id       OUT nm_gaz_query.ngq_source_id%TYPE   
                             ,po_ngq_source          OUT nm_gaz_query.ngq_source%TYPE
                             ,po_ngq_query_all_items OUT nm_gaz_query.ngq_query_all_items%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="set_ignore_case">
+PROCEDURE set_ignore_case(p_value  IN  BOOLEAN);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="get_ignore_case">
+FUNCTION get_ignore_case RETURN BOOLEAN;
 --</PROC>
 --
 -----------------------------------------------------------------------------
