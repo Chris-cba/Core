@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.15   Dec 02 2009 16:58:24   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.16   Dec 03 2009 09:20:00   aedwards  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Dec 02 2009 16:58:24  $
---       Date fetched Out : $Modtime:   Dec 02 2009 16:57:08  $
---       SCCS Version     : $Revision:   2.15  $
+--       Date into SCCS   : $Date:   Dec 03 2009 09:20:00  $
+--       Date fetched Out : $Modtime:   Dec 03 2009 09:18:40  $
+--       SCCS Version     : $Revision:   2.16  $
 --       Based on --
 --
 --   nm3inv package body
@@ -2096,10 +2096,10 @@ BEGIN
             -- AE Perform Case validation
             
             append (' ');
-            append (' g_rec_iit.'||cs_rec.ita_attrib_name||' := '
+            append (' '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||' := '
                                  ||'nm3inv.format_with_ita_case ( pi_asset_type   => '||nm3flx.string(cs_rec.ita_inv_type)||
                                                               ' , pi_attrib_name  => '||nm3flx.string(cs_rec.ita_attrib_name)||
-                                                              ' , pi_value        => '||'g_rec_iit.'||cs_rec.ita_attrib_name||');');
+                                                              ' , pi_value        => '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||');');
             append (' ');
 
          ELSIF cs_rec.ita_format = Nm3type.c_date
