@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3net AS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkh-arc   2.2   Jun 04 2008 13:32:32   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkh-arc   2.3   Dec 08 2009 16:14:34   gjohnson  $
 --       Module Name      : $Workfile:   nm3net.pkh  $
---       Date into SCCS   : $Date:   Jun 04 2008 13:32:32  $
---       Date fetched Out : $Modtime:   Jun 03 2008 11:11:10  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Dec 08 2009 16:14:34  $
+--       Date fetched Out : $Modtime:   Dec 08 2009 16:13:36  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE nm3net AS
 
 -- 03.06.08 PT added pi_no_purpose parameter to create_node()
 
-  g_sccsid      CONSTANT  varchar2(80) := '"$Revision:   2.2  $"';
+  g_sccsid      CONSTANT  varchar2(80) := '"$Revision:   2.3  $"';
 --  g_sccsid is the SCCS_ID
 --
 
@@ -1527,6 +1527,14 @@ PROCEDURE bypass_nm_elements_trgs ( pi_mode IN BOOLEAN );
 -- Sets global g_bypass_nm_points_trgs true or false.
 PROCEDURE bypass_nm_points_trgs ( pi_mode IN BOOLEAN );
 --</PROC>
+--
+----------------------------------------------------------------------------------
+--
+--<PROC NAME="get_id_and_unique_node_name">
+PROCEDURE get_id_and_unique_node_name(pi_no_node_type     IN      nm_nodes.no_node_type%TYPE
+                                     ,po_no_node_id       IN OUT  nm_nodes.no_node_id%TYPE
+                                     ,po_no_node_name     IN OUT  nm_nodes.no_node_name%TYPE);
+--</PROC>                                     
 --
 ----------------------------------------------------------------------------------
 --
