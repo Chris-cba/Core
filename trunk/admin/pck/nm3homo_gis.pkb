@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3homo_Gis AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_gis.pkb-arc   2.4   Nov 18 2009 11:42:08   aedwards  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_gis.pkb-arc   2.5   Dec 08 2009 10:44:58   aedwards  $
 -- Module Name : $Workfile:   nm3homo_gis.pkb  $
--- Date into PVCS : $Date:   Nov 18 2009 11:42:08  $
--- Date fetched Out : $Modtime:   Nov 18 2009 11:41:46  $
--- PVCS Version : $Revision:   2.4  $
+-- Date into PVCS : $Date:   Dec 08 2009 10:44:58  $
+-- Date fetched Out : $Modtime:   Dec 08 2009 10:44:02  $
+-- PVCS Version : $Revision:   2.5  $
 -- Based on SCCS version : 
 --   Author : Jonathan Mills
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3homo_Gis AS
 --
 --all global package variables here
 --
-   g_body_sccsid      CONSTANT   VARCHAR2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid      CONSTANT   VARCHAR2(2000) := '"$Revision:   2.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name     CONSTANT   VARCHAR2(30)   := 'nm3homo_gis';
@@ -332,6 +332,10 @@ BEGIN
   BEGIN
   --
     IF l_rec_nit.nit_use_xy = 'Y'
+    -- Task 0108875
+    -- Correction to 0108730
+    -- Make sure it's a point shape before doing any rounding
+    AND l_geom.sdo_gtype = 2001
     THEN
     --
       SELECT * BULK COLLECT INTO l_tab_ita
@@ -359,23 +363,23 @@ BEGIN
         END LOOP;
       --
       END IF;
-    --
-    END IF;
 --  --
 --    nm_debug.debug_on;
 --    nm_debug.debug('Setting X and Y to - '||ROUND (l_geom.sdo_point.x,l_x_dp)||' : '||ROUND (l_geom.sdo_point.y,l_y_dp));
   --
   -- set the srid
-    l_geom := Nm3sdo.get_2d_pt(l_geom);
-  --
-    IF l_x_dp IS NOT NULL
-    THEN
-      l_geom.sdo_point.x := ROUND (l_geom.sdo_point.x,l_x_dp);
-    END IF;
-  --
-    IF l_y_dp IS NOT NULL
-    THEN
-      l_geom.sdo_point.y := ROUND (l_geom.sdo_point.y,l_y_dp);
+      l_geom := Nm3sdo.get_2d_pt(l_geom);
+    --
+      IF l_x_dp IS NOT NULL
+      THEN
+        l_geom.sdo_point.x := ROUND (l_geom.sdo_point.x,l_x_dp);
+      END IF;
+    --
+      IF l_y_dp IS NOT NULL
+      THEN
+        l_geom.sdo_point.y := ROUND (l_geom.sdo_point.y,l_y_dp);
+      END IF;
+    --
     END IF;
   --
   END;
