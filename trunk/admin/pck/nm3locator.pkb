@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3locator AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.3  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.4  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3locator';
 
@@ -1730,7 +1730,7 @@ RETURN boolean IS
   l_tab_northings nm3type.tab_number;
   no_data EXCEPTION;
 BEGIN
-  --nm_debug.debug_on;
+  nm_debug.debug_on;
   nm_debug.debug('Parameters');
   nm_debug.debug('pi_session_id : '||pi_session_id);
   OPEN get_coords(pi_session_id);
@@ -1882,8 +1882,19 @@ END store_coords;
 PROCEDURE return_stored_coords(po_eastings               OUT    gis_data_objects.gdo_x_val%TYPE
                               ,po_northings              OUT    gis_data_objects.gdo_x_val%TYPE) IS
 BEGIN
-  po_eastings  := g_eastings;
-  po_northings := g_northings;
+  IF g_eastings IS NOT NULL
+  AND g_northings IS NOT NULL
+  THEN
+    po_eastings  := g_eastings;
+    po_northings := g_northings;
+  ELSE
+    -- Task 0108887 / 0108889
+    IF g_multi_coords.COUNT > 0
+    THEN
+      po_eastings := g_multi_coords(1).x_coord;
+      po_northings := g_multi_coords(1).y_coord;
+    END IF;
+  END IF;
 END return_stored_coords;
 --
 -----------------------------------------------------------------------------
