@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.33   Dec 02 2009 15:57:22   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.34   Dec 09 2009 16:06:56   aedwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Dec 02 2009 15:57:22  $
---       Date fetched Out : $Modtime:   Dec 02 2009 08:55:38  $
---       PVCS Version     : $Revision:   2.33  $
+--       Date into PVCS   : $Date:   Dec 09 2009 16:06:56  $
+--       Date fetched Out : $Modtime:   Dec 09 2009 16:06:28  $
+--       PVCS Version     : $Revision:   2.34  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.33  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.34  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -2536,6 +2536,14 @@ PROCEDURE make_nt_spatial_layer
       Nm_Debug.proc_start (g_package_name, 'make_ona_inv_spatial_layer');
       --
       l_rec_nth := Nm3get.get_nth (pi_nth_theme_id => pi_nth_theme_id);
+      --
+      -- Task 0108890 - GIS0020 - Error when creating ONA layer
+      -- Ensure the Asset views are in place
+      DECLARE
+        view_name user_views.view_name%TYPE;
+      BEGIN
+        nm3inv_view.create_inv_view(pi_nit_inv_type,TRUE,view_name);
+      END;
   --
   --  Nm_Debug.debug_on;
     ---------------------------------------------------------------
