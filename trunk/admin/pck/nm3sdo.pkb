@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.30   Nov 19 2009 17:06:48   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.31   Dec 15 2009 09:41:56   cstrettle  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Nov 19 2009 17:06:48  $
---       Date fetched Out : $Modtime:   Nov 19 2009 17:05:36  $
---       PVCS Version     : $Revision:   2.30  $
+--       Date into PVCS   : $Date:   Dec 15 2009 09:41:56  $
+--       Date fetched Out : $Modtime:   Dec 09 2009 15:10:34  $
+--       PVCS Version     : $Revision:   2.31  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.30  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.31  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -5910,11 +5910,16 @@ END;
 --------------------------------------------------------------------------------------
 --
 
-PROCEDURE register_sdo_table_as_theme ( p_table IN VARCHAR2, p_pk_col IN VARCHAR2,
-                                    p_fk_col IN VARCHAR2, p_shape_col IN VARCHAR2, p_tol NUMBER DEFAULT 0.005,
-                                    p_cre_idx IN VARCHAR2 DEFAULT 'N',
-                                    p_estimate_new_tol IN VARCHAR2 DEFAULT 'N',
-                                    p_override_sdo_meta IN VARCHAR2 DEFAULT 'I') IS
+PROCEDURE register_sdo_table_as_theme ( p_table IN VARCHAR2
+                                                              , p_theme_name IN VARCHAR2
+                                                              , p_pk_col IN VARCHAR2
+                                                              , p_fk_col IN VARCHAR2
+                                                              , p_shape_col IN VARCHAR2
+                                                              , p_tol NUMBER DEFAULT 0.005
+                                                              ,p_cre_idx IN VARCHAR2 DEFAULT 'N'
+                                                              ,p_estimate_new_tol IN VARCHAR2 DEFAULT 'N'
+                                                              ,p_override_sdo_meta IN VARCHAR2 DEFAULT 'I'
+                                                              ) IS
 
 
 nth NM_THEMES_ALL%ROWTYPE;
@@ -5946,7 +5951,7 @@ l_data_scale     INTEGER;
 BEGIN
 
    nth.NTH_THEME_ID              := l_theme;
-   nth.NTH_THEME_NAME            := p_table;
+   nth.NTH_THEME_NAME            := p_theme_name;
    nth.NTH_TABLE_NAME            := p_table;
    nth.NTH_WHERE                 := NULL;
    nth.NTH_PK_COLUMN             := p_pk_col;
@@ -6017,7 +6022,30 @@ BEGIN
    END IF;
 
 END;
-
+--
+--------------------------------------------------------------------------------------------------------------
+--
+PROCEDURE register_sdo_table_as_theme ( p_table IN VARCHAR2
+                                                              , p_pk_col IN VARCHAR2
+                                                              , p_fk_col IN VARCHAR2
+                                                              , p_shape_col IN VARCHAR2
+                                                              , p_tol NUMBER DEFAULT 0.005
+                                                              ,p_cre_idx IN VARCHAR2 DEFAULT 'N'
+                                                              ,p_estimate_new_tol IN VARCHAR2 DEFAULT 'N'
+                                                              ,p_override_sdo_meta IN VARCHAR2 DEFAULT 'I'
+                                                              ) IS
+BEGIN
+ register_sdo_table_as_theme ( p_table => p_table
+                                             , p_theme_name => p_table 
+                                             , p_pk_col => p_pk_col
+                                             , p_fk_col => p_fk_col
+                                             , p_shape_col => p_shape_col
+                                             , p_tol => p_tol
+                                             ,p_cre_idx => p_cre_idx
+                                             ,p_estimate_new_tol => p_estimate_new_tol
+                                             ,p_override_sdo_meta => p_override_sdo_meta
+                                              );
+END;
 --
 --------------------------------------------------------------------------------------------------------------
 --
