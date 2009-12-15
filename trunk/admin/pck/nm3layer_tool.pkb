@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.10   Dec 02 2009 15:57:22   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.11   Dec 15 2009 09:32:40   cstrettle  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Dec 02 2009 15:57:22  $
---       Date fetched Out : $Modtime:   Dec 02 2009 08:55:48  $
---       Version          : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Dec 15 2009 09:32:40  $
+--       Date fetched Out : $Modtime:   Dec 15 2009 09:30:42  $
+--       Version          : $Revision:   2.11  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.10  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.11  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -209,10 +209,12 @@ AS
  /*
    FUNCTIONS
  */
+ 
    PROCEDURE is_an_asset_theme (
       pi_theme_id    IN   nm_themes_all.nth_theme_id%TYPE
     , pi_new_theme   IN   nm_themes_all.nth_theme_id%TYPE
    );
+   --
 
 --
    PROCEDURE is_an_area_theme (
@@ -346,7 +348,7 @@ AS
          SELECT nltr_child c_branch, NULL c_depth, NULL c_type, nltr_order
            FROM nm_layer_tree
           WHERE nltr_parent = 'ROOT'
-            AND nltr_child =  'CUS'
+            AND nltr_child IN  ('CUS', 'REG')
           ORDER by nltr_order;
 
       l_tab_order_by        nm3type.tab_number;
@@ -604,7 +606,6 @@ AS
          FETCH get_tma_layers
          BULK COLLECT INTO l_tab_nth;
          CLOSE get_tma_layers;
-
       ELSIF pi_layer_type = 'STP'
       AND hig.is_product_licensed ('STP')
       -- STP Scheme layers
@@ -751,7 +752,6 @@ AS
          nm3get.get_ntg (pi_ntg_theme_id         => pi_nth_theme_id
                        , pi_raise_not_found      => FALSE
                         ).ntg_gtype;
-
       --
       -- [ Get USER_SDO_GEOM_METADATA ]
       BEGIN
@@ -3846,6 +3846,93 @@ AS
 --
 -----------------------------------------------------------------------------
 --
+/*
+   **************************
+     REGISTER TABLE RELATED FUNCTIONS
+   **************************
+*/
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REGISTER_TABLE">
+--
+  FUNCTION register_table( p_table IN VARCHAR2
+                                         , p_theme_name IN VARCHAR2
+                                         , p_pk_col IN VARCHAR2
+                                         , p_fk_col IN VARCHAR2
+                                         , p_shape_col IN VARCHAR2
+                                         , p_tol NUMBER DEFAULT 0.005
+                                         ,p_cre_idx IN VARCHAR2 DEFAULT 'N'
+                                         ,p_estimate_new_tol IN VARCHAR2 DEFAULT 'N'
+                                         ,p_override_sdo_meta IN VARCHAR2 DEFAULT 'I'
+                                         ,p_asset_type IN VARCHAR2
+                                         ,p_asset_descr IN VARCHAR2
+                                         ,p_gtype IN VARCHAR2
+                                         ,p_error OUT VARCHAR2
+                                         ) 
+                                         return BOOLEAN IS
+  l_nith nm_inv_themes%rowtype;
+  l_ntg nm_theme_gtypes%rowtype;
+  l_success BOOLEAN := TRUE;
+  --
+  BEGIN
+  --
+      BEGIN
+          nm3sdo.register_sdo_table_as_theme ( p_table => p_table
+                                                      , p_theme_name => p_theme_name 
+                                                      , p_pk_col => p_pk_col  
+                                                      , p_fk_col  => p_fk_col 
+                                                      , p_shape_col  => p_shape_col 
+                                                      , p_tol  => p_tol 
+                                                      , p_cre_idx  => p_cre_idx 
+                                                      , p_estimate_new_tol => p_estimate_new_tol  
+                                                      , p_override_sdo_meta  => p_override_sdo_meta 
+                                                      );
+      EXCEPTION WHEN DUP_VAL_ON_INDEX THEN
+       l_success := FALSE;
+       p_error := hig.get_ner('HIG', 145).ner_descr || ': A theme already exists for the specified base table or theme name.';
+      END;
+--
+       IF  p_asset_type IS NOT NULL AND l_success THEN 
+          IF nm3get.get_nit ( pi_nit_inv_type    => p_asset_type
+                                     ,pi_raise_not_found => FALSE).nit_inv_type IS NULL THEN
+          
+              nm3inv.create_ft_asset_from_table(pi_table_name  => p_table
+                                                                , pi_pk_column   => p_pk_col
+                                                                , pi_asset_type   => p_asset_type
+                                                                , pi_asset_descr  => p_asset_descr
+                                                                , pi_pnt_or_cont  => 'P'
+                                                                , pi_use_xy         => 'Y'
+                                                                , pi_x_column     => NULL
+                                                                , pi_y_column     => NULL
+                                                                , pi_lr_ne_column => NULL
+                                                                , pi_lr_st_chain  => NULL
+                                                                , pi_lr_end_chain => NULL
+                                                                , pi_attrib_ltrim => 7);
+           END IF;
+      --
+       l_nith.nith_nit_id := p_asset_type;
+       l_nith.nith_nth_theme_id:= nm3get.get_nth( pi_nth_theme_name    => p_theme_name
+                                                   ,pi_raise_not_found => FALSE).nth_theme_id; 
+      --
+      nm3ins.ins_nith( l_nith );
+      --
+      l_ntg.ntg_theme_id := l_nith.nith_nth_theme_id;
+      l_ntg.ntg_gtype:= p_gtype;
+      l_ntg.ntg_seq_no:= 1;
+      --
+      nm3ins.ins_ntg(l_ntg);
+       END IF;
+  --
+     COMMIT;
+  RETURN l_success;
+  --
+  EXCEPTION
+  WHEN OTHERS THEN
+  ROLLBACK;
+  l_success := FALSE;
+  p_error := SQLERRM;
+  RETURN l_success;
+  END register_table;
 /*
    **************************
      GENERAL PROCS/FUNCTIONS
