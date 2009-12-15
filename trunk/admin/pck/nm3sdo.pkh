@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE Nm3sdo AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkh-arc   2.3   Jun 11 2009 11:41:24   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkh-arc   2.4   Dec 15 2009 09:42:12   cstrettle  $
 --       Module Name      : $Workfile:   nm3sdo.pkh  $
---       Date into PVCS   : $Date:   Jun 11 2009 11:41:24  $
---       Date fetched Out : $Modtime:   Jun 11 2009 11:38:22  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Dec 15 2009 09:42:12  $
+--       Date fetched Out : $Modtime:   Dec 09 2009 15:10:36  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --   Author : Rob Coupe
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE Nm3sdo AS
 --<GLOBVAR>
 -- g_sccsid is the SCCS_ID
 -- Constants
-  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   2.3  $"';
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   2.4  $"';
   single_shape_inv   CONSTANT VARCHAR2(3)  := NVL( Hig.get_sysopt('SDOSINGSHP'), 'N');
   use_surrogate_key  CONSTANT VARCHAR2(1)  := NVL( Hig.get_sysopt('SDOSURKEY'),'N');
   def_pt_zoom        CONSTANT NUMBER       := NVL( TO_NUMBER( Hig.get_sysopt('SDOPTZOOM' )), 100);
@@ -1243,6 +1243,22 @@ FUNCTION get_dimension ( p_diminfo IN mdsys.sdo_dim_array ) RETURN NUMBER;
            , p_column    IN VARCHAR2
            , p_full_scan IN VARCHAR2 DEFAULT 'N')
     RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REGISTER_SDO_TABLE_AS_THEME">
+-- Regsiters the minimum infomation of a table and geometry pair as a theme.
+  PROCEDURE register_sdo_table_as_theme
+            ( p_table              IN VARCHAR2
+            , p_theme_name  IN VARCHAR2
+            , p_pk_col            IN VARCHAR2
+            , p_fk_col             IN VARCHAR2
+            , p_shape_col       IN VARCHAR2
+            , p_tol                  IN NUMBER   DEFAULT 0.005
+            , p_cre_idx           IN VARCHAR2 DEFAULT 'N'
+            , p_estimate_new_tol  IN VARCHAR2 DEFAULT 'N'
+            , p_override_sdo_meta IN VARCHAR2 DEFAULT 'I');
 --</PROC>
 --
 -----------------------------------------------------------------------------
