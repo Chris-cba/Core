@@ -3,16 +3,16 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.4   Aug 06 2009 13:14:30   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.5   Dec 15 2009 09:33:32   cstrettle  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkh  $
---       Date into PVCS   : $Date:   Aug 06 2009 13:14:30  $
---       Date fetched Out : $Modtime:   Aug 06 2009 13:09:58  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Dec 15 2009 09:33:32  $
+--       Date fetched Out : $Modtime:   Dec 15 2009 09:29:24  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.6
 -------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.4  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.5  $';
     g_boolean               BOOLEAN        := FALSE;
     g_x_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_X';
     g_y_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_Y';
@@ -743,7 +743,33 @@ FUNCTION scotland_asd_in_use RETURN BOOLEAN;
 --
 -----------------------------------------------------------------------------
 --
-
+/*
+   **************************
+     REGISTER TABLE RELATED FUNCTIONS
+   **************************
+*/
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REGISTER_TABLE">
+--
+  FUNCTION register_table( p_table IN VARCHAR2
+                                         , p_theme_name IN VARCHAR2
+                                         , p_pk_col IN VARCHAR2
+                                         , p_fk_col IN VARCHAR2
+                                         , p_shape_col IN VARCHAR2
+                                         , p_tol NUMBER DEFAULT 0.005
+                                         ,p_cre_idx IN VARCHAR2 DEFAULT 'N'
+                                         ,p_estimate_new_tol IN VARCHAR2 DEFAULT 'N'
+                                         ,p_override_sdo_meta IN VARCHAR2 DEFAULT 'I'
+                                         ,p_asset_type IN VARCHAR2
+                                         ,p_asset_descr IN VARCHAR2
+                                         ,p_gtype IN VARCHAR2
+                                         ,p_error OUT VARCHAR2
+                                         ) return BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
 /*
    **************************
      GENERAL PROCS/FUNCTIONS
