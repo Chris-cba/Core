@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.6   Jul 17 2009 11:19:36   gjohnson  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.7   Jan 04 2010 17:06:12   cstrettle  $
 -- Module Name : $Workfile:   nm3file.pkb  $
--- Date into PVCS : $Date:   Jul 17 2009 11:19:36  $
--- Date fetched Out : $Modtime:   Jul 17 2009 11:17:54  $
--- PVCS Version : $Revision:   2.6  $
+-- Date into PVCS : $Date:   Jan 04 2010 17:06:12  $
+-- Date fetched Out : $Modtime:   Jan 04 2010 17:05:48  $
+-- PVCS Version : $Revision:   2.7  $
 -- Based on SCCS version : 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3file.pkb	1.18 12/12/06"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.7  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3file';
