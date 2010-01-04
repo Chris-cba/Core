@@ -2,11 +2,16 @@ CREATE OR REPLACE package nm3api_trans as
 --<PACKAGE>
 --   SCCS Identifiers :-
 --
---       sccsid           : @(#)nm3api_trans.pkh	1.2 09/03/02
---       Module Name      : nm3api_trans.pkh
---       Date into SCCS   : 02/09/03 11:09:52
---       Date fetched Out : 07/06/13 14:10:59
---       SCCS Version     : 1.2
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_trans.pkh-arc   2.1   Jan 04 2010 12:01:30   cstrettle  $
+--       Module Name      : $Workfile:   nm3api_trans.pkh  $
+--       Date into PVCS   : $Date:   Jan 04 2010 12:01:30  $
+--       Date fetched Out : $Modtime:   Jan 04 2010 11:56:32  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.2
+-------------------------------------------------------------------------
 --
 --
 --   Author : Rob Coupe
@@ -26,7 +31,7 @@ CREATE OR REPLACE package nm3api_trans as
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3api_trans.pkh	1.2 09/03/02"';
+    g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --

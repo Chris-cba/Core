@@ -2,13 +2,14 @@ CREATE OR REPLACE PACKAGE BODY nm3api_trans AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3api_trans.pkb	1.3 09/03/02
---       Module Name      : nm3api_trans.pkb
---       Date into SCCS   : 02/09/03 11:16:41
---       Date fetched Out : 07/06/13 14:10:58
---       SCCS Version     : 1.3
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_trans.pkb-arc   2.1   Jan 04 2010 12:01:30   cstrettle  $
+--       Module Name      : $Workfile:   nm3api_trans.pkb  $
+--       Date into PVCS   : $Date:   Jan 04 2010 12:01:30  $
+--       Date fetched Out : $Modtime:   Jan 04 2010 11:55:48  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version :  1.3
 --
 --
 --   Author : Rob Coupe
@@ -25,7 +26,7 @@ CREATE OR REPLACE PACKAGE BODY nm3api_trans AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3api_trans.pkb	1.3 09/03/02"';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'NM3API_TRANS';
