@@ -1,12 +1,15 @@
 CREATE OR REPLACE PACKAGE nm3api as
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3api.pkh	1.6 09/06/02
---       Module Name      : nm3api.pkh
---       Date into SCCS   : 02/09/06 09:08:12
---       Date fetched Out : 07/06/13 14:10:55
---       SCCS Version     : 1.6
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api.pkh-arc   2.1   Jan 04 2010 10:58:50   cstrettle  $
+--       Module Name      : $Workfile:   nm3api.pkh  $
+--       Date into PVCS   : $Date:   Jan 04 2010 10:58:50  $
+--       Date fetched Out : $Modtime:   Jan 04 2010 10:58:16  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 
+-------------------------------------------------------------------------
 --
 --
 --   Author : Rob Coupe
@@ -22,7 +25,7 @@ CREATE OR REPLACE PACKAGE nm3api as
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3api.pkh	1.6 09/06/02"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
