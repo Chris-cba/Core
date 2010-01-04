@@ -1,13 +1,13 @@
 CREATE OR REPLACE PACKAGE nm3extlov AS
 --<PACKAGE>
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3extlov.pkh	1.2 07/09/02
---       Module Name      : nm3extlov.pkh
---       Date into SCCS   : 02/07/09 13:44:02
---       Date fetched Out : 07/06/13 14:11:31
---       SCCS Version     : 1.2
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extlov.pkh-arc   2.1   Jan 04 2010 16:54:54   cstrettle  $
+--       Module Name      : $Workfile:   nm3extlov.pkh  $
+--       Date into PVCS   : $Date:   Jan 04 2010 16:54:54  $
+--       Date fetched Out : $Modtime:   Jan 04 2010 16:51:26  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version :  1.2
 --
 --   Author : Nik Stace
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE nm3extlov AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(80) := '"@(#)nm3extlov.pkh	1.2 07/09/02"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_sccsid is the SCCS ID for the package
   g_flex_validation_exception EXCEPTION;
   g_flex_validation_exc_code number;
