@@ -4,12 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3api_inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_inv.pkb-arc   2.3   Sep 22 2009 12:08:10   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_inv.pkb-arc   2.4   Jan 04 2010 11:29:00   cstrettle  $
 --       Module Name      : $Workfile:   nm3api_inv.pkb  $
---       Date into PVCS   : $Date:   Sep 22 2009 12:08:10  $
---       Date fetched Out : $Modtime:   Sep 22 2009 12:02:54  $
---       PVCS Version     : $Revision:   2.3  $
---       Based on 
+--       Date into PVCS   : $Date:   Jan 04 2010 11:29:00  $
+--       Date fetched Out : $Modtime:   Jan 04 2010 11:25:48  $
+--       Version          : $Revision:   2.4  $
 --
 --   Author : Jonathan Mills
 --
@@ -23,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3api_inv AS
 --
 
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
   
 --   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3api_inv.pkb	1.6 12/18/03"';
 --  g_body_sccsid is the SCCS ID for the package body
