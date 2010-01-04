@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3clob AS
 --<PACKAGE>
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3clob.pkh-arc   2.3   Jan 10 2008 16:55:22   gjohnson  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3clob.pkh-arc   2.4   Jan 04 2010 15:14:08   cstrettle  $
 -- Module Name : $Workfile:   nm3clob.pkh  $
--- Date into PVCS : $Date:   Jan 10 2008 16:55:22  $
--- Date fetched Out : $Modtime:   Jan 10 2008 16:50:58  $
--- PVCS Version : $Revision:   2.3  $
+-- Date into PVCS : $Date:   Jan 04 2010 15:14:08  $
+-- Date fetched Out : $Modtime:   Jan 04 2010 15:11:26  $
+-- PVCS Version : $Revision:   2.4  $
 -- Based on SCCS version : 
 --
 --   Author : Jonathan Mills
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE nm3clob AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3clob.pkh	1.9 09/19/02"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
 --  g_sccsid is the SCCS ID for the package
 --
 -- This global is used internally within nm3clob. do not use it for any other

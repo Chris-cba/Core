@@ -4,12 +4,12 @@ CREATE OR REPLACE PACKAGE BODY nm3clob AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3clob.pkb-arc   2.3   Jan 10 2008 16:55:22   gjohnson  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3clob.pkb-arc   2.4   Jan 04 2010 15:14:08   cstrettle  $
 -- Module Name : $Workfile:   nm3clob.pkb  $
--- Date into PVCS : $Date:   Jan 10 2008 16:55:22  $
--- Date fetched Out : $Modtime:   Jan 10 2008 16:50:56  $
--- PVCS Version : $Revision:   2.3  $
--- Based on SCCS version : 
+-- Date into PVCS : $Date:   Jan 04 2010 15:14:08  $
+-- Date fetched Out : $Modtime:   Jan 04 2010 15:13:22  $
+-- PVCS Version : $Revision:   2.4  $
+-- Based on SCCS version : 1.9
 --
 --
 --   Author : Jonathan Mills
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3clob AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3clob.pkb	1.11 06/02/03"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3clob';
