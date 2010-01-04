@@ -1,15 +1,13 @@
 CREATE OR REPLACE PACKAGE BODY nm3api AS
 --
------------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3api.pkb	1.5 09/06/02
---       Module Name      : nm3api.pkb
---       Date into SCCS   : 02/09/06 09:08:22
---       Date fetched Out : 07/06/13 14:10:54
---       SCCS Version     : 1.5
---
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api.pkb-arc   2.1   Jan 04 2010 10:54:20   cstrettle  $
+--       Module Name      : $Workfile:   nm3api.pkb  $
+--       Date into PVCS   : $Date:   Jan 04 2010 10:54:20  $
+--       Date fetched Out : $Modtime:   Jan 04 2010 10:53:22  $
+--       PVCS Version     : $Revision:   2.1  $
+--       Based on SCCS version 1.5: 
 --
 --   Author : Rob Coupe
 --
@@ -21,8 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3api AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3api.pkb	1.5 09/06/02"';
---  g_body_sccsid is the SCCS ID for the package body
+   g_body_sccsid constant varchar2(30) :='"$Revision:   2.1  $"';
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3api';
 --
