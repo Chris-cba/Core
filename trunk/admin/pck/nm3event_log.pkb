@@ -2,14 +2,14 @@ CREATE OR REPLACE PACKAGE BODY nm3event_log AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3event_log.pkb	1.2 07/23/02
---       Module Name      : nm3event_log.pkb
---       Date into SCCS   : 02/07/23 10:12:13
---       Date fetched Out : 07/06/13 14:11:26
---       SCCS Version     : 1.2
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3event_log.pkb-arc   2.1   Jan 04 2010 16:07:08   cstrettle  $
+--       Module Name      : $Workfile:   nm3event_log.pkb  $
+--       Date into PVCS   : $Date:   Jan 04 2010 16:07:08  $
+--       Date fetched Out : $Modtime:   Jan 04 2010 16:06:44  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version :  1.2
 --
 --   Author : Kevin Angus
 --
@@ -22,10 +22,8 @@ CREATE OR REPLACE PACKAGE BODY nm3event_log AS
 --all global package variables here
 
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3event_log.pkb	1.2 07/23/02"';
-  
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
   g_package_name     CONSTANT  varchar2(30) := 'nm3event_log';
-   
   c_session_id       CONSTANT number       := NVL(USERENV('SESSIONID'),-1);
   c_terminal         CONSTANT varchar2(30) := NVL(USERENV('TERMINAL'),'Unknown');
 --
