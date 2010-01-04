@@ -1,15 +1,14 @@
 CREATE OR REPLACE PACKAGE BODY nm3disco AS
 --
 -----------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3disco.pkb	1.2 07/20/04
---       Module Name      : nm3disco.pkb
---       Date into SCCS   : 04/07/20 11:31:08
---       Date fetched Out : 07/06/13 14:11:23
---       SCCS Version     : 1.2
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3disco.pkb-arc   2.1   Jan 04 2010 15:57:20   cstrettle  $
+--       Module Name      : $Workfile:   nm3disco.pkb  $
+--       Date into PVCS   : $Date:   Jan 04 2010 15:57:20  $
+--       Date fetched Out : $Modtime:   Jan 04 2010 15:57:02  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version :  1.2
 --
 --   Author : Kevin Angus
 --
@@ -25,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3disco AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid             CONSTANT varchar2(2000) := '"@(#)nm3disco.pkb	1.2 07/20/04"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
 
   g_package_name            CONSTANT varchar2(30) := 'nm3disco';
 
