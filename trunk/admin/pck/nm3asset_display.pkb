@@ -2,14 +2,14 @@ CREATE OR REPLACE PACKAGE BODY nm3asset_display AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3asset_display.pkb 1.4 11/14/02
---       Module Name      : nm3asset_display.pkb
---       Date into SCCS   : 02/11/14 15:29:57
---       Date fetched Out : 07/06/13 14:11:03
---       SCCS Version     : 1.4
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset_display.pkb-arc   2.4   Jan 04 2010 12:46:14   cstrettle  $
+--       Module Name      : $Workfile:   nm3asset_display.pkb  $
+--       Date into PVCS   : $Date:   Jan 04 2010 12:46:14  $
+--       Date fetched Out : $Modtime:   Jan 04 2010 12:45:48  $
+--       Version          : $Revision:   2.4  $
+--       Based on SCCS version : 1.4
 --
 --   Author : Kevin Angus
 --
@@ -23,10 +23,8 @@ CREATE OR REPLACE PACKAGE BODY nm3asset_display AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"@(#)nm3asset_display.pkb 1.4 11/14/02"';
-
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm3asset_display';
-
   c_nl CONSTANT VARCHAR2(1) := CHR(10);
 
   -----------
