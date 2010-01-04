@@ -1,15 +1,14 @@
 CREATE OR REPLACE PACKAGE BODY nm3asset_rep AS
 --
 -----------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3asset_rep.pkb	1.2 02/07/03
---       Module Name      : nm3asset_rep.pkb
---       Date into SCCS   : 03/02/07 09:01:43
---       Date fetched Out : 07/06/13 14:11:05
---       SCCS Version     : 1.2
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset_rep.pkb-arc   2.1   Jan 04 2010 14:40:16   cstrettle  $
+--       Module Name      : $Workfile:   nm3asset_rep.pkb  $
+--       Date into PVCS   : $Date:   Jan 04 2010 14:40:16  $
+--       Date fetched Out : $Modtime:   Jan 04 2010 14:38:56  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.2
 --
 --   Author : Kevin Angus
 --
@@ -25,12 +24,9 @@ CREATE OR REPLACE PACKAGE BODY nm3asset_rep AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid            CONSTANT varchar2(2000) := '"@(#)nm3asset_rep.pkb	1.2 02/07/03"';
-
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
   g_package_name           CONSTANT varchar2(30) := 'nm3asset_rep';
-
   c_nl                     CONSTANT varchar2(1) := CHR(10);
-
   c_aor_filename           CONSTANT hig_modules.hmo_filename%TYPE := 'NM0560';
 --
 -----------------------------------------------------------------------------
