@@ -1,12 +1,14 @@
-Create OR REPLACE PACKAGE BODY nm3extlov  AS
---   SCCS Identifiers :-
+CREATE OR REPLACE PACKAGE BODY nm3extlov  AS
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3extlov.pkb	1.12 09/05/06
---       Module Name      : nm3extlov.pkb
---       Date into SCCS   : 06/09/05 12:18:17
---       Date fetched Out : 07/06/13 14:11:31
---       SCCS Version     : 1.12
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extlov.pkb-arc   2.1   Jan 04 2010 16:54:52   cstrettle  $
+--       Module Name      : $Workfile:   nm3extlov.pkb  $
+--       Date into PVCS   : $Date:   Jan 04 2010 16:54:52  $
+--       Date fetched Out : $Modtime:   Jan 04 2010 16:53:44  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.12
+-------------------------------------------------------------------------
 --
 --   Author : Nik Stace
 --
@@ -16,7 +18,7 @@ Create OR REPLACE PACKAGE BODY nm3extlov  AS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3extlov.pkb	1.12 09/05/06"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
