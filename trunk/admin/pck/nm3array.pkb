@@ -2,13 +2,14 @@ CREATE OR REPLACE PACKAGE BODY Nm3array AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3array.pkb	1.5 06/12/06
---       Module Name      : nm3array.pkb
---       Date into SCCS   : 06/06/12 12:46:33
---       Date fetched Out : 07/06/13 14:10:59
---       SCCS Version     : 1.5
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3array.pkb-arc   2.1   Jan 04 2010 12:14:54   cstrettle  $
+--       Module Name      : $Workfile:   nm3array.pkb  $
+--       Date into PVCS   : $Date:   Jan 04 2010 12:14:54  $
+--       Date fetched Out : $Modtime:   Jan 04 2010 12:13:30  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.5
 --
 --   Author : Rob Coupe
 --
@@ -21,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3array AS
 -----------------------------------------------------------------------------
 --  g_body_sccsid is the SCCS ID for the package body
 
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '@(#)nm3array.pkb	1.5 06/12/06';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
 
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3ARRAY';
    
