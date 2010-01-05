@@ -1,15 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3type AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3type.pkb	1.6 11/01/06
---       Module Name      : nm3type.pkb
---       Date into SCCS   : 06/11/01 17:47:46
---       Date fetched Out : 07/06/13 14:13:39
---       SCCS Version     : 1.6
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3type.pkb-arc   2.1   Jan 05 2010 11:06:42   cstrettle  $
+--       Module Name      : $Workfile:   nm3type.pkb  $
+--       Date into PVCS   : $Date:   Jan 05 2010 11:06:42  $
+--       Date fetched Out : $Modtime:   Jan 05 2010 11:06:06  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.6 
+-------------------------------------------------------------------------
 --
 --   Author : Jonathan Mills
 --
@@ -21,8 +21,8 @@ CREATE OR REPLACE PACKAGE BODY nm3type AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3type.pkb	1.6 11/01/06"';
 --  g_body_sccsid is the SCCS ID for the package body
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3type';
 --
