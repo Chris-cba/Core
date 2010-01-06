@@ -1,13 +1,15 @@
 CREATE OR REPLACE PACKAGE nm3route_ref AS
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3route_ref.pkh	1.3 04/23/03
---       Module Name      : nm3route_ref.pkh
---       Date into SCCS   : 03/04/23 16:12:37
---       Date fetched Out : 07/06/13 14:13:20
---       SCCS Version     : 1.3
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3route_ref.pkh-arc   2.1   Jan 06 2010 16:41:34   cstrettle  $
+--       Module Name      : $Workfile:   nm3route_ref.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:34  $
+--       Date fetched Out : $Modtime:   Jan 05 2010 11:39:34  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.3
+-------------------------------------------------------------------------
 --
 --   Author : I Turnbull
 --
@@ -18,7 +20,7 @@ CREATE OR REPLACE PACKAGE nm3route_ref AS
 --</PACKAGE>
 --<GLOBVAR>
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT varchar2(2000) := '"@(#)nm3route_ref.pkh	1.3 04/23/03"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
   
   TYPE rec_route_loc_dets IS RECORD
        (route_ne_id            nm_elements.ne_id%TYPE

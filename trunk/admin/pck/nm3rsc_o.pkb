@@ -2,15 +2,16 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc_o AS
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3rsc_o.pkb	1.1 09/23/02
---       Module Name      : nm3rsc_o.pkb
---       Date into SCCS   : 02/09/23 09:48:57
---       Date fetched Out : 07/06/13 14:13:22
---       SCCS Version     : 1.1
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc_o.pkb-arc   2.1   Jan 06 2010 16:41:34   cstrettle  $
+--       Module Name      : $Workfile:   nm3rsc_o.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:34  $
+--       Date fetched Out : $Modtime:   Jan 05 2010 11:29:52  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
 --   Author : Rob Coupe
 --
 --   NM3 Rescale (object) package body
@@ -21,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc_o AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3rsc_o.pkb	1.1 09/23/02"';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3rsc_o';

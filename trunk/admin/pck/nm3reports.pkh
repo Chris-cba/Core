@@ -2,15 +2,16 @@ CREATE OR REPLACE PACKAGE nm3reports
 AS
 --<PACKAGE>
 -----------------------------------------------------------------------------
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3reports.pkh	1.2 03/29/06
---       Module Name      : nm3reports.pkh
---       Date into SCCS   : 06/03/29 13:26:06
---       Date fetched Out : 07/06/13 14:13:17
---       SCCS Version     : 1.2
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reports.pkh-arc   2.1   Jan 06 2010 16:41:34   cstrettle  $
+--       Module Name      : $Workfile:   nm3reports.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:34  $
+--       Date fetched Out : $Modtime:   Jan 05 2010 11:40:10  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.2
+-------------------------------------------------------------------------
 --   Author : Sarah Scanlon
 --
 --    NM3REPORTS HEADER
@@ -25,7 +26,7 @@ AS
 --constants
 -----------
 --g_sccsid is the SCCS ID for the package
-   g_sccsid      CONSTANT VARCHAR2 (2000) := '"@(#)nm3reports.pkh	1.2 03/29/06"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
    g_gis_id               NUMBER;
 
 --</GLOBVAR>

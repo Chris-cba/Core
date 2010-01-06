@@ -1,21 +1,16 @@
 CREATE OR REPLACE PACKAGE nm3progress AS 
 --<PACKAGE>
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3progress.pkh	1.1 11/02/05
---       Module Name      : nm3progress.pkh
---       Date into SCCS   : 05/11/02 20:36:53
---       Date fetched Out : 07/06/13 14:13:12
---       SCCS Version     : 1.1
---
---
---   Author : 
---
---
------------------------------------------------------------------------------
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3progress.pkh-arc   2.1   Jan 06 2010 16:41:34   cstrettle  $
+--       Module Name      : $Workfile:   nm3progress.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:34  $
+--       Date fetched Out : $Modtime:   Jan 05 2010 11:40:44  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
 --
 --	Copyright (c) exor corporation ltd, 2005
 --
@@ -23,7 +18,7 @@ CREATE OR REPLACE PACKAGE nm3progress AS
 --
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3progress.pkh	1.1 11/02/05"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_sccsid is the SCCS ID for the package
 --
 --</GLOBVAR>

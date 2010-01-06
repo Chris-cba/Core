@@ -1,15 +1,16 @@
 CREATE OR REPLACE PACKAGE BODY nm3route_check AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3route_check.pkb	1.4 09/10/02
---       Module Name      : nm3route_check.pkb
---       Date into SCCS   : 02/09/10 08:18:20
---       Date fetched Out : 07/06/13 14:13:17
---       SCCS Version     : 1.4
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3route_check.pkb-arc   2.1   Jan 06 2010 16:41:34   cstrettle  $
+--       Module Name      : $Workfile:   nm3route_check.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:34  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 10:38:52  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.4
+-------------------------------------------------------------------------
+
 --
 --   Author : R Coupe
 --
@@ -21,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3route_check AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3route_check.pkb	1.4 09/10/02"';
+     g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3route_check';

@@ -1,16 +1,16 @@
 CREATE OR REPLACE PACKAGE BODY nm3reports
 AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3reports.pkb	1.3 03/29/06
---       Module Name      : nm3reports.pkb
---       Date into SCCS   : 06/03/29 13:24:31
---       Date fetched Out : 07/06/13 14:13:16
---       SCCS Version     : 1.3
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reports.pkb-arc   2.1   Jan 06 2010 16:41:34   cstrettle  $
+--       Module Name      : $Workfile:   nm3reports.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:34  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 10:41:14  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.3
+-------------------------------------------------------------------------
 --
 --   Author : Sarah Scanlon
 --
@@ -26,8 +26,8 @@ AS
 --constants
 -----------
 --g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid CONSTANT VARCHAR2 (2000) := '"@(#)nm3reports.pkb	1.3 03/29/06"';
-   g_package_name CONSTANT VARCHAR2 (30) := 'nm3reports';
+     g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+     g_package_name CONSTANT VARCHAR2 (30) := 'nm3reports';
    lf                     VARCHAR2 (1) := CHR (10);
 
 --

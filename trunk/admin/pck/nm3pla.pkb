@@ -1,12 +1,14 @@
 CREATE OR REPLACE PACKAGE BODY Nm3pla AS
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3pla.pkb	1.61 11/29/06
---       Module Name      : nm3pla.pkb
---       Date into SCCS   : 06/11/29 13:04:19
---       Date fetched Out : 07/06/13 14:13:10
---       SCCS Version     : 1.61
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.2   Jan 06 2010 16:41:34   cstrettle  $
+--       Module Name      : $Workfile:   nm3pla.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:34  $
+--       Date fetched Out : $Modtime:   Jan 05 2010 18:17:44  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.61
+------------------------------------------------------------------------
 --
 --   Author : Rob Coupe
 --
@@ -17,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------------------------
 -- Global variables - tree definitions etc.
    --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb	1.61 11/29/06"';
-   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.2  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2(30) := 'nm3pla';

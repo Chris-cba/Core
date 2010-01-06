@@ -1,15 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3progress AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3progress.pkb	1.2 09/20/06
---       Module Name      : nm3progress.pkb
---       Date into SCCS   : 06/09/20 16:25:46
---       Date fetched Out : 07/06/13 14:13:11
---       SCCS Version     : 1.2
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3progress.pkb-arc   2.1   Jan 06 2010 16:41:34   cstrettle  $
+--       Module Name      : $Workfile:   nm3progress.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:34  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 10:42:08  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.2
+-------------------------------------------------------------------------
 --
 --   Author : Graeme Johnson 
 --
@@ -19,14 +19,10 @@ CREATE OR REPLACE PACKAGE BODY nm3progress AS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"@(#)nm3progress.pkb	1.2 09/20/06"';
 --  g_body_sccsid is the SCCS ID for the package body
---
-   g_package_name    CONSTANT  varchar2(30)   := 'nm3progress';
-
-   g_progress_counter  PLS_INTEGER; 
-
-
+  g_body_sccsid         CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_package_name     CONSTANT  varchar2(30)   := 'nm3progress';
+  g_progress_counter  PLS_INTEGER; 
 --
 FUNCTION get_version RETURN VARCHAR2 IS
 BEGIN
