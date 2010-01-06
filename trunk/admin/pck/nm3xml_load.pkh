@@ -1,14 +1,15 @@
 CREATE OR REPLACE PACKAGE nm3xml_load AS
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3xml_load.pkh	1.4 10/22/03
---       Module Name      : nm3xml_load.pkh
---       Date into SCCS   : 03/10/22 17:14:30
---       Date fetched Out : 07/06/13 14:13:57
---       SCCS Version     : 1.4
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3xml_load.pkh-arc   2.1   Jan 06 2010 16:41:36   cstrettle  $
+--       Module Name      : $Workfile:   nm3xml_load.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:36  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.4
+-------------------------------------------------------------------------
 --   Author : I Turnbull
 --
 --   nm3xml_load
@@ -20,7 +21,7 @@ CREATE OR REPLACE PACKAGE nm3xml_load AS
 --<GLOBVAR>
 -- 
 --  g_sccsid is the SCCS ID for the package
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3xml_load.pkh	1.4 10/22/03"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.1  $';
 --
   g_batch_id    NM_XML_LOAD_BATCHES.nxb_batch_id%TYPE;
   g_records_processed NUMBER;

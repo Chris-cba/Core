@@ -2,11 +2,11 @@ create or replace package nm3tab_varchar as
 --<PACKAGE>
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3tab_varchar.pkh-arc   2.3   Jan 10 2008 17:09:22   jwadsworth  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3tab_varchar.pkh-arc   2.4   Jan 06 2010 16:41:36   cstrettle  $
 -- Module Name : $Workfile:   nm3tab_varchar.pkh  $
--- Date into PVCS : $Date:   Jan 10 2008 17:09:22  $
--- Date fetched Out : $Modtime:   Jan 10 2008 17:09:06  $
--- PVCS Version : $Revision:   2.3  $
+-- Date into PVCS : $Date:   Jan 06 2010 16:41:36  $
+-- Date fetched Out : $Modtime:   Jan 05 2010 11:10:32  $
+-- PVCS Version : $Revision:   2.4  $
 -- Based on SCCS version : 
 --
 --
@@ -19,7 +19,7 @@ create or replace package nm3tab_varchar as
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3tab_varchar.pkh	1.2 07/24/03"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --

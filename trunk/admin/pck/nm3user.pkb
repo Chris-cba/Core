@@ -1,13 +1,14 @@
 CREATE OR REPLACE PACKAGE BODY nm3user AS
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3user.pkb	1.21 12/18/06
---       Module Name      : nm3user.pkb
---       Date into SCCS   : 06/12/18 15:43:15
---       Date fetched Out : 07/06/13 14:13:44
---       SCCS Version     : 1.21
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkb-arc   2.3   Jan 06 2010 16:41:36   cstrettle  $
+--       Module Name      : $Workfile:   nm3user.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:36  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
+--       Version          : $Revision:   2.3  $
+--       Based on SCCS version : 1.21
+-------------------------------------------------------------------------
 --   Author : Rob Coupe
 --
 --   NM3 user package
@@ -15,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3user AS
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3user.pkb	1.21 12/18/06"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.3  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name CONSTANT  varchar2(2000) := 'nm3user';

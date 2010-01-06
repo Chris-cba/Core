@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3xml_load AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3xml_load.pkb	1.7 10/22/03
---       Module Name      : nm3xml_load.pkb
---       Date into SCCS   : 03/10/22 17:14:52
---       Date fetched Out : 07/06/13 14:13:57
---       SCCS Version     : 1.7
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3xml_load.pkb-arc   2.1   Jan 06 2010 16:41:36   cstrettle  $
+--       Module Name      : $Workfile:   nm3xml_load.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:36  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 15:23:18  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.7
+-------------------------------------------------------------------------
 --   Author : I Turnbull
 --
 --   nm3xml_load package body
@@ -21,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3xml_load AS
 --
 --all global PACKAGE variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3xml_load.pkb	1.7 10/22/03"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3xml_load';

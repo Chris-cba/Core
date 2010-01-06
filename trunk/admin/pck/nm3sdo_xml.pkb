@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3sdo_xml AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3sdo_xml.pkb	1.1 05/06/04
---       Module Name      : nm3sdo_xml.pkb
---       Date into SCCS   : 04/05/06 10:39:53
---       Date fetched Out : 07/06/13 14:13:32
---       SCCS Version     : 1.1
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_xml.pkb-arc   2.2   Jan 06 2010 16:41:36   cstrettle  $
+--       Module Name      : $Workfile:   nm3sdo_xml.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:36  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.1
+---------------------------------------------------------------------------
 --   Author : I Turnbull
 --
 --   nm3sdo_xml body
@@ -25,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo_xml AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"@(#)nm3sdo_xml.pkb	1.1 05/06/04"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 
   g_package_name CONSTANT VARCHAR2(30) := 'nm3sdo_xml';
 

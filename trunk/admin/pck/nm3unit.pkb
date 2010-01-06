@@ -1,14 +1,14 @@
 create or replace package body nm3unit as
-
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3unit.pkb	1.12 02/10/06
---       Module Name      : nm3unit.pkb
---       Date into SCCS   : 06/02/10 11:27:39
---       Date fetched Out : 07/06/13 14:13:42
---       SCCS Version     : 1.12
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3unit.pkb-arc   2.1   Jan 06 2010 16:41:36   cstrettle  $
+--       Module Name      : $Workfile:   nm3unit.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:36  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.12
+-------------------------------------------------------------------------
 --   Author : Rob Coupe
 --
 --   nm3unit package
@@ -16,7 +16,7 @@ create or replace package body nm3unit as
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3unit.pkb	1.12 02/10/06"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3unit';
 --

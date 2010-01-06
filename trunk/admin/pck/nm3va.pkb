@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3va AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3va.pkb	1.1 09/13/02
---       Module Name      : nm3va.pkb
---       Date into SCCS   : 02/09/13 09:08:07
---       Date fetched Out : 07/06/13 14:13:45
---       SCCS Version     : 1.1
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3va.pkb-arc   2.1   Jan 06 2010 16:41:36   cstrettle  $
+--       Module Name      : $Workfile:   nm3va.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:36  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
 --   Author : Kevin Angus
 --
 --   nm3va body
@@ -25,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3va AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"@(#)nm3va.pkb	1.1 09/13/02"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3va';
   

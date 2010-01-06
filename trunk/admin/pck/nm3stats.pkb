@@ -1,15 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3stats AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3stats.pkb	1.11 02/06/06
---       Module Name      : nm3stats.pkb
---       Date into SCCS   : 06/02/06 10:09:13
---       Date fetched Out : 07/06/13 14:13:36
---       SCCS Version     : 1.11
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3stats.pkb-arc   2.1   Jan 06 2010 16:41:36   cstrettle  $
+--       Module Name      : $Workfile:   nm3stats.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:36  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.11
+-------------------------------------------------------------------------
 --
 --   Author : Jonathan Mills
 --
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3stats AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3stats.pkb	1.11 02/06/06"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3stats';

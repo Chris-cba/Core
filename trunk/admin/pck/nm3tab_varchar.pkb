@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3tab_varchar AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3tab_varchar.pkb-arc   2.3   Jan 10 2008 17:09:22   jwadsworth  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3tab_varchar.pkb-arc   2.4   Jan 06 2010 16:41:36   cstrettle  $
 -- Module Name : $Workfile:   nm3tab_varchar.pkb  $
--- Date into PVCS : $Date:   Jan 10 2008 17:09:22  $
--- Date fetched Out : $Modtime:   Jan 10 2008 17:09:10  $
--- PVCS Version : $Revision:   2.3  $
+-- Date into PVCS : $Date:   Jan 06 2010 16:41:36  $
+-- Date fetched Out : $Modtime:   Jan 05 2010 11:24:00  $
+-- PVCS Version : $Revision:   2.4  $
 -- Based on SCCS version : 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3tab_varchar AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3tab_varchar.pkb	1.2 07/24/03"';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3tab_varchar';

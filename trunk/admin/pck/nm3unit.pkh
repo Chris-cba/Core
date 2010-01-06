@@ -1,14 +1,15 @@
 create or replace package nm3unit as
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3unit.pkh	1.8 02/10/06
---       Module Name      : nm3unit.pkh
---       Date into SCCS   : 06/02/10 11:27:14
---       Date fetched Out : 07/06/13 14:13:42
---       SCCS Version     : 1.8
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3unit.pkh-arc   2.1   Jan 06 2010 16:41:36   cstrettle  $
+--       Module Name      : $Workfile:   nm3unit.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:36  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.8
+-------------------------------------------------------------------------
 --   Author : Rob Coupe
 --
 --   nm3unit package
@@ -18,7 +19,7 @@ create or replace package nm3unit as
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(80) := '"@(#)nm3unit.pkh	1.8 02/10/06"';
+  g_sccsid      CONSTANT  VARCHAR2(80) := '$Revision:   2.1  $';
 -- g_sccsid is the SCCS_ID
   g_def_unit_id number := 1; -- := to_number(hig.get_sysopt( 'DEFUNITID' ) );
 --</GLOBVAR>
