@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3globinv AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3globinv.pkb	1.7 01/02/03
---       Module Name      : nm3globinv.pkb
---       Date into SCCS   : 03/01/02 09:54:38
---       Date fetched Out : 07/06/13 14:11:42
---       SCCS Version     : 1.7
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3globinv.pkb-arc   2.2   Jan 06 2010 16:38:26   cstrettle  $
+--       Module Name      : $Workfile:   nm3globinv.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:26  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 11:37:18  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.7
+-------------------------------------------------------------------------
 --   Author : Jonathan Mills
 --
 --   Global Inventory Update Package body
@@ -21,9 +20,8 @@ CREATE OR REPLACE PACKAGE BODY nm3globinv AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3globinv.pkb	1.7 01/02/03"';
 --  g_body_sccsid is the SCCS ID for the package body
---
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3globinv';
 --
    g_tab_pre_val_format  nm3type.tab_varchar30;

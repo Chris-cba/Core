@@ -1,14 +1,15 @@
 CREATE OR REPLACE PACKAGE nm3globinv AS
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3globinv.pkh	1.5 12/23/02
---       Module Name      : nm3globinv.pkh
---       Date into SCCS   : 02/12/23 13:56:04
---       Date fetched Out : 07/06/13 14:11:42
---       SCCS Version     : 1.5
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3globinv.pkh-arc   2.3   Jan 06 2010 16:38:26   cstrettle  $
+--       Module Name      : $Workfile:   nm3globinv.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:26  $
+--       Date fetched Out : $Modtime:   Jan 05 2010 18:02:30  $
+--       Version          : $Revision:   2.3  $
+--       Based on SCCS version : 1.5
+-------------------------------------------------------------------------
 --   Author : Jonathan Mills
 --
 --   Global Inventory Update Package
@@ -19,7 +20,7 @@ CREATE OR REPLACE PACKAGE nm3globinv AS
 --</PACKAGE>
 --<GLOBVAR>
 --
-  g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3globinv.pkh	1.5 12/23/02"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 --  g_sccsid is the SCCS ID for the package
 --
 -- These constant values are the values to be used for the PI_OVERHANG_RULE

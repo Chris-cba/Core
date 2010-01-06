@@ -1,13 +1,15 @@
 create or replace package nm3homo_o as
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3homo_o.pkh	1.1 05/02/02
---       Module Name      : nm3homo_o.pkh
---       Date into SCCS   : 02/05/02 10:55:21
---       Date fetched Out : 07/06/13 14:11:47
---       SCCS Version     : 1.1
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_o.pkh-arc   2.1   Jan 06 2010 16:38:26   cstrettle  $
+--       Module Name      : $Workfile:   nm3homo_o.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:26  $
+--       Date fetched Out : $Modtime:   Jan 05 2010 18:00:54  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
 --
 --   Author : Jonathan Mills
 --
@@ -18,7 +20,7 @@ create or replace package nm3homo_o as
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3homo_o.pkh	1.1 05/02/02"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --

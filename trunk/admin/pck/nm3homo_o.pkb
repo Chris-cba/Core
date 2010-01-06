@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3homo_o AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3homo_o.pkb	1.2 05/17/02
---       Module Name      : nm3homo_o.pkb
---       Date into SCCS   : 02/05/17 10:04:28
---       Date fetched Out : 07/06/13 14:11:46
---       SCCS Version     : 1.2
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo_o.pkb-arc   2.1   Jan 06 2010 16:38:26   cstrettle  $
+--       Module Name      : $Workfile:   nm3homo_o.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:26  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 11:35:46  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 
+-------------------------------------------------------------------------
 --   Author : Jonathan Mills
 --
 --   Homogenous Inventory Update Object package body
@@ -21,8 +20,8 @@ CREATE OR REPLACE PACKAGE BODY nm3homo_o AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3homo_o.pkb	1.2 05/17/02"';
 --  g_body_sccsid is the SCCS ID for the package body
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3homo_o';
 --

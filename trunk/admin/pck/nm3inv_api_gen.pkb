@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3inv_api_gen AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3inv_api_gen.pkb	1.15 03/08/05
---       Module Name      : nm3inv_api_gen.pkb
---       Date into SCCS   : 05/03/08 05:20:49
---       Date fetched Out : 07/06/13 14:11:55
---       SCCS Version     : 1.15
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_api_gen.pkb-arc   2.1   Jan 06 2010 16:38:26   cstrettle  $
+--       Module Name      : $Workfile:   nm3inv_api_gen.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:26  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 11:33:06  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.15
+-------------------------------------------------------------------------
 --   Author : Jonathan Mills
 --
 --   NM3 Inventory API package generation package body
@@ -21,9 +20,9 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_api_gen AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3inv_api_gen.pkb	1.15 03/08/05"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_api_gen';
 --
    c_app_owner       CONSTANT  VARCHAR2(30)   := hig.get_application_owner;

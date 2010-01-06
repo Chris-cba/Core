@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3group_inv AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3group_inv.pkb	1.7 10/06/04
---       Module Name      : nm3group_inv.pkb
---       Date into SCCS   : 04/10/06 09:08:16
---       Date fetched Out : 07/06/13 14:11:43
---       SCCS Version     : 1.7
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3group_inv.pkb-arc   2.1   Jan 06 2010 16:38:26   cstrettle  $
+--       Module Name      : $Workfile:   nm3group_inv.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:26  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 11:36:36  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.7
+-------------------------------------------------------------------------
 --   Author : Kevin Angus
 --
 --   nm3group_inv body
@@ -20,23 +19,18 @@ CREATE OR REPLACE PACKAGE BODY nm3group_inv AS
 -----------------------------------------------------------------------------
 --
 --all global package variables here
-
   ------------
   --exceptions
   ------------
   e_generic_error EXCEPTION;
   PRAGMA EXCEPTION_INIT(e_generic_error, -20000);
-  
   -----------
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"@(#)nm3group_inv.pkb	1.7 10/06/04"';
-
-  g_package_name CONSTANT varchar2(30) := 'nm3group_inv';
-  
-  c_nl           CONSTANT varchar2(1) := CHR(10);
-  
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+   g_package_name CONSTANT varchar2(30) := 'nm3group_inv'
+   c_nl           CONSTANT varchar2(1) := CHR(10);
   -----------
   --variables
   -----------

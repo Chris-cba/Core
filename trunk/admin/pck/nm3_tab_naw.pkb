@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3_tab_naw AS
 --
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_tab_naw.pkb-arc   2.1   Jan 06 2010 16:38:26   cstrettle  $
+--       Module Name      : $Workfile:   nm3_tab_naw.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:26  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 14:46:20  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.1
 -----------------------------------------------------------------------------
---
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3_tab_naw.pkb	1.1 01/11/06
---       Module Name      : nm3_tab_naw.pkb
---       Date into SCCS   : 06/01/11 13:06:12
---       Date fetched Out : 07/06/13 14:10:50
---       SCCS Version     : 1.1
---
---
 --   Author : 
 --
 --   Generated package DO NOT MODIFY
@@ -24,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3_tab_naw AS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"@(#)nm3_tab_naw.pkb	1.1 01/11/06"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3_tab_naw';

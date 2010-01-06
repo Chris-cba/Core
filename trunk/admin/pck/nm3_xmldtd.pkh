@@ -1,14 +1,15 @@
 CREATE OR REPLACE PACKAGE nm3_xmldtd AS
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3_xmldtd.pkh	1.5 07/16/02
---       Module Name      : nm3_xmldtd.pkh
---       Date into SCCS   : 02/07/16 10:20:28
---       Date fetched Out : 07/06/13 14:10:53
---       SCCS Version     : 1.5
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_xmldtd.pkh-arc   2.1   Jan 06 2010 16:38:26   cstrettle  $
+--       Module Name      : $Workfile:   nm3_xmldtd.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:26  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.5
+---------------------------------------------------------------------------
 --   Author : A.N. Other
 --
 --   xmldtd
@@ -19,7 +20,7 @@ CREATE OR REPLACE PACKAGE nm3_xmldtd AS
 --</PACKAGE>
 --<GLOBVAR>
 --  g_sccsid is the SCCS ID for the package
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3_xmldtd.pkh	1.5 07/16/02"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.1  $';
   
 -- Constants
   c_element  VARCHAR(20)   := '<!ELEMENT ';

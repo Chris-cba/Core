@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3_tab_nex AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3_tab_nex.pkb	1.1 11/24/05
---       Module Name      : nm3_tab_nex.pkb
---       Date into SCCS   : 05/11/24 09:09:15
---       Date fetched Out : 07/06/13 14:10:51
---       SCCS Version     : 1.1
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_tab_nex.pkb-arc   2.1   Jan 06 2010 16:38:26   cstrettle  $
+--       Module Name      : $Workfile:   nm3_tab_nex.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:26  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.1
+---------------------------------------------------------------------------
 --   Author : 
 --
 --   Generated package DO NOT MODIFY
@@ -24,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3_tab_nex AS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"@(#)nm3_tab_nex.pkb	1.1 11/24/05"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'hig_tab_nex';
