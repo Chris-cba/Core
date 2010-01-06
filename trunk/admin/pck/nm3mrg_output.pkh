@@ -1,14 +1,15 @@
 create or replace package nm3mrg_output as
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3mrg_output.pkh	1.7 09/08/03
---       Module Name      : nm3mrg_output.pkh
---       Date into SCCS   : 03/09/08 01:51:47
---       Date fetched Out : 07/06/13 14:12:45
---       SCCS Version     : 1.7
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_output.pkh-arc   2.1   Jan 06 2010 16:38:44   cstrettle  $
+--       Module Name      : $Workfile:   nm3mrg_output.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:44  $
+--       Date fetched Out : $Modtime:   Jan 05 2010 11:45:22  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.7
+-------------------------------------------------------------------------
 --   Author : Jonathan Mills
 --
 --   NM3 Merge Output
@@ -18,7 +19,7 @@ create or replace package nm3mrg_output as
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3mrg_output.pkh	1.7 09/08/03"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_sccsid is the SCCS ID for the package
    g_sql        VARCHAR2(32767);
    g_tab_data  nm3type.tab_varchar32767;

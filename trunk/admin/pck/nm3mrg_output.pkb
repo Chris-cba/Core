@@ -1,16 +1,15 @@
 create or replace package body nm3mrg_output as
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3mrg_output.pkb	1.22 03/22/07
---       Module Name      : nm3mrg_output.pkb
---       Date into SCCS   : 07/03/22 14:03:11
---       Date fetched Out : 07/06/13 14:12:45
---       SCCS Version     : 1.22
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_output.pkb-arc   2.2   Jan 06 2010 16:38:44   cstrettle  $
+--       Module Name      : $Workfile:   nm3mrg_output.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:44  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 10:47:58  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.22
+-------------------------------------------------------------------------
 --   Author : Jonathan Mills
 --
 --   NM3 Merge Output body
@@ -21,7 +20,7 @@ create or replace package body nm3mrg_output as
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3mrg_output.pkb	1.22 03/22/07"';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3mrg_output';
