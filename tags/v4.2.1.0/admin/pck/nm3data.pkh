@@ -1,0 +1,73 @@
+CREATE OR REPLACE PACKAGE nm3data AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3data.pkh-arc   3.1   Jan 06 2010 14:21:54   cstrettle  $
+--       Module Name      : $Workfile:   nm3data.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 14:21:54  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 14:19:48  $
+--       Version          : $Revision:   3.1  $
+--       Based on SCCS version : 1.21
+-------------------------------------------------------------------------
+--   Author : A Edwards
+--
+--  NM3 Data maintenance package
+--
+--
+-----------------------------------------------------------------------------
+-- Copyright (c) exor corporation ltd, 2004
+-----------------------------------------------------------------------------
+----
+--</PACKAGE>
+--all global package variables here
+--<GLOBVAR>
+-- g_sccsid is the SCCS_ID
+-- Constants
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.1  $"';
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CLEARDOWN_GDO">
+-- This procedure clears out the GDO (GIS_DATA_OBJECTS) table
+  PROCEDURE cleardown_gdo;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--
+--<PROC NAME="CLEARDOWN_NGQI">
+-- This procedure clears out the GDO (GIS_DATA_OBJECTS) table
+  PROCEDURE cleardown_ngqi;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CLEARDOWN_ND">
+-- This procedure clears out the ND (NM_DBUG) table
+  PROCEDURE cleardown_nd;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CLEARDOWN">
+-- This procedure clears out any table
+  PROCEDURE cleardown ( pi_table_name IN user_tables.table_name%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+END nm3data;
+/
