@@ -1,13 +1,15 @@
-CREATE OR REPLACE PACKAGE BODY nm3lrs AS
---   SCCS Identifiers :-
+CREATE OR REPLACE PACKAGE BODY nm3lrs 
+AS
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3lrs.pkb	1.45 09/25/06
---       Module Name      : nm3lrs.pkb
---       Date into SCCS   : 06/09/25 08:50:33
---       Date fetched Out : 07/06/13 14:12:32
---       SCCS Version     : 1.45
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lrs.pkb-arc   2.4   Jan 06 2010 16:38:38   cstrettle  $
+--       Module Name      : $Workfile:   nm3lrs.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:38  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 10:27:32  $
+--       Version          : $Revision:   2.4  $
+--       Based on SCCS version : 1.45
+-------------------------------------------------------------------------
 --   Author : Rob Coupe
 --
 --  nm3lrs package
@@ -16,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lrs AS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3lrs.pkb	1.45 09/25/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lrs';
