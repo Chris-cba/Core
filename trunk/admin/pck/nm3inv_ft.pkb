@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3inv_ft AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3inv_ft.pkb	1.5 09/30/02
---       Module Name      : nm3inv_ft.pkb
---       Date into SCCS   : 02/09/30 10:16:40
---       Date fetched Out : 07/06/13 14:12:01
---       SCCS Version     : 1.5
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_ft.pkb-arc   2.1   Jan 06 2010 16:38:28   cstrettle  $
+--       Module Name      : $Workfile:   nm3inv_ft.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:28  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 11:03:30  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.5
+-------------------------------------------------------------------------
 --   Author : Jonathan Mills
 --
 --   NM3 Inventory Foreign Table package body
@@ -21,10 +20,10 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_ft AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3inv_ft.pkb	1.5 09/30/02"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
-   g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3inv_ft';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3inv_ft';
 --
    g_rec_nit         NM_INV_TYPES%ROWTYPE;
    g_tab_nita        nm3inv.tab_nita;

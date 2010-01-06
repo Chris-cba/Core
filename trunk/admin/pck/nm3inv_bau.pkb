@@ -1,16 +1,15 @@
 CREATE OR REPLACE package body nm3inv_bau as
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3inv_bau.pkb	1.3 02/10/06
---       Module Name      : nm3inv_bau.pkb
---       Date into SCCS   : 06/02/10 16:48:01
---       Date fetched Out : 07/06/13 14:11:56
---       SCCS Version     : 1.3
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_bau.pkb-arc   2.1   Jan 06 2010 16:38:28   cstrettle  $
+--       Module Name      : $Workfile:   nm3inv_bau.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:28  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 11:04:48  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.3
+-------------------------------------------------------------------------
 --   Author : Priidu Tanava
 --
 --   service api: BULK ASSET UPDATE
@@ -19,7 +18,7 @@ CREATE OR REPLACE package body nm3inv_bau as
 --	Copyright (c) exor corporation ltd, 2005
 -----------------------------------------------------------------------------
 --
-  g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3inv_bau.pkb	1.3 02/10/06"';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_bau';
 
   m_date_format constant varchar2(20) := 'DD-MON-YYYY';

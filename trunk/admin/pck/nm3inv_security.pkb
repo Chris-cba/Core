@@ -1,15 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3inv_security AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3inv_security.pkb	1.1 10/12/01
---       Module Name      : nm3inv_security.pkb
---       Date into SCCS   : 01/10/12 16:34:41
---       Date fetched Out : 07/06/13 14:12:04
---       SCCS Version     : 1.1
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_security.pkb-arc   2.1   Jan 06 2010 16:38:28   cstrettle  $
+--       Module Name      : $Workfile:   nm3inv_security.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:28  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 11:02:30  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
 --
 --   Author : Jonathan Mills
 --
@@ -21,9 +21,9 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_security AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3inv_security.pkb	1.1 10/12/01"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_security';
 --
    l_dummy_package_variable number;

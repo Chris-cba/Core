@@ -1,14 +1,16 @@
 CREATE OR REPLACE PACKAGE nm3inv_extent AS
 --<PACKAGE>
 --   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3inv_extent.pkh	1.2 06/28/02
---       Module Name      : nm3inv_extent.pkh
---       Date into SCCS   : 02/06/28 10:27:11
---       Date fetched Out : 07/06/13 14:12:00
---       SCCS Version     : 1.2
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_extent.pkh-arc   2.1   Jan 06 2010 16:38:28   cstrettle  $
+--       Module Name      : $Workfile:   nm3inv_extent.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:28  $
+--       Date fetched Out : $Modtime:   Jan 05 2010 17:53:42  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.2
+-------------------------------------------------------------------------
 --   Author : Kevin Angus
 --
 --    nm3inv_extent
@@ -18,7 +20,7 @@ CREATE OR REPLACE PACKAGE nm3inv_extent AS
 --</PACKAGE>
 --<GLOBVAR>
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT varchar2(2000) := '"@(#)nm3inv_extent.pkh	1.2 06/28/02"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------

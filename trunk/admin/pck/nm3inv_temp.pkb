@@ -1,15 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3inv_temp AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3inv_temp.pkb	1.9 04/27/04
---       Module Name      : nm3inv_temp.pkb
---       Date into SCCS   : 04/04/27 16:10:17
---       Date fetched Out : 07/06/13 14:12:05
---       SCCS Version     : 1.9
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_temp.pkb-arc   2.1   Jan 06 2010 16:38:28   cstrettle  $
+--       Module Name      : $Workfile:   nm3inv_temp.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:28  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 11:01:38  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.9
+-------------------------------------------------------------------------
 --
 --   Author : Kevin Angus
 --
@@ -25,8 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_temp AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"@(#)nm3inv_temp.pkb	1.9 04/27/04"';
-
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
   g_package_name CONSTANT varchar2(30) := 'nm3inv_temp';
 --
    c_app_owner       CONSTANT  varchar2(30) := hig.get_application_owner;

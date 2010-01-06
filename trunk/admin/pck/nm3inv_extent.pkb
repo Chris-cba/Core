@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3inv_extent AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3inv_extent.pkb	1.2 06/28/02
---       Module Name      : nm3inv_extent.pkb
---       Date into SCCS   : 02/06/28 10:27:44
---       Date fetched Out : 07/06/13 14:12:00
---       SCCS Version     : 1.2
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_extent.pkb-arc   2.1   Jan 06 2010 16:38:28   cstrettle  $
+--       Module Name      : $Workfile:   nm3inv_extent.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:28  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 11:03:50  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.2
+-------------------------------------------------------------------------
 --   Author : Kevin Angus
 --
 --   nm3inv_extent body
@@ -22,8 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_extent AS
 --all global package variables here
 
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT varchar2(2000) := '"@(#)nm3inv_extent.pkb	1.2 06/28/02"';
-
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
   g_package_name CONSTANT varchar2(30) := 'nm3inv_extent';
 --
 -----------------------------------------------------------------------------
