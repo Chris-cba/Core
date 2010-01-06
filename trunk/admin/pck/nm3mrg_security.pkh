@@ -1,14 +1,15 @@
 CREATE OR REPLACE PACKAGE nm3mrg_security AS
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3mrg_security.pkh	1.5 02/09/04
---       Module Name      : nm3mrg_security.pkh
---       Date into SCCS   : 04/02/09 23:10:00
---       Date fetched Out : 07/06/13 14:12:47
---       SCCS Version     : 1.5
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_security.pkh-arc   2.1   Jan 06 2010 16:41:32   cstrettle  $
+--       Module Name      : $Workfile:   nm3mrg_security.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:32  $
+--       Date fetched Out : $Modtime:   Jan 05 2010 11:45:04  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.5
+-------------------------------------------------------------------------
 --   Author : Jonathan Mills
 --
 --   NM3 Merge Security package
@@ -18,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3mrg_security AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3mrg_security.pkh	1.5 02/09/04"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --

@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3mrg_security AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3mrg_security.pkb	1.9 02/09/04
---       Module Name      : nm3mrg_security.pkb
---       Date into SCCS   : 04/02/09 23:10:01
---       Date fetched Out : 07/06/13 14:12:47
---       SCCS Version     : 1.9
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_security.pkb-arc   2.1   Jan 06 2010 16:41:32   cstrettle  $
+--       Module Name      : $Workfile:   nm3mrg_security.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:32  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 10:47:20  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.9
+-------------------------------------------------------------------------
 --   Author : Jonathan Mills
 --
 --   NM3 Merge Security package body
@@ -25,9 +24,9 @@ CREATE OR REPLACE PACKAGE BODY nm3mrg_security AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT varchar2(2000) := '"@(#)nm3mrg_security.pkb	1.9 02/09/04"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
    g_package_name    CONSTANT varchar2(30)   := 'nm3mrg_security';
 --
    c_true            CONSTANT varchar2(4)  := nm3context.c_true;

@@ -1,16 +1,15 @@
 create or replace package body nm3mrg_wrap as
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3mrg_wrap.pkb	1.1 08/24/01
---       Module Name      : nm3mrg_wrap.pkb
---       Date into SCCS   : 01/08/24 13:49:15
---       Date fetched Out : 07/06/13 14:12:53
---       SCCS Version     : 1.1
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_wrap.pkb-arc   2.1   Jan 06 2010 16:41:32   cstrettle  $
+--       Module Name      : $Workfile:   nm3mrg_wrap.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:32  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 10:46:18  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
 --   Author : Jonathan Mills
 --
 --   nm3mrg_wrap package body
@@ -21,10 +20,10 @@ create or replace package body nm3mrg_wrap as
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3mrg_wrap.pkb	1.1 08/24/01"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
-   g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3mrg_wrap';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3mrg_wrap';
 --
 -----------------------------------------------------------------------------
 --

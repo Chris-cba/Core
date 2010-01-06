@@ -1,17 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3net_o AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3net_o.pkb	1.9 10/26/04
---       Module Name      : nm3net_o.pkb
---       Date into SCCS   : 04/10/26 14:17:38
---       Date fetched Out : 07/06/13 14:13:00
---       SCCS Version     : 1.9
---
---
---   Author : A.N. Other
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net_o.pkb-arc   2.1   Jan 06 2010 16:41:32   cstrettle  $
+--       Module Name      : $Workfile:   nm3net_o.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:32  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.9
+---------------------------------------------------------------------------
 --
 --   nm3net_o package: Contains procedures/functions for manipulating
 --                     networks that use objects. This package will not be
@@ -24,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3net_o AS
 --all global package variables here
 --
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3net_o.pkb	1.9 10/26/04"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name CONSTANT varchar2(30) := 'nm3net_o';

@@ -1,15 +1,15 @@
 CREATE OR REPLACE PACKAGE nm3nta AS
 --<PACKAGE>
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3nta.pkh	1.1 06/15/05
---       Module Name      : nm3nta.pkh
---       Date into SCCS   : 05/06/15 09:57:36
---       Date fetched Out : 07/06/13 14:13:02
---       SCCS Version     : 1.1
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nta.pkh-arc   2.1   Jan 06 2010 16:41:32   cstrettle  $
+--       Module Name      : $Workfile:   nm3nta.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:32  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.1
+---------------------------------------------------------------------------
 --   Author : R.A. Coupe
 --
 --   NM_THEME_ARRAY related code
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE nm3nta AS
 --<GLOBVAR>
 --  g_sccsid is the SCCS ID for the package
 
-  g_sccsid      CONSTANT   VARCHAR2(2000) := '"@(#)nm3nta.pkh	1.1 06/15/05"';
+  g_sccsid      CONSTANT   VARCHAR2(2000) := '$Revision:   2.1  $';
 
   g_theme_array         nm_theme_array := nm_theme_array( nm_theme_array_type( nm_theme_entry( null)));
   g_theme_array_flag    BOOLEAN        := FALSE;
