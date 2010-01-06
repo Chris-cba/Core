@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3mail_pop AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3mail_pop.pkb	1.1 03/07/05
---       Module Name      : nm3mail_pop.pkb
---       Date into SCCS   : 05/03/07 23:48:43
---       Date fetched Out : 07/06/13 14:12:36
---       SCCS Version     : 1.1
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail_pop.pkb-arc   2.2   Jan 06 2010 16:38:42   cstrettle  $
+--       Module Name      : $Workfile:   nm3mail_pop.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:42  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 10:49:24  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
 --   Author : Jonathan Mills
 --
 --   NM3 POP Mail Processing package body
@@ -21,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail_pop AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3mail_pop.pkb	1.1 03/07/05"';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail_pop';

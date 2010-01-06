@@ -1,14 +1,15 @@
 CREATE OR REPLACE PACKAGE nm3mapcapture_int AS
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3mapcapture_int.pkh	1.5 11/17/03
---       Module Name      : nm3mapcapture_int.pkh
---       Date into SCCS   : 03/11/17 11:49:22
---       Date fetched Out : 07/06/13 14:12:38
---       SCCS Version     : 1.5
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mapcapture_int.pkh-arc   2.1   Jan 06 2010 16:38:42   cstrettle  $
+--       Module Name      : $Workfile:   nm3mapcapture_int.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:42  $
+--       Date fetched Out : $Modtime:   Jan 05 2010 11:46:04  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.5
+-------------------------------------------------------------------------
 --   Author : Darren Cope
 --
 --   MapCapture File Loader 
@@ -18,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3mapcapture_int AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3mapcapture_int.pkh	1.5 11/17/03"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_sccsid is the SCCS ID for the package
 --
   c_headfile_extension  CONSTANT varchar2(3)  := 'mch';

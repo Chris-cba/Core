@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3mapcapture_ins_inv AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3mapcapture_ins_inv.pkb	1.15 09/09/05
---       Module Name      : nm3mapcapture_ins_inv.pkb
---       Date into SCCS   : 05/09/09 16:32:28
---       Date fetched Out : 07/06/13 14:12:37
---       SCCS Version     : 1.15
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mapcapture_ins_inv.pkb-arc   2.5   Jan 06 2010 16:38:42   cstrettle  $
+--       Module Name      : $Workfile:   nm3mapcapture_ins_inv.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:42  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 10:29:06  $
+--       Version          : $Revision:   2.5  $
+--       Based on SCCS version : 1.15
+-------------------------------------------------------------------------
 --   Author : Darren Cope
 --
 --   <<  description >>
@@ -22,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mapcapture_ins_inv AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3mapcapture_ins_inv.pkb	1.15 09/09/05"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mapcapture_ins_inv';
