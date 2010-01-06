@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3xsp AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3xsp.pkb	1.1 03/16/04
---       Module Name      : nm3xsp.pkb
---       Date into SCCS   : 04/03/16 11:00:00
---       Date fetched Out : 07/06/13 14:13:59
---       SCCS Version     : 1.1
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3xsp.pkb-arc   2.1   Jan 06 2010 16:41:38   cstrettle  $
+--       Module Name      : $Workfile:   nm3xsp.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:38  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
 --   Author : Darren Cope
 --
 --   nm3xsp body
@@ -25,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3xsp AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"@(#)nm3xsp.pkb	1.1 03/16/04"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3xsp';
 --

@@ -1,15 +1,15 @@
 create or replace package nm3xsp as
 --<PACKAGE>
------------------------------------------------------------------------------
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3xsp.pkh	1.1 03/16/04
---       Module Name      : nm3xsp.pkh
---       Date into SCCS   : 04/03/16 10:59:43
---       Date fetched Out : 07/06/13 14:13:59
---       SCCS Version     : 1.1
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3xsp.pkh-arc   2.1   Jan 06 2010 16:41:38   cstrettle  $
+--       Module Name      : $Workfile:   nm3xsp.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:41:38  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 15:24:12  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
 --   Author : Darren Cope
 --
 --    nm3xsp
@@ -24,7 +24,7 @@ create or replace package nm3xsp as
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '"@(#)nm3xsp.pkh	1.1 03/16/04"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 
 --</GLOBVAR>
 --
