@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.16   Dec 03 2009 09:20:00   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.17   Jan 06 2010 16:38:36   cstrettle  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Dec 03 2009 09:20:00  $
---       Date fetched Out : $Modtime:   Dec 03 2009 09:18:40  $
---       SCCS Version     : $Revision:   2.16  $
+--       Date into SCCS   : $Date:   Jan 06 2010 16:38:36  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 11:34:54  $
+--       SCCS Version     : $Revision:   2.17  $
 --       Based on --
 --
 --   nm3inv package body
@@ -27,12 +27,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --      Copyright (c) exor corporation ltd, 2005
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(80) := '@(#)nm3inv.pkb	1.97 01/12/07';
---  g_body_sccsid is the SCCS ID for the package body
---
 --all global package variables here
 --
-   g_package_name CONSTANT VARCHAR2(30) := 'nm3inv';
+--  g_body_sccsid is the SCCS ID for the package body
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.17  $';
+   g_package_name   CONSTANT VARCHAR2(30) := 'nm3inv';
 --
    --<USED BY validate_rec_iit>
    g_last_inv_type_dyn_val NM_INV_TYPES.nit_inv_type%TYPE;
