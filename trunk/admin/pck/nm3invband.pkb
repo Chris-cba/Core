@@ -2,15 +2,16 @@ create or replace package body nm3invband as
 --
 -----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3invband.pkb	1.3 04/19/01
---       Module Name      : nm3invband.pkb
---       Date into SCCS   : 01/04/19 13:24:44
---       Date fetched Out : 07/06/13 14:12:11
---       SCCS Version     : 1.3
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invband.pkb-arc   2.2   Jan 06 2010 22:50:32   cstrettle  $
+--       Module Name      : $Workfile:   nm3invband.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 22:50:32  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 22:49:16  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.3
+-------------------------------------------------------------------------
 --   Author : Jonathan Mills
 --
 --   Inventory Banding package body
@@ -22,7 +23,7 @@ create or replace package body nm3invband as
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3invband.pkb	1.3 04/19/01"';
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
