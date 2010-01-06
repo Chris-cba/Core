@@ -1,14 +1,15 @@
 CREATE OR REPLACE PACKAGE nm3inv_view AS
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3inv_view.pkh	1.13 01/14/05
---       Module Name      : nm3inv_view.pkh
---       Date into SCCS   : 05/01/14 17:52:52
---       Date fetched Out : 07/06/13 14:12:09
---       SCCS Version     : 1.13
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkh-arc   2.1   Jan 06 2010 16:38:36   cstrettle  $
+--       Module Name      : $Workfile:   nm3inv_view.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:36  $
+--       Date fetched Out : $Modtime:   Jan 05 2010 17:45:58  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 
+-------------------------------------------------------------------------
 --   Author : Jonathan Mills
 --
 --   nm3inv_view package
@@ -20,7 +21,7 @@ CREATE OR REPLACE PACKAGE nm3inv_view AS
 
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid   CONSTANT   VARCHAR2(2000) := '@(#)nm3inv_view.pkh	1.13 01/14/05';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --
 --</GLOBVAR>
 --

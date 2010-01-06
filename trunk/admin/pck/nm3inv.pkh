@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkh-arc   2.2   Nov 19 2009 10:21:20   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkh-arc   2.3   Jan 06 2010 16:38:36   cstrettle  $
 --       Module Name      : $Workfile:   nm3inv.pkh  $
---       Date into SCCS   : $Date:   Nov 19 2009 10:21:20  $
---       Date fetched Out : $Modtime:   Nov 19 2009 10:21:00  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Jan 06 2010 16:38:36  $
+--       Date fetched Out : $Modtime:   Jan 05 2010 18:00:30  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --
 --   nm3inv package header
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE Nm3inv AS
 
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid	CONSTANT	VARCHAR2(2000) := '"@(#)nm3inv.pkh	1.48 09/14/06"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 --  some common error messages - prevent more than one database lookup
   g_thing_already_exists	VARCHAR2(2000);
   g_thing_does_not_exist	VARCHAR2(2000);

@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3javautil AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3javautil.pkb	1.6 02/24/03
---       Module Name      : nm3javautil.pkb
---       Date into SCCS   : 03/02/24 09:46:47
---       Date fetched Out : 07/06/13 14:12:14
---       SCCS Version     : 1.6
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3javautil.pkb-arc   2.1   Jan 06 2010 16:38:36   cstrettle  $
+--       Module Name      : $Workfile:   nm3javautil.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:36  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 11:00:30  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.6
+-------------------------------------------------------------------------
 --   Author : I Turnbull
 --
 --   nm3javautil body
@@ -22,8 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3javautil AS
 --all global package variables here
 
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '"@(#)nm3javautil.pkb	1.6 02/24/03"';
-
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
   g_package_name CONSTANT VARCHAR2(30) := 'nm3javautil';
 --
    c_dirrepstrn CONSTANT VARCHAR2(1) := hig.get_sysopt(p_option_id => 'DIRREPSTRN');  

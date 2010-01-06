@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY NM3LOAD_INV_FAILED AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3load_inv_failed.pkb	1.9 11/17/03
---       Module Name      : nm3load_inv_failed.pkb
---       Date into SCCS   : 03/11/17 15:04:29
---       Date fetched Out : 07/06/13 14:12:22
---       SCCS Version     : 1.9
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3load_inv_failed.pkb-arc   2.3   Jan 06 2010 16:38:36   cstrettle  $
+--       Module Name      : $Workfile:   nm3load_inv_failed.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:36  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 10:50:32  $
+--       Version          : $Revision:   2.3  $
+--       Based on SCCS version : 1.9
+-------------------------------------------------------------------------
 --   Author : Graeme Johnson
 --
 --   NM3LOAD_INV_FAILED body
@@ -25,9 +24,7 @@ CREATE OR REPLACE PACKAGE BODY NM3LOAD_INV_FAILED AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  --g_body_sccsid  CONSTANT varchar2(2000) := '"@(#)nm3load_inv_failed.pkb	1.9 11/17/03"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
-
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
   g_package_name CONSTANT varchar2(30) := 'NM3LOAD_INV_FAILED';
 --
 -----------------------------------------------------------------------------

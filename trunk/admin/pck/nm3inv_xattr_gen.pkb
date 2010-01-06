@@ -1,15 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3inv_xattr_gen AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3inv_xattr_gen.pkb	1.9 01/02/03
---       Module Name      : nm3inv_xattr_gen.pkb
---       Date into SCCS   : 03/01/02 16:08:11
---       Date fetched Out : 07/06/13 14:12:10
---       SCCS Version     : 1.9
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_xattr_gen.pkb-arc   2.1   Jan 06 2010 16:38:36   cstrettle  $
+--       Module Name      : $Workfile:   nm3inv_xattr_gen.pkb  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:36  $
+--       Date fetched Out : $Modtime:   Jan 06 2010 11:01:06  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.9
+-------------------------------------------------------------------------
 --
 --   Author : Jonathan Mills
 --
@@ -21,9 +21,9 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_xattr_gen AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3inv_xattr_gen.pkb	1.9 01/02/03"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_xattr_gen';
 --
    g_tab_varchar     nm3type.tab_varchar32767;

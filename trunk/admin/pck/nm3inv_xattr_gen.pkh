@@ -1,13 +1,15 @@
 CREATE OR REPLACE PACKAGE nm3inv_xattr_gen AS
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3inv_xattr_gen.pkh	1.6 01/02/03
---       Module Name      : nm3inv_xattr_gen.pkh
---       Date into SCCS   : 03/01/02 16:07:58
---       Date fetched Out : 07/06/13 14:12:11
---       SCCS Version     : 1.6
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_xattr_gen.pkh-arc   2.1   Jan 06 2010 16:38:36   cstrettle  $
+--       Module Name      : $Workfile:   nm3inv_xattr_gen.pkh  $
+--       Date into PVCS   : $Date:   Jan 06 2010 16:38:36  $
+--       Date fetched Out : $Modtime:   Jan 05 2010 17:45:32  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 
+-------------------------------------------------------------------------
 --
 --   Author : Jonathan Mills
 --
@@ -18,7 +20,7 @@ CREATE OR REPLACE PACKAGE nm3inv_xattr_gen AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3inv_xattr_gen.pkh	1.6 01/02/03"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_sccsid is the SCCS ID for the package
 --
    TYPE tab_ae IS TABLE OF all_errors%ROWTYPE INDEX BY binary_integer;
