@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.3   Sep 15 2009 16:58:52   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.4   Jan 11 2010 15:18:40   aedwards  $
 --       Module Name      : $Workfile:   higroles.sql  $
---       Date into PVCS   : $Date:   Sep 15 2009 16:58:52  $
---       Date fetched Out : $Modtime:   Sep 15 2009 16:53:34  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jan 11 2010 15:18:40  $
+--       Date fetched Out : $Modtime:   Jan 11 2010 15:17:42  $
+--       Version          : $Revision:   2.4  $
 --
 -------------------------------------------------------------------------
 --  Copyright (c) exor corporation ltd, 2009
@@ -72,7 +72,8 @@ GRANT DROP USER TO hig_admin;
 GRANT ALTER USER TO hig_admin;
 GRANT DROP ANY DIRECTORY TO HIG_ADMIN;   -- Added by GJ 31-AUG-2005
 GRANT CREATE ANY DIRECTORY TO HIG_ADMIN; -- Added by GJ 31-AUG-2005
-GRANT DROP ANY SYNONYM TO hig_admin; -- Added by GJ 17-MAY-2007 for test manager log 51489
+GRANT DROP ANY SYNONYM TO hig_admin;     -- Added by GJ 17-MAY-2007 for test manager log 51489
+GRANT ANALYZE ANY TO hig_admin;          -- Added by AE 11-JAN-2010 for Task 0108303 
 
 rem --------------------------------------------------------------------------
 rem	CREATE a ROLE FOR granting TO highways users who may UPDATE core data
@@ -121,7 +122,7 @@ grant select on dba_role_privs to hig_user;
 grant select on dba_ts_quotas to hig_user;
 grant select on dba_roles to hig_user;
 grant select on dba_profiles to hig_user;
-
+GRANT ANALYZE ANY TO hig_user;            -- Added by AE 11-JAN-2010 for Task 0108303
 
 rem --------------------------------------------------------------------------
 rem	CREATE a ROLE FOR granting TO readonly highways users.
