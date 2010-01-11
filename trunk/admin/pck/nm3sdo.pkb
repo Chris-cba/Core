@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.31   Dec 15 2009 09:41:56   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.32   Jan 11 2010 10:34:50   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Dec 15 2009 09:41:56  $
---       Date fetched Out : $Modtime:   Dec 09 2009 15:10:34  $
---       PVCS Version     : $Revision:   2.31  $
+--       Date into PVCS   : $Date:   Jan 11 2010 10:34:50  $
+--       Date fetched Out : $Modtime:   Jan 11 2010 10:33:30  $
+--       PVCS Version     : $Revision:   2.32  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.31  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.32  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -5705,7 +5705,9 @@ CURSOR c1( c_nth_id IN NUMBER ) IS
   AND   sdo_owner = Hig.get_application_owner
   AND   nth_theme_id = c_nth_id;
 
-dummy  sdo_geom_metadata_table%ROWTYPE; -- assumes synonym exists
+-- AE 
+-- Task 0108674 - Add MDSYS prefix  
+dummy  mdsys.sdo_geom_metadata_table%ROWTYPE; -- assumes synonym exists
 
 retval user_sdo_geom_metadata%ROWTYPE;
 
@@ -8492,7 +8494,9 @@ IS
                ,pi_owner      IN VARCHAR2)
    IS
    BEGIN
-      DELETE FROM sdo_geom_metadata_table
+-- AE 
+-- Task 0108674 - Add MDSYS prefix  
+      DELETE FROM mdsys.sdo_geom_metadata_table
        WHERE sdo_owner = pi_owner
          AND sdo_table_name = pi_table_name
          AND sdo_column_name = pi_column;
@@ -9396,7 +9400,9 @@ END;
       RETURN user_sdo_geom_metadata%ROWTYPE
    IS
       l_rec_usgm   user_sdo_geom_metadata%ROWTYPE;
-   dummy        sdo_geom_metadata_table%ROWTYPE;
+-- AE 
+-- Task 0108674 - Add MDSYS prefix  
+      dummy        mdsys.sdo_geom_metadata_table%ROWTYPE;
    BEGIN
       SELECT *
         INTO dummy
