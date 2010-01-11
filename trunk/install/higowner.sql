@@ -1,5 +1,5 @@
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.9      $"';
+define sccsid = '"$Revision::   2.10     $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
@@ -463,6 +463,13 @@ DECLARE
     EXECUTE IMMEDIATE 'ALTER TABLE '||p_user||'.HIG_USERS'
          || CHR(10) ||'ADD CONSTRAINT HUS_UNRESTRICTED_CHK CHECK (HUS_UNRESTRICTED IN (''Y'', ''N''))'
          || CHR(10) ||'ADD CONSTRAINT HUS_IS_HIG_OWNER_FLAG_CHK CHECK (HUS_IS_HIG_OWNER_FLAG IN (''Y'', ''N''))';
+
+--
+-- AE 
+-- Task 0108549 - Index to control Hig Owner flag
+
+    EXECUTE IMMEDIATE 'CREATE UNIQUE INDEX '||p_user||'.HUS_OWNER_UNIQUE_FBI ON '||p_user||'.HIG_USERS '
+         || CHR(10) ||' (decode(hus_is_hig_owner_flag, ''Y'', -999, hus_user_id ))';
 
 --
     -- NM_AU_TYPES
