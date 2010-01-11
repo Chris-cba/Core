@@ -1,5 +1,5 @@
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.10     $"';
+define sccsid = '"$Revision::   2.11     $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
@@ -398,6 +398,7 @@ DECLARE
     EXECUTE IMMEDIATE 'GRANT DROP ANY DIRECTORY TO  ' || p_user;               -- Added by GJ 31-AUG-2005
     EXECUTE IMMEDIATE 'GRANT CREATE ANY DIRECTORY TO  ' || p_user;             -- Added by GJ 31-AUG-2005
     EXECUTE IMMEDIATE 'GRANT DROP ANY SYNONYM TO  ' || p_user;                 -- Added by GJ 17-MAY-2007
+    EXECUTE IMMEDIATE 'GRANT ANALYZE ANY TO '||p_user||' WITH ADMIN OPTION';   -- Task 0108303  - GRANT ANALYZE ANY TO hig_user/admin
   --
     IF l_oracle9i OR l_oracle10gr1 OR l_oracle10gr2 OR l_oracle11gr1
     THEN
