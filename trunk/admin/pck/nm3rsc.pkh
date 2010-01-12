@@ -1,13 +1,15 @@
 CREATE OR REPLACE PACKAGE nm3rsc AS
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3rsc.pkh	1.20 01/11/07
---       Module Name      : nm3rsc.pkh
---       Date into SCCS   : 07/01/11 16:02:01
---       Date fetched Out : 07/06/13 14:13:21
---       SCCS Version     : 1.20
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkh-arc   2.1   Jan 12 2010 10:53:00   cstrettle  $
+--       Module Name      : $Workfile:   nm3rsc.pkh  $
+--       Date into PVCS   : $Date:   Jan 12 2010 10:53:00  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 10:52:18  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.20
+-------------------------------------------------------------------------
 --
 --   Author : R.A. Coupe
 --
@@ -18,7 +20,7 @@ CREATE OR REPLACE PACKAGE nm3rsc AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3rsc.pkh	1.20 01/11/07"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_sccsid is the SCCS ID for the package
 
   g_gty          nm_elements.ne_gty_group_type%TYPE;
