@@ -7,11 +7,11 @@ DECLARE
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items.trg-arc   2.3   Jan 11 2010 12:49:52   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items.trg-arc   2.4   Jan 12 2010 08:53:14   cstrettle  $
 --       Module Name      : $Workfile:   nm_inv_items.trg  $
---       Date into PVCS   : $Date:   Jan 11 2010 12:49:52  $
---       Date fetched Out : $Modtime:   Jan 11 2010 12:49:08  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jan 12 2010 08:53:14  $
+--       Date fetched Out : $Modtime:   Oct 07 2009 14:54:28  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.8
 -------------------------------------------------------------------------
 BEGIN
@@ -37,11 +37,11 @@ BEGIN
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items.trg-arc   2.3   Jan 11 2010 12:49:52   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items.trg-arc   2.4   Jan 12 2010 08:53:14   cstrettle  $
 --       Module Name      : $Workfile:   nm_inv_items.trg  $
---       Date into PVCS   : $Date:   Jan 11 2010 12:49:52  $
---       Date fetched Out : $Modtime:   Jan 11 2010 12:49:08  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jan 12 2010 08:53:14  $
+--       Date fetched Out : $Modtime:   Oct 07 2009 14:54:28  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.8
 -------------------------------------------------------------------------
    --
@@ -54,9 +54,6 @@ BEGIN
       nm3invval.g_tab_rec_nii.DELETE;
       nm3invval.g_tab_rec_date_chk.DELETE;
    END IF;
- --  
-   nm3net_unique_history.delete_tab_iit;
- --
 END nm_inv_items_all_b_ins_upd;
 /
 --
@@ -68,16 +65,15 @@ DECLARE
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items.trg-arc   2.3   Jan 11 2010 12:49:52   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items.trg-arc   2.4   Jan 12 2010 08:53:14   cstrettle  $
 --       Module Name      : $Workfile:   nm_inv_items.trg  $
---       Date into PVCS   : $Date:   Jan 11 2010 12:49:52  $
---       Date fetched Out : $Modtime:   Jan 11 2010 12:49:08  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jan 12 2010 08:53:14  $
+--       Date fetched Out : $Modtime:   Oct 07 2009 14:54:28  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.8
 -------------------------------------------------------------------------
 --
    l_rec_nii nm_inv_items%ROWTYPE;
-   l_rec_nii_old nm_inv_items%ROWTYPE;      
 --
    l_mode    VARCHAR2(30) := NULL;
 --
@@ -115,16 +111,6 @@ BEGIN
          nm3invval.pc_pop_nit_tab (l_rec_nii
                                   ,l_mode
                                   );
-                  
-         l_rec_nii_old.iit_ne_id       := :OLD.iit_ne_id;
-         l_rec_nii_old.iit_start_date  := :OLD.iit_start_date;
-         l_rec_nii_old.iit_end_date    := :OLD.iit_end_date;
-         l_rec_nii_old.iit_primary_key := :OLD.iit_primary_key;
-         l_rec_nii_old.iit_foreign_key := :OLD.iit_foreign_key;
-         l_rec_nii_old.iit_inv_type    := :OLD.iit_inv_type;
-         l_rec_nii_old.iit_admin_unit  := :OLD.iit_admin_unit;                          
-         
-         nm3invval.g_tab_rec_nii_old := l_rec_nii_old;
       END IF;
    END IF;
 --
@@ -138,11 +124,11 @@ BEGIN
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items.trg-arc   2.3   Jan 11 2010 12:49:52   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items.trg-arc   2.4   Jan 12 2010 08:53:14   cstrettle  $
 --       Module Name      : $Workfile:   nm_inv_items.trg  $
---       Date into PVCS   : $Date:   Jan 11 2010 12:49:52  $
---       Date fetched Out : $Modtime:   Jan 11 2010 12:49:08  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jan 12 2010 08:53:14  $
+--       Date fetched Out : $Modtime:   Oct 07 2009 14:54:28  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.8
 -------------------------------------------------------------------------
 --
@@ -165,11 +151,11 @@ BEGIN
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items.trg-arc   2.3   Jan 11 2010 12:49:52   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_items.trg-arc   2.4   Jan 12 2010 08:53:14   cstrettle  $
 --       Module Name      : $Workfile:   nm_inv_items.trg  $
---       Date into PVCS   : $Date:   Jan 11 2010 12:49:52  $
---       Date fetched Out : $Modtime:   Jan 11 2010 12:49:08  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jan 12 2010 08:53:14  $
+--       Date fetched Out : $Modtime:   Oct 07 2009 14:54:28  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.8
 -------------------------------------------------------------------------
 --
