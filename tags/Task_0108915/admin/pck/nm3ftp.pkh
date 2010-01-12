@@ -1,0 +1,211 @@
+CREATE OR REPLACE PACKAGE nm3ftp
+AS
+--
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkh-arc   3.0   Jan 12 2010 10:12:58   aedwards  $
+--       Module Name      : $Workfile:   nm3ftp.pkh  $
+--       Date into PVCS   : $Date:   Jan 12 2010 10:12:58  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 09:26:34  $
+--       PVCS Version     : $Revision:   3.0  $
+--
+--------------------------------------------------------------------------------
+--
+  g_sccsid constant varchar2(30) :='"$Revision:   3.0  $"';
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+   TYPE t_string_table IS TABLE OF VARCHAR2 (32767);
+--
+--------------------------------------------------------------------------------
+--
+   FUNCTION login (
+      p_host      IN   VARCHAR2,
+      p_port      IN   VARCHAR2,
+      p_user      IN   VARCHAR2,
+      p_pass      IN   VARCHAR2,
+      p_timeout   IN   NUMBER := NULL
+   )
+      RETURN UTL_TCP.connection;
+--
+--------------------------------------------------------------------------------
+--
+   FUNCTION get_passive (p_conn IN OUT NOCOPY UTL_TCP.connection)
+      RETURN UTL_TCP.connection;
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE LOGOUT (
+      p_conn    IN OUT NOCOPY   UTL_TCP.connection,
+      p_reply   IN              BOOLEAN := TRUE
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE send_command (
+      p_conn      IN OUT NOCOPY   UTL_TCP.connection,
+      p_command   IN              VARCHAR2,
+      p_reply     IN              BOOLEAN := TRUE
+   );
+--
+--------------------------------------------------------------------------------
+--
+   FUNCTION get_local_ascii_data (p_dir IN VARCHAR2, p_file IN VARCHAR2)
+      RETURN CLOB;
+--
+--------------------------------------------------------------------------------
+--
+   FUNCTION get_local_binary_data (p_dir IN VARCHAR2, p_file IN VARCHAR2)
+      RETURN BLOB;
+--
+--------------------------------------------------------------------------------
+--
+   FUNCTION get_remote_ascii_data (
+      p_conn   IN OUT NOCOPY   UTL_TCP.connection,
+      p_file   IN              VARCHAR2
+   )
+      RETURN CLOB;
+--
+--------------------------------------------------------------------------------
+--
+   FUNCTION get_remote_binary_data (
+      p_conn   IN OUT NOCOPY   UTL_TCP.connection,
+      p_file   IN              VARCHAR2
+   )
+      RETURN BLOB;
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE put_local_ascii_data (
+      p_data   IN   CLOB,
+      p_dir    IN   VARCHAR2,
+      p_file   IN   VARCHAR2
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE put_local_binary_data (
+      p_data   IN   BLOB,
+      p_dir    IN   VARCHAR2,
+      p_file   IN   VARCHAR2
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE put_remote_ascii_data (
+      p_conn   IN OUT NOCOPY   UTL_TCP.connection,
+      p_file   IN              VARCHAR2,
+      p_data   IN              CLOB
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE put_remote_binary_data (
+      p_conn   IN OUT NOCOPY   UTL_TCP.connection,
+      p_file   IN              VARCHAR2,
+      p_data   IN              BLOB
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE get (
+      p_conn        IN OUT NOCOPY   UTL_TCP.connection,
+      p_from_file   IN              VARCHAR2,
+      p_to_dir      IN              VARCHAR2,
+      p_to_file     IN              VARCHAR2
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE put (
+      p_conn        IN OUT NOCOPY   UTL_TCP.connection,
+      p_from_dir    IN              VARCHAR2,
+      p_from_file   IN              VARCHAR2,
+      p_to_file     IN              VARCHAR2
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE get_direct (
+      p_conn        IN OUT NOCOPY   UTL_TCP.connection,
+      p_from_file   IN              VARCHAR2,
+      p_to_dir      IN              VARCHAR2,
+      p_to_file     IN              VARCHAR2
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE put_direct (
+      p_conn        IN OUT NOCOPY   UTL_TCP.connection,
+      p_from_dir    IN              VARCHAR2,
+      p_from_file   IN              VARCHAR2,
+      p_to_file     IN              VARCHAR2
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE HELP (p_conn IN OUT NOCOPY UTL_TCP.connection);
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE ASCII (p_conn IN OUT NOCOPY UTL_TCP.connection);
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE BINARY (p_conn IN OUT NOCOPY UTL_TCP.connection);
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE LIST (
+      p_conn   IN OUT NOCOPY   UTL_TCP.connection,
+      p_dir    IN              VARCHAR2,
+      p_list   OUT             t_string_table
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE RENAME (
+      p_conn   IN OUT NOCOPY   UTL_TCP.connection,
+      p_from   IN              VARCHAR2,
+      p_to     IN              VARCHAR2
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE DELETE (
+      p_conn   IN OUT NOCOPY   UTL_TCP.connection,
+      p_file   IN              VARCHAR2
+   );
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE mkdir (p_conn IN OUT NOCOPY UTL_TCP.connection, p_dir IN VARCHAR2);
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE rmdir (p_conn IN OUT NOCOPY UTL_TCP.connection, p_dir IN VARCHAR2);
+--
+--------------------------------------------------------------------------------
+--
+   PROCEDURE convert_crlf (p_status IN BOOLEAN);
+--
+--------------------------------------------------------------------------------
+--
+END nm3ftp;
+/
