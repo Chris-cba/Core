@@ -2,18 +2,18 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.4   Aug 19 2009 10:59:06   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.5   Jan 12 2010 11:12:24   malexander  $
 --       Module Name      : $Workfile:   nm3data8.sql  $
---       Date into PVCS   : $Date:   Aug 19 2009 10:59:06  $
---       Date fetched Out : $Modtime:   Aug 19 2009 10:57:52  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jan 12 2010 11:12:24  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 11:02:36  $
+--       Version          : $Revision:   2.5  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 19-AUG-2009 10:57
+--       Generation Date  : 12-JAN-2010 11:02
 --
 --   Product metadata script
---   As at Release 4.1.0.0
+--   As at Release 4.2.0.0
 --
---   Copyright (c) exor corporation ltd, 2009
+--   Copyright (c) exor corporation ltd, 2010
 --
 --   TABLES PROCESSED
 --   ================
@@ -786,7 +786,7 @@ SELECT
        ,'CUS'
        ,'Custom Layers'
        ,'F'
-       ,120 FROM DUAL
+       ,10000 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_LAYER_TREE
                    WHERE NLTR_CHILD = 'CUS');
 --
