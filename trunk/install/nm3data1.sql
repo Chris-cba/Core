@@ -2,18 +2,18 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.31   Oct 05 2009 17:09:54   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.32   Jan 12 2010 11:12:22   malexander  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Oct 05 2009 17:09:54  $
---       Date fetched Out : $Modtime:   Oct 05 2009 17:06:50  $
---       Version          : $Revision:   2.31  $
+--       Date into PVCS   : $Date:   Jan 12 2010 11:12:22  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 11:02:20  $
+--       Version          : $Revision:   2.32  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 05-OCT-2009 17:06
+--       Generation Date  : 12-JAN-2010 11:02
 --
 --   Product metadata script
---   As at Release 4.1.0.0
+--   As at Release 4.2.0.0
 --
---   Copyright (c) exor corporation ltd, 2009
+--   Copyright (c) exor corporation ltd, 2010
 --
 --   TABLES PROCESSED
 --   ================
@@ -5871,6 +5871,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'HIG'
                     AND  NER_ID = 508);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,509
+       ,null
+       ,'User must be assigned HIG_USER role.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 509);
 --
 INSERT INTO NM_ERRORS
        (NER_APPL
@@ -13573,6 +13590,40 @@ SELECT
                    WHERE NER_APPL = 'NET'
                     AND  NER_ID = 461);
 --
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,462
+       ,null
+       ,'The type chosen is not a datum'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 462);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,463
+       ,null
+       ,'The type chosen is not allowed sub groups'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 463);
+--
 --
 --
 ----------------------------------------------------------------------------------------
@@ -18920,27 +18971,6 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
                    WHERE HCO_DOMAIN = 'INV_RELATION'
                     AND  HCO_CODE = 'NONE');
---
-INSERT INTO HIG_CODES
-       (HCO_DOMAIN
-       ,HCO_CODE
-       ,HCO_MEANING
-       ,HCO_SYSTEM
-       ,HCO_SEQ
-       ,HCO_START_DATE
-       ,HCO_END_DATE
-       )
-SELECT 
-        'INV_RELATION'
-       ,'RELATIVE'
-       ,'Child must exist within the parent but its location'
-       ,'N'
-       ,4
-       ,null
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
-                   WHERE HCO_DOMAIN = 'INV_RELATION'
-                    AND  HCO_CODE = 'RELATIVE');
 --
 INSERT INTO HIG_CODES
        (HCO_DOMAIN
@@ -27796,6 +27826,30 @@ SELECT
        ,'FORM' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
                    WHERE HMO_MODULE = 'HIG1810');
+--
+INSERT INTO HIG_MODULES
+       (HMO_MODULE
+       ,HMO_TITLE
+       ,HMO_FILENAME
+       ,HMO_MODULE_TYPE
+       ,HMO_FASTPATH_OPTS
+       ,HMO_FASTPATH_INVALID
+       ,HMO_USE_GRI
+       ,HMO_APPLICATION
+       ,HMO_MENU
+       )
+SELECT 
+        'HIG1811'
+       ,'Fill Patterns'
+       ,'hig1811'
+       ,'FMX'
+       ,''
+       ,'N'
+       ,'N'
+       ,'HIG'
+       ,'FORM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
+                   WHERE HMO_MODULE = 'HIG1811');
 --
 INSERT INTO HIG_MODULES
        (HMO_MODULE

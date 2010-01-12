@@ -2,18 +2,18 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.11   Oct 07 2009 12:11:40   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.12   Jan 12 2010 11:12:22   malexander  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Oct 07 2009 12:11:40  $
---       Date fetched Out : $Modtime:   Oct 07 2009 12:10:54  $
---       Version          : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Jan 12 2010 11:12:22  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 11:02:28  $
+--       Version          : $Revision:   2.12  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 07-OCT-2009 12:09
+--       Generation Date  : 12-JAN-2010 11:02
 --
 --   Product metadata script
---   As at Release 4.1.0.0
+--   As at Release 4.2.0.0
 --
---   Copyright (c) exor corporation ltd, 2009
+--   Copyright (c) exor corporation ltd, 2010
 --
 --   TABLES PROCESSED
 --   ================
@@ -839,6 +839,19 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'HIG1810'
                     AND  HMR_ROLE = 'HIG_ADMIN');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'HIG1811'
+       ,'HIG_USER'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'HIG1811'
+                    AND  HMR_ROLE = 'HIG_USER');
 --
 INSERT INTO HIG_MODULE_ROLES
        (HMR_MODULE
