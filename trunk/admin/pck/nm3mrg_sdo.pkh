@@ -1,13 +1,15 @@
 CREATE OR REPLACE PACKAGE NM3MRG_SDO AS
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3mrg_sdo.pkh	1.2 03/08/06
---       Module Name      : nm3mrg_sdo.pkh
---       Date into SCCS   : 06/03/08 14:38:18
---       Date fetched Out : 07/06/13 14:12:46
---       SCCS Version     : 1.2
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_sdo.pkh-arc   2.1   Jan 12 2010 10:41:16   cstrettle  $
+--       Module Name      : $Workfile:   nm3mrg_sdo.pkh  $
+--       Date into PVCS   : $Date:   Jan 12 2010 10:41:16  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 10:40:04  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.2
+-------------------------------------------------------------------------
 --
 --   Author : R.A. Coupe
 --
@@ -19,7 +21,7 @@ CREATE OR REPLACE PACKAGE NM3MRG_SDO AS
 --</PACKAGE>
 --<GLOBVAR>
 --  g_sccsid is the SCCS ID for the package
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3mrg_sdo.pkh	1.2 03/08/06"';
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 
 
 --</GLOBVAR>

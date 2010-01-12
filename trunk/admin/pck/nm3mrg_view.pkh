@@ -1,13 +1,15 @@
 CREATE OR REPLACE PACKAGE nm3mrg_view AS
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3mrg_view.pkh	1.10 09/06/05
---       Module Name      : nm3mrg_view.pkh
---       Date into SCCS   : 05/09/06 13:26:01
---       Date fetched Out : 07/06/13 14:12:53
---       SCCS Version     : 1.10
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkh-arc   2.1   Jan 12 2010 10:41:16   cstrettle  $
+--       Module Name      : $Workfile:   nm3mrg_view.pkh  $
+--       Date into PVCS   : $Date:   Jan 12 2010 10:41:16  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 10:40:16  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.10
+-------------------------------------------------------------------------
 --
 --   Author : Jonathan Mills
 --
@@ -18,8 +20,8 @@ CREATE OR REPLACE PACKAGE nm3mrg_view AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3mrg_view.pkh	1.10 09/06/05"';
 --  g_sccsid is the SCCS ID for the package
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --
   g_views_to_del   nm3type.tab_varchar30;
   g_tab_nmq_id_del nm3type.tab_number;

@@ -1,13 +1,15 @@
 CREATE OR REPLACE PACKAGE nm3mrg IS
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3mrg.pkh	1.19 09/08/03
---       Module Name      : nm3mrg.pkh
---       Date into SCCS   : 03/09/08 01:51:26
---       Date fetched Out : 07/06/13 14:12:44
---       SCCS Version     : 1.19
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkh-arc   2.1   Jan 12 2010 10:41:16   cstrettle  $
+--       Module Name      : $Workfile:   nm3mrg.pkh  $
+--       Date into PVCS   : $Date:   Jan 12 2010 10:41:16  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 10:39:54  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.19
+-------------------------------------------------------------------------
 --
 --   Author : Jonathan Mills
 --
@@ -19,8 +21,8 @@ CREATE OR REPLACE PACKAGE nm3mrg IS
 --</PACKAGE>
 --all global package variables here
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '"@(#)nm3mrg.pkh	1.19 09/08/03"';
 --  g_sccsid is the SCCS_ID
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --
 -- Global TYPE declarations
 --
