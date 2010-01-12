@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm410x_nm4200_upg.sql-arc   3.0   Jan 11 2010 16:24:36   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm410x_nm4200_upg.sql-arc   3.1   Jan 12 2010 12:31:44   malexander  $
 --       Module Name      : $Workfile:   nm410x_nm4200_upg.sql  $
---       Date into PVCS   : $Date:   Jan 11 2010 16:24:36  $
---       Date fetched Out : $Modtime:   Jan 11 2010 16:23:38  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jan 12 2010 12:31:44  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 12:31:26  $
+--       Version          : $Revision:   3.1  $
 --
 --   Product upgrade script
 --
@@ -49,6 +49,13 @@ FROM hig_products WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP') AND hpr_v
 /
 select  TO_CHAR(sysdate,'DDMONYYYY_HH24MISS')||'.LOG' log_extension from dual
 /
+SELECT 'nm'||replace(hpr_version,'.',Null)||'_nm4200_1_&log_extension' logfile1
+FROM hig_products WHERE hpr_product = 'NET' 
+/
+SELECT 'nm'||replace(hpr_version,'.',Null)||'_nm4200_2_&log_extension' logfile2
+FROM hig_products WHERE hpr_product = 'NET' 
+/
+
 set term on
 ---------------------------------------------------------------------------------------------------
 --
