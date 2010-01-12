@@ -1,5 +1,5 @@
 ------------------------------------------------------------------
--- nm4100_nm4200_ddl_upg.sql
+-- nm4101_nm4200_ddl_upg.sql
 ------------------------------------------------------------------
 
 
@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4101_nm4200_ddl_upg.sql-arc   3.0   Jan 12 2010 14:16:34   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4101_nm4200_ddl_upg.sql-arc   3.1   Jan 12 2010 15:34:22   malexander  $
 --       Module Name      : $Workfile:   nm4101_nm4200_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jan 12 2010 14:16:34  $
---       Date fetched Out : $Modtime:   Jan 12 2010 10:56:08  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jan 12 2010 15:34:22  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 15:27:16  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -82,6 +82,8 @@ EXCEPTION
 WHEN already_exists THEN
 NULL;
 END;
+/
+
 --
 ALTER TABLE nm_inv_type_attribs_all ENABLE ALL TRIGGERS;
 --
@@ -103,6 +105,8 @@ EXCEPTION
 WHEN already_exists THEN
   NULL;
 END;
+/
+
 ------------------------------------------------------------------
 
 
