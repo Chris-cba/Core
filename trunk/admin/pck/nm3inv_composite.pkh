@@ -1,14 +1,15 @@
 create or replace package nm3inv_composite as
 --<PACKAGE>
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3inv_composite.pkh	1.1 09/06/05
---       Module Name      : nm3inv_composite.pkh
---       Date into SCCS   : 05/09/06 10:26:22
---       Date fetched Out : 07/06/13 14:11:58
---       SCCS Version     : 1.1
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite.pkh-arc   2.1   Jan 12 2010 09:46:36   cstrettle  $
+--       Module Name      : $Workfile:   nm3inv_composite.pkh  $
+--       Date into PVCS   : $Date:   Jan 12 2010 09:46:36  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 09:43:42  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
 --   Author : Jonathan Mills
 --
 --   Composite Inventory package
@@ -18,7 +19,7 @@ create or replace package nm3inv_composite as
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3inv_composite.pkh	1.1 09/06/05"';
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --  g_sccsid is the SCCS ID for the package
 --
    c_composite_nic_category CONSTANT nm_inv_categories.nic_category%TYPE := 'D';

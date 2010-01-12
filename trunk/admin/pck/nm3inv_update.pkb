@@ -1,16 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3inv_update AS
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3inv_update.pkb	1.5 04/27/06
---       Module Name      : nm3inv_update.pkb
---       Date into SCCS   : 06/04/27 14:10:04
---       Date fetched Out : 07/06/13 14:12:06
---       SCCS Version     : 1.5
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_update.pkb-arc   2.5   Jan 12 2010 09:46:36   cstrettle  $
+--       Module Name      : $Workfile:   nm3inv_update.pkb  $
+--       Date into PVCS   : $Date:   Jan 12 2010 09:46:36  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 09:39:02  $
+--       Version          : $Revision:   2.5  $
+--       Based on SCCS version : 1.5 
+-------------------------------------------------------------------------
 --   Author : Kevin Angus
 --
 --   nm3inv_update body
@@ -26,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_update AS
   -----------
   --g_body_sccsid is the SCCS ID for the package body
   --g_body_sccsid  CONSTANT varchar2(2000) := '"@(#)nm3inv_update.pkb	1.5 04/27/06"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.4  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.5  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3inv_update';
 
