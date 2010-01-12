@@ -1,17 +1,15 @@
 create or replace package body nm3mrg_supplementary as
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3mrg_supplementary.pkb	1.16 05/02/06
---       Module Name      : nm3mrg_supplementary.pkb
---       Date into SCCS   : 06/05/02 10:19:56
---       Date fetched Out : 07/06/13 14:12:50
---       SCCS Version     : 1.16
---
---
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_supplementary.pkb-arc   2.1   Jan 12 2010 10:00:36   cstrettle  $
+--       Module Name      : $Workfile:   nm3mrg_supplementary.pkb  $
+--       Date into PVCS   : $Date:   Jan 12 2010 10:00:36  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 09:58:22  $
+--       Version          : $Revision:   2.1  $
+--       Based on SCCS version : 1.16
+-------------------------------------------------------------------------
 --
 --   Author : Jonathan Mills
 --
@@ -23,8 +21,8 @@ create or replace package body nm3mrg_supplementary as
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3mrg_supplementary.pkb	1.16 05/02/06"';
 --  g_body_sccsid is the SCCS ID for the package body
+   g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3mrg_supplementary';
 --
