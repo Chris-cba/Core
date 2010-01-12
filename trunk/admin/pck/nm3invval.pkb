@@ -1,13 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3invval.pkb	1.30 10/02/06
---       Module Name      : nm3invval.pkb
---       Date into SCCS   : 06/10/02 15:52:36
---       Date fetched Out : 07/06/13 14:12:13
---       SCCS Version     : 1.30
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.5   Jan 12 2010 09:53:48   cstrettle  $
+--       Module Name      : $Workfile:   nm3invval.pkb  $
+--       Date into PVCS   : $Date:   Jan 12 2010 09:53:48  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 09:50:16  $
+--       Version          : $Revision:   2.5  $
+--       Based on SCCS version : 1.30
+-------------------------------------------------------------------------
 --
 --   Author : Jonathan Mills
 --
@@ -17,8 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3invval.pkb	1.30 10/02/06"';
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -990,7 +991,16 @@ BEGIN
        SET   nm_end_date                          = p_rec_nii.end_date
       WHERE  nm_ne_id_in                          = p_rec_nii.ne_id
        AND   NVL(nm_end_date,p_rec_nii.end_date) >= p_rec_nii.end_date;
+      -- task 0108705 CWS
+   ELSE   
+   --
+    UPDATE nm_members_all
+          SET  nm_end_date             = p_rec_nii.end_date
+     WHERE  nm_ne_id_in              = p_rec_nii.ne_id
+          AND TRUNC(nm_end_date) = TRUNC(g_tab_rec_nii_old.iit_end_date)
+          AND EXISTS (SELECT 'X' FROM nm_elements WHERE nm_ne_id_of = ne_id);           
    END IF;
+      -- task 0108705 END
 --
 --   nm_debug.proc_end(g_package_name, 'check_inv_dates');
    --
