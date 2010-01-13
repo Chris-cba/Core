@@ -5,11 +5,11 @@ CREATE OR REPLACE PACKAGE nm3seq IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3seq.pkh-arc   2.10   Oct 19 2009 11:08:24   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3seq.pkh-arc   2.11   Jan 13 2010 11:40:40   malexander  $
 --       Module Name      : $Workfile:   nm3seq.pkh  $
---       Date into PVCS   : $Date:   Oct 19 2009 11:08:24  $
---       Date fetched Out : $Modtime:   Oct 19 2009 11:04:00  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jan 13 2010 11:40:40  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 13:04:28  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --
 --   Author : Jonathan Mills
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE nm3seq IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.10  $"
+--   nm3get_gen body   : "$Revision:   2.11  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE nm3seq IS
 --
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
+   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
 --  g_sccsid is the SCCS ID for the package
 --
 --</GLOBVAR>
