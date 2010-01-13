@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.10   Oct 19 2009 11:08:30   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.11   Jan 13 2010 11:40:38   malexander  $
 --       Module Name      : $Workfile:   nm3debug.pkb  $
---       Date into PVCS   : $Date:   Oct 19 2009 11:08:30  $
---       Date fetched Out : $Modtime:   Oct 19 2009 11:04:02  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jan 13 2010 11:40:38  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 13:04:30  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.10  $"
+--   nm3get_gen body   : "$Revision:   2.11  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3debug';
@@ -3300,6 +3300,7 @@ BEGIN
    nm_debug.debug('ita_displayed       : '||pi_rec_ita.ita_displayed,p_level);
    nm_debug.debug('ita_disp_width      : '||pi_rec_ita.ita_disp_width,p_level);
    nm_debug.debug('ita_inspectable     : '||pi_rec_ita.ita_inspectable,p_level);
+   nm_debug.debug('ita_case            : '||pi_rec_ita.ita_case,p_level);
 --
    nm_debug.proc_end(g_package_name,'debug_ita');
 --
@@ -3344,6 +3345,7 @@ BEGIN
    nm_debug.debug('ita_displayed       : '||pi_rec_ita_all.ita_displayed,p_level);
    nm_debug.debug('ita_disp_width      : '||pi_rec_ita_all.ita_disp_width,p_level);
    nm_debug.debug('ita_inspectable     : '||pi_rec_ita_all.ita_inspectable,p_level);
+   nm_debug.debug('ita_case            : '||pi_rec_ita_all.ita_case,p_level);
 --
    nm_debug.proc_end(g_package_name,'debug_ita_all');
 --

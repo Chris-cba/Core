@@ -5,11 +5,11 @@ CREATE OR REPLACE PACKAGE nm3get IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkh-arc   2.10   Oct 19 2009 11:08:28   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkh-arc   2.11   Jan 13 2010 11:40:38   malexander  $
 --       Module Name      : $Workfile:   nm3get.pkh  $
---       Date into PVCS   : $Date:   Oct 19 2009 11:08:28  $
---       Date fetched Out : $Modtime:   Oct 19 2009 11:04:00  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jan 13 2010 11:40:38  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 13:04:28  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --
 --   Author : Jonathan Mills
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE nm3get IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.10  $"
+--   nm3get_gen body   : "$Revision:   2.11  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE nm3get IS
 --
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
+   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
 --  g_sccsid is the SCCS ID for the package
 --
 --</GLOBVAR>
@@ -1090,18 +1090,18 @@ FUNCTION get_nau (pi_nau_admin_unit    nm_admin_units.nau_admin_unit%TYPE
                  ) RETURN nm_admin_units%ROWTYPE;
 PRAGMA RESTRICT_REFERENCES (get_nau, WNPS, WNDS);
 --
---   Function to get using HAU_UK1 constraint
+--   Function to get using HAU_UK2 constraint
 --
-FUNCTION get_nau (pi_nau_unit_code     nm_admin_units.nau_unit_code%TYPE
+FUNCTION get_nau (pi_nau_name          nm_admin_units.nau_name%TYPE
                  ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                  ) RETURN nm_admin_units%ROWTYPE;
 PRAGMA RESTRICT_REFERENCES (get_nau, WNPS, WNDS);
 --
---   Function to get using HAU_UK2 constraint
+--   Function to get using HAU_UK1 constraint
 --
-FUNCTION get_nau (pi_nau_name          nm_admin_units.nau_name%TYPE
+FUNCTION get_nau (pi_nau_unit_code     nm_admin_units.nau_unit_code%TYPE
                  ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
@@ -1120,18 +1120,18 @@ FUNCTION get_nau_all (pi_nau_admin_unit    nm_admin_units_all.nau_admin_unit%TYP
                      ) RETURN nm_admin_units_all%ROWTYPE;
 PRAGMA RESTRICT_REFERENCES (get_nau_all, WNPS, WNDS);
 --
---   Function to get using HAU_UK1 constraint
+--   Function to get using HAU_UK2 constraint
 --
-FUNCTION get_nau_all (pi_nau_unit_code     nm_admin_units_all.nau_unit_code%TYPE
+FUNCTION get_nau_all (pi_nau_name          nm_admin_units_all.nau_name%TYPE
                      ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                      ) RETURN nm_admin_units_all%ROWTYPE;
 PRAGMA RESTRICT_REFERENCES (get_nau_all, WNPS, WNDS);
 --
---   Function to get using HAU_UK2 constraint
+--   Function to get using HAU_UK1 constraint
 --
-FUNCTION get_nau_all (pi_nau_name          nm_admin_units_all.nau_name%TYPE
+FUNCTION get_nau_all (pi_nau_unit_code     nm_admin_units_all.nau_unit_code%TYPE
                      ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
@@ -1936,19 +1936,19 @@ FUNCTION get_ita (pi_ita_inv_type      nm_inv_type_attribs.ita_inv_type%TYPE
                  ) RETURN nm_inv_type_attribs%ROWTYPE;
 PRAGMA RESTRICT_REFERENCES (get_ita, WNPS, WNDS);
 --
---   Function to get using ITA_UK_VIEW_ATTRI constraint
+--   Function to get using ITA_UK_VIEW_COL constraint
 --
 FUNCTION get_ita (pi_ita_inv_type      nm_inv_type_attribs.ita_inv_type%TYPE
-                 ,pi_ita_view_attri    nm_inv_type_attribs.ita_view_attri%TYPE
+                 ,pi_ita_view_col_name nm_inv_type_attribs.ita_view_col_name%TYPE
                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                  ) RETURN nm_inv_type_attribs%ROWTYPE;
 PRAGMA RESTRICT_REFERENCES (get_ita, WNPS, WNDS);
 --
---   Function to get using ITA_UK_VIEW_COL constraint
+--   Function to get using ITA_UK_VIEW_ATTRI constraint
 --
 FUNCTION get_ita (pi_ita_inv_type      nm_inv_type_attribs.ita_inv_type%TYPE
-                 ,pi_ita_view_col_name nm_inv_type_attribs.ita_view_col_name%TYPE
+                 ,pi_ita_view_attri    nm_inv_type_attribs.ita_view_attri%TYPE
                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                  ) RETURN nm_inv_type_attribs%ROWTYPE;
@@ -1967,19 +1967,19 @@ FUNCTION get_ita_all (pi_ita_inv_type      nm_inv_type_attribs_all.ita_inv_type%
                      ) RETURN nm_inv_type_attribs_all%ROWTYPE;
 PRAGMA RESTRICT_REFERENCES (get_ita_all, WNPS, WNDS);
 --
---   Function to get using ITA_UK_VIEW_ATTRI constraint
+--   Function to get using ITA_UK_VIEW_COL constraint
 --
 FUNCTION get_ita_all (pi_ita_inv_type      nm_inv_type_attribs_all.ita_inv_type%TYPE
-                     ,pi_ita_view_attri    nm_inv_type_attribs_all.ita_view_attri%TYPE
+                     ,pi_ita_view_col_name nm_inv_type_attribs_all.ita_view_col_name%TYPE
                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                      ) RETURN nm_inv_type_attribs_all%ROWTYPE;
 PRAGMA RESTRICT_REFERENCES (get_ita_all, WNPS, WNDS);
 --
---   Function to get using ITA_UK_VIEW_COL constraint
+--   Function to get using ITA_UK_VIEW_ATTRI constraint
 --
 FUNCTION get_ita_all (pi_ita_inv_type      nm_inv_type_attribs_all.ita_inv_type%TYPE
-                     ,pi_ita_view_col_name nm_inv_type_attribs_all.ita_view_col_name%TYPE
+                     ,pi_ita_view_attri    nm_inv_type_attribs_all.ita_view_attri%TYPE
                      ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                      ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                      ) RETURN nm_inv_type_attribs_all%ROWTYPE;
@@ -2296,19 +2296,19 @@ FUNCTION get_nld (pi_nld_id            nm_load_destinations.nld_id%TYPE
                  ) RETURN nm_load_destinations%ROWTYPE;
 PRAGMA RESTRICT_REFERENCES (get_nld, WNPS, WNDS);
 --
---   Function to get using NLD_UK1 constraint
---
-FUNCTION get_nld (pi_nld_table_name    nm_load_destinations.nld_table_name%TYPE
-                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                 ) RETURN nm_load_destinations%ROWTYPE;
-PRAGMA RESTRICT_REFERENCES (get_nld, WNPS, WNDS);
---
 --   Function to get using NLD_UK2 constraint
 --
 FUNCTION get_nld (pi_nld_table_short_name nm_load_destinations.nld_table_short_name%TYPE
                  ,pi_raise_not_found      BOOLEAN     DEFAULT TRUE
                  ,pi_not_found_sqlcode    PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_load_destinations%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get_nld, WNPS, WNDS);
+--
+--   Function to get using NLD_UK1 constraint
+--
+FUNCTION get_nld (pi_nld_table_name    nm_load_destinations.nld_table_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                  ) RETURN nm_load_destinations%ROWTYPE;
 PRAGMA RESTRICT_REFERENCES (get_nld, WNPS, WNDS);
 --</PROC>
@@ -3071,19 +3071,19 @@ FUNCTION get_nod (pi_nod_nmo_operation nm_operation_data.nod_nmo_operation%TYPE
                  ) RETURN nm_operation_data%ROWTYPE;
 PRAGMA RESTRICT_REFERENCES (get_nod, WNPS, WNDS);
 --
---   Function to get using NOD_SCRN_TEXT_UK constraint
+--   Function to get using NOD_UK constraint
 --
 FUNCTION get_nod (pi_nod_nmo_operation nm_operation_data.nod_nmo_operation%TYPE
-                 ,pi_nod_scrn_text     nm_operation_data.nod_scrn_text%TYPE
+                 ,pi_nod_seq           nm_operation_data.nod_seq%TYPE
                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                  ) RETURN nm_operation_data%ROWTYPE;
 PRAGMA RESTRICT_REFERENCES (get_nod, WNPS, WNDS);
 --
---   Function to get using NOD_UK constraint
+--   Function to get using NOD_SCRN_TEXT_UK constraint
 --
 FUNCTION get_nod (pi_nod_nmo_operation nm_operation_data.nod_nmo_operation%TYPE
-                 ,pi_nod_seq           nm_operation_data.nod_seq%TYPE
+                 ,pi_nod_scrn_text     nm_operation_data.nod_scrn_text%TYPE
                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
                  ) RETURN nm_operation_data%ROWTYPE;

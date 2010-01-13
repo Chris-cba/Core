@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.11   Oct 19 2009 11:08:28   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.12   Jan 13 2010 11:40:38   malexander  $
 --       Module Name      : $Workfile:   nm3ins.pkb  $
---       Date into PVCS   : $Date:   Oct 19 2009 11:08:28  $
---       Date fetched Out : $Modtime:   Oct 19 2009 11:04:02  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Jan 13 2010 11:40:38  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 13:04:30  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.11  $"
+--   nm3get_gen body   : "$Revision:   2.12  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.12  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
@@ -8005,6 +8005,7 @@ BEGIN
    p_rec_ita.ita_keep_history_yn            := NVL(p_rec_ita.ita_keep_history_yn,'N' );
    p_rec_ita.ita_displayed                  := NVL(p_rec_ita.ita_displayed,'Y' );
    p_rec_ita.ita_inspectable                := NVL(p_rec_ita.ita_inspectable,'Y' );
+   p_rec_ita.ita_case                       := NVL(p_rec_ita.ita_case,'UPPER' );
 --
    INSERT INTO nm_inv_type_attribs
             (ita_inv_type
@@ -8039,6 +8040,7 @@ BEGIN
             ,ita_displayed
             ,ita_disp_width
             ,ita_inspectable
+            ,ita_case
             )
      VALUES (p_rec_ita.ita_inv_type
             ,p_rec_ita.ita_attrib_name
@@ -8072,6 +8074,7 @@ BEGIN
             ,p_rec_ita.ita_displayed
             ,p_rec_ita.ita_disp_width
             ,p_rec_ita.ita_inspectable
+            ,p_rec_ita.ita_case
             );
 --
    p_rec_ita := nm3get.get_ita
@@ -8097,6 +8100,7 @@ BEGIN
    p_rec_ita_all.ita_keep_history_yn            := NVL(p_rec_ita_all.ita_keep_history_yn,'N' );
    p_rec_ita_all.ita_displayed                  := NVL(p_rec_ita_all.ita_displayed,'Y' );
    p_rec_ita_all.ita_inspectable                := NVL(p_rec_ita_all.ita_inspectable,'Y' );
+   p_rec_ita_all.ita_case                       := NVL(p_rec_ita_all.ita_case,'UPPER' );
 --
    INSERT INTO nm_inv_type_attribs_all
             (ita_inv_type
@@ -8131,6 +8135,7 @@ BEGIN
             ,ita_displayed
             ,ita_disp_width
             ,ita_inspectable
+            ,ita_case
             )
      VALUES (p_rec_ita_all.ita_inv_type
             ,p_rec_ita_all.ita_attrib_name
@@ -8164,6 +8169,7 @@ BEGIN
             ,p_rec_ita_all.ita_displayed
             ,p_rec_ita_all.ita_disp_width
             ,p_rec_ita_all.ita_inspectable
+            ,p_rec_ita_all.ita_case
             )
    RETURNING ita_inv_type
             ,ita_attrib_name
@@ -8197,6 +8203,7 @@ BEGIN
             ,ita_displayed
             ,ita_disp_width
             ,ita_inspectable
+            ,ita_case
       INTO   p_rec_ita_all.ita_inv_type
             ,p_rec_ita_all.ita_attrib_name
             ,p_rec_ita_all.ita_dynamic_attrib
@@ -8228,7 +8235,8 @@ BEGIN
             ,p_rec_ita_all.ita_query
             ,p_rec_ita_all.ita_displayed
             ,p_rec_ita_all.ita_disp_width
-            ,p_rec_ita_all.ita_inspectable;
+            ,p_rec_ita_all.ita_inspectable
+            ,p_rec_ita_all.ita_case;
 --
    nm_debug.proc_end(g_package_name,'ins_ita_all');
 --

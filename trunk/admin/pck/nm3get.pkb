@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkb-arc   2.10   Oct 19 2009 11:08:28   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkb-arc   2.11   Jan 13 2010 11:40:38   malexander  $
 --       Module Name      : $Workfile:   nm3get.pkb  $
---       Date into PVCS   : $Date:   Oct 19 2009 11:08:28  $
---       Date fetched Out : $Modtime:   Oct 19 2009 11:04:00  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jan 13 2010 11:40:38  $
+--       Date fetched Out : $Modtime:   Jan 12 2010 13:04:28  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.10  $"
+--   nm3get_gen body   : "$Revision:   2.11  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3get';
@@ -3666,52 +3666,6 @@ END get_nau;
 -----------------------------------------------------------------------------
 --
 --
---   Function to get using HAU_UK1 constraint
---
-FUNCTION get_nau (pi_nau_unit_code     nm_admin_units.nau_unit_code%TYPE
-                 ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
-                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                 ) RETURN nm_admin_units%ROWTYPE IS
---
-   CURSOR cs_nau IS
-   SELECT /*+ INDEX (nau HAU_UK1) */ *
-    FROM  nm_admin_units nau
-   WHERE  nau.nau_unit_code  = pi_nau_unit_code
-    AND   nau.nau_admin_type = pi_nau_admin_type;
---
-   l_found  BOOLEAN;
-   l_retval nm_admin_units%ROWTYPE;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'get_nau');
---
-   OPEN  cs_nau;
-   FETCH cs_nau INTO l_retval;
-   l_found := cs_nau%FOUND;
-   CLOSE cs_nau;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_admin_units (HAU_UK1)'
-                                              ||CHR(10)||'nau_unit_code  => '||pi_nau_unit_code
-                                              ||CHR(10)||'nau_admin_type => '||pi_nau_admin_type
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'get_nau');
---
-   RETURN l_retval;
---
-END get_nau;
---
------------------------------------------------------------------------------
---
---
 --   Function to get using HAU_UK2 constraint
 --
 FUNCTION get_nau (pi_nau_name          nm_admin_units.nau_name%TYPE
@@ -3745,6 +3699,52 @@ BEGIN
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'nm_admin_units (HAU_UK2)'
                                               ||CHR(10)||'nau_name       => '||pi_nau_name
+                                              ||CHR(10)||'nau_admin_type => '||pi_nau_admin_type
+                    );
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'get_nau');
+--
+   RETURN l_retval;
+--
+END get_nau;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Function to get using HAU_UK1 constraint
+--
+FUNCTION get_nau (pi_nau_unit_code     nm_admin_units.nau_unit_code%TYPE
+                 ,pi_nau_admin_type    nm_admin_units.nau_admin_type%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_admin_units%ROWTYPE IS
+--
+   CURSOR cs_nau IS
+   SELECT /*+ INDEX (nau HAU_UK1) */ *
+    FROM  nm_admin_units nau
+   WHERE  nau.nau_unit_code  = pi_nau_unit_code
+    AND   nau.nau_admin_type = pi_nau_admin_type;
+--
+   l_found  BOOLEAN;
+   l_retval nm_admin_units%ROWTYPE;
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'get_nau');
+--
+   OPEN  cs_nau;
+   FETCH cs_nau INTO l_retval;
+   l_found := cs_nau%FOUND;
+   CLOSE cs_nau;
+--
+   IF pi_raise_not_found AND NOT l_found
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 67
+                    ,pi_sqlcode            => pi_not_found_sqlcode
+                    ,pi_supplementary_info => 'nm_admin_units (HAU_UK1)'
+                                              ||CHR(10)||'nau_unit_code  => '||pi_nau_unit_code
                                               ||CHR(10)||'nau_admin_type => '||pi_nau_admin_type
                     );
    END IF;
@@ -3801,52 +3801,6 @@ END get_nau_all;
 -----------------------------------------------------------------------------
 --
 --
---   Function to get using HAU_UK1 constraint
---
-FUNCTION get_nau_all (pi_nau_unit_code     nm_admin_units_all.nau_unit_code%TYPE
-                     ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
-                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                     ) RETURN nm_admin_units_all%ROWTYPE IS
---
-   CURSOR cs_nau_all IS
-   SELECT /*+ INDEX (nau_all HAU_UK1) */ *
-    FROM  nm_admin_units_all nau_all
-   WHERE  nau_all.nau_unit_code  = pi_nau_unit_code
-    AND   nau_all.nau_admin_type = pi_nau_admin_type;
---
-   l_found  BOOLEAN;
-   l_retval nm_admin_units_all%ROWTYPE;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'get_nau_all');
---
-   OPEN  cs_nau_all;
-   FETCH cs_nau_all INTO l_retval;
-   l_found := cs_nau_all%FOUND;
-   CLOSE cs_nau_all;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_admin_units_all (HAU_UK1)'
-                                              ||CHR(10)||'nau_unit_code  => '||pi_nau_unit_code
-                                              ||CHR(10)||'nau_admin_type => '||pi_nau_admin_type
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'get_nau_all');
---
-   RETURN l_retval;
---
-END get_nau_all;
---
------------------------------------------------------------------------------
---
---
 --   Function to get using HAU_UK2 constraint
 --
 FUNCTION get_nau_all (pi_nau_name          nm_admin_units_all.nau_name%TYPE
@@ -3880,6 +3834,52 @@ BEGIN
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'nm_admin_units_all (HAU_UK2)'
                                               ||CHR(10)||'nau_name       => '||pi_nau_name
+                                              ||CHR(10)||'nau_admin_type => '||pi_nau_admin_type
+                    );
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'get_nau_all');
+--
+   RETURN l_retval;
+--
+END get_nau_all;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Function to get using HAU_UK1 constraint
+--
+FUNCTION get_nau_all (pi_nau_unit_code     nm_admin_units_all.nau_unit_code%TYPE
+                     ,pi_nau_admin_type    nm_admin_units_all.nau_admin_type%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_admin_units_all%ROWTYPE IS
+--
+   CURSOR cs_nau_all IS
+   SELECT /*+ INDEX (nau_all HAU_UK1) */ *
+    FROM  nm_admin_units_all nau_all
+   WHERE  nau_all.nau_unit_code  = pi_nau_unit_code
+    AND   nau_all.nau_admin_type = pi_nau_admin_type;
+--
+   l_found  BOOLEAN;
+   l_retval nm_admin_units_all%ROWTYPE;
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'get_nau_all');
+--
+   OPEN  cs_nau_all;
+   FETCH cs_nau_all INTO l_retval;
+   l_found := cs_nau_all%FOUND;
+   CLOSE cs_nau_all;
+--
+   IF pi_raise_not_found AND NOT l_found
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 67
+                    ,pi_sqlcode            => pi_not_found_sqlcode
+                    ,pi_supplementary_info => 'nm_admin_units_all (HAU_UK1)'
+                                              ||CHR(10)||'nau_unit_code  => '||pi_nau_unit_code
                                               ||CHR(10)||'nau_admin_type => '||pi_nau_admin_type
                     );
    END IF;
@@ -6752,52 +6752,6 @@ END get_ita;
 -----------------------------------------------------------------------------
 --
 --
---   Function to get using ITA_UK_VIEW_ATTRI constraint
---
-FUNCTION get_ita (pi_ita_inv_type      nm_inv_type_attribs.ita_inv_type%TYPE
-                 ,pi_ita_view_attri    nm_inv_type_attribs.ita_view_attri%TYPE
-                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                 ) RETURN nm_inv_type_attribs%ROWTYPE IS
---
-   CURSOR cs_ita IS
-   SELECT /*+ INDEX (ita ITA_UK_VIEW_ATTRI) */ *
-    FROM  nm_inv_type_attribs ita
-   WHERE  ita.ita_inv_type   = pi_ita_inv_type
-    AND   ita.ita_view_attri = pi_ita_view_attri;
---
-   l_found  BOOLEAN;
-   l_retval nm_inv_type_attribs%ROWTYPE;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'get_ita');
---
-   OPEN  cs_ita;
-   FETCH cs_ita INTO l_retval;
-   l_found := cs_ita%FOUND;
-   CLOSE cs_ita;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_inv_type_attribs (ITA_UK_VIEW_ATTRI)'
-                                              ||CHR(10)||'ita_inv_type   => '||pi_ita_inv_type
-                                              ||CHR(10)||'ita_view_attri => '||pi_ita_view_attri
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'get_ita');
---
-   RETURN l_retval;
---
-END get_ita;
---
------------------------------------------------------------------------------
---
---
 --   Function to get using ITA_UK_VIEW_COL constraint
 --
 FUNCTION get_ita (pi_ita_inv_type      nm_inv_type_attribs.ita_inv_type%TYPE
@@ -6832,6 +6786,52 @@ BEGIN
                     ,pi_supplementary_info => 'nm_inv_type_attribs (ITA_UK_VIEW_COL)'
                                               ||CHR(10)||'ita_inv_type      => '||pi_ita_inv_type
                                               ||CHR(10)||'ita_view_col_name => '||pi_ita_view_col_name
+                    );
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'get_ita');
+--
+   RETURN l_retval;
+--
+END get_ita;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Function to get using ITA_UK_VIEW_ATTRI constraint
+--
+FUNCTION get_ita (pi_ita_inv_type      nm_inv_type_attribs.ita_inv_type%TYPE
+                 ,pi_ita_view_attri    nm_inv_type_attribs.ita_view_attri%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_inv_type_attribs%ROWTYPE IS
+--
+   CURSOR cs_ita IS
+   SELECT /*+ INDEX (ita ITA_UK_VIEW_ATTRI) */ *
+    FROM  nm_inv_type_attribs ita
+   WHERE  ita.ita_inv_type   = pi_ita_inv_type
+    AND   ita.ita_view_attri = pi_ita_view_attri;
+--
+   l_found  BOOLEAN;
+   l_retval nm_inv_type_attribs%ROWTYPE;
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'get_ita');
+--
+   OPEN  cs_ita;
+   FETCH cs_ita INTO l_retval;
+   l_found := cs_ita%FOUND;
+   CLOSE cs_ita;
+--
+   IF pi_raise_not_found AND NOT l_found
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 67
+                    ,pi_sqlcode            => pi_not_found_sqlcode
+                    ,pi_supplementary_info => 'nm_inv_type_attribs (ITA_UK_VIEW_ATTRI)'
+                                              ||CHR(10)||'ita_inv_type   => '||pi_ita_inv_type
+                                              ||CHR(10)||'ita_view_attri => '||pi_ita_view_attri
                     );
    END IF;
 --
@@ -6890,52 +6890,6 @@ END get_ita_all;
 -----------------------------------------------------------------------------
 --
 --
---   Function to get using ITA_UK_VIEW_ATTRI constraint
---
-FUNCTION get_ita_all (pi_ita_inv_type      nm_inv_type_attribs_all.ita_inv_type%TYPE
-                     ,pi_ita_view_attri    nm_inv_type_attribs_all.ita_view_attri%TYPE
-                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                     ) RETURN nm_inv_type_attribs_all%ROWTYPE IS
---
-   CURSOR cs_ita_all IS
-   SELECT /*+ INDEX (ita_all ITA_UK_VIEW_ATTRI) */ *
-    FROM  nm_inv_type_attribs_all ita_all
-   WHERE  ita_all.ita_inv_type   = pi_ita_inv_type
-    AND   ita_all.ita_view_attri = pi_ita_view_attri;
---
-   l_found  BOOLEAN;
-   l_retval nm_inv_type_attribs_all%ROWTYPE;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'get_ita_all');
---
-   OPEN  cs_ita_all;
-   FETCH cs_ita_all INTO l_retval;
-   l_found := cs_ita_all%FOUND;
-   CLOSE cs_ita_all;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_inv_type_attribs_all (ITA_UK_VIEW_ATTRI)'
-                                              ||CHR(10)||'ita_inv_type   => '||pi_ita_inv_type
-                                              ||CHR(10)||'ita_view_attri => '||pi_ita_view_attri
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'get_ita_all');
---
-   RETURN l_retval;
---
-END get_ita_all;
---
------------------------------------------------------------------------------
---
---
 --   Function to get using ITA_UK_VIEW_COL constraint
 --
 FUNCTION get_ita_all (pi_ita_inv_type      nm_inv_type_attribs_all.ita_inv_type%TYPE
@@ -6970,6 +6924,52 @@ BEGIN
                     ,pi_supplementary_info => 'nm_inv_type_attribs_all (ITA_UK_VIEW_COL)'
                                               ||CHR(10)||'ita_inv_type      => '||pi_ita_inv_type
                                               ||CHR(10)||'ita_view_col_name => '||pi_ita_view_col_name
+                    );
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'get_ita_all');
+--
+   RETURN l_retval;
+--
+END get_ita_all;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Function to get using ITA_UK_VIEW_ATTRI constraint
+--
+FUNCTION get_ita_all (pi_ita_inv_type      nm_inv_type_attribs_all.ita_inv_type%TYPE
+                     ,pi_ita_view_attri    nm_inv_type_attribs_all.ita_view_attri%TYPE
+                     ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                     ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                     ) RETURN nm_inv_type_attribs_all%ROWTYPE IS
+--
+   CURSOR cs_ita_all IS
+   SELECT /*+ INDEX (ita_all ITA_UK_VIEW_ATTRI) */ *
+    FROM  nm_inv_type_attribs_all ita_all
+   WHERE  ita_all.ita_inv_type   = pi_ita_inv_type
+    AND   ita_all.ita_view_attri = pi_ita_view_attri;
+--
+   l_found  BOOLEAN;
+   l_retval nm_inv_type_attribs_all%ROWTYPE;
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'get_ita_all');
+--
+   OPEN  cs_ita_all;
+   FETCH cs_ita_all INTO l_retval;
+   l_found := cs_ita_all%FOUND;
+   CLOSE cs_ita_all;
+--
+   IF pi_raise_not_found AND NOT l_found
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 67
+                    ,pi_sqlcode            => pi_not_found_sqlcode
+                    ,pi_supplementary_info => 'nm_inv_type_attribs_all (ITA_UK_VIEW_ATTRI)'
+                                              ||CHR(10)||'ita_inv_type   => '||pi_ita_inv_type
+                                              ||CHR(10)||'ita_view_attri => '||pi_ita_view_attri
                     );
    END IF;
 --
@@ -8086,49 +8086,6 @@ END get_nld;
 -----------------------------------------------------------------------------
 --
 --
---   Function to get using NLD_UK1 constraint
---
-FUNCTION get_nld (pi_nld_table_name    nm_load_destinations.nld_table_name%TYPE
-                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                 ) RETURN nm_load_destinations%ROWTYPE IS
---
-   CURSOR cs_nld IS
-   SELECT /*+ INDEX (nld NLD_UK1) */ *
-    FROM  nm_load_destinations nld
-   WHERE  nld.nld_table_name = pi_nld_table_name;
---
-   l_found  BOOLEAN;
-   l_retval nm_load_destinations%ROWTYPE;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'get_nld');
---
-   OPEN  cs_nld;
-   FETCH cs_nld INTO l_retval;
-   l_found := cs_nld%FOUND;
-   CLOSE cs_nld;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_load_destinations (NLD_UK1)'
-                                              ||CHR(10)||'nld_table_name => '||pi_nld_table_name
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'get_nld');
---
-   RETURN l_retval;
---
-END get_nld;
---
------------------------------------------------------------------------------
---
---
 --   Function to get using NLD_UK2 constraint
 --
 FUNCTION get_nld (pi_nld_table_short_name nm_load_destinations.nld_table_short_name%TYPE
@@ -8160,6 +8117,49 @@ BEGIN
                     ,pi_sqlcode            => pi_not_found_sqlcode
                     ,pi_supplementary_info => 'nm_load_destinations (NLD_UK2)'
                                               ||CHR(10)||'nld_table_short_name => '||pi_nld_table_short_name
+                    );
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'get_nld');
+--
+   RETURN l_retval;
+--
+END get_nld;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Function to get using NLD_UK1 constraint
+--
+FUNCTION get_nld (pi_nld_table_name    nm_load_destinations.nld_table_name%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_load_destinations%ROWTYPE IS
+--
+   CURSOR cs_nld IS
+   SELECT /*+ INDEX (nld NLD_UK1) */ *
+    FROM  nm_load_destinations nld
+   WHERE  nld.nld_table_name = pi_nld_table_name;
+--
+   l_found  BOOLEAN;
+   l_retval nm_load_destinations%ROWTYPE;
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'get_nld');
+--
+   OPEN  cs_nld;
+   FETCH cs_nld INTO l_retval;
+   l_found := cs_nld%FOUND;
+   CLOSE cs_nld;
+--
+   IF pi_raise_not_found AND NOT l_found
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 67
+                    ,pi_sqlcode            => pi_not_found_sqlcode
+                    ,pi_supplementary_info => 'nm_load_destinations (NLD_UK1)'
+                                              ||CHR(10)||'nld_table_name => '||pi_nld_table_name
                     );
    END IF;
 --
@@ -10892,52 +10892,6 @@ END get_nod;
 -----------------------------------------------------------------------------
 --
 --
---   Function to get using NOD_SCRN_TEXT_UK constraint
---
-FUNCTION get_nod (pi_nod_nmo_operation nm_operation_data.nod_nmo_operation%TYPE
-                 ,pi_nod_scrn_text     nm_operation_data.nod_scrn_text%TYPE
-                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
-                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
-                 ) RETURN nm_operation_data%ROWTYPE IS
---
-   CURSOR cs_nod IS
-   SELECT /*+ INDEX (nod NOD_SCRN_TEXT_UK) */ *
-    FROM  nm_operation_data nod
-   WHERE  nod.nod_nmo_operation = pi_nod_nmo_operation
-    AND   nod.nod_scrn_text     = pi_nod_scrn_text;
---
-   l_found  BOOLEAN;
-   l_retval nm_operation_data%ROWTYPE;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'get_nod');
---
-   OPEN  cs_nod;
-   FETCH cs_nod INTO l_retval;
-   l_found := cs_nod%FOUND;
-   CLOSE cs_nod;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_operation_data (NOD_SCRN_TEXT_UK)'
-                                              ||CHR(10)||'nod_nmo_operation => '||pi_nod_nmo_operation
-                                              ||CHR(10)||'nod_scrn_text     => '||pi_nod_scrn_text
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'get_nod');
---
-   RETURN l_retval;
---
-END get_nod;
---
------------------------------------------------------------------------------
---
---
 --   Function to get using NOD_UK constraint
 --
 FUNCTION get_nod (pi_nod_nmo_operation nm_operation_data.nod_nmo_operation%TYPE
@@ -10972,6 +10926,52 @@ BEGIN
                     ,pi_supplementary_info => 'nm_operation_data (NOD_UK)'
                                               ||CHR(10)||'nod_nmo_operation => '||pi_nod_nmo_operation
                                               ||CHR(10)||'nod_seq           => '||pi_nod_seq
+                    );
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'get_nod');
+--
+   RETURN l_retval;
+--
+END get_nod;
+--
+-----------------------------------------------------------------------------
+--
+--
+--   Function to get using NOD_SCRN_TEXT_UK constraint
+--
+FUNCTION get_nod (pi_nod_nmo_operation nm_operation_data.nod_nmo_operation%TYPE
+                 ,pi_nod_scrn_text     nm_operation_data.nod_scrn_text%TYPE
+                 ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                 ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                 ) RETURN nm_operation_data%ROWTYPE IS
+--
+   CURSOR cs_nod IS
+   SELECT /*+ INDEX (nod NOD_SCRN_TEXT_UK) */ *
+    FROM  nm_operation_data nod
+   WHERE  nod.nod_nmo_operation = pi_nod_nmo_operation
+    AND   nod.nod_scrn_text     = pi_nod_scrn_text;
+--
+   l_found  BOOLEAN;
+   l_retval nm_operation_data%ROWTYPE;
+--
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'get_nod');
+--
+   OPEN  cs_nod;
+   FETCH cs_nod INTO l_retval;
+   l_found := cs_nod%FOUND;
+   CLOSE cs_nod;
+--
+   IF pi_raise_not_found AND NOT l_found
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 67
+                    ,pi_sqlcode            => pi_not_found_sqlcode
+                    ,pi_supplementary_info => 'nm_operation_data (NOD_SCRN_TEXT_UK)'
+                                              ||CHR(10)||'nod_nmo_operation => '||pi_nod_nmo_operation
+                                              ||CHR(10)||'nod_scrn_text     => '||pi_nod_scrn_text
                     );
    END IF;
 --
