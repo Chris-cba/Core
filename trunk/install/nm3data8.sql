@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.5   Jan 12 2010 11:12:24   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.6   Jan 13 2010 11:31:08   malexander  $
 --       Module Name      : $Workfile:   nm3data8.sql  $
---       Date into PVCS   : $Date:   Jan 12 2010 11:12:24  $
---       Date fetched Out : $Modtime:   Jan 12 2010 11:02:36  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Jan 13 2010 11:31:08  $
+--       Date fetched Out : $Modtime:   Jan 13 2010 11:22:04  $
+--       Version          : $Revision:   2.6  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 12-JAN-2010 11:02
+--       Generation Date  : 13-JAN-2010 11:22
 --
 --   Product metadata script
 --   As at Release 4.2.0.0
@@ -949,6 +949,22 @@ SELECT
        ,90 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_LAYER_TREE
                    WHERE NLTR_CHILD = 'NSG');
+--
+INSERT INTO NM_LAYER_TREE
+       (NLTR_PARENT
+       ,NLTR_CHILD
+       ,NLTR_DESCR
+       ,NLTR_TYPE
+       ,NLTR_ORDER
+       )
+SELECT 
+        'CUS'
+       ,'RG1'
+       ,'Register Table As Theme'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LAYER_TREE
+                   WHERE NLTR_CHILD = 'RG1');
 --
 INSERT INTO NM_LAYER_TREE
        (NLTR_PARENT

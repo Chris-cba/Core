@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.32   Jan 12 2010 11:12:22   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.33   Jan 13 2010 11:31:08   malexander  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Jan 12 2010 11:12:22  $
---       Date fetched Out : $Modtime:   Jan 12 2010 11:02:20  $
---       Version          : $Revision:   2.32  $
+--       Date into PVCS   : $Date:   Jan 13 2010 11:31:08  $
+--       Date fetched Out : $Modtime:   Jan 13 2010 11:21:50  $
+--       Version          : $Revision:   2.33  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 12-JAN-2010 11:02
+--       Generation Date  : 13-JAN-2010 11:21
 --
 --   Product metadata script
 --   As at Release 4.2.0.0
@@ -13676,6 +13676,20 @@ INSERT INTO HIG_DOMAINS
        ,HDO_CODE_LENGTH
        )
 SELECT 
+        'ATTRIBUTE_CASE'
+       ,'HIG'
+       ,'Attribute Case'
+       ,7 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_DOMAINS
+                   WHERE HDO_DOMAIN = 'ATTRIBUTE_CASE');
+--
+INSERT INTO HIG_DOMAINS
+       (HDO_DOMAIN
+       ,HDO_PRODUCT
+       ,HDO_TITLE
+       ,HDO_CODE_LENGTH
+       )
+SELECT 
         'BOOLEAN'
        ,'HIG'
        ,'"TRUE" or "FALSE"'
@@ -15044,6 +15058,69 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
                    WHERE HCO_DOMAIN = 'ADOPTION_STATUS'
                     AND  HCO_CODE = 'U');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'ATTRIBUTE_CASE'
+       ,'LOWER'
+       ,'Lower Case'
+       ,'N'
+       ,2
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'ATTRIBUTE_CASE'
+                    AND  HCO_CODE = 'LOWER');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'ATTRIBUTE_CASE'
+       ,'MIXED'
+       ,'Mixed Case'
+       ,'N'
+       ,3
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'ATTRIBUTE_CASE'
+                    AND  HCO_CODE = 'MIXED');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'ATTRIBUTE_CASE'
+       ,'UPPER'
+       ,'Upper Case'
+       ,'N'
+       ,1
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'ATTRIBUTE_CASE'
+                    AND  HCO_CODE = 'UPPER');
 --
 INSERT INTO HIG_CODES
        (HCO_DOMAIN
@@ -24515,6 +24592,48 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
                    WHERE HCO_DOMAIN = 'PBI_SR_COND'
                     AND  HCO_CODE = '>=');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'PBI_SR_COND'
+       ,'IS NOT NULL'
+       ,'Value is not Null'
+       ,'Y'
+       ,8
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'PBI_SR_COND'
+                    AND  HCO_CODE = 'IS NOT NULL');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'PBI_SR_COND'
+       ,'IS NULL'
+       ,'Value is Null'
+       ,'Y'
+       ,9
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'PBI_SR_COND'
+                    AND  HCO_CODE = 'IS NULL');
 --
 INSERT INTO HIG_CODES
        (HCO_DOMAIN
@@ -34234,7 +34353,7 @@ SELECT
         'WEEKEND'
        ,'HIG'
        ,'Weekend Day Numbers'
-       ,'This option must contain a list of numeric values in the range 1 to 7.'||CHR(10)||'They define the days of the week which constitute the weekend in a particular country, for use in working day calculations.  The following convention must be adopted:'||CHR(10)||'7=Sunday 2=Monday ... 6=Saturday.'||CHR(10)||'Therefore in the UK this option will contain the value 6,7'||CHR(10)||'In the Inspection Loader (MAI2200), when repairs are loaded a repair due date calculation takes place. This may be based on working days or calendar days as indicated by the defect priority rules.'||CHR(10)||'In Maintain Defects (MAI3806) a similar calculation takes place when a repair is created.'
+       ,'This option must contain a list of numeric values in the range 1 to 7.'||CHR(10)||'They define the days of the week which constitute the weekend in a particular country, for use in working day calculations.  The following convention must be adopted:'||CHR(10)||'7=Sunday 1=Monday ... 6=Saturday.'||CHR(10)||'Therefore in the UK this option will contain the value 6,7'||CHR(10)||'In the Inspection Loader (MAI2200), when repairs are loaded a repair due date calculation takes place. This may be based on working days or calendar days as indicated by the defect priority rules.'||CHR(10)||'In Maintain Defects (MAI3806) a similar calculation takes place when a repair is created.'
        ,''
        ,'VARCHAR2'
        ,'N'
