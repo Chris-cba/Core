@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.12   Jan 11 2010 16:33:36   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.13   Jan 14 2010 17:40:46   cstrettle  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Jan 11 2010 16:33:36  $
---       Date fetched Out : $Modtime:   Jan 11 2010 16:32:14  $
---       Version          : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Jan 14 2010 17:40:46  $
+--       Date fetched Out : $Modtime:   Jan 14 2010 17:36:48  $
+--       Version          : $Revision:   2.13  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.12  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.13  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -3856,21 +3856,20 @@ AS
 --<PROC NAME="REGISTER_TABLE">
 --
   FUNCTION register_table( p_table IN VARCHAR2
-                         , p_theme_name IN VARCHAR2
-                         , p_pk_col IN VARCHAR2
-                         , p_fk_col IN VARCHAR2
-                         , p_shape_col IN VARCHAR2
-                         , p_tol NUMBER DEFAULT 0.005
-                         , p_cre_idx IN VARCHAR2 DEFAULT 'N'
-                         , p_estimate_new_tol IN VARCHAR2 DEFAULT 'N'
-                         , p_override_sdo_meta IN VARCHAR2 DEFAULT 'I'
-                         , p_asset_type IN VARCHAR2
-                         , p_asset_descr IN VARCHAR2
-                         , p_gtype IN VARCHAR2
-                         , p_error OUT VARCHAR2
-                         ) 
-    return BOOLEAN 
-  IS
+                                         , p_theme_name IN VARCHAR2
+                                         , p_pk_col IN VARCHAR2
+                                         , p_fk_col IN VARCHAR2
+                                         , p_shape_col IN VARCHAR2
+                                         , p_tol NUMBER DEFAULT 0.005
+                                         ,p_cre_idx IN VARCHAR2 DEFAULT 'N'
+                                         ,p_estimate_new_tol IN VARCHAR2 DEFAULT 'N'
+                                         ,p_override_sdo_meta IN VARCHAR2 DEFAULT 'I'
+                                         ,p_asset_type IN VARCHAR2
+                                         ,p_asset_descr IN VARCHAR2
+                                         ,p_gtype IN VARCHAR2
+                                         ,p_error OUT VARCHAR2
+                                         ) 
+                                         return BOOLEAN IS
   l_nith nm_inv_themes%rowtype;
   l_ntg nm_theme_gtypes%rowtype;
   l_success BOOLEAN := TRUE;
@@ -3879,15 +3878,15 @@ AS
   --
       BEGIN
           nm3sdo.register_sdo_table_as_theme ( p_table => p_table
-	                                           , p_theme_name => p_theme_name 
-	                                           , p_pk_col => p_pk_col  
-	                                           , p_fk_col  => p_fk_col 
-	                                           , p_shape_col  => p_shape_col 
-	                                           , p_tol  => p_tol 
-	                                           , p_cre_idx  => p_cre_idx 
-	                                           , p_estimate_new_tol => p_estimate_new_tol  
-	                                           , p_override_sdo_meta  => p_override_sdo_meta 
-	                                           );
+                                                      , p_theme_name => p_theme_name 
+                                                      , p_pk_col => p_pk_col  
+                                                      , p_fk_col  => p_fk_col 
+                                                      , p_shape_col  => p_shape_col 
+                                                      , p_tol  => p_tol 
+                                                      , p_cre_idx  => p_cre_idx 
+                                                      , p_estimate_new_tol => p_estimate_new_tol  
+                                                      , p_override_sdo_meta  => p_override_sdo_meta 
+                                                      );
       EXCEPTION WHEN DUP_VAL_ON_INDEX THEN
        l_success := FALSE;
        p_error := hig.get_ner('HIG', 145).ner_descr || ': A theme already exists for the specified base table or theme name.';
@@ -3896,24 +3895,24 @@ AS
        IF  p_asset_type IS NOT NULL AND l_success THEN 
           IF nm3get.get_nit ( pi_nit_inv_type    => p_asset_type
                                      ,pi_raise_not_found => FALSE).nit_inv_type IS NULL THEN
-          
-              nm3inv.create_ft_asset_from_table(pi_table_name   => p_table
-                                              , pi_pk_column    => p_pk_col
-                                              , pi_asset_type   => p_asset_type
-                                              , pi_asset_descr  => p_asset_descr
-                                              , pi_pnt_or_cont  => 'P'
-                                              , pi_use_xy       => 'N'
-                                              , pi_x_column     => NULL
-                                              , pi_y_column     => NULL
-                                              , pi_lr_ne_column => NULL
-                                              , pi_lr_st_chain  => NULL
-                                              , pi_lr_end_chain => NULL
-                                              , pi_attrib_ltrim => 0);
+          NM_DEBUG.DEBUG('3');
+              nm3inv.create_ft_asset_from_table(pi_table_name  => p_table
+                                                                , pi_pk_column   => p_pk_col
+                                                                , pi_asset_type   => p_asset_type
+                                                                , pi_asset_descr  => p_asset_descr
+                                                                , pi_pnt_or_cont  => 'P'
+                                                                , pi_use_xy         => 'Y'
+                                                                , pi_x_column     => NULL
+                                                                , pi_y_column     => NULL
+                                                                , pi_lr_ne_column => NULL
+                                                                , pi_lr_st_chain  => NULL
+                                                                , pi_lr_end_chain => NULL
+                                                                , pi_attrib_ltrim => 7);
            END IF;
       --
        l_nith.nith_nit_id := p_asset_type;
        l_nith.nith_nth_theme_id:= nm3get.get_nth( pi_nth_theme_name    => p_theme_name
-                                                , pi_raise_not_found => FALSE).nth_theme_id; 
+                                                   ,pi_raise_not_found => FALSE).nth_theme_id; 
       --
       nm3ins.ins_nith( l_nith );
       --
@@ -3922,17 +3921,17 @@ AS
       l_ntg.ntg_seq_no:= 1;
       --
       nm3ins.ins_ntg(l_ntg);
-    END IF;
+       END IF;
   --
-    COMMIT;
-    RETURN l_success;
+     COMMIT;
+  RETURN l_success;
   --
   EXCEPTION
   WHEN OTHERS THEN
-    ROLLBACK;
-    l_success := FALSE;
-    p_error := SQLERRM;
-    RETURN l_success;
+  ROLLBACK;
+  l_success := FALSE;
+  p_error := SQLERRM;
+  RETURN l_success;
   END register_table;
 /*
    **************************
@@ -4464,6 +4463,75 @@ AS
     END;
   --
   END build_npl_data;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION run_healthcheck( pi_location IN VARCHAR2
+                                          , pi_theme_filename IN VARCHAR2
+                                          , pi_sdo_filename IN VARCHAR2
+                                          , pi_sde_filename IN VARCHAR2
+                                          , po_summary OUT VARCHAR2
+                                          ) RETURN BOOLEAN IS
+--
+l_success BOOLEAN:= TRUE;
+--
+BEGIN
+  IF pi_location IS NOT NULL THEN
+   --
+     IF pi_theme_filename IS NOT NULL THEN
+       BEGIN
+        
+          execute immediate 'BEGIN nm3sdo_check.run_theme_check(:pi_location, :pi_theme_filename); END;'
+          using pi_location, pi_theme_filename;
+         po_summary:= po_summary || pi_theme_filename || ' Created. ' || CHR (10);
+       EXCEPTION WHEN OTHERS THEN
+        l_success := FALSE;
+        po_summary:= po_summary || pi_theme_filename || ' Failed. ' || SQLERRM || CHR (10);
+       END;
+    END IF;
+    --
+    IF pi_sdo_filename IS NOT NULL THEN 
+       BEGIN
+          execute immediate 'BEGIN nm3sdo_check.run_sdo_check(:pi_location, :pi_sdo_filename); END;'
+          using pi_location, pi_sdo_filename;
+          po_summary:= po_summary || pi_sdo_filename || ' Created. ' || CHR (10);
+       EXCEPTION WHEN OTHERS THEN
+        po_summary:= po_summary ||  pi_sdo_filename || ' Failed. ' || SQLERRM || CHR (10);
+        l_success := FALSE;
+       END;
+    END IF;
+    
+    --
+    IF pi_sde_filename IS NOT NULL THEN
+       
+      BEGIN
+          execute immediate 'BEGIN nm3sde_check.run_sde_check(:pi_location, :pi_sde_filename); END;'
+          using pi_location, pi_sde_filename;
+        po_summary:= po_summary || pi_sde_filename || ' Created. ' || CHR (10);
+      EXCEPTION WHEN OTHERS THEN
+        l_success := FALSE;
+        po_summary:= po_summary || pi_sde_filename || ' Failed. ' || SQLERRM || CHR (10);
+      END;
+    --
+    END IF;
+    
+   ELSE
+    l_success := FALSE;
+  END IF;
+    
+RETURN l_success;
+END;
+
+
+FUNCTION cleanup_idx(pi_index_name IN VARCHAR2, po_error_message OUT VARCHAR2) 
+RETURN BOOLEAN AS
+BEGIN
+EXECUTE IMMEDIATE 'ALTER INDEX ' || pi_index_name || ' REBUILD ONLINE PARAMETERS(''index_status=cleanup'')';
+RETURN TRUE;
+EXCEPTION WHEN OTHERS THEN
+po_error_message:= SQLERRM;
+RETURN FALSE;
+END;
 --
 -----------------------------------------------------------------------------
 --
