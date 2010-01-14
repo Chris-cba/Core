@@ -3,16 +3,16 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.5   Dec 15 2009 09:33:32   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.6   Jan 14 2010 17:39:14   cstrettle  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkh  $
---       Date into PVCS   : $Date:   Dec 15 2009 09:33:32  $
---       Date fetched Out : $Modtime:   Dec 15 2009 09:29:24  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Jan 14 2010 17:39:14  $
+--       Date fetched Out : $Modtime:   Jan 14 2010 17:37:00  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.6
 -------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.5  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.6  $';
     g_boolean               BOOLEAN        := FALSE;
     g_x_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_X';
     g_y_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_Y';
@@ -758,13 +758,13 @@ FUNCTION scotland_asd_in_use RETURN BOOLEAN;
                                          , p_fk_col IN VARCHAR2
                                          , p_shape_col IN VARCHAR2
                                          , p_tol NUMBER DEFAULT 0.005
-                                         ,p_cre_idx IN VARCHAR2 DEFAULT 'N'
-                                         ,p_estimate_new_tol IN VARCHAR2 DEFAULT 'N'
-                                         ,p_override_sdo_meta IN VARCHAR2 DEFAULT 'I'
-                                         ,p_asset_type IN VARCHAR2
-                                         ,p_asset_descr IN VARCHAR2
-                                         ,p_gtype IN VARCHAR2
-                                         ,p_error OUT VARCHAR2
+                                         , p_cre_idx IN VARCHAR2 DEFAULT 'N'
+                                         , p_estimate_new_tol IN VARCHAR2 DEFAULT 'N'
+                                         , p_override_sdo_meta IN VARCHAR2 DEFAULT 'I'
+                                         , p_asset_type IN VARCHAR2
+                                         , p_asset_descr IN VARCHAR2
+                                         , p_gtype IN VARCHAR2
+                                         , p_error OUT VARCHAR2
                                          ) return BOOLEAN;
 --</PROC>
 --
@@ -881,6 +881,24 @@ FUNCTION scotland_asd_in_use RETURN BOOLEAN;
 --<PROC NAME="BUILD_NPL_DATA">
 -- Build the nm_point_locations data
   PROCEDURE build_npl_data;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RUN_HEALTHCHECK">
+FUNCTION run_healthcheck( pi_location IN VARCHAR2
+                                        , pi_theme_filename IN VARCHAR2
+                                        , pi_sdo_filename IN VARCHAR2
+                                        , pi_sde_filename IN VARCHAR2
+                                        , po_summary OUT VARCHAR2
+                                        ) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CLEANUP_IDX">
+FUNCTION cleanup_idx(pi_index_name IN VARCHAR2, po_error_message OUT VARCHAR2) 
+RETURN BOOLEAN;
 --</PROC>
 --
 -----------------------------------------------------------------------------
