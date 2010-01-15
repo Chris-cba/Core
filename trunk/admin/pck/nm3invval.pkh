@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE Nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkh-arc   2.1   Jan 12 2010 09:53:48   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkh-arc   2.2   Jan 15 2010 16:52:02   cstrettle  $
 --       Module Name      : $Workfile:   nm3invval.pkh  $
---       Date into PVCS   : $Date:   Jan 12 2010 09:53:48  $
---       Date fetched Out : $Modtime:   Jan 12 2010 09:52:00  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jan 15 2010 16:52:02  $
+--       Date fetched Out : $Modtime:   Jan 15 2010 16:44:06  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.13
 -------------------------------------------------------------------------
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE Nm3invval IS
 --</PACKAGE>
 --
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --
    TYPE tab_nin IS TABLE OF nm_inv_nw%ROWTYPE INDEX BY BINARY_INTEGER;
 --
@@ -52,7 +52,7 @@ CREATE OR REPLACE PACKAGE Nm3invval IS
    TYPE tab_rec_nii IS TABLE OF rec_nii INDEX BY BINARY_INTEGER;
    g_tab_rec_nii tab_rec_nii;
    -- task 0108705 CWS
-   g_tab_rec_nii_old nm_inv_items%rowtype;
+   g_nii_end_date_old nm_inv_items.iit_end_date%type;
 --
    TYPE rec_date_chk IS RECORD
        ( ne_id       nm_inv_items.iit_ne_id%TYPE
