@@ -3,12 +3,12 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_util.pkb-arc   1.0   30 Nov 2009 11:46:56   kdawson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_util.pkb-arc   1.1   Jan 16 2010 00:17:00   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo_util.pkb  $
---       Date into PVCS   : $Date:   30 Nov 2009 11:46:56  $
---       Date fetched Out : $Modtime:   30 Nov 2009 11:43:28  $
---       Version          : $Revision:   1.0  $
---       Based on SCCS version : 
+--       Date into PVCS   : $Date:   Jan 16 2010 00:17:00  $
+--       Date fetched Out : $Modtime:   Jan 16 2010 00:14:52  $
+--       Version          : $Revision:   1.1  $
+--       Based on SCCS version :
 -------------------------------------------------------------------------
 --
 --all global package variables here
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   1.0  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   1.1  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3sdo_util';
 --
@@ -53,7 +53,7 @@ BEGIN
 END reshape_route;
 --
 -----------------------------------------------------------------------------
--- 
+--
 PROCEDURE reverse_datum (
    gis_session_id IN gis_data_objects.gdo_session_id%TYPE)
 IS
@@ -63,7 +63,7 @@ IS
    feature_table NM_THEMES_ALL.NTH_FEATURE_TABLE%type;
    pk_column  NM_THEMES_ALL.NTH_FEATURE_PK_COLUMN%type;
    theme_id   nm_themes_all.nth_theme_id%type;
-   
+
    CURSOR c1 is
    select distinct nth_feature_table, nth_feature_pk_column, nth_theme_id
     from gis_data_objects, nm_themes_all, nm_nw_themes, nm_linear_types, nm_nodes, nm_types
@@ -74,7 +74,7 @@ IS
     and no_node_type = nt_node_type
     and nlt_nt_type = nt_type
     and nth_base_table_theme is null;
-   
+
 BEGIN
 
     OPEN c1;
@@ -86,17 +86,18 @@ EXECUTE IMMEDIATE
      'FROM gis_data_objects, nm_elements, ' || feature_table || ' ' ||
      'WHERE gdo_session_id = '|| gis_session_id  ||
      'AND ne_id = gdo_pk_id ' ||
-     'AND road_network_sdo_id = ne_id ' INTO l_ne, l_length, l_shape;
+     'AND '||pk_column||' = ne_id ' INTO l_ne, l_length, l_shape;
+
 
 EXECUTE IMMEDIATE
     'UPDATE ' || feature_table || ' ' ||
     'SET shape = NM3SDO.REVERSE_GEOMETRY (:l_shape, 0) ' ||
     'WHERE ' || pk_column || ' = '|| l_ne using l_shape;
 
-   NM3SDO.CHANGE_AFFECTED_SHAPES (theme_id, l_ne); 
+   NM3SDO.CHANGE_AFFECTED_SHAPES (theme_id, l_ne);
 END reverse_datum;
 --
 -----------------------------------------------------------------------------
---                               
+--
 END nm3sdo_util;
 /
