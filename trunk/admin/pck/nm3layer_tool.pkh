@@ -3,16 +3,16 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.6   Jan 14 2010 17:39:14   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.7   Jan 19 2010 11:15:18   aedwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkh  $
---       Date into PVCS   : $Date:   Jan 14 2010 17:39:14  $
---       Date fetched Out : $Modtime:   Jan 14 2010 17:37:00  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Jan 19 2010 11:15:18  $
+--       Date fetched Out : $Modtime:   Jan 19 2010 11:12:54  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version : 1.6
 -------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.6  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.7  $';
     g_boolean               BOOLEAN        := FALSE;
     g_x_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_X';
     g_y_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_Y';
@@ -699,14 +699,16 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 --
 --<PROC NAME="CREATE_NSGN_LAYER">
   PROCEDURE create_nsgn_layer
-              ( pi_street_type   IN  nm_group_types.ngt_group_type%TYPE );
+              ( pi_street_type   IN  nm_group_types.ngt_group_type%TYPE  
+              , pi_job_id IN NUMBER DEFAULT NULL);
 --</PROC>
 --
 -----------------------------------------------------------------------------
 --
 --<PROC NAME="CREATE_NSGN_ASD_LAYER">
   PROCEDURE create_nsgn_asd_layer
-              ( pi_type    IN  nm_inv_types.nit_inv_type%TYPE );
+              ( pi_type    IN  nm_inv_types.nit_inv_type%TYPE  
+              , pi_job_id IN NUMBER DEFAULT NULL);
 --</PROC>
 -----------------------------------------------------------------------------
 --
@@ -722,6 +724,14 @@ FUNCTION england_wales_asd_in_use RETURN BOOLEAN;
 FUNCTION scotland_asd_in_use RETURN BOOLEAN;
 --</PROC>
 --
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REFRESH_ASD_LAYER">
+-- Refreshes the ASD asset spatial data when called from the GIS0020 form.
+   PROCEDURE refresh_asd_layer( pi_inv_type IN nm_inv_types.nit_inv_type%TYPE
+                              , pi_job_id   IN NUMBER DEFAULT NULL);
+--</PROC>
 -----------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------
@@ -903,5 +913,13 @@ RETURN BOOLEAN;
 --
 -----------------------------------------------------------------------------
 --
+--<PROC NAME="GET_NSG_LABEL">
+FUNCTION get_nsg_label(pi_nit_inv_type IN nm_inv_types.nit_inv_type%type) 
+RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
 END Nm3layer_Tool;
 /
+

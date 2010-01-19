@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.13   Jan 14 2010 17:40:46   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.14   Jan 19 2010 11:15:18   aedwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Jan 14 2010 17:40:46  $
---       Date fetched Out : $Modtime:   Jan 14 2010 17:36:48  $
---       Version          : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Jan 19 2010 11:15:18  $
+--       Date fetched Out : $Modtime:   Jan 19 2010 11:13:02  $
+--       Version          : $Revision:   2.14  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.13  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.14  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -3588,9 +3588,6 @@ AS
 --
 -----------------------------------------------------------------------------
 --
---
------------------------------------------------------------------------------
---
 -- Drop Enquiries SDO layer
   PROCEDURE drop_str_layer
               ( pi_nth_theme_id        IN     NM_THEMES_ALL.nth_theme_id%TYPE)
@@ -3601,116 +3598,32 @@ AS
 --
 -----------------------------------------------------------------------------
 --
-  PROCEDURE update_nsg_themes (pi_gty_type IN nm_group_types.ngt_group_type%TYPE)
-  IS
-    l_theme_name   nm_themes_all.nth_theme_name%TYPE;
-    l_theme_ft     nm_themes_all.nth_Feature_table%TYPE;
-    l_theme_label  nm_themes_all.nth_label_column%TYPE  :=  'NE_DESCR';
-  BEGIN
-    IF pi_gty_type IN ('OFFN','RDNM','UOFF')
-    THEN
-    --
-        IF pi_gty_type = 'OFFN'
-        THEN
-        --
-          l_theme_name := 'TYPE 1 AND 2 STREETS';
-          l_theme_ft   := 'V_NM_NAT_NSGN_OFFN_SDO_DT';
-        --
-        ELSIF pi_gty_type = 'RDNM'
-        THEN
-        --
-          l_theme_name := 'TYPE 3 STREETS';
-          l_theme_ft   := 'V_NM_NAT_NSGN_RDNM_SDO_DT';
-        --
-        ELSIF pi_gty_type = 'UOFF'
-        THEN
-        --
-          l_theme_name := 'TYPE 4 STREETS';
-          l_theme_ft   := 'V_NM_NAT_NSGN_UOFF_SDO_DT';
-        --
-        END IF;
-        --
-        UPDATE nm_themes_all
-           SET nth_theme_name = l_theme_name
-             , nth_label_column = l_theme_label
-         WHERE nth_feature_table = l_theme_ft;
-        --
-        DELETE nm_theme_functions_all
-         WHERE EXISTS
-           ( SELECT 1 FROM nm_themes_all
-               WHERE nth_feature_table = l_theme_ft
-                 AND ntf_nth_theme_id = nth_theme_id )
-           AND ntf_hmo_module in ('NM0105','NM0110');
-        --
-        INSERT INTO nm_theme_functions_all
-        SELECT nth_theme_id, 'NSG0010','GIS_SESSION_ID','STREET DETAILS','Y'
-          FROM nm_themes_all
-         WHERE nth_feature_table = l_theme_ft;
-     
-        IF pi_gty_type = 'OFFN' THEN    
-                --
-                -- for OFFN layer, allow a Streetworks Works to be created from the map
-                -- if the actual supporting module exists
-                --
-                INSERT INTO nm_theme_functions_all(ntf_nth_theme_id
-                                                 , ntf_hmo_module
-                                                 , ntf_parameter
-                                                 , ntf_menu_option
-                                                 , ntf_seen_in_gis)
-                   SELECT nth_theme_id
-                       ,  hmo_module
-                       , 'GIS_SESSION_ID_STR_NSG_REF'
-                       , 'CREATE WORKS FROM MAP'
-                       , 'Y'
-                     FROM nm_themes_all
-                        , hig_modules
-                    WHERE nth_feature_table = l_theme_ft
-                    AND   hmo_module = 'SWR1190';
-            
-        END IF;
-            
-                --
-        -- Give both SWR and NSG standard roles to the theme 
-        -- 
-        INSERT INTO nm_theme_roles(nthr_theme_id, nthr_role, nthr_mode)
-        SELECT            nth_theme_id
-                         ,hro_role
-                         ,'NORMAL'
-        FROM nm_themes_all
-           , hig_roles -- join to hig_roles to ensure only those roles implemented are used
-        WHERE nth_theme_name = l_theme_name
-        AND  hro_role IN( 'SWR_USER'
-                        , 'SWR_OWNER'
-                        , 'NSG_USER'
-                        , 'NSG_ADMIN');            
-    
-    END IF;
-    
-  END update_nsg_themes;
---
------------------------------------------------------------------------------
---
   PROCEDURE create_nsgn_layer
-              ( pi_street_type   IN  nm_group_types.ngt_group_type%TYPE )
+              ( pi_street_type   IN  nm_group_types.ngt_group_type%TYPE 
+              , pi_job_id IN NUMBER DEFAULT NULL)
   IS
   BEGIN
   --
     nm_debug.proc_start (g_package_name, 'create_nsgn_layer');
-
+  --
       --  hig_products
       IF hig.is_product_licensed ('NSG')
       THEN
         EXECUTE IMMEDIATE
           'BEGIN '||lf||
-          ' nm3sdm.make_group_layer (:pi_nt_type, :pi_gty_type);'||lf||
+          ' nm3sdm.make_group_layer (p_nt_type =>:pi_nt_type, p_gty_type =>  :pi_gty_type, p_job_id => :pi_job_id);'||lf||
           'END;'
         USING
-          'NSGN', pi_street_type;
-
-        update_nsg_themes (pi_gty_type => pi_street_type);
-
+          'NSGN', pi_street_type, pi_job_id;
+      --
+        EXECUTE IMMEDIATE
+          'BEGIN '||lf||
+          '  nsg_sdo_util.update_nsg_themes (pi_gty_type => :pi_street_type);'||lf||
+          'END;'
+        USING pi_street_type;
+      --
       END IF;
-
+    --
     nm_debug.proc_end (g_package_name, 'create_nsgn_layer');
   --
   END create_nsgn_layer;
@@ -3718,7 +3631,8 @@ AS
 -----------------------------------------------------------------------------
 --
   PROCEDURE create_nsgn_asd_layer
-              ( pi_type    IN  nm_inv_types.nit_inv_type%TYPE )
+              ( pi_type    IN  nm_inv_types.nit_inv_type%TYPE  
+              , pi_job_id IN NUMBER DEFAULT NULL)
   IS
     l_asset_type nm_inv_types.nit_inv_type%TYPE ;
   BEGIN
@@ -3729,9 +3643,9 @@ AS
         EXECUTE IMMEDIATE
           'BEGIN '||lf||
           ' IF nm3nsgasd.asd_record_type_in_use(pi_type => :pi_type) THEN'||lf||
-          '   nm3nsgasd.Make_Asd_Spatial_Layer (p_inv_type => :pi_type );'||lf||
+          '   nm3nsgasd.Make_Asd_Spatial_Layer (p_inv_type => :pi_type, p_job_id => :p_job_id );'||lf||
           ' END IF;'||lf||
-          'END;' USING pi_type;
+          'END;' USING pi_type, pi_job_id;
       
   END IF;
   
@@ -3776,6 +3690,32 @@ AS
   END IF;
   
   END scotland_asd_in_use;
+--
+-----------------------------------------------------------------------------
+--
+-- REFRESH_ASD_LAYER
+-- Task 0108723
+-- Refreshes the ASD asset spatial data when called from the GIS0020 form.
+-- This is specifically for ASD, but will be brought into line with the standard
+-- Core call (like refresh asset layer) once core refresh code has been 
+-- changed to use NM_NW_AD_LINK_ALL table.
+--
+  PROCEDURE refresh_asd_layer( pi_inv_type IN nm_inv_types.nit_inv_type%TYPE
+                             , pi_job_id   IN NUMBER DEFAULT NULL)
+  IS
+  BEGIN
+  --
+    IF hig.is_product_licensed ('NSG') THEN
+    --
+     EXECUTE IMMEDIATE    
+          'BEGIN '||lf||
+          '  nm3nsgasd.refresh_asd_layer(:pi_inv_type,:pi_job_id);'||lf||
+          'END;'
+       USING IN pi_inv_type, IN pi_job_id;
+    --
+    END IF;
+  --
+  END refresh_asd_layer;
 --
 -----------------------------------------------------------------------------
 --
@@ -3895,7 +3835,6 @@ AS
        IF  p_asset_type IS NOT NULL AND l_success THEN 
           IF nm3get.get_nit ( pi_nit_inv_type    => p_asset_type
                                      ,pi_raise_not_found => FALSE).nit_inv_type IS NULL THEN
-          NM_DEBUG.DEBUG('3');
               nm3inv.create_ft_asset_from_table(pi_table_name  => p_table
                                                                 , pi_pk_column   => p_pk_col
                                                                 , pi_asset_type   => p_asset_type
@@ -4535,5 +4474,29 @@ END;
 --
 -----------------------------------------------------------------------------
 --
+FUNCTION get_nsg_label(pi_nit_inv_type IN nm_inv_types.nit_inv_type%type) RETURN VARCHAR2 IS
+--
+l_return_val VARCHAR2(100);
+--
+BEGIN
+--
+  IF hig.is_product_licensed ('NSG') THEN
+        BEGIN
+            EXECUTE IMMEDIATE 'SELECT nsg_sdo_util.get_label_from_asset_type(:b_nit_inv_type) FROM DUAL'
+                                 INTO l_return_val
+                                 USING  pi_nit_inv_type;
+        EXCEPTION WHEN OTHERS THEN
+        NULL;
+        END;
+  END IF;
+--
+    l_return_val := NVL(l_return_val,pi_nit_inv_type);
+--
+RETURN l_return_val;
+--
+-----------------------------------------------------------------------------
+--
+END;
 END nm3layer_tool;
 /
+
