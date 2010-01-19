@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.10   Jul 15 2009 14:49:40   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.11   Jan 19 2010 17:11:22   rcoupe  $
 --       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   Jul 15 2009 14:49:40  $
---       Date fetched Out : $Modtime:   Jul 15 2009 14:49:26  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jan 19 2010 17:11:22  $
+--       Date fetched Out : $Modtime:   Jan 19 2010 17:09:58  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Wed Jul 15  14:41:12 2009 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Tue Jan 19  17:03:49 2010 by Server Generator 10.1.2.9.28
 
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
@@ -157,9 +157,9 @@ CREATE INDEX DRP_DTP_IND ON DOC_REDIR_PRIOR
  (DRP_DOC_DTP_CODE)
 /
 
-PROMPT Creating Index 'DRP_ROAD_IND'
-CREATE INDEX DRP_ROAD_IND ON DOC_REDIR_PRIOR
- (DRP_ROAD_UNIQUE)
+PROMPT Creating Index 'DRP_NE_IND'
+CREATE INDEX DRP_NE_IND ON DOC_REDIR_PRIOR
+ (DRP_NE_ID)
 /
 
 PROMPT Creating Index 'DRP_TYPE_IND'
