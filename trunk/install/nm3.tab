@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.16   Jan 11 2010 16:34:48   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.17   Jan 19 2010 17:11:42   rcoupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Jan 11 2010 16:34:48  $
---       Date fetched Out : $Modtime:   Jan 11 2010 16:33:14  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Jan 19 2010 17:11:42  $
+--       Date fetched Out : $Modtime:   Jan 19 2010 17:08:28  $
+--       PVCS Version     : $Revision:   2.17  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Mon Jan 11  17:25:57 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Tue Jan 19  17:03:44 2010 by Server Generator 10.1.2.9.28
 
 
 
@@ -376,10 +376,10 @@ CREATE TABLE DOC_REDIR_PRIOR
  ,DRP_DOC_DCL_CODE VARCHAR2(4)
  ,DRP_DOC_DTP_CODE VARCHAR2(4)
  ,DRP_DOC_COMPL_TYPE VARCHAR2(4)
- ,DRP_ROAD_UNIQUE VARCHAR2(30)
  ,DRP_DOC_CPR_ID VARCHAR2(4)
  ,DRP_USER_TYPE VARCHAR2(4)
  ,DRP_RESPONS NUMBER(9)
+ ,DRP_NE_ID NUMBER(9)
  )
 /
 
