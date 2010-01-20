@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4101_nm4200_ddl_upg.sql-arc   3.1   Jan 12 2010 15:34:22   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4101_nm4200_ddl_upg.sql-arc   3.2   Jan 20 2010 10:08:00   malexander  $
 --       Module Name      : $Workfile:   nm4101_nm4200_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jan 12 2010 15:34:22  $
---       Date fetched Out : $Modtime:   Jan 12 2010 15:27:16  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jan 20 2010 10:08:00  $
+--       Date fetched Out : $Modtime:   Jan 20 2010 10:05:40  $
+--       Version          : $Revision:   3.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2009
@@ -204,6 +204,54 @@ BEGIN
 END;
 /
 
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New column and index on DOC_REDIR_PRIOR
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 108058
+-- 
+-- TASK DETAILS
+-- After creating a Group of Groups, within Network Manager, the new group does not appear within the gazetteer called from the Enquiry Redirection form (DOC0157).
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- New column on DOC_REDIR_PRIOR
+-- 
+------------------------------------------------------------------
+DECLARE
+-- 
+  already_exists Exception;
+  Pragma Exception_INIT( already_exists,-01430); 
+-- 
+BEGIN
+--
+  EXECUTE IMMEDIATE 'ALTER TABLE doc_redir_prior ADD (drp_ne_id  NUMBER(9))';
+--
+  EXECUTE IMMEDIATE 'CREATE INDEX DRP_NE_IND ON DOC_REDIR_PRIOR (DRP_NE_ID)';
+--
+  EXECUTE IMMEDIATE ' UPDATE doc_redir_prior '||
+                       ' SET drp_ne_id = (SELECT MIN(ne_id) '||
+                                          ' FROM nm_elements_all '|| 
+                                         ' WHERE ne_unique = drp_road_unique) ';
+--
+  EXECUTE IMMEDIATE 'ALTER TABLE doc_redir_prior DROP COLUMN drp_road_unique';
+--
+EXCEPTION
+   WHEN already_exists 
+   THEN
+       Null;
+   WHEN OTHERS
+   THEN
+       RAISE;
+END ;
+/
 
 ------------------------------------------------------------------
 
