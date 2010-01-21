@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv_Load AS
 --
 --   SCCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.4   Jul 17 2009 18:16:42   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.5   Jan 21 2010 16:14:42   rcoupe  $
 --       Module Name      : $Workfile:   nm3inv_load.pkb  $
---       Date into PVCS   : $Date:   Jul 17 2009 18:16:42  $
---       Date fetched Out : $Modtime:   Jul 17 2009 18:15:28  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jan 21 2010 16:14:42  $
+--       Date fetched Out : $Modtime:   Jan 21 2010 16:13:14  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --   Author : Jonathan Mills
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv_Load AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3inv_load';
@@ -951,13 +951,9 @@ IS
   l_ne_id     nm_elements.ne_id%TYPE;
   l_dist      NUMBER;
   retval      nm_lref;
---
-BEGIN
---
-  l_ne := Nm3get.get_ne( p_ne_id );
---
+
+cursor get_theme (c_ne_gty_group_type nm_elements.ne_gty_group_type%type ) is
   SELECT nnth_nth_theme_id, nth_tolerance, nth_tol_units
-    INTO l_theme_id, l_tol, l_unit
     FROM nm_nw_themes
        , nm_linear_types
        , nm_nt_groupings
@@ -965,8 +961,22 @@ BEGIN
    WHERE nnth_nlt_id = nlt_id
      AND nnth_nth_theme_id = nth_theme_id
      AND nlt_nt_type = nng_nt_type
-     AND nng_group_type = l_ne.ne_gty_group_type
-     AND nlt_g_i_d = 'D';
+     AND nng_group_type = c_ne_gty_group_type
+     AND nlt_g_i_d = 'D'
+     order by decode(nth_base_table_theme, NULL, 'B', 'A');  
+--
+BEGIN
+--
+  l_ne := Nm3get.get_ne( p_ne_id );
+--
+  open get_theme( l_ne.ne_gty_group_type );
+  fetch get_theme INTO l_theme_id, l_tol, l_unit;
+  if get_theme%notfound then
+    close get_theme;
+    raise_application_error(-20001, 'No theme found' );
+  end if;
+  close get_theme;
+
 --  
   --nm_debug.debug_on;
   nm_debug.debug(l_theme_id||' - ');
