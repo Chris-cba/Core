@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_util.pkb-arc   1.1   Jan 16 2010 00:17:00   rcoupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_util.pkb-arc   1.2   Jan 25 2010 00:15:22   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo_util.pkb  $
---       Date into PVCS   : $Date:   Jan 16 2010 00:17:00  $
---       Date fetched Out : $Modtime:   Jan 16 2010 00:14:52  $
---       Version          : $Revision:   1.1  $
+--       Date into PVCS   : $Date:   Jan 25 2010 00:15:22  $
+--       Date fetched Out : $Modtime:   Jan 25 2010 00:14:10  $
+--       Version          : $Revision:   1.2  $
 --       Based on SCCS version :
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   1.1  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   1.2  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3sdo_util';
 --
@@ -82,17 +82,17 @@ BEGIN
     CLOSE c1;
 
 EXECUTE IMMEDIATE
-     'SELECT ne_id, ne_length, shape ' ||
-     'FROM gis_data_objects, nm_elements, ' || feature_table || ' ' ||
+     'SELECT e.ne_id, e.ne_length, s.shape ' ||
+     'FROM gis_data_objects, nm_elements e, ' || feature_table || ' s ' ||
      'WHERE gdo_session_id = '|| gis_session_id  ||
-     'AND ne_id = gdo_pk_id ' ||
-     'AND '||pk_column||' = ne_id ' INTO l_ne, l_length, l_shape;
+     'AND e.ne_id = gdo_pk_id ' ||
+     'AND s.'||pk_column||' = e.ne_id ' INTO l_ne, l_length, l_shape;
 
 
 EXECUTE IMMEDIATE
     'UPDATE ' || feature_table || ' ' ||
     'SET shape = NM3SDO.REVERSE_GEOMETRY (:l_shape, 0) ' ||
-    'WHERE ' || pk_column || ' = '|| l_ne using l_shape;
+    'WHERE ' || pk_column || ' = :l_ne ' using l_shape, l_ne;
 
    NM3SDO.CHANGE_AFFECTED_SHAPES (theme_id, l_ne);
 END reverse_datum;
@@ -101,3 +101,4 @@ END reverse_datum;
 --
 END nm3sdo_util;
 /
+
