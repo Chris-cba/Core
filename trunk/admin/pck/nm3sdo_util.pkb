@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_util.pkb-arc   1.2   Jan 25 2010 00:15:22   rcoupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_util.pkb-arc   1.3   Jan 26 2010 15:17:18   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo_util.pkb  $
---       Date into PVCS   : $Date:   Jan 25 2010 00:15:22  $
---       Date fetched Out : $Modtime:   Jan 25 2010 00:14:10  $
---       Version          : $Revision:   1.2  $
+--       Date into PVCS   : $Date:   Jan 26 2010 15:17:18  $
+--       Date fetched Out : $Modtime:   Jan 26 2010 15:16:34  $
+--       Version          : $Revision:   1.3  $
 --       Based on SCCS version :
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   1.2  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   1.3  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3sdo_util';
 --
@@ -63,26 +63,27 @@ IS
    feature_table NM_THEMES_ALL.NTH_FEATURE_TABLE%type;
    pk_column  NM_THEMES_ALL.NTH_FEATURE_PK_COLUMN%type;
    theme_id   nm_themes_all.nth_theme_id%type;
+   l_shape_column NM_THEMES_ALL.NTH_FEATURE_SHAPE_COLUMN%type;
 
    CURSOR c1 is
-   select distinct nth_feature_table, nth_feature_pk_column, nth_theme_id
-    from gis_data_objects, nm_themes_all, nm_nw_themes, nm_linear_types, nm_nodes, nm_types
+   select distinct nth_feature_table, nth_feature_pk_column, nth_theme_id, nth_feature_shape_column
+    from gis_data_objects, nm_themes_all, nm_nw_themes, nm_linear_types, nm_elements
     where gdo_session_id = gis_session_id
     and nlt_g_i_d = 'D'
     and nlt_id = nnth_nlt_id
     and nnth_nth_theme_id = nth_theme_id
-    and no_node_type = nt_node_type
-    and nlt_nt_type = nt_type
+    and nlt_nt_type = ne_nt_type
+    and gdo_pk_id   = ne_id
     and nth_base_table_theme is null;
 
 BEGIN
 
     OPEN c1;
-    FETCH c1 INTO feature_table, pk_column, theme_id;
+    FETCH c1 INTO feature_table, pk_column, theme_id, l_shape_column;
     CLOSE c1;
 
 EXECUTE IMMEDIATE
-     'SELECT e.ne_id, e.ne_length, s.shape ' ||
+     'SELECT e.ne_id, e.ne_length, s.'||l_shape_column ||' '||
      'FROM gis_data_objects, nm_elements e, ' || feature_table || ' s ' ||
      'WHERE gdo_session_id = '|| gis_session_id  ||
      'AND e.ne_id = gdo_pk_id ' ||
