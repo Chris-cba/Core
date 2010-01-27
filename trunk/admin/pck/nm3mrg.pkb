@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3mrg IS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkb-arc   2.4   Sep 17 2009 17:19:00   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkb-arc   2.5   Jan 27 2010 10:13:38   cstrettle  $
 --       Module Name      : $Workfile:   nm3mrg.pkb  $
---       Date into PVCS   : $Date:   Sep 17 2009 17:19:00  $
---       Date fetched Out : $Modtime:   Sep 14 2009 21:01:58  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jan 27 2010 10:13:38  $
+--       Date fetched Out : $Modtime:   Jan 27 2010 09:44:58  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on SCCS version : 1.60
 --
 --   Author : Jonathan Mills
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mrg IS
                 removed direct / assign modes
 */
 
-  g_body_sccsid   constant varchar2(200) :='"$Revision:   2.4  $"';
+  g_body_sccsid   constant varchar2(200) :='"$Revision:   2.5  $"';
   g_package_name     CONSTANT  varchar2(30)   := 'NM3MRG';
 --
   g_mrg_section_id  pls_integer;
@@ -684,6 +684,15 @@ PROCEDURE insert_details (pi_nte_job_id IN nm_members.nm_ne_id_in%TYPE
           AND l_rec_attrib.nqa_condition  IS NOT NULL
           THEN
    --
+   IF nm3gaz_qry.get_ignore_case THEN
+       l_query_sql := l_query_sql||
+                               CHR(10)||' AND  UPPER('||l_table_alias||l_rec_attrib.nqa_attrib_name||') '||l_rec_attrib.nqa_condition
+                                      ||nm3mrg_supplementary.build_value_list(l_rec_attrib.nqa_condition
+                                                        ,l_rec_attrib.nqa_nqt_seq_no
+                                                        ,l_rec_attrib.nqa_attrib_name
+                                                        ,g_tab_rec_nita(l_counter).ita_format
+                                                        );
+   ELSE
             l_query_sql := l_query_sql||
                                CHR(10)||' AND   '||l_table_alias||l_rec_attrib.nqa_attrib_name||' '||l_rec_attrib.nqa_condition||' '
                                       ||nm3mrg_supplementary.build_value_list(l_rec_attrib.nqa_condition
@@ -691,6 +700,7 @@ PROCEDURE insert_details (pi_nte_job_id IN nm_members.nm_ne_id_in%TYPE
                                                         ,l_rec_attrib.nqa_attrib_name
                                                         ,g_tab_rec_nita(l_counter).ita_format
                                                         );
+   END IF;
    --
          END IF;
    --
