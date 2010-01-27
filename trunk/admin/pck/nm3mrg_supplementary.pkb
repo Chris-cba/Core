@@ -3,11 +3,11 @@ create or replace package body nm3mrg_supplementary as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_supplementary.pkb-arc   2.1   Jan 12 2010 10:00:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_supplementary.pkb-arc   2.2   Jan 27 2010 10:11:42   cstrettle  $
 --       Module Name      : $Workfile:   nm3mrg_supplementary.pkb  $
---       Date into PVCS   : $Date:   Jan 12 2010 10:00:36  $
---       Date fetched Out : $Modtime:   Jan 12 2010 09:58:22  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jan 27 2010 10:11:42  $
+--       Date fetched Out : $Modtime:   Jan 27 2010 10:07:40  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.16
 -------------------------------------------------------------------------
 --
@@ -22,7 +22,7 @@ create or replace package body nm3mrg_supplementary as
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+   g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3mrg_supplementary';
 --
@@ -867,9 +867,15 @@ BEGIN
 --
          END IF;
 --
+      IF nm3gaz_qry.get_ignore_case THEN
+         l_retval := l_retval||'upper('||nm3pbi.fn_convert_attrib_value(nm3mrg.g_tab_rec_query_values(l_counter).nqv_value
+                                                             ,pi_format
+                                                             ) ||')';
+      ELSE
          l_retval := l_retval||nm3pbi.fn_convert_attrib_value(nm3mrg.g_tab_rec_query_values(l_counter).nqv_value
                                                              ,pi_format
                                                              );
+      END IF;
 --
       END IF;
 --
