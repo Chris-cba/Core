@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.3   Jan 06 2010 22:34:14   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.4   Jan 29 2010 15:37:18   cstrettle  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 22:34:14  $
---       Date fetched Out : $Modtime:   Jan 06 2010 22:30:32  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jan 29 2010 15:37:18  $
+--       Date fetched Out : $Modtime:   Jan 29 2010 15:07:36  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb	1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -1762,12 +1762,19 @@ END get_ngqa_lov_sql_ele;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_ngqa_lov_sql_inv (pi_ngqt_item_type         nm_gaz_query_types.ngqt_item_type%TYPE
+FUNCTION get_ngqa_lov_sql_inv (pi_ngqt_item_type  nm_gaz_query_types.ngqt_item_type%TYPE
                               ,pi_queryable_attribs_only boolean DEFAULT FALSE
                               ,pi_inc_primary_key      boolean DEFAULT FALSE) RETURN varchar2 IS
 --
    l_retval  nm3type.max_varchar2;
    l_rec_nit nm_inv_types%ROWTYPE;
+   l_ft_pk_column VARCHAR2(100);
+--
+CURSOR ft_cur(p_inv_type VARCHAR2) IS
+    SELECT NVL(nit_foreign_pk_column, '-1') 
+    FROM nm_inv_types 
+    WHERE nit_table_name IS NOT NULL
+    AND nit_inv_type = p_inv_type;
 --
 BEGIN
 --
@@ -1780,12 +1787,21 @@ BEGIN
               ||CHR(10)||'        AND ita_queryable = '||nm3flx.string('Y');
    END IF;
    IF pi_inc_primary_key THEN
-        IF NOT nm3inv.attrib_in_use(pi_inv_type => pi_ngqt_item_type
-                                   ,pi_attrib_name => 'IIT_PRIMARY_KEY') THEN
-           l_retval := l_retval
-                ||CHR(10)||'        UNION '
-                ||CHR(10)||'        SELECT ''IIT_PRIMARY_KEY'' lup_meaning, ''ASSET ID'' lup_desription, ''ASSET ID'' lup_value, 1 lup_seq from dual';
-        END IF;
+         OPEN ft_cur(p_inv_type => pi_ngqt_item_type);
+         FETCH ft_cur INTO l_ft_pk_column; 
+         IF ft_cur%notfound THEN 
+            IF NOT nm3inv.attrib_in_use(pi_inv_type => pi_ngqt_item_type
+                                       ,pi_attrib_name => 'IIT_PRIMARY_KEY') THEN
+                l_retval := l_retval
+                      ||CHR(10)||'        UNION '
+                      ||CHR(10)||'        SELECT ''IIT_PRIMARY_KEY'' lup_meaning, ''ASSET ID'' lup_desription, ''ASSET ID'' lup_value, 1 lup_seq from dual';
+            END IF;
+        ELSIF l_ft_pk_column <> '-1' AND NOT nm3inv.attrib_in_use(pi_inv_type => pi_ngqt_item_type, pi_attrib_name => l_ft_pk_column) THEN
+          l_retval := l_retval
+               ||CHR(10)||'        UNION '
+               ||CHR(10)||'        SELECT ''' || l_ft_pk_column || ''' lup_meaning, ''ASSET ID'' lup_desription, ''ASSET ID'' lup_value, 1 lup_seq from dual';
+         END IF;
+         CLOSE ft_cur;
       END IF;
    l_rec_nit := nm3get.get_nit (pi_nit_inv_type => pi_ngqt_item_type);
    IF l_rec_nit.nit_table_name IS NULL
