@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.0   Jan 26 2010 16:39:48   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.1   02 Feb 2010 18:05:58   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Jan 26 2010 16:39:48  $
---       Date fetched Out : $Modtime:   Jan 26 2010 14:11:16  $
---       PVCS Version     : $Revision:   2.32.1.0  $
+--       Date into PVCS   : $Date:   02 Feb 2010 18:05:58  $
+--       Date fetched Out : $Modtime:   02 Feb 2010 18:01:58  $
+--       PVCS Version     : $Revision:   2.32.1.1  $
 --
 --
 --   Author : Priidu Tanava
@@ -86,14 +86,18 @@ No query types defined.
                 datum references, instead of route references, are now put into NMS_BEGIN_OFFSET and NMS_END_OFFSET
   29.10.09  PT logs 723109 and 722950: increased the varchar2 buffer size inside
                 ins_datum_homo_chunks() and std_insert_invitems() sql string functions
+  02.02.10  PT log 724463: in std_populate() moved the begin/end offset calculation into the main query
+                changed end offset logic to use slk instead of end_slk
+               added preferred lrm fallback logic to load_group_datums() load_nt_type_datums() and load_all_network_datums()
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
         add ita_format_mask to ita_mapping_rec
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
+        add p_group_type variable to load_group_datums() to specify driving group type when loaded group is non-linear
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.0  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.1  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -1369,89 +1373,106 @@ No query types defined.
     r_res.nqr_admin_unit := p_admin_unit_id;
     
     nm3dbg.putln('open populate query');
-    
+
     
     -- chunk_no identifies the connected chunk within route
     --  (each route can have many distinct connected chunks
     --    because of breaks in connectivity)
     -- cunk_seq is the order by of the pieces within chunk
-    for r in (        
+    for r in (  
+      select
+         q3.nm_ne_id_in
+        ,q3.chunk_no
+        ,q3.chunk_seq
+        ,q3.nm_ne_id_of
+        ,q3.inv_begin_mp
+        ,q3.inv_end_mp
+        ,q3.nm_inv_begin_mp
+        ,q3.nm_inv_end_mp
+        ,q3.hash_value
+        ,q3.nm_begin_mp
+        ,q3.nm_end_mp
+        ,q3.nt_unit_in
+        ,q3.nt_unit_of
+        ,q3.measure
+        ,q3.end_measure
+        ,q3.nm_slk
+        ,q3.nm_end_slk
+        ,q3.lag_nm_ne_id_in
+        ,q3.lag_chunk_no
+        ,q3.lag_chunk_seq
+        ,lag(q3.hash_value, 1, null) over
+          (partition by q3.nm_ne_id_in, q3.chunk_no order by q3.chunk_seq, q3.inv_begin_mp, q3.inv_end_mp) lag_hash_value
+        ,lag(q3.nm_end_mp - q3.inv_end_mp, 1, 0) over
+          (partition by q3.nm_ne_id_in, q3.chunk_no order by q3.chunk_seq, q3.inv_begin_mp, q3.inv_end_mp) lag_datum_gap
+        -- offsets
+        ,case
+         when q3.nt_unit_in = q3.nt_unit_of then
+          nvl(q3.nm_slk, q3.measure) + (q3.inv_begin_mp - q3.nm_begin_mp)
+         when q3.nm_slk is null then
+          nm3unit.convert_unit(q3.nt_unit_of, q3.nt_unit_in, q3.measure + (q3.inv_begin_mp - q3.nm_begin_mp))
+         else
+          q3.nm_slk + nm3unit.convert_unit(q3.nt_unit_of, q3.nt_unit_in, (q3.inv_begin_mp - q3.nm_begin_mp))
+         end begin_offset        
+        ,case
+         when q3.nt_unit_in = q3.nt_unit_of then
+          nvl(q3.nm_slk, q3.measure) + (q3.inv_end_mp - q3.nm_begin_mp)
+         when q3.nm_end_slk is null then
+          nm3unit.convert_unit(q3.nt_unit_of, q3.nt_unit_in, q3.measure + (q3.inv_end_mp - q3.nm_begin_mp))
+         else
+          q3.nm_slk + nm3unit.convert_unit(q3.nt_unit_of, q3.nt_unit_in, (q3.inv_end_mp - q3.nm_begin_mp))
+         end end_offset
+      from (
+      select q2.*
+        ,decode(q2.nm_cardinality, 1, q2.begin_mp, q2.nm_end_mp - q2.end_mp) inv_begin_mp
+        ,decode(q2.nm_cardinality, 1, q2.end_mp, q2.nm_end_mp - q2.begin_mp) inv_end_mp
+      from (
+      select
+         qq.*
+        ,greatest(inv.nm_begin_mp, qq.nm_begin_mp) begin_mp
+        ,least(inv.nm_end_mp, qq.nm_end_mp) end_mp
+        ,lag(qq.nm_ne_id_in, 1, null) over
+          (order by qq.nm_ne_id_in, qq.chunk_no, qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality, inv.nm_end_mp * qq.nm_cardinality) lag_nm_ne_id_in
+        ,lag(qq.chunk_no, 1, null) over
+          (partition by qq.nm_ne_id_in order by qq.chunk_no, qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality, inv.nm_end_mp * qq.nm_cardinality) lag_chunk_no
+        ,lag(qq.chunk_seq, 1, null) over
+          (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality, inv.nm_end_mp * qq.nm_cardinality) lag_chunk_seq
+        ,inv.hash_value
+        ,inv.nm_begin_mp nm_inv_begin_mp
+        ,inv.nm_end_mp nm_inv_end_mp
+      from
+        (
         select
-           q3.nm_ne_id_in
-          ,q3.chunk_no
-          ,q3.chunk_seq
-          ,q3.nm_ne_id_of
-          ,q3.inv_begin_mp
-          ,q3.inv_end_mp
-          ,q3.nm_inv_begin_mp
-          ,q3.nm_inv_end_mp
-          ,q3.hash_value
-          ,q3.nm_begin_mp
-          ,q3.nm_end_mp
-          ,q3.nt_unit_in
-          ,q3.nt_unit_of
-          ,q3.measure
-          ,q3.end_measure
-          ,q3.nm_slk
-          ,q3.nm_end_slk
-          ,q3.lag_nm_ne_id_in
-          ,q3.lag_chunk_no
-          ,q3.lag_chunk_seq
-          ,lag(q3.hash_value, 1, null) over
-            (partition by q3.nm_ne_id_in, q3.chunk_no order by q3.chunk_seq, q3.inv_begin_mp, q3.inv_end_mp) lag_hash_value
-          ,lag(q3.nm_end_mp - q3.inv_end_mp, 1, 0) over
-            (partition by q3.nm_ne_id_in, q3.chunk_no order by q3.chunk_seq, q3.inv_begin_mp, q3.inv_end_mp) lag_datum_gap
-        from (
-        select q2.*
-          ,decode(q2.nm_cardinality, 1, q2.begin_mp, q2.nm_end_mp - q2.end_mp) inv_begin_mp
-          ,decode(q2.nm_cardinality, 1, q2.end_mp, q2.nm_end_mp - q2.begin_mp) inv_end_mp
+           q.nm_ne_id_in
+          ,dense_rank() over (partition by q.nm_ne_id_in order by q.nsc_seq_no, q.min_slk_measure) chunk_no
+          ,q.chunk_seq, q.nm_ne_id_of, q.nm_begin_mp, q.nm_end_mp, q.measure, q.end_measure
+          ,q.nm_slk, q.nm_end_slk, nvl(q.nm_cardinality, 1) nm_cardinality, q.nt_unit_in, q.nt_unit_of
         from (
         select
-           qq.*
-          ,greatest(inv.nm_begin_mp, qq.nm_begin_mp) begin_mp
-          ,least(inv.nm_end_mp, qq.nm_end_mp) end_mp
-          ,lag(qq.nm_ne_id_in, 1, null) over
-            (order by qq.nm_ne_id_in, qq.chunk_no, qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality, inv.nm_end_mp * qq.nm_cardinality) lag_nm_ne_id_in
-          ,lag(qq.chunk_no, 1, null) over
-            (partition by qq.nm_ne_id_in order by qq.chunk_no, qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality, inv.nm_end_mp * qq.nm_cardinality) lag_chunk_no
-          ,lag(qq.chunk_seq, 1, null) over
-            (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality, inv.nm_end_mp * qq.nm_cardinality) lag_chunk_seq
-          ,inv.hash_value
-          ,inv.nm_begin_mp nm_inv_begin_mp
-          ,inv.nm_end_mp nm_inv_end_mp
+           t.*
+          ,min(nvl(t.nm_slk, t.measure)) over (partition by t.nm_ne_id_in, t.chunk_no) min_slk_measure
+          ,decode(e.ne_type, 'D', null, nvl((select case when nsc_seq_no <= 2 then 1 else 2 end
+              from nm_type_subclass
+              where nsc_sub_class = e.ne_sub_class and nsc_nw_type = e.ne_nt_type
+             ), 1)) nsc_seq_no
         from
-          (
-          select
-             q.nm_ne_id_in
-            ,dense_rank() over (partition by q.nm_ne_id_in order by q.nsc_seq_no, q.min_slk_measure) chunk_no
-            ,q.chunk_seq, q.nm_ne_id_of, q.nm_begin_mp, q.nm_end_mp, q.measure, q.end_measure
-            ,q.nm_slk, q.nm_end_slk, nvl(q.nm_cardinality, 1) nm_cardinality, q.nt_unit_in, q.nt_unit_of
-          from (
-          select
-             t.*
-            ,min(nvl(t.nm_slk, t.measure)) over (partition by t.nm_ne_id_in, t.chunk_no) min_slk_measure
-            ,decode(e.ne_type, 'D', null, nvl((select case when nsc_seq_no <= 2 then 1 else 2 end
-                from nm_type_subclass
-                where nsc_sub_class = e.ne_sub_class and nsc_nw_type = e.ne_nt_type
-               ), 1)) nsc_seq_no
-          from
-             nm_route_connectivity_tmp t
-            ,nm_elements_all e
-          where t.nm_ne_id_of = e.ne_id
-          ) q
-          ) qq
-          ,nm_mrg_datum_homo_chunks_tmp inv
-        where qq.nm_ne_id_of = inv.nm_ne_id_of
-          and ((qq.nm_begin_mp < inv.nm_end_mp and qq.nm_end_mp > inv.nm_begin_mp)
-            or ((qq.nm_begin_mp = qq.nm_end_mp or inv.nm_begin_mp = inv.nm_end_mp)
-              and (qq.nm_begin_mp = inv.nm_end_mp or qq.nm_end_mp = inv.nm_begin_mp)))
-        ) q2
-        ) q3
-        order by
-           q3.nm_ne_id_in
-          ,q3.chunk_no
-          ,q3.chunk_seq
-          ,q3.inv_begin_mp
+           nm_route_connectivity_tmp t
+          ,nm_elements_all e
+        where t.nm_ne_id_of = e.ne_id
+        ) q
+        ) qq
+        ,nm_mrg_datum_homo_chunks_tmp inv
+      where qq.nm_ne_id_of = inv.nm_ne_id_of
+        and ((qq.nm_begin_mp < inv.nm_end_mp and qq.nm_end_mp > inv.nm_begin_mp)
+          or ((qq.nm_begin_mp = qq.nm_end_mp or inv.nm_begin_mp = inv.nm_end_mp)
+            and (qq.nm_begin_mp = inv.nm_end_mp or qq.nm_end_mp = inv.nm_begin_mp)))
+      ) q2
+      ) q3
+      order by
+         q3.nm_ne_id_in
+        ,q3.chunk_no
+        ,q3.chunk_seq
+        ,q3.inv_begin_mp
     )
     loop
       j := j + 1;
@@ -1468,6 +1489,8 @@ No query types defined.
 --        ||', inv_end_mp='||r.inv_end_mp
 --        ||', chunk_seq='||r.chunk_seq
 --        ||', lag_chunk_seq='||r.lag_chunk_seq
+--        ||', begin_offset='||r.begin_offset
+--        ||', end_offset='||r.end_offset
 --        );
       
       -- same route
@@ -1546,17 +1569,7 @@ No query types defined.
         t_sect(i).nms_offset_ne_id    := r.nm_ne_id_in;
         
         -- begin offset
-        if r.nt_unit_in = r.nt_unit_of then
-          t_sect(i).nms_begin_offset  := nvl(r.nm_slk, r.measure) + (r.inv_begin_mp - r.nm_begin_mp);
-        else
-          if r.nm_slk is null then
-            t_sect(i).nms_begin_offset  := nm3unit.convert_unit(
-                r.nt_unit_of, r.nt_unit_in, r.measure + (r.inv_begin_mp - r.nm_begin_mp));
-          else
-            t_sect(i).nms_begin_offset  := r.nm_slk + nm3unit.convert_unit(
-                r.nt_unit_of, r.nt_unit_in, (r.inv_begin_mp - r.nm_begin_mp));
-          end if;      
-        end if;
+        t_sect(i).nms_begin_offset    := r.begin_offset;
         t_sect(i).nms_end_offset      := null;
         t_sect(i).nms_ne_id_first     := r.nm_ne_id_of;
         t_sect(i).nms_begin_mp_first  := r.inv_begin_mp; --r.inv_begin_mp;
@@ -1569,26 +1582,13 @@ No query types defined.
       
       -- carry forward the section end values
       t_sect(i).nms_ne_id_last  := r.nm_ne_id_of;
-      t_sect(i).nms_end_mp_last := r.inv_end_mp; --r.inv_end_mp;
+      t_sect(i).nms_end_mp_last := r.inv_end_mp;
       
       -- end offset
-      --  special case point section, use begin value
-      if r.nm_inv_begin_mp = r.nm_inv_end_mp then
-        t_sect(i).nms_end_offset := t_sect(i).nms_begin_offset;
-      -- standard section, calcualte
-      elsif r.nt_unit_in = r.nt_unit_of then
-        t_sect(i).nms_end_offset  := nvl(r.nm_end_slk, r.end_measure) - (r.nm_end_mp - r.inv_end_mp);
-      else
-        if r.nm_end_slk is null then
-          t_sect(i).nms_end_offset  := nm3unit.convert_unit(
-              r.nt_unit_of, r.nt_unit_in, r.end_measure - (r.nm_end_mp - r.inv_end_mp));
-        else
-          t_sect(i).nms_end_offset  := r.nm_end_slk - nm3unit.convert_unit(
-              r.nt_unit_of, r.nt_unit_in, (r.nm_end_mp - r.inv_end_mp));
-        end if;
-      end if;
-    
-      
+      t_sect(i).nms_end_offset := r.end_offset;
+
+
+
       -- handle the section member record
       k := t_memb.count + 1;
       t_memb(k).nsm_mrg_job_id      := t_sect(i).nms_mrg_job_id;
@@ -2204,8 +2204,8 @@ No query types defined.
   
   
   -- loads datum criteria for as single group or datum
-  --  the group can be linear or non linear
-  --  TODO: add support for group of groups
+  --  the group can be linear or non linear or a group of grouops
+  --  TODO: add p_group_type parameter
   procedure load_group_datums(
      p_group_id in nm_elements_all.ne_id%type
     ,p_sqlcount out pls_integer
@@ -2253,6 +2253,7 @@ No query types defined.
        
       -- non linear group 
       else
+        l_group_type := hig.get_useopt('PREFLRM', user);
         l_sql :=
           sql_load_nm_datum_criteria_tmp(
              p_elements_sql => 
@@ -2282,6 +2283,7 @@ No query types defined.
     
     -- group of groups
     when l_ne_type = 'P' then
+      l_group_type := hig.get_useopt('PREFLRM', user); 
       l_sql :=
         sql_load_nm_datum_criteria_tmp(
            p_elements_sql => 
@@ -2479,8 +2481,10 @@ No query types defined.
           ,'Invalid parameter: nt_type must be a linear datm network type: '||p_nt_type);
     end;
     
+    l_group_type := nvl(hig.get_useopt('PREFLRM', user), p_group_type);
+    
     ensure_group_type_linear(
-       p_group_type_in  => p_group_type
+       p_group_type_in  => l_group_type
       ,p_group_type_out => l_group_type
     );
       
@@ -2532,8 +2536,10 @@ No query types defined.
       
     execute immediate 'truncate table nm_datum_criteria_tmp';
     
+    l_group_type := nvl(hig.get_useopt('PREFLRM', user), p_group_type);
+    
     ensure_group_type_linear(
-       p_group_type_in  => p_group_type
+       p_group_type_in  => l_group_type
       ,p_group_type_out => l_group_type
     );
     
