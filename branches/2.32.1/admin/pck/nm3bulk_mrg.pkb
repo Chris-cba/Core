@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.1   02 Feb 2010 18:05:58   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.2   03 Feb 2010 13:18:50   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   02 Feb 2010 18:05:58  $
---       Date fetched Out : $Modtime:   02 Feb 2010 18:01:58  $
---       PVCS Version     : $Revision:   2.32.1.1  $
+--       Date into PVCS   : $Date:   03 Feb 2010 13:18:50  $
+--       Date fetched Out : $Modtime:   03 Feb 2010 13:18:30  $
+--       PVCS Version     : $Revision:   2.32.1.2  $
 --
 --
 --   Author : Priidu Tanava
@@ -89,6 +89,8 @@ No query types defined.
   02.02.10  PT log 724463: in std_populate() moved the begin/end offset calculation into the main query
                 changed end offset logic to use slk instead of end_slk
                added preferred lrm fallback logic to load_group_datums() load_nt_type_datums() and load_all_network_datums()
+  03.02.10  PT change in ins_splits() in how splits are joined back to members: to avoid extra assets on splits
+               change std_insert_invitems() in how merge sections are joined to splits: to avoid extra sections
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
@@ -97,7 +99,7 @@ No query types defined.
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
         add p_group_type variable to load_group_datums() to specify driving group type when loaded group is non-linear
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.1  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.2  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -549,10 +551,12 @@ No query types defined.
     ||cr||') q1'
     ||cr||',mrg m'
     ||cr||'where q1.nm_ne_id_of = m.nm_ne_id_of'
-    ||cr||'  and q1.begin_mp between m.nm_begin_mp and m.nm_end_mp'
-    ||cr||'  and q1.end_mp between m.nm_begin_mp and m.nm_end_mp'
+    ||cr||'  and ((q1.begin_mp < m.nm_end_mp and q1.end_mp > m.nm_begin_mp)' -- lenthts
+    ||cr||'    or (q1.begin_mp = m.nm_begin_mp and q1.end_mp = m.nm_end_mp))' -- points
+    --||cr||'  and q1.begin_mp between m.nm_begin_mp and m.nm_end_mp'
+    --||cr||'  and q1.end_mp between m.nm_begin_mp and m.nm_end_mp'
     ||cr||'order by q1.nm_ne_id_of, q1.begin_mp, q1.end_mp, m.nm_type, m.nm_obj_type';
-    
+
     
     nm3dbg.putln(l_sql);
     execute immediate l_sql;
@@ -2112,10 +2116,11 @@ No query types defined.
         ||sql_ft_sources
     ||cr||'where m.nsm_mrg_job_id = :p_mrg_job_id'
     ||cr||'  and m.nsm_ne_id = t.nm_ne_id_of'
-    ||cr||'  and ((t.nm_begin_mp < m.nsm_end_mp and t.nm_end_mp > m.nsm_begin_mp)'
---    ||cr||'    or (t.nm_begin_mp = t.nm_end_mp and t.nm_begin_mp = m.nsm_begin_mp and t.nm_begin_mp = m.nsm_end_mp))'
-    ||cr||'    or ((t.nm_begin_mp = t.nm_end_mp or m.nsm_begin_mp = m.nsm_end_mp)'
-    ||cr||'      and (t.nm_begin_mp = m.nsm_end_mp or t.nm_end_mp = m.nsm_begin_mp)))'
+    ||cr||'  and t.nm_begin_mp = m.nsm_begin_mp'
+    ||cr||'  and t.nm_end_mp = m.nsm_end_mp'
+    --||cr||'  and ((t.nm_begin_mp < m.nsm_end_mp and t.nm_end_mp > m.nsm_begin_mp)'
+    --||cr||'    or ((t.nm_begin_mp = t.nm_end_mp or m.nsm_begin_mp = m.nsm_end_mp)'
+    --||cr||'      and (t.nm_begin_mp = m.nsm_end_mp or t.nm_end_mp = m.nsm_begin_mp)))'
     ||cr||'  and t.iit_rowid = i.rowid (+)'
         ||sql_ft_outer_joins
     ||cr||')'
@@ -2984,8 +2989,10 @@ No query types defined.
       ||cr||'right outer join'
       ||cr||'rc m'
       ||cr||'on q1.nm_ne_id_of = m.nm_ne_id_of'
-      ||cr||'  and q1.begin_mp between m.nm_begin_mp and m.nm_end_mp'
-      ||cr||'  and q1.end_mp between m.nm_begin_mp and m.nm_end_mp'
+      ||cr||'  and ((q1.begin_mp < m.nm_end_mp and q1.end_mp > m.nm_begin_mp)' -- lenthts
+      ||cr||'    or (q1.begin_mp = m.nm_begin_mp and q1.end_mp = m.nm_end_mp))' -- points
+      --||cr||'  and q1.begin_mp between m.nm_begin_mp and m.nm_end_mp'
+      --||cr||'  and q1.end_mp between m.nm_begin_mp and m.nm_end_mp'
       ||cr||') q2';
       --||cr||'order by q2.nm_ne_id_of, q2.begin_mp, q2.end_mp'
     
