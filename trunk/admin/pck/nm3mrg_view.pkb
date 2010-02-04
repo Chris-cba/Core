@@ -1,11 +1,11 @@
 create or replace package body nm3mrg_view as
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkb-arc   2.4   Jul 22 2009 11:30:30   ptanava  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkb-arc   2.5   04 Feb 2010 09:08:42   ptanava  $
 --       Module Name      : $Workfile:   nm3mrg_view.pkb  $
---       Date into PVCS   : $Date:   Jul 22 2009 11:30:30  $
---       Date fetched Out : $Modtime:   Jul 22 2009 11:31:48  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   04 Feb 2010 09:08:42  $
+--       Date fetched Out : $Modtime:   04 Feb 2010 09:04:04  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on SCCS version     : 1.38
 --
 --
@@ -24,10 +24,11 @@ create or replace package body nm3mrg_view as
   04.06.09  PT in V_MRG_xxxxxx removed RULE hint and optimized unit conversion
   13.07.09  PT fixed missing xsp columns in _SVL by fixing t_val loading at the start of _SEC - not all xsp's per type were loaded
   22.07.09  PT modified _SVL to include begin_offset_true and end_offset_true with MRGVIEWTRU option - these are used by the main view
+  04.02.10  PT in _SVL fixed the wrong xsp value counts by adding the missing nsv_x_sect criterion to the case count logic
 */
 
 
-   g_body_sccsid      CONSTANT  VARCHAR2(200) := '"$Revision:   2.4  $"';
+   g_body_sccsid      CONSTANT  VARCHAR2(200) := '"$Revision:   2.5  $"';
    g_package_name     CONSTANT  VARCHAR2(30)  := 'nm3mrg_view';
    
    cr constant varchar2(1) := chr(10);
@@ -793,7 +794,8 @@ BEGIN
     
     -- sec count() columns
     for i in 1 .. t_sec.count loop
-      append('      ,count(case when v.nsv_inv_type = '''||t_sec(i).inv_type||''' then 1 end)');
+      -- PT 04.02.10 add missing and v.NSV_X_SECT = '''||t_sec(i).inv_type||'' to the case
+      append('      ,count(case when v.nsv_inv_type = '''||t_sec(i).inv_type||''' and v.NSV_X_SECT = '''||t_sec(i).xsp||'''  then 1 end)');
       append('        over (partition by mi.nsi_mrg_job_id, mi.nsi_mrg_section_id) '||t_sec(i).col_name);
     
     end loop;
