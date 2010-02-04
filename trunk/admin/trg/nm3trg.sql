@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.11   Nov 10 2009 10:07:16   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.12   Feb 04 2010 10:07:26   cstrettle  $
 --       Module Name      : $Workfile:   nm3trg.sql  $
---       Date into PVCS   : $Date:   Nov 10 2009 10:07:16  $
---       Date fetched Out : $Modtime:   Nov 10 2009 10:06:32  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Feb 04 2010 10:07:26  $
+--       Date fetched Out : $Modtime:   Feb 04 2010 09:58:10  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --
 --   Author : Graeme Johnson
@@ -1843,6 +1843,49 @@ start '&run_file'
 --
 -----------------------------------------------------------------------------------------
 --
+SET TERM ON 
+PROMPT hov_hol_length_trg.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'hov_hol_length_trg.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+-----------------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT hol_hov_length_trg.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'hol_hov_length_trg.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+-----------------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT huo_huol_length_trg.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'huo_huol_length_trg.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+-----------------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT huol_huo_length_trg.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'huol_huo_length_trg.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+-----------------------------------------------------------------------------------------
 --
 -- new triggers above this
 SET TERM ON
