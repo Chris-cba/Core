@@ -6,20 +6,20 @@ CREATE OR REPLACE FORCE VIEW  hig_user_option_list_all
 ,  HUOL_DOMAIN
 ,  HUOL_DATATYPE
 ,  HUOL_MIXED_CASE
-,  HUOL_PRODUCT_OPTION)
+,  HUOL_PRODUCT_OPTION
+,  HUOL_MAX_LENGTH)
 AS 
 SELECT
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)hig_user_option_list_all.vw	1.1 10/26/05
---       Module Name      : hig_user_option_list_all.vw
---       Date into SCCS   : 05/10/26 17:28:35
---       Date fetched Out : 07/06/13 17:08:02
---       SCCS Version     : 1.1
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_user_option_list_all.vw-arc   2.1   Feb 04 2010 10:26:20   cstrettle  $
+--       Module Name      : $Workfile:   hig_user_option_list_all.vw  $
+--       Date into PVCS   : $Date:   Feb 04 2010 10:26:20  $
+--       Date fetched Out : $Modtime:   Feb 04 2010 10:22:08  $
+--       Version          : $Revision:   2.1  $
+-------------------------------------------------------------------------
 --
 --   Author : G Johnson
 --
@@ -35,6 +35,7 @@ SELECT
 ,  HOL_DATATYPE
 ,  HOL_MIXED_CASE
 ,  HOL_USER_OPTION
+,  HOL_MAX_LENGTH
 FROM hig_option_list
 WHERE hol_user_option = 'Y'
 UNION
@@ -47,6 +48,7 @@ SELECT
 ,  HUOL_DATATYPE
 ,  HUOL_MIXED_CASE
 ,  'N'
+,  HUOL_MAX_LENGTH
 FROM hig_user_option_list
 WHERE not exists (select 'x'
                   from hig_option_list
