@@ -1,16 +1,15 @@
 CREATE OR REPLACE FORCE VIEW hig_options AS
 SELECT
 --
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)hig_options.vw	1.2 12/03/03
---       Module Name      : hig_options.vw
---       Date into SCCS   : 03/12/03 10:01:31
---       Date fetched Out : 07/06/13 17:08:02
---       SCCS Version     : 1.2
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_options.vw-arc   2.1   Feb 04 2010 10:18:50   cstrettle  $
+--       Module Name      : $Workfile:   hig_options.vw  $
+--       Date into PVCS   : $Date:   Feb 04 2010 10:18:50  $
+--       Date fetched Out : $Modtime:   Feb 04 2010 10:17:48  $
+--       Version          : $Revision:   2.1  $
+-------------------------------------------------------------------------
 --
 --   Author : Jonathan Mills
 --
@@ -28,6 +27,7 @@ SELECT
       ,hol_domain     hop_domain
       ,hol_datatype   hop_datatype
       ,hol_mixed_case hop_mixed_case
+      ,hol_max_length hop_max_length
  FROM  hig_option_list
       ,hig_option_values
 WHERE  hol_id = hov_id (+)
