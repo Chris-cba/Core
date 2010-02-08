@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.5   Dec 02 2009 15:57:20   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.6   Feb 08 2010 09:33:30   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Dec 02 2009 15:57:20  $
---       Date fetched Out : $Modtime:   Dec 02 2009 08:55:22  $
---       SCCS Version     : $Revision:   2.5  $
+--       Date into SCCS   : $Date:   Feb 08 2010 09:33:30  $
+--       Date fetched Out : $Modtime:   Feb 08 2010 09:30:04  $
+--       SCCS Version     : $Revision:   2.6  $
 --
 --
 --  Author :  R Coupe
@@ -23,8 +23,8 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.5  $';
-  g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_lock';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.6  $';
+  g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
 --
@@ -69,9 +69,9 @@ l_usgm user_sdo_geom_metadata%ROWTYPE;
 BEGIN
 
    l_usgm := Nm3sdo.get_theme_metadata( pi_theme );
-   
+
    RETURN set_srid( pi_geom => pi_geom,
-                    pi_srid => l_usgm.srid ); 
+                    pi_srid => l_usgm.srid );
 END set_srid;
 --
 
@@ -207,7 +207,7 @@ BEGIN
 
    IF NVL( l_usgm.srid, -999999 ) != NVL(pi_geom.sdo_srid, Nm3type.c_big_number ) THEN
      retval := '13365: Layer SRID does not match geometry SRID';
-   ELSE     
+   ELSE
      IF l_lrs > 0
      THEN
         retval := sdo_lrs.validate_lrs_geometry (pi_geom, l_usgm.diminfo);
@@ -679,7 +679,7 @@ BEGIN
               FOR i IN (
                   SELECT id,
                          x ,
-                         y 
+                         y
                     FROM table (sdo_util.getvertices (pi_shape)))
               LOOP
                 nm_debug.debug('sdoedit X = '||i.x );
@@ -747,13 +747,13 @@ IS
      WHEN OTHERS THEN RAISE;
    END;
 --
-  FUNCTION is_inv_loc_mandatory 
+  FUNCTION is_inv_loc_mandatory
      (p_nit_inv_type   IN   nm_inv_types.nit_inv_type%TYPE) RETURN BOOLEAN
   IS
      CURSOR c1 (c_inv IN nm_inv_types.nit_inv_type%TYPE)
      IS
        SELECT 1 FROM nm_inv_nw
-        WHERE nin_nit_inv_code = c_inv 
+        WHERE nin_nit_inv_code = c_inv
           AND nin_loc_mandatory = 'Y';
      l_dummy   NUMBER;
      retval    BOOLEAN;
@@ -825,8 +825,8 @@ BEGIN
           --<RAC - 3.2.1.1
             l_lref := nm3sdo.get_nearest_lref( l_rec_nth.nth_theme_id, l_geom );
 
-            IF  l_lref.lr_ne_id IS NULL 
-            AND is_inv_loc_mandatory( l_rec_iit.iit_inv_type) 
+            IF  l_lref.lr_ne_id IS NULL
+            AND is_inv_loc_mandatory( l_rec_iit.iit_inv_type)
             THEN
               RAISE_APPLICATION_ERROR( -20001, 'Failure to locate mandatory inventory type');
             END IF;
@@ -876,7 +876,7 @@ PROCEDURE process_inv_xy_update
 IS
 --
 -- Task 0108731
--- Process the entire asset type in bulk 
+-- Process the entire asset type in bulk
 -- for the intial creation and refreshing
 -- of the layer
 --
@@ -962,7 +962,7 @@ BEGIN
 --
 -------------------------------------------------------------------------------
 --
-  IF l_spatial_index IS NOT NULL 
+  IF l_spatial_index IS NOT NULL
   THEN
     BEGIN
       IF b_defer
@@ -974,7 +974,7 @@ BEGIN
     EXCEPTION
     WHEN OTHERS THEN
       NULL;-- IF THE INDEX IS ALREADY DEFERRED CARRY ON.
-    END;         
+    END;
   END IF;
 --
   lstr := 'INSERT /*+ APPEND */ into ' || l_nth.nth_feature_table || lf;
@@ -1026,8 +1026,8 @@ BEGIN
   EXECUTE IMMEDIATE lstr USING IN l_srid;
 --
 -------------------------------------------------------------------------------
--- Create the index - this will fail if it already exists so suppress the errors 
--- 
+-- Create the index - this will fail if it already exists so suppress the errors
+--
 -- Deferring is slower
 -------------------------------------------------------------------------------
 --
@@ -1128,7 +1128,7 @@ BEGIN
         --
         END LOOP;
       --
-        EXIT WHEN l_tab_lrefs.COUNT = 0; 
+        EXIT WHEN l_tab_lrefs.COUNT = 0;
       --
       END LOOP;
     --
