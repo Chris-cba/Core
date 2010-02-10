@@ -3,11 +3,11 @@ CREATE OR REPLACE package body nm3inv_bau as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_bau.pkb-arc   2.1   Jan 06 2010 16:38:28   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_bau.pkb-arc   2.2   Feb 10 2010 13:55:04   cstrettle  $
 --       Module Name      : $Workfile:   nm3inv_bau.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:28  $
---       Date fetched Out : $Modtime:   Jan 06 2010 11:04:48  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Feb 10 2010 13:55:04  $
+--       Date fetched Out : $Modtime:   Feb 10 2010 13:51:42  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.3
 -------------------------------------------------------------------------
 --   Author : Priidu Tanava
@@ -18,7 +18,7 @@ CREATE OR REPLACE package body nm3inv_bau as
 --	Copyright (c) exor corporation ltd, 2005
 -----------------------------------------------------------------------------
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
   g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_bau';
 
   m_date_format constant varchar2(20) := 'DD-MON-YYYY';
@@ -401,7 +401,7 @@ CREATE OR REPLACE package body nm3inv_bau as
 		when no_data_found then
 			raise_application_error(-20001, 'Unable to determine inventory type: no data found');
 		when too_many_rows then
-			raise_application_error(-20001, 'Unable to determine inventory type: too may rows');
+			raise_application_error(-20001, 'Unable to determine inventory type: too many rows');
   
   end;
 
