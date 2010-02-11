@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.14   Jan 19 2010 11:15:18   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.15   Feb 11 2010 13:03:42   cstrettle  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Jan 19 2010 11:15:18  $
---       Date fetched Out : $Modtime:   Jan 19 2010 11:13:02  $
---       Version          : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Feb 11 2010 13:03:42  $
+--       Date fetched Out : $Modtime:   Feb 11 2010 12:50:30  $
+--       Version          : $Revision:   2.15  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.14  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.15  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -186,6 +186,12 @@ AS
        FROM nm_themes_all
       WHERE NTH_FEATURE_TABLE like '%' || p_table_name || '%';
       
+      
+      CURSOR get_reg_layers(p_theme_name IN VARCHAR2)
+      IS
+      SELECT * 
+      FROM nm_themes_all
+      WHERE nth_theme_name = p_theme_name;
       /*
      SELECT * 
        FROM nm_themes_all
@@ -476,7 +482,8 @@ AS
 --            ST  =   Structures
 --            SW  =   Streetworks Sites
 --            C   =   Streetlights
---            NSG =   NSGN Streets
+--            NSG =  NSGN Streets
+--            REG = Register Table
 
    PROCEDURE get_theme_details (
       pi_layer_type   IN       VARCHAR2
@@ -606,6 +613,12 @@ AS
          FETCH get_tma_layers
          BULK COLLECT INTO l_tab_nth;
          CLOSE get_tma_layers;
+      ELSIF pi_layer_type = 'REG'
+      THEN
+         OPEN get_reg_layers (p_theme_name => pi_type );
+         FETCH get_reg_layers
+         BULK COLLECT INTO l_tab_nth;
+         CLOSE get_reg_layers;
       ELSIF pi_layer_type = 'STP'
       AND hig.is_product_licensed ('STP')
       -- STP Scheme layers
@@ -3796,19 +3809,19 @@ AS
 --<PROC NAME="REGISTER_TABLE">
 --
   FUNCTION register_table( p_table IN VARCHAR2
-                                         , p_theme_name IN VARCHAR2
-                                         , p_pk_col IN VARCHAR2
-                                         , p_fk_col IN VARCHAR2
-                                         , p_shape_col IN VARCHAR2
-                                         , p_tol NUMBER DEFAULT 0.005
-                                         ,p_cre_idx IN VARCHAR2 DEFAULT 'N'
-                                         ,p_estimate_new_tol IN VARCHAR2 DEFAULT 'N'
-                                         ,p_override_sdo_meta IN VARCHAR2 DEFAULT 'I'
-                                         ,p_asset_type IN VARCHAR2
-                                         ,p_asset_descr IN VARCHAR2
-                                         ,p_gtype IN VARCHAR2
-                                         ,p_error OUT VARCHAR2
-                                         ) 
+                                      , p_theme_name IN VARCHAR2
+                                      , p_pk_col IN VARCHAR2
+                                      , p_fk_col IN VARCHAR2
+                                      , p_shape_col IN VARCHAR2
+                                      , p_tol NUMBER DEFAULT 0.005
+                                      , p_cre_idx IN VARCHAR2 DEFAULT 'N'
+                                      , p_estimate_new_tol IN VARCHAR2 DEFAULT 'N'
+                                      , p_override_sdo_meta IN VARCHAR2 DEFAULT 'I'
+                                      , p_asset_type IN VARCHAR2
+                                      , p_asset_descr IN VARCHAR2
+                                      , p_gtype IN VARCHAR2
+                                      , p_error OUT VARCHAR2
+                                       ) 
                                          return BOOLEAN IS
   l_nith nm_inv_themes%rowtype;
   l_ntg nm_theme_gtypes%rowtype;
@@ -3817,16 +3830,16 @@ AS
   BEGIN
   --
       BEGIN
-          nm3sdo.register_sdo_table_as_theme ( p_table => p_table
-                                                      , p_theme_name => p_theme_name 
-                                                      , p_pk_col => p_pk_col  
-                                                      , p_fk_col  => p_fk_col 
-                                                      , p_shape_col  => p_shape_col 
-                                                      , p_tol  => p_tol 
-                                                      , p_cre_idx  => p_cre_idx 
-                                                      , p_estimate_new_tol => p_estimate_new_tol  
-                                                      , p_override_sdo_meta  => p_override_sdo_meta 
-                                                      );
+          nm3sdo.register_sdo_table_as_theme( p_table => p_table
+                                                                 , p_theme_name => p_theme_name 
+                                                                 , p_pk_col => p_pk_col  
+                                                                 , p_fk_col  => p_fk_col 
+                                                                 , p_shape_col  => p_shape_col 
+                                                                 , p_tol  => p_tol 
+                                                                 , p_cre_idx  => p_cre_idx 
+                                                                 , p_estimate_new_tol => p_estimate_new_tol  
+                                                                 , p_override_sdo_meta  => p_override_sdo_meta 
+                                                                 );
       EXCEPTION WHEN DUP_VAL_ON_INDEX THEN
        l_success := FALSE;
        p_error := hig.get_ner('HIG', 145).ner_descr || ': A theme already exists for the specified base table or theme name.';
@@ -3846,7 +3859,7 @@ AS
                                                                 , pi_lr_ne_column => NULL
                                                                 , pi_lr_st_chain  => NULL
                                                                 , pi_lr_end_chain => NULL
-                                                                , pi_attrib_ltrim => 7);
+                                                                , pi_attrib_ltrim => 0);
            END IF;
       --
        l_nith.nith_nit_id := p_asset_type;
