@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkh-arc   2.0   Feb 09 2010 10:23:10   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkh-arc   2.1   Feb 12 2010 11:35:34   aedwards  $
 --       Module Name      : $Workfile:   nm3doc_files.pkh  $
---       Date into PVCS   : $Date:   Feb 09 2010 10:23:10  $
---       Date fetched Out : $Modtime:   Feb 09 2010 10:04:38  $
---       Version          : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Feb 12 2010 11:35:34  $
+--       Date fetched Out : $Modtime:   Feb 12 2010 11:34:50  $
+--       Version          : $Revision:   2.1  $
 --       Based on SCCS version :
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.0  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 
 --</GLOBVAR>
 --
@@ -199,7 +199,86 @@ AS
 --</PROC>
 --
 --------------------------------------------------------------------------------
+--<PROC NAME="GET_DLC_TABLE">
+-- Get DOC_LOCATION_TABLES table name
+  FUNCTION get_dlc_table (pi_doc_id IN docs.doc_id%TYPE) RETURN doc_location_tables.dlt_table%TYPE;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_DLC_TABLE">
+-- Get DOC_LOCATION_TABLES table name
+  FUNCTION get_dlc_table (pi_dlc_id IN doc_locations.dlc_id%TYPE) RETURN doc_location_tables.dlt_table%TYPE;
+--</PROC>
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_TEMPLATE_HDIR">
+-- See if template location has a matching Oracle directory for use with WebUtil
+--  FUNCTION get_template_hdir ( pi_table_name IN user_tables.table_name%TYPE )
+--    RETURN hig_directories.hdir_name%TYPE;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_TEMPLATE_DOWNLOAD_INFO">
+-- Get info required to download the template using WebUtil onto the client
+--  PROCEDURE get_template_download_info
+--                ( pi_template_name   IN doc_template_files_all.dtf_template_name%TYPE
+--                , po_client_file    OUT VARCHAR2
+--                , po_working_folder OUT VARCHAR2
+--                , po_table_name     OUT user_tables.table_name%TYPE
+--                , po_column_name    OUT user_tab_columns.column_name%TYPE
+--                , po_where_clause   OUT VARCHAR2
+--                , po_prog_title     OUT VARCHAR2
+--                , po_prog_sub_title OUT VARCHAR2 );
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="LOAD_DTF">
+-- Load a template from an existing location/file into DOC_TEMPLATE_FILES_ALL table
+--  PROCEDURE load_dtf ( pi_filename      IN doc_template_files_all.dtf_filename%TYPE
+--                     , pi_location      IN VARCHAR2
+--                     , pi_template_name IN doc_template_files_all.dtf_template_name%TYPE);
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="INSERT_DTF">
+-- insert_dtf
+--  PROCEDURE insert_dtf ( pi_rec_dtf IN doc_template_files_all%ROWTYPE );
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_MAX_DOT_REVISION">
+--
+--  FUNCTION get_max_dot_revision (pi_template_name IN doc_template_files_all.dtf_template_name%TYPE)
+--  RETURN NUMBER;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="GET_DTF">
+--
+--  FUNCTION get_dtf ( pi_dtf_template_name IN doc_template_files_all.dtf_template_name%TYPE
+--                   , pi_dtf_revision      IN doc_template_files_all.dtf_revision%TYPE )
+--  RETURN doc_template_files_all%ROWTYPE;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="MOVE_FILE_TO_BLOB">
+--
+  FUNCTION move_file_to_blob ( pi_filename IN VARCHAR2 
+                             , pi_location IN VARCHAR2 )
+    RETURN BLOB;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="SET_DOC_LOCATION_TABLE">
+--
+  PROCEDURE set_doc_location_table ( pi_dlc_id IN doc_locations.dlc_id%TYPE 
+                                   , pi_flag   IN BOOLEAN );
+--</PROC>
+--
+--
+--------------------------------------------------------------------------------
+--
+--
+--------------------------------------------------------------------------------
 --
 END nm3doc_files;
 /
-
