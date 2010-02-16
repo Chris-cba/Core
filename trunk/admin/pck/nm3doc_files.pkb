@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.1   Feb 12 2010 11:35:32   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.2   Feb 16 2010 09:41:46   aedwards  $
 --       Module Name      : $Workfile:   nm3doc_files.pkb  $
---       Date into PVCS   : $Date:   Feb 12 2010 11:35:32  $
---       Date fetched Out : $Modtime:   Feb 12 2010 11:34:52  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Feb 16 2010 09:41:46  $
+--       Date fetched Out : $Modtime:   Feb 16 2010 09:41:02  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
   g_package_name CONSTANT varchar2(30) := 'nm3doc_files';
 --
   g_sep      VARCHAR2(1) := NVL(hig.get_sysopt('DIRREPSTRN'),'\');
@@ -82,14 +82,14 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-  PROCEDURE insert_temp ( pi_blob IN BLOB ) IS
-  BEGIN
-    INSERT INTO doc_files_tmp
-       (dft_id, dft_content)
-    SELECT dft_id_seq.NEXTVAL
-         , pi_blob
-      FROM dual;
-  END insert_temp;
+--  PROCEDURE insert_temp ( pi_blob IN BLOB ) IS
+--  BEGIN
+--    INSERT INTO doc_files_tmp
+--       (dft_id, dft_content)
+--    SELECT dft_id_seq.NEXTVAL
+--         , pi_blob
+--      FROM dual;
+--  END insert_temp;
 --
 --------------------------------------------------------------------------------
 --
