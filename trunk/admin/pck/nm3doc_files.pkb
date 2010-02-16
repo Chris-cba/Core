@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.2   Feb 16 2010 09:41:46   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.3   Feb 16 2010 15:50:32   aedwards  $
 --       Module Name      : $Workfile:   nm3doc_files.pkb  $
---       Date into PVCS   : $Date:   Feb 16 2010 09:41:46  $
---       Date fetched Out : $Modtime:   Feb 16 2010 09:41:02  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Feb 16 2010 15:50:32  $
+--       Date fetched Out : $Modtime:   Feb 16 2010 15:49:34  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
   g_package_name CONSTANT varchar2(30) := 'nm3doc_files';
 --
   g_sep      VARCHAR2(1) := NVL(hig.get_sysopt('DIRREPSTRN'),'\');
@@ -682,6 +682,7 @@ AS
       t_chucklen := t_remain;
       END IF;
     END LOOP;
+    utl_file.fclose(t_output);
   END write_blob3;
 --
 --------------------------------------------------------------------------------
