@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.17   Jan 19 2010 17:11:42   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.18   Feb 16 2010 13:48:48   cstrettle  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Jan 19 2010 17:11:42  $
---       Date fetched Out : $Modtime:   Jan 19 2010 17:08:28  $
---       PVCS Version     : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Feb 16 2010 13:48:48  $
+--       Date fetched Out : $Modtime:   Feb 16 2010 12:04:28  $
+--       PVCS Version     : $Revision:   2.18  $
 --
 --------------------------------------------------------------------------------
 --
@@ -8315,4 +8315,10 @@ CREATE TABLE REPORT_TAGS
 
 COMMENT ON TABLE REPORT_TAGS IS 'Interface table which allows reports to be driven from a GIS or a front-end form.'
 /
-
+PROMPT Creating Table 'NM_RESERVE_WORDS_EX'
+CREATE TABLE NM_RESERVE_WORDS_EX
+(
+   NRWE_KEYWORD VARCHAR2(30)                    NOT NULL PRIMARY KEY
+ , NRWE_EXCLUDE  VARCHAR2(1)   DEFAULT 'Y'  NOT NULL
+)
+/
