@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.4   Sep 03 2009 09:56:30   drawat  $
---       Module Name      : $Workfile:   nm3reclass.pkb  $
---       Date into PVCS   : $Date:   Sep 03 2009 09:56:30  $
---       Date fetched Out : $Modtime:   Sep 03 2009 09:38:54  $
---       PVCS Version     : $Revision:   2.4  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.5   Feb 16 2010 10:49:10   cstrettle  $
+--       Module Name      : $Workfile:   NM3RECLASS_FIX.pkb  $
+--       Date into PVCS   : $Date:   Feb 16 2010 10:49:10  $
+--       Date fetched Out : $Modtime:   Feb 16 2010 10:44:06  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --
 --   Author : R.A. Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';
@@ -207,6 +207,30 @@ FUNCTION can_element_be_reclassed(pi_ne_rec         IN nm_elements%ROWTYPE
 	g_supplimentary_info := p_supplimentary_info;
  END;						    
 
+ FUNCTION element_has_future_dt_ad_links( pi_ne_id NUMBER
+                                                                   , pi_effective_date DATE)
+  return BOOLEAN IS
+  --
+  CURSOR exists_cur( pi_ne_id NUMBER
+                              , pi_effective_date DATE ) IS
+  SELECT DISTINCT 'X'
+  FROM nm_nw_ad_link T 
+  WHERE nad_ne_id = pi_ne_id
+  AND nad_start_date > pi_effective_date;
+       
+    l_dummy VARCHAR2(1);
+    l_return_val BOOLEAN;
+  --
+  BEGIN
+    --
+       OPEN  exists_cur( pi_ne_id => pi_ne_id, pi_effective_date => pi_effective_date);
+       FETCH exists_cur INTO l_dummy;
+       l_return_val:= exists_cur%FOUND;
+       CLOSE exists_cur;
+    --
+       RETURN l_return_val;
+  END;
+
 BEGIN
 
   nm_debug.proc_start(g_package_name,'can_element_be_reclassed');
@@ -236,7 +260,15 @@ BEGIN
   
      RETURN(FALSE);
   END IF;
-
+  --
+  IF  element_has_future_dt_ad_links( pi_ne_id            =>  pi_ne_rec.ne_id
+                                                     , pi_effective_date => pi_effective_date) THEN
+     set_output_params(nm3type.c_net 
+                      ,378  
+                      ,'AD Links exist after the effective date.');  
+  
+     RETURN(FALSE);
+  END IF;
   
   check_other_products ( p_ne_id          => pi_ne_rec.ne_id
                         ,p_effective_date => pi_effective_date
@@ -315,13 +347,9 @@ IS
    l_default_bvs_tab Nm3type.tab_varchar80;
    l_ne_rec nm_elements%ROWTYPE;  
 BEGIN 
-
---   Nm_Debug.debug_on;
---   Nm_Debug.delete_debug( TRUE );
---   Nm_Debug.DEBUG( 'Hello World');
-
+--
    l_ne_rec := p_ne_rec_new;
-   
+-- 
    FOR cs_rec IN c_defaults(l_ne_rec.ne_nt_type)
     LOOP
       --get any bind variables in default string
@@ -453,7 +481,7 @@ PROCEDURE validate_new_element(p_old_ne            IN nm_elements%ROWTYPE
     FROM  NM_TYPE_INCLUSION
          ,nm_group_types
    WHERE  nti_nw_child_type = c_child_nw_type
-    AND   ngt_nt_type       = nti_nw_parent_type;					  
+    AND   ngt_nt_type       = nti_nw_parent_type;
 					  
 
 BEGIN
@@ -517,6 +545,7 @@ BEGIN
                                       ,p_new_subclass => p_new_ne.ne_sub_class
                                       )
        THEN
+       commit;
           g_reclass_exc_code  := -20825;
           g_reclass_exc_msg   := 'Unable to reclassify Element as inventory XSP rules would be violated';
           RAISE g_reclass_exception;
@@ -631,23 +660,8 @@ PROCEDURE reclassify_element
 BEGIN
 --
    Nm_Debug.proc_start(g_package_name,'reclassify_element');
-
-----
---   nm_debug.debug('Input Parameters');
---   nm_debug.debug('***Old NE ID  : '||p_old_ne_id);
---   nm_debug.debug('Rec NE');
---   nm_debug.debug('NE_NT_TYPE '||p_new_ne.ne_nt_type);
---   nm_debug.debug('NE_GROUP   '||p_new_ne.ne_group);
---   nm_debug.debug('***New ne rec');
---   nm3debug.debug_ne(p_new_ne);
---   nm_debug.debug('Job ID     : '||p_job_id);
---   nm_debug.debug('GIS Call   : '||nm3flx.boolean_to_char(p_gis_call));
---
-
-
    Nm3merge.set_nw_operation_in_progress;
-
-
+--
   old_ne := nm3get.get_ne(pi_ne_id           => p_old_ne_id
                          ,pi_raise_not_found => FALSE); 
  
@@ -662,8 +676,8 @@ BEGIN
    
   g_gis_call := p_gis_call;
 
-  validate_new_element(p_old_ne             => old_ne
-                      ,p_new_ne             => p_new_ne
+  validate_new_element(p_old_ne       => old_ne
+                      ,p_new_ne                  => p_new_ne
                       ,p_check_for_changes  => p_check_for_changes); 
 
 --
@@ -2084,11 +2098,16 @@ FUNCTION does_nt_scl_change_break_xsp (p_ne_id_of     nm_members.nm_ne_id_of%TYP
                                       ,p_new_subclass nm_elements.ne_sub_class%TYPE
                                       ) RETURN BOOLEAN IS
 --
+l_subclass_default VARCHAR2(100) := rtrim(ltrim(NM3GET.GET_NTC( p_new_nw_type
+                                                                                   , 'NE_SUB_CLASS'
+                                                                                   , FALSE).NTC_DEFAULT,''''),'''');
+   
    CURSOR cs_exists (c_ne_id_of     nm_members.nm_ne_id_of%TYPE
                     ,c_new_nw_type  xsp_restraints.xsr_nw_type%TYPE
                     ,c_new_subclass nm_elements.ne_sub_class%TYPE
+                    ,c_subclass_default nm_elements.ne_sub_class%TYPE
                     ) IS
-   SELECT 1
+   SELECT 'X'
     FROM  nm_inv_items
          ,nm_inv_types nit
          ,nm_members
@@ -2097,16 +2116,17 @@ FUNCTION does_nt_scl_change_break_xsp (p_ne_id_of     nm_members.nm_ne_id_of%TYP
     AND   iit_inv_type = nit.nit_inv_type
     AND   nit.nit_x_sect_allow_flag = 'Y'
     AND   NOT EXISTS (SELECT 1
-                       FROM  xsp_restraints
-                      WHERE  xsr_nw_type      = c_new_nw_type
-                       AND   xsr_ity_inv_code = iit_inv_type
-                       AND   xsr_scl_class    = c_new_subclass
-                       AND   xsr_x_sect_value = iit_x_sect
-                     )
-    AND   EXISTS (SELECT 1
+                                 FROM  xsp_restraints
+                                 WHERE  xsr_nw_type      = c_new_nw_type
+                                 AND   xsr_ity_inv_code = iit_inv_type
+                                 AND   xsr_scl_class    = nvl(rtrim(ltrim(c_new_subclass,''''),''''), c_subclass_default)
+                                 AND   xsr_x_sect_value = iit_x_sect
+                     );
+   -- CWS 16/02/10 0109092 -- Not required as these values are ignored later. No message is required.
+   /* OR NOT  EXISTS (SELECT 1
                    FROM  nm_inv_nw
                   WHERE  nin_nw_type = c_new_nw_type
-                   AND   nin_nit_inv_code = iit_inv_type);
+                   AND   nin_nit_inv_code = iit_inv_type))*/
 --
    l_dummy  BINARY_INTEGER;
 --
@@ -2116,7 +2136,7 @@ BEGIN
 --
    Nm_Debug.proc_start(g_package_name,'does_subclass_change_break_xsp');
 --
-   OPEN  cs_exists (p_ne_id_of,p_new_nw_type,p_new_subclass);
+   OPEN  cs_exists (p_ne_id_of,p_new_nw_type,p_new_subclass, l_subclass_default);
    FETCH cs_exists INTO l_dummy;
    l_retval := cs_exists%FOUND;
    CLOSE cs_exists;
