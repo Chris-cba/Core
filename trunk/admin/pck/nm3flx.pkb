@@ -2,15 +2,15 @@ CREATE OR REPLACE PACKAGE BODY nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.5   Apr 24 2009 13:06:28   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.6   Feb 16 2010 11:44:38   cstrettle  $
 --       Module Name      : $Workfile:   nm3flx.pkb  $
---       Date into PVCS   : $Date:   Apr 24 2009 13:06:28  $
---       Date fetched Out : $Modtime:   Apr 24 2009 12:19:02  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Feb 16 2010 11:44:38  $
+--       Date fetched Out : $Modtime:   Feb 16 2010 11:41:34  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.47
 -------------------------------------------------------------------------
 --
-  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.5  $';
+  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.6  $';
 
    g_package_name    CONSTANT varchar2(30) := 'nm3flx';
 -- Package variables
@@ -1650,11 +1650,17 @@ END get_datatype_dbms_sql_desc_rec;
 --
 FUNCTION is_reserved_word (p_name varchar2) RETURN boolean IS
 --
+   -- LS 24/04/09 nm_reserve_words_vw Used: Replace the data dictionary view with Exor view to handle exclusion of Reserve Words
+   -- CWS 15/02/10 nm_reserve_words_vw is no longer used. nm_rserve_words_ex will store excluded keywords instead  of them being hard coded into a view.
    CURSOR cs_resv (c_word varchar2) IS
    SELECT 1
-   --FROM  v$reserved_words  -- LS 24/04/09 Replace the data dictionary view with Exor view to handle exclusion of Reserve Words
-   FROM  nm_reserve_words_vw
-   WHERE  keyword = c_word;
+   FROM  v$reserved_words
+   WHERE  keyword = c_word
+   AND reserved = 'Y'
+   AND NOT EXISTS (SELECT 'X' 
+                                 FROM nm_reserve_words_ex 
+                               WHERE nrwe_keyword = c_word
+                                    AND nrwe_exclude = 'Y');
 --
    l_dummy  binary_integer;
 --
