@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.3   Feb 16 2010 15:50:32   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.4   Feb 16 2010 16:42:26   aedwards  $
 --       Module Name      : $Workfile:   nm3doc_files.pkb  $
---       Date into PVCS   : $Date:   Feb 16 2010 15:50:32  $
---       Date fetched Out : $Modtime:   Feb 16 2010 15:49:34  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Feb 16 2010 16:42:26  $
+--       Date fetched Out : $Modtime:   Feb 16 2010 16:41:26  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
   g_package_name CONSTANT varchar2(30) := 'nm3doc_files';
 --
   g_sep      VARCHAR2(1) := NVL(hig.get_sysopt('DIRREPSTRN'),'\');
@@ -234,10 +234,11 @@ AS
 --    nm_debug.debug_on;
     nm_debug.debug('move_file_to_blob - start');
   --
-    SELECT dlc_name, doc_file INTO location, filename
-      FROM doc_locations, docs
+    SELECT dlc_name, df_filename INTO location, filename
+      FROM doc_locations, docs, doc_files_all
      WHERE dlc_id = doc_dlc_id
-       AND doc_id = pi_doc_id;
+       AND doc_id = df_doc_id
+       AND df_doc_id = pi_doc_id;
   --
     nm_debug.debug('move_file_to_blob - before table update');
     UPDATE doc_files_all
