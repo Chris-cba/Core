@@ -2,15 +2,15 @@ CREATE OR REPLACE PACKAGE BODY nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.6   Feb 16 2010 11:44:38   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.7   Feb 17 2010 17:29:44   cstrettle  $
 --       Module Name      : $Workfile:   nm3flx.pkb  $
---       Date into PVCS   : $Date:   Feb 16 2010 11:44:38  $
---       Date fetched Out : $Modtime:   Feb 16 2010 11:41:34  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Feb 17 2010 17:29:44  $
+--       Date fetched Out : $Modtime:   Feb 17 2010 17:29:20  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version : 1.47
 -------------------------------------------------------------------------
 --
-  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.6  $';
+  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.7  $';
 
    g_package_name    CONSTANT varchar2(30) := 'nm3flx';
 -- Package variables
@@ -1658,9 +1658,9 @@ FUNCTION is_reserved_word (p_name varchar2) RETURN boolean IS
    WHERE  keyword = c_word
    AND reserved = 'Y'
    AND NOT EXISTS (SELECT 'X' 
-                                 FROM nm_reserve_words_ex 
-                               WHERE nrwe_keyword = c_word
-                                    AND nrwe_exclude = 'Y');
+                    FROM nm_reserve_words_ex 
+                   WHERE nrwe_keyword = c_word
+                     AND nrwe_exclude = 'Y');
 --
    l_dummy  binary_integer;
 --
