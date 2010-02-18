@@ -1,24 +1,27 @@
 CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm3nwval.pkb	1.67 05/02/06
---       Module Name      : nm3nwval.pkb
---       Date into SCCS   : 06/05/02 10:52:00
---       Date fetched Out : 06/09/14 15:11:41
---       SCCS Version     : 1.67
---
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.0.1.1   Feb 18 2010 14:31:42   rcoupe  $
+--       Module Name      : $Workfile:   nm3nwval.pkb  $
+--       Date into PVCS   : $Date:   Feb 18 2010 14:31:42  $
+--       Date fetched Out : $Modtime:   Feb 18 2010 14:30:20  $
+--       PVCS Version     : $Revision:   2.0.1.1  $
 --
 --   Author : Jonathan Mills
 --
 --   nm3nwval package
+
+sccsid constant varchar2(30) :='"$Revision:   2.0.1.1  $"';
+
+
 --
 -----------------------------------------------------------------------------
 --      Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3nwval.pkb	1.67 05/02/06"';
---  g_body_sccsid is the SCCS ID for the package body
+-- g_body_sccsid is the SCCS ID for the package body
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.0.1.1  $"';
 -----------------------------------------------------------------------------
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3nwval';
