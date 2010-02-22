@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3data AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3data.pkb-arc   3.0   Jul 10 2009 11:02:48   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3data.pkb-arc   3.1   Feb 22 2010 17:02:24   aedwards  $
 --       Module Name      : $Workfile:   nm3data.pkb  $
---       Date into PVCS   : $Date:   Jul 10 2009 11:02:48  $
---       Date fetched Out : $Modtime:   Jul 10 2009 10:57:28  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Feb 22 2010 17:02:24  $
+--       Date fetched Out : $Modtime:   Feb 22 2010 17:01:56  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --   Author : A Edwards
 --
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3data AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) :='"$Revision:   3.0  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) :='"$Revision:   3.1  $"';
   g_package_name CONSTANT varchar2(30)   := 'nm3data';
 --
   g_gdo          CONSTANT varchar2(30)   := 'GIS_DATA_OBJECTS';
@@ -52,15 +52,36 @@ CREATE OR REPLACE PACKAGE BODY nm3data AS
 --
   PROCEDURE cleardown ( pi_table_name IN user_tables.table_name%TYPE )
   IS
+    l_row_count NUMBER;
   BEGIN
+  --
+    hig_process_api.log_it 
+      ( pi_message_type => 'I'
+      , pi_message      => 'Clearing down contents of ['||pi_table_name||']'
+      );
+  --
+    EXECUTE IMMEDIATE 'SELECT COUNT(*) FROM '||pi_table_name INTO l_row_count;
+  --
     EXECUTE IMMEDIATE 'LOCK TABLE '||pi_table_name||' IN EXCLUSIVE MODE NOWAIT';
+  --
+    hig_process_api.log_it 
+      ( pi_message_type => 'I'
+      , pi_message      => 'Locking table ['||pi_table_name||']'
+      );
+    --
     EXECUTE IMMEDIATE 'TRUNCATE TABLE '||pi_table_name;
+    --
+    hig_process_api.log_it 
+      ( pi_message_type => 'I'
+      , pi_message      => 'Truncated table ['||pi_table_name||'] - '||l_row_count||' rows removed '
+      );
+    --
   EXCEPTION
     WHEN ex_resource_busy
     THEN
-      RAISE_APPLICATION_ERROR (-20101,'Cannot lock table '
+      RAISE_APPLICATION_ERROR (-20101,'Cannot lock table ['
                                ||pi_table_name||
-                               ' - transaction(s) are still active');
+                               '] - transaction(s) are still active');
   END cleardown;
 --
 --------------------------------------------------------------------------------
