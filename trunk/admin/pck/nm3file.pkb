@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.7   Jan 04 2010 17:06:12   cstrettle  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.8   Feb 23 2010 14:06:16   aedwards  $
 -- Module Name : $Workfile:   nm3file.pkb  $
--- Date into PVCS : $Date:   Jan 04 2010 17:06:12  $
--- Date fetched Out : $Modtime:   Jan 04 2010 17:05:48  $
--- PVCS Version : $Revision:   2.7  $
+-- Date into PVCS : $Date:   Feb 23 2010 14:06:16  $
+-- Date fetched Out : $Modtime:   Feb 23 2010 14:05:34  $
+-- PVCS Version : $Revision:   2.8  $
 -- Based on SCCS version : 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 --all global package variables here
 --
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.7  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.8  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3file';
@@ -107,89 +107,96 @@ end web_bottom;
 
 --
 -----------------------------------------------------------------------------
+-- Task 0109101
+-- AE
+-- This is very slow and doesn't really work - replaced with a better version
+-- at the bottom of this package.
+-- 
+
+
 -- nm3clob does uses Pl/sql arrays and writes lines out
 -- this is dandy if you want extra ^Ms all over the place
-procedure write_blob
-  ( p_blob in out nocopy blob
-  , p_file_loc in varchar2
-  , p_file_name in varchar2
-  ) is
-
---77921 BOD 06/08/2008 
---Have changed both l_buffer and l_buffer_size to 16383 from their original size of 32767. 
---We were getting the error ORA-06502: PL/SQL: numeric or value error: character string buffer too small
---when the statement l_buffer := replace( l_buffer, chr(13) ) ;  was executed. 
---By reducing the buffer_size in half, the above statement executes successfully. 
---However it will increase the number of loop iterations for files greater than 16383 chars.
+--procedure write_blob
+--  ( p_blob in out nocopy blob
+--  , p_file_loc in varchar2
+--  , p_file_name in varchar2
+--  ) is
 --
---l_buffer        RAW(32767);
---l_buffer_size   CONSTANT BINARY_INTEGER := 32767;
-l_buffer        RAW(16383);
-l_buffer_size   CONSTANT BINARY_INTEGER := 16383;
-
-l_amount        BINARY_INTEGER;
-l_offset        NUMBER(38);
-l_file_handle   UTL_FILE.FILE_TYPE;
-
-invalid_directory_path EXCEPTION;
-PRAGMA EXCEPTION_INIT(invalid_directory_path, -29280);
-
-BEGIN
-
-  l_file_handle := UTL_FILE.FOPEN(p_file_loc, p_file_name, 'w', l_buffer_size);
-  l_amount := l_buffer_size;
-  l_offset := 1;
-  BEGIN
-
-    WHILE l_amount >= l_buffer_size
-    LOOP
-
-      DBMS_LOB.READ
-        ( lob_loc    => p_blob
-        , amount     => l_amount
-        , offset     => l_offset
-        , buffer     => l_buffer
-        ) ;
-
-      l_offset := l_offset + l_amount;
-
-      l_buffer := replace( l_buffer, chr(13) ) ;
-
-      UTL_FILE.PUT_RAW
-        ( file      => l_file_handle
-        , buffer    => l_buffer
-        , autoflush => true
-        );
-
-      UTL_FILE.FFLUSH
-        ( file => l_file_handle);
-
-    END LOOP;
-
-  EXCEPTION
-
-    WHEN others THEN
-      UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '+----------------------------+');
-      UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '|      ***   ERROR   ***     |');
-      UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '+----------------------------+');
-      UTL_FILE.NEW_LINE(file => l_file_handle);
-      UTL_FILE.PUT_LINE(file => l_file_handle, buffer => 'WHEN OTHERS ERROR');
-      UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '=================');
-      UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '    --> SQL CODE          : ' || SQLCODE);
-      UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '    --> SQL ERROR MESSAGE : ' || SQLERRM);
-      UTL_FILE.FFLUSH(file => l_file_handle);
-
-
-  END ;
-
-  UTL_FILE.FCLOSE(l_file_handle);
-
-EXCEPTION
-
-  WHEN invalid_directory_path THEN
-    raise_application_error(-20001,'** ERROR ** : Invalid Directory Path: ' || p_file_loc);
-
-END write_blob;
+----77921 BOD 06/08/2008 
+----Have changed both l_buffer and l_buffer_size to 16383 from their original size of 32767. 
+----We were getting the error ORA-06502: PL/SQL: numeric or value error: character string buffer too small
+----when the statement l_buffer := replace( l_buffer, chr(13) ) ;  was executed. 
+----By reducing the buffer_size in half, the above statement executes successfully. 
+----However it will increase the number of loop iterations for files greater than 16383 chars.
+----
+----l_buffer        RAW(32767);
+----l_buffer_size   CONSTANT BINARY_INTEGER := 32767;
+--l_buffer        RAW(16383);
+--l_buffer_size   CONSTANT BINARY_INTEGER := 16383;
+--
+--l_amount        BINARY_INTEGER;
+--l_offset        NUMBER(38);
+--l_file_handle   UTL_FILE.FILE_TYPE;
+--
+--invalid_directory_path EXCEPTION;
+--PRAGMA EXCEPTION_INIT(invalid_directory_path, -29280);
+--
+--BEGIN
+--
+--  l_file_handle := UTL_FILE.FOPEN(p_file_loc, p_file_name, 'w', l_buffer_size);
+--  l_amount := l_buffer_size;
+--  l_offset := 1;
+--  BEGIN
+--
+--    WHILE l_amount >= l_buffer_size
+--    LOOP
+--
+--      DBMS_LOB.READ
+--        ( lob_loc    => p_blob
+--        , amount     => l_amount
+--        , offset     => l_offset
+--        , buffer     => l_buffer
+--        ) ;
+--
+--      l_offset := l_offset + l_amount;
+--
+--      l_buffer := replace( l_buffer, chr(13) ) ;
+--
+--      UTL_FILE.PUT_RAW
+--        ( file      => l_file_handle
+--        , buffer    => l_buffer
+--        , autoflush => true
+--        );
+--
+--      UTL_FILE.FFLUSH
+--        ( file => l_file_handle);
+--
+--    END LOOP;
+--
+--  EXCEPTION
+--
+--    WHEN others THEN
+--      UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '+----------------------------+');
+--      UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '|      ***   ERROR   ***     |');
+--      UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '+----------------------------+');
+--      UTL_FILE.NEW_LINE(file => l_file_handle);
+--      UTL_FILE.PUT_LINE(file => l_file_handle, buffer => 'WHEN OTHERS ERROR');
+--      UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '=================');
+--      UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '    --> SQL CODE          : ' || SQLCODE);
+--      UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '    --> SQL ERROR MESSAGE : ' || SQLERRM);
+--      UTL_FILE.FFLUSH(file => l_file_handle);
+--
+--
+--  END ;
+--
+--  UTL_FILE.FCLOSE(l_file_handle);
+--
+--EXCEPTION
+--
+--  WHEN invalid_directory_path THEN
+--    raise_application_error(-20001,'** ERROR ** : Invalid Directory Path: ' || p_file_loc);
+--
+--END write_blob;
 --
 -----------------------------------------------------------------------------
 --
@@ -1396,8 +1403,49 @@ BEGIN
   END IF;
 
 END external_table_record_delim;
-
-
-
+--
+--------------------------------------------------------------------------------
+--
+-- Task 0109101 
+--
+  PROCEDURE write_blob
+    ( p_blob       IN OUT NOCOPY BLOB
+    , p_file_loc   IN VARCHAR2
+    , p_file_name  IN VARCHAR2
+    ) 
+  IS
+    t_blob       BLOB    := p_blob;
+    t_len        NUMBER;
+    t_file_name  VARCHAR2(2000)       := p_file_name;
+    t_output     UTL_FILE.file_type;
+    t_TotalSize  NUMBER;
+    t_position   NUMBER := 1;
+    t_chucklen   NUMBER := 4096;
+    t_chuck      RAW(4096);
+    t_remain     NUMBER;
+  BEGIN
+  -- Get length of blob
+    t_TotalSize := DBMS_LOB.getlength (t_blob);
+    t_remain := t_TotalSize;
+  -- The directory p_file_loc should exist before executing 
+    t_output := UTL_FILE.fopen (p_file_loc, t_file_name, 'wb', 32760);
+  -- Retrieving BLOB
+    WHILE t_position < t_TotalSize 
+     LOOP
+      DBMS_LOB.READ (t_blob, t_chucklen, t_position, t_chuck);
+      UTL_FILE.put_raw (t_output, t_chuck);
+      UTL_FILE.fflush (t_output);
+      t_position := t_position + t_chucklen;
+      t_remain := t_remain - t_chucklen;
+      IF t_remain < 4096
+      THEN
+      t_chucklen := t_remain;
+      END IF;
+    END LOOP;
+    utl_file.fclose(t_output);
+  END write_blob;
+--
+--------------------------------------------------------------------------------
+--
 END nm3file;
 /

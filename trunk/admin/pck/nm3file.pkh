@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3file authid current_user AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkh-arc   2.3   Jan 04 2010 17:06:12   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkh-arc   2.4   Feb 23 2010 14:06:16   aedwards  $
 --       Module Name      : $Workfile:   nm3file.pkh  $
---       Date into PVCS   : $Date:   Jan 04 2010 17:06:12  $
---       Date fetched Out : $Modtime:   Jan 04 2010 17:05:00  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Feb 23 2010 14:06:16  $
+--       Date fetched Out : $Modtime:   Feb 23 2010 14:05:30  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.14
 -------------------------------------------------------------------------
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE nm3file authid current_user AS
 --<GLOBVAR>
 --
 --  g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
 --
   c_read_mode        CONSTANT  VARCHAR2(1)    := 'R';
   c_append_mode      CONSTANT  VARCHAR2(1)    := 'A';
@@ -478,15 +478,15 @@ FUNCTION external_table_record_delim(pi_file_format IN VARCHAR2) RETURN VARCHAR2
 --</PROC>
 --
 -----------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
+--
+--<PROC NAME = "WRITE_BLOB">
+PROCEDURE write_blob
+    ( p_blob       IN OUT NOCOPY BLOB
+    , p_file_loc   IN VARCHAR2
+    , p_file_name  IN VARCHAR2 );
+--</PROC>
+--
+----------------------------------------------------------------------------- 
 --
 --<PRAGMA>
   PRAGMA RESTRICT_REFERENCES(get_version, rnds, wnps, wnds);
