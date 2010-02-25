@@ -3,12 +3,12 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.4   Feb 16 2010 16:42:26   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.5   Feb 25 2010 13:56:14   aedwards  $
 --       Module Name      : $Workfile:   nm3doc_files.pkb  $
---       Date into PVCS   : $Date:   Feb 16 2010 16:42:26  $
---       Date fetched Out : $Modtime:   Feb 16 2010 16:41:26  $
---       Version          : $Revision:   2.4  $
---       Based on SCCS version : 
+--       Date into PVCS   : $Date:   Feb 25 2010 13:56:14  $
+--       Date fetched Out : $Modtime:   Feb 25 2010 13:55:54  $
+--       Version          : $Revision:   2.5  $
+--       Based on SCCS version :
 -------------------------------------------------------------------------
 --
 --all global package variables here
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
   g_package_name CONSTANT varchar2(30) := 'nm3doc_files';
 --
   g_sep      VARCHAR2(1) := NVL(hig.get_sysopt('DIRREPSTRN'),'\');
@@ -25,12 +25,12 @@ AS
   g_win_sep  VARCHAR2(1) := '\';
 --
   g_table_name          user_tables.table_name%TYPE         := 'DOC_FILES_ALL';
-  g_column_name         user_tab_columns.column_name%TYPE   := 'DF_CONTENT'; 
+  g_column_name         user_tab_columns.column_name%TYPE   := 'DF_CONTENT';
   g_pk_column           user_tab_columns.column_name%TYPE   := 'DF_DOC_ID';
   g_revision_col        user_tab_columns.column_name%TYPE   := 'DF_REVISION';
 --
   g_dot_table_name      user_tables.table_name%TYPE         := 'DOC_TEMPLATE_FILES_ALL';
-  g_dot_column_name     user_tab_columns.column_name%TYPE   := 'DTF_CONTENT'; 
+  g_dot_column_name     user_tab_columns.column_name%TYPE   := 'DTF_CONTENT';
   g_dot_pk_column       user_tab_columns.column_name%TYPE   := 'DTF_TEMPLATE_NAME';
   g_dot_revision_col    user_tab_columns.column_name%TYPE   := 'DTF_REVISION';
 --
@@ -93,7 +93,7 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-  PROCEDURE blob2file ( pi_doc_id    IN doc_files_all.df_doc_id%TYPE 
+  PROCEDURE blob2file ( pi_doc_id    IN doc_files_all.df_doc_id%TYPE
                       , pi_revision  IN doc_files_all.df_revision%TYPE
                       , pi_directory IN VARCHAR2
                       , pi_filename  IN VARCHAR2);
@@ -129,7 +129,7 @@ AS
     l_rec_df.df_filename      := strip_filename(pi_rec_df.df_full_path);
     l_rec_df.df_file_info     := NVL(pi_rec_df.df_file_info, LENGTH(pi_rec_df.df_content));
     l_rec_df.df_date_created  := nm3user.get_effective_date;
-    l_rec_df.df_date_modified := l_rec_df.df_date_created; 
+    l_rec_df.df_date_modified := l_rec_df.df_date_created;
     l_rec_df.df_created_by    := USER;
     l_rec_df.df_modified_by   := USER;
   --
@@ -152,7 +152,7 @@ AS
 --    l_rec_dtf.dtf_filename      := strip_filename(pi_rec_dtf.dtf_filename);
 --    l_rec_dtf.dtf_file_info     := pi_rec_dtf.dtf_file_info;
 --    l_rec_dtf.dtf_date_created  := nm3user.get_effective_date;
---    l_rec_dtf.dtf_date_modified := nm3user.get_effective_date; 
+--    l_rec_dtf.dtf_date_modified := nm3user.get_effective_date;
 --    l_rec_dtf.dtf_created_by    := USER;
 --    l_rec_dtf.dtf_modified_by   := USER;
 --  --
@@ -202,7 +202,7 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-  FUNCTION move_file_to_blob ( pi_filename IN VARCHAR2 
+  FUNCTION move_file_to_blob ( pi_filename IN VARCHAR2
                              , pi_location IN VARCHAR2 )
   RETURN BLOB
   IS
@@ -251,7 +251,7 @@ AS
   END move_file_to_blob;
 --
 --------------------------------------------------------------------------------
--- 
+--
   FUNCTION does_df_exist ( pi_doc_id IN doc_files_all.df_doc_id%TYPE
                          , pi_revision IN doc_files_all.df_revision%TYPE )
   RETURN BOOLEAN
@@ -259,25 +259,25 @@ AS
     l_temp NUMBER;
     CURSOR c1 IS
       SELECT COUNT(*) FROM doc_files_all
-       WHERE df_doc_id = pi_doc_id 
+       WHERE df_doc_id = pi_doc_id
          AND df_revision = pi_revision;
   BEGIN
     OPEN c1; FETCH c1 INTO l_temp; CLOSE c1;
     RETURN (l_temp > 0);
   END does_df_exist;
-  
+
 --
 --------------------------------------------------------------------------------
 --
-  PROCEDURE get_filename_and_location ( pi_doc_id IN docs.doc_id%TYPE 
+  PROCEDURE get_filename_and_location ( pi_doc_id IN docs.doc_id%TYPE
                                       , po_filename OUT VARCHAR2
                                       , po_location OUT VARCHAR )
   IS
     retval nm3type.max_varchar2;
   BEGIN
-    SELECT a.filename, b.dlc_name 
+    SELECT a.filename, b.dlc_name
       INTO po_filename, po_location
-      FROM 
+      FROM
       (SELECT doc_id, doc_dlc_id,
               CASE
               WHEN instr(doc_file,'.') = 0
@@ -296,8 +296,8 @@ AS
        AND doc_dlc_id = dlc_id
        AND dlc_name = hdir_name;
   EXCEPTION
-    WHEN NO_DATA_FOUND THEN 
-      po_location := NULL; 
+    WHEN NO_DATA_FOUND THEN
+      po_location := NULL;
       po_filename := NULL;
   END get_filename_and_location;
 --
@@ -315,7 +315,7 @@ AS
 --------------------------------------------------------------------------------
 --  Work out which table to load the file into for upload from client
 --
-  PROCEDURE get_upload_info  
+  PROCEDURE get_upload_info
               ( pi_doc_id          IN docs.doc_id%TYPE
               , po_table_name     OUT user_tables.table_name%TYPE
               , po_column_name    OUT user_tab_columns.column_name%TYPE
@@ -339,14 +339,14 @@ AS
     po_pk_column      := g_pk_column;
     po_where_clause   := l_where_clause;
     po_prog_title     := l_progress_title;
-    po_prog_sub_title := l_progress_sub_title; 
-  -- 
+    po_prog_sub_title := l_progress_sub_title;
+  --
   END get_upload_info;
 --
 --------------------------------------------------------------------------------
 --  Provide the info WebUtil needs to download the file to the client
 --
-  PROCEDURE get_download_info  
+  PROCEDURE get_download_info
               ( pi_doc_id          IN docs.doc_id%TYPE
               , po_client_file    OUT VARCHAR2
               , po_working_folder OUT VARCHAR2
@@ -375,7 +375,7 @@ AS
     THEN
     --
     -- DOC_FILES_ALL record exists
-    -- 
+    --
       l_where_clause := g_pk_column    ||' = '||pi_doc_id||' AND '||
                         g_revision_col ||' = '||get_max_revision (pi_doc_id);
     --
@@ -389,7 +389,7 @@ AS
     --
     ELSE
     --
-    -- Does not exist - load the file up into the table and 
+    -- Does not exist - load the file up into the table and
     -- create the DOC_FILES_ALL record.
     --
       get_filename_and_location (pi_doc_id, l_filename, l_location);
@@ -411,7 +411,7 @@ AS
         l_rec_df.df_full_path   := nm3file.get_true_dir_name(l_location)||g_sep||l_filename;
       --
         insert_df (l_rec_df);
-      -- 
+      --
         l_where_clause := g_pk_column    ||' = '||pi_doc_id||' AND '||
                           g_revision_col ||' = '||get_max_revision (pi_doc_id);
       --
@@ -428,7 +428,7 @@ AS
       END IF;
     --
     END IF;
-  -- 
+  --
   EXCEPTION
     WHEN ex_no_file
       THEN raise_application_error (-20101
@@ -443,7 +443,7 @@ AS
 --  Download the file from the BLOB into an Oracle directory
 --
   PROCEDURE download_from_blob_to_file
-                                 ( pi_doc_id    IN doc_files_all.df_doc_id%TYPE 
+                                 ( pi_doc_id    IN doc_files_all.df_doc_id%TYPE
                                  , pi_revision  IN doc_files_all.df_revision%TYPE
                                  , pi_directory IN VARCHAR2
                                  , pi_filename  IN VARCHAR2)
@@ -463,7 +463,7 @@ AS
       -- Using an Oracle directory
       SELECT hdir_name INTO l_directory
         FROM hig_directories
-       WHERE hdir_path = CASE 
+       WHERE hdir_path = CASE
                            WHEN INSTR(pi_directory,g_sep) > 0
                              THEN pi_directory
                            ELSE hdir_path
@@ -480,7 +480,7 @@ AS
     END;
   --
     blob2file
-      ( pi_doc_id    => pi_doc_id 
+      ( pi_doc_id    => pi_doc_id
       , pi_revision  => pi_revision
       , pi_directory => l_directory
       , pi_filename  => strip_filename(pi_filename) );
@@ -504,7 +504,7 @@ AS
     ( p_blob       IN OUT NOCOPY BLOB
     , p_file_loc   IN VARCHAR2
     , p_file_name  IN VARCHAR2
-    ) 
+    )
   IS
     --l_buffer        RAW(16383);
     l_buffer        RAW (32766);
@@ -581,7 +581,7 @@ AS
     ( p_blob       IN OUT NOCOPY BLOB
     , p_file_loc   IN VARCHAR2
     , p_file_name  IN VARCHAR2
-    ) 
+    )
   IS
     vblob           BLOB;
     vstart          NUMBER := 1;
@@ -610,9 +610,9 @@ AS
 
     -- select blob into variable
     vblob := p_blob;
-    
+
     -- if small enough for a single write
-    IF len < 32760 
+    IF len < 32760
     THEN
       utl_file.put_raw(l_file_handle,vblob);
       utl_file.fflush(l_file_handle);
@@ -623,7 +623,7 @@ AS
         dbms_lob.read(vblob,bytelen,vstart,my_vr);
 
         utl_file.put_raw(l_file_handle,my_vr);
-        utl_file.fflush(l_file_handle); 
+        utl_file.fflush(l_file_handle);
 
         -- set the start position for the next cut
         vstart := vstart + bytelen;
@@ -633,14 +633,14 @@ AS
         IF x < 32000 THEN
           bytelen := x;
         END IF;
-        
+
       END LOOP;
-      
+
     END IF;
-    
+
     utl_file.fclose(l_file_handle);
-    
-    
+
+
 
   END write_blob2;
 --
@@ -650,8 +650,8 @@ AS
     ( p_blob       IN OUT NOCOPY BLOB
     , p_file_loc   IN VARCHAR2
     , p_file_name  IN VARCHAR2
-    ) 
-  
+    )
+
   IS
     t_blob       BLOB    := p_blob;
     t_len        NUMBER;
@@ -667,11 +667,11 @@ AS
     t_TotalSize := DBMS_LOB.getlength (t_blob);
     t_remain := t_TotalSize;
 
-  -- The directory p_file_loc should exist before executing 
+  -- The directory p_file_loc should exist before executing
     t_output := UTL_FILE.fopen (p_file_loc, t_file_name, 'wb', 32760);
 
   -- Retrieving BLOB
-    WHILE t_position < t_TotalSize 
+    WHILE t_position < t_TotalSize
      LOOP
       DBMS_LOB.READ (t_blob, t_chucklen, t_position, t_chuck);
       UTL_FILE.put_raw (t_output, t_chuck);
@@ -687,7 +687,7 @@ AS
   END write_blob3;
 --
 --------------------------------------------------------------------------------
--- 
+--
   PROCEDURE blob2file
                       ( pi_doc_id    IN doc_files_all.df_doc_id%TYPE
                       , pi_revision  IN doc_files_all.df_revision%TYPE
@@ -699,11 +699,11 @@ AS
     SELECT df_content INTO vblob
       FROM doc_files_all
      WHERE df_doc_id = pi_doc_id
-       AND df_revision = 
-         CASE 
+       AND df_revision =
+         CASE
            WHEN pi_revision IS NOT NULL
              THEN pi_revision
-           ELSE 
+           ELSE
              (SELECT MAX(df_revision) FROM doc_files_all
                WHERE df_doc_id = pi_doc_id)
          END;
@@ -719,7 +719,7 @@ AS
 --------------------------------------------------------------------------------
 -- Create a doc_file_locks record
 --
-  PROCEDURE lock_file 
+  PROCEDURE lock_file
                ( pi_rec_dfl IN doc_file_locks%ROWTYPE )
   IS
   BEGIN
@@ -729,8 +729,8 @@ AS
 --------------------------------------------------------------------------------
 -- Get a doc_file_locks record
 --
-  FUNCTION get_dfl 
-               ( pi_dfl_doc_id   IN doc_file_locks.dfl_doc_id%TYPE 
+  FUNCTION get_dfl
+               ( pi_dfl_doc_id   IN doc_file_locks.dfl_doc_id%TYPE
                , pi_dfl_revision IN doc_file_locks.dfl_revision%TYPE )
   RETURN doc_file_locks%ROWTYPE
   IS
@@ -741,32 +741,33 @@ AS
           AND dfl_revision = pi_dfl_revision;
     RETURN retval;
   EXCEPTION
-    WHEN NO_DATA_FOUND 
+    WHEN NO_DATA_FOUND
     THEN RETURN retval;
   END get_dfl;
 --
 --------------------------------------------------------------------------------
 -- Lock a file based on DOC_ID and Revision
 --
-  PROCEDURE lock_file 
-               ( pi_dfl_doc_id   IN doc_file_locks.dfl_doc_id%TYPE 
-               , pi_dfl_revision IN doc_file_locks.dfl_revision%TYPE )
+  PROCEDURE lock_file
+               ( pi_dfl_doc_id   IN doc_file_locks.dfl_doc_id%TYPE
+               , pi_dfl_revision IN doc_file_locks.dfl_revision%TYPE
+               , pi_terminal     IN VARCHAR2 DEFAULT NULL )
   IS
     l_temp_dfl doc_file_locks%ROWTYPE;
   BEGIN
   --
     INSERT INTO doc_file_locks
       ( dfl_doc_id, dfl_revision, dfl_username, dfl_date, dfl_terminal )
-    VALUES 
-      ( pi_dfl_doc_id , pi_dfl_revision, USER, SYSDATE, NVL(SYS_CONTEXT ('USERENV', 'HOST'),'Unknown'));
+    VALUES
+      ( pi_dfl_doc_id , pi_dfl_revision, USER, SYSDATE, NVL(pi_terminal,NVL(SYS_CONTEXT ('USERENV', 'TERMINAL'),'Unknown')));
   --
   EXCEPTION
   -- File already locked
   --
     WHEN DUP_VAL_ON_INDEX
-      THEN 
+      THEN
       l_temp_dfl := get_dfl ( pi_dfl_doc_id, pi_dfl_revision);
-      RAISE_APPLICATION_ERROR 
+      RAISE_APPLICATION_ERROR
         ( -20301
          ,'Document file is already locked by '
               ||l_temp_dfl.dfl_username ||' on '
@@ -778,7 +779,7 @@ AS
 -- Is the file (based on DOC_ID and Revision) locked already?
 --
   FUNCTION is_file_locked
-              ( pi_dfl_doc_id   IN doc_file_locks.dfl_doc_id%TYPE 
+              ( pi_dfl_doc_id   IN doc_file_locks.dfl_doc_id%TYPE
               , pi_dfl_revision IN doc_file_locks.dfl_revision%TYPE )
     RETURN BOOLEAN
   IS
@@ -791,8 +792,8 @@ AS
 --------------------------------------------------------------------------------
 --
   PROCEDURE get_file_lock_info
-              ( pi_dfl_doc_id   IN  doc_file_locks.dfl_doc_id%TYPE 
-              , pi_dfl_revision IN  doc_file_locks.dfl_revision%TYPE 
+              ( pi_dfl_doc_id   IN  doc_file_locks.dfl_doc_id%TYPE
+              , pi_dfl_revision IN  doc_file_locks.dfl_revision%TYPE
               , po_filename     OUT doc_files_all.df_filename%TYPE
               , po_username     OUT doc_file_locks.dfl_username%TYPE
               , po_date         OUT doc_file_locks.dfl_date%TYPE)
@@ -839,10 +840,10 @@ AS
   RETURN VARCHAR2
   IS
     retval      nm3type.max_varchar2;
-    l_formatted VARCHAR2(15) := nm3flx.boolean_to_char( pi_formatted ); 
+    l_formatted VARCHAR2(15) := nm3flx.boolean_to_char( pi_formatted );
   BEGIN
-    SELECT 
-        -- 
+    SELECT
+        --
            CASE
            WHEN l_formatted = nm3type.get_true
            THEN
@@ -914,11 +915,11 @@ AS
   --
     RETURN ( get_file_size ( pi_doc_id
                            , pi_revision
-                           , CASE WHEN pi_formatted = 'N' 
-                                  THEN FALSE 
-                                  WHEN pi_formatted = 'Y' 
-                                  THEN TRUE 
-                             END )); 
+                           , CASE WHEN pi_formatted = 'N'
+                                  THEN FALSE
+                                  WHEN pi_formatted = 'Y'
+                                  THEN TRUE
+                             END ));
   --
   END get_file_size;
 --
@@ -932,17 +933,17 @@ AS
   --
     RETURN ( get_file_size ( pi_doc_id
                            , NULL
-                           , CASE WHEN pi_formatted = 'N' 
-                                  THEN FALSE 
-                                  WHEN pi_formatted = 'Y' 
-                                  THEN TRUE 
-                             END )); 
+                           , CASE WHEN pi_formatted = 'N'
+                                  THEN FALSE
+                                  WHEN pi_formatted = 'Y'
+                                  THEN TRUE
+                             END ));
   --
   END get_file_size;
 --
 --------------------------------------------------------------------------------
 --
--- Return the size 
+-- Return the size
 --    pi_size_in_bytes      Size in Bytes
 --    pi_type               Either b for bits, B for Bytes, KB for KBytes, MB for MBytes
 --                          GB for GBytes, TB for TBytes
@@ -961,13 +962,13 @@ AS
 --2097152 nibbles
 --8388608 bits
 --
-  FUNCTION get_size ( pi_size_in_bytes IN NUMBER 
+  FUNCTION get_size ( pi_size_in_bytes IN NUMBER
                     , pi_type          IN VARCHAR2 DEFAULT 'B')
   RETURN NUMBER
   IS
   BEGIN
   --
-    RETURN ( CASE 
+    RETURN ( CASE
                WHEN pi_type IS NULL
                  THEN pi_size_in_bytes
                WHEN pi_type = 'b'
@@ -991,7 +992,7 @@ AS
 --------------------------------------------------------------------------------
 --
   PROCEDURE unlock_file
-               ( pi_dfl_doc_id   IN doc_file_locks.dfl_doc_id%TYPE 
+               ( pi_dfl_doc_id   IN doc_file_locks.dfl_doc_id%TYPE
                , pi_dfl_revision IN doc_file_locks.dfl_revision%TYPE)
   IS
   BEGIN
@@ -1006,7 +1007,7 @@ AS
   END unlock_file;
 --
 --------------------------------------------------------------------------------
--- Get the users prefered working folder 
+-- Get the users prefered working folder
   FUNCTION get_work_folder RETURN VARCHAR2
   IS
   BEGIN
@@ -1123,7 +1124,7 @@ AS
 --    po_where_clause   := l_where_clause;
 --    po_prog_title     := l_progress_title;
 --    po_prog_sub_title := l_progress_sub_title;
---  -- 
+--  --
 --  END get_template_download_info;
 --
 --------------------------------------------------------------------------------
@@ -1155,7 +1156,7 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-  PROCEDURE set_doc_location_table ( pi_dlc_id IN doc_locations.dlc_id%TYPE 
+  PROCEDURE set_doc_location_table ( pi_dlc_id IN doc_locations.dlc_id%TYPE
                                    , pi_flag   IN BOOLEAN )
   IS
   BEGIN

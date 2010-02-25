@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkh-arc   2.1   Feb 12 2010 11:35:34   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkh-arc   2.2   Feb 25 2010 13:56:14   aedwards  $
 --       Module Name      : $Workfile:   nm3doc_files.pkh  $
---       Date into PVCS   : $Date:   Feb 12 2010 11:35:34  $
---       Date fetched Out : $Modtime:   Feb 12 2010 11:34:50  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Feb 25 2010 13:56:14  $
+--       Date fetched Out : $Modtime:   Feb 25 2010 13:55:48  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version :
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 
 --</GLOBVAR>
 --
@@ -101,7 +101,8 @@ AS
 --
   PROCEDURE lock_file
                ( pi_dfl_doc_id   IN doc_file_locks.dfl_doc_id%TYPE
-               , pi_dfl_revision IN doc_file_locks.dfl_revision%TYPE);
+               , pi_dfl_revision IN doc_file_locks.dfl_revision%TYPE
+               , pi_terminal     IN VARCHAR2 DEFAULT NULL );
 --</PROC>
 --
 --------------------------------------------------------------------------------
