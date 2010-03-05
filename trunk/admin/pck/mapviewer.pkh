@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE mapviewer AS
 --   SCCS Identifiers :-
 -----------------------------------------------------------------------------
 --
---       sccsid           : @(#)mapviewer.pkh	1.9 04/05/07
---       Module Name      : mapviewer.pkh
---       Date into SCCS   : 07/04/05 11:41:09
---       Date fetched Out : 07/06/13 14:10:41
---       SCCS Version     : 1.9
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkh-arc   2.1   Mar 05 2010 14:08:08   rcoupe  $
+--       Module Name      : $Workfile:   mapviewer.pkh  $
+--       Date into PVCS   : $Date:   Mar 05 2010 14:08:08  $
+--       Date fetched Out : $Modtime:   Mar 05 2010 13:58:28  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2004
@@ -17,10 +17,10 @@ CREATE OR REPLACE PACKAGE mapviewer AS
 --<GLOBVAR>
   g_ne_id       NUMBER;
   g_doc_id      NUMBER;
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '@(#)mapviewer.pkh	1.9 04/05/07';
-  
+  g_sccsid      CONSTANT  VARCHAR2(2000) :='"$Revision:   2.1  $"';
+
   g_conversion_factor number;
-  
+
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
@@ -133,7 +133,7 @@ CREATE OR REPLACE PACKAGE mapviewer AS
 --
 --<PROC NAME="MSV_AVAILABLE">
 -- return TRUE if mapviewer is configured to run i.e. product option WEBMAPMSV is set
-  FUNCTION msv_available RETURN BOOLEAN; 
+  FUNCTION msv_available RETURN BOOLEAN;
 --</PROC>
 -----------------------------------------------------------------------------
 --
@@ -153,12 +153,18 @@ CREATE OR REPLACE PACKAGE mapviewer AS
 --
 --<PROC NAME="DELETE_GDO">
 -- delete GDO data for given session id
-  PROCEDURE delete_gdo 
+  PROCEDURE delete_gdo
               ( pi_session_id IN gis_data_objects.gdo_session_id%TYPE );
 
 --</PROC>
 -----------------------------------------------------------------------------
 --
+--<PROC NAME="CREATE_HIGHLIGHT_DATA">
+-- creates the data to be highlighted in MV organised by feature type
+  PROCEDURE create_highlight_data ( p_query in varchar2, p_id in integer );
+
+--</PROC>
+-----------------------------------------------------------------------------
 
 
 END;
