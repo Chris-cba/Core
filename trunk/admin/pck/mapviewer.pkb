@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Mapviewer AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.2   Apr 02 2008 12:09:30   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.3   Mar 05 2010 14:08:44   rcoupe  $
 --       Module Name      : $Workfile:   mapviewer.pkb  $
---       Date into PVCS   : $Date:   Apr 02 2008 12:09:30  $
---       Date fetched Out : $Modtime:   Apr 02 2008 12:05:24  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Mar 05 2010 14:08:44  $
+--       Date fetched Out : $Modtime:   Mar 05 2010 14:00:32  $
+--       PVCS Version     : $Revision:   2.3  $
 
 
 --
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BODY Mapviewer AS
 --	Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.3  $"';
 
 
 FUNCTION Get_Scale RETURN NUMBER;
@@ -391,5 +391,25 @@ END;
 --
 -----------------------------------------------------------------------------
 --
+  PROCEDURE create_highlight_data ( p_query in varchar2, p_id in integer ) is
+  curstr varchar2(2000);
+  qq varchar2(1) := chr(39);
+  begin
+    curstr := 'insert into mv_highlight '||
+            '  ( mv_id, mv_feat_type, mv_geometry ) '||
+            ' select '||p_id||', feat_type, shape '||
+            ' from ( select decode (a.shape.sdo_gtype, 2001, '||qq||'POINT'||qq||', '||qq||'LINE'||qq||' ) feat_type,'||
+            '    sdo_aggr_union( sdoaggrtype( shape, 0.005)) shape from ( '|| p_query||') a '||
+            ' group by decode (a.shape.sdo_gtype, 2001, '||qq||'POINT'||qq||', '||qq||'LINE'||qq||' ))';
+--  nm_debug.debug_on;
+--  nm_debug.debug(curstr);
+    execute immediate curstr;
+    commit;
+end;
+
+--
+-----------------------------------------------------------------------------
+--
+
 END Mapviewer;
 /
