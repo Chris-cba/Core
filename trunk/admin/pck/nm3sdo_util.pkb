@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_util.pkb-arc   1.3   Jan 26 2010 15:17:18   rcoupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_util.pkb-arc   1.4   Mar 05 2010 11:02:42   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo_util.pkb  $
---       Date into PVCS   : $Date:   Jan 26 2010 15:17:18  $
---       Date fetched Out : $Modtime:   Jan 26 2010 15:16:34  $
---       Version          : $Revision:   1.3  $
+--       Date into PVCS   : $Date:   Mar 05 2010 11:02:42  $
+--       Date fetched Out : $Modtime:   Mar 05 2010 11:01:48  $
+--       Version          : $Revision:   1.4  $
 --       Based on SCCS version :
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   1.3  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   1.4  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3sdo_util';
 --
@@ -92,7 +92,7 @@ EXECUTE IMMEDIATE
 
 EXECUTE IMMEDIATE
     'UPDATE ' || feature_table || ' ' ||
-    'SET shape = NM3SDO.REVERSE_GEOMETRY (:l_shape, 0) ' ||
+    'SET '||l_shape_column||' = NM3SDO.REVERSE_GEOMETRY (:l_shape, 0) ' ||
     'WHERE ' || pk_column || ' = :l_ne ' using l_shape, l_ne;
 
    NM3SDO.CHANGE_AFFECTED_SHAPES (theme_id, l_ne);
