@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.15   Feb 11 2010 13:03:42   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.16   Mar 08 2010 12:42:06   cstrettle  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Feb 11 2010 13:03:42  $
---       Date fetched Out : $Modtime:   Feb 11 2010 12:50:30  $
---       Version          : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Mar 08 2010 12:42:06  $
+--       Date fetched Out : $Modtime:   Mar 08 2010 12:37:44  $
+--       Version          : $Revision:   2.16  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.15  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.16  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -25,9 +25,9 @@ AS
                                   := '<?xml version="1.0" standalone="yes"?>';
    g_user_key                VARCHAR2 (50);
    g_cancel_flag             VARCHAR2 (1)          := 'N';
-   
    g_global_boolean          BOOLEAN;
-   
+--
+   e_no_analyse_privs        EXCEPTION;
 --
 -----------------------------------------------------------------------------
 --
@@ -2600,7 +2600,7 @@ AS
        IF rec_linear.nth_feature_table IS NOT NULL THEN
           execute immediate 'truncate table ' || rec_linear.nth_feature_table;
        ELSE          
-          RAISE_APPLICATION_ERROR ( -20101
+          raise_application_error ( -20101
                                   , 'Cannot refresh this layer - there is no linear base Theme available');
        END IF;       
     --   
@@ -2626,6 +2626,18 @@ AS
        IF l_spatial_ind_name is not null THEN       
        execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=synchronize'')';
        END IF;
+    --
+       -- Refresh Stats CWS 0109217
+       BEGIN
+         Nm3ddl.analyse_table( pi_table_name          => rec_linear.nth_feature_table
+                             , pi_schema              => hig.get_application_owner
+                             , pi_estimate_percentage => NULL
+                             , pi_auto_sample_size    => FALSE);
+       EXCEPTION
+       WHEN OTHERS
+       THEN
+       RAISE e_no_analyse_privs;
+       END;
     --
     ELSE --If it is non linear
     --
@@ -2657,18 +2669,36 @@ AS
                                     , p_gty_type   => pi_gty_type
                                     , p_seq_name   => l_sequence_name
                                     , p_job_id     => pi_job_id);
-    -- 
+    --
        if l_spatial_ind_name is not null then  
          execute immediate 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=synchronize'')';
        end if;
     --
+       -- Refresh Stats CWS 0109217
+       BEGIN
+         Nm3ddl.analyse_table( pi_table_name          => l_feature_table
+                             , pi_schema              => hig.get_application_owner
+                             , pi_estimate_percentage => NULL
+                             , pi_auto_sample_size    => FALSE);
+       EXCEPTION
+       WHEN OTHERS
+       THEN
+       RAISE e_no_analyse_privs;
+       NULL;
+       END;
+    --
     END IF; 
-  --
+    --
    EXCEPTION
      WHEN ex_no_spdix
      THEN
        RAISE_APPLICATION_ERROR ( -20103
-                                , 'Cannot derive spatial index for ' || l_feature_table);     
+                                , 'Cannot derive spatial index for ' || l_feature_table);
+     -- Refresh Stats CWS 0109217
+     WHEN e_no_analyse_privs
+     THEN
+       RAISE_APPLICATION_ERROR (-20778,'Layer created - but user does not have ANALYZE ANY granted. '||
+                                       'Please ensure the correct role/privs are applied to the user');
      WHEN OTHERS 
      THEN       
        RAISE;
@@ -2747,6 +2777,19 @@ AS
            EXECUTE IMMEDIATE 'ALTER INDEX ' || l_spatial_ind_name || ' PARAMETERS (''index_status=synchronize'')';
          END IF;
      --
+         -- Refresh Stats CWS 0109217
+         BEGIN
+           Nm3ddl.analyse_table( pi_table_name          => l_feature_table
+                               , pi_schema              => hig.get_application_owner
+                               , pi_estimate_percentage => NULL
+                               , pi_auto_sample_size    => FALSE);
+         EXCEPTION
+         WHEN OTHERS
+         THEN
+         RAISE e_no_analyse_privs;
+         NULL;
+         END;
+       
        ELSE-- Use XY offnetwork asset layer
          nm3sdo_edit.process_inv_xy_update(pi_inv_type=>pi_inv_type);
        END IF;
@@ -2758,10 +2801,12 @@ AS
      THEN
       raise_application_error ( -20103
                               , 'Cannot derive spatial index for ' || l_feature_table);
---     WHEN OTHERS 
---     THEN
---       RAISE;
-   END;   
+     -- Refresh Stats CWS 0109217
+     WHEN e_no_analyse_privs
+     THEN
+      raise_application_error (-20778,'Layer created - but user does not have ANALYZE ANY granted. '||
+                                      'Please ensure the correct role/privs are applied to the user');
+   END refresh_asset_layer;
 --
 -----------------------------------------------------------------------------
 --
@@ -3716,15 +3761,40 @@ AS
   PROCEDURE refresh_asd_layer( pi_inv_type IN nm_inv_types.nit_inv_type%TYPE
                              , pi_job_id   IN NUMBER DEFAULT NULL)
   IS
+  --
+  l_nth_feature_table nm_themes_all.nth_feature_table%TYPE;
+  --
+  CURSOR get_feature_table (c_inv_type IN nm_inv_types.nit_inv_type%TYPE ) IS
+  SELECT nth_feature_table
+  FROM nm_themes_all t, nm_inv_themes
+  WHERE nth_theme_id = nith_nth_theme_id
+  AND   nith_nit_id = c_inv_type
+  AND   nth_base_table_theme IS NULL;
+
   BEGIN
   --
     IF hig.is_product_licensed ('NSG') THEN
     --
-     EXECUTE IMMEDIATE    
-          'BEGIN '||lf||
-          '  nm3nsgasd.refresh_asd_layer(:pi_inv_type,:pi_job_id);'||lf||
-          'END;'
-       USING IN pi_inv_type, IN pi_job_id;
+      EXECUTE IMMEDIATE
+        'BEGIN '||lf||
+        '  nm3nsgasd.refresh_asd_layer(:pi_inv_type,:pi_job_id);'||lf||
+        'END;'
+      USING IN pi_inv_type, IN pi_job_id;
+      --
+      -- Refresh Stats CWS 0109217
+      BEGIN
+        OPEN get_feature_table (pi_inv_type);
+        FETCH get_feature_table INTO l_nth_feature_table;
+        CLOSE get_feature_table;
+        --
+        Nm3ddl.analyse_table( pi_table_name          => l_nth_feature_table
+                            , pi_schema              => hig.get_application_owner
+                            , pi_estimate_percentage => NULL
+                            , pi_auto_sample_size    => FALSE);
+      EXCEPTION
+      WHEN OTHERS THEN
+      RAISE e_no_analyse_privs;
+      END;
     --
     END IF;
   --
