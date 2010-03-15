@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.4   Sep 03 2009 09:54:46   drawat  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.5   Mar 15 2010 17:37:48   cstrettle  $
 --       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   Sep 03 2009 09:54:46  $
---       Date fetched Out : $Modtime:   Sep 02 2009 17:34:44  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Mar 15 2010 17:37:48  $
+--       Date fetched Out : $Modtime:   Mar 15 2010 17:36:10  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -79,31 +79,32 @@ END lock_parent;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE insert_nm_element_history ( p_ne_id IN NM_ELEMENTS.ne_id%TYPE
-                                     ,p_effective_date IN DATE DEFAULT nm3user.get_effective_date
+PROCEDURE insert_nm_element_history ( p_ne_id          IN NM_ELEMENTS.ne_id%TYPE
+                                    , p_effective_date IN DATE DEFAULT nm3user.get_effective_date
+                                    , p_neh_descr      IN nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS 0108990 12/03/2010
                                     )
 IS
-BEGIN
-   nm_debug.proc_start(g_package_name , 'insert_nm_element_history');
 --
-      INSERT INTO  NM_ELEMENT_HISTORY
-         (neh_id,
-          neh_ne_id_old,
-          neh_ne_id_new,
-          neh_operation,
-          neh_effective_date,
-          neh_actioned_date,
-          neh_actioned_by
-         )
-      VALUES ( nm3seq.next_neh_id_seq 
-              ,p_ne_id
-              ,p_ne_id
-              ,'C'
-              ,p_effective_date
-              ,nm3user.get_effective_date
-              ,USER
-             );
-   nm_debug.proc_end(g_package_name , 'insert_nm_element_history');
+  l_rec_neh NM_ELEMENT_HISTORY%ROWTYPE;
+--
+BEGIN
+  nm_debug.proc_start(g_package_name , 'insert_nm_element_history');
+--
+-- CWS 
+-- Insert statement replaced with call to a procedure
+--
+  l_rec_neh.neh_id             := nm3seq.next_neh_id_seq;
+  l_rec_neh.neh_ne_id_old      := p_ne_id;
+  l_rec_neh.neh_ne_id_new      := p_ne_id;
+  l_rec_neh.neh_operation      := 'C';
+  l_rec_neh.neh_effective_date := p_effective_date;
+  l_rec_neh.neh_actioned_date  := nm3user.get_effective_date;
+  l_rec_neh.neh_actioned_by    := USER;
+  l_rec_neh.neh_descr          := p_neh_descr; --CWS 0108990 12/03/2010
+--
+  nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
+--
+  nm_debug.proc_end(g_package_name , 'insert_nm_element_history');
 --
 END insert_nm_element_history;
 --
@@ -373,6 +374,7 @@ END check_other_products;
 --
 PROCEDURE do_close(p_ne_id          NM_ELEMENTS.ne_id%TYPE
                   ,p_effective_date DATE DEFAULT  nm3user.get_effective_date
+                  ,p_neh_descr      nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS 0108990 12/03/2010
                   ) IS
    c_xattr_status BOOLEAN := nm3inv_xattr.g_xattr_active;
 --
@@ -483,7 +485,8 @@ BEGIN
       WHERE ne_id = p_ne_id;
 --
       insert_nm_element_history( p_ne_id
-                                ,p_effective_date
+                               , p_effective_date
+                               , p_neh_descr --CWS 0108990 12/03/2010
                                );
      -- Insert the stored NM_MEMBER_HISTORY records
      nm3merge.ins_nmh;

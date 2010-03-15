@@ -54,6 +54,7 @@ FUNCTION get_body_version RETURN VARCHAR2;
 
 PROCEDURE do_close(p_ne_id          nm_elements.ne_id%TYPE
                   ,p_effective_date DATE DEFAULT  nm3user.get_effective_date
+                  ,p_neh_descr      nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS 0108990 12/03/2010
                   );
 --</PROC>
 --
@@ -82,10 +83,10 @@ PROCEDURE gis_close_elements (p_gdo_session_id gis_data_objects.gdo_session_id%T
 -- pi_end_date_datums = whether or not to end date the datum elements that comprise a Group of Sections
 --
 PROCEDURE multi_element_close ( pi_type            VARCHAR2
-                               ,pi_id              NUMBER
-                               ,pi_effective_date  DATE    DEFAULT nm3user.get_effective_date
-                               ,pi_close_all       VARCHAR2 DEFAULT 'N'
-                               ,pi_end_date_datums VARCHAR2 DEFAULT 'N'
+                              , pi_id              NUMBER
+                              , pi_effective_date  DATE    DEFAULT nm3user.get_effective_date
+                              , pi_close_all       VARCHAR2 DEFAULT 'N'
+                              , pi_end_date_datums VARCHAR2 DEFAULT 'N'
                               );
 --</PROC>
 --
@@ -140,7 +141,7 @@ FUNCTION is_group_to_be_closed(pi_parent_ne_type      IN nm_elements.ne_type%TYP
 --
 PROCEDURE get_membership_hierarchy(pi_route_id                      IN     NM_ELEMENTS.ne_id%TYPE
                                   ,pi_end_date_all                  IN     VARCHAR2 DEFAULT 'N'
---                                  ,pi_end_date_datums               IN     VARCHAR2 DEFAULT 'N'
+--                                ,pi_end_date_datums               IN     VARCHAR2 DEFAULT 'N'
                                   ,pi_include_non_closed_nodes      IN     BOOLEAN DEFAULT FALSE
                                   );
 --</PROC>
