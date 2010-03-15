@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.6   Feb 08 2010 09:33:30   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.7   Mar 15 2010 13:46:56   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Feb 08 2010 09:33:30  $
---       Date fetched Out : $Modtime:   Feb 08 2010 09:30:04  $
---       SCCS Version     : $Revision:   2.6  $
+--       Date into SCCS   : $Date:   Mar 15 2010 13:46:56  $
+--       Date fetched Out : $Modtime:   Mar 15 2010 13:44:08  $
+--       SCCS Version     : $Revision:   2.7  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.6  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.7  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
@@ -937,12 +937,16 @@ BEGIN
   CLOSE c1;
 --
 -- Get the DPs for the attributes
-  SELECT x.ita_dec_places, y.ita_dec_places INTO l_x_dp, l_y_dp
-    FROM nm_inv_type_attribs x, nm_inv_type_attribs y
-   WHERE x.ita_inv_type = pi_inv_type
-     AND y.ita_inv_type = pi_inv_type
-     AND x.ita_attrib_name = 'IIT_X'
-     AND y.ita_attrib_name = 'IIT_Y';
+  BEGIN
+    SELECT x.ita_dec_places, y.ita_dec_places INTO l_x_dp, l_y_dp
+      FROM nm_inv_type_attribs x, nm_inv_type_attribs y
+     WHERE x.ita_inv_type = pi_inv_type
+       AND y.ita_inv_type = pi_inv_type
+       AND x.ita_attrib_name = 'IIT_X'
+       AND y.ita_attrib_name = 'IIT_Y';
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN NULL;
+  END;
 --
   BEGIN
     SELECT index_name INTO l_spatial_index FROM all_indexes
