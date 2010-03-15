@@ -250,11 +250,12 @@ PROCEDURE do_merge_datum_or_group (pi_ne_id_1           IN     nm_elements.ne_id
                                   ,pi_ne_group          IN     nm_elements.ne_group%TYPE          DEFAULT NULL
                                   ,pi_ne_no_start       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
                                   ,pi_ne_no_end         IN     nm_elements.ne_no_end%TYPE         DEFAULT NULL
-                                  ,pi_ne_sub_class      IN     nm_elements.ne_sub_class%TYPE       DEFAULT NULL
+                                  ,pi_ne_sub_class      IN     nm_elements.ne_sub_class%TYPE      DEFAULT NULL
                                   ,pi_ne_nsg_ref        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
                                   ,pi_ne_version_no     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
                                   ,pi_test_poe_at_node  IN     varchar2                           DEFAULT 'N'
-                                  ,po_ne_id_new         IN OUT nm_elements.ne_id%TYPE);
+                                  ,po_ne_id_new         IN OUT nm_elements.ne_id%TYPE
+                                  ,pi_neh_descr         IN     nm_element_history.neh_descr%TYPE  DEFAULT NULL); --CWS 0108990 12/03/2010
 --
 -----------------------------------------------------------------------------
 --

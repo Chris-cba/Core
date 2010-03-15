@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.7   Nov 12 2009 09:26:56   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.8   Mar 15 2010 16:00:40   cstrettle  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Nov 12 2009 09:26:56  $
---       Date fetched Out : $Modtime:   Nov 12 2009 09:25:36  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Mar 15 2010 16:00:40  $
+--       Date fetched Out : $Modtime:   Mar 12 2010 16:06:44  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -253,21 +253,22 @@ END set_leg_numbers;
 --
 ------------------------------------------------------------------------------------------------
 --
-PROCEDURE audit_element_history(pi_ne_id_new     in nm_elements.ne_id%type
-                               ,pi_ne_id_1       in nm_elements.ne_id%type
-                               ,pi_length_1      in nm_elements.ne_length%type
-                               ,pi_ne_id_2       in nm_elements.ne_id%type
-                               ,pi_length_2      in nm_elements.ne_length%type
-                               ,pi_effective_date in date 
+PROCEDURE audit_element_history(pi_ne_id_new      IN nm_elements.ne_id%type
+                               ,pi_ne_id_1        IN nm_elements.ne_id%type
+                               ,pi_length_1       IN nm_elements.ne_length%type
+                               ,pi_ne_id_2        IN nm_elements.ne_id%type
+                               ,pi_length_2       IN nm_elements.ne_length%type
+                               ,pi_effective_date IN date
+                               ,pi_neh_descr      IN nm_element_history.neh_descr%TYPE  DEFAULT NULL --CWS 0108990 12/03/2010
                                ) IS
 
   l_rec_neh nm_element_history%ROWTYPE;
       
-  l_ne_id_1  nm_elements.ne_id%type;
-  l_length_1 nm_elements.ne_length%type;
+  l_ne_id_1  nm_elements.ne_id%TYPE;
+  l_length_1 nm_elements.ne_length%TYPE;
       
-  l_ne_id_2  nm_elements.ne_id%type;
-  l_length_2 nm_elements.ne_length%type;
+  l_ne_id_2  nm_elements.ne_id%TYPE;
+  l_length_2 nm_elements.ne_length%TYPE;
 
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
@@ -299,8 +300,9 @@ BEGIN
   --note this is the first merged element
   l_rec_neh.neh_param_1        := 1;
   l_rec_neh.neh_param_2        := NULL;
+  l_rec_neh.neh_descr          := pi_neh_descr; --CWS 0108990 12/03/2010
       
-  ins_neh (l_rec_neh);
+  nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
       
   l_rec_neh.neh_id             := nm3seq.next_neh_id_seq;
   l_rec_neh.neh_ne_id_old      := l_ne_id_2;
@@ -308,7 +310,7 @@ BEGIN
   --note this is the second merged element
   l_rec_neh.neh_param_1        := 2;
 
-  ins_neh (l_rec_neh);
+  nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
 
   nm_debug.proc_end(p_package_name   => g_package_name
                    ,p_procedure_name => 'audit_element_history');
@@ -342,6 +344,7 @@ PROCEDURE merge_elements (p_ne_id_1               IN     nm_elements.ne_id%TYPE
                          ,p_ne_nsg_ref_new        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
                          ,p_ne_version_no_new     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
                          ,p_test_poe_at_node      IN     varchar2                           DEFAULT 'N'
+                         ,p_neh_descr             IN     nm_element_history.neh_descr%TYPE  DEFAULT NULL --CWS 0108990 12/03/2010
                          ) IS
 --
    -- flexible attributes (columns) to inherit
@@ -535,7 +538,9 @@ nm_debug.debug('done calling insert element');
                        ,pi_length_1       => g_ne_1_datum_length
                        ,pi_ne_id_2        => p_ne_id_2
                        ,pi_length_2       => g_ne_2_datum_length
-                       ,pi_effective_date => p_effective_date);
+                       ,pi_effective_date => p_effective_date
+                       ,pi_neh_descr      => p_neh_descr --CWS 0108990 12/03/2010
+                       );
 
    nm_debug.proc_end(g_package_name , 'merge_elements');
 --
@@ -851,28 +856,29 @@ END check_other_products;
 PROCEDURE do_merge (p_ne_id_1           IN     nm_elements.ne_id%TYPE
                    ,p_ne_id_2           IN     nm_elements.ne_id%TYPE
                    ,p_ne_id_new         IN OUT nm_elements.ne_id%TYPE
-                   ,p_effective_date    IN     date                               DEFAULT nm3user.get_effective_date
+                   ,p_effective_date    IN     date                                DEFAULT nm3user.get_effective_date
                    ,p_merge_at_node     IN     nm_elements.ne_no_start%TYPE
-                   ,p_ne_unique         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
-                   ,p_ne_type           IN     nm_elements.ne_type%TYPE           DEFAULT NULL
-                   ,p_ne_nt_type        IN     nm_elements.ne_nt_type%TYPE        DEFAULT NULL
-                   ,p_ne_descr          IN     nm_elements.ne_descr%TYPE          DEFAULT NULL
-                   ,p_ne_length         IN     nm_elements.ne_length%TYPE         DEFAULT NULL
-                   ,p_ne_admin_unit     IN     nm_elements.ne_admin_unit%TYPE     DEFAULT NULL
-                   ,p_ne_gty_group_type IN     nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
-                   ,p_ne_owner          IN     nm_elements.ne_owner%TYPE          DEFAULT NULL
-                   ,p_ne_name_1         IN     nm_elements.ne_name_1%TYPE         DEFAULT NULL
-                   ,p_ne_name_2         IN     nm_elements.ne_name_2%TYPE         DEFAULT NULL
-                   ,p_ne_prefix         IN     nm_elements.ne_prefix%TYPE         DEFAULT NULL
-                   ,p_ne_number         IN     nm_elements.ne_number%TYPE         DEFAULT NULL
-                   ,p_ne_sub_type       IN     nm_elements.ne_sub_type%TYPE       DEFAULT NULL
-                   ,p_ne_group          IN     nm_elements.ne_group%TYPE          DEFAULT NULL
-                   ,p_ne_no_start       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
-                   ,p_ne_no_end         IN     nm_elements.ne_no_end%TYPE         DEFAULT NULL
+                   ,p_ne_unique         IN     nm_elements.ne_unique%TYPE          DEFAULT NULL
+                   ,p_ne_type           IN     nm_elements.ne_type%TYPE            DEFAULT NULL
+                   ,p_ne_nt_type        IN     nm_elements.ne_nt_type%TYPE         DEFAULT NULL
+                   ,p_ne_descr          IN     nm_elements.ne_descr%TYPE           DEFAULT NULL
+                   ,p_ne_length         IN     nm_elements.ne_length%TYPE          DEFAULT NULL
+                   ,p_ne_admin_unit     IN     nm_elements.ne_admin_unit%TYPE      DEFAULT NULL
+                   ,p_ne_gty_group_type IN     nm_elements.ne_gty_group_type%TYPE  DEFAULT NULL
+                   ,p_ne_owner          IN     nm_elements.ne_owner%TYPE           DEFAULT NULL
+                   ,p_ne_name_1         IN     nm_elements.ne_name_1%TYPE          DEFAULT NULL
+                   ,p_ne_name_2         IN     nm_elements.ne_name_2%TYPE          DEFAULT NULL
+                   ,p_ne_prefix         IN     nm_elements.ne_prefix%TYPE          DEFAULT NULL
+                   ,p_ne_number         IN     nm_elements.ne_number%TYPE          DEFAULT NULL
+                   ,p_ne_sub_type       IN     nm_elements.ne_sub_type%TYPE        DEFAULT NULL
+                   ,p_ne_group          IN     nm_elements.ne_group%TYPE           DEFAULT NULL
+                   ,p_ne_no_start       IN     nm_elements.ne_no_start%TYPE        DEFAULT NULL
+                   ,p_ne_no_end         IN     nm_elements.ne_no_end%TYPE          DEFAULT NULL
                    ,p_ne_sub_class      IN     nm_elements.ne_sub_class%TYPE       DEFAULT NULL
-                   ,p_ne_nsg_ref        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
-                   ,p_ne_version_no     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
-                   ,p_test_poe_at_node  IN     varchar2                           DEFAULT 'N'
+                   ,p_ne_nsg_ref        IN     nm_elements.ne_nsg_ref%TYPE         DEFAULT NULL
+                   ,p_ne_version_no     IN     nm_elements.ne_version_no%TYPE      DEFAULT NULL
+                   ,p_test_poe_at_node  IN     varchar2                            DEFAULT 'N'
+                   ,p_neh_descr         IN     nm_element_history.neh_descr%TYPE   DEFAULT NULL --CWS 0108990 12/03/2010
                    ) IS
 --
    l_connectivity          pls_integer;
@@ -977,6 +983,7 @@ BEGIN
                   ,p_ne_nsg_ref_new        => p_ne_nsg_ref
                   ,p_ne_version_no_new     => p_ne_version_no
                   ,p_test_poe_at_node      => p_test_poe_at_node
+                  ,p_neh_descr             => p_neh_descr --CWS 0108990 12/03/2010
                   );
  --
  -- RAC Merge the element shapes:
@@ -1897,11 +1904,11 @@ PROCEDURE check_elements_can_be_merged (pi_ne_id_1 IN nm_elements.ne_id%TYPE
 BEGIN
 
   nm_debug.proc_start(g_package_name,'check_elements_can_be_merged');
-  IF NOT can_elements_be_merged(pi_ne_id_1 => pi_ne_id_1
-                               ,pi_ne_id_2  => pi_ne_id_2
+  IF NOT can_elements_be_merged(pi_ne_id_1        => pi_ne_id_1
+                               ,pi_ne_id_2        => pi_ne_id_2
                                ,pi_effective_date => pi_effective_date) THEN
-          hig.raise_ner (pi_appl    => g_ner_appl
-                        ,pi_id      => g_ner_id
+          hig.raise_ner (pi_appl               => g_ner_appl
+                        ,pi_id                 => g_ner_id
                         ,pi_supplementary_info => g_supplimentary_info);
   END IF;
 
@@ -2076,8 +2083,8 @@ BEGIN
  -----------------------------------
  -- Find common nodes on both routes
  -----------------------------------
- l_tab_rec_common_nodes :=  nm3merge.get_route_common_node(pi_route_ne_id_1          => pi_route_ne_rec_1.ne_id
-                                                          ,pi_route_ne_id_2          => pi_route_ne_rec_2.ne_id
+ l_tab_rec_common_nodes :=  nm3merge.get_route_common_node(pi_route_ne_id_1  => pi_route_ne_rec_1.ne_id
+                                                          ,pi_route_ne_id_2  => pi_route_ne_rec_2.ne_id
                                                           );
 
                                                           
@@ -2185,11 +2192,12 @@ PROCEDURE merge_group_elements (pi_route_ne_rec_1        IN     nm_elements%ROWT
                                ,pi_ne_number_new         IN     nm_elements.ne_number%TYPE         DEFAULT NULL
                                ,pi_ne_sub_type_new       IN     nm_elements.ne_sub_type%TYPE       DEFAULT NULL
                                ,pi_ne_group_new          IN     nm_elements.ne_group%TYPE          DEFAULT NULL
-                               ,pi_ne_sub_class_new      IN     nm_elements.ne_sub_class%TYPE       DEFAULT NULL
+                               ,pi_ne_sub_class_new      IN     nm_elements.ne_sub_class%TYPE      DEFAULT NULL
                                ,pi_ne_nsg_ref_new        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
                                ,pi_ne_version_no_new     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
                                ,pi_ne_no_start           IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
-                               ,pi_ne_no_end             IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL                               
+                               ,pi_ne_no_end             IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
+                               ,pi_neh_descr             IN     nm_element_history.neh_descr%TYPE  DEFAULT NULL --CWS 0108990 12/03/2010
                                ) IS
 
 
@@ -2253,7 +2261,9 @@ PROCEDURE merge_group_elements (pi_route_ne_rec_1        IN     nm_elements%ROWT
                         ,pi_length_1       => pi_length_1
                         ,pi_ne_id_2        => pi_route_ne_rec_2.ne_id
                         ,pi_length_2       => pi_length_2
-                        ,pi_effective_date => pi_effective_date);
+                        ,pi_effective_date => pi_effective_date
+                        ,pi_neh_descr      => pi_neh_descr --CWS 0108990 12/03/2010
+                        );
 
 END merge_group_elements;
 --
@@ -2476,6 +2486,7 @@ PROCEDURE do_merge_group (pi_route_ne_id_1     IN     nm_elements.ne_id%TYPE
                          ,pi_ne_sub_class      IN     nm_elements.ne_sub_class%TYPE       DEFAULT NULL
                          ,pi_ne_nsg_ref        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
                          ,pi_ne_version_no     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
+                         ,pi_neh_descr         IN     nm_element_history.neh_descr%TYPE  DEFAULT NULL --CWS 0108990 12/03/2010
                    ) IS
 
    v_errors                NUMBER;
@@ -2531,6 +2542,7 @@ BEGIN
                         ,pi_ne_version_no_new     => pi_ne_version_no
                         ,pi_ne_no_start           => l_ne_no_start
                         ,pi_ne_no_end             => l_ne_no_end
+                        ,pi_neh_descr             => pi_neh_descr --CWS 0108990 12/03/2010
                         );
                                                 
   -----------------------------------------------------------------------------------
@@ -2639,7 +2651,9 @@ PROCEDURE do_merge_datum_or_group (pi_ne_id_1           IN     nm_elements.ne_id
                                   ,pi_ne_nsg_ref        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
                                   ,pi_ne_version_no     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
                                   ,pi_test_poe_at_node  IN     varchar2                           DEFAULT 'N'
-                                  ,po_ne_id_new         IN OUT nm_elements.ne_id%TYPE) IS
+                                  ,po_ne_id_new         IN OUT nm_elements.ne_id%TYPE
+                                  ,pi_neh_descr         IN     nm_element_history.neh_descr%TYPE  DEFAULT NULL) --CWS 0108990 12/03/2010
+                                  IS
 	
   l_ne_rec_1 nm_elements%ROWTYPE := nm3net.get_ne(pi_ne_id_1);
 
@@ -2687,9 +2701,9 @@ BEGIN
               ,p_ne_nsg_ref        => pi_ne_nsg_ref
               ,p_ne_version_no     => pi_ne_version_no
               ,p_test_poe_at_node  => pi_test_poe_at_node
+              ,p_neh_descr         => pi_neh_descr --CWS 0108990 12/03/2010
               );
 
-  
   ELSE
 
           do_merge_group (pi_route_ne_id_1     => pi_ne_id_1
@@ -2706,7 +2720,9 @@ BEGIN
                          ,pi_ne_group          => pi_ne_group
                          ,pi_ne_sub_class      => pi_ne_sub_class
                          ,pi_ne_nsg_ref        => pi_ne_nsg_ref
-                         ,pi_ne_version_no     => pi_ne_version_no);
+                         ,pi_ne_version_no     => pi_ne_version_no
+                         ,pi_neh_descr         => pi_neh_descr --CWS 0108990 12/03/2010
+                         );
   
   END IF; 
 
