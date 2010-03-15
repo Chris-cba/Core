@@ -13,11 +13,11 @@ AS
     -------------------------------------------------------------------------
     --   PVCS Identifiers :-
     --
-    --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_gaz_query_attribs_saved.vw-arc   3.0   Jul 13 2009 15:44:22   aedwards  $
+    --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_gaz_query_attribs_saved.vw-arc   3.1   Mar 15 2010 11:50:16   cstrettle  $
     --       Module Name      : $Workfile:   v_nm_gaz_query_attribs_saved.vw  $
-    --       Date into PVCS   : $Date:   Jul 13 2009 15:44:22  $
-    --       Date fetched Out : $Modtime:   Jul 13 2009 15:38:18  $
-    --       Version          : $Revision:   3.0  $
+    --       Date into PVCS   : $Date:   Mar 15 2010 11:50:16  $
+    --       Date fetched Out : $Modtime:   Mar 09 2010 17:28:44  $
+    --       Version          : $Revision:   3.1  $
     --       Based on SCCS version : 
     -------------------------------------------------------------------------
              ngqas_ngq_id       vngqas_ngqa_ngq_id,
@@ -30,9 +30,9 @@ AS
       FROM   nm_gaz_query_attribs_saved
            , nm_gaz_query_values_saved
            , v_nm_gaz_query_saved
-     WHERE   ngqas_ngq_id = ngqvs_ngq_id 
-       AND   ngqas_ngqt_seq_no = ngqvs_ngqt_seq_no 
-       AND   ngqas_seq_no = ngqvs_ngqa_seq_no
+     WHERE   ngqas_ngq_id = ngqvs_ngq_id(+) 
+       AND   ngqas_ngqt_seq_no = ngqvs_ngqt_seq_no(+) 
+       AND   ngqas_seq_no = ngqvs_ngqa_seq_no(+)
        AND   vngqs_ngqs_ngq_id = ngqas_ngq_id
   ORDER BY   ngqvs_ngq_id,
              ngqvs_ngqt_seq_no,
