@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.7   Sep 03 2009 09:57:16   drawat  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.8   Mar 15 2010 15:16:54   cstrettle  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Sep 03 2009 09:57:16  $
---       Date fetched Out : $Modtime:   Aug 10 2009 17:36:46  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Mar 15 2010 15:16:54  $
+--       Date fetched Out : $Modtime:   Mar 15 2010 15:10:44  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -120,7 +120,7 @@ PROCEDURE split_element (p_ne_id               IN     nm_elements.ne_id%TYPE    
                         ,p_ne_group_1          IN     nm_elements.ne_group%TYPE          DEFAULT NULL
                         ,p_ne_no_start_1       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
                         ,p_ne_no_end_1         IN     nm_elements.ne_no_end%TYPE         DEFAULT NULL
-                        ,p_ne_sub_class_1      IN     nm_elements.ne_sub_class%TYPE       DEFAULT NULL
+                        ,p_ne_sub_class_1      IN     nm_elements.ne_sub_class%TYPE      DEFAULT NULL
                         ,p_ne_nsg_ref_1        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
                         ,p_ne_version_no_1     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
                         ,p_ne_unique_2         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
@@ -138,9 +138,10 @@ PROCEDURE split_element (p_ne_id               IN     nm_elements.ne_id%TYPE    
                         ,p_ne_group_2          IN     nm_elements.ne_group%TYPE          DEFAULT NULL
                         ,p_ne_no_start_2       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
                         ,p_ne_no_end_2         IN     nm_elements.ne_no_end%TYPE         DEFAULT NULL
-                        ,p_ne_sub_class_2      IN     nm_elements.ne_sub_class%TYPE       DEFAULT NULL
+                        ,p_ne_sub_class_2      IN     nm_elements.ne_sub_class%TYPE      DEFAULT NULL
                         ,p_ne_nsg_ref_2        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
                         ,p_ne_version_no_2     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
+                        ,p_neh_descr           IN     nm_element_history.neh_descr%TYPE   DEFAULT NULL --CWS 0108990 12/03/2010
                         );
 --
 ------------------------------------------------------------------------------------------------
@@ -307,7 +308,7 @@ PROCEDURE split_element (p_ne_id               IN     nm_elements.ne_id%TYPE    
                         ,p_ne_group_1          IN     nm_elements.ne_group%TYPE          DEFAULT NULL
                         ,p_ne_no_start_1       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
                         ,p_ne_no_end_1         IN     nm_elements.ne_no_end%TYPE         DEFAULT NULL
-                        ,p_ne_sub_class_1      IN     nm_elements.ne_sub_class%TYPE       DEFAULT NULL
+                        ,p_ne_sub_class_1      IN     nm_elements.ne_sub_class%TYPE      DEFAULT NULL
                         ,p_ne_nsg_ref_1        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
                         ,p_ne_version_no_1     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
                         ,p_ne_unique_2         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
@@ -325,9 +326,10 @@ PROCEDURE split_element (p_ne_id               IN     nm_elements.ne_id%TYPE    
                         ,p_ne_group_2          IN     nm_elements.ne_group%TYPE          DEFAULT NULL
                         ,p_ne_no_start_2       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
                         ,p_ne_no_end_2         IN     nm_elements.ne_no_end%TYPE         DEFAULT NULL
-                        ,p_ne_sub_class_2      IN     nm_elements.ne_sub_class%TYPE       DEFAULT NULL
+                        ,p_ne_sub_class_2      IN     nm_elements.ne_sub_class%TYPE      DEFAULT NULL
                         ,p_ne_nsg_ref_2        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
                         ,p_ne_version_no_2     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
+                        ,p_neh_descr           IN     nm_element_history.neh_descr%TYPE   DEFAULT NULL --CWS 0108990 12/03/2010
                         ) IS
    --
 --
@@ -533,9 +535,11 @@ BEGIN
       l_rec_neh.neh_new_ne_length  := p_ne_length_1;
       l_rec_neh.neh_param_1        := 1;
       l_rec_neh.neh_param_2        := NULL;
+      l_rec_neh.neh_descr          := p_neh_descr; --CWS 0108990 12/03/2010
 
       --insert history for first new element
-      Nm3merge.ins_neh (l_rec_neh);
+      --Nm3merge.ins_neh (l_rec_neh);
+      nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
 
       l_rec_neh.neh_id             := nm3seq.next_neh_id_seq;
       l_rec_neh.neh_ne_id_new      := p_ne_id_2;
@@ -543,7 +547,8 @@ BEGIN
       l_rec_neh.neh_param_1        := 2;
 
       --insert history for second new element
-      Nm3merge.ins_neh (l_rec_neh);
+      --Nm3merge.ins_neh (l_rec_neh);
+      nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
    END;
 --
    Nm_Debug.proc_end(g_package_name,'split_element');
@@ -1016,8 +1021,7 @@ PROCEDURE do_split ( p_ne_id nm_elements.ne_id%TYPE -- the element to split
                     ,p_no_np_id            IN     nm_nodes.no_np_id%TYPE             DEFAULT NULL
                     ,p_np_grid_east        IN     NM_POINTS.np_grid_east%TYPE        DEFAULT NULL
                     ,p_np_grid_north       IN     NM_POINTS.np_grid_north%TYPE       DEFAULT NULL
-                    ,p_no_purpose          in     nm_nodes.no_purpose%type default null -- PT 03.06.08
-
+                    ,p_no_purpose          in     nm_nodes.no_purpose%type           DEFAULT NULL -- PT 03.06.08
                     ,p_ne_unique_1         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
                     ,p_ne_type_1           IN     nm_elements.ne_type%TYPE           DEFAULT NULL
                     ,p_ne_nt_type_1        IN     nm_elements.ne_nt_type%TYPE        DEFAULT NULL
@@ -1034,7 +1038,7 @@ PROCEDURE do_split ( p_ne_id nm_elements.ne_id%TYPE -- the element to split
                     ,p_ne_group_1          IN     nm_elements.ne_group%TYPE          DEFAULT NULL
                     ,p_ne_no_start_1       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
                     ,p_ne_no_end_1         IN     nm_elements.ne_no_end%TYPE         DEFAULT NULL
-                    ,p_ne_sub_class_1      IN     nm_elements.ne_sub_class%TYPE       DEFAULT NULL
+                    ,p_ne_sub_class_1      IN     nm_elements.ne_sub_class%TYPE      DEFAULT NULL
                     ,p_ne_nsg_ref_1        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
                     ,p_ne_version_no_1     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
                     ,p_ne_unique_2         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
@@ -1053,9 +1057,10 @@ PROCEDURE do_split ( p_ne_id nm_elements.ne_id%TYPE -- the element to split
                     ,p_ne_group_2          IN     nm_elements.ne_group%TYPE          DEFAULT NULL
                     ,p_ne_no_start_2       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
                     ,p_ne_no_end_2         IN     nm_elements.ne_no_end%TYPE         DEFAULT NULL
-                    ,p_ne_sub_class_2      IN     nm_elements.ne_sub_class%TYPE       DEFAULT NULL
+                    ,p_ne_sub_class_2      IN     nm_elements.ne_sub_class%TYPE      DEFAULT NULL
                     ,p_ne_nsg_ref_2        IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
                     ,p_ne_version_no_2     IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
+                    ,p_neh_descr           IN     nm_element_history.neh_descr%TYPE  DEFAULT NULL --CWS 0108990 12/03/2010
                     ) IS
    --
    l_no_node_type nm_nodes.no_node_type%TYPE   := p_no_node_type;
@@ -1245,6 +1250,7 @@ BEGIN
                  ,p_ne_sub_class_2      => p_ne_sub_class_2
                  ,p_ne_nsg_ref_2        => p_ne_nsg_ref_2
                  ,p_ne_version_no_2     => p_ne_version_no_2
+                 ,p_neh_descr           => p_neh_descr --CWS 0108990 12/03/2010
                  );
 
 --
@@ -2138,8 +2144,7 @@ PROCEDURE do_split_group(pi_route_ne_id             IN     nm_elements.ne_id%TYP
                         ,pi_no_node_type            IN     nm_nodes.no_node_type%TYPE         DEFAULT NULL
                         ,pi_np_grid_east            IN     NM_POINTS.np_grid_east%TYPE        DEFAULT NULL
                         ,pi_np_grid_north           IN     NM_POINTS.np_grid_north%TYPE       DEFAULT NULL
-                        ,pi_no_purpose              in     nm_nodes.no_purpose%type default null -- PT 03.06.08
-                        --
+                        ,pi_no_purpose              in     nm_nodes.no_purpose%type           DEFAULT NULL -- PT 03.06.08
                         ,pi_ne_unique_1             IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
                         ,pi_ne_type_1               IN     nm_elements.ne_type%TYPE           DEFAULT NULL
                         ,pi_ne_nt_type_1            IN     nm_elements.ne_nt_type%TYPE        DEFAULT NULL
@@ -2155,7 +2160,7 @@ PROCEDURE do_split_group(pi_route_ne_id             IN     nm_elements.ne_id%TYP
                         ,pi_ne_group_1              IN     nm_elements.ne_group%TYPE          DEFAULT NULL
                         ,pi_ne_no_start_1           IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
                         ,pi_ne_no_end_1             IN     nm_elements.ne_no_end%TYPE         DEFAULT NULL
-                        ,pi_ne_sub_class_1          IN     nm_elements.ne_sub_class%TYPE       DEFAULT NULL
+                        ,pi_ne_sub_class_1          IN     nm_elements.ne_sub_class%TYPE      DEFAULT NULL
                         ,pi_ne_nsg_ref_1            IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
                         ,pi_ne_version_no_1         IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
                         ,pi_ne_unique_2             IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
@@ -2173,9 +2178,11 @@ PROCEDURE do_split_group(pi_route_ne_id             IN     nm_elements.ne_id%TYP
                         ,pi_ne_group_2              IN     nm_elements.ne_group%TYPE          DEFAULT NULL
                         ,pi_ne_no_start_2           IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
                         ,pi_ne_no_end_2             IN     nm_elements.ne_no_end%TYPE         DEFAULT NULL
-                        ,pi_ne_sub_class_2          IN     nm_elements.ne_sub_class%TYPE       DEFAULT NULL
+                        ,pi_ne_sub_class_2          IN     nm_elements.ne_sub_class%TYPE      DEFAULT NULL
                         ,pi_ne_nsg_ref_2            IN     nm_elements.ne_nsg_ref%TYPE        DEFAULT NULL
-                        ,pi_ne_version_no_2         IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL) IS
+                        ,pi_ne_version_no_2         IN     nm_elements.ne_version_no%TYPE     DEFAULT NULL
+                        ,p_neh_descr                IN     nm_element_history.neh_descr%TYPE  DEFAULT NULL --CWS 0108990 12/03/2010
+                        ) IS
 
 
   l_new_datum_ne_id_1  nm_elements.ne_id%TYPE;   -- the new element ne_id of any datum that is created
@@ -2197,21 +2204,22 @@ BEGIN
 
  IF datum_split_required(pi_ne_id            => pi_route_ne_id
                         ,pi_split_at_node_id =>  pi_split_at_node_id) THEN
-          do_split  (p_ne_id               => pi_non_ambig_ne_id
-                    ,p_ne_id_1             => l_new_datum_ne_id_1  -- the new element ne_id
-                    ,p_ne_id_2             => l_new_datum_ne_id_2  -- the 2nd new element ne_id
-                    ,p_effective_date      => pi_effective_date
-                    ,p_split_measure       => pi_non_ambig_split_offset
-                    ,p_node                => pi_node_id
+          do_split  (p_ne_id                         => pi_non_ambig_ne_id
+                    ,p_ne_id_1                       => l_new_datum_ne_id_1  -- the new element ne_id
+                    ,p_ne_id_2                       => l_new_datum_ne_id_2  -- the 2nd new element ne_id
+                    ,p_effective_date                => pi_effective_date
+                    ,p_split_measure                 => pi_non_ambig_split_offset
+                    ,p_node                          => pi_node_id
                     ,p_force_inheritance_of_attribs  => 'Y'
-                    ,p_no_np_id            => pi_no_np_id
-                    ,p_create_node         => pi_create_node
-                    ,p_no_node_name        => pi_no_node_name
-                    ,p_no_descr            => pi_no_descr
-                    ,p_no_node_type        => pi_no_node_type
-                    ,p_np_grid_east        => pi_np_grid_east
-                    ,p_np_grid_north       => pi_np_grid_north
-                    ,p_no_purpose          => pi_no_purpose   -- PT 03.06.08
+                    ,p_no_np_id                      => pi_no_np_id
+                    ,p_create_node                   => pi_create_node
+                    ,p_no_node_name                  => pi_no_node_name
+                    ,p_no_descr                      => pi_no_descr
+                    ,p_no_node_type                  => pi_no_node_type
+                    ,p_np_grid_east                  => pi_np_grid_east
+                    ,p_np_grid_north                 => pi_np_grid_north
+                    ,p_no_purpose                    => pi_no_purpose   -- PT 03.06.08
+                    ,p_neh_descr                     => p_neh_descr --CWS 0108990 12/03/2010
                     );
  END IF;
 
@@ -2268,7 +2276,9 @@ BEGIN
                 ,p_ne_no_end_2                => pi_ne_no_end_2
                 ,p_ne_sub_class_2             => pi_ne_sub_class_2
                 ,p_ne_nsg_ref_2               => pi_ne_nsg_ref_2
-                ,p_ne_version_no_2            => pi_ne_version_no_2);
+                ,p_ne_version_no_2            => pi_ne_version_no_2
+                ,p_neh_descr                  => p_neh_descr --CWS 0108990 12/03/2010
+                );
 
 
   ----------------------------------------------
@@ -2395,7 +2405,9 @@ PROCEDURE do_split_datum_or_group ( pi_ne_id                  IN     nm_elements
                                    ,pi_ne_no_end_2            IN     nm_elements.ne_no_end%TYPE DEFAULT NULL
                                    ,pi_ne_sub_class_2         IN     nm_elements.ne_sub_class%TYPE DEFAULT NULL
                                    ,pi_ne_nsg_ref_2           IN     nm_elements.ne_nsg_ref%TYPE DEFAULT NULL
-                                   ,pi_ne_version_no_2        IN     nm_elements.ne_version_no%TYPE DEFAULT NULL) IS
+                                   ,pi_ne_version_no_2        IN     nm_elements.ne_version_no%TYPE DEFAULT NULL
+                                   ,pi_neh_descr              IN     nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS 0108990 12/03/2010
+                                   ) IS
 
 
  l_datum_nt     nm_types.nt_type%TYPE       := Nm3net.get_datum_nt(pi_ne_id => pi_ne_id);
@@ -2483,7 +2495,9 @@ BEGIN
                     ,p_ne_no_end_2         => pi_ne_no_end_2
                     ,p_ne_sub_class_2      => pi_ne_sub_class_2
                     ,p_ne_nsg_ref_2        => pi_ne_nsg_ref_2
-                    ,p_ne_version_no_2     => pi_ne_version_no_2);
+                    ,p_ne_version_no_2     => pi_ne_version_no_2
+                    ,p_neh_descr           => pi_neh_descr --CWS 0108990 12/03/2010
+                    );
  ELSE -- assume this is a group split - checked for in do_split_group anyway
           do_split_group(pi_route_ne_id             => pi_ne_id
                         ,pi_ne_id_1                 => pi_ne_id_1
@@ -2537,7 +2551,9 @@ BEGIN
                         ,pi_ne_no_end_2             => pi_ne_no_end_2
                         ,pi_ne_sub_class_2          => pi_ne_sub_class_2
                         ,pi_ne_nsg_ref_2            => pi_ne_nsg_ref_2
-                        ,pi_ne_version_no_2         => pi_ne_version_no_2);
+                        ,pi_ne_version_no_2         => pi_ne_version_no_2
+                        ,p_neh_descr                => pi_neh_descr --CWS 0108990 12/03/2010
+                        );
 
  END IF;
 

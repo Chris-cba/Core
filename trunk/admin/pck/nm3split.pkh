@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE nm3split IS
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkh-arc   2.1   Jun 04 2008 13:31:04   ptanava  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkh-arc   2.2   Mar 15 2010 15:16:54   cstrettle  $
 --       Module Name      : $Workfile:   nm3split.pkh  $
---       Date into PVCS   : $Date:   Jun 04 2008 13:31:04  $
---       Date fetched Out : $Modtime:   Jun 03 2008 19:53:32  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Mar 15 2010 15:16:54  $
+--       Date fetched Out : $Modtime:   Mar 12 2010 17:39:22  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on SCCS version : 1.7
 --
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3split IS
 
 -- 03.06.08 PT added no_purpose parameter to create_node(), do_split_datum_or_group() and do_geo_split()
 
-  g_sccsid      CONSTANT  VARCHAR2(80)  := '"$Revision:   2.1  $"';
+  g_sccsid      CONSTANT  VARCHAR2(80)  := '"$Revision:   2.2  $"';
 --
    g_rec_ne_old   nm_elements%ROWTYPE;
    g_rec_ne_new_1 nm_elements%ROWTYPE;
@@ -144,7 +144,8 @@ PROCEDURE do_split_datum_or_group ( pi_ne_id                  IN     nm_elements
                                    ,pi_ne_no_end_2            IN     nm_elements.ne_no_end%TYPE DEFAULT NULL
                                    ,pi_ne_sub_class_2         IN     nm_elements.ne_sub_class%TYPE DEFAULT NULL
                                    ,pi_ne_nsg_ref_2           IN     nm_elements.ne_nsg_ref%TYPE DEFAULT NULL
-                                   ,pi_ne_version_no_2        IN     nm_elements.ne_version_no%TYPE DEFAULT NULL);
+                                   ,pi_ne_version_no_2        IN     nm_elements.ne_version_no%TYPE DEFAULT NULL
+                                   ,pi_neh_descr              IN     nm_element_history.neh_descr%TYPE DEFAULT NULL); --CWS 0108990 12/03/2010
 
 --</PROC>
 --
