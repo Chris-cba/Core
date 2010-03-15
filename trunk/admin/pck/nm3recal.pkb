@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.4   Sep 03 2009 09:56:16   drawat  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.5   Mar 15 2010 14:58:38   cstrettle  $
 --       Module Name      : $Workfile:   nm3recal.pkb  $
---       Date into PVCS   : $Date:   Sep 03 2009 09:56:16  $
---       Date fetched Out : $Modtime:   Sep 02 2009 11:07:00  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Mar 15 2010 14:58:38  $
+--       Date fetched Out : $Modtime:   Mar 15 2010 14:56:58  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --
 --   Author : Jonathan Mills
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
   PT 05.12.07 mairecal.recal_data() brough in line with the others in recalibrate_other_products()
 */
 
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
    g_package_name    CONSTANT  varchar2(30) := 'nm3recal';
 --
    g_tab_rec_nm      nm3type.tab_rec_nm;
@@ -135,6 +135,7 @@ END gis_recalibrate_section;
 PROCEDURE recalibrate_section (pi_ne_id             IN nm_elements.ne_id%TYPE
                               ,pi_begin_mp          IN nm_members.nm_begin_mp%TYPE
                               ,pi_new_length_to_end IN nm_elements.ne_length%TYPE
+                              ,pi_neh_descr         IN nm_element_history.neh_descr%TYPE   DEFAULT NULL --CWS 0108990 12/03/2010
                               ) IS
 --
    l_length_ratio      number;
@@ -297,9 +298,10 @@ BEGIN
    l_neh_rec.neh_new_ne_length  := l_new_length;
    l_neh_rec.neh_param_1        := round(l_begin_mp,g_dec_places); --pi_begin_mp;
    l_neh_rec.neh_param_2        := pi_new_length_to_end;
-   
-   nm3ins.ins_neh(p_rec_neh => l_neh_rec);
-   
+   l_neh_rec.neh_descr          := pi_neh_descr; --CWS 0108990 12/03/2010
+   --
+   nm3nw_edit.ins_neh(p_rec_neh => l_neh_rec); --CWS 0108990 12/03/2010
+   --
    reset_for_return;
 --
    nm_debug.proc_end(g_package_name,'recalibrate_section');
@@ -480,6 +482,7 @@ END check_other_products;
 PROCEDURE shift_section (pi_ne_id          IN nm_elements.ne_id%TYPE
                         ,pi_begin_mp       IN nm_members.nm_begin_mp%TYPE
                         ,pi_shift_distance IN nm_elements.ne_length%TYPE
+                        ,pi_neh_descr      IN nm_element_history.neh_descr%TYPE  DEFAULT NULL --CWS 0108990 12/03/2010
                         ) IS
    l_begin_mp          number := NVL(pi_begin_mp,0);
 --
@@ -567,9 +570,10 @@ BEGIN
    l_neh_rec.neh_new_ne_length  := g_element_length;
    l_neh_rec.neh_param_1        := pi_begin_mp;
    l_neh_rec.neh_param_2        := pi_shift_distance;
-   
-   nm3ins.ins_neh(p_rec_neh => l_neh_rec);
-   
+   l_neh_rec.neh_descr          := pi_neh_descr; --CWS 0108990 12/03/2010
+   --
+   nm3nw_edit.ins_neh(p_rec_neh => l_neh_rec); --CWS 0108990 12/03/2010
+   --
    reset_for_return;
 --
    nm_debug.proc_end(g_package_name,'shift_section');
