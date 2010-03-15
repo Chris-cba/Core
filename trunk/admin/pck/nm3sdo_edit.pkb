@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.7   Mar 15 2010 13:46:56   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.8   Mar 15 2010 14:20:06   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Mar 15 2010 13:46:56  $
---       Date fetched Out : $Modtime:   Mar 15 2010 13:44:08  $
---       SCCS Version     : $Revision:   2.7  $
+--       Date into SCCS   : $Date:   Mar 15 2010 14:20:06  $
+--       Date fetched Out : $Modtime:   Mar 15 2010 14:19:04  $
+--       SCCS Version     : $Revision:   2.8  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.7  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.8  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
@@ -916,20 +916,24 @@ IS
 BEGIN
 --
 -- Get the Base table Theme
-  SELECT nm_themes_all.* INTO l_nth
-    FROM nm_themes_all, nm_theme_gtypes, nm_inv_types, nm_inv_themes
-   WHERE nith_nth_theme_id        = nth_theme_id
-     AND nth_dependency           = 'I'
-     AND nth_base_table_theme     IS NULL
-     AND nth_location_updatable   = 'Y'
-     AND nth_theme_type           = nm3sdo.c_sdo
-     AND nth_x_column             IS NOT NULL
-     AND nth_y_column             IS NOT NULL
-     AND ntg_theme_id             = nth_theme_id
-     AND ntg_gtype                = 2001
-     AND nit_inv_type             = nith_nit_id
-     AND nit_use_xy               = 'Y'
-     AND nith_nit_id              = pi_inv_type;
+  BEGIN
+	  SELECT nm_themes_all.* INTO l_nth
+	    FROM nm_themes_all, nm_theme_gtypes, nm_inv_types, nm_inv_themes
+	   WHERE nith_nth_theme_id        = nth_theme_id
+	     AND nth_dependency           = 'I'
+	     AND nth_base_table_theme     IS NULL
+	     AND nth_location_updatable   = 'Y'
+	     AND nth_theme_type           = nm3sdo.c_sdo
+	     AND nth_x_column             IS NOT NULL
+	     AND nth_y_column             IS NOT NULL
+	     AND ntg_theme_id             = nth_theme_id
+	     AND ntg_gtype                = 2001
+	     AND nit_inv_type             = nith_nit_id
+	     AND nit_use_xy               = 'Y'
+	     AND nith_nit_id              = pi_inv_type;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN RETURN;
+  END;
 --
 -- Get the srid
   OPEN c1;
