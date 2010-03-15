@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3recal IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkh-arc   2.1   Jul 18 2007 15:22:34   smarshall  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkh-arc   2.2   Mar 15 2010 14:58:52   cstrettle  $
 --       Module Name      : $Workfile:   nm3recal.pkh  $
---       Date into PVCS   : $Date:   Jul 18 2007 15:22:34  $
---       Date fetched Out : $Modtime:   Jun 29 2007 15:23:42  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Mar 15 2010 14:58:52  $
+--       Date fetched Out : $Modtime:   Mar 15 2010 14:23:52  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --
 --   Author : Jonathan Mills
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3recal IS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  VARCHAR2(80) := '"$Revision:   2.1  $"';
+  g_sccsid      CONSTANT  VARCHAR2(80) := '"$Revision:   2.2  $"';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
@@ -44,6 +44,7 @@ FUNCTION get_body_version RETURN varchar2;
 PROCEDURE recalibrate_section (pi_ne_id             IN nm_elements.ne_id%TYPE
                               ,pi_begin_mp          IN nm_members.nm_begin_mp%TYPE
                               ,pi_new_length_to_end IN nm_elements.ne_length%TYPE
+                              ,pi_neh_descr         IN nm_element_history.neh_descr%TYPE   DEFAULT NULL --CWS 0108990 12/03/2010
                               );
 --  pi_ne_id             - The NE_ID of the NM_ELEMENT we are operating upon
 --  pi_begin_mp          - The point on the section from which we are operating
@@ -70,6 +71,7 @@ PROCEDURE gis_recalibrate_section (pi_ne_id             IN nm_elements.ne_id%TYP
 PROCEDURE shift_section (pi_ne_id          IN nm_elements.ne_id%TYPE
                         ,pi_begin_mp       IN nm_members.nm_begin_mp%TYPE
                         ,pi_shift_distance IN nm_elements.ne_length%TYPE
+                        ,pi_neh_descr       IN nm_element_history.neh_descr%TYPE   DEFAULT NULL
                         );
 --  pi_ne_id             - The NE_ID of the NM_ELEMENT we are operating upon
 --  pi_begin_mp          - The point on the section from which we are operating
