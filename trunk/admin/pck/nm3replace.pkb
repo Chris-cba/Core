@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.2   Sep 03 2009 09:56:44   drawat  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3replace.pkb-arc   2.3   Mar 15 2010 16:22:56   cstrettle  $
 --       Module Name      : $Workfile:   nm3replace.pkb  $
---       Date into PVCS   : $Date:   Sep 03 2009 09:56:44  $
---       Date fetched Out : $Modtime:   Aug 13 2009 16:18:40  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Mar 15 2010 16:22:56  $
+--       Date fetched Out : $Modtime:   Mar 12 2010 17:37:16  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --
 --   Author : ITurnbull
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE BODY nm3replace IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3replace';
 ------------------------------------------------------------------------------------------------
@@ -69,6 +69,7 @@ END get_body_version;
                                  ,p_ne_sub_class nm_elements.ne_sub_class%TYPE DEFAULT NULL
                                  ,p_ne_nsg_ref nm_elements.ne_nsg_ref%TYPE DEFAULT NULL
                                  ,p_ne_version_no nm_elements.ne_version_no%TYPE DEFAULT NULL
+                                 ,p_neh_descr nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS 0108990 12/03/2010
                                )
    IS
    CURSOR c1 (c_ne_id nm_elements.ne_id%TYPE) IS
@@ -232,7 +233,8 @@ END get_body_version;
          l_rec_neh.neh_effective_date := p_effective_date;
          l_rec_neh.neh_old_ne_length  := l_orig_ne_length;
          l_rec_neh.neh_new_ne_length  := v_ne_length;
-         nm3merge.ins_neh(l_rec_neh);
+         l_rec_neh.neh_descr          := p_neh_descr; --CWS 0108990 12/03/2010
+         nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
       END;
    END;
 --
@@ -548,6 +550,7 @@ END check_other_products;
                         ,p_ne_sub_class nm_elements.ne_sub_class%TYPE DEFAULT NULL
                         ,p_ne_nsg_ref nm_elements.ne_nsg_ref%TYPE DEFAULT NULL
                         ,p_ne_version_no nm_elements.ne_version_no%TYPE DEFAULT NULL
+                        ,p_neh_descr nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS 0108990 12/03/2010
                        )
    IS
       c_ausec_status CONSTANT VARCHAR2(3) := nm3ausec.get_status;
@@ -623,6 +626,7 @@ END check_other_products;
                             ,p_ne_sub_class
                             ,p_ne_nsg_ref
                             ,p_ne_version_no
+                            ,p_neh_descr --CWS 0108990 12/03/2010
                            );
 
        --RAC - Replicate the shape of the original element.

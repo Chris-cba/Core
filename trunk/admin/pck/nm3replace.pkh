@@ -64,6 +64,7 @@ FUNCTION get_body_version RETURN VARCHAR2;
                         ,p_ne_sub_class nm_elements.ne_sub_class%TYPE DEFAULT NULL
                         ,p_ne_nsg_ref nm_elements.ne_nsg_ref%TYPE DEFAULT NULL
                         ,p_ne_version_no nm_elements.ne_version_no%TYPE DEFAULT NULL
+                        ,p_neh_descr nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS 0108990 12/03/2010
                        );
 
 --</PROC>
