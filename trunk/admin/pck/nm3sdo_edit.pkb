@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.8   Mar 15 2010 14:20:06   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.9   Mar 16 2010 13:43:14   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Mar 15 2010 14:20:06  $
---       Date fetched Out : $Modtime:   Mar 15 2010 14:19:04  $
---       SCCS Version     : $Revision:   2.8  $
+--       Date into SCCS   : $Date:   Mar 16 2010 13:43:14  $
+--       Date fetched Out : $Modtime:   Mar 16 2010 13:41:40  $
+--       SCCS Version     : $Revision:   2.9  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.8  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.9  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
@@ -1023,6 +1023,8 @@ BEGIN
   lstr := lstr || ' mdsys.sdo_geometry( 2001, :l_srid, mdsys.sdo_point_type( iit_x, iit_y, NULL), NULL, NULL)';
   lstr := lstr ||'   FROM nm_inv_items_all i';
   lstr := lstr ||'  WHERE iit_inv_type = '||nm3flx.string(pi_inv_type);
+  lstr := lstr ||'    AND iit_x IS NOT NULL';
+  lstr := lstr ||'    AND iit_y IS NOT NULL';
   lstr := lstr ||'    AND NOT EXISTS ';
   lstr := lstr ||'      (SELECT 1 FROM '||l_nth.nth_feature_table||' s ';
   lstr := lstr ||'       WHERE i.iit_ne_id = s.'||l_nth.nth_feature_pk_column;
