@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.5   Feb 16 2010 10:49:10   cstrettle  $
---       Module Name      : $Workfile:   NM3RECLASS_FIX.pkb  $
---       Date into PVCS   : $Date:   Feb 16 2010 10:49:10  $
---       Date fetched Out : $Modtime:   Feb 16 2010 10:44:06  $
---       PVCS Version     : $Revision:   2.5  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.6   Mar 17 2010 15:03:00   cstrettle  $
+--       Module Name      : $Workfile:   nm3reclass.pkb  $
+--       Date into PVCS   : $Date:   Mar 17 2010 15:03:00  $
+--       Date fetched Out : $Modtime:   Mar 17 2010 12:38:20  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --
 --   Author : R.A. Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';
@@ -91,10 +91,11 @@ PROCEDURE close_inv (p_ne_id          IN nm_inv_items.iit_ne_id%TYPE
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE reclassify_group (p_old_ne    IN     nm_elements%ROWTYPE
-                           ,p_new_ne    IN     nm_elements%ROWTYPE
-                           ,p_job_id    IN     NUMBER
-                           ,p_new_ne_id    OUT NUMBER
+PROCEDURE reclassify_group (p_old_ne    IN   nm_elements%ROWTYPE
+                           ,p_new_ne    IN   nm_elements%ROWTYPE
+                           ,p_job_id    IN   NUMBER
+                           ,p_new_ne_id OUT  NUMBER
+                           ,p_neh_descr         IN   nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS 0108990 12/03/2010
                            );
 --
 -----------------------------------------------------------------------------
@@ -320,6 +321,7 @@ PROCEDURE reclassify_element
                 (p_old_ne_id         IN     nm_elements.ne_id%TYPE
                 ,p_new_ne            IN     nm_elements%ROWTYPE
                 ,p_new_ne_id         OUT    nm_elements.ne_id%TYPE
+                ,p_neh_descr         IN     nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS 0108990 12/03/2010
                 ) IS
 BEGIN
    reclassify_element
@@ -329,6 +331,7 @@ BEGIN
          ,p_gis_call          => FALSE
          ,p_new_ne_id         => p_new_ne_id
          ,p_check_for_changes => TRUE
+         ,p_neh_descr         => p_neh_descr --CWS 0108990 12/03/2010
          );
 END reclassify_element;
 --
@@ -641,14 +644,14 @@ END validate_new_element;
 --
 -----------------------------------------------------------------------------------
 --
-PROCEDURE reclassify_element
-                (p_old_ne_id         IN     nm_elements.ne_id%TYPE
-                ,p_new_ne            IN     nm_elements%ROWTYPE
-                ,p_job_id            IN     NM_RECLASS_DETAILS.nrd_job_id%TYPE
-                ,p_gis_call          IN     BOOLEAN
-                ,p_new_ne_id            OUT nm_elements.ne_id%TYPE
-                ,p_check_for_changes IN     BOOLEAN DEFAULT TRUE
-                ) IS
+PROCEDURE reclassify_element (p_old_ne_id         IN   nm_elements.ne_id%TYPE
+                             ,p_new_ne            IN   nm_elements%ROWTYPE
+                             ,p_job_id            IN   NM_RECLASS_DETAILS.nrd_job_id%TYPE
+                             ,p_gis_call          IN   BOOLEAN
+                             ,p_new_ne_id         OUT  nm_elements.ne_id%TYPE
+                             ,p_check_for_changes IN   BOOLEAN DEFAULT TRUE
+                             ,p_neh_descr         IN   nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS 0108990 12/03/2010
+                             ) IS
 --
    l_code_column       VARCHAR2(30);
    l_code_value        VARCHAR2(30);
@@ -684,46 +687,46 @@ BEGIN
 -- DATUM RECLASSIFY
 --
 
-  IF p_new_ne.ne_type     = 'S' OR old_ne.ne_type = 'S' THEN
+   IF p_new_ne.ne_type     = 'S' OR old_ne.ne_type = 'S' THEN
 
-    p_new_ne_id              := Nm3net.get_next_ne_id;
+     p_new_ne_id              := Nm3net.get_next_ne_id;
 --
-    new_ne.ne_id             := p_new_ne_id;
+     new_ne.ne_id             := p_new_ne_id;
 --
 --
-    new_ne.ne_number         := p_new_ne.ne_number;
-    new_ne.ne_version_no     := p_new_ne.ne_version_no;
-    new_ne.ne_unique         := p_new_ne.ne_unique;
-    new_ne.ne_nt_type        := p_new_ne.ne_nt_type;
-    new_ne.ne_type           := p_new_ne.ne_type;
-    new_ne.ne_length         := p_new_ne.ne_length;
-    new_ne.ne_admin_unit     := p_new_ne.ne_admin_unit;
-    new_ne.ne_start_date     := p_new_ne.ne_start_date;
-    new_ne.ne_end_date       := NULL;
-    new_ne.ne_descr          := p_new_ne.ne_descr;
-    new_ne.ne_gty_group_type := p_new_ne.ne_gty_group_type;
-    new_ne.ne_group          := p_new_ne.ne_group;
-    new_ne.ne_nsg_ref        := p_new_ne.ne_nsg_ref;
+     new_ne.ne_number         := p_new_ne.ne_number;
+     new_ne.ne_version_no     := p_new_ne.ne_version_no;
+     new_ne.ne_unique         := p_new_ne.ne_unique;
+     new_ne.ne_nt_type        := p_new_ne.ne_nt_type;
+     new_ne.ne_type           := p_new_ne.ne_type;
+     new_ne.ne_length         := p_new_ne.ne_length;
+     new_ne.ne_admin_unit     := p_new_ne.ne_admin_unit;
+     new_ne.ne_start_date     := p_new_ne.ne_start_date;
+     new_ne.ne_end_date       := NULL;
+     new_ne.ne_descr          := p_new_ne.ne_descr;
+     new_ne.ne_gty_group_type := p_new_ne.ne_gty_group_type;
+     new_ne.ne_group          := p_new_ne.ne_group;
+     new_ne.ne_nsg_ref        := p_new_ne.ne_nsg_ref;
 --
-    new_ne.ne_no_start       := p_new_ne.ne_no_start;
-    new_ne.ne_no_end         := p_new_ne.ne_no_end;
+     new_ne.ne_no_start       := p_new_ne.ne_no_start;
+     new_ne.ne_no_end         := p_new_ne.ne_no_end;
 --
 --  now set all the other attributes - leave it to the insert trigger to validate.
 --
-    move_flexible_cols (p_old_rec => p_new_ne
-                       ,p_new_rec => new_ne
-                       );
+     move_flexible_cols (p_old_rec => p_new_ne
+                        ,p_new_rec => new_ne
+                        );
 --
-    check_unique (p_nt_type => new_ne.ne_nt_type
-                 ,p_unique  => new_ne.ne_unique
-                 );
+     check_unique (p_nt_type => new_ne.ne_nt_type
+                  ,p_unique  => new_ne.ne_unique
+                  );
 --
     -- Resolve any default columns based on othe columns in nm_elements
 
-    resolve_default_columns( p_ne_rec_old => old_ne
-                            ,p_ne_rec_new => new_ne);
+     resolve_default_columns( p_ne_rec_old => old_ne
+                             ,p_ne_rec_new => new_ne);
 --
-    IF l_code_column IS NOT NULL
+     IF l_code_column IS NOT NULL
      THEN
        g_dyn_rec_ne := new_ne;
        g_block :=            'BEGIN'
@@ -732,11 +735,10 @@ BEGIN
 --       nm_debug.debug(g_block);
        EXECUTE IMMEDIATE g_block;
        new_ne := g_dyn_rec_ne;
-    END IF;        
+     END IF;        
 --
 -- AE - nullify any columns populated by a sequence.
-   resolve_seq_columns ( p_ne_rec => new_ne);
-
+    resolve_seq_columns ( p_ne_rec => new_ne);
 --  create the new element
 --
     --nm_debug.debug('***Creating following new NE');
@@ -745,42 +747,44 @@ BEGIN
     Nm3net.insert_any_element (new_ne);
 --
    -- Move AD data to new element
-   IF Nm3nwad.ad_data_exist (p_old_ne_id)
-    THEN
+     IF Nm3nwad.ad_data_exist (p_old_ne_id)
+     THEN
        Nm3nwad.do_ad_reclass (pi_new_ne_id => p_new_ne_id
                              ,pi_old_ne_id => p_old_ne_id
 							 ,pi_new_ne_nt_type        => new_ne.ne_nt_type
 							 ,pi_new_ne_gty_group_type => new_ne.ne_gty_group_type);
-   END IF;
+     END IF;
 --
 --  Create a NM_ELEMENT_HISTORY record.
-    g_rec_neh.neh_id             := null;
-    g_rec_neh.neh_ne_id_old      := old_ne.ne_id;
-    g_rec_neh.neh_ne_id_new      := p_new_ne_id;
-    g_rec_neh.neh_operation      := c_neh_operation;
-    g_rec_neh.neh_effective_date := new_ne.ne_start_date;
-    g_rec_neh.neh_old_ne_length  := old_ne.ne_length;
-    g_rec_neh.neh_new_ne_length  := new_ne.ne_length;
-    Nm3merge.ins_neh (g_rec_neh);
+     g_rec_neh.neh_id             := null;
+     g_rec_neh.neh_ne_id_old      := old_ne.ne_id;
+     g_rec_neh.neh_ne_id_new      := p_new_ne_id;
+     g_rec_neh.neh_operation      := c_neh_operation;
+     g_rec_neh.neh_effective_date := new_ne.ne_start_date;
+     g_rec_neh.neh_old_ne_length  := old_ne.ne_length;
+     g_rec_neh.neh_new_ne_length  := new_ne.ne_length;
+     g_rec_neh.neh_descr          := p_neh_descr; --CWS 0108990 12/03/2010
+     --
+     Nm3nw_edit.ins_neh (g_rec_neh); --CWS 0108990 12/03/2010
 --
 --
-    -- Update the new node usage records to reflect the old ones
-    update_node_usages(p_old_ne_id,p_new_ne_id);
+     -- Update the new node usage records to reflect the old ones
+     update_node_usages(p_old_ne_id,p_new_ne_id);
 --
 -- AE - Added
 -- RAC - Need to replace the shape of an element that is replaced
 -- At 1.51, this code was moved - it needs to be done before the members or any member
 -- shapes are prevented from being dyn-segged.
 --
-    Nm3sdm.replace_element_shape( p_ne_id_old => p_old_ne_id
+     Nm3sdm.replace_element_shape( p_ne_id_old => p_old_ne_id
                                  ,p_ne_id_new => p_new_ne_id );
 
 --  re-locate the inventory on the old element onto the new, where the nw type
 --  allows it. Then end-date the old locations and the old element
 --
-    Nm3ausec.set_status(Nm3type.c_off);
-    reclassify_members (old_ne, new_ne);
-    Nm3ausec.set_status(Nm3type.c_on);
+     Nm3ausec.set_status(Nm3type.c_off);
+     reclassify_members (old_ne, new_ne);
+     Nm3ausec.set_status(Nm3type.c_on);
 --
 --
     UPDATE nm_elements
@@ -792,8 +796,7 @@ BEGIN
 -- GROUP RECLASSIFY
 --  
 
-  ELSIF p_new_ne.ne_type     = 'G'
-   OR   old_ne.ne_type = 'G' THEN
+   ELSIF p_new_ne.ne_type     = 'G' OR   old_ne.ne_type = 'G' THEN
 
      DECLARE
         l_new_ne nm_elements%ROWTYPE := p_new_ne;
@@ -805,9 +808,10 @@ BEGIN
                          ,p_new_ne    => l_new_ne
                          ,p_job_id    => p_job_id
                          ,p_new_ne_id => p_new_ne_id
+                         ,p_neh_descr => p_neh_descr --CWS 0108990 12/03/2010
                          );
       END;
-  END IF;
+   END IF;
 --
    g_rec_nrd.nrd_job_id    := p_job_id;
    g_rec_nrd.nrd_old_ne_id := p_old_ne_id;
@@ -1262,18 +1266,19 @@ END close_inv;
 --
 ---------------------------------------------------------------------------------------------------
 --
-PROCEDURE reclassify_group (p_old_ne    IN     nm_elements%ROWTYPE
-                           ,p_new_ne    IN     nm_elements%ROWTYPE
-                           ,p_job_id    IN     NUMBER
-                           ,p_new_ne_id    OUT NUMBER
+PROCEDURE reclassify_group (p_old_ne    IN  nm_elements%ROWTYPE
+                           ,p_new_ne    IN  nm_elements%ROWTYPE
+                           ,p_job_id    IN  NUMBER
+                           ,p_new_ne_id OUT NUMBER
+                           ,p_neh_descr IN  nm_element_history.neh_descr%TYPE
                            ) IS
 --
-   CURSOR cs_nti( c_nt NM_TYPES.nt_type%TYPE) IS
+   CURSOR cs_nti( c_nt nm_types.nt_type%TYPE) IS
    SELECT  nti_parent_column
           ,nti_child_column
           ,nti_code_control_column
           ,nti_nw_child_type
-    FROM   NM_TYPE_INCLUSION
+    FROM   nm_type_inclusion
    WHERE   nti_nw_parent_type = c_nt;
 --
    CURSOR c_members( c_ne_id nm_elements.ne_id%TYPE) IS
@@ -1309,7 +1314,7 @@ PROCEDURE reclassify_group (p_old_ne    IN     nm_elements%ROWTYPE
                      ,c_ne_nt_type nm_elements.ne_nt_type%TYPE
                      ) IS
    SELECT 1
-    FROM  NM_ELEMENTS_ALL
+    FROM  nm_elements_all
    WHERE  ne_unique  = c_ne_unique
     AND   ne_nt_type = c_ne_nt_type;
 --
@@ -1450,7 +1455,9 @@ BEGIN
        g_rec_neh.neh_effective_date := l_rec_new_ne.ne_start_date;
        g_rec_neh.neh_old_ne_length  := p_old_ne.ne_length;
        g_rec_neh.neh_new_ne_length  := l_rec_new_ne.ne_length;
-       Nm3merge.ins_neh (g_rec_neh);
+       g_rec_neh.neh_descr          := p_neh_descr; --CWS 0108990 12/03/2010
+       --
+       Nm3nw_edit.ins_neh (g_rec_neh); --CWS 0108990 12/03/2010
       --nm_debug.debug('new group ne_id= ' ||  l_rec_new_ne.ne_id);
 
       l_created_new_ne := TRUE;
