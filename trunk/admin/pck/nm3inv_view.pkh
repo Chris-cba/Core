@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3inv_view AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkh-arc   2.1   Jan 06 2010 16:38:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkh-arc   2.2   Mar 22 2010 09:48:00   cstrettle  $
 --       Module Name      : $Workfile:   nm3inv_view.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:36  $
---       Date fetched Out : $Modtime:   Jan 05 2010 17:45:58  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Mar 22 2010 09:48:00  $
+--       Date fetched Out : $Modtime:   Mar 22 2010 09:32:46  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE nm3inv_view AS
 
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --
 --</GLOBVAR>
 --
@@ -104,15 +104,6 @@ RETURN VARCHAR2;
 -- This function derives the view name for a given INVENTRY TYPE joined to the network
 FUNCTION derive_nw_inv_type_view_name (pi_inv_type IN NM_INV_TYPES.nit_inv_type%TYPE)
  RETURN VARCHAR2;
---</PROC>
---
-----------------------------------------------------------------------------------------------
---
---<PROC NAME="create_gis_theme_for_inv_type">
-PROCEDURE create_gis_theme_for_inv_type(p_inv_type    IN NM_INV_TYPES.nit_inv_type%TYPE
-                                       ,pi_theme_name IN GIS_THEMES.gt_theme_name%TYPE DEFAULT NULL
-                                       ,pi_where      IN GIS_THEMES.gt_where%TYPE      DEFAULT NULL
-                                       );
 --</PROC>
 --
 ----------------------------------------------------------------------------------------------
