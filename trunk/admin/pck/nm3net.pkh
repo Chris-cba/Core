@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE nm3net AS
 --<PACKAGE>
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkh-arc   2.3   Dec 08 2009 16:14:34   gjohnson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkh-arc   2.4   Mar 22 2010 09:25:38   cstrettle  $
 --       Module Name      : $Workfile:   nm3net.pkh  $
---       Date into SCCS   : $Date:   Dec 08 2009 16:14:34  $
---       Date fetched Out : $Modtime:   Dec 08 2009 16:13:36  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Mar 22 2010 09:25:38  $
+--       Date fetched Out : $Modtime:   Mar 22 2010 09:23:26  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on 
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE nm3net AS
 
 -- 03.06.08 PT added pi_no_purpose parameter to create_node()
 
-  g_sccsid      CONSTANT  varchar2(80) := '"$Revision:   2.3  $"';
+  g_sccsid      CONSTANT  varchar2(80) := '"$Revision:   2.4  $"';
 --  g_sccsid is the SCCS_ID
 --
 
@@ -1478,7 +1478,7 @@ PROCEDURE get_id_and_type_from_unique(pi_unique    IN VARCHAR2
 --<PROC NAME="bypass_nm_members_trgs">
 -- MJA add 31-Aug-07
 -- Speaks for itself.  If true then bypass triggers.
--- To be called in NM_MEMBERS_SDO_TRG, NM_MEMBERS_SDE_TRG, NM_MEMBERS_B_IU_END_SLK_TRG,
+-- To be called in NM_MEMBERS_SDO_TRG, NM_MEMBERS_B_IU_END_SLK_TRG,
 --   NM_MEMBERS_ALL_EXCL_B_STM, NM_MEMBERS_ALL_EXCL_B_ROW, NM_MEMBERS_ALL_EXCL_A_STM
 --   NM_MEMBERS_ALL_AU_INSERT_CHECK triggers to see if bypass required
 FUNCTION bypass_nm_members_trgs RETURN BOOLEAN;

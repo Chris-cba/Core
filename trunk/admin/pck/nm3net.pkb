@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY Nm3net AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkb-arc   2.5   Nov 25 2009 10:03:06   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkb-arc   2.6   Mar 22 2010 09:25:38   cstrettle  $
 --       Module Name      : $Workfile:   nm3net.pkb  $
---       Date into SCCS   : $Date:   Nov 25 2009 10:03:06  $
---       Date fetched Out : $Modtime:   Nov 25 2009 09:56:44  $
---       SCCS Version     : $Revision:   2.5  $
+--       Date into SCCS   : $Date:   Mar 22 2010 09:25:38  $
+--       Date fetched Out : $Modtime:   Mar 22 2010 09:24:10  $
+--       SCCS Version     : $Revision:   2.6  $
 --       Based on 
 --
 --
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3net AS
 --              (create_or_reuse_point_and_node() also creates nodes, this sets null no_purpose)
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(200) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(200) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
   g_package_name CONSTANT  VARCHAR2(30) := 'nm3net';
 --
@@ -5188,7 +5188,7 @@ END  get_id_and_type_from_unique;
 --
 -- MJA add 31-Aug-07
 -- Speaks for itself.  If true then bypass triggers.
--- To be called in NM_MEMBERS_SDO_TRG, NM_MEMBERS_SDE_TRG, NM_MEMBERS_B_IU_END_SLK_TRG,
+-- To be called in NM_MEMBERS_SDO_TRG, NM_MEMBERS_B_IU_END_SLK_TRG,
 --   NM_MEMBERS_ALL_EXCL_B_STM, NM_MEMBERS_ALL_EXCL_B_ROW, NM_MEMBERS_ALL_EXCL_A_STM
 --   NM_MEMBERS_ALL_AU_INSERT_CHECK triggers to see if bypass required
 --
