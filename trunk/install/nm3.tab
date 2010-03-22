@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.18   Feb 16 2010 13:48:48   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.19   Mar 22 2010 09:02:50   cstrettle  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Feb 16 2010 13:48:48  $
---       Date fetched Out : $Modtime:   Feb 16 2010 12:04:28  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Mar 22 2010 09:02:50  $
+--       Date fetched Out : $Modtime:   Mar 22 2010 08:40:42  $
+--       PVCS Version     : $Revision:   2.19  $
 --
 --------------------------------------------------------------------------------
 --
@@ -3990,21 +3990,6 @@ CREATE TABLE NM_MEMBERS_ALL
  )
 /
 
-PROMPT Creating Table 'NM_MEMBERS_SDE_TEMP'
-CREATE TABLE NM_MEMBERS_SDE_TEMP
- (NMST_ID NUMBER NOT NULL
- ,NMST_NE_ID_IN NUMBER NOT NULL
- ,NMST_NE_ID_OF NUMBER NOT NULL
- ,NMST_BEGIN_MP NUMBER NOT NULL
- ,NMST_END_MP NUMBER
- ,NMST_OBJ_TYPE VARCHAR2(4) NOT NULL
- ,NMST_START_DATE DATE NOT NULL
- ,NMST_END_DATE DATE
- ,NMST_ACTION VARCHAR2(1) NOT NULL
- ,NMST_PROCESS_TYPE VARCHAR2(6)
- )
-/
-
 PROMPT Creating Table 'NM_MEMBER_HISTORY'
 CREATE TABLE NM_MEMBER_HISTORY
  (NMH_NM_NE_ID_IN NUMBER(9) NOT NULL
@@ -7360,14 +7345,14 @@ CREATE TABLE NM_SAVED_EXTENT_MEMBER_DATUMS
  ,NSD_CARDINALITY NUMBER NOT NULL
  )
 /
-
+/* CWS 0109297 Table Dropped
 PROMPT Creating Table 'NM_SDE_TEMP_RESCALE'
 CREATE TABLE NM_SDE_TEMP_RESCALE
  (NMTR_ID NUMBER(9) NOT NULL
  ,NMTR_NE_ID_OF NUMBER(9) NOT NULL
  )
 /
-
+*/
 PROMPT Creating Table 'NM_SDO_TRG_MEMBERS'
 CREATE GLOBAL TEMPORARY TABLE NM_SDO_TRG_MEMBERS
  (NSTM_ID NUMBER(9)

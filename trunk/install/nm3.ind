@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.11   Jan 19 2010 17:11:22   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.12   Mar 22 2010 09:02:50   cstrettle  $
 --       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   Jan 19 2010 17:11:22  $
---       Date fetched Out : $Modtime:   Jan 19 2010 17:09:58  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Mar 22 2010 09:02:50  $
+--       Date fetched Out : $Modtime:   Mar 22 2010 08:41:28  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --------------------------------------------------------------------------------
 --
@@ -819,12 +819,6 @@ CREATE INDEX NM_OBJ_TYPE_NE_ID_OF_IND ON NM_MEMBERS_ALL
  ,NM_OBJ_TYPE)
 /
 
-PROMPT Creating Index 'NMST_IX'
-CREATE INDEX NMST_IX ON NM_MEMBERS_SDE_TEMP
- (NMST_OBJ_TYPE
- ,NMST_PROCESS_TYPE)
-/
-
 PROMPT Creating Index 'NMH_NEH_FK_IND'
 CREATE INDEX NMH_NEH_FK_IND ON NM_MEMBER_HISTORY
  (NMH_NM_NE_ID_OF_OLD
@@ -1152,12 +1146,6 @@ CREATE INDEX NSD_NSM_FK_IND ON NM_SAVED_EXTENT_MEMBER_DATUMS
  (NSD_NSE_ID
  ,NSD_NSM_ID)
 /
-
-PROMPT Creating Index 'NMTR_NE_FK_IND'
-CREATE INDEX NMTR_NE_FK_IND ON NM_SDE_TEMP_RESCALE
- (NMTR_NE_ID_OF)
-/
-
 PROMPT Creating Index 'TII_FOREIGN_KEY_IX'
 CREATE INDEX TII_FOREIGN_KEY_IX ON NM_TEMP_INV_ITEMS
  (TII_FOREIGN_KEY)

@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.16   Jan 11 2010 16:34:10   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.17   Mar 22 2010 09:02:50   cstrettle  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Jan 11 2010 16:34:10  $
---       Date fetched Out : $Modtime:   Jan 11 2010 16:32:26  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Mar 22 2010 09:02:50  $
+--       Date fetched Out : $Modtime:   Mar 22 2010 08:42:14  $
+--       PVCS Version     : $Revision:   2.17  $
 --
 --------------------------------------------------------------------------------
 --
@@ -1365,12 +1365,6 @@ ALTER TABLE NM_MEMBERS_ALL
   ,NM_START_DATE))
 /
 
-PROMPT Creating Primary Key on 'NM_MEMBERS_SDE_TEMP'
-ALTER TABLE NM_MEMBERS_SDE_TEMP
- ADD (CONSTRAINT NMST_PK PRIMARY KEY
-  (NMST_ID))
-/
-
 PROMPT Creating Primary Key on 'NM_MEMBER_HISTORY'
 ALTER TABLE NM_MEMBER_HISTORY
  ADD (CONSTRAINT NMH_PK PRIMARY KEY
@@ -1725,12 +1719,6 @@ ALTER TABLE NM_SAVED_EXTENT_MEMBER_DATUMS
   ,NSD_BEGIN_MP
   ,NSD_NSE_ID
   ,NSD_NSM_ID))
-/
-
-PROMPT Creating Primary Key on 'NM_SDE_TEMP_RESCALE'
-ALTER TABLE NM_SDE_TEMP_RESCALE
- ADD (CONSTRAINT NMTR_PK PRIMARY KEY
-  (NMTR_ID))
 /
 
 PROMPT Creating Primary Key on 'NM_TEMP_INV_ITEMS'
@@ -3293,21 +3281,6 @@ ALTER TABLE NM_MEMBERS_ALL
 PROMPT Creating Check Constraint on 'NM_MEMBERS_ALL'
 ALTER TABLE NM_MEMBERS_ALL
  ADD (CONSTRAINT NM_START_DATE_TCHK CHECK (NM_START_DATE=TRUNC(NM_START_DATE)))
-/
-
-PROMPT Creating Check Constraint on 'NM_MEMBERS_SDE_TEMP'
-ALTER TABLE NM_MEMBERS_SDE_TEMP
- ADD (CONSTRAINT NMST_ACTION_CHK CHECK (nmst_action IN ('I','U','D')))
-/
-
-PROMPT Creating Check Constraint on 'NM_MEMBERS_SDE_TEMP'
-ALTER TABLE NM_MEMBERS_SDE_TEMP
- ADD (CONSTRAINT NMST_END_DATE_TCHK CHECK (NMST_END_DATE=TRUNC(NMST_END_DATE)))
-/
-
-PROMPT Creating Check Constraint on 'NM_MEMBERS_SDE_TEMP'
-ALTER TABLE NM_MEMBERS_SDE_TEMP
- ADD (CONSTRAINT NMST_START_DATE_TCHK CHECK (NMST_START_DATE=TRUNC(NMST_START_DATE)))
 /
 
 PROMPT Creating Check Constraint on 'NM_MEMBER_HISTORY'
@@ -5602,14 +5575,6 @@ ALTER TABLE NM_SAVED_EXTENT_MEMBER_DATUMS ADD (CONSTRAINT
   (NSM_NSE_ID
   ,NSM_ID))
 /
-
-PROMPT Creating Foreign Key on 'NM_SDE_TEMP_RESCALE'
-ALTER TABLE NM_SDE_TEMP_RESCALE ADD (CONSTRAINT
- NMTR_NE_FK FOREIGN KEY
-  (NMTR_NE_ID_OF) REFERENCES NM_ELEMENTS_ALL
-  (NE_ID) ON DELETE CASCADE)
-/
-
 PROMPT Creating Foreign Key on 'NM_TEMP_INV_ITEMS'
 ALTER TABLE NM_TEMP_INV_ITEMS ADD (CONSTRAINT
  TII_NJC_FK FOREIGN KEY
