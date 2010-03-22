@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.5   Feb 25 2010 13:56:14   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.6   Mar 22 2010 15:23:00   aedwards  $
 --       Module Name      : $Workfile:   nm3doc_files.pkb  $
---       Date into PVCS   : $Date:   Feb 25 2010 13:56:14  $
---       Date fetched Out : $Modtime:   Feb 25 2010 13:55:54  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Mar 22 2010 15:23:00  $
+--       Date fetched Out : $Modtime:   Mar 22 2010 15:22:16  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version :
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.6  $';
   g_package_name CONSTANT varchar2(30) := 'nm3doc_files';
 --
   g_sep      VARCHAR2(1) := NVL(hig.get_sysopt('DIRREPSTRN'),'\');
@@ -128,10 +128,10 @@ AS
     l_rec_df.df_full_path     := pi_rec_df.df_full_path;
     l_rec_df.df_filename      := strip_filename(pi_rec_df.df_full_path);
     l_rec_df.df_file_info     := NVL(pi_rec_df.df_file_info, LENGTH(pi_rec_df.df_content));
-    l_rec_df.df_date_created  := nm3user.get_effective_date;
-    l_rec_df.df_date_modified := l_rec_df.df_date_created;
-    l_rec_df.df_created_by    := USER;
-    l_rec_df.df_modified_by   := USER;
+--    l_rec_df.df_date_created  := nm3user.get_effective_date;
+--    l_rec_df.df_date_modified := l_rec_df.df_date_created;
+--    l_rec_df.df_created_by    := USER;
+--    l_rec_df.df_modified_by   := USER;
   --
     INSERT INTO doc_files_all VALUES l_rec_df;
   --
