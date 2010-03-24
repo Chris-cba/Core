@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.17   Jan 06 2010 16:38:36   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.18   Mar 24 2010 16:54:32   lsorathia  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Jan 06 2010 16:38:36  $
---       Date fetched Out : $Modtime:   Jan 06 2010 11:34:54  $
---       SCCS Version     : $Revision:   2.17  $
+--       Date into SCCS   : $Date:   Mar 24 2010 16:54:32  $
+--       Date fetched Out : $Modtime:   Mar 24 2010 14:30:36  $
+--       SCCS Version     : $Revision:   2.18  $
 --       Based on --
 --
 --   nm3inv package body
@@ -30,7 +30,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.17  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.18  $';
    g_package_name   CONSTANT VARCHAR2(30) := 'nm3inv';
 --
    --<USED BY validate_rec_iit>
@@ -2061,7 +2061,11 @@ BEGIN
                   append('                                                                      ,pi_replace_bind_variable_with => '||g_package_name||'.g_rec_iit.'||REPLACE(l_bind_var,':',NULL)||');');
                   append(' ');
 		  	   ELSE
-			      append('   '||g_package_name||'.g_ita_query := '||Nm3flx.string(cs_rec.ita_query)||';');
+                        -- Task 0109336
+                        -- ITA_QUERY fails if it contains apostrophes, as the ITA_QUERY was passed as literal parameter   
+			      --append('   '||g_package_name||'.g_ita_query := '||Nm3flx.string(cs_rec.ita_query)||';');
+			      append('   '||g_package_name||'.g_ita_query := nm3get.get_ita( pi_ita_inv_type => '||Nm3flx.string(cs_rec.ita_inv_type));
+                        append('                                                      ,pi_ita_attrib_name                 => '||Nm3flx.string(cs_rec.ita_attrib_name)||').ita_query ;');
 			   END IF;
 
                append(' ');
@@ -3588,10 +3592,12 @@ BEGIN
   -- If it's required in other places then there's a major code impact i.e. on nm3gaz_qry and
   -- forms such as assets on a route.
   --
-  IF Nm3get.get_nit(pi_nit_inv_type => pi_ita_inv_type).nit_category != 'G' THEN
-               Hig.raise_ner(pi_appl => 'NET'
-                            ,pi_id   => 422);
-  END IF;
+  -- TASK 0109336 
+  -- Allow setting of ITA_QUERY for all Categories
+  --IF Nm3get.get_nit(pi_nit_inv_type => pi_ita_inv_type).nit_category != 'G' THEN
+  --             Hig.raise_ner(pi_appl => 'NET'
+  --                          ,pi_id   => 422);
+  --END IF;
 
   Nm3flx.validate_ita_query(pi_query           => pi_ita_query
                            ,pi_ita_inv_type    => pi_ita_inv_type
