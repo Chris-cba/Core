@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.6   Mar 22 2010 15:23:00   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.7   Mar 24 2010 10:14:32   aedwards  $
 --       Module Name      : $Workfile:   nm3doc_files.pkb  $
---       Date into PVCS   : $Date:   Mar 22 2010 15:23:00  $
---       Date fetched Out : $Modtime:   Mar 22 2010 15:22:16  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Mar 24 2010 10:14:32  $
+--       Date fetched Out : $Modtime:   Mar 24 2010 10:13:50  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version :
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.6  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.7  $';
   g_package_name CONSTANT varchar2(30) := 'nm3doc_files';
 --
   g_sep      VARCHAR2(1) := NVL(hig.get_sysopt('DIRREPSTRN'),'\');
@@ -755,6 +755,11 @@ AS
   IS
     l_temp_dfl doc_file_locks%ROWTYPE;
   BEGIN
+  --
+    IF get_df(pi_dfl_doc_id, pi_dfl_revision).df_doc_id IS NULL
+    THEN
+      RAISE_APPLICATION_ERROR(-20300,'Cannot lock file - it does not exist in the database table');
+    END IF;
   --
     INSERT INTO doc_file_locks
       ( dfl_doc_id, dfl_revision, dfl_username, dfl_date, dfl_terminal )
