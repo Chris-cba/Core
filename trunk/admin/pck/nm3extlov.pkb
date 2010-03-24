@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3extlov  AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extlov.pkb-arc   2.1   Jan 04 2010 16:54:52   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extlov.pkb-arc   2.2   Mar 24 2010 16:55:24   lsorathia  $
 --       Module Name      : $Workfile:   nm3extlov.pkb  $
---       Date into PVCS   : $Date:   Jan 04 2010 16:54:52  $
---       Date fetched Out : $Modtime:   Jan 04 2010 16:53:44  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Mar 24 2010 16:55:24  $
+--       Date fetched Out : $Modtime:   Mar 24 2010 14:41:54  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY nm3extlov  AS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
@@ -121,7 +121,7 @@ END get_body_version;
     TYPE typ_cs_sql IS REF CURSOR; -- define weak REF CURSOR type
     cs_sql typ_cs_sql; -- declare cursor variable
 
-    v_statement varchar2(2000) := p_statement ;
+    v_statement varchar2(4000) := p_statement ;
     l_statement_b4_where_added varchar2(2000);	
 
     l_group_by_pos pls_integer;
@@ -142,10 +142,91 @@ END get_body_version;
     l_statement_has_where boolean ;
 
   BEGIN
-
     IF p_statement IS NOT NULL
     THEN
-      l_cols_tab := nm3flx.get_cols_from_sql(p_sql => p_statement);
+        -- TASK 0109336
+        -- Added following code to avoid error column ambiguously defined when same column is repeated in the SQL statement 
+	  DECLARE
+	  --	
+          l_sql Varchar2(4000) := p_statement;
+          l_ori_sql Varchar2(4000) := l_sql ;
+          TYPE col IS TABLE OF Varchar(100) INDEX BY BINARY_INTEGER;
+          l_col_tab col;       
+          l_cnt number := 0 ;
+          l_alias Varchar2(500) ;
+          l_pos Number;
+          l_cols_tab nm3type.tab_varchar30; 
+        --   
+	  BEGIN
+	  --	 
+           l_sql := Substr(l_sql,8,Instr(l_sql,'FROM')-(1+8));
+           LOOP
+              l_cnt := l_cnt + 1;
+              l_pos := Instr(l_sql,',');
+              IF l_pos > 0 
+              THEN        
+                  l_alias  := Ltrim(substr(l_sql, 1,l_pos-1))||' ' ;
+                  IF Nvl(Length(Replace(Substr(l_alias,(Instr(l_alias,' '))),' ')),0) > 0
+                  THEN             
+                      l_col_tab(l_cnt) :=  l_alias ; 
+                  ELSE
+                      IF l_cnt = 1 
+                      THEN
+                          l_col_tab(l_cnt) := Substr(l_sql, 1,l_pos-1)||' Identifier ';
+                      ELSIF l_cnt = 2 
+                      THEN 
+                          l_col_tab(l_cnt) :=  Substr(l_sql, 1,l_pos-1)||' Description ';
+                      ELSE
+                          l_col_tab(l_cnt) :=  Substr(l_sql, 1,l_pos-1)||' Value ';
+                      END IF ;
+                  END IF ;    
+                  l_sql := Substr(l_sql,l_pos+1);
+              ELSE
+                  l_alias  := Ltrim(l_sql);
+                  IF Nvl(Length(Replace(Substr(l_alias,(Instr(l_alias,' '))),' ')),0) > 0
+                  THEN             
+                      l_col_tab(l_cnt) :=  l_alias ;--Substr(l_alias,(Instr(l_alias,' ')));
+                  ELSE
+                      IF l_cnt = 1 
+                      THEN
+                          l_col_tab(l_cnt) :=  l_sql||' Identifier ';
+                      ELSIF l_cnt = 2 
+                      THEN
+                          l_col_tab(l_cnt) :=  l_sql||' Description ';
+                      ELSE
+                         l_col_tab(l_cnt) :=  l_sql||' Value ';
+                      END IF ;               
+                  END IF  ;
+                  Exit;     
+              END IF ;
+           END LOOP ;
+           l_sql:= 'SELECT ';
+           FOR i in 1..l_col_tab.count 
+           LOOP
+               IF i = 1 
+               THEN
+                   l_sql := l_sql ||l_col_tab(i);
+               ELSIF i = 2 
+               THEN 
+                   l_sql := l_sql ||' ,'||l_col_tab(i);
+               ELSE
+                   l_sql := l_sql ||' ,'||l_col_tab(i);
+               END IF;
+           END LOOP;
+           v_statement := l_sql ||' '||Substr(l_ori_sql,Instr(Upper(l_ori_sql),'FROM'));
+           l_sql := 'SELECT';
+     	     --get and add columns to query
+    	     l_cols_tab := nm3flx.get_cols_from_sql(p_sql => v_statement);
+           FOR l_i IN 1..l_cols_tab.COUNT
+	     LOOP
+	         l_sql := l_sql 
+	    	 	           || Chr(10) || '  ' || l_cols_tab(l_i) || ',';
+	     END LOOP;
+           v_statement := Substr(l_sql, 1, Length(l_sql) - 1)|| Chr(10) || ' FROM'
+	  		         || Chr(10) || '  (' || v_statement  || ')' ;  
+        END ;
+        -- END TASK TASK 0109336
+      l_cols_tab := nm3flx.get_cols_from_sql(p_sql => v_statement);
 
       IF NOT(l_cols_tab.EXISTS(pi_match_col))
       THEN
