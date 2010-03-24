@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.9   Feb 18 2009 12:54:58   rcoupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.10   Mar 24 2010 14:27:36   rcoupe  $
 --       Module Name      : $Workfile:   nm3nwad.pkb  $
---       Date into PVCS   : $Date:   Feb 18 2009 12:54:58  $
---       Date fetched Out : $Modtime:   Feb 18 2009 12:51:56  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Mar 24 2010 14:27:36  $
+--       Date fetched Out : $Modtime:   Mar 24 2010 14:26:46  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -36,7 +36,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.9  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.10  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'nm3nwad';
 
@@ -3700,7 +3700,7 @@ BEGIN
   ELSE
 
     IF l_rec_iit.iit_start_date IS NULL
-      THEN l_rec_iit.iit_start_date := Nm3user.get_effective_date;
+      THEN l_rec_iit.iit_start_date := l_rec_ne.ne_start_date; -- Nm3user.get_effective_date;
     END IF;
 
     IF l_rec_iit.iit_admin_unit IS NULL
@@ -3721,8 +3721,8 @@ BEGIN
   -- set nad id above
    -- l_rec_nadl.nad_id := l_rec_nadt.nad_id;
     l_rec_nadl.nad_ne_id := l_ne_id;
-    l_rec_nadl.nad_iit_ne_id := l_tmp_iit_rec.iit_ne_id;
-    l_rec_nadl.nad_start_date := Nm3user.get_effective_date;
+    l_rec_nadl.nad_iit_ne_id  := l_tmp_iit_rec.iit_ne_id;
+    l_rec_nadl.nad_start_date := greatest(l_rec_ne.ne_start_date, l_rec_iit.iit_start_date); -- RAC task 0109340 - did use  Nm3user.get_effective_date;
 
     Nm3nwad.ins_nadl(l_rec_nadl);
 
