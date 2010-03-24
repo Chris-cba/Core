@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.11   Aug 17 2009 10:56:26   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.12   Mar 24 2010 10:56:58   aedwards  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Aug 17 2009 10:56:26  $
---       Date fetched Out : $Modtime:   Aug 17 2009 10:54:58  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Mar 24 2010 10:56:58  $
+--       Date fetched Out : $Modtime:   Mar 24 2010 10:56:04  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.11  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.12  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -3989,58 +3989,64 @@ END store_narh;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE get_non_linear_grp_membership (pi_iit_inv_type               IN     nm_inv_items.iit_inv_type%TYPE
-                                        ,pi_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                                        ,po_tab_rec_nl_grp_membership  IN OUT nm3asset.tab_rec_nl_grp_membership
-                                        ) IS
+PROCEDURE get_non_linear_grp_membership (
+  pi_iit_inv_type                IN     nm_inv_items.iit_inv_type%TYPE
+, pi_iit_ne_id                   IN     nm_inv_items.iit_ne_id%TYPE
+, po_tab_rec_nl_grp_membership   IN OUT nm3asset.tab_rec_nl_grp_membership )
+IS
   --
   -- For a given inventory item id get all of the non linear groups that it belongs to
   --
-  CURSOR c_grp IS
-  SELECT   i.nm_ne_id_in  iit_ne_id
-          ,e.ne_id
-          ,e.ne_unique
-          ,e.ne_descr
-		  ,e.ne_gty_group_type
-		  ,gt.ngt_descr
-		  ,e.ne_nt_type
-  FROM     nm_elements    e
-          ,nm_group_types gt
-          ,nm_types       t
-          ,nm_members     i
-          ,nm_members     g
-  WHERE    nt_type = ne_nt_type
-  AND      g.nm_ne_id_of  = i.nm_ne_id_of
-  AND      g.nm_begin_mp  <= i.nm_end_mp -- 713738 added '<=', was <.  Wasn't displaying group membership for point assets at the beginning of a datum (the route start).
-  AND      g.nm_end_mp    > i.nm_begin_mp
-  AND      g.nm_ne_id_in  = ne_id
-  AND      i.nm_ne_id_in  = pi_iit_ne_id
-  AND      ngt_group_type = ne_gty_group_type
-  AND      NT_LINEAR ='N'
-  GROUP BY i.nm_ne_id_in
-          ,e.ne_id
-          ,e.ne_unique
-          ,e.ne_descr
-		  ,e.ne_gty_group_type
-		  ,gt.ngt_descr
-		  ,e.ne_nt_type;
-
-  		  
-		  
+  CURSOR c_grp
+  IS
+      SELECT i.nm_ne_id_in iit_ne_id
+           , e.ne_id
+           , e.ne_unique
+           , e.ne_descr
+           , e.ne_gty_group_type
+           , gt.ngt_descr
+           , e.ne_nt_type
+        FROM nm_elements e
+           , nm_group_types gt
+           , nm_types t
+           , nm_members i
+           , nm_members g
+       --
+       -- Task 0109324
+       -- ECDM Log 722656
+       -- RC Rewrite where clause to work with both linear and point assets for partial groups
+       --
+       WHERE nt_type = ne_nt_type 
+         AND g.nm_ne_id_of = i.nm_ne_id_of
+         AND ( (    i.nm_begin_mp = i.nm_end_mp
+                    AND g.nm_begin_mp <= i.nm_end_mp
+                    AND g.nm_end_mp >= i.nm_begin_mp )
+                  OR (    i.nm_begin_mp < i.nm_end_mp
+                      AND g.nm_begin_mp < i.nm_end_mp
+                      AND g.nm_end_mp > i.nm_begin_mp ) )
+         AND g.nm_ne_id_in = ne_id
+         AND i.nm_ne_id_in = pi_iit_ne_id
+         AND ngt_group_type = ne_gty_group_type
+         AND nt_linear = 'N'
+    --
+    GROUP BY i.nm_ne_id_in
+           , e.ne_id
+           , e.ne_unique
+           , e.ne_descr
+           , e.ne_gty_group_type
+           , gt.ngt_descr
+           , e.ne_nt_type;
 BEGIN
-
- --
- -- ignore locations of FT inventory which does not come from memberships
- --
-
- IF NOT is_ft_inv_type(nm3get.get_nit(pi_iit_inv_type)) THEN 
-
-   OPEN c_grp;
-   FETCH c_grp BULK COLLECT INTO po_tab_rec_nl_grp_membership;
-   CLOSE c_grp;
-   
- END IF;
-
+  --
+  -- ignore locations of FT inventory which does not come from memberships
+  --
+  IF NOT is_ft_inv_type ( nm3get.get_nit ( pi_iit_inv_type ) )
+  THEN
+    OPEN c_grp;
+    FETCH c_grp
+    BULK COLLECT INTO po_tab_rec_nl_grp_membership;
+    CLOSE c_grp;
+  END IF;
 END get_non_linear_grp_membership;
 --
 -----------------------------------------------------------------------------
