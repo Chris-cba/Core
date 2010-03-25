@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3webutil.pkb-arc   2.0   Mar 17 2010 12:04:36   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3webutil.pkb-arc   2.1   Mar 25 2010 12:00:18   aedwards  $
 --       Module Name      : $Workfile:   nm3webutil.pkb  $
---       Date into PVCS   : $Date:   Mar 17 2010 12:04:36  $
---       Date fetched Out : $Modtime:   Feb 23 2010 17:31:36  $
---       Version          : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Mar 25 2010 12:00:18  $
+--       Date fetched Out : $Modtime:   Mar 25 2010 11:59:42  $
+--       Version          : $Revision:   2.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.0  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3webutil';
   
@@ -69,12 +69,28 @@ FUNCTION get_work_folder RETURN VARCHAR2 IS
 BEGIN
     RETURN hig.get_user_or_sys_opt('WORKFOLDER');
 END get_work_folder;
-
-
-
-
-
-
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION start_file_on_client ( pi_os  IN VARCHAR2
+                                , pi_file IN VARCHAR2 )
+    RETURN VARCHAR2
+  IS
+    retval nm3type.max_varchar2;
+  BEGIN
+    IF pi_os IS NOT NULL
+    AND pi_file IS NOT NULL
+    THEN
+      IF UPPER(pi_os) LIKE '%WIN%'
+      THEN
+        retval := 'cmd /c ' ||' "'||pi_file||'"' ;
+      END IF;
+    END IF;
+    RETURN retval;
+  END start_file_on_client;
+--
+-----------------------------------------------------------------------------
+--
 END nm3webutil;
 /
 
