@@ -143,6 +143,7 @@ BEGIN
               END IF;
               CLOSE cs_ft_col_check;
               IF l_data_type != 'NUMBER'
+              AND :New.nit_category != 'A' -- Ignore Audit/Alert Assets from this validation
                THEN
                  RAISE_APPLICATION_ERROR(-20001,'Column '||p_table_name||'.'||p_col_name||' is not a NUMBER column');
               END IF;
