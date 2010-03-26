@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.16   Mar 08 2010 12:42:06   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.17   Mar 26 2010 10:11:50   cstrettle  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Mar 08 2010 12:42:06  $
---       Date fetched Out : $Modtime:   Mar 08 2010 12:37:44  $
---       Version          : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Mar 26 2010 10:11:50  $
+--       Date fetched Out : $Modtime:   Mar 25 2010 17:06:44  $
+--       Version          : $Revision:   2.17  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.16  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.17  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -117,10 +117,19 @@ AS
    IS
       SELECT   *
           FROM nm_themes_all
-         WHERE nth_table_name = 'DOCS'
-            OR nth_pk_column like '%DOC%'
+         WHERE (nth_table_name = 'DOCS'
+            OR nth_pk_column like '%DOC%')
+           AND nth_hpr_product = 'ENQ'
       ORDER BY 1;
 
+   CURSOR get_doc_layers
+   IS
+      SELECT   *
+          FROM nm_themes_all
+         WHERE (nth_table_name = 'DOCS'
+            OR nth_pk_column like '%DOC%')
+            AND nth_hpr_product = 'DOC'
+      ORDER BY 1;
 --
    CURSOR get_acc_location_layers
    IS
@@ -484,6 +493,7 @@ AS
 --            C   =   Streetlights
 --            NSG =  NSGN Streets
 --            REG = Register Table
+--            DOC = Documents
 
    PROCEDURE get_theme_details (
       pi_layer_type   IN       VARCHAR2
@@ -558,6 +568,14 @@ AS
          FETCH get_enq_layers
          BULK COLLECT INTO l_tab_nth;
          CLOSE get_enq_layers;
+
+      ELSIF pi_layer_type = 'DOC'
+      -- Documents Layers
+      THEN
+         OPEN get_doc_layers;
+         FETCH get_doc_layers
+         BULK COLLECT INTO l_tab_nth;
+         CLOSE get_doc_layers;
 
       ELSIF pi_layer_type = 'A'
       -- Accident Layers
@@ -3342,7 +3360,55 @@ AS
          END IF;
       END IF;
    END create_enq_layer;
+--
+-----------------------------------------------------------------------------
+--
+/*
+   **************************
+     ENQ RELATED FUNCTIONS
+   **************************
+*/
+--
+-----------------------------------------------------------------------------
+--
+   PROCEDURE create_doc_layer (
+      pi_theme_name      IN   nm_themes_all.nth_theme_name%TYPE
+    , pi_asset_type      IN   nm_inv_types.nit_inv_type%TYPE
+    , pi_asset_descr     IN   nm_inv_types.nit_descr%TYPE
+    , pi_lr_ne_column    IN   user_tab_columns.column_name%TYPE
+    , pi_lr_st_chain     IN   user_tab_columns.column_name%TYPE
+    , pi_snapping_trig   IN   VARCHAR2 DEFAULT 'TRUE'
+   )
+   IS
+      l_sql   VARCHAR2 (10000);
+   BEGIN
+      --
+      nm_debug.proc_start (g_package_name, 'create_docs_layer');
 
+      --  hig_products
+      IF hig.is_product_licensed ('ENQ')
+      THEN
+         --
+            l_sql :=
+                  ' BEGIN ' || lf
+               || 'doc_sdo_util.make_base_sdo_layer'       || lf
+               || '( pi_theme_name    => :pi_theme_name'   || lf
+               || ', pi_asset_type    => :pi_asset_type'   || lf
+               || ', pi_asset_descr   => :pi_asset_descr'  || lf
+               || ', pi_lr_ne_column  => :pi_lr_ne_column' || lf
+               || ', pi_lr_st_chain   => :pi_lr_st_chain'  || lf
+               || ', pi_snapping_trig => :pi_snapping_trig'|| lf
+               || ' );'                                    || lf
+               || ' END;';
+            EXECUTE IMMEDIATE l_sql
+                        USING pi_theme_name
+                            , pi_asset_type
+                            , pi_asset_descr
+                            , pi_lr_ne_column
+                            , pi_lr_st_chain
+                            , pi_snapping_trig;
+      END IF;
+   END create_doc_layer;
 --
 -----------------------------------------------------------------------------
 --

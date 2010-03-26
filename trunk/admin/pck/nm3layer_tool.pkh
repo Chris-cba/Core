@@ -3,16 +3,16 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.7   Jan 19 2010 11:15:18   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.8   Mar 26 2010 10:11:50   cstrettle  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkh  $
---       Date into PVCS   : $Date:   Jan 19 2010 11:15:18  $
---       Date fetched Out : $Modtime:   Jan 19 2010 11:12:54  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Mar 26 2010 10:11:50  $
+--       Date fetched Out : $Modtime:   Mar 25 2010 17:03:56  $
+--       Version          : $Revision:   2.8  $
 --       Based on SCCS version : 1.6
 -------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.7  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.8  $';
     g_boolean               BOOLEAN        := FALSE;
     g_x_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_X';
     g_y_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_Y';
@@ -584,6 +584,27 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
               , pi_asset_descr   IN nm_inv_types.nit_descr%TYPE
               , pi_x_column      IN user_tab_columns.column_name%TYPE
               , pi_y_column      IN user_tab_columns.column_name%TYPE
+              , pi_lr_ne_column  IN user_tab_columns.column_name%TYPE
+              , pi_lr_st_chain   IN user_tab_columns.column_name%TYPE
+              , pi_snapping_trig IN VARCHAR2 DEFAULT 'TRUE');
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+/*
+   **************************
+     DOC RELATED FUNCTIONS
+   **************************
+*/
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="CREATE_DOC_LAYER">
+-- Creates a standard Enquiries SDO layer
+  PROCEDURE create_doc_layer
+              ( pi_theme_name    IN nm_themes_all.nth_theme_name%TYPE
+              , pi_asset_type    IN nm_inv_types.nit_inv_type%TYPE
+              , pi_asset_descr   IN nm_inv_types.nit_descr%TYPE
               , pi_lr_ne_column  IN user_tab_columns.column_name%TYPE
               , pi_lr_st_chain   IN user_tab_columns.column_name%TYPE
               , pi_snapping_trig IN VARCHAR2 DEFAULT 'TRUE');
