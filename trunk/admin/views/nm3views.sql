@@ -1053,7 +1053,6 @@ start '&run_file'
 --
 ----------------------------------------------------------------------------------------- 
 --
-
 SET TERM ON 
 PROMPT v_nm_gaz_query_attribs_saved.vw
 SET TERM OFF
@@ -1065,3 +1064,129 @@ start '&run_file'
 --
 ----------------------------------------------------------------------------------------- 
 --
+SET TERM ON 
+PROMPT hig_candidate_process_types_v.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'hig_candidate_process_types_v.vw' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_processes_v.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'hig_processes_v.vw' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_process_files_v.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'hig_process_files_v.vw' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_process_job_runs_v.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'hig_process_job_runs_v.vw' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_process_log_v.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'hig_process_log_v.vw' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_process_types_restricted_v.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'hig_process_types_restricted_v.vw' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_process_types_v.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'hig_process_types_v.vw' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_process_type_frequencies_v.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'hig_process_type_frequencies_v.vw' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_process_type_users_v.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'hig_process_type_users_v.vw' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_scheduling_frequencies_v.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'hig_scheduling_frequencies_v.vw' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_scheduling_intervals_v.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'hig_scheduling_intervals_v.vw' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+
+
+
+
+
