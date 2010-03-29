@@ -1,13 +1,14 @@
-CREATE OR REPLACE PACKAGE BODY nm3jobs AS
+CREATE OR REPLACE PACKAGE BODY nm3jobs AS 
+
 --
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.0   Jul 10 2009 11:02:48   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.1   Mar 29 2010 16:47:30   gjohnson  $
 --       Module Name      : $Workfile:   nm3jobs.pkb  $
---       Date into PVCS   : $Date:   Jul 10 2009 11:02:48  $
---       Date fetched Out : $Modtime:   Jul 10 2009 10:58:04  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Mar 29 2010 16:47:30  $
+--       Date fetched Out : $Modtime:   Mar 29 2010 10:40:46  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --   NM3 DBMS_SCHEDULER wrapper
 --
@@ -22,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.0  $"';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.1  $"';
   g_package_name         CONSTANT VARCHAR2(30)   := 'nm3jobs';
   ex_resource_busy                EXCEPTION;
   g_default_comment               VARCHAR2(500)  := 'Created by nm3job ';
@@ -48,25 +49,28 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   PROCEDURE create_job
               ( pi_job_name        IN VARCHAR2
               , pi_job_action      IN VARCHAR2
+              , pi_job_owner       IN VARCHAR2  DEFAULT USER
               , pi_repeat_interval IN VARCHAR2  DEFAULT g_midnight
               , pi_comments        IN VARCHAR2  DEFAULT NULL
               , pi_job_type        IN VARCHAR2  DEFAULT 'PLSQL_BLOCK'
               , pi_start_date      IN TIMESTAMP DEFAULT SYSTIMESTAMP
               , pi_end_date        IN TIMESTAMP DEFAULT NULL
-              , pi_enabled         IN BOOLEAN   DEFAULT TRUE )
+              , pi_enabled         IN BOOLEAN   DEFAULT TRUE 
+              , pi_auto_drop       IN BOOLEAN   DEFAULT TRUE )              
   IS
     --'BEGIN my_job_proc(''CREATE_PROGRAM (BLOCK)''); END;'
   BEGIN
   --
     dbms_scheduler.create_job 
        ( 
-         job_name        => pi_job_name
+         job_name        => pi_job_owner||'.'||pi_job_name
        , job_type        => pi_job_type
        , job_action      => pi_job_action
        , start_date      => pi_start_date
        , repeat_interval => pi_repeat_interval
        , end_date        => pi_end_date
        , enabled         => pi_enabled
+       , auto_drop       => pi_auto_drop
        , comments        => NVL(pi_comments,g_default_comment
                                          ||' at '||SYSDATE
                                          ||' for '||USER )
@@ -115,5 +119,318 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
 --
 -----------------------------------------------------------------------------
 --
+PROCEDURE disable_job (pi_job_name IN VARCHAR2
+                     , pi_force    IN BOOLEAN DEFAULT FALSE) IS
+                     
+BEGIN
+
+  dbms_scheduler.disable(name  => pi_job_name
+                           ,force  => pi_force);
+
+END disable_job;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE enable_job (pi_job_name IN VARCHAR2) IS
+                     
+BEGIN
+
+  dbms_scheduler.enable(name  => pi_job_name);
+
+END enable_job;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE amend_job_start_datim (pi_job_name IN VARCHAR2 
+                                ,pi_value    IN DATE) IS
+                     
+BEGIN
+
+
+ DBMS_SCHEDULER.SET_ATTRIBUTE(name      => pi_job_name
+                                 ,attribute => 'start_date'
+                                 ,value     => pi_value);
+
+                                
+END;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE amend_job_interval (pi_job_name IN VARCHAR2 
+                             ,pi_value    IN VARCHAR2) IS
+                     
+BEGIN
+
+ DBMS_SCHEDULER.SET_ATTRIBUTE(name      => pi_job_name
+                                 ,attribute => 'repeat_interval'
+                                 ,value     => pi_value);
+                                 
+END amend_job_interval;                                  
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE amend_job_action (pi_job_name IN VARCHAR2 
+                           ,pi_value    IN VARCHAR2) IS
+                     
+BEGIN
+
+ DBMS_SCHEDULER.SET_ATTRIBUTE(name      => pi_job_name
+                                 ,attribute => 'job_action'
+                                 ,value     => pi_value);
+                                 
+END amend_job_action;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE amend_job_restartable (pi_job_name    IN VARCHAR2 
+                                ,pi_value       IN BOOLEAN) IS
+                     
+BEGIN
+
+ DBMS_SCHEDULER.SET_ATTRIBUTE(name      => pi_job_name
+                                 ,attribute => 'restartable'
+                                 ,value     => pi_value);
+                                 
+END amend_job_restartable;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE purge_log(
+  log_history        IN PLS_INTEGER DEFAULT 0,
+  which_log          IN VARCHAR2    DEFAULT 'JOB_AND_WINDOW_LOG',
+  job_name           IN VARCHAR2    DEFAULT NULL) IS
+  
+BEGIN
+
+ dbms_scheduler.purge_log(log_history    => log_history
+                             ,which_log      => which_log
+                             ,job_name       => job_name); 
+
+END purge_log;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION evaluate_calendar_string(pi_calendar_string   IN VARCHAR2
+                                 ,pi_start_date        IN  DATE DEFAULT SYSDATE
+                                 ,pi_return_date_after IN  DATE DEFAULT SYSDATE
+                                 ) RETURN DATE IS
+
+
+
+ l_timestamp timestamp;
+
+BEGIN
+
+-- Repeat intervals of jobs, windows or schedules are defined using the
+-- scheduler's calendar syntax. This procedure evaluates the calendar string
+-- and tells you what the next execution date of a job or window will be. This
+-- is very useful for testing the correct definition of the calendar string
+-- without having to actually schedule the job or window.
+--
+-- Parameters
+-- calendar_string    The to be evaluated calendar string.
+-- start_date         The date by which the calendar string becomes valid.
+--                    It might also be used to fill in specific items that are
+--                    missing from the calendar string. Can optionally be NULL.
+-- return_date_after  With the start_date and the calendar string the scheduler
+--                    has sufficient information to determine all valid
+--                    execution dates. By setting this argument the scheduler
+--                    determines which one of all possible matches to return.
+--                    When a NULL value is passed for this argument the
+--                    scheduler automatically fills in systimestamp as its
+--                    value.
+-- next_run_date      The first timestamp that matches the calendar string and
+--                    start date that occurs after the value passed in for the
+--                    return_date_after argument.
+
+ dbms_scheduler.evaluate_calendar_string(
+                                               calendar_string    => pi_calendar_string
+                                              ,start_date         => TO_TIMESTAMP(to_char(pi_start_date,'DD-MON-YYYY HH24:MI:SS'),'DD-MON-YYYY HH24:MI:SS')
+                                              ,return_date_after  => TO_TIMESTAMP(to_char(pi_return_date_after,'DD-MON-YYYY HH24:MI:SS'),'DD-MON-YYYY HH24:MI:SS')
+                                              ,next_run_date      => l_timestamp);
+
+ l_timestamp :=  NVL(l_timestamp
+                    ,TO_TIMESTAMP(to_char(pi_start_date,'DD-MON-YYYY HH24:MI:SS'),'DD-MON-YYYY HH24:MI:SS')
+                    );
+                    
+ RETURN (cast (l_timestamp as date));                    
+                                              
+END evaluate_calendar_string;                                               
+--
+-----------------------------------------------------------------------------
+--             
+PROCEDURE calendar_string_is_valid(pi_calendar_string  IN VARCHAR2
+                                  ,po_is_valid         OUT BOOLEAN
+                                  ,po_frequency        OUT PLS_INTEGER
+                                  ,po_interval         OUT PLS_INTEGER
+                                  ,po_bysecond         OUT dbms_scheduler.BYLIST
+                                  ,po_byminute         OUT dbms_scheduler.BYLIST
+                                  ,po_byhour           OUT dbms_scheduler.BYLIST
+                                  ,po_byday_days       OUT dbms_scheduler.BYLIST
+                                  ,po_byday_occurrence OUT dbms_scheduler.BYLIST
+                                  ,po_bymonthday       OUT dbms_scheduler.BYLIST
+                                  ,po_byyearday        OUT dbms_scheduler.BYLIST
+                                  ,po_byweekno         OUT dbms_scheduler.BYLIST
+                                  ,po_bymonth          OUT dbms_scheduler.BYLIST                                  
+                                  ) IS
+
+BEGIN
+
+ po_is_valid := FALSE;
+
+    dbms_scheduler.resolve_calendar_string(
+                                                    calendar_string  => pi_calendar_string
+                                                   ,frequency        => po_frequency 
+                                                   ,interval         => po_interval 
+                                                   ,bysecond         => po_bysecond 
+                                                   ,byminute         => po_byminute 
+                                                   ,byhour           => po_byhour 
+                                                   ,byday_days       => po_byday_days 
+                                                   ,byday_occurrence => po_byday_occurrence 
+                                                   ,bymonthday       => po_bymonthday 
+                                                   ,byyearday        => po_byyearday 
+                                                   ,byweekno         => po_byweekno 
+                                                   ,bymonth          => po_bymonth
+                                                );
+                                            
+ po_is_valid := TRUE;
+ 
+EXCEPTION
+
+ WHEN others THEN
+   po_is_valid := FALSE;                                                                                             
+
+END calendar_string_is_valid;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION calendar_string_is_valid(pi_calendar_string  IN VARCHAR2) RETURN BOOLEAN IS
+
+ l_retval boolean;
+ l_frequency pls_integer;
+ l_interval  pls_integer;
+ 
+ 
+ l_bysecond         dbms_scheduler.BYLIST;
+ l_byminute         dbms_scheduler.BYLIST;
+ l_byhour           dbms_scheduler.BYLIST;
+ l_byday_days       dbms_scheduler.BYLIST;
+ l_byday_occurrence dbms_scheduler.BYLIST;
+ l_bymonthday       dbms_scheduler.BYLIST;
+ l_byyearday        dbms_scheduler.BYLIST;
+ l_byweekno         dbms_scheduler.BYLIST;
+ l_bymonth          dbms_scheduler.BYLIST;  
+
+BEGIN
+
+
+  calendar_string_is_valid(pi_calendar_string  => pi_calendar_string
+                          ,po_is_valid         => l_retval
+                          ,po_frequency        => l_frequency
+                          ,po_interval         => l_interval
+                          ,po_bysecond         => l_bysecond
+                          ,po_byminute         => l_byminute
+                          ,po_byhour           => l_byhour
+                          ,po_byday_days       => l_byday_days
+                          ,po_byday_occurrence => l_byday_occurrence
+                          ,po_bymonthday       => l_bymonthday
+                          ,po_byyearday        => l_byyearday
+                          ,po_byweekno         => l_byweekno
+                          ,po_bymonth          => l_bymonth);                            
+
+  RETURN(l_retval);
+
+END calendar_string_is_valid;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE validate_calendar_string(pi_calendar_string  IN VARCHAR2) IS
+
+BEGIN
+
+
+ IF NOT calendar_string_is_valid(pi_calendar_string => pi_calendar_string) THEN
+ 
+      hig.raise_ner(pi_appl               => 'HIG'
+                   ,pi_id                 => 515 -- Invalid frequency
+                   ,pi_supplementary_info => chr(10)||pi_calendar_string  ); 
+ END IF;  
+
+END validate_calendar_string;
+--
+-----------------------------------------------------------------------------
+--     
+FUNCTION calendar_string_in_mins(pi_calendar_string  IN VARCHAR2) RETURN PLS_INTEGER IS
+
+
+ l_bool boolean;
+ l_frequency pls_integer;
+ l_interval  pls_integer;
+ l_bysecond         dbms_scheduler.BYLIST;
+ l_byminute         dbms_scheduler.BYLIST;
+ l_byhour           dbms_scheduler.BYLIST;
+ l_byday_days       dbms_scheduler.BYLIST;
+ l_byday_occurrence dbms_scheduler.BYLIST;
+ l_bymonthday       dbms_scheduler.BYLIST;
+ l_byyearday        dbms_scheduler.BYLIST;
+ l_byweekno         dbms_scheduler.BYLIST;
+ l_bymonth          dbms_scheduler.BYLIST;
+ 
+ l_retval pls_integer := Null;  
+ 
+BEGIN
+
+
+  calendar_string_is_valid(pi_calendar_string  => pi_calendar_string
+                          ,po_is_valid         => l_bool
+                          ,po_frequency        => l_frequency
+                          ,po_interval         => l_interval
+                          ,po_bysecond         => l_bysecond
+                          ,po_byminute         => l_byminute
+                          ,po_byhour           => l_byhour
+                          ,po_byday_days       => l_byday_days
+                          ,po_byday_occurrence => l_byday_occurrence
+                          ,po_bymonthday       => l_bymonthday
+                          ,po_byyearday        => l_byyearday
+                          ,po_byweekno         => l_byweekno
+                          ,po_bymonth          => l_bymonth                          
+                          ); 
+
+
+--
+-- only treat this as a "pure" minutely interval if there is no fancy criteria 
+--
+ IF  l_bysecond IS NULL 
+ AND l_byminute IS NULL 
+ AND l_byhour IS NULL 
+ AND l_byday_days IS NULL 
+ AND l_byday_occurrence IS NULL 
+ AND l_bymonthday IS NULL 
+ AND l_byyearday IS NULL 
+ AND l_byweekno IS NULL 
+ AND l_bymonth IS NULL THEN   
+
+ 
+      IF l_frequency = dbms_scheduler.minutely THEN
+        l_retval := l_interval;
+--      ELSIF l_frequency = dbms_scheduler.Hourly THEN
+--        l_retval := l_interval*60;
+      END IF;
+      
+ END IF;      
+  
+ RETURN l_retval; 
+ 
+EXCEPTION
+  WHEN others THEN 
+    RETURN (Null);
+
+END calendar_string_in_mins;
+--
+-----------------------------------------------------------------------------
+--
+
+
+
 END nm3jobs;
 /
