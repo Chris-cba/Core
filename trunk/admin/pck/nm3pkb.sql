@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.19   Mar 22 2010 09:11:32   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.20   Mar 29 2010 18:01:38   gjohnson  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   Mar 22 2010 09:11:32  $
---       Date fetched Out : $Modtime:   Mar 22 2010 09:07:24  $
---       PVCS Version     : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Mar 29 2010 18:01:38  $
+--       Date fetched Out : $Modtime:   Mar 29 2010 17:58:28  $
+--       PVCS Version     : $Revision:   2.20  $
 --
 --
 --   Author : Graeme Johnson
@@ -2078,7 +2078,46 @@ FROM dual
 / 
 start '&run_file'
 --
+----------------------------------------------------------------------------------------- 
 --
+SET TERM ON 
+PROMPT hig_process_framework_utils.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'hig_process_framework_utils.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_process_framework.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'hig_process_framework.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_process_api.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'hig_process_api.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+
+
+
+
+
 --
 -- New PACKAGE BODIES above here
 --
