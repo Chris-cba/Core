@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.14   Mar 25 2010 11:20:54   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.15   Mar 29 2010 17:48:10   gjohnson  $
 --       Module Name      : $Workfile:   nm3trg.sql  $
---       Date into PVCS   : $Date:   Mar 25 2010 11:20:54  $
---       Date fetched Out : $Modtime:   Mar 25 2010 11:19:34  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Mar 29 2010 17:48:10  $
+--       Date fetched Out : $Modtime:   Mar 29 2010 17:47:04  $
+--       PVCS Version     : $Revision:   2.15  $
 --
 --
 --   Author : Graeme Johnson
@@ -1887,5 +1887,20 @@ start '&run_file'
 --
 -----------------------------------------------------------------------------------------
 --
+SET TERM ON 
+PROMPT hig_scheduling_frequencies_biu.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'hig_scheduling_frequencies_biu.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+-----------------------------------------------------------------------------------------
+--
+
+
+
+
 -- new triggers above this
 SET TERM ON
