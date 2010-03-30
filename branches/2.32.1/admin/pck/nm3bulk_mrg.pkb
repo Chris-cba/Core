@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.2   03 Feb 2010 13:18:50   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3   30 Mar 2010 17:45:34   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   03 Feb 2010 13:18:50  $
---       Date fetched Out : $Modtime:   03 Feb 2010 13:18:30  $
---       PVCS Version     : $Revision:   2.32.1.2  $
+--       Date into PVCS   : $Date:   30 Mar 2010 17:45:34  $
+--       Date fetched Out : $Modtime:   30 Mar 2010 16:32:10  $
+--       PVCS Version     : $Revision:   2.32.1.3  $
 --
 --
 --   Author : Priidu Tanava
@@ -91,6 +91,7 @@ No query types defined.
                added preferred lrm fallback logic to load_group_datums() load_nt_type_datums() and load_all_network_datums()
   03.02.10  PT change in ins_splits() in how splits are joined back to members: to avoid extra assets on splits
                change std_insert_invitems() in how merge sections are joined to splits: to avoid extra sections
+  30.03.10  PT log 725391: in ins_datum_homo_chunks().sql_hashcode_cols() added banded values julian date conversion
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
@@ -99,7 +100,7 @@ No query types defined.
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
         add p_group_type variable to load_group_datums() to specify driving group type when loaded group is non-linear
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.2  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.3  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -621,6 +622,8 @@ No query types defined.
       l_cr varchar2(20) := cr||'           ';
       l_band_value  number(4);
       l_case        varchar2(4000);
+      l_tochar1     varchar2(20);
+      l_tochar2     varchar2(20);
       k binary_integer;
     begin
       i := pt_attr.first;
@@ -637,8 +640,17 @@ No query types defined.
               ) = pt_itd(k).itd_attrib_name
             then
               l_band_value := l_band_value + 1;
+              if pt_attr(i).ita_format = 'DATE' then
+                l_tochar1 := 'to_number(to_char(';
+                l_tochar2 := ', ''J''))';
+              else
+                l_tochar1 := null;
+                l_tochar2 := null;
+              end if;
               l_case := l_case
-                ||cr||'           when '||p_alias||'.'||attribute_xsp_name(pt_attr(i).mrg_attrib, pt_attr(i).xsp)||' between '
+                ||cr||'           when '||l_tochar1
+                    ||p_alias||'.'||attribute_xsp_name(pt_attr(i).mrg_attrib, pt_attr(i).xsp)
+                    ||l_tochar2||' between '
                     ||pt_itd(k).itd_band_min_value||' and '
                     ||pt_itd(k).itd_band_max_value||' then '||qt||l_band_value||qt;
             end if;
