@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.0   Mar 29 2010 17:09:30   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.1   Mar 30 2010 14:04:32   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Mar 29 2010 17:09:30  $
---       Date fetched Out : $Modtime:   Mar 29 2010 17:08:56  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Mar 30 2010 14:04:32  $
+--       Date fetched Out : $Modtime:   Mar 29 2010 17:43:42  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -760,10 +760,18 @@ BEGIN
  hig_process_framework.check_process_can_be_amended(pi_process_Id => pi_process_Id); 
 
  l_rowid := lock_process(pi_process_id => pi_process_id);
+ 
+--
+-- change attributes of the scheduled job
+--
+  OPEN c_what;
+  FETCH c_what INTO l_hpt_what;
+  CLOSE c_what; 
 
  UPDATE  hig_processes
  SET     hp_initiators_ref  = pi_initiators_ref
        , hp_frequency_id   = pi_frequency_id
+       , hp_what_to_call   = l_hpt_what 
  WHERE   rowid = l_rowid;
   
 
@@ -775,12 +783,7 @@ BEGIN
     l_frequency_rec := hig_process_framework.get_frequency(pi_frequency_id => pi_frequency_id);
   END IF;
  
---
--- change attributes of the scheduled job
---
-  OPEN c_what;
-  FETCH c_what INTO l_hpt_what;
-  CLOSE c_what;
+
 
   nm3jobs.amend_job_action(pi_job_name => l_full_job_name
                           ,pi_value    => hig_process_framework.wrapper_around_what(pi_what_to_call => l_hpt_what
