@@ -1,11 +1,11 @@
 create or replace package body nm3mrg_view as
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkb-arc   2.5   04 Feb 2010 09:08:42   ptanava  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkb-arc   2.6   30 Mar 2010 09:37:40   ptanava  $
 --       Module Name      : $Workfile:   nm3mrg_view.pkb  $
---       Date into PVCS   : $Date:   04 Feb 2010 09:08:42  $
---       Date fetched Out : $Modtime:   04 Feb 2010 09:04:04  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   30 Mar 2010 09:37:40  $
+--       Date fetched Out : $Modtime:   30 Mar 2010 09:32:12  $
+--       PVCS Version     : $Revision:   2.6  $
 --       Based on SCCS version     : 1.38
 --
 --
@@ -25,10 +25,11 @@ create or replace package body nm3mrg_view as
   13.07.09  PT fixed missing xsp columns in _SVL by fixing t_val loading at the start of _SEC - not all xsp's per type were loaded
   22.07.09  PT modified _SVL to include begin_offset_true and end_offset_true with MRGVIEWTRU option - these are used by the main view
   04.02.10  PT in _SVL fixed the wrong xsp value counts by adding the missing nsv_x_sect criterion to the case count logic
+  30.02.10  PT in _SVL corrected the mistiake in counting of null xsp values introduced by the previous fix
 */
 
 
-   g_body_sccsid      CONSTANT  VARCHAR2(200) := '"$Revision:   2.5  $"';
+   g_body_sccsid      CONSTANT  VARCHAR2(200) := '"$Revision:   2.6  $"';
    g_package_name     CONSTANT  VARCHAR2(30)  := 'nm3mrg_view';
    
    cr constant varchar2(1) := chr(10);
@@ -795,7 +796,13 @@ BEGIN
     -- sec count() columns
     for i in 1 .. t_sec.count loop
       -- PT 04.02.10 add missing and v.NSV_X_SECT = '''||t_sec(i).inv_type||'' to the case
-      append('      ,count(case when v.nsv_inv_type = '''||t_sec(i).inv_type||''' and v.NSV_X_SECT = '''||t_sec(i).xsp||'''  then 1 end)');
+      
+      -- PT 30.03.10 correctly handle null xsp's like min() above
+      if t_sec(i).xsp is not null then
+        append('      ,count(case when v.nsv_inv_type = '''||t_sec(i).inv_type||''' and v.NSV_X_SECT = '''||t_sec(i).xsp||'''  then 1 end)');
+      else
+        append('      ,count(case when v.nsv_inv_type = '''||t_sec(i).inv_type||''' and v.NSV_X_SECT is null then 1 end)');
+      end if;
       append('        over (partition by mi.nsi_mrg_job_id, mi.nsi_mrg_section_id) '||t_sec(i).col_name);
     
     end loop;
