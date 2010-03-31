@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3   30 Mar 2010 17:45:34   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.4   31 Mar 2010 16:30:34   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   30 Mar 2010 17:45:34  $
---       Date fetched Out : $Modtime:   30 Mar 2010 16:32:10  $
---       PVCS Version     : $Revision:   2.32.1.3  $
+--       Date into PVCS   : $Date:   31 Mar 2010 16:30:34  $
+--       Date fetched Out : $Modtime:   31 Mar 2010 16:20:34  $
+--       PVCS Version     : $Revision:   2.32.1.4  $
 --
 --
 --   Author : Priidu Tanava
@@ -92,6 +92,10 @@ No query types defined.
   03.02.10  PT change in ins_splits() in how splits are joined back to members: to avoid extra assets on splits
                change std_insert_invitems() in how merge sections are joined to splits: to avoid extra sections
   30.03.10  PT log 725391: in ins_datum_homo_chunks().sql_hashcode_cols() added banded values julian date conversion
+  31.03.10  PT in std_insert_invitems().sql_case_cols() added banding lookup for result values
+                in the process added pt_itd parmeter to std_populate() and new function first_banding_index()
+                also added load_temp_extent_datums() from nm3mrg.pkb (not yet functional)
+                requires nm3bulk_mrg.pkh version 2.5 or higher
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
@@ -100,7 +104,7 @@ No query types defined.
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
         add p_group_type variable to load_group_datums() to specify driving group type when loaded group is non-linear
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.3  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.4  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -147,7 +151,8 @@ No query types defined.
   
   procedure std_insert_invitems(
      p_mrg_job_id in nm_mrg_query_results_all.nqr_mrg_job_id%type
-    ,pt_attr in ita_mapping_tbl
+    ,pt_attr  in ita_mapping_tbl
+    ,pt_itd   in itd_tbl
     ,p_splits_rowcount in integer
   );
   
@@ -180,6 +185,11 @@ No query types defined.
   function is_key_preserved(
      p_table_name in varchar2
   ) return boolean;
+  
+  function first_banding_index(
+     pr_attr  in ita_mapping_rec
+    ,pt_itd   in itd_tbl
+  ) return binary_integer;
   
   
   function get_version return varchar2 is
@@ -1193,6 +1203,7 @@ No query types defined.
           k := k + 1;
           pt_itd(k).itd_inv_type          := r2.itd_inv_type;
           pt_itd(k).itd_attrib_name       := r2.itd_attrib_name;
+          pt_itd(k).itd_itb_banding_id    := r2.itd_itb_banding_id;
           pt_itd(k).itd_band_min_value    := r2.itd_band_min_value;
           pt_itd(k).itd_band_max_value    := r2.itd_band_max_value;
           pt_itd(k).itd_band_description  := r2.itd_band_description;
@@ -1325,6 +1336,7 @@ No query types defined.
   procedure std_populate(
      p_nmq_id in nm_mrg_query_all.nmq_id%type
     ,pt_attr in ita_mapping_tbl
+    ,pt_itd  in itd_tbl
     ,p_admin_unit_id in nm_admin_units_all.nau_admin_unit%type
     ,p_splits_rowcount in integer
     ,p_description in varchar2
@@ -1367,10 +1379,12 @@ No query types defined.
     j           pls_integer := 0;
     lc_sect     pls_integer := 0;
     lc_memb     pls_integer := 0;
+    
   begin
     nm3dbg.putln(g_package_name||'.std_populate('
       ||'p_nmq_id='||p_nmq_id
       ||', pt_attr.count='||pt_attr.count
+      ||', pt_itd.count='||pt_itd.count
       ||', p_admin_unit_id='||p_admin_unit_id
       ||', p_splits_rowcount='||p_splits_rowcount
       ||', p_description='||p_description
@@ -1651,7 +1665,8 @@ No query types defined.
       -- insert all invitems
       std_insert_invitems(
          p_mrg_job_id => r_res.nqr_mrg_job_id
-        ,pt_attr => pt_attr
+        ,pt_attr  => pt_attr
+        ,pt_itd   => pt_itd
         ,p_splits_rowcount => p_splits_rowcount
       );
           
@@ -1670,6 +1685,7 @@ No query types defined.
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.std_populate('
         ||'p_nmq_id='||p_nmq_id
         ||', pt_attr.count='||pt_attr.count
+        ||', pt_itd.count='||pt_itd.count
         ||', p_admin_unit_id='||p_admin_unit_id
         ||', p_splits_rowcount='||p_splits_rowcount
         ||', j='||j
@@ -1783,6 +1799,7 @@ No query types defined.
     std_populate(
        p_nmq_id         => p_nmq_id
       ,pt_attr          => t_inv
+      ,pt_itd           => t_idt
       ,p_admin_unit_id  => p_nqr_admin_unit
       ,p_splits_rowcount => l_splits_rowcount -- in
       ,p_description    => p_nmq_descr
@@ -1816,7 +1833,8 @@ No query types defined.
   --  called from within std_populate()
   procedure std_insert_invitems(
      p_mrg_job_id in nm_mrg_query_results_all.nqr_mrg_job_id%type
-    ,pt_attr in ita_mapping_tbl
+    ,pt_attr  in ita_mapping_tbl
+    ,pt_itd   in itd_tbl
     ,p_splits_rowcount in integer
   )
   is
@@ -1835,6 +1853,7 @@ No query types defined.
       k           binary_integer := 1;
       j           binary_integer := 0;
       l_attrib    varchar2(100);
+      b           binary_integer;
     begin
       i := pt_attr.first;
       while i is not null loop
@@ -1849,23 +1868,59 @@ No query types defined.
           l_inv_alias := 'i'||k;
           l_attrib := pt_attr(i).ita_attrib_name;
         end if;
-        -- CWS test 0108614 03/11/2009
-        -- Change made to prevent the year 1949 appearing as 2049 in the Merge Query Module.
-        IF pt_attr(i).ita_format = 'DATE' 
-        THEN 
+        b := first_banding_index(
+           pr_attr  => pt_attr(i)
+          ,pt_itd   => pt_itd
+        );
+        -- date attribute with banding
+        if pt_attr(i).ita_format = 'DATE' and b is not null then
           s := s||cr||'  ,case t.nm_obj_type'
-          ||cr||'    when '''||pt_attr(i).inv_type
-          ||''' then to_char('||l_inv_alias||'.'||l_attrib||', '''|| nm3user.get_user_date_mask ||''') end NSV_ATTRIB'||j;
-        ELSE
+          ||cr||'    when '''||pt_attr(i).inv_type||''''
+          ||cr||'    then (select itd_band_description from nm_inv_type_attrib_band_dets'
+          ||cr||'      where itd_inv_type = t.nm_obj_type'
+          ||cr||'        and itd_attrib_name = '''||l_attrib||''''
+          ||cr||'        and itd_itb_banding_id = '||pt_itd(b).itd_itb_banding_id
+          ||cr||'        and to_number(to_char('||l_inv_alias||'.'||l_attrib||', ''J'')) between itd_band_min_value and itd_band_max_value'
+          ||cr||'        and rownum = 1) end NSV_ATTRIB'||j;
+        
+        -- date attribute no banding
+        elsif pt_attr(i).ita_format = 'DATE' then
           s := s||cr||'  ,case t.nm_obj_type'
-          ||cr||'    when '''||pt_attr(i).inv_type
-          ||''' then '||l_inv_alias||'.'||l_attrib||' end NSV_ATTRIB'||j;
-        END IF;   
+          ||cr||'    when '''||pt_attr(i).inv_type||''''
+          ||cr||'    then to_char('||l_inv_alias||'.'||l_attrib||', '''|| nm3user.get_user_date_mask ||''') end NSV_ATTRIB'||j;
+        
+        -- normal attribute with banding
+        elsif b is not null then
+          s := s||cr||'  ,case t.nm_obj_type'
+          ||cr||'    when '''||pt_attr(i).inv_type||''''
+          ||cr||'    then (select itd_band_description from nm_inv_type_attrib_band_dets'
+          ||cr||'      where itd_inv_type = t.nm_obj_type'
+          ||cr||'        and itd_attrib_name = '''||l_attrib||''''
+          ||cr||'        and itd_itb_banding_id = '||pt_itd(b).itd_itb_banding_id
+          ||cr||'        and '||l_inv_alias||'.'||l_attrib||' between itd_band_min_value and itd_band_max_value'
+          ||cr||'        and rownum = 1) end NSV_ATTRIB'||j;
+          
+        -- normal attribute no banding
+        else
+          s := s||cr||'  ,case t.nm_obj_type'
+          ||cr||'    when '''||pt_attr(i).inv_type||''' then '||l_inv_alias||'.'||l_attrib||' end NSV_ATTRIB'||j;
+       
+        end if;
+--          -- CWS test 0108614 03/11/2009
+--          -- Change made to prevent the year 1949 appearing as 2049 in the Merge Query Module.
+--          IF pt_attr(i).ita_format = 'DATE' 
+--          THEN 
+--            s := s||cr||'  ,case t.nm_obj_type'
+--            ||cr||'    when '''||pt_attr(i).inv_type
+--            ||''' then to_char('||l_inv_alias||'.'||l_attrib||', '''|| nm3user.get_user_date_mask ||''') end NSV_ATTRIB'||j;
+--          ELSE
+--            s := s||cr||'  ,case t.nm_obj_type'
+--            ||cr||'    when '''||pt_attr(i).inv_type||''' then '||l_inv_alias||'.'||l_attrib||' end NSV_ATTRIB'||j;
+--          END IF;
         --  
         i := pt_attr.next(i);
       end loop;
       return s;
-      
     end;
     
     --  ,(select 'XNAA' ft_inv_type, ft2.FT_PK_COL, ft2.NAA_DESCR from XNMDOT_NAA ft2) i2
@@ -1949,17 +2004,19 @@ No query types defined.
       l_cr      varchar2(1);
       l_attrib  varchar2(100);
       l_ita_format_mask nm_inv_type_attribs_all.ita_format_mask%type;
+      b         binary_integer;
+      l_ita_format  varchar2(20);
       
     begin
       i := pt_attr.first;
       while i is not null loop
         j := j + 1;
         l_attrib := 'nsv_attrib'||j;
-        l_ita_format_mask := null;
+        l_conversion      := null;
         
-        if p_format then
+        -- ignore formatting if banding is used
+        if p_format and first_banding_index(pt_attr(i), pt_itd) is null then
           -- manually select ita_format_mask until it is made part of ita_mapping_rec
-          
           if pt_attr(i).ita_format in ('NUMBER', 'DATE') then
             l_conversion := lower('to_'||pt_attr(i).ita_format);
           
@@ -2402,6 +2459,33 @@ No query types defined.
   
   end;
   
+  -- this has been ported here from nm3mrg
+  procedure load_temp_extent_datums(
+     p_group_type in nm_group_types.ngt_group_type%type
+    ,p_nte_job_id in nm_nw_temp_extents.nte_job_id%type
+    ,p_sqlcount out pls_integer
+  )
+  is
+    l_group_type nm_group_types.ngt_group_type%type;
+    
+  begin
+    nm3dbg.putln(g_package_name||'.load_temp_extent_datums('
+      ||'p_group_type='||p_group_type
+      ||', p_nte_job_id='||p_nte_job_id
+      ||')');
+    nm3dbg.ind;
+    --
+    raise_application_error(-20099, 'procedure not implemented');
+    nm3dbg.deind;
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_temp_extent_datums('
+        ||'p_group_type='||p_group_type
+        ||', p_nte_job_id='||p_nte_job_id
+        ||')');
+      raise;
+      
+  end;
   
   -- load datum criteria for a single group type
   --  the group type can be linear or non-linear
@@ -2847,6 +2931,7 @@ No query types defined.
     return '('
       ||'inv_type='||p_rec.itd_inv_type
       ||', attrib_name='||p_rec.itd_attrib_name
+      ||', banding_id='||p_rec.itd_itb_banding_id
       ||', band_min_value='||p_rec.itd_band_min_value
       ||', band_max_value='||p_rec.itd_band_max_value
       ||', band_description='||p_rec.itd_band_description
@@ -2888,7 +2973,7 @@ No query types defined.
       ||'p_group_type_in='||p_group_type_in
       ||')');
     nm3dbg.ind;
-    
+    nm3dbg.deind;
     raise_application_error(-20999, 'Dead plsql code');
   end;
   
@@ -3093,6 +3178,32 @@ No query types defined.
   end;
   
   
+  -- this returns the first banding values index
+  --  for the banding matching the attribut
+  --  returns null if no bandig for the attribute
+  function first_banding_index(
+     pr_attr  in ita_mapping_rec
+    ,pt_itd   in itd_tbl
+  ) return binary_integer
+  is
+    k binary_integer;
+  begin
+    k := pt_itd.first;
+    while k is not null loop
+      if pr_attr.inv_type = pt_itd(k).itd_inv_type then
+        if get_attrib_name(
+           p_table_name => pr_attr.table_name
+          ,p_ita_attrib_name => pr_attr.ita_attrib_name
+          ,p_iit_attrib_name => pr_attr.iit_attrib_name
+          ) = pt_itd(k).itd_attrib_name
+        then
+          return k;
+        end if;
+      end if;
+      k := pt_itd.next(k);
+    end loop;
+    return null;
+  end;
 --
 -----------------------------------------------------------------------------
 --
