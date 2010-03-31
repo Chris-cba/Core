@@ -2,11 +2,11 @@ create or replace package nm3bulk_mrg as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.4   Nov 01 2007 16:37:36   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.5   31 Mar 2010 16:29:32   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkh  $
---       Date into PVCS   : $Date:   Nov 01 2007 16:37:36  $
---       Date fetched Out : $Modtime:   Oct 19 2007 13:42:14  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   31 Mar 2010 16:29:32  $
+--       Date fetched Out : $Modtime:   31 Mar 2010 16:23:02  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on sccs version : 
 --
 --   Author : Priidu Tanava
@@ -17,7 +17,7 @@ create or replace package nm3bulk_mrg as
 --   Copyright (c) exor corporation ltd, 2006
 -----------------------------------------------------------------------------
 
-  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.4  $"';
+  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.5  $"';
    
 
   type nm_obj_type_tbl is table of nm_members_all.nm_obj_type%type index by binary_integer;
@@ -77,6 +77,7 @@ create or replace package nm3bulk_mrg as
   procedure std_populate(
      p_nmq_id in nm_mrg_query_all.nmq_id%type
     ,pt_attr in ita_mapping_tbl
+    ,pt_itd  in itd_tbl
     ,p_admin_unit_id in nm_admin_units_all.nau_admin_unit%type
     ,p_splits_rowcount in integer
     ,p_description in varchar2
@@ -107,6 +108,11 @@ create or replace package nm3bulk_mrg as
   procedure load_extent_datums(
      p_group_type in nm_group_types.ngt_group_type%type
     ,p_nse_id in nm_saved_extents.nse_id%type
+    ,p_sqlcount out pls_integer
+  );
+  procedure load_temp_extent_datums(
+     p_group_type in nm_group_types.ngt_group_type%type
+    ,p_nte_job_id in nm_nw_temp_extents.nte_job_id%type
     ,p_sqlcount out pls_integer
   );
   procedure load_nt_type_datums(
