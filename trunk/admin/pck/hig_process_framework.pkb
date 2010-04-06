@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.0   Mar 29 2010 17:09:30   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.1   Apr 06 2010 15:23:32   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_framework.pkb  $
---       Date into PVCS   : $Date:   Mar 29 2010 17:09:30  $
---       Date fetched Out : $Modtime:   Mar 29 2010 17:08:56  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Apr 06 2010 15:23:32  $
+--       Date fetched Out : $Modtime:   Apr 01 2010 11:26:30  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
 
@@ -131,7 +131,23 @@ PROCEDURE delete_process_type(pi_process_type_id            IN hig_process_types
 
  l_rowid rowid;
 
+ l_count pls_integer;
+
 BEGIN
+
+
+--
+-- don't allow delete of process type id process records exist for that process type
+--
+ SELECT count(*)
+ INTO  l_count
+ FROM  hig_processes
+ WHERE hp_process_type_id = pi_process_type_id;
+ 
+ IF l_count > 0 THEN
+  hig.raise_ner(pi_appl => 'HIG'
+               ,pi_id   => 502); --Cannot delete record as child records exist.
+ END IF;
 
  l_rowid := lock_process_type(pi_process_type_id => pi_process_type_id);
 
