@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.1   Mar 30 2010 14:04:32   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.2   Apr 06 2010 15:23:30   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Mar 30 2010 14:04:32  $
---       Date fetched Out : $Modtime:   Mar 29 2010 17:43:42  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 06 2010 15:23:30  $
+--       Date fetched Out : $Modtime:   Apr 01 2010 14:35:42  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -550,8 +550,11 @@ BEGIN
      INTO   l_count_live_processes
      FROM   hig_processes_v
      WHERE  hp_process_type_id = pi_process_type_id
-     AND    hpj_next_run_date >= sysdate
-     AND    upper(hpj_job_state) != 'DISABLED';
+     AND    (
+             (hpj_next_run_date >= sysdate AND  upper(hpj_job_state) != 'DISABLED') 
+           OR 
+            ( upper(hpj_job_state) = 'RUNNING')
+            );
  
      IF l_count_live_processes+1 > pi_limit THEN
         hig.raise_ner(pi_appl => 'HIG'
