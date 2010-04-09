@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.12   Mar 22 2010 09:02:50   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.13   Apr 09 2010 12:14:56   rcoupe  $
 --       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   Mar 22 2010 09:02:50  $
---       Date fetched Out : $Modtime:   Mar 22 2010 08:41:28  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Apr 09 2010 12:14:56  $
+--       Date fetched Out : $Modtime:   Apr 09 2010 12:14:22  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Tue Jan 19  17:03:49 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Fri Apr 09  12:01:52 2010 by Server Generator 10.1.2.9.28
 
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
@@ -322,6 +322,32 @@ CREATE INDEX HDP_IND1 ON HIG_ADDRESS_POINT
  (HDP_OSAPR)
 /
 
+PROMPT Creating Index 'HAL_HALT_ID_PK_ID_IND'
+CREATE INDEX HAL_HALT_ID_PK_ID_IND ON HIG_ALERTS
+ (HAL_HALT_ID
+ ,HAL_PK_ID)
+/
+
+PROMPT Creating Index 'HAUD_PK_ID_IND'
+CREATE INDEX HAUD_PK_ID_IND ON HIG_AUDITS
+ (HAUD_PK_ID)
+/
+
+PROMPT Creating Index 'HAAT_HAUT_FK_IND'
+CREATE INDEX HAAT_HAUT_FK_IND ON HIG_AUDIT_ATTRIBUTES
+ (HAAT_HAUT_ID)
+/
+
+PROMPT Creating Index 'HAC_HAUT_FK_IND'
+CREATE INDEX HAC_HAUT_FK_IND ON HIG_AUDIT_CONDITIONS
+ (HAC_HAUT_ID)
+/
+
+PROMPT Creating Index 'HAUT_NIT_FK_IND'
+CREATE INDEX HAUT_NIT_FK_IND ON HIG_AUDIT_TYPES
+ (HAUT_NIT_INV_TYPE)
+/
+
 PROMPT Creating Index 'HCCA_NER_FK_IND'
 CREATE INDEX HCCA_NER_FK_IND ON HIG_CHECK_CONSTRAINT_ASSOCS
  (HCCA_NER_APPL
@@ -395,9 +421,50 @@ CREATE INDEX HMU_HMO_FK_IND ON HIG_MODULE_USAGES
  (HMU_MODULE)
 /
 
+PROMPT Creating Index 'HNM_HIERARCHY_LABEL_IND'
+CREATE INDEX HNM_HIERARCHY_LABEL_IND ON HIG_NAVIGATOR_MODULES
+ (HNM_HIERARCHY_LABEL)
+/
+
 PROMPT Creating Index 'HOL_HPR_FK_IND'
 CREATE INDEX HOL_HPR_FK_IND ON HIG_OPTION_LIST
  (HOL_PRODUCT)
+/
+
+PROMPT Creating Index 'HP_HPT_FK_IND'
+CREATE INDEX HP_HPT_FK_IND ON HIG_PROCESSES
+ (HP_PROCESS_TYPE_ID)
+/
+
+PROMPT Creating Index 'HP_HSFR_FK_IND'
+CREATE INDEX HP_HSFR_FK_IND ON HIG_PROCESSES
+ (HP_FREQUENCY_ID)
+/
+
+PROMPT Creating Index 'HPF_HPJR_FK_IND'
+CREATE INDEX HPF_HPJR_FK_IND ON HIG_PROCESS_FILES
+ (HPF_PROCESS_ID
+ ,HPF_JOB_RUN_SEQ)
+/
+
+PROMPT Creating Index 'HPF_HPTF_FK_IND'
+CREATE INDEX HPF_HPTF_FK_IND ON HIG_PROCESS_FILES
+ (HPF_FILE_TYPE_ID)
+/
+
+PROMPT Creating Index 'HPF_HP_FK_IND'
+CREATE INDEX HPF_HP_FK_IND ON HIG_PROCESS_FILES
+ (HPF_PROCESS_ID)
+/
+
+PROMPT Creating Index 'HPFR_HSFR_FK_IND'
+CREATE INDEX HPFR_HSFR_FK_IND ON HIG_PROCESS_TYPE_FREQUENCIES
+ (HPFR_FREQUENCY_ID)
+/
+
+PROMPT Creating Index 'HTPR_HRO_FK_IND'
+CREATE INDEX HTPR_HRO_FK_IND ON HIG_PROCESS_TYPE_ROLES
+ (HPTR_ROLE)
 /
 
 PROMPT Creating Index 'HRO_HPR_FK_IND'
@@ -1146,6 +1213,7 @@ CREATE INDEX NSD_NSM_FK_IND ON NM_SAVED_EXTENT_MEMBER_DATUMS
  (NSD_NSE_ID
  ,NSD_NSM_ID)
 /
+
 PROMPT Creating Index 'TII_FOREIGN_KEY_IX'
 CREATE INDEX TII_FOREIGN_KEY_IX ON NM_TEMP_INV_ITEMS
  (TII_FOREIGN_KEY)
