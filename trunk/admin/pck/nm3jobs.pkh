@@ -5,11 +5,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkh-arc   3.2   Mar 29 2010 16:47:30   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkh-arc   3.3   Apr 09 2010 09:25:26   aedwards  $
 --       Module Name      : $Workfile:   nm3jobs.pkh  $
---       Date into PVCS   : $Date:   Mar 29 2010 16:47:30  $
---       Date fetched Out : $Modtime:   Mar 26 2010 14:42:58  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Apr 09 2010 09:25:26  $
+--       Date fetched Out : $Modtime:   Apr 08 2010 15:02:16  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 1.21
 -------------------------------------------------------------------------
 --   Author : A Edwards
@@ -25,7 +25,7 @@ AS
 --<GLOBVAR>
 -- g_sccsid is the SCCS_ID
 -- Constants
-  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.2  $"';
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.3  $"';
 --
 -- Some invervals
 --
@@ -75,6 +75,7 @@ AS
 --     pi_end_date           - Defaulted to never
 --     pi_enabled            - Defaulted to enabled
 --     pi_auto_drop          - Defaulted to TRUE - when TRUE the dba_scheduler_jobs entry and all other associated data for the job are purged when FALSE they are kept
+--     pi_run_synchro        - Use same session (i.e. synchronous) or run job in new session - i.e. asynchronous
 --
 --
   PROCEDURE create_job
@@ -87,7 +88,23 @@ AS
               , pi_start_date      IN TIMESTAMP DEFAULT SYSTIMESTAMP
               , pi_end_date        IN TIMESTAMP DEFAULT NULL
               , pi_enabled         IN BOOLEAN   DEFAULT TRUE
-              , pi_auto_drop       IN BOOLEAN   DEFAULT TRUE );
+              , pi_auto_drop       IN BOOLEAN   DEFAULT TRUE  
+              , pi_run_synchro     IN BOOLEAN   DEFAULT TRUE );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="INSTANTIATE_ARGS">
+-- 
+  PROCEDURE instantiate_args;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ADD_ARG">
+-- 
+  PROCEDURE add_arg ( pi_arg IN VARCHAR );
 --</PROC>
 --
 -----------------------------------------------------------------------------
