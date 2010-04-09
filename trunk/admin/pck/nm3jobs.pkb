@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.2   Apr 09 2010 09:25:24   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.3   Apr 09 2010 16:11:22   gjohnson  $
 --       Module Name      : $Workfile:   nm3jobs.pkb  $
---       Date into PVCS   : $Date:   Apr 09 2010 09:25:24  $
---       Date fetched Out : $Modtime:   Apr 09 2010 09:24:46  $
---       PVCS Version     : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Apr 09 2010 16:11:22  $
+--       Date fetched Out : $Modtime:   Apr 09 2010 16:10:20  $
+--       PVCS Version     : $Revision:   3.3  $
 --
 --   NM3 DBMS_SCHEDULER wrapper
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.2  $"';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.3  $"';
   g_package_name         CONSTANT VARCHAR2(30)   := 'nm3jobs';
   ex_resource_busy                EXCEPTION;
   g_default_comment               VARCHAR2(500)  := 'Created by nm3job ';
@@ -103,8 +103,29 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
               , pi_run_synchro     IN BOOLEAN   DEFAULT TRUE)
   IS
     l_arg_count NUMBER := g_args.COUNT;
+    
+    
   BEGIN
   --
+  
+     IF NOT nm3user.user_has_priv(pi_priv => 'CREATE JOB') THEN
+
+      hig.raise_ner(pi_appl => 'HIG'
+                   ,pi_id   => 126
+                   ,pi_supplementary_info => 'Create Job'); -- You do not have privileges to perform this action
+
+     END IF;
+
+
+     IF pi_job_type = 'EXECUTABLE' AND NOT nm3user.user_has_priv(pi_priv => 'CREATE EXTERNAL JOB') THEN
+
+      hig.raise_ner(pi_appl => 'HIG'
+                   ,pi_id   => 126
+                   ,pi_supplementary_info => 'Create External Job'); -- You do not have privileges to perform this action
+
+     END IF;  
+
+  
     IF l_arg_count = 0
     THEN
     --
