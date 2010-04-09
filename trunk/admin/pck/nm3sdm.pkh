@@ -1,14 +1,15 @@
 CREATE OR REPLACE PACKAGE Nm3sdm AS
 --<PACKAGE>
------------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---   SCCS Identifiers :-
---
---       sccsid           : @(#)nm3sdm.pkh	1.25 01/19/07
---       Module Name      : nm3sdm.pkh
---       Date into SCCS   : 07/01/19 11:39:02
---       Date fetched Out : 07/06/13 14:13:28
---       SCCS Version     : 1.25
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkh-arc   2.4   Apr 09 2010 16:21:20   cstrettle  $
+--       Module Name      : $Workfile:   nm3sdm.pkh  $
+--       Date into PVCS   : $Date:   Apr 09 2010 16:21:20  $
+--       Date fetched Out : $Modtime:   Apr 09 2010 16:14:42  $
+--       Version          : $Revision:   2.4  $
+--       Based on SCCS version : 1.25 
+-------------------------------------------------------------------------
 --
 --   Author : R.A. Coupe
 --
@@ -18,7 +19,7 @@ CREATE OR REPLACE PACKAGE Nm3sdm AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT   VARCHAR2(2000) := '@(#)nm3sdm.pkh	1.25 01/19/07';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
 
   g_date_views  CONSTANT   VARCHAR2(1) := NVL(Hig.get_sysopt('SDODATEVW'),'N');
 
@@ -929,7 +930,8 @@ PROCEDURE drop_layers_by_inv_type
 --<PROC NAME="CREATE_NTH_SDO_TRIGGER>
 --
   PROCEDURE Create_Nth_Sdo_Trigger
-             ( p_nth_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE );
+             ( p_nth_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE 
+             , p_restrict     IN   VARCHAR2 DEFAULT NULL);
 --</PROC>
 --
 -----------------------------------------------------------------------------

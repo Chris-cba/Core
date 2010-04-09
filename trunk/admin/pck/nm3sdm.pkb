@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.35   Apr 09 2010 14:30:32   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.36   Apr 09 2010 16:21:20   cstrettle  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Apr 09 2010 14:30:32  $
---       Date fetched Out : $Modtime:   Apr 09 2010 14:27:32  $
---       PVCS Version     : $Revision:   2.35  $
+--       Date into PVCS   : $Date:   Apr 09 2010 16:21:20  $
+--       Date fetched Out : $Modtime:   Apr 09 2010 16:12:06  $
+--       PVCS Version     : $Revision:   2.36  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.35  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.36  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -64,7 +64,6 @@ AS
       p_table             IN   VARCHAR2
     , p_start_date_column IN VARCHAR2 DEFAULT NULL
     , p_end_date_column   IN VARCHAR2 DEFAULT NULL
-
    )
       RETURN VARCHAR2;
 
@@ -7420,8 +7419,8 @@ end;
 ---------------------------------------------------------------------------------------------------------------------------------
 --
 
-   PROCEDURE create_nth_sdo_trigger (
-      p_nth_theme_id   IN   NM_THEMES_ALL.nth_theme_id%TYPE
+   PROCEDURE create_nth_sdo_trigger (p_nth_theme_id   IN   NM_THEMES_ALL.nth_theme_id%TYPE
+                                    ,p_restrict       IN   VARCHAR2 DEFAULT NULL
    )
    IS
       lf                    VARCHAR2 (1)                     := CHR (10);
@@ -7572,7 +7571,7 @@ end;
          ('--------------------------------------------------------------------------'
          );
       append ('--');
-      append ('--   SCCS Identifiers :- ');
+  /*    append ('--   SCCS Identifiers :- ');
       append ('--');
       append ('--       sccsid           : @(#)nm3sdm.pkb 1.25 06/10/05');
       append ('--       Module Name      : nm3sdm.pkb');
@@ -7580,6 +7579,24 @@ end;
       append ('--       Date fetched Out : 05/06/21 09:36:13');
       append ('--       SCCS Version     : 1.25');
       append ('--');
+   */
+   --   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.36   Apr 09 2010 16:21:20   cstrettle  $
+--       Module Name      : $Workfile:   nm3sdm.pkb  $
+--       Date into PVCS   : $Date:   Apr 09 2010 16:21:20  $
+--       Date fetched Out : $Modtime:   Apr 09 2010 16:12:06  $
+--       PVCS Version     : $Revision:   2.36  $
+
+      append ('--   PVCS Identifiers :-');
+      append ('--');
+      append ('--       PVCS id          : $Header::   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   '|| get_body_version);
+      append ('--       Module Name      : $Workfile:   nm3sdm.pkb  $');
+      append ('--       Version          : ' || g_body_sccsid);
+      append ('--');
+      append ('-----------------------------------------------------------------------------');
+      append ('--    Copyright (c) exor corporation ltd, 2010');
+      append ('-----------------------------------------------------------------------------');
       append ('-- Author : R Coupe');
       append ('--          G Johnson / A Edwards');
       append ('--');
@@ -7595,14 +7612,6 @@ end;
       append ('--');
       append ('-- Generated on ' || l_date);
       append ('--');
-      append
-         ('--------------------------------------------------------------------------'
-         );
-      append ('-- Copyright (c) exor corporation ltd, 2005');
-      append
-         ('--------------------------------------------------------------------------'
-         );
-      append ('--');
       append (' ');
 
 -- Need to cater for views or tables
@@ -7617,6 +7626,11 @@ end;
       append ('DELETE OR INSERT OR UPDATE of ' || LOWER (l_update_str));
       append ('ON ' || l_base_table_nth.nth_table_name);
       append ('FOR EACH ROW');
+      -- CWS task 0108359
+    /*  IF p_restrict IS NOT NULL THEN
+        append ('WHEN (OLD.' ||p_restrict || ' )');
+      END IF;*/
+      --
       append ('DECLARE' || lf);
       append (' l_geom mdsys.sdo_geometry;');
       append (' l_lref nm_lref;' || lf);
@@ -7971,6 +7985,10 @@ end;
          );
       append ('--');
       append ('BEGIN' || lf);
+      IF p_restrict IS NOT NULL THEN
+        append ('IF ' ||p_restrict || ' THEN');
+      END IF;
+      
       append ('   IF DELETING THEN');
       append ('        del;');
       append ('   ELSIF INSERTING THEN');
@@ -7978,7 +7996,9 @@ end;
       append ('   ELSIF UPDATING THEN');
       append ('        upd;');
       append ('   END IF;');
-      append ('');
+      IF p_restrict IS NOT NULL THEN
+        append ('END IF;');
+      END IF;
       append ('EXCEPTION');
       append ('   WHEN NO_DATA_FOUND THEN');
       append ('     NULL; -- no data in spatial table to update or delete');
