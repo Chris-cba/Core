@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.4   Jan 11 2010 15:18:40   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.5   Apr 09 2010 15:02:06   aedwards  $
 --       Module Name      : $Workfile:   higroles.sql  $
---       Date into PVCS   : $Date:   Jan 11 2010 15:18:40  $
---       Date fetched Out : $Modtime:   Jan 11 2010 15:17:42  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Apr 09 2010 15:02:06  $
+--       Date fetched Out : $Modtime:   Apr 09 2010 14:54:58  $
+--       Version          : $Revision:   2.5  $
 --
 -------------------------------------------------------------------------
 --  Copyright (c) exor corporation ltd, 2009
@@ -566,6 +566,25 @@ BEGIN
    EXECUTE IMMEDIATE 'grant '||l_role||' to '||USER||' with admin option';
 END;
 /
+
+-- Task 0109363
+-- Create job privs
+DECLARE
+  role_exists EXCEPTION;
+  PRAGMA EXCEPTION_INIT(role_exists, -1921); 
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE ROLE PROCESS_EXECUTION';
+  EXECUTE IMMEDIATE 'GRANT CREATE JOB TO PROCESS_EXECUTION';
+  EXECUTE IMMEDIATE 'GRANT CREATE EXTERNAL JOB TO PROCESS_EXECUTION';
+  EXECUTE IMMEDIATE 'GRANT PROCESS_EXECUTION to '||USER;
+  EXECUTE IMMEDIATE 'GRANT PROCESS_EXECUTION to '||USER||' WITH ADMIN OPTION';
+EXCEPTION
+  WHEN role_exists
+  THEN NULL;
+END;
+/
+
+
 --
 REM End of command file
 rem
