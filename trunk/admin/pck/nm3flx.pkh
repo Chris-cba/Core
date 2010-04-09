@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkh-arc   2.4   Jan 22 2008 15:59:32   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkh-arc   2.5   Apr 09 2010 16:35:26   cstrettle  $
 --       Module Name      : $Workfile:   nm3flx.pkh  $
---       Date into PVCS   : $Date:   Jan 22 2008 15:59:32  $
---       Date fetched Out : $Modtime:   Jan 22 2008 15:58:56  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Apr 09 2010 16:35:26  $
+--       Date fetched Out : $Modtime:   Apr 09 2010 16:28:48  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -688,6 +688,13 @@ FUNCTION date_is_unchanged(pi_old IN DATE
 --<PROC NAME="number_is_unchanged">
 FUNCTION number_is_unchanged(pi_old IN NUMBER
                             ,pi_new IN NUMBER) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="search_in_long">
+FUNCTION search_in_long( p_long           LONG
+                       , p_search_val     VARCHAR2
+                       , p_ignore_case    BOOLEAN DEFAULT TRUE) RETURN BOOLEAN;
 --</PROC>
 --
 -----------------------------------------------------------------------------

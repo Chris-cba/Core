@@ -2,15 +2,15 @@ CREATE OR REPLACE PACKAGE BODY nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.8   Mar 01 2010 09:27:24   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.9   Apr 09 2010 16:35:26   cstrettle  $
 --       Module Name      : $Workfile:   nm3flx.pkb  $
---       Date into PVCS   : $Date:   Mar 01 2010 09:27:24  $
---       Date fetched Out : $Modtime:   Mar 01 2010 09:26:50  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Apr 09 2010 16:35:26  $
+--       Date fetched Out : $Modtime:   Apr 09 2010 16:27:26  $
+--       Version          : $Revision:   2.9  $
 --       Based on SCCS version : 1.47
 -------------------------------------------------------------------------
 --
-  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.8  $';
+  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.9  $';
 
    g_package_name    CONSTANT varchar2(30) := 'nm3flx';
 -- Package variables
@@ -2270,6 +2270,49 @@ BEGIN
        );
        
 END number_is_unchanged;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION search_in_long( p_long           LONG
+                       , p_search_val     VARCHAR2
+                       , p_ignore_case    BOOLEAN DEFAULT TRUE)
+  RETURN BOOLEAN
+IS
+  --
+  l_search_block_size  NUMBER(10) := 4000 - length(p_search_val);
+  l_start_position     NUMBER(10) := 1;
+  l_char               VARCHAR2(32767) := substr(p_long, l_start_position, 4000);
+  l_found              BOOLEAN := FALSE;
+--
+BEGIN
+  --
+  WHILE length(l_char) > 0
+        AND NOT l_found
+  LOOP
+    --
+    IF p_ignore_case THEN
+      --
+      IF upper(l_char) LIKE '%' || upper(p_search_val) || '%' THEN
+        l_found   := TRUE;
+      ELSE
+        l_start_position   := l_start_position + l_search_block_size;
+      END IF;
+    --
+    ELSE
+      --
+      IF l_char LIKE '%' || p_search_val || '%' THEN
+        l_found   := TRUE;
+      ELSE
+        l_start_position   := l_start_position + l_search_block_size;
+      END IF;
+    --
+    END IF;
+
+    l_char   := substr(p_long, l_start_position, 4000);
+  END LOOP;
+  --
+  RETURN l_found;
+END search_in_long;
 --
 -----------------------------------------------------------------------------
 --
