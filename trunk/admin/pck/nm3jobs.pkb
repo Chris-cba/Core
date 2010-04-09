@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.1   Mar 29 2010 16:47:30   gjohnson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.2   Apr 09 2010 09:25:24   aedwards  $
 --       Module Name      : $Workfile:   nm3jobs.pkb  $
---       Date into PVCS   : $Date:   Mar 29 2010 16:47:30  $
---       Date fetched Out : $Modtime:   Mar 29 2010 10:40:46  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 09 2010 09:25:24  $
+--       Date fetched Out : $Modtime:   Apr 09 2010 09:24:46  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --   NM3 DBMS_SCHEDULER wrapper
 --
@@ -23,10 +23,11 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.1  $"';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.2  $"';
   g_package_name         CONSTANT VARCHAR2(30)   := 'nm3jobs';
   ex_resource_busy                EXCEPTION;
   g_default_comment               VARCHAR2(500)  := 'Created by nm3job ';
+  g_args                          nm3type.tab_varchar32767;
 --  ORA-00054: resource busy and acquire with NOWAIT specified
   PRAGMA                          EXCEPTION_INIT(ex_resource_busy,-54);
 --
@@ -44,6 +45,48 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
      RETURN g_body_sccsid;
   END get_body_version;
 --
+-----------------------------------------------------------------------------
+--
+  PROCEDURE instantiate_args
+  IS
+  BEGIN
+    g_args.DELETE;
+  END instantiate_args;
+--
+-----------------------------------------------------------------------------
+--
+-- 
+  PROCEDURE add_arg ( pi_arg IN VARCHAR )
+  IS
+  BEGIN
+    IF pi_arg IS NOT NULL
+    THEN
+      g_args(g_args.COUNT+1) := pi_arg;
+    END IF;
+  END add_arg;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_job_error ( pi_job_name IN VARCHAR2 )
+  RETURN VARCHAR2
+  IS
+    retval nm3type.max_varchar2;
+  BEGIN
+    SELECT SUBSTR ( additional_info,
+                (INSTR(additional_info,'STANDARD_ERROR')+LENGTH('STANDARD_ERROR')+1),
+                (LENGTH(additional_info)-INSTR(additional_info,'STANDARD_ERROR'))
+              ) job_error
+    INTO retval
+    FROM dba_scheduler_job_run_details
+   WHERE log_id = (SELECT MAX(log_id) 
+                     FROM dba_scheduler_job_run_details
+                    WHERE job_name = pi_job_name
+                      AND owner = USER);
+    RETURN retval;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN RETURN NULL;
+  END get_job_error;
+--
 --------------------------------------------------------------------------------
 --
   PROCEDURE create_job
@@ -56,26 +99,77 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
               , pi_start_date      IN TIMESTAMP DEFAULT SYSTIMESTAMP
               , pi_end_date        IN TIMESTAMP DEFAULT NULL
               , pi_enabled         IN BOOLEAN   DEFAULT TRUE 
-              , pi_auto_drop       IN BOOLEAN   DEFAULT TRUE )              
+              , pi_auto_drop       IN BOOLEAN   DEFAULT TRUE 
+              , pi_run_synchro     IN BOOLEAN   DEFAULT TRUE)
   IS
-    --'BEGIN my_job_proc(''CREATE_PROGRAM (BLOCK)''); END;'
+    l_arg_count NUMBER := g_args.COUNT;
   BEGIN
   --
-    dbms_scheduler.create_job 
-       ( 
-         job_name        => pi_job_owner||'.'||pi_job_name
-       , job_type        => pi_job_type
-       , job_action      => pi_job_action
-       , start_date      => pi_start_date
-       , repeat_interval => pi_repeat_interval
-       , end_date        => pi_end_date
-       , enabled         => pi_enabled
-       , auto_drop       => pi_auto_drop
-       , comments        => NVL(pi_comments,g_default_comment
-                                         ||' at '||SYSDATE
-                                         ||' for '||USER )
-        );
+    IF l_arg_count = 0
+    THEN
+    --
+      dbms_scheduler.create_job 
+         ( 
+           job_name        => pi_job_owner||'.'||pi_job_name
+         , job_type        => pi_job_type
+         , job_action      => pi_job_action
+         , start_date      => pi_start_date
+         , repeat_interval => pi_repeat_interval
+         , end_date        => pi_end_date
+         , enabled         => pi_enabled
+         , auto_drop       => pi_auto_drop
+         , comments        => NVL(pi_comments,g_default_comment
+                                           ||' at '||SYSDATE
+                                           ||' for '||USER )
+          );
+    ELSE
+    --
+       dbms_scheduler.create_job
+         ( job_name            => pi_job_owner||'.'||pi_job_name
+         , job_type            => pi_job_type
+         , job_action          => pi_job_action
+         , number_of_arguments => l_arg_count
+         , start_date          => pi_start_date
+         , repeat_interval     => pi_repeat_interval
+         , end_date            => pi_end_date
+         , job_class           => 'DEFAULT_JOB_CLASS'
+         , enabled             => FALSE
+         , auto_drop           => pi_auto_drop
+         , comments            => NVL(pi_comments,g_default_comment
+                                           ||' at '||SYSDATE
+                                           ||' for '||USER )
+         );
+    --
+      FOR args IN 1..g_args.COUNT
+      LOOP
+    --
+        dbms_scheduler.set_job_argument_value 
+          ( job_name            => pi_job_owner||'.'||pi_job_name
+          , argument_position   => args
+          , argument_value      => g_args(args));
+    --
+      END LOOP;
+    --
+      IF pi_enabled
+      THEN
+      --
+        dbms_scheduler.run_job
+          ( job_name            => pi_job_owner||'.'||pi_job_name
+          , use_current_session => pi_run_synchro);
+      --
+      END IF;
+    --
+    END IF;
   --
+    instantiate_args;
+  --
+  EXCEPTION
+    WHEN OTHERS 
+      THEN
+      instantiate_args;
+      hig.raise_ner(pi_appl               => 'NET'
+                   ,pi_id                 => 28
+                   ,pi_supplementary_info => NVL(get_job_error(pi_job_name),SQLERRM));
   END create_job;
 --
 -----------------------------------------------------------------------------
