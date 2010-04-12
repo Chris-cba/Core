@@ -1,0 +1,61 @@
+CREATE OR REPLACE PACKAGE hig_svr_util
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_svr_util.pkh-arc   2.0   Apr 12 2010 10:14:08   aedwards  $
+--       Module Name      : $Workfile:   hig_svr_util.pkh  $
+--       Date into PVCS   : $Date:   Apr 12 2010 10:14:08  $
+--       Date fetched Out : $Modtime:   Apr 09 2010 09:27:16  $
+--       Version          : $Revision:   2.0  $
+--       Based on SCCS version : 
+-------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.0  $';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+  FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+  FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="UNZIP_FILE">
+-- Unzip a file on the dbserver.
+-- Assumes you have privs to run an external dbms_scheduler job
+  PROCEDURE unzip_file ( pi_location      IN VARCHAR2
+                       , pi_filename      IN VARCHAR2
+                       , pi_dest_location IN VARCHAR2 DEFAULT NULL
+                       , pi_logfile       IN VARCHAR2 DEFAULT NULL
+                       );
+--
+   FUNCTION unzip_file ( pi_location      IN VARCHAR2
+                       , pi_filename      IN VARCHAR2
+                       , pi_dest_location IN VARCHAR2 DEFAULT NULL
+                       , pi_logfile       IN VARCHAR2 DEFAULT NULL
+                       )
+     RETURN nm3type.tab_varchar32767;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+END hig_svr_util;
+/
