@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.0   Jan 12 2010 10:12:58   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.1   Apr 12 2010 11:06:42   aedwards  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Jan 12 2010 10:12:58  $
---       Date fetched Out : $Modtime:   Jan 12 2010 09:26:42  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Apr 12 2010 11:06:42  $
+--       Date fetched Out : $Modtime:   Apr 12 2010 11:06:00  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,11 +16,98 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.0  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
-   g_package_name    CONSTANT  varchar2(30)   := 'nm3ftp';
-   g_total_ops       NUMBER    := 6;
+   g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
+   g_total_ops               NUMBER         := 6;
+--
+   g_key                     RAW(32767)     := UTL_RAW.cast_to_raw( 'I9ir9*$3FJ$d92jd"£23j)*£"kjWFSsd' );
+   g_pad_chr                 VARCHAR2(1)    := '~';
+--
+------------------------------------------------------------------------------
+--
+  PROCEDURE padstring (p_text  IN OUT  VARCHAR2) IS
+    l_units  NUMBER;
+  BEGIN
+    IF LENGTH(p_text) MOD 8 > 0 THEN
+      l_units := TRUNC(LENGTH(p_text)/8) + 1;
+      p_text  := RPAD(p_text, l_units * 8, g_pad_chr);
+    END IF;
+  END;
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION obfuscate_password ( pi_password IN VARCHAR2 )
+  RETURN VARCHAR2
+  IS
+    l_string      nm3type.max_varchar2 := pi_password;
+    retval        RAW(32767);
+  BEGIN
+  --
+    IF pi_password IS NOT NULL
+    THEN
+    --
+      padstring(l_string);
+    --
+      dbms_obfuscation_toolkit.DESEncrypt
+            (  input           => UTL_RAW.cast_to_raw(l_string)
+             , key             => g_key
+             , encrypted_data  => retval );
+    END IF;
+  -- 
+    RETURN retval;
+  --
+  END obfuscate_password;
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION get_password ( pi_password_raw IN RAW ) RETURN VARCHAR2
+  IS
+    l_decrypted  VARCHAR2(32767);
+  BEGIN
+    IF pi_password_raw IS NOT NULL
+    THEN
+      dbms_obfuscation_toolkit.desdecrypt(input => pi_password_raw,
+                                          key   => g_key,
+                                          decrypted_data => l_decrypted);
+      RETURN RTRIM(UTL_RAW.cast_to_varchar2(l_decrypted), g_pad_chr);
+    ELSE
+      RETURN NULL;
+    END IF;
+  END get_password;
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION get_password ( pi_password IN VARCHAR2 ) RETURN VARCHAR2
+  IS
+    l_decrypted  VARCHAR2(32767);
+  BEGIN
+    IF sys_context('NM3SQL','NM3FTPPASSWORD') = 'Y'
+    AND pi_password IS NOT NULL
+    THEN
+      dbms_obfuscation_toolkit.desdecrypt(input => pi_password,
+                                          key   => g_key,
+                                          decrypted_data => l_decrypted);
+      RETURN RTRIM(UTL_RAW.cast_to_varchar2(l_decrypted), g_pad_chr);
+    ELSE
+      RETURN NULL;
+    END IF;
+  END get_password;
+--
+-----------------------------------------------------------------------------
+--
+--  FUNCTION ret_value ( pi_string IN VARCHAR2 
+--                     , pi_code    IN VARCHAR2)
+--    RETURN VARCHAR2
+--  IS
+--  BEGIN
+--    RETURN ( CASE WHEN pi_code = '#Password#Return#String#' 
+--                   AND pi_string IS NOT NULL
+--                    THEN get_password ( pi_password => pi_string )
+--                  ELSE NULL 
+--             END);
+--  END ret_value;
 --
 -----------------------------------------------------------------------------
 --
@@ -42,7 +129,7 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-   PROCEDURE DEBUG (p_text IN VARCHAR2);
+   PROCEDURE debug (p_text IN VARCHAR2);
 --
 --------------------------------------------------------------------------------
 --
@@ -51,7 +138,7 @@ AS
       p_port      IN   VARCHAR2,
       p_user      IN   VARCHAR2,
       p_pass      IN   VARCHAR2,
-      p_timeout   IN   NUMBER := NULL
+      p_timeout   IN   NUMBER DEFAULT NULL
    )
       RETURN UTL_TCP.connection
    IS
@@ -106,7 +193,7 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-   PROCEDURE LOGOUT (
+   PROCEDURE logout (
       p_conn    IN OUT NOCOPY   UTL_TCP.connection,
       p_reply   IN              BOOLEAN := TRUE
    )
@@ -616,7 +703,7 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-   PROCEDURE HELP (p_conn IN OUT NOCOPY UTL_TCP.connection)
+   PROCEDURE help (p_conn IN OUT NOCOPY UTL_TCP.connection)
    AS
    BEGIN
       send_command (p_conn, 'HELP', TRUE);
@@ -624,7 +711,7 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-   PROCEDURE ASCII (p_conn IN OUT NOCOPY UTL_TCP.connection)
+   PROCEDURE ascii (p_conn IN OUT NOCOPY UTL_TCP.connection)
    AS
    BEGIN
       send_command (p_conn, 'TYPE A', TRUE);
@@ -633,7 +720,7 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-   PROCEDURE BINARY (p_conn IN OUT NOCOPY UTL_TCP.connection)
+   PROCEDURE binary (p_conn IN OUT NOCOPY UTL_TCP.connection)
    AS
    BEGIN
       send_command (p_conn, 'TYPE I', TRUE);
@@ -642,18 +729,24 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-   PROCEDURE LIST (
-      p_conn   IN OUT NOCOPY   UTL_TCP.connection,
-      p_dir    IN              VARCHAR2,
-      p_list   OUT             t_string_table
+   PROCEDURE list (
+      p_conn    IN OUT NOCOPY   UTL_TCP.connection,
+      p_dir     IN              VARCHAR2,
+      p_list    OUT             t_string_table,
+      p_command IN VARCHAR2 DEFAULT NULL 
    )
    AS
       l_conn         UTL_TCP.connection;
       l_list         t_string_table     := t_string_table ();
       l_reply_code   VARCHAR2 (3)       := NULL;
+      l_command      VARCHAR2(500)      := NVL(p_command||' ', 'LIST ');
    BEGIN
       l_conn := get_passive (p_conn);
-      send_command (p_conn, 'LIST ' || p_dir, TRUE);
+--      send_command (p_conn, 'NLST ' || p_dir, TRUE);
+      --send_command (p_conn, 'MLSD ' || p_dir, TRUE);
+      --send_command (p_conn, 'MLSD', TRUE);
+  
+      send_command (p_conn, l_command || p_dir, TRUE);
 
       BEGIN
          LOOP
@@ -690,7 +783,7 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-   PROCEDURE RENAME (
+   PROCEDURE rename (
       p_conn   IN OUT NOCOPY   UTL_TCP.connection,
       p_from   IN              VARCHAR2,
       p_to     IN              VARCHAR2
@@ -706,7 +799,7 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-   PROCEDURE DELETE (
+   PROCEDURE delete (
       p_conn   IN OUT NOCOPY   UTL_TCP.connection,
       p_file   IN              VARCHAR2
    )
@@ -750,7 +843,7 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-   PROCEDURE DEBUG (p_text IN VARCHAR2)
+   PROCEDURE debug (p_text IN VARCHAR2)
    IS
    BEGIN
       IF g_debug
@@ -761,5 +854,498 @@ AS
 --
 --------------------------------------------------------------------------------
 --
+  FUNCTION convert_to_results_tab ( pi_char_array IN dbms_output.chararr )
+  RETURN tab_results
+  IS
+    retval tab_results;
+    l_ind  PLS_INTEGER;
+  BEGIN
+  --nm_debug.debug_on;
+  --nm_debug.debug('pi_char_array has '||pi_char_array.COUNT||' lines');
+    IF pi_char_array.COUNT > 0
+    THEN
+      FOR i IN 1..pi_char_array.COUNT LOOP
+        IF pi_char_array(i) IS NOT NULL
+        THEN
+          l_ind := retval.COUNT+1;
+          retval(l_ind).l_result_line := pi_char_array(i);
+        END IF;
+      END LOOP;
+    END IF;
+    RETURN retval;
+  END convert_to_results_tab;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_hft ( pi_hft_id          IN hig_ftp_types.hft_id%TYPE 
+                   , pi_raise_not_found IN BOOLEAN DEFAULT TRUE )
+  RETURN hig_ftp_types%ROWTYPE
+  IS
+    retval hig_ftp_types%ROWTYPE;
+  BEGIN
+    SELECT * INTO retval
+      FROM hig_ftp_types
+     WHERE hft_id = pi_hft_id;
+    RETURN retval; 
+  EXCEPTION
+    WHEN NO_DATA_FOUND
+    THEN
+      IF pi_raise_not_found 
+      THEN 
+        raise_application_error(-20001,'Cannot find HIG_FTP_TYPES record for ['||pi_hft_id||']');
+      ELSE
+        RETURN retval;
+      END IF;
+  END get_hft;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_hft ( pi_hft_type        IN hig_ftp_types.hft_type%TYPE 
+                   , pi_raise_not_found IN BOOLEAN DEFAULT TRUE )
+  RETURN hig_ftp_types%ROWTYPE
+  IS
+    retval hig_ftp_types%ROWTYPE;
+  BEGIN
+    SELECT * INTO retval
+      FROM hig_ftp_types
+     WHERE hft_type = pi_hft_type;
+    RETURN retval; 
+  EXCEPTION
+    WHEN NO_DATA_FOUND
+    THEN
+      IF pi_raise_not_found 
+      THEN 
+        raise_application_error(-20001,'Cannot find HIG_FTP_TYPES record for ['||pi_hft_type||']');
+      ELSE
+        RETURN retval;
+      END IF;
+  END get_hft;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_hfc ( pi_hfc_id          IN hig_ftp_connections.hfc_id%TYPE 
+                   , pi_raise_not_found IN BOOLEAN DEFAULT TRUE )
+  RETURN hig_ftp_connections%ROWTYPE
+  IS
+    retval hig_ftp_connections%ROWTYPE;
+  BEGIN
+    SELECT * INTO retval
+      FROM hig_ftp_connections
+     WHERE hfc_id = pi_hfc_id;
+    RETURN retval; 
+  EXCEPTION
+    WHEN NO_DATA_FOUND
+    THEN
+      IF pi_raise_not_found 
+      THEN 
+        raise_application_error(-20001,'Cannot find HIG_FTP_CONNECTIONS record for ['||pi_hfc_id||']');
+      ELSE 
+        RETURN retval;
+      END IF;
+  END get_hfc;
+--
+--------------------------------------------------------------------------------
+--
+  PROCEDURE test_connection 
+                 ( pi_hfc_id    IN     hig_ftp_connections.hfc_id%TYPE
+                 , pio_results  IN OUT tab_results )
+  IS
+    l_conn         utl_tcp.connection;
+    l_char_array   dbms_output.chararr;
+    l_num_lines    INTEGER := 100;
+    l_rec_hfc      hig_ftp_connections%ROWTYPE;
+    l_password     nm3type.max_varchar2;
+    l_in_dir_list  t_string_table;
+    l_out_dir_list t_string_table;
+  BEGIN
+  --
+    SELECT * INTO l_rec_hfc
+      FROM hig_ftp_connections
+     WHERE hfc_id = pi_hfc_id;
+  --
+    dbms_output.enable;
+  --
+    IF l_rec_hfc.hfc_ftp_password IS NOT NULL
+    THEN
+      l_password := get_password(pi_password_raw => l_rec_hfc.hfc_ftp_password);
+    END IF;
+  --
+  -- Test connection
+  --
+    nm_debug.debug_on;
+    nm_debug.debug('Decrypted - '||l_password);
+    nm_debug.debug('Encryted - '||l_rec_hfc.hfc_ftp_password);
+    l_conn := nm3ftp.login(l_rec_hfc.hfc_ftp_host
+                           ,NVL(l_rec_hfc.hfc_ftp_port,21)
+                           ,l_rec_hfc.hfc_ftp_username
+                           ,l_password);
+  --
+  -- See if directories are accessable
+  --
+    IF l_rec_hfc.hfc_ftp_in_dir IS NOT NULL
+    THEN
+    --
+      --send_command(p_conn => l_conn, p_command => 'LIST '||l_rec_hfc.hfc_ftp_in_dir);
+      list ( p_conn   => l_conn,
+             p_dir    => l_rec_hfc.hfc_ftp_in_dir,
+             p_list   => l_in_dir_list );
+    --
+--      FOR in_files IN 1..l_in_dir_list.COUNT LOOP
+--      --
+--        pio_results (
+--      --
+--      END LOOP;
+    --
+    END IF;
+  --
+    IF l_rec_hfc.hfc_ftp_out_dir IS NOT NULL
+    THEN
+    --
+      list ( p_conn   => l_conn,
+             p_dir    => l_rec_hfc.hfc_ftp_out_dir,
+             p_list   => l_in_dir_list );
+    --
+    END IF;
+  --
+    utl_tcp.close_all_connections;
+  --
+    dbms_output.get_lines(l_char_array,l_num_lines);
+  --
+    pio_results := convert_to_results_tab (l_char_array);
+  --
+  EXCEPTION
+    WHEN OTHERS 
+      THEN
+    --
+      utl_tcp.close_all_connections;
+    --
+      dbms_output.get_lines(l_char_array,l_num_lines);
+    --
+      pio_results := convert_to_results_tab (l_char_array);
+    --
+      pio_results(pio_results.COUNT+1).l_result_line := SQLERRM;
+    --
+  END test_connection;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION test_connection 
+                 ( pi_hfc_id    IN     hig_ftp_connections.hfc_id%TYPE )
+  RETURN BOOLEAN
+  IS
+  --
+    l_conn         utl_tcp.connection;
+    l_char_array   dbms_output.chararr;
+    l_num_lines    INTEGER := 100;
+    l_rec_hfc      hig_ftp_connections%ROWTYPE;
+    l_password     nm3type.max_varchar2;
+    l_in_dir_list  t_string_table;
+    l_out_dir_list t_string_table;
+  --
+  BEGIN
+  --
+    SELECT * INTO l_rec_hfc
+      FROM hig_ftp_connections
+     WHERE hfc_id = pi_hfc_id;
+  --
+    IF l_rec_hfc.hfc_ftp_password IS NOT NULL
+    THEN
+      l_password := get_password(pi_password_raw => l_rec_hfc.hfc_ftp_password);
+    END IF;
+  --
+    l_conn := nm3ftp.login(l_rec_hfc.hfc_ftp_host
+                           ,NVL(l_rec_hfc.hfc_ftp_port,21)
+                           ,l_rec_hfc.hfc_ftp_username
+                           ,l_password);
+  --
+    utl_tcp.close_all_connections;
+  --
+    RETURN TRUE;
+  --
+  EXCEPTION
+    WHEN NO_DATA_FOUND
+    THEN
+      RAISE_APPLICATION_ERROR (-20101,'Invalid FTP connection ID ['||pi_hfc_id||']');
+  --
+    WHEN OTHERS
+    THEN
+    --
+      utl_tcp.close_all_connections;
+    --
+      RETURN FALSE;
+    --
+  END test_connection;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION list_all_files_coming_in
+              ( pi_hfc_id    IN     hig_ftp_connections.hfc_id%TYPE )
+    RETURN nm3type.tab_varchar32767
+  IS
+    retval         nm3type.tab_varchar32767;
+    l_rec_hfc      hig_ftp_connections%ROWTYPE;
+    l_password     hig_ftp_connections.hfc_ftp_password%TYPE;
+    l_conn         utl_tcp.connection;
+    l_in_dir_list  t_string_table;
+  BEGIN
+  --
+    l_rec_hfc := get_hfc ( pi_hfc_id => pi_hfc_id );
+  --
+    IF l_rec_hfc.hfc_ftp_password IS NOT NULL
+    THEN
+      l_password := get_password(pi_password_raw => l_rec_hfc.hfc_ftp_password);
+    END IF;
+  --
+    l_conn := nm3ftp.login(l_rec_hfc.hfc_ftp_host
+                          ,NVL(l_rec_hfc.hfc_ftp_port,21)
+                          ,l_rec_hfc.hfc_ftp_username
+                          ,l_password);
+  --
+    IF l_rec_hfc.hfc_ftp_in_dir IS NOT NULL
+    THEN
+    --
+      --send_command(p_conn => l_conn, p_command => 'LIST '||l_rec_hfc.hfc_ftp_in_dir);
+      list ( p_conn    => l_conn,
+             p_dir     => l_rec_hfc.hfc_ftp_in_dir,
+             p_list    => l_in_dir_list,
+             p_command => 'NLST' );
+    --
+      FOR in_files IN 1..l_in_dir_list.COUNT LOOP
+      --
+        retval(in_files) := l_in_dir_list(in_files); 
+      --
+      END LOOP;
+    --
+    END IF;
+  --
+    utl_tcp.close_all_connections;
+  --
+    RETURN retval;
+  --
+  END list_all_files_coming_in;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION list_all_files_coming_in
+              ( pi_hft_id    IN     hig_ftp_types.hft_id%TYPE)
+    RETURN nm3type.tab_varchar32767
+  IS
+    retval  nm3type.tab_varchar32767;
+    l_local nm3type.tab_varchar32767;
+  BEGIN
+  --
+    FOR i IN 
+      (SELECT hfc_id FROM hig_ftp_connections
+        WHERE hfc_hft_id = pi_hft_id)
+    LOOP
+    --
+      l_local := list_all_files_coming_in
+                    ( pi_hfc_id   => i.hfc_id );
+    --
+      FOR l IN 1..l_local.COUNT LOOP
+      --
+        retval(retval.COUNT+1) := l_local(l);
+      --
+      END LOOP;
+    --
+    END LOOP;
+  --
+    RETURN retval;
+  --
+  END list_all_files_coming_in;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION list_all_files_coming_in
+              ( pi_hft_type    IN     hig_ftp_types.hft_type%TYPE)
+    RETURN nm3type.tab_varchar32767
+  IS
+    l_rec_hft hig_ftp_types%ROWTYPE;
+    retval    nm3type.tab_varchar32767;
+  BEGIN
+  --
+    l_rec_hft :=  get_hft ( pi_hft_type        => pi_hft_type
+                          , pi_raise_not_found => FALSE );
+    IF l_rec_hft.hft_id IS NOT NULL
+    THEN
+    --
+      retval := list_all_files_coming_in
+                    ( pi_hft_id => l_rec_hft.hft_id);
+    --
+    END IF;
+  --
+    RETURN retval;
+  --
+  END list_all_files_coming_in;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION ftp_in_to_database
+              ( pi_ftp_type                IN hig_ftp_types.hft_type%TYPE
+              , pi_db_location_to_move_to  IN VARCHAR2
+              , pi_file_mask               IN VARCHAR2
+              , pi_binary                  IN BOOLEAN DEFAULT TRUE)
+    RETURN nm3type.tab_varchar32767 
+  IS
+  --
+    l_hft_rec      hig_ftp_types%ROWTYPE;
+    l_temp_tab     nm3type.tab_varchar32767;
+    l_files_tab    nm3type.tab_varchar32767;
+    l_retval       nm3type.tab_varchar32767;
+    l_include_file BOOLEAN; 
+    l_filename     nm3type.max_varchar2;
+    l_db_dir       VARCHAR2(50) := nm3file.get_oracle_directory(pi_path => pi_db_location_to_move_to);
+    l_password     nm3type.max_varchar2;
+    l_conn         utl_tcp.connection;
+  --
+  BEGIN
+  --
+  -------------------------
+  -- Get FTP Type details
+  -------------------------
+  --
+    l_hft_rec := nm3ftp.get_hft(pi_hft_type        => pi_ftp_type 
+                              , pi_raise_not_found => FALSE);
+
+  --
+  -----------------------------------------------------------------------------
+  -- Get all the connections for the ftp type and loop around each one looking 
+  -- for files to move and moving and archiving them if required
+  -----------------------------------------------------------------------------
+  --
+    IF l_hft_rec.hft_id IS NULL
+    THEN
+      -- Return with nothing
+      RETURN l_retval;
+    END IF;
+  --
+    FOR i IN (SELECT * FROM hig_ftp_connections 
+               WHERE hfc_hft_id = l_hft_rec.hft_id ) 
+    LOOP
+    --
+      l_temp_tab.DELETE;
+      l_files_tab.DELETE;
+    --
+      l_temp_tab := nm3ftp.list_all_files_coming_in
+                        ( pi_hfc_id => i.hfc_id );
+    --
+      FOR files In 1..l_temp_tab.COUNT 
+      LOOP
+        --
+          l_temp_tab(files) := 
+             SUBSTR(l_temp_tab(files)
+             , INSTR(l_temp_tab(files),'\',-1)+1
+             ,( LENGTH(l_temp_tab(files)) 
+               - INSTR(l_temp_tab(files),'\',-1))
+              );
+      END LOOP;
+    --
+    ---------------------------------------
+    -- Filter out any files we don't want
+    ---------------------------------------
+    --
+      IF pi_file_mask IS NOT NULL
+      THEN
+      --
+        FOR e IN 1..l_temp_tab.COUNT 
+        LOOP
+        --
+          IF UPPER(l_temp_tab(e)) LIKE UPPER ('%'||pi_file_mask||'%')
+          THEN
+             l_files_tab(l_files_tab.COUNT+1) := l_temp_tab(e);
+          END IF;
+        --
+        END LOOP;
+      --
+      ELSE
+      --
+        l_files_tab := l_temp_tab;
+      --
+      END IF;
+    --
+      FOR f IN 1..l_files_tab.COUNT 
+      LOOP
+      --
+      --
+      ------------------------------------------------------------------------
+      -- Move file from ftp in to database named in pi_db_location_to_move_to 
+      ------------------------------------------------------------------------
+      --
+        IF i.hfc_ftp_password IS NOT NULL
+        THEN
+          l_password := get_password( pi_password_raw => i.hfc_ftp_password );
+        END IF;
+      --
+        l_conn := nm3ftp.login(i.hfc_ftp_host
+                               ,NVL(i.hfc_ftp_port,21)
+                               ,i.hfc_ftp_username
+                               ,l_password);
+      --
+        IF pi_binary
+        THEN
+          binary (p_conn => l_conn);
+        ELSE
+          ascii  (p_conn => l_conn);
+        END IF;
+      --
+        BEGIN
+      --
+          get (
+                p_conn        => l_conn,
+                p_from_file   => i.hfc_ftp_in_dir||'/'||l_files_tab(f),
+                p_to_dir      => l_db_dir,
+                p_to_file     => l_files_tab(f)
+              );
+        --
+        ------------------------------------------------------------------------
+        -- Move file from ftp in to ftp archive in if 
+        -- the hig_ftp_connections record has an archived in 
+        ------------------------------------------------------------------------
+        --
+          BEGIN
+            IF i.hfc_ftp_arc_in_dir IS NOT NULL
+            THEN
+              rename
+                ( p_conn   => l_conn,
+                  p_from   => i.hfc_ftp_in_dir||'/'||l_files_tab(f),
+                  p_to     => i.hfc_ftp_arc_in_dir||'/'||l_files_tab(f));
+            END IF;
+          EXCEPTION
+            WHEN OTHERS 
+            THEN utl_tcp.close_all_connections; 
+          END;
+        --
+          utl_tcp.close_all_connections;
+        --
+        ----------------------------------------
+        -- Send the name of the moved file out
+        ----------------------------------------
+        --
+          l_retval(l_retval.COUNT+1) := l_files_tab(f);
+        --
+        EXCEPTION
+          WHEN OTHERS
+          THEN utl_tcp.close_all_connections;
+        --
+        END;
+      --
+      END LOOP;
+    --
+    END LOOP; 
+  --
+    RETURN(l_retval);
+  --
+  EXCEPTION
+  --
+    WHEN OTHERS 
+      THEN
+      utl_tcp.close_all_connections;
+      RAISE;
+  --
+  END ftp_in_to_database;
+--
+--------------------------------------------------------------------------------
+--
 END nm3ftp;
 /
+
