@@ -1642,11 +1642,11 @@ BEGIN
         po_lov_sql         := l_datum_sql;
         po_found_true_nth  := FALSE;
       ELSE
-        RAISE_APPLICATION_ERROR (-20001, 'No Themes availible for '||l_ne.ne_unique);
+        RAISE_APPLICATION_ERROR (-20001, 'No Themes are available for '||l_ne.ne_unique);
       END IF;
     --
     ELSE
-      RAISE_APPLICATION_ERROR (-20001, 'No Themes availible for '||l_ne.ne_unique);
+      RAISE_APPLICATION_ERROR (-20001, 'No Themes are available for '||l_ne.ne_unique);
     END IF;
 --
   ELSIF l_tab_vnnt.COUNT = 1
