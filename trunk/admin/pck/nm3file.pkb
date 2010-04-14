@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.8   Feb 23 2010 14:06:16   aedwards  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.9   Apr 14 2010 17:10:06   aedwards  $
 -- Module Name : $Workfile:   nm3file.pkb  $
--- Date into PVCS : $Date:   Feb 23 2010 14:06:16  $
--- Date fetched Out : $Modtime:   Feb 23 2010 14:05:34  $
--- PVCS Version : $Revision:   2.8  $
+-- Date into PVCS : $Date:   Apr 14 2010 17:10:06  $
+-- Date fetched Out : $Modtime:   Apr 14 2010 17:09:40  $
+-- PVCS Version : $Revision:   2.9  $
 -- Based on SCCS version : 
 --
 --
@@ -22,12 +22,12 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 --all global package variables here
 --
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.8  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.9  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3file';
 --
-   c_dirrepstrn CONSTANT VARCHAR2(1) := hig.get_sysopt(p_option_id => 'DIRREPSTRN');
+   c_dirrepstrn CONSTANT VARCHAR2(1) := NVL(hig.get_sysopt('DIRREPSTRN'),'\');
 --
    g_files file_list;
 -----------------------------------------------------------------------------
@@ -956,31 +956,38 @@ FUNCTION get_true_dir_name
   (pi_loc       IN varchar2
   ,pi_use_hig   in boolean
   ) RETURN varchar2  is
+
 l_directory_path all_directories.directory_path%type ;
-l_errmess varchar2(200);
+
 begin
   nm_debug.proc_start(g_package_name,'get_true_dir_name');
+
   if pi_use_hig
   then
-    l_errmess := ' in HIG_DIRECTORIES table' ;
+
     select hdir_path
       into l_directory_path
       from hig_directories
      where hdir_name = upper( pi_loc ) ;
+
   else
-    l_errmess := ' in ALL_DIRECTORIES table' ;
+
     select directory_path
       into l_directory_path
       from all_directories
      where directory_name = upper( pi_loc ) 
             ;
   end if ;
+
   nm_debug.proc_end(g_package_name,'get_true_dir_name');
   return l_directory_path ;
+
 exception
   when no_data_found then
-    nm_debug.debug( 'get_true_dir_name: Location name "' || pi_loc || '" not found' || l_errmess ) ;
-    raise_application_error(-20001,'get_true_dir_name: Location name "' || pi_loc || '" not found' || l_errmess );
+    hig.raise_ner(pi_appl                => 'HIG'
+                , pi_id                  => 536 -- DIRECTORY DOES NOT EXIST
+                , pi_supplementary_info  => pi_loc);
+    
 end get_true_dir_name;
 --
 -----------------------------------------------------------------------------
@@ -1319,17 +1326,24 @@ END parse_dir_and_or_filename;
 --
 -----------------------------------------------------------------------------
 -- 
-procedure check_directory_valid( pi_dir_name in varchar2 ) is
+procedure check_directory_valid( pi_dir_name        IN VARCHAR2 
+                                ,pi_check_delimiter IN BOOLEAN DEFAULT TRUE ) IS
+
   l_ora_dir varchar2(2000) := nvl(nm3file.get_true_dir_name(pi_loc => pi_dir_name, pi_use_hig => false),'<NULL>') ;
   l_hig_dir varchar2(2000) := nvl(nm3file.get_true_dir_name(pi_loc => pi_dir_name, pi_use_hig => true ),'<Null>') ;
+
 begin
+
   if l_ora_dir <> l_hig_dir then
     raise_application_error(-20000,pi_dir_name || ': Oracle and Highways directory definitions are not aligned properly, please contact your system administrator'
                             || chr(10) || 'Oracle = ' ||  l_ora_dir || chr(10) || 'Highways = ' || l_hig_dir );
   end if ;
-  if substr(l_ora_dir,-1) <> c_dirrepstrn then
+
+  if pi_check_delimiter and substr(l_ora_dir,-1) <> c_dirrepstrn then
     raise_application_error(-20000,'Directory names must end with a delimiter : "' || c_dirrepstrn || '", please contact your system administrator' ); 
   end if ;
+  
+
 end check_directory_valid ;
 --
 -----------------------------------------------------------------------------
@@ -1424,28 +1438,223 @@ END external_table_record_delim;
     t_chuck      RAW(4096);
     t_remain     NUMBER;
   BEGIN
+  --
+    nm_debug.proc_start (g_package_name,'write_blob');
+  --
   -- Get length of blob
-    t_TotalSize := DBMS_LOB.getlength (t_blob);
+    t_TotalSize := dbms_lob.getlength (t_blob);
+  --
     t_remain := t_TotalSize;
+  --
   -- The directory p_file_loc should exist before executing 
-    t_output := UTL_FILE.fopen (p_file_loc, t_file_name, 'wb', 32760);
+    t_output := utl_file.fopen 
+                  ( location     => p_file_loc
+                  , filename     => t_file_name
+                  , open_mode    => 'wb'
+                  , max_linesize => 32760);
+  --
   -- Retrieving BLOB
-    WHILE t_position < t_TotalSize 
-     LOOP
-      DBMS_LOB.READ (t_blob, t_chucklen, t_position, t_chuck);
-      UTL_FILE.put_raw (t_output, t_chuck);
-      UTL_FILE.fflush (t_output);
+    WHILE t_position < t_totalsize 
+    LOOP
+    --
+      dbms_lob.read 
+        ( lob_loc => t_blob
+        , amount  => t_chucklen
+        , offset  => t_position
+        , buffer  => t_chuck
+        );
+    --
+      utl_file.put_raw 
+        ( file   => t_output
+        , buffer => t_chuck
+        );
+    --
+      utl_file.fflush 
+        (file    => t_output );
+    --
       t_position := t_position + t_chucklen;
-      t_remain := t_remain - t_chucklen;
+      t_remain   := t_remain - t_chucklen;
+    --
       IF t_remain < 4096
       THEN
-      t_chucklen := t_remain;
+        t_chucklen := t_remain;
       END IF;
+    --
     END LOOP;
-    utl_file.fclose(t_output);
+  --
+    utl_file.fclose( file => t_output );
+  --
+    nm_debug.proc_end (g_package_name,'write_blob');
+  --
   END write_blob;
+--
+--------------------------------------------------------------------------------
+--
+  PROCEDURE copy_file
+     ( pi_source_dir       IN VARCHAR2
+     , pi_source_file      IN VARCHAR2
+     , pi_destination_dir  IN VARCHAR2
+     , pi_destination_file IN VARCHAR2 DEFAULT NULL
+     , pi_overwrite        IN BOOLEAN DEFAULT TRUE
+     , pi_leave_original   IN BOOLEAN DEFAULT TRUE)
+  IS
+  BEGIN
+  --
+    nm_debug.proc_start (g_package_name,'copy_file');
+  --
+--    dbms_file_transfer.copy_file(
+--        source_directory_object       => get_oracle_directory(pi_source_dir)
+--      , source_file_name              => pi_source_file
+--      , destination_directory_object  => get_oracle_directory(pi_destination_dir)
+--      , destination_file_name         => NVL(pi_destination_file,pi_source_file)
+--      );
+  --
+    IF pi_leave_original
+    THEN
+      utl_file.fcopy
+        ( src_location  => get_oracle_directory(pi_source_dir)
+        , src_filename  => pi_source_file
+        , dest_location => get_oracle_directory(pi_destination_dir)
+        , dest_filename => NVL(pi_destination_file,pi_source_file));
+--        , start_line    => NULL
+--        , end_line      => NULL);
+    ELSE
+      utl_file.frename 
+        ( src_location  => get_oracle_directory(pi_source_dir)
+        , src_filename  => pi_source_file
+        , dest_location => get_oracle_directory(pi_destination_dir)
+        , dest_filename => NVL(pi_destination_file,pi_source_file)
+        , overwrite     => pi_overwrite);
+    END IF;
+  --
+    nm_debug.proc_end (g_package_name,'copy_file');
+  --
+  END copy_file;
+--
+--------------------------------------------------------------------------------
+--
+  PROCEDURE file_to_blob
+      ( pi_source_dir      IN VARCHAR2
+      , pi_source_file     IN VARCHAR2
+      , po_blob           OUT BLOB  )
+  IS
+    v_blob    BLOB ;--:= EMPTY_BLOB();
+    l_bfile   BFILE;
+    amt       NUMBER;
+    location  VARCHAR2(30)    := get_oracle_directory(pi_source_dir);
+    filename  VARCHAR2(2000)  := pi_source_file;
+  BEGIN
+  --
+    nm_debug.proc_start (g_package_name,'file_to_blob');
+  --
+    l_bfile := BFILENAME 
+                 ( location 
+                 , filename );
+  --
+    dbms_lob.createtemporary
+       ( lob_loc => v_blob
+       , cache   => FALSE);
+  --
+    amt := dbms_lob.getlength 
+             ( l_bfile );
+  --
+    dbms_lob.fileopen
+       ( l_bfile
+       , dbms_lob.file_readonly);
+  --
+    dbms_lob.loadfromfile
+       ( v_blob
+       , l_bfile 
+       , amt);
+  --
+    dbms_lob.fileclose
+       ( l_bfile );
+  --
+    po_blob := v_blob;
+  --
+    nm_debug.proc_end (g_package_name,'file_to_blob');
+  --
+  END file_to_blob;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION file_to_blob
+      ( pi_source_dir      IN VARCHAR2
+      , pi_source_file     IN VARCHAR2)
+  RETURN BLOB
+  IS
+    retval BLOB;
+  BEGIN
+  --
+    nm_debug.proc_start (g_package_name,'file_to_blob');
+  --
+    file_to_blob( get_oracle_directory(pi_source_dir)
+                , pi_source_file
+                , retval);
+  --
+    nm_debug.proc_end (g_package_name,'file_to_blob');
+  --
+    RETURN retval;
+  --
+  END file_to_blob;
+--
+--------------------------------------------------------------------------------
+--
+  PROCEDURE blob_to_file
+      ( pi_blob             IN OUT NOCOPY BLOB
+      , pi_destination_dir  IN VARCHAR2
+      , pi_destination_file IN VARCHAR2 )
+  IS
+  BEGIN
+  --
+    nm_debug.proc_start (g_package_name,'blob_to_file');
+  --
+    write_blob
+    ( p_blob       => pi_blob
+    , p_file_loc   => get_oracle_directory(pi_destination_dir)
+    , p_file_name  => pi_destination_file
+    ) ;
+  --
+    nm_debug.proc_end (g_package_name,'blob_to_file');
+  --
+  END blob_to_file;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_oracle_directory ( pi_path IN VARCHAR2 ) 
+    RETURN all_directories.directory_name%TYPE
+  IS
+    l_directory           all_directories.directory_name%TYPE;
+  BEGIN
+  --
+    nm_debug.proc_start (g_package_name,'get_oracle_directory');
+  --
+    SELECT directory_name INTO l_directory
+      FROM all_directories
+     WHERE directory_path
+                      = CASE
+                         WHEN INSTR(pi_path,c_dirrepstrn) > 0
+                           THEN pi_path
+                         ELSE directory_path
+                       END
+       AND directory_name
+                     = CASE
+                         WHEN INSTR(pi_path,c_dirrepstrn) = 0
+                           THEN pi_path
+                         ELSE directory_name
+                       END;
+  --
+    nm_debug.proc_end (g_package_name,'get_oracle_directory');
+  --
+    RETURN l_directory;
+  --
+  EXCEPTION
+    WHEN NO_DATA_FOUND
+    THEN hig.raise_ner(nm3type.c_net, 28, NULL, 'Oracle directory ['||pi_path||'] cannot  be found');
+  END get_oracle_directory;
 --
 --------------------------------------------------------------------------------
 --
 END nm3file;
 /
+

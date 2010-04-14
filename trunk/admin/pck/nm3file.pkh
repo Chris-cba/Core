@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3file authid current_user AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkh-arc   2.4   Feb 23 2010 14:06:16   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkh-arc   2.5   Apr 14 2010 17:10:06   aedwards  $
 --       Module Name      : $Workfile:   nm3file.pkh  $
---       Date into PVCS   : $Date:   Feb 23 2010 14:06:16  $
---       Date fetched Out : $Modtime:   Feb 23 2010 14:05:30  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Apr 14 2010 17:10:06  $
+--       Date fetched Out : $Modtime:   Apr 14 2010 17:09:28  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.14
 -------------------------------------------------------------------------
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE nm3file authid current_user AS
 --<GLOBVAR>
 --
 --  g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
 --
   c_read_mode        CONSTANT  VARCHAR2(1)    := 'R';
   c_append_mode      CONSTANT  VARCHAR2(1)    := 'A';
@@ -447,7 +447,8 @@ FUNCTION parse_dir_and_or_filename(pi_name           IN VARCHAR2
 --<PROC NAME="check_directory_valid">
 -- do the hig directory and the oracle directory line up?
 -- raise_application_error if not
-procedure check_directory_valid( pi_dir_name in varchar2 ) ;
+procedure check_directory_valid( pi_dir_name        IN VARCHAR2 
+                                ,pi_check_delimiter IN BOOLEAN DEFAULT TRUE ) ;
 --</PROC>
 --
 -----------------------------------------------------------------------------
@@ -488,6 +489,72 @@ PROCEDURE write_blob
 --
 ----------------------------------------------------------------------------- 
 --
+--<PROC NAME = "COPY_FILE">
+-- Copy a file from one Oracle directory to another
+--
+--   pi_source_dir          Source Oracle Directory or server path
+--   pi_source_file         Source filename
+--   pi_destination_dir     Destination Oracle Directory or server path
+--   pi_destination_file    Desctination filename (leave NULL uses pi_source_file)
+--
+PROCEDURE copy_file
+     ( pi_source_dir       IN VARCHAR2
+     , pi_source_file      IN VARCHAR2
+     , pi_destination_dir  IN VARCHAR2
+     , pi_destination_file IN VARCHAR2 DEFAULT NULL 
+     , pi_overwrite        IN BOOLEAN DEFAULT TRUE
+     , pi_leave_original   IN BOOLEAN DEFAULT TRUE);
+--</PROC>
+--
+----------------------------------------------------------------------------- 
+--
+--<PROC NAME = "FILE_TO_BLOB">
+-- Read a binary file into a BLOB
+--
+--   pi_source_dir            Source Oracle Directory or server path
+--   pi_source_file           Source filename
+--   po_blob                  BLOB out
+--
+PROCEDURE file_to_blob
+      ( pi_source_dir      IN VARCHAR2
+      , pi_source_file     IN VARCHAR2
+      , po_blob           OUT BLOB  );
+--
+--   pi_source_dir            Source Oracle Directory or server path
+--   pi_source_file           Source filename
+--
+FUNCTION file_to_blob
+      ( pi_source_dir      IN VARCHAR2
+      , pi_source_file     IN VARCHAR2)
+  RETURN BLOB;
+--</PROC>
+--
+----------------------------------------------------------------------------- 
+--
+--<PROC NAME = "BLOB_TO_FILE">
+-- Write a BLOB out to a file
+--
+--   pi_blob                   BLOB in
+--   pi_destination_dir        Destination Oracle Directory or server path
+--   pi_destination_file       Destination filename
+--
+PROCEDURE blob_to_file
+      ( pi_blob             IN OUT NOCOPY BLOB
+      , pi_destination_dir  IN VARCHAR2
+      , pi_destination_file IN VARCHAR2 );
+--</PROC>
+--
+----------------------------------------------------------------------------- 
+--
+--<PROC NAME = "GET_ORACLE_DIRECTORY">
+--
+--
+FUNCTION get_oracle_directory ( pi_path IN VARCHAR2 ) 
+  RETURN all_directories.directory_name%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------- 
+--
 --<PRAGMA>
   PRAGMA RESTRICT_REFERENCES(get_version, rnds, wnps, wnds);
   PRAGMA RESTRICT_REFERENCES(get_body_version, rnds, wnps, wnds);
@@ -503,3 +570,4 @@ PROCEDURE write_blob
 --
 END nm3file;
 /
+
