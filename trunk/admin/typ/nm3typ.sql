@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.6   Sep 18 2009 10:51:54   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.7   Apr 14 2010 10:53:54   lsorathia  $
 --       Module Name      : $Workfile:   nm3typ.sql  $
---       Date into PVCS   : $Date:   Sep 18 2009 10:51:54  $
---       Date fetched Out : $Modtime:   Sep 18 2009 10:51:30  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Apr 14 2010 10:53:54  $
+--       Date fetched Out : $Modtime:   Apr 14 2010 10:52:14  $
+--       Version          : $Revision:   2.7  $
 --
 --   Product upgrade script
 --
@@ -1995,6 +1995,45 @@ set define on
 set feedback off
 select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
         '&terminator'||'nm_ne_id_array.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt hig_navigator_type header
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'hig_navigator_type.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt hig_navigator_tab header
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'hig_navigator_tab.tyh' run_file
+from dual
+/
+start '&&run_file'
+--
+--------------------------------------------------------------------------------------------
+--
+set term on
+prompt nav_id header
+set term off
+set define on
+set feedback off
+select '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'typ'||
+        '&terminator'||'nav_id.tyh' run_file
 from dual
 /
 start '&&run_file'
