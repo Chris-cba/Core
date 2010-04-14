@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.2   Apr 06 2010 15:23:30   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.3   Apr 14 2010 15:26:44   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Apr 06 2010 15:23:30  $
---       Date fetched Out : $Modtime:   Apr 01 2010 14:35:42  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Apr 14 2010 15:26:44  $
+--       Date fetched Out : $Modtime:   Apr 14 2010 15:25:58  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -275,11 +275,8 @@ BEGIN
        
  commit;
  
---
--- this procedure should always be the last procedure called in the execution of a process
--- to make doubly sure raise an application error to stop further processing
---
- raise_application_error(-20099,'Processing stopped');
+
+-- raise_application_error(-20099,'Processing stopped');
  
 END process_execution_end;
 --
@@ -577,7 +574,8 @@ PROCEDURE create_and_schedule_process    (pi_process_type_id           IN hig_pr
 --                                        , pi_job_owner                 IN hig_processes.hp_job_owner%TYPE DEFAULT USER
                                         , pi_start_date                IN date
                                         , pi_frequency_id              IN hig_processes.hp_frequency_id%TYPE
-                                         ,pi_check_file_cardinality    IN BOOLEAN DEFAULT FALSE
+                                        , pi_check_file_cardinality    IN BOOLEAN DEFAULT FALSE
+                                        , pi_max_failures              IN NUMBER DEFAULT Null
                                         , po_process_id                OUT hig_processes.hp_process_id%TYPE
                                         , po_job_name                  OUT hig_processes.hp_job_name%TYPE
                                         , po_scheduled_start_date      OUT date) IS
@@ -668,8 +666,17 @@ BEGIN
                         , pi_enabled         => FALSE
                         , pi_auto_drop       => FALSE);
 
+
+
  nm3jobs.amend_job_restartable(pi_job_name => l_full_job_name
                               ,pi_value    => l_process_type_rec.hpt_restartable = 'Y');
+
+
+ IF pi_max_failures IS NOT NULL THEN
+   nm3jobs.amend_job_max_failures(pi_job_name => l_full_job_name
+                                 ,pi_value    => pi_max_failures);
+ END IF;                                 
+
 
  enable_process(pi_process_id => po_process_id);                                    
                         

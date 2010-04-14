@@ -5,11 +5,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkh-arc   3.0   Mar 29 2010 17:09:30   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkh-arc   3.1   Apr 14 2010 15:26:44   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_api.pkh  $
---       Date into PVCS   : $Date:   Mar 29 2010 17:09:30  $
---       Date fetched Out : $Modtime:   Mar 29 2010 17:08:56  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Apr 14 2010 15:26:44  $
+--       Date fetched Out : $Modtime:   Apr 14 2010 15:26:12  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -19,7 +19,7 @@ AS
 --constants
 -----------
 --g_sccsid is the SCCS ID for the package
-g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
   
   
 
@@ -176,6 +176,7 @@ PROCEDURE create_and_schedule_process    (pi_process_type_id           IN hig_pr
                                         , pi_start_date                IN date
                                         , pi_frequency_id              IN hig_processes.hp_frequency_id%TYPE
                                         , pi_check_file_cardinality    IN BOOLEAN DEFAULT FALSE
+                                        , pi_max_failures              IN NUMBER DEFAULT Null                                      
                                         , po_process_id                OUT hig_processes.hp_process_id%TYPE
                                         , po_job_name                  OUT hig_processes.hp_job_name%TYPE
                                         , po_scheduled_start_date      OUT date);
