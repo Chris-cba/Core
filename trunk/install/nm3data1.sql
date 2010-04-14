@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.35   Apr 14 2010 14:43:06   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.36   Apr 14 2010 17:59:30   malexander  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Apr 14 2010 14:43:06  $
---       Date fetched Out : $Modtime:   Apr 14 2010 14:35:50  $
---       Version          : $Revision:   2.35  $
+--       Date into PVCS   : $Date:   Apr 14 2010 17:59:30  $
+--       Date fetched Out : $Modtime:   Apr 14 2010 17:58:40  $
+--       Version          : $Revision:   2.36  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 14-APR-2010 14:35
+--       Generation Date  : 14-APR-2010 17:58
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -45340,6 +45340,19 @@ SET TERM ON
 PROMPT hig_process_type_frequencies
 SET TERM OFF
 
+INSERT INTO HIG_PROCESS_TYPE_FREQUENCIES
+       (HPFR_PROCESS_TYPE_ID
+       ,HPFR_FREQUENCY_ID
+       ,HPFR_SEQ
+       )
+SELECT 
+        -1
+       ,-4
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_TYPE_FREQUENCIES
+                   WHERE HPFR_PROCESS_TYPE_ID = -1
+                    AND  HPFR_FREQUENCY_ID = -4);
+--
 --
 --
 ----------------------------------------------------------------------------------------
