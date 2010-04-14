@@ -2,18 +2,18 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data6.sql-arc   2.4   Aug 21 2009 10:07:20   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data6.sql-arc   2.5   Apr 14 2010 14:43:08   malexander  $
 --       Module Name      : $Workfile:   nm3data6.sql  $
---       Date into PVCS   : $Date:   Aug 21 2009 10:07:20  $
---       Date fetched Out : $Modtime:   Aug 21 2009 10:06:28  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Apr 14 2010 14:43:08  $
+--       Date fetched Out : $Modtime:   Apr 14 2010 14:36:02  $
+--       Version          : $Revision:   2.5  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 19-AUG-2009 10:57
+--       Generation Date  : 14-APR-2010 14:36
 --
 --   Product metadata script
---   As at Release 4.1.0.0
+--   As at Release 4.2.1.0
 --
---   Copyright (c) exor corporation ltd, 2009
+--   Copyright (c) exor corporation ltd, 2010
 --
 --   TABLES PROCESSED
 --   ================
@@ -2437,6 +2437,16 @@ SET TERM ON
 PROMPT nm_inv_categories
 SET TERM OFF
 
+INSERT INTO NM_INV_CATEGORIES
+       (NIC_CATEGORY
+       ,NIC_DESCR
+       )
+SELECT 
+        'A'
+       ,'Alert and Audit Metamodels' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_CATEGORIES
+                   WHERE NIC_CATEGORY = 'A');
+--
 INSERT INTO NM_INV_CATEGORIES
        (NIC_CATEGORY
        ,NIC_DESCR
@@ -6182,6 +6192,7 @@ SELECT
 --
 --
 ----------------------------------------------------------------------------------------
+
 --
 COMMIT;
 --
