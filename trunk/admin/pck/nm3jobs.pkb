@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.3   Apr 09 2010 16:11:22   gjohnson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.4   Apr 14 2010 15:27:20   gjohnson  $
 --       Module Name      : $Workfile:   nm3jobs.pkb  $
---       Date into PVCS   : $Date:   Apr 09 2010 16:11:22  $
---       Date fetched Out : $Modtime:   Apr 09 2010 16:10:20  $
---       PVCS Version     : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Apr 14 2010 15:27:20  $
+--       Date fetched Out : $Modtime:   Apr 14 2010 15:15:44  $
+--       PVCS Version     : $Revision:   3.4  $
 --
 --   NM3 DBMS_SCHEDULER wrapper
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.3  $"';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.4  $"';
   g_package_name         CONSTANT VARCHAR2(30)   := 'nm3jobs';
   ex_resource_busy                EXCEPTION;
   g_default_comment               VARCHAR2(500)  := 'Created by nm3job ';
@@ -307,6 +307,19 @@ BEGIN
                                  ,value     => pi_value);
                                  
 END amend_job_restartable;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE amend_job_max_failures (pi_job_name    IN VARCHAR2 
+                                 ,pi_value       IN NUMBER) IS
+                     
+BEGIN
+
+ DBMS_SCHEDULER.SET_ATTRIBUTE(name      => pi_job_name
+                                 ,attribute => 'max_failures'
+                                 ,value     => pi_value);
+                                 
+END amend_job_max_failures;
 --
 -----------------------------------------------------------------------------
 --

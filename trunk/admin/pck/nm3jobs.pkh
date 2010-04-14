@@ -5,11 +5,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkh-arc   3.3   Apr 09 2010 09:25:26   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkh-arc   3.4   Apr 14 2010 15:27:20   gjohnson  $
 --       Module Name      : $Workfile:   nm3jobs.pkh  $
---       Date into PVCS   : $Date:   Apr 09 2010 09:25:26  $
---       Date fetched Out : $Modtime:   Apr 08 2010 15:02:16  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Apr 14 2010 15:27:20  $
+--       Date fetched Out : $Modtime:   Apr 14 2010 15:15:46  $
+--       Version          : $Revision:   3.4  $
 --       Based on SCCS version : 1.21
 -------------------------------------------------------------------------
 --   Author : A Edwards
@@ -25,7 +25,7 @@ AS
 --<GLOBVAR>
 -- g_sccsid is the SCCS_ID
 -- Constants
-  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.3  $"';
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.4  $"';
 --
 -- Some invervals
 --
@@ -175,6 +175,13 @@ PROCEDURE amend_job_action (pi_job_name IN VARCHAR2
 -- Change the restartable attribute of a job
 PROCEDURE amend_job_restartable (pi_job_name    IN VARCHAR2 
                                 ,pi_value       IN BOOLEAN);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="amend_job_max_failures">
+-- Change the max_failures attribute of a job
+PROCEDURE amend_job_max_failures (pi_job_name    IN VARCHAR2 
+                                 ,pi_value       IN NUMBER);
 --</PROC>
 --
 -----------------------------------------------------------------------------
