@@ -24,3 +24,4 @@ BEGIN
                               );
     END IF;
 END huo_huol_length_trg;
+/
