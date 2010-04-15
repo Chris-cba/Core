@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.0   Apr 14 2010 10:42:32   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.1   Apr 15 2010 10:38:26   lsorathia  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   Apr 14 2010 10:42:32  $
---       Date fetched Out : $Modtime:   Apr 14 2010 10:42:08  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Apr 15 2010 10:38:26  $
+--       Date fetched Out : $Modtime:   Apr 15 2010 10:00:58  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,10 +17,11 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.0  $';
-  g_app_owner CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
-  c_date_format CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
-  g_trigger_text Long;
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.1  $';
+  g_app_owner     CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
+  c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
+  g_trigger_text  Varchar2(32767);
+  g_trigger_text1 Varchar2(32767) ;
   g_mail_conn        utl_smtp.connection;
 
   g_package_name CONSTANT varchar2(30) := 'hig_alert';
@@ -882,10 +883,20 @@ BEGIN
 --
    IF pi_new_line = 'Y'
    THEN
-       g_trigger_text := g_trigger_text||CHR(10)||pi_text;
+       IF Length(g_trigger_text) >= 32500
+       THEN
+           g_trigger_text1 := g_trigger_text1||CHR(10)||pi_text;
+       ELSE
+           g_trigger_text := g_trigger_text||CHR(10)||pi_text;
+       END IF;
    ELSE
-       g_trigger_text := g_trigger_text||' '||pi_text;
-   END IF ;   
+       IF Length(g_trigger_text) >= 32500
+       THEN
+           g_trigger_text1 := g_trigger_text1||CHR(10)||pi_text;
+       ELSE   
+           g_trigger_text := g_trigger_text||' '||pi_text;
+       END IF ;   
+   END IF ;
 --
 END append;
 --
@@ -1118,10 +1129,11 @@ IS
    l_old_new        Varchar2(10) ;
    l_nit_rec        nm_inv_types%ROWTYPE;
    l_when_condition Boolean ;
-   l_halt_rec        hig_alert_types%ROWTYPE;
+   l_halt_rec       hig_alert_types%ROWTYPE;
 --
 BEGIN
 --
+--nm_debug.debug_on;
    g_trigger_text  := Null ;
    IF pi_halt_id IS NOT NULL
    THEN        
@@ -1215,7 +1227,7 @@ BEGIN
                     END IF ;
                     append (hatc.hatc_post_bracket,'N'); 
                 END IF ; 
-        END LOOP;             
+        END LOOP;  
         IF l_when_condition
         THEN
             append(')'); 
@@ -1245,15 +1257,14 @@ BEGIN
         append ('   l_email_body Long; ');
         append ('BEGIN');
         append ('--');
-        append ('   l_hal_rec.hal_halt_id := '||l_halt_rec.halt_id||';');        
+        append ('   l_hal_rec.hal_halt_id := '||l_halt_rec.halt_id||';'); 
         trg_body(l_halt_rec.halt_operation,l_halt_rec.halt_id,l_nit_rec.nit_foreign_pk_column) ;
         append ('END;');
         g_trigger_text := Substr(g_trigger_text,2);
---nm_debug.debug_on;
 --nm_debug.debug(l_trigger_name);
 --nm_debug.debug(g_trigger_text);
 --nm_debug.debug(Length(g_trigger_text));
-       Execute Immediate g_trigger_text ;
+       Execute Immediate g_trigger_text||g_trigger_text1 ;
        Commit;
        g_trigger_text :=  Null ;
    END IF ; 

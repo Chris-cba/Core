@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_audit.pkb-arc   3.0   Apr 14 2010 10:42:32   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_audit.pkb-arc   3.1   Apr 15 2010 10:38:26   lsorathia  $
 --       Module Name      : $Workfile:   hig_audit.pkb  $
---       Date into PVCS   : $Date:   Apr 14 2010 10:42:32  $
---       Date fetched Out : $Modtime:   Apr 14 2010 10:42:08  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Apr 15 2010 10:38:26  $
+--       Date fetched Out : $Modtime:   Apr 15 2010 10:04:32  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,12 +17,13 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.0  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.1  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_audit';
-  g_app_owner CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
-  c_date_format CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
-  g_trigger_text Long;
+  g_app_owner    CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
+  c_date_format  CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
+  g_trigger_text  Varchar2(32767);
+  g_trigger_text1 Varchar2(32767);
 --
 -----------------------------------------------------------------------------
 --
@@ -47,10 +48,20 @@ BEGIN
 --
    IF pi_new_line = 'Y'
    THEN
-       g_trigger_text := g_trigger_text||CHR(10)||pi_text;
+       IF Length(g_trigger_text) >= 32500
+       THEN
+           g_trigger_text1 := g_trigger_text1||CHR(10)||pi_text;
+       ELSE
+           g_trigger_text := g_trigger_text||CHR(10)||pi_text;
+       END IF;
    ELSE
-       g_trigger_text := g_trigger_text||' '||pi_text;
-   END IF ;   
+       IF Length(g_trigger_text) >= 32500
+       THEN
+           g_trigger_text1 := g_trigger_text1||CHR(10)||pi_text;
+       ELSE   
+           g_trigger_text := g_trigger_text||' '||pi_text;
+       END IF ;   
+   END IF ;
 --
 END append;
 --
@@ -134,6 +145,7 @@ IS
 --
 BEGIN
 --
+--nm_debug.debug_on;
    g_trigger_text :=  Null ;
    IF pi_haut_id IS NOT NULL
    THEN        
@@ -228,7 +240,7 @@ BEGIN
                     END IF ;
                     append (hac.hac_post_bracket,'N'); 
                 END IF ;
-            END LOOP;             
+            END LOOP;          
             IF l_when_condition
             THEN
                 append(')'); 
@@ -286,12 +298,11 @@ BEGIN
             END IF ;
             append ('END;');
         END LOOP;                
---nm_debug.debug_on;
---nm_debug.debug(l_trigger_name);
---nm_debug.debug(g_trigger_text);
---nm_debug.debug(Length(g_trigger_text));
        g_trigger_text := Substr(g_trigger_text,2);
-       Execute Immediate g_trigger_text ;
+nm_debug.debug(l_trigger_name);
+nm_debug.debug(g_trigger_text||g_trigger_text1);
+nm_debug.debug(Length(g_trigger_text));
+       Execute Immediate g_trigger_text||g_trigger_text1 ;
        Commit;
        g_trigger_text :=  Null ;
    END IF ; 
