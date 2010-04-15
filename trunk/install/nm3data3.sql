@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.14   Apr 14 2010 14:43:08   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.15   Apr 15 2010 11:24:12   malexander  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Apr 14 2010 14:43:08  $
---       Date fetched Out : $Modtime:   Apr 14 2010 14:35:56  $
---       Version          : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Apr 15 2010 11:24:12  $
+--       Date fetched Out : $Modtime:   Apr 15 2010 11:18:48  $
+--       Version          : $Revision:   2.15  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 14-APR-2010 14:35
+--       Generation Date  : 15-APR-2010 11:18
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -20,6 +20,10 @@
 --   HIG_ROLES
 --   HIG_MODULE_ROLES
 --   HIG_MODULE_KEYWORDS
+--   HIG_PROCESS_TYPES
+--   HIG_PROCESS_TYPE_ROLES
+--   HIG_SCHEDULING_FREQUENCIES
+--   HIG_PROCESS_TYPE_FREQUENCIES
 --
 -----------------------------------------------------------------------------
 
@@ -4579,6 +4583,294 @@ SELECT
                    WHERE HMK_HMO_MODULE = 'NM9999'
                     AND  HMK_KEYWORD = 'EXTENDED LOV'
                     AND  HMK_OWNER = 1);
+--
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_PROCESS_TYPES
+--
+-- select * from nm3_metadata.hig_process_types
+-- order by hpt_process_type_id
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT hig_process_types
+SET TERM OFF
+
+INSERT INTO HIG_PROCESS_TYPES
+       (HPT_PROCESS_TYPE_ID
+       ,HPT_NAME
+       ,HPT_DESCR
+       ,HPT_WHAT_TO_CALL
+       ,HPT_INITIATION_MODULE
+       ,HPT_INTERNAL_MODULE
+       ,HPT_INTERNAL_MODULE_PARAM
+       ,HPT_PROCESS_LIMIT
+       ,HPT_RESTARTABLE
+       ,HPT_SEE_IN_HIG2510
+       )
+SELECT 
+        -1
+       ,'Alert Manager'
+       ,'This Process will sent out pending Alerts every 10 minutes'
+       ,'hig_alert.run_alert_batch;'
+       ,''
+       ,''
+       ,''
+       ,null
+       ,'Y'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_TYPES
+                   WHERE HPT_PROCESS_TYPE_ID = -1);
+--
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_PROCESS_TYPE_ROLES
+--
+-- select * from nm3_metadata.hig_process_type_roles
+-- order by hptr_process_type_id
+--         ,hptr_role
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT hig_process_type_roles
+SET TERM OFF
+
+INSERT INTO HIG_PROCESS_TYPE_ROLES
+       (HPTR_PROCESS_TYPE_ID
+       ,HPTR_ROLE
+       )
+SELECT 
+        -1
+       ,'HIG_USER' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_TYPE_ROLES
+                   WHERE HPTR_PROCESS_TYPE_ID = -1
+                    AND  HPTR_ROLE = 'HIG_USER');
+--
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_SCHEDULING_FREQUENCIES
+--
+-- select * from nm3_metadata.hig_scheduling_frequencies
+-- order by hsfr_frequency_id
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT hig_scheduling_frequencies
+SET TERM OFF
+
+INSERT INTO HIG_SCHEDULING_FREQUENCIES
+       (HSFR_FREQUENCY_ID
+       ,HSFR_MEANING
+       ,HSFR_FREQUENCY
+       ,HSFR_INTERVAL_IN_MINS
+       )
+SELECT 
+        -12
+       ,'Daily'
+       ,'freq=daily;'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
+                   WHERE HSFR_FREQUENCY_ID = -12);
+--
+INSERT INTO HIG_SCHEDULING_FREQUENCIES
+       (HSFR_FREQUENCY_ID
+       ,HSFR_MEANING
+       ,HSFR_FREQUENCY
+       ,HSFR_INTERVAL_IN_MINS
+       )
+SELECT 
+        -11
+       ,'Daily at Midnight'
+       ,'freq=daily; byhour=0; byminute=0; bysecond=0;'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
+                   WHERE HSFR_FREQUENCY_ID = -11);
+--
+INSERT INTO HIG_SCHEDULING_FREQUENCIES
+       (HSFR_FREQUENCY_ID
+       ,HSFR_MEANING
+       ,HSFR_FREQUENCY
+       ,HSFR_INTERVAL_IN_MINS
+       )
+SELECT 
+        -10
+       ,'Hourly'
+       ,'freq=hourly;'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
+                   WHERE HSFR_FREQUENCY_ID = -10);
+--
+INSERT INTO HIG_SCHEDULING_FREQUENCIES
+       (HSFR_FREQUENCY_ID
+       ,HSFR_MEANING
+       ,HSFR_FREQUENCY
+       ,HSFR_INTERVAL_IN_MINS
+       )
+SELECT 
+        -9
+       ,'Hourly (on the hour)'
+       ,'freq=hourly; byminute=0; bysecond=0;'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
+                   WHERE HSFR_FREQUENCY_ID = -9);
+--
+INSERT INTO HIG_SCHEDULING_FREQUENCIES
+       (HSFR_FREQUENCY_ID
+       ,HSFR_MEANING
+       ,HSFR_FREQUENCY
+       ,HSFR_INTERVAL_IN_MINS
+       )
+SELECT 
+        -8
+       ,'45 Minutes'
+       ,'freq=minutely; interval=45;'
+       ,45 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
+                   WHERE HSFR_FREQUENCY_ID = -8);
+--
+INSERT INTO HIG_SCHEDULING_FREQUENCIES
+       (HSFR_FREQUENCY_ID
+       ,HSFR_MEANING
+       ,HSFR_FREQUENCY
+       ,HSFR_INTERVAL_IN_MINS
+       )
+SELECT 
+        -7
+       ,'30 Minutes'
+       ,'freq=minutely; interval=30;'
+       ,30 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
+                   WHERE HSFR_FREQUENCY_ID = -7);
+--
+INSERT INTO HIG_SCHEDULING_FREQUENCIES
+       (HSFR_FREQUENCY_ID
+       ,HSFR_MEANING
+       ,HSFR_FREQUENCY
+       ,HSFR_INTERVAL_IN_MINS
+       )
+SELECT 
+        -6
+       ,'20 Minutes'
+       ,'freq=minutely; interval=20;'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
+                   WHERE HSFR_FREQUENCY_ID = -6);
+--
+INSERT INTO HIG_SCHEDULING_FREQUENCIES
+       (HSFR_FREQUENCY_ID
+       ,HSFR_MEANING
+       ,HSFR_FREQUENCY
+       ,HSFR_INTERVAL_IN_MINS
+       )
+SELECT 
+        -5
+       ,'15 Minutes'
+       ,'freq=minutely; interval=15;'
+       ,15 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
+                   WHERE HSFR_FREQUENCY_ID = -5);
+--
+INSERT INTO HIG_SCHEDULING_FREQUENCIES
+       (HSFR_FREQUENCY_ID
+       ,HSFR_MEANING
+       ,HSFR_FREQUENCY
+       ,HSFR_INTERVAL_IN_MINS
+       )
+SELECT 
+        -4
+       ,'10 Minutes'
+       ,'freq=minutely; interval=10;'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
+                   WHERE HSFR_FREQUENCY_ID = -4);
+--
+INSERT INTO HIG_SCHEDULING_FREQUENCIES
+       (HSFR_FREQUENCY_ID
+       ,HSFR_MEANING
+       ,HSFR_FREQUENCY
+       ,HSFR_INTERVAL_IN_MINS
+       )
+SELECT 
+        -3
+       ,'5 Minutes'
+       ,'freq=minutely; interval=5;'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
+                   WHERE HSFR_FREQUENCY_ID = -3);
+--
+INSERT INTO HIG_SCHEDULING_FREQUENCIES
+       (HSFR_FREQUENCY_ID
+       ,HSFR_MEANING
+       ,HSFR_FREQUENCY
+       ,HSFR_INTERVAL_IN_MINS
+       )
+SELECT 
+        -2
+       ,'Minute'
+       ,'freq=minutely; interval=1;'
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
+                   WHERE HSFR_FREQUENCY_ID = -2);
+--
+INSERT INTO HIG_SCHEDULING_FREQUENCIES
+       (HSFR_FREQUENCY_ID
+       ,HSFR_MEANING
+       ,HSFR_FREQUENCY
+       ,HSFR_INTERVAL_IN_MINS
+       )
+SELECT 
+        -1
+       ,'Once'
+       ,''
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
+                   WHERE HSFR_FREQUENCY_ID = -1);
+--
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_PROCESS_TYPE_FREQUENCIES
+--
+-- select * from nm3_metadata.hig_process_type_frequencies
+-- order by hpfr_process_type_id
+--         ,hpfr_frequency_id
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT hig_process_type_frequencies
+SET TERM OFF
+
+INSERT INTO HIG_PROCESS_TYPE_FREQUENCIES
+       (HPFR_PROCESS_TYPE_ID
+       ,HPFR_FREQUENCY_ID
+       ,HPFR_SEQ
+       )
+SELECT 
+        -1
+       ,-4
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_TYPE_FREQUENCIES
+                   WHERE HPFR_PROCESS_TYPE_ID = -1
+                    AND  HPFR_FREQUENCY_ID = -4);
 --
 --
 --
