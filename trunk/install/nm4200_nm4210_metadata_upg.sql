@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.0   Apr 14 2010 14:32:36   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.1   Apr 15 2010 15:05:32   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Apr 14 2010 14:32:36  $
---       Date fetched Out : $Modtime:   Apr 14 2010 14:27:00  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Apr 15 2010 15:05:32  $
+--       Date fetched Out : $Modtime:   Apr 15 2010 15:01:02  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -445,41 +445,6 @@ BEGIN
 --
 END;
 /
-
-
-------------------------------------------------------------------
-
-
-------------------------------------------------------------------
-SET TERM ON
-PROMPT All new Process Types
-SET TERM OFF
-
-------------------------------------------------------------------
--- 
--- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
--- Process Types across the Core product.
--- 
-------------------------------------------------------------------
-PROMPT Creating Alert Manager Process Type
-Insert into HIG_PROCESS_TYPES
-SELECT -1, 'Alert Manager', 'This Process will sent out pending Alerts every 10 minutes', 'hig_alert.run_alert_batch;', NULL,Null ,Null , NULL, 'Y', 'Y'
-FROM Dual 
-WHERE NOT Exists (Select 1 From HIG_PROCESS_TYPES WHERE HPT_PROCESS_TYPE_ID = -1) ;
-
-
-PROMPT Creating Alert Manager Process Type Roles
-Insert into HIG_PROCESS_TYPE_ROLES
-SELECT -1, 'HIG_USER'
-FROm dual 
-WHERE not exists (SELECT 1 from HIG_PROCESS_TYPE_ROLES WHERE HPTR_PROCESS_TYPE_ID = -1);
-
-PROMPT Creating Alert Manager Process Type Frequency
-Insert into HIG_PROCESS_TYPE_FREQUENCIES
-Select -1,-4,1 FRom dual
-Where not exists (Select 1 from HIG_PROCESS_TYPE_FREQUENCIES WHERE HPFR_PROCESS_TYPE_ID = -1);
-
-
 
 
 ------------------------------------------------------------------
@@ -1547,6 +1512,41 @@ Where Not Exists (Select 1 from hig_standard_favourites Where hstf_parent = 'HIG
 Insert into hig_standard_favourites 
 Select 'NET_INVENTORY','NAVIGATOR','EXOR Navigator','M',41 from dual
 Where Not Exists (Select 1 from hig_standard_favourites Where hstf_parent = 'NET_INVENTORY' And hstf_child = 'NAVIGATOR');
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT All new Process Types
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Process Types across the Core product.
+-- 
+------------------------------------------------------------------
+PROMPT Creating Alert Manager Process Type
+Insert into HIG_PROCESS_TYPES
+SELECT -1, 'Alert Manager', 'This Process will sent out pending Alerts every 10 minutes', 'hig_alert.run_alert_batch;', NULL,Null ,Null , NULL, 'Y', 'Y'
+FROM Dual 
+WHERE NOT Exists (Select 1 From HIG_PROCESS_TYPES WHERE HPT_PROCESS_TYPE_ID = -1) ;
+
+
+PROMPT Creating Alert Manager Process Type Roles
+Insert into HIG_PROCESS_TYPE_ROLES
+SELECT -1, 'HIG_USER'
+FROm dual 
+WHERE not exists (SELECT 1 from HIG_PROCESS_TYPE_ROLES WHERE HPTR_PROCESS_TYPE_ID = -1);
+
+PROMPT Creating Alert Manager Process Type Frequency
+Insert into HIG_PROCESS_TYPE_FREQUENCIES
+Select -1,-4,1 FRom dual
+Where not exists (Select 1 from HIG_PROCESS_TYPE_FREQUENCIES WHERE HPFR_PROCESS_TYPE_ID = -1);
+
+
+
 
 ------------------------------------------------------------------
 
