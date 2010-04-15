@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.11   Jan 13 2010 11:40:38   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.12   Apr 15 2010 11:59:32   malexander  $
 --       Module Name      : $Workfile:   nm3debug.pkb  $
---       Date into PVCS   : $Date:   Jan 13 2010 11:40:38  $
---       Date fetched Out : $Modtime:   Jan 12 2010 13:04:30  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Apr 15 2010 11:59:32  $
+--       Date fetched Out : $Modtime:   Apr 15 2010 11:46:50  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.11  $"
+--   nm3get_gen body   : "$Revision:   2.12  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.12  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3debug';
@@ -1340,6 +1340,7 @@ BEGIN
    nm_debug.debug('hol_datatype    : '||pi_rec_hol.hol_datatype,p_level);
    nm_debug.debug('hol_mixed_case  : '||pi_rec_hol.hol_mixed_case,p_level);
    nm_debug.debug('hol_user_option : '||pi_rec_hol.hol_user_option,p_level);
+   nm_debug.debug('hol_max_length  : '||pi_rec_hol.hol_max_length,p_level);
 --
    nm_debug.proc_end(g_package_name,'debug_hol');
 --
@@ -1360,6 +1361,7 @@ BEGIN
    nm_debug.debug('hop_domain     : '||pi_rec_hop.hop_domain,p_level);
    nm_debug.debug('hop_datatype   : '||pi_rec_hop.hop_datatype,p_level);
    nm_debug.debug('hop_mixed_case : '||pi_rec_hop.hop_mixed_case,p_level);
+   nm_debug.debug('hop_max_length : '||pi_rec_hop.hop_max_length,p_level);
 --
    nm_debug.proc_end(g_package_name,'debug_hop');
 --
@@ -2316,6 +2318,7 @@ BEGIN
    nm_debug.debug('neh_new_ne_length  : '||pi_rec_neh.neh_new_ne_length,p_level);
    nm_debug.debug('neh_param_1        : '||pi_rec_neh.neh_param_1,p_level);
    nm_debug.debug('neh_param_2        : '||pi_rec_neh.neh_param_2,p_level);
+   nm_debug.debug('neh_descr          : '||pi_rec_neh.neh_descr,p_level);
 --
    nm_debug.proc_end(g_package_name,'debug_neh');
 --
