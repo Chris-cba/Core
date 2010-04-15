@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.12   Jan 13 2010 11:40:38   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.13   Apr 15 2010 11:59:34   malexander  $
 --       Module Name      : $Workfile:   nm3ins.pkb  $
---       Date into PVCS   : $Date:   Jan 13 2010 11:40:38  $
---       Date fetched Out : $Modtime:   Jan 12 2010 13:04:30  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Apr 15 2010 11:59:34  $
+--       Date fetched Out : $Modtime:   Apr 15 2010 11:46:50  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.12  $"
+--   nm3get_gen body   : "$Revision:   2.13  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.12  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.13  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
@@ -2874,6 +2874,7 @@ BEGIN
    p_rec_hol.hol_datatype                   := NVL(p_rec_hol.hol_datatype,'VARCHAR2' );
    p_rec_hol.hol_mixed_case                 := NVL(p_rec_hol.hol_mixed_case,'N' );
    p_rec_hol.hol_user_option                := NVL(p_rec_hol.hol_user_option,'N' );
+   p_rec_hol.hol_max_length                 := NVL(p_rec_hol.hol_max_length,2000 );
 --
    INSERT INTO hig_option_list
             (hol_id
@@ -2884,6 +2885,7 @@ BEGIN
             ,hol_datatype
             ,hol_mixed_case
             ,hol_user_option
+            ,hol_max_length
             )
      VALUES (p_rec_hol.hol_id
             ,p_rec_hol.hol_product
@@ -2893,6 +2895,7 @@ BEGIN
             ,p_rec_hol.hol_datatype
             ,p_rec_hol.hol_mixed_case
             ,p_rec_hol.hol_user_option
+            ,p_rec_hol.hol_max_length
             )
    RETURNING hol_id
             ,hol_product
@@ -2902,6 +2905,7 @@ BEGIN
             ,hol_datatype
             ,hol_mixed_case
             ,hol_user_option
+            ,hol_max_length
       INTO   p_rec_hol.hol_id
             ,p_rec_hol.hol_product
             ,p_rec_hol.hol_name
@@ -2909,7 +2913,8 @@ BEGIN
             ,p_rec_hol.hol_domain
             ,p_rec_hol.hol_datatype
             ,p_rec_hol.hol_mixed_case
-            ,p_rec_hol.hol_user_option;
+            ,p_rec_hol.hol_user_option
+            ,p_rec_hol.hol_max_length;
 --
    nm_debug.proc_end(g_package_name,'ins_hol');
 --
@@ -2932,6 +2937,7 @@ BEGIN
             ,hop_domain
             ,hop_datatype
             ,hop_mixed_case
+            ,hop_max_length
             )
      VALUES (p_rec_hop.hop_id
             ,p_rec_hop.hop_product
@@ -2941,6 +2947,7 @@ BEGIN
             ,p_rec_hop.hop_domain
             ,p_rec_hop.hop_datatype
             ,p_rec_hop.hop_mixed_case
+            ,p_rec_hop.hop_max_length
             )
    RETURNING hop_id
             ,hop_product
@@ -2950,6 +2957,7 @@ BEGIN
             ,hop_domain
             ,hop_datatype
             ,hop_mixed_case
+            ,hop_max_length
       INTO   p_rec_hop.hop_id
             ,p_rec_hop.hop_product
             ,p_rec_hop.hop_name
@@ -2957,7 +2965,8 @@ BEGIN
             ,p_rec_hop.hop_remarks
             ,p_rec_hop.hop_domain
             ,p_rec_hop.hop_datatype
-            ,p_rec_hop.hop_mixed_case;
+            ,p_rec_hop.hop_mixed_case
+            ,p_rec_hop.hop_max_length;
 --
    nm_debug.proc_end(g_package_name,'ins_hop');
 --
@@ -5588,6 +5597,7 @@ BEGIN
             ,neh_new_ne_length
             ,neh_param_1
             ,neh_param_2
+            ,neh_descr
             )
      VALUES (p_rec_neh.neh_id
             ,p_rec_neh.neh_ne_id_old
@@ -5600,6 +5610,7 @@ BEGIN
             ,p_rec_neh.neh_new_ne_length
             ,p_rec_neh.neh_param_1
             ,p_rec_neh.neh_param_2
+            ,p_rec_neh.neh_descr
             )
    RETURNING neh_id
             ,neh_ne_id_old
@@ -5612,6 +5623,7 @@ BEGIN
             ,neh_new_ne_length
             ,neh_param_1
             ,neh_param_2
+            ,neh_descr
       INTO   p_rec_neh.neh_id
             ,p_rec_neh.neh_ne_id_old
             ,p_rec_neh.neh_ne_id_new
@@ -5622,7 +5634,8 @@ BEGIN
             ,p_rec_neh.neh_old_ne_length
             ,p_rec_neh.neh_new_ne_length
             ,p_rec_neh.neh_param_1
-            ,p_rec_neh.neh_param_2;
+            ,p_rec_neh.neh_param_2
+            ,p_rec_neh.neh_descr;
 --
    nm_debug.proc_end(g_package_name,'ins_neh');
 --
