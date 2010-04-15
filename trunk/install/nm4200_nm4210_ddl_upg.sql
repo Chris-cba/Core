@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.0   Apr 14 2010 14:32:36   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.1   Apr 15 2010 09:26:20   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Apr 14 2010 14:32:36  $
---       Date fetched Out : $Modtime:   Apr 14 2010 11:22:20  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Apr 15 2010 09:26:20  $
+--       Date fetched Out : $Modtime:   Apr 15 2010 09:24:40  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -1932,7 +1932,7 @@ CREATE OR REPLACE type hig_navigator_type IS OBJECT
 ,label     varchar2(3000)
 ,icon      varchar2(100)
 ,tab_level Number(9)
-)
+);
 /
 
 Prompt Creating Type hig_navigator_tab.....
