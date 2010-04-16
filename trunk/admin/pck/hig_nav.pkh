@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkh-arc   3.0   Apr 14 2010 10:42:32   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkh-arc   3.1   Apr 16 2010 11:47:36   lsorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkh  $
---       Date into PVCS   : $Date:   Apr 14 2010 10:42:32  $
---       Date fetched Out : $Modtime:   Apr 14 2010 10:42:08  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Apr 16 2010 11:47:36  $
+--       Date fetched Out : $Modtime:   Apr 16 2010 11:37:50  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
 
   TYPE         l_tab_tab IS TABLE OF hig_navigator_type INDEX BY BINARY_INTEGER ;
   l_tab        hig_navigator_tab  := hig_navigator_tab(hig_navigator_type(Null,Null,Null,Null,Null,Null));       
@@ -462,6 +462,15 @@ Return Varchar2;
 --<PROC NAME="get_doc_status_code">
 -- This procedure removes the passed value from PL/SQL table
 PROCEDURE remove_return_id(pi_value IN Varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This function returns the wor_flag for passed wor/wol
+FUNCTION get_wor_flag(pi_label IN Varchar2
+                     ,pi_value IN Varchar2)
+Return Varchar2;
 --</PROC>
 --
 -----------------------------------------------------------------------------
