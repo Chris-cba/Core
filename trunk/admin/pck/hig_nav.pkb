@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.0   Apr 14 2010 10:42:32   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.1   Apr 16 2010 11:22:14   lsorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   Apr 14 2010 10:42:32  $
---       Date fetched Out : $Modtime:   Apr 14 2010 10:42:08  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Apr 16 2010 11:22:14  $
+--       Date fetched Out : $Modtime:   Apr 16 2010 11:18:46  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.0  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.1  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
@@ -1173,7 +1173,7 @@ FUNCTION get_budget_descr(pi_bud_sys_flag              Varchar2
 Return Varchar2
 IS
 --
-   l_value item_code_breakdowns.icb_work_category_name%TYPE;
+   l_value Varchar2(2000);
 --
 BEGIN
 -- 
