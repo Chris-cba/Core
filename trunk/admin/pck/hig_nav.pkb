@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.1   Apr 16 2010 11:22:14   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.2   Apr 16 2010 11:47:34   lsorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2010 11:22:14  $
---       Date fetched Out : $Modtime:   Apr 16 2010 11:18:46  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 16 2010 11:47:34  $
+--       Date fetched Out : $Modtime:   Apr 16 2010 11:45:30  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.1  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.2  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
@@ -1735,5 +1735,32 @@ EXCEPTION
 --
 END tma_notice_details;
 --
+FUNCTION get_wor_flag(pi_label IN Varchar2
+                     ,pi_value IN Varchar2)
+Return Varchar2
+--
+IS
+   l_value Varchar2(10);
+BEGIN
+--
+   IF pi_label = 'WORK ORDER'
+   THEN
+       Execute Immediate ' SELECT wor_flag '||
+	                   ' FROM   work_orders '||
+	                   ' WHERE  wor_works_order_no = :1' INTO l_value Using pi_value ;
+   ELSE
+       Execute Immediate ' SELECT wor_flag	'||
+	                   ' FROM   work_orders   '||
+	                   ' WHERE  wor_works_order_no = (SELECT wol_works_order_no FROM work_order_lines WHERE wol_id = :1)' INTO l_value Using pi_value;
+   END IF ;
+   Return l_value ;
+--
+EXCEPTION When Others
+THEN
+    Return Null;
+--
+END get_wor_flag;
+--
 END hig_nav;
 /
+
