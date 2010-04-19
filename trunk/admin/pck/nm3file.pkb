@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.9   Apr 14 2010 17:10:06   aedwards  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.10   Apr 19 2010 09:32:34   aedwards  $
 -- Module Name : $Workfile:   nm3file.pkb  $
--- Date into PVCS : $Date:   Apr 14 2010 17:10:06  $
--- Date fetched Out : $Modtime:   Apr 14 2010 17:09:40  $
--- PVCS Version : $Revision:   2.9  $
+-- Date into PVCS : $Date:   Apr 19 2010 09:32:34  $
+-- Date fetched Out : $Modtime:   Apr 19 2010 09:31:50  $
+-- PVCS Version : $Revision:   2.10  $
 -- Based on SCCS version : 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 --all global package variables here
 --
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.9  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.10  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3file';
@@ -1498,9 +1498,12 @@ END external_table_record_delim;
      , pi_overwrite        IN BOOLEAN DEFAULT TRUE
      , pi_leave_original   IN BOOLEAN DEFAULT TRUE)
   IS
+    l_file   BLOB;
   BEGIN
   --
     nm_debug.proc_start (g_package_name,'copy_file');
+  --
+    
   --
 --    dbms_file_transfer.copy_file(
 --        source_directory_object       => get_oracle_directory(pi_source_dir)
@@ -1508,23 +1511,51 @@ END external_table_record_delim;
 --      , destination_directory_object  => get_oracle_directory(pi_destination_dir)
 --      , destination_file_name         => NVL(pi_destination_file,pi_source_file)
 --      );
+--  --
+--    IF pi_leave_original
+--    THEN
+--      utl_file.fcopy
+--        ( src_location  => get_oracle_directory(pi_source_dir)
+--        , src_filename  => pi_source_file
+--        , dest_location => get_oracle_directory(pi_destination_dir)
+--        , dest_filename => NVL(pi_destination_file,pi_source_file));
+----        , start_line    => NULL
+----        , end_line      => NULL);
+--    ELSE
+--      utl_file.frename 
+--        ( src_location  => get_oracle_directory(pi_source_dir)
+--        , src_filename  => pi_source_file
+--        , dest_location => get_oracle_directory(pi_destination_dir)
+--        , dest_filename => NVL(pi_destination_file,pi_source_file)
+--        , overwrite     => pi_overwrite);
+--    END IF;
   --
-    IF pi_leave_original
+  -- DBMS_FILE_TRANSFER has proved to be unreliable, and UTL_FILE.FCOPY/FRENAME seems
+  -- to only work with ascii files.
+  --
+  -- Read it in as a blob and write it out again.
+  --
+    IF NOT pi_overwrite
+    AND nm3file.file_exists( location => pi_destination_dir
+                                     , filename => NVL(pi_destination_file, pi_source_file)) = 'Y'
     THEN
-      utl_file.fcopy
-        ( src_location  => get_oracle_directory(pi_source_dir)
-        , src_filename  => pi_source_file
-        , dest_location => get_oracle_directory(pi_destination_dir)
-        , dest_filename => NVL(pi_destination_file,pi_source_file));
---        , start_line    => NULL
---        , end_line      => NULL);
-    ELSE
-      utl_file.frename 
-        ( src_location  => get_oracle_directory(pi_source_dir)
-        , src_filename  => pi_source_file
-        , dest_location => get_oracle_directory(pi_destination_dir)
-        , dest_filename => NVL(pi_destination_file,pi_source_file)
-        , overwrite     => pi_overwrite);
+      RAISE_APPLICATION_ERROR (-20101,'File "'||NVL(pi_destination_file, pi_source_file)||'" in "'||pi_destination_dir||'" already exists');
+    END IF;
+  --
+    l_file := file_to_blob
+                (  pi_source_dir  => get_oracle_directory(pi_source_dir)
+                 , pi_source_file => pi_source_file );
+  --
+    blob_to_file 
+      ( pi_blob             => l_file
+      , pi_destination_dir  => pi_destination_dir
+      , pi_destination_file => pi_destination_file );
+  --
+    IF NOT pi_leave_original
+    THEN
+    --
+      nm3file.delete_file(pi_dir => pi_source_dir, pi_file => pi_source_file); 
+    --
     END IF;
   --
     nm_debug.proc_end (g_package_name,'copy_file');
