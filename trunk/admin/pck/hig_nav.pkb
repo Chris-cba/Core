@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.2   Apr 16 2010 11:47:34   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.3   Apr 20 2010 09:12:18   lsorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   Apr 16 2010 11:47:34  $
---       Date fetched Out : $Modtime:   Apr 16 2010 11:45:30  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Apr 20 2010 09:12:18  $
+--       Date fetched Out : $Modtime:   Apr 20 2010 09:09:48  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.2  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.3  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
@@ -273,7 +273,7 @@ IS
 --
 BEGIN
 --
-   RETURN hig_nav.id_tab;
+   RETURN  hig_nav.id_tab;
 --
 END get_id_tab;
 --
@@ -491,77 +491,6 @@ BEGIN
    RETURN pi_tab;
 END get_tab ;
 --
-PROCEDURE get_top_level(pi_id Varchar2,pi_tab_alias Varchar2) 
-IS
---
-   l_sql      Varchar2(32767) ;
-   l_hnv_child_id Varchar2(1000);
-   l_tab_join Varchar2(1000);
-   l_col_join Varchar2(1000);
-   l_add_con Varchar2(4000) ;
-   l_cnt      Number:= 0 ;
-   l_colname  Varchar2(100);
-   l_type     hig_navigator_type := hig_navigator_type(null,null,null,null,null,null);
-   l_where    Varchar2(32767);
-   TYPE l_ref is REF CURSOR;
-   l_r  l_ref;
-BEGIN
---
---nm_debug.debug_on;
---nm_debug.debug('get_top_level '||pi_tab_alias);
---
-   nm3ctx.set_context('NAV_VAR3',pi_id);
-   FOR i IN (SELECT hnv_parent_column,hnv_child_column,hnv_child_table,hnv_hierarchy_level,hnv_hierarchy_label,hnv_child_id,hnv_hierarchy_seq,hnv_ADDITIONAL_COND
-             FROM         
-                 (SELECT hnv_parent_column,hnv_child_column,hnv_child_table,hnv_hierarchy_level ,hnv_hierarchy_label,hnv_child_id,hnv_parent_table,hnv_child_alias,hnv_parent_alias,hnv_hierarchy_seq,hnv_ADDITIONAL_COND
-                  FROM   hig_navigator b
-                  WHERE  hnv_hierarchy_type = l_hir_type
-                  )
-             CONNECT BY hnv_child_alias = Prior hnv_parent_alias
-             START WITH hnv_child_alias = pi_tab_alias
-             ORDER BY hnv_hierarchy_level asc,hnv_hierarchy_seq)
-   LOOP
-       l_cnt := l_cnt + 1;
-       --dbms_output.put_line(i.hnv_child_table      );
-       IF l_cnt = 1
-       THEN
-           l_tab_join := i.hnv_child_table      ;
-           l_colname  := i.hnv_child_column;
-       ELSE      
-           l_tab_join := l_tab_join||chr(10)||','||i.hnv_child_table      ;
-       END IF ;    
-       IF i.hnv_parent_column is not null
-       THEN
-           IF l_col_join IS NULL 
-           THEN
-               l_col_join := 'WHERE '||i.hnv_parent_column ||' = '||i.hnv_child_column;
-           ELSE
-               l_col_join := l_col_join||chr(10)||'AND '||i.hnv_parent_column ||' = '||i.hnv_child_column;
-           END IF ;        
-       END IF ;        
-       l_hnv_child_id  := i.hnv_child_id ; 
-       IF i.hnv_additional_cond IS NOT NULL
-       THEN
-           l_add_con := l_add_con||' AND '|| i.hnv_additional_cond;
-       END IF ;
-   END LOOP;
-    
-   IF l_col_join IS NULL
-   THEN
-       l_where := 'WHERE '||l_hnv_child_id||'= sys_context(''NM3SQL'',''NAV_VAR3'') '||l_add_con;
-   ELSE
-       l_where := l_col_join||chr(10)||'AND '||l_hnv_child_id||'= sys_context(''NM3SQL'',''NAV_VAR3'') '||l_add_con;  
-   END IF;
-   l_sql :=  'SELECT dISTINCT '||l_colname||' FROM '|| l_tab_join||chr(10)||l_where ;
---nm_debug.debug('get_top '||l_sql);
-   OPEN l_r for l_sql;
-   LOOP
-       l_top_id.extend ;
-       FETCH l_r into l_top_id(l_top_id.Count) ;
-       EXIT WHEN l_r%NOTFOUND;
-   END LOOP;
-END get_top_level;
---
 PROCEDURE pop_up_child(pi_id IN VARCHAR2
                       ,pi_alias Varchar2)
 IS
@@ -608,73 +537,8 @@ BEGIN
              START WITH hnv_child_alias = pi_alias
              ORDER BY hnv_hierarchy_level asc,hnv_hierarchy_seq)
    LOOP
-       cnt := 0 ;
-       out_cnt := out_cnt + 1;
-       l_sql := null;
-       l_tab_join := null;
-       l_col_join := null;
-       FOR i IN (SELECT hnv_parent_column,hnv_child_column,hnv_child_table,hnv_hierarchy_level,hnv_hierarchy_label,hnv_child_id,hnv_hierarchy_seq
-                 FROM         
-                     (SELECT hnv_parent_column,hnv_child_column,hnv_child_table,hnv_hierarchy_level,hnv_hierarchy_label,hnv_child_id,hnv_parent_table,hnv_child_alias,hnv_parent_alias,hnv_hierarchy_seq
-                      FROM   hig_navigator b
-                      WHERE  hnv_hierarchy_type = l_hir_type
-                     )
-                 CONNECT BY PRIOR hnv_child_alias = hnv_parent_alias
-                 START WITH hnv_child_alias = pi_alias                 
-                 ORDER BY hnv_hierarchy_level asc,hnv_hierarchy_seq)
-       LOOP
-           cnt := cnt + 1;
-           IF cnt = 1
-           THEN
-               l_tab_join := i.hnv_child_table      ;
-           ELSE      
-               l_tab_join := l_tab_join||chr(10)||','||i.hnv_child_table      ;
-           END IF ; 
-           IF cnt > 1   
-           THEN
-               IF i.hnv_parent_column is not null
-               THEN
-                   IF l_col_join is null 
-                   THEN
-                       l_col_join := 'WHERE '||i.hnv_parent_column ||' = '||i.hnv_child_column;
-                   ELSE
-                       l_col_join := l_col_join||chr(10)||'AND '||i.hnv_parent_column ||' = '||i.hnv_child_column;
-                   END IF ;        
-               END IF ;        
-           END IF ; 
-       END LOOP;
-       IF out_cnt = 1
-       THEN
-           par_id := '-1' ;
-       ELSE
-           par_id := j.hnv_parent_id ;
-       END IF ;
-       IF j.hnv_additional_cond IS NOT NULL
-       THEN
-           IF Upper(l_tab_join) Like '%DOC_ASSOCS%'
-           THEN
-               l_add_con := 'AND '|| j.hnv_additional_cond; 
-               --j.hnv_additional_cond := Replace(Upper(j.hnv_additional_cond),'DAS_TABLE_NAME','NULL') ;
-           END IF ;           
-       END IF ;
-       IF Nvl(l_col_join,'$')  != '$'
-       THEN 
-           l_and_where := ' AND ';
-       ELSE  
-           l_and_where := ' WHERE ';
-       END IF ;  
-       l_label := Chr(10)||Nvl(j.hnv_hier_label_1,'Null')||'||'||Nvl(j.hnv_hier_label_2,'Null')||'||'||Nvl(j.hnv_hier_label_3,'Null')||'||'||
-                  Nvl(j.hnv_hier_label_4,'Null')||'||'||Nvl(j.hnv_hier_label_5,'Null')||'||'||Nvl(j.hnv_hier_label_6,'Null')||'||'||
-                  Nvl(j.hnv_hier_label_7,'Null')||'||'||Nvl(j.hnv_hier_label_8,'Null')||'||'||Nvl(j.hnv_hier_label_9,'Null')||'||'||Nvl(j.hnv_hier_label_10,'Null');
-
-           l_select := 'SELECT ' ;
-           l_sql := l_select||' distinct '||j.hnv_child_id||','''||j.hnv_hierarchy_label||' -  ''||                                                                                 '||
-                 --Nvl(j.hnv_hier_label_1,'Chr(32)')||'||'' ,  ''||'||Nvl(j.hnv_hier_label_2,'Chr(32)')||'||'' , ''||'||Nvl(j.hnv_hier_label_3,'Chr(32)')||'||'' , '''||
-             l_label||','||chr(39)||
-             j.hnv_icon_name||chr(39) ||' col_icon'||','||j.hnv_hierarchy_level|| ' col_level, '||
-             par_id||'||'||chr(39)||j.hnv_parent_alias||chr(39)||' par,'||j.hnv_child_id||'||'||CHR(39)||j.hnv_child_alias||CHR(39)||' chi '||
-             'FROM '|| l_tab_join||' '||l_col_join||chr(10)||l_and_where||where_col||'= sys_context(''NM3SQL'',''NAV_VAR2'') AND '||j.hnv_child_id|| ' IS NOT NULL '||l_add_con;             
---nm_debug.debug('def '||l_sql);
+       l_sql := build_child_sql(j.hnv_CHILD_ALIAS,top_alias,sys_context('NM3SQL','NAV_VAR1'));        
+--nm_debug.debug('child '||l_sql);
        OPEN l_r for l_sql;
        LOOP
            FETCH l_r into l_type.data,l_type.label,l_type.icon,l_type.tab_level,l_type.parent,l_type.child ;
@@ -752,6 +616,7 @@ BEGIN
    FOR i in 1..pi_id.count 
    LOOP
        p_id := pi_id(i);
+--nm_debug.debug('p_id '||p_id); 
        IF p_id IS NOT NULL 
        THEN
            IF pi_tab = 'NM_INV_ITEMS_ALL' 
@@ -790,7 +655,8 @@ BEGIN
                    Exit;
                END LOOP;
            END IF ; -- HIE_TYPE          
-           get_top_level(p_id,l_chi_alias);
+           --get_top_level(p_id,l_chi_alias);
+           get_top_par(p_id,l_chi_alias);
            BEGIN
               SELECT Count(Column_value)
               INTO   l_top_id_cnt 
@@ -806,104 +672,60 @@ BEGIN
                FOR top_id IN (SELECT *
                              FROM   Table(Cast(l_top_id AS nav_id)) a)  
                LOOP  
-               nm3ctx.set_context('NAV_VAR1',top_id.column_value);  
-               BEGIN
-                  SELECT Count(1) INTO l_found
-                  FROM   table(cast(get_tab(l_tab) as hig_navigator_tab)) x
-                  WHERE  child LIKE top_id.column_value||'%'                     
-                  AND    parent IS NULL ;
-               EXCEPTION
-                   WHEN OTHERS 
-                   THEN
-                       l_found := 0;
-               END ;
-               IF l_found = 0
-               THEN 
-                   SELECT upper(hnv_child_column),upper(hnv_child_alias) 
-                   INTO   where_col,top_alias                
-                   FROM (
-                         SELECT hnv_child_column,hnv_child_table,hnv_parent_table ,hnv_parent_column,hnv_parent_alias,hnv_child_alias               
-                         FROM   hig_navigator b                       
-                         WHERE  hnv_hierarchy_type  = l_hir_type) 
-                   WHERE hnv_parent_column IS NULL
-                   CONNECT BY hnv_child_alias = PRIOR hnv_Parent_alias
-                   START WITH hnv_child_alias = l_chi_alias ;  
-                   --l_sql := 'SELECT ';
-                   FOR j IN (SELECT hnv_parent_column,hnv_child_column,hnv_child_table,hnv_hierarchy_level ,hnv_hierarchy_label,hnv_child_id,hnv_parent_id,hnv_ADDITIONAL_COND,
-                             hnv_icon_name,hnv_PARent_ALIAS,hnv_CHILD_ALIAS,
-                             hnv_hier_label_1,hnv_hier_label_2,hnv_hier_label_3,hnv_hier_label_4,hnv_hier_label_5,hnv_hier_label_6,hnv_hier_label_7,hnv_hier_label_8,hnv_hier_label_9,hnv_hier_label_10,hnv_hierarchy_seq
-                             FROM         
-                                 (SELECT hnv_parent_column,hnv_child_column,hnv_child_table,hnv_hierarchy_level ,hnv_hierarchy_label,hnv_child_id,hnv_parent_table,hnv_parent_id,hnv_ADDITIONAL_COND,
-                                         hnv_icon_name,hnv_PARent_ALIAS,hnv_CHILD_ALIAS,
-                                         hnv_hier_label_1,hnv_hier_label_2,hnv_hier_label_3,hnv_hier_label_4,hnv_hier_label_5,hnv_hier_label_6,hnv_hier_label_7,
-                                         hnv_hier_label_8,hnv_hier_label_9,hnv_hier_label_10,hnv_hierarchy_seq
-                                  FROM   hig_navigator b
-                                  WHERE  hnv_hierarchy_type = l_hir_type
-                                  )
-                             CONNECT BY PRIOR hnv_child_alias =  hnv_Parent_alias
-                             START WITH hnv_child_alias = top_alias
-                             ORDER BY hnv_hierarchy_level asc,hnv_hierarchy_seq)
-                   LOOP
-                       l_cnt := 0 ;
-                       l_sql      := null;
-                       l_tab_join := null;
-                       l_col_join := null;
-                       FOR i IN (SELECT hnv_parent_column,hnv_child_column,hnv_child_table,hnv_hierarchy_level ,hnv_hierarchy_label,hnv_child_id,hnv_hierarchy_seq
-                                    FROM         
-                                    (SELECT hnv_parent_column,hnv_child_column,hnv_child_table,hnv_hierarchy_level ,hnv_hierarchy_label,hnv_child_id,hnv_parent_table,hnv_PARent_ALIAS,hnv_CHILD_ALIAS,hnv_hierarchy_seq
+                   nm3ctx.set_context('NAV_VAR1',top_id.column_value);  
+                   BEGIN
+                     SELECT Count(1) INTO l_found
+                     FROM   table(cast(get_tab(l_tab) as hig_navigator_tab)) x
+                     WHERE  child LIKE top_id.column_value||'%'                     
+                     AND    parent IS NULL ;
+                  EXCEPTION
+                      WHEN OTHERS 
+                      THEN
+                          l_found := 0;
+                  END ;
+                  IF l_found = 0
+                  THEN 
+                      SELECT upper(hnv_child_column),upper(hnv_child_alias) 
+                      INTO   where_col,top_alias                
+                      FROM (
+                            SELECT hnv_child_column,hnv_child_table,hnv_parent_table ,hnv_parent_column,hnv_parent_alias,hnv_child_alias               
+                            FROM   hig_navigator b                       
+                            WHERE  hnv_hierarchy_type  = l_hir_type) 
+                      WHERE hnv_parent_column IS NULL
+                      CONNECT BY hnv_child_alias = PRIOR hnv_Parent_alias
+                      START WITH hnv_child_alias = l_chi_alias ;  
+                      FOR j IN (SELECT hnv_parent_column,hnv_child_column,hnv_child_table,hnv_hierarchy_level ,hnv_hierarchy_label,hnv_child_id,hnv_parent_id,hnv_ADDITIONAL_COND,
+                                hnv_icon_name,hnv_PARent_ALIAS,hnv_CHILD_ALIAS,
+                                hnv_hier_label_1,hnv_hier_label_2,hnv_hier_label_3,hnv_hier_label_4,hnv_hier_label_5,hnv_hier_label_6,hnv_hier_label_7,hnv_hier_label_8,hnv_hier_label_9,hnv_hier_label_10,hnv_hierarchy_seq
+                                FROM         
+                                    (SELECT hnv_parent_column,hnv_child_column,hnv_child_table,hnv_hierarchy_level ,hnv_hierarchy_label,hnv_child_id,hnv_parent_table,hnv_parent_id,hnv_ADDITIONAL_COND,
+                                            hnv_icon_name,hnv_PARent_ALIAS,hnv_CHILD_ALIAS,
+                                            hnv_hier_label_1,hnv_hier_label_2,hnv_hier_label_3,hnv_hier_label_4,hnv_hier_label_5,hnv_hier_label_6,hnv_hier_label_7,
+                                            hnv_hier_label_8,hnv_hier_label_9,hnv_hier_label_10,hnv_hierarchy_seq
                                      FROM   hig_navigator b
                                      WHERE  hnv_hierarchy_type = l_hir_type
-                                    )
-                                 CONNECT BY PRIOR hnv_child_alias =  hnv_Parent_alias
-                                 START WITH hnv_child_alias = top_alias
-                                 ORDER BY hnv_hierarchy_level asc,hnv_hierarchy_seq)
-                       LOOP
-                           l_cnt := l_cnt + 1;
-                           IF l_cnt = 1
-                           THEN
-                               l_tab_join := i.hnv_child_table      ;
-                           ELSE      
-                               l_tab_join := l_tab_join||chr(10)||','||i.hnv_child_table      ;
-                           END IF ;    
-                           IF i.hnv_parent_column is not null
-                           THEN
-                               IF l_col_join is null 
-                               THEN
-                                   l_col_join := 'WHERE '||i.hnv_parent_column ||' = '||i.hnv_child_column;
-                               ELSE
-                                   l_col_join := l_col_join||chr(10)||'AND '||i.hnv_parent_column ||' = '||i.hnv_child_column;
-                               END IF ;        
-                           END IF ;        
-                       END LOOP;
-                       IF j.hnv_additional_cond IS NOT NULL
-                       THEN
-                           l_add_con := 'AND '|| j.hnv_additional_cond;
-                       END IF ;
-                       l_label := Chr(10)||Nvl(j.hnv_hier_label_1,'Null')||'||'||Nvl(j.hnv_hier_label_2,'Null')||'||'||Nvl(j.hnv_hier_label_3,'Null')||'||'||
-                                  Nvl(j.hnv_hier_label_4,'Null')||'||'||Nvl(j.hnv_hier_label_5,'Null')||'||'||Nvl(j.hnv_hier_label_6,'Null')||'||'||
-                                  Nvl(j.hnv_hier_label_7,'Null')||'||'||Nvl(j.hnv_hier_label_8,'Null')||'||'||Nvl(j.hnv_hier_label_9,'Null')||'||'||Nvl(j.hnv_hier_label_10,'Null');
-                           l_select := 'SELECT ' ;
-                           l_sql :=  l_select ||' distinct '||j.hnv_child_id||','''||j.hnv_hierarchy_label||' -  ''||                                                                                  '||
---                                 Nvl(j.hnv_hier_label_1,'Chr(32)')||'||'' , ''||'||Nvl(j.hnv_hier_label_2,'Chr(32)')||'||'' , ''||'||Nvl(j.hnv_hier_label_3,'Chr(32)')||'||'' , '''||
-                                 l_label||','||chr(39)||
-                                 j.hnv_icon_name||chr(39) ||' col_icon'||','||j.hnv_hierarchy_level|| ' col_level, '||
-                              Nvl(j.hnv_parent_id,'-1')||'||'||chr(39)||j.hnv_parent_alias||chr(39)||' par,'||j.hnv_child_id||'||'||CHR(39)||j.hnv_child_alias||CHR(39)||' chi '||
-                             ' FROM '|| l_tab_join||chr(10)||l_col_join||chr(10)||'AND '||where_col||'= sys_context(''NM3SQL'',''NAV_VAR1'') AND '||j.hnv_child_id|| ' IS NOT NULL '||l_add_con;
+                                     )
+                                CONNECT BY PRIOR hnv_child_alias =  hnv_Parent_alias
+                                START WITH hnv_child_alias = top_alias
+                                ORDER BY hnv_hierarchy_level asc,hnv_hierarchy_seq)
+                      LOOP
+--nm_debug.debug(j.hnv_CHILD_ALIAS||','||top_alias||','||sys_context('NM3SQL','NAV_VAR1'));
+                          l_sql := build_child_sql(j.hnv_CHILD_ALIAS,top_alias,sys_context('NM3SQL','NAV_VAR1'));  
 --nm_debug.debug(l_sql);
-                       OPEN l_r for l_sql;
-                       LOOP
-                           FETCH l_r into l_type.data,l_type.label,l_type.icon,l_type.tab_level,l_type.parent,l_type.child ;
-                           EXIT WHEN l_r%NOTFOUND;
-                           tab_cnt := tab_cnt + 1;
-                           IF Substr(l_type.parent,1,2) = '-1'
-                           THEN
-                               l_type.parent := Null; 
-                           END IF; 
-                           l_tab.extend ;
-                           l_tab(l_tab.count) :=  l_type;
-                       END LOOP;
-                   END LOOP;
-               END IF ;                   
+                          OPEN l_r for l_sql;
+                          LOOP
+                              FETCH l_r into l_type.data,l_type.label,l_type.icon,l_type.tab_level,l_type.parent,l_type.child ;
+                              EXIT WHEN l_r%NOTFOUND;
+                              tab_cnt := tab_cnt + 1;
+                              IF Substr(l_type.parent,1,2) = '-1'
+                              THEN
+                                  l_type.parent := Null; 
+                              END IF; 
+                              l_tab.extend ;
+                              l_tab(l_tab.count) :=  l_type;
+                          END LOOP;
+                      END LOOP;
+                  END IF ;                   
                END LOOP;
            END IF ;
        END IF ; -- p_id not null
@@ -1109,17 +931,28 @@ Return Varchar2
 IS
 --
    l_value Number ;
+   Type l_ref IS REF CURSOR;
+   lref l_ref;
 --
 BEGIN
 --
    IF pi_doc_ID IS NOT NULL
    THEN       
-       EXECUTE IMMEDIATE ' SELECT count(0) '||
-                         ' FROM   docs,doc_assocs,doc_types '||
+       /*EXECUTE IMMEDIATE ' SELECT count(0) '||
+                         ' FROM   docs,doc_types '||
                          ' WHERE  doc_id = :1 '||
-                         ' AND    das_doc_id =  doc_id '||
-                         ' AND     doc_dtp_code = dtp_code '||
-                         ' AND     dtp_allow_complaints = ''Y''' INTO l_value Using pi_doc_id;
+                         ' AND    doc_dtp_code = dtp_code '||
+                         ' AND    dtp_allow_complaints = ''Y''' INTO l_value Using pi_doc_id;
+       */
+       OPEN lref FOR ' SELECT count(0) '||
+                     ' FROM   docs '||
+                     '       ,doc_types '||
+                     ' WHERE  doc_id = :1 '||
+                     ' AND    doc_dtp_code = dtp_code '||
+                     ' AND    dtp_allow_complaints = ''Y''' Using pi_doc_id;
+
+       FETCH lref INTO l_value;
+       CLOSE lref;
        IF l_value > 0
        THEN
            Return 1;
@@ -1127,7 +960,7 @@ BEGIN
            Return 0;
        END IF ;
    ELSE
-       Return 1 ;
+       Return 0 ;
    END IF ;        
 --
 EXCEPTION
@@ -1760,6 +1593,169 @@ THEN
     Return Null;
 --
 END get_wor_flag;
+--
+FUNCTION build_child_sql(pi_start_alias IN Varchar2
+                        ,pi_end_alias   IN Varchar2
+                        ,pi_id          IN VARCHAR2)
+Return Varchar2
+IS
+--
+   l_sql       Varchar2(32767) ;
+   l_tab_join  Varchar2(1000);
+   l_col_join  Varchar2(1000);
+   l_label     Varchar2(32767) ;
+   cnt         number := 0 ;
+   TYPE l_ref  IS REF CURSOR;
+   tab_cnt     Number := 0 ;
+   l_r         l_ref;
+   l_type      hig_navigator_type := hig_navigator_type(Null,Null,Null,null,Null,Null);
+   l_top       Varchar2(100) ;
+   p_id        Varchar2(100);
+   where_col   Varchar2(100);
+   top_alias   Varchar2(100);
+   l_add_con   Varchar2(4000) ;
+   l_and_where Varchar2(20);
+   l_select    Varchar2(1000);
+   l_nav_rec   nav%ROWTYPE;
+--
+BEGIN
+--
+   SELECT UPPER(hnv_child_id),upper(hnv_child_alias) 
+   INTO   where_col,top_alias                
+   FROM   hig_navigator b 
+   WHERE  hnv_child_alias = pi_end_alias
+   AND    hnv_hierarchy_type = l_hir_type;
+   nm3ctx.set_context('NAV_VAR2',pi_id);
+   FOR i IN (SELECT  *  
+             FROM    hig_navigator
+             CONNECT BY  hnv_child_alias = PRIOR hnv_parent_alias
+             START WITH hnv_child_alias = pi_start_alias
+             ORDER BY LEVEL)
+   LOOP
+       cnt := cnt + 1;
+       IF cnt = 1
+       THEN
+           l_tab_join := i.hnv_child_table      ;
+           l_nav_rec  := i ;
+       ELSE      
+           l_tab_join := l_tab_join||chr(10)||','||i.hnv_child_table      ;
+       END IF ; 
+       IF i.hnv_child_alias != pi_end_alias
+       THEN
+           IF i.hnv_parent_column is not null
+           THEN
+               IF l_col_join is null 
+               THEN
+                   l_col_join := 'WHERE '||i.hnv_parent_column ||' = '||i.hnv_child_column;
+               ELSE
+                   l_col_join := l_col_join||chr(10)||'AND '||i.hnv_parent_column ||' = '||i.hnv_child_column;
+               END IF ;        
+           END IF ;        
+       END IF ; 
+       IF i.hnv_additional_cond IS NOT NULL
+       THEN
+           l_add_con := 'AND '|| i.hnv_additional_cond; 
+       END IF ;
+       IF Nvl(l_col_join,'$')  != '$'
+       THEN 
+           l_and_where := ' AND ';
+       ELSE  
+           l_and_where := ' WHERE ';
+       END IF ;         
+       IF i.hnv_child_alias = pi_end_alias
+       THEN
+           Exit;
+       END IF ;  
+   END LOOP;   
+   l_label := Chr(10)||Nvl(l_nav_rec.hnv_hier_label_1,'Null')||'||'||Nvl(l_nav_rec.hnv_hier_label_2,'Null')||'||'||Nvl(l_nav_rec.hnv_hier_label_3,'Null')||'||'||
+              Nvl(l_nav_rec.hnv_hier_label_4,'Null')||'||'||Nvl(l_nav_rec.hnv_hier_label_5,'Null')||'||'||Nvl(l_nav_rec.hnv_hier_label_6,'Null')||'||'||
+              Nvl(l_nav_rec.hnv_hier_label_7,'Null')||'||'||Nvl(l_nav_rec.hnv_hier_label_8,'Null')||'||'||Nvl(l_nav_rec.hnv_hier_label_9,'Null')||'||'||Nvl(l_nav_rec.hnv_hier_label_10,'Null');
+
+   l_select := 'SELECT ' ;
+   IF l_nav_rec.hnv_parent_id IS NULL
+   THEN
+       l_nav_rec.hnv_parent_id := -1;
+   END IF ;
+   l_sql := l_select||' '||l_nav_rec.hnv_child_id||','''||l_nav_rec.hnv_hierarchy_label||' -  ''||                                                                                 '||
+            l_label||','||chr(39)||
+            l_nav_rec.hnv_icon_name||chr(39) ||' col_icon'||','||l_nav_rec.hnv_hierarchy_level|| ' col_level, '||
+            l_nav_rec.hnv_parent_id||'||'||chr(39)||l_nav_rec.hnv_parent_alias||chr(39)||' par,'||l_nav_rec.hnv_child_id||'||'||CHR(39)||l_nav_rec.hnv_child_alias||CHR(39)||' chi '||Chr(10)||
+            'FROM '|| l_tab_join||' '||l_col_join||chr(10)||l_and_where||where_col||'= sys_context(''NM3SQL'',''NAV_VAR2'') '||l_nav_rec.hnv_additional_cond;
+   RETURN l_sql ;  
+--
+END build_child_sql;
+--
+PROCEDURE get_top_par(pi_id    IN Varchar2
+                     ,pi_alias IN Varchar2)
+IS
+--
+   l_sql       Varchar2(32767) ;
+   l_tab_join  Varchar2(1000);
+   l_col_join  Varchar2(1000);
+   cnt         number := 0 ;
+   TYPE l_ref is REF CURSOR;
+   l_r l_ref;
+   l_type hig_navigator_type := hig_navigator_type(Null,Null,Null,null,Null,Null);
+   where_col Varchar2(100);
+   l_add_con Varchar2(4000) ;
+   l_and_where Varchar2(20);
+   l_select    Varchar2(1000);
+   l_parent_col Varchar2(30);
+--
+
+BEGIN
+--
+   SELECT UPPER(hnv_child_id)
+   INTO   where_col
+   FROM   hig_navigator b 
+   WHERE  hnv_child_alias = pi_alias
+   AND    hnv_hierarchy_type = l_hir_type;
+   nm3ctx.set_context('NAV_VAR2',pi_id);
+   FOR i IN (SELECT  *  
+             FROM    hig_navigator
+             CONNECT BY  hnv_child_alias = PRIOR hnv_parent_alias
+             START WITH hnv_child_alias = pi_alias
+             ORDER BY LEVEL DESC)
+   LOOP
+       cnt := cnt + 1;
+       IF cnt = 1
+       THEN
+           l_tab_join := i.hnv_child_table      ;
+           l_parent_col := i.hnv_child_column  ;
+       ELSE      
+           l_tab_join := l_tab_join||chr(10)||','||i.hnv_child_table      ;
+       END IF ; 
+       IF i.hnv_parent_column is not null
+       THEN
+           IF l_col_join is null 
+           THEN
+               l_col_join := 'WHERE '||i.hnv_parent_column ||' = '||i.hnv_child_column;
+           ELSE
+               l_col_join := l_col_join||chr(10)||'AND '||i.hnv_parent_column ||' = '||i.hnv_child_column;
+           END IF ;        
+       END IF ;  
+       IF i.hnv_additional_cond IS NOT NULL
+       THEN
+           l_add_con :=  i.hnv_additional_cond; 
+       END IF ;
+       IF Nvl(l_col_join,'$')  != '$'
+       THEN 
+           l_and_where := ' AND ';
+       ELSE  
+           l_and_where := ' WHERE ';
+       END IF ;         
+   END LOOP;   
+   l_select := 'SELECT '|| l_parent_col ;
+   l_sql := l_select||Chr(10)||'FROM '|| l_tab_join||' '||l_col_join||chr(10)||l_and_where||where_col||'= sys_context(''NM3SQL'',''NAV_VAR2'') '||l_add_con;
+--nm_debug.debug(l_sql);
+   OPEN l_r for l_sql;
+   LOOP
+       l_top_id.extend ;
+       FETCH l_r into l_top_id(l_top_id.Count) ;
+       EXIT WHEN l_r%NOTFOUND;
+   END LOOP;
+--
+END get_top_par;     
 --
 END hig_nav;
 /
