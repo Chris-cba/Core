@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkh-arc   3.1   Apr 16 2010 11:47:36   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkh-arc   3.2   Apr 20 2010 09:12:20   lsorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkh  $
---       Date into PVCS   : $Date:   Apr 16 2010 11:47:36  $
---       Date fetched Out : $Modtime:   Apr 16 2010 11:37:50  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 20 2010 09:12:20  $
+--       Date fetched Out : $Modtime:   Apr 20 2010 09:08:36  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
 
   TYPE         l_tab_tab IS TABLE OF hig_navigator_type INDEX BY BINARY_INTEGER ;
   l_tab        hig_navigator_tab  := hig_navigator_tab(hig_navigator_type(Null,Null,Null,Null,Null,Null));       
@@ -67,13 +67,6 @@ RETURN Number;
 PROCEDURE populate_tree(pi_id  IN  nav_id
                        ,pi_tab IN  Varchar2
                        ,po_tab OUT hig_navigator_tab);
---</PROC>
------------------------------------------------------------------------------
---
---<PROC NAME="get_top_level">
--- This Function get the Top Level in the Hierarchy
---FUNCTION get_top_level(pi_id Varchar2,pi_tab_alias Varchar2) Return Varchar2 ;
-PROCEDURE get_top_level(pi_id Varchar2,pi_tab_alias Varchar2)  ;
 --</PROC>
 -----------------------------------------------------------------------------
 --
@@ -471,6 +464,24 @@ PROCEDURE remove_return_id(pi_value IN Varchar2);
 FUNCTION get_wor_flag(pi_label IN Varchar2
                      ,pi_value IN Varchar2)
 Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This function returns the wor_flag for passed wor/wol
+FUNCTION build_child_sql(pi_start_alias IN Varchar2
+                        ,pi_end_alias   IN Varchar2
+                        ,pi_id          IN VARCHAR2)
+Return Varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_doc_status_code">
+-- This function returns the wor_flag for passed wor/wol
+PROCEDURE get_top_par(pi_id    IN Varchar2
+                     ,pi_alias IN Varchar2);
 --</PROC>
 --
 -----------------------------------------------------------------------------
