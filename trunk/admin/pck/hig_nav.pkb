@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.3   Apr 20 2010 09:12:18   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.4   Apr 21 2010 16:22:34   lsorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   Apr 20 2010 09:12:18  $
---       Date fetched Out : $Modtime:   Apr 20 2010 09:09:48  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Apr 21 2010 16:22:34  $
+--       Date fetched Out : $Modtime:   Apr 21 2010 15:50:04  $
+--       Version          : $Revision:   3.4  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.3  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.4  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
@@ -522,7 +522,7 @@ BEGIN
    FROM   hig_navigator b 
    WHERE  hnv_child_alias = pi_alias
    AND    hnv_hierarchy_type = l_hir_type;
-   nm3ctx.set_context('NAV_VAR2',pi_id);
+   --nm3ctx.set_context('NAV_VAR2',pi_id);
    FOR j IN (SELECT hnv_parent_column,hnv_child_column,hnv_child_table,hnv_hierarchy_level ,hnv_hierarchy_label,hnv_child_id,hnv_parent_id,hnv_ADDITIONAL_COND,
                     hnv_icon_name,hnv_PARent_ALIAS,hnv_CHILD_ALIAS,
                     hnv_hier_label_1,hnv_hier_label_2,hnv_hier_label_3,hnv_hier_label_4,hnv_hier_label_5,hnv_hier_label_6,hnv_hier_label_7,hnv_hier_label_8,hnv_hier_label_9,hnv_hier_label_10,hnv_hierarchy_seq
@@ -537,15 +537,23 @@ BEGIN
              START WITH hnv_child_alias = pi_alias
              ORDER BY hnv_hierarchy_level asc,hnv_hierarchy_seq)
    LOOP
-       l_sql := build_child_sql(j.hnv_CHILD_ALIAS,top_alias,sys_context('NM3SQL','NAV_VAR1'));        
---nm_debug.debug('child '||l_sql);
+       cnt := cnt+1 ;
+       l_sql := build_child_sql(j.hnv_CHILD_ALIAS
+                                ,top_alias
+                                ,pi_id
+                                ,cnt
+                                ,'CHILD');        
+nm_debug.debug('child '||l_sql);
        OPEN l_r for l_sql;
        LOOP
+nm_debug.debug('found ');
            FETCH l_r into l_type.data,l_type.label,l_type.icon,l_type.tab_level,l_type.parent,l_type.child ;
            EXIT WHEN l_r%NOTFOUND;
+nm_debug.debug('data '||l_type.data||' , '||l_type.label||' , '||l_type.icon||' , '||l_type.tab_level||' , '||l_type.parent||' , '||l_type.child );
            tab_cnt := tab_cnt + 1;
            IF substr(l_type.parent,1,2) = '-1'
            THEN
+nm_debug.debug('par null ');
                l_type.parent := Null;
            END IF; 
            l_tab.extend ;
@@ -621,11 +629,11 @@ BEGIN
        THEN
            IF pi_tab = 'NM_INV_ITEMS_ALL' 
            THEN
-               l_par := has_parent(p_id);
-               IF Nvl(l_par,0) != 0
-               THEN
-                   p_id := l_par;
-               END IF ;
+               --l_par := has_parent(p_id);
+               --IF Nvl(l_par,0) != 0
+               --THEN
+               --    p_id := l_par;
+               --END IF ;
                SELECT hnv_child_alias 
                INTO   l_chi_alias
                FROM   (
@@ -638,7 +646,7 @@ BEGIN
                        WHERE  substr(UPPER(hnv_child_table),1,decode(instr(hnv_child_table,' '),0,length(hnv_child_table),instr(hnv_child_table,' ')-1)) =  pi_tab) 
                        ORDER BY hnv_hierarchy_level,hnv_hierarchy_seq)
                WHERE ROWNUM = 1;  
---nm_debug.debug('par alias '||l_chi_alias);                
+nm_debug.debug('par alias '||l_chi_alias);                
            ELSE
                For m IN (
                SELECT hnv_child_alias 
@@ -667,6 +675,7 @@ BEGIN
            END ;
            IF l_top_id_cnt  = 0
            THEN
+nm_debug.debug('pop up chi '||p_id||' '||l_chi_alias);
                pop_up_child(p_id,l_chi_alias);
            ELSE
                FOR top_id IN (SELECT *
@@ -709,9 +718,9 @@ BEGIN
                                 START WITH hnv_child_alias = top_alias
                                 ORDER BY hnv_hierarchy_level asc,hnv_hierarchy_seq)
                       LOOP
---nm_debug.debug(j.hnv_CHILD_ALIAS||','||top_alias||','||sys_context('NM3SQL','NAV_VAR1'));
+nm_debug.debug(j.hnv_CHILD_ALIAS||','||top_alias||','||sys_context('NM3SQL','NAV_VAR1'));
                           l_sql := build_child_sql(j.hnv_CHILD_ALIAS,top_alias,sys_context('NM3SQL','NAV_VAR1'));  
---nm_debug.debug(l_sql);
+nm_debug.debug(l_sql);
                           OPEN l_r for l_sql;
                           LOOP
                               FETCH l_r into l_type.data,l_type.label,l_type.icon,l_type.tab_level,l_type.parent,l_type.child ;
@@ -1596,7 +1605,9 @@ END get_wor_flag;
 --
 FUNCTION build_child_sql(pi_start_alias IN Varchar2
                         ,pi_end_alias   IN Varchar2
-                        ,pi_id          IN VARCHAR2)
+                        ,pi_id          IN VARCHAR2
+                        ,pi_rownum      IN NUMBER   Default Null 
+                        ,pi_par_chi     IN Varchar2 Default Null)
 Return Varchar2
 IS
 --
@@ -1637,6 +1648,12 @@ BEGIN
        THEN
            l_tab_join := i.hnv_child_table      ;
            l_nav_rec  := i ;
+           IF  Nvl(pi_par_chi,'X') = 'CHILD'
+           AND Nvl(pi_rownum,0)    = 1
+           THEN
+               l_nav_rec.hnv_parent_id    := Null;
+               l_nav_rec.hnv_parent_alias := Null;
+           END IF ;
        ELSE      
            l_tab_join := l_tab_join||chr(10)||','||i.hnv_child_table      ;
        END IF ; 
@@ -1747,7 +1764,7 @@ BEGIN
    END LOOP;   
    l_select := 'SELECT '|| l_parent_col ;
    l_sql := l_select||Chr(10)||'FROM '|| l_tab_join||' '||l_col_join||chr(10)||l_and_where||where_col||'= sys_context(''NM3SQL'',''NAV_VAR2'') '||l_add_con;
---nm_debug.debug(l_sql);
+nm_debug.debug('find top '||l_sql);
    OPEN l_r for l_sql;
    LOOP
        l_top_id.extend ;
