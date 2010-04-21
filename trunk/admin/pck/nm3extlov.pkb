@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3extlov  AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extlov.pkb-arc   2.3   Apr 14 2010 17:29:20   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extlov.pkb-arc   2.4   Apr 21 2010 12:34:00   lsorathia  $
 --       Module Name      : $Workfile:   nm3extlov.pkb  $
---       Date into PVCS   : $Date:   Apr 14 2010 17:29:20  $
---       Date fetched Out : $Modtime:   Apr 14 2010 17:28:20  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Apr 21 2010 12:34:00  $
+--       Date fetched Out : $Modtime:   Apr 21 2010 12:29:56  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY nm3extlov  AS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
@@ -290,7 +290,7 @@ END get_body_version;
 
       -- Just let it fail otherwise
 
-      v_statement := v_statement|| ' ' || l_group_by;
+      v_statement := v_statement|| ' ' || l_group_by||' '||l_order_by;
       
       --
       -- Assume that the restriction on column = value passed in 
