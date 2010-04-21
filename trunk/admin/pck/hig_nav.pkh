@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkh-arc   3.2   Apr 20 2010 09:12:20   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkh-arc   3.3   Apr 21 2010 16:22:18   lsorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkh  $
---       Date into PVCS   : $Date:   Apr 20 2010 09:12:20  $
---       Date fetched Out : $Modtime:   Apr 20 2010 09:08:36  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Apr 21 2010 16:22:18  $
+--       Date fetched Out : $Modtime:   Apr 21 2010 15:20:14  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
 
   TYPE         l_tab_tab IS TABLE OF hig_navigator_type INDEX BY BINARY_INTEGER ;
   l_tab        hig_navigator_tab  := hig_navigator_tab(hig_navigator_type(Null,Null,Null,Null,Null,Null));       
@@ -472,7 +472,9 @@ Return Varchar2;
 -- This function returns the wor_flag for passed wor/wol
 FUNCTION build_child_sql(pi_start_alias IN Varchar2
                         ,pi_end_alias   IN Varchar2
-                        ,pi_id          IN VARCHAR2)
+                        ,pi_id          IN VARCHAR2
+                        ,pi_rownum      IN NUMBER   Default Null 
+                        ,pi_par_chi     IN Varchar2 Default Null)
 Return Varchar2;
 --</PROC>
 --
