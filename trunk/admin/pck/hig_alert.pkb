@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.1   Apr 15 2010 10:38:26   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.2   Apr 21 2010 10:32:48   lsorathia  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   Apr 15 2010 10:38:26  $
---       Date fetched Out : $Modtime:   Apr 15 2010 10:00:58  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 21 2010 10:32:48  $
+--       Date fetched Out : $Modtime:   Apr 21 2010 10:19:04  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.1  $';
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.2  $';
   g_app_owner     CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  Varchar2(32767);
@@ -454,8 +454,7 @@ BEGIN
                    l_har_rec.har_status          := 'Pending' ;
                    insert_har(l_har_rec);
                END LOOP;
-           ELSIF l_harr_rec.harr_recipient_type = 'HIG_CONTACT'
-           THEN 
+           ELSE 
                EXECUTE IMMEDIATE l_harr_rec.harr_sql||' :1 ' Bulk Collect INTO l_email_tab Using pi_hal_rec.hal_pk_id;
                FOR i IN 1..l_email_tab.Count
                LOOP
@@ -973,8 +972,7 @@ BEGIN
                    append ('       l_har_rec.har_status          := ''Pending'' ; ' );
                    append ('       hig_alert.insert_har(l_har_rec); ');
                    append ('   END LOOP; ');     
-               ELSIF l_harr_rec.harr_recipient_type = 'HIG_CONTACT'
-               THEN 
+               ELSE
                    append ('   FOR nmu IN ('||l_harr_rec.harr_sql ||' :NEW.'||l_harr_rec.harr_attribute_name||') LOOP ');
                    append ('       l_har_rec.har_hatr_id         := '||hatr.hatr_id||' ; ');
                    append ('       l_har_rec.har_hal_id          := l_hal_rec.hal_id ; ');
@@ -1075,8 +1073,7 @@ BEGIN
                    append ('       l_har_rec.har_status          := ''Pending'' ; ' );
                    append ('       hig_alert.insert_har(l_har_rec); ');
                    append ('   END LOOP; ');     
-               ELSIF l_harr_rec.harr_recipient_type = 'HIG_CONTACT'
-               THEN 
+               ELSE
                    append ('   FOR nmu IN ('||l_harr_rec.harr_sql ||' :OLD.'||l_harr_rec.harr_attribute_name||') LOOP ');
                    append ('       l_har_rec.har_hal_id          := l_hal_rec.hal_id ; ');
                    append ('       l_har_rec.har_recipient_email := Lower(nmu.email_address) ; ');
