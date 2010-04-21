@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3webutil.pkb-arc   2.1   Mar 25 2010 12:00:18   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3webutil.pkb-arc   2.2   Apr 21 2010 18:17:02   gjohnson  $
 --       Module Name      : $Workfile:   nm3webutil.pkb  $
---       Date into PVCS   : $Date:   Mar 25 2010 12:00:18  $
---       Date fetched Out : $Modtime:   Mar 25 2010 11:59:42  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Apr 21 2010 18:17:02  $
+--       Date fetched Out : $Modtime:   Apr 21 2010 17:22:24  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 
   g_package_name CONSTANT varchar2(30) := 'nm3webutil';
   
@@ -78,16 +78,29 @@ END get_work_folder;
   IS
     retval nm3type.max_varchar2;
   BEGIN
-    IF pi_os IS NOT NULL
+    IF UPPER(pi_os) LIKE '%WIN%'
     AND pi_file IS NOT NULL
     THEN
-      IF UPPER(pi_os) LIKE '%WIN%'
-      THEN
         retval := 'cmd /c ' ||' "'||pi_file||'"' ;
-      END IF;
     END IF;
     RETURN retval;
   END start_file_on_client;
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION open_folder_on_client ( pi_os     IN VARCHAR2
+                                 , pi_folder IN VARCHAR2 )
+    RETURN VARCHAR2
+  IS
+    retval nm3type.max_varchar2;
+  BEGIN
+    IF UPPER(pi_os) LIKE '%WIN%'
+    AND pi_folder IS NOT NULL
+    THEN
+        retval := 'explorer ' ||' "'||pi_folder||'"' ;
+    END IF;
+    RETURN retval;
+  END open_folder_on_client;
 --
 -----------------------------------------------------------------------------
 --
