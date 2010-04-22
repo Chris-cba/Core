@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.26   Apr 15 2010 08:29:10   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkh.sql-arc   2.27   Apr 22 2010 11:32:14   gjohnson  $
 --       Module Name      : $Workfile:   nm3pkh.sql  $
---       Date into PVCS   : $Date:   Apr 15 2010 08:29:10  $
---       Date fetched Out : $Modtime:   Apr 15 2010 08:28:42  $
---       PVCS Version     : $Revision:   2.26  $
+--       Date into PVCS   : $Date:   Apr 22 2010 11:32:14  $
+--       Date fetched Out : $Modtime:   Apr 22 2010 11:31:30  $
+--       PVCS Version     : $Revision:   2.27  $
 --
 --
 --   Author : Graeme Johnson
@@ -2395,6 +2395,17 @@ PROMPT hig_alert.pkh
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'hig_alert.pkh' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT doc_bundle_loader.pkh
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'doc_bundle_loader.pkh' run_file
 FROM dual 
 / 
 start '&run_file'
