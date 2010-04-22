@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.2   Apr 22 2010 14:09:48   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.3   Apr 22 2010 14:26:04   lsorathia  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Apr 22 2010 14:09:48  $
---       Date fetched Out : $Modtime:   Apr 22 2010 13:52:22  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 22 2010 14:26:04  $
+--       Date fetched Out : $Modtime:   Apr 22 2010 14:24:42  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.3  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -1137,17 +1137,10 @@ BEGIN
    utl_smtp.close_data(g_mail_conn);
    RETURN  TRUE;
 EXCEPTION
-    WHEN utl_smtp.transient_error OR utl_smtp.permanent_error THEN           
-        BEGIN
-           utl_smtp.close_data(g_mail_conn);
-           po_error_text := SQLERRM;
-           RETURN FALSE;
-        EXCEPTION
-           WHEN utl_smtp.transient_error OR utl_smtp.permanent_error 
-           THEN
-               po_error_text := sqlerrm; --'SMTP server is down or unavailable';
-               RETURN  FALSE;
-        END;
+    WHEN utl_smtp.transient_error OR utl_smtp.permanent_error 
+    THEN           
+        po_error_text := sqlerrm; --'SMTP server is down or unavailable';
+        RETURN  FALSE;
     WHEN OTHERS 
     THEN    
         po_error_text := SQLERRM;  
