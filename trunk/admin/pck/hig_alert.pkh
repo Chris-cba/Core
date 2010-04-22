@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkh-arc   3.0   Apr 14 2010 10:42:32   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkh-arc   3.1   Apr 22 2010 14:12:48   lsorathia  $
 --       Module Name      : $Workfile:   hig_alert.pkh  $
---       Date into PVCS   : $Date:   Apr 14 2010 10:42:32  $
---       Date fetched Out : $Modtime:   Apr 14 2010 10:42:08  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Apr 22 2010 14:12:48  $
+--       Date fetched Out : $Modtime:   Apr 22 2010 13:29:06  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,11 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $'; 
-  g_smtp_server   CONSTANT hig_options.hop_value%TYPE := 'gbexor284' ;     --hig.get_sysopt(g_server_sysopt);
-  g_smtp_port     CONSTANT hig_options.hop_value%TYPE := '25' ;            --hig.get_sysopt(g_port_sysopt);
-  g_smtp_domain   CONSTANT hig_options.hop_value%TYPE := 'exorcorp.local' ;--hig.get_sysopt(g_domain_sysopt); 
-
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $'; 
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------
