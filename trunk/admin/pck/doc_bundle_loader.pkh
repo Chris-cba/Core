@@ -1,0 +1,61 @@
+CREATE OR REPLACE PACKAGE doc_bundle_loader
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkh-arc   3.0   Apr 22 2010 11:29:56   gjohnson  $
+--       Module Name      : $Workfile:   doc_bundle_loader.pkh  $
+--       Date into PVCS   : $Date:   Apr 22 2010 11:29:56  $
+--       Date fetched Out : $Modtime:   Apr 22 2010 11:29:30  $
+--       Version          : $Revision:   3.0  $
+--       Based on SCCS version : 
+-------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+-- 
+PROCEDURE ftp_in_to_database(pi_ftp_type                IN hig_ftp_types.hft_type%TYPE
+                            ,pi_file_mask               IN VARCHAR2 DEFAULT '.ZIP');
+
+
+--
+-----------------------------------------------------------------------------
+--
+
+PROCEDURE load_process_document_bundles(pi_process_id IN hig_processes.hp_process_id%TYPE DEFAULT hig_process_api.get_current_process_id);
+
+
+FUNCTION load_document_bundle(pi_filename         IN doc_bundles.dbun_filename%TYPE
+                             ,pi_oracle_directory IN doc_bundles.dbun_location%TYPE
+                             ,pi_process_id       IN hig_processes.hp_process_id%TYPE) RETURN BOOLEAN; -- boolean indicates success/failure
+
+PROCEDURE initialise;
+
+PROCEDURE discards_to_temp_table(pi_bundle_id IN doc_bundles.dbun_bundle_id%TYPE);
+
+end doc_bundle_loader;
+/
