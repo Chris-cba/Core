@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.sqs-arc   2.8   Apr 09 2010 12:13:12   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.sqs-arc   2.9   Apr 22 2010 12:23:58   rcoupe  $
 --       Module Name      : $Workfile:   nm3.sqs  $
---       Date into PVCS   : $Date:   Apr 09 2010 12:13:12  $
---       Date fetched Out : $Modtime:   Apr 09 2010 12:12:52  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Apr 22 2010 12:23:58  $
+--       Date fetched Out : $Modtime:   Apr 22 2010 12:23:38  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Fri Apr 09  12:01:52 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Thu Apr 22  12:20:21 2010 by Server Generator 10.1.2.9.28
 
 PROMPT Creating Sequence 'BATCH_ID_SEQ'
 CREATE SEQUENCE BATCH_ID_SEQ
@@ -62,6 +62,14 @@ CREATE SEQUENCE DLC_ID_SEQ
  NOMINVALUE
  NOCYCLE
  NOCACHE
+/
+
+PROMPT Creating Sequence 'DLT_ID_SEQ'
+CREATE SEQUENCE DLT_ID_SEQ
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
 /
 
 PROMPT Creating Sequence 'DMD_ID_SEQ'
