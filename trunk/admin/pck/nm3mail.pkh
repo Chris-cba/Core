@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkh-arc   2.1   Jan 06 2010 16:38:42   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkh-arc   2.2   Apr 22 2010 14:09:48   lsorathia  $
 --       Module Name      : $Workfile:   nm3mail.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:42  $
---       Date fetched Out : $Modtime:   Jan 05 2010 11:47:00  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Apr 22 2010 14:09:48  $
+--       Date fetched Out : $Modtime:   Apr 22 2010 13:12:40  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.5
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE nm3mail AS
 --
 --<GLOBVAR>
 --
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 --
    g_server_sysopt CONSTANT hig_options.hop_id%TYPE    := 'SMTPSERVER';
@@ -267,6 +267,23 @@ FUNCTION get_current_nmu_id RETURN nm_mail_users.nmu_id%TYPE;
 --
 -----------------------------------------------------------------------------
 --
+--<PROC NAME="get_current_nmu_id">
+--
+-- This function send mail for passed parameters
+FUNCTION send_mail (pi_recipient_to  IN  Varchar2 Default Null
+                   ,pi_recipient_cc  IN  Varchar2 Default Null
+                   ,pi_recipient_bcc IN  Varchar2 Default Null
+                   ,pi_subject       IN  Varchar2 Default Null
+                   ,pi_mailformat    IN  Varchar2 Default 'T' --T for Plain Text H for HTML 
+                   ,pi_mail_body     IN  Clob     Default Null 
+                   ,pi_att_file_name IN  Varchar2 Default Null 
+                   ,pi_file_att      IN  Blob     Default Null
+                   ,po_error_text    Out Varchar2)
+RETURN Boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
 --<PRAGMA>
    PRAGMA RESTRICT_REFERENCES (get_version, wnps, wnds);
    PRAGMA RESTRICT_REFERENCES (get_body_version, wnps, wnds);
@@ -276,3 +293,4 @@ FUNCTION get_current_nmu_id RETURN nm_mail_users.nmu_id%TYPE;
 --
 END nm3mail;
 /
+
