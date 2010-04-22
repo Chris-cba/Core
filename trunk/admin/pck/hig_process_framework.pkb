@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.1   Apr 06 2010 15:23:32   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.2   Apr 22 2010 12:11:32   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_framework.pkb  $
---       Date into PVCS   : $Date:   Apr 06 2010 15:23:32  $
---       Date fetched Out : $Modtime:   Apr 01 2010 11:26:30  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 22 2010 12:11:32  $
+--       Date fetched Out : $Modtime:   Apr 20 2010 10:53:34  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
 
@@ -369,13 +369,36 @@ BEGIN
  OPEN c1;
  FETCH c1 INTO l_retval;
  CLOSE c1;
-
+ 
  RETURN l_retval;
 
 END get_process_type;
 --
 -----------------------------------------------------------------------------
 --
+FUNCTION get_process_type(pi_process_type_name IN hig_process_types.hpt_name%TYPE) RETURN hig_process_types%ROWTYPE IS
+
+ CURSOR c1 IS
+ SELECT *
+ FROM   hig_process_types
+ WHERE  UPPER(hpt_name) = UPPER(pi_process_type_name);
+ 
+ l_retval hig_process_types%ROWTYPE; 
+
+BEGIN
+
+
+ OPEN c1;
+ FETCH c1 INTO l_retval;
+ CLOSE c1;
+ 
+ RETURN(l_retval);
+ 
+
+END get_process_type;
+
+
+
 FUNCTION get_process_type_from_module(pi_module IN hig_process_types.hpt_initiation_module%TYPE) RETURN hig_process_types%ROWTYPE IS
 
  CURSOR c1 IS
@@ -511,6 +534,30 @@ FUNCTION get_process_type_file(pi_file_type_id IN hig_process_type_files.hptf_fi
  SELECT *
  FROM hig_process_type_files
  WHERE hptf_file_type_id = pi_file_type_id;
+
+ l_retval hig_process_type_files%ROWTYPE;
+
+BEGIN
+
+ OPEN c1;
+ FETCH c1 INTO l_retval;
+ CLOSE c1;
+
+ RETURN l_retval;
+
+
+END get_process_type_file;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_process_type_file(pi_process_type_id  IN hig_process_type_files.hptf_process_type_id%TYPE
+                              ,pi_file_type_name   IN hig_process_type_files.hptf_name%TYPE) RETURN hig_process_type_files%ROWTYPE IS
+
+ CURSOR c1 IS
+ SELECT *
+ FROM hig_process_type_files
+ WHERE hptf_process_type_id = pi_process_type_id
+ AND   UPPER(hptf_name) = UPPER(pi_file_type_name);
 
  l_retval hig_process_type_files%ROWTYPE;
 
@@ -1039,10 +1086,26 @@ FUNCTION log_text_as_clob(pi_process_id            IN hig_process_log.hpl_proces
           ||'======='||chr(10)     
           ||'Start Date             : '||hpjr_start||chr(10)
           ||'End Date               : '||hpjr_end     ||chr(10)
---          ||'Days                   : '||EXTRACT (DAY FROM hpjr_end - hpjr_start)||chr(10)
-          ||'Hours                  : '||EXTRACT (HOUR FROM hpjr_end - hpjr_start)||chr(10)
-          ||'Minutes                : '||EXTRACT (MINUTE FROM hpjr_end - hpjr_start)||chr(10)
-          ||'Seconds                : '||ROUND(EXTRACT (SECOND FROM hpjr_end - hpjr_start),0)||chr(10)||chr(10)
+          || case when EXTRACT (DAY FROM hpjr_end - hpjr_start) > 0 then
+              'Days                   : '||EXTRACT (DAY FROM hpjr_end - hpjr_start)||chr(10)
+            else
+              Null
+            end
+          || case when EXTRACT (HOUR FROM hpjr_end - hpjr_start) > 0 then
+              'Hours                  : '||EXTRACT (HOUR FROM hpjr_end - hpjr_start)||chr(10)
+            else
+              Null
+            end
+          || case when EXTRACT (MINUTE FROM hpjr_end - hpjr_start) > 0 then
+            'Minutes                : '||EXTRACT (MINUTE FROM hpjr_end - hpjr_start)||chr(10)
+            else
+              Null
+            end
+          || case when ROUND(EXTRACT (SECOND FROM hpjr_end - hpjr_start),0) > 0 then
+            'Seconds                : '||ROUND(EXTRACT (SECOND FROM hpjr_end - hpjr_start),0)||chr(10)||chr(10)
+            else
+              Null
+            end
           ||'Log'||chr(10)
           ||'==='||chr(10)
         FROM hig_processes_v a
