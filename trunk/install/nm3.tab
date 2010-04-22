@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.20   Apr 09 2010 12:09:46   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.21   Apr 22 2010 12:17:58   rcoupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Apr 09 2010 12:09:46  $
---       Date fetched Out : $Modtime:   Apr 09 2010 12:09:02  $
---       PVCS Version     : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Apr 22 2010 12:17:58  $
+--       Date fetched Out : $Modtime:   Apr 22 2010 12:17:28  $
+--       PVCS Version     : $Revision:   2.21  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Fri Apr 09  12:01:49 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Thu Apr 22  12:02:49 2010 by Server Generator 10.1.2.9.28
 
 
 
@@ -233,6 +233,102 @@ CREATE TABLE DOC_ENQUIRY_TYPES
  )
 /
 
+PROMPT Creating Table 'DOC_FILE_LOCKS'
+CREATE TABLE DOC_FILE_LOCKS
+ (DFL_DOC_ID NUMBER NOT NULL
+ ,DFL_REVISION NUMBER NOT NULL
+ ,DFL_USERNAME VARCHAR2(30) NOT NULL
+ ,DFL_DATE DATE NOT NULL
+ ,DFL_TERMINAL VARCHAR2(2000) NOT NULL
+ ,DFL_DATE_CREATED DATE
+ ,DFL_DATE_MODIFIED DATE
+ ,DFL_MODIFIED_BY VARCHAR2(30)
+ ,DFL_CREATED_BY VARCHAR2(30)
+ )
+/
+
+COMMENT ON TABLE DOC_FILE_LOCKS IS 'Document File Locks table. Stores editing locks on files associated with Documents'
+/
+
+COMMENT ON COLUMN DOC_FILE_LOCKS.DFL_DOC_ID IS 'Primary Key Column 1. Document ID'
+/
+
+COMMENT ON COLUMN DOC_FILE_LOCKS.DFL_REVISION IS 'Primary Key Column 2. Revision'
+/
+
+COMMENT ON COLUMN DOC_FILE_LOCKS.DFL_USERNAME IS 'Terminal column. Logs the Terminal name of the machine the lock was taken out on'
+/
+
+COMMENT ON COLUMN DOC_FILE_LOCKS.DFL_DATE IS 'Date column. Date the lock was taken out'
+/
+
+COMMENT ON COLUMN DOC_FILE_LOCKS.DFL_DATE_CREATED IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_FILE_LOCKS.DFL_DATE_MODIFIED IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_FILE_LOCKS.DFL_MODIFIED_BY IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_FILE_LOCKS.DFL_CREATED_BY IS 'Audit details.'
+/
+
+PROMPT Creating Table 'DOC_FILE_TRANSFER_TEMP'
+CREATE GLOBAL TEMPORARY TABLE DOC_FILE_TRANSFER_TEMP
+ (DFTT_DOC_ID NUMBER NOT NULL
+ ,DFTT_REVISION NUMBER NOT NULL
+ ,DFTT_START_DATE DATE NOT NULL
+ ,DFTT_FULL_PATH VARCHAR2(4000) NOT NULL
+ ,DFTT_FILENAME VARCHAR2(4000) NOT NULL
+ ,DFTT_END_DATE DATE
+ ,DFTT_CONTENT BLOB
+ ,DFTT_AUDIT VARCHAR2(4000)
+ ,DFTT_FILE_INFO VARCHAR2(2000)
+ ,DFTT_DATE_CREATED DATE
+ ,DFTT_DATE_MODIFIED DATE
+ ,DFTT_CREATED_BY VARCHAR2(30)
+ ,DFTT_MODIFIED_BY VARCHAR2(30)
+ )
+ NOCACHE
+/
+
+COMMENT ON TABLE DOC_FILE_TRANSFER_TEMP IS 'Document File Locks table. Stores editing locks on files associated with Documents'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_DOC_ID IS 'Primary Key Column 1. Document ID'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_REVISION IS 'Primary Key Column 2. Revision'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_START_DATE IS 'Start Date. Column used to store Start Date of the file being loaded'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_END_DATE IS 'End Date. Column used to store End Date of the file being loaded'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_CONTENT IS 'BLOB Content. Column used to store BLOB for transfer from Client to Server'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_AUDIT IS 'Audit. Column used to audit details for debugging and error trapping'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_FILE_INFO IS 'File Info. Column used to store the File info such as size and other attributes'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_DATE_CREATED IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_DATE_MODIFIED IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_CREATED_BY IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_MODIFIED_BY IS 'Audit details.'
+/
+
 PROMPT Creating Table 'DOC_GATEWAYS'
 CREATE TABLE DOC_GATEWAYS
  (DGT_TABLE_NAME VARCHAR2(30) NOT NULL
@@ -311,10 +407,81 @@ CREATE TABLE DOC_LOCATIONS
  ,DLC_END_DATE DATE
  ,DLC_APPS_PATHNAME VARCHAR2(4000)
  ,DLC_URL_PATHNAME VARCHAR2(4000)
+ ,DLC_LOCATION_NAME VARCHAR2(2000) NOT NULL
+ ,DLC_LOCATION_TYPE VARCHAR2(30) NOT NULL
  )
 /
 
 COMMENT ON TABLE DOC_LOCATIONS IS 'Created from Entity DOCUMENT LOCATION by HIGHWAYS on 02-APR-93'
+/
+
+PROMPT Creating Table 'DOC_LOCATION_TABLES'
+CREATE TABLE DOC_LOCATION_TABLES
+ (DLT_ID NUMBER NOT NULL
+ ,DLT_DLC_ID NUMBER NOT NULL
+ ,DLT_TABLE VARCHAR2(30) NOT NULL
+ ,DLT_DOC_ID_COL VARCHAR2(30) NOT NULL
+ ,DLT_REVISION_COL VARCHAR2(30) NOT NULL
+ ,DLT_CONTENT_COL VARCHAR2(30) NOT NULL
+ ,DLT_START_DATE_COL VARCHAR2(30)
+ ,DLT_END_DATE_COL VARCHAR2(30)
+ ,DLT_FULL_PATH_COL VARCHAR2(30)
+ ,DLT_FILENAME VARCHAR2(30)
+ ,DLT_AUDIT_COL VARCHAR2(30)
+ ,DLT_FILE_INFO_COL VARCHAR2(30)
+ ,DLT_DATE_CREATED DATE
+ ,DLT_DATE_MODIFIED DATE
+ ,DLT_MODIFIED_BY VARCHAR2(30)
+ ,DLT_CREATED_BY VARCHAR2(30)
+ )
+/
+
+COMMENT ON TABLE DOC_LOCATION_TABLES IS 'Document Location Table metadata. Required when a Document Location is an Oracle table'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_ID IS 'Primary Key. Populated from sequence ''DLT_ID_SEQ''.'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_DLC_ID IS 'Foreign Key. Pointer to the DOC_LOCATION.DLC_ID column'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_TABLE IS 'Table Name. Refers to the table being used for the document storage'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_DOC_ID_COL IS 'Doc ID Column Name. Refers to the Foreign Key on the table to DOC_ID'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_REVISION_COL IS 'Revision Column Name. Refers to the Revision column on the table used for the document storage'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_CONTENT_COL IS 'BLOB Column Name. Refers to the BLOB column on the table used for the document storage'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_START_DATE_COL IS 'Start Date Column Name. Refers to the Start Date column on the table used for the document storage'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_END_DATE_COL IS 'End Date Column Name. Refers to the End Date column on the table used for the document storage'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_FULL_PATH_COL IS 'Full Path Column Name. Refers to the Full Path column on the table used for the document storage'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_FILENAME IS 'Filename Column Name. Refers to the Filename column on the table used for the document storage'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_AUDIT_COL IS 'File Info Column Name. Refers to the File Info column on the table used for the document storage'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_DATE_CREATED IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_DATE_MODIFIED IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_MODIFIED_BY IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_CREATED_BY IS 'Audit details.'
 /
 
 PROMPT Creating Table 'DOC_LOV_RECS'
@@ -1677,6 +1844,139 @@ CREATE TABLE HIG_ERRORS
  )
 /
 
+PROMPT Creating Table 'HIG_FILE_TRANSFER_LOG'
+CREATE TABLE HIG_FILE_TRANSFER_LOG
+ (HFTL_ID NUMBER(38) NOT NULL
+ ,HFTL_HFTQ_ID NUMBER(38) NOT NULL
+ ,HFTL_HFTQ_BATCH_NO NUMBER(38) NOT NULL
+ ,HFTL_DATE DATE NOT NULL
+ ,HFTL_FILENAME VARCHAR2(2000) NOT NULL
+ ,HFTL_DESTINATION_PATH VARCHAR2(2000) NOT NULL
+ ,HFTL_MESSAGE VARCHAR2(2000) NOT NULL
+ )
+/
+
+COMMENT ON TABLE HIG_FILE_TRANSFER_LOG IS 'Exor File Transfer Log. Log of the files queued for transfer'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_LOG.HFTL_ID IS 'Primary Key. Populated from sequence ''HFTL_ID_SEQ''.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_LOG.HFTL_HFTQ_ID IS 'Queue ID Foreign Key. Points to the Queue Primary Key'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_LOG.HFTL_HFTQ_BATCH_NO IS 'Queue Batch No Foreign Key. Points to the Queue Batch No'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_LOG.HFTL_DATE IS 'Queue Log Date. Date of the file transfer log entry'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_LOG.HFTL_FILENAME IS 'Destination Filename. Filename being transfered'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_LOG.HFTL_DESTINATION_PATH IS 'Destination Path. Path being transfered to'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_LOG.HFTL_MESSAGE IS 'Queue Message. File transfer log'
+/
+
+PROMPT Creating Table 'HIG_FILE_TRANSFER_QUEUE'
+CREATE TABLE HIG_FILE_TRANSFER_QUEUE
+ (HFTQ_ID NUMBER(38) NOT NULL
+ ,HFTQ_BATCH_NO NUMBER(38) NOT NULL
+ ,HFTQ_DATE DATE NOT NULL
+ ,HFTQ_INITIATED_BY VARCHAR2(30) NOT NULL
+ ,HFTQ_DIRECTION VARCHAR2(10) NOT NULL
+ ,HFTQ_TRANSFER_TYPE VARCHAR2(20) NOT NULL
+ ,HFTQ_SOURCE VARCHAR2(2000) NOT NULL
+ ,HFTQ_SOURCE_TYPE VARCHAR2(2000) NOT NULL
+ ,HFTQ_SOURCE_FILENAME VARCHAR2(2000) NOT NULL
+ ,HFTQ_SOURCE_COLUMN VARCHAR2(30)
+ ,HFTQ_DESTINATION VARCHAR2(2000) NOT NULL
+ ,HFTQ_DESTINATION_TYPE VARCHAR2(2000) NOT NULL
+ ,HFTQ_DESTINATION_FILENAME VARCHAR2(2000) NOT NULL
+ ,HFTQ_DESTINATION_COLUMN VARCHAR2(30)
+ ,HFTQ_STATUS VARCHAR2(20) NOT NULL
+ ,HFTQ_CONDITION VARCHAR2(2000)
+ ,HFTQ_CONTENT BLOB
+ ,HFTQ_COMMENTS VARCHAR2(2000)
+ ,HFTQ_HP_PROCESS_ID NUMBER(38)
+ ,HFTQ_DATE_CREATED DATE
+ ,HFTQ_DATE_MODIFIED DATE
+ ,HFTQ_MODIFIED_BY VARCHAR2(30)
+ ,HFTQ_CREATED_BY VARCHAR2(30)
+ )
+/
+
+COMMENT ON TABLE HIG_FILE_TRANSFER_QUEUE IS 'Exor File Transfer Queue.  Table to store files awaiting transfer'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_ID IS 'Primary Key. Populated from sequence ''HFTQ_ID_SEQ''.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_BATCH_NO IS 'Queue Batch No. Represents a batch of files.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_DATE IS 'Queue Date. Date on which the queue was populated.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_INITIATED_BY IS 'Queue Initiator. User responsible for placing the files in the queue.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_DIRECTION IS 'Queue Direction. Indicates whether the files is going IN or OUT of Exor system.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_TRANSFER_TYPE IS 'Queue Transfer Type. Indicates the transfer protocol.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_SOURCE IS 'Queue Source. Indicates the original source path of the file.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_SOURCE_TYPE IS 'Queue Source Type. Indicates the original source type of the file.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_SOURCE_FILENAME IS 'Queue Source Filename. Indicates the original source filename.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_SOURCE_COLUMN IS 'Queue Source Column. Indicates the original source column.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_DESTINATION IS 'Queue File Destination Path. Indicates the destination path for the file.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_DESTINATION_TYPE IS 'Queue Destination Type. Indicates the destination type for file.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_DESTINATION_FILENAME IS 'Queue File Destination Filename. Indicates the destination filename.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_DESTINATION_COLUMN IS 'Queue File Destination Column. Indicates the destination column.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_STATUS IS 'Queue File Transfer Status. Current status of the queued file.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_CONDITION IS 'Queue File Condition. Predicate used for table transfers.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_CONTENT IS 'Queue File Binary Content. Binary representation of the file stored in table.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_COMMENTS IS 'Queue File Process ID. Link back to a HIG Process.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_DATE_CREATED IS 'Audit details.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_DATE_MODIFIED IS 'Audit details.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_MODIFIED_BY IS 'Audit details.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_CREATED_BY IS 'Audit details.'
+/
+
 PROMPT Creating Table 'HIG_FLEX_ATTRIBUTES'
 CREATE TABLE HIG_FLEX_ATTRIBUTES
  (HFA_ID NUMBER(9) NOT NULL
@@ -2390,7 +2690,7 @@ CREATE GLOBAL TEMPORARY TABLE HIG_NAVIGATOR_RESULT_TAB
  ,COL_165 VARCHAR2(500)
  ,COL_166 VARCHAR2(500)
  ,COL_167 VARCHAR2(500)
- ,COL_168 VARCHAR2(100)
+ ,COL_168 VARCHAR2(500)
  )
  ON COMMIT PRESERVE ROWS
  NOCACHE
@@ -9081,18 +9381,6 @@ CREATE TABLE NM_SAVED_EXTENT_MEMBER_DATUMS
  ,NSD_END_MP NUMBER
  ,NSD_SEQ_NO NUMBER
  ,NSD_CARDINALITY NUMBER NOT NULL
- )
-/
-
-PROMPT Creating Table 'NM_SDO_TRG_MEMBERS'
-CREATE GLOBAL TEMPORARY TABLE NM_SDO_TRG_MEMBERS
- (NSTM_ID NUMBER(9)
- ,NSTM_NE_ID_IN NUMBER(9)
- ,NSTM_NE_ID_OF NUMBER(9)
- ,NSTM_TYPE VARCHAR2(1)
- ,NSTM_OBJ_TYPE VARCHAR2(4)
- ,NSTM_ROWID ROWID
- ,NSTM_OPERATION VARCHAR2(1)
  )
 /
 
