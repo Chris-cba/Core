@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.13   Apr 09 2010 12:14:56   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.14   Apr 22 2010 12:11:42   rcoupe  $
 --       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   Apr 09 2010 12:14:56  $
---       Date fetched Out : $Modtime:   Apr 09 2010 12:14:22  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Apr 22 2010 12:11:42  $
+--       Date fetched Out : $Modtime:   Apr 22 2010 12:10:52  $
+--       PVCS Version     : $Revision:   2.14  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Fri Apr 09  12:01:52 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Thu Apr 22  12:02:52 2010 by Server Generator 10.1.2.9.28
 
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
@@ -47,11 +47,6 @@ PROMPT Creating Index 'DAH_IND1'
 CREATE INDEX DAH_IND1 ON DOC_ACTION_HISTORY
  (DAH_DAC_ID
  ,DAH_CODE)
-/
-
-PROMPT Creating Index 'DAS_FK_DGT_IND'
-CREATE INDEX DAS_FK_DGT_IND ON DOC_ASSOCS
- (DAS_TABLE_NAME)
 /
 
 PROMPT Creating Index 'DAS_IND1'
@@ -394,6 +389,13 @@ CREATE INDEX HDO_FK_HPR_IND ON HIG_DOMAINS
 PROMPT Creating Index 'HER_FK_HPR_IND'
 CREATE INDEX HER_FK_HPR_IND ON HIG_ERRORS
  (HER_APPL)
+/
+
+PROMPT Creating Index 'HFTQ_BATCH_NO_STATUS_IND'
+CREATE INDEX HFTQ_BATCH_NO_STATUS_IND ON HIG_FILE_TRANSFER_QUEUE
+ (HFTQ_BATCH_NO
+ ,HFTQ_STATUS
+ ,HFTQ_TRANSFER_TYPE)
 /
 
 PROMPT Creating Index 'HMH_HUS_FK_IND'
