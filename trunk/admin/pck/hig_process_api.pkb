@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.3   Apr 14 2010 15:26:44   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.4   Apr 22 2010 12:11:26   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Apr 14 2010 15:26:44  $
---       Date fetched Out : $Modtime:   Apr 14 2010 15:25:58  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Apr 22 2010 12:11:26  $
+--       Date fetched Out : $Modtime:   Apr 19 2010 15:01:24  $
+--       Version          : $Revision:   3.4  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -107,9 +107,9 @@ BEGIN
  RETURN l_retval;
 
 END get_current_process_in_files;
-
-
-
+--
+---------------------------------------------------------------------------
+--
 FUNCTION get_process_created_message RETURN VARCHAR2 IS
 
 BEGIN
@@ -167,6 +167,56 @@ END get_current_process_id;
 --
 -----------------------------------------------------------------------------
 --
+PROCEDURE set_current_job_run_seq(pi_job_run_seq IN hig_process_job_runs.hpjr_job_run_seq%TYPE) IS
+
+BEGIN
+
+ nm3ctx.set_context(p_Attribute  => 'HPJR_RUN_SEQ'
+                   ,p_Value      =>  TO_CHAR(pi_job_run_seq));
+
+END set_current_job_run_seq;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_current_job_run_seq RETURN hig_process_job_runs.hpjr_job_run_seq%TYPE IS
+
+BEGIN
+
+ RETURN(TO_NUMBER(Sys_Context('NM3SQL','HPJR_RUN_SEQ')));
+
+
+END get_current_job_run_seq;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION last_process_job_run(pi_process_id IN hig_processes.hp_process_id%TYPE) RETURN hig_process_job_runs.hpjr_job_run_seq%TYPE IS
+
+ l_retval hig_process_job_runs.hpjr_job_run_seq%TYPE;
+
+BEGIN
+
+ select count(hpjr_process_id)
+ into  l_retval 
+ from hig_process_job_runs 
+ where hpjr_process_id = pi_process_id;
+
+ RETURN(l_retval);
+
+
+END last_process_job_run;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION next_process_job_run(pi_process_id IN hig_processes.hp_process_id%TYPE) RETURN hig_process_job_runs.hpjr_job_run_seq%TYPE IS
+
+BEGIN
+
+ RETURN ( last_process_job_run(pi_process_id => pi_process_id)+1 );
+
+END next_process_job_run;
+--
+-----------------------------------------------------------------------------
+--
 PROCEDURE process_execution_start IS
 
  l_id pls_integer;
@@ -185,10 +235,7 @@ PROCEDURE process_execution_start IS
  
 BEGIN
 
- select count(hpjr_process_id)+1
- into  l_id 
- from hig_process_job_runs 
- where hpjr_process_id = get_current_process_id;
+ l_id := next_process_job_run(pi_process_id => get_current_process_id);
 
  insert into hig_process_job_runs(hpjr_process_id
                                  ,hpjr_job_run_seq
@@ -200,9 +247,7 @@ BEGIN
                                 );         
 
 
- nm3ctx.set_context(p_Attribute  => 'HPJR_RUN_SEQ'
-                   ,p_Value      =>  TO_CHAR(l_id));
-                   
+ set_current_job_run_seq(pi_job_run_seq => l_id); 
 
  --
  -- mark any input files that are attributed to this process but unattributed to a process execution
@@ -224,18 +269,9 @@ END process_execution_start;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_current_job_run_seq RETURN hig_process_job_runs.hpjr_job_run_seq%TYPE IS
-
-BEGIN
-
- RETURN(TO_NUMBER(Sys_Context('NM3SQL','HPJR_RUN_SEQ')));
-
-END get_current_job_run_seq;
---
------------------------------------------------------------------------------
--- 
 PROCEDURE process_execution_end(pi_success_flag    IN hig_processes.hp_success_flag%TYPE DEFAULT 'Y'
-                               ,pi_additional_info IN VARCHAR2 DEFAULT NULL) IS
+                               ,pi_additional_info IN VARCHAR2 DEFAULT NULL
+                               ,pi_force           IN BOOLEAN DEFAULT FALSE) IS
 
  l_id pls_integer;
  
@@ -243,7 +279,7 @@ PROCEDURE process_execution_end(pi_success_flag    IN hig_processes.hp_success_f
  
  l_current_process_id  hig_processes.hp_process_id%TYPE;
  l_current_job_run_seq hig_process_job_runs.hpjr_job_run_seq%TYPE;
- 
+ l_force varchar2(10);
 
 BEGIN
 
@@ -251,15 +287,22 @@ BEGIN
  l_current_job_run_seq := get_current_job_run_seq;
 
 --
--- update the job run record if it's not already been updated (perhaps by the bespoke api code that was called by the job)
+-- 
 --
- update hig_process_job_runs
- set    hpjr_end             = systimestamp
-       ,hpjr_success_flag    = pi_success_flag
-       ,hpjr_additional_info = SUBSTR(pi_additional_info,1,500)
- where  hpjr_process_id      = l_current_process_id
- and    hpjr_job_run_seq     = l_current_job_run_seq
- and    hpjr_end IS NULL;
+ l_force := nm3flx.boolean_to_char(pi_force);
+ 
+     update hig_process_job_runs
+     set    hpjr_end             = systimestamp
+           ,hpjr_success_flag    = pi_success_flag
+           ,hpjr_additional_info = SUBSTR(pi_additional_info,1,500)
+     where  hpjr_process_id      = l_current_process_id
+     and    hpjr_job_run_seq     = l_current_job_run_seq
+     and    (
+              (l_force = 'TRUE')
+            OR
+              (hpjr_end IS NULL) -- only update the job run record if it's not already been updated (perhaps by the bespoke api code that was called by the job)
+            );      
+     
 
 --
 -- if job run record was updated then also update the process record
@@ -325,7 +368,7 @@ PROCEDURE check_file_cardinality(pi_process_id  IN hig_processes.hp_process_id%T
          SELECT hptf_file_type_id
                ,hptf_name
                ,NVL(hptf_min_input_files,0) hptf_min_input_files
-               ,NVL(hptf_max_input_files,0) hptf_max_input_files 
+               ,NVL(hptf_max_input_files,999999999) hptf_max_input_files 
                ,(select count(*) 
                       from hig_process_files
                       where hpf_process_id = pi_process_id
@@ -347,7 +390,7 @@ BEGIN
        hig.raise_ner(pi_appl => 'HIG'
                     ,pi_id   => i.violation
                     ,pi_supplementary_info => i.hptf_name||'  Limit '||i.hptf_max_input_files||' Submitted '||i.count_of_files
-                    );
+                    ); 
  
    ELSE
    
@@ -829,7 +872,9 @@ BEGIN
 
 IF pi_process_id IS NOT NULL THEN
 
-     l_process_run_seq := get_current_job_run_seq;
+     l_process_run_seq := NVL(get_current_job_run_seq,last_process_job_run(pi_process_id => pi_process_id));
+     
+     
 
      insert into hig_process_log(hpl_process_id
                                , hpl_job_run_seq
