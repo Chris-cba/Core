@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.18   Apr 09 2010 12:11:04   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.19   Apr 22 2010 12:15:08   rcoupe  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Apr 09 2010 12:11:04  $
---       Date fetched Out : $Modtime:   Apr 09 2010 12:10:38  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Apr 22 2010 12:15:08  $
+--       Date fetched Out : $Modtime:   Apr 22 2010 12:14:42  $
+--       PVCS Version     : $Revision:   2.19  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Fri Apr 09  12:01:52 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Thu Apr 22  12:02:52 2010 by Server Generator 10.1.2.9.28
 
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -85,6 +85,20 @@ ALTER TABLE DOC_ENQUIRY_TYPES
   ,DET_CODE))
 /
 
+PROMPT Creating Primary Key on 'DOC_FILE_LOCKS'
+ALTER TABLE DOC_FILE_LOCKS
+ ADD (CONSTRAINT DFL_PK PRIMARY KEY
+  (DFL_DOC_ID
+  ,DFL_REVISION))
+/
+
+PROMPT Creating Primary Key on 'DOC_FILE_TRANSFER_TEMP'
+ALTER TABLE DOC_FILE_TRANSFER_TEMP
+ ADD (CONSTRAINT DFTT_PK PRIMARY KEY
+  (DFTT_DOC_ID
+  ,DFTT_REVISION))
+/
+
 PROMPT Creating Primary Key on 'DOC_GATEWAYS'
 ALTER TABLE DOC_GATEWAYS
  ADD (CONSTRAINT DGT_PK PRIMARY KEY
@@ -122,6 +136,12 @@ PROMPT Creating Primary Key on 'DOC_LOCATIONS'
 ALTER TABLE DOC_LOCATIONS
  ADD (CONSTRAINT DLC_PK PRIMARY KEY
   (DLC_ID))
+/
+
+PROMPT Creating Primary Key on 'DOC_LOCATION_TABLES'
+ALTER TABLE DOC_LOCATION_TABLES
+ ADD (CONSTRAINT DOC_LOCATION_TABLES_PK PRIMARY KEY
+  (DLT_ID))
 /
 
 PROMPT Creating Primary Key on 'DOC_MEDIA'
@@ -463,6 +483,12 @@ ALTER TABLE HIG_ERRORS
  ADD (CONSTRAINT HER_PK PRIMARY KEY
   (HER_NO
   ,HER_APPL))
+/
+
+PROMPT Creating Primary Key on 'HIG_FILE_TRANSFER_QUEUE'
+ALTER TABLE HIG_FILE_TRANSFER_QUEUE
+ ADD (CONSTRAINT HFTQ_PK PRIMARY KEY
+  (HFTQ_ID))
 /
 
 PROMPT Creating Primary Key on 'HIG_FLEX_ATTRIBUTES'
@@ -2238,6 +2264,13 @@ PROMPT Creating Unique Key on 'DOC_LOCATIONS'
 ALTER TABLE DOC_LOCATIONS
  ADD (CONSTRAINT DLC_UK UNIQUE
   (DLC_NAME))
+/
+
+PROMPT Creating Unique Key on 'DOC_LOCATION_TABLES'
+ALTER TABLE DOC_LOCATION_TABLES
+ ADD (CONSTRAINT DOC_LOCATION_TABLES_UK UNIQUE
+  (DLT_DLC_ID
+  ,DLT_TABLE))
 /
 
 PROMPT Creating Unique Key on 'DOC_MEDIA'
@@ -4361,6 +4394,13 @@ ALTER TABLE DOC_LOCATIONS ADD (CONSTRAINT
  DLC_FK_DMD FOREIGN KEY
   (DLC_DMD_ID) REFERENCES DOC_MEDIA
   (DMD_ID))
+/
+
+PROMPT Creating Foreign Key on 'DOC_LOCATION_TABLES'
+ALTER TABLE DOC_LOCATION_TABLES ADD (CONSTRAINT
+ DLT_DLC_ID_DLC_ID_FK FOREIGN KEY
+  (DLT_DLC_ID) REFERENCES DOC_LOCATIONS
+  (DLC_ID))
 /
 
 PROMPT Creating Foreign Key on 'DOC_QUERY_COLS'
