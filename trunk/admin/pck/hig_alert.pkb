@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.2   Apr 21 2010 10:32:48   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.3   Apr 22 2010 14:12:46   lsorathia  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   Apr 21 2010 10:32:48  $
---       Date fetched Out : $Modtime:   Apr 21 2010 10:19:04  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Apr 22 2010 14:12:46  $
+--       Date fetched Out : $Modtime:   Apr 22 2010 13:53:24  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,12 +17,11 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.2  $';
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.3  $';
   g_app_owner     CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  Varchar2(32767);
-  g_trigger_text1 Varchar2(32767) ;
-  g_mail_conn        utl_smtp.connection;
+  g_trigger_text1 Varchar2(32767) ;  
 
   g_package_name CONSTANT varchar2(30) := 'hig_alert';
   
@@ -87,32 +86,26 @@ BEGIN
 --
 END upd_har_status;
 --
-PROCEDURE send_mail(pi_har_id IN hig_alert_recipients.har_id%TYPE
+PROCEDURE send_mail(pi_har_id      IN hig_alert_recipients.har_id%TYPE
                    ,pi_from_screen IN Varchar2 DEFAULT 'N' )
 IS
 -- 
-   l_har_rec   hig_alert_recipients%ROWTYPE ;  
-   l_hal_rec   hig_alerts%ROWTYPE ;
-   l_hatm_rec  hig_alert_type_mail%ROWTYPE ;
-   l_halt_rec  hig_alert_types%ROWTYPE ;
-   l_hael_rec  hig_alert_error_logs%ROWTYPE;
-   l_hatr_rec  hig_alert_type_recipients%ROWTYPE ;
-  
+   l_har_rec          hig_alert_recipients%ROWTYPE ;  
+   l_hal_rec          hig_alerts%ROWTYPE ;
+   l_hatm_rec         hig_alert_type_mail%ROWTYPE ;
+   l_halt_rec         hig_alert_types%ROWTYPE ;
+   l_hael_rec         hig_alert_error_logs%ROWTYPE;
+   l_hatr_rec         hig_alert_type_recipients%ROWTYPE ;
+   l_to_recipient     nm_mail_users.nmu_email_address%TYPE;
+   l_cc_recipient     nm_mail_users.nmu_email_address%TYPE;
+   l_bcc_recipient    nm_mail_users.nmu_email_address%TYPE;
+   l_send_mail_status Boolean;
+   l_error_text       Varchar2(2000);
+
+
    recipient_not_found Exception ;
    Pragma Exception_Init(recipient_not_found,-22000);
  
-   CURSOR cs_sender  
-   IS
-   SELECT nmu_name||' <'||nmu_email_address||'>' sender_name
-         ,nmu_email_address sender_email
-   FROM  nm_mail_users
-   WHERE nmu_hus_user_id = nm3user.get_user_id ;
-   l_sender_rec cs_sender%ROWTYPE;
-   PROCEDURE send_header(name IN VARCHAR2, header IN VARCHAR2) 
-   IS
-   BEGIN
-      utl_smtp.write_data(g_mail_conn, name || ': ' || header || utl_tcp.CRLF);
-   END ;
 --
 BEGIN
 --
@@ -121,62 +114,38 @@ BEGIN
    l_hatm_rec := get_hatm(l_hal_rec.hal_halt_id);
    l_halt_rec := get_halt(l_hal_rec.hal_halt_id);   
    l_hatr_rec := get_hatr(l_har_rec.har_hatr_id);
-   OPEN  cs_sender ;
-   FETCH cs_sender INTO l_sender_rec;
-   CLOSE cs_sender;
-   g_mail_conn := utl_smtp.open_connection(g_smtp_server, g_smtp_port);
-   utl_smtp.helo(g_mail_conn, g_smtp_domain);   
-   utl_smtp.mail(g_mail_conn, l_sender_rec.sender_email);
    IF l_har_rec.har_recipient_email IS NULL
    THEN    
        Raise recipient_not_found;
    END IF ;
-   utl_smtp.rcpt(g_mail_conn,l_har_rec.har_recipient_email);
-   utl_smtp.open_data(g_mail_conn);
-   send_header('From',   l_sender_rec.sender_name );
    IF l_hatr_rec.hatr_type = 'To :'
    THEN
-       send_header('To',     l_har_rec.har_recipient_email  );
+       l_to_recipient  := l_har_rec.har_recipient_email;
    ELSIF l_hatr_rec.hatr_type = 'Cc :'
    THEN
-       send_header('Cc',     l_har_rec.har_recipient_email  );
+       l_cc_recipient  := l_har_rec.har_recipient_email;
    ELSIF l_hatr_rec.hatr_type = 'Bcc :'
    THEN
-       send_header('Bcc',     l_har_rec.har_recipient_email  );
+       l_bcc_recipient := l_har_rec.har_recipient_email;
    END IF ;
-   send_header('Subject', l_hal_rec.hal_subject);
-   IF Nvl(l_hatm_rec.hatm_mail_type,'T') = 'H'
-   THEN
-       utl_smtp.write_data(g_mail_conn,'MIME-Version: 1.0'|| utl_tcp.crlf);
-       utl_smtp.write_data(g_mail_conn,'Content-Type: text/html' || utl_tcp.crlf);  
+   l_send_mail_status := nm3mail.send_mail(pi_recipient_to  => l_to_recipient 
+                                          ,pi_recipient_cc  => l_cc_recipient
+                                          ,pi_recipient_bcc => l_bcc_recipient
+                                          ,pi_subject       => l_hal_rec.hal_subject
+                                          ,pi_mailformat    => Nvl(l_hatm_rec.hatm_mail_type,'T')
+                                          ,pi_mail_body     => l_hal_rec.hal_mail_text
+                                          ,po_error_text    => l_error_text);                 
+   IF l_send_mail_status
+   THEN   
+       upd_har_status(l_har_rec.har_id,'Completed');
+   ELSE
+       upd_har_status(l_har_rec.har_id,'Failed',l_error_text);
    END IF ;
-   utl_smtp.write_data(g_mail_conn, utl_tcp.CRLF || l_hal_rec.hal_mail_text);
-   utl_smtp.close_data(g_mail_conn);
-   utl_smtp.quit(g_mail_conn);
-   upd_har_status(l_har_rec.har_id,'Completed');
    IF pi_from_screen = 'Y'
    THEN
        Commit;
    END IF ;
-EXCEPTION
-    WHEN utl_smtp.transient_error OR utl_smtp.permanent_error THEN
-        BEGIN
-           utl_smtp.quit(g_mail_conn);
-           upd_har_status(l_har_rec.har_id,'Failed','Failed to send mail due to the following error: ' || sqlerrm);
-           l_hael_rec.hael_nit_inv_type := l_halt_rec.halt_nit_inv_type ;
-           l_hael_rec.hael_har_id       := pi_har_id ;
-           l_hael_rec.hael_pk_id        := l_hal_rec.hal_pk_id ;
-           l_hael_rec.hael_alert_description := l_halt_rec.halt_description;
-           l_hael_rec.hael_description := 'Error :- '|| sqlerrm ;
-           insert_hael(l_hael_rec);
-        EXCEPTION
-           WHEN utl_smtp.transient_error OR utl_smtp.permanent_error THEN
-               upd_har_status(l_har_rec.har_id,'Failed','SMTP server is down or unavailable'); -- When the SMTP server is down or unavailable, we don't
-        END;
-        IF pi_from_screen = 'Y'
-        THEN
-            Commit;
-        END IF ;
+EXCEPTION   
     WHEN recipient_not_found THEN
         upd_har_status(l_har_rec.har_id,'Failed','Recipient email ID is blank');
         IF l_halt_rec.halt_nit_inv_type != 'ERR'
@@ -192,21 +161,6 @@ EXCEPTION
                 Commit;
             END IF ;
         END IF ;   
-    WHEN OTHERS THEN     
-        upd_har_status(l_har_rec.har_id,'Failed','Failed due to : ' || sqlerrm);
-        IF l_halt_rec.halt_nit_inv_type != 'ERR'
-        THEN
-            l_hael_rec.hael_nit_inv_type := l_halt_rec.halt_nit_inv_type ;
-            l_hael_rec.hael_har_id       := pi_har_id  ; 
-            l_hael_rec.hael_pk_id        := l_hal_rec.hal_pk_id ;
-            l_hael_rec.hael_alert_description := l_halt_rec.halt_description;
-            l_hael_rec.hael_description :=  'Error :- '|| sqlerrm ;
-            insert_hael(l_hael_rec);
-            IF pi_from_screen = 'Y'
-            THEN
-                Commit;
-            END IF ;
-        END IF ;
 --    
 END send_mail;
 --
