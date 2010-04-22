@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkh-arc   3.0   Mar 29 2010 17:09:30   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkh-arc   3.1   Apr 22 2010 12:11:34   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_framework.pkh  $
---       Date into PVCS   : $Date:   Mar 29 2010 17:09:30  $
---       Date fetched Out : $Modtime:   Mar 29 2010 17:08:56  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Apr 22 2010 12:11:34  $
+--       Date fetched Out : $Modtime:   Apr 07 2010 14:42:24  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
 
 --  
 --</GLOBVAR>
@@ -112,6 +112,8 @@ PROCEDURE delete_process_type_frequency(pi_process_type_id            IN hig_pro
 ----------------------------------------------------------------------------------
 FUNCTION get_process_type(pi_process_type_id IN hig_process_types.hpt_process_type_id%TYPE) RETURN hig_process_types%ROWTYPE;
 
+FUNCTION get_process_type(pi_process_type_name IN hig_process_types.hpt_name%TYPE) RETURN hig_process_types%ROWTYPE;
+
 
 --------------------------------------------------------------------------------------------------------------------------------
 -- HIG2510-Submit A Process can be called directly from the launchpad/fastpath
@@ -148,6 +150,10 @@ FUNCTION get_job(pi_job_name IN dba_scheduler_jobs.job_name%TYPE) RETURN dba_sch
 -- For a given file type get the hig_process_type_files record
 --------------------------------------------------------------
 FUNCTION get_process_type_file(pi_file_type_id IN hig_process_type_files.hptf_file_type_id%TYPE) RETURN hig_process_type_files%ROWTYPE;
+
+FUNCTION get_process_type_file(pi_process_type_id  IN hig_process_type_files.hptf_process_type_id%TYPE
+                              ,pi_file_type_name   IN hig_process_type_files.hptf_name%TYPE) RETURN hig_process_type_files%ROWTYPE;
+
 
 
 ------------------------------------------------------------------------
