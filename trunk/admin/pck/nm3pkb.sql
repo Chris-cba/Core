@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.29   Apr 23 2010 14:34:30   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.30   Apr 23 2010 14:36:16   aedwards  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   Apr 23 2010 14:34:30  $
---       Date fetched Out : $Modtime:   Apr 23 2010 14:34:06  $
---       PVCS Version     : $Revision:   2.29  $
+--       Date into PVCS   : $Date:   Apr 23 2010 14:36:16  $
+--       Date fetched Out : $Modtime:   Apr 23 2010 14:35:54  $
+--       PVCS Version     : $Revision:   2.30  $
 --
 --
 --   Author : Graeme Johnson
@@ -2234,7 +2234,17 @@ start '&run_file'
 --
 ----------------------------------------------------------------------------------------- 
 --
-
+SET TERM ON 
+PROMPT nm3doc_files.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3doc_files.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
 --
 -- New PACKAGE BODIES above here
 --
