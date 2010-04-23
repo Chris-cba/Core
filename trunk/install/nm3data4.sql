@@ -2,18 +2,18 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data4.sql-arc   2.4   Aug 21 2009 10:07:22   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data4.sql-arc   2.5   Apr 23 2010 15:26:40   malexander  $
 --       Module Name      : $Workfile:   nm3data4.sql  $
---       Date into PVCS   : $Date:   Aug 21 2009 10:07:22  $
---       Date fetched Out : $Modtime:   Aug 21 2009 10:07:12  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Apr 23 2010 15:26:40  $
+--       Date fetched Out : $Modtime:   Apr 23 2010 15:23:44  $
+--       Version          : $Revision:   2.5  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 19-AUG-2009 10:57
+--       Generation Date  : 23-APR-2010 15:23
 --
 --   Product metadata script
---   As at Release 4.1.0.0
+--   As at Release 4.2.1.0
 --
---   Copyright (c) exor corporation ltd, 2009
+--   Copyright (c) exor corporation ltd, 2010
 --
 --   TABLES PROCESSED
 --   ================
@@ -21,6 +21,8 @@
 --   GROUP_TYPE_ROLES
 --   INTERVALS
 --   HIG_REPORT_STYLES
+--   HIG_NAVIGATOR
+--   HIG_NAVIGATOR_MODULES
 --
 -----------------------------------------------------------------------------
 
@@ -1781,7 +1783,37 @@ SELECT
 --
 --
 --
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_NAVIGATOR
 --
+-- select * from nm3_metadata.hig_navigator
+-- order by hnv_child_alias
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT hig_navigator
+SET TERM OFF
+
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_NAVIGATOR_MODULES
+--
+-- WARNING - TABLE DOES NOT HAVE A UNIQUE KEY
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT hig_navigator_modules
+SET TERM OFF
+
 --
 --
 ----------------------------------------------------------------------------------------

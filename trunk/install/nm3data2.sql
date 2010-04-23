@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.19   Apr 14 2010 14:43:08   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.20   Apr 23 2010 15:26:40   malexander  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Apr 14 2010 14:43:08  $
---       Date fetched Out : $Modtime:   Apr 14 2010 14:35:56  $
---       Version          : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Apr 23 2010 15:26:40  $
+--       Date fetched Out : $Modtime:   Apr 23 2010 15:23:40  $
+--       Version          : $Revision:   2.20  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 14-APR-2010 14:35
+--       Generation Date  : 23-APR-2010 15:23
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -80612,6 +80612,23 @@ INSERT INTO HIG_STANDARD_FAVOURITES
        )
 SELECT 
         'DOC'
+       ,'DOC_BUNDLES'
+       ,'Document Bundles'
+       ,'F'
+       ,3 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'DOC'
+                    AND  HSTF_CHILD = 'DOC_BUNDLES');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'DOC'
        ,'DOC_DOCUMENTS'
        ,'Documents'
        ,'F'
@@ -80636,6 +80653,40 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'DOC'
                     AND  HSTF_CHILD = 'DOC_REF');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'DOC_BUNDLES'
+       ,'DOC0300'
+       ,'Load Document Bundles'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'DOC_BUNDLES'
+                    AND  HSTF_CHILD = 'DOC0300');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'DOC_BUNDLES'
+       ,'DOC0310'
+       ,'Manage Document Bundles'
+       ,'M'
+       ,20 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'DOC_BUNDLES'
+                    AND  HSTF_CHILD = 'DOC0310');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT

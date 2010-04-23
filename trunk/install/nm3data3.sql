@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.15   Apr 15 2010 11:24:12   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.16   Apr 23 2010 15:26:40   malexander  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Apr 15 2010 11:24:12  $
---       Date fetched Out : $Modtime:   Apr 15 2010 11:18:48  $
---       Version          : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Apr 23 2010 15:26:40  $
+--       Date fetched Out : $Modtime:   Apr 23 2010 15:23:42  $
+--       Version          : $Revision:   2.16  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 15-APR-2010 11:18
+--       Generation Date  : 23-APR-2010 15:23
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -24,6 +24,8 @@
 --   HIG_PROCESS_TYPE_ROLES
 --   HIG_SCHEDULING_FREQUENCIES
 --   HIG_PROCESS_TYPE_FREQUENCIES
+--   HIG_PROCESS_TYPE_FILES
+--   HIG_MODULE_BLOCKS
 --
 -----------------------------------------------------------------------------
 
@@ -491,6 +493,19 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'DOC0202'
                     AND  HMR_ROLE = 'DOC0202');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'DOC0300'
+       ,'DOC_USER'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'DOC0300'
+                    AND  HMR_ROLE = 'DOC_USER');
 --
 INSERT INTO HIG_MODULE_ROLES
        (HMR_MODULE
@@ -1478,6 +1493,19 @@ SELECT
        ,'NORMAL' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'HIG2540'
+                    AND  HMR_ROLE = 'HIG_USER');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'HIG2600'
+       ,'HIG_USER'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'HIG2600'
                     AND  HMR_ROLE = 'HIG_USER');
 --
 INSERT INTO HIG_MODULE_ROLES
@@ -4614,6 +4642,32 @@ INSERT INTO HIG_PROCESS_TYPES
        ,HPT_SEE_IN_HIG2510
        )
 SELECT 
+        -2
+       ,'Load Document Bundles'
+       ,'Unpacks document bundle zip file(s)'||CHR(10)||'Reads the driving file(s)'||CHR(10)||'Creates document and document association records'||CHR(10)||'Moves the document files to the correct location'
+       ,'doc_bundle_loader.load_process_document_bundles;'
+       ,'DOC0300'
+       ,'DOC0310'
+       ,'P_PROCESS_ID'
+       ,null
+       ,'Y'
+       ,'Y' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_TYPES
+                   WHERE HPT_PROCESS_TYPE_ID = -2);
+--
+INSERT INTO HIG_PROCESS_TYPES
+       (HPT_PROCESS_TYPE_ID
+       ,HPT_NAME
+       ,HPT_DESCR
+       ,HPT_WHAT_TO_CALL
+       ,HPT_INITIATION_MODULE
+       ,HPT_INTERNAL_MODULE
+       ,HPT_INTERNAL_MODULE_PARAM
+       ,HPT_PROCESS_LIMIT
+       ,HPT_RESTARTABLE
+       ,HPT_SEE_IN_HIG2510
+       )
+SELECT 
         -1
        ,'Alert Manager'
        ,'This Process will sent out pending Alerts every 10 minutes'
@@ -4645,6 +4699,17 @@ SET TERM ON
 PROMPT hig_process_type_roles
 SET TERM OFF
 
+INSERT INTO HIG_PROCESS_TYPE_ROLES
+       (HPTR_PROCESS_TYPE_ID
+       ,HPTR_ROLE
+       )
+SELECT 
+        -2
+       ,'DOC_USER' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_TYPE_ROLES
+                   WHERE HPTR_PROCESS_TYPE_ID = -2
+                    AND  HPTR_ROLE = 'DOC_USER');
+--
 INSERT INTO HIG_PROCESS_TYPE_ROLES
        (HPTR_PROCESS_TYPE_ID
        ,HPTR_ROLE
@@ -4865,12 +4930,107 @@ INSERT INTO HIG_PROCESS_TYPE_FREQUENCIES
        ,HPFR_SEQ
        )
 SELECT 
+        -2
+       ,-1
+       ,1 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_TYPE_FREQUENCIES
+                   WHERE HPFR_PROCESS_TYPE_ID = -2
+                    AND  HPFR_FREQUENCY_ID = -1);
+--
+INSERT INTO HIG_PROCESS_TYPE_FREQUENCIES
+       (HPFR_PROCESS_TYPE_ID
+       ,HPFR_FREQUENCY_ID
+       ,HPFR_SEQ
+       )
+SELECT 
         -1
        ,-4
        ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_TYPE_FREQUENCIES
                    WHERE HPFR_PROCESS_TYPE_ID = -1
                     AND  HPFR_FREQUENCY_ID = -4);
+--
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_PROCESS_TYPE_FILES
+--
+-- select * from nm3_metadata.hig_process_type_files
+-- order by hptf_file_type_id
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT hig_process_type_files
+SET TERM OFF
+
+INSERT INTO HIG_PROCESS_TYPE_FILES
+       (HPTF_FILE_TYPE_ID
+       ,HPTF_NAME
+       ,HPTF_PROCESS_TYPE_ID
+       ,HPTF_INPUT
+       ,HPTF_OUTPUT
+       ,HPTF_INPUT_DESTINATION
+       ,HPTF_INPUT_DESTINATION_TYPE
+       ,HPTF_MIN_INPUT_FILES
+       ,HPTF_MAX_INPUT_FILES
+       ,HPTF_OUTPUT_DESTINATION
+       ,HPTF_OUTPUT_DESTINATION_TYPE
+       )
+SELECT 
+        -1
+       ,'Doc Bundle'
+       ,-2
+       ,'Y'
+       ,'N'
+       ,''
+       ,'ORACLE_DIRECTORY'
+       ,1
+       ,null
+       ,''
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_TYPE_FILES
+                   WHERE HPTF_FILE_TYPE_ID = -1);
+--
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_MODULE_BLOCKS
+--
+-- select * from nm3_metadata.hig_module_blocks
+-- order by hmb_module_name
+--         ,hmb_block_name
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT hig_module_blocks
+SET TERM OFF
+
+INSERT INTO HIG_MODULE_BLOCKS
+       (HMB_MODULE_NAME
+       ,HMB_BLOCK_NAME
+       ,HMB_DATE_CREATED
+       ,HMB_DATE_MODIFIED
+       ,HMB_CREATED_BY
+       ,HMB_MODIFIED_BY
+       )
+SELECT 
+        'HIG1505'
+       ,'HAUD'
+       ,to_date('20100423152136','YYYYMMDDHH24MISS')
+       ,to_date('20100423152136','YYYYMMDDHH24MISS')
+       ,'NM3_METADATA'
+       ,'NM3_METADATA' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_BLOCKS
+                   WHERE HMB_MODULE_NAME = 'HIG1505'
+                    AND  HMB_BLOCK_NAME = 'HAUD');
 --
 --
 --
