@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.1   Apr 15 2010 09:26:20   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.2   Apr 23 2010 15:27:06   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Apr 15 2010 09:26:20  $
---       Date fetched Out : $Modtime:   Apr 15 2010 09:24:40  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 23 2010 15:27:06  $
+--       Date fetched Out : $Modtime:   Apr 23 2010 15:17:18  $
+--       Version          : $Revision:   3.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -362,6 +362,623 @@ CREATE SEQUENCE HFC_ID_SEQ
  NOMINVALUE
  NOCYCLE
 /
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Doc Assoc - Rebuild Indexes and constraints
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 109499
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Rebuild Doc Assocs Indexes and Constraints
+-- 
+------------------------------------------------------------------
+DECLARE
+  TYPE tab_varchar IS TABLE OF VARCHAR2(32767) INDEX BY BINARY_INTEGER;
+  l_drop_con   tab_varchar;
+  l_drop_index tab_varchar;
+BEGIN
+--
+-- Gather constraint drop statements
+--
+  SELECT 'alter table doc_assocs drop constraint '||constraint_name
+    BULK COLLECT INTO l_drop_con 
+    FROM user_constraints
+   WHERE table_name = 'DOC_ASSOCS'
+     AND constraint_type IN ('R','P');
+--
+  FOR i IN 1..l_drop_con.COUNT
+  LOOP
+    BEGIN
+      EXECUTE IMMEDIATE l_drop_con(i);
+      dbms_output.put_line ('Dropped constraint '||l_drop_con(i));
+    EXCEPTION
+      WHEN OTHERS 
+      THEN dbms_output.put_line ('Error dropping constraint '||l_drop_con(i)||' - '||SQLERRM);
+    END;
+  END LOOP;
+--
+-- Gather constraint index statements
+--
+  SELECT 'drop index '||index_name
+    BULK COLLECT INTO l_drop_index 
+    FROM user_indexes
+   WHERE table_name = 'DOC_ASSOCS';
+--
+  FOR i IN 1..l_drop_index.COUNT
+  LOOP
+    BEGIN
+      EXECUTE IMMEDIATE l_drop_index(i);
+      dbms_output.put_line ('Dropped index '||l_drop_index(i));
+    EXCEPTION
+      WHEN OTHERS 
+      THEN dbms_output.put_line ('Error dropping index '||l_drop_index(i)||' - '||SQLERRM);
+    END;
+  END LOOP;
+--
+-- Restore index and contraint configuration 
+--
+  dbms_output.put_line ('Creating Primary Key on DOC_ASSOCS');
+--
+  BEGIN
+    EXECUTE IMMEDIATE
+      'ALTER TABLE DOC_ASSOCS ADD (CONSTRAINT DAS_PK PRIMARY KEY (DAS_TABLE_NAME '
+                                                               ||',DAS_REC_ID '
+                                                               ||',DAS_DOC_ID))';
+  EXCEPTION
+    WHEN OTHERS
+    THEN dbms_output.put_line ('Creating Primary Key on DOC_ASSOCS error : '||SQLERRM);
+  END;
+--
+  dbms_output.put_line ('Creating Foreign Key on DOC_ASSOCS');
+--
+  BEGIN
+    EXECUTE IMMEDIATE 
+      'ALTER TABLE DOC_ASSOCS ADD (CONSTRAINT DAS_FK_DGT FOREIGN KEY (DAS_TABLE_NAME) REFERENCES DOC_GATEWAYS (DGT_TABLE_NAME))';
+  EXCEPTION
+    WHEN OTHERS
+    THEN dbms_output.put_line ('Creating Foreign Key on DOC_ASSOCS error : '||SQLERRM);
+  END;
+--
+  dbms_output.put_line ('Creating Foreign Key on DOC_ASSOCS');
+--
+  BEGIN
+    EXECUTE IMMEDIATE
+      'ALTER TABLE DOC_ASSOCS ADD (CONSTRAINT DAS_FK_DOC FOREIGN KEY (DAS_DOC_ID) REFERENCES DOCS '
+                                                                   ||' (DOC_ID) ON DELETE CASCADE) ';
+  EXCEPTION
+    WHEN OTHERS
+    THEN dbms_output.put_line ('Creating Foreign Key on DOC_ASSOCS error : '||SQLERRM);
+  END;
+--
+  dbms_output.put_line ('Creating Index DAS_IND1');
+--
+  BEGIN
+    EXECUTE IMMEDIATE 
+      'CREATE UNIQUE INDEX DAS_IND1 ON DOC_ASSOCS (DAS_DOC_ID,DAS_TABLE_NAME,DAS_REC_ID)';
+  EXCEPTION
+    WHEN OTHERS
+    THEN dbms_output.put_line ('Creating Index DAS_IND1 : '||SQLERRM);
+  END;
+--
+END;
+/
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT File Transfer Queue - Tables
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- File Transfer Queue - Tables
+-- 
+------------------------------------------------------------------
+PROMPT Creating Table 'HIG_FILE_TRANSFER_QUEUE'
+CREATE TABLE HIG_FILE_TRANSFER_QUEUE
+ (HFTQ_ID NUMBER(38) NOT NULL
+ ,HFTQ_BATCH_NO NUMBER(38) NOT NULL
+ ,HFTQ_DATE DATE NOT NULL
+ ,HFTQ_INITIATED_BY VARCHAR2(30) NOT NULL
+ ,HFTQ_DIRECTION VARCHAR2(10) NOT NULL
+ ,HFTQ_TRANSFER_TYPE VARCHAR2(20) NOT NULL
+ ,HFTQ_SOURCE VARCHAR2(2000) NOT NULL
+ ,HFTQ_SOURCE_TYPE VARCHAR2(2000) NOT NULL
+ ,HFTQ_SOURCE_FILENAME VARCHAR2(2000) NOT NULL
+ ,HFTQ_SOURCE_COLUMN VARCHAR2(30)
+ ,HFTQ_DESTINATION VARCHAR2(2000) NOT NULL
+ ,HFTQ_DESTINATION_TYPE VARCHAR2(2000) NOT NULL
+ ,HFTQ_DESTINATION_FILENAME VARCHAR2(2000) NOT NULL
+ ,HFTQ_DESTINATION_COLUMN VARCHAR2(30)
+ ,HFTQ_STATUS VARCHAR2(20) NOT NULL
+ ,HFTQ_CONDITION VARCHAR2(2000)
+ ,HFTQ_CONTENT BLOB
+ ,HFTQ_COMMENTS VARCHAR2(2000)
+ ,HFTQ_HP_PROCESS_ID NUMBER(38)
+ ,HFTQ_DATE_CREATED DATE
+ ,HFTQ_DATE_MODIFIED DATE
+ ,HFTQ_MODIFIED_BY VARCHAR2(30)
+ ,HFTQ_CREATED_BY VARCHAR2(30)
+ )
+/
+
+COMMENT ON TABLE HIG_FILE_TRANSFER_QUEUE IS 'Exor File Transfer Queue.  Table to store files awaiting transfer'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_ID IS 'Primary Key. Populated from sequence ''HFTQ_ID_SEQ''.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_BATCH_NO IS 'Queue Batch No. Represents a batch of files.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_DATE IS 'Queue Date. Date on which the queue was populated.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_INITIATED_BY IS 'Queue Initiator. User responsible for placing the files in the queue.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_DIRECTION IS 'Queue Direction. Indicates whether the files is going IN or OUT of Exor system.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_TRANSFER_TYPE IS 'Queue Transfer Type. Indicates the transfer protocol.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_SOURCE IS 'Queue Source. Indicates the original source path of the file.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_SOURCE_TYPE IS 'Queue Source Type. Indicates the original source type of the file.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_SOURCE_FILENAME IS 'Queue Source Filename. Indicates the original source filename.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_SOURCE_COLUMN IS 'Queue Source Column. Indicates the original source column.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_DESTINATION IS 'Queue File Destination Path. Indicates the destination path for the file.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_DESTINATION_TYPE IS 'Queue Destination Type. Indicates the destination type for file.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_DESTINATION_FILENAME IS 'Queue File Destination Filename. Indicates the destination filename.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_DESTINATION_COLUMN IS 'Queue File Destination Column. Indicates the destination column.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_STATUS IS 'Queue File Transfer Status. Current status of the queued file.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_CONDITION IS 'Queue File Condition. Predicate used for table transfers.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_CONTENT IS 'Queue File Binary Content. Binary representation of the file stored in table.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_COMMENTS IS 'Queue File Process ID. Link back to a HIG Process.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_DATE_CREATED IS 'Audit details.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_DATE_MODIFIED IS 'Audit details.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_MODIFIED_BY IS 'Audit details.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_QUEUE.HFTQ_CREATED_BY IS 'Audit details.'
+/
+
+PROMPT Creating Table 'HIG_FILE_TRANSFER_LOG'
+CREATE TABLE HIG_FILE_TRANSFER_LOG
+ (HFTL_ID NUMBER(38) NOT NULL
+ ,HFTL_HFTQ_ID NUMBER(38) NOT NULL
+ ,HFTL_HFTQ_BATCH_NO NUMBER(38) NOT NULL
+ ,HFTL_DATE DATE NOT NULL
+ ,HFTL_FILENAME VARCHAR2(2000) NOT NULL
+ ,HFTL_DESTINATION_PATH VARCHAR2(2000) NOT NULL
+ ,HFTL_MESSAGE VARCHAR2(2000) NOT NULL
+ )
+/
+
+COMMENT ON TABLE HIG_FILE_TRANSFER_LOG IS 'Exor File Transfer Log. Log of the files queued for transfer'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_LOG.HFTL_ID IS 'Primary Key. Populated from sequence ''HFTL_ID_SEQ''.'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_LOG.HFTL_HFTQ_ID IS 'Queue ID Foreign Key. Points to the Queue Primary Key'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_LOG.HFTL_HFTQ_BATCH_NO IS 'Queue Batch No Foreign Key. Points to the Queue Batch No'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_LOG.HFTL_DATE IS 'Queue Log Date. Date of the file transfer log entry'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_LOG.HFTL_FILENAME IS 'Destination Filename. Filename being transfered'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_LOG.HFTL_DESTINATION_PATH IS 'Destination Path. Path being transfered to'
+/
+
+COMMENT ON COLUMN HIG_FILE_TRANSFER_LOG.HFTL_MESSAGE IS 'Queue Message. File transfer log'
+/
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT File Transfer Queue - Constraints
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- File Transfer Queue - Constraints
+-- 
+------------------------------------------------------------------
+PROMPT Creating Primary Key on 'HIG_FILE_TRANSFER_QUEUE'
+ALTER TABLE HIG_FILE_TRANSFER_QUEUE
+ ADD (CONSTRAINT HFTQ_PK PRIMARY KEY
+  (HFTQ_ID))
+/
+
+PROMPT Creating Primary Key on 'HIG_FILE_TRANSFER_LOG'
+ALTER TABLE HIG_FILE_TRANSFER_LOG
+ ADD (CONSTRAINT HFTL_PK PRIMARY KEY
+  (HFTL_ID))
+/
+
+PROMPT Creating Foreign Key on 'HIG_FILE_TRANSFER_LOG'
+ALTER TABLE HIG_FILE_TRANSFER_LOG ADD (CONSTRAINT
+ HFTL_HFTQ_FK FOREIGN KEY
+  (HFTL_HFTQ_ID) REFERENCES HIG_FILE_TRANSFER_QUEUE
+  (HFTQ_ID))
+/
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT File Transfer Queue - Indexes
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- File Transfer Queue - Indexes
+-- 
+------------------------------------------------------------------
+
+PROMPT Creating Index 'HFTQ_BATCH_NO_STATUS_IND'
+CREATE INDEX HFTQ_BATCH_NO_STATUS_IND ON HIG_FILE_TRANSFER_QUEUE
+ (HFTQ_BATCH_NO
+ ,HFTQ_STATUS
+ ,HFTQ_TRANSFER_TYPE)
+/
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT File Transfer Queue - Sequences
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- File Transfer Queue - Sequences
+-- 
+------------------------------------------------------------------
+PROMPT Creating Sequence 'HFTQ_BATCH_NO_SEQ'
+CREATE SEQUENCE HFTQ_BATCH_NO_SEQ
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+/
+
+PROMPT Creating Sequence 'HFTQ_ID_SEQ'
+CREATE SEQUENCE HFTQ_ID_SEQ
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+/
+
+PROMPT Creating Sequence 'HFTL_ID_SEQ'
+CREATE SEQUENCE HFTL_ID_SEQ
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+/
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Document Manager - Tables
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Document Manager - Tables - Changes and modifications
+-- 
+------------------------------------------------------------------
+PROMPT Add DLC_LOCATION_TYPE to DOC_LOCATIONS
+ALTER TABLE doc_locations
+ADD dlc_location_type VARCHAR2(30) NOT NULL
+/
+
+PROMPT Add DLC_LOCATION_NAME to DOC_LOCATIONS
+ALTER TABLE doc_locations
+ADD dlc_location_name VARCHAR2(2000) NOT NULL
+/
+
+PROMPT Creating Table 'DOC_LOCATION_TABLES'
+CREATE TABLE DOC_LOCATION_TABLES
+ (DLT_ID NUMBER NOT NULL
+ ,DLT_DLC_ID NUMBER NOT NULL
+ ,DLT_TABLE VARCHAR2(30) NOT NULL
+ ,DLT_DOC_ID_COL VARCHAR2(30) NOT NULL
+ ,DLT_REVISION_COL VARCHAR2(30) NOT NULL
+ ,DLT_CONTENT_COL VARCHAR2(30) NOT NULL
+ ,DLT_START_DATE_COL VARCHAR2(30)
+ ,DLT_END_DATE_COL VARCHAR2(30)
+ ,DLT_FULL_PATH_COL VARCHAR2(30)
+ ,DLT_FILENAME VARCHAR2(30)
+ ,DLT_AUDIT_COL VARCHAR2(30)
+ ,DLT_FILE_INFO_COL VARCHAR2(30)
+ ,DLT_DATE_CREATED DATE
+ ,DLT_DATE_MODIFIED DATE
+ ,DLT_MODIFIED_BY VARCHAR2(30)
+ ,DLT_CREATED_BY VARCHAR2(30)
+ )
+/
+
+COMMENT ON TABLE DOC_LOCATION_TABLES IS 'Document Location Table metadata. Required when a Document Location is an Oracle table'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_ID IS 'Primary Key. Populated from sequence ''DLT_ID_SEQ''.'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_DLC_ID IS 'Foreign Key. Pointer to the DOC_LOCATION.DLC_ID column'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_TABLE IS 'Table Name. Refers to the table being used for the document storage'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_DOC_ID_COL IS 'Doc ID Column Name. Refers to the Foreign Key on the table to DOC_ID'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_REVISION_COL IS 'Revision Column Name. Refers to the Revision column on the table used for the document storage'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_CONTENT_COL IS 'BLOB Column Name. Refers to the BLOB column on the table used for the document storage'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_START_DATE_COL IS 'Start Date Column Name. Refers to the Start Date column on the table used for the document storage'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_END_DATE_COL IS 'End Date Column Name. Refers to the End Date column on the table used for the document storage'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_FULL_PATH_COL IS 'Full Path Column Name. Refers to the Full Path column on the table used for the document storage'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_FILENAME IS 'Filename Column Name. Refers to the Filename column on the table used for the document storage'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_AUDIT_COL IS 'File Info Column Name. Refers to the File Info column on the table used for the document storage'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_DATE_CREATED IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_DATE_MODIFIED IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_MODIFIED_BY IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_TABLES.DLT_CREATED_BY IS 'Audit details.'
+/
+
+PROMPT Creating Table 'DOC_FILE_LOCKS'
+CREATE TABLE DOC_FILE_LOCKS
+ (DFL_DOC_ID NUMBER NOT NULL
+ ,DFL_REVISION NUMBER NOT NULL
+ ,DFL_USERNAME VARCHAR2(30) NOT NULL
+ ,DFL_DATE DATE NOT NULL
+ ,DFL_TERMINAL VARCHAR2(2000) NOT NULL
+ ,DFL_DATE_CREATED DATE
+ ,DFL_DATE_MODIFIED DATE
+ ,DFL_MODIFIED_BY VARCHAR2(30)
+ ,DFL_CREATED_BY VARCHAR2(30)
+ )
+/
+
+COMMENT ON TABLE DOC_FILE_LOCKS IS 'Document File Locks table. Stores editing locks on files associated with Documents'
+/
+
+COMMENT ON COLUMN DOC_FILE_LOCKS.DFL_DOC_ID IS 'Primary Key Column 1. Document ID'
+/
+
+COMMENT ON COLUMN DOC_FILE_LOCKS.DFL_REVISION IS 'Primary Key Column 2. Revision'
+/
+
+COMMENT ON COLUMN DOC_FILE_LOCKS.DFL_USERNAME IS 'Terminal column. Logs the Terminal name of the machine the lock was taken out on'
+/
+
+COMMENT ON COLUMN DOC_FILE_LOCKS.DFL_DATE IS 'Date column. Date the lock was taken out'
+/
+
+COMMENT ON COLUMN DOC_FILE_LOCKS.DFL_DATE_CREATED IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_FILE_LOCKS.DFL_DATE_MODIFIED IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_FILE_LOCKS.DFL_MODIFIED_BY IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_FILE_LOCKS.DFL_CREATED_BY IS 'Audit details.'
+/
+
+PROMPT Creating Table 'DOC_FILE_TRANSFER_TEMP'
+CREATE GLOBAL TEMPORARY TABLE DOC_FILE_TRANSFER_TEMP
+ (DFTT_DOC_ID NUMBER NOT NULL
+ ,DFTT_REVISION NUMBER NOT NULL
+ ,DFTT_START_DATE DATE NOT NULL
+ ,DFTT_FULL_PATH VARCHAR2(4000) NOT NULL
+ ,DFTT_FILENAME VARCHAR2(4000) NOT NULL
+ ,DFTT_END_DATE DATE
+ ,DFTT_CONTENT BLOB
+ ,DFTT_AUDIT VARCHAR2(4000)
+ ,DFTT_FILE_INFO VARCHAR2(2000)
+ ,DFTT_DATE_CREATED DATE
+ ,DFTT_DATE_MODIFIED DATE
+ ,DFTT_CREATED_BY VARCHAR2(30)
+ ,DFTT_MODIFIED_BY VARCHAR2(30)
+ )
+ NOCACHE
+/
+
+COMMENT ON TABLE DOC_FILE_TRANSFER_TEMP IS 'Doc File Transfer table. A temporary file transfer table for database to client file transfers'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_DOC_ID IS 'Primary Key Column 1. Document ID'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_REVISION IS 'Primary Key Column 2. Revision'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_START_DATE IS 'Start Date. Column used to store Start Date of the file being loaded'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_END_DATE IS 'End Date. Column used to store End Date of the file being loaded'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_CONTENT IS 'BLOB Content. Column used to store BLOB for transfer from Client to Server'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_AUDIT IS 'Audit. Column used to audit details for debugging and error trapping'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_FILE_INFO IS 'File Info. Column used to store the File info such as size and other attributes'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_DATE_CREATED IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_DATE_MODIFIED IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_CREATED_BY IS 'Audit details.'
+/
+
+COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_MODIFIED_BY IS 'Audit details.'
+/
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Document Manager - Constraints
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Document Manager - Constraints
+-- 
+------------------------------------------------------------------
+PROMPT Creating Primary Key on 'DOC_LOCATION_TABLES'
+ALTER TABLE DOC_LOCATION_TABLES
+ ADD (CONSTRAINT DOC_LOCATION_TABLES_PK PRIMARY KEY
+  (DLT_ID))
+/
+
+PROMPT Creating Unique Key on 'DOC_LOCATION_TABLES'
+ALTER TABLE DOC_LOCATION_TABLES
+ ADD (CONSTRAINT DOC_LOCATION_TABLES_UK UNIQUE
+  (DLT_DLC_ID
+  ,DLT_TABLE))
+/
+
+PROMPT Creating Foreign Key on 'DOC_LOCATION_TABLES'
+ALTER TABLE DOC_LOCATION_TABLES ADD (CONSTRAINT
+ DLT_DLC_ID_DLC_ID_FK FOREIGN KEY
+  (DLT_DLC_ID) REFERENCES DOC_LOCATIONS
+  (DLC_ID))
+/
+
+PROMPT Creating Primary Key on 'DOC_FILE_LOCKS'
+ALTER TABLE DOC_FILE_LOCKS
+ ADD (CONSTRAINT DFL_PK PRIMARY KEY
+  (DFL_DOC_ID
+  ,DFL_REVISION))
+/
+
+PROMPT Creating Primary Key on 'DOC_FILE_TRANSFER_TEMP'
+ALTER TABLE DOC_FILE_TRANSFER_TEMP
+ ADD (CONSTRAINT DFTT_PK PRIMARY KEY
+  (DFTT_DOC_ID
+  ,DFTT_REVISION))
+/
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Document Manager - Sequences
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Document Manager - Sequences
+-- 
+------------------------------------------------------------------
+PROMPT Creating Sequence 'DLT_ID_SEQ'
+CREATE SEQUENCE DLT_ID_SEQ
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+/
+
 
 ------------------------------------------------------------------
 
@@ -827,8 +1444,7 @@ CREATE TABLE HIG_PROCESS_TYPE_ROLES
 COMMENT ON TABLE HIG_PROCESS_TYPE_ROLES IS 'Exor Process Framework table.  Defines relevant process type roles.'
 /
 
-COMMENT ON COLUMN HIG_PROCESS_TYPE_ROLES.HPTR_PROCESS_TYPE_ID IS 'Identifies the process type.
-Foreign key to HIG_PROCESS_TYPES.'
+COMMENT ON COLUMN HIG_PROCESS_TYPE_ROLES.HPTR_PROCESS_TYPE_ID IS 'Identifies the process type. Foreign key to HIG_PROCESS_TYPES.'
 /
 
 COMMENT ON COLUMN HIG_PROCESS_TYPE_ROLES.HPTR_ROLE IS 'Identifies the role.
@@ -1602,9 +2218,9 @@ COMMENT ON COLUMN HIG_FLEX_ATTRIBUTE_INV_MAPPING.HFAM_MODIFIED_BY IS 'Audit deta
 PROMPT Creating Table 'HIG_NAVIGATOR'
 CREATE TABLE HIG_NAVIGATOR
  (HNV_HIERARCHY_TYPE VARCHAR2(50) NOT NULL
- ,HNV_PARENT_TABLE VARCHAR2(30)
+ ,HNV_PARENT_TABLE VARCHAR2(500)
  ,HNV_PARENT_COLUMN VARCHAR2(1000)
- ,HNV_CHILD_TABLE VARCHAR2(30) NOT NULL
+ ,HNV_CHILD_TABLE VARCHAR2(500) NOT NULL
  ,HNV_CHILD_COLUMN VARCHAR2(1000) NOT NULL
  ,HNV_HIERARCHY_LEVEL NUMBER(9) NOT NULL
  ,HNV_HIERARCHY_LABEL VARCHAR2(100) NOT NULL
@@ -1613,7 +2229,7 @@ CREATE TABLE HIG_NAVIGATOR
  ,HNV_PARENT_ALIAS VARCHAR2(10)
  ,HNV_CHILD_ALIAS VARCHAR2(10) NOT NULL
  ,HNV_ICON_NAME VARCHAR2(50)
- ,HNV_ADDITIONAL_COND VARCHAR2(1000)
+ ,HNV_ADDITIONAL_COND VARCHAR2(2000)
  ,HNV_PRIMARY_HIERARCHY VARCHAR2(1) DEFAULT 'N'
  ,HNV_HIER_LABEL_1 VARCHAR2(500) NOT NULL
  ,HNV_HIER_LABEL_2 VARCHAR2(500)
@@ -3406,6 +4022,54 @@ PROMPT Creating Index 'HAL_HALT_ID_PK_ID_IND'
 CREATE INDEX HAL_HALT_ID_PK_ID_IND ON HIG_ALERTS
  (HAL_HALT_ID
  ,HAL_PK_ID)
+/
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT hig_status_codes extra feature flag.
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 109186
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (MIKE HUITSON)
+-- Additional feature flag column to be used with WOL and Defect Status Codes.
+-- 
+------------------------------------------------------------------
+BEGIN
+  /*
+  ||Alter hig_status_domains.
+  */
+  EXECUTE IMMEDIATE 'ALTER TABLE hig_status_domains ADD(hsd_feature10 VARCHAR2(254))';
+  --
+  UPDATE hig_status_domains
+     SET hsd_feature10 = 'Not Used'
+       ;
+  --
+  COMMIT;
+  --
+  EXECUTE IMMEDIATE 'ALTER TABLE hig_status_domains MODIFY(hsd_feature10 VARCHAR2(254) NOT NULL)';
+  /*
+  ||Alter hig_status_domains.
+  */
+  EXECUTE IMMEDIATE 'ALTER TABLE hig_status_codes ADD(hsc_allow_feature10 VARCHAR2(1))';
+  --
+  UPDATE hig_status_codes
+     SET hsc_allow_feature10 = 'N'
+       ;
+  --
+  COMMIT;
+  --
+  EXECUTE IMMEDIATE 'ALTER TABLE hig_status_codes MODIFY(hsc_allow_feature10 VARCHAR2(1) NOT NULL)';
+  --
+END;
 /
 ------------------------------------------------------------------
 

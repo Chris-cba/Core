@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.1   Apr 15 2010 15:05:32   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.2   Apr 23 2010 15:27:06   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Apr 15 2010 15:05:32  $
---       Date fetched Out : $Modtime:   Apr 15 2010 15:01:02  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 23 2010 15:27:06  $
+--       Date fetched Out : $Modtime:   Apr 23 2010 15:17:18  $
+--       Version          : $Revision:   3.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -447,6 +447,142 @@ END;
 /
 
 
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT SDOBATSIZE product option and default value
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 109470
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
+-- Adding product option SDOBATSIZE with a default value of 100
+-- 
+------------------------------------------------------------------
+INSERT INTO hig_option_list (hol_id
+                            ,hol_product      
+                            ,hol_name         
+                            ,hol_remarks      
+                            ,hol_datatype     
+                            ,hol_mixed_case   
+                            ,hol_user_option  
+                            ,hol_max_length)
+SELECT 'SDOBATSIZE'
+     , 'HIG'
+     , 'Batch size for spatial queries'
+     , 'This will set the batch size for spatial queries'
+     , 'NUMBER'
+     , 'N'
+     , 'N'
+     , '10'
+  FROM dual
+  WHERE NOT EXISTS (SELECT 'X' 
+                     FROM hig_option_list
+                    WHERE HOL_ID = 'SDOBATSIZE')
+/
+
+INSERT INTO hig_option_values ( hov_id
+                                                   , hov_value)
+SELECT 'SDOBATSIZE'
+     , '100'
+  FROM dual
+ WHERE NOT EXISTS (SELECT 'X' 
+                     FROM hig_option_values
+                    WHERE hov_id = 'SDOBATSIZE')
+/
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New module hig2600
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 109389
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
+-- Module details and role for hig2600
+-- 
+------------------------------------------------------------------
+  INSERT INTO hig_modules
+  (HMO_MODULE
+  ,HMO_TITLE
+  ,HMO_FILENAME
+  ,HMO_MODULE_TYPE
+  ,HMO_FASTPATH_INVALID
+  ,HMO_USE_GRI
+  ,HMO_APPLICATION
+  ,HMO_MENU
+  )
+  SELECT 'HIG2600'
+       , 'Transfer Log'
+       , 'hig2600'
+       , 'FMX'
+       , 'N'
+       , 'N'
+       , 'HIG'
+       , 'FORM'
+    FROM DUAL
+   WHERE NOT EXISTS (SELECT 'X' 
+                       FROM hig_modules
+                      WHERE HMO_MODULE = 'HIG2600')
+/
+INSERT INTO hig_module_roles( HMR_MODULE
+                             ,HMR_ROLE
+                             ,HMR_MODE)
+SELECT 'HIG2600'
+     , 'HIG_USER'
+     , 'NORMAL'
+  FROM DUAL
+ WHERE NOT EXISTS (SELECT 'X'
+                     FROM hig_module_roles
+                    WHERE HMR_MODULE = 'HIG2600'
+                      AND HMR_ROLE = 'HIG_USER')
+/
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT hig2600 standard favourites
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
+-- **** COMMENTS TO BE ADDED BY CHRIS STRETTLE ****
+-- 
+------------------------------------------------------------------
+INSERT INTO hig_standard_favourites(hstf_parent
+ ,hstf_child
+ ,hstf_descr
+ ,hstf_type
+ ,hstf_order)
+	SELECT 'HIG_PROCESSES'
+				,'HIG2600'
+				,'Transfer Log'
+				,'M'
+				,50
+		FROM dual
+	 WHERE NOT EXISTS
+ (SELECT 'X'
+ FROM hig_standard_favourites
+ WHERE hstf_child = 'HIG2600')
+/
 ------------------------------------------------------------------
 
 
@@ -1513,6 +1649,221 @@ Insert into hig_standard_favourites
 Select 'NET_INVENTORY','NAVIGATOR','EXOR Navigator','M',41 from dual
 Where Not Exists (Select 1 from hig_standard_favourites Where hstf_parent = 'NET_INVENTORY' And hstf_child = 'NAVIGATOR');
 
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Document Bundle Loader - Modules and Module Roles
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (GRAEME JOHNSON)
+-- To support document bundle loader
+-- 
+------------------------------------------------------------------
+INSERT INTO HIG_MODULES
+   (HMO_MODULE
+  , HMO_TITLE
+  , HMO_FILENAME
+  , HMO_MODULE_TYPE
+  , HMO_FASTPATH_INVALID
+  , HMO_USE_GRI
+  , HMO_APPLICATION
+  , HMO_MENU)
+SELECT 
+    'DOC0310', 
+    'Manage Document Bundles', 
+    'doc0310', 
+    'FMX', 
+    'N', 
+    'N', 
+    'DOC', 
+    'FORM'
+FROM dual
+WHERE NOT EXISTS (SELECT 1 
+                     FROM hig_modules 
+                    WHERE hmo_module = 'DOC0300')
+/
+    
+INSERT INTO HIG_MODULES
+   (HMO_MODULE
+  , HMO_TITLE
+  , HMO_FILENAME
+  , HMO_MODULE_TYPE
+  , HMO_FASTPATH_INVALID
+  , HMO_USE_GRI
+  , HMO_APPLICATION
+  , HMO_MENU)
+SELECT 
+    'DOC0300', 
+    'Load Document Bundles', 
+    'HIG2510', 
+    'FMX', 
+    'N', 
+    'N', 
+    'DOC', 
+    'FORM'
+FROM dual
+WHERE NOT EXISTS (SELECT 1 
+                     FROM hig_modules 
+                    WHERE hmo_module = 'DOC0310')
+/
+
+
+
+Insert into HIG_MODULE_ROLES
+   (HMR_MODULE, HMR_ROLE, HMR_MODE)
+SELECT
+    'DOC0300', 
+    'DOC_USER', 
+    'NORMAL'
+FROM dual
+WHERE NOT EXISTS (SELECT 1
+                    FROM hig_module_roles
+                   WHERE hmr_module = 'DOC0300'
+                     AND hmr_role   = 'DOC_USER'
+                  )    
+/
+
+Insert into HIG_MODULE_ROLES
+   (HMR_MODULE, HMR_ROLE, HMR_MODE)
+SELECT
+    'DOC0310', 
+    'DOC_USER', 
+    'NORMAL'
+FROM dual
+WHERE NOT EXISTS (SELECT 1
+                    FROM hig_module_roles
+                   WHERE hmr_module = 'DOC0300'
+                     AND hmr_role   = 'DOC_USER'
+                  )    
+/
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Document Bundle Loader - Launchpad
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (GRAEME JOHNSON)
+-- To support document bundle loader
+-- 
+------------------------------------------------------------------
+delete from hig_standard_favourites
+where hstf_parent = 'DOC'
+and   hstf_child = 'DOC_BUNDLES'
+/
+delete from hig_standard_favourites
+where hstf_parent = 'DOC_BUNDLES'
+/
+
+
+Insert into HIG_STANDARD_FAVOURITES
+   (HSTF_PARENT, HSTF_CHILD, HSTF_DESCR, HSTF_TYPE, HSTF_ORDER)
+ Values
+   ('DOC', 
+    'DOC_BUNDLES', 
+    'Document Bundles', 
+    'F', 
+    3);
+
+Insert into HIG_STANDARD_FAVOURITES
+   (HSTF_PARENT, HSTF_CHILD, HSTF_DESCR, HSTF_TYPE, HSTF_ORDER)
+ Values
+   ('DOC_BUNDLES', 
+    'DOC0300', 
+    'Load Document Bundles', 
+    'M', 
+    10);
+
+Insert into HIG_STANDARD_FAVOURITES
+   (HSTF_PARENT, HSTF_CHILD, HSTF_DESCR, HSTF_TYPE, HSTF_ORDER)
+ Values
+   ('DOC_BUNDLES', 
+    'DOC0310', 
+    'Manage Document Bundles', 
+    'M', 
+    20);
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Document Bundle Loader - Error Messages
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (GRAEME JOHNSON)
+-- To support document bundle loader
+-- 
+------------------------------------------------------------------
+delete from nm_errors where ner_appl = 'DOC' and ner_id = 1
+/
+Insert into NM_ERRORS
+   (NER_APPL, NER_ID, NER_DESCR)
+ Values
+   ('DOC', 1, 'A Document Bundle of this name already exists')
+/
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Document Bundle Loader - Process Metadata
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (GRAEME JOHNSON)
+-- To support document bundle loader
+-- 
+------------------------------------------------------------------
+delete from hig_process_type_files
+where hptf_process_type_id = -2
+/
+delete from hig_process_type_roles
+where hptr_process_type_id = -2
+/
+delete from hig_process_type_frequencies
+where hpfr_process_type_id = -2
+/
+delete from hig_process_types
+where hpt_process_type_id = -2
+/
+
+
+Insert into HIG_PROCESS_TYPES
+   (HPT_PROCESS_TYPE_ID, HPT_NAME, HPT_DESCR, HPT_WHAT_TO_CALL, HPT_INITIATION_MODULE, HPT_INTERNAL_MODULE, HPT_INTERNAL_MODULE_PARAM, HPT_RESTARTABLE, HPT_SEE_IN_HIG2510)
+ Values
+   (-2, 'Load Document Bundles', 'Unpacks document bundle zip file(s) 
+Reads the driving file(s)
+Creates document and document association records
+Moves the document files to the correct location', 'doc_bundle_loader.load_process_document_bundles;', 
+    'DOC0300', 'DOC0310', 'P_PROCESS_ID', 'Y', 'Y');
+
+Insert into HIG_PROCESS_TYPE_FILES
+   (HPTF_FILE_TYPE_ID, HPTF_NAME, HPTF_PROCESS_TYPE_ID, HPTF_INPUT, HPTF_OUTPUT, HPTF_INPUT_DESTINATION, HPTF_INPUT_DESTINATION_TYPE, HPTF_MIN_INPUT_FILES)
+ Values
+   (-1, 'Doc Bundle', -2, 'Y', 
+    'N',null , 'ORACLE_DIRECTORY', 1);
+
+Insert into HIG_PROCESS_TYPE_ROLES
+   (HPTR_PROCESS_TYPE_ID, HPTR_ROLE)
+ Values
+   (-2, 'DOC_USER');
+
+Insert into HIG_PROCESS_TYPE_FREQUENCIES
+   (HPFR_PROCESS_TYPE_ID, HPFR_FREQUENCY_ID, HPFR_SEQ)
+ Values
+   (-2, -1, 1);
 ------------------------------------------------------------------
 
 
