@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.14   Apr 22 2010 12:11:42   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.15   Apr 23 2010 14:32:26   rcoupe  $
 --       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   Apr 22 2010 12:11:42  $
---       Date fetched Out : $Modtime:   Apr 22 2010 12:10:52  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Apr 23 2010 14:32:26  $
+--       Date fetched Out : $Modtime:   Apr 23 2010 14:32:04  $
+--       PVCS Version     : $Revision:   2.15  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Thu Apr 22  12:02:52 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Fri Apr 23  14:29:34 2010 by Server Generator 10.1.2.9.28
 
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
@@ -54,6 +54,21 @@ CREATE UNIQUE INDEX DAS_IND1 ON DOC_ASSOCS
  (DAS_DOC_ID
  ,DAS_TABLE_NAME
  ,DAS_REC_ID)
+/
+
+PROMPT Creating Index 'DBUN_HP_FK_IND'
+CREATE INDEX DBUN_HP_FK_IND ON DOC_BUNDLES
+ (DBUN_PROCESS_ID)
+/
+
+PROMPT Creating Index 'DBF_DBUN_FK_IND'
+CREATE INDEX DBF_DBUN_FK_IND ON DOC_BUNDLE_FILES
+ (DBF_BUNDLE_ID)
+/
+
+PROMPT Creating Index 'DBFR_DBF_FK2_IND'
+CREATE INDEX DBFR_DBF_FK2_IND ON DOC_BUNDLE_FILE_RELATIONS
+ (DBFR_CHILD_FILE_ID)
 /
 
 PROMPT Creating Index 'DCL_FK_DTP_IND'
