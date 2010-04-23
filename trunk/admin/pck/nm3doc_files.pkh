@@ -4,21 +4,36 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkh-arc   2.2   Feb 25 2010 13:56:14   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkh-arc   2.3   Apr 23 2010 14:39:16   aedwards  $
 --       Module Name      : $Workfile:   nm3doc_files.pkh  $
---       Date into PVCS   : $Date:   Feb 25 2010 13:56:14  $
---       Date fetched Out : $Modtime:   Feb 25 2010 13:55:48  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Apr 23 2010 14:39:16  $
+--       Date fetched Out : $Modtime:   Apr 23 2010 14:38:30  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version :
 -------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-
+--
+-- Package to deal with Document associations and table storage
+--
   -----------
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+  
+  TYPE rec_doc_table
+    IS RECORD ( 
+                doc_id        NUMBER 
+              , revision      NUMBER
+              , start_date    DATE
+              , end_date      DATE
+              , full_path     VARCHAR2(4000)
+              , filename      VARCHAR2(4000)
+              , content       BLOB
+              , audit         VARCHAR2(4000)
+              , file_info     VARCHAR2(2000)
+              ); 
 
 --</GLOBVAR>
 --
@@ -39,14 +54,21 @@ AS
 --------------------------------------------------------------------------------
 --<PROC NAME="INSERT_DF">
 -- Insert doc_files record
-  PROCEDURE insert_df ( pi_rec_df IN doc_files_all%ROWTYPE );
+--  PROCEDURE insert_df ( pi_rec_df IN doc_files_all%ROWTYPE );
 --</PROC>
+
+--<PROC NAME="INSERT_DF">
+-- Insert files record
+  PROCEDURE insert_df ( pi_rec_df IN rec_doc_table );
+--</PROC>
+
 --
 --------------------------------------------------------------------------------
 --<PROC NAME="GET_UPLOAD_INFO">
 -- Get the info WebUtil needs to upload a file into DOC_FILES table.
   PROCEDURE get_upload_info
               ( pi_doc_id          IN docs.doc_id%TYPE
+              , pi_revision        IN NUMBER DEFAULT NULL
               , po_table_name     OUT user_tables.table_name%TYPE
               , po_column_name    OUT user_tab_columns.column_name%TYPE
               , po_pk_column      OUT user_tab_columns.column_name%TYPE
@@ -60,6 +82,7 @@ AS
 -- Get the info WebUtil needs to download a file from DOC_FILES table.
   PROCEDURE get_download_info
               ( pi_doc_id          IN docs.doc_id%TYPE
+              , pi_revision        IN NUMBER DEFAULT NULL
               , po_client_file    OUT VARCHAR2
               , po_working_folder OUT VARCHAR2
               , po_table_name     OUT user_tables.table_name%TYPE
@@ -73,8 +96,8 @@ AS
 --<PROC NAME="DOWNLOAD_FROM_BLOB_TO_FILE">
 -- Download a file stored in DOC_FILES to a specified Oracle Directory
   PROCEDURE download_from_blob_to_file
-                             ( pi_doc_id    IN doc_files_all.df_doc_id%TYPE
-                             , pi_revision  IN doc_files_all.df_revision%TYPE
+                             ( pi_doc_id    IN docs.doc_id%TYPE
+                             , pi_revision  IN NUMBER
                              , pi_directory IN VARCHAR2
                              , pi_filename  IN VARCHAR2);
 --</PROC>
@@ -83,7 +106,8 @@ AS
 --
 --<PROC NAME="MOVE_FILE_TO_BLOB">
 -- Upload the file to the BLOB on the database
-  PROCEDURE move_file_to_blob ( pi_doc_id IN docs.doc_id%TYPE );
+  PROCEDURE move_file_to_blob ( pi_doc_id IN docs.doc_id%TYPE 
+                              , pi_revision IN NUMBER DEFAULT NULL);
 --</PROC>
 --
 --------------------------------------------------------------------------------
@@ -137,7 +161,7 @@ AS
   PROCEDURE get_file_lock_info
               ( pi_dfl_doc_id   IN  doc_file_locks.dfl_doc_id%TYPE
               , pi_dfl_revision IN  doc_file_locks.dfl_revision%TYPE
-              , po_filename     OUT doc_files_all.df_filename%TYPE
+              , po_filename     OUT VARCHAR2
               , po_username     OUT doc_file_locks.dfl_username%TYPE
               , po_date         OUT doc_file_locks.dfl_date%TYPE);
 --</PROC>
@@ -145,7 +169,7 @@ AS
 --------------------------------------------------------------------------------
 --<PROC NAME="GET_MAX_REVISION">
 -- Get the latest revision (version) number of a file
-  FUNCTION get_max_revision (pi_doc_id IN doc_files_all.df_doc_id%TYPE)
+  FUNCTION get_max_revision (pi_doc_id IN docs.doc_id%TYPE)
   RETURN NUMBER;
 --</PROC>
 --
@@ -160,17 +184,17 @@ AS
 --------------------------------------------------------------------------------
 --<PROC NAME="GET_FILE_SIZE">
 -- Return the filesize from DOC_FILES, either plain bytes, or formatted value
-  FUNCTION get_file_size ( pi_doc_id    IN doc_files_all.df_doc_id%TYPE
-                         , pi_revision  IN doc_files_all.df_revision%TYPE
+  FUNCTION get_file_size ( pi_doc_id    IN docs.doc_id%TYPE
+                         , pi_revision  IN NUMBER
                          , pi_formatted IN BOOLEAN DEFAULT FALSE )
   RETURN VARCHAR2;
 --
-  FUNCTION get_file_size ( pi_doc_id    IN doc_files_all.df_doc_id%TYPE
-                         , pi_revision  IN doc_files_all.df_revision%TYPE
+  FUNCTION get_file_size ( pi_doc_id    IN docs.doc_id%TYPE
+                         , pi_revision  IN NUMBER
                          , pi_formatted IN VARCHAR2 DEFAULT 'N' )
   RETURN VARCHAR2;
 --
-  FUNCTION get_file_size ( pi_doc_id    IN doc_files_all.df_doc_id%TYPE
+  FUNCTION get_file_size ( pi_doc_id    IN docs.doc_id%TYPE
                          , pi_formatted IN VARCHAR2 DEFAULT 'N' )
   RETURN VARCHAR2;
 --</PROC>
@@ -263,21 +287,27 @@ AS
 --------------------------------------------------------------------------------
 --<PROC NAME="MOVE_FILE_TO_BLOB">
 --
-  FUNCTION move_file_to_blob ( pi_filename IN VARCHAR2 
-                             , pi_location IN VARCHAR2 )
-    RETURN BLOB;
+--  FUNCTION move_file_to_blob ( pi_filename IN VARCHAR2 
+--                             , pi_location IN VARCHAR2 )
+--    RETURN BLOB;
 --</PROC>
 --
 --------------------------------------------------------------------------------
 --<PROC NAME="SET_DOC_LOCATION_TABLE">
 --
-  PROCEDURE set_doc_location_table ( pi_dlc_id IN doc_locations.dlc_id%TYPE 
-                                   , pi_flag   IN BOOLEAN );
+--  PROCEDURE set_doc_location_table ( pi_dlc_id IN doc_locations.dlc_id%TYPE 
+--                                   , pi_flag   IN BOOLEAN );
 --</PROC>
 --
 --
 --------------------------------------------------------------------------------
 --
+--<PROC NAME="GET_DF">
+
+  FUNCTION get_df ( pi_doc_id   IN docs.doc_id%TYPE
+                  , pi_revision IN NUMBER )
+    RETURN rec_doc_table;
+--</PROC>
 --
 --------------------------------------------------------------------------------
 --

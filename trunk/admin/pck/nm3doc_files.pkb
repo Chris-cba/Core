@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.7   Mar 24 2010 10:14:32   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.8   Apr 23 2010 14:39:16   aedwards  $
 --       Module Name      : $Workfile:   nm3doc_files.pkb  $
---       Date into PVCS   : $Date:   Mar 24 2010 10:14:32  $
---       Date fetched Out : $Modtime:   Mar 24 2010 10:13:50  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Apr 23 2010 14:39:16  $
+--       Date fetched Out : $Modtime:   Apr 23 2010 14:38:52  $
+--       Version          : $Revision:   2.8  $
 --       Based on SCCS version :
 -------------------------------------------------------------------------
 --
@@ -17,22 +17,26 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.7  $';
-  g_package_name CONSTANT varchar2(30) := 'nm3doc_files';
+  g_body_sccsid     CONSTANT VARCHAR2(2000) := '$Revision:   2.8  $';
+  g_package_name    CONSTANT VARCHAR2(30)   := 'nm3doc_files';
 --
-  g_sep      VARCHAR2(1) := NVL(hig.get_sysopt('DIRREPSTRN'),'\');
-  g_dir_move VARCHAR2(1) := NVL(hig.get_sysopt('DIRMOVE'),'N');
-  g_win_sep  VARCHAR2(1) := '\';
+  g_sep                      VARCHAR2(1)    := NVL(hig.get_sysopt('DIRREPSTRN'),'\');
+  g_dir_move                 VARCHAR2(1)    := NVL(hig.get_sysopt('DIRMOVE'),'N');
+  g_win_sep                  VARCHAR2(1)    := '\';
+  g_temp_load_table          VARCHAR2(30)   := 'DOC_FILE_TRANSFER_TEMP';
 --
-  g_table_name          user_tables.table_name%TYPE         := 'DOC_FILES_ALL';
-  g_column_name         user_tab_columns.column_name%TYPE   := 'DF_CONTENT';
-  g_pk_column           user_tab_columns.column_name%TYPE   := 'DF_DOC_ID';
-  g_revision_col        user_tab_columns.column_name%TYPE   := 'DF_REVISION';
+  g_table_name      CONSTANT VARCHAR2(30)   := 'DOC_FILE_TRANSFER_TEMP';
+  g_content_col     CONSTANT VARCHAR2(30)   := 'DFTT_CONTENT';
+  g_doc_id_col      CONSTANT VARCHAR2(30)   := 'DFTT_DOC_ID';
+  g_revision_col    CONSTANT VARCHAR2(30)   := 'DFTT_REVISION';
 --
-  g_dot_table_name      user_tables.table_name%TYPE         := 'DOC_TEMPLATE_FILES_ALL';
-  g_dot_column_name     user_tab_columns.column_name%TYPE   := 'DTF_CONTENT';
-  g_dot_pk_column       user_tab_columns.column_name%TYPE   := 'DTF_TEMPLATE_NAME';
-  g_dot_revision_col    user_tab_columns.column_name%TYPE   := 'DTF_REVISION';
+-----------------------------------------------------------------------------
+--
+  PROCEDURE blob2file
+               ( pi_doc_id    IN docs.doc_id%TYPE
+               , pi_revision  IN NUMBER
+               , pi_directory IN VARCHAR2
+               , pi_filename  IN VARCHAR2);
 --
 -----------------------------------------------------------------------------
 --
@@ -50,53 +54,31 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-  FUNCTION get_max_revision (pi_doc_id IN doc_files_all.df_doc_id%TYPE)
+  FUNCTION get_max_revision (pi_doc_id IN docs.doc_id%TYPE)
   RETURN NUMBER
   IS
     retval NUMBER;
+    l_rec_dlt doc_location_tables%ROWTYPE;
   BEGIN
   --
-    SELECT MAX(df_revision) INTO retval FROM doc_files_all
-     WHERE df_doc_id = pi_doc_id;
-    RETURN NVL(retval,1);
+    l_rec_dlt := doc_locations_api.get_dlt ( pi_doc_id => pi_doc_id);
+  --
+    IF l_rec_dlt.dlt_table IS NOT NULL
+    THEN
+      EXECUTE IMMEDIATE
+        ' SELECT MAX('||l_rec_dlt.dlt_revision_col||') FROM '||l_rec_dlt.dlt_table||
+        '  WHERE '||l_rec_dlt.dlt_doc_id_col||' = :pi_doc_id'
+      INTO retval
+      USING IN pi_doc_id;
+      RETURN retval;
+    ELSE
+      RETURN NULL;
+    END IF;
+  --
   EXCEPTION
     WHEN NO_DATA_FOUND
     THEN RAISE_APPLICATION_ERROR (-20201,'Cannot derive a revision for '||pi_doc_id);
   END get_max_revision;
---
---------------------------------------------------------------------------------
---
---  FUNCTION get_max_dot_revision (pi_template_name IN doc_template_files_all.dtf_template_name%TYPE)
---  RETURN NUMBER
---  IS
---    retval NUMBER;
---  BEGIN
---  --
---    SELECT MAX(dtf_revision) INTO retval FROM doc_template_files_all
---     WHERE dtf_template_name = pi_template_name;
---    RETURN NVL(retval,1);
---  EXCEPTION
---    WHEN NO_DATA_FOUND
---    THEN RAISE_APPLICATION_ERROR (-20201,'Cannot derive a revision for '||pi_template_name);
---  END get_max_dot_revision;
---
---------------------------------------------------------------------------------
---
---  PROCEDURE insert_temp ( pi_blob IN BLOB ) IS
---  BEGIN
---    INSERT INTO doc_files_tmp
---       (dft_id, dft_content)
---    SELECT dft_id_seq.NEXTVAL
---         , pi_blob
---      FROM dual;
---  END insert_temp;
---
---------------------------------------------------------------------------------
---
-  PROCEDURE blob2file ( pi_doc_id    IN doc_files_all.df_doc_id%TYPE
-                      , pi_revision  IN doc_files_all.df_revision%TYPE
-                      , pi_directory IN VARCHAR2
-                      , pi_filename  IN VARCHAR2);
 --
 --------------------------------------------------------------------------------
 -- Return just the filename portion of the full path and filename
@@ -114,156 +96,244 @@ AS
   END strip_filename;
 --
 --------------------------------------------------------------------------------
--- Insert a row in doc_files_all
 --
-  PROCEDURE insert_df ( pi_rec_df IN doc_files_all%ROWTYPE )
+  PROCEDURE insert_temp_df ( pi_rec_df IN doc_file_transfer_temp%ROWTYPE )
   IS
-    l_rec_df doc_files_all%ROWTYPE;
+    l_rec_table   doc_file_transfer_temp%ROWTYPE;
   BEGIN
   --
-    l_rec_df.df_doc_id        := pi_rec_df.df_doc_id;
-    l_rec_df.df_revision      := NVL(pi_rec_df.df_revision,1);
-    l_rec_df.df_start_date    := NVL(pi_rec_df.df_start_date,nm3user.get_effective_date);
-    l_rec_df.df_content       := pi_rec_df.df_content;
-    l_rec_df.df_full_path     := pi_rec_df.df_full_path;
-    l_rec_df.df_filename      := strip_filename(pi_rec_df.df_full_path);
-    l_rec_df.df_file_info     := NVL(pi_rec_df.df_file_info, LENGTH(pi_rec_df.df_content));
---    l_rec_df.df_date_created  := nm3user.get_effective_date;
---    l_rec_df.df_date_modified := l_rec_df.df_date_created;
---    l_rec_df.df_created_by    := USER;
---    l_rec_df.df_modified_by   := USER;
+    l_rec_table.dftt_doc_id          := pi_rec_df.dftt_doc_id;
+    l_rec_table.dftt_revision        := NVL(pi_rec_df.dftt_revision,1);
+    l_rec_table.dftt_start_date      := NVL(pi_rec_df.dftt_start_date,nm3user.get_effective_date);
+    l_rec_table.dftt_content         := pi_rec_df.dftt_content;
+    l_rec_table.dftt_full_path       := pi_rec_df.dftt_full_path;
+    l_rec_table.dftt_filename        := strip_filename(pi_rec_df.dftt_full_path);
+    l_rec_table.dftt_file_info       := NVL(pi_rec_df.dftt_file_info, LENGTH(pi_rec_df.dftt_content));
+  -- 
+    INSERT INTO doc_file_transfer_temp VALUES l_rec_table;
   --
-    INSERT INTO doc_files_all VALUES l_rec_df;
+  END insert_temp_df;
+--
+--------------------------------------------------------------------------------
+-- Insert a row in doc_files_all
+--
+  PROCEDURE insert_df ( pi_rec_df IN rec_doc_table )
+  IS
+    l_rec_table       rec_doc_table;
+    l_rec_dlt         doc_location_tables%ROWTYPE;
+    l_rec_temp_table  doc_file_transfer_temp%ROWTYPE;
+  BEGIN
+  --
+    l_rec_dlt := doc_locations_api.get_dlt(pi_doc_id => pi_rec_df.doc_id );
+  --
+    nm_debug.debug_on;
+    nm_debug.debug('Inserting '||pi_rec_df.filename||' in '||l_rec_dlt.dlt_table);
+  --
+    l_rec_table.doc_id          := pi_rec_df.doc_id;
+    l_rec_table.revision        := NVL(pi_rec_df.revision,1);
+    l_rec_table.start_date      := NVL(pi_rec_df.start_date,nm3user.get_effective_date);
+    l_rec_table.content         := pi_rec_df.content;
+    l_rec_table.full_path       := pi_rec_df.full_path;
+    l_rec_table.filename        := strip_filename(pi_rec_df.full_path);
+    l_rec_table.file_info       := NVL(pi_rec_df.file_info, LENGTH(pi_rec_df.content));
+  -- 
+    IF l_rec_dlt.dlt_table IS NOT NULL
+    THEN
+      EXECUTE IMMEDIATE
+        'INSERT INTO '||l_rec_dlt.dlt_table
+      ||' ('
+      ||'   '||l_rec_dlt.dlt_doc_id_col
+      ||' , '||l_rec_dlt.dlt_revision_col
+      ||' , '||l_rec_dlt.dlt_start_date_col
+      ||' , '||l_rec_dlt.dlt_full_path_col
+      ||' , '||l_rec_dlt.dlt_filename
+      ||' , '||l_rec_dlt.dlt_content_col
+      ||' , '||l_rec_dlt.dlt_audit_col
+      ||' , '||l_rec_dlt.dlt_file_info_col
+      ||' )'
+      ||' VALUES '
+      ||' ('
+      ||'   :pi_doc_id '
+      ||' , :pi_revision '
+      ||' , :pi_start_date '
+      ||' , :pi_full_path '
+      ||' , :pi_filename '
+      ||' , :pi_content '
+      ||' , :pi_audit '
+      ||' , :pi_file_info )'
+      USING IN l_rec_table.doc_id
+          , IN l_rec_table.revision
+          , IN l_rec_table.start_date
+          , IN l_rec_table.full_path
+          , IN l_rec_table.filename
+          , IN l_rec_table.content
+          , IN l_rec_table.audit
+          , IN l_rec_table.file_info;
+  --
+    ELSIF doc_locations_api.get_dlc(pi_doc_id => pi_rec_df.doc_id).dlc_location_Type = 'ORACLE_DIRECTORY'
+    THEN
+      l_rec_temp_table.dftt_doc_id     := l_rec_table.doc_id;
+      l_rec_temp_table.dftt_revision   := l_rec_table.revision;
+      l_rec_temp_table.dftt_start_date := l_rec_table.start_date;
+      l_rec_temp_table.dftt_content    := l_rec_table.content;
+      l_rec_temp_table.dftt_full_path  := l_rec_table.full_path;
+      l_rec_temp_table.dftt_filename   := l_rec_table.filename;
+      l_rec_temp_table.dftt_file_info  := l_rec_table.file_info;
+    -- 
+      insert_temp_df ( pi_rec_df => l_rec_temp_table );
+    -- 
+    END IF;
   --
   END insert_df;
 --
 --------------------------------------------------------------------------------
--- Insert a row in doc_template_files_all
---
---  PROCEDURE insert_dtf ( pi_rec_dtf IN doc_template_files_all%ROWTYPE )
---  IS
---    l_rec_dtf doc_template_files_all%ROWTYPE;
---  BEGIN
---  --
---    l_rec_dtf.dtf_template_name := pi_rec_dtf.dtf_template_name;
---    l_rec_dtf.dtf_revision      := NVL(pi_rec_dtf.dtf_revision,1);
---    l_rec_dtf.dtf_start_date    := NVL(pi_rec_dtf.dtf_start_date,nm3user.get_effective_date);
---    l_rec_dtf.dtf_content       := pi_rec_dtf.dtf_content;
---    l_rec_dtf.dtf_filename      := strip_filename(pi_rec_dtf.dtf_filename);
---    l_rec_dtf.dtf_file_info     := pi_rec_dtf.dtf_file_info;
---    l_rec_dtf.dtf_date_created  := nm3user.get_effective_date;
---    l_rec_dtf.dtf_date_modified := nm3user.get_effective_date;
---    l_rec_dtf.dtf_created_by    := USER;
---    l_rec_dtf.dtf_modified_by   := USER;
---  --
---    INSERT INTO doc_template_files_all VALUES l_rec_dtf;
---  --
---  END insert_dtf;
---
---------------------------------------------------------------------------------
 -- Insert a row in doc_files
 --
-  FUNCTION get_df ( pi_df_doc_id IN doc_files_all.df_doc_id%TYPE
-                  , pi_df_revision IN doc_files_all.df_revision%TYPE )
-  RETURN doc_files_all%ROWTYPE
+  FUNCTION get_df ( pi_doc_id   IN docs.doc_id%TYPE
+                  , pi_revision IN NUMBER )
+  RETURN rec_doc_table
   IS
-    l_rec_df doc_files_all%ROWTYPE;
+    l_rec_table rec_doc_table;
+    l_rec_dlt   doc_location_tables%ROWTYPE;
+--    doc_id        NUMBER 
+--  , revision      NUMBER
+--  , start_date    DATE
+--  , end_date      DATE
+--  , full_path     VARCHAR2(4000)
+--  , filename      VARCHAR2(4000)
+--  , content       BLOB
+--  , audit         VARCHAR2(4000)
+--  , file_info     VARCHAR2(2000)
   BEGIN
   --
-    SELECT * INTO l_rec_df FROM doc_files_all
-     WHERE df_doc_id = pi_df_doc_id
-       AND df_revision = pi_df_revision;
-    RETURN l_rec_df;
+    l_rec_dlt := doc_locations_api.get_dlt(pi_doc_id => pi_doc_id );
+  --
+    IF l_rec_dlt.dlt_table IS NOT NULL
+    THEN
+      EXECUTE IMMEDIATE 
+        ' SELECT '||l_rec_dlt.dlt_doc_id_col||' ,'||
+                    l_rec_dlt.dlt_revision_col||' ,'||
+                    l_rec_dlt.dlt_start_date_col||' ,'||
+                    l_rec_dlt.dlt_end_date_col||' ,'||
+                    l_rec_dlt.dlt_full_path_col||' ,'||
+                    l_rec_dlt.dlt_filename||' ,'||
+                    l_rec_dlt.dlt_content_col||' ,'||
+                    l_rec_dlt.dlt_audit_col||' ,'||
+                    l_rec_dlt.dlt_file_info_col||
+        '   FROM '||l_rec_dlt.dlt_table||
+        '  WHERE '||l_rec_dlt.dlt_doc_id_col||' = :pi_df_doc_id '||
+        '    AND '||l_rec_dlt.dlt_revision_col||' = :pi_df_revision'
+      INTO l_rec_table
+      USING IN pi_doc_id, IN pi_revision;
+    END IF;
+  --
+    RETURN l_rec_table;
+  --
   EXCEPTION
     WHEN NO_DATA_FOUND
-    THEN RETURN l_rec_df;
+    THEN RETURN l_rec_table;
   --
   END get_df;
+--
+--------------------------------------------------------------------------------
+--
+  PROCEDURE move_file_to_blob ( pi_doc_id IN docs.doc_id%TYPE 
+                              , pi_revision IN NUMBER DEFAULT NULL)
+  IS
+    location    VARCHAR2(30);
+    filename    VARCHAR2(2000);
+    l_rec_dlt   doc_location_tables%ROWTYPE;
+    l_rec_dlc   doc_locations%ROWTYPE := doc_locations_api.get_dlc(pi_doc_id=>pi_doc_id);
+    vblob       BLOB;
+  BEGIN
   --
---------------------------------------------------------------------------------
--- Get a row from doc_template_files_all
---
---  FUNCTION get_dtf ( pi_dtf_template_name IN doc_template_files_all.dtf_template_name%TYPE
---                   , pi_dtf_revision      IN doc_template_files_all.dtf_revision%TYPE )
---  RETURN doc_template_files_all%ROWTYPE
---  IS
---    l_rec_dtf doc_template_files_all%ROWTYPE;
---  BEGIN
---  --
---    SELECT * INTO l_rec_dtf FROM doc_template_files_all
---     WHERE dtf_template_name = pi_dtf_template_name
---       AND dtf_revision = pi_dtf_revision;
---    RETURN l_rec_dtf;
---  EXCEPTION
---    WHEN NO_DATA_FOUND
---    THEN RETURN l_rec_dtf;
---  --
---  END get_dtf;
---
---------------------------------------------------------------------------------
---
-  FUNCTION move_file_to_blob ( pi_filename IN VARCHAR2
-                             , pi_location IN VARCHAR2 )
-  RETURN BLOB
-  IS
-    v_blob    BLOB ;--:= EMPTY_BLOB();
-    l_bfile   BFILE;
-    amt       NUMBER;
-    location  VARCHAR2(30)    := pi_location;
-    filename  VARCHAR2(2000)  := pi_filename;
-  BEGIN
-    l_bfile := BFILENAME(location, filename);
-    dbms_lob.createtemporary(lob_loc => v_blob, CACHE => FALSE);
-    amt := dbms_lob.getlength( l_bfile );
-    dbms_lob.fileopen( l_bfile ,dbms_lob.file_readonly);
-    nm_debug.debug('move_file_to_blob - before loadfromfile');
-    dbms_lob.loadfromfile( v_blob, l_bfile ,amt);
-    nm_debug.debug('move_file_to_blob - after loadfromfile');
-    dbms_lob.fileclose( l_bfile );
-    RETURN v_blob;
-  END move_file_to_blob;
---
---------------------------------------------------------------------------------
---
-  PROCEDURE move_file_to_blob ( pi_doc_id IN docs.doc_id%TYPE )
-  IS
-    location  VARCHAR2(30);
-    filename  VARCHAR2(2000);
-  BEGIN
+    l_rec_dlt := doc_locations_api.get_dlt(pi_doc_id => pi_doc_id );
   --
 --    nm_debug.debug_on;
-    nm_debug.debug('move_file_to_blob - start');
   --
-    SELECT dlc_name, df_filename INTO location, filename
-      FROM doc_locations, docs, doc_files_all
-     WHERE dlc_id = doc_dlc_id
-       AND doc_id = df_doc_id
-       AND df_doc_id = pi_doc_id;
+    IF l_rec_dlt.dlt_table IS NOT NULL
+    THEN
+    --
+      nm_debug.debug('move_file_to_blob - start');
+    --
+      EXECUTE IMMEDIATE 
+        ' SELECT dlc_name, '||l_rec_dlt.dlt_filename 
+        ||' FROM doc_locations, docs, '||l_rec_dlt.dlt_table
+       ||' WHERE dlc_id = doc_dlc_id '
+         ||' AND doc_id = '||l_rec_dlt.dlt_doc_id_col
+         ||' AND '||l_rec_dlt.dlt_revision_col||' = NVL(pi_revision,nm3doc_files.get_max_revision(:pi_doc_id))'
+         ||' AND df_doc_id = :pi_doc_id '
+      INTO location, filename
+      USING IN pi_doc_id;
+    --
+      nm_debug.debug('move_file_to_blob - before table update');
+    --
+      EXECUTE IMMEDIATE 
+        'UPDATE '||l_rec_dlt.dlt_table ||
+          ' SET '||l_rec_dlt.dlt_content_col  ||' = nm3file.file_to_blob( :location, :filename) '||
+        ' WHERE '||l_rec_dlt.dlt_doc_id_col   ||' = :pi_doc_id '||
+          ' AND '||l_rec_dlt.dlt_revision_col ||' = NVL(:pi_revision,nm3doc_files.get_max_revision(:pi_doc_id))' --get_max_revision(pi_doc_id);
+      USING IN location
+          , IN filename 
+          , IN pi_doc_id
+          , IN pi_revision; 
+    --
+      COMMIT;
+    --
+      nm_debug.debug('move_file_to_blob - after table update');
+    --
+    ELSIF doc_locations_api.get_dlc_table(pi_doc_id=>pi_doc_id) = doc_locations_api.get_temp_load_table
+    AND l_rec_dlc.dlc_location_type = 'ORACLE_DIRECTORY'
+    THEN
+    -- 
+    -- Copy the file from the File to the temp BLOB table so that webutil can read
+    --
+      SELECT doc_file INTO filename
+        FROM docs
+       WHERE doc_id = pi_doc_id;
+    --
+      UPDATE doc_file_transfer_temp
+         SET dftt_content  = nm3file.file_to_blob ( l_rec_dlc.dlc_location_name, filename )
+       WHERE dftt_doc_id   = pi_doc_id
+         AND dftt_revision = pi_revision ;
+    --
+    END IF;
   --
-    nm_debug.debug('move_file_to_blob - before table update');
-    UPDATE doc_files_all
-       SET df_content = move_file_to_blob ( filename, location )
-         , df_audit = 'Updated by "move_file_to_blob" on '||to_char(sysdate,'DD-MON-YYYY HH24:MI:SS')||' by '||user
-     WHERE df_doc_id = pi_doc_id
-       AND df_revision = 1;--get_max_revision(pi_doc_id);
-    nm_debug.debug('move_file_to_blob - after table update');
-     --COMMIT;
+  EXCEPTION
+  --
+    WHEN NO_DATA_FOUND
+    THEN
+      RAISE_APPLICATION_ERROR (-20701,'Cannot find DOC_ID '||pi_doc_id);
   END move_file_to_blob;
 --
 --------------------------------------------------------------------------------
 --
-  FUNCTION does_df_exist ( pi_doc_id IN doc_files_all.df_doc_id%TYPE
-                         , pi_revision IN doc_files_all.df_revision%TYPE )
+  FUNCTION does_df_exist ( pi_doc_id   IN docs.doc_id%TYPE
+                         , pi_revision IN NUMBER )
   RETURN BOOLEAN
   IS
     l_temp NUMBER;
-    CURSOR c1 IS
-      SELECT COUNT(*) FROM doc_files_all
-       WHERE df_doc_id = pi_doc_id
-         AND df_revision = pi_revision;
+    l_rec_dlt   doc_location_tables%ROWTYPE;
   BEGIN
-    OPEN c1; FETCH c1 INTO l_temp; CLOSE c1;
-    RETURN (l_temp > 0);
+  --
+    l_rec_dlt := doc_locations_api.get_dlt(pi_doc_id => pi_doc_id );
+  --
+    IF l_rec_dlt.dlt_table IS NOT NULL
+    THEN
+    --
+      EXECUTE IMMEDIATE 
+        ' SELECT COUNT(*) FROM '||l_rec_dlt.dlt_table||
+        '  WHERE '||l_rec_dlt.dlt_doc_id_col||' = :pi_doc_id '||
+        '    AND '||l_rec_dlt.dlt_revision_col||' = NVL(:pi_revision,nm3doc_files.get_max_revision(:pi_doc_id))'
+      INTO l_temp
+      USING IN pi_doc_id
+          , IN pi_revision
+          , IN pi_doc_id;
+    --
+      RETURN (l_temp > 0);
+    --
+    END IF;
+  --
   END does_df_exist;
 
 --
@@ -275,7 +345,7 @@ AS
   IS
     retval nm3type.max_varchar2;
   BEGIN
-    SELECT a.filename, b.dlc_name
+    SELECT a.filename, b.dlc_location_name
       INTO po_filename, po_location
       FROM
       (SELECT doc_id, doc_dlc_id,
@@ -294,7 +364,9 @@ AS
      WHERE filename IS NOT NULL
        AND doc_id = pi_doc_id
        AND doc_dlc_id = dlc_id
-       AND dlc_name = hdir_name;
+       --AND dlc_name = hdir_name;
+       AND dlc_location_type = 'ORACLE_DIRECTORY'
+       AND dlc_location_name = hdir_name ;
   EXCEPTION
     WHEN NO_DATA_FOUND THEN
       po_location := NULL;
@@ -317,6 +389,7 @@ AS
 --
   PROCEDURE get_upload_info
               ( pi_doc_id          IN docs.doc_id%TYPE
+              , pi_revision        IN NUMBER DEFAULT NULL
               , po_table_name     OUT user_tables.table_name%TYPE
               , po_column_name    OUT user_tab_columns.column_name%TYPE
               , po_pk_column      OUT user_tab_columns.column_name%TYPE
@@ -325,21 +398,48 @@ AS
               , po_prog_sub_title OUT VARCHAR2 )
   IS
   --
-    l_where_clause        nm3type.max_varchar2                := g_pk_column||'='||pi_doc_id;
+    l_where_clause        nm3type.max_varchar2;
     l_progress_title      nm3type.max_varchar2                := 'Uploading ... Please Wait';
     l_progress_sub_title  nm3type.max_varchar2;
-  --
+    l_rec_dlt             doc_location_tables%ROWTYPE;
   BEGIN
   --
-    l_where_clause := g_pk_column    ||' = '||pi_doc_id||' AND '||
-                      g_revision_col ||' = '||get_max_revision (pi_doc_id);
-  --
-    po_table_name     := g_table_name;
-    po_column_name    := g_column_name;
-    po_pk_column      := g_pk_column;
-    po_where_clause   := l_where_clause;
-    po_prog_title     := l_progress_title;
-    po_prog_sub_title := l_progress_sub_title;
+    IF doc_locations_api.get_dlc_table(pi_doc_id) != g_temp_load_table 
+    THEN
+    --
+      l_rec_dlt := doc_locations_api.get_dlt(pi_doc_id => pi_doc_id );
+    --
+      IF l_rec_dlt.dlt_table IS NOT NULL
+      THEN
+        l_where_clause := l_rec_dlt.dlt_doc_id_col||' = '||pi_doc_id||' AND '||
+                          l_rec_dlt.dlt_revision_col ||' = '||NVL(pi_revision,get_max_revision (pi_doc_id));
+      --
+        po_table_name     := l_rec_dlt.dlt_table;
+        po_column_name    := l_rec_dlt.dlt_content_col;
+        po_pk_column      := l_rec_dlt.dlt_doc_id_col;
+        po_where_clause   := l_where_clause;
+        po_prog_title     := l_progress_title;
+        po_prog_sub_title := l_progress_sub_title;
+      END IF;
+    --
+    ELSE
+    --
+      IF pi_revision IS NULL
+      THEN
+        RAISE_APPLICATION_ERROR (-20101,'A revision must be specified');
+      END IF;
+    --
+      l_where_clause := g_doc_id_col||' = '||pi_doc_id||' AND '||
+                        g_revision_col ||' = '||pi_revision;
+    --
+      po_table_name     := g_table_name;
+      po_column_name    := g_content_col;
+      po_pk_column      := g_doc_id_col;
+      po_where_clause   := l_where_clause;
+      po_prog_title     := l_progress_title;
+      po_prog_sub_title := l_progress_sub_title;
+    --
+    END IF;
   --
   END get_upload_info;
 --
@@ -348,6 +448,7 @@ AS
 --
   PROCEDURE get_download_info
               ( pi_doc_id          IN docs.doc_id%TYPE
+              , pi_revision        IN NUMBER DEFAULT NULL
               , po_client_file    OUT VARCHAR2
               , po_working_folder OUT VARCHAR2
               , po_table_name     OUT user_tables.table_name%TYPE
@@ -358,39 +459,105 @@ AS
   IS
   --
     l_client_file         nm3type.max_varchar2;
-    l_where_clause        nm3type.max_varchar2 := (g_pk_column)||'='||pi_doc_id;
+    l_where_clause        nm3type.max_varchar2;
     l_progress_title      nm3type.max_varchar2 := 'Downloading To Client ... Please Wait';
     l_progress_sub_title  nm3type.max_varchar2;
     l_location            nm3type.max_varchar2;
     l_filename            nm3type.max_varchar2;
   --
-    l_rec_df              doc_files_all%ROWTYPE;
+    l_rec_table           rec_doc_table;
+    l_rec_temp_table      doc_file_transfer_temp%ROWTYPE;
   --
     ex_no_file            EXCEPTION;
     ex_cannot_find_file   EXCEPTION;
+    l_rec_dlt             doc_location_tables%ROWTYPE;
+  --
+    l_revision            NUMBER := NVL(pi_revision,get_max_revision (pi_doc_id));
   --
   BEGIN
   --
-    IF does_df_exist ( pi_doc_id, get_max_revision(pi_doc_id) )
+    IF doc_locations_api.get_dlc_table(pi_doc_id) != g_temp_load_table 
     THEN
     --
-    -- DOC_FILES_ALL record exists
+    ---------------------------------------------------------
+    -- Retriving from a Table defined in DOC_LOCATIONS_TABLE
+    ---------------------------------------------------------
     --
-      l_where_clause := g_pk_column    ||' = '||pi_doc_id||' AND '||
-                        g_revision_col ||' = '||get_max_revision (pi_doc_id);
+      l_rec_dlt := doc_locations_api.get_dlt(pi_doc_id => pi_doc_id );
     --
-      po_client_file    := get_df ( pi_doc_id, get_max_revision(pi_doc_id) ).df_filename;
-      po_working_folder := get_work_folder ;
-      po_table_name     := g_table_name;
-      po_column_name    := g_column_name;
-      po_where_clause   := l_where_clause;
-      po_prog_title     := l_progress_title;
-      po_prog_sub_title := l_progress_sub_title;
+      IF l_rec_dlt.dlt_table IS NOT NULL
+      THEN
+    --
+        IF does_df_exist ( pi_doc_id,l_revision )
+        THEN
+        --
+        -- DOC_FILES_ALL record exists
+        --
+          l_where_clause := l_rec_dlt.dlt_doc_id_col||' = '||pi_doc_id||' AND '||
+                            l_rec_dlt.dlt_revision_col ||' = '||l_revision;
+        --
+          po_client_file    := get_df ( pi_doc_id, l_revision ).filename;
+          po_working_folder := get_work_folder ;
+          po_table_name     := l_rec_dlt.dlt_table;
+          po_column_name    := l_rec_dlt.dlt_content_col;
+          po_where_clause   := l_where_clause;
+          po_prog_title     := l_progress_title;
+          po_prog_sub_title := l_progress_sub_title;
+        --
+        ELSE
+        --
+        -- Does not exist - load the file up into the table and
+        -- create the DOC_FILES_ALL record.
+        --
+          get_filename_and_location (pi_doc_id, l_filename, l_location);
+        --
+          IF l_filename IS NOT NULL
+          AND l_location IS NOT NULL
+          THEN
+          --
+            IF nm3file.file_exists(l_location, l_filename) = 'N'
+            THEN
+              RAISE ex_cannot_find_file;
+            END IF;
+          --
+            l_rec_table.doc_id      := pi_doc_id;
+            l_rec_table.revision    := 1;
+            l_rec_table.start_date  := get_doc_start_date (pi_doc_id);
+            l_rec_table.content     := nm3file.file_to_blob(l_location, l_filename);
+            l_rec_table.filename    := l_filename;
+            l_rec_table.full_path   := nm3file.get_true_dir_name(l_location)||g_sep||l_filename;
+          --
+            insert_df (l_rec_table);
+          --
+            l_where_clause := l_rec_dlt.dlt_doc_id_col||' = '||pi_doc_id||' AND '||
+                              l_rec_dlt.dlt_revision_col ||' = '||l_revision;
+          --
+            po_client_file    := l_filename;
+            po_working_folder := get_work_folder ;
+            po_table_name     := l_rec_dlt.dlt_table;
+            po_column_name    := l_rec_dlt.dlt_content_col;
+            po_where_clause   := l_where_clause;
+            po_prog_title     := l_progress_title;
+            po_prog_sub_title := l_progress_sub_title;
+          --
+          ELSE
+            RAISE ex_no_file;
+          END IF;
+        --
+        END IF;
+      --
+      END IF;
     --
     ELSE
     --
-    -- Does not exist - load the file up into the table and
-    -- create the DOC_FILES_ALL record.
+    --------------------------------------------------------------
+    -- Retriving from a Database Directory via Generic Temp Table
+    --------------------------------------------------------------
+    --
+      IF pi_revision IS NULL
+      THEN
+        RAISE_APPLICATION_ERROR (-20101,'A revision must be specified');
+      END IF;
     --
       get_filename_and_location (pi_doc_id, l_filename, l_location);
     --
@@ -403,28 +570,30 @@ AS
           RAISE ex_cannot_find_file;
         END IF;
       --
-        l_rec_df.df_doc_id      := pi_doc_id;
-        l_rec_df.df_revision    := 1;
-        l_rec_df.df_content     := move_file_to_blob(l_filename, l_location);
-        l_rec_df.df_start_date  := get_doc_start_date (pi_doc_id);
-        l_rec_df.df_filename    := l_filename;
-        l_rec_df.df_full_path   := nm3file.get_true_dir_name(l_location)||g_sep||l_filename;
+        l_rec_temp_table.dftt_doc_id      := pi_doc_id;
+        l_rec_temp_table.dftt_revision    := 1;
+        l_rec_temp_table.dftt_start_date  := get_doc_start_date (pi_doc_id);
+        l_rec_temp_table.dftt_content     := nm3file.file_to_blob(l_location, l_filename);
+        l_rec_temp_table.dftt_filename    := l_filename;
+        l_rec_temp_table.dftt_full_path   := nm3file.get_true_dir_name(l_location)||g_sep||l_filename;
       --
-        insert_df (l_rec_df);
+        insert_temp_df (l_rec_temp_table);
       --
-        l_where_clause := g_pk_column    ||' = '||pi_doc_id||' AND '||
-                          g_revision_col ||' = '||get_max_revision (pi_doc_id);
+        l_where_clause := g_doc_id_col||' = '||pi_doc_id||' AND '||
+                          g_revision_col ||' = '||l_revision;
       --
         po_client_file    := l_filename;
         po_working_folder := get_work_folder ;
         po_table_name     := g_table_name;
-        po_column_name    := g_column_name;
+        po_column_name    := g_content_col;
         po_where_clause   := l_where_clause;
         po_prog_title     := l_progress_title;
         po_prog_sub_title := l_progress_sub_title;
       --
       ELSE
+      --
         RAISE ex_no_file;
+      --
       END IF;
     --
     END IF;
@@ -432,7 +601,8 @@ AS
   EXCEPTION
     WHEN ex_no_file
       THEN raise_application_error (-20101
-                                   ,'DOC_ID ['||pi_doc_id||'] has a null DOC_FILE entry');
+                                   --,'DOC_ID ['||pi_doc_id||'] has a null DOC_FILE entry');
+                                   ,'DOC_ID ['||pi_doc_id||'] has no corresponing entry in its storage table');
     WHEN ex_cannot_find_file
       THEN raise_application_error (-20102
                                    ,'Cannot read file ['||l_filename
@@ -443,8 +613,8 @@ AS
 --  Download the file from the BLOB into an Oracle directory
 --
   PROCEDURE download_from_blob_to_file
-                                 ( pi_doc_id    IN doc_files_all.df_doc_id%TYPE
-                                 , pi_revision  IN doc_files_all.df_revision%TYPE
+                                 ( pi_doc_id    IN docs.doc_id%TYPE
+                                 , pi_revision  IN NUMBER
                                  , pi_directory IN VARCHAR2
                                  , pi_filename  IN VARCHAR2)
   IS
@@ -459,8 +629,11 @@ AS
     END IF;
   --
     BEGIN
-      ------------------------------------
-      -- Using an Oracle directory
+    --
+      --------------------------------
+        -- Using an Oracle directory
+      --------------------------------
+    --
       SELECT hdir_name INTO l_directory
         FROM hig_directories
        WHERE hdir_path = CASE
@@ -498,222 +671,75 @@ AS
   END download_from_blob_to_file;
 --
 --------------------------------------------------------------------------------
--- Private procedure borrowed from nm3file to write the blob into a file
---
-  PROCEDURE write_blob
-    ( p_blob       IN OUT NOCOPY BLOB
-    , p_file_loc   IN VARCHAR2
-    , p_file_name  IN VARCHAR2
-    )
-  IS
-    --l_buffer        RAW(16383);
-    l_buffer        RAW (32766);
-    --l_buffer_size   CONSTANT BINARY_INTEGER := 16383;
-    l_buffer_size   CONSTANT BINARY_INTEGER := 32767;
-    l_amount        BINARY_INTEGER;
-    l_offset        NUMBER(38);
-    l_file_handle   UTL_FILE.FILE_TYPE;
-    invalid_directory_path EXCEPTION;
-    PRAGMA EXCEPTION_INIT(invalid_directory_path, -29280);
-  --
-  BEGIN
-  --
-    l_file_handle := UTL_FILE.FOPEN(p_file_loc, p_file_name, 'w', 32760);
-    l_amount := l_buffer_size;
-    l_offset := 1;
-  --
-    BEGIN
-  --
-      WHILE l_amount >= l_buffer_size
-      LOOP
-
-        DBMS_LOB.READ
-          ( lob_loc    => p_blob
-          , amount     => l_amount
-          , offset     => l_offset
-          , buffer     => l_buffer
-          ) ;
-
-        l_offset := l_offset + l_amount;
-
-        l_buffer := replace( l_buffer, chr(13) ) ;
-
-        UTL_FILE.PUT_RAW
-          ( file      => l_file_handle
-          , buffer    => l_buffer
-          , autoflush => true
-          );
-
-        UTL_FILE.FFLUSH
-          ( file => l_file_handle);
-
-      END LOOP;
-
---    EXCEPTION
---
---      WHEN others THEN
---        UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '+----------------------------+');
---        UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '|      ***   ERROR   ***     |');
---        UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '+----------------------------+');
---        UTL_FILE.NEW_LINE(file => l_file_handle);
---        UTL_FILE.PUT_LINE(file => l_file_handle, buffer => 'WHEN OTHERS ERROR');
---        UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '=================');
---        UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '    --> SQL CODE          : ' || SQLCODE);
---        UTL_FILE.PUT_LINE(file => l_file_handle, buffer => '    --> SQL ERROR MESSAGE : ' || SQLERRM);
---        UTL_FILE.FFLUSH(file => l_file_handle);
-
-
-    END ;
-
-    UTL_FILE.FCLOSE(l_file_handle);
-
---  EXCEPTION
---
---    WHEN invalid_directory_path THEN
---      raise_application_error(-20001,'** ERROR ** : Invalid Directory Path: ' || p_file_loc);
-
-  END write_blob;
---
---------------------------------------------------------------------------------
---
---
-  PROCEDURE write_blob2
-    ( p_blob       IN OUT NOCOPY BLOB
-    , p_file_loc   IN VARCHAR2
-    , p_file_name  IN VARCHAR2
-    )
-  IS
-    vblob           BLOB;
-    vstart          NUMBER := 1;
-    bytelen         NUMBER := 32000;
-    len             NUMBER;
-    my_vr           RAW(32000);
-    x               NUMBER;
-    l_file_handle   utl_file.file_type;
-
-  BEGIN
-
---  --
-    nm_debug.debug_on;
-    nm_debug.debug('filename = '||p_file_name);
-  --
-    l_file_handle := UTL_FILE.FOPEN(p_file_loc, p_file_name, 'w', 32760);
-
-    vstart := 1;
-    bytelen := 32000;
-
-    -- get length of blob
-    len := dbms_lob.getlength(p_blob);
-
-    -- save blob length
-    x := len;
-
-    -- select blob into variable
-    vblob := p_blob;
-
-    -- if small enough for a single write
-    IF len < 32760
-    THEN
-      utl_file.put_raw(l_file_handle,vblob);
-      utl_file.fflush(l_file_handle);
-    ELSE -- write in pieces
-      vstart := 1;
-      WHILE vstart < len and bytelen > 0
-      LOOP
-        dbms_lob.read(vblob,bytelen,vstart,my_vr);
-
-        utl_file.put_raw(l_file_handle,my_vr);
-        utl_file.fflush(l_file_handle);
-
-        -- set the start position for the next cut
-        vstart := vstart + bytelen;
-
-        -- set the end position if less than 32000 bytes
-        x := x - bytelen;
-        IF x < 32000 THEN
-          bytelen := x;
-        END IF;
-
-      END LOOP;
-
-    END IF;
-
-    utl_file.fclose(l_file_handle);
-
-
-
-  END write_blob2;
---
---------------------------------------------------------------------------------
---
-  PROCEDURE write_blob3
-    ( p_blob       IN OUT NOCOPY BLOB
-    , p_file_loc   IN VARCHAR2
-    , p_file_name  IN VARCHAR2
-    )
-
-  IS
-    t_blob       BLOB    := p_blob;
-    t_len        NUMBER;
-    t_file_name  VARCHAR2(2000)       := p_file_name;
-    t_output     UTL_FILE.file_type;
-    t_TotalSize  NUMBER;
-    t_position   NUMBER := 1;
-    t_chucklen   NUMBER := 4096;
-    t_chuck      RAW(4096);
-    t_remain     NUMBER;
-  BEGIN
-  -- Get length of blob
-    t_TotalSize := DBMS_LOB.getlength (t_blob);
-    t_remain := t_TotalSize;
-
-  -- The directory p_file_loc should exist before executing
-    t_output := UTL_FILE.fopen (p_file_loc, t_file_name, 'wb', 32760);
-
-  -- Retrieving BLOB
-    WHILE t_position < t_TotalSize
-     LOOP
-      DBMS_LOB.READ (t_blob, t_chucklen, t_position, t_chuck);
-      UTL_FILE.put_raw (t_output, t_chuck);
-      UTL_FILE.fflush (t_output);
-      t_position := t_position + t_chucklen;
-      t_remain := t_remain - t_chucklen;
-      IF t_remain < 4096
-      THEN
-      t_chucklen := t_remain;
-      END IF;
-    END LOOP;
-    utl_file.fclose(t_output);
-  END write_blob3;
---
---------------------------------------------------------------------------------
 --
   PROCEDURE blob2file
-                      ( pi_doc_id    IN doc_files_all.df_doc_id%TYPE
-                      , pi_revision  IN doc_files_all.df_revision%TYPE
+                      ( pi_doc_id    IN docs.doc_id%TYPE
+                      , pi_revision  IN NUMBER
                       , pi_directory IN VARCHAR2
                       , pi_filename  IN VARCHAR2)
   IS
     vblob   BLOB;
+    l_rec_dlt             doc_location_tables%ROWTYPE;
   BEGIN
-    SELECT df_content INTO vblob
-      FROM doc_files_all
-     WHERE df_doc_id = pi_doc_id
-       AND df_revision =
-         CASE
-           WHEN pi_revision IS NOT NULL
-             THEN pi_revision
-           ELSE
-             (SELECT MAX(df_revision) FROM doc_files_all
-               WHERE df_doc_id = pi_doc_id)
-         END;
-  --doc_file_locks
-    write_blob3
-      ( p_blob      => vblob
-      , p_file_loc  => pi_directory
-      , p_file_name => pi_filename
-      );
   --
+    l_rec_dlt := doc_locations_api.get_dlt(pi_doc_id => pi_doc_id );
+  --
+    IF l_rec_dlt.dlt_table IS NOT NULL
+    THEN
+    --
+    ----------------------------------
+    -- Read from static storage table
+    ----------------------------------
+    --
+      EXECUTE IMMEDIATE 
+        'SELECT '||l_rec_dlt.dlt_content_col||' FROM '||l_rec_dlt.dlt_table||
+        ' WHERE '||l_rec_dlt.dlt_doc_id_col||' = :pi_doc_id '||
+        '   AND '||l_rec_dlt.dlt_revision_col||' = '||
+             ' CASE '||
+              '  WHEN :pi_revision IS NOT NULL'||
+              '    THEN :pi_revision '||
+              '  ELSE '||
+              '   (SELECT MAX('||l_rec_dlt.dlt_revision_col||') FROM '||l_rec_dlt.dlt_table||
+                  ' WHERE '||l_rec_dlt.dlt_doc_id_col||' = :pi_doc_id) END'
+      INTO vblob
+      USING IN pi_doc_id
+          , IN pi_revision;
+    --
+    ELSIF doc_locations_api.get_dlc_table(pi_doc_id=>pi_doc_id) = g_temp_load_table
+    THEN
+    --
+    ----------------------------------
+    -- Read from temporary load table
+    ----------------------------------
+    --
+      SELECT dftt_content INTO vblob 
+        FROM doc_file_transfer_temp
+       WHERE dftt_doc_id = pi_doc_id
+         AND dftt_revision = 
+              CASE
+              WHEN pi_revision IS NOT NULL
+                THEN pi_revision
+              ELSE 
+                (SELECT MAX(dftt_revision) 
+                   FROM doc_file_transfer_temp
+                  WHERE dftt_doc_id = pi_doc_id)
+              END;
+    --
+    END IF;
+  --
+    IF vblob IS NOT NULL
+    THEN
+      nm3file.blob_to_file
+        ( pi_blob             => vblob
+        , pi_destination_dir  => pi_directory
+        , pi_destination_file => pi_filename
+        );
+    END IF;
+  --
+  EXCEPTION
+  --
+    WHEN NO_DATA_FOUND
+    THEN RAISE_APPLICATION_ERROR (-20601,'Cannot find BLOB content for '||pi_doc_id||' revision '||pi_revision||' in '||l_rec_dlt.dlt_table);
   END blob2file;
 --
 --------------------------------------------------------------------------------
@@ -756,10 +782,10 @@ AS
     l_temp_dfl doc_file_locks%ROWTYPE;
   BEGIN
   --
-    IF get_df(pi_dfl_doc_id, pi_dfl_revision).df_doc_id IS NULL
-    THEN
-      RAISE_APPLICATION_ERROR(-20300,'Cannot lock file - it does not exist in the database table');
-    END IF;
+--    IF get_df(pi_dfl_doc_id, pi_dfl_revision).df_doc_id IS NULL
+--    THEN
+--      RAISE_APPLICATION_ERROR(-20300,'Cannot lock file - it does not exist in the database table');
+--    END IF;
   --
     INSERT INTO doc_file_locks
       ( dfl_doc_id, dfl_revision, dfl_username, dfl_date, dfl_terminal )
@@ -799,25 +825,38 @@ AS
   PROCEDURE get_file_lock_info
               ( pi_dfl_doc_id   IN  doc_file_locks.dfl_doc_id%TYPE
               , pi_dfl_revision IN  doc_file_locks.dfl_revision%TYPE
-              , po_filename     OUT doc_files_all.df_filename%TYPE
+              , po_filename     OUT VARCHAR2
               , po_username     OUT doc_file_locks.dfl_username%TYPE
               , po_date         OUT doc_file_locks.dfl_date%TYPE)
   IS
     l_filename nm3type.max_varchar2;
     l_username VARCHAR2(30);
     l_date     DATE;
+    l_rec_dlt             doc_location_tables%ROWTYPE;
   BEGIN
-    SELECT df_filename, dfl_username, dfl_date
+  --
+    l_rec_dlt := doc_locations_api.get_dlt(pi_doc_id => pi_dfl_doc_id );
+  --
+    IF l_rec_dlt.dlt_table IS NOT NULL
+    THEN
+    --
+      EXECUTE IMMEDIATE 
+      'SELECT '||l_rec_dlt.dlt_filename||', dfl_username, dfl_date '||
+      '  FROM doc_file_locks, '||l_rec_dlt.dlt_table ||
+      ' WHERE '||l_rec_dlt.dlt_doc_id_col||' = dlf_doc_id '||
+       '  AND '||l_rec_dlt.dlt_revision_col||' = dfl_revision '||
+        ' AND dfl_doc_id = :pi_doc_id '||
+        ' AND dfl_revision = :pi_revision '
       INTO l_filename, l_username, l_date
-      FROM doc_file_locks, doc_files_all
-     WHERE df_doc_id = dfl_doc_id
-       AND df_revision = dfl_revision
-       AND dfl_doc_id = pi_dfl_doc_id
-       AND dfl_revision = pi_dfl_revision;
+      USING IN pi_dfl_doc_id
+          , IN pi_dfl_revision;
+    --
+    END IF;
   --
     po_filename := l_filename;
     po_username := l_username;
     po_date     := l_date;
+  --
   EXCEPTION
     WHEN NO_DATA_FOUND
     THEN
@@ -839,71 +878,71 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-  FUNCTION get_file_size ( pi_doc_id    IN doc_files_all.df_doc_id%TYPE
-                         , pi_revision  IN doc_files_all.df_revision%TYPE
+  FUNCTION get_file_size ( pi_doc_id    IN docs.doc_id%TYPE
+                         , pi_revision  IN NUMBER
                          , pi_formatted IN BOOLEAN DEFAULT FALSE )
   RETURN VARCHAR2
   IS
     retval      nm3type.max_varchar2;
     l_formatted VARCHAR2(15) := nm3flx.boolean_to_char( pi_formatted );
   BEGIN
-    SELECT
-        --
-           CASE
-           WHEN l_formatted = nm3type.get_true
-           THEN
-           --
-           -- Return a nice formatted value
-           --
-             CASE
-               --------------------------------------------------------
-               -- Bytes
-               --------------------------------------------------------
-               WHEN LENGTH(df_content) < 1024
-               THEN
-                 --LENGTH(df_content)||' Bytes'
-                 LENGTH(df_content)||' B'
-               --------------------------------------------------------
-               -- Kilobytes
-               ----------------------------------------------------------
-               WHEN LENGTH(df_content) < (1024*1024)
-               THEN
-                 --ROUND(LENGTH(df_content)/1024,0)||' Kilobytes'
-                 ROUND(LENGTH(df_content)/1024,0)||' KB'
-               --------------------------------------------------------
-               -- Megabytes
-               --------------------------------------------------------
-               WHEN LENGTH(df_content) < (1024*1024*1024)
-               THEN
-                 --ROUND(LENGTH(df_content)/(1024*1024),2)||' Megabytes'
-                 ROUND(LENGTH(df_content)/(1024*1024),2)||' MB'
-               --------------------------------------------------------
-               -- Gigabytes
-               --------------------------------------------------------
-               WHEN LENGTH(df_content) < (1024*1024*1024*1024)
-               THEN
-                 --ROUND(LENGTH(df_content)/(1024*1024*1024),2)||' Gigabytes'
-                 ROUND(LENGTH(df_content)/(1024*1024*1024),2)||' GB'
-               --------------------------------------------------------
-               -- Terrabytes
-               --------------------------------------------------------
-               WHEN LENGTH(df_content) < (1024*1024*1024*1024*1024)
-               THEN
-                 ROUND(LENGTH(df_content)/(1024*1024*1024*1024),2)||' TB'
-               ELSE
-                 LENGTH(df_content)||' Bytes'
-             END
-           ELSE
-           --
-           -- Otherwise just return the length in bytes
-           --
-             LTRIM (TO_CHAR (LENGTH(df_content),'99999999999999'))
-           END
-        --
-      INTO retval
-      FROM doc_files_all
-     WHERE df_doc_id = pi_doc_id
-       AND df_revision = NVL(pi_revision, get_max_revision(pi_doc_id));
+--    SELECT
+--        --
+--           CASE
+--           WHEN l_formatted = nm3type.get_true
+--           THEN
+--           --
+--           -- Return a nice formatted value
+--           --
+--             CASE
+--               --------------------------------------------------------
+--               -- Bytes
+--               --------------------------------------------------------
+--               WHEN LENGTH(df_content) < 1024
+--               THEN
+--                 --LENGTH(df_content)||' Bytes'
+--                 LENGTH(df_content)||' B'
+--               --------------------------------------------------------
+--               -- Kilobytes
+--               ----------------------------------------------------------
+--               WHEN LENGTH(df_content) < (1024*1024)
+--               THEN
+--                 --ROUND(LENGTH(df_content)/1024,0)||' Kilobytes'
+--                 ROUND(LENGTH(df_content)/1024,0)||' KB'
+--               --------------------------------------------------------
+--               -- Megabytes
+--               --------------------------------------------------------
+--               WHEN LENGTH(df_content) < (1024*1024*1024)
+--               THEN
+--                 --ROUND(LENGTH(df_content)/(1024*1024),2)||' Megabytes'
+--                 ROUND(LENGTH(df_content)/(1024*1024),2)||' MB'
+--               --------------------------------------------------------
+--               -- Gigabytes
+--               --------------------------------------------------------
+--               WHEN LENGTH(df_content) < (1024*1024*1024*1024)
+--               THEN
+--                 --ROUND(LENGTH(df_content)/(1024*1024*1024),2)||' Gigabytes'
+--                 ROUND(LENGTH(df_content)/(1024*1024*1024),2)||' GB'
+--               --------------------------------------------------------
+--               -- Terrabytes
+--               --------------------------------------------------------
+--               WHEN LENGTH(df_content) < (1024*1024*1024*1024*1024)
+--               THEN
+--                 ROUND(LENGTH(df_content)/(1024*1024*1024*1024),2)||' TB'
+--               ELSE
+--                 LENGTH(df_content)||' Bytes'
+--             END
+--           ELSE
+--           --
+--           -- Otherwise just return the length in bytes
+--           --
+--             LTRIM (TO_CHAR (LENGTH(df_content),'99999999999999'))
+--           END
+--        --
+--      INTO retval
+--      FROM doc_files_all
+--     WHERE df_doc_id = pi_doc_id
+--       AND df_revision = NVL(pi_revision, get_max_revision(pi_doc_id));
   --
     RETURN retval;
   --
@@ -911,8 +950,8 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-  FUNCTION get_file_size ( pi_doc_id    IN doc_files_all.df_doc_id%TYPE
-                         , pi_revision  IN doc_files_all.df_revision%TYPE
+  FUNCTION get_file_size ( pi_doc_id    IN docs.doc_id%TYPE
+                         , pi_revision  IN NUMBER
                          , pi_formatted IN VARCHAR2 DEFAULT 'N' )
   RETURN VARCHAR2
   IS
@@ -930,7 +969,7 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-  FUNCTION get_file_size ( pi_doc_id    IN doc_files_all.df_doc_id%TYPE
+  FUNCTION get_file_size ( pi_doc_id    IN docs.doc_id%TYPE
                          , pi_formatted IN VARCHAR2 DEFAULT 'N' )
   RETURN VARCHAR2
   IS
@@ -1040,108 +1079,11 @@ AS
 --
 --------------------------------------------------------------------------------
 --
---  FUNCTION get_template_hdir ( pi_table_name IN user_tables.table_name%TYPE )
---    RETURN hig_directories.hdir_name%TYPE
---  IS
---    CURSOR c1
---    IS
---      SELECT dtu_template_name
---           , dtu_print_immediately
---           , dtg_dlc_id
---           , dlc_name
---           , dtg_dmd_id
---           , dmd_name
---        FROM doc_template_users
---           , doc_template_gateways
---           , doc_locations
---           , doc_media
---           , hig_directories
---       WHERE dtu_default_template = 'Y'
---         AND dtu_user_id = (SELECT hus_user_id
---                              FROM hig_users
---                             WHERE hus_username = USER)
---         AND dtu_template_name = dtg_template_name
---         AND dtg_table_name = pi_table_name
---         AND dlc_id = dtg_dlc_id
---         AND dmd_id = dtg_dmd_id
---         AND hdir_name = dlc_name;
---  --
---    l_rec_c1  c1%ROWTYPE;
---  --
---  BEGIN
---  --
---    OPEN c1;
---    FETCH c1 INTO l_rec_c1;
---    CLOSE c1;
---  --
---    RETURN l_rec_c1.dlc_name;
---  --
---  END get_template_hdir;
---
---------------------------------------------------------------------------------
--- Load a template from an existing location/file into DOC_TEMPLATE_FILES_ALL table
---  PROCEDURE load_dtf ( pi_filename      IN doc_template_files_all.dtf_filename%TYPE
---                     , pi_location      IN VARCHAR2
---                     , pi_template_name IN doc_template_files_all.dtf_template_name%TYPE)
---  IS
---    l_rec_dtf doc_template_files_all%ROWTYPE;
---  BEGIN
---  --
---    l_rec_dtf.dtf_template_name := pi_template_name;
---    l_rec_dtf.dtf_filename      := pi_filename;
---    l_rec_dtf.dtf_revision      := 1;
---    l_rec_dtf.dtf_content       := move_file_to_blob ( pi_filename, pi_location);
---    l_rec_dtf.dtf_file_info     := LENGTH(l_rec_dtf.dtf_content);
---  --
---    insert_dtf ( l_rec_dtf );
---  --
---  END load_dtf;
---
---------------------------------------------------------------------------------
---
---  PROCEDURE get_template_download_info
---                ( pi_template_name   IN doc_template_files_all.dtf_template_name%TYPE
---                , po_client_file    OUT VARCHAR2
---                , po_working_folder OUT VARCHAR2
---                , po_table_name     OUT user_tables.table_name%TYPE
---                , po_column_name    OUT user_tab_columns.column_name%TYPE
---                , po_where_clause   OUT VARCHAR2
---                , po_prog_title     OUT VARCHAR2
---                , po_prog_sub_title OUT VARCHAR2 )
---  IS
--- --
---    l_client_file         nm3type.max_varchar2;
---    l_where_clause        nm3type.max_varchar2 ;
---    l_progress_title      nm3type.max_varchar2 := 'Downloading To Client ... Please Wait';
---    l_progress_sub_title  nm3type.max_varchar2;
---  --
---  BEGIN
---  --
---    l_where_clause := g_dot_pk_column    ||' = '||nm3flx.string(pi_template_name)||' AND '||
---                      g_dot_revision_col ||' = '||get_max_dot_revision (pi_template_name);
---  --
---    --move_file_to_blob ( pi_doc_id );
---  --
---    po_client_file    := get_dtf ( pi_template_name, get_max_dot_revision(pi_template_name) ).dtf_filename;
---    po_working_folder := NVL(hig.get_user_or_sys_opt('WORKFOLDER'),'C:\') ;
---    po_table_name     := g_dot_table_name;
---    po_column_name    := g_dot_column_name;
---    po_where_clause   := l_where_clause;
---    po_prog_title     := l_progress_title;
---    po_prog_sub_title := l_progress_sub_title;
---  --
---  END get_template_download_info;
---
---------------------------------------------------------------------------------
---
   FUNCTION get_dlc_table (pi_doc_id IN docs.doc_id%TYPE) RETURN doc_location_tables.dlt_table%TYPE
    IS
     retval doc_location_tables.dlt_table%TYPE;
   BEGIN
-    SELECT dlt_table INTO retval FROM doc_location_tables, docs
-     WHERE dlt_dlc_id = doc_dlc_id
-       AND doc_id = pi_doc_id;
-    RETURN retval;
+    RETURN doc_locations_api.get_dlc_table ( pi_doc_id => pi_doc_id );
   EXCEPTION
     WHEN NO_DATA_FOUND THEN RETURN NULL;
   END get_dlc_table;
@@ -1158,43 +1100,43 @@ AS
   EXCEPTION
     WHEN NO_DATA_FOUND THEN RETURN NULL;
   END get_dlc_table;
---
---------------------------------------------------------------------------------
---
-  PROCEDURE set_doc_location_table ( pi_dlc_id IN doc_locations.dlc_id%TYPE
-                                   , pi_flag   IN BOOLEAN )
-  IS
-  BEGIN
-  --
-    IF pi_flag
-    THEN
-      IF get_dlc_table ( pi_dlc_id => pi_dlc_id) IS NULL
-      THEN
-        INSERT INTO doc_location_tables
-        SELECT dlt_id_seq.nextval
-             , pi_dlc_id
-             , 'DOC_FILES_ALL'
-             , 'DF_DOC_ID'
-             , 'DF_CONTENT'
-             , 'DF_REVISION'
-             , 'DF_START_DATE'
-             , 'DF_END_DATE'
-             , 'DF_FULL_PATH'
-             , 'DF_FILENAME'
-             , 'DF_AUDIT_COL'
-             , 'DF_FILE_INFO'
-           FROM dual;
-      END IF;
-    --
-    ELSE
-    --
-      DELETE doc_location_tables
-       WHERE dlt_dlc_id = pi_dlc_id
-         AND dlt_table = 'DOC_FILES_ALL';
-    --
-    END IF;
-  --
-  END set_doc_location_table;
+----
+----------------------------------------------------------------------------------
+----
+--  PROCEDURE set_doc_location_table ( pi_dlc_id IN doc_locations.dlc_id%TYPE
+--                                   , pi_flag   IN BOOLEAN )
+--  IS
+--  BEGIN
+--  --
+--    IF pi_flag
+--    THEN
+--      IF get_dlc_table ( pi_dlc_id => pi_dlc_id) IS NULL
+--      THEN
+--        INSERT INTO doc_location_tables
+--        SELECT dlt_id_seq.nextval
+--             , pi_dlc_id
+--             , 'DOC_FILES_ALL'
+--             , 'DF_DOC_ID'
+--             , 'DF_CONTENT'
+--             , 'DF_REVISION'
+--             , 'DF_START_DATE'
+--             , 'DF_END_DATE'
+--             , 'DF_FULL_PATH'
+--             , 'DF_FILENAME'
+--             , 'DF_AUDIT_COL'
+--             , 'DF_FILE_INFO'
+--           FROM dual;
+--      END IF;
+--    --
+--    ELSE
+--    --
+--      DELETE doc_location_tables
+--       WHERE dlt_dlc_id = pi_dlc_id
+--         AND dlt_table = 'DOC_FILES_ALL';
+--    --
+--    END IF;
+--  --
+--  END set_doc_location_table;
 --
 --------------------------------------------------------------------------------
 --
