@@ -1262,6 +1262,28 @@ start '&run_file'
 --
 ----------------------------------------------------------------------------------------- 
 --
+SET TERM ON 
+PROMPT hig_file_transfer_details.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'hig_file_transfer_details.vw' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT hig_file_transfer_batch.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'hig_file_transfer_batch.vw' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
 
 
 
