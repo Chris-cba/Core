@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.37   Apr 15 2010 11:24:12   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.38   Apr 23 2010 15:26:38   malexander  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Apr 15 2010 11:24:12  $
---       Date fetched Out : $Modtime:   Apr 15 2010 11:18:48  $
---       Version          : $Revision:   2.37  $
+--       Date into PVCS   : $Date:   Apr 23 2010 15:26:38  $
+--       Date fetched Out : $Modtime:   Apr 23 2010 15:23:34  $
+--       Version          : $Revision:   2.38  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 15-APR-2010 11:18
+--       Generation Date  : 23-APR-2010 15:23
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -670,6 +670,23 @@ SET TERM ON
 PROMPT nm_errors
 SET TERM OFF
 
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'DOC'
+       ,1
+       ,null
+       ,'A Document Bundle of this name already exists'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'DOC'
+                    AND  NER_ID = 1);
+--
 INSERT INTO NM_ERRORS
        (NER_APPL
        ,NER_ID
@@ -6291,7 +6308,7 @@ SELECT
         'HIG'
        ,533
        ,null
-       ,'You are not permitted to submit a process.  '||CHR(10)||'Review process types and process type roles using the ''Process Types'' module.'
+       ,'You are not permitted to submit a process.'||CHR(10)||'Review process types and process type roles using the ''Process Types'' module.'
        ,'' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'HIG'
@@ -28070,6 +28087,54 @@ INSERT INTO HIG_MODULES
        ,HMO_MENU
        )
 SELECT 
+        'DOC0300'
+       ,'Load Document Bundles'
+       ,'HIG2510'
+       ,'FMX'
+       ,''
+       ,'N'
+       ,'N'
+       ,'DOC'
+       ,'FORM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
+                   WHERE HMO_MODULE = 'DOC0300');
+--
+INSERT INTO HIG_MODULES
+       (HMO_MODULE
+       ,HMO_TITLE
+       ,HMO_FILENAME
+       ,HMO_MODULE_TYPE
+       ,HMO_FASTPATH_OPTS
+       ,HMO_FASTPATH_INVALID
+       ,HMO_USE_GRI
+       ,HMO_APPLICATION
+       ,HMO_MENU
+       )
+SELECT 
+        'DOC0310'
+       ,'Manage Document Bundles'
+       ,'doc0310'
+       ,'FMX'
+       ,''
+       ,'N'
+       ,'N'
+       ,'DOC'
+       ,'FORM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
+                   WHERE HMO_MODULE = 'DOC0310');
+--
+INSERT INTO HIG_MODULES
+       (HMO_MODULE
+       ,HMO_TITLE
+       ,HMO_FILENAME
+       ,HMO_MODULE_TYPE
+       ,HMO_FASTPATH_OPTS
+       ,HMO_FASTPATH_INVALID
+       ,HMO_USE_GRI
+       ,HMO_APPLICATION
+       ,HMO_MENU
+       )
+SELECT 
         'DOCWEB0010'
        ,'Run Query'
        ,'dm3query.list_queries'
@@ -29785,6 +29850,30 @@ SELECT
        ,'FORM' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
                    WHERE HMO_MODULE = 'HIG2540');
+--
+INSERT INTO HIG_MODULES
+       (HMO_MODULE
+       ,HMO_TITLE
+       ,HMO_FILENAME
+       ,HMO_MODULE_TYPE
+       ,HMO_FASTPATH_OPTS
+       ,HMO_FASTPATH_INVALID
+       ,HMO_USE_GRI
+       ,HMO_APPLICATION
+       ,HMO_MENU
+       )
+SELECT 
+        'HIG2600'
+       ,'Transfer Log'
+       ,'hig2600'
+       ,'FMX'
+       ,''
+       ,'N'
+       ,'N'
+       ,'HIG'
+       ,'FORM' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULES
+                   WHERE HMO_MODULE = 'HIG2600');
 --
 INSERT INTO HIG_MODULES
        (HMO_MODULE
@@ -34807,6 +34896,30 @@ INSERT INTO HIG_OPTION_LIST
        ,HOL_MAX_LENGTH
        )
 SELECT 
+        'SDOBATSIZE'
+       ,'HIG'
+       ,'Batch size for spatial queries'
+       ,'This will set the batch size for spatial queries'
+       ,''
+       ,'NUMBER'
+       ,'N'
+       ,'N'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'SDOBATSIZE');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       ,HOL_MAX_LENGTH
+       )
+SELECT 
         'SDOCLIPTYP'
        ,'WMP'
        ,'Clipping Algorithm'
@@ -36737,6 +36850,16 @@ SELECT
        ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
                    WHERE HOV_ID = 'SDMREGULYR');
+--
+INSERT INTO HIG_OPTION_VALUES
+       (HOV_ID
+       ,HOV_VALUE
+       )
+SELECT 
+        'SDOBATSIZE'
+       ,'100' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
+                   WHERE HOV_ID = 'SDOBATSIZE');
 --
 INSERT INTO HIG_OPTION_VALUES
        (HOV_ID
