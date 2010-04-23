@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.22   Apr 23 2010 14:37:50   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.23   Apr 23 2010 17:03:50   rcoupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Apr 23 2010 14:37:50  $
---       Date fetched Out : $Modtime:   Apr 23 2010 14:37:26  $
---       PVCS Version     : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   Apr 23 2010 17:03:50  $
+--       Date fetched Out : $Modtime:   Apr 23 2010 17:03:28  $
+--       PVCS Version     : $Revision:   2.23  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Fri Apr 23  14:29:32 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Fri Apr 23  17:01:12 2010 by Server Generator 10.1.2.9.28
 
 
 
@@ -5423,7 +5423,7 @@ CREATE TABLE NM_INV_TYPE_ATTRIBS_ALL
  ,ITA_DATE_MODIFIED DATE NOT NULL
  ,ITA_MODIFIED_BY VARCHAR2(30) NOT NULL
  ,ITA_CREATED_BY VARCHAR2(30) NOT NULL
- ,ITA_QUERY VARCHAR2(240)
+ ,ITA_QUERY VARCHAR2(4000)
  ,ITA_DISPLAYED VARCHAR2(1) DEFAULT 'Y' NOT NULL
  ,ITA_DISP_WIDTH NUMBER(3)
  ,ITA_INSPECTABLE VARCHAR2(1) DEFAULT 'Y' NOT NULL
