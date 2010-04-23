@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.27   Apr 22 2010 11:32:14   gjohnson  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.28   Apr 23 2010 13:21:48   cstrettle  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   Apr 22 2010 11:32:14  $
---       Date fetched Out : $Modtime:   Apr 22 2010 11:31:48  $
---       PVCS Version     : $Revision:   2.27  $
+--       Date into PVCS   : $Date:   Apr 23 2010 13:21:48  $
+--       Date fetched Out : $Modtime:   Apr 23 2010 13:18:34  $
+--       PVCS Version     : $Revision:   2.28  $
 --
 --
 --   Author : Graeme Johnson
@@ -2212,7 +2212,17 @@ start '&run_file'
 --
 ----------------------------------------------------------------------------------------- 
 --
-
+SET TERM ON 
+PROMPT hig_file_transfer_api.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'hig_file_transfer_api.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
 
 
 --
