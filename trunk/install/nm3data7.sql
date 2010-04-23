@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.9   Apr 14 2010 14:43:10   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.10   Apr 23 2010 15:26:42   malexander  $
 --       Module Name      : $Workfile:   nm3data7.sql  $
---       Date into PVCS   : $Date:   Apr 14 2010 14:43:10  $
---       Date fetched Out : $Modtime:   Apr 14 2010 14:36:02  $
---       Version          : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Apr 23 2010 15:26:42  $
+--       Date fetched Out : $Modtime:   Apr 23 2010 15:23:50  $
+--       Version          : $Revision:   2.10  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 14-APR-2010 14:36
+--       Generation Date  : 23-APR-2010 15:23
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -43,6 +43,24 @@ SET TERM ON
 PROMPT nm_errors
 SET TERM OFF
 
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'DOC'
+  AND  NER_ID = 1;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'DOC'
+       ,1
+       ,null
+       ,'A Document Bundle of this name already exists'
+       ,'' FROM DUAL;
+--
 DELETE FROM NM_ERRORS
  WHERE NER_APPL = 'HIG'
   AND  NER_ID = 1;
@@ -5998,7 +6016,7 @@ SELECT
         'HIG'
        ,533
        ,null
-       ,'You are not permitted to submit a process.  '||CHR(10)||'Review process types and process type roles using the ''Process Types'' module.'
+       ,'You are not permitted to submit a process.'||CHR(10)||'Review process types and process type roles using the ''Process Types'' module.'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
