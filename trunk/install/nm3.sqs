@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.sqs-arc   2.9   Apr 22 2010 12:23:58   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.sqs-arc   2.10   Apr 23 2010 14:35:48   rcoupe  $
 --       Module Name      : $Workfile:   nm3.sqs  $
---       Date into PVCS   : $Date:   Apr 22 2010 12:23:58  $
---       Date fetched Out : $Modtime:   Apr 22 2010 12:23:38  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Apr 23 2010 14:35:48  $
+--       Date fetched Out : $Modtime:   Apr 23 2010 14:35:32  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Thu Apr 22  12:20:21 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Fri Apr 23  14:29:35 2010 by Server Generator 10.1.2.9.28
 
 PROMPT Creating Sequence 'BATCH_ID_SEQ'
 CREATE SEQUENCE BATCH_ID_SEQ
@@ -34,6 +34,30 @@ CREATE SEQUENCE DAC_ID_SEQ
  MINVALUE 1
  NOCYCLE
  CACHE 2
+/
+
+PROMPT Creating Sequence 'DBFR_RELATIONSHIP_ID_SEQ'
+CREATE SEQUENCE DBFR_RELATIONSHIP_ID_SEQ
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'DBF_FILE_ID_SEQ'
+CREATE SEQUENCE DBF_FILE_ID_SEQ
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+ NOCACHE
+/
+
+PROMPT Creating Sequence 'DBUN_BUNDLE_ID_SEQ'
+CREATE SEQUENCE DBUN_BUNDLE_ID_SEQ
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+ NOCACHE
 /
 
 PROMPT Creating Sequence 'DDC_ID_SEQ'
@@ -320,6 +344,30 @@ CREATE SEQUENCE HFC_ID_SEQ
 
 PROMPT Creating Sequence 'HFL_ID_SEQ'
 CREATE SEQUENCE HFL_ID_SEQ
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+/
+
+PROMPT Creating Sequence 'HFTL_ID_SEQ'
+CREATE SEQUENCE HFTL_ID_SEQ
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+/
+
+PROMPT Creating Sequence 'HFTQ_BATCH_NO_SEQ'
+CREATE SEQUENCE HFTQ_BATCH_NO_SEQ
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+/
+
+PROMPT Creating Sequence 'HFTQ_ID_SEQ'
+CREATE SEQUENCE HFTQ_ID_SEQ
+ START WITH 1
  NOMAXVALUE
  NOMINVALUE
  NOCYCLE
