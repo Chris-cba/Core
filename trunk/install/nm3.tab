@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.21   Apr 22 2010 12:17:58   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.22   Apr 23 2010 14:37:50   rcoupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Apr 22 2010 12:17:58  $
---       Date fetched Out : $Modtime:   Apr 22 2010 12:17:28  $
---       PVCS Version     : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   Apr 23 2010 14:37:50  $
+--       Date fetched Out : $Modtime:   Apr 23 2010 14:37:26  $
+--       PVCS Version     : $Revision:   2.22  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Thu Apr 22  12:02:49 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Fri Apr 23  14:29:32 2010 by Server Generator 10.1.2.9.28
 
 
 
@@ -159,6 +159,187 @@ CREATE TABLE DOC_ASSOCS
 COMMENT ON TABLE DOC_ASSOCS IS 'Created from Entity DOCUMENT ASSOC by HIGHWAYS on 02-APR-93'
 /
 
+PROMPT Creating Table 'DOC_BUNDLES'
+CREATE TABLE DOC_BUNDLES
+ (DBUN_BUNDLE_ID NUMBER(38) NOT NULL
+ ,DBUN_FILENAME VARCHAR2(256) NOT NULL
+ ,DBUN_LOCATION VARCHAR2(256)
+ ,DBUN_UNZIP_LOCATION VARCHAR2(256)
+ ,DBUN_UNZIP_LOG CLOB
+ ,DBUN_PROCESS_ID NUMBER(38)
+ ,DBUN_SUCCESS_FLAG VARCHAR2(1) DEFAULT 'N' NOT NULL
+ ,DBUN_ERROR_TEXT VARCHAR2(500)
+ ,DBUN_DATE_CREATED DATE NOT NULL
+ ,DBUN_DATE_MODIFIED DATE NOT NULL
+ ,DBUN_MODIFIED_BY VARCHAR2(30) NOT NULL
+ ,DBUN_CREATED_BY VARCHAR2(30) NOT NULL
+ )
+/
+
+COMMENT ON TABLE DOC_BUNDLES IS 'List of document bundles'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_BUNDLE_ID IS 'Primary Key'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_FILENAME IS 'Bundle Filename'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_LOCATION IS 'File system path where the bundle can be located'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_UNZIP_LOCATION IS 'File system path where the bundle was unzipped to'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_UNZIP_LOG IS 'The unzip log file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_PROCESS_ID IS 'Associated process ID'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_SUCCESS_FLAG IS 'Success or Failure flag'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_ERROR_TEXT IS 'Error text'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_DATE_CREATED IS 'Audit column'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_DATE_MODIFIED IS 'Audit column'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_MODIFIED_BY IS 'Audit column'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_CREATED_BY IS 'Audit column'
+/
+
+PROMPT Creating Table 'DOC_BUNDLE_DISCARD_BLOBS'
+CREATE GLOBAL TEMPORARY TABLE DOC_BUNDLE_DISCARD_BLOBS
+ (ID NUMBER(38)
+ ,FILENAME VARCHAR2(240)
+ ,THE_BLOB BLOB
+ )
+ NOCACHE
+/
+
+COMMENT ON TABLE DOC_BUNDLE_DISCARD_BLOBS IS 'Temporary table used to store blobs of discarded files to write to a location on the client machine.  Drives the Discards functionality in DOC0310-Manage Document Bundles'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_DISCARD_BLOBS.ID IS 'Unique identifier for the record'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_DISCARD_BLOBS.FILENAME IS 'Filename to be written out'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_DISCARD_BLOBS.THE_BLOB IS 'File content'
+/
+
+PROMPT Creating Table 'DOC_BUNDLE_FILES'
+CREATE TABLE DOC_BUNDLE_FILES
+ (DBF_FILE_ID NUMBER(38) NOT NULL
+ ,DBF_BUNDLE_ID NUMBER(38) NOT NULL
+ ,DBF_FILENAME VARCHAR2(240) NOT NULL
+ ,DBF_DRIVING_FILE_FLAG VARCHAR2(1) DEFAULT 'N' NOT NULL
+ ,DBF_FILE_INCLUDED_WITH_BUNDLE VARCHAR2(1) DEFAULT 'Y' NOT NULL
+ ,DBF_BLOB BLOB
+ )
+/
+
+COMMENT ON TABLE DOC_BUNDLE_FILES IS 'List of the files in a document bundle'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_FILE_ID IS 'Primary Key'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_BUNDLE_ID IS 'Foreign Key to DOC_BUNDLES'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_FILENAME IS 'Filename'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_DRIVING_FILE_FLAG IS 'Flag to indicate whether or not this file is a driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_FILE_INCLUDED_WITH_BUNDLE IS 'Flag to indicate where or not this file was part of the bundle (Y) or was just referenced in a driving file (N)'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_BLOB IS 'The file content'
+/
+
+PROMPT Creating Table 'DOC_BUNDLE_FILE_RELATIONS'
+CREATE TABLE DOC_BUNDLE_FILE_RELATIONS
+ (DBFR_RELATIONSHIP_ID NUMBER(38) NOT NULL
+ ,DBFR_DRIVING_FILE_ID NUMBER(38) NOT NULL
+ ,DBFR_DRIVING_FILE_RECNO NUMBER(38) NOT NULL
+ ,DBFR_CHILD_FILE_ID NUMBER(38) NOT NULL
+ ,DBFR_DOC_TITLE VARCHAR2(60)
+ ,DBFR_DOC_DESCR VARCHAR2(2000)
+ ,DBFR_DOC_TYPE VARCHAR2(4)
+ ,DBFR_DLC_NAME VARCHAR2(30)
+ ,DBFR_GATEWAY_TABLE_NAME VARCHAR2(30)
+ ,DBFR_REC_ID VARCHAR2(30)
+ ,DBFR_X_COORDINATE NUMBER(38)
+ ,DBFR_Y_COORDINATE NUMBER(38)
+ ,DBFR_DOC_ID NUMBER(38)
+ ,DBFR_DOC_FILENAME VARCHAR2(254)
+ ,DBFR_HFTQ_BATCH_NO NUMBER(38)
+ ,DBFR_ERROR_TEXT VARCHAR2(500)
+ )
+/
+
+COMMENT ON TABLE DOC_BUNDLE_FILE_RELATIONS IS 'Defines the relationships between the files in a document bundle and the data read from each of the driving files'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_RELATIONSHIP_ID IS 'Primary Key'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_DRIVING_FILE_ID IS 'Foreign Key to DOC_BUNDLE_FILES'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_DRIVING_FILE_RECNO IS 'The line number within the driving file that this record relates to'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_CHILD_FILE_ID IS 'Foreign Key to DOC_BUNDLE_FILES'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_DOC_TITLE IS 'Attribute as supplied in driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_DOC_DESCR IS 'Attribute as supplied in driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_DOC_TYPE IS 'Attribute as supplied in driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_DLC_NAME IS 'Attribute as supplied in driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_GATEWAY_TABLE_NAME IS 'Attribute as supplied in driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_REC_ID IS 'Attribute as supplied in driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_X_COORDINATE IS 'Attribute as supplied in driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_Y_COORDINATE IS 'Attribute as supplied in driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_DOC_ID IS 'Resultant DOC_ID of any DOCS record created'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_DOC_FILENAME IS 'The unique filename that the file referred to in DOC_BUNDLE_FILES was renamed to'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_HFTQ_BATCH_NO IS 'Pointer to entries in HIG_FILE_TRANSFER_QUEUE table'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_ERROR_TEXT IS 'Error Text'
+/
+
 PROMPT Creating Table 'DOC_CLASS'
 CREATE TABLE DOC_CLASS
  (DCL_CODE VARCHAR2(4) NOT NULL
@@ -293,7 +474,7 @@ CREATE GLOBAL TEMPORARY TABLE DOC_FILE_TRANSFER_TEMP
  NOCACHE
 /
 
-COMMENT ON TABLE DOC_FILE_TRANSFER_TEMP IS 'Document File Locks table. Stores editing locks on files associated with Documents'
+COMMENT ON TABLE DOC_FILE_TRANSFER_TEMP IS 'Doc File Transfer table. A temporary file transfer table for database to client file transfers'
 /
 
 COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_DOC_ID IS 'Primary Key Column 1. Document ID'
