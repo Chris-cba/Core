@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.23   Apr 23 2010 17:03:50   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.24   Apr 26 2010 14:32:40   cstrettle  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Apr 23 2010 17:03:50  $
---       Date fetched Out : $Modtime:   Apr 23 2010 17:03:28  $
---       PVCS Version     : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   Apr 26 2010 14:32:40  $
+--       Date fetched Out : $Modtime:   Apr 26 2010 14:10:18  $
+--       PVCS Version     : $Revision:   2.24  $
 --
 --------------------------------------------------------------------------------
 --
@@ -3971,7 +3971,7 @@ CREATE TABLE NM_ASSETS_ON_ROUTE_STORE_HEAD
  ,NARSH_SOURCE_ID NUMBER NOT NULL
  ,NARSH_SOURCE VARCHAR2(10) NOT NULL
  ,NARSH_SOURCE_UNIQUE VARCHAR2(30) NOT NULL
- ,NARSH_SOURCE_DESCR VARCHAR(80) NOT NULL
+ ,NARSH_SOURCE_DESCR VARCHAR(240) NOT NULL
  ,NARSH_SOURCE_MIN_OFFSET NUMBER
  ,NARSH_SOURCE_MAX_OFFSET NUMBER
  ,NARSH_SOURCE_LENGTH NUMBER
