@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.13   Apr 15 2010 11:59:34   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.14   Apr 26 2010 10:25:04   malexander  $
 --       Module Name      : $Workfile:   nm3ins.pkb  $
---       Date into PVCS   : $Date:   Apr 15 2010 11:59:34  $
---       Date fetched Out : $Modtime:   Apr 15 2010 11:46:50  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Apr 26 2010 10:25:04  $
+--       Date fetched Out : $Modtime:   Apr 26 2010 10:04:56  $
+--       PVCS Version     : $Revision:   2.14  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.13  $"
+--   nm3get_gen body   : "$Revision:   2.14  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.13  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.14  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
@@ -941,6 +941,8 @@ BEGIN
             ,dlc_end_date
             ,dlc_apps_pathname
             ,dlc_url_pathname
+            ,dlc_location_name
+            ,dlc_location_type
             )
      VALUES (p_rec_dlc.dlc_id
             ,p_rec_dlc.dlc_name
@@ -951,6 +953,8 @@ BEGIN
             ,p_rec_dlc.dlc_end_date
             ,p_rec_dlc.dlc_apps_pathname
             ,p_rec_dlc.dlc_url_pathname
+            ,p_rec_dlc.dlc_location_name
+            ,p_rec_dlc.dlc_location_type
             )
    RETURNING dlc_id
             ,dlc_name
@@ -961,6 +965,8 @@ BEGIN
             ,dlc_end_date
             ,dlc_apps_pathname
             ,dlc_url_pathname
+            ,dlc_location_name
+            ,dlc_location_type
       INTO   p_rec_dlc.dlc_id
             ,p_rec_dlc.dlc_name
             ,p_rec_dlc.dlc_pathname
@@ -969,7 +975,9 @@ BEGIN
             ,p_rec_dlc.dlc_start_date
             ,p_rec_dlc.dlc_end_date
             ,p_rec_dlc.dlc_apps_pathname
-            ,p_rec_dlc.dlc_url_pathname;
+            ,p_rec_dlc.dlc_url_pathname
+            ,p_rec_dlc.dlc_location_name
+            ,p_rec_dlc.dlc_location_type;
 --
    nm_debug.proc_end(g_package_name,'ins_dlc');
 --
