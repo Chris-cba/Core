@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.0   Apr 23 2010 14:41:04   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.1   Apr 26 2010 10:37:28   aedwards  $
 --       Module Name      : $Workfile:   doc_locations_api.pkb  $
---       Date into PVCS   : $Date:   Apr 23 2010 14:41:04  $
---       Date fetched Out : $Modtime:   Apr 23 2010 14:40:10  $
---       Version          : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Apr 26 2010 10:37:28  $
+--       Date fetched Out : $Modtime:   Apr 26 2010 10:36:52  $
+--       Version          : $Revision:   2.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.0  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
 --
   g_package_name CONSTANT varchar2(30) := 'doc_locations_api';
 --
@@ -394,11 +394,11 @@ BEGIN
      l_tab_comments(1)  := '--';
      l_tab_comments(2)  := '--   SCCS Identifiers :-';
      l_tab_comments(3)  := '--';
-     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.0   Apr 23 2010 14:41:04   aedwards  $';
+     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.1   Apr 26 2010 10:37:28   aedwards  $';
      l_tab_comments(5)  := '--       Module Name                : $Workfile:   doc_locations_api.pkb  $';
-     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Apr 23 2010 14:41:04  $';
-     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Apr 23 2010 14:40:10  $';
-     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.0  $';
+     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Apr 26 2010 10:37:28  $';
+     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Apr 26 2010 10:36:52  $';
+     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.1  $';
      l_tab_comments(9)  := '--';
      l_tab_comments(10) := '--   table_name_WHO trigger';
      l_tab_comments(11) := '--';
@@ -659,6 +659,7 @@ BEGIN
        , pi_col_prefix||'_FILENAME'              dlt_filename
        , pi_col_prefix||'_AUDIT'                 dlt_audit_col
        , pi_col_prefix||'_FILE_INFO'             dlt_file_info_col
+       , NULL, NULL, NULL, NULL
     FROM DUAL;
 --
 END map_table_to_dlc;
