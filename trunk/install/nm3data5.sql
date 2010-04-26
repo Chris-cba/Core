@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data5.sql-arc   2.5   Apr 23 2010 15:26:42   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data5.sql-arc   2.6   Apr 26 2010 10:58:46   malexander  $
 --       Module Name      : $Workfile:   nm3data5.sql  $
---       Date into PVCS   : $Date:   Apr 23 2010 15:26:42  $
---       Date fetched Out : $Modtime:   Apr 23 2010 15:23:46  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Apr 26 2010 10:58:46  $
+--       Date fetched Out : $Modtime:   Apr 26 2010 10:55:06  $
+--       Version          : $Revision:   2.6  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 23-APR-2010 15:23
+--       Generation Date  : 26-APR-2010 10:55
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -898,6 +898,8 @@ INSERT INTO DOC_LOCATIONS
        ,DLC_END_DATE
        ,DLC_APPS_PATHNAME
        ,DLC_URL_PATHNAME
+       ,DLC_LOCATION_TYPE
+       ,DLC_LOCATION_NAME
        )
 SELECT 
         2
@@ -907,6 +909,8 @@ SELECT
        ,'Word documents populated through OLE'
        ,null
        ,null
+       ,''
+       ,''
        ,''
        ,'' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM DOC_LOCATIONS
