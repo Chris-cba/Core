@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.12   Apr 15 2010 11:59:32   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.13   Apr 26 2010 10:25:02   malexander  $
 --       Module Name      : $Workfile:   nm3debug.pkb  $
---       Date into PVCS   : $Date:   Apr 15 2010 11:59:32  $
---       Date fetched Out : $Modtime:   Apr 15 2010 11:46:50  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Apr 26 2010 10:25:02  $
+--       Date fetched Out : $Modtime:   Apr 26 2010 10:04:56  $
+--       PVCS Version     : $Revision:   2.13  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.12  $"
+--   nm3get_gen body   : "$Revision:   2.13  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.12  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.13  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3debug';
@@ -513,6 +513,8 @@ BEGIN
    nm_debug.debug('dlc_end_date      : '||pi_rec_dlc.dlc_end_date,p_level);
    nm_debug.debug('dlc_apps_pathname : '||pi_rec_dlc.dlc_apps_pathname,p_level);
    nm_debug.debug('dlc_url_pathname  : '||pi_rec_dlc.dlc_url_pathname,p_level);
+   nm_debug.debug('dlc_location_name : '||pi_rec_dlc.dlc_location_name,p_level);
+   nm_debug.debug('dlc_location_type : '||pi_rec_dlc.dlc_location_type,p_level);
 --
    nm_debug.proc_end(g_package_name,'debug_dlc');
 --
