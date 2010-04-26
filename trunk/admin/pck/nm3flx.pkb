@@ -2,15 +2,15 @@ CREATE OR REPLACE PACKAGE BODY nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.9   Apr 09 2010 16:35:26   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.10   Apr 26 2010 10:55:08   lsorathia  $
 --       Module Name      : $Workfile:   nm3flx.pkb  $
---       Date into PVCS   : $Date:   Apr 09 2010 16:35:26  $
---       Date fetched Out : $Modtime:   Apr 09 2010 16:27:26  $
---       Version          : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Apr 26 2010 10:55:08  $
+--       Date fetched Out : $Modtime:   Apr 26 2010 10:16:00  $
+--       Version          : $Revision:   2.10  $
 --       Based on SCCS version : 1.47
 -------------------------------------------------------------------------
 --
-  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.9  $';
+  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.10  $';
 
    g_package_name    CONSTANT varchar2(30) := 'nm3flx';
 -- Package variables
@@ -858,7 +858,8 @@ PROCEDURE validate_flx_query(pi_query          IN VARCHAR2
  l_this_ita_rec    nm_inv_type_attribs%ROWTYPE;
  l_bind_ita_rec    nm_inv_type_attribs%ROWTYPE;
 
- l_where_clause    nm_type_columns.ntc_query%TYPE := '...'||SUBSTR(pi_query,INSTR(pi_query,'WHERE'),LENGTH(pi_query));
+ --l_where_clause    nm_type_columns.ntc_query%TYPE := '...'||SUBSTR(pi_query,INSTR(pi_query,'WHERE'),LENGTH(pi_query));
+ l_where_clause    nm_inv_type_attribs.ita_query%TYPE := '...'||SUBSTR(pi_query,INSTR(pi_query,'WHERE'),LENGTH(pi_query));
  
 BEGIN
 

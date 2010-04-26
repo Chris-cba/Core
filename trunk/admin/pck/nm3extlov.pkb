@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3extlov  AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extlov.pkb-arc   2.4   Apr 21 2010 12:34:00   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3extlov.pkb-arc   2.5   Apr 26 2010 10:55:08   lsorathia  $
 --       Module Name      : $Workfile:   nm3extlov.pkb  $
---       Date into PVCS   : $Date:   Apr 21 2010 12:34:00  $
---       Date fetched Out : $Modtime:   Apr 21 2010 12:29:56  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Apr 26 2010 10:55:08  $
+--       Date fetched Out : $Modtime:   Apr 23 2010 15:42:46  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY nm3extlov  AS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5  $';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
@@ -156,10 +156,19 @@ END get_body_version;
           l_alias Varchar2(500) ;
           l_pos Number;
           l_cols_tab nm3type.tab_varchar30; 
+          l_distinct Boolean ; 
         --   
 	  BEGIN
 	  --
-           l_sql := Substr(l_sql,8,Instr(Upper(l_sql),'FROM')-(1+8));
+           l_distinct := Substr(Trim(Substr(Upper(l_sql),7)),1,8) Like 'DISTINCT%';
+           IF l_distinct
+           THEN
+               l_sql := Ltrim(Substr(l_sql,8));
+               l_sql  := Substr(l_sql,Instr(l_sql,' ',1,1));
+               l_sql := Substr(l_sql,1,Instr(Upper(l_sql),'FROM')-(1));
+           ELSE
+               l_sql := Substr(l_sql,8,Instr(Upper(l_sql),'FROM')-(1+8));    
+           END IF;
            LOOP
               l_cnt := l_cnt + 1;
               l_pos := Instr(l_sql,',');
@@ -183,24 +192,26 @@ END get_body_version;
                   l_sql := Substr(l_sql,l_pos+1);
               ELSE
                   l_alias  := Ltrim(l_sql);
-                  IF Nvl(Length(Replace(Substr(l_alias,(Instr(l_alias,' '))),' ')),0) > 0
-                  THEN             
-                      l_col_tab(l_cnt) :=  l_alias ;--Substr(l_alias,(Instr(l_alias,' ')));
-                  ELSE
-                      IF l_cnt = 1 
+                  IF Instr(l_alias,' ') > 0
+                  THEN  
+                      IF Nvl(Length(Replace(Substr(l_alias,(Instr(l_alias,' '))),' ')),0) > 0
                       THEN
-                          l_col_tab(l_cnt) :=  l_sql||' Identifier ';
-                      ELSIF l_cnt = 2 
-                      THEN
-                          l_col_tab(l_cnt) :=  l_sql||' Description ';
+                          l_col_tab(l_cnt) :=  l_alias ; --Substr(l_alias,(Instr(l_alias,' ')));
                       ELSE
-                         l_col_tab(l_cnt) :=  l_sql||' Value ';
-                      END IF ;               
+                          l_col_tab(l_cnt) :=  l_sql||' Value ';
+                      END IF ;        
+                  ELSE
+                       l_col_tab(l_cnt) :=  l_sql||' Value ';
                   END IF  ;
                   Exit;     
               END IF ;
            END LOOP ;
-           l_sql:= 'SELECT ';
+           IF l_distinct 
+           THEN
+               l_sql:= 'SELECT DISTINCT ';
+           ELSE
+               l_sql:= 'SELECT ';
+           END IF ;
            FOR i in 1..l_col_tab.count 
            LOOP
                IF i = 1 
@@ -276,21 +287,22 @@ END get_body_version;
       l_statement_b4_where_added := v_statement;
       l_statement_has_where := INSTR(UPPER(v_statement), 'WHERE') > 0 ;
       l_equal_test := l_cols_tab(pi_match_col) || ' = :1' ;
-      IF l_statement_has_where
-      THEN
-        v_statement := v_statement || ' AND ' || l_equal_test ;
-      ELSE
-        v_statement := v_statement || ' WHERE ' || l_equal_test ;
-      END IF;
 
       -- If we tried an and it it failed then we must need a where after all
+      v_statement := v_statement|| ' ' || l_group_by||' '||l_order_by;
+
+      --IF l_statement_has_where
+      --THEN
+      --  v_statement := v_statement || ' AND ' || l_equal_test ;
+      --ELSE
+        v_statement := v_statement || ' WHERE ' || l_equal_test ;
+      --END IF;
+
       IF NOT nm3flx.is_select_statement_valid(v_statement) and l_statement_has_where THEN
         v_statement := l_statement_b4_where_added || ' WHERE ' || l_equal_test ;
       END IF;
 
       -- Just let it fail otherwise
-
-      v_statement := v_statement|| ' ' || l_group_by||' '||l_order_by;
       
       --
       -- Assume that the restriction on column = value passed in 
