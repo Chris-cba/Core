@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.2   Apr 23 2010 15:27:06   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.3   Apr 27 2010 10:25:50   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Apr 23 2010 15:27:06  $
---       Date fetched Out : $Modtime:   Apr 23 2010 15:17:18  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Apr 27 2010 10:25:50  $
+--       Date fetched Out : $Modtime:   Apr 27 2010 10:24:46  $
+--       Version          : $Revision:   3.3  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -1684,7 +1684,7 @@ SELECT
 FROM dual
 WHERE NOT EXISTS (SELECT 1 
                      FROM hig_modules 
-                    WHERE hmo_module = 'DOC0300')
+                    WHERE hmo_module = 'DOC0310')
 /
     
 INSERT INTO HIG_MODULES
@@ -1708,7 +1708,7 @@ SELECT
 FROM dual
 WHERE NOT EXISTS (SELECT 1 
                      FROM hig_modules 
-                    WHERE hmo_module = 'DOC0310')
+                    WHERE hmo_module = 'DOC0300')
 /
 
 
@@ -1736,7 +1736,7 @@ SELECT
 FROM dual
 WHERE NOT EXISTS (SELECT 1
                     FROM hig_module_roles
-                   WHERE hmr_module = 'DOC0300'
+                   WHERE hmr_module = 'DOC0310'
                      AND hmr_role   = 'DOC_USER'
                   )    
 /
