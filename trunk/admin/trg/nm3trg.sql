@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.15   Mar 29 2010 17:48:10   gjohnson  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.16   Apr 27 2010 13:52:18   aedwards  $
 --       Module Name      : $Workfile:   nm3trg.sql  $
---       Date into PVCS   : $Date:   Mar 29 2010 17:48:10  $
---       Date fetched Out : $Modtime:   Mar 29 2010 17:47:04  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Apr 27 2010 13:52:18  $
+--       Date fetched Out : $Modtime:   Apr 27 2010 13:52:02  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 --
 --   Author : Graeme Johnson
@@ -1898,7 +1898,17 @@ start '&run_file'
 --
 -----------------------------------------------------------------------------------------
 --
-
+SET TERM ON 
+PROMPT hig_ftp_connections_b_ins_upd.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'hig_ftp_connections_b_ins_upd.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+-----------------------------------------------------------------------------------------
+--
 
 
 
