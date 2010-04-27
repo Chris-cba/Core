@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.24   Apr 26 2010 14:32:40   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.25   Apr 27 2010 13:10:04   rcoupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Apr 26 2010 14:32:40  $
---       Date fetched Out : $Modtime:   Apr 26 2010 14:10:18  $
---       PVCS Version     : $Revision:   2.24  $
+--       Date into PVCS   : $Date:   Apr 27 2010 13:10:04  $
+--       Date fetched Out : $Modtime:   Apr 27 2010 13:09:02  $
+--       PVCS Version     : $Revision:   2.25  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Fri Apr 23  17:01:12 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Tue Apr 27  13:06:20 2010 by Server Generator 10.1.2.9.28
 
 
 
@@ -2562,9 +2562,9 @@ CREATE TABLE HIG_MODULE_USAGES
 PROMPT Creating Table 'HIG_NAVIGATOR'
 CREATE TABLE HIG_NAVIGATOR
  (HNV_HIERARCHY_TYPE VARCHAR2(50) NOT NULL
- ,HNV_PARENT_TABLE VARCHAR2(30)
+ ,HNV_PARENT_TABLE VARCHAR2(500)
  ,HNV_PARENT_COLUMN VARCHAR2(1000)
- ,HNV_CHILD_TABLE VARCHAR2(30) NOT NULL
+ ,HNV_CHILD_TABLE VARCHAR2(500) NOT NULL
  ,HNV_CHILD_COLUMN VARCHAR2(1000) NOT NULL
  ,HNV_HIERARCHY_LEVEL NUMBER(9) NOT NULL
  ,HNV_HIERARCHY_LABEL VARCHAR2(100) NOT NULL
@@ -2573,7 +2573,7 @@ CREATE TABLE HIG_NAVIGATOR
  ,HNV_PARENT_ALIAS VARCHAR2(10)
  ,HNV_CHILD_ALIAS VARCHAR2(10) NOT NULL
  ,HNV_ICON_NAME VARCHAR2(50)
- ,HNV_ADDITIONAL_COND VARCHAR2(1000)
+ ,HNV_ADDITIONAL_COND VARCHAR2(2000)
  ,HNV_PRIMARY_HIERARCHY VARCHAR2(1) DEFAULT 'N'
  ,HNV_HIER_LABEL_1 VARCHAR2(500) NOT NULL
  ,HNV_HIER_LABEL_2 VARCHAR2(500)
@@ -3148,6 +3148,15 @@ COMMENT ON TABLE HIG_PROCESS_TYPES IS 'Exor Process Framework table. Defines eac
 /
 
 COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_PROCESS_TYPE_ID IS 'Primary Key.  When a negative value it indicates that the process has been shipped as a standard process and is therefore marked as Protected in the Maintain Process Types module.  Otherwise when records are created the value of this column should be taken from sequence HPT_PROCESS_TYPE_ID_SEQ.'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_NAME IS 'Process type name.'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_DESCR IS 'Process type description.'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_WHAT_TO_CALL IS 'The pl/sql code to call when a process of this type is executed.'
 /
 
 COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_INITIATION_MODULE IS 'The HIG_MODULE that can be used to initiate the submission of a process of this type.'
