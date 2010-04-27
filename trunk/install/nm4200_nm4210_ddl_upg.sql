@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.2   Apr 23 2010 15:27:06   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.3   Apr 27 2010 09:59:38   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Apr 23 2010 15:27:06  $
---       Date fetched Out : $Modtime:   Apr 23 2010 15:17:18  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Apr 27 2010 09:59:38  $
+--       Date fetched Out : $Modtime:   Apr 27 2010 09:58:04  $
+--       Version          : $Revision:   3.3  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -734,12 +734,12 @@ SET TERM OFF
 ------------------------------------------------------------------
 PROMPT Add DLC_LOCATION_TYPE to DOC_LOCATIONS
 ALTER TABLE doc_locations
-ADD dlc_location_type VARCHAR2(30) NOT NULL
+ADD dlc_location_type VARCHAR2(30)
 /
 
 PROMPT Add DLC_LOCATION_NAME to DOC_LOCATIONS
 ALTER TABLE doc_locations
-ADD dlc_location_name VARCHAR2(2000) NOT NULL
+ADD dlc_location_name VARCHAR2(2000)
 /
 
 PROMPT Creating Table 'DOC_LOCATION_TABLES'
@@ -1979,6 +1979,303 @@ CREATE INDEX HTPR_HRO_FK_IND ON HIG_PROCESS_TYPE_ROLES
 /
 
 
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Document Bundle Loader - Tables
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (GRAEME JOHNSON)
+-- To support document bundle loader
+-- 
+------------------------------------------------------------------
+CREATE TABLE doc_bundles(
+                         dbun_bundle_id         number(38) not null
+                        ,dbun_filename          varchar2(256) not null         
+                        ,dbun_location          varchar2(256) 
+                        ,dbun_unzip_location    varchar2(256) 
+                        ,dbun_unzip_log         clob
+                        ,dbun_process_id        number(38)
+                        ,dbun_success_flag      varchar2(1) DEFAULT 'N' not null 
+                        ,dbun_error_text        varchar2(500)
+                        ,dbun_date_created      date not null            
+                        ,dbun_date_modified     date not null            
+                        ,dbun_modified_by       varchar2(30) not null             
+                        ,dbun_created_by        varchar2(30) not null
+                        )
+/
+
+
+COMMENT ON TABLE DOC_BUNDLES IS 'List of document bundles'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_CREATED_BY IS 'Audit column'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_BUNDLE_ID IS 'Primary Key'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_FILENAME IS 'Bundle Filename'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_LOCATION IS 'File system path where the bundle can be located'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_UNZIP_LOCATION IS 'File system path where the bundle was unzipped to'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_UNZIP_LOG IS 'The unzip log file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_PROCESS_ID IS 'Associated process ID'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_SUCCESS_FLAG IS 'Success or Failure flag'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_ERROR_TEXT IS 'Error text'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_DATE_CREATED IS 'Audit column'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_DATE_MODIFIED IS 'Audit column'
+/
+
+COMMENT ON COLUMN DOC_BUNDLES.DBUN_MODIFIED_BY IS 'Audit column'
+/
+
+
+CREATE TABLE doc_bundle_files(
+                              dbf_file_id                   number(38) not null
+                             ,dbf_bundle_id                 number(38) not null  
+                             ,dbf_filename                  varchar2(240) not null
+                             ,dbf_driving_file_flag         varchar2(1) DEFAULT 'N' not null
+                             ,dbf_file_included_with_bundle varchar2(1) DEFAULT 'Y' not null
+                             ,dbf_blob                      blob
+                              )
+/
+
+
+COMMENT ON TABLE DOC_BUNDLE_FILES IS 'List of the files in a document bundle'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_BUNDLE_ID IS 'Foreign Key to DOC_BUNDLES'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_FILE_ID IS 'Primary Key'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_FILENAME IS 'Filename'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_DRIVING_FILE_FLAG IS 'Flag  to indicate whether or not this file is a driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_FILE_INCLUDED_WITH_BUNDLE IS 'Flag to indicate where or not this file was part of the bundle (Y) or was just referenced in a driving file (N)'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_BLOB IS 'The file content'
+/
+
+
+
+CREATE TABLE doc_bundle_file_relations(dbfr_relationship_id      number(38) not null
+                                     ,dbfr_driving_file_id       number(38) not null
+                                     ,dbfr_driving_file_recno    number(38) not null
+                                     ,dbfr_child_file_id         number(38) not null
+                                     ,dbfr_doc_title             varchar2(60)
+                                     ,dbfr_doc_descr             varchar2(2000)
+                                     ,dbfr_doc_type              varchar2(4) 
+                                     ,dbfr_dlc_name              varchar2(30)
+                                     ,dbfr_gateway_table_name    varchar2(30)
+                                     ,dbfr_rec_id                varchar2(30)
+                                     ,dbfr_x_coordinate          number(38)
+                                     ,dbfr_y_coordinate          number(38) 
+                                     ,dbfr_doc_id                number(38)
+                                     ,dbfr_doc_filename          varchar2(254)
+                                     ,dbfr_hftq_batch_no         number(38) 
+                                     ,dbfr_error_text            varchar2(500)
+                                    )
+/
+
+
+COMMENT ON TABLE DOC_BUNDLE_FILE_RELATIONS IS 'Defines the relationships between the files in a document bundle and the data read from each of the driving files'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_RELATIONSHIP_ID IS 'Primary Key'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_DRIVING_FILE_ID IS 'Foreign Key to DOC_BUNDLE_FILES'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_DRIVING_FILE_RECNO IS 'The line number within the driving file that this record relates to'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_CHILD_FILE_ID IS 'Foreign Key to DOC_BUNDLE_FILES'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_DOC_TITLE IS 'Attribute as supplied in driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_DOC_DESCR IS 'Attribute as supplied in driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_DOC_TYPE IS 'Attribute as supplied in driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_DLC_NAME IS 'Attribute as supplied in driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_GATEWAY_TABLE_NAME IS 'Attribute as supplied in driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_REC_ID IS 'Attribute as supplied in driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_X_COORDINATE IS 'Attribute as supplied in driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_Y_COORDINATE IS 'Attribute as supplied in driving file'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_DOC_ID IS 'Resultant DOC_ID of any DOCS record created'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_DOC_FILENAME IS 'The unique filename that the file referred to in DOC_BUNDLE_FILES was renamed to'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_HFTQ_BATCH_NO IS 'Pointer to entries in HIG_FILE_TRANSFER_QUEUE table'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_FILE_RELATIONS.DBFR_ERROR_TEXT IS 'Error Text'
+/
+
+
+
+CREATE GLOBAL TEMPORARY TABLE doc_bundle_discard_blobs(id       number(38)
+                                                      ,filename varchar2(240)
+                                                      ,the_blob blob) ON COMMIT DELETE ROWS
+NOCACHE
+/
+
+COMMENT ON TABLE DOC_BUNDLE_DISCARD_BLOBS IS 'Temporary table used to store blobs of discarded files to write to a location on the client machine.  Drives the ''Discards'' functionality in DOC0310-Manage Document Bundles'
+/
+COMMENT ON COLUMN DOC_BUNDLE_DISCARD_BLOBS.ID IS 'Unique identifier for the record'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_DISCARD_BLOBS.FILENAME IS 'Filename to be written out'
+/
+
+COMMENT ON COLUMN DOC_BUNDLE_DISCARD_BLOBS.THE_BLOB IS 'File content'
+/
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Document Bundle Loader - Constraints
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (GRAEME JOHNSON)
+-- To support document bundle loader
+-- 
+------------------------------------------------------------------
+ALTER TABLE doc_bundles ADD (
+  CONSTRAINT dbun_pk
+ PRIMARY KEY
+ (dbun_bundle_id))
+/
+ALTER TABLE doc_bundles ADD (
+  CONSTRAINT dbun_hp_fk 
+ FOREIGN KEY (dbun_process_id) 
+ REFERENCES HIG_PROCESSES (HP_PROCESS_ID)
+    ON DELETE SET NULL)
+/
+ALTER TABLE doc_bundle_files ADD (
+  CONSTRAINT dbf_pk
+ PRIMARY KEY
+ (dbf_file_id))
+/
+ALTER TABLE doc_bundle_files ADD (
+  CONSTRAINT dbdf_dbun_fk 
+ FOREIGN KEY (dbf_bundle_id) 
+ REFERENCES doc_bundles (dbun_bundle_id)
+    ON DELETE CASCADE)
+/
+ALTER TABLE doc_bundle_file_relations ADD (
+  CONSTRAINT dbfr_pk
+ PRIMARY KEY
+ (dbfr_relationship_id))
+/
+ALTER TABLE doc_bundle_file_relations ADD (
+  CONSTRAINT dbfr_uk
+ UNIQUE
+ (dbfr_driving_file_id,dbfr_driving_file_recno, dbfr_child_file_id))
+/
+ALTER TABLE doc_bundle_file_relations ADD (
+  CONSTRAINT dbfr_dbf_fk1 
+ FOREIGN KEY (dbfr_driving_file_id) 
+ REFERENCES doc_bundle_files (dbf_file_id)
+    ON DELETE CASCADE)
+/
+
+ALTER TABLE doc_bundle_file_relations ADD (
+  CONSTRAINT dbfr_dbf_fk2
+ FOREIGN KEY (dbfr_child_file_id) 
+ REFERENCES doc_bundle_files (dbf_file_id)
+    ON DELETE CASCADE)
+/
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Document Bundle Loader - Indexes
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (GRAEME JOHNSON)
+-- To support document bundle loader
+-- 
+------------------------------------------------------------------
+CREATE INDEX dbun_hp_fk_ind ON doc_bundles(dbun_process_id)
+/
+CREATE INDEX dbf_dbun_fk_ind ON doc_bundle_files(dbf_bundle_id)
+/
+CREATE INDEX dbfr_dbf_fk2_ind ON doc_bundle_file_relations(dbfr_child_file_id)
+/
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Document Bundle Loader - Sequences
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (GRAEME JOHNSON)
+-- To support document bundle loader
+-- 
+------------------------------------------------------------------
+CREATE SEQUENCE dbun_bundle_id_seq nocache
+/
+CREATE SEQUENCE dbf_file_id_seq nocache
+/
+create sequence dbfr_relationship_id_seq nocache
+/
 
 ------------------------------------------------------------------
 
