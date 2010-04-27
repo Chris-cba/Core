@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.5   Mar 15 2010 14:58:38   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3recal.pkb-arc   2.6   Apr 27 2010 11:27:06   cstrettle  $
 --       Module Name      : $Workfile:   nm3recal.pkb  $
---       Date into PVCS   : $Date:   Mar 15 2010 14:58:38  $
---       Date fetched Out : $Modtime:   Mar 15 2010 14:56:58  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Apr 27 2010 11:27:06  $
+--       Date fetched Out : $Modtime:   Apr 27 2010 11:24:08  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --
 --   Author : Jonathan Mills
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3recal IS
   PT 05.12.07 mairecal.recal_data() brough in line with the others in recalibrate_other_products()
 */
 
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
    g_package_name    CONSTANT  varchar2(30) := 'nm3recal';
 --
    g_tab_rec_nm      nm3type.tab_rec_nm;
@@ -691,7 +691,9 @@ PROCEDURE process_individual_shift (pi_ne_id_in       IN nm_members.nm_ne_id_in%
 BEGIN
 --
    IF  pi_begin_mp < pi_shift_start_mp
-    OR pi_begin_mp = 0
+    -- Task 0109508 CWS
+    -- This caused point assets to be stretched out
+    OR (pi_begin_mp = 0 and pi_end_mp > 0) --OR pi_begin_mp = 0
     OR pi_begin_mp = g_element_length
     THEN
       l_start_shift_dist := 0;
