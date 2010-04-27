@@ -4,15 +4,15 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkh-arc   3.1   Apr 12 2010 11:06:42   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkh-arc   3.2   Apr 27 2010 13:23:42   aedwards  $
 --       Module Name      : $Workfile:   nm3ftp.pkh  $
---       Date into PVCS   : $Date:   Apr 12 2010 11:06:42  $
---       Date fetched Out : $Modtime:   Apr 12 2010 11:06:18  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 27 2010 13:23:42  $
+--       Date fetched Out : $Modtime:   Apr 27 2010 13:23:30  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --------------------------------------------------------------------------------
 --
-  g_sccsid constant varchar2(30) :='"$Revision:   3.1  $"';
+  g_sccsid constant varchar2(30) :='"$Revision:   3.2  $"';
 --
 -----------------------------------------------------------------------------
 --
@@ -276,6 +276,11 @@ AS
               , pi_file_mask               IN VARCHAR2
               , pi_binary                  IN BOOLEAN DEFAULT TRUE)
     RETURN nm3type.tab_varchar32767;
+--
+------------------------------------------------------------------------------
+--
+  FUNCTION format_with_separator ( pi_input IN VARCHAR2 )
+  RETURN VARCHAR2;
 --
 --------------------------------------------------------------------------------
 --

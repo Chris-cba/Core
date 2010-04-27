@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.1   Apr 12 2010 11:06:42   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.2   Apr 27 2010 13:23:42   aedwards  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Apr 12 2010 11:06:42  $
---       Date fetched Out : $Modtime:   Apr 12 2010 11:06:00  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Apr 27 2010 13:23:42  $
+--       Date fetched Out : $Modtime:   Apr 27 2010 13:23:24  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.1  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -24,6 +24,24 @@ AS
 --
    g_key                     RAW(32767)     := UTL_RAW.cast_to_raw( 'I9ir9*$3FJ$d92jd"£23j)*£"kjWFSsd' );
    g_pad_chr                 VARCHAR2(1)    := '~';
+   g_back_slash              VARCHAR2(1)    := '\';
+   g_forward_slash           VARCHAR2(1)    := '/';
+--
+------------------------------------------------------------------------------
+--
+  FUNCTION format_with_separator ( pi_input IN VARCHAR2 )
+  RETURN VARCHAR2
+  IS
+  BEGIN
+    RETURN (
+        CASE 
+          WHEN SUBSTR( pi_input
+                      , LENGTH(pi_input)
+                      , 1) NOT IN (g_back_slash,g_forward_slash)
+          THEN pi_input||g_forward_slash
+          ELSE pi_input
+        END );
+  END format_with_separator;
 --
 ------------------------------------------------------------------------------
 --
@@ -739,14 +757,15 @@ AS
       l_conn         UTL_TCP.connection;
       l_list         t_string_table     := t_string_table ();
       l_reply_code   VARCHAR2 (3)       := NULL;
-      l_command      VARCHAR2(500)      := NVL(p_command||' ', 'LIST ');
+      l_command      VARCHAR2(500)      := NVL(p_command, 'LIST');
    BEGIN
       l_conn := get_passive (p_conn);
 --      send_command (p_conn, 'NLST ' || p_dir, TRUE);
       --send_command (p_conn, 'MLSD ' || p_dir, TRUE);
       --send_command (p_conn, 'MLSD', TRUE);
   
-      send_command (p_conn, l_command || p_dir, TRUE);
+      send_command (p_conn, l_command ||' '|| p_dir, TRUE);
+      --send_command (p_conn, 'LIST /aims/amp/in', TRUE);
 
       BEGIN
          LOOP
@@ -1234,9 +1253,9 @@ AS
         --
           l_temp_tab(files) := 
              SUBSTR(l_temp_tab(files)
-             , INSTR(l_temp_tab(files),'\',-1)+1
+             , INSTR(l_temp_tab(files),g_forward_slash,-1)+1
              ,( LENGTH(l_temp_tab(files)) 
-               - INSTR(l_temp_tab(files),'\',-1))
+               - INSTR(l_temp_tab(files),g_forward_slash,-1))
               );
       END LOOP;
     --
@@ -1292,7 +1311,7 @@ AS
       --
           get (
                 p_conn        => l_conn,
-                p_from_file   => i.hfc_ftp_in_dir||'/'||l_files_tab(f),
+                p_from_file   => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f),
                 p_to_dir      => l_db_dir,
                 p_to_file     => l_files_tab(f)
               );
@@ -1307,8 +1326,8 @@ AS
             THEN
               rename
                 ( p_conn   => l_conn,
-                  p_from   => i.hfc_ftp_in_dir||'/'||l_files_tab(f),
-                  p_to     => i.hfc_ftp_arc_in_dir||'/'||l_files_tab(f));
+                  p_from   => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f),
+                  p_to     => format_with_separator(i.hfc_ftp_arc_in_dir)||l_files_tab(f));
             END IF;
           EXCEPTION
             WHEN OTHERS 
