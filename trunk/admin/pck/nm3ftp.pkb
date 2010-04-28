@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.3   Apr 28 2010 14:20:46   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.4   Apr 28 2010 14:27:24   cstrettle  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Apr 28 2010 14:20:46  $
---       Date fetched Out : $Modtime:   Apr 28 2010 14:16:56  $
---       PVCS Version     : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Apr 28 2010 14:27:24  $
+--       Date fetched Out : $Modtime:   Apr 28 2010 14:27:00  $
+--       PVCS Version     : $Revision:   3.4  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.3  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -1141,7 +1141,7 @@ AS
               ( pi_hfc_id    IN     hig_ftp_connections.hfc_id%TYPE )
     RETURN nm3type.tab_varchar32767
   IS
-    retv al         nm3type.tab_varchar32767;
+    retval         nm3type.tab_varchar32767;
     l_rec_hfc      hig_ftp_connections%ROWTYPE;
     l_password     hig_ftp_connections.hfc_ftp_password%TYPE;
     l_conn         utl_tcp.connection;
