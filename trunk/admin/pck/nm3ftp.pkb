@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.2   Apr 27 2010 13:23:42   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.3   Apr 28 2010 14:20:46   cstrettle  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Apr 27 2010 13:23:42  $
---       Date fetched Out : $Modtime:   Apr 27 2010 13:23:24  $
---       PVCS Version     : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Apr 28 2010 14:20:46  $
+--       Date fetched Out : $Modtime:   Apr 28 2010 14:16:56  $
+--       PVCS Version     : $Revision:   3.3  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.2  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -803,17 +803,39 @@ AS
 --------------------------------------------------------------------------------
 --
    PROCEDURE rename (
-      p_conn   IN OUT NOCOPY   UTL_TCP.connection,
-      p_from   IN              VARCHAR2,
-      p_to     IN              VARCHAR2
-   )
+      p_conn               IN OUT NOCOPY   UTL_TCP.connection,
+      p_from               IN              VARCHAR2,
+      p_to                 IN              VARCHAR2,
+      p_archive_overwrite  IN              BOOLEAN DEFAULT FALSE,
+      p_remove_failed_arch IN              BOOLEAN DEFAULT FALSE
+      )
    AS
       l_conn   UTL_TCP.connection;
    BEGIN
       l_conn := get_passive (p_conn);
+      IF p_archive_overwrite THEN
+      -- remove archive file
+        BEGIN
+          send_command(p_conn, 'DELE ' || p_to, TRUE);
+        EXCEPTION
+        WHEN OTHERS THEN
+         NULL;
+        END;
+      END IF;
+      --
       send_command (p_conn, 'RNFR ' || p_from, TRUE);
       send_command (p_conn, 'RNTO ' || p_to, TRUE);
       LOGOUT (l_conn, FALSE);
+  -- This exception removes a failed file from the in 
+  -- folder if the parameter is set.
+   EXCEPTION
+      WHEN OTHERS THEN
+      IF p_remove_failed_arch THEN
+          send_command(p_conn, 'DELE ' || p_from, TRUE);
+          LOGOUT (l_conn, FALSE);
+      ELSE
+          LOGOUT (l_conn, FALSE);
+      END IF;
    END RENAME;
 --
 --------------------------------------------------------------------------------
@@ -1026,6 +1048,24 @@ AS
     --
     END IF;
   --
+    IF l_rec_hfc.hfc_ftp_arc_in_dir IS NOT NULL
+    THEN
+    --
+      list ( p_conn   => l_conn,
+             p_dir    => l_rec_hfc.hfc_ftp_arc_in_dir,
+             p_list   => l_in_dir_list );
+    --
+    END IF;
+  --
+    IF l_rec_hfc.hfc_ftp_arc_out_dir IS NOT NULL
+    THEN
+    --
+      list ( p_conn   => l_conn,
+             p_dir    => l_rec_hfc.hfc_ftp_arc_out_dir,
+             p_list   => l_in_dir_list );
+    --
+    END IF;    
+  --
     utl_tcp.close_all_connections;
   --
     dbms_output.get_lines(l_char_array,l_num_lines);
@@ -1101,7 +1141,7 @@ AS
               ( pi_hfc_id    IN     hig_ftp_connections.hfc_id%TYPE )
     RETURN nm3type.tab_varchar32767
   IS
-    retval         nm3type.tab_varchar32767;
+    retv al         nm3type.tab_varchar32767;
     l_rec_hfc      hig_ftp_connections%ROWTYPE;
     l_password     hig_ftp_connections.hfc_ftp_password%TYPE;
     l_conn         utl_tcp.connection;
@@ -1141,6 +1181,11 @@ AS
   --
     RETURN retval;
   --
+  EXCEPTION
+  WHEN OTHERS
+  THEN 
+  -- If there is an error return the empty value
+  RETURN retval;
   END list_all_files_coming_in;
 --
 --------------------------------------------------------------------------------
@@ -1203,7 +1248,9 @@ AS
               ( pi_ftp_type                IN hig_ftp_types.hft_type%TYPE
               , pi_db_location_to_move_to  IN VARCHAR2
               , pi_file_mask               IN VARCHAR2
-              , pi_binary                  IN BOOLEAN DEFAULT TRUE)
+              , pi_binary                  IN BOOLEAN DEFAULT TRUE
+              , pi_archive_overwrite       IN BOOLEAN DEFAULT FALSE
+              , pi_remove_failed_arch      IN BOOLEAN DEFAULT FALSE)
     RETURN nm3type.tab_varchar32767 
   IS
   --
@@ -1308,7 +1355,7 @@ AS
         END IF;
       --
         BEGIN
-      --
+        --
           get (
                 p_conn        => l_conn,
                 p_from_file   => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f),
@@ -1325,9 +1372,12 @@ AS
             IF i.hfc_ftp_arc_in_dir IS NOT NULL
             THEN
               rename
-                ( p_conn   => l_conn,
-                  p_from   => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f),
-                  p_to     => format_with_separator(i.hfc_ftp_arc_in_dir)||l_files_tab(f));
+                ( p_conn               => l_conn,
+                  p_from               => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f),
+                  p_to                 => format_with_separator(i.hfc_ftp_arc_in_dir)||l_files_tab(f),
+                  p_archive_overwrite  => pi_archive_overwrite,
+                  p_remove_failed_arch => pi_remove_failed_arch
+                );
             END IF;
           EXCEPTION
             WHEN OTHERS 
@@ -1354,12 +1404,12 @@ AS
   --
     RETURN(l_retval);
   --
-  EXCEPTION
+ /* EXCEPTION
   --
     WHEN OTHERS 
       THEN
       utl_tcp.close_all_connections;
-      RAISE;
+      RAISE;*/
   --
   END ftp_in_to_database;
 --
