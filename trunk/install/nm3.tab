@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.25   Apr 27 2010 13:10:04   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.26   Apr 28 2010 13:51:46   rcoupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Apr 27 2010 13:10:04  $
---       Date fetched Out : $Modtime:   Apr 27 2010 13:09:02  $
---       PVCS Version     : $Revision:   2.25  $
+--       Date into PVCS   : $Date:   Apr 28 2010 13:51:46  $
+--       Date fetched Out : $Modtime:   Apr 28 2010 13:50:42  $
+--       PVCS Version     : $Revision:   2.26  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Tue Apr 27  13:06:20 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Wed Apr 28  13:45:50 2010 by Server Generator 10.1.2.9.28
 
 
 
@@ -3539,6 +3539,7 @@ CREATE TABLE HIG_STATUS_CODES
  ,HSC_ALLOW_FEATURE9 VARCHAR2(1) NOT NULL
  ,HSC_START_DATE DATE
  ,HSC_END_DATE DATE
+ ,HSC_ALLOW_FEATURE10 VARCHAR2(1) NOT NULL
  )
 /
 
@@ -3559,6 +3560,7 @@ CREATE TABLE HIG_STATUS_DOMAINS
  ,HSD_FEATURE7 VARCHAR2(254) NOT NULL
  ,HSD_FEATURE8 VARCHAR2(254) NOT NULL
  ,HSD_FEATURE9 VARCHAR2(254) NOT NULL
+ ,HSD_FEATURE10 VARCHAR2(254) NOT NULL
  )
 /
 
