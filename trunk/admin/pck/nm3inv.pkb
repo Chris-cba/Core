@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.18   Mar 24 2010 16:54:32   lsorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.19   Apr 29 2010 17:04:54   aedwards  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Mar 24 2010 16:54:32  $
---       Date fetched Out : $Modtime:   Mar 24 2010 14:30:36  $
---       SCCS Version     : $Revision:   2.18  $
+--       Date into SCCS   : $Date:   Apr 29 2010 17:04:54  $
+--       Date fetched Out : $Modtime:   Apr 29 2010 17:02:44  $
+--       SCCS Version     : $Revision:   2.19  $
 --       Based on --
 --
 --   nm3inv package body
@@ -30,7 +30,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.18  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.19  $';
    g_package_name   CONSTANT VARCHAR2(30) := 'nm3inv';
 --
    --<USED BY validate_rec_iit>
@@ -1920,6 +1920,15 @@ BEGIN
       append ('   PRAGMA EXCEPTION_INIT(l_notfound,-20001);');
       append ('BEGIN');
    --
+      append ('   --');
+      append ('   -------------------------------------------------------------');
+      append ('   -- IIT_NE_ID = '||g_rec_iit.iit_ne_id);
+      append ('   -- IIT_PRIMARY_KEY = '||g_rec_iit.iit_primary_key);
+      append ('   -- IIT_START_DATE = '||g_rec_iit.iit_start_date);
+      append ('   -- IIT_INV_TYPE = '||g_rec_iit.iit_inv_type);
+      append ('   -------------------------------------------------------------');
+      append ('   --');
+   --
       append ('   l_attr := '||Nm3flx.string('IIT_X_SECT')||';');
       IF l_rec_nit.nit_x_sect_allow_flag = 'Y'
        THEN
@@ -2175,7 +2184,7 @@ BEGIN
 --nm_dbug
 --nm_debug.debug_on;
 --nm_debug.debug('executing validation trigger');
---   nm3tab_varchar.debug_tab_varchar(g_inv_val_tab_varchar);
+   nm3tab_varchar.debug_tab_varchar(g_inv_val_tab_varchar);
    Nm3ddl.execute_tab_varchar (g_inv_val_tab_varchar);
 --nm_debug.debug('done executing validation trigger');
 --
