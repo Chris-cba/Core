@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.6   Jan 15 2010 16:52:02   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.7   Apr 29 2010 10:16:52   rcoupe  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   Jan 15 2010 16:52:02  $
---       Date fetched Out : $Modtime:   Jan 15 2010 16:50:08  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Apr 29 2010 10:16:52  $
+--       Date fetched Out : $Modtime:   Apr 29 2010 10:15:30  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -297,7 +297,7 @@ BEGIN
        THEN
          process_insert_for_child (l_rec_nii);
       END IF;
-      -- 713421 
+      -- 713421
       --      ELSIF l_rec_nii.is_parent
       --       AND  l_rec_nii.trigger_mode = c_update_mode
       --       AND  l_rec_nii.end_date IS NOT NULL
@@ -418,7 +418,7 @@ PROCEDURE process_insert_for_child (pi_rec_nii rec_nii) IS
    l_found_more_than_1 BOOLEAN;
 --
    l_rec_iig    nm_inv_item_groupings%ROWTYPE;
-   
+
    --Log 697651:LS:21/04/09
    --Added this check to stop creation of duplicate Child if It is Exclusive and relationship is AT
    FUNCTION does_relation_exist (p_inv_type IN VARCHAR2
@@ -737,11 +737,13 @@ PROCEDURE check_inv_dates ( p_rec_nii    rec_date_chk) IS
 --     AND  iig_parent_id = iit_ne_id;
 --
 --
+--RAC - log 726036 -needs to assess the full set of parent/child data across all dates.Change to prevent failure on multi-row subquery
+
    CURSOR c4 (c_child_ne_id nm_inv_items.iit_ne_id%TYPE) IS
    SELECT iit_start_date, iit_end_date
    FROM   nm_inv_items_all
-   WHERE  iit_ne_id = (SELECT iig_parent_id FROM nm_inv_item_groupings_all WHERE iig_item_id = c_child_ne_id);   
---   
+   WHERE  iit_ne_id in (SELECT iig_parent_id FROM nm_inv_item_groupings_all WHERE iig_item_id = c_child_ne_id);
+--
 -- End Log 37786
    --
    CURSOR cs_child_inv (c_iit_ne_id  nm_inv_items.iit_ne_id%TYPE
@@ -760,6 +762,10 @@ PROCEDURE check_inv_dates ( p_rec_nii    rec_date_chk) IS
                         )
                  );
 --
+--RAC - log 726036 - this is not related to the exact scenario in the log
+--                   but is the same problem - just accessing data by parent rather than item.
+
+
     CURSOR cs_child_iig (c_iit_ne_id  nm_inv_items.iit_ne_id%TYPE
                         ,c_start_date date
                         ,c_end_date   date
@@ -774,11 +780,11 @@ PROCEDURE check_inv_dates ( p_rec_nii    rec_date_chk) IS
                 OR (iit_end_date IS NOT NULL AND c_end_date IS NOT NULL AND iit_end_date > c_end_date)
                )
           )
-     AND  (iig_start_date < c_start_date 
-            OR (   (iig_end_date IS     NULL AND c_end_date IS NOT NULL) 
-                OR (iig_end_date IS NOT NULL AND c_end_date IS NOT NULL AND iig_end_date > c_end_date) 
-               ) 
-          );           
+     AND  (iig_start_date < c_start_date
+            OR (   (iig_end_date IS     NULL AND c_end_date IS NOT NULL)
+                OR (iig_end_date IS NOT NULL AND c_end_date IS NOT NULL AND iig_end_date > c_end_date)
+               )
+          );
 --
    CURSOR check_for_dup_pk (c_iit_ne_id    nm_inv_items.iit_ne_id%TYPE
                            ,c_iit_pk       nm_inv_items.iit_primary_key%TYPE
@@ -886,15 +892,11 @@ BEGIN
    END IF;
    --
  --nm_debug.debug('Check for hierarchical stuff');
-   -- Check for hierarchical stuff
+   -- Check for hierarchical stuff -  log 726036 - need to cater for multiple rows
    --
    OPEN  c4 ( p_rec_nii.ne_id);
    FETCH c4 INTO l_parent_start_date, l_parent_end_date;
-   IF c4%NOTFOUND
-    THEN
-      CLOSE c4; -- This is not a hierarchical child item
-   ELSE
-      CLOSE c4;
+   while c4%found loop
       IF l_parent_end_date IS NULL
        THEN
          NULL; -- Dont worry about it
@@ -911,8 +913,13 @@ BEGIN
          l_supplementary_info := l_supplementary_info||' - NM_INV_ITEMS_ALL (parent)';
          RAISE l_start_date_out_of_range;
       END IF;
-   END IF;
-   --
+      
+      FETCH c4 INTO l_parent_start_date, l_parent_end_date;   
+      
+   END LOOP;
+   CLOSE c4;
+
+
  --nm_debug.debug('Check for children');
    -- Check for children
    --
@@ -941,7 +948,7 @@ BEGIN
                          WHERE   iig.iig_item_id       = iit.iit_ne_id
                          AND     iit.iit_inv_type      = itg.itg_inv_type
                          CONNECT By PRIOR iig_item_id  = iig_parent_id
-                         START   WITH iig_parent_id    = p_rec_nii.ne_id 
+                         START   WITH iig_parent_id    = p_rec_nii.ne_id
                         )
            LOOP
                IF  NVL(l_rec.itg_mandatory,'N')  = 'Y'
@@ -962,15 +969,15 @@ BEGIN
                THEN
                    UPDATE nm_inv_item_groupings
                    SET    iig_end_date = p_rec_nii.end_date
-                   WHERE  iig_item_id  = l_rec.iig_item_id ;                     
-               END IF ;  
+                   WHERE  iig_item_id  = l_rec.iig_item_id ;
+               END IF ;
            END LOOP;
            -- LOG 713421
-       END IF ; 
+       END IF ;
    ELSE
        CLOSE cs_child_iig;
    END IF;
-   --Log 696122:Linesh:04-Feb-2009:End   
+   --Log 696122:Linesh:04-Feb-2009:End
 --
  --nm_debug.debug('cs_child_inv');
    OPEN  cs_child_inv (p_rec_nii.ne_id, p_rec_nii.start_date, p_rec_nii.end_date);
@@ -992,7 +999,7 @@ BEGIN
       WHERE  nm_ne_id_in                          = p_rec_nii.ne_id
        AND   NVL(nm_end_date,p_rec_nii.end_date) >= p_rec_nii.end_date;
       -- task 0108705 CWS Updates value from global variable set in the pre update trigger.
-   ELSE   
+   ELSE
    --
     UPDATE nm_members_all
           SET  nm_end_date             = p_rec_nii.end_date
