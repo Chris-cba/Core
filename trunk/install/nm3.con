@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.20   Apr 23 2010 14:33:34   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.21   Apr 29 2010 15:31:18   rcoupe  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Apr 23 2010 14:33:34  $
---       Date fetched Out : $Modtime:   Apr 23 2010 14:33:20  $
---       PVCS Version     : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Apr 29 2010 15:31:18  $
+--       Date fetched Out : $Modtime:   Apr 29 2010 15:30:46  $
+--       PVCS Version     : $Revision:   2.21  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Fri Apr 23  14:29:35 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Thu Apr 29  15:24:46 2010 by Server Generator 10.1.2.9.28
 
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -2414,7 +2414,8 @@ PROMPT Creating Unique Key on 'HIG_NAVIGATOR_MODULES'
 ALTER TABLE HIG_NAVIGATOR_MODULES
  ADD (CONSTRAINT HNM_UK UNIQUE
   (HNM_MODULE_NAME
-  ,HNM_MODULE_PARAM))
+  ,HNM_MODULE_PARAM
+  ,HNM_HIERARCHY_LABEL))
 /
 
 PROMPT Creating Unique Key on 'HIG_PROCESS_TYPES'
