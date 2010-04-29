@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.7   Apr 29 2010 10:16:52   rcoupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.8   Apr 29 2010 11:25:52   rcoupe  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   Apr 29 2010 10:16:52  $
---       Date fetched Out : $Modtime:   Apr 29 2010 10:15:30  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Apr 29 2010 11:25:52  $
+--       Date fetched Out : $Modtime:   Apr 29 2010 11:24:38  $
+--       Version          : $Revision:   2.8  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -897,7 +897,7 @@ BEGIN
    OPEN  c4 ( p_rec_nii.ne_id);
    FETCH c4 INTO l_parent_start_date, l_parent_end_date;
    while c4%found loop
-      IF l_parent_end_date IS NULL
+      IF l_parent_end_date IS NULL AND l_hier_end_date is NULL
        THEN
          NULL; -- Dont worry about it
       ELSIF p_rec_nii.end_date IS NULL
@@ -906,6 +906,12 @@ BEGIN
          l_ner_id             := 12;
          l_supplementary_info := l_supplementary_info||' - NM_INV_ITEMS_ALL (parent)';
          RAISE l_end_date_out_of_range;
+      ELSIF p_rec_nii.end_date IS NULL
+       OR   p_rec_nii.end_date <  l_hier_end_date
+       THEN
+         l_ner_id             := 12;
+         l_supplementary_info := l_supplementary_info||' - NM_INV_ITEM_GROUPINGS_ALL (parent)';
+         RAISE l_end_date_out_of_range;
       END IF;
       IF p_rec_nii.start_date < l_parent_start_date
        THEN
@@ -913,9 +919,15 @@ BEGIN
          l_supplementary_info := l_supplementary_info||' - NM_INV_ITEMS_ALL (parent)';
          RAISE l_start_date_out_of_range;
       END IF;
-      
-      FETCH c4 INTO l_parent_start_date, l_parent_end_date;   
-      
+      IF p_rec_nii.start_date > l_hier_start_date
+       THEN
+         l_ner_id             := 11;
+         l_supplementary_info := l_supplementary_info||' - NM_INV_ITEM_GROUPINGS_ALL (parent)';
+         RAISE l_start_date_out_of_range;
+      END IF;
+
+      FETCH c4 INTO l_parent_start_date, l_parent_end_date;
+
    END LOOP;
    CLOSE c4;
 
