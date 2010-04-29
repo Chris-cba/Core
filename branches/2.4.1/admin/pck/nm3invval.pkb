@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -----------------------------------------------------------------------------
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3invval.pkb	1.30 10/02/06"';
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4.1.1  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4.1.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -705,6 +705,9 @@ PROCEDURE check_inv_dates ( p_rec_nii    rec_date_chk) IS
 --
    l_parent_start_date        DATE;
    l_parent_end_date          DATE;
+   
+   l_hier_start_date          DATE;
+   l_hier_end_date            DATE;
 --
    --
    CURSOR c1 ( c_iit_located_by nm_inv_items.iit_located_by%TYPE ) IS
@@ -737,9 +740,10 @@ PROCEDURE check_inv_dates ( p_rec_nii    rec_date_chk) IS
 --
 --
    CURSOR c4 (c_child_ne_id nm_inv_items.iit_ne_id%TYPE) IS
-   SELECT iit_start_date, iit_end_date
-   FROM   nm_inv_items_all
-   WHERE  iit_ne_id IN (SELECT iig_parent_id FROM nm_inv_item_groupings_all WHERE iig_item_id = c_child_ne_id);
+   SELECT iit_start_date, iit_end_date, iig_start_date, iig_end_date
+   FROM   nm_inv_items_all, nm_inv_item_groupings_all 
+   WHERE iig_item_id = c_child_ne_id
+   AND   iit_ne_id   = iig_parent_id;
 --
 -- End Log 37786
    --
@@ -888,9 +892,9 @@ BEGIN
    -- Check for hierarchical stufflog 726036 - need to cater for multiple rows
    --
    OPEN  c4 ( p_rec_nii.ne_id);
-   FETCH c4 INTO l_parent_start_date, l_parent_end_date;
+   FETCH c4 INTO l_parent_start_date, l_parent_end_date, l_hier_start_date, l_hier_end_date;
    while c4%found loop
-      IF l_parent_end_date IS NULL
+      IF l_parent_end_date IS NULL AND l_hier_end_date is NULL
        THEN
          NULL; -- Dont worry about it
       ELSIF p_rec_nii.end_date IS NULL
@@ -899,6 +903,12 @@ BEGIN
          l_ner_id             := 12;
          l_supplementary_info := l_supplementary_info||' - NM_INV_ITEMS_ALL (parent)';
          RAISE l_end_date_out_of_range;
+      ELSIF p_rec_nii.end_date IS NULL
+       OR   p_rec_nii.end_date <  l_hier_end_date
+       THEN
+         l_ner_id             := 12;
+         l_supplementary_info := l_supplementary_info||' - NM_INV_ITEM_GROUPINGS_ALL (parent)';
+         RAISE l_end_date_out_of_range;
       END IF;
       IF p_rec_nii.start_date < l_parent_start_date
        THEN
@@ -906,8 +916,14 @@ BEGIN
          l_supplementary_info := l_supplementary_info||' - NM_INV_ITEMS_ALL (parent)';
          RAISE l_start_date_out_of_range;
       END IF;
+      IF p_rec_nii.start_date > l_hier_start_date
+       THEN
+         l_ner_id             := 11;
+         l_supplementary_info := l_supplementary_info||' - NM_INV_ITEM_GROUPINGS_ALL (parent)';
+         RAISE l_start_date_out_of_range;
+      END IF;
 
-      FETCH c4 INTO l_parent_start_date, l_parent_end_date;
+   FETCH c4 INTO l_parent_start_date, l_parent_end_date, l_hier_start_date, l_hier_end_date;
 
    END LOOP;
    CLOSE c4;
