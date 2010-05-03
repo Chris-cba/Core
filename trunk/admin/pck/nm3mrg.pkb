@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3mrg IS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkb-arc   2.5   Jan 27 2010 10:13:38   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkb-arc   2.6   03 May 2010 13:07:02   ptanava  $
 --       Module Name      : $Workfile:   nm3mrg.pkb  $
---       Date into PVCS   : $Date:   Jan 27 2010 10:13:38  $
---       Date fetched Out : $Modtime:   Jan 27 2010 09:44:58  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   03 May 2010 13:07:02  $
+--       Date fetched Out : $Modtime:   03 May 2010 12:07:56  $
+--       PVCS Version     : $Revision:   2.6  $
 --       Based on SCCS version : 1.60
 --
 --   Author : Jonathan Mills
@@ -25,30 +25,17 @@ CREATE OR REPLACE PACKAGE BODY nm3mrg IS
                 the load_temp_extent_datums calls it both modes - as the NTE_ROUTE_NE_ID can be a group_id or datum_id
   08.09.09 PT log 722431: modified sql_load_nm_datum_criteria_tmp() so that elements are not left out when not part of any route
                 removed direct / assign modes
+  07.04.09 PT log 724637: in load_temp_extent_datums() changed the member datum multiple routes check logic to work as intended
+  03.05.10 PT load_temp_extent_datums() and related subprocedures moved to nm3bulk_mrg
+                NB! requires nm3bulk_mrg.pkh 2.6 or higher
 */
 
-  g_body_sccsid   constant varchar2(200) :='"$Revision:   2.5  $"';
+  g_body_sccsid   constant varchar2(200) :='"$Revision:   2.6  $"';
   g_package_name     CONSTANT  varchar2(30)   := 'NM3MRG';
 --
   g_mrg_section_id  pls_integer;
 --
   c_mrg_au_type CONSTANT hig_options.hop_value%TYPE := hig.get_sysopt('MRGAUTYPE');
-
-  cr  constant varchar2(1) := chr(10);
-  
-  -- TODO: these four need to migrate into nm3bulk_mrg
-  function sql_load_nm_datum_criteria_tmp(
-     p_elements_sql in varchar2
-  ) return varchar2;
-  procedure ensure_group_type_linear(
-     p_group_type_in in nm_group_types.ngt_group_type%type
-    ,p_group_type_out out nm_group_types.ngt_group_type%type
-  );
-  procedure load_temp_extent_datums(
-     p_group_type in nm_group_types.ngt_group_type%type
-    ,p_nte_job_id in nm_nw_temp_extents.nte_job_id%type
-    ,p_sqlcount out pls_integer
-  );
 --
 ------------------------------------------------------------------------------------------------
 --
@@ -171,7 +158,7 @@ BEGIN
   if nvl(hig.get_sysopt('MRGCODE32'), 'Y') != 'Y' then
 
     -- populate nm_datum_criteria_tmp from temp extent
-    load_temp_extent_datums(
+    nm3bulk_mrg.load_temp_extent_datums(
        p_group_type => null
       ,p_nte_job_id => pi_nte_job_id
       ,p_sqlcount   => l_sqlcount
@@ -187,8 +174,9 @@ BEGIN
     nm3bulk_mrg.std_run(
        p_nmq_id         => pi_query_id
       ,p_nqr_admin_unit => pi_admin_unit
+      ,p_nqr_source     => nm3bulk_mrg.NQR_SOURCE_TEMP_NE
+      ,p_nqr_source_id  => pi_nte_job_id
       ,p_nmq_descr      => pi_description
-      ,p_ignore_poe     => null -- //this setting has no effect, set ignore_poe in ins_route_connectivity()
       ,p_criteria_rowcount => l_sqlcount
       ,p_mrg_job_id     => po_result_job_id
       ,p_longops_rec    => r_longops
@@ -2892,231 +2880,6 @@ BEGIN
    RETURN l_rec_ita;
 --
 END get_ita_for_mrg;
-
-  
-  
-  -- this is a single select for both elements with group given and those without
-  --  where group_id is null or equals nm_ne_id_of the group_id is assgned from nm_members
-  --  where there is no linear group null is assgined
-  --  p_elements_sql must return 4 columns: nm_ne_id_of, begin_mp, end_mp, group_id
-  --  the output has 4 binds: 1,2,3) effective_date; 4) group_type
-  -- TODO: this needs to migrate into nm3bulk_mrg
-  function sql_load_nm_datum_criteria_tmp(
-     p_elements_sql in varchar2
-  ) return varchar2
-  is
-  begin
-    nm3dbg.putln(g_package_name||'.sql_load_nm_datum_criteria_tmp('
-      ||')');
-    
-    -- the group id with the highest member count is retunred in the group_id column
-    -- if l_group_type has value then the the groups of this type have preference
-    -- if two groups have equal highest count of members then the lowest nm_ne_id_in value is returned
-    -- if the soure query has a valid gruop_id then this is used and not the assigned value
-    
-    -- within the rc with subquery the elements source is outer joined to the rest so that sole datums are not dropped
-    -- nm_members_all is used with explicit date logic as view in outer join causes a full scan on the table
-    -- the splitting logic is copied from ins_splits()
-    
-    return
-            'insert into nm_datum_criteria_tmp ('
-      ||cr||'  datum_id, begin_mp, end_mp, group_id'
-      ||cr||')'
-      ||cr||'with rc as ('
-      ||cr||'select x.*'
-      ||cr||'from ('
-      ||cr||'  select'
-      ||cr||'     dc.nm_ne_id_of'
-      ||cr||'    ,m.nm_ne_id_in'
-      ||cr||'    ,greatest(nvl(m.nm_begin_mp, dc.begin_mp), dc.begin_mp) nm_begin_mp'
-      ||cr||'    ,least(nvl(m.nm_end_mp, dc.end_mp), dc.end_mp) nm_end_mp'
-      ||cr||'    ,e.ne_gty_group_type'
-      ||cr||'    ,gt.ngt_group_type'
-      ||cr||'    ,dc.group_id'
-      ||cr||'    ,row_number() over (partition by dc.nm_ne_id_of order by gt.ngt_group_type nulls last) row_num'
-      ||cr||'  from'
-      ||cr||'     ('
-      ||cr||p_elements_sql
-      ||cr||'     ) dc'
-      ||cr||'    ,nm_members_all m'
-      ||cr||'    ,nm_elements_all e'
-      ||cr||'    ,(select ngt_group_type from nm_group_types_all where ngt_linear_flag = ''Y'') gt'
-      ||cr||'  where dc.nm_ne_id_of = m.nm_ne_id_of (+)'
-      ||cr||'    and ''G'' = m.nm_type (+)'
-      ||cr||'    and nvl(m.nm_start_date, :p_effective_date) <= :p_effective_date'
-      ||cr||'    and nvl(m.nm_end_date, to_date(''99991231'', ''YYYYMMDD'')) > :p_effective_date' 
-      ||cr||'    and m.nm_ne_id_in = e.ne_id (+)'
-      ||cr||'    and e.ne_gty_group_type = gt.ngt_group_type (+)'
-      ||cr||'    and dc.begin_mp <= m.nm_end_mp (+)'
-      ||cr||'    and dc.end_mp >= m.nm_begin_mp (+)'
-      ||cr||'  ) x'
-      ||cr||'  where x.row_num = 1'
-      ||cr||'    or x.ngt_group_type is not null'
-      ||cr||')'
-      ||cr||'select distinct'
-      ||cr||'   q2.nm_ne_id_of'
-      ||cr||'  ,q2.begin_mp'
-      ||cr||'  ,q2.end_mp'
-      ||cr||'  ,case when q2.nm_ne_id_of = q2.group_id and q2.ngt_group_type is not null then'
-      ||cr||'    first_value (q2.nm_ne_id_in) over (partition by q2.nm_ne_id_of, q2.begin_mp'
-      ||cr||'       order by q2.gty_order, q2.val_count desc, q2.nm_ne_id_in)'
-      ||cr||'   when q2.nm_ne_id_of != q2.group_id then'
-      ||cr||'     q2.group_id'
-      ||cr||'   end group_id'
-      ||cr||'from ('
-      ||cr||'select'
-      ||cr||'   m.nm_ne_id_of'
-      ||cr||'  ,q1.begin_mp'
-      ||cr||'  ,q1.end_mp'
-      ||cr||'  ,m.nm_ne_id_in'
-      ||cr||'  ,m.ne_gty_group_type'
-      ||cr||'  ,m.ngt_group_type'
-      ||cr||'  ,nvl(m.group_id, q1.nm_ne_id_of) group_id'
-      ||cr||'  ,decode(m.ne_gty_group_type, :l_group_type, 1, 2) gty_order'
-      ||cr||'  ,count(*) over (partition by m.nm_ne_id_in) val_count'
-      ||cr||'from ('
-      ||cr||'select'
-      ||cr||'   m3.nm_ne_id_of, m3.begin_mp, m3.end_mp'
-      ||cr||'from ('
-      ||cr||'select distinct'
-      ||cr||'   m2.nm_ne_id_of'
-      ||cr||'  ,m2.pos begin_mp'
-      ||cr||'  ,lead(m2.pos, 1) over (partition by m2.nm_ne_id_of order by m2.pos, m2.pos2) end_mp'
-      ||cr||'  ,m2.is_point'
-      ||cr||'from ('
-      ||cr||'select distinct'
-      ||cr||'   rc.nm_ne_id_of'
-      ||cr||'  ,rc.nm_begin_mp pos'
-      ||cr||'  ,rc.nm_end_mp pos2'
-      ||cr||'  ,decode(rc.nm_begin_mp, rc.nm_end_mp, 1, 0) is_point'
-      ||cr||'from rc'
-      ||cr||'union all'
-      ||cr||'select distinct'
-      ||cr||'   rc.nm_ne_id_of'
-      ||cr||'  ,rc.nm_end_mp pos'
-      ||cr||'  ,rc.nm_end_mp pos2'
-      ||cr||'  ,decode(rc.nm_begin_mp, rc.nm_end_mp, 1, 0) is_point'
-      ||cr||'from rc'
-      ||cr||') m2'
-      ||cr||') m3'
-      ||cr||'where m3.end_mp is not null'
-      ||cr||'  and (m3.end_mp != m3.begin_mp or m3.is_point = 1)'
-      ||cr||') q1'
-      ||cr||'right outer join'
-      ||cr||'rc m'
-      ||cr||'on q1.nm_ne_id_of = m.nm_ne_id_of'
-      ||cr||'  and q1.begin_mp between m.nm_begin_mp and m.nm_end_mp'
-      ||cr||'  and q1.end_mp between m.nm_begin_mp and m.nm_end_mp'
-      ||cr||') q2';
-
-  end;
-  
-
-  -- copy of nm3bulk_mrg body procedure
-  --  only needed until load_temp_extent_datums() is ported from here into nm3bulk_mrg
-  procedure ensure_group_type_linear(
-     p_group_type_in in nm_group_types.ngt_group_type%type
-    ,p_group_type_out out nm_group_types.ngt_group_type%type
-  )
-  is
-  begin
-    if p_group_type_in is not null then
-      select ngt_group_type into p_group_type_out
-      from nm_group_types where ngt_group_type = p_group_type_in
-        and ngt_linear_flag = 'Y';
-    end if;
-  exception
-    -- silent here, only log
-    when no_data_found then
-      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.ensure_group_type_linear('
-        ||'p_group_type_in='||p_group_type_in
-        ||')');
-  end;
-
-
-  -- load datum criteria for a single temp extent
-  --  todo: this procedure needs to be put into nm3bulk_mrg with the next signature change
-  procedure load_temp_extent_datums(
-     p_group_type in nm_group_types.ngt_group_type%type
-    ,p_nte_job_id in nm_nw_temp_extents.nte_job_id%type
-    ,p_sqlcount out pls_integer
-  )
-  is
-    l_sql varchar2(32767);
-    l_elements_sql constant varchar2(2000) :=
-              '    select d.nte_ne_id_of nm_ne_id_of, min(d.nte_begin_mp) begin_mp, max(d.nte_end_mp) end_mp'
-        ||cr||'     ,min(d.nte_route_ne_id) group_id'
-        ||cr||'    from nm_nw_temp_extents d'
-        ||cr||'    where d.nte_job_id = :p_nte_job_id'
-        ||cr||'    group by d.nte_ne_id_of';
-    l_group_type      nm_group_types.ngt_group_type%type;
-    l_effective_date  constant date := nm3context.get_effective_date;
-    l_sqlcount        pls_integer;
-
-
-  begin
-    nm3dbg.putln(g_package_name||'.load_temp_extent_datums('
-      ||'p_group_type='||p_group_type
-      ||', p_nte_job_id='||p_nte_job_id
-      ||', l_effective_date='||l_effective_date
-      ||')');
-    nm3dbg.ind;
-
-    -- test for overlapping routes on same member
-    declare
-      l_dup_route_count integer;
-    begin
-      select count(*)
-      into l_dup_route_count
-      from nm_nw_temp_extents d
-      where d.nte_job_id = p_nte_job_id
-      group by d.nte_ne_id_of, d.nte_route_ne_id
-      having count(*) > 1;
-      raise too_many_rows;
-    exception
-      when no_data_found then null;
-      when too_many_rows then
-        raise_application_error(-20000, 'Invalid temp extent: multiple routes specified for same member');
-    end;
-
-
-    -- test nte_route_ne_id is linear
-    ensure_group_type_linear(
-       p_group_type_in  => p_group_type
-      ,p_group_type_out => l_group_type
-    );
-
-    execute immediate 'truncate table nm_datum_criteria_tmp';
-
-    -- the NTE_ROUTE_NE_ID may be a true group_id, or datum_id.
-
-    l_sql := sql_load_nm_datum_criteria_tmp(
-       p_elements_sql => l_elements_sql
-    );
-    nm3dbg.putln(l_sql);
-    execute immediate l_sql
-    using
-       p_nte_job_id
-      ,l_effective_date
-      ,l_effective_date
-      ,l_effective_date
-      ,l_group_type;
-    p_sqlcount := sql%rowcount;
-    commit;
-    nm3dbg.putln('nm_mrg_section_member_inv: '||p_sqlcount);
-
-    nm3dbg.deind;
-  exception
-    when others then
-      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_temp_extent_datums('
-        ||'p_nte_job_id='||p_nte_job_id
-        ||', l_effective_date='||l_effective_date
-        ||', l_group_type='||l_group_type
-        ||')');
-      raise;
-
-  end;
-
 --
 ------------------------------------------------------------------------------------------------
 --
