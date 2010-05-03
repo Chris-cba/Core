@@ -2,11 +2,11 @@ create or replace package nm3bulk_mrg as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.5   31 Mar 2010 16:29:32   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.6   03 May 2010 13:01:22   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkh  $
---       Date into PVCS   : $Date:   31 Mar 2010 16:29:32  $
---       Date fetched Out : $Modtime:   31 Mar 2010 16:23:02  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   03 May 2010 13:01:22  $
+--       Date fetched Out : $Modtime:   03 May 2010 12:17:38  $
+--       PVCS Version     : $Revision:   2.6  $
 --       Based on sccs version : 
 --
 --   Author : Priidu Tanava
@@ -17,7 +17,18 @@ create or replace package nm3bulk_mrg as
 --   Copyright (c) exor corporation ltd, 2006
 -----------------------------------------------------------------------------
 
-  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.5  $"';
+  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.6  $"';
+  
+  
+  -- values copied from nm3extent
+  nqr_source_saved      CONSTANT nm_mrg_query_results.nqr_source%TYPE := 'SAVED';
+  nqr_source_route      CONSTANT nm_mrg_query_results.nqr_source%TYPE := 'ROUTE';
+  nqr_source_merge      CONSTANT nm_mrg_query_results.nqr_source%TYPE := 'MERGE';
+  nqr_source_merge_sect CONSTANT nm_mrg_query_results.nqr_source%TYPE := 'MERGE_SECT';
+  nqr_source_pbi        CONSTANT nm_mrg_query_results.nqr_source%TYPE := 'PBI';
+  nqr_source_pbi_sect   CONSTANT nm_mrg_query_results.nqr_source%TYPE := 'PBI_SECT';
+  nqr_source_gis        CONSTANT nm_mrg_query_results.nqr_source%TYPE := 'GIS';
+  nqr_source_temp_ne    CONSTANT nm_mrg_query_results.nqr_source%TYPE := 'TEMP_NE';
    
 
   type nm_obj_type_tbl is table of nm_members_all.nm_obj_type%type index by binary_integer;
@@ -28,6 +39,7 @@ create or replace package nm3bulk_mrg as
     ,ita_attrib_name    nm_inv_type_attribs_all.ita_attrib_name%type
     ,iit_attrib_name    nm_inv_type_attribs_all.ita_attrib_name%type
     ,ita_format         nm_inv_type_attribs_all.ita_format%type
+    ,ita_format_mask    nm_inv_type_attribs_all.ita_format_mask%type
     ,table_name         nm_inv_types_all.nit_table_name%type
     ,table_iit_flag     varchar2(1)                                   -- Y if ft table is to be treated as a standard nm_inv_items_all table
     ,table_pk_column    nm_inv_types_all.nit_foreign_pk_column%type
@@ -79,6 +91,8 @@ create or replace package nm3bulk_mrg as
     ,pt_attr in ita_mapping_tbl
     ,pt_itd  in itd_tbl
     ,p_admin_unit_id in nm_admin_units_all.nau_admin_unit%type
+    ,p_nqr_source in nm_mrg_query_results_all.nqr_source%type
+    ,p_nqr_source_id in nm_mrg_query_results_all.nqr_source_id%type
     ,p_splits_rowcount in integer
     ,p_description in varchar2
     ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
@@ -88,8 +102,9 @@ create or replace package nm3bulk_mrg as
   procedure std_run(
      p_nmq_id in nm_mrg_query_all.nmq_id%type
     ,p_nqr_admin_unit in nm_mrg_query_results_all.nqr_admin_unit%type
+    ,p_nqr_source in nm_mrg_query_results_all.nqr_source%type
+    ,p_nqr_source_id in nm_mrg_query_results_all.nqr_source_id%type
     ,p_nmq_descr in nm_mrg_query_all.nmq_descr%type
-    ,p_ignore_poe in boolean
     ,p_criteria_rowcount in integer
     ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
     ,p_longops_rec in out nm3sql.longops_rec
@@ -99,10 +114,12 @@ create or replace package nm3bulk_mrg as
   -- convinience network criteria loaders
   procedure load_group_datums(
      p_group_id in nm_elements_all.ne_id%type
+    ,p_group_type in nm_group_types.ngt_group_type%type
     ,p_sqlcount out pls_integer
   );
   procedure load_group_type_datums(
-     p_group_type in nm_members_all.nm_obj_type%type
+     p_group_type in nm_group_types.ngt_group_type%type
+    ,p_route_group_type in nm_group_types.ngt_group_type%type
     ,p_sqlcount out pls_integer
   );
   procedure load_extent_datums(
@@ -116,26 +133,19 @@ create or replace package nm3bulk_mrg as
     ,p_sqlcount out pls_integer
   );
   procedure load_nt_type_datums(
-     p_group_type in varchar2
+     p_group_type in nm_group_types.ngt_group_type%type
     ,p_nt_type in nm_types.nt_type%type
     ,p_sqlcount out pls_integer
   );
   procedure load_all_network_datums(
-     p_group_type in varchar2
+     p_group_type in nm_group_types.ngt_group_type%type
     ,p_sqlcount out pls_integer
   );
   procedure load_gaz_list_datums(
-     p_group_type in varchar2
+     p_group_type in nm_group_types.ngt_group_type%type
     ,pt_ne in nm_id_tbl
     ,pt_nse in nm_id_tbl
     ,p_sqlcount out pls_integer
-  );
-  
-  
-  
-  procedure process_datums_group_type(
-     p_group_type_in  in nm_group_types_all.ngt_group_type%type
-    ,p_group_type_out out nm_group_types_all.ngt_group_type%type
   );
   
   
