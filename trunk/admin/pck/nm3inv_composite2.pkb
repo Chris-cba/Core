@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.10   Feb 26 2009 16:31:54   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.11   03 May 2010 13:05:28   ptanava  $
 --       Module Name      : $Workfile:   nm3inv_composite2.pkb  $
---       Date into PVCS   : $Date:   Feb 26 2009 16:31:54  $
---       Date fetched Out : $Modtime:   Feb 26 2009 12:18:56  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   03 May 2010 13:05:28  $
+--       Date fetched Out : $Modtime:   03 May 2010 12:17:50  $
+--       PVCS Version     : $Revision:   2.11  $
 --       Based on sccs version :
 --
 --   Author : Priidu Tanava
@@ -33,9 +33,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
                 added get_admin_unit() local proc to get value corresponding to asset inv type
   20.01.09 PT in ins_iit_tmp_values() ignore SYS_% columns - these are hidden columns created e.g. for function based indexes
   25.02.09 PT added nm3net.bypass_members_triggers() to process_from_iit_tmp()
+  27.04.10 PT in do_rebuild() added parameters added parameters p_nqr_source and p_nqr_source_id to the call to nm3bulk_mrg.std_run()
+                NB! requires nm3bulk_mrg.pkh version 2.6 or higher
 */
 
-  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.10  $"';
+  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.11  $"';
   g_package_name  constant  varchar2(30) := 'nm3inv_composite2';
   
   cant_serialize exception;
@@ -560,6 +562,9 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     t_events        nm3type.tab_varchar32767;
     r_longops       nm3sql.longops_rec;
     l_group_type    nm_group_types_all.ngt_group_type%type;
+    l_nqr_source    nm_mrg_query_results_all.nqr_source%type;
+    l_nqr_source_id nm_mrg_query_results_all.nqr_source_id%type;
+    i               binary_integer;
     
   begin
     nm3dbg.putln(g_package_name||'.do_rebuild('
@@ -654,12 +659,31 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
         ,pt_nse       => pt_nse
         ,p_sqlcount   => l_sqlcount
       );
+      
+      -- assign merge results source arguments
+      -- if both specified then group takes precedence over saved extent
+      
+      -- group
+      i := pt_ne.first;
+      if i is not null then
+        l_nqr_source    := nm3bulk_mrg.NQR_SOURCE_ROUTE;
+        l_nqr_source_id := pt_ne(i);
+      end if;
+      
+      -- saved extent
+      i := pt_nse.first;
+      if i is not null and l_nqr_source_id is null then
+        l_nqr_source    := nm3bulk_mrg.NQR_SOURCE_SAVED;
+        l_nqr_source_id := pt_nse(i);
+      end if;
+
   
 
     -- 1.2 we have a group type (linear)
     elsif p_ngt_group_type is not null then
       nm3bulk_mrg.load_group_type_datums(
          p_group_type => p_ngt_group_type
+        ,p_route_group_type => null
         ,p_sqlcount => l_sqlcount
       );
       
@@ -708,8 +732,9 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
     nm3bulk_mrg.std_run(
        p_nmq_id         => p_nmq_id
       ,p_nqr_admin_unit => p_admin_unit_id
+      ,p_nqr_source     => l_nqr_source
+      ,p_nqr_source_id  => l_nqr_source_id
       ,p_nmq_descr      => l_nqr_description
-      ,p_ignore_poe     => p_ignore_poe
       ,p_criteria_rowcount => l_sqlcount
       ,p_mrg_job_id     => l_mrg_job_id
       ,p_longops_rec    => r_longops
@@ -812,6 +837,8 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
         ||', l_sqlcount2='||l_sqlcount2
         ||', l_effective_date='||l_effective_date
         ||', l_group_type='||l_group_type
+        ||', l_nqr_source='||l_nqr_source
+        ||', l_nqr_source_id='||l_nqr_source_id
         ||')');
         rollback;
         nm3user.set_effective_date(l_effective_date);
