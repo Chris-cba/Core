@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.26   Apr 28 2010 13:51:46   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.27   May 05 2010 14:38:16   rcoupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Apr 28 2010 13:51:46  $
---       Date fetched Out : $Modtime:   Apr 28 2010 13:50:42  $
---       PVCS Version     : $Revision:   2.26  $
+--       Date into PVCS   : $Date:   May 05 2010 14:38:16  $
+--       Date fetched Out : $Modtime:   May 05 2010 14:37:24  $
+--       PVCS Version     : $Revision:   2.27  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Wed Apr 28  13:45:50 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Wed May 05  14:29:33 2010 by Server Generator 10.1.2.9.28
 
 
 
@@ -594,6 +594,38 @@ CREATE TABLE DOC_LOCATIONS
 /
 
 COMMENT ON TABLE DOC_LOCATIONS IS 'Created from Entity DOCUMENT LOCATION by HIGHWAYS on 02-APR-93'
+/
+
+PROMPT Creating Table 'DOC_LOCATION_ARCHIVES'
+CREATE TABLE DOC_LOCATION_ARCHIVES
+ (DLA_ID NUMBER(38) NOT NULL
+ ,DLA_DLC_ID NUMBER(38) NOT NULL
+ ,DLA_ARCHIVE_TYPE VARCHAR2(30) NOT NULL
+ ,DLA_ARCHIVE_NAME VARCHAR2(2000) NOT NULL
+ ,DLA_HFT_ID NUMBER(38)
+ ,DLA_DLT_ID NUMBER(38)
+ )
+/
+
+COMMENT ON TABLE DOC_LOCATION_ARCHIVES IS 'Document Location Archives, details of archive areas used for Document Locations'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_ARCHIVES.DLA_ID IS 'Primary Key column, populated from sequence DLA_ID_SEQ'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_ARCHIVES.DLA_DLC_ID IS 'Foreign Key column, pointer to DOC_LOCATIONS primary key'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_ARCHIVES.DLA_ARCHIVE_TYPE IS 'Archive Type, indicates the type of archive being used.'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_ARCHIVES.DLA_ARCHIVE_NAME IS 'Archive Name, a description of the archive being used'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_ARCHIVES.DLA_HFT_ID IS 'Foreign Key column, pointer to HIG_FTP_TYPES Primary Key'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_ARCHIVES.DLA_DLT_ID IS 'Foreign Key column, pointer to DOC_LOCATIONS_TABLES Primary Key'
 /
 
 PROMPT Creating Table 'DOC_LOCATION_TABLES'
