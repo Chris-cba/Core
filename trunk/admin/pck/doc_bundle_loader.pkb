@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.0   Apr 22 2010 11:29:56   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.1   May 05 2010 17:54:24   gjohnson  $
 --       Module Name      : $Workfile:   doc_bundle_loader.pkb  $
---       Date into PVCS   : $Date:   Apr 22 2010 11:29:56  $
---       Date fetched Out : $Modtime:   Apr 22 2010 11:29:30  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   May 05 2010 17:54:24  $
+--       Date fetched Out : $Modtime:   May 05 2010 17:49:12  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
 
   g_package_name CONSTANT varchar2(30) := 'doc_bundle_loader';
   
@@ -774,24 +774,30 @@ END create_docs_etc;
 --
 PROCEDURE move_files_to_destination(pi_dbun_rec IN doc_bundles%ROWTYPE) IS
 
-
-
  l_tab_files      hig_file_transfer_api.g_tab_files;
  l_htfq_batch_no  hig_file_transfer_queue.hftq_batch_no%TYPE;
 
  CURSOR c1(cp_bundle_id IN doc_bundles.dbun_bundle_id%TYPE) IS
- SELECT c.dbun_unzip_location         from_path
-       ,c_unzip_subdir_prefix||dbun_bundle_id from_directory 
-       ,b.dbf_filename        from_filename
-       ,b.dbf_blob            from_blob
-       ,a.dbfr_doc_filename   to_filename
-       ,d.dlc_location_name   dlc_location_name
-       ,d.dlc_location_type   dlc_location_type
+ SELECT c.dbun_unzip_location                 from_path
+       ,c_unzip_subdir_prefix||dbun_bundle_id source 
+       ,b.dbf_filename                        source_filename
+       ,b.dbf_blob                            content
+       ,a.dbfr_doc_filename                   destination_filename
+       ,d.dlc_location_type                   destination_type
+       ,d.dlc_location_name                   destination
+       ,e.dlt_content_col                     destination_column
+       ,case when e.dlt_doc_id_col is not null then
+               dlt_doc_id_col||'='||a.dbfr_doc_id
+             else
+               null
+             end              condition           
+       ,a.dbfr_doc_id         doc_id
        ,a.rowid       
  FROM   doc_bundle_file_relations a
        ,doc_bundle_files b
        ,doc_bundles      c
        ,doc_locations    d
+       ,doc_location_tables e       
  WHERE c.dbun_bundle_id = cp_bundle_id
  AND   b.dbf_bundle_id = c.dbun_bundle_id
  AND   b.dbf_file_id   = a.dbfr_child_file_id
@@ -799,10 +805,29 @@ PROCEDURE move_files_to_destination(pi_dbun_rec IN doc_bundles%ROWTYPE) IS
  AND   a.dbfr_doc_id IS NOT NULL  
  AND   a.dbfr_error_text IS NULL
  AND   a.dbfr_hftq_batch_no IS NULL -- i.e. cater for re-submission by not processing records for which we already initiated a transfer
+ AND   e.dlt_dlc_id(+) = d.dlc_id -- outer join cos not all doc_locations have a corresponding entry in doc_location_tables 
  ORDER BY dbfr_doc_filename;
 
  TYPE t_tab_c1 IS TABLE OF c1%ROWTYPE INDEX BY BINARY_INTEGER;
  l_tab_c1 t_tab_c1;
+
+
+
+ PROCEDURE insert_file_record_for_doc(pi_filename IN docs.doc_file%TYPE
+                                     ,pi_doc_id   IN docs.doc_id%TYPE) IS
+
+      l_rec_file_record doc_locations_api.rec_file_record; 
+ 
+ BEGIN
+
+      l_rec_file_record.doc_id          := pi_doc_id;
+      l_rec_file_record.start_date      := Null; 
+      l_rec_file_record.full_path       := Null;
+      l_rec_file_record.filename        := pi_filename;
+
+      doc_locations_api.insert_file_record(pi_rec_df=>l_rec_file_record);
+
+END insert_file_record_for_doc;
  
  
 BEGIN
@@ -810,21 +835,29 @@ BEGIN
  hig_process_api.log_it(pi_message         => '   Submitting Files for Transfer to Document Location(s)' 
                        ,pi_summary_flag    => 'N' );
 
+
  OPEN c1(cp_bundle_id => pi_dbun_rec.dbun_bundle_id);
  FETCH c1 BULK COLLECT INTO l_tab_c1;
  CLOSE c1;
 
-
  FOR f IN 1..l_tab_c1.COUNT LOOP
- 
-    l_tab_files(f).source                 := l_tab_c1(f).from_directory;
+
+    IF l_tab_c1(f).destination_type = 'TABLE' THEN
+
+        insert_file_record_for_doc(pi_filename => l_tab_c1(f).destination_filename
+                                  ,pi_doc_id   => l_tab_c1(f).doc_id);   
+    
+    END IF;
+
+    l_tab_files(f).source                 := l_tab_c1(f).source;
     l_tab_files(f).source_type            := 'ORACLE_DIRECTORY';
-    l_tab_files(f).source_filename        := l_tab_c1(f).from_filename;
-    l_tab_files(f).destination            := l_tab_c1(f).dlc_location_name;
-    l_tab_files(f).destination_type       := l_tab_c1(f).dlc_location_type;
-    l_tab_files(f).destination_filename   := l_tab_c1(f).to_filename;
-    l_tab_files(f).condition              := NULL;
-    l_tab_files(f).content                := l_tab_c1(f).from_blob;
+    l_tab_files(f).source_filename        := l_tab_c1(f).source_filename;
+    l_tab_files(f).destination            := l_tab_c1(f).destination; 
+    l_tab_files(f).destination_type       := l_tab_c1(f).destination_type; -- 'TABLE','URL','ORACLE DIRECTORY'
+    l_tab_files(f).destination_column     := l_tab_c1(f).destination_column; 
+    l_tab_files(f).destination_filename   := l_tab_c1(f).destination_filename;
+    l_tab_files(f).condition              := l_tab_c1(f).condition;
+    l_tab_files(f).content                := l_tab_c1(f).content;
     l_tab_files(f).comments               := 'Initiated via '||c_process_type_name;
     l_tab_files(f).process_id             := hig_process_api.get_current_process_id;
 
@@ -839,6 +872,7 @@ BEGIN
       --
       hig_file_transfer_api.add_files_to_queue ( pi_tab_files     => l_tab_files 
                                                , po_hftq_batch_no => l_htfq_batch_no);
+
 
       --
       --
@@ -858,12 +892,7 @@ BEGIN
 
  END IF;
  
-
  commit;                                         
-
-EXCEPTION
-  WHEN others THEN
-    raise_application_error(-20001,'Could not submit files for transfer'||chr(10)||nm3flx.parse_error_message(sqlerrm));   
 
 END move_files_to_destination;
 --
