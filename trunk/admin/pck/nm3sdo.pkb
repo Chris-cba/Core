@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.33   Feb 01 2010 11:38:22   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.34   May 05 2010 13:23:24   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Feb 01 2010 11:38:22  $
---       Date fetched Out : $Modtime:   Feb 01 2010 11:37:16  $
---       PVCS Version     : $Revision:   2.33  $
+--       Date into PVCS   : $Date:   May 05 2010 13:23:24  $
+--       Date fetched Out : $Modtime:   May 05 2010 13:22:10  $
+--       PVCS Version     : $Revision:   2.34  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.33  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.34  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -99,6 +99,8 @@ function local_join_ptr_array( p_pa in ptr_array, p_table in varchar2, p_key in 
 PROCEDURE add_segments_m ( p_geom1 IN OUT NOCOPY mdsys.sdo_geometry, p_geom2 IN mdsys.sdo_geometry,
                            p_diminfo IN mdsys.sdo_dim_array,
                            p_conn IN BOOLEAN DEFAULT FALSE );
+--
+FUNCTION get_list(p_theme_txt IN VARCHAR2 ) RETURN nm_theme_array;
 --
 -----------------------------------------------------------------------------
 --
@@ -8879,25 +8881,25 @@ BEGIN
   END IF;
 
 
-  IF p_get_projection = 'TRUE' THEN
-    IF NOT is_nw_theme( p_nth_id ) THEN
-      Hig.raise_ner(pi_appl                => Nm3type.c_hig
-                    ,pi_id                 => 291
-                    ,pi_sqlcode            => -20001
-                    );
---    RAISE_APPLICATION_ERROR( -20001, 'Theme is not a linear referencing layer - cannot return projections');
-
-    ELSIF l_geometry.sdo_gtype != 2001 THEN
-      Hig.raise_ner(pi_appl                => Nm3type.c_hig
-                    ,pi_id                 => 292
-                    ,pi_sqlcode            => -20001
-                    );
---      RAISE_APPLICATION_ERROR( -20001, 'Cannot find position to project from');
-
-    ELSE
-      l_get_projection := ( p_get_projection = 'TRUE');
-    END IF;
-  END IF;
+--  IF p_get_projection = 'TRUE' THEN
+--    IF NOT is_nw_theme( p_nth_id ) THEN
+--      Hig.raise_ner(pi_appl                => Nm3type.c_hig
+--                    ,pi_id                 => 291
+--                    ,pi_sqlcode            => -20001
+--                    );
+----    RAISE_APPLICATION_ERROR( -20001, 'Theme is not a linear referencing layer - cannot return projections');
+--
+--    ELSIF l_geometry.sdo_gtype != 2001 THEN
+--      Hig.raise_ner(pi_appl                => Nm3type.c_hig
+--                    ,pi_id                 => 292
+--                    ,pi_sqlcode            => -20001
+--                    );
+----      RAISE_APPLICATION_ERROR( -20001, 'Cannot find position to project from');
+--
+--    ELSE
+--      l_get_projection := ( p_get_projection = 'TRUE');
+--    END IF;
+--  END IF;
 
   l_nth := p_nth;
 
@@ -8913,7 +8915,15 @@ BEGIN
 
        cur_string := cur_string||', sdo_geom.sdo_distance(t.'||l_nth.nth_feature_shape_column||', :p_geometry, :l_tol )';
 
+       IF is_nw_theme( p_nth_id ) THEN
+
        cur_string := cur_string||', sdo_lrs.get_measure( sdo_lrs.project_pt(t.'||l_nth.nth_feature_shape_column||', :p_geometry ))';
+
+       ELSE
+
+         cur_string := cur_string||', null ';
+
+       END IF;
 
      END IF;
 
@@ -8946,8 +8956,15 @@ BEGIN
 
        cur_string := cur_string||', sdo_geom.sdo_distance(f.'||l_nth.nth_feature_shape_column||', :p_geometry, :l_tol )';
 
+       IF is_nw_theme( p_nth_id ) THEN
+
        cur_string := cur_string||', sdo_lrs.get_measure( sdo_lrs.project_pt(f.'||l_nth.nth_feature_shape_column||', :p_geometry ))';
 
+       ELSE
+
+         cur_string := cur_string||', null ';
+
+       END IF;
      END IF;
 
      IF p_gdo_session_id IS NOT NULL and not l_get_projection
@@ -8984,7 +9001,15 @@ BEGIN
 
        cur_string := cur_string||', sdo_geom.sdo_distance(f.'||l_nth.nth_feature_shape_column||', :p_geometry, :l_tol )';
 
+       IF is_nw_theme( p_nth_id ) THEN
+
        cur_string := cur_string||', sdo_lrs.get_measure( sdo_lrs.project_pt(f.'||l_nth.nth_feature_shape_column||', :p_geometry ))';
+
+       ELSE
+
+         cur_string := cur_string||', null ';
+
+       END IF;
 
      END IF;
 
@@ -9023,7 +9048,15 @@ BEGIN
 
   IF l_get_projection THEN
 
+    IF is_nw_theme( p_nth_id ) THEN
+
     EXECUTE IMMEDIATE cur_string BULK COLLECT INTO l_pk_array, l_label_array, l_fk_array, l_feat_pk, l_dist_array, l_meas_array USING l_geometry, l_tol, l_geometry, l_geometry;
+
+  ELSE
+
+       EXECUTE IMMEDIATE cur_string BULK COLLECT INTO l_pk_array, l_label_array, l_fk_array, l_feat_pk, l_dist_array, l_meas_array USING l_geometry, l_tol, l_geometry;
+
+    END IF;
 
   ELSE
 
@@ -9034,8 +9067,9 @@ BEGIN
 --nm_debug.debug('Finished statement - returned '||to_char(l_pk_array.count));
 
   FOR i IN 1..l_pk_array.COUNT LOOP
+    if l_pk_array(i) is not null then
 
-    IF l_get_projection THEN
+    IF l_get_projection and is_nw_theme( p_nth_id ) THEN
 
       IF Nm3net.is_nt_datum( Nm3net.Get_Nt_Type( l_pk_array(i) ) )  = 'N' THEN
 
@@ -9079,6 +9113,41 @@ BEGIN
 
 END get_objects_in_buffer;
 
+
+--
+----------------------------------------------------------------------------
+-- Function used by itool to return all theme items for all themes within the buffer
+-- (usually) of a point geometry.
+
+FUNCTION get_objects_in_buffer( p_geometry       IN mdsys.sdo_geometry,
+                                p_buffer         IN NUMBER,
+                                p_buffer_units   IN NUMBER,
+                                p_theme_txt      IN VARCHAR2 )
+  RETURN nm_theme_list is
+--
+cursor c_obj ( c_theme_array  in nm_theme_array_type,
+               c_geometry     in mdsys.sdo_geometry,
+               c_buffer       in number,
+               c_buffer_units in number ) is
+select nm3sdo.get_objects_in_buffer( nthe_id, c_geometry, c_buffer, c_buffer_units, 'TRUE')
+from table ( c_theme_array );
+
+l_theme_array nm_theme_array := get_list(p_theme_txt => p_theme_txt );
+
+l_tmp  nm_theme_list := NM3ARRAY.INIT_NM_THEME_LIST;
+retval nm_theme_list := NM3ARRAY.INIT_NM_THEME_LIST;
+
+begin
+  open c_obj( l_theme_array.nta_theme_array, p_geometry, p_buffer, p_buffer_units );
+  fetch c_obj into retval;
+  while c_obj%found loop
+    fetch c_obj into l_tmp;
+    retval := retval.add_theme_list( l_tmp );
+  end loop;
+  close c_obj;
+
+  return retval;
+end;
 
 --
 ----------------------------------------------------------------------------
@@ -9190,48 +9259,6 @@ BEGIN
 
 END;
 --
-----------------------------------------------------------------------------------
---
-FUNCTION get_nw_snaps_at_xy( p_nth_id IN NUMBER,
-                             p_geom IN mdsys.sdo_geometry,
-                             p_theme_txt IN VARCHAR2 )
-                    RETURN nm_theme_list IS
-retval nm_theme_list := nm_theme_list( nm_theme_list_type(nm_theme_detail( NULL, NULL, NULL, NULL, NULL, NULL, NULL)));
-l_detail nm_theme_detail;
-
-CURSOR c1 (c_theme IN NUMBER) IS
-  SELECT nts_snap_to
-  FROM NM_THEME_SNAPS, NM_NW_THEMES
-  WHERE nts_theme_id = c_theme
-  AND  nts_snap_to = nnth_nth_theme_id
-  AND  EXISTS ( SELECT 1 FROM NM_THEME_ROLES, HIG_USER_ROLES
-                WHERE hur_username = USER
-    AND hur_role = nthr_role
-    AND nthr_theme_id = nnth_nth_theme_id )
-  ORDER BY nts_priority;
-
-CURSOR c2 (c_theme IN NUMBER) IS
-  SELECT nbth_base_theme
-  FROM NM_BASE_THEMES, NM_NW_THEMES
-  WHERE nbth_theme_id = c_theme
-  AND  nbth_base_theme = nnth_nth_theme_id
-  AND  EXISTS ( SELECT 1 FROM NM_THEME_ROLES, HIG_USER_ROLES
-                WHERE hur_username = USER
-    AND hur_role = nthr_role
-    AND nthr_theme_id = nnth_nth_theme_id );
-
-l_theme_list Nm3type.tab_number;
-
-l_get_projection VARCHAR2(5) := 'TRUE';
-
-l_nth   NM_THEMES_ALL%ROWTYPE;
-l_ntl   nm_theme_list;
-
-p_nth   NM_THEMES_ALL%ROWTYPE := Nm3get.get_nth(p_nth_id);
-
-
-p_theme_array nm_theme_array;
-
 ---------------------------------------------------------------------------------
 FUNCTION get_list(p_theme_txt IN VARCHAR2 ) RETURN nm_theme_array IS
 
@@ -9288,6 +9315,49 @@ BEGIN
       RETURN nm_theme_array( nm_theme_array_type(nm_theme_entry(NULL)));
     END IF;
 END;
+
+----------------------------------------------------------------------------------
+--
+FUNCTION get_nw_snaps_at_xy( p_nth_id IN NUMBER,
+                             p_geom IN mdsys.sdo_geometry,
+                             p_theme_txt IN VARCHAR2 )
+                    RETURN nm_theme_list IS
+retval nm_theme_list := nm_theme_list( nm_theme_list_type(nm_theme_detail( NULL, NULL, NULL, NULL, NULL, NULL, NULL)));
+l_detail nm_theme_detail;
+
+CURSOR c1 (c_theme IN NUMBER) IS
+  SELECT nts_snap_to
+  FROM NM_THEME_SNAPS, NM_NW_THEMES
+  WHERE nts_theme_id = c_theme
+  AND  nts_snap_to = nnth_nth_theme_id
+  AND  EXISTS ( SELECT 1 FROM NM_THEME_ROLES, HIG_USER_ROLES
+                WHERE hur_username = USER
+    AND hur_role = nthr_role
+    AND nthr_theme_id = nnth_nth_theme_id )
+  ORDER BY nts_priority;
+
+CURSOR c2 (c_theme IN NUMBER) IS
+  SELECT nbth_base_theme
+  FROM NM_BASE_THEMES, NM_NW_THEMES
+  WHERE nbth_theme_id = c_theme
+  AND  nbth_base_theme = nnth_nth_theme_id
+  AND  EXISTS ( SELECT 1 FROM NM_THEME_ROLES, HIG_USER_ROLES
+                WHERE hur_username = USER
+    AND hur_role = nthr_role
+    AND nthr_theme_id = nnth_nth_theme_id );
+
+l_theme_list Nm3type.tab_number;
+
+l_get_projection VARCHAR2(5) := 'TRUE';
+
+l_nth   NM_THEMES_ALL%ROWTYPE;
+l_ntl   nm_theme_list;
+
+p_nth   NM_THEMES_ALL%ROWTYPE := Nm3get.get_nth(p_nth_id);
+
+
+p_theme_array nm_theme_array;
+
 ---------------------------------------------------------------------------------------
 
 
