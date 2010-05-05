@@ -32,6 +32,8 @@ member FUNCTION add_detail  (p_theme_id IN integer
    c_max_array_count CONSTANT BINARY_INTEGER := 1048576;
 --
 begin
+
+   if p_theme_id is not null then
 --
 -- If there are NO entries in the VARRAY then extend it
 --
@@ -62,6 +64,8 @@ begin
                                                                               ,p_descr
                                                                                    );
 --
+   end if;
+   
    return this_ntl;
 --
 exception
@@ -87,14 +91,18 @@ begin
 
      for i in 1..p_theme_list.ntl_theme_list.count loop
 
-       IF this_ntl.ntl_theme_list.COUNT = c_max_array_count
-       THEN
-           raise_application_error(-20001,'Theme list cannot have more than '||c_max_array_count||' entries');
-       END IF;
+      if p_theme_list.ntl_theme_list(i).ntd_theme_id is not null then
 
-       this_ntl.ntl_theme_list.extend;
+        IF this_ntl.ntl_theme_list.COUNT = c_max_array_count
+        THEN
+           raise_application_error(-20001,'Theme list cannot have more than '||c_max_array_count||' entries');
+        END IF;
+
+        this_ntl.ntl_theme_list.extend;
   --
-       this_ntl.ntl_theme_list( this_ntl.ntl_theme_list.last) := p_theme_list.ntl_theme_list(i);
+        this_ntl.ntl_theme_list( this_ntl.ntl_theme_list.last) := p_theme_list.ntl_theme_list(i);
+        
+      end if;
 
   end loop;
   --
