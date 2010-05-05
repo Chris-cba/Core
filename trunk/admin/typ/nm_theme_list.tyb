@@ -1,14 +1,14 @@
 CREATE OR REPLACE type body nm_theme_list as
 --
------------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--------------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm_theme_list.tyb	1.1 06/15/05
---       Module Name      : nm_theme_list.tyb
---       Date into SCCS   : 05/06/15 10:18:41
---       Date fetched Out : 07/06/13 17:04:52
---       SCCS Version     : 1.1
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/typ/nm_theme_list.tyb-arc   2.2   May 05 2010 13:42:52   rcoupe  $
+--       Module Name      : $Workfile:   nm_theme_list.tyb  $
+--       Date into PVCS   : $Date:   May 05 2010 13:42:52  $
+--       Date fetched Out : $Modtime:   May 05 2010 13:42:08  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --    Author : R.A. Coupe
 --
@@ -65,7 +65,7 @@ begin
                                                                                    );
 --
    end if;
-   
+
    return this_ntl;
 --
 exception
@@ -101,7 +101,7 @@ begin
         this_ntl.ntl_theme_list.extend;
   --
         this_ntl.ntl_theme_list( this_ntl.ntl_theme_list.last) := p_theme_list.ntl_theme_list(i);
-        
+
       end if;
 
   end loop;
