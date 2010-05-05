@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.21   Apr 29 2010 15:31:18   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.22   May 05 2010 14:33:50   rcoupe  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Apr 29 2010 15:31:18  $
---       Date fetched Out : $Modtime:   Apr 29 2010 15:30:46  $
---       PVCS Version     : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   May 05 2010 14:33:50  $
+--       Date fetched Out : $Modtime:   May 05 2010 14:33:16  $
+--       PVCS Version     : $Revision:   2.22  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Thu Apr 29  15:24:46 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Wed May 05  14:29:37 2010 by Server Generator 10.1.2.9.28
 
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -154,6 +154,12 @@ PROMPT Creating Primary Key on 'DOC_LOCATIONS'
 ALTER TABLE DOC_LOCATIONS
  ADD (CONSTRAINT DLC_PK PRIMARY KEY
   (DLC_ID))
+/
+
+PROMPT Creating Primary Key on 'DOC_LOCATION_ARCHIVES'
+ALTER TABLE DOC_LOCATION_ARCHIVES
+ ADD (CONSTRAINT DLA_PK PRIMARY KEY
+  (DLA_ID))
 /
 
 PROMPT Creating Primary Key on 'DOC_LOCATION_TABLES'
@@ -2296,6 +2302,13 @@ PROMPT Creating Unique Key on 'DOC_LOCATIONS'
 ALTER TABLE DOC_LOCATIONS
  ADD (CONSTRAINT DLC_UK UNIQUE
   (DLC_NAME))
+/
+
+PROMPT Creating Unique Key on 'DOC_LOCATION_ARCHIVES'
+ALTER TABLE DOC_LOCATION_ARCHIVES
+ ADD (CONSTRAINT DLA_UK UNIQUE
+  (DLA_DLC_ID
+  ,DLA_ARCHIVE_TYPE))
 /
 
 PROMPT Creating Unique Key on 'DOC_LOCATION_TABLES'
@@ -4455,6 +4468,13 @@ ALTER TABLE DOC_LOCATIONS ADD (CONSTRAINT
  DLC_FK_DMD FOREIGN KEY
   (DLC_DMD_ID) REFERENCES DOC_MEDIA
   (DMD_ID))
+/
+
+PROMPT Creating Foreign Key on 'DOC_LOCATION_ARCHIVES'
+ALTER TABLE DOC_LOCATION_ARCHIVES ADD (CONSTRAINT
+ DLA_DLC_FK FOREIGN KEY
+  (DLA_DLC_ID) REFERENCES DOC_LOCATIONS
+  (DLC_ID))
 /
 
 PROMPT Creating Foreign Key on 'DOC_LOCATION_TABLES'
