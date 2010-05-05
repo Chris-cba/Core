@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.34   May 05 2010 13:23:24   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.35   May 05 2010 13:32:20   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   May 05 2010 13:23:24  $
---       Date fetched Out : $Modtime:   May 05 2010 13:22:10  $
---       PVCS Version     : $Revision:   2.34  $
+--       Date into PVCS   : $Date:   May 05 2010 13:32:20  $
+--       Date fetched Out : $Modtime:   May 05 2010 13:30:32  $
+--       PVCS Version     : $Revision:   2.35  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.34  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.35  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -9067,39 +9067,42 @@ BEGIN
 --nm_debug.debug('Finished statement - returned '||to_char(l_pk_array.count));
 
   FOR i IN 1..l_pk_array.COUNT LOOP
+    
     if l_pk_array(i) is not null then
 
-    IF l_get_projection and is_nw_theme( p_nth_id ) THEN
+      IF l_get_projection and is_nw_theme( p_nth_id ) THEN
 
-      IF Nm3net.is_nt_datum( Nm3net.Get_Nt_Type( l_pk_array(i) ) )  = 'N' THEN
+        IF Nm3net.is_nt_datum( Nm3net.Get_Nt_Type( l_pk_array(i) ) )  = 'N' THEN
 
---      make sure we are dealing in correct units. The shape lengths are in datum units.
+  --      make sure we are dealing in correct units. The shape lengths are in datum units.
 
-        Nm3net.get_group_units( l_pk_array(i), l_p_unit, l_c_unit );
+          Nm3net.get_group_units( l_pk_array(i), l_p_unit, l_c_unit );
 
-        l_meas_array(i) := Nm3unit.convert_unit ( l_c_unit, l_p_unit, l_meas_array(i) );
+          l_meas_array(i) := Nm3unit.convert_unit ( l_c_unit, l_p_unit, l_meas_array(i) );
+
+        END IF;
 
       END IF;
 
-    END IF;
+      IF i = 1 THEN
 
-    IF i = 1 THEN
+        IF l_get_projection THEN
 
-      IF l_get_projection THEN
-
-        retval := nm_theme_list ( nm_theme_list_type ( nm_theme_detail (l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), l_dist_array(i), l_meas_array(i), l_nth.nth_theme_name)));
+          retval := nm_theme_list ( nm_theme_list_type ( nm_theme_detail (l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), l_dist_array(i), l_meas_array(i), l_nth.nth_theme_name)));
+        ELSE
+          retval := nm_theme_list ( nm_theme_list_type ( nm_theme_detail ( l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), NULL, NULL, l_nth.nth_theme_name)));
+        END IF;
       ELSE
-        retval := nm_theme_list ( nm_theme_list_type ( nm_theme_detail ( l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), NULL, NULL, l_nth.nth_theme_name)));
-      END IF;
-    ELSE
---    nm_debug.debug(' count = '||to_char(i)||' - adding new detail');
+  --    nm_debug.debug(' count = '||to_char(i)||' - adding new detail');
 
-      IF l_get_projection THEN
-        retval := retval.add_detail( l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), l_dist_array(i), l_meas_array(i), l_nth.nth_theme_name);
-      ELSE
-        retval := retval.add_detail( l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), NULL, NULL, l_nth.nth_theme_name);
-      END IF;
+        IF l_get_projection THEN
+          retval := retval.add_detail( l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), l_dist_array(i), l_meas_array(i), l_nth.nth_theme_name);
+        ELSE
+          retval := retval.add_detail( l_nth.nth_theme_id, l_pk_array(i), l_fk_array(i), l_label_array(i), NULL, NULL, l_nth.nth_theme_name);
+        END IF;
 
+      END IF;
+    
     END IF;
 
   END LOOP;
