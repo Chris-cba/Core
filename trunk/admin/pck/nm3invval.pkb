@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.8   Apr 29 2010 11:25:52   rcoupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.9   May 05 2010 09:39:22   rcoupe  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   Apr 29 2010 11:25:52  $
---       Date fetched Out : $Modtime:   Apr 29 2010 11:24:38  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   May 05 2010 09:39:22  $
+--       Date fetched Out : $Modtime:   May 05 2010 09:35:10  $
+--       Version          : $Revision:   2.9  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -706,6 +706,9 @@ PROCEDURE check_inv_dates ( p_rec_nii    rec_date_chk) IS
 --
    l_parent_start_date        DATE;
    l_parent_end_date          DATE;
+   
+   l_hier_start_date          DATE;
+   l_hier_end_date            DATE;
 --
    --
    CURSOR c1 ( c_iit_located_by nm_inv_items.iit_located_by%TYPE ) IS
@@ -737,12 +740,11 @@ PROCEDURE check_inv_dates ( p_rec_nii    rec_date_chk) IS
 --     AND  iig_parent_id = iit_ne_id;
 --
 --
---RAC - log 726036 -needs to assess the full set of parent/child data across all dates.Change to prevent failure on multi-row subquery
-
    CURSOR c4 (c_child_ne_id nm_inv_items.iit_ne_id%TYPE) IS
-   SELECT iit_start_date, iit_end_date
-   FROM   nm_inv_items_all
-   WHERE  iit_ne_id in (SELECT iig_parent_id FROM nm_inv_item_groupings_all WHERE iig_item_id = c_child_ne_id);
+   SELECT iit_start_date, iit_end_date, iig_start_date, iig_end_date
+   FROM   nm_inv_items_all, nm_inv_item_groupings_all 
+   WHERE iig_item_id = c_child_ne_id
+   AND   iit_ne_id   = iig_parent_id;
 --
 -- End Log 37786
    --
@@ -762,9 +764,6 @@ PROCEDURE check_inv_dates ( p_rec_nii    rec_date_chk) IS
                         )
                  );
 --
---RAC - log 726036 - this is not related to the exact scenario in the log
---                   but is the same problem - just accessing data by parent rather than item.
-
 
     CURSOR cs_child_iig (c_iit_ne_id  nm_inv_items.iit_ne_id%TYPE
                         ,c_start_date date
@@ -895,7 +894,7 @@ BEGIN
    -- Check for hierarchical stuff -  log 726036 - need to cater for multiple rows
    --
    OPEN  c4 ( p_rec_nii.ne_id);
-   FETCH c4 INTO l_parent_start_date, l_parent_end_date;
+   FETCH c4 INTO l_parent_start_date, l_parent_end_date, l_hier_start_date, l_hier_end_date;
    while c4%found loop
       IF l_parent_end_date IS NULL AND l_hier_end_date is NULL
        THEN
@@ -926,7 +925,7 @@ BEGIN
          RAISE l_start_date_out_of_range;
       END IF;
 
-      FETCH c4 INTO l_parent_start_date, l_parent_end_date;
+   FETCH c4 INTO l_parent_start_date, l_parent_end_date, l_hier_start_date, l_hier_end_date;
 
    END LOOP;
    CLOSE c4;
