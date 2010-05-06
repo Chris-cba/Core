@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.20   Apr 23 2010 15:26:40   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.21   May 06 2010 18:13:32   malexander  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Apr 23 2010 15:26:40  $
---       Date fetched Out : $Modtime:   Apr 23 2010 15:23:40  $
---       Version          : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   May 06 2010 18:13:32  $
+--       Date fetched Out : $Modtime:   May 06 2010 18:12:36  $
+--       Version          : $Revision:   2.21  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 23-APR-2010 15:23
+--       Generation Date  : 06-MAY-2010 18:12
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -80783,7 +80783,7 @@ INSERT INTO HIG_STANDARD_FAVOURITES
 SELECT 
         'DOC_REF'
        ,'DOC0118'
-       ,'Media/Locations'
+       ,'Document Locations and Media Types'
        ,'M'
        ,2 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
