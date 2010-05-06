@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.13   Apr 26 2010 10:25:02   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.14   May 06 2010 22:32:56   malexander  $
 --       Module Name      : $Workfile:   nm3debug.pkb  $
---       Date into PVCS   : $Date:   Apr 26 2010 10:25:02  $
---       Date fetched Out : $Modtime:   Apr 26 2010 10:04:56  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   May 06 2010 22:32:56  $
+--       Date fetched Out : $Modtime:   May 06 2010 22:28:20  $
+--       PVCS Version     : $Revision:   2.14  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.13  $"
+--   nm3get_gen body   : "$Revision:   2.14  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.13  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.14  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3debug';
@@ -1450,21 +1450,22 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'debug_hsc');
 --
-   nm_debug.debug('hsc_domain_code    : '||pi_rec_hsc.hsc_domain_code,p_level);
-   nm_debug.debug('hsc_status_code    : '||pi_rec_hsc.hsc_status_code,p_level);
-   nm_debug.debug('hsc_status_name    : '||pi_rec_hsc.hsc_status_name,p_level);
-   nm_debug.debug('hsc_seq_no         : '||pi_rec_hsc.hsc_seq_no,p_level);
-   nm_debug.debug('hsc_allow_feature1 : '||pi_rec_hsc.hsc_allow_feature1,p_level);
-   nm_debug.debug('hsc_allow_feature2 : '||pi_rec_hsc.hsc_allow_feature2,p_level);
-   nm_debug.debug('hsc_allow_feature3 : '||pi_rec_hsc.hsc_allow_feature3,p_level);
-   nm_debug.debug('hsc_allow_feature4 : '||pi_rec_hsc.hsc_allow_feature4,p_level);
-   nm_debug.debug('hsc_allow_feature5 : '||pi_rec_hsc.hsc_allow_feature5,p_level);
-   nm_debug.debug('hsc_allow_feature6 : '||pi_rec_hsc.hsc_allow_feature6,p_level);
-   nm_debug.debug('hsc_allow_feature7 : '||pi_rec_hsc.hsc_allow_feature7,p_level);
-   nm_debug.debug('hsc_allow_feature8 : '||pi_rec_hsc.hsc_allow_feature8,p_level);
-   nm_debug.debug('hsc_allow_feature9 : '||pi_rec_hsc.hsc_allow_feature9,p_level);
-   nm_debug.debug('hsc_start_date     : '||pi_rec_hsc.hsc_start_date,p_level);
-   nm_debug.debug('hsc_end_date       : '||pi_rec_hsc.hsc_end_date,p_level);
+   nm_debug.debug('hsc_domain_code     : '||pi_rec_hsc.hsc_domain_code,p_level);
+   nm_debug.debug('hsc_status_code     : '||pi_rec_hsc.hsc_status_code,p_level);
+   nm_debug.debug('hsc_status_name     : '||pi_rec_hsc.hsc_status_name,p_level);
+   nm_debug.debug('hsc_seq_no          : '||pi_rec_hsc.hsc_seq_no,p_level);
+   nm_debug.debug('hsc_allow_feature1  : '||pi_rec_hsc.hsc_allow_feature1,p_level);
+   nm_debug.debug('hsc_allow_feature2  : '||pi_rec_hsc.hsc_allow_feature2,p_level);
+   nm_debug.debug('hsc_allow_feature3  : '||pi_rec_hsc.hsc_allow_feature3,p_level);
+   nm_debug.debug('hsc_allow_feature4  : '||pi_rec_hsc.hsc_allow_feature4,p_level);
+   nm_debug.debug('hsc_allow_feature5  : '||pi_rec_hsc.hsc_allow_feature5,p_level);
+   nm_debug.debug('hsc_allow_feature6  : '||pi_rec_hsc.hsc_allow_feature6,p_level);
+   nm_debug.debug('hsc_allow_feature7  : '||pi_rec_hsc.hsc_allow_feature7,p_level);
+   nm_debug.debug('hsc_allow_feature8  : '||pi_rec_hsc.hsc_allow_feature8,p_level);
+   nm_debug.debug('hsc_allow_feature9  : '||pi_rec_hsc.hsc_allow_feature9,p_level);
+   nm_debug.debug('hsc_start_date      : '||pi_rec_hsc.hsc_start_date,p_level);
+   nm_debug.debug('hsc_end_date        : '||pi_rec_hsc.hsc_end_date,p_level);
+   nm_debug.debug('hsc_allow_feature10 : '||pi_rec_hsc.hsc_allow_feature10,p_level);
 --
    nm_debug.proc_end(g_package_name,'debug_hsc');
 --
@@ -1489,6 +1490,7 @@ BEGIN
    nm_debug.debug('hsd_feature7    : '||pi_rec_hsd.hsd_feature7,p_level);
    nm_debug.debug('hsd_feature8    : '||pi_rec_hsd.hsd_feature8,p_level);
    nm_debug.debug('hsd_feature9    : '||pi_rec_hsd.hsd_feature9,p_level);
+   nm_debug.debug('hsd_feature10   : '||pi_rec_hsd.hsd_feature10,p_level);
 --
    nm_debug.proc_end(g_package_name,'debug_hsd');
 --
