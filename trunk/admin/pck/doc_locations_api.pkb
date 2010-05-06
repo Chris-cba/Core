@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.2   Apr 26 2010 11:27:14   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.3   May 06 2010 17:28:40   aedwards  $
 --       Module Name      : $Workfile:   doc_locations_api.pkb  $
---       Date into PVCS   : $Date:   Apr 26 2010 11:27:14  $
---       Date fetched Out : $Modtime:   Apr 26 2010 11:26:34  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   May 06 2010 17:28:40  $
+--       Date fetched Out : $Modtime:   May 06 2010 17:27:58  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 --
   g_package_name CONSTANT varchar2(30) := 'doc_locations_api';
 --
@@ -27,6 +27,8 @@ AS
   g_content_col     CONSTANT VARCHAR2(30)   := 'DFTT_CONTENT';
   g_doc_id_col      CONSTANT VARCHAR2(30)   := 'DFTT_DOC_ID';
   g_revision_col    CONSTANT VARCHAR2(30)   := 'DFTT_REVISION';
+  g_sep                      VARCHAR2(1)    := NVL(hig.get_sysopt('DIRREPSTRN'),'\');
+  g_win_sep                  VARCHAR2(1)    := '\';
 --
 -----------------------------------------------------------------------------
 --
@@ -394,11 +396,11 @@ BEGIN
      l_tab_comments(1)  := '--';
      l_tab_comments(2)  := '--   SCCS Identifiers :-';
      l_tab_comments(3)  := '--';
-     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.2   Apr 26 2010 11:27:14   aedwards  $';
+     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.3   May 06 2010 17:28:40   aedwards  $';
      l_tab_comments(5)  := '--       Module Name                : $Workfile:   doc_locations_api.pkb  $';
-     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Apr 26 2010 11:27:14  $';
-     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Apr 26 2010 11:26:34  $';
-     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.2  $';
+     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   May 06 2010 17:28:40  $';
+     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   May 06 2010 17:27:58  $';
+     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.3  $';
      l_tab_comments(9)  := '--';
      l_tab_comments(10) := '--   table_name_WHO trigger';
      l_tab_comments(11) := '--';
@@ -643,10 +645,11 @@ IS
   
 BEGIN
 --
+--
+  DELETE doc_location_tables
+   WHERE dlt_dlc_id = pi_dlc_id;
+--
   INSERT INTO doc_location_tables
-        ( dlt_id, dlt_dlc_id, dlt_table, dlt_doc_id_col, dlt_revision_col
-        , dlt_content_col, dlt_start_date_col, dlt_end_date_col
-        , dlt_full_path_col, dlt_filename, dlt_audit_col, dlt_file_info_col)
   SELECT nm3ddl.sequence_nextval('dlt_id_seq')   dlt_id
        , pi_dlc_id                               dlt_dlc_id
        , pi_table_name                           dlt_table
@@ -659,6 +662,7 @@ BEGIN
        , pi_col_prefix||'_FILENAME'              dlt_filename
        , pi_col_prefix||'_AUDIT'                 dlt_audit_col
        , pi_col_prefix||'_FILE_INFO'             dlt_file_info_col
+       , NULL, NULL, NULL, NULL
     FROM DUAL;
 --
 END map_table_to_dlc;
@@ -757,6 +761,247 @@ BEGIN
 END map_table_to_doc_location;
 --
 ------------------------------------------------------------------------------
+--
+FUNCTION get_location_type_lov_sql 
+RETURN VARCHAR2
+IS
+BEGIN
+  RETURN 'select hco_code location_type, hco_meaning description'||
+          ' from hig_codes '||
+          'where hco_domain = ''DOC_LOCATION_TYPES'''||
+         ' order by hco_seq';
+END get_location_type_lov_sql;
+--
+------------------------------------------------------------------------------
+--
+FUNCTION get_location_descr (pi_location_type IN doc_locations.dlc_location_type%TYPE)
+  RETURN VARCHAR2
+IS
+  retval nm3type.max_varchar2;
+BEGIN
+--
+  SELECT hco_meaning INTO retval
+    FROM hig_codes
+   WHERE hco_domain = 'DOC_LOCATION_TYPES'
+     AND hco_code = pi_location_type;
+  RETURN retval;
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN RETURN NULL;
+--
+END get_location_descr;
+--
+--------------------------------------------------------------------------------
+-- Return just the filename portion of the full path and filename
+--
+  FUNCTION strip_filename ( pi_full_path_and_file IN VARCHAR2 )
+  RETURN VARCHAR2
+  IS
+    retval nm3type.max_varchar2;
+  BEGIN
+    retval := SUBSTR(pi_full_path_and_file
+             ,INSTR(pi_full_path_and_file,g_sep,-1)+1);
+    retval := SUBSTR(retval
+             ,INSTR(retval,g_win_sep,-1)+1);
+    RETURN retval ;
+  END strip_filename;
+--
+--------------------------------------------------------------------------------
+--
+  PROCEDURE insert_temp_file_record ( pi_rec_df IN doc_file_transfer_temp%ROWTYPE )
+  IS
+    l_rec_table   doc_file_transfer_temp%ROWTYPE;
+  BEGIN
+  --
+    l_rec_table.dftt_doc_id          := pi_rec_df.dftt_doc_id;
+    l_rec_table.dftt_revision        := NVL(pi_rec_df.dftt_revision,1);
+    l_rec_table.dftt_start_date      := NVL(pi_rec_df.dftt_start_date,nm3user.get_effective_date);
+    l_rec_table.dftt_content         := pi_rec_df.dftt_content;
+    l_rec_table.dftt_full_path       := pi_rec_df.dftt_full_path;
+    l_rec_table.dftt_filename        := strip_filename(pi_rec_df.dftt_full_path);
+    l_rec_table.dftt_file_info       := NVL(pi_rec_df.dftt_file_info, LENGTH(pi_rec_df.dftt_content));
+  -- 
+    INSERT INTO doc_file_transfer_temp VALUES l_rec_table;
+  --
+  END insert_temp_file_record;
+--
+--------------------------------------------------------------------------------
+-- Insert a row in doc_files_all
+--
+  PROCEDURE insert_file_record ( pi_rec_df IN rec_file_record )
+  IS
+    l_rec_table       rec_file_record;
+    l_rec_dlt         doc_location_tables%ROWTYPE;
+    l_rec_temp_table  doc_file_transfer_temp%ROWTYPE;
+  BEGIN
+  --
+    l_rec_dlt := doc_locations_api.get_dlt(pi_doc_id => pi_rec_df.doc_id );
+  --
+    nm_debug.debug_on;
+    nm_debug.debug('Inserting '||pi_rec_df.filename||' in '||l_rec_dlt.dlt_table);
+  --
+    l_rec_table.doc_id          := pi_rec_df.doc_id;
+    l_rec_table.revision        := NVL(pi_rec_df.revision,1);
+    l_rec_table.start_date      := NVL(pi_rec_df.start_date,nm3user.get_effective_date);
+    l_rec_table.content         := pi_rec_df.content;
+    l_rec_table.full_path       := pi_rec_df.full_path;
+    l_rec_table.filename        := NVL(pi_rec_df.filename, strip_filename(pi_rec_df.full_path));
+    l_rec_table.file_info       := NVL(pi_rec_df.file_info, LENGTH(pi_rec_df.content));
+  -- 
+    IF l_rec_dlt.dlt_table IS NOT NULL
+    THEN
+      EXECUTE IMMEDIATE
+        'INSERT INTO '||l_rec_dlt.dlt_table
+      ||' ('
+      ||'   '||l_rec_dlt.dlt_doc_id_col
+      ||' , '||l_rec_dlt.dlt_revision_col
+      ||' , '||l_rec_dlt.dlt_start_date_col
+      ||' , '||l_rec_dlt.dlt_full_path_col
+      ||' , '||l_rec_dlt.dlt_filename
+      ||' , '||l_rec_dlt.dlt_content_col
+      ||' , '||l_rec_dlt.dlt_audit_col
+      ||' , '||l_rec_dlt.dlt_file_info_col
+      ||' )'
+      ||' VALUES '
+      ||' ('
+      ||'   :pi_doc_id '
+      ||' , :pi_revision '
+      ||' , :pi_start_date '
+      ||' , :pi_full_path '
+      ||' , :pi_filename '
+      ||' , :pi_content '
+      ||' , :pi_audit '
+      ||' , :pi_file_info )'
+      USING IN l_rec_table.doc_id
+          , IN l_rec_table.revision
+          , IN l_rec_table.start_date
+          , IN l_rec_table.full_path
+          , IN l_rec_table.filename
+          , IN l_rec_table.content
+          , IN l_rec_table.audit
+          , IN l_rec_table.file_info;
+  --
+    ELSIF doc_locations_api.get_dlc(pi_doc_id => pi_rec_df.doc_id).dlc_location_Type = 'ORACLE_DIRECTORY'
+    THEN
+      l_rec_temp_table.dftt_doc_id     := l_rec_table.doc_id;
+      l_rec_temp_table.dftt_revision   := l_rec_table.revision;
+      l_rec_temp_table.dftt_start_date := l_rec_table.start_date;
+      l_rec_temp_table.dftt_content    := l_rec_table.content;
+      l_rec_temp_table.dftt_full_path  := l_rec_table.full_path;
+      l_rec_temp_table.dftt_filename   := l_rec_table.filename;
+      l_rec_temp_table.dftt_file_info  := l_rec_table.file_info;
+    -- 
+      insert_temp_file_record ( pi_rec_df => l_rec_temp_table );
+    -- 
+    END IF;
+  --
+  END insert_file_record;
+--
+------------------------------------------------------------------------------
+--
+--
+  FUNCTION get_file_record
+                  ( pi_doc_id   IN docs.doc_id%TYPE
+                  , pi_revision IN NUMBER )
+  RETURN rec_file_record
+  IS
+    l_rec_table rec_file_record;
+    l_rec_dlt   doc_location_tables%ROWTYPE;
+--    doc_id        NUMBER 
+--  , revision      NUMBER
+--  , start_date    DATE
+--  , end_date      DATE
+--  , full_path     VARCHAR2(4000)
+--  , filename      VARCHAR2(4000)
+--  , content       BLOB
+--  , audit         VARCHAR2(4000)
+--  , file_info     VARCHAR2(2000)
+  BEGIN
+  --
+    l_rec_dlt := doc_locations_api.get_dlt(pi_doc_id => pi_doc_id );
+  --
+    IF l_rec_dlt.dlt_table IS NOT NULL
+    THEN
+      EXECUTE IMMEDIATE 
+        ' SELECT '||l_rec_dlt.dlt_doc_id_col||' ,'||
+                    l_rec_dlt.dlt_revision_col||' ,'||
+                    l_rec_dlt.dlt_start_date_col||' ,'||
+                    l_rec_dlt.dlt_end_date_col||' ,'||
+                    l_rec_dlt.dlt_full_path_col||' ,'||
+                    l_rec_dlt.dlt_filename||' ,'||
+                    l_rec_dlt.dlt_content_col||' ,'||
+                    l_rec_dlt.dlt_audit_col||' ,'||
+                    l_rec_dlt.dlt_file_info_col||
+        '   FROM '||l_rec_dlt.dlt_table||
+        '  WHERE '||l_rec_dlt.dlt_doc_id_col||' = :pi_df_doc_id '||
+        '    AND '||l_rec_dlt.dlt_revision_col||' = :pi_df_revision'
+      INTO l_rec_table
+      USING IN pi_doc_id, IN pi_revision;
+    END IF;
+  --
+    RETURN l_rec_table;
+  --
+  EXCEPTION
+    WHEN NO_DATA_FOUND
+    THEN RETURN l_rec_table;
+  --
+  END get_file_record;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_archive ( pi_dlc_id IN doc_locations.dlc_id%TYPE ) 
+    RETURN doc_location_archives%ROWTYPE
+  IS
+    retval doc_location_archives%ROWTYPE;
+  BEGIN
+  --
+    SELECT * INTO retval
+      FROM doc_location_archives
+     WHERE dla_dlc_id = pi_dlc_id;
+    RETURN retval;
+  EXCEPTION
+    WHEN NO_DATA_FOUND
+    THEN RETURN retval;
+  --
+  END get_archive;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_archive ( pi_doc_id IN docs.doc_id%TYPE ) 
+    RETURN doc_location_archives%ROWTYPE
+  IS
+    retval doc_location_archives%ROWTYPE;
+  BEGIN
+    SELECT * INTO retval
+      FROM doc_location_archives
+     WHERE dla_dlc_id = ( SELECT doc_dlc_id FROM docs 
+                           WHERE doc_id = pi_doc_id );
+    RETURN retval;
+  EXCEPTION
+    WHEN NO_DATA_FOUND
+    THEN RETURN retval;
+  END get_archive;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_table_prefix RETURN VARCHAR2
+  IS
+    retval nm3type.max_varchar2;
+  BEGIN
+    RETURN retval;
+  END get_table_prefix;
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION get_default_tablespace RETURN user_tablespaces.tablespace_name%TYPE
+  IS
+    retval user_tablespaces.tablespace_name%TYPE;
+  BEGIN
+    SELECT default_tablespace INTO retval FROM user_users
+     WHERE username = USER;
+    RETURN retval;
+  END get_default_tablespace;
+--
+-----------------------------------------------------------------------------
 --
 END doc_locations_api;
 /
