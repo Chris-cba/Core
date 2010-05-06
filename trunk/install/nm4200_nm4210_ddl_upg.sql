@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.3   Apr 27 2010 09:59:38   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.4   May 06 2010 18:01:28   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Apr 27 2010 09:59:38  $
---       Date fetched Out : $Modtime:   Apr 27 2010 09:58:04  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   May 06 2010 18:01:28  $
+--       Date fetched Out : $Modtime:   May 06 2010 17:59:38  $
+--       Version          : $Revision:   3.4  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -408,7 +408,7 @@ BEGIN
     END;
   END LOOP;
 --
--- Gather constraint index statements
+-- Gather index drop statements
 --
   SELECT 'drop index '||index_name
     BULK COLLECT INTO l_drop_index 
@@ -723,6 +723,34 @@ CREATE SEQUENCE HFTL_ID_SEQ
 
 ------------------------------------------------------------------
 SET TERM ON
+PROMPT Increase of narch_source_descr field
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED PROBLEM MANAGER LOG#
+-- 724425  Newfoundland DOT
+-- 
+-- ASSOCIATED DEVELOPMENT TASK
+-- 109516
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
+-- Column size changed to be inline with nm_elements_all.ne_descr. This will prevent any error with large values.
+-- 
+------------------------------------------------------------------
+ALTER TABLE nm_assets_on_route_store_head MODIFY
+(
+narsh_source_descr VARCHAR2(240)
+)
+/
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
 PROMPT Document Manager - Tables
 SET TERM OFF
 
@@ -732,15 +760,23 @@ SET TERM OFF
 -- Document Manager - Tables - Changes and modifications
 -- 
 ------------------------------------------------------------------
+PROMPT Add DLC_LOCATION_NAME to DOC_LOCATIONS
+ALTER TABLE doc_locations
+ADD dlc_location_name VARCHAR2(2000)
+/
+
 PROMPT Add DLC_LOCATION_TYPE to DOC_LOCATIONS
 ALTER TABLE doc_locations
 ADD dlc_location_type VARCHAR2(30)
 /
 
-PROMPT Add DLC_LOCATION_NAME to DOC_LOCATIONS
-ALTER TABLE doc_locations
-ADD dlc_location_name VARCHAR2(2000)
-/
+PROMPT Add DLC_LOCATION_TYPE Values to DOC_LOCATIONS
+UPDATE doc_locations
+SET dlc_location_type = 'APP_SERVER';
+
+PROMPT Set DOC_LOCATION_TYPE to Mandatory
+ALTER TABLE DOC_LOCATIONS
+MODIFY  dlc_location_type NOT NULL;
 
 PROMPT Creating Table 'DOC_LOCATION_TABLES'
 CREATE TABLE DOC_LOCATION_TABLES
@@ -907,6 +943,38 @@ COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_CREATED_BY IS 'Audit details.'
 COMMENT ON COLUMN DOC_FILE_TRANSFER_TEMP.DFTT_MODIFIED_BY IS 'Audit details.'
 /
 
+PROMPT Creating Table 'DOC_LOCATION_ARCHIVES'
+CREATE TABLE DOC_LOCATION_ARCHIVES
+ (DLA_ID NUMBER(38) NOT NULL
+ ,DLA_DLC_ID NUMBER(38) NOT NULL
+ ,DLA_ARCHIVE_TYPE VARCHAR2(30) NOT NULL
+ ,DLA_ARCHIVE_NAME VARCHAR2(2000) NOT NULL
+ ,DLA_HFT_ID NUMBER(38)
+ ,DLA_DLT_ID NUMBER(38)
+ )
+/
+
+COMMENT ON TABLE DOC_LOCATION_ARCHIVES IS 'Document Location Archives, details of archive areas used for Document Locations'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_ARCHIVES.DLA_ID IS 'Primary Key column, populated from sequence DLA_ID_SEQ'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_ARCHIVES.DLA_DLC_ID IS 'Foreign Key column, pointer to DOC_LOCATIONS primary key'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_ARCHIVES.DLA_ARCHIVE_TYPE IS 'Archive Type, indicates the type of archive being used.'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_ARCHIVES.DLA_ARCHIVE_NAME IS 'Archive Name, a description of the archive being used'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_ARCHIVES.DLA_HFT_ID IS 'Foreign Key column, pointer to HIG_FTP_TYPES Primary Key'
+/
+
+COMMENT ON COLUMN DOC_LOCATION_ARCHIVES.DLA_DLT_ID IS 'Foreign Key column, pointer to DOC_LOCATIONS_TABLES Primary Key'
+/
+
 
 ------------------------------------------------------------------
 
@@ -956,6 +1024,19 @@ ALTER TABLE DOC_FILE_TRANSFER_TEMP
   ,DFTT_REVISION))
 /
 
+PROMPT Creating Primary Key on 'DOC_LOCATION_ARCHIVES'
+ALTER TABLE DOC_LOCATION_ARCHIVES
+ ADD (CONSTRAINT DLA_PK PRIMARY KEY
+  (DLA_ID))
+/
+
+PROMPT Creating Unique Key on 'DOC_LOCATION_ARCHIVES'
+ALTER TABLE DOC_LOCATION_ARCHIVES
+ ADD (CONSTRAINT DLA_UK UNIQUE
+  (DLA_DLC_ID
+  ,DLA_ARCHIVE_TYPE))
+/
+
 
 ------------------------------------------------------------------
 
@@ -973,6 +1054,14 @@ SET TERM OFF
 ------------------------------------------------------------------
 PROMPT Creating Sequence 'DLT_ID_SEQ'
 CREATE SEQUENCE DLT_ID_SEQ
+ START WITH 1
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+/
+
+PROMPT Creating Sequence 'DLA_ID_SEQ'
+CREATE SEQUENCE DLA_ID_SEQ
  START WITH 1
  NOMAXVALUE
  NOMINVALUE
@@ -2065,16 +2154,16 @@ CREATE TABLE doc_bundle_files(
 COMMENT ON TABLE DOC_BUNDLE_FILES IS 'List of the files in a document bundle'
 /
 
-COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_BUNDLE_ID IS 'Foreign Key to DOC_BUNDLES'
+COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_FILE_ID IS 'Primary Key'
 /
 
-COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_FILE_ID IS 'Primary Key'
+COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_BUNDLE_ID IS 'Foreign Key to DOC_BUNDLES'
 /
 
 COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_FILENAME IS 'Filename'
 /
 
-COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_DRIVING_FILE_FLAG IS 'Flag  to indicate whether or not this file is a driving file'
+COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_DRIVING_FILE_FLAG IS 'Flag to indicate whether or not this file is a driving file'
 /
 
 COMMENT ON COLUMN DOC_BUNDLE_FILES.DBF_FILE_INCLUDED_WITH_BUNDLE IS 'Flag to indicate where or not this file was part of the bundle (Y) or was just referenced in a driving file (N)'
@@ -2164,7 +2253,7 @@ CREATE GLOBAL TEMPORARY TABLE doc_bundle_discard_blobs(id       number(38)
 NOCACHE
 /
 
-COMMENT ON TABLE DOC_BUNDLE_DISCARD_BLOBS IS 'Temporary table used to store blobs of discarded files to write to a location on the client machine.  Drives the ''Discards'' functionality in DOC0310-Manage Document Bundles'
+COMMENT ON TABLE DOC_BUNDLE_DISCARD_BLOBS IS 'Temporary table used to store blobs of discarded files to write to a location on the client machine.  Drives the Discards functionality in DOC0310-Manage Document Bundles'
 /
 COMMENT ON COLUMN DOC_BUNDLE_DISCARD_BLOBS.ID IS 'Unique identifier for the record'
 /
@@ -2960,14 +3049,6 @@ ALTER TABLE HIG_NAVIGATOR
   (HNV_CHILD_ALIAS))
 /
 
-PROMPT Creating Foreign Key on 'HIG_NAVIGATOR'
-ALTER TABLE HIG_NAVIGATOR ADD (CONSTRAINT
- HNV_HNV_FK FOREIGN KEY
-  (HNV_PARENT_ALIAS) REFERENCES HIG_NAVIGATOR
-  (HNV_CHILD_ALIAS))
-/
-
-
 PROMPT Creating Check Constraint on 'HIG_NAVIGATOR'
 ALTER TABLE HIG_NAVIGATOR
  ADD (CONSTRAINT HNV_PRIMARY_HIERARCHY_CKH CHECK (HNV_PRIMARY_HIERARCHY IN ('Y','N')))
@@ -2977,7 +3058,8 @@ PROMPT Creating Unique Key on 'HIG_NAVIGATOR_MODULES'
 ALTER TABLE HIG_NAVIGATOR_MODULES
  ADD (CONSTRAINT HNM_UK UNIQUE
   (HNM_MODULE_NAME
-  ,HNM_MODULE_PARAM))
+  ,HNM_MODULE_PARAM
+,hnm_hierarchy_label))
 /
 
 PROMPT Creating Check Constraint on 'HIG_NAVIGATOR_MODULES'
@@ -4325,6 +4407,30 @@ CREATE INDEX HAL_HALT_ID_PK_ID_IND ON HIG_ALERTS
 
 ------------------------------------------------------------------
 SET TERM ON
+PROMPT Increase length of ITA_QUERY
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 109336
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (LINESH SORATHIA)
+-- Increase length of ITA_QUERY
+-- 
+------------------------------------------------------------------
+begin
+EXECUTE IMMEDIATE ('ALTER TABLE nm_inv_type_attribs_all MODIFY (ita_query Varchar2(4000) )');
+end ;
+/
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
 PROMPT hig_status_codes extra feature flag.
 SET TERM OFF
 
@@ -4346,9 +4452,7 @@ BEGIN
   */
   EXECUTE IMMEDIATE 'ALTER TABLE hig_status_domains ADD(hsd_feature10 VARCHAR2(254))';
   --
-  UPDATE hig_status_domains
-     SET hsd_feature10 = 'Not Used'
-       ;
+  EXECUTE IMMEDIATE 'UPDATE hig_status_domains SET hsd_feature10 = ''Not Used''';
   --
   COMMIT;
   --
@@ -4358,9 +4462,7 @@ BEGIN
   */
   EXECUTE IMMEDIATE 'ALTER TABLE hig_status_codes ADD(hsc_allow_feature10 VARCHAR2(1))';
   --
-  UPDATE hig_status_codes
-     SET hsc_allow_feature10 = 'N'
-       ;
+  EXECUTE IMMEDIATE 'UPDATE hig_status_codes SET hsc_allow_feature10 = ''N''';
   --
   COMMIT;
   --

@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.3   Apr 27 2010 10:25:50   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.4   May 06 2010 18:01:28   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Apr 27 2010 10:25:50  $
---       Date fetched Out : $Modtime:   Apr 27 2010 10:24:46  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   May 06 2010 18:01:28  $
+--       Date fetched Out : $Modtime:   May 06 2010 17:59:40  $
+--       Version          : $Revision:   3.4  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -558,13 +558,13 @@ SELECT 'HIG2600'
 
 ------------------------------------------------------------------
 SET TERM ON
-PROMPT hig2600 standard favourites
+PROMPT HIG2600 standard favourites
 SET TERM OFF
 
 ------------------------------------------------------------------
 -- 
 -- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
--- **** COMMENTS TO BE ADDED BY CHRIS STRETTLE ****
+-- HIG2600 standard favourites
 -- 
 ------------------------------------------------------------------
 INSERT INTO hig_standard_favourites(hstf_parent
@@ -583,6 +583,190 @@ INSERT INTO hig_standard_favourites(hstf_parent
  FROM hig_standard_favourites
  WHERE hstf_child = 'HIG2600')
 /
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Gis0020 Tree metadata for documents tab
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 108359
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
+-- This is for the documents tab in Gis0020.
+-- 
+------------------------------------------------------------------
+INSERT INTO NM_LAYER_TREE
+ (NLTR_PARENT
+ ,NLTR_CHILD
+ ,NLTR_DESCR
+ ,NLTR_TYPE 
+ ,NLTR_ORDER)
+(SELECT 'ROOT'
+      , 'DOC'
+      , 'Documents Manager'
+      , 'F'
+      , '35' 
+   FROM DUAL
+   WHERE NOT EXISTS (SELECT 'X'
+                       FROM NM_LAYER_TREE
+                      WHERE NLTR_PARENT = 'ROOT'
+                        AND NLTR_CHILD = 'DOC'));
+
+INSERT INTO NM_LAYER_TREE
+ (NLTR_PARENT
+ ,NLTR_CHILD
+ ,NLTR_DESCR
+ ,NLTR_TYPE 
+ ,NLTR_ORDER)
+(SELECT 'DOC'
+      , 'DC1'
+      , 'Document Theme'
+      , 'M'
+      , '10' 
+   FROM DUAL
+   WHERE NOT EXISTS (SELECT 'X'
+                       FROM NM_LAYER_TREE
+                      WHERE NLTR_PARENT = 'DOC'
+                        AND NLTR_CHILD = 'DC1'));
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Document Manager - Update module names
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Document Manager - Update module names
+-- 
+------------------------------------------------------------------
+
+UPDATE hig_modules
+   SET hmo_title = 'Document Locations and Media Types'
+ WHERE hmo_module = 'DOC0118';
+ 
+UPDATE hig_standard_favourites
+   SET hstf_descr = 'Document Locations and Media Types'
+ WHERE hstf_child = 'DOC0118';
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Document Manager - Domains, Codes and Options
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
+-- Document Manager - Domains, Codes and Options
+-- 
+------------------------------------------------------------------
+PROMPT Create System Option WORKFOLDER
+INSERT INTO hig_option_list
+SELECT 'WORKFOLDER','DOC','Working Folder'
+     , 'Default working folder'
+     , NULL, 'VARCHAR2','Y','Y'
+  FROM DUAL
+ WHERE NOT EXISTS
+   (SELECT 1 FROM hig_option_list
+     WHERE hol_id = 'WORKFOLDER');
+
+PROMPT Create HIGOWNER User Option Value for WORKFOLDER
+INSERT INTO hig_user_options
+  SELECT hus_user_id, 'WORKFOLDER', 'C:\doc_files'
+    FROM hig_users
+   WHERE hus_is_hig_owner_flag = 'Y'
+     AND NOT EXISTS
+     (SELECT 1 FROM hig_user_options
+       WHERE huo_hus_user_id = hus_user_id
+         AND huo_id = 'WORKFOLDER');
+
+PROMPT Create DOC_LOCATION_TYPES Domain
+INSERT INTO hig_domains
+SELECT 'DOC_LOCATION_TYPES', 'DOC', 'Document Location Types', 50
+  FROM dual 
+ WHERE NOT EXISTS
+   (SELECT 1 FROM hig_domains
+     WHERE hdo_domain = 'DOC_LOCATION_TYPES') ;
+
+PROMPT Clearout DOC_LOCATION_TYPES Codes
+DELETE HIG_CODES
+ WHERE hco_domain = 'DOC_LOCATION_TYPES';
+
+PROMPT Create DOC_LOCATION_TYPES Codes
+INSERT INTO HIG_CODES ( HCO_DOMAIN
+                      , HCO_CODE
+                      , HCO_MEANING
+                      , HCO_SYSTEM
+                      , HCO_SEQ
+                      , HCO_START_DATE
+                      , HCO_END_DATE )
+     VALUES ( 'DOC_LOCATION_TYPES'
+            , 'APP_SERVER'
+            , 'Application Server'
+            , 'Y'
+            , 10
+            , NULL
+            , NULL );
+
+INSERT INTO HIG_CODES ( HCO_DOMAIN
+                      , HCO_CODE
+                      , HCO_MEANING
+                      , HCO_SYSTEM
+                      , HCO_SEQ
+                      , HCO_START_DATE
+                      , HCO_END_DATE )
+     VALUES ( 'DOC_LOCATION_TYPES'
+            , 'ORACLE_DIRECTORY'
+            , 'Oracle Directory'
+            , 'Y'
+            , 20
+            , NULL
+            , NULL );
+
+INSERT INTO HIG_CODES ( HCO_DOMAIN
+                      , HCO_CODE
+                      , HCO_MEANING
+                      , HCO_SYSTEM
+                      , HCO_SEQ
+                      , HCO_START_DATE
+                      , HCO_END_DATE )
+     VALUES ( 'DOC_LOCATION_TYPES'
+            , 'TABLE'
+            , 'Database Table'
+            , 'Y'
+            , 30
+            , NULL
+            , NULL );
+
+INSERT INTO HIG_CODES ( HCO_DOMAIN
+                      , HCO_CODE
+                      , HCO_MEANING
+                      , HCO_SYSTEM
+                      , HCO_SEQ
+                      , HCO_START_DATE
+                      , HCO_END_DATE )
+     VALUES ( 'DOC_LOCATION_TYPES'
+            , 'FTP'
+            , 'FTP Location'
+            , 'Y'
+            , 40
+            , NULL
+            , NULL );
+
 ------------------------------------------------------------------
 
 
@@ -1514,6 +1698,25 @@ SELECT 'HIG'
      WHERE ner_appl = 'HIG'
        AND ner_id = 537);
 
+delete from hig_navigator_modules where HNM_MODULE_NAME In  ('NM0510','NM0590') ;
+
+Insert into HIG_NAVIGATOR_MODULES
+   (HNM_MODULE_NAME, HNM_MODULE_PARAM, HNM_PRIMARY_MODULE, HNM_SEQUENCE, HNM_TABLE_NAME, 
+    HNM_FIELD_NAME, HNM_HIERARCHY_LABEL, HNM_DATE_CREATED, HNM_CREATED_BY, HNM_DATE_MODIFIED, 
+    HNM_MODIFIED_BY)
+ Values
+   ('NM0510', 'query_inv_item', 'Y', 1, NULL, 
+    NULL, 'Asset', TO_DATE('02/22/2010 16:53:43', 'MM/DD/YYYY HH24:MI:SS'), 'DORSET', TO_DATE('02/22/2010 16:53:43', 'MM/DD/YYYY HH24:MI:SS'), 
+    'DORSET');
+    
+Insert into HIG_NAVIGATOR_MODULES
+   (HNM_MODULE_NAME, HNM_MODULE_PARAM, HNM_PRIMARY_MODULE, HNM_SEQUENCE, HNM_TABLE_NAME, 
+    HNM_FIELD_NAME, HNM_HIERARCHY_LABEL, HNM_DATE_CREATED, HNM_CREATED_BY, HNM_DATE_MODIFIED, 
+    HNM_MODIFIED_BY)
+ Values
+   ('NM0590', 'query_inv_item', 'N', 2, NULL, 
+    NULL, 'Asset', TO_DATE('03/30/2010 17:43:05', 'MM/DD/YYYY HH24:MI:SS'), 'DORSET', TO_DATE('03/30/2010 17:43:05', 'MM/DD/YYYY HH24:MI:SS'), 
+    'DORSET');
 ------------------------------------------------------------------
 
 
