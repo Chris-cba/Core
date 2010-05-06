@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_file_transfer_api.pkb-arc   3.0   Apr 23 2010 14:19:08   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_file_transfer_api.pkb-arc   3.1   May 06 2010 17:30:22   aedwards  $
 --       Module Name      : $Workfile:   hig_file_transfer_api.pkb  $
---       Date into PVCS   : $Date:   Apr 23 2010 14:19:08  $
---       Date fetched Out : $Modtime:   Apr 23 2010 14:18:46  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   May 06 2010 17:30:22  $
+--       Date fetched Out : $Modtime:   May 06 2010 17:29:54  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid    CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+  g_body_sccsid    CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
   g_package_name   CONSTANT varchar2(30) := 'hig_file_transfer_api';
   g_pending        CONSTANT varchar2(30) := 'PENDING';
   g_internal       CONSTANT varchar2(30) := 'INTERNAL'; 
@@ -93,6 +93,8 @@ BEGIN
       l_tab_queue(i).hftq_comments             := pi_tab_files(i).comments;
       l_tab_queue(i).hftq_hp_process_id        := pi_tab_files(i).process_id;
     --
+      validate_file_queue_record (l_tab_queue(i));
+    --
     END LOOP;
   --
   END IF;
@@ -128,6 +130,255 @@ BEGIN
   INSERT INTO hig_file_transfer_log VALUES l_rec_hftl;
 --
 END log_transfer;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE validate_file_queue_record
+            ( pi_rec_hftq  IN  hig_file_transfer_queue%ROWTYPE )
+IS
+--
+  PROCEDURE raise_error ( pi_error IN VARCHAR2 ) IS
+  BEGIN
+    RAISE_APPLICATION_ERROR (-20205,pi_error);
+  END raise_error;
+--
+  FUNCTION check_directory ( pi_directory_name IN VARCHAR2 ) RETURN BOOLEAN IS
+    l_count NUMBER;
+  BEGIN
+    SELECT COUNT(*) INTO l_count
+      FROM all_directories
+     WHERE directory_name = pi_directory_name;
+    RETURN (l_count>0);
+  END check_directory;
+--
+BEGIN
+--
+  IF pi_rec_hftq.hftq_source_type NOT IN ('ORACLE_DIRECTORY','TABLE','URL')
+  THEN
+    raise_error('Invalid Source Type : '||pi_rec_hftq.hftq_source_type);
+  ELSIF pi_rec_hftq.hftq_destination_type NOT IN ('ORACLE_DIRECTORY','TABLE','URL')
+  THEN
+    raise_error('Invalid Destination Type : '||pi_rec_hftq.hftq_destination_type);
+  END IF;
+--
+  CASE
+  /*
+  ******************************************************************************
+  **            Validate the Oracle DIR to Oracle DIR transfer 
+  ******************************************************************************
+  */ 
+    WHEN pi_rec_hftq.hftq_source_type      = 'ORACLE_DIRECTORY'
+     AND pi_rec_hftq.hftq_destination_type = 'ORACLE_DIRECTORY'
+    THEN
+   --
+      IF pi_rec_hftq.hftq_content IS NULL
+      THEN
+      --
+      ------------------------------------------------
+      -- Check to make sure we have some source data, 
+      -- either via directory or blob
+      ------------------------------------------------
+      -- 
+        IF pi_rec_hftq.hftq_source IS NULL
+        THEN
+          raise_error ('Please specify a source Oracle Directory or binary content');
+        ELSE
+        --
+        ------------------------------------------------
+        -- Check source oracle directory actually exists
+        ------------------------------------------------
+        --
+          IF NOT check_directory(pi_rec_hftq.hftq_source)
+          THEN
+            raise_error ('Please specify a valid source Oracle Directory - '||pi_rec_hftq.hftq_source||' does not exist');
+          END IF;
+        --
+        ------------------------------------------------
+        -- Check filename is specified
+        ------------------------------------------------
+        --
+          IF pi_rec_hftq.hftq_source_filename IS NULL
+          THEN
+            raise_error ('Please specify a source filename');
+          END IF;
+        END IF;
+      --
+      END IF;
+    --
+    ------------------------------------------------
+    -- Check the destination Oracle directory 
+    -- is specified and is valid
+    ------------------------------------------------
+    -- 
+      IF pi_rec_hftq.hftq_destination IS NULL
+      THEN
+        raise_error ('Please specify a destination Oracle Directory');
+      ELSIF NOT check_directory(pi_rec_hftq.hftq_destination)
+      THEN
+        raise_error ('Please specify a valid destination Oracle Directory - '||pi_rec_hftq.hftq_destination||' does not exist');
+      END IF;
+  /*
+  ******************************************************************************
+  **              Validate the Table to Oracle DIR transfer 
+  ******************************************************************************
+  */
+    WHEN pi_rec_hftq.hftq_source_type      = 'TABLE'
+     AND pi_rec_hftq.hftq_destination_type = 'ORACLE_DIRECTORY'
+    THEN
+    --
+    ------------------------------------------------
+    -- Check source info is specified correctly
+    ------------------------------------------------
+    --
+      IF pi_rec_hftq.hftq_content IS NULL
+      THEN
+      --
+        IF pi_rec_hftq.hftq_source IS NULL
+        THEN
+          raise_error ('Please specify a source table');
+        ELSIF NOT nm3ddl.does_object_exist(pi_rec_hftq.hftq_source)
+        THEN
+          raise_error ('Please specify a valid source table '||pi_rec_hftq.hftq_source||' does not exist');
+        ELSIF pi_rec_hftq.hftq_source_column IS NULL
+        THEN
+          raise_error ('Please specify a source column on '||pi_rec_hftq.hftq_source);
+        ELSIF pi_rec_hftq.hftq_condition IS NULL
+        THEN
+          raise_error ('Please specify a condition');
+        END IF;
+      --
+      END IF;
+    --
+    ------------------------------------------------
+    -- Check the destination Oracle directory 
+    -- is specified and is valid
+    ------------------------------------------------
+    -- 
+      IF pi_rec_hftq.hftq_destination IS NULL
+      THEN
+        raise_error ('Please specify a destination Oracle Directory');
+      ELSIF NOT check_directory(pi_rec_hftq.hftq_destination)
+      THEN
+        raise_error ('Please specify a valid destination Oracle Directory - '||pi_rec_hftq.hftq_destination||' does not exist');
+      ELSIF ( pi_rec_hftq.hftq_destination_filename IS NULL AND pi_rec_hftq.hftq_source_filename IS NULL )
+        THEN 
+        raise_error ('Please specify a destination filename');
+      END IF;
+    --
+  /*
+  ******************************************************************************
+  **              Validate the Oracle Directory to Table 
+  ******************************************************************************
+  */
+    WHEN pi_rec_hftq.hftq_source_type      = 'ORACLE_DIRECTORY'
+     AND pi_rec_hftq.hftq_destination_type = 'TABLE'
+    THEN
+    --
+    ------------------------------------------------
+    -- Check source info is specified correctly
+    ------------------------------------------------
+    --
+      IF pi_rec_hftq.hftq_content IS NULL
+      THEN
+      --
+      ------------------------------------------------
+      -- Check to make sure we have some source data, 
+      -- either via directory or blob
+      ------------------------------------------------
+      -- 
+        IF pi_rec_hftq.hftq_source IS NULL
+        THEN
+          raise_error ('Please specify a source Oracle Directory or binary content');
+        ELSE
+        --
+        ------------------------------------------------
+        -- Check source oracle directory actually exists
+        ------------------------------------------------
+        --
+          IF NOT check_directory(pi_rec_hftq.hftq_source)
+          THEN
+            raise_error ('Please specify a valid source Oracle Directory - '||pi_rec_hftq.hftq_source||' does not exist');
+          END IF;
+        --
+        ------------------------------------------------
+        -- Check filename is specified
+        ------------------------------------------------
+        --
+          IF pi_rec_hftq.hftq_source_filename IS NULL
+          THEN
+            raise_error ('Please specify a source filename');
+          END IF;
+        END IF;
+      --
+      END IF;
+    --
+    ------------------------------------------------
+    -- Check the destination table 
+    -- is specified and is valid
+    ------------------------------------------------
+    -- 
+      IF pi_rec_hftq.hftq_destination IS NULL
+      THEN
+        raise_error ('Please specify a destination table');
+      ELSIF NOT nm3ddl.does_object_exist(pi_rec_hftq.hftq_destination)
+      THEN
+        raise_error ('Please specify a valid destination table '||pi_rec_hftq.hftq_destination||' does not exist');
+      ELSIF pi_rec_hftq.hftq_destination_column IS NULL
+      THEN
+        raise_error ('Please specify a destination column on '||pi_rec_hftq.hftq_destination);
+      ELSIF pi_rec_hftq.hftq_condition IS NULL
+      THEN
+        raise_error ('Please specify a condition');
+      ELSIF ( pi_rec_hftq.hftq_destination_filename IS NULL AND pi_rec_hftq.hftq_source_filename IS NULL )
+        THEN 
+        raise_error ('Please specify a destination filename');
+      END IF;
+    --
+  /*
+  ******************************************************************************
+  **                  Validate the Table to Table 
+  ******************************************************************************
+  */
+    WHEN pi_rec_hftq.hftq_source_type      = 'TABLE'
+     AND pi_rec_hftq.hftq_destination_type = 'TABLE'
+    THEN
+    --
+    ------------------------------------------------
+    -- Check source blob is specified correctly
+    ------------------------------------------------
+    --
+      IF pi_rec_hftq.hftq_content IS NULL
+      THEN
+        raise_error ('Please specify source binary content');
+      --
+      END IF;
+    --
+    ------------------------------------------------
+    -- Check the destination table 
+    -- is specified and is valid
+    ------------------------------------------------
+    -- 
+      IF pi_rec_hftq.hftq_destination IS NULL
+      THEN
+        raise_error ('Please specify a destination table');
+      ELSIF NOT nm3ddl.does_object_exist(pi_rec_hftq.hftq_destination)
+      THEN
+        raise_error ('Please specify a valid destination table '||pi_rec_hftq.hftq_destination||' does not exist');
+      ELSIF pi_rec_hftq.hftq_destination_column IS NULL
+      THEN
+        raise_error ('Please specify a destination column on '||pi_rec_hftq.hftq_destination);
+      ELSIF pi_rec_hftq.hftq_condition IS NULL
+      THEN
+        raise_error ('Please specify a condition');
+      ELSIF ( pi_rec_hftq.hftq_destination_filename IS NULL AND pi_rec_hftq.hftq_source_filename IS NULL )
+        THEN 
+        raise_error ('Please specify a destination filename');
+      END IF;
+    --
+    END CASE;
+  --
+--
+END validate_file_queue_record;
 --
 -----------------------------------------------------------------------------
 --
@@ -221,42 +472,85 @@ BEGIN
                  -------------------------------------
                  -- BLOB needs reading in from source
                  -------------------------------------
+                 ELSE ' USING IN nm3file.file_to_blob(pi_source_dir  => nm3file.get_oracle_directory('||g_package_name||'.g_tab_queue_files('||i||').hftq_source'||') '||g_nl
+                                                || ' ,pi_source_file => '||g_package_name||'.g_tab_queue_files('||i||').hftq_source_filename'||') ;'||g_nl
+                 END;
+        --
+--
+          WHEN g_tab_queue_files(i).hftq_source_type      = 'TABLE'
+           AND g_tab_queue_files(i).hftq_destination_type = 'ORACLE_DIRECTORY'
+        --
+        -------------------------------------------------s
+        -- Transfer from Table >> Oracle Directory
+        -------------------------------------------------
+        --
+          THEN
+        --
+           exec_code := exec_code
+           ||       '''DECLARE  '||g_nl
+           ||            ' l_blob_content BLOB;'||g_nl
+           ||       '  BEGIN  '||g_nl;
+          --
+          -- Read the blob from the source table
+          --
+            CASE 
+              WHEN g_tab_queue_files(i).hftq_content IS NULL
+              THEN
+              exec_code := exec_code
+                    ||' SELECT '||g_tab_queue_files(i).hftq_source_column ||g_nl
+                      ||' INTO l_blob_content '||g_nl
+                      ||' FROM '||g_tab_queue_files(i).hftq_source ||g_nl
+                     ||' WHERE '|| REPLACE(
+                                      REPLACE (g_tab_queue_files(i).hftq_condition, 'WHERE',''),';','')||';'||g_nl
+                  ||' -- '||g_nl
+                    || ' nm3file.blob_to_file(l_blob_content, '
+                                           || nm3flx.string(nm3flx.string(g_tab_queue_files(i).hftq_destination))||','
+                                           || nm3flx.string(nm3flx.string(g_tab_queue_files(i).hftq_destination_filename))||');'
+                 ||' END; '';'||g_nl;
+              ELSE
+          --
+          -- Read the blob from the file queue 
+          --
+              exec_code := exec_code
+                    || ' nm3file.blob_to_file(:blob_content, '
+                                           || nm3flx.string(nm3flx.string(g_tab_queue_files(i).hftq_destination))||','
+                                           || nm3flx.string(nm3flx.string(g_tab_queue_files(i).hftq_destination_filename))||');'
+                 ||' END; '''||g_nl
+            ||' USING IN OUT '||g_package_name||'.g_tab_queue_files('||i||').hftq_content;'||g_nl;
+          --
+            END CASE;
+        --
+          WHEN g_tab_queue_files(i).hftq_source_type      = 'TABLE'
+           AND g_tab_queue_files(i).hftq_destination_type = 'TABLE'
+        --
+        -------------------------------------------------
+        -- Transfer Table >> Table
+        -------------------------------------------------
+        --
+        -- Use nm3file to copy the files between oracle directories
+        --
+          THEN
+               exec_code := exec_code
+           ||       '''BEGIN  '||g_nl;
+               exec_code := exec_code
+                        || ' UPDATE '|| g_tab_queue_files(i).hftq_destination ||g_nl
+                            || 'SET '|| g_tab_queue_files(i).hftq_destination_column ||' = :pi_blob '||g_nl
+                          ||' WHERE '|| REPLACE(
+                                             REPLACE (g_tab_queue_files(i).hftq_condition, 'WHERE',''),';','')||';'||g_nl
+                    ||' END; '''||g_nl||
+              --
+                 CASE WHEN g_tab_queue_files(i).hftq_content IS NOT NULL
+                 -------------------------------------------------------
+                 -- BLOB already read in and passed into the file queue
+                 -------------------------------------------------------
+                 THEN ' USING IN '||g_package_name||'.g_tab_queue_files('||i||').hftq_content;'||g_nl
+                 -------------------------------------
+                 -- BLOB needs reading in from source
+                 -------------------------------------
                  ELSE ' USING IN nm3file.file_to_blob(pi_source_dir  => nm3file.get_oracle_directory(nm3flx.string('||g_package_name||'.g_tab_queue_files('||i||').hftq_source'||')) '||g_nl
                                                 || ' ,pi_source_file => nm3flx.string('||g_package_name||'.g_tab_queue_files('||i||').hftq_source_filename'||')) ;'||g_nl
                  END;
         --
---
---          WHEN g_tab_queue_files(i).hftq_source_type      = 'TABLE'
---           AND g_tab_queue_files(i).hftq_destination_type = 'ORACLE_DIRECTORY'
---        --
---        -------------------------------------------------
---        -- Transfer Oracle Directory >> Table
---        -------------------------------------------------
---        --
---        --
---        -- Use nm3file to copy the files between oracle directories
---        --
---          THEN
---               exec_code := exec_code
---           ||       '''BEGIN  '||g_nl;
---               exec_code := exec_code
---                        || ' UPDATE '|| g_tab_queue_files(i).hftq_destination ||g_nl
---                            || 'SET '|| g_tab_queue_files(i).hftq_destination_column ||' = :pi_blob '||g_nl
---                          ||' WHERE '|| REPLACE(
---                                             REPLACE (g_tab_queue_files(i).hftq_condition, 'WHERE',''),';','')||';'||g_nl
---                    ||' END; '''||g_nl||
---              --
---                 CASE WHEN g_tab_queue_files(i).hftq_content IS NOT NULL
---                 -------------------------------------------------------
---                 -- BLOB already read in and passed into the file queue
---                 -------------------------------------------------------
---                 THEN ' USING IN '||g_package_name||'.g_tab_queue_files('||i||').hftq_content;'||g_nl
---                 -------------------------------------
---                 -- BLOB needs reading in from source
---                 -------------------------------------
---                 ELSE ' USING IN nm3file.file_to_blob(pi_source_dir  => nm3file.get_oracle_directory(nm3flx.string('||g_package_name||'.g_tab_queue_files('||i||').hftq_source'||')) '||g_nl
---                                                || ' ,pi_source_file => nm3flx.string('||g_package_name||'.g_tab_queue_files('||i||').hftq_source_filename'||')) ;'||g_nl
---                 END;
         --
         END CASE ;
       --
@@ -272,6 +566,11 @@ BEGIN
     nm_debug.debug(exec_code);
   --
     BEGIN
+    --
+    -- Validate the record before executing it
+    --
+       validate_file_queue_record
+             ( pi_rec_hftq => g_tab_queue_files(i) );
     --
       EXECUTE IMMEDIATE exec_code;
     --
@@ -415,3 +714,4 @@ END;
 --
 END hig_file_transfer_api;
 /
+
