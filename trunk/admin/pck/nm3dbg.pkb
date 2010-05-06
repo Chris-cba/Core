@@ -2,11 +2,11 @@ create or replace package body nm3dbg as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dbg.pkb-arc   2.1   Jul 22 2008 11:41:52   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dbg.pkb-arc   2.2   06 May 2010 11:16:46   ptanava  $
 --       Module Name      : $Workfile:   nm3dbg.pkb  $
---       Date into PVCS   : $Date:   Jul 22 2008 11:41:52  $
---       Date fetched Out : $Modtime:   Jul 22 2008 11:40:08  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   06 May 2010 11:16:46  $
+--       Date fetched Out : $Modtime:   06 May 2010 11:07:44  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on sccs version :
 --
 --   Author : Priidu Tanava
@@ -19,10 +19,13 @@ create or replace package body nm3dbg as
 --
 /* History
   22.07.08 PT added rounding to timings to fix 10g different handling of localtimestamp
+  06.05.10 PT log 724081: increased the size of l_time varchar2(10) to varchar2(20)
+                the previous size overflows when time spent exceeds 28 hours
+                this hopefully fixes the random overflows that have been reported
 */
 
 
-  g_body_sccsid     constant  varchar2(2000) := '"$Revision:   2.1  $"';
+  g_body_sccsid     constant  varchar2(2000) := '"$Revision:   2.2  $"';
   g_package_name    constant  varchar2(30)   := 'nm3dbg';
 
   
@@ -68,7 +71,7 @@ create or replace package body nm3dbg as
   -- call only in outer access procedures
   procedure debug_off
   is
-    l_time      varchar2(10);
+    l_time      varchar2(20);
     l_timestamp number;
   begin
     if m_timing_on then
@@ -116,7 +119,7 @@ create or replace package body nm3dbg as
   --   /
   procedure putln(p_text in varchar2)
   is
-    l_time      varchar2(10);
+    l_time      varchar2(20);
     l_timestamp number;
   begin
     if m_debug_on then
