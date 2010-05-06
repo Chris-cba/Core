@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.10   Apr 23 2010 15:26:42   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.11   May 06 2010 18:13:34   malexander  $
 --       Module Name      : $Workfile:   nm3data7.sql  $
---       Date into PVCS   : $Date:   Apr 23 2010 15:26:42  $
---       Date fetched Out : $Modtime:   Apr 23 2010 15:23:50  $
---       Version          : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   May 06 2010 18:13:34  $
+--       Date fetched Out : $Modtime:   May 06 2010 18:12:46  $
+--       Version          : $Revision:   2.11  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 23-APR-2010 15:23
+--       Generation Date  : 06-MAY-2010 18:12
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -6016,7 +6016,7 @@ SELECT
         'HIG'
        ,533
        ,null
-       ,'You are not permitted to submit a process.'||CHR(10)||'Review process types and process type roles using the ''Process Types'' module.'
+       ,'You are not permitted to submit a process.  '||CHR(10)||'Review process types and process type roles using the ''Process Types'' module.'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS

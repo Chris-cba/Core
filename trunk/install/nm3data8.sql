@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.7   Apr 23 2010 15:26:42   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.8   May 06 2010 18:13:34   malexander  $
 --       Module Name      : $Workfile:   nm3data8.sql  $
---       Date into PVCS   : $Date:   Apr 23 2010 15:26:42  $
---       Date fetched Out : $Modtime:   Apr 23 2010 15:23:50  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   May 06 2010 18:13:34  $
+--       Date fetched Out : $Modtime:   May 06 2010 18:12:46  $
+--       Version          : $Revision:   2.8  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 23-APR-2010 15:23
+--       Generation Date  : 06-MAY-2010 18:12
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -789,6 +789,38 @@ SELECT
        ,10000 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_LAYER_TREE
                    WHERE NLTR_CHILD = 'CUS');
+--
+INSERT INTO NM_LAYER_TREE
+       (NLTR_PARENT
+       ,NLTR_CHILD
+       ,NLTR_DESCR
+       ,NLTR_TYPE
+       ,NLTR_ORDER
+       )
+SELECT 
+        'DOC'
+       ,'DC1'
+       ,'Document Theme'
+       ,'M'
+       ,10 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LAYER_TREE
+                   WHERE NLTR_CHILD = 'DC1');
+--
+INSERT INTO NM_LAYER_TREE
+       (NLTR_PARENT
+       ,NLTR_CHILD
+       ,NLTR_DESCR
+       ,NLTR_TYPE
+       ,NLTR_ORDER
+       )
+SELECT 
+        'ROOT'
+       ,'DOC'
+       ,'Documents Manager'
+       ,'F'
+       ,35 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_LAYER_TREE
+                   WHERE NLTR_CHILD = 'DOC');
 --
 INSERT INTO NM_LAYER_TREE
        (NLTR_PARENT

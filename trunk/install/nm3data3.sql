@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.16   Apr 23 2010 15:26:40   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.17   May 06 2010 18:13:34   malexander  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Apr 23 2010 15:26:40  $
---       Date fetched Out : $Modtime:   Apr 23 2010 15:23:42  $
---       Version          : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   May 06 2010 18:13:34  $
+--       Date fetched Out : $Modtime:   May 06 2010 18:12:38  $
+--       Version          : $Revision:   2.17  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 23-APR-2010 15:23
+--       Generation Date  : 06-MAY-2010 18:12
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -505,6 +505,19 @@ SELECT
        ,'NORMAL' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'DOC0300'
+                    AND  HMR_ROLE = 'DOC_USER');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'DOC0310'
+       ,'DOC_USER'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'DOC0310'
                     AND  HMR_ROLE = 'DOC_USER');
 --
 INSERT INTO HIG_MODULE_ROLES
@@ -4644,7 +4657,7 @@ INSERT INTO HIG_PROCESS_TYPES
 SELECT 
         -2
        ,'Load Document Bundles'
-       ,'Unpacks document bundle zip file(s)'||CHR(10)||'Reads the driving file(s)'||CHR(10)||'Creates document and document association records'||CHR(10)||'Moves the document files to the correct location'
+       ,'Unpacks document bundle zip file(s) '||CHR(10)||'Reads the driving file(s)'||CHR(10)||'Creates document and document association records'||CHR(10)||'Moves the document files to the correct location'
        ,'doc_bundle_loader.load_process_document_bundles;'
        ,'DOC0300'
        ,'DOC0310'
@@ -5024,8 +5037,8 @@ INSERT INTO HIG_MODULE_BLOCKS
 SELECT 
         'HIG1505'
        ,'HAUD'
-       ,to_date('20100423152136','YYYYMMDDHH24MISS')
-       ,to_date('20100423152136','YYYYMMDDHH24MISS')
+       ,to_date('20100506180830','YYYYMMDDHH24MISS')
+       ,to_date('20100506180830','YYYYMMDDHH24MISS')
        ,'NM3_METADATA'
        ,'NM3_METADATA' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_BLOCKS
