@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.0   06 May 2010 11:24:14   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.1   06 May 2010 12:13:44   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   06 May 2010 11:24:14  $
---       Date fetched Out : $Modtime:   06 May 2010 11:23:24  $
---       PVCS Version     : $Revision:   2.32.1.3.1.0  $
+--       Date into PVCS   : $Date:   06 May 2010 12:13:44  $
+--       Date fetched Out : $Modtime:   06 May 2010 12:06:56  $
+--       PVCS Version     : $Revision:   2.32.1.3.1.1  $
 --
 --
 --   Author : Priidu Tanava
@@ -102,7 +102,7 @@ No query types defined.
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
         add p_group_type variable to load_group_datums() to specify driving group type when loaded group is non-linear
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.3.1.0  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.3.1.1  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -2258,9 +2258,8 @@ No query types defined.
     -- datum or distance break
     if l_ne_type in ('S','D') then
     
-      -- truncate nm_datum_criteria_tmp
+      -- hard coded insert of the lone datum (distance break)
       clear_datum_criteria_tmp;
-    
       insert into nm_datum_criteria_tmp(
         datum_id, begin_mp, end_mp, group_id
       )
@@ -2313,6 +2312,7 @@ No query types defined.
       if l_group_id_linear then
       
         -- special hard coded handling of a linear group
+        clear_datum_criteria_tmp;
         insert /*+ append */ into nm_datum_criteria_tmp (
           datum_id, begin_mp, end_mp, group_id
         )
@@ -2752,6 +2752,48 @@ No query types defined.
       ||')');
     nm3dbg.ind;
     
+    
+    -- explicit driving group type
+    l_group_type := p_group_type;
+    ensure_group_type_linear(
+       p_group_type_in  => l_group_type
+      ,p_group_type_out => l_group_type
+    );
+    -- preferred lrm
+    if l_group_type is null then
+      l_group_type := hig.get_useopt('PREFLRM', user);
+      ensure_group_type_linear(
+         p_group_type_in  => l_group_type
+        ,p_group_type_out => l_group_type
+      );
+    end if;
+    nm3dbg.putln('l_group_type='||l_group_type);
+    
+    
+    -- single element
+    if pt_ne.count = 1 and pt_nse.count = 0 then
+      -- todo: p_group_type needs to be passed in
+      --  currently it is lost for non linear groups
+      load_group_datums(
+         p_group_id => pt_ne(pt_ne.first)
+        ,p_sqlcount => p_sqlcount
+      );
+      nm3dbg.deind;
+      return;
+      
+    -- single saved extent
+    elsif pt_ne.count = 0 and pt_nse.count = 1 then
+      load_extent_datums(
+         p_group_type => l_group_type
+        ,p_nse_id     => pt_nse(pt_nse.first)
+        ,p_sqlcount   => p_sqlcount
+      );
+      nm3dbg.deind;
+      return;
+      
+    end if;
+    
+
     -- reset the cached id tables
     mt_datum_id := new nm_id_tbl();
     mt_group_id := new nm_id_tbl();
@@ -2825,11 +2867,13 @@ No query types defined.
       
       -- 2.2 groups
       if mt_group_id.count > 0 then
+
         l_inner_sql := l_inner_sql
               ||l_union_all
               ||'    select /*+ cardinality(x 1) */'
           ||cr||'      nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
           ||cr||'     ,to_number(null) group_id'
+          --||cr||'     ,min(decode((select ngt_linear_flag from nm_group_types_all where ngt_group_type = nm_ne_id_in), ''Y'', nm_ne_id_in, to_number(null))) group_id'
           ||cr||'    from'
           ||cr||'       nm_members'
           ||cr||'      ,table(cast('||g_package_name||'.get_group_id_tbl as nm_id_tbl)) x'
@@ -2883,30 +2927,12 @@ No query types defined.
         
     end if;
     
-    
-    -- explicit driving group type
-    l_group_type := p_group_type;
-    ensure_group_type_linear(
-       p_group_type_in  => l_group_type
-      ,p_group_type_out => l_group_type
-    );
-    -- preferred lrm
-    if l_group_type is null then
-      l_group_type := hig.get_useopt('PREFLRM', user);
-      ensure_group_type_linear(
-         p_group_type_in  => l_group_type
-        ,p_group_type_out => l_group_type
-      );
-    end if;
-      
-      
+
     l_sql :=
       sql_nm_datum_criteria_pre_tmp(
          p_elements_sql => l_inner_sql
       );
-
-
-    nm3dbg.putln('l_group_type='||l_group_type);
+      
     nm3dbg.putln(l_sql);
       
 
@@ -2928,15 +2954,15 @@ No query types defined.
     
     commit;
     nm3dbg.deind;
-   exception
-     when others then
-       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_gaz_list_datums('
-         ||'p_group_type='||p_group_type
-         ||', pt_ne.count='||pt_ne.count
-         ||', pt_nse.count='||pt_nse.count
-         ||', l_group_type='||l_group_type
-         ||')');
-       raise;
+--   exception
+--     when others then
+--       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_gaz_list_datums('
+--         ||'p_group_type='||p_group_type
+--         ||', pt_ne.count='||pt_ne.count
+--         ||', pt_nse.count='||pt_nse.count
+--         ||', l_group_type='||l_group_type
+--         ||')');
+--       raise;
     
   end;
   
