@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.14   Apr 26 2010 10:25:04   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.15   May 06 2010 22:32:52   malexander  $
 --       Module Name      : $Workfile:   nm3ins.pkb  $
---       Date into PVCS   : $Date:   Apr 26 2010 10:25:04  $
---       Date fetched Out : $Modtime:   Apr 26 2010 10:04:56  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   May 06 2010 22:32:52  $
+--       Date fetched Out : $Modtime:   May 06 2010 22:28:20  $
+--       PVCS Version     : $Revision:   2.15  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.14  $"
+--   nm3get_gen body   : "$Revision:   2.15  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.14  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.15  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
@@ -3172,6 +3172,7 @@ BEGIN
             ,hsc_allow_feature9
             ,hsc_start_date
             ,hsc_end_date
+            ,hsc_allow_feature10
             )
      VALUES (p_rec_hsc.hsc_domain_code
             ,p_rec_hsc.hsc_status_code
@@ -3188,6 +3189,7 @@ BEGIN
             ,p_rec_hsc.hsc_allow_feature9
             ,p_rec_hsc.hsc_start_date
             ,p_rec_hsc.hsc_end_date
+            ,p_rec_hsc.hsc_allow_feature10
             )
    RETURNING hsc_domain_code
             ,hsc_status_code
@@ -3204,6 +3206,7 @@ BEGIN
             ,hsc_allow_feature9
             ,hsc_start_date
             ,hsc_end_date
+            ,hsc_allow_feature10
       INTO   p_rec_hsc.hsc_domain_code
             ,p_rec_hsc.hsc_status_code
             ,p_rec_hsc.hsc_status_name
@@ -3218,7 +3221,8 @@ BEGIN
             ,p_rec_hsc.hsc_allow_feature8
             ,p_rec_hsc.hsc_allow_feature9
             ,p_rec_hsc.hsc_start_date
-            ,p_rec_hsc.hsc_end_date;
+            ,p_rec_hsc.hsc_end_date
+            ,p_rec_hsc.hsc_allow_feature10;
 --
    nm_debug.proc_end(g_package_name,'ins_hsc');
 --
@@ -3245,6 +3249,7 @@ BEGIN
             ,hsd_feature7
             ,hsd_feature8
             ,hsd_feature9
+            ,hsd_feature10
             )
      VALUES (p_rec_hsd.hsd_domain_code
             ,p_rec_hsd.hsd_product
@@ -3258,6 +3263,7 @@ BEGIN
             ,p_rec_hsd.hsd_feature7
             ,p_rec_hsd.hsd_feature8
             ,p_rec_hsd.hsd_feature9
+            ,p_rec_hsd.hsd_feature10
             )
    RETURNING hsd_domain_code
             ,hsd_product
@@ -3271,6 +3277,7 @@ BEGIN
             ,hsd_feature7
             ,hsd_feature8
             ,hsd_feature9
+            ,hsd_feature10
       INTO   p_rec_hsd.hsd_domain_code
             ,p_rec_hsd.hsd_product
             ,p_rec_hsd.hsd_description
@@ -3282,7 +3289,8 @@ BEGIN
             ,p_rec_hsd.hsd_feature6
             ,p_rec_hsd.hsd_feature7
             ,p_rec_hsd.hsd_feature8
-            ,p_rec_hsd.hsd_feature9;
+            ,p_rec_hsd.hsd_feature9
+            ,p_rec_hsd.hsd_feature10;
 --
    nm_debug.proc_end(g_package_name,'ins_hsd');
 --
