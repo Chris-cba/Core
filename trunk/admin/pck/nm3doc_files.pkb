@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.8   Apr 23 2010 14:39:16   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.9   May 06 2010 17:31:16   aedwards  $
 --       Module Name      : $Workfile:   nm3doc_files.pkb  $
---       Date into PVCS   : $Date:   Apr 23 2010 14:39:16  $
---       Date fetched Out : $Modtime:   Apr 23 2010 14:38:52  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   May 06 2010 17:31:16  $
+--       Date fetched Out : $Modtime:   May 06 2010 17:31:00  $
+--       Version          : $Revision:   2.9  $
 --       Based on SCCS version :
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid     CONSTANT VARCHAR2(2000) := '$Revision:   2.8  $';
+  g_body_sccsid     CONSTANT VARCHAR2(2000) := '$Revision:   2.9  $';
   g_package_name    CONSTANT VARCHAR2(30)   := 'nm3doc_files';
 --
   g_sep                      VARCHAR2(1)    := NVL(hig.get_sysopt('DIRREPSTRN'),'\');
@@ -94,146 +94,6 @@ AS
              ,INSTR(retval,g_win_sep,-1)+1);
     RETURN retval ;
   END strip_filename;
---
---------------------------------------------------------------------------------
---
-  PROCEDURE insert_temp_df ( pi_rec_df IN doc_file_transfer_temp%ROWTYPE )
-  IS
-    l_rec_table   doc_file_transfer_temp%ROWTYPE;
-  BEGIN
-  --
-    l_rec_table.dftt_doc_id          := pi_rec_df.dftt_doc_id;
-    l_rec_table.dftt_revision        := NVL(pi_rec_df.dftt_revision,1);
-    l_rec_table.dftt_start_date      := NVL(pi_rec_df.dftt_start_date,nm3user.get_effective_date);
-    l_rec_table.dftt_content         := pi_rec_df.dftt_content;
-    l_rec_table.dftt_full_path       := pi_rec_df.dftt_full_path;
-    l_rec_table.dftt_filename        := strip_filename(pi_rec_df.dftt_full_path);
-    l_rec_table.dftt_file_info       := NVL(pi_rec_df.dftt_file_info, LENGTH(pi_rec_df.dftt_content));
-  -- 
-    INSERT INTO doc_file_transfer_temp VALUES l_rec_table;
-  --
-  END insert_temp_df;
---
---------------------------------------------------------------------------------
--- Insert a row in doc_files_all
---
-  PROCEDURE insert_df ( pi_rec_df IN rec_doc_table )
-  IS
-    l_rec_table       rec_doc_table;
-    l_rec_dlt         doc_location_tables%ROWTYPE;
-    l_rec_temp_table  doc_file_transfer_temp%ROWTYPE;
-  BEGIN
-  --
-    l_rec_dlt := doc_locations_api.get_dlt(pi_doc_id => pi_rec_df.doc_id );
-  --
-    nm_debug.debug_on;
-    nm_debug.debug('Inserting '||pi_rec_df.filename||' in '||l_rec_dlt.dlt_table);
-  --
-    l_rec_table.doc_id          := pi_rec_df.doc_id;
-    l_rec_table.revision        := NVL(pi_rec_df.revision,1);
-    l_rec_table.start_date      := NVL(pi_rec_df.start_date,nm3user.get_effective_date);
-    l_rec_table.content         := pi_rec_df.content;
-    l_rec_table.full_path       := pi_rec_df.full_path;
-    l_rec_table.filename        := strip_filename(pi_rec_df.full_path);
-    l_rec_table.file_info       := NVL(pi_rec_df.file_info, LENGTH(pi_rec_df.content));
-  -- 
-    IF l_rec_dlt.dlt_table IS NOT NULL
-    THEN
-      EXECUTE IMMEDIATE
-        'INSERT INTO '||l_rec_dlt.dlt_table
-      ||' ('
-      ||'   '||l_rec_dlt.dlt_doc_id_col
-      ||' , '||l_rec_dlt.dlt_revision_col
-      ||' , '||l_rec_dlt.dlt_start_date_col
-      ||' , '||l_rec_dlt.dlt_full_path_col
-      ||' , '||l_rec_dlt.dlt_filename
-      ||' , '||l_rec_dlt.dlt_content_col
-      ||' , '||l_rec_dlt.dlt_audit_col
-      ||' , '||l_rec_dlt.dlt_file_info_col
-      ||' )'
-      ||' VALUES '
-      ||' ('
-      ||'   :pi_doc_id '
-      ||' , :pi_revision '
-      ||' , :pi_start_date '
-      ||' , :pi_full_path '
-      ||' , :pi_filename '
-      ||' , :pi_content '
-      ||' , :pi_audit '
-      ||' , :pi_file_info )'
-      USING IN l_rec_table.doc_id
-          , IN l_rec_table.revision
-          , IN l_rec_table.start_date
-          , IN l_rec_table.full_path
-          , IN l_rec_table.filename
-          , IN l_rec_table.content
-          , IN l_rec_table.audit
-          , IN l_rec_table.file_info;
-  --
-    ELSIF doc_locations_api.get_dlc(pi_doc_id => pi_rec_df.doc_id).dlc_location_Type = 'ORACLE_DIRECTORY'
-    THEN
-      l_rec_temp_table.dftt_doc_id     := l_rec_table.doc_id;
-      l_rec_temp_table.dftt_revision   := l_rec_table.revision;
-      l_rec_temp_table.dftt_start_date := l_rec_table.start_date;
-      l_rec_temp_table.dftt_content    := l_rec_table.content;
-      l_rec_temp_table.dftt_full_path  := l_rec_table.full_path;
-      l_rec_temp_table.dftt_filename   := l_rec_table.filename;
-      l_rec_temp_table.dftt_file_info  := l_rec_table.file_info;
-    -- 
-      insert_temp_df ( pi_rec_df => l_rec_temp_table );
-    -- 
-    END IF;
-  --
-  END insert_df;
---
---------------------------------------------------------------------------------
--- Insert a row in doc_files
---
-  FUNCTION get_df ( pi_doc_id   IN docs.doc_id%TYPE
-                  , pi_revision IN NUMBER )
-  RETURN rec_doc_table
-  IS
-    l_rec_table rec_doc_table;
-    l_rec_dlt   doc_location_tables%ROWTYPE;
---    doc_id        NUMBER 
---  , revision      NUMBER
---  , start_date    DATE
---  , end_date      DATE
---  , full_path     VARCHAR2(4000)
---  , filename      VARCHAR2(4000)
---  , content       BLOB
---  , audit         VARCHAR2(4000)
---  , file_info     VARCHAR2(2000)
-  BEGIN
-  --
-    l_rec_dlt := doc_locations_api.get_dlt(pi_doc_id => pi_doc_id );
-  --
-    IF l_rec_dlt.dlt_table IS NOT NULL
-    THEN
-      EXECUTE IMMEDIATE 
-        ' SELECT '||l_rec_dlt.dlt_doc_id_col||' ,'||
-                    l_rec_dlt.dlt_revision_col||' ,'||
-                    l_rec_dlt.dlt_start_date_col||' ,'||
-                    l_rec_dlt.dlt_end_date_col||' ,'||
-                    l_rec_dlt.dlt_full_path_col||' ,'||
-                    l_rec_dlt.dlt_filename||' ,'||
-                    l_rec_dlt.dlt_content_col||' ,'||
-                    l_rec_dlt.dlt_audit_col||' ,'||
-                    l_rec_dlt.dlt_file_info_col||
-        '   FROM '||l_rec_dlt.dlt_table||
-        '  WHERE '||l_rec_dlt.dlt_doc_id_col||' = :pi_df_doc_id '||
-        '    AND '||l_rec_dlt.dlt_revision_col||' = :pi_df_revision'
-      INTO l_rec_table
-      USING IN pi_doc_id, IN pi_revision;
-    END IF;
-  --
-    RETURN l_rec_table;
-  --
-  EXCEPTION
-    WHEN NO_DATA_FOUND
-    THEN RETURN l_rec_table;
-  --
-  END get_df;
 --
 --------------------------------------------------------------------------------
 --
@@ -465,7 +325,7 @@ AS
     l_location            nm3type.max_varchar2;
     l_filename            nm3type.max_varchar2;
   --
-    l_rec_table           rec_doc_table;
+    l_rec_table           doc_locations_api.rec_file_record;
     l_rec_temp_table      doc_file_transfer_temp%ROWTYPE;
   --
     ex_no_file            EXCEPTION;
@@ -496,7 +356,7 @@ AS
           l_where_clause := l_rec_dlt.dlt_doc_id_col||' = '||pi_doc_id||' AND '||
                             l_rec_dlt.dlt_revision_col ||' = '||l_revision;
         --
-          po_client_file    := get_df ( pi_doc_id, l_revision ).filename;
+          po_client_file    := doc_locations_api.get_file_record ( pi_doc_id, l_revision ).filename;
           po_working_folder := get_work_folder ;
           po_table_name     := l_rec_dlt.dlt_table;
           po_column_name    := l_rec_dlt.dlt_content_col;
@@ -527,7 +387,7 @@ AS
             l_rec_table.filename    := l_filename;
             l_rec_table.full_path   := nm3file.get_true_dir_name(l_location)||g_sep||l_filename;
           --
-            insert_df (l_rec_table);
+            doc_locations_api.insert_file_record (l_rec_table);
           --
             l_where_clause := l_rec_dlt.dlt_doc_id_col||' = '||pi_doc_id||' AND '||
                               l_rec_dlt.dlt_revision_col ||' = '||l_revision;
@@ -577,7 +437,7 @@ AS
         l_rec_temp_table.dftt_filename    := l_filename;
         l_rec_temp_table.dftt_full_path   := nm3file.get_true_dir_name(l_location)||g_sep||l_filename;
       --
-        insert_temp_df (l_rec_temp_table);
+        doc_locations_api.insert_temp_file_record (l_rec_temp_table);
       --
         l_where_clause := g_doc_id_col||' = '||pi_doc_id||' AND '||
                           g_revision_col ||' = '||l_revision;
@@ -1142,3 +1002,4 @@ AS
 --
 END nm3doc_files;
 /
+
