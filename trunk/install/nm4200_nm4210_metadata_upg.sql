@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.4   May 06 2010 18:01:28   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.5   May 06 2010 18:11:30   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_metadata_upg.sql  $
---       Date into PVCS   : $Date:   May 06 2010 18:01:28  $
---       Date fetched Out : $Modtime:   May 06 2010 17:59:40  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   May 06 2010 18:11:30  $
+--       Date fetched Out : $Modtime:   May 06 2010 18:11:06  $
+--       Version          : $Revision:   3.5  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -678,7 +678,7 @@ PROMPT Create System Option WORKFOLDER
 INSERT INTO hig_option_list
 SELECT 'WORKFOLDER','DOC','Working Folder'
      , 'Default working folder'
-     , NULL, 'VARCHAR2','Y','Y'
+     , NULL, 'VARCHAR2','Y','Y', 2000
   FROM DUAL
  WHERE NOT EXISTS
    (SELECT 1 FROM hig_option_list
