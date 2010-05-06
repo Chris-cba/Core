@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.38   Apr 23 2010 15:26:38   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.39   May 06 2010 18:13:30   malexander  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Apr 23 2010 15:26:38  $
---       Date fetched Out : $Modtime:   Apr 23 2010 15:23:34  $
---       Version          : $Revision:   2.38  $
+--       Date into PVCS   : $Date:   May 06 2010 18:13:30  $
+--       Date fetched Out : $Modtime:   May 06 2010 18:12:30  $
+--       Version          : $Revision:   2.39  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 23-APR-2010 15:23
+--       Generation Date  : 06-MAY-2010 18:12
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -6308,7 +6308,7 @@ SELECT
         'HIG'
        ,533
        ,null
-       ,'You are not permitted to submit a process.'||CHR(10)||'Review process types and process type roles using the ''Process Types'' module.'
+       ,'You are not permitted to submit a process.  '||CHR(10)||'Review process types and process type roles using the ''Process Types'' module.'
        ,'' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'HIG'
@@ -14477,6 +14477,20 @@ INSERT INTO HIG_DOMAINS
        ,HDO_CODE_LENGTH
        )
 SELECT 
+        'DOC_LOCATION_TYPES'
+       ,'DOC'
+       ,'Document Location Types'
+       ,50 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_DOMAINS
+                   WHERE HDO_DOMAIN = 'DOC_LOCATION_TYPES');
+--
+INSERT INTO HIG_DOMAINS
+       (HDO_DOMAIN
+       ,HDO_PRODUCT
+       ,HDO_TITLE
+       ,HDO_CODE_LENGTH
+       )
+SELECT 
         'ELEC_DRAIN_CARR'
        ,'NET'
        ,'Elec/Drain/Carriageway'
@@ -17308,6 +17322,90 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
                    WHERE HCO_DOMAIN = 'DOC_CATEGORIES'
                     AND  HCO_CODE = 'UTILITY');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'DOC_LOCATION_TYPES'
+       ,'APP_SERVER'
+       ,'Application Server'
+       ,'Y'
+       ,10
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'DOC_LOCATION_TYPES'
+                    AND  HCO_CODE = 'APP_SERVER');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'DOC_LOCATION_TYPES'
+       ,'FTP'
+       ,'FTP Location'
+       ,'Y'
+       ,40
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'DOC_LOCATION_TYPES'
+                    AND  HCO_CODE = 'FTP');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'DOC_LOCATION_TYPES'
+       ,'ORACLE_DIRECTORY'
+       ,'Oracle Directory'
+       ,'Y'
+       ,20
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'DOC_LOCATION_TYPES'
+                    AND  HCO_CODE = 'ORACLE_DIRECTORY');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'DOC_LOCATION_TYPES'
+       ,'TABLE'
+       ,'Database Table'
+       ,'Y'
+       ,30
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'DOC_LOCATION_TYPES'
+                    AND  HCO_CODE = 'TABLE');
 --
 INSERT INTO HIG_CODES
        (HCO_DOMAIN
@@ -27896,7 +27994,7 @@ INSERT INTO HIG_MODULES
        )
 SELECT 
         'DOC0118'
-       ,'Media/Locations'
+       ,'Document Locations and Media Types'
        ,'doc0118'
        ,'FMX'
        ,''
@@ -36059,6 +36157,30 @@ SELECT
        ,2000 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'WMSSVCNAME');
+--
+INSERT INTO HIG_OPTION_LIST
+       (HOL_ID
+       ,HOL_PRODUCT
+       ,HOL_NAME
+       ,HOL_REMARKS
+       ,HOL_DOMAIN
+       ,HOL_DATATYPE
+       ,HOL_MIXED_CASE
+       ,HOL_USER_OPTION
+       ,HOL_MAX_LENGTH
+       )
+SELECT 
+        'WORKFOLDER'
+       ,'DOC'
+       ,'Working Folder'
+       ,'Default working folder'
+       ,''
+       ,'VARCHAR2'
+       ,'Y'
+       ,'Y'
+       ,2000 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
+                   WHERE HOL_ID = 'WORKFOLDER');
 --
 INSERT INTO HIG_OPTION_LIST
        (HOL_ID
