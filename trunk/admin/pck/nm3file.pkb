@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.10   Apr 19 2010 09:32:34   aedwards  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.11   May 07 2010 16:15:28   aedwards  $
 -- Module Name : $Workfile:   nm3file.pkb  $
--- Date into PVCS : $Date:   Apr 19 2010 09:32:34  $
--- Date fetched Out : $Modtime:   Apr 19 2010 09:31:50  $
--- PVCS Version : $Revision:   2.10  $
+-- Date into PVCS : $Date:   May 07 2010 16:15:28  $
+-- Date fetched Out : $Modtime:   May 07 2010 16:14:58  $
+-- PVCS Version : $Revision:   2.11  $
 -- Based on SCCS version : 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 --all global package variables here
 --
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.10  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.11  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3file';
@@ -1660,17 +1660,27 @@ END external_table_record_delim;
   --
     nm_debug.proc_start (g_package_name,'get_oracle_directory');
   --
+  -- Uses '/' and '\' because Oracle directories may be spread across
+  -- different platforms. Cannot use the standard product option.
+  --
+  -- Designed to return Oracle Directory for either a Path or Oracle Directory
+  --
     SELECT directory_name INTO l_directory
       FROM all_directories
      WHERE directory_path
                       = CASE
-                         WHEN INSTR(pi_path,c_dirrepstrn) > 0
+                         WHEN ( INSTR(pi_path,'\') > 0 
+                                OR 
+                                INSTR(pi_path,'/') > 0 )
                            THEN pi_path
                          ELSE directory_path
                        END
        AND directory_name
                      = CASE
-                         WHEN INSTR(pi_path,c_dirrepstrn) = 0
+                         WHEN ( INSTR(pi_path,'\') = 0
+                                AND
+                                INSTR(pi_path,'/') = 0
+                              )
                            THEN pi_path
                          ELSE directory_name
                        END;
@@ -1681,10 +1691,49 @@ END external_table_record_delim;
   --
   EXCEPTION
     WHEN NO_DATA_FOUND
-    THEN hig.raise_ner(nm3type.c_net, 28, NULL, 'Oracle directory ['||pi_path||'] cannot  be found');
+    THEN hig.raise_ner(nm3type.c_net, 28, NULL, 'Oracle directory for ['||pi_path||'] cannot  be found');
   END get_oracle_directory;
 --
 --------------------------------------------------------------------------------
+--
+  FUNCTION get_path ( pi_oracle_directory IN VARCHAR2 ) 
+    RETURN all_directories.directory_path%TYPE
+  IS
+    l_path          all_directories.directory_path%TYPE;
+  BEGIN
+  --
+  -- Uses '/' and '\' because Oracle directories may be spread across
+  -- different platforms. Cannot use the standard product option.
+  --
+  -- Designed to return Path for either a Path or Oracle Directory 
+  --
+    SELECT directory_path INTO l_path
+      FROM all_directories
+     WHERE directory_path
+                      = CASE
+                         WHEN ( INSTR(pi_oracle_directory,'\') > 0
+                                OR 
+                                INSTR(pi_oracle_directory,'/') > 0
+                              )
+                           THEN pi_oracle_directory
+                         ELSE directory_path
+                       END
+       AND directory_name
+                     = CASE
+                         WHEN ( INSTR(pi_oracle_directory,'\') = 0
+                                AND
+                                INSTR(pi_oracle_directory,'/') = 0
+                              )
+                           THEN pi_oracle_directory
+                         ELSE directory_name
+                       END;
+    RETURN l_path;
+  EXCEPTION
+    WHEN NO_DATA_FOUND
+    THEN hig.raise_ner(nm3type.c_net, 28, NULL, 'Path for Oracle Directory ['||pi_oracle_directory||'] cannot be found');
+  END get_path;
+--
+----------------------------------------------------------------------------- 
 --
 END nm3file;
 /
