@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.2   07 May 2010 12:13:54   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.3   07 May 2010 12:40:50   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   07 May 2010 12:13:54  $
---       Date fetched Out : $Modtime:   07 May 2010 12:09:50  $
---       PVCS Version     : $Revision:   2.32.1.3.1.2  $
+--       Date into PVCS   : $Date:   07 May 2010 12:40:50  $
+--       Date fetched Out : $Modtime:   07 May 2010 12:37:06  $
+--       PVCS Version     : $Revision:   2.32.1.3.1.3  $
 --
 --
 --   Author : Priidu Tanava
@@ -102,7 +102,7 @@ No query types defined.
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
         add p_group_type variable to load_group_datums() to specify driving group type when loaded group is non-linear
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.3.1.2  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.3.1.3  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -1215,12 +1215,12 @@ No query types defined.
     
     nm3dbg.putln('pt_attr.count='||pt_attr.count||', pt_itd.count='||pt_itd.count);
     nm3dbg.deind;
---  exception
---    when others then
---      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_attrib_metadata('
---        ||'p_nmq_id='||p_nmq_id
---        ||')');
---      raise;
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_attrib_metadata('
+        ||'p_nmq_id='||p_nmq_id
+        ||')');
+      raise;
       
   end;
   
@@ -2954,15 +2954,15 @@ No query types defined.
     
     commit;
     nm3dbg.deind;
---   exception
---     when others then
---       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_gaz_list_datums('
---         ||'p_group_type='||p_group_type
---         ||', pt_ne.count='||pt_ne.count
---         ||', pt_nse.count='||pt_nse.count
---         ||', l_group_type='||l_group_type
---         ||')');
---       raise;
+   exception
+     when others then
+       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_gaz_list_datums('
+         ||'p_group_type='||p_group_type
+         ||', pt_ne.count='||pt_ne.count
+         ||', pt_nse.count='||pt_nse.count
+         ||', l_group_type='||l_group_type
+         ||')');
+       raise;
     
   end;
   
