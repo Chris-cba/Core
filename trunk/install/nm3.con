@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.22   May 05 2010 14:33:50   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.23   May 07 2010 10:22:24   rcoupe  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   May 05 2010 14:33:50  $
---       Date fetched Out : $Modtime:   May 05 2010 14:33:16  $
---       PVCS Version     : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   May 07 2010 10:22:24  $
+--       Date fetched Out : $Modtime:   May 07 2010 10:21:02  $
+--       PVCS Version     : $Revision:   2.23  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Wed May 05  14:29:37 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Fri May 07  10:17:34 2010 by Server Generator 10.1.2.9.28
 
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -5063,13 +5063,6 @@ ALTER TABLE HIG_MODULE_USAGES ADD (CONSTRAINT
  HMU_HMO_FK FOREIGN KEY
   (HMU_MODULE) REFERENCES HIG_MODULES
   (HMO_MODULE) ON DELETE CASCADE)
-/
-
-PROMPT Creating Foreign Key on 'HIG_NAVIGATOR'
-ALTER TABLE HIG_NAVIGATOR ADD (CONSTRAINT
- HNV_HNV_FK FOREIGN KEY
-  (HNV_PARENT_ALIAS) REFERENCES HIG_NAVIGATOR
-  (HNV_CHILD_ALIAS))
 /
 
 PROMPT Creating Foreign Key on 'HIG_NAVIGATOR_MODULES'
