@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.5   Apr 22 2010 12:20:18   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.6   May 07 2010 11:02:36   lsorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   Apr 22 2010 12:20:18  $
---       Date fetched Out : $Modtime:   Apr 22 2010 12:16:02  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   May 07 2010 11:02:36  $
+--       Date fetched Out : $Modtime:   May 07 2010 10:02:18  $
+--       Version          : $Revision:   3.6  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.5  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.6  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
@@ -1792,6 +1792,52 @@ nm_debug.debug('find top '||l_sql);
    END LOOP;
 --
 END get_top_par;     
+--
+FUNCTION get_docs_tab(pi_id         IN  Varchar2
+                     ,pi_table_name IN  Varchar2)
+RETURN g_doc_tab_type 
+--
+IS 
+-- 
+   l_doc_tab    g_doc_tab_type;
+   l_table_name Varchar2(50);
+--
+BEGIN
+--
+   Execute Immediate 'SELECT doc_id,''Document - ''|| doc_id||'', ''||To_Char(doc_date_issued,''dd-Mon-yyyy'')||'', ''||doc_reference_code||'', ''||doc_dtp_code||'', ''||doc_title  '||
+                     'FROM   doc_assocs,docs '||
+                     'WHERE  das_rec_id = :1 '||
+                     'AND    das_doc_id = doc_id '||
+                     'AND    hig_nav.check_enquiry(das_doc_id )!= 1 '||
+                     'AND    das_table_name = :2 ' BULK COLLECT INTO l_doc_tab Using pi_id,pi_table_name ;
+
+   IF l_doc_tab.Count > 0
+   THEN
+       Return l_doc_tab;
+   ELSE
+       BEGIN  
+       --
+          Execute Immediate ' SELECT DGS_DGT_TABLE_NAME '||
+                            ' FROM   DOC_GATE_SYNS      '||
+                            ' WHERE  DGS_TABLE_SYN = :1 ' INTO l_table_name Using pi_table_name;
+       EXCEPTION
+           WHEN  NO_DATA_FOUND
+           THEN
+               Null;
+       END ;
+       IF l_table_name IS NOT NULL
+       THEN
+           Execute Immediate 'SELECT doc_id,''Document - ''|| doc_id||'', ''||To_Char(doc_date_issued,''dd-Mon-yyyy'')||'', ''||doc_reference_code||'', ''||doc_dtp_code||'', ''||doc_title  '||
+                             'FROM   doc_assocs,docs '||
+                             'WHERE  das_rec_id = :1 '||
+                             'AND    das_doc_id = doc_id '||
+                             'AND    hig_nav.check_enquiry(das_doc_id )!= 1 '||
+                             'AND    das_table_name = :2 ' BULK COLLECT INTO l_doc_tab Using pi_id,l_table_name ;           
+       END IF ;
+       Return l_doc_tab;
+   END IF ;
+--         
+END get_docs_tab;
 --
 END hig_nav;
 /
