@@ -5,11 +5,11 @@ IS
   --
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkb-arc   2.1   May 07 2010 11:21:42   cstrettle  $
-  --       Module Name      : $Workfile:   doc_sdo_util_fix.pkb  $
-  --       Date into PVCS   : $Date:   May 07 2010 11:21:42  $
-  --       Date fetched Out : $Modtime:   May 07 2010 11:20:44  $
-  --       Version          : $Revision:   2.1  $
+  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkb-arc   2.2   May 07 2010 12:21:38   cstrettle  $
+  --       Module Name      : $Workfile:   doc_sdo_util.pkb  $
+  --       Date into PVCS   : $Date:   May 07 2010 12:21:38  $
+  --       Date fetched Out : $Modtime:   May 07 2010 12:10:24  $
+  --       Version          : $Revision:   2.2  $
   --
   --   Author : Chris Strettle
   --
@@ -18,7 +18,7 @@ IS
   -----------------------------------------------------------------------------
   --
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
   g_package_name         CONSTANT VARCHAR2(30) := 'DOC_SDO_UTIL';
   nl                     CONSTANT VARCHAR2(5) := chr(10);
 
@@ -286,7 +286,7 @@ IS
     l_rec_nth_v.nth_feature_pk_column    := g_view_pk_col;
     l_rec_nth_v.nth_theme_type           := 'SDO';
     l_rec_nth_v.nth_base_table_theme     := l_theme_id;
-    --  l_rec_nth_v.nth_where                  := NULL;
+    l_rec_nth_v.nth_where                := NULL;
     --
     l_rec_ntg_v.ntg_theme_id             := l_view_theme_id;
     l_rec_ntg_v.ntg_gtype                := '2001';
