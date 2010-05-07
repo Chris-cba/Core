@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.1   06 May 2010 12:13:44   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.2   07 May 2010 12:13:54   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   06 May 2010 12:13:44  $
---       Date fetched Out : $Modtime:   06 May 2010 12:06:56  $
---       PVCS Version     : $Revision:   2.32.1.3.1.1  $
+--       Date into PVCS   : $Date:   07 May 2010 12:13:54  $
+--       Date fetched Out : $Modtime:   07 May 2010 12:09:50  $
+--       PVCS Version     : $Revision:   2.32.1.3.1.2  $
 --
 --
 --   Author : Priidu Tanava
@@ -102,7 +102,7 @@ No query types defined.
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
         add p_group_type variable to load_group_datums() to specify driving group type when loaded group is non-linear
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.3.1.1  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.3.1.2  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -2902,7 +2902,7 @@ No query types defined.
           ||cr||'                        connect by nm_ne_id_in = prior nm_ne_id_of'
           ||cr||'                        start with nm_ne_id_in in (select /*+ cardinality(x 1) */ x.column_value from table(cast('
                                                                    ||g_package_name||'.get_gg_id_tbl as nm_id_tbl)) x))'
-          ||cr||'        and ne_type = ''S'''
+          ||cr||'        and ne_type in (''S'', ''D'')'
           ||cr||'      )'
           ||cr||'    group by nm_ne_id_of';
         
