@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3file authid current_user AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkh-arc   2.5   Apr 14 2010 17:10:06   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkh-arc   2.6   May 07 2010 16:15:26   aedwards  $
 --       Module Name      : $Workfile:   nm3file.pkh  $
---       Date into PVCS   : $Date:   Apr 14 2010 17:10:06  $
---       Date fetched Out : $Modtime:   Apr 14 2010 17:09:28  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   May 07 2010 16:15:26  $
+--       Date fetched Out : $Modtime:   May 07 2010 16:14:46  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.14
 -------------------------------------------------------------------------
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE nm3file authid current_user AS
 --<GLOBVAR>
 --
 --  g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.6  $';
 --
   c_read_mode        CONSTANT  VARCHAR2(1)    := 'R';
   c_append_mode      CONSTANT  VARCHAR2(1)    := 'A';
@@ -551,6 +551,15 @@ PROCEDURE blob_to_file
 --
 FUNCTION get_oracle_directory ( pi_path IN VARCHAR2 ) 
   RETURN all_directories.directory_name%TYPE;
+--</PROC>
+--
+----------------------------------------------------------------------------- 
+--
+--<PROC NAME = "GET_PATH">
+--
+--
+FUNCTION get_path ( pi_oracle_directory IN VARCHAR2 ) 
+  RETURN all_directories.directory_path%TYPE;
 --</PROC>
 --
 ----------------------------------------------------------------------------- 
