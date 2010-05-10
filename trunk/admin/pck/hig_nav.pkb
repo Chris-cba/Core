@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.6   May 07 2010 11:02:36   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.7   May 10 2010 10:44:24   lsorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   May 07 2010 11:02:36  $
---       Date fetched Out : $Modtime:   May 07 2010 10:02:18  $
---       Version          : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   May 10 2010 10:44:24  $
+--       Date fetched Out : $Modtime:   May 10 2010 10:43:30  $
+--       Version          : $Revision:   3.7  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.6  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.7  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
@@ -1836,6 +1836,9 @@ BEGIN
        END IF ;
        Return l_doc_tab;
    END IF ;
+EXCEPTION
+WHEN OTHERS THEN
+    Null ;
 --         
 END get_docs_tab;
 --
