@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.3   Apr 22 2010 14:12:46   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.4   May 10 2010 15:52:44   lsorathia  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   Apr 22 2010 14:12:46  $
---       Date fetched Out : $Modtime:   Apr 22 2010 13:53:24  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   May 10 2010 15:52:44  $
+--       Date fetched Out : $Modtime:   May 06 2010 09:29:14  $
+--       Version          : $Revision:   3.4  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.3  $';
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.4  $';
   g_app_owner     CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  Varchar2(32767);
@@ -101,11 +101,19 @@ IS
    l_bcc_recipient    nm_mail_users.nmu_email_address%TYPE;
    l_send_mail_status Boolean;
    l_error_text       Varchar2(2000);
-
+   l_attachment       Blob ;
+   l_att_name         Varchar2(100);
+   l_hpt_rec          hig_process_types%ROWTYPE;
+   l_hp_rec           hig_processes%ROWTYPE;
+   l_hpal_rec         hig_process_alert_log%ROWTYPE;
+   CURSOR c_hpal(qp_hpal_id hig_process_alert_log.hpal_id%TYPE)
+   IS
+   SELECT *
+   FROM   hig_process_alert_log
+   WHERE  hpal_id = qp_hpal_id ;
 
    recipient_not_found Exception ;
    Pragma Exception_Init(recipient_not_found,-22000);
- 
 --
 BEGIN
 --
@@ -114,6 +122,31 @@ BEGIN
    l_hatm_rec := get_hatm(l_hal_rec.hal_halt_id);
    l_halt_rec := get_halt(l_hal_rec.hal_halt_id);   
    l_hatr_rec := get_hatr(l_har_rec.har_hatr_id);
+
+   IF l_halt_rec.halt_nit_inv_type = 'PRO$'
+   THEN
+       IF pi_from_screen  = 'N'
+       THEN       
+           l_hp_rec     := hig_process_framework.get_process(hig_process_api.get_current_process_id);
+           l_hpt_rec    := hig_process_framework.get_process_type(l_hp_rec.hp_process_type_id);
+           l_attachment := hig_process_framework.log_text_as_blob(pi_process_id            => hig_process_api.get_current_process_id           
+                                                                 ,pi_job_run_seq           => hig_process_api.get_current_job_run_seq
+                                                                 ,pi_only_summary_messages => 'N');
+       ELSE
+           OPEN  c_hpal(l_hal_rec.hal_pk_id);
+           FETCH c_hpal INTO l_hpal_rec;
+           CLOSE c_hpal ;
+           l_hpt_rec    := hig_process_framework.get_process_type(l_hpal_rec.hpal_process_type_id);
+           l_attachment := hig_process_framework.log_text_as_blob(pi_process_id            => l_hpal_rec.hpal_process_id           
+                                                                 ,pi_job_run_seq           => l_hpal_rec.hpal_job_run_seq
+                                                                 ,pi_only_summary_messages => 'N');
+            
+       END IF ;
+       IF l_attachment IS NOT NULL
+       THEN
+           l_att_name := 'Log for '||l_hpt_rec.hpt_name||' '||To_Char(Sysdate)||'.txt' ;
+       END IF ;
+   END IF ;
    IF l_har_rec.har_recipient_email IS NULL
    THEN    
        Raise recipient_not_found;
@@ -134,6 +167,8 @@ BEGIN
                                           ,pi_subject       => l_hal_rec.hal_subject
                                           ,pi_mailformat    => Nvl(l_hatm_rec.hatm_mail_type,'T')
                                           ,pi_mail_body     => l_hal_rec.hal_mail_text
+                                          ,pi_att_file_name => l_att_name
+                                          ,pi_file_att      => l_attachment
                                           ,po_error_text    => l_error_text);                 
    IF l_send_mail_status
    THEN   
