@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.4   Apr 22 2010 12:11:26   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.5   May 10 2010 15:46:10   lsorathia  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Apr 22 2010 12:11:26  $
---       Date fetched Out : $Modtime:   Apr 19 2010 15:01:24  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   May 10 2010 15:46:10  $
+--       Date fetched Out : $Modtime:   May 10 2010 14:04:44  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -1135,7 +1135,30 @@ END run_process_now;
 --
 -----------------------------------------------------------------------------
 --
+-----------------------------------------------------------------------------
+--
+PROCEDURE create_alert_log (pi_hpal_rec IN OUT hig_process_alert_log%ROWTYPE)
+IS
+--
+   PRAGMA AUTONOMOUS_TRANSACTION ;
+--
+BEGIN
+--
+   SELECT hpal_id_seq.NEXTVAL 
+   INTO   pi_hpal_rec.hpal_id
+   FROM   dual;
 
+   INSERT INTO hig_process_alert_log VALUES pi_hpal_rec;
+
+   Commit;
+EXCEPTION
+WHEN OTHERS THEN
+    Raise_Application_Error(-2000,'Error while insertint into hig_process_alert_log '||SQLERRM);   
+--
+END create_alert_log;
+--
+-----------------------------------------------------------------------------
+--
 
 
 END hig_process_api;
