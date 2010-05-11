@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.27   May 05 2010 14:38:16   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.28   May 11 2010 16:12:20   rcoupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   May 05 2010 14:38:16  $
---       Date fetched Out : $Modtime:   May 05 2010 14:37:24  $
---       PVCS Version     : $Revision:   2.27  $
+--       Date into PVCS   : $Date:   May 11 2010 16:12:20  $
+--       Date fetched Out : $Modtime:   May 11 2010 16:11:10  $
+--       PVCS Version     : $Revision:   2.28  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Wed May 05  14:29:33 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Tue May 11  15:45:29 2010 by Server Generator 10.1.2.9.28
 
 
 
@@ -2988,6 +2988,70 @@ COMMENT ON COLUMN HIG_PROCESSES.HP_SUCCESS_FLAG IS 'Flag to denote the success o
 COMMENT ON COLUMN HIG_PROCESSES.HP_JOB_OWNER IS 'The schema against which the scheduled job for this process will be executed.'
 /
 
+PROMPT Creating Table 'HIG_PROCESS_ALERT_LOG'
+CREATE TABLE HIG_PROCESS_ALERT_LOG
+ (HPAL_ID NUMBER(38) NOT NULL
+ ,HPAL_SUCCESS_FLAG VARCHAR2(1) NOT NULL
+ ,HPAL_PROCESS_TYPE_ID NUMBER(38)
+ ,HPAL_PROCESS_ID NUMBER(38)
+ ,HPAL_JOB_RUN_SEQ NUMBER(38)
+ ,HPAL_ADMIN_UNIT NUMBER(9)
+ ,HPAL_UNIT_CODE VARCHAR2(10)
+ ,HPAL_UNIT_NAME VARCHAR2(40)
+ ,HPAL_INITIATED_USER VARCHAR2(30)
+ ,HPAL_CON_CODE VARCHAR2(10)
+ ,HPAL_CON_NAME VARCHAR2(40)
+ ,HPAL_CONTRACT_ID VARCHAR2(10)
+ ,HPAL_EMAIL_SUBJECT VARCHAR2(1000)
+ ,HPAL_EMAIL_BODY VARCHAR2(1000)
+ )
+/
+
+COMMENT ON TABLE HIG_PROCESS_ALERT_LOG IS 'A log of process events which may be used to trigger alert emails.  These will typically be used to warn of process failures.'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_ALERT_LOG.HPAL_ID IS 'Unique identifier generated from a sequence'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_ALERT_LOG.HPAL_SUCCESS_FLAG IS 'Flag to indicate the status of the alert log'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_ALERT_LOG.HPAL_PROCESS_TYPE_ID IS 'Process Type identifier'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_ALERT_LOG.HPAL_PROCESS_ID IS 'Process Identifier'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_ALERT_LOG.HPAL_JOB_RUN_SEQ IS 'The execution iteration of the given process.'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_ALERT_LOG.HPAL_ADMIN_UNIT IS 'Admin Unit'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_ALERT_LOG.HPAL_UNIT_CODE IS 'Admin Unit Code'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_ALERT_LOG.HPAL_UNIT_NAME IS 'Admin Unit Name'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_ALERT_LOG.HPAL_INITIATED_USER IS 'Process Initiator'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_ALERT_LOG.HPAL_CON_CODE IS 'Contractor code'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_ALERT_LOG.HPAL_CON_NAME IS 'Contractor Name'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_ALERT_LOG.HPAL_CONTRACT_ID IS 'Contractor Id'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_ALERT_LOG.HPAL_EMAIL_SUBJECT IS 'Text that can be used as parameter in Alert configuration'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_ALERT_LOG.HPAL_EMAIL_BODY IS 'Text that can be used as parameter in Alert configuration'
+/
+
 PROMPT Creating Table 'HIG_PROCESS_FILES'
 CREATE TABLE HIG_PROCESS_FILES
  (HPF_FILE_ID NUMBER(38) NOT NULL
@@ -3771,6 +3835,14 @@ CREATE TABLE MV_ERRORS
  (ERR_SEQUENCE NUMBER
  ,ERR_NUM NUMBER
  ,ERR_MSG VARCHAR2(1000)
+ )
+/
+
+PROMPT Creating Table 'MV_HIGHLIGHT'
+CREATE TABLE MV_HIGHLIGHT
+ (MV_ID INTEGER NOT NULL
+ ,MV_FEAT_TYPE VARCHAR2(10) NOT NULL
+ ,MV_GEOMETRY SDO_GEOMETRY
  )
 /
 
@@ -10173,9 +10245,10 @@ CREATE TABLE NM_TYPES
  ,NT_NODE_TYPE VARCHAR2(4)
  ,NT_DESCR VARCHAR2(80) NOT NULL
  ,NT_ADMIN_TYPE VARCHAR2(4) NOT NULL
- ,NT_LENGTH_UNIT NUMBER(9)
+ ,NT_LENGTH_UNIT NUMBER(9) NOT NULL
  ,NT_DATUM VARCHAR2(1) DEFAULT 'N' NOT NULL
  ,NT_POP_UNIQUE VARCHAR2(1) DEFAULT 'N' NOT NULL
+ ,NUT_UN_UNIT_ID NUMBER(4) NOT NULL
  )
 /
 
