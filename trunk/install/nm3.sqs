@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.sqs-arc   2.11   May 05 2010 14:36:32   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.sqs-arc   2.12   May 11 2010 16:09:52   rcoupe  $
 --       Module Name      : $Workfile:   nm3.sqs  $
---       Date into PVCS   : $Date:   May 05 2010 14:36:32  $
---       Date fetched Out : $Modtime:   May 05 2010 14:35:42  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   May 11 2010 16:09:52  $
+--       Date fetched Out : $Modtime:   May 11 2010 16:09:14  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Wed May 05  14:29:38 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Tue May 11  15:45:33 2010 by Server Generator 10.1.2.9.28
 
 PROMPT Creating Sequence 'BATCH_ID_SEQ'
 CREATE SEQUENCE BATCH_ID_SEQ
@@ -407,6 +407,13 @@ CREATE SEQUENCE HMLC_ID_SEQ
  NOCACHE
 /
 
+PROMPT Creating Sequence 'HPAL_ID_SEQ'
+CREATE SEQUENCE HPAL_ID_SEQ
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+/
+
 PROMPT Creating Sequence 'HPF_FILE_ID_SEQ'
 CREATE SEQUENCE HPF_FILE_ID_SEQ
  NOMAXVALUE
@@ -515,6 +522,13 @@ CREATE SEQUENCE MV_ERROR_SEQ
  NOMINVALUE
  NOCYCLE
  NOCACHE
+/
+
+PROMPT Creating Sequence 'MV_ID_SEQ'
+CREATE SEQUENCE MV_ID_SEQ
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
 /
 
 PROMPT Creating Sequence 'NAD_ID_SEQ'
