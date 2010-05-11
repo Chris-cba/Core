@@ -1,15 +1,16 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.15   Apr 23 2010 14:32:26   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.16   May 11 2010 16:08:06   rcoupe  $
 --       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   Apr 23 2010 14:32:26  $
---       Date fetched Out : $Modtime:   Apr 23 2010 14:32:04  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   May 11 2010 16:08:06  $
+--       Date fetched Out : $Modtime:   May 11 2010 16:07:32  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Fri Apr 23  14:29:34 2010 by Server Generator 10.1.2.9.28
+
+-- Generated for Oracle 10g on Tue May 11  15:45:32 2010 by Server Generator 10.1.2.9.28
 
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
@@ -150,6 +151,11 @@ PROMPT Creating Index 'DLC_IND1'
 CREATE UNIQUE INDEX DLC_IND1 ON DOC_LOCATIONS
  (DLC_DMD_ID
  ,DLC_ID)
+/
+
+PROMPT Creating Index 'DLA_DLC_ID_IND'
+CREATE INDEX DLA_DLC_ID_IND ON DOC_LOCATION_ARCHIVES
+ (DLA_DLC_ID)
 /
 
 PROMPT Creating Index 'DRP_CPR_IND'
@@ -456,6 +462,16 @@ CREATE INDEX HP_HPT_FK_IND ON HIG_PROCESSES
 PROMPT Creating Index 'HP_HSFR_FK_IND'
 CREATE INDEX HP_HSFR_FK_IND ON HIG_PROCESSES
  (HP_FREQUENCY_ID)
+/
+
+PROMPT Creating Index 'HPA_HPT_FK_IND'
+CREATE INDEX HPA_HPT_FK_IND ON HIG_PROCESS_ALERT_LOG
+ (HPAL_PROCESS_TYPE_ID)
+/
+
+PROMPT Creating Index 'HPA_HP_FK_IND'
+CREATE INDEX HPA_HP_FK_IND ON HIG_PROCESS_ALERT_LOG
+ (HPAL_PROCESS_ID)
 /
 
 PROMPT Creating Index 'HPF_HPJR_FK_IND'
