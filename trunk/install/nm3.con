@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.23   May 07 2010 10:22:24   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.24   May 11 2010 16:04:38   rcoupe  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   May 07 2010 10:22:24  $
---       Date fetched Out : $Modtime:   May 07 2010 10:21:02  $
---       PVCS Version     : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   May 11 2010 16:04:38  $
+--       Date fetched Out : $Modtime:   May 11 2010 16:03:40  $
+--       PVCS Version     : $Revision:   2.24  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Fri May 07  10:17:34 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Tue May 11  15:45:32 2010 by Server Generator 10.1.2.9.28
 
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -712,6 +712,12 @@ ALTER TABLE HIG_PROCESSES
   (HP_PROCESS_ID))
 /
 
+PROMPT Creating Primary Key on 'HIG_PROCESS_ALERT_LOG'
+ALTER TABLE HIG_PROCESS_ALERT_LOG
+ ADD (CONSTRAINT HPAL_PK PRIMARY KEY
+  (HPAL_ID))
+/
+
 PROMPT Creating Primary Key on 'HIG_PROCESS_FILES'
 ALTER TABLE HIG_PROCESS_FILES
  ADD (CONSTRAINT HPF_PK PRIMARY KEY
@@ -941,6 +947,13 @@ PROMPT Creating Primary Key on 'INTERVALS'
 ALTER TABLE INTERVALS
  ADD (CONSTRAINT INT_PK PRIMARY KEY
   (INT_CODE))
+/
+
+PROMPT Creating Primary Key on 'MV_HIGHLIGHT'
+ALTER TABLE MV_HIGHLIGHT
+ ADD (CONSTRAINT MV_HIGHLIGHT_PK PRIMARY KEY
+  (MV_ID
+  ,MV_FEAT_TYPE))
 /
 
 PROMPT Creating Primary Key on 'NM0575_EVENT_LOG'
@@ -2304,13 +2317,6 @@ ALTER TABLE DOC_LOCATIONS
   (DLC_NAME))
 /
 
-PROMPT Creating Unique Key on 'DOC_LOCATION_ARCHIVES'
-ALTER TABLE DOC_LOCATION_ARCHIVES
- ADD (CONSTRAINT DLA_UK UNIQUE
-  (DLA_DLC_ID
-  ,DLA_ARCHIVE_TYPE))
-/
-
 PROMPT Creating Unique Key on 'DOC_LOCATION_TABLES'
 ALTER TABLE DOC_LOCATION_TABLES
  ADD (CONSTRAINT DOC_LOCATION_TABLES_UK UNIQUE
@@ -3001,6 +3007,11 @@ ALTER TABLE HIG_OPTION_LIST
 PROMPT Creating Check Constraint on 'HIG_PROCESSES'
 ALTER TABLE HIG_PROCESSES
  ADD (CONSTRAINT HP_SUCCESS_FLAG_CHK CHECK (hp_success_flag in ('Y','N','TBD')))
+/
+
+PROMPT Creating Check Constraint on 'HIG_PROCESS_ALERT_LOG'
+ALTER TABLE HIG_PROCESS_ALERT_LOG
+ ADD (CONSTRAINT HPAL_HPAL_SUCCESS_FLAG_CHK CHECK (hpal_success_flag IN ('Y','N','I')))
 /
 
 PROMPT Creating Check Constraint on 'HIG_PROCESS_FILES'
@@ -5107,6 +5118,20 @@ ALTER TABLE HIG_PROCESSES ADD (CONSTRAINT
   (HSFR_FREQUENCY_ID))
 /
 
+PROMPT Creating Foreign Key on 'HIG_PROCESS_ALERT_LOG'
+ALTER TABLE HIG_PROCESS_ALERT_LOG ADD (CONSTRAINT
+ HPAL_HPT_FK FOREIGN KEY
+  (HPAL_PROCESS_TYPE_ID) REFERENCES HIG_PROCESS_TYPES
+  (HPT_PROCESS_TYPE_ID))
+/
+
+PROMPT Creating Foreign Key on 'HIG_PROCESS_ALERT_LOG'
+ALTER TABLE HIG_PROCESS_ALERT_LOG ADD (CONSTRAINT
+ HPAL_HP_FK FOREIGN KEY
+  (HPAL_PROCESS_ID) REFERENCES HIG_PROCESSES
+  (HP_PROCESS_ID))
+/
+
 PROMPT Creating Foreign Key on 'HIG_PROCESS_FILES'
 ALTER TABLE HIG_PROCESS_FILES ADD (CONSTRAINT
  HPF_HPFT_FK FOREIGN KEY
@@ -6541,6 +6566,13 @@ ALTER TABLE NM_TYPES ADD (CONSTRAINT
  NT_NNT_FK FOREIGN KEY
   (NT_NODE_TYPE) REFERENCES NM_NODE_TYPES
   (NNT_TYPE))
+/
+
+PROMPT Creating Foreign Key on 'NM_TYPES'
+ALTER TABLE NM_TYPES ADD (CONSTRAINT
+ NT_UN_FK FOREIGN KEY
+  (NT_LENGTH_UNIT) REFERENCES NM_UNITS
+  (UN_UNIT_ID))
 /
 
 PROMPT Creating Foreign Key on 'NM_TYPE_COLUMNS'
