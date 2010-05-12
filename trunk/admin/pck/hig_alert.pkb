@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.4   May 10 2010 15:52:44   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.5   May 12 2010 13:23:30   lsorathia  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   May 10 2010 15:52:44  $
---       Date fetched Out : $Modtime:   May 06 2010 09:29:14  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   May 12 2010 13:23:30  $
+--       Date fetched Out : $Modtime:   May 12 2010 13:19:54  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,11 +17,11 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.4  $';
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.5  $';
   g_app_owner     CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
-  g_trigger_text  Varchar2(32767);
-  g_trigger_text1 Varchar2(32767) ;  
+  g_trigger_text  clob;
+  --g_trigger_text1 Varchar2(32767) ;  
 
   g_package_name CONSTANT varchar2(30) := 'hig_alert';
   
@@ -144,7 +144,7 @@ BEGIN
        END IF ;
        IF l_attachment IS NOT NULL
        THEN
-           l_att_name := 'Log for '||l_hpt_rec.hpt_name||' '||To_Char(Sysdate)||'.txt' ;
+           l_att_name := 'Log for '||l_hpt_rec.hpt_name||' '||To_Char(Sysdate,'DD-Mon-YYYY')||'.txt' ;
        END IF ;
    END IF ;
    IF l_har_rec.har_recipient_email IS NULL
@@ -833,24 +833,40 @@ BEGIN
            END IF ;
        END IF ;
        IF l_time_counter_ela 
-       THEN            
+       THEN
+           FOR hal IN (SELECT har_recipient_email,count(0) cnt  
+                       FROM   hig_alerts,hig_alert_recipients 
+                       WHERE  hal_halt_id = hna.halt_id
+                       AND    hal_id      = har_hal_id
+                       AND    hal_status  = 'Pending'
+                       AND    har_status  = 'Pending'
+                       GROUP BY har_recipient_email
+                       HAVING Count(0) > 1 )
+           LOOP
+           --
+               send_batch_mail(pi_halt_id         => hna.halt_id
+                              ,pi_recipient_email => hal.har_recipient_email);        
+           -- 
+           END LOOP;
            FOR hno IN (SELECT * FROM hig_alerts 
                        WHERE  hal_halt_id = hna.halt_id 
                        AND   hal_status = 'Pending'
                        ORDER  by hal_date_created)
            LOOP
-               upd_hal_status(hno.hal_id,'Running');
-               Commit ;
-               FOR hnmd IN (SELECT * FROM hig_alert_recipients 
+               FOR har IN (SELECT * FROM hig_alert_recipients 
                             WHERE  har_hal_id = hno.hal_id     
                             AND    har_status = 'Pending'
                             ORDER  BY har_date_created)                                                               
                LOOP
-                   send_mail(hnmd.har_id);
+                   send_batch_single_mail(pi_halt_id   => hna.halt_id
+                                         ,pi_hal_id    => hno.hal_id
+                                         ,pi_har_id    => har.har_id);
                END LOOP;
-               upd_hal_status(hno.hal_id,'Completed');   
-               Commit ;
            END LOOP;
+           UPDATE hig_alerts
+           SET    hal_status  = 'Completed'     
+           WHERE  hal_halt_id =  hna.halt_id;
+            Commit;   
        END IF ;
        IF hna.halt_alert_type = 'Q'
        THEN
@@ -864,6 +880,266 @@ BEGIN
 --
 END run_alert_batch;
 --
+PROCEDURE send_batch_mail(pi_halt_id         IN hig_alert_types.halt_id%TYPE
+                         ,pi_recipient_email IN hig_alert_recipients.har_recipient_email%TYPE)
+IS
+--
+   TYPE               l_col_name_type IS TABLE OF VARCHAR(30) INDEX BY BINARY_INTEGER;
+   l_col_tab          l_col_name_type;
+   TYPE               l_col_value_type IS TABLE OF VARCHAR(1000) INDEX BY BINARY_INTEGER;
+   l_col_value_tab    l_col_value_type;
+   l_hatm_rec         hig_alert_type_mail%ROWTYPE;
+   l_nit_rec          nm_inv_types%ROWTYPE ;
+   l_halt_rec         hig_alert_types%ROWTYPE ; 
+   l_email_body       Varchar2(32767);
+   l_subject          Varchar2(1000);
+   l_ita_rec          nm_inv_type_attribs_all%ROWTYPE;
+   l_value            Varchar2(4000) ;
+   l_email_table      clob;
+   l_send_mail_status Boolean;
+   l_error_text       clob;
+--
+BEGIN
+--
+   l_hatm_rec := hig_alert.get_hatm(pi_halt_id);
+   IF l_hatm_rec.hatm_param_1 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_1;
+   END IF ;   
+   IF l_hatm_rec.hatm_param_2 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_2;
+   END IF ;
+   IF l_hatm_rec.hatm_param_3 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_3;
+   END IF ;
+   IF l_hatm_rec.hatm_param_4 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_4;
+   END IF ;
+   IF l_hatm_rec.hatm_param_5 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_5;
+   END IF ;
+   IF l_hatm_rec.hatm_param_6 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_6;
+   END IF ;
+   IF l_hatm_rec.hatm_param_7 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_7;
+   END IF ;
+   IF l_hatm_rec.hatm_param_8 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_8;
+   END IF ;
+   IF l_hatm_rec.hatm_param_9 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_9;
+   END IF ;
+   IF l_hatm_rec.hatm_param_10 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_10;
+   END IF ;
+   l_halt_rec    := hig_alert.get_halt(pi_halt_id);
+   l_nit_rec     := nm3get.get_nit(l_halt_rec.halt_nit_inv_type);
+   l_subject     := l_hatm_rec.hatm_subject ;
+   l_email_table := '<table border="1">  <tr> ' ;
+   IF Nvl(l_col_tab.count,0) > 0
+   THEN     
+       FOR i in 1..l_col_tab.count 
+       LOOP
+           l_ita_rec := nm3get.get_ita(pi_ita_inv_type => l_nit_rec.nit_inv_type ,pi_ita_attrib_name => l_col_tab(i));                
+           l_email_table  := l_email_table|| ' <td> <b>'||l_ita_rec.ita_scrn_text ||' </b></td> ';
+       END LOOP;
+   ELSE
+       l_ita_rec := nm3get.get_ita(pi_ita_inv_type => l_nit_rec.nit_inv_type ,pi_ita_attrib_name => l_nit_rec.nit_foreign_pk_column); 
+       l_email_table  := l_email_table|| ' <td> <b>'||l_ita_rec.ita_scrn_text ||' </b></td> ';
+   END IF;     
+   l_email_body := l_email_body ||' </tr> ';                                
+   FOR hal IN (SELECT hal.* 
+                FROM   hig_alerts hal ,hig_alert_recipients 
+                WHERE  hal_halt_id = pi_halt_id
+                AND    hal_id = har_hal_id
+                AND    hal_status = 'Pending'
+                AND    har_status  = 'Pending'
+                AND    har_recipient_email = pi_recipient_email )
+   LOOP
+       l_email_table  := l_email_table ||' <tr> ';             
+       IF Nvl(l_col_tab.count,0) > 0
+       THEN     
+           FOR i in 1..l_col_tab.count 
+           LOOP
+               Execute Immediate 'SELECT '||l_col_tab(i)||Chr(10)||
+                                 'FROM   '||l_nit_rec.nit_table_name||Chr(10)||
+                                 'WHERE  '||l_nit_rec.nit_foreign_pk_column||' = :1' INTO l_value  USING hal.hal_pk_id;
+               l_email_table  := l_email_table|| ' <td>'||Nvl(l_value,nm3web.c_nbsp)||'</td> ';                  
+           END LOOP;
+       ELSE
+           l_email_table  := l_email_table|| ' <td>'||hal.hal_pk_id||'</td> ';
+       END IF ;   
+       l_email_table  := l_email_table ||' </tr> ';      
+   END LOOP;    
+   l_email_table  := l_email_table ||Chr(10)||'</table>'||Chr(10);
+   l_email_body   := Replace(l_hatm_rec.hatm_mail_text,'{table}',l_email_table);
+   l_email_body   := Replace(l_email_body,Chr(10),'</br>');
+   l_send_mail_status := nm3mail.send_mail(pi_recipient_to  => pi_recipient_email 
+                                          ,pi_subject       => l_subject
+                                          ,pi_mailformat    => 'H'
+                                          ,pi_mail_body     => l_email_body
+                                          ,po_error_text    => l_error_text);                 
+   IF l_send_mail_status
+   THEN   
+       Update hig_alert_recipients
+       SET    har_status = 'Completed'
+       WHERE  har_hal_id IN (SELECT hal_id 
+                             FROM   hig_alerts
+                             WHERE  hal_halt_id = pi_halt_id 
+                             AND    hal_status = 'Pending')
+       AND    har_status  = 'Pending'
+       AND    har_recipient_email = pi_recipient_email;
+   ELSE
+       Update hig_alert_recipients
+       SET    har_status   = 'Failed'
+             ,har_comments = l_error_text
+       WHERE  har_hal_id IN (SELECT hal_id 
+                             FROM   hig_alerts
+                             WHERE  hal_halt_id = pi_halt_id 
+                             AND    hal_status = 'Pending')
+       AND    har_status  = 'Pending'
+       AND    har_recipient_email = pi_recipient_email;
+   END IF ;
+   Commit;
+--
+END send_batch_mail;
+--
+PROCEDURE send_batch_single_mail(pi_halt_id  IN hig_alert_types.halt_id%TYPE
+                                ,pi_hal_id   IN hig_alerts.hal_id%TYPE 
+                                ,pi_har_id   IN hig_alert_recipients.har_id%TYPE)
+IS
+--
+   TYPE               l_col_name_type IS TABLE OF VARCHAR(30) INDEX BY BINARY_INTEGER;
+   l_col_tab          l_col_name_type;
+   TYPE               l_col_value_type IS TABLE OF VARCHAR(1000) INDEX BY BINARY_INTEGER;
+   l_col_value_tab    l_col_value_type;
+   l_hatm_rec         hig_alert_type_mail%ROWTYPE;
+   l_nit_rec          nm_inv_types%ROWTYPE ;
+   l_halt_rec         hig_alert_types%ROWTYPE ; 
+   l_email_body       Varchar2(32767);
+   l_subject          Varchar2(1000);
+   l_ita_rec          nm_inv_type_attribs_all%ROWTYPE;
+   l_value            Varchar2(4000) ;
+   l_email_table      clob;
+   l_send_mail_status Boolean;
+   l_error_text       clob;
+   l_har_rec          hig_alert_recipients%ROWTYPE;
+--
+BEGIN
+--
+   l_hatm_rec := hig_alert.get_hatm(pi_halt_id);
+   l_har_rec  := hig_alert.get_har(pi_har_id);
+   IF l_hatm_rec.hatm_param_1 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_1;
+   END IF ;   
+   IF l_hatm_rec.hatm_param_2 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_2;
+   END IF ;
+   IF l_hatm_rec.hatm_param_3 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_3;
+   END IF ;
+   IF l_hatm_rec.hatm_param_4 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_4;
+   END IF ;
+   IF l_hatm_rec.hatm_param_5 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_5;
+   END IF ;
+   IF l_hatm_rec.hatm_param_6 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_6;
+   END IF ;
+   IF l_hatm_rec.hatm_param_7 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_7;
+   END IF ;
+   IF l_hatm_rec.hatm_param_8 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_8;
+   END IF ;
+   IF l_hatm_rec.hatm_param_9 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_9;
+   END IF ;
+   IF l_hatm_rec.hatm_param_10 IS NOT NULL
+   THEN
+       l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_10;
+   END IF ;
+   l_halt_rec    := hig_alert.get_halt(pi_halt_id);
+   l_nit_rec     := nm3get.get_nit(l_halt_rec.halt_nit_inv_type);
+   l_subject     := l_hatm_rec.hatm_subject ;
+   l_email_table := '<table border="1">  <tr> ' ;
+   IF Nvl(l_col_tab.count,0) > 0
+   THEN     
+       FOR i in 1..l_col_tab.count 
+       LOOP
+           l_ita_rec := nm3get.get_ita(pi_ita_inv_type => l_nit_rec.nit_inv_type ,pi_ita_attrib_name => l_col_tab(i));                
+           l_email_table  := l_email_table|| ' <td> <b>'||l_ita_rec.ita_scrn_text ||' </b> </td> ';
+       END LOOP;
+   ELSE
+       l_ita_rec := nm3get.get_ita(pi_ita_inv_type => l_nit_rec.nit_inv_type ,pi_ita_attrib_name => l_nit_rec.nit_foreign_pk_column); 
+       l_email_table  := l_email_table|| ' <td> <b>'||l_ita_rec.ita_scrn_text ||' </b></td> ';    
+   END IF;     
+   l_email_body := l_email_body ||' </tr> ';                                
+   FOR hal IN (SELECT hal.* 
+                FROM   hig_alerts hal ,hig_alert_recipients 
+                WHERE  hal_id = pi_hal_id
+                AND    hal_id = har_hal_id
+                AND    hal_status = 'Pending'
+                AND    har_status  = 'Pending')
+   LOOP
+       l_email_table  := l_email_table ||' <tr> ';             
+       IF Nvl(l_col_tab.count,0) > 0
+       THEN     
+           FOR i in 1..l_col_tab.count 
+           LOOP
+               Execute Immediate 'SELECT '||l_col_tab(i)||Chr(10)||
+                                 'FROM   '||l_nit_rec.nit_table_name||Chr(10)||
+                                 'WHERE  '||l_nit_rec.nit_foreign_pk_column||' = :1' INTO l_value  USING hal.hal_pk_id;
+               l_email_table  := l_email_table|| ' <td>'||Nvl(l_value,nm3web.c_nbsp)||'</td> ';                  
+           END LOOP;
+       ELSE
+           l_email_table  := l_email_table|| ' <td>'||hal.hal_pk_id||'</td> ';
+       END IF ;   
+       l_email_table  := l_email_table ||' </tr> ';      
+   END LOOP;    
+   l_email_table  := l_email_table ||Chr(10)||'</table>'||Chr(10);
+   l_email_body   := Replace(l_hatm_rec.hatm_mail_text,'{table}',l_email_table);
+   l_email_body   := Replace(l_email_body,Chr(10),'</br>');
+   l_send_mail_status := nm3mail.send_mail(pi_recipient_to  => l_har_rec.har_recipient_email
+                                          ,pi_subject       => l_subject
+                                          ,pi_mailformat    => 'H'
+                                          ,pi_mail_body     => l_email_body
+                                          ,po_error_text    => l_error_text);                 
+   IF l_send_mail_status
+   THEN   
+       Update hig_alert_recipients
+       SET    har_status = 'Completed'
+       WHERE  har_id     = pi_har_id;
+   ELSE
+       Update hig_alert_recipients
+       SET    har_status   = 'Failed'
+             ,har_comments = l_error_text
+       WHERE  har_id     = pi_har_id;
+   END IF ;
+   Commit;
+--
+END send_batch_single_mail;
+--
 PROCEDURE append(pi_text     Varchar2
                 ,pi_new_line Varchar2 Default 'Y' )
 IS
@@ -871,19 +1147,9 @@ BEGIN
 --
    IF pi_new_line = 'Y'
    THEN
-       IF Length(g_trigger_text) >= 32500
-       THEN
-           g_trigger_text1 := g_trigger_text1||CHR(10)||pi_text;
-       ELSE
-           g_trigger_text := g_trigger_text||CHR(10)||pi_text;
-       END IF;
+       g_trigger_text := g_trigger_text||CHR(10)||pi_text;
    ELSE
-       IF Length(g_trigger_text) >= 32500
-       THEN
-           g_trigger_text1 := g_trigger_text1||CHR(10)||pi_text;
-       ELSE   
-           g_trigger_text := g_trigger_text||' '||pi_text;
-       END IF ;   
+       g_trigger_text := g_trigger_text||' '||pi_text;
    END IF ;
 --
 END append;
@@ -1250,7 +1516,8 @@ BEGIN
 --nm_debug.debug(l_trigger_name);
 --nm_debug.debug(g_trigger_text);
 --nm_debug.debug(Length(g_trigger_text));
-       Execute Immediate g_trigger_text||g_trigger_text1 ;
+       --Execute Immediate g_trigger_text||g_trigger_text1 ;
+       nm3clob.execute_immediate_clob(g_trigger_text);
        Commit;
        g_trigger_text :=  Null ;
    END IF ; 
