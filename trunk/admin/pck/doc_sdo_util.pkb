@@ -5,20 +5,20 @@ IS
   --
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkb-arc   2.2   May 07 2010 12:21:38   cstrettle  $
+  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkb-arc   2.3   May 12 2010 10:03:26   cstrettle  $
   --       Module Name      : $Workfile:   doc_sdo_util.pkb  $
-  --       Date into PVCS   : $Date:   May 07 2010 12:21:38  $
-  --       Date fetched Out : $Modtime:   May 07 2010 12:10:24  $
-  --       Version          : $Revision:   2.2  $
+  --       Date into PVCS   : $Date:   May 12 2010 10:03:26  $
+  --       Date fetched Out : $Modtime:   May 12 2010 10:01:08  $
+  --       Version          : $Revision:   2.3  $
   --
-  --   Author : Chris Strettle
+  --   Author : Christopher Strettle
   --
   -----------------------------------------------------------------------------
   --   Copyright (c) exor corporation ltd, 2006
   -----------------------------------------------------------------------------
   --
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
   g_package_name         CONSTANT VARCHAR2(30) := 'DOC_SDO_UTIL';
   nl                     CONSTANT VARCHAR2(5) := chr(10);
 
@@ -29,7 +29,7 @@ IS
   --
   g_theme_name           nm3type.tab_varchar30;
   g_theme_functions      tab_ntf;
-  g_theme_feature_views  nm3type.tab_varchar30;
+  --g_theme_feature_views  nm3type.tab_varchar30;
 
   --
   --   g_prod_option          CONSTANT hig_option_values.hov_id%TYPE     := 'SDOPEMNTH';
@@ -52,7 +52,15 @@ IS
   BEGIN
     RETURN g_body_sccsid;
   END get_body_version;
-
+  --
+  -----------------------------------------------------------------------------
+  --
+/*  FUNCTION is_default_theme_name(p_theme_name nm_themes_all.nth_theme_name%TYPE )
+  RETURN BOOLEAN
+  IS
+  BEGIN
+    RETURN g_view_theme_name = p_theme_name;
+  END is_default_theme_name;*/
   --
   -----------------------------------------------------------------------------
   --
@@ -147,8 +155,6 @@ IS
     l_theme_id             NUMBER := nm3seq.next_nth_theme_id_seq;
     l_view_theme_id        NUMBER := nm3seq.next_nth_theme_id_seq;
     l_dummy                NUMBER;
-    g_theme_feature_views  VARCHAR2(30) := 'V_DOCUMENTS_XY_SDO';
-    g_view_theme_name      VARCHAR2(30) := 'DOCUMENTS';
     l_doc_sdo_view_sql     nm3type.max_varchar2;
   BEGIN
     --
@@ -183,14 +189,14 @@ IS
     --------------------------------------------------------------
     --
     l_rec_nth.nth_theme_id               := l_theme_id;
-    l_rec_nth.nth_theme_name             := pi_theme_name;
+    l_rec_nth.nth_theme_name             := substr(pi_theme_name, 0, 26) || '_TAB';
     l_rec_nth.nth_table_name             := g_table_name;
     --
     l_rec_nth.nth_where                  :=
       g_x_column || ' IS NOT NULL ' || 'AND ' || g_y_column ||
       ' IS NOT NULL ';
 
-    IF nm3ddl.does_object_exist(g_feature_tab) THEN
+   IF nm3ddl.does_object_exist(g_feature_tab) THEN
       raise_application_error(-20110, g_feature_tab ||
                                       ' exists - please drop or rename');
     END IF;
@@ -278,7 +284,7 @@ IS
     l_rec_nth_v                          := l_rec_nth;
     --
     l_rec_nth_v.nth_theme_id             := l_view_theme_id;
-    l_rec_nth_v.nth_theme_name           := g_view_theme_name;
+    l_rec_nth_v.nth_theme_name           := pi_theme_name;
     l_rec_nth_v.nth_table_name           := g_view_name;
     l_rec_nth_v.nth_pk_column            := g_view_pk_col;
     l_rec_nth_v.nth_label_column         := g_view_pk_col;
