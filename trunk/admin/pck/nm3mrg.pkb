@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3mrg IS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkb-arc   2.6   03 May 2010 13:07:02   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkb-arc   2.7   12 May 2010 14:03:36   ptanava  $
 --       Module Name      : $Workfile:   nm3mrg.pkb  $
---       Date into PVCS   : $Date:   03 May 2010 13:07:02  $
---       Date fetched Out : $Modtime:   03 May 2010 12:07:56  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   12 May 2010 14:03:36  $
+--       Date fetched Out : $Modtime:   12 May 2010 13:48:24  $
+--       PVCS Version     : $Revision:   2.7  $
 --       Based on SCCS version : 1.60
 --
 --   Author : Jonathan Mills
@@ -28,9 +28,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mrg IS
   07.04.09 PT log 724637: in load_temp_extent_datums() changed the member datum multiple routes check logic to work as intended
   03.05.10 PT load_temp_extent_datums() and related subprocedures moved to nm3bulk_mrg
                 NB! requires nm3bulk_mrg.pkh 2.6 or higher
+  12.05.10 PT added p_domain_return parameter in call to nm3bulk_mrg.std_run()
+                NB! requires nm3bulk_mrg_pkh 2.7 or higher (logs 723574, 724275)
 */
 
-  g_body_sccsid   constant varchar2(200) :='"$Revision:   2.6  $"';
+  g_body_sccsid   constant varchar2(200) :='"$Revision:   2.7  $"';
   g_package_name     CONSTANT  varchar2(30)   := 'NM3MRG';
 --
   g_mrg_section_id  pls_integer;
@@ -176,6 +178,7 @@ BEGIN
       ,p_nqr_admin_unit => pi_admin_unit
       ,p_nqr_source     => nm3bulk_mrg.NQR_SOURCE_TEMP_NE
       ,p_nqr_source_id  => pi_nte_job_id
+      ,p_domain_return  => null -- defaults to 'C' - code
       ,p_nmq_descr      => pi_description
       ,p_criteria_rowcount => l_sqlcount
       ,p_mrg_job_id     => po_result_job_id
