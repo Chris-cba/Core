@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.5   03 May 2010 13:03:24   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.6   13 May 2010 10:19:40   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   03 May 2010 13:03:24  $
---       Date fetched Out : $Modtime:   03 May 2010 13:02:30  $
---       PVCS Version     : $Revision:   2.32.1.5  $
+--       Date into PVCS   : $Date:   13 May 2010 10:19:40  $
+--       Date fetched Out : $Modtime:   12 May 2010 16:43:28  $
+--       PVCS Version     : $Revision:   2.32.1.6  $
 --
 --
 --   Author : Priidu Tanava
@@ -101,15 +101,20 @@ No query types defined.
                3) added p_route_group_type to load_group_type_datums()
                4) log 722431 replaced sql_load_nm_datum_criteria_tmp() with the implementation from nm3mrg.pkb
                5) in std_run() removed parameter p_ignore_poe
-  03.05.10 PT  6) log 724637: the implementation of load_temp_extent_datums() copied from nm3mrg.pkb
+  03.05.10  PT 6) log 724637: the implementation of load_temp_extent_datums() copied from nm3mrg.pkb
+  10.05.10  PT logs 723574, 724275: fixed in std_ins_invitems()
+                added parameter p_domain_return to std_run()
+                added attribute iit_domain to ita_mapping_rec
+                added std_run() without p_longops parameter
+                NB! requires nm3bulk_mrg.pkh 2.7
+                
   
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
-        add p_group_type variable to load_group_datums() to specify driving group type when loaded group is non-linear
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.5  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.6  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
   
   cr  constant varchar2(1) := chr(10);
@@ -158,6 +163,7 @@ No query types defined.
      p_mrg_job_id in nm_mrg_query_results_all.nqr_mrg_job_id%type
     ,pt_attr  in ita_mapping_tbl
     ,pt_itd   in itd_tbl
+    ,p_domain_return in varchar2
     ,p_splits_rowcount in integer
   );
   
@@ -178,7 +184,7 @@ No query types defined.
   ) return varchar2;
   
   
-  function sql_load_nm_datum_criteria_tmp(
+  function sql_nm_datum_criteria_pre_tmp(
      p_elements_sql in varchar2
   ) return varchar2;
   
@@ -196,6 +202,14 @@ No query types defined.
     ,pt_itd   in itd_tbl
   ) return binary_integer;
   
+  procedure clear_datum_criteria_pre_tmp;
+  procedure clear_datum_criteria_tmp;
+  procedure clear_route_connectivity_tmp;
+  
+  procedure load_nm_datum_criteria_tmp(
+     p_group_type in nm_group_types_all.ngt_group_type%type
+    ,p_sqlcount out pls_integer
+  );
   
   function get_version return varchar2 is
   begin
@@ -1115,6 +1129,7 @@ No query types defined.
           , ta.ita_format
          ), 'VARCHAR2') ita_format
         ,ta.ita_format_mask
+        ,ta.ita_id_domain
         ,t.nit_table_name
         ,decode(t.nit_table_name, null, null
           ,nvl((select 'Y' from nm_inv_nw
@@ -1169,6 +1184,8 @@ No query types defined.
       pt_attr(i).ita_attrib_name    := r.ita_attrib_name;
       pt_attr(i).iit_attrib_name    := r.iit_attrib_name;
       pt_attr(i).ita_format         := r.ita_format;
+      pt_attr(i).ita_format_mask    := r.ita_format_mask;
+      pt_attr(i).ita_domain         := r.ita_id_domain;
       pt_attr(i).table_name         := r.nit_table_name;
       pt_attr(i).table_iit_flag     := r.table_iit_flag;
       pt_attr(i).table_pk_column    := r.nit_foreign_pk_column;
@@ -1221,12 +1238,12 @@ No query types defined.
     
     nm3dbg.putln('pt_attr.count='||pt_attr.count||', pt_itd.count='||pt_itd.count);
     nm3dbg.deind;
---  exception
---    when others then
---      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_attrib_metadata('
---        ||'p_nmq_id='||p_nmq_id
---        ||')');
---      raise;
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_attrib_metadata('
+        ||'p_nmq_id='||p_nmq_id
+        ||')');
+      raise;
       
   end;
   
@@ -1278,7 +1295,9 @@ No query types defined.
        ||cr||l_sql_conn
        ||cr||')';
        
-    execute immediate 'truncate table nm_route_connectivity_tmp';
+    -- truncate nm_route_connectivity_tmp
+    clear_route_connectivity_tmp;
+    --execute immediate 'truncate table nm_route_connectivity_tmp';
     
     nm3dbg.putln(l_sql);
     execute immediate l_sql;
@@ -1346,6 +1365,7 @@ No query types defined.
     ,p_admin_unit_id in nm_admin_units_all.nau_admin_unit%type
     ,p_nqr_source in nm_mrg_query_results_all.nqr_source%type
     ,p_nqr_source_id in nm_mrg_query_results_all.nqr_source_id%type
+    ,p_domain_return in varchar2
     ,p_splits_rowcount in integer
     ,p_description in varchar2
     ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
@@ -1396,6 +1416,7 @@ No query types defined.
       ||', p_admin_unit_id='||p_admin_unit_id
       ||', p_nqr_source='||p_nqr_source
       ||', p_nqr_source_id='||p_nqr_source_id
+      ||', p_domain_return='||p_domain_return
       ||', p_splits_rowcount='||p_splits_rowcount
       ||', p_description='||p_description
       ||')');
@@ -1677,6 +1698,7 @@ No query types defined.
          p_mrg_job_id => r_res.nqr_mrg_job_id
         ,pt_attr  => pt_attr
         ,pt_itd   => pt_itd
+        ,p_domain_return => p_domain_return
         ,p_splits_rowcount => p_splits_rowcount
       );
           
@@ -1699,6 +1721,7 @@ No query types defined.
         ||', p_admin_unit_id='||p_admin_unit_id
         ||', p_nqr_source='||p_nqr_source
         ||', p_nqr_source_id='||p_nqr_source_id
+        ||', p_domain_return='||p_domain_return
         ||', p_splits_rowcount='||p_splits_rowcount
         ||', j='||j
         ||', i='||i
@@ -1724,6 +1747,7 @@ No query types defined.
     ,p_nqr_admin_unit in nm_mrg_query_results_all.nqr_admin_unit%type
     ,p_nqr_source in nm_mrg_query_results_all.nqr_source%type
     ,p_nqr_source_id in nm_mrg_query_results_all.nqr_source_id%type
+    ,p_domain_return in varchar2
     ,p_nmq_descr in nm_mrg_query_all.nmq_descr%type
     ,p_criteria_rowcount in integer
     ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
@@ -1745,6 +1769,7 @@ No query types defined.
       ||', p_nqr_admin_unit='||p_nqr_admin_unit
       ||', p_nqr_source='||p_nqr_source
       ||', p_nqr_source_id='||p_nqr_source_id
+      ||', p_domain_return='||p_domain_return
       ||', p_nmq_descr='||p_nmq_descr
       ||', p_criteria_rowcount='||p_criteria_rowcount
       ||', l_effective_date='||l_effective_date
@@ -1816,6 +1841,7 @@ No query types defined.
       ,pt_itd           => t_idt
       ,p_nqr_source     => p_nqr_source
       ,p_nqr_source_id  => p_nqr_source_id
+      ,p_domain_return  => p_domain_return
       ,p_admin_unit_id  => p_nqr_admin_unit
       ,p_splits_rowcount => l_splits_rowcount -- in
       ,p_description    => p_nmq_descr
@@ -1831,6 +1857,7 @@ No query types defined.
         ||', p_nqr_admin_unit='||p_nqr_admin_unit
         ||', p_nqr_source='||p_nqr_source
         ||', p_nqr_source_id='||p_nqr_source_id
+        ||', p_domain_return='||p_domain_return
         ||', p_nmq_descr='||p_nmq_descr
         ||', p_criteria_rowcount='||p_criteria_rowcount
         ||', l_inner_join='||nm3dbg.to_char(l_inner_join)
@@ -1840,6 +1867,69 @@ No query types defined.
         ||')');
       raise;
       
+  end;
+  
+  
+  -- this is std_run from above without p_longops_rec
+  procedure std_run(
+     p_nmq_id in nm_mrg_query_all.nmq_id%type
+    ,p_nqr_admin_unit in nm_mrg_query_results_all.nqr_admin_unit%type
+    ,p_nqr_source in nm_mrg_query_results_all.nqr_source%type
+    ,p_nqr_source_id in nm_mrg_query_results_all.nqr_source_id%type
+    ,p_domain_return in varchar2
+    ,p_nmq_descr in nm_mrg_query_all.nmq_descr%type
+    ,p_criteria_rowcount in integer
+    ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
+  )
+  is
+    r_longops       nm3sql.longops_rec;
+    
+  begin
+    nm3dbg.putln(g_package_name||'.std_run('
+      ||'p_nmq_id='||p_nmq_id
+      ||', p_nqr_admin_unit='||p_nqr_admin_unit
+      ||', p_nqr_source='||p_nqr_source
+      ||', p_nqr_source_id='||p_nqr_source_id
+      ||', p_domain_return='||p_domain_return
+      ||', p_nmq_descr='||p_nmq_descr
+      ||', p_criteria_rowcount='||p_criteria_rowcount
+      ||')');
+    nm3dbg.ind;
+    
+    -- 0 initialize
+    r_longops.rindex      := -1; -- dbms_application_info.set_session_longops_nohint;
+    r_longops.op_name     := 'Merge Query: '||p_nmq_id;
+    r_longops.context     := null;
+    r_longops.sofar       := 0;
+    r_longops.totalwork   := 3;
+    r_longops.target_desc  := p_nqr_source_id;
+    nm3sql.set_longops(p_rec => r_longops, p_increment => 0);
+    
+    std_run(
+       p_nmq_id         => p_nmq_id
+      ,p_nqr_admin_unit => p_nqr_admin_unit
+      ,p_nqr_source     => p_nqr_source
+      ,p_nqr_source_id  => p_nqr_source_id
+      ,p_domain_return  => p_domain_return
+      ,p_nmq_descr      => p_nmq_descr
+      ,p_criteria_rowcount => p_criteria_rowcount
+      ,p_mrg_job_id     => p_mrg_job_id
+      ,p_longops_rec    => r_longops
+    );
+    
+    nm3dbg.deind;
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.std_run('
+        ||'p_nmq_id='||p_nmq_id
+        ||', p_nqr_admin_unit='||p_nqr_admin_unit
+        ||', p_nqr_source='||p_nqr_source
+        ||', p_nqr_source_id='||p_nqr_source_id
+        ||', p_domain_return='||p_domain_return
+        ||', p_nmq_descr='||p_nmq_descr
+        ||', p_criteria_rowcount='||p_criteria_rowcount
+        ||')');
+      raise;
   end;
     
   
@@ -1852,13 +1942,22 @@ No query types defined.
      p_mrg_job_id in nm_mrg_query_results_all.nqr_mrg_job_id%type
     ,pt_attr  in ita_mapping_tbl
     ,pt_itd   in itd_tbl
+    ,p_domain_return in varchar2
     ,p_splits_rowcount in integer
   )
   is
     cr            constant varchar2(1) := chr(10);
     l_sql         varchar2(32767);
     i             binary_integer;
-    l_splits_cardinality integer;
+    l_splits_cardinality      integer;
+    l_sql_ial_effective_date  constant varchar2(200) := nm3dynsql.sql_effective_date(
+       p_date               => nm3user.get_effective_date
+      ,p_start_date_column  => 'ial_start_date'
+      ,p_end_date_column    => 'ial_end_date'
+    );
+    l_def_user_date_format    constant varchar2(30) := 'DD-MON-YYYY HH24:MI:SS';
+    --l_ial_date_format         varchar2(30);
+    
     -- This is used in bulk insert
     --  ,case i.iit_inv_type
     --   when 'RSCS' then i.IIT_MATERIAL
@@ -2015,60 +2114,137 @@ No query types defined.
        p_format in boolean
     ) return varchar2
     is
-      s         varchar2(32767);
-      j         binary_integer := 0;
-      l_conversion varchar2(20);
-      l_cr      varchar2(1);
-      l_attrib  varchar2(100);
+      s             varchar2(32767);
+      j             binary_integer := 0;
+      l_conversion  varchar2(20);
+      l_cr          varchar2(1);
+      l_attrib      varchar2(100);
+      l_formatted_attrib  varchar2(500);
       l_ita_format_mask nm_inv_type_attribs_all.ita_format_mask%type;
-      b         binary_integer;
+      b             binary_integer;
       l_ita_format  varchar2(20);
+      l_format      boolean;
+      l_domain_return varchar2(1); -- C|M|B
       
     begin
+--      nm3dbg.putln(g_package_name||'.sql_nsv_attrib_cols('
+--        ||'p_format='||nm3dbg.to_char(p_format)
+--        ||')');
+--      nm3dbg.ind;
+    
       i := pt_attr.first;
       while i is not null loop
         j := j + 1;
         l_attrib := 'nsv_attrib'||j;
+        l_ita_format_mask := null;
         l_conversion      := null;
+        l_format          := p_format;
         
-        -- ignore formatting if banding is used
-        if p_format and first_banding_index(pt_attr(i), pt_itd) is null then
-          -- manually select ita_format_mask until it is made part of ita_mapping_rec
-          if pt_attr(i).ita_format in ('NUMBER', 'DATE') then
-            l_conversion := lower('to_'||pt_attr(i).ita_format);
-          
---            -- some columns like iit_end_date are not declared in nm_inv_type_attribs_all
---            begin
---              select ta.ita_format_mask
---              into l_ita_format_mask
---              from
---                 nm_inv_type_attribs_all ta
---              where ta.ita_inv_type = pt_attr(i).inv_type
---                and ta.ita_attrib_name = nvl2(pt_attr(i).table_name, pt_attr(i).ita_attrib_name, pt_attr(i).iit_attrib_name);
---            exception
---              when no_data_found then
---                null;
---            end;
-            l_ita_format_mask := pt_attr(i).ita_format_mask;
-       
-          end if;
-          
-          if pt_attr(i).ita_format = 'DATE' then
-            l_ita_format_mask := nvl(l_ita_format_mask, m_mrg_date_format);
-          end if;
+        -- only do domain lookup if formating is required
+        if p_format then
+          l_domain_return := nvl(p_domain_return, 'C');
+        else
+          l_domain_return := 'C';
         end if;
+        
+        -- domain return is CODE when no domain
+        if pt_attr(i).ita_domain is null then
+          l_domain_return := 'C';
+        end if;
+        
+        -- is there banding?
+        b := first_banding_index(
+           pr_attr  => pt_attr(i)
+          ,pt_itd   => pt_itd
+        );
+        
+        -- banded value: no formatting, no domain lookup
+        if b is not null then
+          l_format := false;
+          l_domain_return := 'C';
+        
+        end if;
+        
+        
+        -- formatting is required
+        if l_format and pt_attr(i).ita_format in ('NUMBER', 'DATE') then
+          l_conversion := lower('to_'||pt_attr(i).ita_format);
+          
+          -- CODE value
+          if l_domain_return = 'C' then
+            l_ita_format_mask := pt_attr(i).ita_format_mask;
+            
+            -- for dates default to m_mrg_date_format
+            if pt_attr(i).ita_format = 'DATE' then
+              l_ita_format_mask := nvl(l_ita_format_mask, m_mrg_date_format);
+            end if;
+            
+          -- MEANING or BOTH value
+          else
+            -- domain lookup date formatting inferred from nm3inv.get_inv_domain_meaning()
+            --  (no domain lookup formatting for numbers)
+            if pt_attr(i).ita_format = 'DATE' then
+              l_ita_format_mask := nvl(nm3user.get_user_date_mask, l_def_user_date_format);
+              
+            end if;
+            
+          end if;
+        
+        end if;
+        
+--        nm3dbg.putln('p_format='||nm3dbg.to_char(p_format)
+--          ||', p_domain_return='||p_domain_return
+--          ||', pt_attr('||i||').ita_domain='||pt_attr(i).ita_domain
+--          ||', pt_attr('||i||').ita_format='||pt_attr(i).ita_format
+--          ||', pt_attr('||i||').ita_format_mask='||pt_attr(i).ita_format_mask
+--          ||', l_domain_return='||l_domain_return
+--          ||', l_ita_format='||l_ita_format
+--          ||', l_ita_format_mask='||l_ita_format_mask
+--          ||', l_format='||nm3dbg.to_char(l_format)
+--          ||', b='||b
+--          ||', l_attrib='||l_attrib
+--        );
         
         -- date, number conversion
         --  conversions into nm_mrg_section_inv_values_tmp are done with database default format
         --  read out with default format and then convert into given format
-        if l_ita_format_mask is not null then
+        if l_format and l_ita_format_mask is not null then
           -- , to_char(to_date(nsv_attrib1), 'DD-MON-YYYY') nsv_attrib1
-          s := s||l_cr||', to_char('||l_conversion||'('||l_attrib||'), '''||l_ita_format_mask||''')'||' '||l_attrib;
+          l_formatted_attrib := 'to_char('||l_conversion||'('||l_attrib||'), '''||l_ita_format_mask||''')';
           
-        -- no conversion
         else
-          s := s||l_cr||', '||l_attrib;
+          l_formatted_attrib := l_attrib;
+          
         end if;
+        
+        
+        -- build return
+        case l_domain_return
+        
+        -- CODE
+        when 'C' then
+          if p_format then
+            s := s||l_cr||', '||l_formatted_attrib||' '||l_attrib;
+          else
+            s := s||l_cr||', '||l_attrib;
+          end if;
+          
+        -- MEANING
+        when 'M' then
+          s := s||l_cr||', '
+            ||'nvl((select ial_meaning from nm_inv_attri_lookup_all where ial_domain = '''
+              ||pt_attr(i).ita_domain||''' and ial_value = '||l_formatted_attrib
+              ||' and '||l_sql_ial_effective_date||'), '||l_attrib||') '||l_attrib;
+          
+        -- both CODE and MEANING
+        when 'B' then
+          s := s||l_cr||', '
+            ||'nvl((select ial_value||'' - ''||ial_meaning from nm_inv_attri_lookup_all where ial_domain = '''
+              ||pt_attr(i).ita_domain||''' and ial_value = '||l_formatted_attrib
+              ||' and '||l_sql_ial_effective_date||'), '||l_attrib||') '||l_attrib;
+        
+        end case;
+        
         
         if p_format then
           l_cr := cr;
@@ -2076,6 +2252,7 @@ No query types defined.
         
         i := pt_attr.next(i);
       end loop;
+--      nm3dbg.deind;
       return s;
     end;
     
@@ -2156,6 +2333,7 @@ No query types defined.
     nm3dbg.putln(g_package_name||'.std_insert_invitems('
       ||'p_mrg_job_id='||p_mrg_job_id
       ||', pt_attr.count='||pt_attr.count
+      ||', p_domain_return='||p_domain_return
       ||', p_splits_rowcount='||p_splits_rowcount
       ||')');
     nm3dbg.ind;
@@ -2287,6 +2465,7 @@ No query types defined.
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.std_insert_invitems('
         ||'p_mrg_job_id='||p_mrg_job_id
         ||', pt_attr.count='||pt_attr.count
+        ||', p_domain_return='||p_domain_return
         ||', p_splits_rowcount='||p_splits_rowcount
         ||', l_splits_cardinality='||l_splits_cardinality
         ||')');
@@ -2320,11 +2499,12 @@ No query types defined.
     l_ne_type := nm3net.get_ne_type(p_group_id);
     nm3dbg.putln('l_ne_type='||l_ne_type);
     
-    execute immediate 'truncate table nm_datum_criteria_tmp';
-    
     
     -- datum or distance break
     if l_ne_type in ('S','D') then
+    
+      -- hard coded insert of the lone datum (distance break)
+      clear_datum_criteria_tmp;
       insert into nm_datum_criteria_tmp(
         datum_id, begin_mp, end_mp, group_id
       )
@@ -2332,8 +2512,8 @@ No query types defined.
       from nm_elements
       where ne_id = p_group_id;
       p_sqlcount := sql%rowcount;
-    
-    
+      
+      
     -- linear or non linear group or group of groups
     --  detremine the driving group type
     else
@@ -2378,6 +2558,7 @@ No query types defined.
       if l_group_id_linear then
       
         -- special hard coded handling of a linear group
+        clear_datum_criteria_tmp;
         insert /*+ append */ into nm_datum_criteria_tmp (
           datum_id, begin_mp, end_mp, group_id
         )
@@ -2390,7 +2571,7 @@ No query types defined.
       -- non linear group
       else
         l_sql :=
-          sql_load_nm_datum_criteria_tmp(
+          sql_nm_datum_criteria_pre_tmp(
              p_elements_sql => 
                     '    select nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
               ||cr||'     ,to_number(null) group_id'
@@ -2405,7 +2586,7 @@ No query types defined.
     -- group of groups
     elsif l_ne_type = 'P' then
       l_sql :=
-        sql_load_nm_datum_criteria_tmp(
+        sql_nm_datum_criteria_pre_tmp(
            p_elements_sql => 
                   '    select nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
             ||cr||'     ,to_number(null) group_id'
@@ -2418,30 +2599,36 @@ No query types defined.
             ||cr||'      where ne_id in (select nm_ne_id_of from nm_members'
             ||cr||'                        connect by nm_ne_id_in = prior nm_ne_id_of'
             ||cr||'                        start with nm_ne_id_in = :p_group_id)'
-            ||cr||'        and ne_type = ''S'''
+            ||cr||'        and ne_type in (''S'', ''D'')'
             ||cr||'      )'
             ||cr||'    group by nm_ne_id_of'
          );
         
     end if;
-
-
+    
+    nm3dbg.putln('l_group_type='||l_group_type);
+    nm3dbg.putln(l_sql);
+    
     if l_sql is not null then
-      nm3dbg.putln(l_sql);
+      clear_datum_criteria_pre_tmp;
       execute immediate l_sql
       using
          p_group_id
         ,l_effective_date
         ,l_effective_date
-        ,l_effective_date
-        ,l_group_type;
+        ,l_effective_date;
       p_sqlcount := sql%rowcount;
+      nm3dbg.putln('ins nm_datum_criteria_pre_tmp: '||p_sqlcount);
       
+      -- load from nm_datum_criteria_pre_tmp into nm_datum_criteria_tmp
+      clear_datum_criteria_tmp;
+      load_nm_datum_criteria_tmp(
+         p_group_type => l_group_type
+        ,p_sqlcount   => p_sqlcount
+      );
     end if;
     
     commit;
-   
-    nm3dbg.putln('nm_datum_criteria_tmp rowcount='||p_sqlcount);
     nm3dbg.deind;
   exception
     when others then
@@ -2467,7 +2654,7 @@ No query types defined.
   )
   is
     l_sql     constant varchar2(10000) :=
-      sql_load_nm_datum_criteria_tmp(
+      sql_nm_datum_criteria_pre_tmp(
          p_elements_sql => 
                 '    select d.nsd_ne_id nm_ne_id_of, min(d.nsd_begin_mp) begin_mp, max(d.nsd_end_mp) end_mp'
           ||cr||'     ,to_number(null) group_id'
@@ -2500,20 +2687,27 @@ No query types defined.
       );
     end if;
     
-    execute immediate 'truncate table nm_datum_criteria_tmp';
-    
+    nm3dbg.putln('l_group_type='||l_group_type);
     nm3dbg.putln(l_sql);
+    
+    clear_datum_criteria_pre_tmp;
     execute immediate l_sql
     using
        p_nse_id
       ,l_effective_date
       ,l_effective_date
-      ,l_effective_date
-      ,l_group_type;
+      ,l_effective_date;
     p_sqlcount := sql%rowcount;
-    commit;
+    nm3dbg.putln('ins nm_datum_criteria_pre_tmp: '||p_sqlcount);
     
-    nm3dbg.putln('nm_mrg_section_member_inv rowcount='||p_sqlcount);
+    -- load from nm_datum_criteria_pre_tmp into nm_datum_criteria_tmp
+    clear_datum_criteria_tmp;
+    load_nm_datum_criteria_tmp(
+       p_group_type => l_group_type
+      ,p_sqlcount   => p_sqlcount
+    );
+    
+    commit;
     nm3dbg.deind;
   exception
     when others then
@@ -2574,9 +2768,10 @@ No query types defined.
       when too_many_rows then
         raise_application_error(-20000, 'Invalid temp extent: multiple routes specified for same member: ne_id='||l_dup_ne_id_of);
     end;
-
-
-    -- explicit driving group type
+    
+    
+    
+      -- explicit driving group type
     l_group_type := p_group_type;
     ensure_group_type_linear(
        p_group_type_in  => l_group_type
@@ -2590,26 +2785,28 @@ No query types defined.
         ,p_group_type_out => l_group_type
       );
     end if;
-
-    execute immediate 'truncate table nm_datum_criteria_tmp';
-
-    -- the NTE_ROUTE_NE_ID may be a true group_id, or datum_id.
-
-    l_sql := sql_load_nm_datum_criteria_tmp(
-       p_elements_sql => l_elements_sql
-    );
+    
+    nm3dbg.putln('l_group_type='||l_group_type);
     nm3dbg.putln(l_sql);
+    
+    clear_datum_criteria_pre_tmp;
     execute immediate l_sql
     using
        p_nte_job_id
       ,l_effective_date
       ,l_effective_date
-      ,l_effective_date
-      ,l_group_type;
+      ,l_effective_date;
     p_sqlcount := sql%rowcount;
+    nm3dbg.putln('ins nm_datum_criteria_pre_tmp: '||p_sqlcount);
+    
+    -- load from nm_datum_criteria_pre_tmp into nm_datum_criteria_tmp
+    clear_datum_criteria_tmp;
+    load_nm_datum_criteria_tmp(
+       p_group_type => l_group_type
+      ,p_sqlcount   => p_sqlcount
+    );
+    
     commit;
-    nm3dbg.putln('nm_mrg_section_member_inv: '||p_sqlcount);
-
     nm3dbg.deind;
   exception
     when others then
@@ -2631,7 +2828,7 @@ No query types defined.
   )
   is
     l_sql     constant varchar2(10000) :=
-      sql_load_nm_datum_criteria_tmp(
+      sql_nm_datum_criteria_pre_tmp(
          p_elements_sql => 
                 '    select nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
           ||cr||'     ,to_number(null) group_id'
@@ -2673,20 +2870,27 @@ No query types defined.
       );
     end if;
     
-    execute immediate 'truncate table nm_datum_criteria_tmp';
-    
+    nm3dbg.putln('l_group_type='||l_group_type);
     nm3dbg.putln(l_sql);
+    
+    clear_datum_criteria_pre_tmp;
     execute immediate l_sql
     using
        p_group_type
       ,l_effective_date
       ,l_effective_date
-      ,l_effective_date
-      ,l_group_type;
+      ,l_effective_date;
     p_sqlcount := sql%rowcount;
-    commit;
+    nm3dbg.putln('ins nm_datum_criteria_pre_tmp: '||p_sqlcount);
     
-    nm3dbg.putln('nm_datum_criteria_tmp rowcount='||p_sqlcount);
+    -- load from nm_datum_criteria_pre_tmp into nm_datum_criteria_tmp
+    clear_datum_criteria_tmp;
+    load_nm_datum_criteria_tmp(
+       p_group_type => l_group_type
+      ,p_sqlcount   => p_sqlcount
+    );
+    
+    commit;
     nm3dbg.deind;
   exception
     when others then
@@ -2707,11 +2911,9 @@ No query types defined.
     ,p_sqlcount out pls_integer
   )
   is
-    l_nt_type         nm_types.nt_type%type;
-    l_group_type      nm_group_types.ngt_group_type%type;
-    l_effective_date  constant date := nm3context.get_effective_date;
-    l_sql             constant varchar2(10000) :=
-      sql_load_nm_datum_criteria_tmp(
+    l_nt_type     nm_types.nt_type%type;
+    l_sql         constant varchar2(10000) :=
+      sql_nm_datum_criteria_pre_tmp(
          p_elements_sql => 
                 '    select e.ne_id nm_ne_id_of, 0 begin_mp, ne_length end_mp'
           ||cr||'     ,to_number(null) group_id'
@@ -2723,6 +2925,8 @@ No query types defined.
           ||cr||'        and nt_type = :l_nt_type'
           ||cr||'    )'
       );
+    l_group_type      nm_group_types.ngt_group_type%type;
+    l_effective_date  constant date := nm3context.get_effective_date;
     
   begin
     nm3dbg.putln(g_package_name||'.load_nt_type_datums('
@@ -2731,7 +2935,6 @@ No query types defined.
       ||')');
     nm3dbg.ind;
     
-    execute immediate 'truncate table nm_datum_criteria_tmp';
     -- check that the type given is linear datum type
     begin
       select nt_type into l_nt_type
@@ -2758,20 +2961,29 @@ No query types defined.
         ,p_group_type_out => l_group_type
       );
     end if;
-      
     
+    
+    nm3dbg.putln('l_group_type='||l_group_type);
     nm3dbg.putln(l_sql);
+    
+    clear_datum_criteria_pre_tmp;
     execute immediate l_sql
     using
        l_nt_type
       ,l_effective_date
       ,l_effective_date
-      ,l_effective_date
-      ,l_group_type;
+      ,l_effective_date;
     p_sqlcount := sql%rowcount;
+    nm3dbg.putln('ins nm_datum_criteria_pre_tmp: '||p_sqlcount);
+    
+    -- load from nm_datum_criteria_pre_tmp into nm_datum_criteria_tmp
+    clear_datum_criteria_tmp;
+    load_nm_datum_criteria_tmp(
+       p_group_type => l_group_type
+      ,p_sqlcount   => p_sqlcount
+    );
+    
     commit;
-      
-    nm3dbg.putln('nm_datum_criteria_tmp rowcount='||p_sqlcount);
     nm3dbg.deind;
   exception
     when others then
@@ -2791,10 +3003,8 @@ No query types defined.
     ,p_sqlcount out pls_integer
   )
   is
-    l_group_type      nm_group_types.ngt_group_type%type;
-    l_effective_date  constant date := nm3context.get_effective_date;
-    l_sql             constant varchar2(10000) :=
-      sql_load_nm_datum_criteria_tmp(
+    l_sql constant varchar2(10000) :=
+      sql_nm_datum_criteria_pre_tmp(
          p_elements_sql => 
                 '    select e.ne_id nm_ne_id_of, 0 begin_mp, ne_length end_mp'
           ||cr||'     ,to_number(null) group_id'
@@ -2805,13 +3015,15 @@ No query types defined.
           ||cr||'        and nt_linear = ''Y'''
           ||cr||'    )'
       );
+    l_group_type      nm_group_types.ngt_group_type%type;
+    l_effective_date  constant date := nm3context.get_effective_date;
+    
   begin
     nm3dbg.putln(g_package_name||'.load_all_network_datums('
       ||'p_group_type='||p_group_type
       ||')');
     nm3dbg.ind;
       
-    
     
     -- explicit driving group type
     l_group_type := p_group_type;
@@ -2828,21 +3040,27 @@ No query types defined.
       );
     end if;
     
-    
-    execute immediate 'truncate table nm_datum_criteria_tmp';
-    
-    
+
+    nm3dbg.putln('l_group_type='||l_group_type);
     nm3dbg.putln(l_sql);
+    
+    clear_datum_criteria_pre_tmp;
     execute immediate l_sql
     using
        l_effective_date
       ,l_effective_date
-      ,l_effective_date
-      ,l_group_type;
+      ,l_effective_date;
     p_sqlcount := sql%rowcount;
+    nm3dbg.putln('ins nm_datum_criteria_pre_tmp: '||p_sqlcount);
+    
+    -- load from nm_datum_criteria_pre_tmp into nm_datum_criteria_tmp
+    clear_datum_criteria_tmp;
+    load_nm_datum_criteria_tmp(
+       p_group_type => l_group_type
+      ,p_sqlcount   => p_sqlcount
+    );
+    
     commit;
-       
-    nm3dbg.putln('nm_datum_criteria_tmp rowcount='||p_sqlcount);
     nm3dbg.deind;
   exception
     when others then
@@ -2885,6 +3103,49 @@ No query types defined.
       ||')');
     nm3dbg.ind;
     
+    
+    -- explicit driving group type
+    l_group_type := p_group_type;
+    ensure_group_type_linear(
+       p_group_type_in  => l_group_type
+      ,p_group_type_out => l_group_type
+    );
+    -- preferred lrm
+    if l_group_type is null then
+      l_group_type := hig.get_useopt('PREFLRM', user);
+      ensure_group_type_linear(
+         p_group_type_in  => l_group_type
+        ,p_group_type_out => l_group_type
+      );
+    end if;
+    nm3dbg.putln('l_group_type='||l_group_type);
+    
+    
+    -- single element
+    if pt_ne.count = 1 and pt_nse.count = 0 then
+      -- todo: p_group_type needs to be passed in
+      --  currently it is lost for non linear groups
+      load_group_datums(
+         p_group_id => pt_ne(pt_ne.first)
+        ,p_group_type => null
+        ,p_sqlcount => p_sqlcount
+      );
+      nm3dbg.deind;
+      return;
+      
+    -- single saved extent
+    elsif pt_ne.count = 0 and pt_nse.count = 1 then
+      load_extent_datums(
+         p_group_type => l_group_type
+        ,p_nse_id     => pt_nse(pt_nse.first)
+        ,p_sqlcount   => p_sqlcount
+      );
+      nm3dbg.deind;
+      return;
+      
+    end if;
+    
+
     -- reset the cached id tables
     mt_datum_id := new nm_id_tbl();
     mt_group_id := new nm_id_tbl();
@@ -2944,7 +3205,7 @@ No query types defined.
               ||l_union_all
               ||'    select /*+ cardinality(x 1) */'
           ||cr||'       ne_id nm_ne_id_of, 0 begin_mp, ne_length end_mp'
-          ||cr||'     ,to_number(null) group_id'
+          ||cr||'      ,to_number(null) group_id'
           ||cr||'    from'
           ||cr||'       nm_elements'
           ||cr||'      ,table(cast('||g_package_name||'.get_datum_id_tbl as nm_id_tbl)) x'
@@ -2958,6 +3219,7 @@ No query types defined.
       
       -- 2.2 groups
       if mt_group_id.count > 0 then
+
         l_inner_sql := l_inner_sql
               ||l_union_all
               ||'    select /*+ cardinality(x 1) */'
@@ -2991,7 +3253,7 @@ No query types defined.
           ||cr||'                        connect by nm_ne_id_in = prior nm_ne_id_of'
           ||cr||'                        start with nm_ne_id_in in (select /*+ cardinality(x 1) */ x.column_value from table(cast('
                                                                    ||g_package_name||'.get_gg_id_tbl as nm_id_tbl)) x))'
-          ||cr||'        and ne_type = ''S'''
+          ||cr||'        and ne_type in (''S'', ''D'')'
           ||cr||'      )'
           ||cr||'    group by nm_ne_id_of';
         
@@ -3015,44 +3277,33 @@ No query types defined.
         ||cr||'    group by nm_ne_id_of';
         
     end if;
-      
-      
+    
+
     l_sql :=
-      sql_load_nm_datum_criteria_tmp(
+      sql_nm_datum_criteria_pre_tmp(
          p_elements_sql => l_inner_sql
       );
       
-    
-    -- explicit driving group type
-    l_group_type := p_group_type;
-    ensure_group_type_linear(
-       p_group_type_in  => l_group_type
-      ,p_group_type_out => l_group_type
-    );
-    -- preferred lrm
-    if l_group_type is null then
-      l_group_type := hig.get_useopt('PREFLRM', user);
-      ensure_group_type_linear(
-         p_group_type_in  => l_group_type
-        ,p_group_type_out => l_group_type
-      );
-    end if;
-      
-      
-    execute immediate 'truncate table nm_datum_criteria_tmp';
-    
-    
     nm3dbg.putln(l_sql);
+      
+
+    clear_datum_criteria_pre_tmp;
     execute immediate l_sql
     using
        l_effective_date
       ,l_effective_date
-      ,l_effective_date
-      ,l_group_type;
+      ,l_effective_date;
     p_sqlcount := sql%rowcount;
-    commit;
+    nm3dbg.putln('ins nm_datum_criteria_pre_tmp: '||p_sqlcount);
     
-    nm3dbg.putln('nm_datum_criteria_tmp rowcount='||p_sqlcount);
+    -- load from nm_datum_criteria_pre_tmp into nm_datum_criteria_tmp
+    clear_datum_criteria_tmp;
+    load_nm_datum_criteria_tmp(
+       p_group_type => l_group_type
+      ,p_sqlcount   => p_sqlcount
+    );
+    
+    commit;
     nm3dbg.deind;
    exception
      when others then
@@ -3114,7 +3365,7 @@ No query types defined.
      p_rec in ita_mapping_rec
   ) return varchar2
   is
-    s varchar2(4000);
+    s varchar2(32767);
   begin
     select '('
       ||'inv_type='||p_rec.inv_type
@@ -3124,6 +3375,7 @@ No query types defined.
       ||', iit_attrib_name='||p_rec.iit_attrib_name
       ||', ita_format='||p_rec.ita_format
       ||', ita_format_mask='||p_rec.ita_format_mask
+      ||', ita_domain='||p_rec.ita_domain
       ||nvl2(p_rec.table_name, ', table_name='||p_rec.table_name, null)
       ||nvl2(p_rec.table_iit_flag, ', table_iit_flag='||p_rec.table_iit_flag, null)
       ||nvl2(p_rec.table_pk_column, ', table_pk_column='||p_rec.table_pk_column, null)
@@ -3196,23 +3448,15 @@ No query types defined.
   end;
   
   
-  
-  -- this is a single select for both elements with group given and those without
-  --  where group_id is null or equals nm_ne_id_of the group_id is assgned from nm_members
-  --  where there is no linear group null is assgined
-  --  p_elements_sql must return 4 columns: nm_ne_id_of, begin_mp, end_mp, group_id
-  --  the output has 4 binds: 1,2,3) effective_date; 4) group_type
-  
---  -- this is the sql wrapper that inserts into nm_datum_criteria_tmp
---  --  and calculates the group_id for each datum returned by the p_elements_sql
---  -- this is called for each datum criteria load procedure
---  -- TODO: consider turning this into a procedure that also executes the sql.
-  function sql_load_nm_datum_criteria_tmp(
+ 
+  -- this is the sql wrapper that inserts into nm_datum_criteria_pre_tmp
+  -- this is called from each datum criteria load procedure
+  function sql_nm_datum_criteria_pre_tmp(
      p_elements_sql in varchar2
   ) return varchar2
   is
   begin
-    nm3dbg.putln(g_package_name||'.sql_load_nm_datum_criteria_tmp('
+    nm3dbg.putln(g_package_name||'.sql_nm_datum_criteria_pre_tmp('
       ||')');
   
     -- the group id with the highest member count is retunred in the group_id column
@@ -3225,11 +3469,17 @@ No query types defined.
     -- the splitting logic is copied from ins_splits()
     
     return
-            'insert into nm_datum_criteria_tmp ('
-      ||cr||'  datum_id, begin_mp, end_mp, group_id'
+            'insert into nm_datum_criteria_pre_tmp ('
+      ||cr||'  nm_ne_id_of, nm_ne_id_in, nm_begin_mp, nm_end_mp, ne_gty_group_type, ngt_group_type, group_id'
       ||cr||')'
-      ||cr||'with rc as ('
-      ||cr||'select x.*'
+      ||cr||'select'
+      ||cr||'   x.nm_ne_id_of'
+      ||cr||'  ,x.nm_ne_id_in'
+      ||cr||'  ,x.nm_begin_mp'
+      ||cr||'  ,x.nm_end_mp'
+      ||cr||'  ,x.ne_gty_group_type'
+      ||cr||'  ,x.ngt_group_type'
+      ||cr||'  ,x.group_id'
       ||cr||'from ('
       ||cr||'  select'
       ||cr||'     dc.nm_ne_id_of'
@@ -3257,150 +3507,8 @@ No query types defined.
       ||cr||'    and dc.end_mp >= m.nm_begin_mp (+)'
       ||cr||'  ) x'
       ||cr||'  where x.row_num = 1'
-      ||cr||'    or x.ngt_group_type is not null'
-      ||cr||')'
-      ||cr||'select distinct'
-      ||cr||'   q2.nm_ne_id_of'
-      ||cr||'  ,q2.begin_mp'
-      ||cr||'  ,q2.end_mp'
-      ||cr||'  ,case when q2.nm_ne_id_of = q2.group_id and q2.ngt_group_type is not null then'
-      ||cr||'    first_value (q2.nm_ne_id_in) over (partition by q2.nm_ne_id_of, q2.begin_mp'
-      ||cr||'       order by q2.gty_order, q2.val_count desc, q2.nm_ne_id_in)'
-      ||cr||'   when q2.nm_ne_id_of != q2.group_id then'
-      ||cr||'     q2.group_id'
-      ||cr||'   end group_id'
-      ||cr||'from ('
-      ||cr||'select'
-      ||cr||'   m.nm_ne_id_of'
-      ||cr||'  ,q1.begin_mp'
-      ||cr||'  ,q1.end_mp'
-      ||cr||'  ,m.nm_ne_id_in'
-      ||cr||'  ,m.ne_gty_group_type'
-      ||cr||'  ,m.ngt_group_type'
-      ||cr||'  ,nvl(m.group_id, q1.nm_ne_id_of) group_id'
-      ||cr||'  ,decode(m.ne_gty_group_type, :l_group_type, 1, 2) gty_order'
-      ||cr||'  ,count(*) over (partition by m.nm_ne_id_in) val_count'
-      ||cr||'from ('
-      ||cr||'select'
-      ||cr||'   m3.nm_ne_id_of, m3.begin_mp, m3.end_mp'
-      ||cr||'from ('
-      ||cr||'select distinct'
-      ||cr||'   m2.nm_ne_id_of'
-      ||cr||'  ,m2.pos begin_mp'
-      ||cr||'  ,lead(m2.pos, 1) over (partition by m2.nm_ne_id_of order by m2.pos, m2.pos2) end_mp'
-      ||cr||'  ,m2.is_point'
-      ||cr||'from ('
-      ||cr||'select distinct'
-      ||cr||'   rc.nm_ne_id_of'
-      ||cr||'  ,rc.nm_begin_mp pos'
-      ||cr||'  ,rc.nm_end_mp pos2'
-      ||cr||'  ,decode(rc.nm_begin_mp, rc.nm_end_mp, 1, 0) is_point'
-      ||cr||'from rc'
-      ||cr||'union all'
-      ||cr||'select distinct'
-      ||cr||'   rc.nm_ne_id_of'
-      ||cr||'  ,rc.nm_end_mp pos'
-      ||cr||'  ,rc.nm_end_mp pos2'
-      ||cr||'  ,decode(rc.nm_begin_mp, rc.nm_end_mp, 1, 0) is_point'
-      ||cr||'from rc'
-      ||cr||') m2'
-      ||cr||') m3'
-      ||cr||'where m3.end_mp is not null'
-      ||cr||'  and (m3.end_mp != m3.begin_mp or m3.is_point = 1)'
-      ||cr||') q1'
-      ||cr||'right outer join'
-      ||cr||'rc m'
-      ||cr||'on q1.nm_ne_id_of = m.nm_ne_id_of'
-      ||cr||'  and q1.begin_mp between m.nm_begin_mp and m.nm_end_mp'
-      ||cr||'  and q1.end_mp between m.nm_begin_mp and m.nm_end_mp'
-      ||cr||') q2';
+      ||cr||'    or x.ngt_group_type is not null';
 
-  
-  
-  
---    -- this selects the member counts for each datum for every linear group that the datum is member of
---    --  the group id with the highest member count is retunred in the group_id column
---    --  if l_group_type has value then the the groups of this type have preference
---    --  if two groups have equal highest count of members then the lowest nm_ne_id_in value is returned
---    -- the spitting logic is copied from ins_splits()
---    -- TODO:
---    
---    return
---            'insert into nm_datum_criteria_tmp ('
---      ||cr||'  datum_id, begin_mp, end_mp, group_id'
---      ||cr||')'
---      ||cr||'with rc as ('
---      ||cr||'  select'
---      ||cr||'     m.nm_ne_id_of'
---      ||cr||'    ,m.nm_ne_id_in'
---      ||cr||'    ,e.ne_gty_group_type'
---      ||cr||'    ,greatest(m.nm_begin_mp, dc.begin_mp) nm_begin_mp'
---      ||cr||'    ,least(m.nm_end_mp, dc.end_mp) nm_end_mp'
---      ||cr||'  from'
---      ||cr||'     ('
---      ||cr||p_elements_sql
---      ||cr||'     ) dc'
---      ||cr||'    ,nm_members m'
---      ||cr||'    ,nm_elements e'
---      ||cr||'    ,nm_group_types_all gt'
---      ||cr||'  where dc.nm_ne_id_of = m.nm_ne_id_of'
---      ||cr||'    and m.nm_ne_id_in = e.ne_id'
---      ||cr||'    and e.ne_gty_group_type = gt.ngt_group_type'
---      ||cr||'    and gt.ngt_linear_flag = ''Y'''
---      ||cr||'    and dc.begin_mp <= m.nm_end_mp'
---      ||cr||'    and dc.end_mp >= m.nm_begin_mp'
---      ||cr||')'
---      ||cr||'select distinct'
---      ||cr||'   q2.nm_ne_id_of'
---      ||cr||'  ,q2.begin_mp'
---      ||cr||'  ,q2.end_mp'
---      ||cr||'  ,first_value(q2.nm_ne_id_in) over (partition by q2.nm_ne_id_of, q2.begin_mp order by q2.gty_order, q2.val_count desc, q2.nm_ne_id_in) group_id'
---      ||cr||'from ('
---      ||cr||'select'
---      ||cr||'   q1.*'
---      ||cr||'  ,m.nm_ne_id_in'
---      ||cr||'  ,m.ne_gty_group_type'
---      ||cr||'  ,decode(m.ne_gty_group_type, :l_group_type, 1, 2) gty_order'
---      ||cr||'  ,count(*) over (partition by m.nm_ne_id_in) val_count'
---      ||cr||'from ('
---      ||cr||'select'
---      ||cr||'   m3.nm_ne_id_of, m3.begin_mp, m3.end_mp'
---      ||cr||'from ('
---      ||cr||'select distinct'
---      ||cr||'   m2.nm_ne_id_of'
---      ||cr||'  ,m2.pos begin_mp'
---      ||cr||'  ,lead(m2.pos, 1) over (partition by m2.nm_ne_id_of order by m2.pos, m2.pos2) end_mp'
---      ||cr||'  ,m2.is_point'
---      ||cr||'from ('
---      ||cr||'select distinct'
---      ||cr||'   rc.nm_ne_id_of'
---      ||cr||'  ,rc.nm_begin_mp pos'
---      ||cr||'  ,rc.nm_end_mp pos2'
---      ||cr||'  ,decode(rc.nm_begin_mp, rc.nm_end_mp, 1, 0) is_point'
---      ||cr||'from rc'
---      ||cr||'union all'
---      ||cr||'select distinct'
---      ||cr||'   rc.nm_ne_id_of'
---      ||cr||'  ,rc.nm_end_mp pos'
---      ||cr||'  ,rc.nm_end_mp pos2'
---      ||cr||'  ,decode(rc.nm_begin_mp, rc.nm_end_mp, 1, 0) is_point'
---      ||cr||'from rc'
---      ||cr||') m2'
---      ||cr||') m3'
---      ||cr||'where m3.end_mp is not null'
---      ||cr||'  and (m3.end_mp != m3.begin_mp or m3.is_point = 1)'
---      ||cr||') q1'
---      ||cr||'right outer join'
---      ||cr||'rc m'
---      ||cr||'on q1.nm_ne_id_of = m.nm_ne_id_of'
---      ||cr||'  and ((q1.begin_mp < m.nm_end_mp and q1.end_mp > m.nm_begin_mp)' -- lenthts
---      ||cr||'    or (q1.begin_mp = m.nm_begin_mp and q1.end_mp = m.nm_end_mp))' -- points
---      --||cr||'  and q1.begin_mp between m.nm_begin_mp and m.nm_end_mp'
---      --||cr||'  and q1.end_mp between m.nm_begin_mp and m.nm_end_mp'
---      ||cr||') q2';
---      --||cr||'order by q2.nm_ne_id_of, q2.begin_mp, q2.end_mp'
-  
-      
   end;
   
   
@@ -3474,6 +3582,119 @@ No query types defined.
     end loop;
     return null;
   end;
+  
+  
+  procedure clear_datum_criteria_pre_tmp
+  is
+    pragma autonomous_transaction;
+  begin
+    execute immediate 'truncate table nm_datum_criteria_pre_tmp';
+    commit;
+  exception
+    when others then rollback;
+    raise;
+  end;
+ 
+  procedure clear_datum_criteria_tmp
+  is
+    pragma autonomous_transaction;
+  begin
+    execute immediate 'truncate table nm_datum_criteria_tmp';
+    commit;
+  exception
+    when others then rollback;
+    raise;
+  end;
+  
+  procedure clear_route_connectivity_tmp
+  is
+    pragma autonomous_transaction;
+  begin
+    execute immediate 'truncate table nm_route_connectivity_tmp';
+    commit;
+  exception
+    when others then rollback;
+    raise;
+  end;
+  
+  
+  -- this populates nm_datum_criteria_tmp from nm_datum_criteria_pre_tmp
+  procedure load_nm_datum_criteria_tmp(
+     p_group_type in nm_group_types_all.ngt_group_type%type
+    ,p_sqlcount out pls_integer
+  )
+  is
+  begin
+    nm3dbg.putln(g_package_name||'.load_nm_datum_criteria_tmp('
+      ||'p_group_type='||p_group_type
+      ||')');
+    insert into nm_datum_criteria_tmp
+    select distinct
+       q2.nm_ne_id_of
+      ,q2.begin_mp
+      ,q2.end_mp
+      ,case when q2.nm_ne_id_of = q2.group_id and q2.ngt_group_type is not null then
+        first_value (q2.nm_ne_id_in) over (partition by q2.nm_ne_id_of, q2.begin_mp
+           order by q2.gty_order, q2.val_count desc, q2.nm_ne_id_in)
+       when q2.nm_ne_id_of != q2.group_id then
+         q2.group_id
+       end group_id
+    from (
+    select
+       m.nm_ne_id_of
+      ,q1.begin_mp
+      ,q1.end_mp
+      ,m.nm_ne_id_in
+      ,m.ne_gty_group_type
+      ,m.ngt_group_type
+      ,nvl(m.group_id, q1.nm_ne_id_of) group_id
+      ,decode(m.ne_gty_group_type, p_group_type, 1, 2) gty_order
+      ,count(*) over (partition by m.nm_ne_id_in) val_count
+    from (
+    select
+       m3.nm_ne_id_of, m3.begin_mp, m3.end_mp
+    from (
+    select distinct
+       m2.nm_ne_id_of
+      ,m2.pos begin_mp
+      ,lead(m2.pos, 1) over (partition by m2.nm_ne_id_of order by m2.pos, m2.pos2) end_mp
+      ,m2.is_point
+    from (
+    select distinct
+       rc.nm_ne_id_of
+      ,rc.nm_begin_mp pos
+      ,rc.nm_end_mp pos2
+      ,decode(rc.nm_begin_mp, rc.nm_end_mp, 1, 0) is_point
+    from nm_datum_criteria_pre_tmp rc
+    union all
+    select distinct
+       rc.nm_ne_id_of
+      ,rc.nm_end_mp pos
+      ,rc.nm_end_mp pos2
+      ,decode(rc.nm_begin_mp, rc.nm_end_mp, 1, 0) is_point
+    from nm_datum_criteria_pre_tmp rc
+    ) m2
+    ) m3
+    where m3.end_mp is not null
+      and (m3.end_mp != m3.begin_mp or m3.is_point = 1)
+    ) q1
+    right outer join
+    nm_datum_criteria_pre_tmp m
+    on q1.nm_ne_id_of = m.nm_ne_id_of
+      and q1.begin_mp between m.nm_begin_mp and m.nm_end_mp
+      and q1.end_mp between m.nm_begin_mp and m.nm_end_mp
+    ) q2;
+    p_sqlcount := sql%rowcount;
+    nm3dbg.putln('ins nm_datum_criteria_tmp: '||p_sqlcount);
+  
+  exception
+    when others then
+      nm3dbg.puterr(sqlerrm||': '||g_package_name||'.load_nm_datum_criteria_tmp('
+        ||')');
+      raise;
+  end;
+  
+  
 --
 -----------------------------------------------------------------------------
 --
