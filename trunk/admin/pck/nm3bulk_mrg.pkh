@@ -2,12 +2,12 @@ create or replace package nm3bulk_mrg as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.6   03 May 2010 13:01:22   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkh-arc   2.7   13 May 2010 10:18:30   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkh  $
---       Date into PVCS   : $Date:   03 May 2010 13:01:22  $
---       Date fetched Out : $Modtime:   03 May 2010 12:17:38  $
---       PVCS Version     : $Revision:   2.6  $
---       Based on sccs version : 
+--       Date into PVCS   : $Date:   13 May 2010 10:18:30  $
+--       Date fetched Out : $Modtime:   12 May 2010 16:07:44  $
+--       PVCS Version     : $Revision:   2.7  $
+--       Based on sccs version :
 --
 --   Author : Priidu Tanava
 --
@@ -17,7 +17,7 @@ create or replace package nm3bulk_mrg as
 --   Copyright (c) exor corporation ltd, 2006
 -----------------------------------------------------------------------------
 
-  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.6  $"';
+  g_sccsid      constant  varchar2(2000) := '"$Revision:   2.7  $"';
   
   
   -- values copied from nm3extent
@@ -40,6 +40,7 @@ create or replace package nm3bulk_mrg as
     ,iit_attrib_name    nm_inv_type_attribs_all.ita_attrib_name%type
     ,ita_format         nm_inv_type_attribs_all.ita_format%type
     ,ita_format_mask    nm_inv_type_attribs_all.ita_format_mask%type
+    ,ita_domain         nm_inv_type_attribs_all.ita_id_domain%type
     ,table_name         nm_inv_types_all.nit_table_name%type
     ,table_iit_flag     varchar2(1)                                   -- Y if ft table is to be treated as a standard nm_inv_items_all table
     ,table_pk_column    nm_inv_types_all.nit_foreign_pk_column%type
@@ -93,6 +94,7 @@ create or replace package nm3bulk_mrg as
     ,p_admin_unit_id in nm_admin_units_all.nau_admin_unit%type
     ,p_nqr_source in nm_mrg_query_results_all.nqr_source%type
     ,p_nqr_source_id in nm_mrg_query_results_all.nqr_source_id%type
+    ,p_domain_return in varchar2
     ,p_splits_rowcount in integer
     ,p_description in varchar2
     ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
@@ -104,10 +106,22 @@ create or replace package nm3bulk_mrg as
     ,p_nqr_admin_unit in nm_mrg_query_results_all.nqr_admin_unit%type
     ,p_nqr_source in nm_mrg_query_results_all.nqr_source%type
     ,p_nqr_source_id in nm_mrg_query_results_all.nqr_source_id%type
+    ,p_domain_return in varchar2
     ,p_nmq_descr in nm_mrg_query_all.nmq_descr%type
     ,p_criteria_rowcount in integer
     ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
     ,p_longops_rec in out nm3sql.longops_rec
+  );
+  
+  procedure std_run(
+     p_nmq_id in nm_mrg_query_all.nmq_id%type
+    ,p_nqr_admin_unit in nm_mrg_query_results_all.nqr_admin_unit%type
+    ,p_nqr_source in nm_mrg_query_results_all.nqr_source%type
+    ,p_nqr_source_id in nm_mrg_query_results_all.nqr_source_id%type
+    ,p_domain_return in varchar2
+    ,p_nmq_descr in nm_mrg_query_all.nmq_descr%type
+    ,p_criteria_rowcount in integer
+    ,p_mrg_job_id out nm_mrg_query_results_all.nqr_mrg_job_id%type
   );
   
   
