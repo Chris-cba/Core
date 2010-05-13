@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.11   03 May 2010 13:05:28   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite2.pkb-arc   2.12   13 May 2010 08:47:04   ptanava  $
 --       Module Name      : $Workfile:   nm3inv_composite2.pkb  $
---       Date into PVCS   : $Date:   03 May 2010 13:05:28  $
---       Date fetched Out : $Modtime:   03 May 2010 12:17:50  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   13 May 2010 08:47:04  $
+--       Date fetched Out : $Modtime:   13 May 2010 08:39:46  $
+--       PVCS Version     : $Revision:   2.12  $
 --       Based on sccs version :
 --
 --   Author : Priidu Tanava
@@ -35,9 +35,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
   25.02.09 PT added nm3net.bypass_members_triggers() to process_from_iit_tmp()
   27.04.10 PT in do_rebuild() added parameters added parameters p_nqr_source and p_nqr_source_id to the call to nm3bulk_mrg.std_run()
                 NB! requires nm3bulk_mrg.pkh version 2.6 or higher
+  12.05.10 PT added parameter p_domain_return  => 'C' to the call to nm3bulk_mrg.std_run()
+                NB! requires nm3bulk_mrg_pkh 2.7 or higher (logs 723574, 724275)
 */
 
-  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.11  $"';
+  g_body_sccsid   constant  varchar2(30) := '"$Revision:   2.12  $"';
   g_package_name  constant  varchar2(30) := 'nm3inv_composite2';
   
   cant_serialize exception;
@@ -734,6 +736,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_composite2 AS
       ,p_nqr_admin_unit => p_admin_unit_id
       ,p_nqr_source     => l_nqr_source
       ,p_nqr_source_id  => l_nqr_source_id
+      ,p_domain_return  => 'C' -- CODE
       ,p_nmq_descr      => l_nqr_description
       ,p_criteria_rowcount => l_sqlcount
       ,p_mrg_job_id     => l_mrg_job_id
