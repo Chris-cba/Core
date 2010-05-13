@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.30.1.0   Feb 01 2010 12:02:26   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.30.1.1   May 13 2010 13:27:16   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Feb 01 2010 12:02:26  $
---       Date fetched Out : $Modtime:   Feb 01 2010 11:57:26  $
---       PVCS Version     : $Revision:   2.30.1.0  $
+--       Date into PVCS   : $Date:   May 13 2010 13:27:16  $
+--       Date fetched Out : $Modtime:   May 13 2010 13:26:08  $
+--       PVCS Version     : $Revision:   2.30.1.1  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.30.1.0  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.30.1.1  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -2472,7 +2472,7 @@ geocur geocurtyp;
 
 l_geom         mdsys.sdo_geometry;
 l_length       nm_elements.ne_length%TYPE := Nm3net.get_datum_element_length( p_ne_id_of );
-
+l_geom_length  number;
 BEGIN
 
 --    --   nm_debug.debug_on;
@@ -2484,6 +2484,25 @@ BEGIN
   END IF;
 
    l_geom := Get_Layer_Element_Geometry( p_layer, p_ne_id_of );
+   l_geom_length := sdo_lrs.geom_segment_end_measure(l_geom);
+
+   if abs(l_geom_length - l_length) > g_usgm.diminfo(3).sdo_tolerance then
+      Hig.raise_ner(pi_appl                => Nm3type.c_hig
+                    ,pi_id                 => 204
+                    ,pi_sqlcode            => -20001
+                    );
+--    Lengths of element and shape are inconsistent
+   end if;
+
+   if p_end_mp > l_length + g_usgm.diminfo(3).sdo_tolerance then
+      Hig.raise_ner(pi_appl                => Nm3type.c_net
+                    ,pi_id                 => 227
+                    ,pi_sqlcode            => -20001
+                    );
+--    Membership measures out of range of parent element
+   end if;
+
+
 
 --   nm_debug.debug( 'Got the element geometry');
 
@@ -2496,7 +2515,7 @@ BEGIN
      IF is_clipped( p_begin_mp, p_end_mp, l_length ) = 0 THEN
 --       nm_debug.debug('Clipped between '||to_char( p_begin_mp )||' and '||to_char(p_end_mp)||' length = '||to_char(l_length));
 
-       l_geom := sdo_lrs.clip_geom_segment( l_geom, g_usgm.diminfo, p_begin_mp, p_end_mp );
+       l_geom := sdo_lrs.clip_geom_segment( l_geom, g_usgm.diminfo, least(p_begin_mp, l_geom_length), least(p_end_mp, l_geom_length) );
 
      ELSE
 --       nm_debug.debug('Not clipped '||to_char( p_begin_mp )||' and '||to_char(p_end_mp)||' length = '||to_char(l_length));
