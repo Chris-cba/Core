@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.7   May 17 2010 10:37:26   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.8   May 17 2010 14:28:28   aedwards  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   May 17 2010 10:37:26  $
---       Date fetched Out : $Modtime:   May 17 2010 10:36:58  $
---       PVCS Version     : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   May 17 2010 14:28:28  $
+--       Date fetched Out : $Modtime:   May 17 2010 14:28:04  $
+--       PVCS Version     : $Revision:   3.8  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.7  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -993,18 +993,27 @@ AS
   IS
     l_conn         utl_tcp.connection;
     l_char_array   dbms_output.chararr;
-    l_num_lines    INTEGER := 100;
+    l_num_lines    INTEGER := 1000000;
     l_rec_hfc      hig_ftp_connections%ROWTYPE;
     l_password     nm3type.max_varchar2;
     l_in_dir_list  t_string_table;
     l_out_dir_list t_string_table;
+    PROCEDURE put_sep IS 
+    BEGIN
+      dbms_output.put_line (' ================================================'
+                          ||'===================================================');
+    END put_sep;
   BEGIN
   --
     SELECT * INTO l_rec_hfc
       FROM hig_ftp_connections
      WHERE hfc_id = pi_hfc_id;
   --
-    dbms_output.enable;
+    dbms_output.enable(1000000);
+  --
+    put_sep;
+    dbms_output.put_line (' === Testing FTP Connection ['||l_rec_hfc.hfc_name||']');
+    put_sep;
   --
     IF l_rec_hfc.hfc_ftp_password IS NOT NULL
     THEN
@@ -1013,34 +1022,42 @@ AS
   --
   -- Test connection
   --
-    nm_debug.debug_on;
-    nm_debug.debug('Decrypted - '||l_password);
-    nm_debug.debug('Encryted - '||l_rec_hfc.hfc_ftp_password);
+--    nm_debug.debug_on;
+--    nm_debug.debug('Decrypted - '||l_password);
+--    nm_debug.debug('Encryted - '||l_rec_hfc.hfc_ftp_password);
     l_conn := nm3ftp.login(l_rec_hfc.hfc_ftp_host
                            ,NVL(l_rec_hfc.hfc_ftp_port,21)
                            ,l_rec_hfc.hfc_ftp_username
                            ,l_password);
   --
+    put_sep;
+    dbms_output.put_line (' === Testing FTP Connection - Connection ['||l_rec_hfc.hfc_name||'] is valid');
+    put_sep;
+  --
   -- See if directories are accessable
+  --
+
   --
     IF l_rec_hfc.hfc_ftp_in_dir IS NOT NULL
     THEN
+    --
+      put_sep;
+      dbms_output.put_line (' === Testing FTP Connection - Connection ['||l_rec_hfc.hfc_name||'] - Check IN Directory');
+      put_sep;
     --
       --send_command(p_conn => l_conn, p_command => 'LIST '||l_rec_hfc.hfc_ftp_in_dir);
       list ( p_conn   => l_conn,
              p_dir    => l_rec_hfc.hfc_ftp_in_dir,
              p_list   => l_in_dir_list );
     --
---      FOR in_files IN 1..l_in_dir_list.COUNT LOOP
---      --
---        pio_results (
---      --
---      END LOOP;
-    --
     END IF;
   --
     IF l_rec_hfc.hfc_ftp_out_dir IS NOT NULL
     THEN
+    --
+      put_sep;
+      dbms_output.put_line (' === Testing FTP Connection - Connection ['||l_rec_hfc.hfc_name||'] - Check OUT Directory');
+      put_sep;
     --
       list ( p_conn   => l_conn,
              p_dir    => l_rec_hfc.hfc_ftp_out_dir,
@@ -1048,23 +1065,60 @@ AS
     --
     END IF;
   --
-    IF l_rec_hfc.hfc_ftp_arc_in_dir IS NOT NULL
-    THEN
+    DECLARE
+      l_arc_host       nm3type.max_varchar2 := NVL(l_rec_hfc.hfc_ftp_arc_host,l_rec_hfc.hfc_ftp_host);
+      l_arc_port       nm3type.max_varchar2 := NVL(NVL(l_rec_hfc.hfc_ftp_arc_port,l_rec_hfc.hfc_ftp_port),21);
+      l_arc_username   nm3type.max_varchar2 := NVL(l_rec_hfc.hfc_ftp_arc_username,l_rec_hfc.hfc_ftp_username);
+      l_arc_password   nm3type.max_varchar2 := NVL(l_rec_hfc.hfc_ftp_arc_password,l_rec_hfc.hfc_ftp_password);
+      l_arc_in_folder  nm3type.max_varchar2 := l_rec_hfc.hfc_ftp_arc_in_dir;
+      l_arc_out_folder nm3type.max_varchar2 := l_rec_hfc.hfc_ftp_arc_out_dir;
+    BEGIN
     --
-      list ( p_conn   => l_conn,
-             p_dir    => l_rec_hfc.hfc_ftp_arc_in_dir,
-             p_list   => l_in_dir_list );
+      IF l_arc_in_folder IS NOT NULL
+      THEN
+      --
+        nm3ftp.logout(p_conn => l_conn);
+      --
+        put_sep;
+        dbms_output.put_line (' === Testing FTP Connection - Connection ['||l_rec_hfc.hfc_name||'] - Check Archive IN Directory');
+        put_sep;
+        l_conn := nm3ftp.login( p_host => l_arc_host
+                              , p_port => l_arc_port
+                              , p_user => l_arc_username
+                              , p_pass => get_password ( pi_password_raw => l_arc_password) );
+      --
+        list ( p_conn   => l_conn,
+               p_dir    => l_arc_in_folder,
+               p_list   => l_in_dir_list );
+      --
+      END IF;
     --
-    END IF;
+      IF l_arc_out_folder IS NOT NULL
+      THEN
+      --
+        nm3ftp.logout(p_conn => l_conn);
+      --
+        put_sep;
+        dbms_output.put_line (' === Testing FTP Connection - Connection ['||l_rec_hfc.hfc_name||'] - Check Archive OUT Directory');
+        put_sep;
+      --
+        dbms_output.put_line ('Connect as '||l_arc_host||':'||l_arc_port||' - '||l_arc_username||'@'||get_password ( pi_password_raw => l_arc_password));
+        l_conn := nm3ftp.login( p_host => l_arc_host
+                              , p_port => l_arc_port
+                              , p_user => l_arc_username
+                              , p_pass => get_password ( pi_password_raw => l_arc_password) );
+      --
+        list ( p_conn   => l_conn,
+               p_dir    => l_arc_out_folder,
+               p_list   => l_in_dir_list );
+      --
+      END IF;
+    --
+    END;
   --
-    IF l_rec_hfc.hfc_ftp_arc_out_dir IS NOT NULL
-    THEN
-    --
-      list ( p_conn   => l_conn,
-             p_dir    => l_rec_hfc.hfc_ftp_arc_out_dir,
-             p_list   => l_in_dir_list );
-    --
-    END IF;    
+    put_sep;
+    dbms_output.put_line (' === Testing FTP Connection - Connection ['||l_rec_hfc.hfc_name||'] - Completed Successfully ');
+    put_sep;
   --
     utl_tcp.close_all_connections;
   --
@@ -1076,7 +1130,12 @@ AS
     WHEN OTHERS 
       THEN
     --
+      put_sep;
+      dbms_output.put_line (' === Testing FTP Connection - Connection ['||l_rec_hfc.hfc_name||'] - Completed with Errors : ');
+      put_sep;
+    --
       utl_tcp.close_all_connections;
+
     --
       dbms_output.get_lines(l_char_array,l_num_lines);
     --
