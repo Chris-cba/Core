@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.6   May 17 2010 09:37:28   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.7   May 17 2010 10:37:26   aedwards  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   May 17 2010 09:37:28  $
---       Date fetched Out : $Modtime:   May 17 2010 09:37:02  $
---       PVCS Version     : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   May 17 2010 10:37:26  $
+--       Date fetched Out : $Modtime:   May 17 2010 10:36:58  $
+--       PVCS Version     : $Revision:   3.7  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.6  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -1371,13 +1371,54 @@ AS
           BEGIN
             IF i.hfc_ftp_arc_in_dir IS NOT NULL
             THEN
-              rename
-                ( p_conn               => l_conn,
-                  p_from               => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f),
-                  p_to                 => format_with_separator(i.hfc_ftp_arc_in_dir)||l_files_tab(f),
-                  p_archive_overwrite  => pi_archive_overwrite,
-                  p_remove_failed_arch => pi_remove_failed_arch
-                );
+            --
+            -- If the Archive location is on the same server as the main connection
+            -- then use the same conneciton and do a rename
+            --
+              IF  NVL(i.hfc_ftp_arc_host,i.hfc_ftp_host)         = i.hfc_ftp_host
+              AND NVL(i.hfc_ftp_port,21)                         = NVL(i.hfc_ftp_arc_port,21)
+              AND NVL(i.hfc_ftp_arc_username,i.hfc_ftp_username) = i.hfc_ftp_username
+              THEN
+                rename
+                  ( p_conn               => l_conn,
+                    p_from               => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f),
+                    p_to                 => format_with_separator(i.hfc_ftp_arc_in_dir)||l_files_tab(f),
+                    p_archive_overwrite  => pi_archive_overwrite,
+                    p_remove_failed_arch => pi_remove_failed_arch
+                  );
+              ELSE
+              --
+              -- Connect to the different archive server and archive the files
+              --
+                DECLARE
+                  l_arc_conn utl_tcp.connection;
+                BEGIN
+                --
+                  l_arc_conn := nm3ftp.login( p_host => i.hfc_ftp_arc_host
+                                            , p_port => NVL(i.hfc_ftp_arc_port,21)
+                                            , p_user => i.hfc_ftp_arc_username
+                                            , p_pass => get_password( pi_password_raw => i.hfc_ftp_arc_password ));
+                --
+                  IF pi_binary
+                  THEN binary (p_conn => l_arc_conn);
+                  ELSE ascii  (p_conn => l_arc_conn);
+                  END IF;
+                --
+                  nm3ftp.put(p_conn      => l_arc_conn,
+                             p_from_dir  => l_db_dir,
+                             p_from_file => l_files_tab(f),
+                             p_to_file   => format_with_separator(i.hfc_ftp_arc_in_dir)||l_files_tab(f));
+                --
+                  nm3ftp.logout(p_conn => l_arc_conn);
+                --
+                EXCEPTION
+                  WHEN OTHERS
+                  THEN
+                    nm3ftp.logout(p_conn => l_arc_conn);
+                    utl_tcp.close_all_connections;
+                END;
+              --
+              END IF;
             END IF;
           EXCEPTION
             WHEN OTHERS 
