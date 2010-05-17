@@ -2,12 +2,12 @@ CREATE OR REPLACE package body nm3dynsql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.3   Feb 26 2009 20:53:32   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.4   May 17 2010 17:34:18   rcoupe  $
 --       Module Name      : $Workfile:   nm3dynsql.pkb  $
---       Date into PVCS   : $Date:   Feb 26 2009 20:53:32  $
---       Date fetched Out : $Modtime:   Feb 26 2009 20:51:08  $
---       PVCS Version     : $Revision:   2.3  $
---       Based on sccs version : 
+--       Date into PVCS   : $Date:   May 17 2010 17:34:18  $
+--       Date fetched Out : $Modtime:   May 17 2010 17:34:08  $
+--       PVCS Version     : $Revision:   2.4  $
+--       Based on sccs version :
 --
 --
 --   Author : Priidu Tanava
@@ -27,28 +27,29 @@ CREATE OR REPLACE package body nm3dynsql as
                 in sql_route_connectivity replaced references to m.nm_begin_mp and m.nm_end_mp with those of d.begin_mp and d.end_mp
                 this ensures that nm_datum_criteria mp values are observed and avoids overlaps in nm_route_connectivity_tmp
                 requires nm3bulk_mrg 2.17 or later
+  27.05.10  RC Task 0109651 - comment out line to restrict query to only live elements (ecdm log 726355)
 */
 
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.3  $"';
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.4  $"';
   g_package_name    constant  varchar2(30) := 'nm3dynsql';
-  
-  
+
+
   -- exception used by is_circular() function
   connect_by_loop exception; -- CONNECT BY loop in user data
   pragma exception_init(connect_by_loop, -1436);
-  
+
   cr  constant varchar2(10) := chr(10);
   qt  constant varchar2(39) := chr(39); -- single quote
 
   m_date_format constant varchar2(20) := 'DD-MON-YYYY';
   m_debug constant number(1) := 3;
-  
+
   mt_id       nm_id_tbl       := new nm_id_tbl();
   mt_code     nm_code_tbl     := new nm_code_tbl();
   mt_id_code  nm_id_code_tbl  := new nm_id_code_tbl();
 
-  
-  
+
+
   --
   -----------------------------------------------------------------------------
   --
@@ -65,8 +66,8 @@ CREATE OR REPLACE package body nm3dynsql as
   begin
      return g_body_sccsid;
   end;
-  
-    
+
+
   -- this returns the effective date criteria string using bind variables
   -- the bind count is incremented in p_bind_count
   --  (it is recommended to use the sys_context version of this function)
@@ -88,8 +89,8 @@ CREATE OR REPLACE package body nm3dynsql as
         ||'('||p_end_date_column||' is null or '||p_end_date_column||' > :p_effective_date)';
     end if;
   end;
-  
-  
+
+
   -- this returns the effective date criteria string using the sys_context 'effective_date'
   function sql_effective_date(
      p_date in date
@@ -106,17 +107,17 @@ CREATE OR REPLACE package body nm3dynsql as
         ||'('||p_end_date_column||' is null or '||p_end_date_column||' > to_date(sys_context(''nm_sql'', ''effective_date''), ''YYYYMMDD''))';
     end if;
   end;
-  
-  
+
+
   function sql_effective_date_tbl return varchar2
   is
   begin
     return '(select /*+ cardinality(dd 1) */ nm3user.get_effective_date effective_date from dual dd)';
   end;
-  
-  
-  
-  
+
+
+
+
   -- this returns the sql select statement for route connectivity.
   --  the nm_datum_criteria_tmp must be filled before the sql is used
   --  p_criteria_rowcount: the record count in nm_datum_criteria_tmp
@@ -133,7 +134,7 @@ CREATE OR REPLACE package body nm3dynsql as
     l_effective_date  date := nm3user.get_effective_date;
     l_sql_effective_date_tbl  varchar2(200);
     l_sql_effective_date_join varchar2(500);
-    
+
   begin
     nm3dbg.putln(g_package_name||'.sql_route_connectivity('
       ||'p_criteria_rowcount='||p_criteria_rowcount
@@ -149,24 +150,24 @@ CREATE OR REPLACE package body nm3dynsql as
     else
       l_sql_ignore_poe := cr||'          and s1.nm_end_slk = s2.nm_slk';
     end if;
-    
-    
+
+
     -- effective date
     -- (this can be skipped if the datums table has values
     --    and they can be relied on to be valid for the current effective date)
     if l_effective_date = trunc(sysdate) then
-      l_sql_effective_date_join := 
+      l_sql_effective_date_join :=
           cr||'  and m.nm_end_date is null'
-        ||cr||'  and e.ne_end_date is null';      
+        ||cr||'  and e.ne_end_date is null';
     else
       l_sql_effective_date_tbl := '  ,'||sql_effective_date_tbl||' ed';
-      l_sql_effective_date_join := 
+      l_sql_effective_date_join :=
           cr||'  and m.nm_start_date <= ed.effective_date and (m.nm_end_date is null or m.nm_end_date > ed.effective_date)'
         ||cr||'  and e.ne_start_date <= ed.effective_date and (e.ne_end_date is null or e.ne_end_date > ed.effective_date)';
         --||cr||'  and gt.ngt_start_date <= gt.ngt_start_date and (gt.ngt_end_date is null or gt.ngt_end_date > ed.effective_date)'
     end if;
-  
-    l_sql := 
+
+    l_sql :=
           'select'
     ||cr||'   q4.nm_ne_id_in'
     ||cr||'  ,q4.chunk_no'
@@ -203,7 +204,7 @@ CREATE OR REPLACE package body nm3dynsql as
     ||cr||'     order by q3.chunk_seq, q3.nm_begin_mp rows unbounded preceding'
     ||cr||'   ) measure'
     ||cr||'  ,row_number() over (partition by q3.nm_ne_id_in, q3.nm_ne_id_of order by q3.chunk_seq) member_rownum'
-    ||cr||'from ('    
+    ||cr||'from ('
     ||cr||'select'
     ||cr||'   q2.nm_ne_id_in'
     ||cr||'  ,to_number(substr(q2.chunk_no_seq, 1, 6)) chunk_no'
@@ -299,7 +300,7 @@ CREATE OR REPLACE package body nm3dynsql as
     ||cr||'  and e.ne_nt_type = t.nt_type'
     ||cr||'  and gt.ngt_nt_type = t2.nt_type'
         ||l_sql_effective_date_join
-    ||cr||'  and e.ne_end_date is null'
+--  ||cr||'  and e.ne_end_date is null'  -- RAC change to allow software to work as past effective dates.
     ||cr||'  and gt.ngt_end_date is null'
     ||cr||'  and m.nm_type = ''G'''
     ||cr||'  and gt.ngt_linear_flag = ''Y'''
@@ -376,11 +377,11 @@ CREATE OR REPLACE package body nm3dynsql as
     ;
     nm3dbg.deind;
     return l_sql;
-    
+
   end;
-  
-  
-  
+
+
+
   -- this tests if a piece or route starting at p_nm_ne_id_of is circular
   --  used by sql_route_connectivity() and the connectivity views
   -- returns 1 when circular, 0 when not
@@ -392,7 +393,7 @@ CREATE OR REPLACE package body nm3dynsql as
   is
     l_count number(6);
   begin
-  
+
     -- this query tires to issue a connect by select
     --  fails if there is circluar connectivity
     --  deals gracefully with duplicate same lane connections between nodes
@@ -451,11 +452,11 @@ CREATE OR REPLACE package body nm3dynsql as
         ||', p_connecting_nm_ne_id_of='||p_connecting_nm_ne_id_of
         ||')');
       raise;
-      
+
   end;
 
-  
-  
-    
+
+
+
 end;
 /
