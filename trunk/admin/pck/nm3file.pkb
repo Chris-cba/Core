@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.11   May 07 2010 16:15:28   aedwards  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.12   May 17 2010 08:48:50   aedwards  $
 -- Module Name : $Workfile:   nm3file.pkb  $
--- Date into PVCS : $Date:   May 07 2010 16:15:28  $
--- Date fetched Out : $Modtime:   May 07 2010 16:14:58  $
--- PVCS Version : $Revision:   2.11  $
+-- Date into PVCS : $Date:   May 17 2010 08:48:50  $
+-- Date fetched Out : $Modtime:   May 14 2010 16:24:08  $
+-- PVCS Version : $Revision:   2.12  $
 -- Based on SCCS version : 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 --all global package variables here
 --
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.11  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.12  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3file';
@@ -1656,6 +1656,27 @@ END external_table_record_delim;
     RETURN all_directories.directory_name%TYPE
   IS
     l_directory           all_directories.directory_name%TYPE;
+    CURSOR get_directory 
+    IS
+      SELECT directory_name INTO l_directory
+        FROM all_directories
+       WHERE directory_path
+                        = CASE
+                           WHEN ( INSTR(pi_path,'\') > 0 
+                                  OR 
+                                  INSTR(pi_path,'/') > 0 )
+                             THEN pi_path
+                           ELSE directory_path
+                         END
+         AND directory_name
+                       = CASE
+                           WHEN ( INSTR(pi_path,'\') = 0
+                                  AND
+                                  INSTR(pi_path,'/') = 0
+                                )
+                             THEN pi_path
+                           ELSE directory_name
+                         END;
   BEGIN
   --
     nm_debug.proc_start (g_package_name,'get_oracle_directory');
@@ -1665,25 +1686,9 @@ END external_table_record_delim;
   --
   -- Designed to return Oracle Directory for either a Path or Oracle Directory
   --
-    SELECT directory_name INTO l_directory
-      FROM all_directories
-     WHERE directory_path
-                      = CASE
-                         WHEN ( INSTR(pi_path,'\') > 0 
-                                OR 
-                                INSTR(pi_path,'/') > 0 )
-                           THEN pi_path
-                         ELSE directory_path
-                       END
-       AND directory_name
-                     = CASE
-                         WHEN ( INSTR(pi_path,'\') = 0
-                                AND
-                                INSTR(pi_path,'/') = 0
-                              )
-                           THEN pi_path
-                         ELSE directory_name
-                       END;
+    OPEN get_directory;
+    FETCH get_directory INTO l_directory;
+    CLOSE get_directory;
   --
     nm_debug.proc_end (g_package_name,'get_oracle_directory');
   --
@@ -1700,6 +1705,28 @@ END external_table_record_delim;
     RETURN all_directories.directory_path%TYPE
   IS
     l_path          all_directories.directory_path%TYPE;
+    CURSOR get_path
+    IS
+      SELECT directory_path INTO l_path
+        FROM all_directories
+       WHERE directory_path
+                        = CASE
+                           WHEN ( INSTR(pi_oracle_directory,'\') > 0
+                                  OR 
+                                  INSTR(pi_oracle_directory,'/') > 0
+                                )
+                             THEN pi_oracle_directory
+                           ELSE directory_path
+                         END
+         AND directory_name
+                       = CASE
+                           WHEN ( INSTR(pi_oracle_directory,'\') = 0
+                                  AND
+                                  INSTR(pi_oracle_directory,'/') = 0
+                                )
+                             THEN pi_oracle_directory
+                           ELSE directory_name
+                         END;
   BEGIN
   --
   -- Uses '/' and '\' because Oracle directories may be spread across
@@ -1707,26 +1734,10 @@ END external_table_record_delim;
   --
   -- Designed to return Path for either a Path or Oracle Directory 
   --
-    SELECT directory_path INTO l_path
-      FROM all_directories
-     WHERE directory_path
-                      = CASE
-                         WHEN ( INSTR(pi_oracle_directory,'\') > 0
-                                OR 
-                                INSTR(pi_oracle_directory,'/') > 0
-                              )
-                           THEN pi_oracle_directory
-                         ELSE directory_path
-                       END
-       AND directory_name
-                     = CASE
-                         WHEN ( INSTR(pi_oracle_directory,'\') = 0
-                                AND
-                                INSTR(pi_oracle_directory,'/') = 0
-                              )
-                           THEN pi_oracle_directory
-                         ELSE directory_name
-                       END;
+    OPEN get_path;
+    FETCH get_path INTO l_path;
+    CLOSE get_path;
+  --
     RETURN l_path;
   EXCEPTION
     WHEN NO_DATA_FOUND
