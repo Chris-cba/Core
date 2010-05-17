@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.5   May 11 2010 09:07:40   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.6   May 17 2010 09:37:28   aedwards  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   May 11 2010 09:07:40  $
---       Date fetched Out : $Modtime:   May 11 2010 09:02:38  $
---       PVCS Version     : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   May 17 2010 09:37:28  $
+--       Date fetched Out : $Modtime:   May 17 2010 09:37:02  $
+--       PVCS Version     : $Revision:   3.6  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.5  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -164,7 +164,7 @@ AS
    BEGIN
       g_reply.DELETE;
       l_conn :=
-            UTL_TCP.open_connection (p_host, p_port, tx_timeout => p_timeout);
+            UTL_TCP.open_connection (p_host, NVL(p_port,21), tx_timeout => p_timeout);
       get_reply (l_conn);
       send_command (l_conn, 'USER ' || p_user);
       send_command (l_conn, 'PASS ' || p_pass);
