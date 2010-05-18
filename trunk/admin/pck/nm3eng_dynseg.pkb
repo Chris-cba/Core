@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.12   Mar 19 2009 16:35:32   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.13   May 18 2010 12:48:58   rcoupe  $
 --       Module Name      : $Workfile:   nm3eng_dynseg.pkb  $
---       Date into PVCS   : $Date:   Mar 19 2009 16:35:32  $
---       Date fetched Out : $Modtime:   Mar 19 2009 16:33:26  $
---       PVCS Version     : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   May 18 2010 12:48:58  $
+--       Date fetched Out : $Modtime:   May 18 2010 12:47:26  $
+--       PVCS Version     : $Revision:   2.13  $
 --       Based on sccs version : 1.13
 --
 --   Author : Jonathan Mills
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.12  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.13  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg';
@@ -2510,11 +2510,11 @@ BEGIN
       IF g_merge_run
        THEN
          g_sql := g_sql
-              ||chr(10)||', nm_members r, nm_mrg_sections';
+              ||chr(10)||', nm_members r, nm_mrg_sections nms';
          g_sql := g_sql
               ||CHR(10)||'WHERE  nsm.nsm_mrg_job_id     = :mrg_job_id'
               ||CHR(10)||' AND   nsm.nsm_mrg_section_id = :mrg_section_id'
-              ||CHR(10)||' AND   nms_mrg_section_id     = nsm.nsm_mrg_section_id'
+              ||CHR(10)||' AND   nms.nms_mrg_section_id = nsm.nsm_mrg_section_id'  -- task 0109654 - found during investigation of ecdm log 726192
               ||CHR(10)||' AND   r.nm_ne_id_of          = ft.'||l_rec_nit.nit_lr_ne_column_name
               ||CHR(10)||' AND   nms_mrg_job_id         = nsm.nsm_mrg_job_id'
               ||CHR(10)||' AND   r.nm_ne_id_in          = nms_offset_ne_id';
