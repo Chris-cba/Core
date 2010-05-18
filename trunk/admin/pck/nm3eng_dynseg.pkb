@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.13   May 18 2010 12:48:58   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3eng_dynseg.pkb-arc   2.14   May 18 2010 13:43:30   rcoupe  $
 --       Module Name      : $Workfile:   nm3eng_dynseg.pkb  $
---       Date into PVCS   : $Date:   May 18 2010 12:48:58  $
---       Date fetched Out : $Modtime:   May 18 2010 12:47:26  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   May 18 2010 13:43:30  $
+--       Date fetched Out : $Modtime:   May 18 2010 13:43:02  $
+--       PVCS Version     : $Revision:   2.14  $
 --       Based on sccs version : 1.13
 --
 --   Author : Jonathan Mills
@@ -27,7 +27,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.13  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.14  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3eng_dynseg';
@@ -55,6 +55,7 @@ CREATE OR REPLACE PACKAGE BODY nm3eng_dynseg AS
    g_bins_run       BOOLEAN := FALSE;
    --
    g_field_is_number BOOLEAN;
+   g_field_is_date   BOOLEAN;
 
    --
 --
@@ -2318,6 +2319,9 @@ PROCEDURE build_sql (pi_inv_type   IN     VARCHAR2
   l_inv_table_name    varchar2(30) := 'nm_inv_items';
   l_inv_ne_id_col     varchar2(30) := 'iit_ne_id';
   -- PT 24.07.07 end
+  l_inv_attr_col      varchar2(200);
+
+  l_date_mask varchar2(20) :=   nvl(nm3user.get_user_date_mask, 'DD-MON-YYYY'); 
 
 BEGIN
   nm3dbg.putln(g_package_name||'.build_sql('
@@ -2346,7 +2350,10 @@ BEGIN
    l_rec_nit := nm3inv.get_inv_type (pi_inv_type);
    l_rec_ita := nm3inv.get_ita_by_view_col (pi_inv_type,pi_view_col);
 --
+   l_inv_attr_col := l_rec_ita.ita_view_col_name;
+   
    g_field_is_number := (l_rec_ita.ita_format = 'NUMBER');
+   g_field_is_date   := (l_rec_ita.ita_format = 'DATE');
 --
    IF NOT g_field_is_number
     AND g_stats_run
@@ -2374,6 +2381,12 @@ BEGIN
       RAISE g_eng_dynseg_exception;
    END IF;
 --
+
+   If g_field_is_date
+    THEN
+      l_inv_attr_col := 'TO_CHAR('||l_inv_attr_col||', '||''''||l_date_mask||''''||')'; 
+   END IF;
+
    IF pi_wrap_nvl
     THEN
       l_nvl_before := 'NVL(';
@@ -2416,7 +2429,7 @@ BEGIN
     THEN
 
       g_sql :=           'SELECT '||l_inv_ne_id_col
-              ||CHR(10)||'      ,'||l_nvl_before||'iit.'||l_col_name||l_nvl_after||' '||l_rec_ita.ita_view_col_name
+              ||CHR(10)||'      ,'||l_nvl_before||'iit.'||l_col_name||l_nvl_after||' '||l_inv_attr_col --l_rec_ita.ita_view_col_name
               ||CHR(10)||'      ,GREATEST(nm.nm_begin_mp,nsm.'||l_begin_mp_col||') nm_begin_mp'
               ||CHR(10)||'      ,LEAST(nm.nm_end_mp,nsm.'||l_end_mp_col||') nm_end_mp'
               ||CHR(10)||'      ,nm.nm_cardinality'
@@ -2499,8 +2512,16 @@ BEGIN
    --   that must be translated into our placments in the nm_members. Once this is done the type should
    --   be marked as palced on the networ in nm_inv_nw_all)
    ELSE
+
+      l_inv_attr_col := 'ft.'||l_col_name;
+   
+      If g_field_is_date
+       THEN
+         l_inv_attr_col := 'TO_CHAR('||l_col_name||', '||''''||l_date_mask||''''||')';
+      END IF;
+
       g_sql :=           'SELECT TRUNC('||l_rec_nit.nit_foreign_pk_column||') '||l_rec_nit.nit_foreign_pk_column
-              ||CHR(10)||'      ,'||l_nvl_before||'ft.'||l_col_name||l_nvl_after||' '||l_rec_ita.ita_view_col_name
+              ||CHR(10)||'      ,'||l_nvl_before||l_inv_attr_col||l_nvl_after||' '||l_rec_ita.ita_view_col_name
               ||CHR(10)||'      ,GREATEST(ft.'||l_rec_nit.nit_lr_st_chain||',nsm.'||l_begin_mp_col||') nm_begin_mp'
               ||CHR(10)||'      ,LEAST(ft.'||l_rec_nit.nit_lr_end_chain||',nsm.'||l_end_mp_col||') nm_end_mp'
               ||CHR(10)||'      ,1 nm_cardinality'
@@ -2630,8 +2651,8 @@ BEGIN
    g_val_dist_arr := initialise_val_dist_array;
 --
 --   nm_debug.delete_debug(TRUE);
---   nm_debug.debug_on;
---   nm_debug.debug(g_sql);
+   nm_debug.debug_on;
+   nm_debug.debug(g_sql);
 --   nm_debug.debug(pi_nms_mrg_job_id||':'||pi_nms_section_id||':'||pi_inv_type||':'||pi_xsp);
 --   nm_debug.debug_off;
 --
