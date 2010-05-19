@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.7   May 19 2010 11:11:54   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.8   19 May 2010 14:31:32   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   May 19 2010 11:11:54  $
---       Date fetched Out : $Modtime:   May 19 2010 11:07:34  $
---       PVCS Version     : $Revision:   2.32.1.7  $
+--       Date into PVCS   : $Date:   19 May 2010 14:31:32  $
+--       Date fetched Out : $Modtime:   19 May 2010 14:26:34  $
+--       PVCS Version     : $Revision:   2.32.1.8  $
 --
 --
 --   Author : Priidu Tanava
@@ -107,14 +107,14 @@ No query types defined.
                 added attribute iit_domain to ita_mapping_rec
                 added std_run() without p_longops parameter
                 NB! requires nm3bulk_mrg.pkh 2.7
+  19.05.10  PT tasks 0109662, 0109663: in load_temp_extent_datums() added missing sql_nm_datum_criteria_pre_tmp() wrapper
 
 
-  Todo: std_run without longops parameter
-        load_group_datums() with begin and end parameters
+  Todo: load_group_datums() with begin and end parameters
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.7  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.8  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -2726,13 +2726,15 @@ No query types defined.
     ,p_sqlcount out pls_integer
   )
   is
-    l_sql varchar2(32767);
-    l_elements_sql constant varchar2(2000) :=
+    l_sql constant varchar2(10000) :=
+      sql_nm_datum_criteria_pre_tmp(
+         p_elements_sql =>
               '    select d.nte_ne_id_of nm_ne_id_of, min(d.nte_begin_mp) begin_mp, max(d.nte_end_mp) end_mp'
         ||cr||'     ,min(d.nte_route_ne_id) group_id'
         ||cr||'    from nm_nw_temp_extents d'
         ||cr||'    where d.nte_job_id = :p_nte_job_id'
-        ||cr||'    group by d.nte_ne_id_of';
+        ||cr||'    group by d.nte_ne_id_of'
+      );
     l_group_type      nm_group_types.ngt_group_type%type;
     l_effective_date  constant date := nm3context.get_effective_date;
     l_sqlcount        pls_integer;
