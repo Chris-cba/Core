@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.8   May 13 2010 10:14:04   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.9   May 20 2010 09:44:18   lsorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   May 13 2010 10:14:04  $
---       Date fetched Out : $Modtime:   May 13 2010 10:12:42  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   May 20 2010 09:44:18  $
+--       Date fetched Out : $Modtime:   May 20 2010 09:42:22  $
+--       Version          : $Revision:   3.9  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,11 +17,12 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.8  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.9  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
   g_hie_seq    Number := 0;
+--  l_t hig_nav.l_hie_tab%TYPE;
 
 --
 -----------------------------------------------------------------------------
@@ -566,9 +567,9 @@ BEGIN
    END loop;
 END  pop_up_child;
 --
-PROCEDURE populate_tree(pi_id  IN  nav_id
-                       ,pi_tab IN  Varchar2
-                       ,po_tab OUT hig_navigator_tab)
+PROCEDURE populate_tree(--pi_id  IN  nav_id
+                       pi_tab IN  Varchar2
+                     ,po_tab OUT   hig_nav.l_type_tab)
 IS
 --
    l_sql       Varchar2(32767) ;
@@ -578,6 +579,7 @@ IS
    l_cnt       NUMBER := 0 ;
    tab_cnt     NUMBER := 0 ;
    l_type      hig_navigator_type := hig_navigator_type(null,null,null,null,null,null);
+   l_hie_type  hig_nav.l_type%TYPE;
    l_top       Varchar2(100) ;
    p_id        Varchar2(100);
    where_col   Varchar2(100);
@@ -625,11 +627,12 @@ BEGIN
 --
    g_hie_seq := 0;
    l_tab.delete ;
+   l_t.delete ;
    L_TOP_ID.dELETE ;
 --nm_debug.debug_on;
-   FOR i in 1..pi_id.count 
+   FOR i in 1..hig_nav.id_tab.count 
    LOOP
-       p_id := pi_id(i);
+       p_id := hig_nav.id_tab(i);
 --nm_debug.debug('p_id '||p_id); 
        IF p_id IS NOT NULL 
        THEN
@@ -751,21 +754,22 @@ BEGIN
        END IF ; -- p_id not null
    END loop;
    l_cnt := 0 ;
-   po_tab := hig_navigator_tab(hig_navigator_type(Null,Null,Null,Null,null,Null));  
+   -- po_tab := hig_navigator_tab(hig_navigator_type(Null,Null,Null,Null,null,Null));  
    FOR i in (SELECT x.*,level
              FROM   table(cast(get_tab(l_tab) as hig_navigator_tab)) x
              CONNECT BY parent= prior child
              START WITH parent IS NULL )
    LOOP
        l_cnt := l_cnt+1;
-       l_type.data := i.data ;
-       l_type.label := i.label ;
-       l_type.icon := i.icon ;
-       l_type.tab_level:= i.level ;--i.tab_level ;
-       l_type.parent:= i.parent ;
-       l_type.child := i.child ;          
-       po_tab(po_tab.Count) :=  l_type;
-       po_tab.extend;
+       l_hie_type.data := i.data ;
+       l_hie_type.label := i.label ;
+       l_hie_type.icon := i.icon ;
+       l_hie_type.tab_level:= i.level ;--i.tab_level ;
+       l_hie_type.parent:= i.parent ;
+       l_hie_type.child := i.child ;          
+       po_tab(po_tab.Count+1) :=  l_hie_type;
+       --l_t(l_t.Count+1) :=  l_hie_type;
+       --po_tab.extend;
    END LOOP;  
 END populate_tree;
 --
@@ -1319,6 +1323,26 @@ BEGIN
    RETURN hig_nav.return_id_tab;
 --
 END get_return_id_tab;
+--
+FUNCTION get_return_tab_cnt
+RETURN NUMBER 
+IS
+--
+BEGIN
+--
+   IF Nvl(hig_nav.return_id_tab.Count,0) > 1
+   THEN
+       IF hig_nav.return_id_tab(1) IS NOT NULL
+       THEN
+           RETURN 1;
+       ELSE
+           Return 0;
+       END IF ;
+   ELSE
+       Return 0;
+   END IF ;
+--
+END get_return_tab_cnt;
 --
 PROCEDURE populate_return_id_tab (pi_id Varchar2)
 IS
