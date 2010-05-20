@@ -1,15 +1,15 @@
-CREATE OR REPLACE PACKAGE BODY doc_sdo_util
+CREATE OR REPLACE PACKAGE BODY highways.doc_sdo_util
 IS
   -----------------------------------------------------------------------------
   --
   --
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkb-arc   2.3   May 12 2010 10:03:26   cstrettle  $
+  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkb-arc   2.4   May 20 2010 12:07:28   cstrettle  $
   --       Module Name      : $Workfile:   doc_sdo_util.pkb  $
-  --       Date into PVCS   : $Date:   May 12 2010 10:03:26  $
-  --       Date fetched Out : $Modtime:   May 12 2010 10:01:08  $
-  --       Version          : $Revision:   2.3  $
+  --       Date into PVCS   : $Date:   May 20 2010 12:07:28  $
+  --       Date fetched Out : $Modtime:   May 20 2010 12:06:16  $
+  --       Version          : $Revision:   2.4  $
   --
   --   Author : Christopher Strettle
   --
@@ -18,7 +18,7 @@ IS
   -----------------------------------------------------------------------------
   --
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
   g_package_name         CONSTANT VARCHAR2(30) := 'DOC_SDO_UTIL';
   nl                     CONSTANT VARCHAR2(5) := chr(10);
 
@@ -381,12 +381,11 @@ IS
     IS
       SELECT 'X'
         FROM doc_types
-       WHERE (dtp_allow_comments = 'N'
-              OR dtp_allow_complaints = 'N')
-             AND sysdate BETWEEN nvl(dtp_start_date, sysdate)
-                             AND nvl(dtp_end_date, sysdate)
-             AND dtp_code = p_doc_dtp_code;
-
+       WHERE dtp_allow_comments = 'N'
+         AND dtp_allow_complaints = 'N'
+         AND sysdate BETWEEN nvl(dtp_start_date, sysdate)
+                         AND nvl(dtp_end_date, sysdate)
+         AND dtp_code = p_doc_dtp_code;
     --
     l_dummy       VARCHAR2(1);
     l_return_val  BOOLEAN;
