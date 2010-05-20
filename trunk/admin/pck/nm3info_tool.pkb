@@ -3,11 +3,11 @@ AS
   -------------------------------------------------------------------------
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3info_tool.pkb-arc   3.0   May 06 2010 17:19:18   aedwards  $
+  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3info_tool.pkb-arc   3.1   May 20 2010 14:07:40   cstrettle  $
   --       Module Name      : $Workfile:   nm3info_tool.pkb  $
-  --       Date into PVCS   : $Date:   May 06 2010 17:19:18  $
-  --       Date fetched Out : $Modtime:   May 06 2010 17:17:58  $
-  --       Version          : $Revision:   3.0  $
+  --       Date into PVCS   : $Date:   May 20 2010 14:07:40  $
+  --       Date fetched Out : $Modtime:   May 20 2010 14:04:08  $
+  --       Version          : $Revision:   3.1  $
   --       Based on SCCS version :
   -------------------------------------------------------------------------
   --
@@ -17,12 +17,13 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
-  g_package_name  CONSTANT VARCHAR2(30) := 'NM3INFO_TOOL';
+  g_body_sccsid   CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+  g_package_name  CONSTANT VARCHAR2(30) := 'nm3info_tool';
   g_inv_attrs     nm3inv.tab_nita;
   g_is_ft         BOOLEAN; -- is the query a ft query
   l_sql           nm3type.tab_varchar32767;
-  c_date_format   CONSTANT VARCHAR2(30):= nm3context.get_context(pi_attribute => 'USER_DATE_MASK') ;
+  c_date_format CONSTANT VARCHAR2(30)
+      := nm3context.get_context(pi_attribute => 'USER_DATE_MASK') ;
 
   --
   -----------------------------------------------------------------------------
@@ -54,7 +55,7 @@ AS
              WHEN nath_nat_id IS NOT NULL THEN --'Area Network'
                                               'NETWORK'
              ELSE -- Unknown - use theme table
-                  'UNKNOWN'
+                 'UNKNOWN'
            END
              AS source
           ,CASE
@@ -107,96 +108,129 @@ AS
     RETURN g_body_sccsid;
   END get_body_version;
 
-
-FUNCTION get_inv_query_meaning (
-  pi_inv_type      IN VARCHAR2
-, pi_attrib_name   IN VARCHAR2
-, pi_value         IN VARCHAR2)
-  RETURN VARCHAR2
-IS
-  l_rec_nita          nm_inv_type_attribs%ROWTYPE;
-  l_qry               nm3type.max_varchar2;
-  l_id                nm3type.max_varchar2;
-  l_num_length        VARCHAR2 ( 50 );
-  l_raise_len_error   BOOLEAN;
-  l_length            NUMBER;
-  retval              nm3type.max_varchar2;
---
-BEGIN
-  --
-  -- If the value passed in is null then just exit
-  --
-  IF pi_value IS NULL
-  THEN
-    RETURN NULL;
-  END IF;
-
-  --
-  l_rec_nita :=  Nm3get.get_ita ( pi_ita_inv_type      => pi_inv_type
-                                , pi_ita_attrib_name   => pi_attrib_name
-                                , pi_raise_not_found   => FALSE );
-  --
-  l_qry := Nm3inv.build_ita_lov_sql_string ( pi_ita_inv_type                 => pi_inv_type
-                                           , pi_ita_attrib_name              => pi_attrib_name
-                                           , pi_include_bind_variable        => TRUE
-                                           , pi_replace_bind_variable_with   => NULL );
-  --
-  -- if we have a bind variable then re-build the query string to use the bind variable value passed in to our procedure
-  --
-  IF Nm3flx.extract_bind_variable ( l_qry, 1 ) IS NOT NULL
-  THEN
-    l_qry := Nm3inv.build_ita_lov_sql_string ( pi_ita_inv_type                 => pi_inv_type
-                                             , pi_ita_attrib_name              => pi_attrib_name
-                                             , pi_include_bind_variable        => FALSE
-                                             , pi_replace_bind_variable_with   => NULL );
-  END IF;
---
-  IF l_qry IS NOT NULL
-  THEN
-    BEGIN
-      Nm3extlov.validate_lov_value ( p_statement    => l_qry
-                                   , p_value        => pi_value
-                                   , p_meaning      => retval
-                                   , p_id           => l_id
-                                   , pi_match_col   => 3 ); -- important to match on the correct column in the sql query string
-    --  po_value := l_id;
-
-    EXCEPTION
-      WHEN OTHERS
-      THEN
-        Hig.
-        raise_ner (
-                    pi_appl                 => 'NET'
-                  , pi_id                   => 389
-                  , pi_supplementary_info   =>   CHR ( 10 )
-                                              || l_rec_nita.ita_scrn_text
-                                              || CHR ( 10 )
-                                              || Nm3flx.string ( pi_value ) );
-    END;
-  END IF;
-  RETURN retval;
-END get_inv_query_meaning;
-
-  --
-  -----------------------------------------------------------------------------
-  --
-  FUNCTION num_result_rows
-    RETURN PLS_INTEGER
+  FUNCTION get_inv_bind_variable(pi_inv_type       VARCHAR2
+                                ,pi_attrib_name    VARCHAR2)
+    RETURN VARCHAR2
   IS
-    CURSOR get_rows
-    IS
-      SELECT count(*) FROM nm_locator_results;
-
-    l_count_rows  PLS_INTEGER;
+    --
+    l_qry  nm3type.max_varchar2;
   BEGIN
-    OPEN get_rows;
+    l_qry   :=
+      nm3inv.
+      build_ita_lov_sql_string(pi_ita_inv_type                 => pi_inv_type
+                              ,pi_ita_attrib_name              => pi_attrib_name
+                              ,pi_include_bind_variable        => TRUE
+                              ,pi_replace_bind_variable_with   => NULL);
+    --
+    RETURN nvl(replace(nm3flx.extract_bind_variable(l_qry, 1), ':', NULL)
+              ,'NULL');
+  END;
 
-    FETCH get_rows INTO l_count_rows;
+  FUNCTION get_net_bind_variable(pi_ntc_nt_type    VARCHAR2
+                                ,pi_attrib_name    VARCHAR2)
+    RETURN VARCHAR2
+  IS
+    --
+    l_qry  nm3type.max_varchar2;
+  BEGIN
+    l_qry   :=
+      nm3flx.build_lov_sql_string(p_nt_type                      => pi_ntc_nt_type
+                                 ,p_column_name                  => pi_attrib_name
+                                 ,p_include_bind_variable        => TRUE
+                                 ,p_replace_bind_variable_with   => NULL);
+    --
+    RETURN nvl(replace(nm3flx.extract_bind_variable(l_qry, 1), ':', NULL)
+              ,'NULL');
+  END;
 
-    CLOSE get_rows;
+  FUNCTION get_query_meaning(pi_type          IN VARCHAR2
+                            ,pi_attrib_name   IN VARCHAR2
+                            ,pi_value         IN VARCHAR2
+                            ,pi_source        IN VARCHAR2
+                            ,pi_bind_value    IN VARCHAR2 DEFAULT NULL)
+    RETURN VARCHAR2
+  IS
+    l_qry                nm3type.max_varchar2;
+    retval               nm3type.max_varchar2;
+    l_id                 VARCHAR2(50);
+    l_bind_variable_col  VARCHAR2(50);
+  --
+  BEGIN
+    --
+    -- If the value passed in is null then just exit
+    --
+    IF pi_value IS NULL THEN
+      RETURN NULL;
+    END IF;
 
-    RETURN l_count_rows;
-  END num_result_rows;
+    --
+    IF pi_source = 'ASSET' THEN
+      IF pi_bind_value IS NULL THEN
+        l_qry   :=
+          nm3inv.
+          build_ita_lov_sql_string(pi_ita_inv_type                 => pi_type
+                                  ,pi_ita_attrib_name              => pi_attrib_name
+                                  ,pi_include_bind_variable        => TRUE
+                                  ,pi_replace_bind_variable_with   => NULL);
+        --
+        l_bind_variable_col   :=
+          replace(nm3flx.extract_bind_variable(l_qry), ':', NULL);
+      END IF;
+
+      --
+      IF pi_bind_value IS NOT NULL
+         OR l_bind_variable_col IS NOT NULL THEN
+        l_qry   :=
+          nm3inv.
+          build_ita_lov_sql_string(
+            pi_ita_inv_type                 => pi_type
+           ,pi_ita_attrib_name              => pi_attrib_name
+           ,pi_include_bind_variable        => FALSE
+           ,pi_replace_bind_variable_with   => pi_bind_value);
+      END IF;
+    --
+    ELSIF pi_source = 'NETWORK' THEN
+      --
+      IF pi_bind_value IS NULL THEN
+        l_qry   :=
+          nm3flx.build_lov_sql_string(p_nt_type                      => pi_type
+                                     ,p_column_name                  => pi_attrib_name
+                                     ,p_include_bind_variable        => TRUE
+                                     ,p_replace_bind_variable_with   => NULL);
+        l_bind_variable_col   :=
+          replace(nm3flx.extract_bind_variable(l_qry), ':', NULL);
+      END IF;
+
+      --
+      IF pi_bind_value IS NOT NULL
+         OR l_bind_variable_col IS NOT NULL THEN
+        l_qry   :=
+          nm3flx.
+          build_lov_sql_string(
+            p_nt_type                      => pi_type
+           ,p_column_name                  => pi_attrib_name
+           ,p_include_bind_variable        => FALSE
+           ,p_replace_bind_variable_with   => pi_bind_value);
+      END IF;
+    END IF;
+
+    --
+    IF l_qry IS NOT NULL THEN
+      BEGIN
+        nm3extlov.validate_lov_value(p_statement    => l_qry
+                                    ,p_value        => pi_value
+                                    ,p_meaning      => retval
+                                    ,p_id           => l_id
+                                    ,pi_match_col   => 3); -- important to match on the correct column in the sql query string
+      --
+      EXCEPTION
+        WHEN OTHERS THEN
+          NULL;
+      END;
+    END IF;
+
+    RETURN retval;
+  END get_query_meaning;
 
   --
   -----------------------------------------------------------------------------
@@ -206,7 +240,6 @@ END get_inv_query_meaning;
   BEGIN
     nm3ddl.append_tab_varchar(l_sql, p_text);
     DBMS_OUTPUT.put_line(p_text);
-  -- l_sql := l_sql || l_text || CHR(10);
   END add;
 
   --
@@ -227,17 +260,17 @@ END get_inv_query_meaning;
     nm3tab_varchar.debug_tab_varchar(l_sql);
   END debug_sql;
 
-FUNCTION get_inv_domain_meaning(pi_domain IN NM_INV_ATTRI_LOOKUP_ALL.ial_domain%TYPE
-                               ,pi_value  IN NM_INV_ATTRI_LOOKUP_ALL.ial_value%TYPE
-                               ) RETURN NM_INV_ATTRI_LOOKUP_ALL.ial_meaning%TYPE IS
-BEGIN
-
-RETURN nm3inv.get_inv_domain_meaning(pi_domain
-                                    ,pi_value);
-EXCEPTION
-WHEN OTHERS THEN
-RETURN NULL;
-END;
+  FUNCTION get_inv_domain_meaning(
+    pi_domain   IN nm_inv_attri_lookup_all.ial_domain%TYPE
+   ,pi_value    IN nm_inv_attri_lookup_all.ial_value%TYPE)
+    RETURN nm_inv_attri_lookup_all.ial_meaning%TYPE
+  IS
+  BEGIN
+    RETURN nm3inv.get_inv_domain_meaning(pi_domain, pi_value);
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END;
 
   --
   -----------------------------------------------------------------------------
@@ -361,59 +394,63 @@ END;
                     ,-5
                 FROM dual)
       ORDER BY ita_disp_seq_no;
+
     --
     CURSOR network_attrib_cur(p_type VARCHAR2)
     IS
       SELECT attrib_name
-           , textname
-           , NULL query_meaning
-           , domain_meaning
-           , datatype
-        FROM
-     (SELECT ntc_column_name attrib_name
-           , ntc_prompt textname
-           , ntc_domain domain_meaning
-           , ntc_column_type datatype
-           , ntc_seq_no
-        FROM nm_type_columns c
-       WHERE     ntc_displayed = 'Y'
-             AND ntc_nt_type = p_type
-             AND ntc_column_type IN ('VARCHAR2', 'CHAR', 'NUMBER', 'DATE')
-       UNION
-      SELECT 'ne_unique'
-           , 'Network Asset Id'
-           , NULL
-           , 'NUMBER'
-           , -10
-        FROM dual
-      UNION
-      SELECT 'ne_descr'
-           , 'Description'
-           , NULL
-           , 'VARCHAR2'
-           , -9
-        FROM dual)
+            ,textname
+            ,domain_meaning
+            ,query_meaning
+            ,datatype
+        FROM (SELECT ntc_column_name attrib_name
+                    ,ntc_prompt textname
+                    ,ntc_domain domain_meaning
+                    ,ntc_query query_meaning
+                    ,ntc_column_type datatype
+                    ,ntc_seq_no
+                FROM nm_type_columns c
+               WHERE     ntc_displayed = 'Y'
+              AND ntc_nt_type = p_type
+              AND ntc_column_type IN ('VARCHAR2', 'CHAR', 'NUMBER', 'DATE')
+              UNION
+              SELECT 'ne_unique'
+                    ,'Network Asset Id'
+                    ,NULL
+                    ,NULL
+                    ,'NUMBER'
+                    ,-10
+                FROM dual
+              UNION
+              SELECT 'ne_descr'
+                    ,'Description'
+                    ,NULL
+                    ,NULL
+                    ,'VARCHAR2'
+                    ,-9
+                FROM dual)
       ORDER BY ntc_seq_no;
+
     --
     CURSOR unknown_attrib_cur(p_table_name VARCHAR2)
     IS
       SELECT column_name attrib_name
-            ,initcap(replace(column_name,'_',' ')) textname
+            ,initcap(replace(column_name, '_', ' ')) textname
             ,NULL domain_meaning
             ,NULL query_meaning
             ,data_type datatype
         FROM user_tab_cols
-       WHERE table_name = p_table_name
+       WHERE     table_name = p_table_name
              AND data_type IN ('VARCHAR2', 'CHAR', 'NUMBER', 'DATE')
-             and hidden_column = 'NO'
+             AND hidden_column = 'NO'
       ORDER BY column_id;
 
     --
-    l_attrib_name    nm3type.tab_varchar30;
-    l_textname       nm3type.tab_varchar30;
-    l_query_meaning  nm3type.tab_varchar4000;
-    l_domain_meaning nm3type.tab_varchar30;
-    l_datatype       nm3type.tab_varchar30;
+    l_attrib_name     nm3type.tab_varchar30;
+    l_textname        nm3type.tab_varchar30;
+    l_query_meaning   nm3type.tab_varchar4000;
+    l_domain_meaning  nm3type.tab_varchar30;
+    l_datatype        nm3type.tab_varchar30;
   --
   BEGIN
     --
@@ -422,8 +459,14 @@ END;
         --
         IF p_source_table = 'NM_INV_ITEMS' THEN
           OPEN asset_attrib_cur(p_source_type);
+
           FETCH asset_attrib_cur
-          BULK COLLECT INTO l_attrib_name, l_textname, l_domain_meaning, l_query_meaning, l_datatype;
+          BULK COLLECT INTO l_attrib_name
+                           ,l_textname
+                           ,l_domain_meaning
+                           ,l_query_meaning
+                           ,l_datatype;
+
           CLOSE asset_attrib_cur;
         ELSE
           OPEN ft_asset_attrib_cur(p_source_type
@@ -431,7 +474,11 @@ END;
                                   ,p_source_pk_col);
 
           FETCH ft_asset_attrib_cur
-          BULK COLLECT INTO l_attrib_name, l_textname, l_domain_meaning, l_query_meaning, l_datatype;
+          BULK COLLECT INTO l_attrib_name
+                           ,l_textname
+                           ,l_domain_meaning
+                           ,l_query_meaning
+                           ,l_datatype;
 
           CLOSE ft_asset_attrib_cur;
         END IF;
@@ -441,7 +488,11 @@ END;
         OPEN network_attrib_cur(p_source_type);
 
         FETCH network_attrib_cur
-        BULK COLLECT INTO l_attrib_name, l_textname, l_domain_meaning, l_query_meaning, l_datatype;
+        BULK COLLECT INTO l_attrib_name
+                         ,l_textname
+                         ,l_domain_meaning
+                         ,l_query_meaning
+                         ,l_datatype;
 
         CLOSE network_attrib_cur;
       --
@@ -450,7 +501,11 @@ END;
         OPEN unknown_attrib_cur(p_source_table);
 
         FETCH unknown_attrib_cur
-        BULK COLLECT INTO l_attrib_name, l_textname, l_domain_meaning, l_query_meaning, l_datatype;
+        BULK COLLECT INTO l_attrib_name
+                         ,l_textname
+                         ,l_domain_meaning
+                         ,l_query_meaning
+                         ,l_datatype;
 
         CLOSE unknown_attrib_cur;
     --
@@ -468,35 +523,21 @@ END;
     add('  FROM');
     add('   (WITH asset AS');
     add('      (');
+    --
+    add('SELECT');
 
     --
-/*    CASE p_source
-      WHEN 'NETWORK' THEN
-        --
-        add('SELECT ne_unique');
-        add(', ne_descr');
-      --
-      ELSE
-        --*/
-        add('SELECT');
-    --
-    --END CASE;
-
     FOR i IN 1 .. l_attrib_name.count
     LOOP
       --
       IF l_datatype(i) IN ('VARCHAR2', 'CHAR') THEN
-        IF i = 1
-        --   AND p_source <> 'NETWORK' 
-        THEN
+        IF i = 1 THEN
           add(' ' || l_attrib_name(i));
         ELSE
           add(', ' || l_attrib_name(i));
         END IF;
       ELSIF l_datatype(i) = 'NUMBER' THEN
-        IF i = 1
-      --     AND p_source <> 'NETWORK' 
-        THEN
+        IF i = 1 THEN
           add(
             '  TO_CHAR(' || l_attrib_name(i) || ') AS ' || l_attrib_name(i));
         ELSE
@@ -504,9 +545,7 @@ END;
             ', TO_CHAR(' || l_attrib_name(i) || ') AS ' || l_attrib_name(i));
         END IF;
       ELSIF l_datatype(i) = 'DATE' THEN
-        IF i = 1
-        --   AND p_source <> 'NETWORK' 
-        THEN
+        IF i = 1 THEN
           add('  TO_CHAR(' || l_attrib_name(i) || ', ''' || c_date_format
               || ''') AS ' || l_attrib_name(i));
         ELSE
@@ -528,8 +567,10 @@ END;
     ELSE
       add('WHERE ' || p_source_pk_col || ' = ''' || p_pk_id || '''');
     END IF;
+
     --
     add(')');
+
     --
     FOR i IN 1 .. l_attrib_name.count
     LOOP
@@ -537,28 +578,36 @@ END;
       add('SELECT ''' || l_textname(i) || ''' as Attribute');
       add(' , substr(to_char(' || l_attrib_name(i) || '),0,500) as Value');
 
-      --ADD('     , ''Domain'' as "Domain"');
+      --
       IF l_query_meaning(i) IS NOT NULL THEN
         CASE p_source
           WHEN 'ASSET' THEN
-            add(', nm3info_tool.get_inv_query_meaning(''' || p_source_type ||
-                ''', ''' || l_attrib_name(i) || ''', ' || l_attrib_name(i) || ' ) as Domain');
+            add(
+              ', nm3info_tool.get_query_meaning(''' || p_source_type ||
+              ''', ''' || l_attrib_name(i) || ''', ' || l_attrib_name(i) ||
+              ', ''' || p_source || ''', ' || get_inv_bind_variable(
+              p_source_type, l_attrib_name    (i)) || ' ) as Domain');
           WHEN 'NETWORK' THEN
-          /*  add(', nm3info_tool.get_inv_query_meaning(''' || p_source_type ||
-                ''', ''' || l_attrib_name(i) || ''', ' || l_attrib_name(i) || ' ) as Domain');*/
-            add(', NULL as Domain');
+            add(
+              ', nm3info_tool.get_query_meaning(''' || p_source_type ||
+              ''', ''' || l_attrib_name(i) || ''', ' || l_attrib_name(i) ||
+              ', ''' || p_source || ''', ' || get_net_bind_variable(
+              p_source_type, l_attrib_name    (i)) || ' ) as Domain');
           WHEN 'UNKNOWN' THEN
             add(', NULL as Domain');
         END CASE;
-        null;
+
+        NULL;
       ELSIF l_domain_meaning(i) IS NOT NULL THEN
         CASE p_source
           WHEN 'ASSET' THEN
-            add(', nm3info_tool.get_inv_domain_meaning(''' || l_domain_meaning(i) ||
-                ''', ' || l_attrib_name(i) || ') as Domain');
+            add(
+              ', nm3info_tool.get_inv_domain_meaning(''' ||
+              l_domain_meaning                              (i) || ''', '
+              || l_attrib_name(i) || ') as Domain');
           WHEN 'NETWORK' THEN
-            add(', nm3flx.validate_domain_value(''' || l_domain_meaning(i) ||
-                ''', ' || l_attrib_name(i) || ')  as Domain');
+            add(', nm3flx.validate_domain_value(''' || l_domain_meaning(i)
+                || ''', ' || l_attrib_name(i) || ')  as Domain');
           WHEN 'UNKNOWN' THEN
             add(', NULL as Domain');
         END CASE;
