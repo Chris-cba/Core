@@ -1,15 +1,15 @@
-CREATE OR REPLACE PACKAGE BODY highways.doc_sdo_util
+CREATE OR REPLACE PACKAGE BODY doc_sdo_util
 IS
   -----------------------------------------------------------------------------
   --
   --
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkb-arc   2.4   May 20 2010 12:07:28   cstrettle  $
+  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkb-arc   2.5   May 20 2010 14:37:36   cstrettle  $
   --       Module Name      : $Workfile:   doc_sdo_util.pkb  $
-  --       Date into PVCS   : $Date:   May 20 2010 12:07:28  $
-  --       Date fetched Out : $Modtime:   May 20 2010 12:06:16  $
-  --       Version          : $Revision:   2.4  $
+  --       Date into PVCS   : $Date:   May 20 2010 14:37:36  $
+  --       Date fetched Out : $Modtime:   May 20 2010 14:36:24  $
+  --       Version          : $Revision:   2.5  $
   --
   --   Author : Christopher Strettle
   --
@@ -18,7 +18,7 @@ IS
   -----------------------------------------------------------------------------
   --
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
   g_package_name         CONSTANT VARCHAR2(30) := 'DOC_SDO_UTIL';
   nl                     CONSTANT VARCHAR2(5) := chr(10);
 
@@ -345,7 +345,31 @@ IS
       nm3ins.ins_ntf(l_rec_ntf);
     --
     END LOOP;
-
+    ---------------------------------------------------------------
+    -- Create SDO metadata for view themes
+    --
+    ---------------------------------------------------------------
+    BEGIN
+      l_dummy := Nm3sdo.create_sdo_layer
+                 ( pi_table_name   => l_rec_nth_v.nth_feature_table
+                 , pi_column_name  => l_rec_nth_v.nth_feature_shape_column
+                 , pi_gtype        => l_rec_ntg_v.ntg_gtype);
+    EXCEPTION
+      WHEN OTHERS
+        THEN RAISE;
+    END;
+    --------------------------------------------------------------
+    -- Create the SDE layer
+    --------------------------------------------------------------
+    IF Hig.get_sysopt('REGSDELAY') = 'Y'
+    THEN
+       EXECUTE IMMEDIATE
+         ( ' BEGIN  '
+         ||'    nm3sde.register_sde_layer( p_theme_id => '
+         ||TO_CHAR( l_rec_nth_v.nth_theme_id )||');'
+         ||' END;'
+         );
+    END IF;
     --
     -- Create the shape generation / snapping trigger
     --------------------------------------------------------------
