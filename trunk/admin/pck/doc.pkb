@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY doc AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc.pkb-arc   2.2   Sep 28 2007 16:10:20   dyounger  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/doc.pkb-arc   2.3   May 21 2010 16:48:00   aedwards  $
 --       Module Name      : $Workfile:   doc.pkb  $
---       Date into SCCS   : $Date:   Sep 28 2007 16:10:20  $
---       Date fetched Out : $Modtime:   Sep 21 2007 12:24:58  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   May 21 2010 16:48:00  $
+--       Date fetched Out : $Modtime:   May 21 2010 16:47:30  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on SCCS Version     : 1.12
 --
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY doc AS
 -----------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
    g_package_name    CONSTANT varchar2(30) := 'doc';
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -67,45 +67,48 @@ END;
 --
 -------------------------------------------------------------------------------------------------------
 --
-FUNCTION check_doc_assocs (p_doc_id        IN docs.doc_id%TYPE,
-                           p_rse_he_id     IN road_segs.rse_he_id%TYPE)
-         RETURN NUMBER IS
+/* Formatted on 07/05/2010 10:56:02 (QP5 v5.139.911.3011) */
+FUNCTION check_doc_assocs ( p_doc_id      IN docs.doc_id%TYPE
+                          , p_rse_he_id   IN road_segs.rse_he_id%TYPE )
+  RETURN NUMBER
+IS
+  l_dummy   NUMBER;
+  retval    NUMBER;
 
-l_dummy NUMBER;
-retval  NUMBER;
-
-CURSOR c1 IS
-	SELECT	1
-	FROM	doc_assocs
-	WHERE	das_doc_id = p_doc_id
-	AND	das_table_name = 'ROAD_SEGMENTS_ALL'
-	AND	das_rec_id IN
-	       (SELECT	TO_CHAR(p_rse_he_id)
-		FROM	dual
-		UNION
-		SELECT	TO_CHAR(rsm_rse_he_id_of)
-		FROM	road_seg_membs
-		CONNECT BY PRIOR rsm_rse_he_id_in = rsm_rse_he_id_of
-		START WITH rsm_rse_he_id_in = p_rse_he_id
-		UNION
-		SELECT	TO_CHAR(rsm_rse_he_id_in)
-		FROM	road_seg_membs
-		CONNECT BY PRIOR rsm_rse_he_id_of = rsm_rse_he_id_in
-		START WITH rsm_rse_he_id_of = p_rse_he_id
-		);
+  CURSOR c1
+  IS
+    SELECT 1
+      FROM doc_assocs
+     WHERE das_doc_id = p_doc_id AND das_table_name = 'ROAD_SEGMENTS_ALL'
+           AND das_rec_id IN
+                 (SELECT TO_CHAR ( p_rse_he_id ) FROM dual
+                  UNION
+                      SELECT TO_CHAR ( rsm_rse_he_id_of )
+                        FROM road_seg_membs
+                  CONNECT BY PRIOR rsm_rse_he_id_in = rsm_rse_he_id_of
+                  START WITH rsm_rse_he_id_in = p_rse_he_id
+                  UNION
+                      SELECT TO_CHAR ( rsm_rse_he_id_in )
+                        FROM road_seg_membs
+                  CONNECT BY PRIOR rsm_rse_he_id_of = rsm_rse_he_id_in
+                  START WITH rsm_rse_he_id_of = p_rse_he_id);
 BEGIN
   OPEN c1;
+
   FETCH c1 INTO l_dummy;
-  IF c1%FOUND THEN
-     CLOSE c1;
-     retval := 1;
+
+  IF c1%FOUND
+  THEN
+    CLOSE c1;
+
+    retval := 1;
   ELSE
-     CLOSE c1;
-     retval := 0;
+    CLOSE c1;
+
+    retval := 0;
   END IF;
 
   RETURN retval;
-
 END;
 --
 -------------------------------------------------------------------------------------------------------
@@ -188,160 +191,165 @@ END;
 --
 -------------------------------------------------------------------------------------------------------
 --
-  PROCEDURE  create_doc (intdocid		IN NUMBER,
-				 strtitle 		IN VARCHAR2,
-			       strfile		IN VARCHAR2,
-				 mediaid		IN NUMBER,
-				 locationid		IN NUMBER,
-				 strdoctype		IN VARCHAR2,
-				 strpkid		IN VARCHAR2,
-				 strtablename	IN VARCHAR2,
-                         strdescflag      IN VARCHAR2 ,
-                         strcreassoc      IN VARCHAR2
-  ) IS
-	new_doc_id docs.doc_id%TYPE;
-	strdescr   docs.doc_descr%TYPE := 'Not Set';
-  BEGIN
+  /* Formatted on 07/05/2010 10:56:11 (QP5 v5.139.911.3011) */
+PROCEDURE create_doc ( intdocid       IN NUMBER
+                     , strtitle       IN VARCHAR2
+                     , strfile        IN VARCHAR2
+                     , mediaid        IN NUMBER
+                     , locationid     IN NUMBER
+                     , strdoctype     IN VARCHAR2
+                     , strpkid        IN VARCHAR2
+                     , strtablename   IN VARCHAR2
+                     , strdescflag    IN VARCHAR2
+                     , strcreassoc    IN VARCHAR2 )
+IS
+  new_doc_id   docs.doc_id%TYPE;
+  strdescr     docs.doc_descr%TYPE := 'Not Set';
+BEGIN
+  IF strdescflag = 'T'
+  THEN
+    strdescr := 'Document automatically created by template';
+  ELSIF strdescflag = 'N'
+  THEN
+    strdescr := 'Document automatically created by new file association';
+  END IF;
 
-      IF strdescflag = 'T' THEN
-   	   strdescr := 'Document automatically created by template';
-      ELSIF strdescflag = 'N' THEN
-   	   strdescr := 'Document automatically created by new file association';
-      END IF;
+  ---Create the base document
+  INSERT INTO docs ( doc_id
+                   , doc_title
+                   , doc_dtp_code
+                   , doc_date_issued
+                   , doc_file
+                   , doc_dlc_dmd_id
+                   , doc_dlc_id
+                   , doc_reference_code
+                   , doc_descr )
+       VALUES ( intdocid
+              , strtitle
+              , strdoctype
+              , SYSDATE
+              , strfile
+              , mediaid
+              , locationid
+              , strfile
+              , strdescr );
 
-	---Create the base document
-	INSERT INTO docs (
-		doc_id,
-		doc_title,
-		doc_dtp_code,
-		doc_date_issued,
-		doc_file,
-		doc_dlc_dmd_id,
-		doc_dlc_id,
-		doc_reference_code,
-		doc_descr)
-	VALUES	(
-		intdocid,
-		strtitle,
-		strdoctype,
-		SYSDATE,
-		strfile,
-		mediaid,
-		locationid,
-		strfile,
-		strdescr);
-      IF strcreassoc = 'Y' THEN
-         create_doc_assoc( strtablename, strpkid, intdocid );
-      END IF;
-	COMMIT;
+  IF strcreassoc = 'Y'
+  THEN
+    create_doc_assoc ( strtablename, strpkid, intdocid );
+  END IF;
 
-  END;
+  COMMIT;
+END;
 --
 -------------------------------------------------------------------------------------------------------
 --
 -- overloaded due to extra parameters for auto creation/association
 
-  PROCEDURE  create_doc (intdocid		IN NUMBER,
-				 strtitle 		IN VARCHAR2,
-			       strfile		IN VARCHAR2,
-				 mediaid		IN NUMBER,
-				 locationid		IN NUMBER,
-				 strdoctype		IN VARCHAR2,
-				 strpkid		IN VARCHAR2,
-				 strtablename	IN VARCHAR2
-  ) IS
-	new_doc_id docs.doc_id%TYPE;
-	strdescr   docs.doc_descr%TYPE := 'Created through Template';
-  BEGIN
+  /* Formatted on 07/05/2010 10:56:16 (QP5 v5.139.911.3011) */
+PROCEDURE create_doc ( intdocid       IN NUMBER
+                     , strtitle       IN VARCHAR2
+                     , strfile        IN VARCHAR2
+                     , mediaid        IN NUMBER
+                     , locationid     IN NUMBER
+                     , strdoctype     IN VARCHAR2
+                     , strpkid        IN VARCHAR2
+                     , strtablename   IN VARCHAR2 )
+IS
+  new_doc_id   docs.doc_id%TYPE;
+  strdescr     docs.doc_descr%TYPE := 'Created through Template';
+BEGIN
+  ---Create the base document
+  INSERT INTO docs ( doc_id
+                   , doc_title
+                   , doc_dtp_code
+                   , doc_date_issued
+                   , doc_file
+                   , doc_dlc_dmd_id
+                   , doc_dlc_id
+                   , doc_reference_code
+                   , doc_descr )
+       VALUES ( intdocid
+              , strtitle
+              , strdoctype
+              , SYSDATE
+              , strfile
+              , mediaid
+              , locationid
+              , strfile
+              , strdescr );
 
-	---Create the base document
-	INSERT INTO docs (
-		doc_id,
-		doc_title,
-		doc_dtp_code,
-		doc_date_issued,
-		doc_file,
-		doc_dlc_dmd_id,
-		doc_dlc_id,
-		doc_reference_code,
-		doc_descr)
-	VALUES	(
-		intdocid,
-		strtitle,
-		strdoctype,
-		SYSDATE,
-		strfile,
-		mediaid,
-		locationid,
-		strfile,
-		strdescr);
+  create_doc_assoc ( strtablename, strpkid, intdocid );
 
-      create_doc_assoc( strtablename, strpkid, intdocid );
+  COMMIT;
+END;
 
-	COMMIT;
+PROCEDURE create_doc_assoc ( p_table    IN VARCHAR2
+                           , p_pk       IN VARCHAR2
+                           , p_doc_id   IN NUMBER )
+IS
+BEGIN
+  INSERT INTO doc_assocs ( das_table_name, das_rec_id, das_doc_id )
+       VALUES ( p_table, p_pk, p_doc_id );
 
-  END;
-
-  PROCEDURE create_doc_assoc( p_table IN VARCHAR2, p_pk IN VARCHAR2, p_doc_id IN NUMBER ) IS
-
-  BEGIN
-
-	INSERT INTO doc_assocs (
-		das_table_name,
-		das_rec_id,
-		das_doc_id)
-	VALUES	(
-		p_table,
-		p_pk,
-		p_doc_id );
-
-	COMMIT;
+  COMMIT;
 END;
 --
 -------------------------------------------------------------------------------------------------------
 --
-  FUNCTION get_image(strentity	IN VARCHAR2,
-				strentitypk 	IN VARCHAR2,
-				strimagetype 	IN VARCHAR2,
-				intimageno 		IN NUMBER) RETURN VARCHAR2 IS
+FUNCTION get_image ( strentity      IN VARCHAR2
+                   , strentitypk    IN VARCHAR2
+                   , strimagetype   IN VARCHAR2
+                   , intimageno     IN NUMBER )
+  RETURN VARCHAR2
+IS
+  strreturn   doc_locations.DLC_PATHNAME%TYPE;
+  ---strImageType VARCHAR2(100);
+  intlocid    NUMBER;
+  intcount    NUMBER := 1;
 
-	strreturn 		doc_locations.DLC_PATHNAME%TYPE;
-	---strImageType	VARCHAR2(100);
-	intlocid		NUMBER;
-	intcount		NUMBER := 1;
+  CURSOR images
+  IS
+    SELECT doc_id, doc_file, doc_dlc_id
+      FROM docs
+     WHERE doc_id IN
+             (SELECT das_doc_id
+                FROM doc_assocs
+               WHERE das_table_name = strentity AND das_rec_id = strentitypk)
+           AND doc_dtp_code = strimagetype;
 
-	CURSOR images IS
-		SELECT  doc_id,doc_file,doc_dlc_id
-		FROM docs
-		WHERE doc_id IN (SELECT das_doc_id FROM doc_assocs
-  		WHERE das_table_name = strentity AND das_rec_id = strentitypk)
-		AND doc_dtp_code = strimagetype;
-
-	CURSOR doc_loc IS
-		SELECT dlc_pathname
-		FROM doc_locations
-		WHERE dlc_id = intlocid
-		AND dlc_end_date IS NULL;
-
+  CURSOR doc_loc
+  IS
+    SELECT dlc_pathname
+      FROM doc_locations
+     WHERE dlc_id = intlocid AND dlc_end_date IS NULL;
 BEGIN
+  ---Do we have a type
+  IF strimagetype IS NULL
+  THEN
+    RETURN NULL;
+  END IF;
 
-	---Do we have a type
-	IF strimagetype IS NULL THEN
-		RETURN NULL;
-	END IF;
+  FOR recs IN images
+  LOOP
+    IF intimageno = intcount
+    THEN
+      intlocid := recs.doc_dlc_id;
 
-	FOR recs IN images LOOP
-		IF intimageno = intcount THEN
-			intlocid := recs.doc_dlc_id;
-			OPEN doc_loc;
-			FETCH doc_loc INTO strreturn;
-			CLOSE doc_loc;
-			strreturn := strreturn ||recs.doc_file;
-		END IF;
-		intcount := intcount + 1;
-	END LOOP;
+--      OPEN doc_loc;
+--      FETCH doc_loc INTO strreturn;
+--      CLOSE doc_loc;
 
-	RETURN strreturn;
+      strreturn := doc_locations_api.get_doc_path ( pi_dlc_id            => recs.doc_dlc_id 
+                                                  , pi_include_end_slash => TRUE );
+
+      strreturn := strreturn || recs.doc_file;
+    END IF;
+
+    intcount := intcount + 1;
+  END LOOP;
+
+  RETURN strreturn;
 END;
 --
 -------------------------------------------------------------------------------------------------------
@@ -357,13 +365,16 @@ CURSOR c1 IS
 retval doc_locations.DLC_PATHNAME%TYPE;
 BEGIN
 
-  OPEN c1;
-  FETCH c1 INTO retval;
-  IF c1%NOTFOUND THEN
-    retval := NULL;
-  END IF;
-  CLOSE c1;
-  RETURN retval;
+--  OPEN c1;
+--  FETCH c1 INTO retval;
+--  IF c1%NOTFOUND THEN
+--    retval := NULL;
+--  END IF;
+--  CLOSE c1;
+--
+  RETURN doc_locations_api.get_doc_path ( pi_dlc_id            => p_location
+                                        , pi_include_end_slash => TRUE );
+--
 END;
 --
 -------------------------------------------------------------------------------------------------------
@@ -596,81 +607,82 @@ FUNCTION get_doc_url( pi_doc_id  IN docs.doc_id%TYPE
   l_dlc          doc_locations%ROWTYPE;
   l_dmd          doc_media%ROWTYPE;
   l_docs         docs%ROWTYPE;
-
---  e_generic_error exception;
---  PRAGMA EXCEPTION_INIT(e_generic_error, -20000);
-
-
-BEGIN
-
-  BEGIN
-     l_docs := nm3get.get_doc(pi_doc_id  => pi_doc_id);
-  EXCEPTION
-     WHEN others THEN
-	    RETURN(Null);
-  END;
-
-  ---------------------------------------------------
-  -- if we have an associated doc location record
-  -- then get the details to add into the url
-  -- if it goes pear shaped then return NULL
-  ---------------------------------------------------
-  IF l_docs.doc_dlc_id IS NOT NULL
-  THEN
-
-	  BEGIN
-		  l_dlc := nm3get.get_dlc(pi_dlc_id => l_docs.doc_dlc_id);
-      EXCEPTION
-    	WHEN others
-    	THEN
-    	  	RETURN(Null);
-      END;
-
-  END IF;
-
-
-  ---------------------------------------------------
-  -- if we have an associated doc media record
-  -- then get the details to add into the url
-  -- if it goes pear shaped then return NULL
-  ---------------------------------------------------
-  IF l_docs.doc_dlc_dmd_id IS NOT NULL
-  THEN
-
-       BEGIN
-         l_dmd := nm3get.get_dmd(pi_dmd_id => l_docs.doc_dlc_dmd_id);
-       EXCEPTION
-       	 WHEN others
-    	 THEN
-    	  	RETURN(Null);
-       END;
-
-  END IF;
-
-  -- set the url to be the url path plus filename of the document
-  l_url      := l_dlc.dlc_url_pathname || l_docs.doc_file;
-
-  -- if there is an associated file extension with this document and the document does not already have a file extension then
-  -- append this extension on to the url
-  --
-  -- MJA log 706710 (inc 49707 and 702638)
-  -- Do not add extension if pi_ret_ext passed as false
-  If pi_ret_ext
-  Then
-    IF l_dmd.dmd_file_extension IS NOT NULL AND INSTR(l_docs.doc_file,'.') = 0
-    THEN
-      l_url := l_url || '.' || l_dmd.dmd_file_extension;
-    END IF;
-  End If;
-  --
---  RETURN(
---          nm3web.string_to_url(pi_str               => l_url)
 --
---         );
--- GJ removed the string to url conversion cos it's not needed
--- i.e. it was screwing up filenames with + characters in them by replacing
--- them with %43 - when the raw filename was fine anyway
-  RETURN(l_url);
+BEGIN
+--
+  RETURN doc_locations_api.get_doc_url(pi_doc_id => pi_doc_id);
+--
+--
+--  BEGIN
+--     l_docs := nm3get.get_doc(pi_doc_id  => pi_doc_id);
+--  EXCEPTION
+--     WHEN others THEN
+--	    RETURN(Null);
+--  END;
+--
+--  ---------------------------------------------------
+--  -- if we have an associated doc location record
+--  -- then get the details to add into the url
+--  -- if it goes pear shaped then return NULL
+--  ---------------------------------------------------
+--  IF l_docs.doc_dlc_id IS NOT NULL
+--  THEN
+--
+--	  BEGIN
+--		  l_dlc := nm3get.get_dlc(pi_dlc_id => l_docs.doc_dlc_id);
+--      EXCEPTION
+--    	WHEN others
+--    	THEN
+--    	  	RETURN(Null);
+--      END;
+--
+--  END IF;
+--
+--
+--  ---------------------------------------------------
+--  -- if we have an associated doc media record
+--  -- then get the details to add into the url
+--  -- if it goes pear shaped then return NULL
+--  ---------------------------------------------------
+--  IF l_docs.doc_dlc_dmd_id IS NOT NULL
+--  THEN
+--
+--       BEGIN
+--         l_dmd := nm3get.get_dmd(pi_dmd_id => l_docs.doc_dlc_dmd_id);
+--       EXCEPTION
+--       	 WHEN others
+--    	 THEN
+--    	  	RETURN(Null);
+--       END;
+--
+--  END IF;
+--
+--  -- set the url to be the url path plus filename of the document
+--  --l_url      := l_dlc.dlc_url_pathname || l_docs.doc_file;
+----
+--  l_url := doc_locations_api.get_doc_url  ( pi_dlc_id => l_dlc.dlc_id)|| l_docs.doc_file;
+----
+--  -- if there is an associated file extension with this document and the document does not already have a file extension then
+--  -- append this extension on to the url
+--  --
+--  -- MJA log 706710 (inc 49707 and 702638)
+--  -- Do not add extension if pi_ret_ext passed as false
+----  If pi_ret_ext
+----  Then
+----    IF l_dmd.dmd_file_extension IS NOT NULL AND INSTR(l_docs.doc_file,'.') = 0
+----    THEN
+----      l_url := l_url || '.' || l_dmd.dmd_file_extension;
+----    END IF;
+----  End If;
+--  --
+----  RETURN(
+----          nm3web.string_to_url(pi_str               => l_url)
+----
+----         );
+---- GJ removed the string to url conversion cos it's not needed
+---- i.e. it was screwing up filenames with + characters in them by replacing
+---- them with %43 - when the raw filename was fine anyway
+--  RETURN(l_url);
 
 
 END;

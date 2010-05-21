@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.3   May 06 2010 17:28:40   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.4   May 21 2010 16:48:00   aedwards  $
 --       Module Name      : $Workfile:   doc_locations_api.pkb  $
---       Date into PVCS   : $Date:   May 06 2010 17:28:40  $
---       Date fetched Out : $Modtime:   May 06 2010 17:27:58  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   May 21 2010 16:48:00  $
+--       Date fetched Out : $Modtime:   May 21 2010 16:47:08  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
 --
   g_package_name CONSTANT varchar2(30) := 'doc_locations_api';
 --
@@ -27,8 +27,10 @@ AS
   g_content_col     CONSTANT VARCHAR2(30)   := 'DFTT_CONTENT';
   g_doc_id_col      CONSTANT VARCHAR2(30)   := 'DFTT_DOC_ID';
   g_revision_col    CONSTANT VARCHAR2(30)   := 'DFTT_REVISION';
-  g_sep                      VARCHAR2(1)    := NVL(hig.get_sysopt('DIRREPSTRN'),'\');
-  g_win_sep                  VARCHAR2(1)    := '\';
+  g_forward_slash   CONSTANT VARCHAR2(1)    := CHR(47);
+  g_back_slash      CONSTANT VARCHAR2(1)    := CHR(92);
+  g_sep                      VARCHAR2(1)    := NVL(hig.get_sysopt('DIRREPSTRN'),g_back_slash);
+  g_win_sep                  VARCHAR2(1)    := g_back_slash;
 --
 -----------------------------------------------------------------------------
 --
@@ -186,6 +188,48 @@ END get_dlc_location;
 --
 -----------------------------------------------------------------------------
 --
+PROCEDURE get_dlc_location ( pi_doc_id             IN docs.doc_id%TYPE
+                           , po_name              OUT doc_locations.dlc_name%TYPE
+                           , po_location          OUT doc_locations.dlc_location_name%TYPE
+                           , po_meaning           OUT doc_locations.dlc_location_name%TYPE )
+IS
+BEGIN
+  SELECT dlc_name
+       , hco_meaning
+       , CASE
+           WHEN dlc_location_type = 'TABLE'
+           THEN
+             ( SELECT dlt_content_col
+                 FROM doc_location_tables
+                WHERE dlt_dlc_id = dlc_id )
+           WHEN dlc_location_type = 'ORACLE_DIRECTORY'
+           THEN
+             ( SELECT directory_path
+                 FROM all_directories
+                WHERE directory_name = dlc_location_name )
+           WHEN dlc_location_type = 'DB_SERVER'
+           THEN
+             dlc_location_name
+           WHEN dlc_location_type = 'APP_SERVER'
+           THEN
+             dlc_location_name
+         END 
+    INTO po_name, po_location, po_meaning
+    FROM doc_locations, hig_codes
+   WHERE dlc_id = (SELECT doc_dlc_id FROM docs
+                    WHERE doc_id = pi_doc_id )
+     AND dlc_location_type = hco_code
+     AND hco_domain = 'DOC_LOCATION_TYPES';
+EXCEPTION
+  WHEN NO_DATA_FOUND
+  THEN
+    po_name := NULL;
+    po_location := NULL;
+    po_meaning := NULL;
+END get_dlc_location;
+--
+-----------------------------------------------------------------------------
+--
 FUNCTION get_dlc_table ( pi_doc_id IN docs.doc_id%TYPE )
   RETURN VARCHAR2
 IS
@@ -203,9 +247,8 @@ BEGIN
                   WHERE dlt_dlc_id = (SELECT doc_dlc_id 
                                         FROM docs
                                        WHERE doc_id = pi_doc_id ))
-             WHEN location_type IN ( 'ORACLE_DIRECTORY', 'URL' )
-             THEN
-               ( SELECT g_table_name FROM DUAL )
+             ELSE --WHEN location_type IN ( 'ORACLE_DIRECTORY', 'DB_SERVER' )
+               ( SELECT g_table_name FROM DUAL ) 
            END)
     INTO retval
     FROM DUAL;
@@ -217,6 +260,24 @@ BEGIN
 --  THEN RETURN retval;
 --
 END get_dlc_table;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_dlt ( pi_dlc_id             IN doc_locations.dlc_id%TYPE )
+  RETURN doc_location_tables%ROWTYPE
+IS
+  retval doc_location_tables%ROWTYPE;
+BEGIN
+--
+  SELECT * INTO retval
+    FROM doc_location_tables
+   WHERE dlt_dlc_id =  pi_dlc_id ;
+  RETURN retval;
+--
+EXCEPTION
+  WHEN NO_DATA_FOUND
+  THEN RETURN retval;
+END get_dlt;
 --
 -----------------------------------------------------------------------------
 --
@@ -396,11 +457,11 @@ BEGIN
      l_tab_comments(1)  := '--';
      l_tab_comments(2)  := '--   SCCS Identifiers :-';
      l_tab_comments(3)  := '--';
-     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.3   May 06 2010 17:28:40   aedwards  $';
+     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.4   May 21 2010 16:48:00   aedwards  $';
      l_tab_comments(5)  := '--       Module Name                : $Workfile:   doc_locations_api.pkb  $';
-     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   May 06 2010 17:28:40  $';
-     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   May 06 2010 17:27:58  $';
-     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.3  $';
+     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   May 21 2010 16:48:00  $';
+     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   May 21 2010 16:47:08  $';
+     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.4  $';
      l_tab_comments(9)  := '--';
      l_tab_comments(10) := '--   table_name_WHO trigger';
      l_tab_comments(11) := '--';
@@ -880,7 +941,7 @@ END get_location_descr;
           , IN l_rec_table.audit
           , IN l_rec_table.file_info;
   --
-    ELSIF doc_locations_api.get_dlc(pi_doc_id => pi_rec_df.doc_id).dlc_location_Type = 'ORACLE_DIRECTORY'
+    ELSIF doc_locations_api.get_dlc(pi_doc_id => pi_rec_df.doc_id).dlc_location_Type IN ('ORACLE_DIRECTORY','DB_SERVER')
     THEN
       l_rec_temp_table.dftt_doc_id     := l_rec_table.doc_id;
       l_rec_temp_table.dftt_revision   := l_rec_table.revision;
@@ -983,6 +1044,41 @@ END get_location_descr;
 --
 --------------------------------------------------------------------------------
 --
+  FUNCTION get_archives ( pi_dlc_id IN doc_locations.dlc_id%TYPE ) 
+    RETURN g_tab_dla
+  IS
+    retval g_tab_dla;
+  BEGIN
+  --
+    SELECT * BULK COLLECT INTO retval
+      FROM doc_location_archives
+     WHERE dla_dlc_id = pi_dlc_id;
+    RETURN retval;
+  EXCEPTION
+    WHEN NO_DATA_FOUND
+    THEN RETURN retval;
+  --
+  END get_archives;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_archives ( pi_doc_id IN docs.doc_id%TYPE ) 
+    RETURN g_tab_dla
+  IS
+    retval g_tab_dla;
+  BEGIN
+    SELECT * BULK COLLECT INTO retval
+      FROM doc_location_archives
+     WHERE dla_dlc_id = ( SELECT doc_dlc_id FROM docs 
+                           WHERE doc_id = pi_doc_id );
+    RETURN retval;
+  EXCEPTION
+    WHEN NO_DATA_FOUND
+    THEN RETURN retval;
+  END get_archives;
+--
+--------------------------------------------------------------------------------
+--
   FUNCTION get_table_prefix RETURN VARCHAR2
   IS
     retval nm3type.max_varchar2;
@@ -1003,6 +1099,218 @@ END get_location_descr;
 --
 -----------------------------------------------------------------------------
 --
+  FUNCTION get_doc_path ( pi_dlc_id            IN doc_locations.dlc_id%TYPE 
+                        , pi_include_end_slash IN BOOLEAN DEFAULT FALSE)
+    RETURN doc_locations.dlc_location_name%TYPE
+  IS
+    l_path        doc_locations.dlc_location_name%TYPE;
+    retval        doc_locations.dlc_location_name%TYPE;
+    l_terminator  VARCHAR2(1);
+  BEGIN
+  --
+    l_path := nm3file.get_path(get_dlc ( pi_dlc_id => pi_dlc_id ).dlc_location_name);
+  --
+    IF pi_include_end_slash 
+    AND SUBSTR ( l_path, LENGTH (l_path),1 ) NOT IN (g_forward_slash,g_back_slash)
+    THEN
+    --
+      IF INSTR(l_path,g_back_slash) > 0
+        THEN l_terminator := g_back_slash;
+      ELSIF INSTR(l_path,g_forward_slash) > 0
+        THEN l_terminator := g_forward_slash;
+      END IF;
+      retval := l_path||l_terminator;
+    --
+    ELSE
+    --
+      retval := l_path;
+    END IF;
+  --
+    RETURN retval;
+  --
+  END get_doc_path;
+--
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION get_doc_url  ( pi_dlc_id            IN doc_locations.dlc_id%TYPE )
+    RETURN doc_locations.dlc_location_name%TYPE
+  IS
+    l_dir_url hig_directories.hdir_url%TYPE;
+  BEGIN
+  --
+    RETURN NVL(hig_directories_api.get(pi_hdir_name       => get_dlc(pi_dlc_id=>pi_dlc_id).dlc_location_name
+                                      ,pi_raise_not_found => FALSE ).hdir_url
+              ,get_dlc(pi_dlc_id=>pi_dlc_id).dlc_url_pathname) ;
+  --
+  END get_doc_url;
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION get_doc_url  ( pi_doc_id            IN docs.doc_id%TYPE )
+    RETURN doc_locations.dlc_location_name%TYPE
+  IS
+    l_dir_url      hig_directories.hdir_url%TYPE;
+    l_url          doc_locations.dlc_pathname%TYPE;
+    l_dlc          doc_locations%ROWTYPE;
+    l_dmd          doc_media%ROWTYPE;
+    l_docs         docs%ROWTYPE;
+  --
+  BEGIN
+  --
+    BEGIN
+       l_docs := nm3get.get_doc(pi_doc_id  => pi_doc_id);
+    EXCEPTION
+       WHEN others THEN
+       RETURN(Null);
+    END;
+  --
+    IF l_docs.doc_dlc_id IS NOT NULL
+    THEN
+      BEGIN
+        l_dlc := get_dlc(pi_dlc_id => l_docs.doc_dlc_id);
+      EXCEPTION
+        WHEN OTHERS THEN
+          RETURN NULL;
+      END;
+    END IF;
+  --
+    IF l_docs.doc_dlc_dmd_id IS NOT NULL
+    THEN
+       BEGIN
+         l_dmd := nm3get.get_dmd(pi_dmd_id => l_docs.doc_dlc_dmd_id);
+       EXCEPTION
+         WHEN others
+      THEN
+        RETURN(Null);
+       END;
+    END IF;
+  --
+    l_url := NVL(hig_directories_api.get(pi_hdir_name       => get_dlc(pi_dlc_id=>l_docs.doc_dlc_id).dlc_location_name
+                                      ,pi_raise_not_found => FALSE ).hdir_url
+                ,get_dlc(pi_dlc_id=>l_docs.doc_dlc_id).dlc_url_pathname);
+  --
+  -- Append the trailing forward slash if not present
+  --
+    IF SUBSTR ( l_url, LENGTH (l_url),1 ) NOT IN (g_forward_slash,g_back_slash)
+    THEN
+      l_url := l_url||g_forward_slash;
+    END IF;
+  --
+    l_url := l_url||l_docs.doc_file;
+  -- 
+    IF l_dmd.dmd_file_extension IS NOT NULL 
+    AND INSTR(l_docs.doc_file,'.') = 0
+    THEN
+      l_url := l_url || '.' || l_dmd.dmd_file_extension;
+    END IF;
+  --
+    RETURN l_url;
+  --
+  END get_doc_url;
+--
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION get_doc_template_path ( pi_template_name IN doc_template_gateways.dtg_template_name%TYPE )
+    RETURN doc_locations.dlc_location_name%TYPE
+  IS
+    retval doc_locations.dlc_location_name%TYPE;
+  --
+    CURSOR c1 IS
+      SELECT dlc_apps_pathname
+        FROM doc_locations dl
+           , doc_template_gateways dtg
+       WHERE dl.dlc_dmd_id = dtg.dtg_dmd_id
+         AND dl.dlc_id = dtg.dtg_dlc_id
+         AND dtg.dtg_template_name = pi_template_name;
+  --
+  BEGIN
+  --
+    OPEN c1;
+    FETCH c1 INTO retval;
+    CLOSE c1;
+  --
+    RETURN retval;
+  --
+  END get_doc_template_path;
+--
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE archive_doc_bundle_files ( pi_doc_bundle_id IN NUMBER )
+  IS
+  --
+    l_blob                     BLOB;
+    l_hftq_batch_no            hig_file_transfer_queue.hftq_batch_no%TYPE;
+  --
+    CURSOR get_files
+    IS
+      SELECT hftq_destination_filename
+           , dbf_blob
+           , dbfr_doc_id 
+        FROM doc_bundle_files_v
+           , doc_bundle_file_relations
+           , hig_file_transfer_queue
+           , doc_locations
+           , docs
+       WHERE dbf_bundle_id = pi_doc_bundle_id
+         AND error_text = 'Success'
+         AND dbf_driving_file_flag = 'N'
+         AND dbfr_child_file_id = dbf_file_id
+         AND hftq_batch_no = dbfr_hftq_batch_no
+         -- Filename is unique across a batch
+         AND dbfr_doc_filename = hftq_destination_filename
+         AND hftq_status = 'TRANSFER COMPLETE'
+         AND doc_id = dbfr_doc_id
+         AND doc_dlc_id = dlc_id;
+  --
+    TYPE tab_files IS TABLE OF get_files%ROWTYPE INDEX BY BINARY_INTEGER;
+    l_tab_files                tab_files;
+  --
+  BEGIN
+  --
+    OPEN get_files;
+    FETCH get_files BULK COLLECT INTO l_tab_files;
+    CLOSE get_files;
+  --
+    FOR i IN 1..l_tab_files.COUNT
+    LOOP
+    --
+      FOR z IN (
+          SELECT * 
+            FROM doc_location_archives
+           WHERE dla_dlc_id = (SELECT doc_dlc_id FROM docs
+                                 WHERE doc_id = l_tab_files(i).dbfr_doc_id )
+          )
+      LOOP
+      --
+        IF z.dla_archive_type = 'ORACLE_DIRECTORY'
+        THEN
+          BEGIN
+            nm3file.blob_to_file 
+              ( pi_blob             => l_tab_files(i).dbf_blob
+              , pi_destination_dir  => z.dla_archive_name
+              , pi_destination_file => l_tab_files(i).hftq_destination_filename
+              );
+          END;
+        END IF;
+      --
+      END LOOP;
+    --
+    END LOOP;
+  --
+  EXCEPTION
+    WHEN NO_DATA_FOUND
+    THEN NULL;
+    WHEN TOO_MANY_ROWS
+    THEN NULL;
+  END archive_doc_bundle_files;
+--
+--
+-----------------------------------------------------------------------------
+--
+
 END doc_locations_api;
 /
 
