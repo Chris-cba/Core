@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.28   May 11 2010 16:12:20   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.29   May 21 2010 17:49:34   rcoupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   May 11 2010 16:12:20  $
---       Date fetched Out : $Modtime:   May 11 2010 16:11:10  $
---       PVCS Version     : $Revision:   2.28  $
+--       Date into PVCS   : $Date:   May 21 2010 17:49:34  $
+--       Date fetched Out : $Modtime:   May 21 2010 17:48:04  $
+--       PVCS Version     : $Revision:   2.29  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Tue May 11  15:45:29 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Fri May 21  17:45:20 2010 by Server Generator 10.1.2.9.28
 
 
 
@@ -2309,6 +2309,10 @@ CREATE TABLE HIG_FTP_CONNECTIONS
  ,HFC_FTP_PORT VARCHAR2(50)
  ,HFC_FTP_IN_DIR VARCHAR2(500)
  ,HFC_FTP_OUT_DIR VARCHAR2(500)
+ ,HFC_FTP_ARC_USERNAME VARCHAR2(500)
+ ,HFC_FTP_ARC_PASSWORD VARCHAR2(500)
+ ,HFC_FTP_ARC_HOST VARCHAR2(30)
+ ,HFC_FTP_ARC_PORT VARCHAR2(50)
  ,HFC_FTP_ARC_IN_DIR VARCHAR2(500)
  ,HFC_FTP_ARC_OUT_DIR VARCHAR2(500)
  ,HFC_DATE_CREATED DATE
@@ -2948,6 +2952,10 @@ CREATE TABLE HIG_PROCESSES
  ,HP_WHAT_TO_CALL VARCHAR2(4000) NOT NULL
  ,HP_SUCCESS_FLAG VARCHAR2(3) DEFAULT 'TBD' NOT NULL
  ,HP_JOB_OWNER VARCHAR2(30) DEFAULT USER NOT NULL
+ ,HP_AREA_ID VARCHAR2(100)
+ ,HP_AREA_MEANING VARCHAR2(100)
+ ,HP_AREA_TYPE VARCHAR2(20)
+ ,HP_POLLING_FLAG VARCHAR2(1) DEFAULT 'N' NOT NULL
  )
 /
 
@@ -2986,6 +2994,18 @@ COMMENT ON COLUMN HIG_PROCESSES.HP_SUCCESS_FLAG IS 'Flag to denote the success o
 /
 
 COMMENT ON COLUMN HIG_PROCESSES.HP_JOB_OWNER IS 'The schema against which the scheduled job for this process will be executed.'
+/
+
+COMMENT ON COLUMN HIG_PROCESSES.HP_AREA_ID IS 'Area ID against which this process was parameterised.  The HP_AREA_TYPE value gives the context of the ID.'
+/
+
+COMMENT ON COLUMN HIG_PROCESSES.HP_AREA_MEANING IS 'Meaning derived from HP_AREA_TYPE and HP_AREA_ID.  This could be determined retrospectively, but for performance reasons it''s stamped onto the process when the process is created.'
+/
+
+COMMENT ON COLUMN HIG_PROCESSES.HP_AREA_TYPE IS 'Foreign Key to area type against which this process was parameterised.  Is also on the HIG_PROCESS_TYPE record but denormalised onto HIG_PROCESSES.'
+/
+
+COMMENT ON COLUMN HIG_PROCESSES.HP_POLLING_FLAG IS 'Flag to denote whether or not this process was called in ''polling mode'''
 /
 
 PROMPT Creating Table 'HIG_PROCESS_ALERT_LOG'
@@ -3050,6 +3070,64 @@ COMMENT ON COLUMN HIG_PROCESS_ALERT_LOG.HPAL_EMAIL_SUBJECT IS 'Text that can be 
 /
 
 COMMENT ON COLUMN HIG_PROCESS_ALERT_LOG.HPAL_EMAIL_BODY IS 'Text that can be used as parameter in Alert configuration'
+/
+
+PROMPT Creating Table 'HIG_PROCESS_AREAS'
+CREATE TABLE HIG_PROCESS_AREAS
+ (HPA_AREA_TYPE VARCHAR2(20) NOT NULL
+ ,HPA_DESCRIPTION VARCHAR2(100) NOT NULL
+ ,HPA_TABLE VARCHAR2(30) NOT NULL
+ ,HPA_RESTRICTED_TABLE VARCHAR2(30)
+ ,HPA_WHERE_CLAUSE VARCHAR2(500)
+ ,HPA_RESTRICTED_WHERE_CLAUSE VARCHAR2(500)
+ ,HPA_ID_COLUMN VARCHAR2(30) NOT NULL
+ ,HPA_MEANING_COLUMN VARCHAR2(100) NOT NULL
+ )
+/
+
+COMMENT ON TABLE HIG_PROCESS_AREAS IS 'Defines how processes can be broken down by area'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_AREAS.HPA_AREA_TYPE IS 'Primary Key'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_AREAS.HPA_DESCRIPTION IS 'Description for area type'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_AREAS.HPA_TABLE IS 'Name of table/view that is used to select areas from when configuring the process type'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_AREAS.HPA_RESTRICTED_TABLE IS 'Name of table/view that is used to select areas from when submitting a process.  If null then the HPA_TABLE value is used.'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_AREAS.HPA_WHERE_CLAUSE IS 'A where clause to apply to the HPA_TABLE'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_AREAS.HPA_RESTRICTED_WHERE_CLAUSE IS 'A where clause to apply to the HPA_RESTRICTED_TABLE'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_AREAS.HPA_ID_COLUMN IS 'The name of the primary key column on the table'
+/
+
+PROMPT Creating Table 'HIG_PROCESS_CONNS_BY_AREA'
+CREATE TABLE HIG_PROCESS_CONNS_BY_AREA
+ (HPTC_PROCESS_TYPE_ID NUMBER(38) NOT NULL
+ ,HPTC_FTP_CONNECTION_ID NUMBER(38) NOT NULL
+ ,HPTC_AREA_TYPE VARCHAR2(20) NOT NULL
+ ,HPTC_AREA_ID_VALUE VARCHAR2(100) NOT NULL
+ )
+/
+
+COMMENT ON TABLE HIG_PROCESS_CONNS_BY_AREA IS 'Defines how FTP connections can be polled by area'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_CONNS_BY_AREA.HPTC_PROCESS_TYPE_ID IS 'Foreign Key To Process Type'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_CONNS_BY_AREA.HPTC_FTP_CONNECTION_ID IS 'Foreign Key to FTP Connection'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_CONNS_BY_AREA.HPTC_AREA_TYPE IS 'Foreign Key to Area Type'
 /
 
 PROMPT Creating Table 'HIG_PROCESS_FILES'
@@ -3237,6 +3315,9 @@ CREATE TABLE HIG_PROCESS_TYPES
  ,HPT_PROCESS_LIMIT NUMBER(38)
  ,HPT_RESTARTABLE VARCHAR2(1) DEFAULT 'Y' NOT NULL
  ,HPT_SEE_IN_HIG2510 VARCHAR2(1) DEFAULT 'Y' NOT NULL
+ ,HPT_AREA_TYPE VARCHAR2(20)
+ ,HPT_POLLING_ENABLED VARCHAR2(1) DEFAULT 'N' NOT NULL
+ ,HPT_POLLING_FTP_TYPE_ID NUMBER(38)
  )
 /
 
@@ -3271,6 +3352,15 @@ COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_RESTARTABLE IS '''Value is used when sch
 /
 
 COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_SEE_IN_HIG2510 IS 'Is this process visible in the Process Submission module?'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_AREA_TYPE IS 'Foreign key to the area type that can be used to parameterise the process'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_POLLING_ENABLED IS 'Flag to denote whether this process type can be initiated by polling of FTP folder(s)'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_POLLING_FTP_TYPE_ID IS 'Foreign key to the polling ftp type'
 /
 
 PROMPT Creating Table 'HIG_PROCESS_TYPE_FILES'
