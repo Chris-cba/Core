@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.5   Apr 09 2010 15:02:06   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.6   May 21 2010 16:24:10   aedwards  $
 --       Module Name      : $Workfile:   higroles.sql  $
---       Date into PVCS   : $Date:   Apr 09 2010 15:02:06  $
---       Date fetched Out : $Modtime:   Apr 09 2010 14:54:58  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   May 21 2010 16:24:10  $
+--       Date fetched Out : $Modtime:   May 21 2010 16:22:58  $
+--       Version          : $Revision:   2.6  $
 --
 -------------------------------------------------------------------------
 --  Copyright (c) exor corporation ltd, 2009
@@ -573,16 +573,44 @@ DECLARE
   role_exists EXCEPTION;
   PRAGMA EXCEPTION_INIT(role_exists, -1921); 
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE ROLE PROCESS_EXECUTION';
-  EXECUTE IMMEDIATE 'GRANT CREATE JOB TO PROCESS_EXECUTION';
-  EXECUTE IMMEDIATE 'GRANT CREATE EXTERNAL JOB TO PROCESS_EXECUTION';
-  EXECUTE IMMEDIATE 'GRANT PROCESS_EXECUTION to '||USER;
-  EXECUTE IMMEDIATE 'GRANT PROCESS_EXECUTION to '||USER||' WITH ADMIN OPTION';
+  BEGIN
+    EXECUTE IMMEDIATE 'CREATE ROLE PROCESS_USER';
+  EXCEPTION
+    WHEN role_exists
+    THEN NULL;
+  END;
+  EXECUTE IMMEDIATE 'GRANT CREATE JOB TO PROCESS_USER';
+  EXECUTE IMMEDIATE 'GRANT CREATE EXTERNAL JOB TO PROCESS_USER';
+  EXECUTE IMMEDIATE 'GRANT PROCESS_USER to '||USER;
+  EXECUTE IMMEDIATE 'GRANT PROCESS_USER to '||USER||' WITH ADMIN OPTION';
 EXCEPTION
   WHEN role_exists
   THEN NULL;
 END;
 /
+
+
+DECLARE
+  role_exists EXCEPTION;
+  PRAGMA EXCEPTION_INIT(role_exists, -1921); 
+BEGIN
+  BEGIN
+    EXECUTE IMMEDIATE 'CREATE ROLE PROCESS_ADMIN';
+  EXCEPTION
+    WHEN role_exists
+    THEN NULL;
+  END;
+  EXECUTE IMMEDIATE 'GRANT CREATE ANY JOB TO PROCESS_ADMIN';
+  EXECUTE IMMEDIATE 'GRANT CREATE EXTERNAL JOB TO PROCESS_ADMIN';
+  EXECUTE IMMEDIATE 'GRANT PROCESS_ADMIN to '||USER;
+  EXECUTE IMMEDIATE 'GRANT PROCESS_ADMIN to '||USER||' WITH ADMIN OPTION';
+EXCEPTION
+  WHEN role_exists
+  THEN NULL;
+END;
+/
+
+
 
 
 --
