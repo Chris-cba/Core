@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.9   May 20 2010 09:44:18   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.10   May 21 2010 16:22:06   lsorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   May 20 2010 09:44:18  $
---       Date fetched Out : $Modtime:   May 20 2010 09:42:22  $
---       Version          : $Revision:   3.9  $
+--       Date into PVCS   : $Date:   May 21 2010 16:22:06  $
+--       Date fetched Out : $Modtime:   May 20 2010 11:53:44  $
+--       Version          : $Revision:   3.10  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.9  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.10  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
@@ -1330,7 +1330,7 @@ IS
 --
 BEGIN
 --
-   IF Nvl(hig_nav.return_id_tab.Count,0) > 1
+   IF Nvl(hig_nav.return_id_tab.Count,0) > 0
    THEN
        IF hig_nav.return_id_tab(1) IS NOT NULL
        THEN
