@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.36   May 13 2010 14:21:58   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.37   May 21 2010 10:57:44   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   May 13 2010 14:21:58  $
---       Date fetched Out : $Modtime:   May 13 2010 14:13:16  $
---       PVCS Version     : $Revision:   2.36  $
+--       Date into PVCS   : $Date:   May 21 2010 10:57:44  $
+--       Date fetched Out : $Modtime:   May 21 2010 10:52:14  $
+--       PVCS Version     : $Revision:   2.37  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.36  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.37  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -8920,6 +8920,11 @@ BEGIN
 --      l_get_projection := ( p_get_projection = 'TRUE');
 --    END IF;
 --  END IF;
+
+--RAC - the projection needs to work dynamically when used with the ID tool - it should return the disatnce to the object and, when the object s a network object,
+--      it should return the distance (measure) along the object.
+
+  l_get_projection := ( p_get_projection = 'TRUE');
 
   l_nth := p_nth;
 
