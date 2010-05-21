@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE Nm3sdo AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkh-arc   2.4   Dec 15 2009 09:42:12   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkh-arc   2.5   May 21 2010 13:55:08   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkh  $
---       Date into PVCS   : $Date:   Dec 15 2009 09:42:12  $
---       Date fetched Out : $Modtime:   Dec 09 2009 15:10:36  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   May 21 2010 13:55:08  $
+--       Date fetched Out : $Modtime:   May 21 2010 13:52:54  $
+--       PVCS Version     : $Revision:   2.5  $
 --
 --   Author : Rob Coupe
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE Nm3sdo AS
 --<GLOBVAR>
 -- g_sccsid is the SCCS_ID
 -- Constants
-  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   2.4  $"';
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   2.5  $"';
   single_shape_inv   CONSTANT VARCHAR2(3)  := NVL( Hig.get_sysopt('SDOSINGSHP'), 'N');
   use_surrogate_key  CONSTANT VARCHAR2(1)  := NVL( Hig.get_sysopt('SDOSURKEY'),'N');
   def_pt_zoom        CONSTANT NUMBER       := NVL( TO_NUMBER( Hig.get_sysopt('SDOPTZOOM' )), 100);
@@ -1605,6 +1605,12 @@ FUNCTION get_objects_in_buffer( p_nth_id         IN NUMBER,
                                 p_buffer_units   IN NUMBER DEFAULT 1,
                                 p_get_projection IN VARCHAR2 DEFAULT 'FALSE',
                                 p_gdo_session_id IN gis_data_objects.gdo_session_id%TYPE DEFAULT NULL )
+  RETURN nm_theme_list;
+--
+FUNCTION get_objects_in_buffer( p_geometry       IN mdsys.sdo_geometry,
+                                p_buffer         IN NUMBER,
+                                p_buffer_units   IN NUMBER,
+                                p_theme_txt      IN VARCHAR2 )
   RETURN nm_theme_list;
 --
 --</PROC>
