@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.5   May 10 2010 15:46:10   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.6   May 21 2010 16:54:30   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   May 10 2010 15:46:10  $
---       Date fetched Out : $Modtime:   May 10 2010 14:04:44  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   May 21 2010 16:54:30  $
+--       Date fetched Out : $Modtime:   May 21 2010 16:53:58  $
+--       Version          : $Revision:   3.6  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.6  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -617,6 +617,8 @@ PROCEDURE create_and_schedule_process    (pi_process_type_id           IN hig_pr
 --                                        , pi_job_owner                 IN hig_processes.hp_job_owner%TYPE DEFAULT USER
                                         , pi_start_date                IN date
                                         , pi_frequency_id              IN hig_processes.hp_frequency_id%TYPE
+                                        , pi_polling_flag              IN hig_processes.hp_polling_flag%TYPE DEFAULT 'N'
+                                        , pi_area_id                   IN hig_processes.hp_area_id%TYPE DEFAULT NULL
                                         , pi_check_file_cardinality    IN BOOLEAN DEFAULT FALSE
                                         , pi_max_failures              IN NUMBER DEFAULT Null
                                         , po_process_id                OUT hig_processes.hp_process_id%TYPE
@@ -631,9 +633,28 @@ PROCEDURE create_and_schedule_process    (pi_process_type_id           IN hig_pr
  l_full_job_name    hig_processes_v.hp_full_job_name%TYPE;
  l_job_owner        varchar2(30) := USER;
  
-                      
+ l_sqlerrm nm3type.max_varchar2;
+ 
+ 
+ 
+ PROCEDURE double_check_privs IS
+ 
+ BEGIN
+ 
+     IF NOT nm3user.user_has_priv(pi_priv => 'CREATE JOB') AND NOT nm3user.user_has_priv(pi_priv => 'CREATE ANY JOB')  THEN
+
+      hig.raise_ner(pi_appl => 'HIG'
+                   ,pi_id   => 126
+                   ,pi_supplementary_info => 'Create Job'); -- You do not have privileges to perform this action
+
+     END IF;
+
+ END;
+ 
 BEGIN
 
+
+ double_check_privs;
 
  l_process_type_rec := hig_process_framework.get_process_type(pi_process_type_id => pi_process_type_id);
  
@@ -642,6 +663,7 @@ BEGIN
                         ,pi_limit           => l_process_type_rec.hpt_process_limit);
   
  po_process_id := nm3ddl.sequence_nextval('hp_process_id_seq');
+
  
  --
  -- job names need to be unique cos we need to join between hig_process_jobs and the data dictionary views based on this value
@@ -657,7 +679,11 @@ BEGIN
                          , hp_initiators_ref
                          , hp_job_name
                          , hp_frequency_id
-                         , hp_what_to_call)
+                         , hp_what_to_call
+                         , hp_polling_flag
+                         , hp_area_type
+                         , hp_area_id
+                         , hp_area_meaning)
                    VALUES (po_process_id
                          , pi_process_type_id
                          , pi_initiated_by_username
@@ -666,7 +692,19 @@ BEGIN
                          , pi_initiators_ref
                          , po_job_name
                          , NVL(pi_frequency_id,-1) -- default frequency to -1 "Once"
-                         , l_process_type_rec.hpt_what_to_call                         
+                         , l_process_type_rec.hpt_what_to_call
+                         , NVL(pi_polling_flag,'N')
+                         , case when pi_area_id is not null then
+                                 l_process_type_rec.hpt_area_type
+                                else
+                                 null
+                                end
+                         , pi_area_id
+                         , case when pi_area_id is not null then
+                                     hig_process_framework.area_meaning_from_id_value(l_process_type_rec.hpt_area_type,pi_area_id)
+                                 else
+                                     null
+                                 end
                          );
                 
           
@@ -694,9 +732,16 @@ BEGIN
  --
  -- build up a string which will be executed by the resulting scheduled job
  --
+ 
+
+ 
  l_what := hig_process_framework.wrapper_around_what(pi_what_to_call => l_process_type_rec.hpt_what_to_call
                                                     ,pi_process_id    => po_process_id);
- 
+
+
+
+
+
  
        nm3jobs.create_job(pi_job_name        => po_job_name
                         , pi_job_action      => l_what
@@ -715,6 +760,7 @@ BEGIN
                               ,pi_value    => l_process_type_rec.hpt_restartable = 'Y');
 
 
+
  IF pi_max_failures IS NOT NULL THEN
    nm3jobs.amend_job_max_failures(pi_job_name => l_full_job_name
                                  ,pi_value    => pi_max_failures);
@@ -728,7 +774,8 @@ BEGIN
                          
  po_scheduled_start_date := NVL(l_job_rec.last_start_date,l_job_rec.next_run_date);                       
 
- commit;                    
+ commit;
+ 
 
 END create_and_schedule_process;                           
 --
@@ -1134,9 +1181,7 @@ BEGIN
 END run_process_now; 
 --
 -----------------------------------------------------------------------------
---
------------------------------------------------------------------------------
---
+
 PROCEDURE create_alert_log (pi_hpal_rec IN OUT hig_process_alert_log%ROWTYPE)
 IS
 --
@@ -1153,9 +1198,41 @@ BEGIN
    Commit;
 EXCEPTION
 WHEN OTHERS THEN
-    Raise_Application_Error(-2000,'Error while insertint into hig_process_alert_log '||SQLERRM);   
+    Raise_Application_Error(-2000,'Error while inserting into hig_process_alert_log '||SQLERRM);   
 --
 END create_alert_log;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_conns_for_process(pi_process_id IN hig_processes.hp_process_id%TYPE) RETURN nm3type.tab_number IS
+ 
+ CURSOR c1 IS
+ select hfc_id 
+ from hig_process_polled_conns_v
+ where hp_process_id = pi_process_id;
+  
+ l_retval nm3type.tab_number;
+ 
+BEGIN
+
+ OPEN c1;
+ FETCH c1 BULK COLLECT INTO l_retval;
+ CLOSE c1;
+ 
+ RETURN l_retval;
+
+
+END get_conns_for_process;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_conns_for_current_process RETURN nm3type.tab_number IS
+
+BEGIN
+ 
+ RETURN(get_conns_for_process(pi_process_id => hig_process_api.get_current_process_id));
+
+END get_conns_for_current_process; 
 --
 -----------------------------------------------------------------------------
 --
