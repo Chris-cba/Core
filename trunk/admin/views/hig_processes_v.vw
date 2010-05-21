@@ -4,11 +4,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_processes_v.vw-arc   3.0   Mar 29 2010 17:14:50   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_processes_v.vw-arc   3.1   May 21 2010 10:35:04   gjohnson  $
 --       Module Name      : $Workfile:   hig_processes_v.vw  $
---       Date into PVCS   : $Date:   Mar 29 2010 17:14:50  $
---       Date fetched Out : $Modtime:   Mar 29 2010 17:14:16  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   May 21 2010 10:35:04  $
+--       Date fetched Out : $Modtime:   May 20 2010 15:06:18  $
+--       Version          : $Revision:   3.1  $
 -------------------------------------------------------------------------
         hp_process_id
       , hig_process_framework_utils.formatted_process_id(hp_process_id) hp_formatted_process_id
@@ -27,6 +27,11 @@ SELECT
       , hp_success_flag
      , (select hco_meaning from hig_codes where hco_domain = 'PROCESS_SUCCESS_FLAG' and hco_code = hp_success_flag) hp_success_flag_meaning      
       , hp_what_to_call    hp_what_to_call
+      , hp_polling_flag
+      , hp_area_type
+      , (select hpa_description from hig_process_areas where hpa_area_type = hp_area_type) hp_area_type_description
+      , hp_area_id
+      , hp_area_meaning      
       ,b.job_action         hpj_job_action
       ,b.schedule_type      hpj_schedule_type
       ,b.repeat_interval    hpj_repeat_interval

@@ -4,11 +4,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_process_types_v.vw-arc   3.0   Mar 29 2010 17:14:50   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_process_types_v.vw-arc   3.1   May 21 2010 10:35:04   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_types_v.vw  $
---       Date into PVCS   : $Date:   Mar 29 2010 17:14:50  $
---       Date fetched Out : $Modtime:   Mar 29 2010 17:14:16  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   May 21 2010 10:35:04  $
+--       Date fetched Out : $Modtime:   May 19 2010 18:08:46  $
+--       Version          : $Revision:   3.1  $
 -------------------------------------------------------------------------
              hpt_process_type_id,
              hpt_name,
@@ -27,6 +27,11 @@ SELECT
             ,(select hmo_title from hig_modules where hmo_module = hpt_internal_module) hpt_internal_module_title
             , hpt_internal_module_param
             ,hpt_see_in_hig2510
+            ,hpt_polling_enabled
+            ,hpt_polling_ftp_type_id 
+            ,(select hft_type from hig_ftp_types where hft_id = hpt_polling_ftp_type_id) hpt_polling_ftp_type_descr 
+            ,hpt_area_type
+            ,(select hpa_description from hig_process_areas where hpa_area_type = hpt_area_type) hpt_area_type_meaning  
       FROM hig_process_types
 /
 
