@@ -4,11 +4,11 @@ CREATE OR REPLACE type body nm_theme_list as
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/typ/nm_theme_list.tyb-arc   2.2   May 05 2010 13:42:52   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/typ/nm_theme_list.tyb-arc   2.3   May 21 2010 13:44:00   rcoupe  $
 --       Module Name      : $Workfile:   nm_theme_list.tyb  $
---       Date into PVCS   : $Date:   May 05 2010 13:42:52  $
---       Date fetched Out : $Modtime:   May 05 2010 13:42:08  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   May 21 2010 13:44:00  $
+--       Date fetched Out : $Modtime:   May 21 2010 13:42:40  $
+--       PVCS Version     : $Revision:   2.3  $
 --
 --    Author : R.A. Coupe
 --
@@ -42,7 +42,7 @@ begin
       this_ntl.ntl_theme_list.extend;
    END IF;
 --
--- If the last element in the array has a NULL pl_ne_id, then just update this entry when the time comes
+-- If the last element in the array has a NULL entry, then just update this entry when the time comes
 --
    l_extend_varray := (ntl_theme_list(this_ntl.ntl_theme_list.last).ntd_theme_id IS NOT NULL);
 --
@@ -87,6 +87,9 @@ begin
 
    if p_theme_list.ntl_theme_list.count = 0 then
      return this_ntl;
+   elsif this_ntl.ntl_theme_list.count = 1 and
+         this_ntl.ntl_theme_list(1).ntd_pk_id is null then
+     return p_theme_list;
    else
 
      for i in 1..p_theme_list.ntl_theme_list.count loop
