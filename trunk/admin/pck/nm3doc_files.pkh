@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkh-arc   2.4   May 06 2010 17:31:16   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkh-arc   2.5   May 21 2010 16:48:28   aedwards  $
 --       Module Name      : $Workfile:   nm3doc_files.pkh  $
---       Date into PVCS   : $Date:   May 06 2010 17:31:16  $
---       Date fetched Out : $Modtime:   May 06 2010 17:30:54  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   May 21 2010 16:48:28  $
+--       Date fetched Out : $Modtime:   May 21 2010 16:47:24  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version :
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -20,7 +20,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
  
 
 --</GLOBVAR>
@@ -209,6 +209,16 @@ AS
 --<PROC NAME="GET_DLC_TABLE">
 -- Get DOC_LOCATION_TABLES table name
   FUNCTION get_dlc_table (pi_dlc_id IN doc_locations.dlc_id%TYPE) RETURN doc_location_tables.dlt_table%TYPE;
+--</PROC>
+--
+--------------------------------------------------------------------------------
+--<PROC NAME="ARCHIVE_FILE">
+-- 
+  PROCEDURE archive_file ( pi_doc_id    IN docs.doc_id%TYPE
+                         , pi_blob      IN BLOB
+                         , pi_filename  IN VARCHAR2);
+--
+  PROCEDURE archive_file ( pi_doc_id    IN docs.doc_id%TYPE );
 --</PROC>
 --
 --------------------------------------------------------------------------------
