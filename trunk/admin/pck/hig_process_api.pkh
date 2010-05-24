@@ -5,11 +5,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkh-arc   3.4   May 21 2010 16:54:30   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkh-arc   3.5   May 24 2010 11:23:56   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_api.pkh  $
---       Date into PVCS   : $Date:   May 21 2010 16:54:30  $
---       Date fetched Out : $Modtime:   May 21 2010 15:53:44  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   May 24 2010 11:23:56  $
+--       Date fetched Out : $Modtime:   May 24 2010 10:55:12  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -19,7 +19,7 @@ AS
 --constants
 -----------
 --g_sccsid is the SCCS ID for the package
-g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
+g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $';
   
   
 
@@ -373,12 +373,12 @@ PROCEDURE create_alert_log (pi_hpal_rec IN OUT hig_process_alert_log%ROWTYPE);
 ----------------------------------------------------------
 -- Get all ftp connections associated with a given process
 ----------------------------------------------------------
-FUNCTION get_conns_for_process(pi_process_id IN hig_processes.hp_process_id%TYPE) RETURN nm3type.tab_number;
+FUNCTION get_conns_for_process(pi_process_id IN hig_processes.hp_process_id%TYPE) RETURN nm_id_tbl;
 
 ----------------------------------------------------------
 -- Get all ftp connections associated with current process
 ----------------------------------------------------------
-FUNCTION get_conns_for_current_process RETURN nm3type.tab_number;
+FUNCTION get_conns_for_current_process RETURN nm_id_tbl;
 
 
 end hig_process_api;

@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.6   May 21 2010 16:54:30   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.7   May 24 2010 11:23:56   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   May 21 2010 16:54:30  $
---       Date fetched Out : $Modtime:   May 21 2010 16:53:58  $
---       Version          : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   May 24 2010 11:23:56  $
+--       Date fetched Out : $Modtime:   May 24 2010 10:55:10  $
+--       Version          : $Revision:   3.7  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.6  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.7  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -1204,14 +1204,14 @@ END create_alert_log;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_conns_for_process(pi_process_id IN hig_processes.hp_process_id%TYPE) RETURN nm3type.tab_number IS
+FUNCTION get_conns_for_process(pi_process_id IN hig_processes.hp_process_id%TYPE) RETURN nm_id_tbl IS
  
  CURSOR c1 IS
  select hfc_id 
  from hig_process_polled_conns_v
  where hp_process_id = pi_process_id;
   
- l_retval nm3type.tab_number;
+ l_retval nm_id_tbl;
  
 BEGIN
 
@@ -1226,7 +1226,7 @@ END get_conns_for_process;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_conns_for_current_process RETURN nm3type.tab_number IS
+FUNCTION get_conns_for_current_process RETURN nm_id_tbl IS
 
 BEGIN
  
