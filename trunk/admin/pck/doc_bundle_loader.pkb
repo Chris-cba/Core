@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.1   May 05 2010 17:54:24   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.2   May 24 2010 15:19:56   gjohnson  $
 --       Module Name      : $Workfile:   doc_bundle_loader.pkb  $
---       Date into PVCS   : $Date:   May 05 2010 17:54:24  $
---       Date fetched Out : $Modtime:   May 05 2010 17:49:12  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   May 24 2010 15:19:56  $
+--       Date fetched Out : $Modtime:   May 24 2010 15:19:10  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
 
   g_package_name CONSTANT varchar2(30) := 'doc_bundle_loader';
   
@@ -28,10 +28,8 @@ AS
   
   
     
-  g_doc_bundle_process_type      hig_process_types%ROWTYPE; 
-  g_doc_bundle_file_type         hig_process_type_files%ROWTYPE;
   g_unzip_oracle_directory       hig_directories.hdir_name%TYPE;
-  
+  g_current_process              hig_processes%ROWTYPE;
   
 --
 -----------------------------------------------------------------------------
@@ -47,45 +45,6 @@ FUNCTION get_body_version RETURN varchar2 IS
 BEGIN
    RETURN g_body_sccsid;
 END get_body_version;
---
------------------------------------------------------------------------------
---
-PROCEDURE initialise IS
-
-
-BEGIN
-
-  hig_process_api.log_it(pi_message => LTRIM(g_package_name||' '||get_body_Version)
-                        ,pi_summary_flag => 'N');
-
-  g_doc_bundle_process_type      := hig_process_framework.get_process_type(pi_process_type_name => UPPER(c_process_type_name));
-  
-  IF g_doc_bundle_process_type.hpt_process_type_id IS NULL THEN
-     hig.raise_ner(pi_appl => 'HIG'
-                 , pi_id    => 534 -- PROCESS TYPE DOES NOT EXIST
-                 , pi_supplementary_info => c_process_type_name); 
-  END IF;
-
-
-  g_doc_bundle_file_type         := hig_process_framework.get_process_type_file(pi_process_type_id  => g_doc_bundle_process_type.hpt_process_type_id 
-                                                                               ,pi_file_type_name   => c_file_type_name);    
-
-  IF g_doc_bundle_file_type.hptf_file_type_id IS NULL THEN
-     hig.raise_ner(pi_appl => 'HIG'
-                 , pi_id    => 535 -- FILE TYPE FOR THIS PROCESS TYPE DOES NOT EXIST
-                 , pi_supplementary_info => chr(10)||'File Type ['||c_file_type_name||']'||chr(10)||'Process Type ['||c_file_type_name||']'); 
-  END IF;
-  
-
---  hig_process_api.log_it(pi_message => '   Checking that the '''||g_doc_bundle_file_type.hptf_input_destination||''' Oracle directory is valid'
---                        ,pi_summary_flag => 'N'); 
-
-  
-  nm3file.check_directory_valid(pi_dir_name        => g_doc_bundle_file_type.hptf_input_destination
-                               ,pi_check_delimiter => FALSE);
-
-  
-END initialise;
 --
 -----------------------------------------------------------------------------
 --
@@ -298,87 +257,6 @@ END insert_doc_bundle_file_rel;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE ftp_in_to_database(pi_ftp_type                IN hig_ftp_types.hft_type%TYPE
-                            ,pi_file_mask               IN VARCHAR2 DEFAULT '.ZIP') IS
-
-
-  l_files         nm3type.tab_varchar32767;
-  l_process_id    hig_processes.hp_process_id%TYPE;
-  l_job_name      hig_processes.hp_job_name%TYPE;
-  l_date          date;
-  
- 
-  PROCEDURE initialise_files_for_process  IS
-
-    l_file_rec      hig_process_api.rec_temp_files;
-
-  BEGIN
-
-
-     hig_process_api.initialise_temp_files;  
-
-     FOR f IN 1..l_files.COUNT LOOP
-         
-         l_file_rec := Null;
-         
-         l_file_rec.filename         := l_files(f);
-         l_file_rec.file_type_id     := g_doc_bundle_file_type.hptf_file_type_id;
-         l_file_rec.I_or_O           := 'I';
-         l_file_rec.destination      := g_doc_bundle_file_type.hptf_input_destination;
-         l_file_rec.destination_type := g_doc_bundle_file_type.hptf_input_destination_type;
-         l_file_rec.content          := Null;
-         
-         
-         hig_process_api.add_temp_file(pi_rec => l_file_rec) ;
-         
-     END LOOP;
-     
-  END initialise_files_for_process;
-  
-BEGIN
-
-  hig_process_api.log_it(pi_message => 'Looking for document bundles in the '||g_doc_bundle_file_type.hptf_input_destination||' Oracle directory');
-
-  l_files:= nm3ftp.ftp_in_to_database
-              ( pi_ftp_type                => pi_ftp_type
-              , pi_db_location_to_move_to  => g_doc_bundle_file_type.hptf_input_destination
-              , pi_file_mask               => pi_file_mask);
-
-             
- IF l_files.count > 0 THEN
-
-
-     
-      hig_process_api.log_it(pi_message => l_files.count||' document bundles found');
-
-
-
-      initialise_files_for_process;
-      
-      hig_process_api.create_and_schedule_process
-                          ( pi_process_type_id           => g_doc_bundle_process_type.hpt_process_type_id
-                          , pi_initiated_by_username     => user
-                          , pi_initiated_date            => SYSDATE
-                          , pi_initiators_ref            => 'via FTP'
-                          , pi_start_date                => SYSDATE
-                          , pi_frequency_id              => -1 -- once
-                          , po_process_id                => l_process_id
-                          , po_job_name                  => l_job_name
-                          , po_scheduled_start_date      => l_date);
-
-      hig_process_api.log_it(pi_message => 'Process '||hig_process_framework_utils.formatted_process_id(l_process_id)||' created');
-
- ELSE
- 
- 
-      hig_process_api.log_it(pi_message => 'No document bundles found');
-              
- END IF;
-
-END ftp_in_to_database;
---
------------------------------------------------------------------------------
---
 PROCEDURE unzip_document_bundle(pi_dbun_rec         IN OUT doc_bundles%ROWTYPE) IS
 
  l_tab_vc nm3type.tab_varchar32767;
@@ -493,9 +371,6 @@ FUNCTION get_or_create_file(pi_bundle_id   IN doc_bundle_files.dbf_bundle_id%TYP
  l_retval doc_bundle_files%ROWTYPE := Null;
 
 BEGIN
-
--- hig_process_api.log_it(pi_message         => 'inserting record for '||pi_filename 
---                       ,pi_summary_flag    => 'N' );
 
  OPEN c1(cp_bundle_id => pi_bundle_id
         ,cp_filename  => pi_filename);
@@ -898,7 +773,7 @@ END move_files_to_destination;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE load_process_document_bundles(pi_process_id IN hig_processes.hp_process_id%TYPE DEFAULT hig_process_api.get_current_process_id) IS
+PROCEDURE load_doc_bundles(pi_process_id IN hig_processes.hp_process_id%TYPE DEFAULT hig_process_api.get_current_process_id) IS
 
  l_document_bundles hig_process_api.tab_process_files;
 
@@ -928,7 +803,7 @@ BEGIN
                                         ,pi_force        => TRUE);
  END IF;                                         
 
-END load_process_document_bundles;
+END load_doc_bundles;
 --
 -----------------------------------------------------------------------------
 --
@@ -1116,6 +991,14 @@ BEGIN
 
 
 --
+-- Archive any files
+--
+ hig_process_api.log_it(pi_message         => '   Archiving Files' 
+                       ,pi_summary_flag    => 'N' );
+
+  doc_locations_api.archive_doc_bundle_files(pi_doc_bundle_id => l_dbun_rec.dbun_bundle_id);
+
+--
 -- remove the unzip location and the .zip 
 --
   IF files_processed_successfully(pi_bundle_id => l_dbun_rec.dbun_bundle_id) THEN
@@ -1301,10 +1184,23 @@ END discards_to_temp_table;
 --
 -----------------------------------------------------------------------------
 --
+PROCEDURE initialise IS
+
 
 BEGIN
 
- initialise;
+  hig_process_api.log_it(pi_message => LTRIM(g_package_name||' '||get_body_Version)
+                        ,pi_summary_flag => 'N');
+
+  hig_process_api.do_polling_if_requested(pi_file_type_name          => c_file_type_name
+                                        , pi_file_mask               => 'ZIP'
+                                        , pi_binary                  => TRUE
+                                        , pi_archive_overwrite       => TRUE
+                                        , pi_remove_failed_arch      => TRUE);
+     
+  load_doc_bundles;
+     
+END initialise;
 
 END doc_bundle_loader;
 /
