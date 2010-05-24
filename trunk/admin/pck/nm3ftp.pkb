@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.8   May 17 2010 14:28:28   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.9   May 24 2010 11:20:04   gjohnson  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   May 17 2010 14:28:28  $
---       Date fetched Out : $Modtime:   May 17 2010 14:28:04  $
---       PVCS Version     : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   May 24 2010 11:20:04  $
+--       Date fetched Out : $Modtime:   May 24 2010 10:55:14  $
+--       PVCS Version     : $Revision:   3.9  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.8  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -1304,16 +1304,13 @@ AS
 --------------------------------------------------------------------------------
 --
   FUNCTION ftp_in_to_database
-              ( pi_ftp_type                IN hig_ftp_types.hft_type%TYPE
+              ( pi_tab_ftp_connections     NM_ID_TBL 
               , pi_db_location_to_move_to  IN VARCHAR2
               , pi_file_mask               IN VARCHAR2
               , pi_binary                  IN BOOLEAN DEFAULT TRUE
               , pi_archive_overwrite       IN BOOLEAN DEFAULT FALSE
-              , pi_remove_failed_arch      IN BOOLEAN DEFAULT FALSE)
-    RETURN nm3type.tab_varchar32767 
-  IS
-  --
-    l_hft_rec      hig_ftp_types%ROWTYPE;
+              , pi_remove_failed_arch      IN BOOLEAN DEFAULT FALSE)  RETURN nm3type.tab_varchar32767 IS
+
     l_temp_tab     nm3type.tab_varchar32767;
     l_files_tab    nm3type.tab_varchar32767;
     l_retval       nm3type.tab_varchar32767;
@@ -1323,30 +1320,23 @@ AS
     l_password     nm3type.max_varchar2;
     l_conn         utl_tcp.connection;
   --
-  BEGIN
-  --
-  -------------------------
-  -- Get FTP Type details
-  -------------------------
-  --
-    l_hft_rec := nm3ftp.get_hft(pi_hft_type        => pi_ftp_type 
-                              , pi_raise_not_found => FALSE);
 
-  --
-  -----------------------------------------------------------------------------
-  -- Get all the connections for the ftp type and loop around each one looking 
-  -- for files to move and moving and archiving them if required
-  -----------------------------------------------------------------------------
-  --
-    IF l_hft_rec.hft_id IS NULL
-    THEN
-      -- Return with nothing
-      RETURN l_retval;
-    END IF;
-  --
-    FOR i IN (SELECT * FROM hig_ftp_connections 
-               WHERE hfc_hft_id = l_hft_rec.hft_id ) 
-    LOOP
+
+  BEGIN
+
+/*
+nm_debug.debug_on;
+for i in (select column_value from table(pi_tab_ftp_connections) ) loop
+nm_debug.debug('connection id = '||i.column_value);
+end loop;
+*/
+
+
+    FOR i IN (SELECT a.* 
+                FROM hig_ftp_connections a
+                , table(pi_tab_ftp_connections)  b 
+               WHERE a.hfc_hft_id = b.column_value ) LOOP 
+
     --
       l_temp_tab.DELETE;
       l_files_tab.DELETE;
@@ -1512,6 +1502,48 @@ AS
       RAISE;
   --
   END ftp_in_to_database;
+--
+--------------------------------------------------------------------------------
+--
+FUNCTION ftp_in_to_database
+              ( pi_ftp_type                IN hig_ftp_types.hft_type%TYPE
+              , pi_db_location_to_move_to  IN VARCHAR2
+              , pi_file_mask               IN VARCHAR2
+              , pi_binary                  IN BOOLEAN DEFAULT TRUE
+              , pi_archive_overwrite       IN BOOLEAN DEFAULT FALSE
+              , pi_remove_failed_arch      IN BOOLEAN DEFAULT FALSE) RETURN nm3type.tab_varchar32767 IS
+
+
+ l_tab_ftp_connections NM_ID_TBL := new NM_ID_TBL();
+
+
+ CURSOR c_all_conns_for_type IS
+ select hfc_id
+   from hig_ftp_connections a
+       ,hig_ftp_types b
+  where b.hft_type = 'DOC_BUNDLES'
+    and a.hfc_hft_id = b.hft_id;  
+ 
+
+BEGIN
+
+ OPEN c_all_conns_for_type;
+ FETCH c_all_conns_for_type BULK COLLECT INTO l_tab_ftp_connections;
+ CLOSE c_all_conns_for_type;
+
+ RETURN(
+        ftp_in_to_database(
+                           pi_tab_ftp_connections     => l_tab_ftp_connections 
+                         , pi_db_location_to_move_to  => pi_db_location_to_move_to 
+                         , pi_file_mask               => pi_file_mask 
+                         , pi_binary                  => pi_binary 
+                         , pi_archive_overwrite       => pi_archive_overwrite 
+                         , pi_remove_failed_arch      => pi_remove_failed_arch 
+                           )
+       );
+
+
+END ftp_in_to_database;
 --
 --------------------------------------------------------------------------------
 --
