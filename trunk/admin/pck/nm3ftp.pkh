@@ -4,15 +4,15 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkh-arc   3.3   Apr 28 2010 14:20:48   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkh-arc   3.4   May 24 2010 11:20:06   gjohnson  $
 --       Module Name      : $Workfile:   nm3ftp.pkh  $
---       Date into PVCS   : $Date:   Apr 28 2010 14:20:48  $
---       Date fetched Out : $Modtime:   Apr 28 2010 12:37:38  $
---       PVCS Version     : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   May 24 2010 11:20:06  $
+--       Date fetched Out : $Modtime:   May 24 2010 10:30:58  $
+--       PVCS Version     : $Revision:   3.4  $
 --
 --------------------------------------------------------------------------------
 --
-  g_sccsid constant varchar2(30) :='"$Revision:   3.3  $"';
+  g_sccsid constant varchar2(30) :='"$Revision:   3.4  $"';
 --
 -----------------------------------------------------------------------------
 --
@@ -273,13 +273,22 @@ AS
 --------------------------------------------------------------------------------
 --
   FUNCTION ftp_in_to_database
+              ( pi_tab_ftp_connections     NM_ID_TBL 
+              , pi_db_location_to_move_to  IN VARCHAR2
+              , pi_file_mask               IN VARCHAR2
+              , pi_binary                  IN BOOLEAN DEFAULT TRUE
+              , pi_archive_overwrite       IN BOOLEAN DEFAULT FALSE
+              , pi_remove_failed_arch      IN BOOLEAN DEFAULT FALSE)  RETURN nm3type.tab_varchar32767;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION ftp_in_to_database
               ( pi_ftp_type                IN hig_ftp_types.hft_type%TYPE
               , pi_db_location_to_move_to  IN VARCHAR2
               , pi_file_mask               IN VARCHAR2
               , pi_binary                  IN BOOLEAN DEFAULT TRUE
               , pi_archive_overwrite       IN BOOLEAN DEFAULT FALSE
-              , pi_remove_failed_arch      IN BOOLEAN DEFAULT FALSE)
-    RETURN nm3type.tab_varchar32767;
+              , pi_remove_failed_arch      IN BOOLEAN DEFAULT FALSE) RETURN nm3type.tab_varchar32767;
 --
 ------------------------------------------------------------------------------
 --
