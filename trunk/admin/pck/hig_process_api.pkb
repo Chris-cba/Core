@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.7   May 24 2010 11:23:56   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.8   May 24 2010 15:20:40   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   May 24 2010 11:23:56  $
---       Date fetched Out : $Modtime:   May 24 2010 10:55:10  $
---       Version          : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   May 24 2010 15:20:40  $
+--       Date fetched Out : $Modtime:   May 24 2010 15:19:08  $
+--       Version          : $Revision:   3.8  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.7  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.8  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -1158,7 +1158,7 @@ EXCEPTION
                   ,pi_supplementary_info => nm3flx.parse_error_message(l_sqlerrm)  );  
 
 END drop_process; 
---
+-- 
 -----------------------------------------------------------------------------
 --
 PROCEDURE run_process_now(pi_process_id IN hig_processes.hp_process_id%TYPE) IS
@@ -1185,6 +1185,13 @@ END run_process_now;
 PROCEDURE create_alert_log (pi_hpal_rec IN OUT hig_process_alert_log%ROWTYPE)
 IS
 --
+
+
+
+--************************************************************
+-- need to get code and name for admin unit id and contractor 
+--************************************************************
+
    PRAGMA AUTONOMOUS_TRANSACTION ;
 --
 BEGIN
@@ -1200,7 +1207,7 @@ EXCEPTION
 WHEN OTHERS THEN
     Raise_Application_Error(-2000,'Error while inserting into hig_process_alert_log '||SQLERRM);   
 --
-END create_alert_log;
+END create_alert_log;  
 --
 -----------------------------------------------------------------------------
 --
@@ -1236,7 +1243,148 @@ END get_conns_for_current_process;
 --
 -----------------------------------------------------------------------------
 --
+PROCEDURE do_polling_if_requested(pi_file_type_name          IN hig_process_type_files.hptf_name%TYPE
+                                , pi_file_mask               IN VARCHAR2
+                                , pi_binary                  IN BOOLEAN DEFAULT TRUE
+                                , pi_archive_overwrite       IN BOOLEAN DEFAULT FALSE
+                                , pi_remove_failed_arch      IN BOOLEAN DEFAULT FALSE) IS
+                                
 
+  l_process_rec      hig_processes%ROWTYPE;
+  l_process_type_rec hig_process_types%ROWTYPE;
+  l_file_type_rec    hig_process_type_files%ROWTYPE;
+  
+  l_tab_ftp_connections nm_id_tbl; 
+           
+  l_files            nm3type.tab_varchar32767;
+  
+  
+  
+  PROCEDURE initialise IS
+  
+  BEGIN
+  
+  
+    hig_process_api.log_it(pi_message => 'Polling...');
+
+      l_file_type_rec         := hig_process_framework.get_process_type_file(pi_process_type_id  => l_process_rec.hp_process_type_id 
+                                                                            ,pi_file_type_name   => pi_file_type_name);
+                                                                            
+      IF l_file_type_rec.hptf_file_type_id IS NULL THEN
+
+       l_process_type_rec := hig_process_framework.get_process_type(pi_process_type_id => l_process_rec.hp_process_type_id);
+          
+       hig.raise_ner(pi_appl => 'HIG'
+                     , pi_id    => 535 -- FILE TYPE FOR THIS PROCESS TYPE DOES NOT EXIST
+                     , pi_supplementary_info => chr(10)||'File Type ['||pi_file_type_name||']'||chr(10)||'Process Type ['||l_process_type_rec.hpt_name||']'); 
+      END IF;
+
+
+      IF l_file_type_rec.hptf_input_destination_type = 'ORACLE_DIRECTORY' THEN
+        nm3file.check_directory_valid(pi_dir_name        => l_file_type_rec.hptf_input_destination
+                                     ,pi_check_delimiter => FALSE);
+      END IF;
+      
+      l_tab_ftp_connections   := hig_process_api.get_conns_for_current_process;
+      
+  END initialise;
+
+  
+  PROCEDURE move_files IS
+  
+  BEGIN
+
+    IF l_tab_ftp_connections.COUNT > 0 THEN
+
+      hig_process_api.log_it(pi_message => 'Polling for files in '||l_tab_ftp_connections.COUNT||' locations');
+
+      l_files:= nm3ftp.ftp_in_to_database( 
+                                         pi_tab_ftp_connections     => l_tab_ftp_connections
+                                       , pi_db_location_to_move_to  => l_file_type_rec.hptf_input_destination
+                                       , pi_file_mask               => pi_file_mask
+                                       , pi_binary                  => pi_binary
+                                       , pi_archive_overwrite       => pi_archive_overwrite
+                                       , pi_remove_failed_arch      => pi_remove_failed_arch
+                                       );
+                                       
+      hig_process_api.log_it(pi_message => l_files.COUNT||' files found');
+
+   ELSE
+         hig_process_api.log_it(pi_message => 'No locations to poll');
+      
+   END IF;      
+  
+  
+  END move_files;
+  
+  
+  PROCEDURE associate_files IS
+
+    l_tab_files        hig_process_api.tab_temp_files;
+    l_file_rec         hig_process_api.rec_temp_files;
+
+  
+  BEGIN
+  
+  
+    IF l_files.COUNT > 0 THEN
+
+        l_tab_files.DELETE;
+        
+         FOR f IN 1..l_files.COUNT LOOP
+                 
+             l_file_rec := Null;
+                 
+             l_file_rec.filename         := l_files(f);
+             l_file_rec.file_type_id     := l_file_type_rec.hptf_file_type_id;
+             l_file_rec.I_or_O           := 'I';
+             l_file_rec.destination      := l_file_type_rec.hptf_input_destination;
+             l_file_rec.destination_type := l_file_type_rec.hptf_input_destination_type;
+             l_file_rec.content          := Null;
+                 
+                 
+             l_tab_files(l_tab_files.COUNT+1) := l_file_rec;
+                 
+         END LOOP;
+
+
+
+         hig_process_api.associate_files_with_process(pi_tab_files  => l_tab_files);
+         
+    END IF;            
+  
+  
+  END associate_files;
+  
+  
+  PROCEDURE finish IS
+  
+  BEGIN
+   
+    hig_process_api.log_it(pi_message => 'Polling complete');
+    
+  END;    
+
+
+BEGIN
+
+  l_process_rec           := get_current_process;
+  
+  IF l_process_rec.hp_polling_flag = 'Y' THEN
+                              
+    initialise;
+  
+    move_files;
+  
+    associate_files;
+  
+    finish;
+    
+  END IF;  
+  
+  
+ 
+END do_polling_if_requested;
 
 END hig_process_api;
 /
