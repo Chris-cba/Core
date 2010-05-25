@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.2   May 24 2010 15:19:56   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.3   May 25 2010 15:35:06   gjohnson  $
 --       Module Name      : $Workfile:   doc_bundle_loader.pkb  $
---       Date into PVCS   : $Date:   May 24 2010 15:19:56  $
---       Date fetched Out : $Modtime:   May 24 2010 15:19:10  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   May 25 2010 15:35:06  $
+--       Date fetched Out : $Modtime:   May 25 2010 10:45:22  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
 
   g_package_name CONSTANT varchar2(30) := 'doc_bundle_loader';
   
@@ -1186,19 +1186,25 @@ END discards_to_temp_table;
 --
 PROCEDURE initialise IS
 
+ l_ok_to_proceed BOOLEAN;
 
 BEGIN
 
   hig_process_api.log_it(pi_message => LTRIM(g_package_name||' '||get_body_Version)
                         ,pi_summary_flag => 'N');
 
-  hig_process_api.do_polling_if_requested(pi_file_type_name          => c_file_type_name
-                                        , pi_file_mask               => 'ZIP'
-                                        , pi_binary                  => TRUE
-                                        , pi_archive_overwrite       => TRUE
-                                        , pi_remove_failed_arch      => TRUE);
-     
-  load_doc_bundles;
+  l_ok_to_proceed :=  hig_process_api.do_polling_if_requested(pi_file_type_name          => c_file_type_name
+                                                            , pi_file_mask               => 'ZIP'
+                                                            , pi_binary                  => TRUE
+                                                            , pi_archive_overwrite       => TRUE
+                                                            , pi_remove_failed_arch      => TRUE);
+
+  IF l_ok_to_proceed THEN
+
+    load_doc_bundles;
+   
+  END IF;
+  
      
 END initialise;
 
