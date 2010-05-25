@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.8   May 24 2010 15:20:40   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.9   May 25 2010 15:14:56   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   May 24 2010 15:20:40  $
---       Date fetched Out : $Modtime:   May 24 2010 15:19:08  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   May 25 2010 15:14:56  $
+--       Date fetched Out : $Modtime:   May 25 2010 15:10:02  $
+--       Version          : $Revision:   3.9  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.8  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.9  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -63,7 +63,7 @@ END get_current_process_params;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_current_process_in_files(pi_job_run_seq IN hig_process_job_runs.hpjr_job_run_seq%TYPE) RETURN tab_process_files IS
+FUNCTION get_current_process_in_files RETURN tab_process_files IS
 
 
  CURSOR c1 IS
@@ -87,6 +87,7 @@ END get_current_process_in_files;
 --
 ---------------------------------------------------------------------------
 --
+/*
 FUNCTION get_current_process_in_files RETURN tab_process_files IS
 
 
@@ -107,6 +108,7 @@ BEGIN
  RETURN l_retval;
 
 END get_current_process_in_files;
+*/
 --
 ---------------------------------------------------------------------------
 --
@@ -275,53 +277,119 @@ PROCEDURE process_execution_end(pi_success_flag    IN hig_processes.hp_success_f
 
  l_id pls_integer;
  
- PRAGMA autonomous_transaction;
+ PRAGMA autonomous_transaction; 
  
+ l_current_process_rec  hig_processes%ROWTYPE;
+ l_current_job_run_seq  hig_process_job_runs.hpjr_job_run_seq%TYPE;
+ l_hpal_rec             hig_process_alert_log%ROWTYPE;
+ l_force varchar2(10);
+ 
+ l_nau_rec              nm_admin_units_all%ROWTYPE;
+ l_refcursor            nm3type.ref_cursor;
+ 
+
+BEGIN
+
+ l_current_process_rec := get_current_process;
+ l_current_job_run_seq := get_current_job_run_seq;
+ 
+ IF l_current_job_run_seq IS NOT NULL THEN -- only bother to go ahead with sweeping things up if we've NOT binned the current execution 
+
+
+        --
+        -- 
+        --
+         l_force := nm3flx.boolean_to_char(pi_force);
+         
+             update hig_process_job_runs
+             set    hpjr_end             = systimestamp
+                   ,hpjr_success_flag    = pi_success_flag
+                   ,hpjr_additional_info = SUBSTR(pi_additional_info,1,500)
+             where  hpjr_process_id      = l_current_process_rec.hp_process_id
+             and    hpjr_job_run_seq     = l_current_job_run_seq
+             and    (
+                      (l_force = 'TRUE')
+                    OR
+                      (hpjr_end IS NULL) -- only update the job run record if it's not already been updated (perhaps by the bespoke api code that was called by the job)
+                    );      
+             
+
+        --
+        -- if job run record was updated then also update the process record
+        --
+         IF sql%ROWCOUNT = 1 THEN
+           update hig_processes
+           set    hp_success_flag = pi_success_flag
+           where  hp_process_id   = l_current_process_rec.hp_process_id; 
+
+           log_it(pi_process_id => l_current_process_rec.hp_process_id
+                 ,pi_message    => get_process_complete_message);
+         END IF;         
+
+
+
+         --
+         -- throw a record into hig_process_alert_log to trigger notifications
+         --
+         l_hpal_rec.hpal_success_flag      := pi_success_flag; 
+         l_hpal_rec.hpal_process_type_id   := l_current_process_rec.hp_process_type_id; 
+         l_hpal_rec.hpal_process_id        := l_current_process_rec.hp_process_id;
+         l_hpal_rec.hpal_job_run_seq       := l_current_job_run_seq;
+         l_hpal_rec.hpal_initiated_user    := l_current_process_rec.hp_initiated_by_username;
+              
+          IF l_current_process_rec.hp_area_type = 'ADMIN_UNIT' AND l_current_process_rec.hp_area_id IS NOT NULL THEN
+             l_nau_rec := nm3get.get_nau_all(pi_nau_admin_unit =>  l_current_process_rec.hp_area_id
+                                            ,pi_raise_not_found => FALSE);  
+                  
+             l_hpal_rec.hpal_admin_unit     := l_nau_rec.nau_admin_unit;
+             l_hpal_rec.hpal_unit_code      := l_nau_rec.nau_unit_code;
+             l_hpal_rec.hpal_unit_name      := l_nau_rec.nau_name;
+
+          ELSIF l_current_process_rec.hp_area_type IN ('CONTRACTOR','CIM_CONTRACTOR') AND l_current_process_rec.hp_area_id IS NOT NULL THEN 
+              
+             OPEN l_refcursor FOR 'SELECT oun_unit_code, oun_name FROM org_units WHERE oun_org_id = :a' USING l_current_process_rec.hp_area_id;
+             FETCH l_refcursor INTO l_hpal_rec.hpal_con_code,l_hpal_rec.hpal_con_name;
+             CLOSE l_refcursor;
+                 
+          END IF;
+              
+          create_alert_log (pi_hpal_rec => l_hpal_rec);
+              
+         commit;
+
+ END IF;
+
+ 
+END process_execution_end;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE drop_execution IS
+
  l_current_process_id  hig_processes.hp_process_id%TYPE;
  l_current_job_run_seq hig_process_job_runs.hpjr_job_run_seq%TYPE;
- l_force varchar2(10);
 
+ PRAGMA autonomous_transaction;
+ 
 BEGIN
 
  l_current_process_id := get_current_process_id;
  l_current_job_run_seq := get_current_job_run_seq;
 
---
--- 
---
- l_force := nm3flx.boolean_to_char(pi_force);
+
+ delete from hig_process_job_runs 
+ where hpjr_process_id = l_current_process_id
+ and   hpjr_job_run_seq = l_current_job_run_seq;
+
+ update hig_processes
+ set    hp_success_flag = 'Y'
+ where  hp_process_id   = l_current_process_id;
  
-     update hig_process_job_runs
-     set    hpjr_end             = systimestamp
-           ,hpjr_success_flag    = pi_success_flag
-           ,hpjr_additional_info = SUBSTR(pi_additional_info,1,500)
-     where  hpjr_process_id      = l_current_process_id
-     and    hpjr_job_run_seq     = l_current_job_run_seq
-     and    (
-              (l_force = 'TRUE')
-            OR
-              (hpjr_end IS NULL) -- only update the job run record if it's not already been updated (perhaps by the bespoke api code that was called by the job)
-            );      
-     
+ set_current_job_run_seq(pi_job_run_seq => Null);  
 
---
--- if job run record was updated then also update the process record
---
- IF sql%ROWCOUNT = 1 THEN
-   update hig_processes
-   set    hp_success_flag = pi_success_flag
-   where  hp_process_id   = l_current_process_id; 
-
-   log_it(pi_process_id => l_current_process_id
-         ,pi_message    => get_process_complete_message);
- END IF;         
-       
  commit;
- 
 
--- raise_application_error(-20099,'Processing stopped');
- 
-END process_execution_end;
+END drop_execution;
 --
 -----------------------------------------------------------------------------
 --
@@ -419,11 +487,13 @@ PROCEDURE associate_files_with_process(pi_process_id             IN hig_process_
 BEGIN                                                                            
 
 
+  
+
 --
 -- to tell the process that is executed which files is should be using (if any)
 --                    
  FOR f IN 1..pi_tab_files.COUNT LOOP
-     
+  
      l_file_id := nm3ddl.sequence_nextval('hpf_file_id_seq');
  
      INSERT INTO hig_process_files(hpf_file_id
@@ -578,28 +648,44 @@ END add_temp_file;
 -----------------------------------------------------------------------------
 --
 PROCEDURE check_limit_not_reached(pi_process_type_id   IN hig_process_types.hpt_process_type_id%TYPE
-                                 ,pi_limit             IN hig_process_types.hpt_process_limit%TYPE) IS
+                                 ,pi_polling_flag      IN hig_processes.hp_polling_flag%TYPE           
+                                 ,pi_area_id           IN hig_processes.hp_area_id%TYPE) IS
                     
  l_count_live_processes pls_integer;
+ l_area_id              hig_processes.hp_area_id%TYPE;       
+ l_process_type_rec     hig_process_types%ROWTYPE;
              
 BEGIN
 
- IF pi_limit > 0 THEN
+ l_process_type_rec := hig_process_framework.get_process_type(pi_process_type_id => pi_process_type_id);
+
+ 
+ IF pi_polling_flag = 'Y' THEN
+   l_process_type_rec.hpt_process_limit := 1; -- polling implies a limit of 1 
+ END IF;
+
+
+ IF l_process_type_rec.hpt_process_limit > 0 THEN
   
-     SELECT count(1)
+     SELECT count(1)  
      INTO   l_count_live_processes
      FROM   hig_processes_v
-     WHERE  hp_process_type_id = pi_process_type_id
+     WHERE  hp_process_type_id      = pi_process_type_id
+     AND    (
+               (hp_area_id = pi_area_id)
+            OR 
+               (pi_area_id IS NULL)
+            )
      AND    (
              (hpj_next_run_date >= sysdate AND  upper(hpj_job_state) != 'DISABLED') 
            OR 
             ( upper(hpj_job_state) = 'RUNNING')
             );
- 
-     IF l_count_live_processes+1 > pi_limit THEN
+
+     IF l_count_live_processes+1 > l_process_type_rec.hpt_process_limit THEN
         hig.raise_ner(pi_appl => 'HIG'
                      ,pi_id   => 517
-                     ,pi_supplementary_info => 'Limit ['||pi_limit||']'); -- Process cannot be submitted because the limit for this process type has been reached
+                     ,pi_supplementary_info => 'Limit ['||l_process_type_rec.hpt_process_limit||']'); -- Process cannot be submitted because the limit for this process type has been reached
      END IF;
      
  END IF;     
@@ -660,7 +746,8 @@ BEGIN
  
  
  check_limit_not_reached(pi_process_type_id => l_process_type_rec.hpt_process_type_id
-                        ,pi_limit           => l_process_type_rec.hpt_process_limit);
+                        ,pi_polling_flag    => pi_polling_flag
+                        ,pi_area_id         => pi_area_id);
   
  po_process_id := nm3ddl.sequence_nextval('hp_process_id_seq');
 
@@ -917,11 +1004,11 @@ PROCEDURE log_it(pi_process_id             IN hig_process_log.hpl_process_id%TYP
                 
 BEGIN
 
-IF pi_process_id IS NOT NULL THEN
+-- l_process_run_seq := NVL(get_current_job_run_seq,last_process_job_run(pi_process_id => pi_process_id));
+   l_process_run_seq := get_current_job_run_seq;
 
-     l_process_run_seq := NVL(get_current_job_run_seq,last_process_job_run(pi_process_id => pi_process_id));
-     
-     
+IF pi_process_id IS NOT NULL AND get_current_job_run_seq IS NOT NULL THEN
+
 
      insert into hig_process_log(hpl_process_id
                                , hpl_job_run_seq
@@ -1121,7 +1208,8 @@ BEGIN
  l_rec := hig_process_framework.get_process_and_job(pi_process_id => pi_process_id);
 
  check_limit_not_reached(pi_process_type_id  => l_rec.hp_process_type_id
-                        ,pi_limit            => l_rec.hp_process_limit);         
+                        ,pi_polling_flag     => l_rec.hp_polling_flag
+                        ,pi_area_id          => l_rec.hp_area_id);         
 
  nm3jobs.enable_job(pi_job_name => l_rec.hp_full_job_name);
  
@@ -1181,32 +1269,21 @@ BEGIN
 END run_process_now; 
 --
 -----------------------------------------------------------------------------
-
+--
 PROCEDURE create_alert_log (pi_hpal_rec IN OUT hig_process_alert_log%ROWTYPE)
 IS
---
+   PRAGMA AUTONOMOUS_TRANSACTION;
+   
+   l_nau_rec nm_admin_units_all%ROWTYPE;
 
-
-
---************************************************************
--- need to get code and name for admin unit id and contractor 
---************************************************************
-
-   PRAGMA AUTONOMOUS_TRANSACTION ;
---
 BEGIN
---
-   SELECT hpal_id_seq.NEXTVAL 
-   INTO   pi_hpal_rec.hpal_id
-   FROM   dual;
+
+   pi_hpal_rec.hpal_id := nm3ddl.sequence_nextval('hpal_id_seq');
 
    INSERT INTO hig_process_alert_log VALUES pi_hpal_rec;
 
    Commit;
-EXCEPTION
-WHEN OTHERS THEN
-    Raise_Application_Error(-2000,'Error while inserting into hig_process_alert_log '||SQLERRM);   
---
+
 END create_alert_log;  
 --
 -----------------------------------------------------------------------------
@@ -1243,11 +1320,11 @@ END get_conns_for_current_process;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE do_polling_if_requested(pi_file_type_name          IN hig_process_type_files.hptf_name%TYPE
-                                , pi_file_mask               IN VARCHAR2
-                                , pi_binary                  IN BOOLEAN DEFAULT TRUE
-                                , pi_archive_overwrite       IN BOOLEAN DEFAULT FALSE
-                                , pi_remove_failed_arch      IN BOOLEAN DEFAULT FALSE) IS
+FUNCTION do_polling_if_requested(pi_file_type_name          IN hig_process_type_files.hptf_name%TYPE
+                               , pi_file_mask               IN VARCHAR2
+                               , pi_binary                  IN BOOLEAN DEFAULT TRUE
+                               , pi_archive_overwrite       IN BOOLEAN DEFAULT FALSE
+                               , pi_remove_failed_arch      IN BOOLEAN DEFAULT FALSE) RETURN BOOLEAN IS
                                 
 
   l_process_rec      hig_processes%ROWTYPE;
@@ -1257,6 +1334,8 @@ PROCEDURE do_polling_if_requested(pi_file_type_name          IN hig_process_type
   l_tab_ftp_connections nm_id_tbl; 
            
   l_files            nm3type.tab_varchar32767;
+  
+  l_ok_to_proceed BOOLEAN := TRUE;
   
   
   
@@ -1309,9 +1388,6 @@ PROCEDURE do_polling_if_requested(pi_file_type_name          IN hig_process_type
                                        
       hig_process_api.log_it(pi_message => l_files.COUNT||' files found');
 
-   ELSE
-         hig_process_api.log_it(pi_message => 'No locations to poll');
-      
    END IF;      
   
   
@@ -1325,7 +1401,6 @@ PROCEDURE do_polling_if_requested(pi_file_type_name          IN hig_process_type
 
   
   BEGIN
-  
   
     IF l_files.COUNT > 0 THEN
 
@@ -1347,25 +1422,19 @@ PROCEDURE do_polling_if_requested(pi_file_type_name          IN hig_process_type
                  
          END LOOP;
 
-
-
          hig_process_api.associate_files_with_process(pi_tab_files  => l_tab_files);
-         
+         hig_process_api.log_it(pi_message => 'Polling complete');
+         commit;
+              
+    ELSE
+         drop_execution;
+         l_ok_to_proceed := FALSE;
+
     END IF;            
-  
   
   END associate_files;
   
   
-  PROCEDURE finish IS
-  
-  BEGIN
-   
-    hig_process_api.log_it(pi_message => 'Polling complete');
-    
-  END;    
-
-
 BEGIN
 
   l_process_rec           := get_current_process;
@@ -1378,14 +1447,15 @@ BEGIN
   
     associate_files;
   
-    finish;
-    
   END IF;  
   
-  
- 
-END do_polling_if_requested;
 
+  RETURN(l_ok_to_proceed);
+
+END do_polling_if_requested;
+--
+-----------------------------------------------------------------------------
+--
 END hig_process_api;
 /
 
