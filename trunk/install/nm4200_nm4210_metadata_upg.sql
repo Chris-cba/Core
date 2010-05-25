@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.5   May 06 2010 18:11:30   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.6   May 25 2010 10:11:04   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_metadata_upg.sql  $
---       Date into PVCS   : $Date:   May 06 2010 18:11:30  $
---       Date fetched Out : $Modtime:   May 06 2010 18:11:06  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   May 25 2010 10:11:04  $
+--       Date fetched Out : $Modtime:   May 25 2010 10:07:28  $
+--       Version          : $Revision:   3.6  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -286,7 +286,7 @@ where hcca_table_name IN ('NM_SDE_TEMP_RESCALE', 'NM_MEMBERS_SDE_TEMP')
 
 ------------------------------------------------------------------
 SET TERM ON
-PROMPT PROCESS_EXECUTION Role
+PROMPT PROCESS_ADMIN, PROCESS_USER Roles
 SET TERM OFF
 
 ------------------------------------------------------------------
@@ -298,24 +298,24 @@ SET TERM OFF
 -- 
 -- 
 -- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
--- Add new role to HIG_ROLES and HIG_USER_ROLES for HIGHWAYS owner for Job execution.
+-- PROCESS_ADMIN, PROCESS_USER Roles
 -- 
 ------------------------------------------------------------------
 INSERT INTO hig_roles
-  SELECT 'PROCESS_EXECUTION','HIG','Scheduler Job Privs'
+  SELECT 'PROCESS_ADMIN','HIG','Scheduler Job Admin Privs'
     FROM dual
    WHERE NOT EXISTS
       (SELECT 1 FROM hig_roles
-        WHERE hro_role = 'PROCESS_EXECUTION');
+        WHERE hro_role ='PROCESS_ADMIN');
 
 INSERT INTO hig_user_roles
-  SELECT hus_username, 'PROCESS_EXECUTION', hus_start_date
+  SELECT hus_username, 'PROCESS_ADMIN', hus_start_date
     FROM hig_users
    WHERE hus_username = USER
      AND NOT EXISTS
        (SELECT 1 FROM hig_user_roles
          WHERE hur_username = USER
-           AND hur_role = 'PROCESS_EXECUTION');
+           AND hur_role = 'PROCESS_ADMIN');
 ------------------------------------------------------------------
 
 
@@ -414,32 +414,44 @@ BEGIN
           ' WHERE b.ftp_type = a.ftp_type)';
   --
     EXECUTE IMMEDIATE
-      'INSERT INTO hig_ftp_connections a'||
-      ' ( hfc_id, hfc_hft_id, hfc_name, hfc_nau_admin_unit, hfc_nau_unit_code '||
-      ' , hfc_nau_admin_type, hfc_ftp_username, hfc_ftp_password, hfc_ftp_host '||
-      ' , hfc_ftp_port, hfc_ftp_in_dir, hfc_ftp_out_dir, hfc_ftp_arc_in_dir '||
-      ' , hfc_ftp_arc_out_dir ) '||
-     ' SELECT hfc_id_seq.nextval hfc_id'||
-          ' , hft_id '||
-          ' , ftp_type||CASE WHEN ftp_contractor IS NOT NULL THEN ''_''||ftp_contractor END'||
-          ' , nau_admin_unit '||
-          ' , nau_unit_code '||
-          ' , nau_admin_type '||
-          ' , ftp_username '||
-          ' , nm3ftp.obfuscate_password(ftp_password) '||
-          ' , ftp_host '||
-          ' , ftp_port '||
-          ' , ftp_in_dir '||
-          ' , ftp_out_dir '||
-          ' , ftp_arc_in_dir '||
-          ' , ftp_arc_out_dir '||
-       ' FROM x_tfl_ftp_dirs, hig_ftp_types, nm_admin_units '||
-      ' WHERE ftp_type = hft_type '||
-        ' AND ftp_contractor = nau_unit_code(+)'||
-        ' AND nau_admin_type(+) = ''NETW'''||
-        ' AND NOT EXISTS '||
-           ' (SELECT 1 FROM hig_ftp_connections a '||
-            ' WHERE a.hfc_name = ftp_type||CASE WHEN ftp_contractor IS NOT NULL THEN ''_''||ftp_contractor END )';
+      'BEGIN '||
+      '  FOR i IN ( '||
+         ' SELECT hfc_id_seq.nextval                      hfc_id '||
+              ' , hft_id                                  hfc_hft_id'||
+              ' , ftp_type||CASE WHEN ftp_contractor IS NOT NULL THEN ''_''||ftp_contractor END hfc_name '||
+              ' , nau_admin_unit                          hfc_nau_admin_unit'||
+              ' , nau_unit_code                           hfc_nau_unit_code '||
+              ' , nau_admin_type                          hfc_nau_admin_type '||
+              ' , ftp_username                            hfc_ftp_username'||
+              ' , nm3ftp.obfuscate_password(ftp_password) hfc_ftp_password'||
+              ' , ftp_host                                hfc_ftp_host'||
+              ' , ftp_port                                hfc_ftp_port'||
+              ' , ftp_in_dir                              hfc_ftp_in_dir'||
+              ' , ftp_out_dir                             hfc_ftp_out_dir'||
+              ' , ftp_arc_username                        hfc_ftp_arc_username'||
+              ' , nm3ftp.obfuscate_password(ftp_arc_password) hfc_ftp_arc_password'||
+              ' , ftp_arc_host                            hfc_ftp_arc_host'||
+              ' , ftp_arc_port                            hfc_ftp_arc_port'||
+              ' , ftp_arc_in_dir                          hfc_ftp_arc_in_dir'||
+              ' , ftp_arc_out_dir                         hfc_ftp_arc_out_dir '||
+           ' FROM x_tfl_ftp_dirs, hig_ftp_types, nm_admin_units '||
+          ' WHERE ftp_type = hft_type '||
+            ' AND ftp_contractor = nau_unit_code(+)'||
+            ' AND nau_admin_type(+) = ''NETW'''||
+     ') '||
+     ' LOOP '||
+     '   BEGIN '||
+       '   INSERT INTO hig_ftp_connections VALUES ('||
+          ' i.hfc_id, i.hfc_hft_id, i.hfc_name, i.hfc_nau_admin_unit, i.hfc_nau_unit_code, '||
+        '   i.hfc_nau_admin_type, i.hfc_ftp_username, i.hfc_ftp_password, i.hfc_ftp_host, '||
+        '   i.hfc_ftp_port, i.hfc_ftp_in_dir, i.hfc_ftp_out_dir, i.hfc_ftp_arc_username, '||
+        '   i.hfc_ftp_arc_password, i.hfc_ftp_arc_host, i.hfc_ftp_arc_port, '||
+        '   i.hfc_ftp_arc_in_dir, i.hfc_ftp_arc_out_dir, SYSDATE, SYSDATE, USER, USER );' ||
+        'EXCEPTION ' ||
+        ' WHEN DUP_VAL_ON_INDEX THEN NULL;' ||
+        'END;' ||
+      ' END LOOP ;'||
+      'END;';
   --
   END IF;
 --
@@ -611,7 +623,7 @@ INSERT INTO NM_LAYER_TREE
  ,NLTR_ORDER)
 (SELECT 'ROOT'
       , 'DOC'
-      , 'Documents Manager'
+      , 'Document Manager'
       , 'F'
       , '35' 
    FROM DUAL
@@ -641,7 +653,7 @@ INSERT INTO NM_LAYER_TREE
 
 ------------------------------------------------------------------
 SET TERM ON
-PROMPT Document Manager - Update module names
+PROMPT Document Manager - Update module names, New Error Messages
 SET TERM OFF
 
 ------------------------------------------------------------------
@@ -658,6 +670,22 @@ UPDATE hig_modules
 UPDATE hig_standard_favourites
    SET hstf_descr = 'Document Locations and Media Types'
  WHERE hstf_child = 'DOC0118';
+
+INSERT INTO nm_errors
+SELECT 'HIG',539,NULL,'Archiving from an Application Server can only be done when defined as an Oracle Directory', NULL
+FROM DUAL
+WHERE NOT EXISTS
+ (SELECT 1 FROM nm_errors
+   WHERE ner_appl = 'HIG'
+     AND ner_id = 539);
+
+INSERT INTO nm_errors
+SELECT 'HIG',540,NULL,'You can only lock files for editing if the Document Location is defined as a Table', NULL
+FROM DUAL
+WHERE NOT EXISTS
+ (SELECT 1 FROM nm_errors
+   WHERE ner_appl = 'HIG'
+     AND ner_id = 540);
 
 
 ------------------------------------------------------------------
@@ -730,10 +758,25 @@ INSERT INTO HIG_CODES ( HCO_DOMAIN
                       , HCO_START_DATE
                       , HCO_END_DATE )
      VALUES ( 'DOC_LOCATION_TYPES'
+            , 'DB_SERVER'
+            , 'Database Server'
+            , 'Y'
+            , 20
+            , NULL
+            , NULL );
+
+INSERT INTO HIG_CODES ( HCO_DOMAIN
+                      , HCO_CODE
+                      , HCO_MEANING
+                      , HCO_SYSTEM
+                      , HCO_SEQ
+                      , HCO_START_DATE
+                      , HCO_END_DATE )
+     VALUES ( 'DOC_LOCATION_TYPES'
             , 'ORACLE_DIRECTORY'
             , 'Oracle Directory'
             , 'Y'
-            , 20
+            , 30
             , NULL
             , NULL );
 
@@ -748,7 +791,7 @@ INSERT INTO HIG_CODES ( HCO_DOMAIN
             , 'TABLE'
             , 'Database Table'
             , 'Y'
-            , 30
+            , 40
             , NULL
             , NULL );
 
@@ -763,7 +806,7 @@ INSERT INTO HIG_CODES ( HCO_DOMAIN
             , 'FTP'
             , 'FTP Location'
             , 'Y'
-            , 40
+            , 50
             , NULL
             , NULL );
 
@@ -889,14 +932,14 @@ Insert into HIG_CODES
    (HCO_DOMAIN, HCO_CODE, HCO_MEANING, HCO_SYSTEM, HCO_SEQ)
  Values
    ('PROCESS_SUCCESS_FLAG', 'Y', 'Success', 'Y', 
-    20);
+    10);
 
 
 Insert into HIG_CODES
    (HCO_DOMAIN, HCO_CODE, HCO_MEANING, HCO_SYSTEM, HCO_SEQ)
  Values
    ('PROCESS_SUCCESS_FLAG', 'N', 'Fail', 'Y', 
-    30);
+    20);
 
 
 Insert into HIG_CODES
@@ -904,6 +947,13 @@ Insert into HIG_CODES
  Values
    ('PROCESS_SUCCESS_FLAG', 'TBD', 'To Be Determined', 'Y', 
     30);
+
+Insert into HIG_CODES
+   (HCO_DOMAIN, HCO_CODE, HCO_MEANING, HCO_SYSTEM, HCO_SEQ)
+ Values
+   ('PROCESS_SUCCESS_FLAG', 'I', 'Interim', 'Y', 
+    40);
+
 
 --
 -- Codes for FILE_DIRECTION
@@ -983,7 +1033,7 @@ INSERT INTO hig_modules (hmo_module,
 				'FORM');
 
 insert into hig_module_roles(hmr_module, hmr_role, hmr_mode)
-values ('HIG2500','HIG_ADMIN','NORMAL');
+values ('HIG2500','PROCESS_ADMIN','NORMAL');
 
 --
 -- HIG2510
@@ -1006,7 +1056,7 @@ INSERT INTO hig_modules (hmo_module,
                 'FORM');
 
 insert into hig_module_roles(hmr_module, hmr_role, hmr_mode)
-values ('HIG2510','HIG_USER','NORMAL');
+values ('HIG2510','PROCESS_USER','NORMAL');
 
 --
 -- HIG2515
@@ -1029,7 +1079,7 @@ INSERT INTO hig_modules (hmo_module,
                 'FORM');
 
 insert into hig_module_roles(hmr_module, hmr_role, hmr_mode)
-values ('HIG2515','HIG_ADMIN','NORMAL');
+values ('HIG2515','PROCESS_ADMIN','NORMAL');
 
 
 --
@@ -1053,7 +1103,7 @@ INSERT INTO hig_modules (hmo_module,
                 'FORM');
 
 insert into hig_module_roles(hmr_module, hmr_role, hmr_mode)
-values ('HIG2520','HIG_ADMIN','NORMAL');
+values ('HIG2520','PROCESS_ADMIN','NORMAL');
 
 --
 -- HIG2530
@@ -1076,7 +1126,7 @@ INSERT INTO hig_modules (hmo_module,
                 'FORM');
 
 insert into hig_module_roles(hmr_module, hmr_role, hmr_mode)
-values ('HIG2530','HIG_ADMIN','NORMAL');
+values ('HIG2530','PROCESS_ADMIN','NORMAL');
 
 
 --
@@ -1100,7 +1150,7 @@ INSERT INTO hig_modules (hmo_module,
                 'FORM');
 
 insert into hig_module_roles(hmr_module, hmr_role, hmr_mode)
-values ('HIG2540','HIG_USER','NORMAL');
+values ('HIG2540','PROCESS_USER','NORMAL');
 
 ------------------------------------------------------------------
 
@@ -1654,7 +1704,7 @@ INSERT INTO nm_errors
 SELECT 'HIG'
       , 527
       , NULL
-      , 'The trigger must be re-created to reflect changes made to the alert definition.  Please use the Create Trigger button.'
+      , 'The trigger has been dropped. Please use the Create Trigger button to reflect changes made to the alert definition.'
       , NULL
   FROM dual
  WHERE NOT EXISTS
@@ -1717,6 +1767,18 @@ Insert into HIG_NAVIGATOR_MODULES
    ('NM0590', 'query_inv_item', 'N', 2, NULL, 
     NULL, 'Asset', TO_DATE('03/30/2010 17:43:05', 'MM/DD/YYYY HH24:MI:SS'), 'DORSET', TO_DATE('03/30/2010 17:43:05', 'MM/DD/YYYY HH24:MI:SS'), 
     'DORSET');
+
+INSERT INTO nm_errors
+SELECT 'HIG'
+      , 538
+      , NULL
+      , 'Warning:  Process log attachments are not available when sending batch emails. Do you want to continue?'
+      , NULL
+  FROM dual
+ WHERE NOT EXISTS
+   (SELECT 1 FROM nm_errors
+     WHERE ner_appl = 'HIG'
+       AND ner_id = 538);
 ------------------------------------------------------------------
 
 
@@ -2044,13 +2106,16 @@ where hpt_process_type_id = -2
 
 
 Insert into HIG_PROCESS_TYPES
-   (HPT_PROCESS_TYPE_ID, HPT_NAME, HPT_DESCR, HPT_WHAT_TO_CALL, HPT_INITIATION_MODULE, HPT_INTERNAL_MODULE, HPT_INTERNAL_MODULE_PARAM, HPT_RESTARTABLE, HPT_SEE_IN_HIG2510)
+   (HPT_PROCESS_TYPE_ID, HPT_NAME, HPT_DESCR, HPT_WHAT_TO_CALL, HPT_INITIATION_MODULE, HPT_INTERNAL_MODULE, HPT_INTERNAL_MODULE_PARAM, HPT_RESTARTABLE, HPT_SEE_IN_HIG2510, HPT_POLLING_ENABLED, HPT_AREA_TYPE)
  Values
    (-2, 'Load Document Bundles', 'Unpacks document bundle zip file(s) 
 Reads the driving file(s)
 Creates document and document association records
-Moves the document files to the correct location', 'doc_bundle_loader.load_process_document_bundles;', 
-    'DOC0300', 'DOC0310', 'P_PROCESS_ID', 'Y', 'Y');
+Moves the document files to the correct location', 'doc_bundle_loader.initialise;', 
+    'DOC0300', 'DOC0310', 'P_PROCESS_ID', 'Y', 
+    'Y', 'Y', 'ADMIN_UNIT');
+COMMIT;
+
 
 Insert into HIG_PROCESS_TYPE_FILES
    (HPTF_FILE_TYPE_ID, HPTF_NAME, HPTF_PROCESS_TYPE_ID, HPTF_INPUT, HPTF_OUTPUT, HPTF_INPUT_DESTINATION, HPTF_INPUT_DESTINATION_TYPE, HPTF_MIN_INPUT_FILES)
@@ -2072,6 +2137,71 @@ Insert into HIG_PROCESS_TYPE_FREQUENCIES
 
 ------------------------------------------------------------------
 SET TERM ON
+PROMPT Admin Unit for Audit/Alert Assets
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (LINESH SORATHIA)
+-- **** COMMENTS TO BE ADDED BY LINESH SORATHIA ****
+-- 
+------------------------------------------------------------------
+Prompt Inserting into  nm_au_types
+INSERT INTO nm_au_types SELECT 'EXT$','Admin Type for Navigator, Audit and Alert Meta Models',Null,Null,Null,Null 
+                          FROM   dual 
+                          WHERE  NOT EXISTS (SELECT 'x'
+                                               FROM    nm_au_types 
+                                               WHERE   nat_admin_type = 'EXT$');
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Update lengths of existing sys opts with domain length
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 108523
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
+-- Update lengths of existing system options with domain length where needed.
+-- 
+------------------------------------------------------------------
+UPDATE hig_option_list
+   SET hol_max_length   =
+         (SELECT hdo_code_length
+            FROM hig_domains
+           WHERE hol_domain = hdo_domain)
+ WHERE EXISTS
+         (SELECT 'X'
+            FROM hig_domains
+           WHERE hol_domain = hdo_domain)
+/
+
+UPDATE hig_user_option_list
+   SET huol_max_length   =
+         (SELECT hdo_code_length
+            FROM hig_domains
+           WHERE huol_domain = hdo_domain)
+ WHERE EXISTS
+         (SELECT 'X'
+            FROM hig_domains
+           WHERE huol_domain = hdo_domain)
+/
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
 PROMPT All new Process Types
 SET TERM OFF
 
@@ -2083,7 +2213,7 @@ SET TERM OFF
 ------------------------------------------------------------------
 PROMPT Creating Alert Manager Process Type
 Insert into HIG_PROCESS_TYPES
-SELECT -1, 'Alert Manager', 'This Process will sent out pending Alerts every 10 minutes', 'hig_alert.run_alert_batch;', NULL,Null ,Null , NULL, 'Y', 'Y'
+SELECT -1, 'Alert Manager', 'This Process will sent out pending Alerts every 10 minutes', 'hig_alert.run_alert_batch;', NULL,Null ,Null , NULL, 'Y', 'Y','N',NUll,Null
 FROM Dual 
 WHERE NOT Exists (Select 1 From HIG_PROCESS_TYPES WHERE HPT_PROCESS_TYPE_ID = -1) ;
 
@@ -2098,10 +2228,6 @@ PROMPT Creating Alert Manager Process Type Frequency
 Insert into HIG_PROCESS_TYPE_FREQUENCIES
 Select -1,-4,1 FRom dual
 Where not exists (Select 1 from HIG_PROCESS_TYPE_FREQUENCIES WHERE HPFR_PROCESS_TYPE_ID = -1);
-
-
-
-
 ------------------------------------------------------------------
 
 

@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.4   May 06 2010 18:01:28   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.5   May 25 2010 10:11:04   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_ddl_upg.sql  $
---       Date into PVCS   : $Date:   May 06 2010 18:01:28  $
---       Date fetched Out : $Modtime:   May 06 2010 17:59:38  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   May 25 2010 10:11:04  $
+--       Date fetched Out : $Modtime:   May 25 2010 10:07:28  $
+--       Version          : $Revision:   3.5  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -225,7 +225,7 @@ END;
 
 ------------------------------------------------------------------
 SET TERM ON
-PROMPT PROCESS_EXECUTION role
+PROMPT PROCESS_ADMIN, PROCESS_USER roles
 SET TERM OFF
 
 ------------------------------------------------------------------
@@ -237,24 +237,49 @@ SET TERM OFF
 -- 
 -- 
 -- DEVELOPMENT COMMENTS (ADRIAN EDWARDS)
--- Role to support execution of jobs and external jobs
+-- Roles to support execution of jobs and external jobs
 -- 
 ------------------------------------------------------------------
 DECLARE
   role_exists EXCEPTION;
   PRAGMA EXCEPTION_INIT(role_exists, -1921); 
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE ROLE PROCESS_EXECUTION';
-  EXECUTE IMMEDIATE 'GRANT CREATE JOB TO PROCESS_EXECUTION';
-  EXECUTE IMMEDIATE 'GRANT CREATE EXTERNAL JOB TO PROCESS_EXECUTION';
-  EXECUTE IMMEDIATE 'GRANT PROCESS_EXECUTION to '||USER;
-  EXECUTE IMMEDIATE 'GRANT PROCESS_EXECUTION to '||USER||' WITH ADMIN OPTION';
+  BEGIN
+    EXECUTE IMMEDIATE 'CREATE ROLE PROCESS_USER';
+  EXCEPTION
+    WHEN role_exists
+    THEN NULL;
+  END;
+  EXECUTE IMMEDIATE 'GRANT CREATE JOB TO PROCESS_USER';
+  EXECUTE IMMEDIATE 'GRANT CREATE EXTERNAL JOB TO PROCESS_USER';
+  EXECUTE IMMEDIATE 'GRANT PROCESS_USER to '||USER;
+  EXECUTE IMMEDIATE 'GRANT PROCESS_USER to '||USER||' WITH ADMIN OPTION';
 EXCEPTION
   WHEN role_exists
   THEN NULL;
 END;
 /
 
+
+DECLARE
+  role_exists EXCEPTION;
+  PRAGMA EXCEPTION_INIT(role_exists, -1921); 
+BEGIN
+  BEGIN
+    EXECUTE IMMEDIATE 'CREATE ROLE PROCESS_ADMIN';
+  EXCEPTION
+    WHEN role_exists
+    THEN NULL;
+  END;
+  EXECUTE IMMEDIATE 'GRANT CREATE ANY JOB TO PROCESS_ADMIN';
+  EXECUTE IMMEDIATE 'GRANT CREATE EXTERNAL JOB TO PROCESS_ADMIN';
+  EXECUTE IMMEDIATE 'GRANT PROCESS_ADMIN to '||USER;
+  EXECUTE IMMEDIATE 'GRANT PROCESS_ADMIN to '||USER||' WITH ADMIN OPTION';
+EXCEPTION
+  WHEN role_exists
+  THEN NULL;
+END;
+/
 
 ------------------------------------------------------------------
 
@@ -284,7 +309,6 @@ CREATE TABLE HIG_FTP_TYPES
 /
 
 PROMPT Creating Table 'HIG_FTP_CONNECTIONS'
-
 CREATE TABLE HIG_FTP_CONNECTIONS
  (HFC_ID NUMBER(38) NOT NULL
  ,HFC_HFT_ID NUMBER(38) NOT NULL
@@ -298,6 +322,10 @@ CREATE TABLE HIG_FTP_CONNECTIONS
  ,HFC_FTP_PORT VARCHAR2(50)
  ,HFC_FTP_IN_DIR VARCHAR2(500)
  ,HFC_FTP_OUT_DIR VARCHAR2(500)
+ ,HFC_FTP_ARC_USERNAME VARCHAR2(500)
+ ,HFC_FTP_ARC_PASSWORD VARCHAR2(500)
+ ,HFC_FTP_ARC_HOST VARCHAR2(30)
+ ,HFC_FTP_ARC_PORT VARCHAR2(50)
  ,HFC_FTP_ARC_IN_DIR VARCHAR2(500)
  ,HFC_FTP_ARC_OUT_DIR VARCHAR2(500)
  ,HFC_DATE_CREATED DATE
@@ -770,13 +798,18 @@ ALTER TABLE doc_locations
 ADD dlc_location_type VARCHAR2(30)
 /
 
-PROMPT Add DLC_LOCATION_TYPE Values to DOC_LOCATIONS
+PROMPT Add DLC_LOCATION_TYPE and DLC_LOCATION_TYPE Values to DOC_LOCATIONS
 UPDATE doc_locations
-SET dlc_location_type = 'APP_SERVER';
+   SET dlc_location_name = NVL ( dlc_apps_pathname, dlc_pathname )
+     , dlc_location_type = 'DB_SERVER';
 
 PROMPT Set DOC_LOCATION_TYPE to Mandatory
 ALTER TABLE DOC_LOCATIONS
 MODIFY  dlc_location_type NOT NULL;
+
+PROMPT Set DOC_LOCATION_NAME to Mandatory
+ALTER TABLE DOC_LOCATIONS
+MODIFY  dlc_location_name NOT NULL;
 
 PROMPT Creating Table 'DOC_LOCATION_TABLES'
 CREATE TABLE DOC_LOCATION_TABLES
@@ -1030,13 +1063,32 @@ ALTER TABLE DOC_LOCATION_ARCHIVES
   (DLA_ID))
 /
 
-PROMPT Creating Unique Key on 'DOC_LOCATION_ARCHIVES'
-ALTER TABLE DOC_LOCATION_ARCHIVES
- ADD (CONSTRAINT DLA_UK UNIQUE
-  (DLA_DLC_ID
-  ,DLA_ARCHIVE_TYPE))
+PROMPT Creating Foreign Key on 'DOC_LOCATION_ARCHIVES'
+ALTER TABLE DOC_LOCATION_ARCHIVES ADD (CONSTRAINT
+ DLA_DLC_FK FOREIGN KEY
+  (DLA_DLC_ID) REFERENCES DOC_LOCATIONS
+  (DLC_ID))
 /
 
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Document Manager - Indexes
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADE EDWARDS)
+-- Document Manager - Indexes
+-- 
+------------------------------------------------------------------
+PROMPT Creating Index 'DLA_DLC_ID_IND'
+CREATE INDEX DLA_DLC_ID_IND ON DOC_LOCATION_ARCHIVES
+ (DLA_DLC_ID)
+/
 
 ------------------------------------------------------------------
 
@@ -1153,6 +1205,10 @@ CREATE TABLE HIG_PROCESSES
  ,HP_JOB_OWNER VARCHAR2(30) DEFAULT USER NOT NULL
  )
 /
+
+
+
+
 
 COMMENT ON TABLE HIG_PROCESSES IS 'Exor Process Framework table.  The instantiation of a process of a given process type'
 /
@@ -1372,6 +1428,7 @@ COMMENT ON TABLE HIG_PROCESS_TEMP_LOG IS 'Exor Process Framework table.  Used in
 --
 ---------------------------------------------------------
 --
+PROMPT Creating Table 'HIG_PROCESS_TYPES'
 CREATE TABLE HIG_PROCESS_TYPES
  (HPT_PROCESS_TYPE_ID NUMBER(38) NOT NULL
  ,HPT_NAME VARCHAR2(50) NOT NULL
@@ -1383,6 +1440,9 @@ CREATE TABLE HIG_PROCESS_TYPES
  ,HPT_PROCESS_LIMIT NUMBER(38)
  ,HPT_RESTARTABLE VARCHAR2(1) DEFAULT 'Y' NOT NULL
  ,HPT_SEE_IN_HIG2510 VARCHAR2(1) DEFAULT 'Y' NOT NULL
+ ,HPT_AREA_TYPE VARCHAR2(20)
+ ,HPT_POLLING_ENABLED VARCHAR2(1) DEFAULT 'N' NOT NULL
+ ,HPT_POLLING_FTP_TYPE_ID NUMBER(38)
  )
 /
 COMMENT ON TABLE HIG_PROCESS_TYPES IS 'Exor Process Framework table. Defines each type of automated process for which jobs can be scheduled and executed.'
@@ -1415,6 +1475,41 @@ COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_INTERNAL_MODULE IS 'The HIG_MODULE that 
 COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_INTERNAL_MODULE_PARAM IS 'The name of the forms parameter accepted by the forms module named in HPT_INTERNAL_MODULE.'
 /
 COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_SEE_IN_HIG2510 IS 'Is this process visible in the ''Process Submission'' module?'
+/
+COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_AREA_TYPE IS 'Foreign key to the area type that can be used to parameterise the process'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_POLLING_ENABLED IS 'Flag to denote whether this process type can be initiated by polling of FTP folder(s)'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_POLLING_FTP_TYPE_ID IS 'Foreign key to the polling ftp type'
+/
+
+
+ALTER TABLE HIG_PROCESS_TYPES ADD 
+CONSTRAINT HPT_HTF_FK
+ FOREIGN KEY (HPT_POLLING_FTP_TYPE_ID)
+ REFERENCES HIG_FTP_TYPES (HFT_ID)
+ ON DELETE SET NULL
+/
+
+create index hpt_htf_fk_ind on hig_process_types(HPT_POLLING_FTP_TYPE_ID)
+/
+
+
+ALTER TABLE HIG_PROCESS_TYPES ADD 
+CONSTRAINT HPT_HPA_FK
+ FOREIGN KEY (hpt_area_type)
+ REFERENCES hig_process_areas (hpa_area_type)
+ ON DELETE SET NULL
+/
+
+create index hpt_hpa_fk_ind on hig_process_types(hpt_area_type)
+/
+
+create index hpt_hmo_fk1_ind on hig_process_types(HPT_INITIATION_MODULE)
+/
+create index hpt_hmo_fk2_ind on hig_process_types(HPT_INTERNAL_MODULE)
 /
 
 --
@@ -2068,6 +2163,155 @@ CREATE INDEX HTPR_HRO_FK_IND ON HIG_PROCESS_TYPE_ROLES
 /
 
 
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Process Framework - Other
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (GRAEME JOHNSON)
+-- To support process framework
+-- 
+------------------------------------------------------------------
+CREATE TABLE HIG_PROCESS_AREAS
+(
+  HPA_AREA_TYPE                VARCHAR2(20) NOT NULL,
+  HPA_DESCRIPTION              VARCHAR2(100) NOT NULL,
+  HPA_TABLE                    VARCHAR2(30) NOT NULL,
+  HPA_RESTRICTED_TABLE         VARCHAR2(30),
+  HPA_WHERE_CLAUSE             VARCHAR2(500),
+  HPA_RESTRICTED_WHERE_CLAUSE  VARCHAR2(500),
+  HPA_ID_COLUMN                VARCHAR2(30) NOT NULL,
+  HPA_MEANING_COLUMN           VARCHAR2(100) NOT NULL
+)
+/
+
+COMMENT ON TABLE HIG_PROCESS_AREAS IS 'Defines how processes can be broken down by area'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_AREAS.HPA_AREA_TYPE IS 'Primary Key'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_AREAS.HPA_DESCRIPTION IS 'Description for area type'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_AREAS.HPA_TABLE IS 'Name of table/view that is used to select areas from when configuring the process type'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_AREAS.HPA_RESTRICTED_TABLE IS 'Name of table/view that is used to select areas from when submitting a process.  If null then the HPA_TABLE value is used.'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_AREAS.HPA_WHERE_CLAUSE IS 'A where clause to apply to the HPA_TABLE'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_AREAS.HPA_RESTRICTED_WHERE_CLAUSE IS 'A where clause to apply to the HPA_RESTRICTED_TABLE'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_AREAS.HPA_ID_COLUMN IS 'The name of the primary key column on the table'
+/
+
+ALTER TABLE HIG_PROCESS_AREAS ADD (
+  CONSTRAINT HPA_PK
+ PRIMARY KEY
+ (HPA_AREA_TYPE))
+/
+
+--
+--
+--
+CREATE TABLE hig_process_conns_by_area
+(
+  HPTC_PROCESS_TYPE_ID    NUMBER(38)            NOT NULL,
+  HPTC_FTP_CONNECTION_ID  NUMBER(38)            NOT NULL,
+  HPTC_AREA_TYPE          VARCHAR2(20 BYTE)     NOT NULL,
+  HPTC_AREA_ID_VALUE      VARCHAR2(100 BYTE)    NOT NULL
+)
+/
+
+COMMENT ON TABLE HIG_PROCESS_CONNS_BY_AREA IS 'Defines how FTP connections can be polled by area'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_CONNS_BY_AREA.HPTC_PROCESS_TYPE_ID IS 'Foreign Key To Process Type'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_CONNS_BY_AREA.HPTC_FTP_CONNECTION_ID IS 'Foreign Key to FTP Connection'
+/
+
+COMMENT ON COLUMN HIG_PROCESS_CONNS_BY_AREA.HPTC_AREA_TYPE IS 'Foreign Key to Area Type'
+/
+
+
+CREATE INDEX HPTC_HPA_FK_IND ON HIG_PROCESS_CONNS_BY_AREA
+(HPTC_AREA_TYPE)
+/
+
+
+CREATE INDEX HPTC_HTC_FK_IND ON HIG_PROCESS_CONNS_BY_AREA
+(HPTC_FTP_CONNECTION_ID)
+/
+
+
+ALTER TABLE HIG_PROCESS_CONNS_BY_AREA ADD (
+  CONSTRAINT HPTC_PK
+ PRIMARY KEY
+ (HPTC_PROCESS_TYPE_ID, HPTC_FTP_CONNECTION_ID))
+/
+
+
+ALTER TABLE HIG_PROCESS_CONNS_BY_AREA ADD (
+  CONSTRAINT HPTC_HPA_FK 
+ FOREIGN KEY (HPTC_AREA_TYPE) 
+ REFERENCES HIG_PROCESS_AREAS (HPA_AREA_TYPE))
+/
+
+ALTER TABLE HIG_PROCESS_CONNS_BY_AREA ADD (
+  CONSTRAINT HPTC_HPT_FK 
+ FOREIGN KEY (HPTC_PROCESS_TYPE_ID) 
+ REFERENCES HIG_PROCESS_TYPES (HPT_PROCESS_TYPE_ID))
+/
+
+ALTER TABLE HIG_PROCESS_CONNS_BY_AREA ADD (
+  CONSTRAINT HPTC_HTC_FK 
+ FOREIGN KEY (HPTC_FTP_CONNECTION_ID) 
+ REFERENCES HIG_FTP_CONNECTIONS (HFC_ID))
+/
+--
+--
+--
+alter table hig_processes add (hp_polling_flag varchar2(1) DEFAULT 'N' NOT NULL)
+/
+alter table hig_processes add (hp_area_type varchar2(20) )
+/
+alter table hig_processes add (hp_area_id varchar2(100) )
+/
+alter table hig_processes add (hp_area_meaning varchar2(100) )
+/
+
+
+COMMENT ON COLUMN HIG_PROCESSES.HP_POLLING_FLAG IS 'Flag to denote whether or not this process was called in ''polling mode'''
+/
+COMMENT ON COLUMN HIG_PROCESSES.HP_AREA_TYPE IS 'Foreign Key to area type against which this process was parameterised.  Is also on the HIG_PROCESS_TYPE record but denormalised onto HIG_PROCESSES.'
+/
+COMMENT ON COLUMN HIG_PROCESSES.HP_AREA_ID IS 'Area ID against which this process was parameterised.  The HP_AREA_TYPE value gives the context of the ID.'
+/
+COMMENT ON COLUMN HIG_PROCESSES.HP_AREA_MEANING IS 'Meaning derived from HP_AREA_TYPE and HP_AREA_ID.  This could be determined retrospectively, but for performance reasons it''s stamped onto the process when the process is created.'
+/
+
+
+
+ALTER TABLE hig_processes ADD 
+CONSTRAINT HP_HPA_FK
+ FOREIGN KEY (HP_AREA_TYPE)
+ REFERENCES HIG_PROCESS_AREAS (HPA_AREA_TYPE)
+/
+
+create index HP_HPA_FK_IND on hig_processes(HP_AREA_TYPE)
+/
 
 ------------------------------------------------------------------
 
@@ -2942,7 +3186,7 @@ CREATE OR REPLACE TYPE hig_navigator_tab IS TABLE OF hig_navigator_type  ;
 /
 
 Prompt Creating Type nav_id.....
-CREATE OR REPLACE TYPE nav_id IS TABLE OF Varchar(50) ;
+CREATE OR REPLACE TYPE nav_id IS TABLE OF Varchar2(50) ;
 /
 
 ------------------------------------------------------------------
@@ -4262,13 +4506,6 @@ ALTER TABLE HIG_ALERT_RECIPIENTS ADD (CONSTRAINT
   (HAL_ID))
 /
 
-PROMPT Creating Foreign Key on 'HIG_ALERT_RECIPIENTS'
-ALTER TABLE HIG_ALERT_RECIPIENTS ADD (CONSTRAINT
- HAR_HATR_FK FOREIGN KEY
-  (HAR_HATR_ID) REFERENCES HIG_ALERT_TYPE_RECIPIENTS
-  (HATR_ID))
-/
-
 PROMPT Creating Primary Key on 'HIG_ALERT_ERROR_LOGS'
 ALTER TABLE HIG_ALERT_ERROR_LOGS
  ADD (CONSTRAINT HAEL_PK PRIMARY KEY
@@ -4402,12 +4639,14 @@ CREATE INDEX HAL_HALT_ID_PK_ID_IND ON HIG_ALERTS
  (HAL_HALT_ID
  ,HAL_PK_ID)
 /
+
+
 ------------------------------------------------------------------
 
 
 ------------------------------------------------------------------
 SET TERM ON
-PROMPT Increase length of ITA_QUERY
+PROMPT Increased length of ITA_QUERY
 SET TERM OFF
 
 ------------------------------------------------------------------
@@ -4470,6 +4709,146 @@ BEGIN
   --
 END;
 /
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Process Alert Log
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (LINESH SORATHIA)
+-- New meta model to trigger process alerts
+-- 
+------------------------------------------------------------------
+PROMPT Creating Table 'hig_process_alert_log'
+CREATE TABLE hig_process_alert_log(
+ hpal_id              NUMBER(38)  NOT NULL
+,hpal_success_flag    VARCHAR2(1) NOT NULL
+,hpal_process_type_id NUMBER(38)
+,hpal_process_id      NUMBER(38)
+,hpal_job_run_seq     NUMBER(38) 
+,hpal_admin_unit      NUMBER(9) 
+,hpal_unit_code       VARCHAR2(10)
+,hpal_unit_name       VARCHAR2(40)
+,hpal_initiated_user  VARCHAR2(30)
+,hpal_con_code        VARCHAR2(10)
+,hpal_con_name        VARCHAR2(40)
+,hpal_contract_id     VARCHAR2(10)    
+,hpal_email_subject   VARCHAR2(1000)
+,hpal_email_body      VARCHAR2(1000)
+);
+
+ALTER TABLE hig_process_alert_log Add (Constraint hpal_pk Primary Key  (hpal_id));
+
+ALTER TABLE hig_process_alert_log Add (Constraint hpal_hpal_success_flag_chk Check (hpal_success_flag IN ('Y','N','I')));
+
+ALTER TABLe hig_process_alert_log ADD (Constraint hpal_hpt_fk Foreign Key (hpal_process_type_id) References hig_process_types (hpt_process_type_id));
+
+ALTER TABLe hig_process_alert_log ADD (Constraint hpal_hp_fk Foreign Key (hpal_process_id) References hig_processes (hp_process_id));
+
+CREATE INDEX hpa_hpt_fk_ind ON hig_process_alert_log (hpal_process_type_id);
+
+CREATE INDEX hpa_hp_fk_ind ON hig_process_alert_log (hpal_process_id);
+
+COMMENT ON TABLE hig_process_alert_log IS 'A log of process events which may be used to trigger alert emails.  These will typically be used to warn of 
+process failures.’
+/
+COMMENT ON COLUMN hig_process_alert_log.hpal_id  IS 'Unique identifier generated from a sequence'
+/
+COMMENT ON COLUMN hig_process_alert_log.hpal_success_flag  IS 'Flag to indicate the status of the alert log'
+/
+COMMENT ON COLUMN hig_process_alert_log.hpal_process_type_id IS 'Process Type identifier'
+/
+COMMENT ON COLUMN hig_process_alert_log.hpal_process_id IS 'Process Identifier'
+/
+COMMENT ON COLUMN hig_process_alert_log.hpal_job_run_seq IS 'The execution iteration of the given process.'
+/
+COMMENT ON COLUMN hig_process_alert_log.hpal_admin_unit IS 'Admin Unit'
+/
+COMMENT ON COLUMN hig_process_alert_log.hpal_unit_code IS 'Admin Unit Code'
+/
+COMMENT ON COLUMN hig_process_alert_log.hpal_unit_name IS 'Admin Unit Name'
+/
+COMMENT ON COLUMN hig_process_alert_log.hpal_initiated_user IS 'Process Initiator'
+/
+COMMENT ON COLUMN hig_process_alert_log.hpal_con_code IS 'Contractor code'
+/
+COMMENT ON COLUMN hig_process_alert_log.hpal_con_name IS 'Contractor Name'
+/
+COMMENT ON COLUMN hig_process_alert_log.hpal_contract_id IS 'Contractor Id'
+/
+COMMENT ON COLUMN hig_process_alert_log.hpal_email_subject IS 'Text that can be used as parameter in Alert configuration'
+/
+COMMENT ON COLUMN hig_process_alert_log.hpal_email_body IS 'Text that can be used as parameter in Alert configuration'
+/
+
+Create Sequence hpal_id_seq ;
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Navigator/Audit/Alert FKand composite Indexes
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (LINESH SORATHIA)
+-- Navigator/Audit/Alert FK Indexes
+-- 
+------------------------------------------------------------------
+CREATE INDEX hal_halt_fk_ind ON HIG_ALERTS(hal_halt_id);
+
+CREATE INDEX hael_nit_fk_ind ON HIG_ALERT_ERROR_LOGS(hael_nit_inv_type);
+
+CREATE INDEX hael_har_fk_ind ON HIG_ALERT_ERROR_LOGS(hael_har_id);
+
+CREATE INDEX har_hal_fk_ind ON HIG_ALERT_RECIPIENTS(har_hal_id);
+
+CREATE INDEX har_hatr_fk_ind ON HIG_ALERT_RECIPIENTS(har_hatr_id);
+
+CREATE INDEX harr_ita_fk_ind ON HIG_ALERT_RECIPIENT_RULES(harr_nit_inv_type,harr_attribute_name);
+
+CREATE INDEX halt_nit_fk_ind ON HIG_ALERT_TYPES(halt_nit_inv_type);
+
+CREATE INDEX halt_hsfr_fk_ind ON HIG_ALERT_TYPES(halt_frequency_id);
+
+CREATE INDEX halt_hqt_fk_ind ON HIG_ALERT_TYPES(halt_hqt_id);
+
+CREATE INDEX hata_halt_fk_ind ON HIG_ALERT_TYPE_ATTRIBUTES(hata_halt_id);
+
+CREATE INDEX hatc_halt_fk_ind ON HIG_ALERT_TYPE_CONDITIONS(hatc_halt_id);
+
+CREATE INDEX hatm_halt_fk_ind ON HIG_ALERT_TYPE_MAIL(hatm_halt_id);
+
+CREATE INDEX hatr_halt_fk_ind ON HIG_ALERT_TYPE_RECIPIENTS(hatr_halt_id);
+
+CREATE INDEX hatr_nmu_fk_ind ON HIG_ALERT_TYPE_RECIPIENTS(hatr_nmu_id);
+
+CREATE INDEX hatr_nmg_fk_ind ON HIG_ALERT_TYPE_RECIPIENTS(hatr_nmg_id);
+
+CREATE INDEX hatr_harr_fk_ind ON HIG_ALERT_TYPE_RECIPIENTS(hatr_harr_id);
+
+CREATE INDEX hfam_nit_fk_ind ON HIG_FLEX_ATTRIBUTE_INV_MAPPING(hfam_nit_inv_type); 
+
+CREATE INDEX hfam_hfa_fk_ind ON HIG_FLEX_ATTRIBUTE_INV_MAPPING(hfam_hfa_id); 
+
+CREATE INDEX hnm_hmo_fk_ind ON HIG_NAVIGATOR_MODULES(hnm_module_name); 
+
+CREATE INDEX hnm_nit_fk_ind ON HIG_QUERY_TYPES(hqt_nit_inv_type); 
+
+CREATE INDEX hnm_hqt_fk_ind ON HIG_QUERY_TYPE_ATTRIBUTES(hqta_hqt_id);
+
+CREATE INDEX hal_halt_id_hal_status_ind ON HIG_ALERTS(hal_halt_id,hal_status);
+
+CREATE INDEX har_har_id_har_status_ind ON HIG_ALERT_RECIPIENTS(har_hal_id,har_status);
+
+CREATE INDEX haud_inv_type_pk_id_ind ON HIG_AUDITS(haud_nit_inv_type,haud_pk_id);
+
+
 ------------------------------------------------------------------
 
 
