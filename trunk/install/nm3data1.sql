@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.40   May 26 2010 10:04:16   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.41   May 26 2010 12:05:00   malexander  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   May 26 2010 10:04:16  $
---       Date fetched Out : $Modtime:   May 26 2010 10:02:28  $
---       Version          : $Revision:   2.40  $
+--       Date into PVCS   : $Date:   May 26 2010 12:05:00  $
+--       Date fetched Out : $Modtime:   May 26 2010 12:00:34  $
+--       Version          : $Revision:   2.41  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 26-MAY-2010 10:02
+--       Generation Date  : 26-MAY-2010 12:00
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -28280,7 +28280,7 @@ INSERT INTO HIG_MODULES
 SELECT 
         'DOC0300'
        ,'Load Document Bundles'
-       ,'HIG2510'
+       ,'doc0300'
        ,'FMX'
        ,''
        ,'N'
@@ -29960,7 +29960,7 @@ INSERT INTO HIG_MODULES
 SELECT 
         'HIG2515'
        ,'Amend a Process'
-       ,'hig2510'
+       ,'hig2515'
        ,'FMX'
        ,''
        ,'N'
