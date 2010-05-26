@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.4   Jan 29 2010 15:37:18   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.5   May 26 2010 15:56:06   lsorathia  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Jan 29 2010 15:37:18  $
---       Date fetched Out : $Modtime:   Jan 29 2010 15:07:36  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   May 26 2010 15:56:06  $
+--       Date fetched Out : $Modtime:   May 26 2010 15:53:34  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb	1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -1467,7 +1467,10 @@ END get_users_lov_sql;
 -- changed hus_user_id to to_char
 FUNCTION get_user_id_lov_sql RETURN varchar2 IS
 BEGIN
-   RETURN            'SELECT To_Char(hus_user_id) lup_value,hus_username lup_meaning, hus_name lup_descr'
+   --RETURN 'SELECT To_Char(hus_user_id) lup_value,hus_username lup_meaning, hus_name lup_descr'
+   --       ||CHR(10)||' FROM  hig_users'
+   --       ||CHR(10)||'ORDER BY hus_name';
+   RETURN 'SELECT hus_username lup_meaning, hus_name lup_description, hus_user_id lup_value'
           ||CHR(10)||' FROM  hig_users'
           ||CHR(10)||'ORDER BY hus_name';
 END get_user_id_lov_sql;
