@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.7   May 26 2010 10:04:20   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.8   May 26 2010 11:59:54   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_metadata_upg.sql  $
---       Date into PVCS   : $Date:   May 26 2010 10:04:20  $
---       Date fetched Out : $Modtime:   May 26 2010 09:57:06  $
---       Version          : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   May 26 2010 11:59:54  $
+--       Date fetched Out : $Modtime:   May 26 2010 11:57:18  $
+--       Version          : $Revision:   3.8  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -1071,7 +1071,7 @@ INSERT INTO hig_modules (hmo_module,
                         hmo_menu)
      VALUES ('HIG2515',
                 'Amend a Process',
-                'hig2510',
+                'hig2515',
                 'FMX',
                 'N',
                 'N',
@@ -1964,7 +1964,7 @@ INSERT INTO HIG_MODULES
 SELECT 
     'DOC0300', 
     'Load Document Bundles', 
-    'HIG2510', 
+    'doc0300', 
     'FMX', 
     'N', 
     'N', 
