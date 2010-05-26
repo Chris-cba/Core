@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.17   May 06 2010 18:13:34   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.18   May 26 2010 10:04:12   malexander  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   May 06 2010 18:13:34  $
---       Date fetched Out : $Modtime:   May 06 2010 18:12:38  $
---       Version          : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   May 26 2010 10:04:12  $
+--       Date fetched Out : $Modtime:   May 26 2010 10:02:36  $
+--       Version          : $Revision:   2.18  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 06-MAY-2010 18:12
+--       Generation Date  : 26-MAY-2010 10:02
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -20,6 +20,7 @@
 --   HIG_ROLES
 --   HIG_MODULE_ROLES
 --   HIG_MODULE_KEYWORDS
+--   HIG_PROCESS_AREAS
 --   HIG_PROCESS_TYPES
 --   HIG_PROCESS_TYPE_ROLES
 --   HIG_SCHEDULING_FREQUENCIES
@@ -217,6 +218,18 @@ SELECT
        ,'Network Manager Updates' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_ROLES
                    WHERE HRO_ROLE = 'NET_USER');
+--
+INSERT INTO HIG_ROLES
+       (HRO_ROLE
+       ,HRO_PRODUCT
+       ,HRO_DESCR
+       )
+SELECT 
+        'PROCESS_ADMIN'
+       ,'HIG'
+       ,'Scheduler Job Admin Privs' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_ROLES
+                   WHERE HRO_ROLE = 'PROCESS_ADMIN');
 --
 INSERT INTO HIG_ROLES
        (HRO_ROLE
@@ -1437,11 +1450,11 @@ INSERT INTO HIG_MODULE_ROLES
        )
 SELECT 
         'HIG2500'
-       ,'HIG_ADMIN'
+       ,'PROCESS_ADMIN'
        ,'NORMAL' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'HIG2500'
-                    AND  HMR_ROLE = 'HIG_ADMIN');
+                    AND  HMR_ROLE = 'PROCESS_ADMIN');
 --
 INSERT INTO HIG_MODULE_ROLES
        (HMR_MODULE
@@ -1450,11 +1463,11 @@ INSERT INTO HIG_MODULE_ROLES
        )
 SELECT 
         'HIG2510'
-       ,'HIG_USER'
+       ,'PROCESS_USER'
        ,'NORMAL' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'HIG2510'
-                    AND  HMR_ROLE = 'HIG_USER');
+                    AND  HMR_ROLE = 'PROCESS_USER');
 --
 INSERT INTO HIG_MODULE_ROLES
        (HMR_MODULE
@@ -1463,11 +1476,11 @@ INSERT INTO HIG_MODULE_ROLES
        )
 SELECT 
         'HIG2515'
-       ,'HIG_ADMIN'
+       ,'PROCESS_ADMIN'
        ,'NORMAL' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'HIG2515'
-                    AND  HMR_ROLE = 'HIG_ADMIN');
+                    AND  HMR_ROLE = 'PROCESS_ADMIN');
 --
 INSERT INTO HIG_MODULE_ROLES
        (HMR_MODULE
@@ -1476,11 +1489,11 @@ INSERT INTO HIG_MODULE_ROLES
        )
 SELECT 
         'HIG2520'
-       ,'HIG_ADMIN'
+       ,'PROCESS_ADMIN'
        ,'NORMAL' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'HIG2520'
-                    AND  HMR_ROLE = 'HIG_ADMIN');
+                    AND  HMR_ROLE = 'PROCESS_ADMIN');
 --
 INSERT INTO HIG_MODULE_ROLES
        (HMR_MODULE
@@ -1489,11 +1502,11 @@ INSERT INTO HIG_MODULE_ROLES
        )
 SELECT 
         'HIG2530'
-       ,'HIG_ADMIN'
+       ,'PROCESS_ADMIN'
        ,'NORMAL' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'HIG2530'
-                    AND  HMR_ROLE = 'HIG_ADMIN');
+                    AND  HMR_ROLE = 'PROCESS_ADMIN');
 --
 INSERT INTO HIG_MODULE_ROLES
        (HMR_MODULE
@@ -1502,11 +1515,11 @@ INSERT INTO HIG_MODULE_ROLES
        )
 SELECT 
         'HIG2540'
-       ,'HIG_USER'
+       ,'PROCESS_USER'
        ,'NORMAL' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'HIG2540'
-                    AND  HMR_ROLE = 'HIG_USER');
+                    AND  HMR_ROLE = 'PROCESS_USER');
 --
 INSERT INTO HIG_MODULE_ROLES
        (HMR_MODULE
@@ -4631,6 +4644,45 @@ SELECT
 
 
 ----------------------------------------------------------------------------------------
+-- HIG_PROCESS_AREAS
+--
+-- select * from nm3_metadata.hig_process_areas
+-- order by hpa_area_type
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT hig_process_areas
+SET TERM OFF
+
+INSERT INTO HIG_PROCESS_AREAS
+       (HPA_AREA_TYPE
+       ,HPA_DESCRIPTION
+       ,HPA_TABLE
+       ,HPA_RESTRICTED_TABLE
+       ,HPA_WHERE_CLAUSE
+       ,HPA_RESTRICTED_WHERE_CLAUSE
+       ,HPA_ID_COLUMN
+       ,HPA_MEANING_COLUMN
+       )
+SELECT 
+        'ADMIN_UNIT'
+       ,'Admin Unit'
+       ,'NM_ADMIN_UNITS'
+       ,'V_NM_USER_ADMIN_UNITS'
+       ,''
+       ,''
+       ,'NAU_ADMIN_UNIT'
+       ,'SUBSTR(RPAD(NAU_UNIT_CODE,4,'' ''),1,4)||'' - ''||NAU_NAME' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_AREAS
+                   WHERE HPA_AREA_TYPE = 'ADMIN_UNIT');
+--
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
 -- HIG_PROCESS_TYPES
 --
 -- select * from nm3_metadata.hig_process_types
@@ -4653,18 +4705,24 @@ INSERT INTO HIG_PROCESS_TYPES
        ,HPT_PROCESS_LIMIT
        ,HPT_RESTARTABLE
        ,HPT_SEE_IN_HIG2510
+       ,HPT_POLLING_ENABLED
+       ,HPT_POLLING_FTP_TYPE_ID
+       ,HPT_AREA_TYPE
        )
 SELECT 
         -2
        ,'Load Document Bundles'
        ,'Unpacks document bundle zip file(s) '||CHR(10)||'Reads the driving file(s)'||CHR(10)||'Creates document and document association records'||CHR(10)||'Moves the document files to the correct location'
-       ,'doc_bundle_loader.load_process_document_bundles;'
+       ,'doc_bundle_loader.initialise;'
        ,'DOC0300'
        ,'DOC0310'
        ,'P_PROCESS_ID'
        ,null
        ,'Y'
-       ,'Y' FROM DUAL
+       ,'Y'
+       ,'Y'
+       ,null
+       ,'ADMIN_UNIT' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_TYPES
                    WHERE HPT_PROCESS_TYPE_ID = -2);
 --
@@ -4679,6 +4737,9 @@ INSERT INTO HIG_PROCESS_TYPES
        ,HPT_PROCESS_LIMIT
        ,HPT_RESTARTABLE
        ,HPT_SEE_IN_HIG2510
+       ,HPT_POLLING_ENABLED
+       ,HPT_POLLING_FTP_TYPE_ID
+       ,HPT_AREA_TYPE
        )
 SELECT 
         -1
@@ -4690,7 +4751,10 @@ SELECT
        ,''
        ,null
        ,'Y'
-       ,'Y' FROM DUAL
+       ,'Y'
+       ,'N'
+       ,null
+       ,'' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_TYPES
                    WHERE HPT_PROCESS_TYPE_ID = -1);
 --
@@ -5037,8 +5101,8 @@ INSERT INTO HIG_MODULE_BLOCKS
 SELECT 
         'HIG1505'
        ,'HAUD'
-       ,to_date('20100506180830','YYYYMMDDHH24MISS')
-       ,to_date('20100506180830','YYYYMMDDHH24MISS')
+       ,to_date('20100526100032','YYYYMMDDHH24MISS')
+       ,to_date('20100526100032','YYYYMMDDHH24MISS')
        ,'NM3_METADATA'
        ,'NM3_METADATA' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_BLOCKS
