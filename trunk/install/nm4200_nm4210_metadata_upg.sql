@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.8   May 26 2010 11:59:54   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.9   May 26 2010 14:21:48   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_metadata_upg.sql  $
---       Date into PVCS   : $Date:   May 26 2010 11:59:54  $
---       Date fetched Out : $Modtime:   May 26 2010 11:57:18  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   May 26 2010 14:21:48  $
+--       Date fetched Out : $Modtime:   May 26 2010 14:16:20  $
+--       Version          : $Revision:   3.9  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -316,6 +316,22 @@ INSERT INTO hig_user_roles
        (SELECT 1 FROM hig_user_roles
          WHERE hur_username = USER
            AND hur_role = 'PROCESS_ADMIN');
+
+INSERT INTO hig_roles
+  SELECT 'PROCESS_USER','HIG','Scheduler Job Privs'
+    FROM dual
+   WHERE NOT EXISTS
+      (SELECT 1 FROM hig_roles
+        WHERE hro_role ='PROCESS_USER');
+
+INSERT INTO hig_user_roles
+  SELECT hus_username, 'PROCESS_USER', hus_start_date
+    FROM hig_users
+   WHERE hus_username = USER
+     AND NOT EXISTS
+       (SELECT 1 FROM hig_user_roles
+         WHERE hur_username = USER
+           AND hur_role = 'PROCESS_USER');
 ------------------------------------------------------------------
 
 
