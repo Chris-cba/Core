@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.6   May 25 2010 10:11:04   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.7   May 26 2010 10:04:20   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_metadata_upg.sql  $
---       Date into PVCS   : $Date:   May 25 2010 10:11:04  $
---       Date fetched Out : $Modtime:   May 25 2010 10:07:28  $
---       Version          : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   May 26 2010 10:04:20  $
+--       Date fetched Out : $Modtime:   May 26 2010 09:57:06  $
+--       Version          : $Revision:   3.7  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -2213,7 +2213,7 @@ SET TERM OFF
 ------------------------------------------------------------------
 PROMPT Creating Alert Manager Process Type
 Insert into HIG_PROCESS_TYPES
-SELECT -1, 'Alert Manager', 'This Process will sent out pending Alerts every 10 minutes', 'hig_alert.run_alert_batch;', NULL,Null ,Null , NULL, 'Y', 'Y','N',NUll,Null
+SELECT -1, 'Alert Manager', 'This Process will send out pending Alerts every 10 minutes', 'hig_alert.run_alert_batch;', NULL,Null ,Null , NULL, 'Y', 'Y','N',NUll,Null
 FROM Dual 
 WHERE NOT Exists (Select 1 From HIG_PROCESS_TYPES WHERE HPT_PROCESS_TYPE_ID = -1) ;
 
