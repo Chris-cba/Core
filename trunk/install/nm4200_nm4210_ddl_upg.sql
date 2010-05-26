@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.5   May 25 2010 10:11:04   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.6   May 26 2010 16:39:32   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_ddl_upg.sql  $
---       Date into PVCS   : $Date:   May 25 2010 10:11:04  $
---       Date fetched Out : $Modtime:   May 25 2010 10:07:28  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   May 26 2010 16:39:32  $
+--       Date fetched Out : $Modtime:   May 26 2010 16:38:44  $
+--       Version          : $Revision:   3.6  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -1496,22 +1496,6 @@ CONSTRAINT HPT_HTF_FK
 create index hpt_htf_fk_ind on hig_process_types(HPT_POLLING_FTP_TYPE_ID)
 /
 
-
-ALTER TABLE HIG_PROCESS_TYPES ADD 
-CONSTRAINT HPT_HPA_FK
- FOREIGN KEY (hpt_area_type)
- REFERENCES hig_process_areas (hpa_area_type)
- ON DELETE SET NULL
-/
-
-create index hpt_hpa_fk_ind on hig_process_types(hpt_area_type)
-/
-
-create index hpt_hmo_fk1_ind on hig_process_types(HPT_INITIATION_MODULE)
-/
-create index hpt_hmo_fk2_ind on hig_process_types(HPT_INTERNAL_MODULE)
-/
-
 --
 ---------------------------------------------------------
 --
@@ -2313,6 +2297,20 @@ CONSTRAINT HP_HPA_FK
 create index HP_HPA_FK_IND on hig_processes(HP_AREA_TYPE)
 /
 
+ALTER TABLE HIG_PROCESS_TYPES ADD 
+CONSTRAINT HPT_HPA_FK
+ FOREIGN KEY (hpt_area_type)
+ REFERENCES hig_process_areas (hpa_area_type)
+ ON DELETE SET NULL
+/
+
+create index hpt_hpa_fk_ind on hig_process_types(hpt_area_type)
+/
+
+create index hpt_hmo_fk1_ind on hig_process_types(HPT_INITIATION_MODULE)
+/
+create index hpt_hmo_fk2_ind on hig_process_types(HPT_INTERNAL_MODULE)
+/
 ------------------------------------------------------------------
 
 
@@ -3178,7 +3176,7 @@ CREATE OR REPLACE type hig_navigator_type IS OBJECT
 ,label     varchar2(3000)
 ,icon      varchar2(100)
 ,tab_level Number(9)
-);
+)
 /
 
 Prompt Creating Type hig_navigator_tab.....
@@ -4753,8 +4751,7 @@ CREATE INDEX hpa_hpt_fk_ind ON hig_process_alert_log (hpal_process_type_id);
 
 CREATE INDEX hpa_hp_fk_ind ON hig_process_alert_log (hpal_process_id);
 
-COMMENT ON TABLE hig_process_alert_log IS 'A log of process events which may be used to trigger alert emails.  These will typically be used to warn of 
-process failures.’
+COMMENT ON TABLE hig_process_alert_log IS 'A log of process events which may be used to trigger alert emails.  These will typically be used to warn of process failures.'
 /
 COMMENT ON COLUMN hig_process_alert_log.hpal_id  IS 'Unique identifier generated from a sequence'
 /
