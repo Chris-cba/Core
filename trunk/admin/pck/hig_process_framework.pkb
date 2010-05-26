@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.3   May 21 2010 16:54:30   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.4   May 26 2010 17:59:36   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_framework.pkb  $
---       Date into PVCS   : $Date:   May 21 2010 16:54:30  $
---       Date fetched Out : $Modtime:   May 21 2010 12:12:48  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   May 26 2010 17:59:36  $
+--       Date fetched Out : $Modtime:   May 26 2010 11:58:36  $
+--       Version          : $Revision:   3.4  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
 
@@ -125,6 +125,22 @@ BEGIN
  l_rowid := lock_process_type(pi_process_type_id => pi_process_type_id);
 
  UPDATE hig_process_types SET row = pi_process_type_rec WHERE rowid = l_rowid;
+ 
+ --
+ -- clear out existing connections that are no longer for 
+ -- the same area type and polling ftp type as our process type
+ --
+ delete from hig_process_conns_by_area
+ where  hptc_process_type_id = pi_process_type_rec.hpt_process_type_id
+ and    hptc_area_type != pi_process_type_rec.hpt_area_type;
+
+ delete from hig_process_conns_by_area
+ where hptc_process_type_id = pi_process_type_rec.hpt_process_type_id
+ and not exists (select 1
+                 from hig_ftp_connections
+                 where hfc_id = hptc_ftp_connection_id
+                 and   hfc_hft_id = pi_process_type_rec.hpt_polling_ftp_type_id);  
+ 
 
 END update_process_type;
 --
@@ -358,151 +374,108 @@ END delete_process_type_frequency;
 --
 -----------------------------------------------------------------------------
 -- 
---PROCEDURE insert_process_type_admin_unit(pi_rec IN hig_process_type_admin_units%ROWTYPE) IS
+PROCEDURE insert_hptc(pi_rec IN hig_process_conns_by_area%ROWTYPE) IS
+
+BEGIN
+
+ INSERT INTO hig_process_conns_by_area
+ VALUES pi_rec;
+ 
+EXCEPTION
+ WHEN dup_val_on_index THEN
+   Null;
+ WHEN others THEN
+   RAISE; 
+
+
+END insert_hptc;
 --
---BEGIN
+-----------------------------------------------------------------------------
 --
--- INSERT INTO hig_process_type_admin_units
--- VALUES pi_rec;
--- 
---EXCEPTION
--- WHEN dup_val_on_index THEN
---   Null;
--- WHEN others THEN
---   RAISE; 
+FUNCTION lock_hptc(pi_process_type_id    IN hig_process_conns_by_area.hptc_process_type_id%TYPE
+                  ,pi_ftp_connection_id  IN hig_process_conns_by_area.hptc_ftp_connection_id%TYPE) RETURN rowid IS
+
+   CURSOR c1 IS
+   SELECT ROWID
+    FROM  hig_process_conns_by_area
+   WHERE  hptc_process_type_id = pi_process_type_id
+     AND  hptc_ftp_connection_id    = pi_ftp_connection_id
+   FOR UPDATE NOWAIT;
+
+   l_found         BOOLEAN;
+   l_retval        ROWID;
+   l_record_locked EXCEPTION;
+   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
+
+BEGIN
+
+
+   OPEN  c1;
+   FETCH c1 INTO l_retval;
+   l_found := c1%FOUND;
+   CLOSE c1;
+
+   IF NOT l_found
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 67
+                    ,pi_sqlcode            => -20001
+                    ,pi_supplementary_info => 'hig_process_conns_by_area (HPTC_PK)'
+                                              ||CHR(10)||'hptc_process_type_id => '||pi_process_type_id||chr(10)||'hptc_ftp_connection_id => '||pi_ftp_connection_id
+                    );
+   END IF;
+
+   RETURN l_retval;
+
+EXCEPTION
+
+   WHEN l_record_locked
+    THEN
+      hig.raise_ner (pi_appl               => nm3type.c_hig
+                    ,pi_id                 => 33
+                    ,pi_sqlcode            => -20001
+                    ,pi_supplementary_info => 'hig_process_conns_by_area (HPTC_PK)'
+                                              ||CHR(10)||'hptc_process_type_id => '||pi_process_type_id||chr(10)||'hptc_ftp_connection_id => '||pi_ftp_connection_id
+                    );
+
+
+END lock_hptc;
 --
+-----------------------------------------------------------------------------
+--                                    
+PROCEDURE update_hptc(pi_process_type_id    IN hig_process_conns_by_area.hptc_process_type_id%TYPE
+                     ,pi_ftp_connection_id  IN hig_process_conns_by_area.hptc_ftp_connection_id%TYPE
+                     ,pi_rec             IN hig_process_conns_by_area%ROWTYPE) IS
+
+ l_rowid rowid;
+
+BEGIN
+
+ l_rowid := lock_hptc(pi_process_type_id   => pi_process_type_id
+                     ,pi_ftp_connection_id => pi_ftp_connection_id);
+
+ UPDATE hig_process_conns_by_area SET row = pi_rec WHERE rowid = l_rowid;
+
+END update_hptc;
 --
---END insert_process_type_admin_unit;
-----
--------------------------------------------------------------------------------
-----
---FUNCTION lock_process_type_admin_unit(pi_process_type_id IN hig_process_type_admin_units.hpta_process_type_id%TYPE
---                                     ,pi_admin_unit      IN hig_process_type_admin_units.hpta_admin_unit%TYPE) RETURN rowid IS
---
---   CURSOR c1 IS
---   SELECT ROWID
---    FROM  hig_process_type_admin_units
---   WHERE  hpta_process_type_id = pi_process_type_id
---     AND  hpta_admin_unit    = pi_admin_unit
---   FOR UPDATE NOWAIT;
---
---   l_found         BOOLEAN;
---   l_retval        ROWID;
---   l_record_locked EXCEPTION;
---   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
---
---BEGIN
---
---
---   OPEN  c1;
---   FETCH c1 INTO l_retval;
---   l_found := c1%FOUND;
---   CLOSE c1;
---
---   IF NOT l_found
---    THEN
---      hig.raise_ner (pi_appl               => nm3type.c_hig
---                    ,pi_id                 => 67
---                    ,pi_sqlcode            => -20001
---                    ,pi_supplementary_info => 'hig_process_type_admin_units (HPFR_PK)'
---                                              ||CHR(10)||'hpta_process_type_id => '||pi_process_type_id||chr(10)||'hpta_admin_unit => '||pi_admin_unit
---                    );
---   END IF;
---
---   RETURN l_retval;
---
---EXCEPTION
---
---   WHEN l_record_locked
---    THEN
---      hig.raise_ner (pi_appl               => nm3type.c_hig
---                    ,pi_id                 => 33
---                    ,pi_sqlcode            => -20001
---                    ,pi_supplementary_info => 'hig_process_type_admin_units (HPFR_PK)'
---                                              ||CHR(10)||'hpta_process_type_id => '||pi_process_type_id||chr(10)||'hpta_admin_unit => '||pi_admin_unit
---                    );
---
---
---END lock_process_type_admin_unit;
-----
--------------------------------------------------------------------------------
-----                                    
---PROCEDURE update_process_type_admin_unit(pi_process_type_id IN hig_process_type_admin_units.hpta_process_type_id%TYPE
---                                        ,pi_admin_unit      IN hig_process_type_admin_units.hpta_admin_unit%TYPE
---                                        ,pi_rec             IN hig_process_type_admin_units%ROWTYPE) IS
---
--- l_rowid rowid;
---
---BEGIN
---
--- l_rowid := lock_process_type_admin_unit(pi_process_type_id => pi_process_type_id
---                                        ,pi_admin_unit      => pi_admin_unit);
---
--- UPDATE hig_process_type_admin_units SET row = pi_rec WHERE rowid = l_rowid;
---
---END update_process_type_admin_unit;
-----
--------------------------------------------------------------------------------
-----                                    
---PROCEDURE delete_process_type_admin_unit(pi_process_type_id IN hig_process_type_admin_units.hpta_process_type_id%TYPE
---                                        ,pi_admin_unit      IN hig_process_type_admin_units.hpta_admin_unit%TYPE) IS
---
--- l_rowid rowid;
---
---BEGIN
---
--- l_rowid := lock_process_type_admin_unit(pi_process_type_id => pi_process_type_id
---                                        ,pi_admin_unit      => pi_admin_unit);
---
--- DELETE FROM hig_process_type_admin_units WHERE rowid = l_rowid;
---
---END delete_process_type_admin_unit;
+-----------------------------------------------------------------------------
+--                                    
+PROCEDURE delete_hptc(pi_process_type_id    IN hig_process_conns_by_area.hptc_process_type_id%TYPE
+                     ,pi_ftp_connection_id  IN hig_process_conns_by_area.hptc_ftp_connection_id%TYPE) IS
+
+ l_rowid rowid;
+
+BEGIN
+
+ l_rowid := lock_hptc(pi_process_type_id   => pi_process_type_id
+                     ,pi_ftp_connection_id => pi_ftp_connection_id);
+
+ DELETE FROM hig_process_conns_by_area WHERE rowid = l_rowid;
+
+END delete_hptc;
 ----
 -------------------------------------------------------------------------------
 ----  
---FUNCTION hpta_available_to_user(pi_process_type_id IN hig_process_type_admin_units.hpta_process_type_id%TYPE) RETURN BOOLEAN IS
---
---
--- l_count pls_integer;
---
---BEGIN
---
---
--- select count(a.rowid)
--- into l_count
--- from hig_process_type_admin_units a
---     ,v_nm_user_admin_units
--- where hpta_process_type_id = pi_process_type_id
--- and   hpta_admin_unit = nau_admin_unit;
--- 
--- RETURN l_count > 0;
---
---
---END hpta_available_to_user;  
-----
--------------------------------------------------------------------------------
----- 
---FUNCTION admin_units_for_process_type(pi_process_type_id IN hig_process_types.hpt_process_type_id%TYPE) RETURN t_tab_hpta IS
---
--- CURSOR c1 IS
--- SELECT *
--- FROM   hig_process_type_admin_units_v
--- WHERE  hpta_process_type_id = pi_process_type_id;
--- 
--- l_retval t_tab_hpta;
---
---BEGIN
---
--- OPEN c1;
--- FETCH c1 BULK COLLECT INTO l_retval;
--- CLOSE c1;
---
--- RETURN(l_retval);
---
---END admin_units_for_process_type;
---
------------------------------------------------------------------------------
--- 
 FUNCTION get_process_type(pi_process_type_id IN hig_process_types.hpt_process_type_id%TYPE) RETURN hig_process_types%ROWTYPE IS
 
  CURSOR c1 IS
@@ -1489,7 +1462,8 @@ END area_visible_to_user;
 -----------------------------------------------------------------------------
 --
 FUNCTION process_type_area_lov(pi_process_type_id     IN hig_process_types.hpt_process_type_id%TYPE
-                              ,pi_restricted_list     IN varchar2 DEFAULT 'N') RETURN VARCHAR2 IS
+                              ,pi_restricted_list     IN varchar2 DEFAULT 'N'
+                              ,pi_include_dummy       IN varchar2 DEFAULT 'N') RETURN VARCHAR2 IS
  
 
  CURSOR c1 IS
@@ -1497,9 +1471,13 @@ FUNCTION process_type_area_lov(pi_process_type_id     IN hig_process_types.hpt_p
                'select meaning, id'||chr(10)
              ||'from'||chr(10)
              ||'('||chr(10)
-             ||'select 1 seq, ''None'' meaning, null id from dual'||chr(10)
-             ||'union all'||chr(10)
-             || case when pi_restricted_list = 'Y' THEN 
+             || case when pi_include_dummy = 'Y' then
+                  'select 1 seq, ''None'' meaning, null id from dual'||chr(10)
+                   ||'union all'||chr(10)
+                  else
+                   null
+                  end 
+            || case when pi_restricted_list = 'Y' THEN 
                           'select 2 seq, SUBSTR('||hpa_meaning_column||',1,100) meaning, TO_CHAR('||hpa_id_column||') id from '||NVL(hpa_restricted_table,hpa_table)||chr(10)||' where '||NVL(hpa_restricted_where_clause,'1=1')||chr(10)
                      else 
                           'select 2 seq, SUBSTR('||hpa_meaning_column||',1,100) meaning, TO_CHAR('||hpa_id_column||') id from '||hpa_table||chr(10)||' where '||NVL(hpa_where_clause,'1=1')||chr(10)
@@ -1520,7 +1498,13 @@ BEGIN
  CLOSE c1;
  
  IF l_retval IS NULL THEN
-  RETURN('select null meaning, ''None'' from dual');
+ 
+  IF pi_include_dummy = 'Y' THEN
+    RETURN('select ''None'' meaning, null id from dual');
+  ELSE
+    RETURN('select null meaning, null from dual where 1=2');
+  END IF;  
+  
  ELSE 
   RETURN(l_retval);
  END IF; 
@@ -1534,43 +1518,37 @@ END process_type_area_lov;
 -----------------------------------------------------------------------------
 --                                  
 FUNCTION process_type_polling_area_lov(pi_process_type_id  IN hig_process_types.hpt_process_type_id%TYPE
-                                      ,pi_restricted_list  IN VARCHAR2 DEFAULT 'N') RETURN VARCHAR2 IS
+                                      ,pi_restricted_list  IN VARCHAR2 DEFAULT 'N'
+                                      ,pi_include_dummy       IN varchar2 DEFAULT 'N') RETURN VARCHAR2 IS
+
+
+
+ l_retval varchar2(2000);
                               
 BEGIN
        
-  IF pi_restricted_list = 'N' THEN
-
-   RETURN (
-           'select meaning, id
-            from
-            (
-            select distinct 2 seq, hptc_area_meaning meaning, TO_CHAR(hptc_area_id_value) id 
-            from  hig_process_conns_by_area_v
-            where hptc_process_type_id = '||pi_process_type_id||'
-            UNION ALL 
-            select 1 seq, ''None'' meaning, null from dual
-            )
-            order by seq,meaning'
-          );
+   l_retval :=          'select meaning, id'||chr(10);
+   l_retval := l_retval||'from'||chr(10);
+   l_retval := l_retval||'('||chr(10);   
+   l_retval := l_retval||'               select distinct 2 seq, hptc_area_meaning meaning, TO_CHAR(hptc_area_id_value) id'||chr(10);
+   l_retval := l_retval||'               from  hig_process_conns_by_area_v'||chr(10);                           
+   l_retval := l_retval||'               where hptc_process_type_id = '||pi_process_type_id||chr(10);                           
+   
+   IF pi_restricted_list = 'Y' THEN
+     l_retval := l_retval||'               and hig_process_framework.area_visible_to_user(hptc_area_type,hptc_area_id_value) = ''Y'''||chr(10);
+   END IF;
+    
+   IF pi_include_dummy = 'Y' THEN
+     l_retval := l_retval||'               UNION ALL'||chr(10);               
+     l_retval := l_retval||'               select 1 seq, ''None'' meaning, null from dual'||chr(10);   
+   END IF;
+   
+   l_retval := l_retval||')'||chr(10);              
+   l_retval := l_retval||'order by seq,meaning';
          
- ELSE
- 
-   RETURN (
-           'select meaning, id
-            from
-            (
-            select distinct 2 seq, hptc_area_meaning meaning, TO_CHAR(hptc_area_id_value) id 
-            from  hig_process_conns_by_area_v
-            where hptc_process_type_id = '||pi_process_type_id||'
-            and hig_process_framework.area_visible_to_user(hptc_area_type,hptc_area_id_value) = ''Y''
-            UNION ALL 
-            select 1 seq, ''None'' meaning, null from dual
-            )'
-          ); 
-          
- 
- END IF;               
- 
+
+   RETURN(l_retval);
+   
 END process_type_polling_area_lov;
 --
 -----------------------------------------------------------------------------

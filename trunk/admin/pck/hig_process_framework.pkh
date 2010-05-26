@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkh-arc   3.2   May 21 2010 16:54:30   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkh-arc   3.3   May 26 2010 17:59:36   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_framework.pkh  $
---       Date into PVCS   : $Date:   May 21 2010 16:54:30  $
---       Date fetched Out : $Modtime:   May 20 2010 15:06:18  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   May 26 2010 17:59:36  $
+--       Date fetched Out : $Modtime:   May 26 2010 17:58:10  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
 
 --  
 --</GLOBVAR>
@@ -105,6 +105,35 @@ PROCEDURE update_process_type_frequency(pi_process_type_id            IN hig_pro
 ---------------------------------------------------------------------------
 PROCEDURE delete_process_type_frequency(pi_process_type_id            IN hig_process_type_frequencies.hpfr_process_type_id%TYPE
                                        ,pi_frequency_id               IN hig_process_type_frequencies.hpfr_frequency_id%TYPE);
+
+
+
+----------------------
+-- Called from HIG2500
+----------------------
+PROCEDURE insert_hptc(pi_rec IN hig_process_conns_by_area%ROWTYPE);
+
+
+----------------------
+-- Called from HIG2500
+----------------------
+FUNCTION lock_hptc(pi_process_type_id    IN hig_process_conns_by_area.hptc_process_type_id%TYPE
+                  ,pi_ftp_connection_id  IN hig_process_conns_by_area.hptc_ftp_connection_id%TYPE) RETURN rowid;
+                                    
+
+----------------------
+-- Called from HIG2500
+----------------------
+PROCEDURE update_hptc(pi_process_type_id    IN hig_process_conns_by_area.hptc_process_type_id%TYPE
+                     ,pi_ftp_connection_id  IN hig_process_conns_by_area.hptc_ftp_connection_id%TYPE
+                     ,pi_rec             IN hig_process_conns_by_area%ROWTYPE);
+                                    
+
+----------------------
+-- Called from HIG2500
+----------------------
+PROCEDURE delete_hptc(pi_process_type_id    IN hig_process_conns_by_area.hptc_process_type_id%TYPE
+                     ,pi_ftp_connection_id  IN hig_process_conns_by_area.hptc_ftp_connection_id%TYPE);
 
 
 
@@ -321,10 +350,11 @@ FUNCTION area_visible_to_user(pi_area_type       IN hig_process_areas.hpa_area_t
                              ,pi_area_id_value   IN VARCHAR2) RETURN VARCHAR2;                                   
 
 FUNCTION process_type_area_lov(pi_process_type_id     IN hig_process_types.hpt_process_type_id%TYPE
-                              ,pi_restricted_list     IN varchar2 DEFAULT 'N') RETURN VARCHAR2;
+                              ,pi_restricted_list     IN varchar2 DEFAULT 'N'
+                              ,pi_include_dummy       IN varchar2 DEFAULT 'N') RETURN VARCHAR2;
                               
 FUNCTION process_type_polling_area_lov(pi_process_type_id  IN hig_process_types.hpt_process_type_id%TYPE
-                                      ,pi_restricted_list  IN VARCHAR2 DEFAULT 'N') RETURN VARCHAR2;
-
+                                      ,pi_restricted_list  IN VARCHAR2 DEFAULT 'N'
+                                      ,pi_include_dummy    IN varchar2 DEFAULT 'N') RETURN VARCHAR2;
 END hig_process_framework;
 /
