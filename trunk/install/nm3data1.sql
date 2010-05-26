@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.39   May 06 2010 18:13:30   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.40   May 26 2010 10:04:16   malexander  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   May 06 2010 18:13:30  $
---       Date fetched Out : $Modtime:   May 06 2010 18:12:30  $
---       Version          : $Revision:   2.39  $
+--       Date into PVCS   : $Date:   May 26 2010 10:04:16  $
+--       Date fetched Out : $Modtime:   May 26 2010 10:02:28  $
+--       Version          : $Revision:   2.40  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 06-MAY-2010 18:12
+--       Generation Date  : 26-MAY-2010 10:02
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -6206,7 +6206,7 @@ SELECT
         'HIG'
        ,527
        ,null
-       ,'The trigger must be re-created to reflect changes made to the alert definition.  Please use the Create Trigger button.'
+       ,'The trigger has been dropped. Please use the Create Trigger button to reflect changes made to the alert definition.'
        ,'' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'HIG'
@@ -6381,6 +6381,57 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'HIG'
                     AND  NER_ID = 537);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,538
+       ,null
+       ,'Warning:  Process log attachments are not available when sending batch emails. Do you want to continue?'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 538);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,539
+       ,null
+       ,'Archiving from an Application Server can only be done when defined as an Oracle Directory'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 539);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,540
+       ,null
+       ,'You can only lock files for editing if the Document Location is defined as a Table'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 540);
 --
 INSERT INTO NM_ERRORS
        (NER_APPL
@@ -17355,10 +17406,31 @@ INSERT INTO HIG_CODES
        )
 SELECT 
         'DOC_LOCATION_TYPES'
+       ,'DB_SERVER'
+       ,'Database Server'
+       ,'Y'
+       ,20
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'DOC_LOCATION_TYPES'
+                    AND  HCO_CODE = 'DB_SERVER');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'DOC_LOCATION_TYPES'
        ,'FTP'
        ,'FTP Location'
        ,'Y'
-       ,40
+       ,50
        ,null
        ,null FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
@@ -17379,7 +17451,7 @@ SELECT
        ,'ORACLE_DIRECTORY'
        ,'Oracle Directory'
        ,'Y'
-       ,20
+       ,30
        ,null
        ,null FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
@@ -17400,7 +17472,7 @@ SELECT
        ,'TABLE'
        ,'Database Table'
        ,'Y'
-       ,30
+       ,40
        ,null
        ,null FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
@@ -25860,10 +25932,31 @@ INSERT INTO HIG_CODES
        )
 SELECT 
         'PROCESS_SUCCESS_FLAG'
+       ,'I'
+       ,'Interim'
+       ,'Y'
+       ,40
+       ,null
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
+                   WHERE HCO_DOMAIN = 'PROCESS_SUCCESS_FLAG'
+                    AND  HCO_CODE = 'I');
+--
+INSERT INTO HIG_CODES
+       (HCO_DOMAIN
+       ,HCO_CODE
+       ,HCO_MEANING
+       ,HCO_SYSTEM
+       ,HCO_SEQ
+       ,HCO_START_DATE
+       ,HCO_END_DATE
+       )
+SELECT 
+        'PROCESS_SUCCESS_FLAG'
        ,'N'
        ,'Fail'
        ,'Y'
-       ,30
+       ,20
        ,null
        ,null FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
@@ -25905,7 +25998,7 @@ SELECT
        ,'Y'
        ,'Success'
        ,'Y'
-       ,20
+       ,10
        ,null
        ,null FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_CODES
@@ -32698,7 +32791,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'ALLOWDEBUG');
 --
@@ -32722,7 +32815,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'AOREXTDINV');
 --
@@ -32746,7 +32839,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'Y'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'AORSTRMAP');
 --
@@ -32842,7 +32935,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'CHECKROUTE');
 --
@@ -32866,7 +32959,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'DBWINTITLE');
 --
@@ -32914,7 +33007,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'DEBUGAUTON');
 --
@@ -33058,7 +33151,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'DEFVISNTH');
 --
@@ -33082,7 +33175,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'DIRREPSTRN');
 --
@@ -33202,7 +33295,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'DISCO_VERS');
 --
@@ -33250,7 +33343,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'DISPWDVIS');
 --
@@ -33394,7 +33487,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'Y'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'EDSNULLEXC');
 --
@@ -33418,7 +33511,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'EXTRTEDATE');
 --
@@ -33442,7 +33535,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'Y'
-       ,2000 FROM DUAL
+       ,10 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'FAVMODE');
 --
@@ -33490,7 +33583,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'Y'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'GAZAUTOQRY');
 --
@@ -33514,7 +33607,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'Y'
-       ,2000 FROM DUAL
+       ,8 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'GAZMODE');
 --
@@ -33586,7 +33679,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,15 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'GRIDATE');
 --
@@ -33682,7 +33775,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'HIGGISAVLB');
 --
@@ -33706,7 +33799,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,5 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'HIGGISTYPE');
 --
@@ -33730,7 +33823,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'HIGPUBSYN');
 --
@@ -33754,7 +33847,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,5 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'HIGUSEIMAG');
 --
@@ -33826,7 +33919,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'HISTINVLOC');
 --
@@ -33898,7 +33991,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'IDWINTITLE');
 --
@@ -33922,7 +34015,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'INH_PAR_AU');
 --
@@ -33946,7 +34039,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'INVAPIPACK');
 --
@@ -33970,7 +34063,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'INVROUTEVW');
 --
@@ -33994,7 +34087,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'Y'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'INVRTETAB');
 --
@@ -34018,7 +34111,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'INVVIEWSLK');
 --
@@ -34114,7 +34207,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'JPRIVLEVEL');
 --
@@ -34186,7 +34279,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'MAPCAPTURE');
 --
@@ -34306,7 +34399,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'MRGPOE');
 --
@@ -34330,7 +34423,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'MRGROUTE');
 --
@@ -34354,7 +34447,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'MRGVIEWTRU');
 --
@@ -34378,7 +34471,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'MULTINVRTE');
 --
@@ -34450,7 +34543,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'NETUSELRS');
 --
@@ -34546,7 +34639,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'NOT_6I_REP');
 --
@@ -34570,7 +34663,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'NSGDATA');
 --
@@ -34618,7 +34711,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'PBIPOE');
 --
@@ -34714,7 +34807,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'REGSDELAY');
 --
@@ -34786,7 +34879,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'REVLEGNO');
 --
@@ -34858,7 +34951,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'Y'
-       ,2000 FROM DUAL
+       ,3 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'SAV_FORMAT');
 --
@@ -34930,7 +35023,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'SDERUNLE');
 --
@@ -34978,7 +35071,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'SDMREGULYR');
 --
@@ -35050,7 +35143,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'SDODATEVW');
 --
@@ -35194,7 +35287,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'SDOSINGSHP');
 --
@@ -35218,7 +35311,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'SDOSURKEY');
 --
@@ -35266,7 +35359,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'Y'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'SHOWINVPK');
 --
@@ -35290,7 +35383,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'SHOWRTEDIR');
 --
@@ -35314,7 +35407,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'SMTPAUDTIT');
 --
@@ -35458,7 +35551,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'UPDRDONLY');
 --
@@ -35506,7 +35599,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'USEINVXSP');
 --
@@ -35530,7 +35623,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'USEORIGHU');
 --
@@ -36202,7 +36295,7 @@ SELECT
        ,'VARCHAR2'
        ,'N'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_LIST
                    WHERE HOL_ID = 'XMLCRENODE');
 --
@@ -37333,6 +37426,7 @@ INSERT INTO HIG_STATUS_DOMAINS
        ,HSD_FEATURE7
        ,HSD_FEATURE8
        ,HSD_FEATURE9
+       ,HSD_FEATURE10
        )
 SELECT 
         'COMPLAINTS'
@@ -37345,6 +37439,7 @@ SELECT
        ,'Works Order Raised'
        ,'Can be updated to Status with feature 5'
        ,'Defect Raised'
+       ,'Not Used'
        ,'Not Used'
        ,'Not Used' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STATUS_DOMAINS
@@ -37363,11 +37458,13 @@ INSERT INTO HIG_STATUS_DOMAINS
        ,HSD_FEATURE7
        ,HSD_FEATURE8
        ,HSD_FEATURE9
+       ,HSD_FEATURE10
        )
 SELECT 
         'ENQUIRY_ACTION_STATUS'
        ,'HIG'
        ,'Enquiry Action Status'
+       ,'Not Used'
        ,'Not Used'
        ,'Not Used'
        ,'Not Used'
@@ -37414,6 +37511,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_ALLOW_FEATURE9
        ,HSC_START_DATE
        ,HSC_END_DATE
+       ,HSC_ALLOW_FEATURE10
        )
 SELECT 
         'COMPLAINTS'
@@ -37430,7 +37528,8 @@ SELECT
        ,'N'
        ,'N'
        ,null
-       ,null FROM DUAL
+       ,null
+       ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STATUS_CODES
                    WHERE HSC_DOMAIN_CODE = 'COMPLAINTS'
                     AND  HSC_STATUS_CODE = 'CO');
@@ -37451,6 +37550,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_ALLOW_FEATURE9
        ,HSC_START_DATE
        ,HSC_END_DATE
+       ,HSC_ALLOW_FEATURE10
        )
 SELECT 
         'COMPLAINTS'
@@ -37467,7 +37567,8 @@ SELECT
        ,'N'
        ,'N'
        ,null
-       ,null FROM DUAL
+       ,null
+       ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STATUS_CODES
                    WHERE HSC_DOMAIN_CODE = 'COMPLAINTS'
                     AND  HSC_STATUS_CODE = 'DD');
@@ -37488,6 +37589,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_ALLOW_FEATURE9
        ,HSC_START_DATE
        ,HSC_END_DATE
+       ,HSC_ALLOW_FEATURE10
        )
 SELECT 
         'COMPLAINTS'
@@ -37504,7 +37606,8 @@ SELECT
        ,'N'
        ,'N'
        ,null
-       ,null FROM DUAL
+       ,null
+       ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STATUS_CODES
                    WHERE HSC_DOMAIN_CODE = 'COMPLAINTS'
                     AND  HSC_STATUS_CODE = 'DR');
@@ -37525,6 +37628,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_ALLOW_FEATURE9
        ,HSC_START_DATE
        ,HSC_END_DATE
+       ,HSC_ALLOW_FEATURE10
        )
 SELECT 
         'COMPLAINTS'
@@ -37541,7 +37645,8 @@ SELECT
        ,'N'
        ,'N'
        ,null
-       ,null FROM DUAL
+       ,null
+       ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STATUS_CODES
                    WHERE HSC_DOMAIN_CODE = 'COMPLAINTS'
                     AND  HSC_STATUS_CODE = 'NA');
@@ -37562,6 +37667,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_ALLOW_FEATURE9
        ,HSC_START_DATE
        ,HSC_END_DATE
+       ,HSC_ALLOW_FEATURE10
        )
 SELECT 
         'COMPLAINTS'
@@ -37578,7 +37684,8 @@ SELECT
        ,'Y'
        ,'N'
        ,null
-       ,null FROM DUAL
+       ,null
+       ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STATUS_CODES
                    WHERE HSC_DOMAIN_CODE = 'COMPLAINTS'
                     AND  HSC_STATUS_CODE = 'NI');
@@ -37599,6 +37706,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_ALLOW_FEATURE9
        ,HSC_START_DATE
        ,HSC_END_DATE
+       ,HSC_ALLOW_FEATURE10
        )
 SELECT 
         'COMPLAINTS'
@@ -37615,7 +37723,8 @@ SELECT
        ,'N'
        ,'N'
        ,null
-       ,null FROM DUAL
+       ,null
+       ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STATUS_CODES
                    WHERE HSC_DOMAIN_CODE = 'COMPLAINTS'
                     AND  HSC_STATUS_CODE = 'OD');
@@ -37636,6 +37745,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_ALLOW_FEATURE9
        ,HSC_START_DATE
        ,HSC_END_DATE
+       ,HSC_ALLOW_FEATURE10
        )
 SELECT 
         'COMPLAINTS'
@@ -37652,7 +37762,8 @@ SELECT
        ,'N'
        ,'N'
        ,null
-       ,null FROM DUAL
+       ,null
+       ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STATUS_CODES
                    WHERE HSC_DOMAIN_CODE = 'COMPLAINTS'
                     AND  HSC_STATUS_CODE = 'RE');
@@ -37673,6 +37784,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_ALLOW_FEATURE9
        ,HSC_START_DATE
        ,HSC_END_DATE
+       ,HSC_ALLOW_FEATURE10
        )
 SELECT 
         'COMPLAINTS'
@@ -37689,7 +37801,8 @@ SELECT
        ,'N'
        ,'N'
        ,null
-       ,null FROM DUAL
+       ,null
+       ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STATUS_CODES
                    WHERE HSC_DOMAIN_CODE = 'COMPLAINTS'
                     AND  HSC_STATUS_CODE = 'RF');
@@ -37710,6 +37823,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_ALLOW_FEATURE9
        ,HSC_START_DATE
        ,HSC_END_DATE
+       ,HSC_ALLOW_FEATURE10
        )
 SELECT 
         'COMPLAINTS'
@@ -37726,7 +37840,8 @@ SELECT
        ,'N'
        ,'N'
        ,null
-       ,null FROM DUAL
+       ,null
+       ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STATUS_CODES
                    WHERE HSC_DOMAIN_CODE = 'COMPLAINTS'
                     AND  HSC_STATUS_CODE = 'RI');
@@ -37747,6 +37862,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_ALLOW_FEATURE9
        ,HSC_START_DATE
        ,HSC_END_DATE
+       ,HSC_ALLOW_FEATURE10
        )
 SELECT 
         'COMPLAINTS'
@@ -37763,7 +37879,8 @@ SELECT
        ,'N'
        ,'N'
        ,null
-       ,null FROM DUAL
+       ,null
+       ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STATUS_CODES
                    WHERE HSC_DOMAIN_CODE = 'COMPLAINTS'
                     AND  HSC_STATUS_CODE = 'UI');
@@ -37784,6 +37901,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_ALLOW_FEATURE9
        ,HSC_START_DATE
        ,HSC_END_DATE
+       ,HSC_ALLOW_FEATURE10
        )
 SELECT 
         'COMPLAINTS'
@@ -37800,7 +37918,8 @@ SELECT
        ,'N'
        ,'N'
        ,null
-       ,null FROM DUAL
+       ,null
+       ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STATUS_CODES
                    WHERE HSC_DOMAIN_CODE = 'COMPLAINTS'
                     AND  HSC_STATUS_CODE = 'WA');
@@ -37821,6 +37940,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_ALLOW_FEATURE9
        ,HSC_START_DATE
        ,HSC_END_DATE
+       ,HSC_ALLOW_FEATURE10
        )
 SELECT 
         'COMPLAINTS'
@@ -37837,7 +37957,8 @@ SELECT
        ,'N'
        ,'N'
        ,null
-       ,null FROM DUAL
+       ,null
+       ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STATUS_CODES
                    WHERE HSC_DOMAIN_CODE = 'COMPLAINTS'
                     AND  HSC_STATUS_CODE = 'WI');
@@ -37858,6 +37979,7 @@ INSERT INTO HIG_STATUS_CODES
        ,HSC_ALLOW_FEATURE9
        ,HSC_START_DATE
        ,HSC_END_DATE
+       ,HSC_ALLOW_FEATURE10
        )
 SELECT 
         'ENQUIRY_ACTION_STATUS'
@@ -37874,7 +37996,8 @@ SELECT
        ,'N'
        ,'N'
        ,null
-       ,null FROM DUAL
+       ,null
+       ,'N' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STATUS_CODES
                    WHERE HSC_DOMAIN_CODE = 'ENQUIRY_ACTION_STATUS'
                     AND  HSC_STATUS_CODE = 'DUMMY');
@@ -45422,7 +45545,7 @@ SELECT
        ,'Y_OR_N'
        ,'VARCHAR2'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_USER_OPTION_LIST
                    WHERE HUOL_ID = 'STARTGIS');
 --
@@ -45466,7 +45589,7 @@ SELECT
        ,'Y_OR_N'
        ,'VARCHAR2'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_USER_OPTION_LIST
                    WHERE HUOL_ID = 'WEBAPDDEP');
 --
@@ -45488,7 +45611,7 @@ SELECT
        ,'Y_OR_N'
        ,'VARCHAR2'
        ,'N'
-       ,2000 FROM DUAL
+       ,1 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_USER_OPTION_LIST
                    WHERE HUOL_ID = 'WEBAPDRAD');
 --
