@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.18   May 26 2010 10:04:12   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.19   May 26 2010 14:31:00   malexander  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   May 26 2010 10:04:12  $
---       Date fetched Out : $Modtime:   May 26 2010 10:02:36  $
---       Version          : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   May 26 2010 14:31:00  $
+--       Date fetched Out : $Modtime:   May 26 2010 14:29:34  $
+--       Version          : $Revision:   2.19  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 26-MAY-2010 10:02
+--       Generation Date  : 26-MAY-2010 14:29
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -27,6 +27,7 @@
 --   HIG_PROCESS_TYPE_FREQUENCIES
 --   HIG_PROCESS_TYPE_FILES
 --   HIG_MODULE_BLOCKS
+--   HIG_USER_ROLES
 --
 -----------------------------------------------------------------------------
 
@@ -242,6 +243,18 @@ SELECT
        ,'Scheduler Job Privs' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_ROLES
                    WHERE HRO_ROLE = 'PROCESS_EXECUTION');
+--
+INSERT INTO HIG_ROLES
+       (HRO_ROLE
+       ,HRO_PRODUCT
+       ,HRO_DESCR
+       )
+SELECT 
+        'PROCESS_USER'
+       ,'HIG'
+       ,'Scheduler Job Privs' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_ROLES
+                   WHERE HRO_ROLE = 'PROCESS_USER');
 --
 INSERT INTO HIG_ROLES
        (HRO_ROLE
@@ -5101,14 +5114,30 @@ INSERT INTO HIG_MODULE_BLOCKS
 SELECT 
         'HIG1505'
        ,'HAUD'
-       ,to_date('20100526100032','YYYYMMDDHH24MISS')
-       ,to_date('20100526100032','YYYYMMDDHH24MISS')
+       ,to_date('20100526141937','YYYYMMDDHH24MISS')
+       ,to_date('20100526141937','YYYYMMDDHH24MISS')
        ,'NM3_METADATA'
        ,'NM3_METADATA' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_BLOCKS
                    WHERE HMB_MODULE_NAME = 'HIG1505'
                     AND  HMB_BLOCK_NAME = 'HAUD');
 --
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- HIG_USER_ROLES
+--
+-- WARNING - TABLE DOES NOT HAVE A UNIQUE KEY
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT hig_user_roles
+SET TERM OFF
+
 --
 --
 ----------------------------------------------------------------------------------------
