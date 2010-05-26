@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.15   May 06 2010 22:32:52   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.16   May 26 2010 15:19:34   malexander  $
 --       Module Name      : $Workfile:   nm3ins.pkb  $
---       Date into PVCS   : $Date:   May 06 2010 22:32:52  $
---       Date fetched Out : $Modtime:   May 06 2010 22:28:20  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   May 26 2010 15:19:34  $
+--       Date fetched Out : $Modtime:   May 26 2010 15:07:40  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.15  $"
+--   nm3get_gen body   : "$Revision:   2.16  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.15  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.16  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
@@ -17563,6 +17563,7 @@ BEGIN
             ,nt_length_unit
             ,nt_datum
             ,nt_pop_unique
+            ,nut_un_unit_id
             )
      VALUES (p_rec_nt.nt_type
             ,p_rec_nt.nt_unique
@@ -17573,6 +17574,7 @@ BEGIN
             ,p_rec_nt.nt_length_unit
             ,p_rec_nt.nt_datum
             ,p_rec_nt.nt_pop_unique
+            ,p_rec_nt.nut_un_unit_id
             )
    RETURNING nt_type
             ,nt_unique
@@ -17583,6 +17585,7 @@ BEGIN
             ,nt_length_unit
             ,nt_datum
             ,nt_pop_unique
+            ,nut_un_unit_id
       INTO   p_rec_nt.nt_type
             ,p_rec_nt.nt_unique
             ,p_rec_nt.nt_linear
@@ -17591,7 +17594,8 @@ BEGIN
             ,p_rec_nt.nt_admin_type
             ,p_rec_nt.nt_length_unit
             ,p_rec_nt.nt_datum
-            ,p_rec_nt.nt_pop_unique;
+            ,p_rec_nt.nt_pop_unique
+            ,p_rec_nt.nut_un_unit_id;
 --
    nm_debug.proc_end(g_package_name,'ins_nt');
 --
