@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data5.sql-arc   2.8   May 07 2010 09:13:16   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data5.sql-arc   2.9   May 26 2010 10:04:10   malexander  $
 --       Module Name      : $Workfile:   nm3data5.sql  $
---       Date into PVCS   : $Date:   May 07 2010 09:13:16  $
---       Date fetched Out : $Modtime:   May 07 2010 09:08:34  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   May 26 2010 10:04:10  $
+--       Date fetched Out : $Modtime:   May 26 2010 10:02:42  $
+--       Version          : $Revision:   2.9  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 07-MAY-2010 09:08
+--       Generation Date  : 26-MAY-2010 10:02
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -911,7 +911,7 @@ SELECT
        ,null
        ,''
        ,''
-       ,'APP_SERVER'
+       ,'DB_SERVER'
        ,'x:\docs\' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM DOC_LOCATIONS
                    WHERE DLC_ID = 2);

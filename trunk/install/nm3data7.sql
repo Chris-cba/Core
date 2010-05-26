@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.11   May 06 2010 18:13:34   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.12   May 26 2010 10:04:10   malexander  $
 --       Module Name      : $Workfile:   nm3data7.sql  $
---       Date into PVCS   : $Date:   May 06 2010 18:13:34  $
---       Date fetched Out : $Modtime:   May 06 2010 18:12:46  $
---       Version          : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   May 26 2010 10:04:10  $
+--       Date fetched Out : $Modtime:   May 26 2010 10:02:44  $
+--       Version          : $Revision:   2.12  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 06-MAY-2010 18:12
+--       Generation Date  : 26-MAY-2010 10:02
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -5908,7 +5908,7 @@ SELECT
         'HIG'
        ,527
        ,null
-       ,'The trigger must be re-created to reflect changes made to the alert definition.  Please use the Create Trigger button.'
+       ,'The trigger has been dropped. Please use the Create Trigger button to reflect changes made to the alert definition.'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
@@ -6089,6 +6089,60 @@ SELECT
        ,537
        ,null
        ,'Cannot delete this query, it is linked with the Alert.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 538;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,538
+       ,null
+       ,'Warning:  Process log attachments are not available when sending batch emails. Do you want to continue?'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 539;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,539
+       ,null
+       ,'Archiving from an Application Server can only be done when defined as an Oracle Directory'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 540;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,540
+       ,null
+       ,'You can only lock files for editing if the Document Location is defined as a Table'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
