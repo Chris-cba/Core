@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.3   Apr 22 2010 14:26:04   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.4   May 27 2010 14:23:50   lsorathia  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Apr 22 2010 14:26:04  $
---       Date fetched Out : $Modtime:   Apr 22 2010 14:24:42  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   May 27 2010 14:23:50  $
+--       Date fetched Out : $Modtime:   May 27 2010 14:22:38  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.3  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.4  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -1053,6 +1053,9 @@ IS
    v_offset integer := 1;
    v_raw raw(57); 
    crlf    VARCHAR2(2)  := chr(13)||chr(10);
+   i       Number ;
+   j       Number ;
+   l_email Varchar2(500);
    CURSOR cs_sender  
    IS
    SELECT nmu_name||' <'||nmu_email_address||'>' sender_name
@@ -1077,15 +1080,51 @@ BEGIN
    utl_smtp.mail(g_mail_conn, l_sender_rec.sender_email);
    IF pi_recipient_to IS NOT NULL
    THEN
-       utl_smtp.rcpt(g_mail_conn, pi_recipient_to);
+       BEGIN
+          i := 1;
+          j := 1;
+          While Instr(pi_recipient_to,';',i) != 0 
+          LOOP
+              l_email := Substr(pi_recipient_to,i,Instr(pi_recipient_to,';',i)-j);
+              i := Instr(pi_recipient_to,';',i)+1;
+              j := i;
+              utl_smtp.rcpt(g_mail_conn, l_email); 
+         END LOOP;
+         l_email := Substr(pi_recipient_to,i,Length(pi_recipient_to));
+         utl_smtp.rcpt(g_mail_conn, l_email);
+       END ;
    END IF ;
    IF pi_recipient_cc IS NOT NULL
    THEN
-       utl_smtp.rcpt(g_mail_conn, pi_recipient_cc);
+       BEGIN
+          i := 1;
+          j := 1;
+          While Instr(pi_recipient_cc,';',i) != 0 
+          LOOP
+              l_email := Substr(pi_recipient_cc,i,Instr(pi_recipient_cc,';',i)-j);
+              i := Instr(pi_recipient_cc,';',i)+1;
+              j := i;
+              utl_smtp.rcpt(g_mail_conn, l_email); 
+         END LOOP;
+         l_email := Substr(pi_recipient_cc,i,Length(pi_recipient_cc));
+         utl_smtp.rcpt(g_mail_conn, l_email);
+       END ;
    END IF ;
    IF pi_recipient_bcc IS NOT NULL
    THEN
-       utl_smtp.rcpt(g_mail_conn, pi_recipient_bcc);
+       BEGIN
+          i := 1;
+          j := 1;
+          While Instr(pi_recipient_bcc,';',i) != 0 
+          LOOP
+              l_email := Substr(pi_recipient_bcc,i,Instr(pi_recipient_bcc,';',i)-j);
+              i := Instr(pi_recipient_bcc,';',i)+1;
+              j := i;
+              utl_smtp.rcpt(g_mail_conn, l_email); 
+         END LOOP;
+         l_email := Substr(pi_recipient_bcc,i,Length(pi_recipient_bcc));
+         utl_smtp.rcpt(g_mail_conn, l_email);
+       END ;
    END IF ;
    utl_smtp.open_data(g_mail_conn);
    send_header('From',   l_sender_rec.sender_name );
