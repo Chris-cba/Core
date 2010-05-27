@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.25   May 21 2010 17:57:52   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.26   May 27 2010 11:16:16   malexander  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   May 21 2010 17:57:52  $
---       Date fetched Out : $Modtime:   May 21 2010 17:56:58  $
---       PVCS Version     : $Revision:   2.25  $
+--       Date into PVCS   : $Date:   May 27 2010 11:16:16  $
+--       Date fetched Out : $Modtime:   May 27 2010 11:15:24  $
+--       PVCS Version     : $Revision:   2.26  $
 --
 --------------------------------------------------------------------------------
 --
@@ -4664,13 +4664,6 @@ ALTER TABLE HIG_ALERT_RECIPIENTS ADD (CONSTRAINT
  HAR_HAL_FK FOREIGN KEY
   (HAR_HAL_ID) REFERENCES HIG_ALERTS
   (HAL_ID))
-/
-
-PROMPT Creating Foreign Key on 'HIG_ALERT_RECIPIENTS'
-ALTER TABLE HIG_ALERT_RECIPIENTS ADD (CONSTRAINT
- HAR_HATR_FK FOREIGN KEY
-  (HAR_HATR_ID) REFERENCES HIG_ALERT_TYPE_RECIPIENTS
-  (HATR_ID))
 /
 
 PROMPT Creating Foreign Key on 'HIG_ALERT_RECIPIENT_RULES'
