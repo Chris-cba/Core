@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.8   19 May 2010 14:31:32   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.9   27 May 2010 10:06:04   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   19 May 2010 14:31:32  $
---       Date fetched Out : $Modtime:   19 May 2010 14:26:34  $
---       PVCS Version     : $Revision:   2.32.1.8  $
+--       Date into PVCS   : $Date:   27 May 2010 10:06:04  $
+--       Date fetched Out : $Modtime:   27 May 2010 10:05:42  $
+--       PVCS Version     : $Revision:   2.32.1.9  $
 --
 --
 --   Author : Priidu Tanava
@@ -108,13 +108,14 @@ No query types defined.
                 added std_run() without p_longops parameter
                 NB! requires nm3bulk_mrg.pkh 2.7
   19.05.10  PT tasks 0109662, 0109663: in load_temp_extent_datums() added missing sql_nm_datum_criteria_pre_tmp() wrapper
+  27.05.10  PT task 0109671: in ins_datum_homo_chunks() increase length of l_case
 
 
   Todo: load_group_datums() with begin and end parameters
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.8  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.9  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -648,9 +649,9 @@ No query types defined.
     ) return varchar2
     is
       s varchar2(32767);
-      l_cr varchar2(20) := cr||'           ';
+      l_cr varchar2(20) := cr||'  ';
       l_band_value  number(4);
-      l_case        varchar2(4000);
+      l_case        varchar2(32767);
       l_tochar1     varchar2(20);
       l_tochar2     varchar2(20);
       k binary_integer;
@@ -677,7 +678,7 @@ No query types defined.
                 l_tochar2 := null;
               end if;
               l_case := l_case
-                ||cr||'           when '||l_tochar1
+                ||cr||'  when '||l_tochar1
                     ||p_alias||'.'||attribute_xsp_name(pt_attr(i).mrg_attrib, pt_attr(i).xsp)
                     ||l_tochar2||' between '
                     ||pt_itd(k).itd_band_min_value||' and '
@@ -689,7 +690,7 @@ No query types defined.
 
         if l_case is not null then
              s := s||l_cr||'case'||l_case
-          ||cr||'           else null end';
+          ||cr||'  else null end';
         else
           s := s||l_cr||p_alias||'.'||attribute_xsp_name(pt_attr(i).mrg_attrib, pt_attr(i).xsp);
         end if;
