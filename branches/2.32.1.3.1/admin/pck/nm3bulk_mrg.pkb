@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.4   May 19 2010 11:03:08   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.5   27 May 2010 10:13:12   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   May 19 2010 11:03:08  $
---       Date fetched Out : $Modtime:   May 19 2010 11:02:18  $
---       PVCS Version     : $Revision:   2.32.1.3.1.4  $
+--       Date into PVCS   : $Date:   27 May 2010 10:13:12  $
+--       Date fetched Out : $Modtime:   27 May 2010 10:11:04  $
+--       PVCS Version     : $Revision:   2.32.1.3.1.5  $
 --
 --
 --   Author : Priidu Tanava
@@ -95,6 +95,7 @@ No query types defined.
   05.05.10  PT log 725642: separated the populating of nm_datum_criteria_tmp into two separate operations
                 NB requires new temp table NM_DATUM_CRITERIA_PRE_TMP
                log 722431: fixed lone datums leaveout by copying the group assign logic from nm3mrg where it was fixed for temp extents
+  27.05.10  PT task 0109671: in ins_datum_homo_chunks() increase length of l_case
 
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
@@ -102,7 +103,7 @@ No query types defined.
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
         add p_group_type variable to load_group_datums() to specify driving group type when loaded group is non-linear
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.3.1.4  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.3.1.5  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -630,9 +631,9 @@ No query types defined.
     ) return varchar2
     is
       s varchar2(32767);
-      l_cr varchar2(20) := cr||'           ';
+      l_cr varchar2(20) := cr||'  ';
       l_band_value  number(4);
-      l_case        varchar2(4000);
+      l_case        varchar2(32767);
       l_tochar1     varchar2(20);
       l_tochar2     varchar2(20);
       k binary_integer;
@@ -659,7 +660,7 @@ No query types defined.
                 l_tochar2 := null;
               end if;
               l_case := l_case
-                ||cr||'           when '||l_tochar1
+                ||cr||'  when '||l_tochar1
                     ||p_alias||'.'||attribute_xsp_name(pt_attr(i).mrg_attrib, pt_attr(i).xsp)
                     ||l_tochar2||' between '
                     ||pt_itd(k).itd_band_min_value||' and '
@@ -671,7 +672,7 @@ No query types defined.
 
         if l_case is not null then
              s := s||l_cr||'case'||l_case
-          ||cr||'           else null end';
+          ||cr||'  else null end';
         else
           s := s||l_cr||p_alias||'.'||attribute_xsp_name(pt_attr(i).mrg_attrib, pt_attr(i).xsp);
         end if;
