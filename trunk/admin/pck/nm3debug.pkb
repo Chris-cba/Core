@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.15   May 26 2010 15:19:26   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkb-arc   2.16   May 27 2010 11:43:44   malexander  $
 --       Module Name      : $Workfile:   nm3debug.pkb  $
---       Date into PVCS   : $Date:   May 26 2010 15:19:26  $
---       Date fetched Out : $Modtime:   May 26 2010 15:07:42  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   May 27 2010 11:43:44  $
+--       Date fetched Out : $Modtime:   May 27 2010 11:39:34  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.15  $"
+--   nm3get_gen body   : "$Revision:   2.16  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3debug IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.15  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.16  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3debug';
@@ -6671,7 +6671,6 @@ BEGIN
    nm_debug.debug('nt_length_unit : '||pi_rec_nt.nt_length_unit,p_level);
    nm_debug.debug('nt_datum       : '||pi_rec_nt.nt_datum,p_level);
    nm_debug.debug('nt_pop_unique  : '||pi_rec_nt.nt_pop_unique,p_level);
-   nm_debug.debug('nut_un_unit_id : '||pi_rec_nt.nut_un_unit_id,p_level);
 --
    nm_debug.proc_end(g_package_name,'debug_nt');
 --
