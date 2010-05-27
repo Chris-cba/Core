@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.7   May 26 2010 17:10:14   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.8   May 27 2010 11:04:58   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_ddl_upg.sql  $
---       Date into PVCS   : $Date:   May 26 2010 17:10:14  $
---       Date fetched Out : $Modtime:   May 26 2010 17:08:26  $
---       Version          : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   May 27 2010 11:04:58  $
+--       Date fetched Out : $Modtime:   May 27 2010 11:03:46  $
+--       Version          : $Revision:   3.8  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -501,6 +501,43 @@ BEGIN
 --
 END;
 /
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Mapviewer - Highlighting objects
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADE EDWARDS)
+-- Mapviewer - Highlighting objects
+-- 
+------------------------------------------------------------------
+PROMPT Creating Table 'MV_HIGHLIGHT'
+CREATE TABLE MV_HIGHLIGHT
+ (MV_ID INTEGER NOT NULL
+ ,MV_FEAT_TYPE VARCHAR2(10) NOT NULL
+ ,MV_GEOMETRY SDO_GEOMETRY
+ )
+/
+
+PROMPT Creating Primary Key on 'MV_HIGHLIGHT'
+ALTER TABLE MV_HIGHLIGHT
+ ADD (CONSTRAINT MV_HIGHLIGHT_PK PRIMARY KEY
+  (MV_ID
+  ,MV_FEAT_TYPE))
+/
+
+PROMPT Creating Sequence 'MV_ID_SEQ'
+CREATE SEQUENCE MV_ID_SEQ
+ NOMAXVALUE
+ NOMINVALUE
+ NOCYCLE
+/
+
 
 ------------------------------------------------------------------
 
@@ -1448,13 +1485,13 @@ CREATE TABLE HIG_PROCESS_TYPES
 COMMENT ON TABLE HIG_PROCESS_TYPES IS 'Exor Process Framework table. Defines each type of automated process for which jobs can be scheduled and executed.'
 /
 
-COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_PROCESS_LIMIT IS 'The maximum number of processes of this type which can be scheduled to run/running at any given time.  This is checked when submitting a process or enabling an existing process.'
+COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_PROCESS_LIMIT IS 'The maximum number of processes of this type which can be scheduled to run running at any given time.  This is checked when submitting a process or enabling an existing process.'
 /
 
-COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_RESTARTABLE IS 'Value is used when scheduling a process.  It indicates to the Oracle scheduling engine whether or not a process of this type can re-start following a database re-start.  If set to ''N'', processes of this type will be left as `Disabled¿ following a re-start.'
+COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_RESTARTABLE IS '''Value is used when scheduling a process.  It indicates to the Oracle scheduling engine whether or not a process of this type can re-start following a database re-start.  If set to ''''N'''', processes of this type will be left as `Disabled¿ following a re-start.'
 /
 
-COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_PROCESS_TYPE_ID IS 'Primary Key.  When a negative value it indicates that the process has been shipped as a standard process and is therefore marked as ''Protected'' in the Maintain Process Types module.  Otherwise when records are created the value of this column should be taken from sequence ''HPT_PROCESS_TYPE_ID_SEQ''.'
+COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_PROCESS_TYPE_ID IS 'Primary Key.  When a negative value it indicates that the process has been shipped as a standard process and is therefore marked as Protected in the Maintain Process Types module.  Otherwise when records are created the value of this column should be taken from sequence HPT_PROCESS_TYPE_ID_SEQ.'
 /
 
 COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_NAME IS 'Process type name.'
@@ -1469,12 +1506,12 @@ COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_WHAT_TO_CALL IS 'The pl/sql code to call
 COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_INITIATION_MODULE IS 'The HIG_MODULE that can be used to initiate the submission of a process of this type.'
 /
 
-COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_INTERNAL_MODULE IS 'The HIG_MODULE that is used to manage process type specific data that is ''outside'' of the standard process framework.'
+COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_INTERNAL_MODULE IS 'The HIG_MODULE that is used to manage process type specific data that is outside of the standard process framework.'
 /
 
 COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_INTERNAL_MODULE_PARAM IS 'The name of the forms parameter accepted by the forms module named in HPT_INTERNAL_MODULE.'
 /
-COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_SEE_IN_HIG2510 IS 'Is this process visible in the ''Process Submission'' module?'
+COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_SEE_IN_HIG2510 IS 'Is this process visible in the Process Submission module?'
 /
 COMMENT ON COLUMN HIG_PROCESS_TYPES.HPT_AREA_TYPE IS 'Foreign key to the area type that can be used to parameterise the process'
 /
@@ -2267,15 +2304,14 @@ ALTER TABLE HIG_PROCESS_CONNS_BY_AREA ADD (
 --
 --
 --
-alter table hig_processes add (hp_polling_flag varchar2(1) DEFAULT 'N' NOT NULL)
-/
-alter table hig_processes add (hp_area_type varchar2(20) )
-/
 alter table hig_processes add (hp_area_id varchar2(100) )
 /
 alter table hig_processes add (hp_area_meaning varchar2(100) )
 /
-
+alter table hig_processes add (hp_area_type varchar2(20) )
+/
+alter table hig_processes add (hp_polling_flag varchar2(1) DEFAULT 'N' NOT NULL)
+/
 
 COMMENT ON COLUMN HIG_PROCESSES.HP_POLLING_FLAG IS 'Flag to denote whether or not this process was called in ''polling mode'''
 /
@@ -4739,7 +4775,7 @@ CREATE INDEX hpa_hpt_fk_ind ON hig_process_alert_log (hpal_process_type_id);
 
 CREATE INDEX hpa_hp_fk_ind ON hig_process_alert_log (hpal_process_id);
 
-COMMENT ON TABLE hig_process_alert_log IS 'A log of process events which may be used to trigger alert emails.  These will typically be used to warn of process failures.'
+COMMENT ON TABLE HIG_PROCESS_ALERT_LOG IS 'A log of process events which may be used to trigger alert emails.  These will typically be used to warn of process failures.'
 /
 COMMENT ON COLUMN hig_process_alert_log.hpal_id  IS 'Unique identifier generated from a sequence'
 /

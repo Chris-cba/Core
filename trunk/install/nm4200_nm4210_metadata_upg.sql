@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.9   May 26 2010 14:21:48   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.10   May 27 2010 11:04:58   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_metadata_upg.sql  $
---       Date into PVCS   : $Date:   May 26 2010 14:21:48  $
---       Date fetched Out : $Modtime:   May 26 2010 14:16:20  $
---       Version          : $Revision:   3.9  $
+--       Date into PVCS   : $Date:   May 27 2010 11:04:58  $
+--       Date fetched Out : $Modtime:   May 27 2010 11:03:48  $
+--       Version          : $Revision:   3.10  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -1595,6 +1595,48 @@ Insert into HIG_CHECK_CONSTRAINT_ASSOCS
    (HCCA_CONSTRAINT_NAME, HCCA_TABLE_NAME, HCCA_NER_APPL, HCCA_NER_ID)
  Values
    ('HPTE_EXTENSION_CHARACTER_CHK', 'HIG_PROCESS_TYPE_FILE_EXT', 'HIG', 532);
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Process Framework - Process Areas
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 108982
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (GRAEME JOHNSON)
+-- To support process framework
+-- 
+------------------------------------------------------------------
+INSERT INTO HIG_PROCESS_AREAS
+       (HPA_AREA_TYPE
+       ,HPA_DESCRIPTION
+       ,HPA_TABLE
+       ,HPA_RESTRICTED_TABLE
+       ,HPA_WHERE_CLAUSE
+       ,HPA_RESTRICTED_WHERE_CLAUSE
+       ,HPA_ID_COLUMN
+       ,HPA_MEANING_COLUMN
+       )
+SELECT 
+        'ADMIN_UNIT'
+       ,'Admin Unit'
+       ,'NM_ADMIN_UNITS'
+       ,'V_NM_USER_ADMIN_UNITS'
+       ,''
+       ,''
+       ,'NAU_ADMIN_UNIT'
+       ,'SUBSTR(RPAD(NAU_UNIT_CODE,4,'' ''),1,4)||'' - ''||NAU_NAME' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_PROCESS_AREAS
+                   WHERE HPA_AREA_TYPE = 'ADMIN_UNIT');
+
 ------------------------------------------------------------------
 
 
