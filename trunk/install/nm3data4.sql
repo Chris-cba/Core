@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data4.sql-arc   2.7   May 26 2010 10:04:12   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data4.sql-arc   2.8   May 27 2010 11:08:40   malexander  $
 --       Module Name      : $Workfile:   nm3data4.sql  $
---       Date into PVCS   : $Date:   May 26 2010 10:04:12  $
---       Date fetched Out : $Modtime:   May 26 2010 10:02:38  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   May 27 2010 11:08:40  $
+--       Date fetched Out : $Modtime:   May 27 2010 11:07:16  $
+--       Version          : $Revision:   2.8  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 26-MAY-2010 10:02
+--       Generation Date  : 27-MAY-2010 11:07
 --
 --   Product metadata script
 --   As at Release 4.2.1.0

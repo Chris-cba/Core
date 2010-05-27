@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data6.sql-arc   2.8   May 26 2010 10:04:10   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data6.sql-arc   2.9   May 27 2010 11:08:40   malexander  $
 --       Module Name      : $Workfile:   nm3data6.sql  $
---       Date into PVCS   : $Date:   May 26 2010 10:04:10  $
---       Date fetched Out : $Modtime:   May 26 2010 10:02:42  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   May 27 2010 11:08:40  $
+--       Date fetched Out : $Modtime:   May 27 2010 11:07:22  $
+--       Version          : $Revision:   2.9  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 26-MAY-2010 10:02
+--       Generation Date  : 27-MAY-2010 11:07
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -30,6 +30,7 @@
 --   NM_INV_CATEGORY_MODULES
 --   NM_FILL_PATTERNS
 --   NM_VISUAL_ATTRIBUTES
+--   NM_AU_TYPES
 --
 -----------------------------------------------------------------------------
 
@@ -6188,6 +6189,59 @@ SELECT
        ,'TRANSPARENT' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_VISUAL_ATTRIBUTES
                    WHERE NVA_ID = 'VA_99');
+--
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- NM_AU_TYPES
+--
+-- select * from nm3_metadata.nm_au_types
+-- order by nat_admin_type
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT nm_au_types
+SET TERM OFF
+
+INSERT INTO NM_AU_TYPES
+       (NAT_ADMIN_TYPE
+       ,NAT_DESCR
+       ,NAT_DATE_CREATED
+       ,NAT_DATE_MODIFIED
+       ,NAT_MODIFIED_BY
+       ,NAT_CREATED_BY
+       )
+SELECT 
+        'EXT$'
+       ,'Admin Type for Navigator, Audit and Alert Meta Models'
+       ,to_date('20100525100858','YYYYMMDDHH24MISS')
+       ,to_date('20100525100858','YYYYMMDDHH24MISS')
+       ,'NM3_METADATA'
+       ,'NM3_METADATA' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_AU_TYPES
+                   WHERE NAT_ADMIN_TYPE = 'EXT$');
+--
+INSERT INTO NM_AU_TYPES
+       (NAT_ADMIN_TYPE
+       ,NAT_DESCR
+       ,NAT_DATE_CREATED
+       ,NAT_DATE_MODIFIED
+       ,NAT_MODIFIED_BY
+       ,NAT_CREATED_BY
+       )
+SELECT 
+        'NETW'
+       ,'Network Default AU Type'
+       ,to_date('20000815000000','YYYYMMDDHH24MISS')
+       ,to_date('20000815000000','YYYYMMDDHH24MISS')
+       ,'NM31'
+       ,'NM31' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_AU_TYPES
+                   WHERE NAT_ADMIN_TYPE = 'NETW');
 --
 --
 --
