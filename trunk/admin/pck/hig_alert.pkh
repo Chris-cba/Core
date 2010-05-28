@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkh-arc   3.2   May 12 2010 13:23:32   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkh-arc   3.3   May 28 2010 10:21:14   lsorathia  $
 --       Module Name      : $Workfile:   hig_alert.pkh  $
---       Date into PVCS   : $Date:   May 12 2010 13:23:32  $
---       Date fetched Out : $Modtime:   May 11 2010 14:45:46  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   May 28 2010 10:21:14  $
+--       Date fetched Out : $Modtime:   May 26 2010 18:06:04  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $'; 
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $'; 
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------
@@ -39,7 +39,8 @@ FUNCTION get_body_version RETURN varchar2;
 --
 --<PROC NAME="GET_BODY_VERSION">
 -- This function returns the current SCCS version of the package body
-PROCEDURE send_mail(pi_har_id      IN hig_alert_recipients.har_id%TYPE
+PROCEDURE send_mail(pi_hal_id      IN hig_alerts.hal_id%TYPE           DEFAULT NULL
+                   ,pi_har_id      IN hig_alert_recipients.har_id%TYPE DEFAULT NULL
                    ,pi_from_screen IN Varchar2 DEFAULT 'N' );
 --</PROC>
 --
@@ -183,8 +184,8 @@ PROCEDURE send_batch_mail(pi_halt_id         IN hig_alert_types.halt_id%TYPE
 --<PROC NAME="create_trigger">
 -- This procedure sends single batch mail
 PROCEDURE send_batch_single_mail(pi_halt_id  IN hig_alert_types.halt_id%TYPE
-                                ,pi_hal_id   IN hig_alerts.hal_id%TYPE 
-                                ,pi_har_id   IN hig_alert_recipients.har_id%TYPE);
+                                ,pi_hal_id   IN hig_alerts.hal_id%TYPE );
+--                                ,pi_har_id   IN hig_alert_recipients.har_id%TYPE);
 --</PROC>
 --
 -----------------------------------------------------------------------------

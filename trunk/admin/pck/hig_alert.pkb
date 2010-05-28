@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.5   May 12 2010 13:23:30   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.6   May 28 2010 10:21:14   lsorathia  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   May 12 2010 13:23:30  $
---       Date fetched Out : $Modtime:   May 12 2010 13:19:54  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   May 28 2010 10:21:14  $
+--       Date fetched Out : $Modtime:   May 27 2010 15:28:06  $
+--       Version          : $Revision:   3.6  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.5  $';
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.6  $';
   g_app_owner     CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  clob;
@@ -73,20 +73,30 @@ BEGIN
 END upd_hal_status;
 --
 --
-PROCEDURE upd_har_status(pi_har_id    IN hig_alert_recipients.har_id%TYPE
-                         ,pi_status   IN hig_alert_recipients.har_status%TYPE
-                         ,pi_comments IN hig_alert_recipients.har_comments%TYPE DEfault Null)
+PROCEDURE upd_har_status(pi_har_id    IN hig_alert_recipients.har_id%TYPE DEFAULT NULL
+                        ,pi_hal_id    IN hig_alerts.hal_id%TYPE           DEFAULT NULL
+                        ,pi_status    IN hig_alert_recipients.har_status%TYPE
+                        ,pi_comments  IN hig_alert_recipients.har_comments%TYPE DEfault Null)
 IS   
 BEGIN
 --
-   UPDATE hig_alert_recipients
-   SET    har_status = pi_status
-         ,har_comments          = pi_comments
-   WHERE  har_id                = pi_har_id   ;
+   IF pi_har_id IS NOT NULL
+   THEN
+       UPDATE hig_alert_recipients
+       SET    har_status    = pi_status
+             ,har_comments  = pi_comments
+       WHERE  har_id        = pi_har_id   ;
+   ELSE
+       UPDATE hig_alert_recipients
+       SET    har_status    = pi_status
+             ,har_comments  = pi_comments
+       WHERE  har_hal_id    = pi_hal_id   ;
+   END IF ;       
 --
 END upd_har_status;
 --
-PROCEDURE send_mail(pi_har_id      IN hig_alert_recipients.har_id%TYPE
+PROCEDURE send_mail(pi_hal_id      IN hig_alerts.hal_id%TYPE           DEFAULT NULL
+                   ,pi_har_id      IN hig_alert_recipients.har_id%TYPE DEFAULT NULL
                    ,pi_from_screen IN Varchar2 DEFAULT 'N' )
 IS
 -- 
@@ -96,9 +106,9 @@ IS
    l_halt_rec         hig_alert_types%ROWTYPE ;
    l_hael_rec         hig_alert_error_logs%ROWTYPE;
    l_hatr_rec         hig_alert_type_recipients%ROWTYPE ;
-   l_to_recipient     nm_mail_users.nmu_email_address%TYPE;
-   l_cc_recipient     nm_mail_users.nmu_email_address%TYPE;
-   l_bcc_recipient    nm_mail_users.nmu_email_address%TYPE;
+   l_to_recipient     Varchar2(32767);
+   l_cc_recipient     Varchar2(32767);
+   l_bcc_recipient    Varchar2(32767);
    l_send_mail_status Boolean;
    l_error_text       Varchar2(2000);
    l_attachment       Blob ;
@@ -117,12 +127,67 @@ IS
 --
 BEGIN
 --
-   l_har_rec  := get_har(pi_har_id);
-   l_hal_rec  := get_hal(l_har_rec.har_hal_id);
-   l_hatm_rec := get_hatm(l_hal_rec.hal_halt_id);
-   l_halt_rec := get_halt(l_hal_rec.hal_halt_id);   
-   l_hatr_rec := get_hatr(l_har_rec.har_hatr_id);
-
+   IF pi_har_id IS NOT NULL
+   THEN       
+       l_har_rec  := get_har(pi_har_id);
+       l_hal_rec  := get_hal(l_har_rec.har_hal_id);
+       l_hatm_rec := get_hatm(l_hal_rec.hal_halt_id);
+       l_halt_rec := get_halt(l_hal_rec.hal_halt_id);   
+       l_hatr_rec := get_hatr(l_har_rec.har_hatr_id);
+       IF l_har_rec.har_recipient_email IS NULL
+       THEN    
+           Raise recipient_not_found;
+       END IF ;
+       IF l_hatr_rec.hatr_type = 'To :'
+       THEN
+           l_to_recipient  := l_har_rec.har_recipient_email;
+       ELSIF l_hatr_rec.hatr_type = 'Cc :'
+       THEN
+          l_cc_recipient  := l_har_rec.har_recipient_email;
+       ELSIF l_hatr_rec.hatr_type = 'Bcc :'
+       THEN
+           l_bcc_recipient := l_har_rec.har_recipient_email;
+       END IF ;
+   ELSIF pi_hal_id IS NOT NULL
+   THEN
+       l_hal_rec  := get_hal(pi_hal_id);
+       l_halt_rec := get_halt(l_hal_rec.hal_halt_id);
+       FOR i IN (SELECT *
+                 FROM   hig_alert_recipients
+                        ,hig_alert_type_recipients
+                 WHERE  pi_hal_id   = har_hal_id
+                 AND    har_hatr_id = hatr_id)
+       LOOP
+           IF i.har_recipient_email IS NOT NULL
+           THEN      
+               IF i.hatr_type = 'To :'
+               THEN
+                   IF l_to_recipient IS NOT NULL
+                   THEN
+                       l_to_recipient  := l_to_recipient||';'||i.har_recipient_email;
+                   ELSE
+                       l_to_recipient  := i.har_recipient_email;
+                   END IF  ;
+               ELSIF i.hatr_type = 'Cc :'
+               THEN
+                   IF l_cc_recipient IS NOT NULL
+                   THEN 
+                       l_cc_recipient  := l_cc_recipient ||';'||i.har_recipient_email;
+                   ELSE
+                       l_cc_recipient  := i.har_recipient_email;
+                   END IF ;
+               ELSIF i.hatr_type = 'Bcc :'
+               THEN
+                   IF l_bcc_recipient IS NOT NULL
+                   THEN
+                       l_bcc_recipient := l_bcc_recipient||';'||i.har_recipient_email;
+                   ELSE
+                       l_bcc_recipient := i.har_recipient_email;
+                   END IF ;
+               END IF ;
+           END IF ;
+       END LOOP;
+   END IF ;
    IF l_halt_rec.halt_nit_inv_type = 'PRO$'
    THEN
        IF pi_from_screen  = 'N'
@@ -147,20 +212,6 @@ BEGIN
            l_att_name := 'Log for '||l_hpt_rec.hpt_name||' '||To_Char(Sysdate,'DD-Mon-YYYY')||'.txt' ;
        END IF ;
    END IF ;
-   IF l_har_rec.har_recipient_email IS NULL
-   THEN    
-       Raise recipient_not_found;
-   END IF ;
-   IF l_hatr_rec.hatr_type = 'To :'
-   THEN
-       l_to_recipient  := l_har_rec.har_recipient_email;
-   ELSIF l_hatr_rec.hatr_type = 'Cc :'
-   THEN
-       l_cc_recipient  := l_har_rec.har_recipient_email;
-   ELSIF l_hatr_rec.hatr_type = 'Bcc :'
-   THEN
-       l_bcc_recipient := l_har_rec.har_recipient_email;
-   END IF ;
    l_send_mail_status := nm3mail.send_mail(pi_recipient_to  => l_to_recipient 
                                           ,pi_recipient_cc  => l_cc_recipient
                                           ,pi_recipient_bcc => l_bcc_recipient
@@ -170,19 +221,35 @@ BEGIN
                                           ,pi_att_file_name => l_att_name
                                           ,pi_file_att      => l_attachment
                                           ,po_error_text    => l_error_text);                 
-   IF l_send_mail_status
-   THEN   
-       upd_har_status(l_har_rec.har_id,'Completed');
+   IF pi_har_id IS NOT NULL
+   THEN
+       IF l_send_mail_status
+       THEN   
+           upd_har_status(pi_har_id => l_har_rec.har_id
+                         ,pi_status => 'Completed');
+       ELSE
+           upd_har_status(pi_har_id     => l_har_rec.har_id
+                         ,pi_status     => 'Failed'
+                         ,pi_comments   => l_error_text);
+       END IF ;
    ELSE
-       upd_har_status(l_har_rec.har_id,'Failed',l_error_text);
-   END IF ;
+       IF l_send_mail_status
+       THEN   
+           upd_har_status(pi_hal_id => pi_hal_id
+                         ,pi_status => 'Completed');
+       ELSE
+           upd_har_status(pi_hal_id   =>     pi_hal_id
+                         ,pi_status   =>     'Failed'
+                         ,pi_comments => l_error_text);
+       END IF ;
+   END IF ;    
    IF pi_from_screen = 'Y'
    THEN
        Commit;
    END IF ;
 EXCEPTION   
     WHEN recipient_not_found THEN
-        upd_har_status(l_har_rec.har_id,'Failed','Recipient email ID is blank');
+        --upd_har_status(l_har_rec.har_id,'Failed','Recipient email ID is blank');
         IF l_halt_rec.halt_nit_inv_type != 'ERR'
         THEN
             l_hael_rec.hael_nit_inv_type := l_halt_rec.halt_nit_inv_type ;
@@ -834,12 +901,16 @@ BEGIN
        END IF ;
        IF l_time_counter_ela 
        THEN
-           FOR hal IN (SELECT har_recipient_email,count(0) cnt  
-                       FROM   hig_alerts,hig_alert_recipients 
+           FOR hal IN (SELECT har_recipient_email
+                       FROM   hig_alerts
+                             ,hig_alert_recipients 
+                             ,hig_alert_type_recipients
                        WHERE  hal_halt_id = hna.halt_id
                        AND    hal_id      = har_hal_id
                        AND    hal_status  = 'Pending'
                        AND    har_status  = 'Pending'
+                       AND    har_hatr_id = hatr_id
+                       AND    hatr_type = 'To :'
                        GROUP BY har_recipient_email
                        HAVING Count(0) > 1 )
            LOOP
@@ -853,15 +924,15 @@ BEGIN
                        AND   hal_status = 'Pending'
                        ORDER  by hal_date_created)
            LOOP
-               FOR har IN (SELECT * FROM hig_alert_recipients 
-                            WHERE  har_hal_id = hno.hal_id     
-                            AND    har_status = 'Pending'
-                            ORDER  BY har_date_created)                                                               
-               LOOP
+               --FOR har IN (SELECT * FROM hig_alert_recipients 
+               --             WHERE  har_hal_id = hno.hal_id     
+               --             AND    har_status = 'Pending'
+               --             ORDER  BY har_date_created)                                                               
+               --LOOP
                    send_batch_single_mail(pi_halt_id   => hna.halt_id
-                                         ,pi_hal_id    => hno.hal_id
-                                         ,pi_har_id    => har.har_id);
-               END LOOP;
+                                         ,pi_hal_id    => hno.hal_id);
+--                                         ,pi_har_id    => har.har_id);
+               --END LOOP;
            END LOOP;
            UPDATE hig_alerts
            SET    hal_status  = 'Completed'     
@@ -898,6 +969,9 @@ IS
    l_email_table      clob;
    l_send_mail_status Boolean;
    l_error_text       clob;
+   l_cc_recipient     Varchar2(32767);
+   l_bcc_recipient    Varchar2(32767);
+   l_num_tab          nm3type.tab_number;
 --
 BEGIN
 --
@@ -963,9 +1037,10 @@ BEGIN
                 WHERE  hal_halt_id = pi_halt_id
                 AND    hal_id = har_hal_id
                 AND    hal_status = 'Pending'
-                AND    har_status  = 'Pending'
+                AND    har_status = 'Pending'
                 AND    har_recipient_email = pi_recipient_email )
    LOOP
+       l_num_tab(l_num_tab.Count+1) := hal.hal_id;
        l_email_table  := l_email_table ||' <tr> ';             
        IF Nvl(l_col_tab.count,0) > 0
        THEN     
@@ -984,7 +1059,53 @@ BEGIN
    l_email_table  := l_email_table ||Chr(10)||'</table>'||Chr(10);
    l_email_body   := Replace(l_hatm_rec.hatm_mail_text,'{table}',l_email_table);
    l_email_body   := Replace(l_email_body,Chr(10),'</br>');
+   For i IN (SELECT Distinct har_recipient_email 
+             FROM   hig_alerts,hig_alert_recipients,hig_alert_type_recipients 
+             WHERE  hal_halt_id = pi_halt_id
+             AND    hal_id      = har_hal_id
+             AND    har_hatr_id = hatr_id
+             AND    hal_id IN     (SELECT hal_id FROM hig_alerts,hig_alert_recipients,hig_alert_type_recipients 
+                                   WHERE  hatr_type           = 'To :'
+                                   AND    hal_halt_id         = pi_halt_id                      
+                                   AND    hal_id              = har_hal_id
+                                   AND    har_recipient_email = pi_recipient_email 
+                                   AND    hal_status          = 'Pending'
+                                   AND    har_status          = 'Pending'
+                                   AND    har_hatr_id         = hatr_id)    
+             AND    hatr_type = 'Cc :')
+   Loop 
+       IF l_cc_recipient IS NOT NULL
+       THEN
+           l_cc_recipient := l_cc_recipient||';'||i.har_recipient_email;  
+       ELSE
+           l_cc_recipient :=   i.har_recipient_email;
+       END IF ;
+   End loop;
+   For i IN (SELECT Distinct har_recipient_email 
+             FROM   hig_alerts,hig_alert_recipients,hig_alert_type_recipients 
+             WHERE  hal_halt_id = pi_halt_id
+             AND    hal_id      = har_hal_id
+             AND    har_hatr_id = hatr_id
+             AND    hal_id IN     (SELECT hal_id FROM hig_alerts,hig_alert_recipients,hig_alert_type_recipients 
+                                   WHERE  hatr_type           = 'To :'
+                                   AND    hal_halt_id         = pi_halt_id                      
+                                   AND    hal_id              = har_hal_id
+                                   AND    har_recipient_email = pi_recipient_email 
+                                   AND    hal_status          = 'Pending'
+                                   AND    har_status          = 'Pending'
+                                   AND    har_hatr_id         = hatr_id)    
+             AND    hatr_type = 'Bcc :')
+   Loop 
+       IF l_bcc_recipient IS NOT NULL
+       THEN
+           l_bcc_recipient := l_bcc_recipient||';'||i.har_recipient_email;  
+       ELSE
+           l_bcc_recipient :=   i.har_recipient_email;
+       END IF ;
+   End loop;
    l_send_mail_status := nm3mail.send_mail(pi_recipient_to  => pi_recipient_email 
+                                          ,pi_recipient_cc  => l_cc_recipient
+                                          ,pi_recipient_bcc => l_bcc_recipient
                                           ,pi_subject       => l_subject
                                           ,pi_mailformat    => 'H'
                                           ,pi_mail_body     => l_email_body
@@ -999,6 +1120,16 @@ BEGIN
                              AND    hal_status = 'Pending')
        AND    har_status  = 'Pending'
        AND    har_recipient_email = pi_recipient_email;
+ 
+       FOR i IN 1..l_num_tab.Count
+       LOOP
+           Update hig_alert_recipients 
+           SET    har_status = 'Completed'
+           WHERE  har_hal_id = l_num_tab(i)
+           AND    har_hatr_id IN (SELECT hatr_id 
+                                  FROM   hig_alert_type_recipients 
+                                  WHERE  hatr_type IN ('Bcc :','Cc :')) ;
+       END LOOP;         
    ELSE
        Update hig_alert_recipients
        SET    har_status   = 'Failed'
@@ -1009,14 +1140,24 @@ BEGIN
                              AND    hal_status = 'Pending')
        AND    har_status  = 'Pending'
        AND    har_recipient_email = pi_recipient_email;
+       FOR i IN 1..l_num_tab.Count
+       LOOP
+           Update hig_alert_recipients 
+           SET    har_status = 'Failed'
+                 ,har_comments = l_error_text
+           WHERE  har_hal_id = l_num_tab(i)
+           AND    har_hatr_id IN (SELECT hatr_id 
+                                  FROM   hig_alert_type_recipients 
+                                  WHERE  hatr_type IN ('Bcc :','Cc :')) ;
+       END LOOP;
    END IF ;
    Commit;
 --
 END send_batch_mail;
 --
 PROCEDURE send_batch_single_mail(pi_halt_id  IN hig_alert_types.halt_id%TYPE
-                                ,pi_hal_id   IN hig_alerts.hal_id%TYPE 
-                                ,pi_har_id   IN hig_alert_recipients.har_id%TYPE)
+                                ,pi_hal_id   IN hig_alerts.hal_id%TYPE )
+--                                ,pi_har_id   IN hig_alert_recipients.har_id%TYPE)
 IS
 --
    TYPE               l_col_name_type IS TABLE OF VARCHAR(30) INDEX BY BINARY_INTEGER;
@@ -1034,11 +1175,17 @@ IS
    l_send_mail_status Boolean;
    l_error_text       clob;
    l_har_rec          hig_alert_recipients%ROWTYPE;
+   l_hal_rec          hig_alerts%ROWTYPE;
+   l_cc_recipient     Varchar2(32767);
+   l_bcc_recipient    Varchar2(32767);
+   l_to_recipient     Varchar2(32767);
 --
 BEGIN
 --
-   l_hatm_rec := hig_alert.get_hatm(pi_halt_id);
-   l_har_rec  := hig_alert.get_har(pi_har_id);
+   l_hatm_rec  := hig_alert.get_hatm(pi_halt_id);
+   --l_har_rec := hig_alert.get_har(pi_har_id);
+   l_hal_rec   := hig_alert.get_hal(pi_hal_id);
+   
    IF l_hatm_rec.hatm_param_1 IS NOT NULL
    THEN
        l_col_tab(l_col_tab.Count+1) :=  l_hatm_rec.hatm_param_1;
@@ -1095,32 +1242,62 @@ BEGIN
        l_email_table  := l_email_table|| ' <td> <b>'||l_ita_rec.ita_scrn_text ||' </b></td> ';    
    END IF;     
    l_email_body := l_email_body ||' </tr> ';                                
-   FOR hal IN (SELECT hal.* 
-                FROM   hig_alerts hal ,hig_alert_recipients 
-                WHERE  hal_id = pi_hal_id
-                AND    hal_id = har_hal_id
-                AND    hal_status = 'Pending'
-                AND    har_status  = 'Pending')
-   LOOP
-       l_email_table  := l_email_table ||' <tr> ';             
-       IF Nvl(l_col_tab.count,0) > 0
-       THEN     
-           FOR i in 1..l_col_tab.count 
-           LOOP
-               Execute Immediate 'SELECT '||l_col_tab(i)||Chr(10)||
-                                 'FROM   '||l_nit_rec.nit_table_name||Chr(10)||
-                                 'WHERE  '||l_nit_rec.nit_foreign_pk_column||' = :1' INTO l_value  USING hal.hal_pk_id;
-               l_email_table  := l_email_table|| ' <td>'||Nvl(l_value,nm3web.c_nbsp)||'</td> ';                  
-           END LOOP;
-       ELSE
-           l_email_table  := l_email_table|| ' <td>'||hal.hal_pk_id||'</td> ';
-       END IF ;   
-       l_email_table  := l_email_table ||' </tr> ';      
-   END LOOP;    
+   l_email_table  := l_email_table ||' <tr> ';             
+   IF Nvl(l_col_tab.count,0) > 0
+   THEN     
+       FOR i in 1..l_col_tab.count 
+       LOOP
+           Execute Immediate 'SELECT '||l_col_tab(i)||Chr(10)||
+                             'FROM   '||l_nit_rec.nit_table_name||Chr(10)||
+                             'WHERE  '||l_nit_rec.nit_foreign_pk_column||' = :1' INTO l_value  USING l_hal_rec.hal_pk_id;
+           l_email_table  := l_email_table|| ' <td>'||Nvl(l_value,nm3web.c_nbsp)||'</td> ';                  
+       END LOOP;
+   ELSE
+       l_email_table  := l_email_table|| ' <td>'||l_hal_rec.hal_pk_id||'</td> ';
+   END IF ;   
+   l_email_table  := l_email_table ||' </tr> ';      
    l_email_table  := l_email_table ||Chr(10)||'</table>'||Chr(10);
    l_email_body   := Replace(l_hatm_rec.hatm_mail_text,'{table}',l_email_table);
    l_email_body   := Replace(l_email_body,Chr(10),'</br>');
-   l_send_mail_status := nm3mail.send_mail(pi_recipient_to  => l_har_rec.har_recipient_email
+   FOR i IN (SELECT distinct hatr_type,har_recipient_email
+             FROM   hig_alert_recipients
+                   ,hig_alert_type_recipients
+             WHERE  har_hal_id  = pi_hal_id   
+             AND    har_hatr_id = hatr_id
+             AND    har_status  = 'Pending')
+   LOOP
+       IF i.har_recipient_email IS NOT NULL
+       THEN      
+           IF i.hatr_type = 'To :'
+           THEN
+               IF l_to_recipient IS NOT NULL
+               THEN
+                   l_to_recipient  := l_to_recipient||';'||i.har_recipient_email;
+               ELSE
+                   l_to_recipient  := i.har_recipient_email;
+               END IF  ;
+           ELSIF i.hatr_type = 'Cc :'
+           THEN
+               IF l_cc_recipient IS NOT NULL
+               THEN 
+                   l_cc_recipient  := l_cc_recipient ||';'||i.har_recipient_email;
+               ELSE
+                   l_cc_recipient  := i.har_recipient_email;
+               END IF ;
+           ELSIF i.hatr_type = 'Bcc :'
+           THEN
+               IF l_bcc_recipient IS NOT NULL
+               THEN
+                   l_bcc_recipient := l_bcc_recipient||';'||i.har_recipient_email;
+               ELSE
+                   l_bcc_recipient := i.har_recipient_email;
+               END IF ;
+           END IF ;
+       END IF ;
+   END LOOP;
+   l_send_mail_status := nm3mail.send_mail(pi_recipient_to  => l_to_recipient
+                                          ,pi_recipient_cc  => l_cc_recipient
+                                          ,pi_recipient_bcc => l_bcc_recipient
                                           ,pi_subject       => l_subject
                                           ,pi_mailformat    => 'H'
                                           ,pi_mail_body     => l_email_body
@@ -1128,15 +1305,15 @@ BEGIN
    IF l_send_mail_status
    THEN   
        Update hig_alert_recipients
-       SET    har_status = 'Completed'
-       WHERE  har_id     = pi_har_id;
+       SET    har_status  = 'Completed'
+       WHERE  har_hal_id  = pi_hal_id;                      
    ELSE
        Update hig_alert_recipients
        SET    har_status   = 'Failed'
              ,har_comments = l_error_text
-       WHERE  har_id     = pi_har_id;
+       WHERE  har_hal_id   = pi_hal_id;
    END IF ;
-   Commit;
+   Commit;   
 --
 END send_batch_single_mail;
 --
@@ -1260,14 +1437,14 @@ BEGIN
        END LOOP;
        append ('   IF Nvl(l_halt_rec.halt_immediate,''N'') = ''Y''');
        append ('   THEN ');
-       append ('       FOR hnmd IN (SELECT * FROM hig_alert_recipients ');
-       append ('                    WHERE  har_hal_id = l_hal_rec.hal_id     ');
-       append ('                    AND    har_status = ''Pending'' ');
-       append ('                    ORDER  BY har_date_created )');
-       append ('      LOOP ');
-       append ('          hig_alert.send_mail(hnmd.har_id); ');
-       append ('      END LOOP; ');
-       append ('      hig_alert.upd_hal_status(l_hal_rec.hal_id,''Completed''); ');   
+       --append ('       FOR hnmd IN (SELECT * FROM hig_alert_recipients ');
+       --append ('                    WHERE  har_hal_id = l_hal_rec.hal_id     ');
+       --append ('                    AND    har_status = ''Pending'' ');
+       --append ('                    ORDER  BY har_date_created )');
+       --append ('      LOOP ');
+       append ('       hig_alert.send_mail(pi_hal_id => l_hal_rec.hal_id); ');
+       --append ('      END LOOP; ');
+       append ('       hig_alert.upd_hal_status(l_hal_rec.hal_id,''Completed''); ');   
        --END LOOP;
        append ('   END IF ;'); 
    ELSE  
@@ -1323,6 +1500,7 @@ BEGIN
                IF l_harr_rec.harr_recipient_type = 'USER_ID'
                THEN               
                    append ('   FOR nmu IN (SELECT nmu_email_address email_address FROM nm_mail_users WHERE nmu_hus_user_id = :OLD.'||l_harr_rec.harr_attribute_name||') LOOP ');
+                   append ('       l_har_rec.har_hatr_id         := '||hatr.hatr_id||' ; ');
                    append ('       l_har_rec.har_hal_id          := l_hal_rec.hal_id ; ');
                    append ('       l_har_rec.har_recipient_email := nmu.email_address ; ');
                    append ('       l_har_rec.har_status          := ''Pending'' ; ' );
@@ -1330,6 +1508,7 @@ BEGIN
                    append ('   END LOOP; ');     
                ELSE
                    append ('   FOR nmu IN ('||l_harr_rec.harr_sql ||' :OLD.'||l_harr_rec.harr_attribute_name||') LOOP ');
+                   append ('       l_har_rec.har_hatr_id         := '||hatr.hatr_id||' ; ');
                    append ('       l_har_rec.har_hal_id          := l_hal_rec.hal_id ; ');
                    append ('       l_har_rec.har_recipient_email := Lower(nmu.email_address) ; ');
                    append ('       l_har_rec.har_status          := ''Pending'' ; ' );
@@ -1340,6 +1519,7 @@ BEGIN
            IF hatr.hatr_nmu_id IS NOT NULL
            THEN
                append ('   FOR nmu IN (SELECT nmu_email_address FROM nm_mail_users WHERE nmu_id = '||hatr.hatr_nmu_id||') LOOP ');
+               append ('       l_har_rec.har_hatr_id         := '||hatr.hatr_id||' ; ');
                append ('       l_har_rec.har_hal_id          := l_hal_rec.hal_id ; ');
                append ('       l_har_rec.har_recipient_email := nmu.nmu_email_address ; ');
                append ('       l_har_rec.har_status          := ''Pending'' ; ' );
@@ -1349,6 +1529,7 @@ BEGIN
            IF hatr.hatr_nmg_id IS NOT NULL
            THEN
                append ('   FOR nmg IN (SELECT nmu_email_address FROM nm_mail_group_membership,nm_mail_users WHERE nmgm_nmu_id = nmu_id AND nmgm_nmg_id = '||hatr.hatr_nmg_id||') LOOP ');
+               append ('       l_har_rec.har_hatr_id         := '||hatr.hatr_id||' ; ');
                append ('       l_har_rec.har_hal_id          := l_hal_rec.hal_id ; ');
                append ('       l_har_rec.har_recipient_email := nmg.nmu_email_address ; ');
                append ('       l_har_rec.har_status          := ''Pending'' ; ' );
@@ -1358,14 +1539,14 @@ BEGIN
        END LOOP;
        append ('   IF Nvl(l_halt_rec.halt_immediate,''N'') = ''Y''');
        append ('   THEN ');
-       append ('       FOR hnmd IN (SELECT * FROM hig_alert_recipients ');
-       append ('                    WHERE  har_hal_id = l_hal_rec.hal_id     ');
-       append ('                    AND    har_status = ''Pending'' ');
-       append ('                    ORDER  BY har_date_created )');
-       append ('      LOOP ');
-       append ('          hig_alert.send_mail(hnmd.har_id); ');
-       append ('      END LOOP; ');
-       append ('      hig_alert.upd_hal_status(l_hal_rec.hal_id,''Completed''); ');   
+       --append ('       FOR hnmd IN (SELECT * FROM hig_alert_recipients ');
+       --append ('                    WHERE  har_hal_id = l_hal_rec.hal_id     ');
+       --append ('                    AND    har_status = ''Pending'' ');
+       --append ('                    ORDER  BY har_date_created )');
+       --append ('      LOOP ');
+       append ('       hig_alert.send_mail(pi_hal_id => l_hal_rec.hal_id); ');
+       --append ('      END LOOP; ');
+       append ('       hig_alert.upd_hal_status(l_hal_rec.hal_id,''Completed''); ');   
        append ('   END IF ;');
    END IF;--
 END trg_body;
