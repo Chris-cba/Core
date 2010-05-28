@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.9   May 25 2010 15:14:56   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.10   May 28 2010 17:48:04   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   May 25 2010 15:14:56  $
---       Date fetched Out : $Modtime:   May 25 2010 15:10:02  $
---       Version          : $Revision:   3.9  $
+--       Date into PVCS   : $Date:   May 28 2010 17:48:04  $
+--       Date fetched Out : $Modtime:   May 28 2010 17:46:54  $
+--       Version          : $Revision:   3.10  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.9  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.10  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -921,44 +921,45 @@ PROCEDURE amend_process    (pi_process_id           IN hig_processes.hp_process_
                            ,pi_job_name             IN hig_processes.hp_job_name%TYPE
                            ,pi_initiators_ref       IN hig_processes.hp_initiators_ref%TYPE
                            ,pi_frequency_id         IN hig_processes.hp_frequency_id%TYPE
+                           ,pi_area_id              IN hig_processes.hp_area_id%TYPE
                            ,pi_scheduled_date       IN DATE) IS
 
 
+ l_process_rec      hig_processes_v%ROWTYPE;
+ l_process_type_rec hig_process_types%ROWTYPE;
  l_frequency_rec    hig_scheduling_frequencies%ROWTYPE;
- l_full_job_name    hig_processes_v.hp_full_job_name%TYPE;
  l_rowid            rowid;
 
- l_hpt_what         hig_process_types.hpt_what_to_call%TYPE;
- 
- CURSOR c_what IS
- SELECT hpt_what_to_call
- FROM   hig_process_types
-       ,hig_processes
- WHERE  hp_process_id       = pi_process_id
- AND    hpt_process_type_id = hp_process_type_id;
-                      
 BEGIN
 
  hig_process_framework.check_process_can_be_amended(pi_process_id => pi_process_id); -- double check process is still disabled
-
- l_full_job_name := hig_process_framework.get_process_and_job(pi_process_id => pi_process_id).hp_full_job_name;
- 
- 
- hig_process_framework.check_process_can_be_amended(pi_process_Id => pi_process_Id); 
-
  l_rowid := lock_process(pi_process_id => pi_process_id);
+
+ l_process_rec := hig_process_framework.get_process_and_job(pi_process_id => pi_process_id);
+ l_process_type_rec := hig_process_framework.get_process_type(pi_process_type_id => l_process_rec.hp_process_type_id);
  
+
+ 
+
 --
 -- change attributes of the scheduled job
 --
-  OPEN c_what;
-  FETCH c_what INTO l_hpt_what;
-  CLOSE c_what; 
 
  UPDATE  hig_processes
- SET     hp_initiators_ref  = pi_initiators_ref
+ SET     hp_initiators_ref = pi_initiators_ref
        , hp_frequency_id   = pi_frequency_id
-       , hp_what_to_call   = l_hpt_what 
+       , hp_what_to_call   = l_process_type_rec.hpt_what_to_call
+       , hp_area_type =   case when pi_area_id is not null THEN 
+                                  l_process_type_rec.hpt_area_type
+                               else
+                                  null
+                               end
+       , hp_area_id = pi_area_id
+       , hp_area_meaning = case when pi_area_id is not null then
+                                     hig_process_framework.area_meaning_from_id_value(l_process_type_rec.hpt_area_type,pi_area_id)
+                                else
+                                     null
+                                end
  WHERE   rowid = l_rowid;
   
 
@@ -972,16 +973,16 @@ BEGIN
  
 
 
-  nm3jobs.amend_job_action(pi_job_name => l_full_job_name
-                          ,pi_value    => hig_process_framework.wrapper_around_what(pi_what_to_call => l_hpt_what
+  nm3jobs.amend_job_action(pi_job_name => l_process_rec.hp_full_job_name
+                          ,pi_value    => hig_process_framework.wrapper_around_what(pi_what_to_call => l_process_type_rec.hpt_what_to_call
                                                                                    ,pi_process_id    => pi_process_id));                                                      
 
 
 
-  nm3jobs.amend_job_start_datim (pi_job_name => l_full_job_name  
+  nm3jobs.amend_job_start_datim (pi_job_name => l_process_rec.hp_full_job_name  
                                  ,pi_value    => pi_scheduled_date);
 
-  nm3jobs.amend_job_interval (pi_job_name => l_full_job_name 
+  nm3jobs.amend_job_interval (pi_job_name => l_process_rec.hp_full_job_name 
                              ,pi_value    => l_frequency_rec.hsfr_frequency);
 
 
@@ -1335,10 +1336,6 @@ FUNCTION do_polling_if_requested(pi_file_type_name          IN hig_process_type_
            
   l_files            nm3type.tab_varchar32767;
   
-  l_ok_to_proceed BOOLEAN := TRUE;
-  
-  
-  
   PROCEDURE initialise IS
   
   BEGIN
@@ -1398,7 +1395,9 @@ FUNCTION do_polling_if_requested(pi_file_type_name          IN hig_process_type_
 
     l_tab_files        hig_process_api.tab_temp_files;
     l_file_rec         hig_process_api.rec_temp_files;
-
+    l_process_id       hig_processes.hp_process_id%TYPE;
+    l_job_name         hig_processes.hp_job_name%TYPE;
+    l_date             date;
   
   BEGIN
   
@@ -1422,18 +1421,46 @@ FUNCTION do_polling_if_requested(pi_file_type_name          IN hig_process_type_
                  
          END LOOP;
 
-         hig_process_api.associate_files_with_process(pi_tab_files  => l_tab_files);
+
+         hig_process_api.associate_files_with_process(pi_tab_files  => l_tab_files); -- associate all of the files found with this execution of the polling process
+
+
+
+         FOR f IN 1..l_tab_files.COUNT LOOP -- spawn a process for each file found and associate the file with the process
+
+                hig_process_api.initialise_temp_files;  
+ 
+                hig_process_api.add_temp_file(pi_rec => l_tab_files(f)) ;
+         
+         
+                         create_and_schedule_process    (pi_process_type_id           => l_process_rec.hp_process_type_id
+                                                       , pi_initiators_ref            => l_process_rec.hp_initiators_ref
+                                                       , pi_start_date                => sysdate
+                                                       , pi_frequency_id              => -1
+                                                       , pi_polling_flag              => 'N'
+                                                       , pi_area_id                   => l_process_rec.hp_area_id
+                                                       , po_process_id                => l_process_id
+                                                       , po_job_name                  => l_job_name
+                                                       , po_scheduled_start_date      => l_date);
+         
+                log_it('Spawned process '||hig_process_framework_utils.formatted_process_id(l_process_id)||' for '||l_tab_files(f).filename);
+         
+         
+         END LOOP;
+
+
          hig_process_api.log_it(pi_message => 'Polling complete');
          commit;
               
     ELSE
          drop_execution;
-         l_ok_to_proceed := FALSE;
 
     END IF;            
   
   END associate_files;
   
+  
+
   
 BEGIN
 
@@ -1450,7 +1477,7 @@ BEGIN
   END IF;  
   
 
-  RETURN(l_ok_to_proceed);
+  RETURN(l_process_rec.hp_polling_flag != 'Y');
 
 END do_polling_if_requested;
 --
