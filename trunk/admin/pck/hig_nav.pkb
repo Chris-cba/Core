@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.10   May 21 2010 16:22:06   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.11   May 28 2010 12:18:00   lsorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   May 21 2010 16:22:06  $
---       Date fetched Out : $Modtime:   May 20 2010 11:53:44  $
---       Version          : $Revision:   3.10  $
+--       Date into PVCS   : $Date:   May 28 2010 12:18:00  $
+--       Date fetched Out : $Modtime:   May 28 2010 12:14:52  $
+--       Version          : $Revision:   3.11  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.10  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.11  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
@@ -1844,7 +1844,7 @@ BEGIN
                      'WHERE  das_rec_id = :1 '||
                      'AND    das_doc_id = doc_id '||
                      'AND    hig_nav.check_enquiry(das_doc_id )!= 1 '||
-                     'AND    das_table_name = :2 ' BULK COLLECT INTO l_doc_tab Using pi_id,pi_table_name ;
+                     'AND    das_table_name = :2 Order By doc_dtp_code, doc_id DESC ' BULK COLLECT INTO l_doc_tab Using pi_id,pi_table_name ;
 
    IF l_doc_tab.Count > 0
    THEN
@@ -1867,13 +1867,13 @@ BEGIN
                              'WHERE  das_rec_id = :1 '||
                              'AND    das_doc_id = doc_id '||
                              'AND    hig_nav.check_enquiry(das_doc_id )!= 1 '||
-                             'AND    das_table_name = :2 ' BULK COLLECT INTO l_doc_tab Using pi_id,l_table_name ;           
+                             'AND    das_table_name = :2 Order By doc_dtp_code, doc_id DESC' BULK COLLECT INTO l_doc_tab Using pi_id,l_table_name ;           
        END IF ;
        Return l_doc_tab;
    END IF ;
 EXCEPTION
 WHEN OTHERS THEN
-    Null ;
+     Return l_doc_tab;
 --         
 END get_docs_tab;
 --
