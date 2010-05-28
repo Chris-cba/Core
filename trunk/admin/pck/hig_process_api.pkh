@@ -5,11 +5,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkh-arc   3.7   May 25 2010 15:15:00   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkh-arc   3.8   May 28 2010 17:48:02   gjohnson  $
 --       Module Name      : $Workfile:   hig_process_api.pkh  $
---       Date into PVCS   : $Date:   May 25 2010 15:15:00  $
---       Date fetched Out : $Modtime:   May 25 2010 10:51:14  $
---       Version          : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   May 28 2010 17:48:02  $
+--       Date fetched Out : $Modtime:   May 28 2010 14:28:58  $
+--       Version          : $Revision:   3.8  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -19,7 +19,7 @@ AS
 --constants
 -----------
 --g_sccsid is the SCCS ID for the package
-g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.7  $';
+g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.8  $';
   
 -----------------------------------------------------------
 -- To facilitate attributing a list of files with a process
@@ -203,6 +203,7 @@ PROCEDURE amend_process    (pi_process_id           IN hig_processes.hp_process_
                            ,pi_job_name             IN hig_processes.hp_job_name%TYPE
                            ,pi_initiators_ref       IN hig_processes.hp_initiators_ref%TYPE
                            ,pi_frequency_id         IN hig_processes.hp_frequency_id%TYPE
+                           ,pi_area_id              IN hig_processes.hp_area_id%TYPE
                            ,pi_scheduled_date       IN DATE);
                                         
 
