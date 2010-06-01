@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.30   May 27 2010 11:14:36   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.31   Jun 01 2010 22:52:48   rcoupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   May 27 2010 11:14:36  $
---       Date fetched Out : $Modtime:   May 27 2010 11:13:58  $
---       PVCS Version     : $Revision:   2.30  $
+--       Date into PVCS   : $Date:   Jun 01 2010 22:52:48  $
+--       Date fetched Out : $Modtime:   Jun 01 2010 22:51:26  $
+--       PVCS Version     : $Revision:   2.31  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Fri May 21  17:45:20 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Tue Jun 01  17:43:42 2010 by Server Generator 10.1.2.9.28
 
 
 
@@ -3566,7 +3566,7 @@ CREATE TABLE HIG_QUERY_TYPE_ATTRIBUTES
  ,HQTA_PRE_BRACKET VARCHAR2(10)
  ,HQTA_OPERATOR VARCHAR(10) NOT NULL
  ,HQTA_ATTRIBUTE_NAME VARCHAR(30) NOT NULL
- ,HQTA_CONDITION VARCHAR(10) NOT NULL
+ ,HQTA_CONDITION VARCHAR(20) NOT NULL
  ,HQTA_DATA_VALUE VARCHAR(1000)
  ,HQTA_POST_BRACKET VARCHAR2(10)
  ,HQTA_DATE_CREATED DATE NOT NULL
@@ -10335,7 +10335,7 @@ CREATE TABLE NM_TYPES
  ,NT_NODE_TYPE VARCHAR2(4)
  ,NT_DESCR VARCHAR2(80) NOT NULL
  ,NT_ADMIN_TYPE VARCHAR2(4) NOT NULL
- ,NT_LENGTH_UNIT NUMBER(9) NOT NULL
+ ,NT_LENGTH_UNIT NUMBER(9)
  ,NT_DATUM VARCHAR2(1) DEFAULT 'N' NOT NULL
  ,NT_POP_UNIQUE VARCHAR2(1) DEFAULT 'N' NOT NULL
  )
