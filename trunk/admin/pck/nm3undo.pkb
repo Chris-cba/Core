@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.7   Sep 03 2009 09:59:26   drawat  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.8   Jun 01 2010 12:47:50   cstrettle  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Sep 03 2009 09:59:26  $
---       Date fetched Out : $Modtime:   Sep 02 2009 17:38:08  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Jun 01 2010 12:47:50  $
+--       Date fetched Out : $Modtime:   Jun 01 2010 12:46:42  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -2033,11 +2033,9 @@ END undo_scheme;
 
 --
 -- delete the nm_element_history record
-      DELETE      NM_ELEMENT_HISTORY
-            WHERE ROWID = l_neh_rowid;
-
+      DELETE NM_ELEMENT_HISTORY
+      WHERE  ROWID = l_neh_rowid;
 --
-
       --RC if it is a route then restore any route shapes.
       IF Nm3net.element_is_a_group (pi_ne_id => p_ne_id)
       THEN
@@ -2045,7 +2043,12 @@ END undo_scheme;
                                      p_date       => v_close_date
                                     );
       END IF;
-
+     --
+     -- CWS 0109500 1/6/10 restore any additional data.
+      UPDATE nm_nw_ad_link_all
+         SET nad_end_date = NULL
+       WHERE nad_ne_id = p_ne_id;
+     --
       set_for_return;
       Nm_Debug.proc_end (g_package_name, 'unclose');
    EXCEPTION
