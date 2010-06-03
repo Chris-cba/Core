@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.4   May 21 2010 16:48:00   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.5   Jun 03 2010 15:28:28   aedwards  $
 --       Module Name      : $Workfile:   doc_locations_api.pkb  $
---       Date into PVCS   : $Date:   May 21 2010 16:48:00  $
---       Date fetched Out : $Modtime:   May 21 2010 16:47:08  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jun 03 2010 15:28:28  $
+--       Date fetched Out : $Modtime:   Jun 03 2010 15:28:04  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
 --
   g_package_name CONSTANT varchar2(30) := 'doc_locations_api';
 --
@@ -457,11 +457,11 @@ BEGIN
      l_tab_comments(1)  := '--';
      l_tab_comments(2)  := '--   SCCS Identifiers :-';
      l_tab_comments(3)  := '--';
-     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.4   May 21 2010 16:48:00   aedwards  $';
+     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.5   Jun 03 2010 15:28:28   aedwards  $';
      l_tab_comments(5)  := '--       Module Name                : $Workfile:   doc_locations_api.pkb  $';
-     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   May 21 2010 16:48:00  $';
-     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   May 21 2010 16:47:08  $';
-     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.4  $';
+     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jun 03 2010 15:28:28  $';
+     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jun 03 2010 15:28:04  $';
+     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.5  $';
      l_tab_comments(9)  := '--';
      l_tab_comments(10) := '--   table_name_WHO trigger';
      l_tab_comments(11) := '--';
@@ -1139,9 +1139,12 @@ END get_location_descr;
     l_dir_url hig_directories.hdir_url%TYPE;
   BEGIN
   --
-    RETURN NVL(hig_directories_api.get(pi_hdir_name       => get_dlc(pi_dlc_id=>pi_dlc_id).dlc_location_name
-                                      ,pi_raise_not_found => FALSE ).hdir_url
-              ,get_dlc(pi_dlc_id=>pi_dlc_id).dlc_url_pathname) ;
+--    RETURN NVL(hig_directories_api.get(pi_hdir_name       => get_dlc(pi_dlc_id=>pi_dlc_id).dlc_location_name
+--                                      ,pi_raise_not_found => FALSE ).hdir_url
+--              ,get_dlc(pi_dlc_id=>pi_dlc_id).dlc_url_pathname) ;
+    RETURN NVL(get_dlc(pi_dlc_id=>pi_dlc_id).dlc_url_pathname
+              ,hig_directories_api.get(pi_hdir_name       => get_dlc(pi_dlc_id=>pi_dlc_id).dlc_location_name
+                                      ,pi_raise_not_found => FALSE ).hdir_url) ;
   --
   END get_doc_url;
 --
@@ -1186,23 +1189,27 @@ END get_location_descr;
        END;
     END IF;
   --
-    l_url := NVL(hig_directories_api.get(pi_hdir_name       => get_dlc(pi_dlc_id=>l_docs.doc_dlc_id).dlc_location_name
-                                      ,pi_raise_not_found => FALSE ).hdir_url
-                ,get_dlc(pi_dlc_id=>l_docs.doc_dlc_id).dlc_url_pathname);
-  --
-  -- Append the trailing forward slash if not present
-  --
-    IF SUBSTR ( l_url, LENGTH (l_url),1 ) NOT IN (g_forward_slash,g_back_slash)
+    l_url := NVL(get_dlc(pi_dlc_id=>l_docs.doc_dlc_id).dlc_url_pathname
+                ,hig_directories_api.get( pi_hdir_name      => get_dlc (pi_dlc_id=>l_docs.doc_dlc_id).dlc_location_name
+                                         ,pi_raise_not_found => FALSE ).hdir_url);
+    IF l_url IS NOT NULL
     THEN
-      l_url := l_url||g_forward_slash;
-    END IF;
-  --
-    l_url := l_url||l_docs.doc_file;
-  -- 
-    IF l_dmd.dmd_file_extension IS NOT NULL 
-    AND INSTR(l_docs.doc_file,'.') = 0
-    THEN
-      l_url := l_url || '.' || l_dmd.dmd_file_extension;
+    --
+    -- Append the trailing forward slash if not present
+    --
+      IF SUBSTR ( l_url, LENGTH (l_url),1 ) NOT IN (g_forward_slash,g_back_slash)
+      THEN
+        l_url := l_url||g_forward_slash;
+      END IF;
+    --
+      l_url := l_url||l_docs.doc_file;
+    -- 
+      IF l_dmd.dmd_file_extension IS NOT NULL 
+      AND INSTR(l_docs.doc_file,'.') = 0
+      THEN
+        l_url := l_url || '.' || l_dmd.dmd_file_extension;
+      END IF;
+    --
     END IF;
   --
     RETURN l_url;
