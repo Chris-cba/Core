@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.9   27 May 2010 10:06:04   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.10   03 Jun 2010 10:45:02   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   27 May 2010 10:06:04  $
---       Date fetched Out : $Modtime:   27 May 2010 10:05:42  $
---       PVCS Version     : $Revision:   2.32.1.9  $
+--       Date into PVCS   : $Date:   03 Jun 2010 10:45:02  $
+--       Date fetched Out : $Modtime:   03 Jun 2010 10:37:48  $
+--       PVCS Version     : $Revision:   2.32.1.10  $
 --
 --
 --   Author : Priidu Tanava
@@ -109,13 +109,14 @@ No query types defined.
                 NB! requires nm3bulk_mrg.pkh 2.7
   19.05.10  PT tasks 0109662, 0109663: in load_temp_extent_datums() added missing sql_nm_datum_criteria_pre_tmp() wrapper
   27.05.10  PT task 0109671: in ins_datum_homo_chunks() increase length of l_case
+  03.06.10  PT task 0109671: in ins_datum_homo_chunks() changed bandings logic to replace case statments with table lookups
 
 
   Todo: load_group_datums() with begin and end parameters
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.9  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.10  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -650,49 +651,37 @@ No query types defined.
     is
       s varchar2(32767);
       l_cr varchar2(20) := cr||'  ';
-      l_band_value  number(4);
-      l_case        varchar2(32767);
+      --l_band_value  number(4);
+      --l_case        varchar2(32767);
       l_tochar1     varchar2(20);
       l_tochar2     varchar2(20);
-      k binary_integer;
+      --k binary_integer;
+      b binary_integer;
     begin
       i := pt_attr.first;
       while i is not null loop
-        l_band_value := 0;
-        l_case := null;
-        k := pt_itd.first;
-        while k is not null loop
-          if pt_attr(i).inv_type = pt_itd(k).itd_inv_type then
-            if get_attrib_name(
-               p_table_name => pt_attr(i).table_name
-              ,p_ita_attrib_name => pt_attr(i).ita_attrib_name
-              ,p_iit_attrib_name => pt_attr(i).iit_attrib_name
-              ) = pt_itd(k).itd_attrib_name
-            then
-              l_band_value := l_band_value + 1;
-              if pt_attr(i).ita_format = 'DATE' then
-                l_tochar1 := 'to_number(to_char(';
-                l_tochar2 := ', ''J''))';
-              else
-                l_tochar1 := null;
-                l_tochar2 := null;
-              end if;
-              l_case := l_case
-                ||cr||'  when '||l_tochar1
-                    ||p_alias||'.'||attribute_xsp_name(pt_attr(i).mrg_attrib, pt_attr(i).xsp)
-                    ||l_tochar2||' between '
-                    ||pt_itd(k).itd_band_min_value||' and '
-                    ||pt_itd(k).itd_band_max_value||' then '||qt||l_band_value||qt;
-            end if;
+        b := first_banding_index(
+           pr_attr  => pt_attr(i)
+          ,pt_itd   => pt_itd
+        );
+        if b is not null then
+          if pt_attr(i).ita_format = 'DATE' then
+            l_tochar1 := 'to_number(to_char(';
+            l_tochar2 := ', ''J''))';
+          else
+            l_tochar1 := null;
+            l_tochar2 := null;
           end if;
-          k := pt_itd.next(k);
-        end loop;
-
-        if l_case is not null then
-             s := s||l_cr||'case'||l_case
-          ||cr||'  else null end';
+          s := s||l_cr||'(select to_char(itd_band_seq) from nm_inv_type_attrib_band_dets'
+            ||cr||'where itd_inv_type = '''||pt_attr(i).inv_type||''''
+            ||cr||'  and itd_attrib_name = '''||pt_itd(b).itd_attrib_name||''''
+            ||cr||'  and itd_itb_banding_id = '||pt_itd(b).itd_itb_banding_id
+            ||cr||'  and '||l_tochar1||p_alias||'.'||attribute_xsp_name(pt_attr(i).mrg_attrib, pt_attr(i).xsp)||l_tochar2
+                ||' between itd_band_min_value and itd_band_max_value)';
+                
         else
           s := s||l_cr||p_alias||'.'||attribute_xsp_name(pt_attr(i).mrg_attrib, pt_attr(i).xsp);
+        
         end if;
 
         l_cr := cr||'    ||'',''||';
@@ -704,8 +693,8 @@ No query types defined.
     when others then
       nm3dbg.puterr(sqlerrm||': '||g_package_name||'.sql_hashcode_cols('
         ||'p_alias='||p_alias
-        ||', l_band_value='||l_band_value
-        ||', l_case='||l_case
+        --||', l_band_value='||l_band_value
+        --||', l_case='||l_case
         ||', i='||i
         ||', length(s)='||length(s)
         ||', s='||s
