@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.11   May 28 2010 12:18:00   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.12   Jun 07 2010 09:41:42   lsorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   May 28 2010 12:18:00  $
---       Date fetched Out : $Modtime:   May 28 2010 12:14:52  $
---       Version          : $Revision:   3.11  $
+--       Date into PVCS   : $Date:   Jun 07 2010 09:41:42  $
+--       Date fetched Out : $Modtime:   Jun 07 2010 09:40:52  $
+--       Version          : $Revision:   3.12  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.11  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.12  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
@@ -1839,9 +1839,10 @@ IS
 --
 BEGIN
 --
-   Execute Immediate 'SELECT doc_id,''Document - ''|| doc_id||'', ''||To_Char(doc_date_issued,''dd-Mon-yyyy'')||'', ''||doc_reference_code||'', ''||doc_dtp_code||'', ''||doc_title  '||
-                     'FROM   doc_assocs,docs '||
+   Execute Immediate 'SELECT doc_id,''Document - ''|| doc_id||''; ''||doc_dtp_code||''; ''||doc_file||''; ''||dmd_name||''; ''||To_Char(doc_date_issued,''dd-Mon-yyyy'')||''; '''||
+                     'FROM   doc_assocs,docs,doc_media '||
                      'WHERE  das_rec_id = :1 '||
+                     'AND    doc_dlc_dmd_id = dmd_id(+) '||
                      'AND    das_doc_id = doc_id '||
                      'AND    hig_nav.check_enquiry(das_doc_id )!= 1 '||
                      'AND    das_table_name = :2 Order By doc_dtp_code, doc_id DESC ' BULK COLLECT INTO l_doc_tab Using pi_id,pi_table_name ;
@@ -1862,9 +1863,10 @@ BEGIN
        END ;
        IF l_table_name IS NOT NULL
        THEN
-           Execute Immediate 'SELECT doc_id,''Document - ''|| doc_id||'', ''||To_Char(doc_date_issued,''dd-Mon-yyyy'')||'', ''||doc_reference_code||'', ''||doc_dtp_code||'', ''||doc_title  '||
-                             'FROM   doc_assocs,docs '||
+           Execute Immediate 'SELECT doc_id,''Document - ''|| doc_id||''; ''||doc_dtp_code||''; ''||doc_file||''; ''||dmd_name||''; ''||To_Char(doc_date_issued,''dd-Mon-yyyy'')||''; '''||
+                             'FROM   doc_assocs,docs,doc_media '||
                              'WHERE  das_rec_id = :1 '||
+                             'AND    doc_dlc_dmd_id = dmd_id(+) '||
                              'AND    das_doc_id = doc_id '||
                              'AND    hig_nav.check_enquiry(das_doc_id )!= 1 '||
                              'AND    das_table_name = :2 Order By doc_dtp_code, doc_id DESC' BULK COLLECT INTO l_doc_tab Using pi_id,l_table_name ;           
