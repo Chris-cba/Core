@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.16   Apr 27 2010 13:52:18   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.17   Jun 07 2010 15:00:42   lsorathia  $
 --       Module Name      : $Workfile:   nm3trg.sql  $
---       Date into PVCS   : $Date:   Apr 27 2010 13:52:18  $
---       Date fetched Out : $Modtime:   Apr 27 2010 13:52:02  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Jun 07 2010 15:00:42  $
+--       Date fetched Out : $Modtime:   Jun 07 2010 15:00:10  $
+--       PVCS Version     : $Revision:   2.17  $
 --
 --
 --   Author : Graeme Johnson
@@ -1870,17 +1870,6 @@ PROMPT huol_huo_length_trg.trg
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'huol_huo_length_trg.trg' run_file 
-FROM dual 
-/ 
-start '&run_file' 
---
------------------------------------------------------------------------------------------
---
-SET TERM ON 
-PROMPT nm_inv_type_roles_ins.trg
-SET TERM OFF
-SET DEFINE ON 
-SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'nm_inv_type_roles_ins.trg' run_file 
 FROM dual 
 / 
 start '&run_file' 
