@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.19   Apr 29 2010 17:04:54   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.20   Jun 08 2010 15:52:52   cstrettle  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Apr 29 2010 17:04:54  $
---       Date fetched Out : $Modtime:   Apr 29 2010 17:02:44  $
---       SCCS Version     : $Revision:   2.19  $
+--       Date into SCCS   : $Date:   Jun 08 2010 15:52:52  $
+--       Date fetched Out : $Modtime:   Jun 08 2010 15:50:36  $
+--       SCCS Version     : $Revision:   2.20  $
 --       Based on --
 --
 --   nm3inv package body
@@ -30,7 +30,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.19  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.20  $';
    g_package_name   CONSTANT VARCHAR2(30) := 'nm3inv';
 --
    --<USED BY validate_rec_iit>
@@ -617,6 +617,10 @@ FUNCTION get_inv_domain_meaning(pi_domain IN NM_INV_ATTRI_LOOKUP_ALL.ial_domain%
       NM_INV_ATTRI_LOOKUP_ALL ial
     WHERE
       ial.ial_domain = p_domain
+    --CWS 0109619 Any end dated domains fail regardless of when the end date is.
+    AND 
+      ial.ial_end_date IS NULL
+    --
     AND
       ial.ial_value = p_value;
 
