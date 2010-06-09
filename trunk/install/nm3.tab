@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.31   Jun 01 2010 22:52:48   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.32   Jun 09 2010 14:24:40   rcoupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Jun 01 2010 22:52:48  $
---       Date fetched Out : $Modtime:   Jun 01 2010 22:51:26  $
---       PVCS Version     : $Revision:   2.31  $
+--       Date into PVCS   : $Date:   Jun 09 2010 14:24:40  $
+--       Date fetched Out : $Modtime:   Jun 09 2010 14:21:20  $
+--       PVCS Version     : $Revision:   2.32  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Tue Jun 01  17:43:42 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Wed Jun 09  14:10:44 2010 by Server Generator 10.1.2.9.28
 
 
 
@@ -3573,6 +3573,7 @@ CREATE TABLE HIG_QUERY_TYPE_ATTRIBUTES
  ,HQTA_CREATED_BY VARCHAR2(30) NOT NULL
  ,HQTA_DATE_MODIFIED DATE NOT NULL
  ,HQTA_MODIFIED_BY VARCHAR2(30) NOT NULL
+ ,HQTA_INV_TYPE VARCHAR2(4) NOT NULL
  )
 /
 
@@ -3613,6 +3614,9 @@ COMMENT ON COLUMN HIG_QUERY_TYPE_ATTRIBUTES.HQTA_DATE_MODIFIED IS 'Audit details
 /
 
 COMMENT ON COLUMN HIG_QUERY_TYPE_ATTRIBUTES.HQTA_MODIFIED_BY IS 'Audit details'
+/
+
+COMMENT ON COLUMN HIG_QUERY_TYPE_ATTRIBUTES.HQTA_INV_TYPE IS 'Identifies the asset metamodel used for the selected column'
 /
 
 PROMPT Creating Table 'HIG_REPORT_STYLES'
@@ -9196,7 +9200,7 @@ CREATE GLOBAL TEMPORARY TABLE NM_MRG_SPLIT_RESULTS_TMP
  (NM_NE_ID_OF NUMBER(9)
  ,NM_BEGIN_MP NUMBER
  ,NM_END_MP NUMBER
- ,NM_NE_ID_IN NUMBER(9)
+ ,NM_NE_ID_IN NUMBER(38)
  ,NM_OBJ_TYPE VARCHAR2(4)
  ,NM_TYPE VARCHAR2(4)
  ,NM_DATE_MODIFIED DATE
