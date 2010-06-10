@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.27   Jun 09 2010 14:55:24   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.28   Jun 10 2010 12:01:26   rcoupe  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Jun 09 2010 14:55:24  $
---       Date fetched Out : $Modtime:   Jun 09 2010 14:54:38  $
---       PVCS Version     : $Revision:   2.27  $
+--       Date into PVCS   : $Date:   Jun 10 2010 12:01:26  $
+--       Date fetched Out : $Modtime:   Jun 10 2010 12:00:34  $
+--       PVCS Version     : $Revision:   2.28  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Wed Jun 09  14:10:47 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Thu Jun 10  11:43:16 2010 by Server Generator 10.1.2.9.28
 
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -692,6 +692,14 @@ PROMPT Creating Primary Key on 'HIG_NAVIGATOR'
 ALTER TABLE HIG_NAVIGATOR
  ADD (CONSTRAINT HNV_PK PRIMARY KEY
   (HNV_CHILD_ALIAS))
+/
+
+PROMPT Creating Primary Key on 'HIG_NAVIGATOR_MODULES'
+ALTER TABLE HIG_NAVIGATOR_MODULES
+ ADD (CONSTRAINT HNM_PK PRIMARY KEY
+  (HNM_MODULE_NAME
+  ,HNM_MODULE_PARAM
+  ,HNM_HIERARCHY_LABEL))
 /
 
 PROMPT Creating Primary Key on 'HIG_OPTION_LIST'
@@ -2446,14 +2454,6 @@ ALTER TABLE HIG_MODULE_LINK_METHODS
   (HMLM_MODULE_LINK_ID
   ,HMLM_PARAM_FROM
   ,HMLM_PARAM_TO))
-/
-
-PROMPT Creating Unique Key on 'HIG_NAVIGATOR_MODULES'
-ALTER TABLE HIG_NAVIGATOR_MODULES
- ADD (CONSTRAINT HNM_UK UNIQUE
-  (HNM_MODULE_NAME
-  ,HNM_MODULE_PARAM
-  ,HNM_HIERARCHY_LABEL))
 /
 
 PROMPT Creating Unique Key on 'HIG_PROCESS_TYPES'
@@ -5141,14 +5141,14 @@ PROMPT Creating Foreign Key on 'HIG_PROCESS_ALERT_LOG'
 ALTER TABLE HIG_PROCESS_ALERT_LOG ADD (CONSTRAINT
  HPAL_HPT_FK FOREIGN KEY
   (HPAL_PROCESS_TYPE_ID) REFERENCES HIG_PROCESS_TYPES
-  (HPT_PROCESS_TYPE_ID))
+  (HPT_PROCESS_TYPE_ID) ON DELETE CASCADE)
 /
 
 PROMPT Creating Foreign Key on 'HIG_PROCESS_ALERT_LOG'
 ALTER TABLE HIG_PROCESS_ALERT_LOG ADD (CONSTRAINT
  HPAL_HP_FK FOREIGN KEY
   (HPAL_PROCESS_ID) REFERENCES HIG_PROCESSES
-  (HP_PROCESS_ID))
+  (HP_PROCESS_ID) ON DELETE CASCADE)
 /
 
 PROMPT Creating Foreign Key on 'HIG_PROCESS_CONNS_BY_AREA'
