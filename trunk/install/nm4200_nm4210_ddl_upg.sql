@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.9   Jun 11 2010 15:17:38   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.10   Jun 11 2010 16:19:16   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jun 11 2010 15:17:38  $
---       Date fetched Out : $Modtime:   Jun 11 2010 15:11:44  $
---       Version          : $Revision:   3.9  $
+--       Date into PVCS   : $Date:   Jun 11 2010 16:19:16  $
+--       Date fetched Out : $Modtime:   Jun 11 2010 16:18:28  $
+--       Version          : $Revision:   3.10  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -2734,9 +2734,6 @@ COMMENT ON COLUMN HIG_QUERY_TYPES.HQT_DATE_MODIFIED IS 'Audit details'
 COMMENT ON COLUMN HIG_QUERY_TYPES.HQT_MODIFIED_BY IS 'Audit details'
 /
 
-COMMENT ON COLUMN HIG_QUERY_TYPE_ATTRIBUTES.hqta_inv_type IS 'Identifies the asset metamodel used for the selected column'
-/
-
 
 
 PROMPT Creating Table 'HIG_QUERY_TYPE_ATTRIBUTES'
@@ -2794,6 +2791,9 @@ COMMENT ON COLUMN HIG_QUERY_TYPE_ATTRIBUTES.HQTA_DATE_MODIFIED IS 'Audit details
 /
 
 COMMENT ON COLUMN HIG_QUERY_TYPE_ATTRIBUTES.HQTA_MODIFIED_BY IS 'Audit details'
+/
+
+COMMENT ON COLUMN HIG_QUERY_TYPE_ATTRIBUTES.hqta_inv_type IS 'Identifies the asset metamodel used for the selected column'
 /
 
 PROMPT Creating Table 'HIG_FLEX_ATTRIBUTES'
