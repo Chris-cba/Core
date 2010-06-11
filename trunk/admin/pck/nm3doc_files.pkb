@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.10   May 21 2010 16:48:28   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkb-arc   2.11   Jun 11 2010 11:24:20   aedwards  $
 --       Module Name      : $Workfile:   nm3doc_files.pkb  $
---       Date into PVCS   : $Date:   May 21 2010 16:48:28  $
---       Date fetched Out : $Modtime:   May 21 2010 16:47:20  $
---       Version          : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jun 11 2010 11:24:20  $
+--       Date fetched Out : $Modtime:   Jun 11 2010 11:23:50  $
+--       Version          : $Revision:   2.11  $
 --       Based on SCCS version :
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid     CONSTANT VARCHAR2(2000) := '$Revision:   2.10  $';
+  g_body_sccsid     CONSTANT VARCHAR2(2000) := '$Revision:   2.11  $';
   g_package_name    CONSTANT VARCHAR2(30)   := 'nm3doc_files';
 --
   g_sep                      VARCHAR2(1)    := NVL(hig.get_sysopt('DIRREPSTRN'),'\');
@@ -31,6 +31,29 @@ AS
   g_revision_col    CONSTANT VARCHAR2(30)   := 'DFTT_REVISION';
   g_forward_slash   CONSTANT VARCHAR2(1)    := CHR(47);
   g_back_slash      CONSTANT VARCHAR2(1)    := CHR(92);
+--
+--------------------------------------------------------------------------------
+--
+  g_debug           CONSTANT BOOLEAN        := TRUE;
+--
+--------------------------------------------------------------------------------
+--
+  PROCEDURE local_debug ( pi_text IN VARCHAR2 )
+  IS
+  BEGIN
+    nm_debug.debug(pi_text);
+  END local_debug;
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE local_debug_on 
+  IS
+  BEGIN
+    IF g_debug
+    THEN
+      nm_debug.debug_on;
+    END IF;
+  END local_debug_on;
 --
 -----------------------------------------------------------------------------
 --
@@ -120,12 +143,12 @@ AS
   --
     l_rec_dlt := doc_locations_api.get_dlt(pi_doc_id => pi_doc_id );
   --
---    nm_debug.debug_on;
+    local_debug_on;
   --
     IF l_rec_dlt.dlt_table IS NOT NULL
     THEN
     --
-      nm_debug.debug('move_file_to_blob - start');
+      local_debug('move_file_to_blob - start');
     --
       EXECUTE IMMEDIATE 
         ' SELECT dlc_name, '||l_rec_dlt.dlt_filename 
@@ -137,7 +160,7 @@ AS
       INTO location, filename
       USING IN pi_doc_id;
     --
-      nm_debug.debug('move_file_to_blob - before table update');
+      local_debug('move_file_to_blob - before table update');
     --
       EXECUTE IMMEDIATE 
         'UPDATE '||l_rec_dlt.dlt_table ||
@@ -151,7 +174,7 @@ AS
     --
       COMMIT;
     --
-      nm_debug.debug('move_file_to_blob - after table update');
+      local_debug('move_file_to_blob - after table update');
     --
     ELSIF doc_locations_api.get_dlc_table(pi_doc_id=>pi_doc_id) = doc_locations_api.get_temp_load_table
     AND l_rec_dlc.dlc_location_type IN ( 'ORACLE_DIRECTORY', 'DB_SERVER' )
@@ -163,10 +186,35 @@ AS
         FROM docs
        WHERE doc_id = pi_doc_id;
     --
-      UPDATE doc_file_transfer_temp
-         SET dftt_content  = nm3file.file_to_blob ( l_rec_dlc.dlc_location_name, filename )
-       WHERE dftt_doc_id   = pi_doc_id
-         AND dftt_revision = pi_revision ;
+      local_debug_on;
+      local_debug( pi_doc_id||' : '||l_rec_dlc.dlc_location_name||'\'|| filename );
+    --
+      DECLARE
+        l_dir hig_directories.hdir_name%TYPE;
+      BEGIN
+        l_dir := CASE WHEN l_rec_dlc.dlc_location_type = 'DB_SERVER'
+                      THEN create_dir_on_fly (l_rec_dlc.dlc_location_name)
+                      ELSE l_rec_dlc.dlc_location_name
+                 END;
+    --
+        UPDATE doc_file_transfer_temp
+           SET dftt_content  = nm3file.file_to_blob ( l_dir, filename )
+         WHERE dftt_doc_id   = pi_doc_id
+           AND dftt_revision = pi_revision ;
+      --
+        IF l_rec_dlc.dlc_location_type = 'DB_SERVER'
+        THEN
+          drop_dir_on_fly (l_dir);
+        END IF;
+      --
+      EXCEPTION
+        WHEN OTHERS
+        THEN 
+          IF l_rec_dlc.dlc_location_type = 'DB_SERVER' 
+          THEN drop_dir_on_fly (l_dir);
+          END IF;
+          RAISE;
+      END;
     --
     END IF;
   --
@@ -469,7 +517,12 @@ AS
         po_prog_title     := l_progress_title;
         po_prog_sub_title := l_progress_sub_title;
       --
-        drop_dir_on_fly (l_location);
+        IF (INSTR(l_location,g_forward_slash) > 0
+        OR INSTR(l_location,g_back_slash) > 0)
+        AND  doc_locations_api.get_dlc(pi_doc_id => pi_doc_id).dlc_location_type = 'DB_SERVER'
+        THEN
+          drop_dir_on_fly (l_location);
+        END IF;
       --
       ELSE
       --
@@ -482,18 +535,25 @@ AS
   EXCEPTION
   --
     WHEN ex_no_file
-      THEN raise_application_error (-20101
-                                   --,'DOC_ID ['||pi_doc_id||'] has a null DOC_FILE entry');
-                                   ,'DOC_ID ['||pi_doc_id||'] has no corresponing entry in its storage table');
+    THEN
+      hig.raise_ner ( pi_appl               => 'HIG'
+                    , pi_id                 => 542
+                    , pi_supplementary_info => 'DOC_ID ['||pi_doc_id||'] in '||l_rec_dlt.dlt_table||' ['||l_rec_dlt.dlt_content_col ||']');
   --
     WHEN ex_cannot_find_file
-      THEN raise_application_error (-20102
-                                   ,'Cannot read file ['||l_filename
-                                  ||'] from location ['||l_location ||']');
+    THEN 
+      hig.raise_ner ( pi_appl               => 'HIG'
+                    , pi_id                 => 543
+                    , pi_supplementary_info => 'Filename ['||l_filename||'] on '||l_location);
   --
     WHEN OTHERS
-      THEN       
-      drop_dir_on_fly (l_location);
+      THEN
+      IF (INSTR(l_location,g_forward_slash) > 0
+        OR INSTR(l_location,g_back_slash) > 0)
+        AND  doc_locations_api.get_dlc(pi_doc_id => pi_doc_id).dlc_location_type = 'DB_SERVER'
+        THEN       
+        drop_dir_on_fly (l_location);
+      END IF;
       RAISE;
   --
   END get_download_info;
@@ -505,10 +565,15 @@ AS
   IS
     retval VARCHAR2(100) := TO_CHAR(SYSTIMESTAMP,'DDHHMISSFF');
   BEGIN
+  --
     hig_directories_api.mkdir(pi_replace        => TRUE
                              ,pi_directory_name => 'DOC'||retval
                              ,pi_directory_path => pi_path);
+  --
+    local_debug('Created dir on fly : '||'DOC'||retval);
+  --
     RETURN 'DOC'||retval;
+  --
   END;
 --
 --------------------------------------------------------------------------------
@@ -521,6 +586,19 @@ AS
      WHEN others THEN
        Null;
   END;
+--
+  FUNCTION ora_dir_exists ( pi_directory IN hig_directories.hdir_name%TYPE )
+  RETURN BOOLEAN
+  IS
+    l_dummy  hig_directories.hdir_name%TYPE ;
+  BEGIN
+    SELECT 'exists' INTO l_dummy
+      FROM all_directories
+     WHERE directory_name = pi_directory;
+    RETURN TRUE;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN RETURN FALSE;
+  END ora_dir_exists;
 --
 --------------------------------------------------------------------------------
 --  Download the file from the BLOB into an Oracle directory
@@ -537,7 +615,7 @@ AS
     ex_no_directory   EXCEPTION;
   BEGIN
   --
-    --nm_debug.debug_on;
+    local_debug_on;
   --
     IF pi_directory IS NULL
     THEN
@@ -563,17 +641,29 @@ AS
                            ELSE hdir_name
                          END;
     --
+      IF doc_locations_api.get_dlc(pi_doc_id => pi_doc_id).dlc_location_type = 'ORACLE_DIRECTORY'
+      AND NOT ora_dir_exists (l_directory)
+      THEN
+        RAISE NO_DATA_FOUND;
+      END IF;
+    --
     EXCEPTION
       WHEN NO_DATA_FOUND
       THEN
-        nm_debug.debug('Create directory on the fly'); 
-        l_directory := create_dir_on_fly ( pi_path => pi_directory );
-        l_drop_dir := TRUE;
+        local_debug('Create directory on the fly'); 
+        IF doc_locations_api.get_dlc(pi_doc_id => pi_doc_id).dlc_location_type = 'DB_SERVER'
+        THEN
+          l_directory := create_dir_on_fly ( pi_path => pi_directory );
+          l_drop_dir := TRUE;
+        ELSE
+          --RAISE_APPLICATION_ERROR(-20502,'Directory '||pi_directory||' does not exist ');
+          hig.raise_ner(pi_appl => 'HIG', pi_id => 536, pi_supplementary_info => pi_directory );
+        END IF;
     END;
   --
-    nm_debug.debug('Before BLOB2FILE');
+    local_debug('Before BLOB2FILE');
   --
-    nm_debug.debug(pi_doc_id||' : '||
+    local_debug(pi_doc_id||' : '||
                    pi_revision||' : '||
                    l_directory||' : '||
                    strip_filename(pi_filename));
@@ -584,25 +674,33 @@ AS
       , pi_directory => l_directory
       , pi_filename  => strip_filename(pi_filename) );
   --
-    nm_debug.debug('After BLOB2FILE');
+    local_debug('After BLOB2FILE');
   --
     IF l_drop_dir THEN
-      nm_debug.debug('Drop dir');
+      local_debug('Drop dir '||l_directory);
       drop_dir_on_fly (l_directory);
     END IF; 
   --
   EXCEPTION
     WHEN ex_no_dir_found
     THEN
+      IF l_drop_dir THEN
+        drop_dir_on_fly ( pi_directory => l_directory );
+      END IF;
       RAISE_APPLICATION_ERROR
         ( -20101,'Please define ['||pi_directory||'] as a HIG_DIRECTORY');
     WHEN ex_no_directory
     THEN
+      IF l_drop_dir THEN
+        drop_dir_on_fly ( pi_directory => l_directory );
+      END IF;
       RAISE_APPLICATION_ERROR
         ( -20102,'Please define a directory !');
     WHEN OTHERS
     THEN
-      drop_dir_on_fly ( pi_directory => l_directory );
+      IF l_drop_dir THEN
+        drop_dir_on_fly ( pi_directory => l_directory );
+      END IF;
       RAISE;
   --
   END download_from_blob_to_file;
@@ -666,9 +764,9 @@ AS
     --
     END IF;
   --
-    nm_debug.debug('Length = '||length(vblob));
-    nm_debug.debug('pi_directory '||pi_directory );
-    nm_debug.debug('pi_filename '||pi_filename);
+    local_debug('Length = '||length(vblob));
+    local_debug('pi_directory '||pi_directory );
+    local_debug('pi_filename '||pi_filename);
   --
   --
   -- Write the file out to the final destination
@@ -682,6 +780,7 @@ AS
         , pi_destination_file => pi_filename
         );
     END IF;
+    local_debug('Written file out to '||pi_directory||' : '||pi_filename);
   --
   -- Archive the file
   --
@@ -699,8 +798,122 @@ AS
 --
   PROCEDURE archive_file ( pi_doc_id    IN docs.doc_id%TYPE )
   IS
+    l_rec_dlc    doc_locations%ROWTYPE;
+    l_rec_dlt    doc_location_tables%ROWTYPE;
+    l_rec_doc    docs%ROWTYPE := nm3get.get_doc(pi_doc_id => pi_doc_id, pi_raise_not_found => FALSE );
+    l_blob       BLOB;
+    l_filename   nm3type.max_varchar2;
+    l_dir        hig_directories.hdir_name%TYPE;
   BEGIN
-  NULL;
+  --
+    local_debug_on;
+    local_debug('Processed - blob is '||CASE when l_blob is null then 'empty' else 'full' end );
+    l_rec_dlc := doc_locations_api.get_dlc(pi_doc_id => pi_doc_id);
+  --
+  -- Get the blob content from the TABLE
+  --
+    IF l_rec_doc.doc_id IS NULL
+    AND l_rec_doc.doc_file IS NULL
+    THEN 
+      RETURN;
+    END IF;
+  --
+    IF l_rec_dlc.dlc_location_type = 'TABLE'
+    THEN
+    --
+      l_rec_dlt := doc_locations_api.get_dlt(pi_doc_id => pi_doc_id );
+    --
+      IF l_rec_dlt.dlt_table IS NOT NULL
+      THEN
+      --
+      ----------------------------------
+      -- Read from static storage table
+      ----------------------------------
+      --
+        BEGIN
+          EXECUTE IMMEDIATE 
+            'SELECT '||l_rec_dlt.dlt_content_col||','||l_rec_dlt.dlt_filename
+           ||' FROM '||l_rec_dlt.dlt_table||
+            ' WHERE '||l_rec_dlt.dlt_doc_id_col||' = :pi_doc_id '||
+            '   AND '||l_rec_dlt.dlt_revision_col||' = '||
+                 ' CASE '||
+                  '  WHEN :pi_revision IS NOT NULL'||
+                  '    THEN :pi_revision '||
+                  '  ELSE '||
+                  '   (SELECT MAX('||l_rec_dlt.dlt_revision_col||') FROM '||l_rec_dlt.dlt_table||
+                      ' WHERE '||l_rec_dlt.dlt_doc_id_col||' = :pi_doc_id) END'
+          INTO l_blob, l_filename
+          USING IN pi_doc_id
+              , IN 1
+              , IN 1
+              , IN pi_doc_id;
+        --
+        EXCEPTION
+          WHEN OTHERS
+          THEN 
+            nm_debug.debug_on;
+            nm_debug.debug('Error getting copy from table '||l_rec_dlt.dlt_table
+                        ||' for DOC '||l_rec_dlt.dlt_doc_id_col||' : '||SQLERRM);
+            nm_debug.debug_off; 
+        END;
+      --
+      END IF;
+  --
+  -- Get the blob content from the ORACLE_DIRECTORY
+  --
+    ELSIF l_rec_dlc.dlc_location_type = 'ORACLE_DIRECTORY'
+    THEN
+      BEGIN
+        IF l_rec_doc.doc_id IS NOT NULL
+        AND l_rec_doc.doc_file IS NOT NULL
+        THEN
+          l_filename := l_rec_doc.doc_file;
+          l_blob := nm3file.file_to_blob( pi_source_dir  => l_rec_dlc.dlc_location_name
+                                        , pi_source_file => l_filename);
+        END IF;
+      EXCEPTION
+        WHEN OTHERS
+        THEN 
+          nm_debug.debug_on;
+          nm_debug.debug('Error getting copy from location '||l_rec_dlc.dlc_location_name
+                      ||' for file '||l_filename||' : '||SQLERRM);
+          nm_debug.debug_off;
+      END;
+--
+  -- Get the blob content from the DB_SERVER
+  --
+    ELSIF l_rec_dlc.dlc_location_type = 'DB_SERVER'
+    THEN
+      BEGIN
+        IF l_rec_doc.doc_id IS NOT NULL
+        AND l_rec_doc.doc_file IS NOT NULL
+        THEN
+          l_filename := l_rec_doc.doc_file;
+          l_dir := create_dir_on_fly( l_rec_dlc.dlc_location_name );
+          l_blob := nm3file.file_to_blob( pi_source_dir  => l_dir
+                                        , pi_source_file => l_filename);
+        END IF;
+        drop_dir_on_fly (l_dir);
+      EXCEPTION
+        WHEN OTHERS
+          THEN 
+          drop_dir_on_fly (l_dir);
+          nm_debug.debug_on;
+          nm_debug.debug('Error getting copy from location '||l_rec_dlc.dlc_location_name
+                      ||' for file '||l_filename||' : '||SQLERRM);
+          nm_debug.debug_off;
+      END;
+    END IF;
+  --
+    local_debug_on;
+    local_debug('Processed - blob is '||CASE when l_blob is not null then 'empty' else 'full' end );
+  --
+    IF l_blob IS NOT NULL
+    THEN
+      archive_file ( pi_doc_id   => pi_doc_id
+                   , pi_blob     => l_blob
+                   , pi_filename => l_filename );
+    END IF;
   END archive_file;
 --
 --------------------------------------------------------------------------------
@@ -711,7 +924,9 @@ AS
   IS
     l_tab_dla doc_locations_api.g_tab_dla;
     l_blob    BLOB  := pi_blob;
+    -- doc_location_archives
   BEGIN
+  --
     l_tab_dla := doc_locations_api.get_archives(pi_doc_id => pi_doc_id);
   --
     IF l_tab_dla.COUNT > 0
@@ -725,14 +940,20 @@ AS
       THEN
       --
         BEGIN
+          local_debug_on;
+          local_debug ('Archive '||l_tab_dla(i).dla_archive_name||'/'||pi_filename);
           nm3file.blob_to_file
-          ( pi_blob             => l_blob
-          , pi_destination_dir  => l_tab_dla(i).dla_archive_name
-          , pi_destination_file => pi_filename
-          );
+            ( pi_blob             => l_blob
+            , pi_destination_dir  => l_tab_dla(i).dla_archive_name
+            , pi_destination_file => pi_filename
+            );
         EXCEPTION
           WHEN OTHERS 
-          THEN RAISE_APPLICATION_ERROR (-20901,'Error archiving - '||nm3flx.parse_error_message(SQLERRM));
+          THEN 
+            nm_debug.debug_on;
+            nm_debug.debug('Error archiving '||pi_filename||' : '||SQLERRM);
+            nm_debug.debug_off; 
+          --RAISE_APPLICATION_ERROR (-20901,'Error archiving - '||nm3flx.parse_error_message(SQLERRM));
         END;
       --
       END IF;
@@ -1056,8 +1277,8 @@ AS
   FUNCTION get_work_folder RETURN VARCHAR2
   IS
   BEGIN
-    --RETURN NVL(hig.get_user_or_sys_opt('WORKFOLDER'),'C:\');
-    RETURN hig.get_user_or_sys_opt('WORKFOLDER');
+    RETURN NVL(hig.get_user_or_sys_opt('WORKFOLDER'),'C:\');
+    --RETURN hig.get_user_or_sys_opt('WORKFOLDER');
   END get_work_folder;
 --
 --------------------------------------------------------------------------------
@@ -1138,6 +1359,19 @@ AS
 --    END IF;
 --  --
 --  END set_doc_location_table;
+--
+--------------------------------------------------------------------------------
+--
+  FUNCTION get_filename_with_doc_id ( pi_filename IN VARCHAR2
+                                    , pi_doc_id   IN NUMBER )
+    RETURN VARCHAR
+  IS
+  BEGIN
+    RETURN
+        SUBSTR(pi_filename,0,instr(pi_filename,g_win_sep,-1))||
+               pi_doc_id||'_'||( substr (pi_filename,
+                                   instr(pi_filename,g_win_sep,-1)+1));
+  END get_filename_with_doc_id;
 --
 --------------------------------------------------------------------------------
 --

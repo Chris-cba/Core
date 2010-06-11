@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkh-arc   2.5   May 21 2010 16:48:28   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3doc_files.pkh-arc   2.6   Jun 11 2010 11:24:20   aedwards  $
 --       Module Name      : $Workfile:   nm3doc_files.pkh  $
---       Date into PVCS   : $Date:   May 21 2010 16:48:28  $
---       Date fetched Out : $Modtime:   May 21 2010 16:47:24  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Jun 11 2010 11:24:20  $
+--       Date fetched Out : $Modtime:   Jun 07 2010 16:22:40  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version :
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -20,7 +20,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.6  $';
  
 
 --</GLOBVAR>
@@ -221,6 +221,13 @@ AS
   PROCEDURE archive_file ( pi_doc_id    IN docs.doc_id%TYPE );
 --</PROC>
 --
+--------------------------------------------------------------------------------
+--
+-- <PROC NAME="GET_FILENAME_WITH_DOC_ID">
+  FUNCTION get_filename_with_doc_id ( pi_filename IN VARCHAR2 
+                                    , pi_doc_id   IN NUMBER )
+    RETURN VARCHAR;
+-- </PROC>
 --------------------------------------------------------------------------------
 --
 END nm3doc_files;

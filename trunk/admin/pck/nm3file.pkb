@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.12   May 17 2010 08:48:50   aedwards  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.13   Jun 11 2010 11:24:20   aedwards  $
 -- Module Name : $Workfile:   nm3file.pkb  $
--- Date into PVCS : $Date:   May 17 2010 08:48:50  $
--- Date fetched Out : $Modtime:   May 14 2010 16:24:08  $
--- PVCS Version : $Revision:   2.12  $
+-- Date into PVCS : $Date:   Jun 11 2010 11:24:20  $
+-- Date fetched Out : $Modtime:   Jun 10 2010 15:56:22  $
+-- PVCS Version : $Revision:   2.13  $
 -- Based on SCCS version : 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 --all global package variables here
 --
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.12  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.13  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3file';
@@ -1437,7 +1437,17 @@ END external_table_record_delim;
     t_chucklen   NUMBER := 4096;
     t_chuck      RAW(4096);
     t_remain     NUMBER;
+    l_dummy      NUMBER;
+    ex_cannot_find_dir   EXCEPTION;
   BEGIN
+  --
+    SELECT COUNT(*) INTO l_dummy 
+      FROM all_directories
+     WHERE directory_name = p_file_loc;
+    IF l_dummy = 0
+    THEN
+      RAISE ex_cannot_find_dir;
+    END IF;
   --
     nm_debug.proc_start (g_package_name,'write_blob');
   --
@@ -1486,6 +1496,11 @@ END external_table_record_delim;
   --
     nm_debug.proc_end (g_package_name,'write_blob');
   --
+  EXCEPTION
+    WHEN ex_cannot_find_dir
+    THEN
+      --RAISE_APPLICATION_ERROR (-20101,'Cannot find '||p_file_loc);
+      hig.raise_ner(pi_appl => 'HIG', pi_id => 536, pi_supplementary_info => p_file_loc);
   END write_blob;
 --
 --------------------------------------------------------------------------------
