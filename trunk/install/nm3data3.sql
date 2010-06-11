@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.20   May 27 2010 11:08:40   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.21   Jun 11 2010 15:22:40   malexander  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   May 27 2010 11:08:40  $
---       Date fetched Out : $Modtime:   May 27 2010 11:07:14  $
---       Version          : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Jun 11 2010 15:22:40  $
+--       Date fetched Out : $Modtime:   Jun 11 2010 15:21:00  $
+--       Version          : $Revision:   2.21  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 27-MAY-2010 11:07
+--       Generation Date  : 11-JUN-2010 15:20
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -4822,10 +4822,24 @@ INSERT INTO HIG_SCHEDULING_FREQUENCIES
        ,HSFR_INTERVAL_IN_MINS
        )
 SELECT 
+        -13
+       ,'Daily at Midday'
+       ,'freq=daily; byhour=12; byminute=0; bysecond=0;'
+       ,null FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
+                   WHERE HSFR_FREQUENCY_ID = -13);
+--
+INSERT INTO HIG_SCHEDULING_FREQUENCIES
+       (HSFR_FREQUENCY_ID
+       ,HSFR_MEANING
+       ,HSFR_FREQUENCY
+       ,HSFR_INTERVAL_IN_MINS
+       )
+SELECT 
         -12
        ,'Daily'
        ,'freq=daily;'
-       ,null FROM DUAL
+       ,1440 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
                    WHERE HSFR_FREQUENCY_ID = -12);
 --
@@ -4853,7 +4867,7 @@ SELECT
         -10
        ,'Hourly'
        ,'freq=hourly;'
-       ,null FROM DUAL
+       ,60 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
                    WHERE HSFR_FREQUENCY_ID = -10);
 --
@@ -4954,20 +4968,6 @@ SELECT
        ,5 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
                    WHERE HSFR_FREQUENCY_ID = -3);
---
-INSERT INTO HIG_SCHEDULING_FREQUENCIES
-       (HSFR_FREQUENCY_ID
-       ,HSFR_MEANING
-       ,HSFR_FREQUENCY
-       ,HSFR_INTERVAL_IN_MINS
-       )
-SELECT 
-        -2
-       ,'Minute'
-       ,'freq=minutely; interval=1;'
-       ,1 FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SCHEDULING_FREQUENCIES
-                   WHERE HSFR_FREQUENCY_ID = -2);
 --
 INSERT INTO HIG_SCHEDULING_FREQUENCIES
        (HSFR_FREQUENCY_ID
@@ -5101,8 +5101,8 @@ INSERT INTO HIG_MODULE_BLOCKS
 SELECT 
         'HIG1505'
        ,'HAUD'
-       ,to_date('20100527110630','YYYYMMDDHH24MISS')
-       ,to_date('20100527110630','YYYYMMDDHH24MISS')
+       ,to_date('20100611151855','YYYYMMDDHH24MISS')
+       ,to_date('20100611151855','YYYYMMDDHH24MISS')
        ,'NM3_METADATA'
        ,'NM3_METADATA' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_BLOCKS
