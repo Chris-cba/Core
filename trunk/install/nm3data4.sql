@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data4.sql-arc   2.9   Jun 11 2010 15:22:38   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data4.sql-arc   2.10   Jun 11 2010 16:15:40   malexander  $
 --       Module Name      : $Workfile:   nm3data4.sql  $
---       Date into PVCS   : $Date:   Jun 11 2010 15:22:38  $
---       Date fetched Out : $Modtime:   Jun 11 2010 15:21:02  $
---       Version          : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Jun 11 2010 16:15:40  $
+--       Date fetched Out : $Modtime:   Jun 11 2010 16:13:40  $
+--       Version          : $Revision:   2.10  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 11-JUN-2010 15:21
+--       Generation Date  : 11-JUN-2010 16:13
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -1806,7 +1806,10 @@ SET TERM OFF
 ----------------------------------------------------------------------------------------
 -- HIG_NAVIGATOR_MODULES
 --
--- WARNING - TABLE DOES NOT HAVE A UNIQUE KEY
+-- select * from nm3_metadata.hig_navigator_modules
+-- order by hnm_module_name
+--         ,hnm_module_param
+--         ,hnm_hierarchy_label
 --
 ----------------------------------------------------------------------------------------
 
@@ -1839,7 +1842,10 @@ SELECT
        ,'DORSET'
        ,to_date('20100222165343','YYYYMMDDHH24MISS')
        ,'DORSET' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_NAVIGATOR_MODULES);
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_NAVIGATOR_MODULES
+                   WHERE HNM_MODULE_NAME = 'NM0510'
+                    AND  HNM_MODULE_PARAM = 'query_inv_item'
+                    AND  HNM_HIERARCHY_LABEL = 'Asset');
 --
 INSERT INTO HIG_NAVIGATOR_MODULES
        (HNM_MODULE_NAME
@@ -1866,7 +1872,10 @@ SELECT
        ,'DORSET'
        ,to_date('20100330174305','YYYYMMDDHH24MISS')
        ,'DORSET' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_NAVIGATOR_MODULES);
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_NAVIGATOR_MODULES
+                   WHERE HNM_MODULE_NAME = 'NM0590'
+                    AND  HNM_MODULE_PARAM = 'query_inv_item'
+                    AND  HNM_HIERARCHY_LABEL = 'Asset');
 --
 --
 --
