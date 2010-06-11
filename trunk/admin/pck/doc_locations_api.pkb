@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.5   Jun 03 2010 15:28:28   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.6   Jun 11 2010 11:24:18   aedwards  $
 --       Module Name      : $Workfile:   doc_locations_api.pkb  $
---       Date into PVCS   : $Date:   Jun 03 2010 15:28:28  $
---       Date fetched Out : $Modtime:   Jun 03 2010 15:28:04  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Jun 11 2010 11:24:18  $
+--       Date fetched Out : $Modtime:   Jun 11 2010 11:23:48  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.6  $';
 --
   g_package_name CONSTANT varchar2(30) := 'doc_locations_api';
 --
@@ -457,11 +457,11 @@ BEGIN
      l_tab_comments(1)  := '--';
      l_tab_comments(2)  := '--   SCCS Identifiers :-';
      l_tab_comments(3)  := '--';
-     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.5   Jun 03 2010 15:28:28   aedwards  $';
+     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.6   Jun 11 2010 11:24:18   aedwards  $';
      l_tab_comments(5)  := '--       Module Name                : $Workfile:   doc_locations_api.pkb  $';
-     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jun 03 2010 15:28:28  $';
-     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jun 03 2010 15:28:04  $';
-     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.5  $';
+     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Jun 11 2010 11:24:18  $';
+     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Jun 11 2010 11:23:48  $';
+     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.6  $';
      l_tab_comments(9)  := '--';
      l_tab_comments(10) := '--   table_name_WHO trigger';
      l_tab_comments(11) := '--';
@@ -548,6 +548,8 @@ BEGIN
      dbms_output.put_line('Finished WHO trigger creation');
   --
   END;
+--
+  nm3ddl.create_synonym_for_object(p_object_name=>l_table_name);
 --
   nm_debug.debug('Finished');
 --
@@ -898,7 +900,7 @@ END get_location_descr;
     l_rec_dlt := doc_locations_api.get_dlt(pi_doc_id => pi_rec_df.doc_id );
   --
     nm_debug.debug_on;
-    nm_debug.debug('Inserting '||pi_rec_df.filename||' in '||l_rec_dlt.dlt_table);
+    nm_debug.debug('Inserting '||l_rec_table.full_path||' in '||l_rec_dlt.dlt_table);
   --
     l_rec_table.doc_id          := pi_rec_df.doc_id;
     l_rec_table.revision        := NVL(pi_rec_df.revision,1);
@@ -1314,6 +1316,23 @@ END get_location_descr;
     THEN NULL;
   END archive_doc_bundle_files;
 --
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION is_table_valid ( pi_table_name IN user_tables.table_name%TYPE )
+    RETURN VARCHAR2
+  IS
+    retval VARCHAR2(1) := 'Y';
+    l_prefix VARCHAR2(10);
+  BEGIN
+    validate_table ( pi_table_name => pi_table_name
+                   , po_col_prefix => l_prefix );
+    RETURN retval;
+  EXCEPTION
+    WHEN OTHERS
+    THEN
+      RETURN 'N';
+  END is_table_valid;
 --
 -----------------------------------------------------------------------------
 --
