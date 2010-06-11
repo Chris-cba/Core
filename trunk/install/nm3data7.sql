@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.13   May 27 2010 11:08:40   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.14   Jun 11 2010 15:22:38   malexander  $
 --       Module Name      : $Workfile:   nm3data7.sql  $
---       Date into PVCS   : $Date:   May 27 2010 11:08:40  $
---       Date fetched Out : $Modtime:   May 27 2010 11:07:24  $
---       Version          : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Jun 11 2010 15:22:38  $
+--       Date fetched Out : $Modtime:   Jun 11 2010 15:21:08  $
+--       Version          : $Revision:   2.14  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 27-MAY-2010 11:07
+--       Generation Date  : 11-JUN-2010 15:21
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -5890,7 +5890,7 @@ SELECT
         'HIG'
        ,526
        ,null
-       ,'The alert Schedule Method must be selected before proceeding.'
+       ,'Batch Email Interval is mandatory when Alert setup is not immediate.'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
@@ -6143,6 +6143,60 @@ SELECT
        ,540
        ,null
        ,'You can only lock files for editing if the Document Location is defined as a Table'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 541;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,541
+       ,null
+       ,'There has been an error transferring the file from its location. Please check the Java Console for more details.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 542;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,542
+       ,null
+       ,'This document has no corresponding record in its storage table'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 543;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,543
+       ,null
+       ,'Cannot read file from its location.'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
