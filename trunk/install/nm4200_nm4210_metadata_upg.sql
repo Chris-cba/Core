@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.11   May 27 2010 14:10:48   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.12   Jun 11 2010 15:17:38   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_metadata_upg.sql  $
---       Date into PVCS   : $Date:   May 27 2010 14:10:48  $
---       Date fetched Out : $Modtime:   May 27 2010 14:09:24  $
---       Version          : $Revision:   3.11  $
+--       Date into PVCS   : $Date:   Jun 11 2010 15:17:38  $
+--       Date fetched Out : $Modtime:   Jun 11 2010 15:11:46  $
+--       Version          : $Revision:   3.12  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -703,6 +703,32 @@ WHERE NOT EXISTS
    WHERE ner_appl = 'HIG'
      AND ner_id = 540);
 
+INSERT INTO nm_errors
+  SELECT 'HIG',541,NULL,'There has been an error transferring the file from its location. Please check the Java Console for more details.',NULL 
+    FROM DUAL
+   WHERE NOT EXISTS
+    (SELECT 1 FROM nm_errors
+      WHERE ner_appl = 'HIG'
+        AND ner_id = 541);
+
+INSERT INTO nm_errors
+  SELECT 'HIG',542,NULL,'This document has no corresponding record in its storage table',NULL 
+    FROM DUAL
+   WHERE NOT EXISTS
+    (SELECT 1 FROM nm_errors
+      WHERE ner_appl = 'HIG'
+        AND ner_id = 542);
+
+INSERT INTO nm_errors
+  SELECT 'HIG',543,NULL,'Cannot read file from its location.',NULL 
+    FROM DUAL
+   WHERE NOT EXISTS
+    (SELECT 1 FROM nm_errors
+      WHERE ner_appl = 'HIG'
+        AND ner_id = 543);
+
+
+
 
 ------------------------------------------------------------------
 
@@ -1261,71 +1287,54 @@ delete from hig_scheduling_frequencies
 -- New Data
 --
 Insert into HIG_SCHEDULING_FREQUENCIES
+   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY)
+ Values
+   (-13, 'Daily at Midday', 'freq=daily; byhour=12; byminute=0; bysecond=0;');
+Insert into HIG_SCHEDULING_FREQUENCIES
+   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY, HSFR_INTERVAL_IN_MINS)
+ Values
+   (-12, 'Daily', 'freq=daily;', 1440);
+Insert into HIG_SCHEDULING_FREQUENCIES
    (HSFR_FREQUENCY_ID, HSFR_MEANING)
  Values
    (-1, 'Once');
-
 Insert into HIG_SCHEDULING_FREQUENCIES
-   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY,HSFR_INTERVAL_IN_MINS)
+   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY, HSFR_INTERVAL_IN_MINS)
  Values
-   (-2, 'Minute', 'freq=minutely; interval=1;',1);
-
-
+   (-3, '5 Minutes', 'freq=minutely; interval=5;', 5);
 Insert into HIG_SCHEDULING_FREQUENCIES
-   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY,HSFR_INTERVAL_IN_MINS)
+   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY, HSFR_INTERVAL_IN_MINS)
  Values
-   (-3, '5 Minutes', 'freq=minutely; interval=5;',5);
-
-
+   (-4, '10 Minutes', 'freq=minutely; interval=10;', 10);
 Insert into HIG_SCHEDULING_FREQUENCIES
-   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY,HSFR_INTERVAL_IN_MINS)
+   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY, HSFR_INTERVAL_IN_MINS)
  Values
-   (-4, '10 Minutes', 'freq=minutely; interval=10;',10);
-
-
+   (-5, '15 Minutes', 'freq=minutely; interval=15;', 15);
 Insert into HIG_SCHEDULING_FREQUENCIES
-   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY,HSFR_INTERVAL_IN_MINS)
+   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY, HSFR_INTERVAL_IN_MINS)
  Values
-   (-5, '15 Minutes', 'freq=minutely; interval=15;',15);
-
-
+   (-6, '20 Minutes', 'freq=minutely; interval=20;', 20);
 Insert into HIG_SCHEDULING_FREQUENCIES
-   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY,HSFR_INTERVAL_IN_MINS)
+   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY, HSFR_INTERVAL_IN_MINS)
  Values
-   (-6, '20 Minutes', 'freq=minutely; interval=20;',20);
-
-
+   (-7, '30 Minutes', 'freq=minutely; interval=30;', 30);
 Insert into HIG_SCHEDULING_FREQUENCIES
-   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY,HSFR_INTERVAL_IN_MINS)
+   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY, HSFR_INTERVAL_IN_MINS)
  Values
-   (-7, '30 Minutes', 'freq=minutely; interval=30;',30);
-
-
-Insert into HIG_SCHEDULING_FREQUENCIES
-   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY,HSFR_INTERVAL_IN_MINS)
- Values
-   (-8, '45 Minutes', 'freq=minutely; interval=45;',45);
-
-
+   (-8, '45 Minutes', 'freq=minutely; interval=45;', 45);
 Insert into HIG_SCHEDULING_FREQUENCIES
    (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY)
  Values
    (-9, 'Hourly (on the hour)', 'freq=hourly; byminute=0; bysecond=0;');
-
 Insert into HIG_SCHEDULING_FREQUENCIES
-   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY)
+   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY, HSFR_INTERVAL_IN_MINS)
  Values
-   (-10, 'Hourly', 'freq=hourly;');
-
+   (-10, 'Hourly', 'freq=hourly;', 60);
 Insert into HIG_SCHEDULING_FREQUENCIES
    (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY)
  Values
    (-11, 'Daily at Midnight', 'freq=daily; byhour=0; byminute=0; bysecond=0;');
 
-Insert into HIG_SCHEDULING_FREQUENCIES
-   (HSFR_FREQUENCY_ID, HSFR_MEANING, HSFR_FREQUENCY)
- Values
-   (-12, 'Daily', 'freq=daily;');
 
 ------------------------------------------------------------------
 
@@ -1749,7 +1758,7 @@ INSERT INTO nm_errors
 SELECT 'HIG'
       , 526
       , NULL
-      , 'The alert Schedule Method must be selected before proceeding.'
+      , 'Batch Email Interval is mandatory when Alert setup is not immediate.'
       , NULL
   FROM dual
  WHERE NOT EXISTS

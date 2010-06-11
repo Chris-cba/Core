@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.8   May 27 2010 11:04:58   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.9   Jun 11 2010 15:17:38   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_ddl_upg.sql  $
---       Date into PVCS   : $Date:   May 27 2010 11:04:58  $
---       Date fetched Out : $Modtime:   May 27 2010 11:03:46  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   Jun 11 2010 15:17:38  $
+--       Date fetched Out : $Modtime:   Jun 11 2010 15:11:44  $
+--       Version          : $Revision:   3.9  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -538,6 +538,23 @@ CREATE SEQUENCE MV_ID_SEQ
  NOCYCLE
 /
 
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Merge Query Split Table
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADE EDWARDS)
+-- Change NM_NE_ID_IN to be Number (38) on NM_MRG_SPLIT_RESULTS_TMP
+-- 
+------------------------------------------------------------------
+alter table NM_MRG_SPLIT_RESULTS_TMP
+modify NM_NE_ID_IN number(38);
 
 ------------------------------------------------------------------
 
@@ -2717,6 +2734,11 @@ COMMENT ON COLUMN HIG_QUERY_TYPES.HQT_DATE_MODIFIED IS 'Audit details'
 COMMENT ON COLUMN HIG_QUERY_TYPES.HQT_MODIFIED_BY IS 'Audit details'
 /
 
+COMMENT ON COLUMN HIG_QUERY_TYPE_ATTRIBUTES.hqta_inv_type IS 'Identifies the asset metamodel used for the selected column'
+/
+
+
+
 PROMPT Creating Table 'HIG_QUERY_TYPE_ATTRIBUTES'
 CREATE TABLE HIG_QUERY_TYPE_ATTRIBUTES
  (HQTA_ID NUMBER(38) NOT NULL
@@ -2724,13 +2746,14 @@ CREATE TABLE HIG_QUERY_TYPE_ATTRIBUTES
  ,HQTA_PRE_BRACKET VARCHAR2(10)
  ,HQTA_OPERATOR VARCHAR(10) NOT NULL
  ,HQTA_ATTRIBUTE_NAME VARCHAR(30) NOT NULL
- ,HQTA_CONDITION VARCHAR(10) NOT NULL
+ ,HQTA_CONDITION VARCHAR(20) NOT NULL
  ,HQTA_DATA_VALUE VARCHAR(1000)
  ,HQTA_POST_BRACKET VARCHAR2(10)
  ,HQTA_DATE_CREATED DATE NOT NULL
  ,HQTA_CREATED_BY VARCHAR2(30) NOT NULL
  ,HQTA_DATE_MODIFIED DATE NOT NULL
  ,HQTA_MODIFIED_BY VARCHAR2(30) NOT NULL
+,HQTA_INV_TYPE VARCHAR2(4) NOT NULL
  )
 /
 
@@ -3272,6 +3295,13 @@ ALTER TABLE HIG_QUERY_TYPE_ATTRIBUTES ADD (CONSTRAINT
   (HQT_ID))
 /
 
+PROMPT Creating Foreign Key on 'HIG_QUERY_TYPE_ATTRIBUTES'
+ALTER TABLE HIG_QUERY_TYPE_ATTRIBUTES ADD (CONSTRAINT
+ HQTA_NIT_FK FOREIGN KEY
+  (HQTA_INV_TYPE) REFERENCES NM_INV_TYPES_ALL
+  (NIT_INV_TYPE))
+/
+
 PROMPT Creating Primary Key on 'HIG_FLEX_ATTRIBUTES'
 ALTER TABLE HIG_FLEX_ATTRIBUTES
  ADD (CONSTRAINT HFA_PK PRIMARY KEY
@@ -3281,12 +3311,7 @@ ALTER TABLE HIG_FLEX_ATTRIBUTES
 PROMPT Creating Unique Key on 'HIG_FLEX_ATTRIBUTES'
 ALTER TABLE HIG_FLEX_ATTRIBUTES
  ADD (CONSTRAINT HFA_UK UNIQUE
-  (HFA_TABLE_NAME
-  ,HFA_ATTRIBUTE1
-  ,HFA_ATTRIBUTE2
-  ,HFA_ATTRIBUTE3
-  ,HFA_ATTRIBUTE4
-  ,HFA_ATTRIBUTE5))
+  (HFA_TABLE_NAME))
 /
 
 PROMPT Creating Primary Key on 'HIG_FLEX_ATTRIBUTE_INV_MAPPING'
@@ -3309,6 +3334,17 @@ ALTER TABLE HIG_FLEX_ATTRIBUTE_INV_MAPPING ADD (CONSTRAINT
   (NIT_INV_TYPE))
 /
 
+PROMPT Creating Unique Key on 'HIG_FLEX_ATTRIBUTE_INV_MAPPING'
+ALTER TABLE HIG_FLEX_ATTRIBUTE_INV_MAPPING
+ ADD (CONSTRAINT HFAM_UK UNIQUE
+  (HFAM_HFA_ID
+  ,HFAM_ATTRIBUTE_DATA1
+  ,HFAM_ATTRIBUTE_DATA2
+  ,HFAM_ATTRIBUTE_DATA3
+  ,HFAM_ATTRIBUTE_DATA4
+  ,HFAM_ATTRIBUTE_DATA5))
+/
+
 PROMPT Creating Primary Key on 'HIG_NAVIGATOR'
 ALTER TABLE HIG_NAVIGATOR
  ADD (CONSTRAINT HNV_PK PRIMARY KEY
@@ -3320,12 +3356,12 @@ ALTER TABLE HIG_NAVIGATOR
  ADD (CONSTRAINT HNV_PRIMARY_HIERARCHY_CKH CHECK (HNV_PRIMARY_HIERARCHY IN ('Y','N')))
 /
 
-PROMPT Creating Unique Key on 'HIG_NAVIGATOR_MODULES'
+PROMPT Creating Primary Key on 'HIG_NAVIGATOR_MODULES'
 ALTER TABLE HIG_NAVIGATOR_MODULES
- ADD (CONSTRAINT HNM_UK UNIQUE
+ ADD (CONSTRAINT HNM_PK PRIMARY KEY
   (HNM_MODULE_NAME
   ,HNM_MODULE_PARAM
-,hnm_hierarchy_label))
+  ,HNM_HIERARCHY_LABEL))
 /
 
 PROMPT Creating Check Constraint on 'HIG_NAVIGATOR_MODULES'
@@ -3415,6 +3451,10 @@ CREATE INDEX HNM_HIERARCHY_LABEL_IND ON HIG_NAVIGATOR_MODULES
 /
 
 
+PROMPT Creating Index 'HQTA_NIT_FK_IND'
+CREATE INDEX HQTA_NIT_FK_IND ON HIG_QUERY_TYPE_ATTRIBUTES
+ (HQTA_INV_TYPE)
+/
 ------------------------------------------------------------------
 
 
@@ -4767,9 +4807,19 @@ ALTER TABLE hig_process_alert_log Add (Constraint hpal_pk Primary Key  (hpal_id)
 
 ALTER TABLE hig_process_alert_log Add (Constraint hpal_hpal_success_flag_chk Check (hpal_success_flag IN ('Y','N','I')));
 
-ALTER TABLe hig_process_alert_log ADD (Constraint hpal_hpt_fk Foreign Key (hpal_process_type_id) References hig_process_types (hpt_process_type_id));
+PROMPT Creating Foreign Key on 'HIG_PROCESS_ALERT_LOG'
+ALTER TABLE HIG_PROCESS_ALERT_LOG ADD (CONSTRAINT
+ HPAL_HPT_FK FOREIGN KEY
+  (HPAL_PROCESS_TYPE_ID) REFERENCES HIG_PROCESS_TYPES
+  (HPT_PROCESS_TYPE_ID) ON DELETE CASCADE)
+/
 
-ALTER TABLe hig_process_alert_log ADD (Constraint hpal_hp_fk Foreign Key (hpal_process_id) References hig_processes (hp_process_id));
+PROMPT Creating Foreign Key on 'HIG_PROCESS_ALERT_LOG'
+ALTER TABLE HIG_PROCESS_ALERT_LOG ADD (CONSTRAINT
+ HPAL_HP_FK FOREIGN KEY
+  (HPAL_PROCESS_ID) REFERENCES HIG_PROCESSES
+  (HP_PROCESS_ID) ON DELETE CASCADE)
+/
 
 CREATE INDEX hpa_hpt_fk_ind ON hig_process_alert_log (hpal_process_type_id);
 
