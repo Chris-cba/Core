@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.4   Apr 14 2010 15:27:20   gjohnson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.5   Jun 11 2010 12:52:20   gjohnson  $
 --       Module Name      : $Workfile:   nm3jobs.pkb  $
---       Date into PVCS   : $Date:   Apr 14 2010 15:27:20  $
---       Date fetched Out : $Modtime:   Apr 14 2010 15:15:44  $
---       PVCS Version     : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Jun 11 2010 12:52:20  $
+--       Date fetched Out : $Modtime:   Jun 11 2010 12:51:48  $
+--       PVCS Version     : $Revision:   3.5  $
 --
 --   NM3 DBMS_SCHEDULER wrapper
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.4  $"';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.5  $"';
   g_package_name         CONSTANT VARCHAR2(30)   := 'nm3jobs';
   ex_resource_busy                EXCEPTION;
   g_default_comment               VARCHAR2(500)  := 'Created by nm3job ';
@@ -426,7 +426,20 @@ BEGIN
 EXCEPTION
 
  WHEN others THEN
-   po_is_valid := FALSE;                                                                                             
+ 
+ 
+  po_is_valid := FALSE;                                                                                             
+  po_frequency        := Null;
+  po_interval         := Null;
+  po_bysecond         := Null;
+  po_byminute         := Null;
+  po_byhour           := Null;
+  po_byday_days       := Null;
+  po_byday_occurrence := Null;
+  po_bymonthday       := Null;
+  po_byyearday        := Null;
+  po_byweekno         := Null;
+  po_bymonth          := Null;
 
 END calendar_string_is_valid;
 --
