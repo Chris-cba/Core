@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.17   May 27 2010 11:43:48   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.18   Jun 11 2010 16:24:54   malexander  $
 --       Module Name      : $Workfile:   nm3ins.pkb  $
---       Date into PVCS   : $Date:   May 27 2010 11:43:48  $
---       Date fetched Out : $Modtime:   May 27 2010 11:39:34  $
---       PVCS Version     : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Jun 11 2010 16:24:54  $
+--       Date fetched Out : $Modtime:   Jun 11 2010 16:22:44  $
+--       PVCS Version     : $Revision:   2.18  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.17  $"
+--   nm3get_gen body   : "$Revision:   2.18  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3ins IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.17  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.18  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
