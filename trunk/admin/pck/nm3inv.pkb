@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.20   Jun 08 2010 15:52:52   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.21   Jun 11 2010 12:19:06   aedwards  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Jun 08 2010 15:52:52  $
---       Date fetched Out : $Modtime:   Jun 08 2010 15:50:36  $
---       SCCS Version     : $Revision:   2.20  $
+--       Date into SCCS   : $Date:   Jun 11 2010 12:19:06  $
+--       Date fetched Out : $Modtime:   Jun 11 2010 12:18:06  $
+--       SCCS Version     : $Revision:   2.21  $
 --       Based on --
 --
 --   nm3inv package body
@@ -30,7 +30,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.20  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.21  $';
    g_package_name   CONSTANT VARCHAR2(30) := 'nm3inv';
 --
    --<USED BY validate_rec_iit>
@@ -4097,13 +4097,21 @@ End bypass_inv_items_all_trgs;
                                 , pi_value        IN  VARCHAR2 ) 
     RETURN VARCHAR2
   IS
-    retval nm3type.max_varchar2;
+    retval   nm3type.max_varchar2;
+    l_quote  VARCHAR2(10) := chr(39);
+    l_dummy  VARCHAR2(10) := chr(126)||chr(33)||chr(36)||chr(33)||chr(126);  
+    l_sql    nm3type.max_varchar2;
   BEGIN
-    EXECUTE IMMEDIATE 'SELECT '||get_ita_case (pi_asset_type, pi_attrib_name)
-                         ||'( '||nm3flx.string(pi_value)||' )'||
-                        ' FROM DUAL'
-    INTO retval;
+  -- Task 0109768 and 0109764
+  -- Ensure formmating of Case works with single quotes (chr(39))
+    l_sql := ' SELECT REPLACE('||get_ita_case (pi_asset_type, pi_attrib_name)
+                       ||'(REPLACE (:l_value,:l_quote,:l_dummy)),:l_dummy,:l_quote)'||
+               ' FROM DUAL';
+  --
+    EXECUTE IMMEDIATE l_sql INTO retval
+    USING IN pi_value, IN l_quote, IN l_dummy, IN l_dummy, IN l_quote;
     RETURN retval;
+  --
   END format_with_ita_case;
 --
 ----------------------------------------------------------------------------------
