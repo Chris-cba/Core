@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.6   03 Jun 2010 11:07:12   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.7   15 Jun 2010 13:21:14   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   03 Jun 2010 11:07:12  $
---       Date fetched Out : $Modtime:   03 Jun 2010 10:56:30  $
---       PVCS Version     : $Revision:   2.32.1.3.1.6  $
+--       Date into PVCS   : $Date:   15 Jun 2010 13:21:14  $
+--       Date fetched Out : $Modtime:   15 Jun 2010 13:20:30  $
+--       PVCS Version     : $Revision:   2.32.1.3.1.7  $
 --
 --
 --   Author : Priidu Tanava
@@ -97,6 +97,7 @@ No query types defined.
                log 722431: fixed lone datums leaveout by copying the group assign logic from nm3mrg where it was fixed for temp extents
   27.05.10  PT task 0109671: in ins_datum_homo_chunks() increase length of l_case
   03.06.10  PT task 0109671: in ins_datum_homo_chunks() changed bandings logic to replace case statments with table lookups
+  15.06.10  PT task 0109773: change std_insert_invitems() in how merge sections are joined to splits: to avoid missing sections
 
   Todo: std_run without longops parameter
         load_group_datums() with begin and end parameters
@@ -104,7 +105,7 @@ No query types defined.
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
         add p_group_type variable to load_group_datums() to specify driving group type when loaded group is non-linear
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.3.1.6  $"';
+  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.3.1.7  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -390,13 +391,14 @@ No query types defined.
           -- add ft criteria
           --  by doing a secondary loop
           for j in 1 .. pt_attr.count loop
-            if pt_attr(j).inv_type = pt_attr(i).inv_type
-              and j != i
-            then
+            if pt_attr(j).inv_type = pt_attr(i).inv_type then
               if pt_attr(j).where_sql is not null then
-                t_ft(k).where_sql := t_ft(k).where_sql
-                  ||l_and||pt_attr(j).where_sql;
+                if j != i then
+                  t_ft(k).where_sql := t_ft(k).where_sql
+                    ||l_and||pt_attr(j).where_sql;
+                end if;
                 l_and := ' and ';
+
               end if;
 
             end if;
@@ -2134,11 +2136,9 @@ No query types defined.
         ||sql_ft_sources
     ||cr||'where m.nsm_mrg_job_id = :p_mrg_job_id'
     ||cr||'  and m.nsm_ne_id = t.nm_ne_id_of'
-    ||cr||'  and t.nm_begin_mp = m.nsm_begin_mp'
-    ||cr||'  and t.nm_end_mp = m.nsm_end_mp'
-    --||cr||'  and ((t.nm_begin_mp < m.nsm_end_mp and t.nm_end_mp > m.nsm_begin_mp)'
-    --||cr||'    or ((t.nm_begin_mp = t.nm_end_mp or m.nsm_begin_mp = m.nsm_end_mp)'
-    --||cr||'      and (t.nm_begin_mp = m.nsm_end_mp or t.nm_end_mp = m.nsm_begin_mp)))'
+    ||cr||'  and m.nsm_begin_mp = t.nm_begin_mp'
+    ||cr||'  and ((m.nsm_end_mp > m.nsm_begin_mp and t.nm_end_mp > t.nm_begin_mp)'
+    ||cr||'    or (m.nsm_end_mp = m.nsm_begin_mp and t.nm_end_mp = t.nm_begin_mp))'
     ||cr||'  and t.iit_rowid = i.rowid (+)'
         ||sql_ft_outer_joins
     ||cr||')'
