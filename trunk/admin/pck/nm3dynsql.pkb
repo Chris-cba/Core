@@ -2,11 +2,11 @@ CREATE OR REPLACE package body nm3dynsql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.4   May 17 2010 17:34:18   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.5   17 Jun 2010 16:26:12   ptanava  $
 --       Module Name      : $Workfile:   nm3dynsql.pkb  $
---       Date into PVCS   : $Date:   May 17 2010 17:34:18  $
---       Date fetched Out : $Modtime:   May 17 2010 17:34:08  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   17 Jun 2010 16:26:12  $
+--       Date fetched Out : $Modtime:   17 Jun 2010 16:25:42  $
+--       PVCS Version     : $Revision:   2.5  $
 --       Based on sccs version :
 --
 --
@@ -28,9 +28,11 @@ CREATE OR REPLACE package body nm3dynsql as
                 this ensures that nm_datum_criteria mp values are observed and avoids overlaps in nm_route_connectivity_tmp
                 requires nm3bulk_mrg 2.17 or later
   27.05.10  RC Task 0109651 - comment out line to restrict query to only live elements (ecdm log 726355)
+  17.06.10  PT task 0109816: in sql_route_connectivity() further replacing m.nm_begin_mp and m.nm_end_mp with those of d.begin_mp and d.end_mp
+                to avoid expanding datum lengths
 */
 
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.4  $"';
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.5  $"';
   g_package_name    constant  varchar2(30) := 'nm3dynsql';
 
 
@@ -252,7 +254,8 @@ CREATE OR REPLACE package body nm3dynsql as
     ||cr||'  ,m.nm_obj_type'
     ||cr||'  ,e.ne_type'
     ||cr||'  ,m.nm_cardinality'
-    ||cr||'  ,m.nm_begin_mp, nvl(m.nm_end_mp, e.ne_length) nm_end_mp'
+    ||cr||'  ,d.begin_mp nm_begin_mp'
+    ||cr||'  ,d.end_mp nm_end_mp'
     ||cr||'  ,e.ne_length'
     ||cr||'  ,nvl(m.nm_slk, -1) nm_slk'
     ||cr||'  ,nvl(m.nm_end_slk, -1) nm_end_slk'
@@ -260,21 +263,15 @@ CREATE OR REPLACE package body nm3dynsql as
     ||cr||'  ,m.nm_seq_no'
     ||cr||'  ,decode(m.nm_cardinality, 1, e.ne_no_start, e.ne_no_end) cd_start_node'
     ||cr||'  ,decode(m.nm_cardinality, 1, e.ne_no_end, e.ne_no_start) cd_end_node'
---    ||cr||'  ,decode(m.nm_cardinality, 1, m.nm_begin_mp, m.nm_end_mp) cd_begin_mp'
---    ||cr||'  ,decode(m.nm_cardinality, 1, m.nm_end_mp, m.nm_begin_mp) cd_end_mp'
     ||cr||'  ,decode(m.nm_cardinality, 1, d.begin_mp, d.end_mp) cd_begin_mp'
     ||cr||'  ,decode(m.nm_cardinality, 1, d.end_mp, d.begin_mp) cd_end_mp'
     ||cr||'  ,case'
---    ||cr||'   when m.nm_cardinality = 1 and m.nm_begin_mp = 0 then 1'
---    ||cr||'   when m.nm_cardinality = -1 and nvl(m.nm_end_mp, e.ne_length) = e.ne_length then 1'
     ||cr||'   when m.nm_cardinality = 1 and d.begin_mp = 0 then 1'
-    ||cr||'   when m.nm_cardinality = -1 and nvl(d.end_mp, e.ne_length) = e.ne_length then 1'
+    ||cr||'   when m.nm_cardinality = -1 and d.end_mp = nvl(e.ne_length, d.end_mp) then 1'
     ||cr||'   else null'
     ||cr||'   end begin_mp_con'
     ||cr||'  ,case'
---    ||cr||'   when m.nm_cardinality = 1 and nvl(m.nm_end_mp, e.ne_length) = e.ne_length then 1'
---    ||cr||'   when m.nm_cardinality = -1 and m.nm_begin_mp = 0 then 1'
-    ||cr||'   when m.nm_cardinality = 1 and nvl(d.end_mp, e.ne_length) = e.ne_length then 1'
+    ||cr||'   when m.nm_cardinality = 1 and d.end_mp = nvl(e.ne_length, d.end_mp) then 1'
     ||cr||'   when m.nm_cardinality = -1 and d.begin_mp = 0 then 1'
     ||cr||'   else null'
     ||cr||'   end end_mp_con'
