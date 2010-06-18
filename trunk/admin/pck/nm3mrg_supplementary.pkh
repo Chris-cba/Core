@@ -23,7 +23,7 @@ create or replace package nm3mrg_supplementary as
   g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3mrg_supplementary.pkh	1.13 05/02/06"';
 --  g_sccsid is the SCCS ID for the package
 --
-  gc_buffer_size integer := 1000 ;
+  gc_buffer_size integer := 2000 ;
 
    TYPE rec_distinct IS RECORD
       (inv_type    nm_mrg_query_results_temp.inv_type%TYPE
