@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.21   Jun 11 2010 12:19:06   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.22   Jun 18 2010 11:49:54   aedwards  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Jun 11 2010 12:19:06  $
---       Date fetched Out : $Modtime:   Jun 11 2010 12:18:06  $
---       SCCS Version     : $Revision:   2.21  $
+--       Date into SCCS   : $Date:   Jun 18 2010 11:49:54  $
+--       Date fetched Out : $Modtime:   Jun 17 2010 16:05:50  $
+--       SCCS Version     : $Revision:   2.22  $
 --       Based on --
 --
 --   nm3inv package body
@@ -30,7 +30,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.21  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.22  $';
    g_package_name   CONSTANT VARCHAR2(30) := 'nm3inv';
 --
    --<USED BY validate_rec_iit>
@@ -2107,16 +2107,24 @@ BEGIN
             append (' IF LENGTH('||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||') > '||cs_rec.ita_fld_length||' THEN');
             append ('  l_fail_msg := '||Nm3flx.string('cannot be more than '||cs_rec.ita_fld_length||' chars in length')||'; RAISE l_fail;');
             append (' END IF;');
-            
+            --
+            -------------------------------------------------------
             -- Task 0108242
             -- AE Perform Case validation
-            
-            append (' ');
-            append (' '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||' := '
-                                 ||'nm3inv.format_with_ita_case ( pi_asset_type   => '||nm3flx.string(cs_rec.ita_inv_type)||
-                                                              ' , pi_attrib_name  => '||nm3flx.string(cs_rec.ita_attrib_name)||
-                                                              ' , pi_value        => '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||');');
-            append (' ');
+            --
+            -- Task 0109501
+            -- Ignore case formatting for Domain based attributes.
+            -------------------------------------------------------
+            --
+            IF cs_rec.ita_id_domain IS NULL
+            THEN
+              append (' ');
+              append (' '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||' := '
+                                   ||'nm3inv.format_with_ita_case ( pi_asset_type   => '||nm3flx.string(cs_rec.ita_inv_type)||
+                                                                ' , pi_attrib_name  => '||nm3flx.string(cs_rec.ita_attrib_name)||
+                                                                ' , pi_value        => '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||');');
+              append (' ');
+            END IF;
 
          ELSIF cs_rec.ita_format = Nm3type.c_date
           AND  INSTR(cs_rec.ita_attrib_name,cs_rec.ita_format,1,1) = 0
