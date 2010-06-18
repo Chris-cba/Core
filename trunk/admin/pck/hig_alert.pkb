@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.7   Jun 16 2010 16:24:50   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.8   Jun 18 2010 12:30:24   lsorathia  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   Jun 16 2010 16:24:50  $
---       Date fetched Out : $Modtime:   Jun 16 2010 15:39:16  $
---       Version          : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   Jun 18 2010 12:30:24  $
+--       Date fetched Out : $Modtime:   Jun 18 2010 12:21:38  $
+--       Version          : $Revision:   3.8  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.7  $';
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.8  $';
   g_app_owner     CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  clob;
@@ -191,6 +191,7 @@ BEGIN
    THEN
        l_hal_rec  := get_hal(pi_hal_id);
        l_halt_rec := get_halt(l_hal_rec.hal_halt_id);
+       l_hatm_rec := get_hatm(l_hal_rec.hal_halt_id);
        FOR i IN (SELECT *
                  FROM   hig_alert_recipients
                         ,hig_alert_type_recipients
