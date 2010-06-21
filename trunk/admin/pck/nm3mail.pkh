@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkh-arc   2.2   Apr 22 2010 14:09:48   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkh-arc   2.3   Jun 21 2010 13:14:38   lsorathia  $
 --       Module Name      : $Workfile:   nm3mail.pkh  $
---       Date into PVCS   : $Date:   Apr 22 2010 14:09:48  $
---       Date fetched Out : $Modtime:   Apr 22 2010 13:12:40  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jun 21 2010 13:14:38  $
+--       Date fetched Out : $Modtime:   Jun 21 2010 10:50:12  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.5
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE nm3mail AS
 --
 --<GLOBVAR>
 --
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 --  g_sccsid is the SCCS ID for the package
 --
    g_server_sysopt CONSTANT hig_options.hop_id%TYPE    := 'SMTPSERVER';
@@ -270,7 +270,8 @@ FUNCTION get_current_nmu_id RETURN nm_mail_users.nmu_id%TYPE;
 --<PROC NAME="get_current_nmu_id">
 --
 -- This function send mail for passed parameters
-FUNCTION send_mail (pi_recipient_to  IN  Varchar2 Default Null
+FUNCTION send_mail (pi_mail_from     IN  Varchar2 Default Null
+                   ,pi_recipient_to  IN  Varchar2 Default Null
                    ,pi_recipient_cc  IN  Varchar2 Default Null
                    ,pi_recipient_bcc IN  Varchar2 Default Null
                    ,pi_subject       IN  Varchar2 Default Null
