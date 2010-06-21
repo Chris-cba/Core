@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.4   May 27 2010 14:23:50   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.5   Jun 21 2010 13:14:36   lsorathia  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   May 27 2010 14:23:50  $
---       Date fetched Out : $Modtime:   May 27 2010 14:22:38  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jun 21 2010 13:14:36  $
+--       Date fetched Out : $Modtime:   Jun 21 2010 10:51:34  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.4  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.5  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -1032,7 +1032,8 @@ EXCEPTION
 
 END get_current_nmu_id;
 --
-FUNCTION send_mail (pi_recipient_to  IN  Varchar2 Default Null
+FUNCTION send_mail (pi_mail_from     IN  Varchar2 Default Null
+                   ,pi_recipient_to  IN  Varchar2 Default Null
                    ,pi_recipient_cc  IN  Varchar2 Default Null
                    ,pi_recipient_bcc IN  Varchar2 Default Null
                    ,pi_subject       IN  Varchar2 Default Null
@@ -1127,7 +1128,7 @@ BEGIN
        END ;
    END IF ;
    utl_smtp.open_data(g_mail_conn);
-   send_header('From',   l_sender_rec.sender_name );
+   send_header('From',   pi_mail_from );
    IF pi_recipient_to IS NOT NULL
    THEN
        send_header('To',     pi_recipient_to  );
