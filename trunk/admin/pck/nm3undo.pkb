@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.8   Jun 01 2010 12:47:50   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.9   Jun 21 2010 14:13:16   cstrettle  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Jun 01 2010 12:47:50  $
---       Date fetched Out : $Modtime:   Jun 01 2010 12:46:42  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Jun 21 2010 14:13:16  $
+--       Date fetched Out : $Modtime:   Jun 21 2010 14:11:30  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -2043,11 +2043,39 @@ END undo_scheme;
                                      p_date       => v_close_date
                                     );
       END IF;
-     --
-     -- CWS 0109500 1/6/10 restore any additional data.
+     /*--
+      DECLARE
+         l_inv_to_check nm3type.tab_number;
+         l_count        PLS_INTEGER := 0;
+      BEGIN
+         FOR i IN 1..nm3merge.g_tab_nmh_nm_ne_id_in.COUNT
+          LOOP
+            IF   nm3merge.g_tab_nmh_nm_type(i) = 'I'
+             AND nm3inv.get_inv_type(nm3merge.g_tab_nmh_nm_obj_type(i)).nit_end_loc_only = 'N'
+             THEN
+               l_count                 := l_inv_to_check.COUNT + 1;
+               l_inv_to_check(l_count) := nm3merge.g_tab_nmh_nm_ne_id_in(i);
+            END IF;
+         END LOOP;
+         FORALL i IN 1..l_count
+            UPDATE NM_INV_ITEMS
+             SET   iit_end_date = NULL
+            WHERE  iit_ne_id    = l_inv_to_check(i);
+      END;*/
+     -- CWS 0109500 0109770 1/6/10 restore any additional data.
+      --
+      UPDATE nm_inv_items_all
+      SET    iit_end_date = NULL
+      WHERE  iit_ne_id IN
+       (SELECT nad_iit_ne_id
+        FROM   nm_nw_ad_link_all
+        WHERE  nad_ne_id = p_ne_id
+        AND    nad_end_date = iit_end_date
+       );
+      --
       UPDATE nm_nw_ad_link_all
-         SET nad_end_date = NULL
-       WHERE nad_ne_id = p_ne_id;
+      SET    nad_end_date = NULL
+      WHERE  nad_ne_id = p_ne_id;
      --
       set_for_return;
       Nm_Debug.proc_end (g_package_name, 'unclose');
