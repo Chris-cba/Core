@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.8   Jun 18 2010 12:30:24   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.9   Jun 21 2010 13:13:12   lsorathia  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   Jun 18 2010 12:30:24  $
---       Date fetched Out : $Modtime:   Jun 18 2010 12:21:38  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   Jun 21 2010 13:13:12  $
+--       Date fetched Out : $Modtime:   Jun 21 2010 11:03:48  $
+--       Version          : $Revision:   3.9  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.8  $';
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.9  $';
   g_app_owner     CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  clob;
@@ -252,7 +252,8 @@ BEGIN
            l_att_name := 'Log for '||l_hpt_rec.hpt_name||' '||To_Char(Sysdate,'DD-Mon-YYYY')||'.txt' ;
        END IF ;
    END IF ;
-   l_send_mail_status := nm3mail.send_mail(pi_recipient_to  => l_to_recipient 
+   l_send_mail_status := nm3mail.send_mail(pi_mail_from     => l_hatm_rec.hatm_mail_from
+                                          ,pi_recipient_to  => l_to_recipient 
                                           ,pi_recipient_cc  => l_cc_recipient
                                           ,pi_recipient_bcc => l_bcc_recipient
                                           ,pi_subject       => l_hal_rec.hal_subject
@@ -1385,7 +1386,8 @@ BEGIN
            l_bcc_recipient :=   i.har_recipient_email;
        END IF ;
    End loop;
-   l_send_mail_status := nm3mail.send_mail(pi_recipient_to  => pi_recipient_email 
+   l_send_mail_status := nm3mail.send_mail(pi_mail_from     => l_hatm_rec.hatm_mail_from
+                                          ,pi_recipient_to  => pi_recipient_email 
                                           ,pi_recipient_cc  => l_cc_recipient
                                           ,pi_recipient_bcc => l_bcc_recipient
                                           ,pi_subject       => l_subject
@@ -1584,7 +1586,8 @@ BEGIN
            END IF ;
        END IF ;
    END LOOP;
-   l_send_mail_status := nm3mail.send_mail(pi_recipient_to  => l_to_recipient
+   l_send_mail_status := nm3mail.send_mail(pi_mail_from     => l_hatm_rec.hatm_mail_from
+                                          ,pi_recipient_to  => l_to_recipient
                                           ,pi_recipient_cc  => l_cc_recipient
                                           ,pi_recipient_bcc => l_bcc_recipient
                                           ,pi_subject       => l_subject
