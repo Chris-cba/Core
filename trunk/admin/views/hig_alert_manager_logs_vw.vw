@@ -12,6 +12,7 @@ CREATE OR REPLACE FORCE VIEW hig_alert_manager_logs_vw
 ,haml_created_date
 ,haml_email_date_sent
 ,haml_recipient_email
+,haml_mail_from
 ,haml_subject
 ,haml_email_body
 ,haml_status
@@ -22,11 +23,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_alert_manager_logs_vw.vw-arc   3.0   Apr 14 2010 10:45:10   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_alert_manager_logs_vw.vw-arc   3.1   Jun 21 2010 13:15:44   lsorathia  $
 --       Module Name      : $Workfile:   hig_alert_manager_logs_vw.vw  $
---       Date into PVCS   : $Date:   Apr 14 2010 10:45:10  $
---       Date fetched Out : $Modtime:   Apr 14 2010 10:44:40  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Jun 21 2010 13:15:44  $
+--       Date fetched Out : $Modtime:   Jun 21 2010 11:29:14  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 -- 
@@ -42,6 +43,7 @@ SELECT halt_id
       ,har_date_created
       ,har_date_modified
       ,har_recipient_email
+      ,hatm_mail_from
       ,hal_subject
       ,hal_mail_text
       ,har_status
@@ -51,8 +53,10 @@ from   hig_alerts
       ,hig_alert_types
       ,nm_inv_types
       ,nm_inv_type_attribs
-WHERE  hal_id = har_hal_id
+      ,hig_alert_type_mail
+WHERE  hal_id  = har_hal_id
 AND    halt_id = hal_halt_id
+AND    halt_id = hatm_halt_id
 AND    halt_nit_inv_type = nit_inv_type
 and    nit_inv_type = ita_inv_type
 AND    nit_foreign_pk_column = ita_attrib_name
