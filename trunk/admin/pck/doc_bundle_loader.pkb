@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.3   May 25 2010 15:35:06   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.4   Jun 22 2010 17:04:54   gjohnson  $
 --       Module Name      : $Workfile:   doc_bundle_loader.pkb  $
---       Date into PVCS   : $Date:   May 25 2010 15:35:06  $
---       Date fetched Out : $Modtime:   May 25 2010 10:45:22  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Jun 22 2010 17:04:54  $
+--       Date fetched Out : $Modtime:   Jun 22 2010 17:04:08  $
+--       Version          : $Revision:   3.4  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
 
   g_package_name CONSTANT varchar2(30) := 'doc_bundle_loader';
   
@@ -275,12 +275,29 @@ BEGIN
                                                       
   pi_dbun_rec.dbun_unzip_log := nm3clob.tab_varchar_to_clob(l_tab_vc);
 
-
+  update doc_bundles
+  set dbun_unzip_log = pi_dbun_rec.dbun_unzip_log
+  where dbun_bundle_id = pi_dbun_rec.dbun_bundle_id;
+  
+  commit;
+  
 EXCEPTION
+
  WHEN others THEN 
-    l_tab_vc(1) := sqlerrm;
-    pi_dbun_rec.dbun_unzip_log := nm3clob.tab_varchar_to_clob(l_tab_vc);  
-                                                        
+ IF instr(pi_dbun_rec.dbun_filename,' ') > 0 THEN
+    hig.raise_ner(pi_appl => 'HIG'
+                 ,pi_id   => 546 -- Unzip Failed
+                 ,pi_supplementary_info => 'Filename contains spaces');
+ ELSE
+
+    hig.raise_ner(pi_appl => 'HIG'
+                 ,pi_id   => 546 -- Unzip Failed
+                 ,pi_supplementary_info => sqlerrm);
+
+ 
+ END IF;                 
+                 
+                 
 END unzip_document_bundle;
 --
 -----------------------------------------------------------------------------
