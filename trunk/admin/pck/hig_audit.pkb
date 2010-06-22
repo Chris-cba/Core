@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_audit.pkb-arc   3.2   May 06 2010 10:49:24   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_audit.pkb-arc   3.3   Jun 22 2010 11:08:54   lsorathia  $
 --       Module Name      : $Workfile:   hig_audit.pkb  $
---       Date into PVCS   : $Date:   May 06 2010 10:49:24  $
---       Date fetched Out : $Modtime:   May 06 2010 10:49:04  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Jun 22 2010 11:08:54  $
+--       Date fetched Out : $Modtime:   Jun 22 2010 10:23:56  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.2  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.3  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_audit';
   g_app_owner    CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
@@ -148,6 +148,7 @@ BEGIN
             ELSE
                 l_trigger_name := Substr(haua.haut_table_name,1,24); 
                 l_trigger_name := l_trigger_name ||'_aud'; 
+                -- derive the new sequence for the trigger
                 FOR i in 1..99 
                 LOOP 
                     BEGIN
@@ -157,11 +158,11 @@ BEGIN
                        WHERE  haut_nit_inv_type  = haua.haut_nit_inv_type
                        AND    haut_table_name    = haua.haut_table_name 
                        AND    haut_trigger_name  = Upper(l_trigger_name||i) ;
-                   EXCEPTION
+                    EXCEPTION
                        WHEN OTHERS THEN
                            l_trigger_name := Upper(l_trigger_name||i) ;
                            Exit;
-                   END ;
+                    END ;
                 END LOOP;
                 UPDATE hig_audit_types
                 SET    haut_trigger_name = l_trigger_name 
@@ -276,10 +277,22 @@ BEGIN
                     LOOP
                         IF haat.ita_format = 'DATE'
                         THEN
+                            append  ('IF Nvl(:OLD.'||haat.ita_attrib_name||',Trunc(Sysdate)) != '); append  ('Nvl(:NEW.'||haat.ita_attrib_name||',Trunc(Sysdate))','N');
+                        ELSIF haat.ita_format = 'VARCHAR2'
+                        THEN
+                            append  ('IF Nvl(:OLD.'||haat.ita_attrib_name||',''0'') != '); append  ('Nvl(:NEW.'||haat.ita_attrib_name||',''0'')','N');
+                        ELSIF haat.ita_format = 'NUMBER'
+                        THEN
+                            append  ('IF Nvl(:OLD.'||haat.ita_attrib_name||',0) != '); append  ('Nvl(:NEW.'||haat.ita_attrib_name||',0)','N');                        
+                        END IF ;
+                        append  ('THEN');
+                        IF haat.ita_format = 'DATE'
+                        THEN
                             trg_body(haua.haut_operation,l_nit_rec.nit_inv_type,haua.haut_table_name,haat.haat_attribute_name,l_nit_rec.nit_foreign_pk_column,'Y');
                         ELSE
                             trg_body(haua.haut_operation,l_nit_rec.nit_inv_type,haua.haut_table_name,haat.haat_attribute_name,l_nit_rec.nit_foreign_pk_column) ;
                         END IF ;
+                        append  ('END IF;');
                     END LOOP;
                 END IF ;
             ELSE
