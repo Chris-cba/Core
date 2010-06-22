@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_ft AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_ft.pkb-arc   2.1   Jan 06 2010 16:38:28   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_ft.pkb-arc   2.2   Jun 22 2010 16:37:40   rcoupe  $
 --       Module Name      : $Workfile:   nm3inv_ft.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:28  $
---       Date fetched Out : $Modtime:   Jan 06 2010 11:03:30  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jun 22 2010 16:37:40  $
+--       Date fetched Out : $Modtime:   Jun 22 2010 16:36:56  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.5
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_ft AS
 --
 --  g_body_sccsid is the SCCS ID for the package body
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
   g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3inv_ft';
 --
    g_rec_nit         NM_INV_TYPES%ROWTYPE;
@@ -359,6 +359,10 @@ BEGIN
       DELETE FROM NM_INV_TYPE_ROLES
       WHERE  itr_inv_type = l_tab_inv_type(i);
 --
+   FORALL i IN 1..l_tab_inv_type.COUNT
+      DELETE FROM NM_INV_NW_ALL
+      WHERE  nin_nit_inv_code = l_tab_inv_type(i);
+
    FORALL i IN 1..l_tab_inv_type.COUNT
       DELETE FROM NM_INV_TYPES
       WHERE  ROWID = l_tab_rowid (i);
