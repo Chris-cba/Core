@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.9   Jun 21 2010 14:13:16   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.10   Jun 23 2010 09:51:28   cstrettle  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Jun 21 2010 14:13:16  $
---       Date fetched Out : $Modtime:   Jun 21 2010 14:11:30  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Jun 23 2010 09:51:28  $
+--       Date fetched Out : $Modtime:   Jun 22 2010 16:36:32  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.9  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.10  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -2062,7 +2062,7 @@ END undo_scheme;
              SET   iit_end_date = NULL
             WHERE  iit_ne_id    = l_inv_to_check(i);
       END;*/
-     -- CWS 0109500 0109770 1/6/10 restore any additional data.
+      -- CWS 0109500 0109770 1/6/10 restore any additional data.
       --
       UPDATE nm_inv_items_all
       SET    iit_end_date = NULL
