@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.5   Jun 21 2010 13:14:36   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.6   Jun 24 2010 12:07:44   lsorathia  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Jun 21 2010 13:14:36  $
---       Date fetched Out : $Modtime:   Jun 21 2010 10:51:34  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Jun 24 2010 12:07:44  $
+--       Date fetched Out : $Modtime:   Jun 24 2010 11:39:18  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.5  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.6  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -1153,7 +1153,27 @@ BEGIN
        utl_smtp.write_data( g_mail_conn,'-------SECBOUND'|| crlf ||
                                         'Content-Type: text/plain;'|| crlf );      
    END IF ;
-   utl_smtp.write_data(g_mail_conn,crlf ||pi_mail_body|| crlf );  -- Message body
+   --utl_smtp.write_data(g_mail_conn,crlf ||pi_mail_body|| crlf );  -- Message body   
+   DECLARE
+   --
+     l_buffer     VARCHAR2(30000);
+     l_amount     BINARY_INTEGER := 30000;
+     l_pos        INTEGER := 1;
+     l_clob_len   INTEGER;
+   --
+   BEGIN 
+   --
+     l_clob_len := DBMS_LOB.getlength (pi_mail_body);
+     WHILE l_pos < l_clob_len
+     LOOP  
+         DBMS_LOB.READ (pi_mail_body,l_amount,l_pos,l_buffer);
+         IF l_buffer IS NOT NULL
+         THEN
+             utl_smtp.write_data(g_mail_conn,crlf ||l_buffer|| crlf );  -- Message body
+         END IF;
+         l_pos :=   l_pos + l_amount;   
+     END LOOP;
+   END ;
    If pi_att_file_name is not null
    THen         
        utl_smtp.write_data( g_mail_conn, crlf ||'-------SECBOUND'|| crlf ||
@@ -1173,7 +1193,27 @@ BEGIN
    END IF ;
    utl_smtp.write_data( g_mail_conn,crlf ||'-------SECBOUND--' );  -- End MIME mail
    utl_smtp.write_data( g_mail_conn, utl_tcp.crlf );
-   utl_smtp.write_data(g_mail_conn, utl_tcp.CRLF || pi_mail_body);
+   --utl_smtp.write_data(g_mail_conn, utl_tcp.CRLF || pi_mail_body);
+   DECLARE
+   --
+     l_buffer     VARCHAR2(30000);
+     l_amount     BINARY_INTEGER := 30000;
+     l_pos        INTEGER := 1;
+     l_clob_len   INTEGER;
+   --
+   BEGIN 
+   --
+     l_clob_len := DBMS_LOB.getlength (pi_mail_body);
+     WHILE l_pos < l_clob_len
+     LOOP  
+         DBMS_LOB.READ (pi_mail_body,l_amount,l_pos,l_buffer);
+         IF l_buffer IS NOT NULL
+         THEN
+             utl_smtp.write_data(g_mail_conn,crlf ||l_buffer|| crlf );  -- Message body
+         END IF;
+         l_pos :=   l_pos + l_amount;   
+     END LOOP;
+   END ;
    utl_smtp.close_data(g_mail_conn);
    RETURN  TRUE;
 EXCEPTION
