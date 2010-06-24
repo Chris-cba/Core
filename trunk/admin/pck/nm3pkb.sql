@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.31   May 06 2010 17:24:24   aedwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pkb.sql-arc   2.32   Jun 24 2010 11:24:26   cstrettle  $
 --       Module Name      : $Workfile:   nm3pkb.sql  $
---       Date into PVCS   : $Date:   May 06 2010 17:24:24  $
---       Date fetched Out : $Modtime:   May 06 2010 17:24:06  $
---       PVCS Version     : $Revision:   2.31  $
+--       Date into PVCS   : $Date:   Jun 24 2010 11:24:26  $
+--       Date fetched Out : $Modtime:   Jun 24 2010 11:23:36  $
+--       PVCS Version     : $Revision:   2.32  $
 --
 --
 --   Author : Graeme Johnson
@@ -2250,6 +2250,17 @@ PROMPT nm3info_tool.pkw
 SET TERM OFF
 SET DEFINE ON 
 SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'nm3info_tool.pkw' run_file
+FROM dual 
+/ 
+start '&run_file'
+--
+----------------------------------------------------------------------------------------- 
+--
+SET TERM ON 
+PROMPT doc_sdo_util.pkw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'pck'||'&terminator'||'doc_sdo_util.pkw' run_file
 FROM dual 
 / 
 start '&run_file'
