@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_flex_attribute.pkb-arc   3.1   Jun 11 2010 09:37:24   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_flex_attribute.pkb-arc   3.2   Jun 24 2010 14:48:18   lsorathia  $
 --       Module Name      : $Workfile:   hig_flex_attribute.pkb  $
---       Date into PVCS   : $Date:   Jun 11 2010 09:37:24  $
---       Date fetched Out : $Modtime:   Jun 09 2010 17:37:42  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jun 24 2010 14:48:18  $
+--       Date fetched Out : $Modtime:   Jun 24 2010 14:34:46  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.1  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.2  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_flex_attribute';
 --
@@ -344,9 +344,10 @@ BEGIN
    WHERE  hfa_table_name = pi_tab_name ;
 
    l_sql := 'SELECT  hfam_id '||Chr(10)||
-            'FROM   hig_flex_attribute_inv_mapping '||Chr(10)||
+            'FROM   hig_flex_attribute_inv_mapping,nm_inv_types '||Chr(10)||
             '      ,'||l_hfa_rec.hfa_table_name||' b'||Chr(10)||                
             'WHERE  '||l_pk_column||' = '||nm3flx.string(pi_value)||Chr(10)||
+            'AND    hfam_nit_inv_type = nit_inv_type'||Chr(10)||
             'AND    hfam_hfa_id  = '||l_hfa_rec.hfa_id||Chr(10);  
    IF l_hfa_rec.hfa_attribute1 IS NOT NULL
    THEN
@@ -491,7 +492,8 @@ BEGIN
 END get_label;
 --
 FUNCTION get_inv_type (pi_tab_name    IN Varchar2
-                      ,pi_column_name IN Varchar2)   
+                      ,pi_column_name IN Varchar2
+                      ,pi_screen_text IN Varchar2)   
 RETURN    hig_flex_attribute_inv_mapping.hfam_nit_inv_type%TYPE
 IS
 --
@@ -508,6 +510,7 @@ BEGIN
    AND    hfa_id            = hfam_hfa_id
    AND    hfam_nit_inv_type = ita_inv_type
    AND    ita_attrib_name   = pi_column_name
+   AND    pi_screen_text    LIKE ita_scrn_text||'%'
    AND    rownum = 1;
 
    Return l_inv_type;
