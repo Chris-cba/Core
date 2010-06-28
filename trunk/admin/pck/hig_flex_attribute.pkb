@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_flex_attribute.pkb-arc   3.2   Jun 24 2010 14:48:18   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_flex_attribute.pkb-arc   3.3   Jun 28 2010 10:17:36   lsorathia  $
 --       Module Name      : $Workfile:   hig_flex_attribute.pkb  $
---       Date into PVCS   : $Date:   Jun 24 2010 14:48:18  $
---       Date fetched Out : $Modtime:   Jun 24 2010 14:34:46  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Jun 28 2010 10:17:36  $
+--       Date fetched Out : $Modtime:   Jun 28 2010 09:37:36  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.2  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.3  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_flex_attribute';
 --
@@ -510,13 +510,13 @@ BEGIN
    AND    hfa_id            = hfam_hfa_id
    AND    hfam_nit_inv_type = ita_inv_type
    AND    ita_attrib_name   = pi_column_name
-   AND    pi_screen_text    LIKE ita_scrn_text||'%'
+   AND    Rtrim(ita_scrn_text) = Rtrim(Replace(pi_screen_text,'- Flexible',' '))
    AND    rownum = 1;
 
    Return l_inv_type;
 EXCEPTION
    WHEN OTHERS THEN
-   Raise_Application_Error(-20001,'Error while deriving the INV for flex attribute');
+   Return Null ;   
 --
 END get_inv_type;
 --
