@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE mapviewer AS
 --   SCCS Identifiers :-
 -----------------------------------------------------------------------------
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkh-arc   2.1   Mar 05 2010 14:08:08   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkh-arc   2.2   Jun 28 2010 11:34:02   cbaugh  $
 --       Module Name      : $Workfile:   mapviewer.pkh  $
---       Date into PVCS   : $Date:   Mar 05 2010 14:08:08  $
---       Date fetched Out : $Modtime:   Mar 05 2010 13:58:28  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Jun 28 2010 11:34:02  $
+--       Date fetched Out : $Modtime:   Jun 24 2010 14:52:00  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2004
@@ -17,7 +17,7 @@ CREATE OR REPLACE PACKAGE mapviewer AS
 --<GLOBVAR>
   g_ne_id       NUMBER;
   g_doc_id      NUMBER;
-  g_sccsid      CONSTANT  VARCHAR2(2000) :='"$Revision:   2.1  $"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) :='"$Revision:   2.2  $"';
 
   g_conversion_factor number;
 
@@ -92,8 +92,7 @@ CREATE OR REPLACE PACKAGE mapviewer AS
 --
 --<PROC NAME="INSERT_GDO">
   PROCEDURE create_pem
-              (
-                pi_asset_id     IN  nm_inv_items.iit_ne_id%TYPE
+              ( pi_asset_id     IN  nm_inv_items.iit_ne_id%TYPE
               , pi_x_val        IN  docs.doc_compl_east%TYPE
               , pi_y_val        IN  docs.doc_compl_north%TYPE
               , pi_lr_ne_id     IN  nm_elements.ne_id%TYPE
@@ -101,7 +100,8 @@ CREATE OR REPLACE PACKAGE mapviewer AS
               , pi_inv_theme_id IN  nm_themes_all.nth_theme_id%TYPE
               , pi_err_sequence IN  NUMBER
               , pi_username     IN  hig_users.hus_username%TYPE DEFAULT USER
-              );
+              , pi_session_id   IN  gis_data_objects.gdo_session_id%TYPE) -- clb 21062010 - task 0109021
+              ;
 
 --</PROC>
 -----------------------------------------------------------------------------
