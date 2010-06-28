@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Mapviewer AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.3   Mar 05 2010 14:08:44   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.4   Jun 28 2010 11:35:10   cbaugh  $
 --       Module Name      : $Workfile:   mapviewer.pkb  $
---       Date into PVCS   : $Date:   Mar 05 2010 14:08:44  $
---       Date fetched Out : $Modtime:   Mar 05 2010 14:00:32  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Jun 28 2010 11:35:10  $
+--       Date fetched Out : $Modtime:   Jun 23 2010 09:42:08  $
+--       PVCS Version     : $Revision:   2.4  $
 
 
 --
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BODY Mapviewer AS
 --	Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.4  $"';
 
 
 FUNCTION Get_Scale RETURN NUMBER;
@@ -236,7 +236,8 @@ PROCEDURE create_pem
               , pi_inv_theme_id IN  nm_themes_all.nth_theme_id%TYPE
               , pi_err_sequence IN  NUMBER
               , pi_username     IN  hig_users.hus_username%TYPE DEFAULT USER
-              ) AS
+              , pi_session_id   IN  gis_data_objects.gdo_session_id%TYPE)
+   AS -- clb 21062010 - task 0109021
 
    err_num  NUMBER;
    err_msg  VARCHAR2(100);
@@ -263,7 +264,18 @@ BEGIN
        , IN pi_inv_theme_id
        , IN pi_username;
 
-   g_doc_id := l_doc_id;
+  /*
+  || clb 21062010 - task 0109021 :Added call to insert_gdo 
+  */
+  insert_gdo (pi_session_id => pi_session_id
+            , pi_theme_name => '0'
+            , pi_pk_id      => l_doc_id
+            , pi_x_val      => 0
+            , pi_y_val      => 0
+            , pi_seq        => 0
+            );
+            
+   COMMIT;
 
 EXCEPTION
 
