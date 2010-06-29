@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.32   Jun 09 2010 14:24:40   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.33   Jun 29 2010 23:23:08   rcoupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Jun 09 2010 14:24:40  $
---       Date fetched Out : $Modtime:   Jun 09 2010 14:21:20  $
---       PVCS Version     : $Revision:   2.32  $
+--       Date into PVCS   : $Date:   Jun 29 2010 23:23:08  $
+--       Date fetched Out : $Modtime:   Jun 29 2010 23:21:04  $
+--       PVCS Version     : $Revision:   2.33  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Wed Jun 09  14:10:44 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Tue Jun 29  23:16:33 2010 by Server Generator 10.1.2.9.28
 
 
 
@@ -1577,6 +1577,7 @@ CREATE TABLE HIG_ALERT_TYPE_MAIL
  ,HATM_CREATED_BY VARCHAR2(30) NOT NULL
  ,HATM_DATE_MODIFIED DATE NOT NULL
  ,HATM_MODIFIED_BY VARCHAR2(30) NOT NULL
+ ,HATM_MAIL_FROM VARCHAR2(100)
  )
 /
 
@@ -1638,6 +1639,9 @@ COMMENT ON COLUMN HIG_ALERT_TYPE_MAIL.HATM_DATE_MODIFIED IS 'Audit details'
 /
 
 COMMENT ON COLUMN HIG_ALERT_TYPE_MAIL.HATM_MODIFIED_BY IS 'Audit details'
+/
+
+COMMENT ON COLUMN HIG_ALERT_TYPE_MAIL.HATM_MAIL_FROM IS 'This field will hold the Sender detail, the FROM field in the email Alert will show the data stored in this field.'
 /
 
 PROMPT Creating Table 'HIG_ALERT_TYPE_RECIPIENTS'
