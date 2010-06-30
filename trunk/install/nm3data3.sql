@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.21   Jun 11 2010 15:22:40   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.22   Jun 30 2010 13:46:54   malexander  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Jun 11 2010 15:22:40  $
---       Date fetched Out : $Modtime:   Jun 11 2010 15:21:00  $
---       Version          : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   Jun 30 2010 13:46:54  $
+--       Date fetched Out : $Modtime:   Jun 30 2010 13:38:12  $
+--       Version          : $Revision:   2.22  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 11-JUN-2010 15:20
+--       Generation Date  : 30-JUN-2010 13:38
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -506,32 +506,6 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'DOC0202'
                     AND  HMR_ROLE = 'DOC0202');
---
-INSERT INTO HIG_MODULE_ROLES
-       (HMR_MODULE
-       ,HMR_ROLE
-       ,HMR_MODE
-       )
-SELECT 
-        'DOC0300'
-       ,'DOC_USER'
-       ,'NORMAL' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
-                   WHERE HMR_MODULE = 'DOC0300'
-                    AND  HMR_ROLE = 'DOC_USER');
---
-INSERT INTO HIG_MODULE_ROLES
-       (HMR_MODULE
-       ,HMR_ROLE
-       ,HMR_MODE
-       )
-SELECT 
-        'DOC0310'
-       ,'DOC_USER'
-       ,'NORMAL' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
-                   WHERE HMR_MODULE = 'DOC0310'
-                    AND  HMR_ROLE = 'DOC_USER');
 --
 INSERT INTO HIG_MODULE_ROLES
        (HMR_MODULE
@@ -5101,8 +5075,8 @@ INSERT INTO HIG_MODULE_BLOCKS
 SELECT 
         'HIG1505'
        ,'HAUD'
-       ,to_date('20100611151855','YYYYMMDDHH24MISS')
-       ,to_date('20100611151855','YYYYMMDDHH24MISS')
+       ,to_date('20100630130803','YYYYMMDDHH24MISS')
+       ,to_date('20100630130803','YYYYMMDDHH24MISS')
        ,'NM3_METADATA'
        ,'NM3_METADATA' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_BLOCKS

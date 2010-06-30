@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.24   Jun 11 2010 15:22:40   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.25   Jun 30 2010 13:46:54   malexander  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Jun 11 2010 15:22:40  $
---       Date fetched Out : $Modtime:   Jun 11 2010 15:20:58  $
---       Version          : $Revision:   2.24  $
+--       Date into PVCS   : $Date:   Jun 30 2010 13:46:54  $
+--       Date fetched Out : $Modtime:   Jun 30 2010 13:38:10  $
+--       Version          : $Revision:   2.25  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 11-JUN-2010 15:20
+--       Generation Date  : 30-JUN-2010 13:38
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -82007,7 +82007,7 @@ INSERT INTO HIG_STANDARD_FAVOURITES
 SELECT 
         'HIG_REFERENCE_MAIL'
        ,'HIG1525'
-       ,'Alert Logs'
+       ,'Alert Log'
        ,'M'
        ,8 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
