@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.13   Jun 30 2010 12:58:50   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.14   Jun 30 2010 13:36:44   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Jun 30 2010 12:58:50  $
---       Date fetched Out : $Modtime:   Jun 30 2010 12:57:52  $
---       Version          : $Revision:   3.13  $
+--       Date into PVCS   : $Date:   Jun 30 2010 13:36:44  $
+--       Date fetched Out : $Modtime:   Jun 30 2010 13:36:34  $
+--       Version          : $Revision:   3.14  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -2019,14 +2019,6 @@ SET TERM OFF
 -- To support document bundle loader
 -- 
 ------------------------------------------------------------------
-delete from hig_module_roles
-where hmr_module in ('DOC0300','DOC0310')
-/
-delete from hig_modules
-where hmo_module in ('DOC0300','DOC0310')
-/
-
-
 INSERT INTO HIG_MODULES
    (HMO_MODULE
   , HMO_TITLE
