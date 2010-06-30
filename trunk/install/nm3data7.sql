@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.14   Jun 11 2010 15:22:38   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.15   Jun 30 2010 13:46:56   malexander  $
 --       Module Name      : $Workfile:   nm3data7.sql  $
---       Date into PVCS   : $Date:   Jun 11 2010 15:22:38  $
---       Date fetched Out : $Modtime:   Jun 11 2010 15:21:08  $
---       Version          : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Jun 30 2010 13:46:56  $
+--       Date fetched Out : $Modtime:   Jun 30 2010 13:38:20  $
+--       Version          : $Revision:   2.15  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 11-JUN-2010 15:21
+--       Generation Date  : 30-JUN-2010 13:38
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -6197,6 +6197,60 @@ SELECT
        ,543
        ,null
        ,'Cannot read file from its location.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 544;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,544
+       ,null
+       ,'Unable to drop trigger.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 545;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,545
+       ,null
+       ,'The selected meta model has a Primary Key Column that is not defined as an Attribute. For Audit/Alert to work correctly it is mandatory to setup this Attribute.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 546;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,546
+       ,null
+       ,'Unzip failed'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS

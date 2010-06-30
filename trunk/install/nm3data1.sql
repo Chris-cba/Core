@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.43   Jun 11 2010 15:22:40   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.44   Jun 30 2010 13:46:56   malexander  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Jun 11 2010 15:22:40  $
---       Date fetched Out : $Modtime:   Jun 11 2010 15:20:52  $
---       Version          : $Revision:   2.43  $
+--       Date into PVCS   : $Date:   Jun 30 2010 13:46:56  $
+--       Date fetched Out : $Modtime:   Jun 30 2010 13:38:04  $
+--       Version          : $Revision:   2.44  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 11-JUN-2010 15:20
+--       Generation Date  : 30-JUN-2010 13:37
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -6483,6 +6483,57 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'HIG'
                     AND  NER_ID = 543);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,544
+       ,null
+       ,'Unable to drop trigger.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 544);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,545
+       ,null
+       ,'The selected meta model has a Primary Key Column that is not defined as an Attribute. For Audit/Alert to work correctly it is mandatory to setup this Attribute.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 545);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,546
+       ,null
+       ,'Unzip failed'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 546);
 --
 INSERT INTO NM_ERRORS
        (NER_APPL
@@ -28978,7 +29029,7 @@ INSERT INTO HIG_MODULES
        )
 SELECT 
         'HIG1525'
-       ,'Alert Logs'
+       ,'Alert Log'
        ,'hig1525'
        ,'fmx'
        ,''
@@ -35140,10 +35191,10 @@ INSERT INTO HIG_OPTION_LIST
 SELECT 
         'SDOBATSIZE'
        ,'HIG'
-       ,'Batch size for spatial queries'
-       ,'This will set the batch size for spatial queries'
+       ,'Batch size used in SDO'
+       ,'This value is used as an array fetch size in some SDO cursors. It should be increased from the default in situations where large volumes of data have been end-dated or where view definitions are very restrictive over and above the native base spatial table'
        ,''
-       ,'NUMBER'
+       ,'VARCHAR2'
        ,'N'
        ,'N'
        ,10 FROM DUAL
@@ -37123,7 +37174,7 @@ INSERT INTO HIG_OPTION_VALUES
        )
 SELECT 
         'SDOBATSIZE'
-       ,'100' FROM DUAL
+       ,'10' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_OPTION_VALUES
                    WHERE HOV_ID = 'SDOBATSIZE');
 --
