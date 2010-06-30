@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.37   May 21 2010 10:57:44   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.38   Jun 30 2010 12:39:06   rcoupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   May 21 2010 10:57:44  $
---       Date fetched Out : $Modtime:   May 21 2010 10:52:14  $
---       PVCS Version     : $Revision:   2.37  $
+--       Date into PVCS   : $Date:   Jun 30 2010 12:39:06  $
+--       Date fetched Out : $Modtime:   Jun 30 2010 12:38:00  $
+--       PVCS Version     : $Revision:   2.38  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.37  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.38  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -6555,7 +6555,13 @@ BEGIN
   exception
     when     subscript_beyond_count then
       raise_application_error( -20006, 'Error in MBR calculation - check the gtypes are consistent');
+    when no_data_found then
+      raise_application_error( -20001, 'No data in table - cannot calculate the diminfo');
   end;
+
+  if l_mbr is null then
+    raise_application_error( -20001, 'No MBR calculated - cannot calculate the diminfo');
+  end if;
 
 --Nm_Debug.DEBUG( curstring );
 
