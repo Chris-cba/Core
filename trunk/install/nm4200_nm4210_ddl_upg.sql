@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.10   Jun 11 2010 16:19:16   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.11   Jun 30 2010 12:58:50   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jun 11 2010 16:19:16  $
---       Date fetched Out : $Modtime:   Jun 11 2010 16:18:28  $
---       Version          : $Revision:   3.10  $
+--       Date into PVCS   : $Date:   Jun 30 2010 12:58:50  $
+--       Date fetched Out : $Modtime:   Jun 30 2010 12:57:48  $
+--       Version          : $Revision:   3.11  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -4100,6 +4100,7 @@ CREATE TABLE HIG_ALERT_TYPE_MAIL
  ,HATM_CREATED_BY VARCHAR2(30) NOT NULL
  ,HATM_DATE_MODIFIED DATE NOT NULL
  ,HATM_MODIFIED_BY VARCHAR2(30) NOT NULL
+ ,HATM_MAIL_FROM VARCHAR2(100)
  )
 /
 
@@ -4162,6 +4163,10 @@ COMMENT ON COLUMN HIG_ALERT_TYPE_MAIL.HATM_DATE_MODIFIED IS 'Audit details'
 
 COMMENT ON COLUMN HIG_ALERT_TYPE_MAIL.HATM_MODIFIED_BY IS 'Audit details'
 /
+
+COMMENT ON COLUMN hig_alert_type_mail.hatm_mail_from IS 'This field will hold the Sender detail, the FROM field in the email Alert will show the data stored in this field.'
+/
+
 
 PROMPT Creating Table 'HIG_ALERT_TYPE_RECIPIENTS'
 CREATE TABLE HIG_ALERT_TYPE_RECIPIENTS

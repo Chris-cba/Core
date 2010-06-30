@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.12   Jun 11 2010 15:17:38   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_metadata_upg.sql-arc   3.13   Jun 30 2010 12:58:50   malexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Jun 11 2010 15:17:38  $
---       Date fetched Out : $Modtime:   Jun 11 2010 15:11:46  $
---       Version          : $Revision:   3.12  $
+--       Date into PVCS   : $Date:   Jun 30 2010 12:58:50  $
+--       Date fetched Out : $Modtime:   Jun 30 2010 12:57:52  $
+--       Version          : $Revision:   3.13  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -505,9 +505,9 @@ INSERT INTO hig_option_list (hol_id
                             ,hol_max_length)
 SELECT 'SDOBATSIZE'
      , 'HIG'
-     , 'Batch size for spatial queries'
-     , 'This will set the batch size for spatial queries'
-     , 'NUMBER'
+     , 'Batch size used in SDO'
+     , 'This value is used as an array fetch size in some SDO cursors. It should be increased from the default in situations where large volumes of data have been end-dated or where view definitions are very restrictive over and above the native base spatial table'
+     , 'VARCHAR2'
      , 'N'
      , 'N'
      , '10'
@@ -520,7 +520,7 @@ SELECT 'SDOBATSIZE'
 INSERT INTO hig_option_values ( hov_id
                                                    , hov_value)
 SELECT 'SDOBATSIZE'
-     , '100'
+     , '10'
   FROM dual
  WHERE NOT EXISTS (SELECT 'X' 
                      FROM hig_option_values
@@ -1846,6 +1846,30 @@ SELECT 'HIG'
    (SELECT 1 FROM nm_errors
      WHERE ner_appl = 'HIG'
        AND ner_id = 538);
+
+INSERT INTO nm_errors
+SELECT 'HIG'
+      , 544
+      , NULL
+      , 'Unable to drop trigger.'
+      , NULL
+  FROM dual
+ WHERE NOT EXISTS
+   (SELECT 1 FROM nm_errors
+     WHERE ner_appl = 'HIG'
+       AND ner_id = 544);
+
+INSERT INTO nm_errors
+SELECT 'HIG'
+      , 545
+      , NULL
+      , 'The selected meta model has a Primary Key Column that is not defined as an Attribute. For Audit/Alert to work correctly it is mandatory to setup this Attribute.'
+      , NULL
+  FROM dual
+ WHERE NOT EXISTS
+   (SELECT 1 FROM nm_errors
+     WHERE ner_appl = 'HIG'
+       AND ner_id = 545);
 ------------------------------------------------------------------
 
 
@@ -1908,7 +1932,7 @@ insert into hig_modules  values('HIG1520','Alert Setup','hig1520','fmx',null,'N'
 
 insert into hig_module_roles  values('HIG1520','HIG_ADMIN','NORMAL');
 
-insert into hig_modules  values('HIG1525','Alert Logs','hig1525','fmx',null,'N','N','HIG','FORM');
+insert into hig_modules  values('HIG1525','Alert Log','hig1525','fmx',null,'N','N','HIG','FORM');
 
 insert into hig_module_roles  values('HIG1525','HIG_USER','NORMAL');
 
@@ -1965,7 +1989,7 @@ Select 'HIG_REFERENCE_MAIL','HIG1520','Alert Setup','M',8 from dual
 Where Not Exists (Select 1 from hig_standard_favourites Where hstf_parent = 'HIG_REFERENCE_MAIL' And hstf_child = 'HIG1520')  ;
 
 Insert into hig_standard_favourites 
-Select 'HIG_REFERENCE_MAIL','HIG1525','Alert Logs','M',8 from dual
+Select 'HIG_REFERENCE_MAIL','HIG1525','Alert Log','M',8 from dual
 Where Not Exists (Select 1 from hig_standard_favourites Where hstf_parent = 'HIG_REFERENCE_MAIL' And hstf_child = 'HIG1525');
 
 Insert into hig_standard_favourites 
@@ -1995,6 +2019,14 @@ SET TERM OFF
 -- To support document bundle loader
 -- 
 ------------------------------------------------------------------
+delete from hig_module_roles
+where hmr_module in ('DOC0300','DOC0310')
+/
+delete from hig_modules
+where hmo_module in ('DOC0300','DOC0310')
+/
+
+
 INSERT INTO HIG_MODULES
    (HMO_MODULE
   , HMO_TITLE
@@ -2031,7 +2063,7 @@ INSERT INTO HIG_MODULES
 SELECT 
     'DOC0300', 
     'Load Document Bundles', 
-    'doc0300', 
+    'hig2510', 
     'FMX', 
     'N', 
     'N', 
@@ -2144,6 +2176,18 @@ Insert into NM_ERRORS
  Values
    ('DOC', 1, 'A Document Bundle of this name already exists')
 /
+
+delete from nm_errors
+where ner_appl = 'HIG'
+and ner_id = 546
+/
+
+Insert into NM_ERRORS
+   (NER_APPL, NER_ID, NER_DESCR)
+ Values
+   ('HIG', 546, 'Unzip failed')
+/   
+
 ------------------------------------------------------------------
 
 
