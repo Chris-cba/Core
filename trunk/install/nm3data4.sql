@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data4.sql-arc   2.11   Jun 30 2010 13:46:52   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data4.sql-arc   2.12   Jul 01 2010 17:02:28   malexander  $
 --       Module Name      : $Workfile:   nm3data4.sql  $
---       Date into PVCS   : $Date:   Jun 30 2010 13:46:52  $
---       Date fetched Out : $Modtime:   Jun 30 2010 13:38:14  $
---       Version          : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Jul 01 2010 17:02:28  $
+--       Date fetched Out : $Modtime:   Jul 01 2010 17:01:02  $
+--       Version          : $Revision:   2.12  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 30-JUN-2010 13:38
+--       Generation Date  : 01-JUL-2010 17:01
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -1817,66 +1817,6 @@ SET TERM ON
 PROMPT hig_navigator_modules
 SET TERM OFF
 
-INSERT INTO HIG_NAVIGATOR_MODULES
-       (HNM_MODULE_NAME
-       ,HNM_MODULE_PARAM
-       ,HNM_PRIMARY_MODULE
-       ,HNM_SEQUENCE
-       ,HNM_TABLE_NAME
-       ,HNM_FIELD_NAME
-       ,HNM_HIERARCHY_LABEL
-       ,HNM_DATE_CREATED
-       ,HNM_CREATED_BY
-       ,HNM_DATE_MODIFIED
-       ,HNM_MODIFIED_BY
-       )
-SELECT 
-        'NM0510'
-       ,'query_inv_item'
-       ,'Y'
-       ,1
-       ,''
-       ,''
-       ,'Asset'
-       ,to_date('20100222165343','YYYYMMDDHH24MISS')
-       ,'DORSET'
-       ,to_date('20100222165343','YYYYMMDDHH24MISS')
-       ,'DORSET' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_NAVIGATOR_MODULES
-                   WHERE HNM_MODULE_NAME = 'NM0510'
-                    AND  HNM_MODULE_PARAM = 'query_inv_item'
-                    AND  HNM_HIERARCHY_LABEL = 'Asset');
---
-INSERT INTO HIG_NAVIGATOR_MODULES
-       (HNM_MODULE_NAME
-       ,HNM_MODULE_PARAM
-       ,HNM_PRIMARY_MODULE
-       ,HNM_SEQUENCE
-       ,HNM_TABLE_NAME
-       ,HNM_FIELD_NAME
-       ,HNM_HIERARCHY_LABEL
-       ,HNM_DATE_CREATED
-       ,HNM_CREATED_BY
-       ,HNM_DATE_MODIFIED
-       ,HNM_MODIFIED_BY
-       )
-SELECT 
-        'NM0590'
-       ,'query_inv_item'
-       ,'N'
-       ,2
-       ,''
-       ,''
-       ,'Asset'
-       ,to_date('20100330174305','YYYYMMDDHH24MISS')
-       ,'DORSET'
-       ,to_date('20100330174305','YYYYMMDDHH24MISS')
-       ,'DORSET' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_NAVIGATOR_MODULES
-                   WHERE HNM_MODULE_NAME = 'NM0590'
-                    AND  HNM_MODULE_PARAM = 'query_inv_item'
-                    AND  HNM_HIERARCHY_LABEL = 'Asset');
---
 --
 --
 ----------------------------------------------------------------------------------------
