@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.10   Jun 23 2010 09:51:28   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3undo.pkb-arc   2.11   Jul 01 2010 12:27:42   cstrettle  $
 --       Module Name      : $Workfile:   nm3undo.pkb  $
---       Date into PVCS   : $Date:   Jun 23 2010 09:51:28  $
---       Date fetched Out : $Modtime:   Jun 22 2010 16:36:32  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jul 01 2010 12:27:42  $
+--       Date fetched Out : $Modtime:   Jul 01 2010 11:47:30  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --   Author : ITurnbull
 --
@@ -19,7 +19,7 @@ IS
 -- Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.10  $"';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000) := '"$Revision:   2.11  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name   CONSTANT VARCHAR2 (2000) := 'nm3undo';
 --
@@ -1191,6 +1191,9 @@ END undo_scheme;
 
          Nm_Debug.DEBUG ('Checking for AD data to unsplit');
          IF Nm3nwad.ad_data_exist (pi_ne_id)
+         -- CWS 01/JUN/2010 0109668
+         OR Nm3nwad.ad_data_exist (pi_ne_id_1)
+         OR Nm3nwad.ad_data_exist (pi_ne_id_2)
          THEN
             Nm_Debug.DEBUG ('Unsplitting - '||pi_ne_id_1||'-'||pi_ne_id_2||'-'||pi_ne_id);
             error_loc := 30 ;
