@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lrs.pkb-arc   2.4   Jan 06 2010 16:38:38   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lrs.pkb-arc   2.5   Jul 01 2010 12:13:10   lsorathia  $
 --       Module Name      : $Workfile:   nm3lrs.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:38  $
---       Date fetched Out : $Modtime:   Jan 06 2010 10:27:32  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Jul 01 2010 12:13:10  $
+--       Date fetched Out : $Modtime:   Jul 01 2010 12:02:20  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -18,7 +18,7 @@ AS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3lrs.pkb	1.45 09/25/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lrs';
@@ -924,7 +924,8 @@ CURSOR c1 ( c_parent_units number, c_offset number, c_ne_id number ) IS
   FROM nm_members, nm_elements
   WHERE nm_ne_id_in = c_ne_id
   AND   nm_ne_id_of = ne_id
-  AND   c_offset BETWEEN nm_true AND nm_end_true;
+  AND   c_offset BETWEEN nm_true AND nm_end_true
+  AND   Nvl(ne_sub_class,'$') = Nvl(pi_sub_class,Nvl(ne_sub_class,'$')); -- Task 0109869 added this code to filter the data if subclas is passed
         --nm_slk + nm3unit.convert_unit( nm3net.get_nt_units( nm3net.get_nt_type( ne_id )), c_parent_units, ne_length );
 
 l1_slk         number;
