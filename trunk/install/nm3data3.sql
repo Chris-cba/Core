@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.22   Jun 30 2010 13:46:54   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.23   Jul 01 2010 09:28:06   malexander  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Jun 30 2010 13:46:54  $
---       Date fetched Out : $Modtime:   Jun 30 2010 13:38:12  $
---       Version          : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   Jul 01 2010 09:28:06  $
+--       Date fetched Out : $Modtime:   Jul 01 2010 09:26:14  $
+--       Version          : $Revision:   2.23  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 30-JUN-2010 13:38
+--       Generation Date  : 01-JUL-2010 09:26
 --
 --   Product metadata script
 --   As at Release 4.2.1.0
@@ -506,6 +506,32 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'DOC0202'
                     AND  HMR_ROLE = 'DOC0202');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'DOC0300'
+       ,'DOC_USER'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'DOC0300'
+                    AND  HMR_ROLE = 'DOC_USER');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'DOC0310'
+       ,'DOC_USER'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'DOC0310'
+                    AND  HMR_ROLE = 'DOC_USER');
 --
 INSERT INTO HIG_MODULE_ROLES
        (HMR_MODULE
