@@ -4,16 +4,16 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.8   Jul 07 2009 09:53:02   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.9   Jul 02 2010 11:03:26   cstrettle  $
 --       Module Name      : $Workfile:   nm3sdo_check.pkb  $
---       Date into PVCS   : $Date:   Jul 07 2009 09:53:02  $
---       Date fetched Out : $Modtime:   Jul 07 2009 09:52:08  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Jul 02 2010 11:03:26  $
+--       Date fetched Out : $Modtime:   Jul 02 2010 11:02:14  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --------------------------------------------------------------------------------
 --
   g_package_name          CONSTANT varchar2(30)    := 'nm3sdo_check';
-  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.8  $"';
+  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.9  $"';
   lf                      CONSTANT VARCHAR2(30)    := chr(10);
   g_write_to_file                  BOOLEAN         := FALSE;
   l_results                        nm3type.tab_varchar32767;
@@ -256,7 +256,7 @@ AS
       put('    PASS : All Subordinate User themes are registered in USER_SDO_GEOM_METADATA');
     ELSE 
       FOR i IN 1..l_results.COUNT LOOP
-        put(l_results(i));
+         put(l_results(i));
       END LOOP;
     END IF;
   --
@@ -311,7 +311,7 @@ AS
       put('    PASS : All Subordinate users have feature views for Themes accessed via roles');
     ELSE 
       FOR i IN 1..l_results.COUNT LOOP
-        put(l_results(i));
+         put(l_results(i));
       END LOOP;
     END IF;
     
@@ -358,7 +358,9 @@ AS
                             ||'] - '|| l_tab_results(j)
                             ||' is not recognised';
               END LOOP; 
-          --
+            ELSE
+              -- CWS 0109886 When no errors the previous searches error were shown.
+              l_results.DELETE;
             END IF;
           EXCEPTION
             WHEN OTHERS
@@ -385,7 +387,7 @@ AS
         put('    PASS : No unrecognised gtypes found');
       ELSE 
         FOR i IN 1..l_results.COUNT LOOP
-          put(l_results(i));
+           put(l_results(i));
         END LOOP;
       END IF;
 --
