@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.11   15 Jun 2010 13:08:16   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.12   06 Jul 2010 09:38:52   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   15 Jun 2010 13:08:16  $
---       Date fetched Out : $Modtime:   15 Jun 2010 10:36:56  $
---       PVCS Version     : $Revision:   2.32.1.11  $
+--       Date into PVCS   : $Date:   06 Jul 2010 09:38:52  $
+--       Date fetched Out : $Modtime:   06 Jul 2010 09:16:06  $
+--       PVCS Version     : $Revision:   2.32.1.12  $
 --
 --
 --   Author : Priidu Tanava
@@ -111,13 +111,16 @@ No query types defined.
   27.05.10  PT task 0109671: in ins_datum_homo_chunks() increase length of l_case
   03.06.10  PT task 0109671: in ins_datum_homo_chunks() changed bandings logic to replace case statments with table lookups
   15.06.10  PT task 0109773: change std_insert_invitems() in how merge sections are joined to splits: to avoid missing sections
+  06.07.10  PT task 0109919: in std_populate() modified the main select statement to inclde BEGIN_CONNECT and LAG_END_CONNECT
+                this fiexes a problem where homo chunks are incorreclty joined when chunk start does not equal datum segment start
+                also, result segment members NSM_BEGIN_MP and NSM_END_MP are now correctly sized when partial datums are in the area of interest
 
 
   Todo: load_group_datums() with begin and end parameters
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(30)  :='"$Revision:   2.32.1.11  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.12  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -168,15 +171,6 @@ No query types defined.
     ,pt_itd   in itd_tbl
     ,p_domain_return in varchar2
     ,p_splits_rowcount in integer
-  );
-
-
-  procedure make_sql_effective_date(
-     p_sql out varchar2
-    ,p_bind_count in out integer
-    ,p_date in date
-    ,p_start_date_column in varchar2
-    ,p_end_date_column in varchar2
   );
 
 
@@ -1438,13 +1432,10 @@ No query types defined.
         ,q3.chunk_no
         ,q3.chunk_seq
         ,q3.nm_ne_id_of
-        ,q3.inv_begin_mp
-        ,q3.inv_end_mp
-        ,q3.nm_inv_begin_mp
-        ,q3.nm_inv_end_mp
         ,q3.hash_value
-        ,q3.nm_begin_mp
-        ,q3.nm_end_mp
+        ,q3.begin_mp, q3.end_mp                 -- inv lengths adjusted to fit datum lengths
+        ,q3.nm_inv_begin_mp, q3.nm_inv_end_mp   -- unadjusted inv lenvths
+        ,q3.nm_begin_mp, q3.nm_end_mp           -- datum lengths
         ,q3.nt_unit_in
         ,q3.nt_unit_of
         ,q3.measure
@@ -1452,12 +1443,11 @@ No query types defined.
         ,q3.nm_slk
         ,q3.nm_end_slk
         ,q3.lag_nm_ne_id_in
+        ,q3.lag_hash_value
         ,q3.lag_chunk_no
         ,q3.lag_chunk_seq
-        ,lag(q3.hash_value, 1, null) over
-          (partition by q3.nm_ne_id_in, q3.chunk_no order by q3.chunk_seq, q3.inv_begin_mp, q3.inv_end_mp) lag_hash_value
-        ,lag(q3.nm_end_mp - q3.inv_end_mp, 1, 0) over
-          (partition by q3.nm_ne_id_in, q3.chunk_no order by q3.chunk_seq, q3.inv_begin_mp, q3.inv_end_mp) lag_datum_gap
+        ,q3.begin_connect
+        ,q3.lag_end_connect
         -- offsets
         ,case
          when q3.nt_unit_in = q3.nt_unit_of then
@@ -1478,31 +1468,45 @@ No query types defined.
       from (
       select q2.*
         ,decode(q2.nm_cardinality, 1, q2.begin_mp, q2.nm_end_mp - q2.end_mp) inv_begin_mp
-        ,decode(q2.nm_cardinality, 1, q2.end_mp, q2.nm_end_mp - q2.begin_mp) inv_end_mp
+        ,decode(q2.nm_cardinality, 1, q2.end_mp, q2.nm_end_mp - q2.begin_mp) inv_end_mp 
+        ,lag(q2.nm_ne_id_in, 1, null) over
+          (partition by q2.nm_ne_id_in order by q2.chunk_no, q2.chunk_seq, q2.begin_mp * q2.nm_cardinality, q2.end_mp * q2.nm_cardinality) lag_nm_ne_id_in
+        ,lag(q2.chunk_no, 1, null) over
+          (partition by q2.nm_ne_id_in order by q2.chunk_no, q2.chunk_seq, q2.begin_mp * q2.nm_cardinality, q2.end_mp * q2.nm_cardinality) lag_chunk_no
+        ,lag(q2.chunk_seq, 1, null) over
+          (partition by q2.nm_ne_id_in, q2.chunk_no order by q2.chunk_seq, q2.begin_mp * q2.nm_cardinality, q2.end_mp * q2.nm_cardinality) lag_chunk_seq
+        ,lag(q2.hash_value, 1, null) over
+          (partition by q2.nm_ne_id_in, q2.chunk_no order by q2.chunk_seq, q2.begin_mp * q2.nm_cardinality, q2.end_mp * q2.nm_cardinality) lag_hash_value
+        ,lag(q2.end_connect, 1, null) over
+          (partition by q2.nm_ne_id_in order by q2.chunk_no, q2.chunk_seq, q2.begin_mp * q2.nm_cardinality, q2.end_mp * q2.nm_cardinality) lag_end_connect
       from (
       select
          qq.*
         ,greatest(inv.nm_begin_mp, qq.nm_begin_mp) begin_mp
         ,least(inv.nm_end_mp, qq.nm_end_mp) end_mp
-        ,lag(qq.nm_ne_id_in, 1, null) over
-          (order by qq.nm_ne_id_in, qq.chunk_no, qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality, inv.nm_end_mp * qq.nm_cardinality) lag_nm_ne_id_in
-        ,lag(qq.chunk_no, 1, null) over
-          (partition by qq.nm_ne_id_in order by qq.chunk_no, qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality, inv.nm_end_mp * qq.nm_cardinality) lag_chunk_no
-        ,lag(qq.chunk_seq, 1, null) over
-          (partition by qq.nm_ne_id_in, qq.chunk_no order by qq.chunk_seq, inv.nm_begin_mp * qq.nm_cardinality, inv.nm_end_mp * qq.nm_cardinality) lag_chunk_seq
-        ,inv.hash_value
         ,inv.nm_begin_mp nm_inv_begin_mp
         ,inv.nm_end_mp nm_inv_end_mp
+        ,inv.hash_value hash_value
+        ,decode(qq.nm_cardinality, 1
+           ,decode(greatest(inv.nm_begin_mp, qq.nm_begin_mp), 0, 1, 0)
+           ,decode(least(inv.nm_end_mp, qq.nm_end_mp), qq.ne_length, 1, 0)
+         ) begin_connect
+        ,decode(qq.nm_cardinality, 1
+           ,decode(least(inv.nm_end_mp, qq.nm_end_mp), qq.ne_length, 1, 0)
+           ,decode(greatest(inv.nm_begin_mp, qq.nm_begin_mp), 0, 1, 0)
+         ) end_connect
       from
         (
         select
            q.nm_ne_id_in
+          ,q.ne_length
           ,dense_rank() over (partition by q.nm_ne_id_in order by q.nsc_seq_no, q.min_slk_measure) chunk_no
           ,q.chunk_seq, q.nm_ne_id_of, q.nm_begin_mp, q.nm_end_mp, q.measure, q.end_measure
           ,q.nm_slk, q.nm_end_slk, nvl(q.nm_cardinality, 1) nm_cardinality, q.nt_unit_in, q.nt_unit_of
         from (
         select
            t.*
+          ,e.ne_length
           ,min(nvl(t.nm_slk, t.measure)) over (partition by t.nm_ne_id_in, t.chunk_no) min_slk_measure
           ,decode(e.ne_type, 'D', null, nvl((select case when nsc_seq_no <= 2 then 1 else 2 end
               from nm_type_subclass
@@ -1526,6 +1530,7 @@ No query types defined.
         ,q3.chunk_no
         ,q3.chunk_seq
         ,q3.inv_begin_mp
+        ,q3.inv_end_mp
     )
     loop
       j := j + 1;
@@ -1598,11 +1603,12 @@ No query types defined.
       -- same section
       if r.nm_ne_id_in = r.lag_nm_ne_id_in        -- new route
         and r.chunk_no = r.lag_chunk_no           -- new route chunk
+        and r.chunk_seq - r.lag_chunk_seq = 1     -- gap between chunk sequences (or point section on same datum)
         and r.hash_value = r.lag_hash_value       -- different inv attribute values
-        and r.lag_datum_gap = 0                   -- prevous chunk does not reach the datum end
-        and r.inv_begin_mp < r.inv_end_mp         -- do not connect point chunks (differ from old code results)
-        and r.chunk_seq - r.lag_chunk_seq <= 1    -- gap between chunk sequences
-
+        and r.begin_connect = 1                   -- chunk does not start at datum start
+        and r.lag_end_connect = 1                 -- prevous chunk does not reach the datum end                
+        --and r.begin_mp < r.end_mp                 -- do not connect point chunks (do not differ from old code results)
+        
       then
         null;
 
@@ -1625,7 +1631,7 @@ No query types defined.
         t_sect(i).nms_begin_offset    := r.begin_offset;
         t_sect(i).nms_end_offset      := null;
         t_sect(i).nms_ne_id_first     := r.nm_ne_id_of;
-        t_sect(i).nms_begin_mp_first  := r.inv_begin_mp; --r.inv_begin_mp;
+        t_sect(i).nms_begin_mp_first  := r.begin_mp; --r.inv_begin_mp;
         t_sect(i).nms_ne_id_last      := null;
         t_sect(i).nms_end_mp_last     := null;
         t_sect(i).nms_in_results      := 'Y';
@@ -1635,7 +1641,7 @@ No query types defined.
 
       -- carry forward the section end values
       t_sect(i).nms_ne_id_last  := r.nm_ne_id_of;
-      t_sect(i).nms_end_mp_last := r.inv_end_mp;
+      t_sect(i).nms_end_mp_last := r.end_mp;
 
       -- end offset
       t_sect(i).nms_end_offset := r.end_offset;
@@ -1647,11 +1653,11 @@ No query types defined.
       t_memb(k).nsm_mrg_job_id      := t_sect(i).nms_mrg_job_id;
       t_memb(k).nsm_mrg_section_id  := t_sect(i).nms_mrg_section_id;
       t_memb(k).nsm_ne_id           := r.nm_ne_id_of;
-      t_memb(k).nsm_begin_mp        := r.nm_inv_begin_mp; --r.inv_begin_mp;
-      t_memb(k).nsm_end_mp          := r.nm_inv_end_mp; --r.inv_end_mp;
+      t_memb(k).nsm_begin_mp        := r.begin_mp; --r.inv_begin_mp;
+      t_memb(k).nsm_end_mp          := r.end_mp; --r.inv_end_mp;
       t_memb(k).nsm_measure         := l_nsm_measure;
 
-      l_nsm_measure := l_nsm_measure + (r.nm_inv_end_mp - r.nm_inv_begin_mp);
+      l_nsm_measure := l_nsm_measure + (r.end_mp - r.begin_mp);
 
 
     end loop;
@@ -2563,11 +2569,10 @@ No query types defined.
         l_sql :=
           sql_nm_datum_criteria_pre_tmp(
              p_elements_sql =>
-                    '    select nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
+                    '    select nm_ne_id_of, nm_begin_mp begin_mp, nm_end_mp end_mp'
               ||cr||'     ,to_number(null) group_id'
               ||cr||'    from nm_members'
               ||cr||'    where nm_ne_id_in = :p_group_id'
-              ||cr||'    group by nm_ne_id_of'
           );
 
       end if;
@@ -2578,7 +2583,7 @@ No query types defined.
       l_sql :=
         sql_nm_datum_criteria_pre_tmp(
            p_elements_sql =>
-                  '    select nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
+                  '    select nm_ne_id_of, nm_begin_mp begin_mp, nm_end_mp end_mp'
             ||cr||'     ,to_number(null) group_id'
             ||cr||'    from'
             ||cr||'       nm_members'
@@ -2591,7 +2596,6 @@ No query types defined.
             ||cr||'                        start with nm_ne_id_in = :p_group_id)'
             ||cr||'        and ne_type in (''S'', ''D'')'
             ||cr||'      )'
-            ||cr||'    group by nm_ne_id_of'
          );
 
     end if;
@@ -2646,11 +2650,10 @@ No query types defined.
     l_sql     constant varchar2(10000) :=
       sql_nm_datum_criteria_pre_tmp(
          p_elements_sql =>
-                '    select d.nsd_ne_id nm_ne_id_of, min(d.nsd_begin_mp) begin_mp, max(d.nsd_end_mp) end_mp'
+                '    select d.nsd_ne_id nm_ne_id_of, d.nsd_begin_mp begin_mp, d.nsd_end_mp end_mp'
           ||cr||'     ,to_number(null) group_id'
           ||cr||'    from nm_saved_extent_member_datums d'
           ||cr||'    where d.nsd_nse_id = :p_nse_id'
-          ||cr||'    group by d.nsd_ne_id'
       );
     l_group_type      nm_group_types.ngt_group_type%type;
     l_effective_date  constant date := nm3context.get_effective_date;
@@ -2719,11 +2722,10 @@ No query types defined.
     l_sql constant varchar2(10000) :=
       sql_nm_datum_criteria_pre_tmp(
          p_elements_sql =>
-              '    select d.nte_ne_id_of nm_ne_id_of, min(d.nte_begin_mp) begin_mp, max(d.nte_end_mp) end_mp'
-        ||cr||'     ,min(d.nte_route_ne_id) group_id'
+              '    select d.nte_ne_id_of nm_ne_id_of, d.nte_begin_mp begin_mp, d.nte_end_mp end_mp'
+        ||cr||'     ,d.nte_route_ne_id group_id'
         ||cr||'    from nm_nw_temp_extents d'
         ||cr||'    where d.nte_job_id = :p_nte_job_id'
-        ||cr||'    group by d.nte_ne_id_of'
       );
     l_group_type      nm_group_types.ngt_group_type%type;
     l_effective_date  constant date := nm3context.get_effective_date;
@@ -2822,11 +2824,11 @@ No query types defined.
     l_sql     constant varchar2(10000) :=
       sql_nm_datum_criteria_pre_tmp(
          p_elements_sql =>
-                '    select nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
+                '    select nm_ne_id_of, nm_begin_mp begin_mp, nm_end_mp end_mp'
           ||cr||'     ,to_number(null) group_id'
           ||cr||'    from nm_members'
           ||cr||'    where nm_obj_type = :p_group_type'
-          ||cr||'    group by nm_ne_id_of'
+          ||cr||'      and nm_type = ''G'''
       );
     l_group_type      nm_group_types.ngt_group_type%type;
     l_effective_date  constant date := nm3context.get_effective_date;
@@ -3149,13 +3151,12 @@ No query types defined.
       mt_nse_id := pt_nse;
       l_inner_sql :=
              '    select /*+ cardinality(x 2) */'
-       ||cr||'      d.nsd_ne_id nm_ne_id_of, min(d.nsd_begin_mp) begin_mp, max(d.nsd_end_mp) end_mp'
+       ||cr||'      d.nsd_ne_id nm_ne_id_of, d.nsd_begin_mp begin_mp, d.nsd_end_mp end_mp'
        ||cr||'     ,to_number(null) group_id'
        ||cr||'    from'
        ||cr||'       nm_saved_extent_member_datums d'
        ||cr||'      ,table(cast('||g_package_name||'.get_nse_id_tbl as nm_id_tbl)) x'
-       ||cr||'    where d.nsd_nse_id = x.column_value'
-       ||cr||'    group by d.nsd_ne_id';
+       ||cr||'    where d.nsd_nse_id = x.column_value';
 
 
       l_union_all := cr||'    union all'||cr;
@@ -3215,13 +3216,12 @@ No query types defined.
         l_inner_sql := l_inner_sql
               ||l_union_all
               ||'    select /*+ cardinality(x 1) */'
-          ||cr||'      nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
+          ||cr||'      nm_ne_id_of, nm_begin_mp begin_mp, nm_end_mp end_mp'
           ||cr||'     ,to_number(null) group_id'
           ||cr||'    from'
           ||cr||'       nm_members'
           ||cr||'      ,table(cast('||g_package_name||'.get_group_id_tbl as nm_id_tbl)) x'
-          ||cr||'    where nm_ne_id_in = x.column_value'
-          ||cr||'    group by nm_ne_id_of';
+          ||cr||'    where nm_ne_id_in = x.column_value';
 
           l_union_all := cr||'    union all'||cr;
           l_union_count := l_union_count + 1;
@@ -3233,7 +3233,7 @@ No query types defined.
       if mt_gg_id.count > 0 then
         l_inner_sql := l_inner_sql
               ||l_union_all
-              ||'    select nm_ne_id_of, min(nm_begin_mp) begin_mp, max(nm_end_mp) end_mp'
+              ||'    select nm_ne_id_of, nm_begin_mp begin_mp, nm_end_mp end_mp'
           ||cr||'     ,to_number(null) group_id'
           ||cr||'    from'
           ||cr||'       nm_members'
@@ -3246,8 +3246,7 @@ No query types defined.
           ||cr||'                        start with nm_ne_id_in in (select /*+ cardinality(x 1) */ x.column_value from table(cast('
                                                                    ||g_package_name||'.get_gg_id_tbl as nm_id_tbl)) x))'
           ||cr||'        and ne_type in (''S'', ''D'')'
-          ||cr||'      )'
-          ||cr||'    group by nm_ne_id_of';
+          ||cr||'      )';
 
           l_union_all := cr||'    union all'||cr;
           l_union_count := l_union_count + 1;
@@ -3257,18 +3256,18 @@ No query types defined.
     end if;
 
 
-    -- if more than one source then wrap all into another group by to ensure distinct nm_ne_id_of
-    if l_union_count > 1 then
+--    -- if more than one source then wrap all into another group by to ensure distinct nm_ne_id_of
+--    if l_union_count > 1 then
 
-      l_inner_sql :=
-              '    select nm_ne_id_of, min(begin_mp) begin_mp, max(end_mp) end_mp'
-        ||cr||'     ,to_number(null) group_id'
-        ||cr||'    from ('
-        ||cr||l_inner_sql
-        ||cr||'    )'
-        ||cr||'    group by nm_ne_id_of';
+--      l_inner_sql :=
+--              '    select nm_ne_id_of, min(begin_mp) begin_mp, max(end_mp) end_mp'
+--        ||cr||'     ,to_number(null) group_id'
+--        ||cr||'    from ('
+--        ||cr||l_inner_sql
+--        ||cr||'    )'
+--        ||cr||'    group by nm_ne_id_of';
 
-    end if;
+--    end if;
 
 
     l_sql :=
@@ -3307,29 +3306,6 @@ No query types defined.
          ||')');
        raise;
 
-  end;
-
-
-
-  -- this builds the effective date where clause for dynamic sql
-  procedure make_sql_effective_date(
-     p_sql out varchar2
-    ,p_bind_count in out integer
-    ,p_date in date
-    ,p_start_date_column in varchar2
-    ,p_end_date_column in varchar2
-  )
-  is
-    l_bind_count integer := nvl(p_bind_count, 0);
-  begin
-    if p_date = trunc(sysdate) then
-      p_sql := p_end_date_column||' is null';
-      p_bind_count := l_bind_count + 0;
-    else
-      p_sql := p_start_date_column||' <= :p_effective_date and '
-        ||'nvl('||p_end_date_column||', :p_effective_date) > :p_effective_date';
-      p_bind_count := l_bind_count + 3;
-    end if;
   end;
 
 
