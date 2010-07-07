@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.33.1.0   Jun 30 2010 12:01:34   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.33.1.1   Jul 07 2010 15:30:52   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jun 30 2010 12:01:34  $
---       Date fetched Out : $Modtime:   Jun 30 2010 11:58:00  $
---       PVCS Version     : $Revision:   2.33.1.0  $
+--       Date into PVCS   : $Date:   Jul 07 2010 15:30:52  $
+--       Date fetched Out : $Modtime:   Jul 07 2010 15:30:30  $
+--       PVCS Version     : $Revision:   2.33.1.1  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.33.1.0  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.33.1.1  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -4895,11 +4895,25 @@ BEGIN
   EXECUTE IMMEDIATE cur_string USING p_ne_id, l_geom;
 
   --
-  -- Task 0108237
-  -- AE Change affected shapes to generate autoincluded group shapes.
-  --
-  nm3sdo.change_affected_shapes (p_layer      => g_nth.nth_theme_id,
-                                 p_ne_id      => p_ne_id);
+  -- Task 0109633, 0109634, 0109938, 0109937, 0109936
+  -- AE 07-July-2010
+  --   Only call the change affected shapes if we are doing this insert element shape
+  --   outside the scope of a network edit.
+  --   Calling this routine during a network edit can cause problems, and it ends up being
+  --   invoked from the members triggers anyway.
+  --   The problem manifested using Reclassify - shorten a datum and any assets off the 
+  --   end of the datum would result in this failing with a null shape - i.e. cannot insert null
+  --   into asset shape table. 
+  -- 
+  IF NOT nm3merge.is_nw_operation_in_progress
+  THEN
+    --
+    -- Task 0108237
+    -- AE Change affected shapes to generate autoincluded group shapes.
+    --
+    nm3sdo.change_affected_shapes (p_layer      => g_nth.nth_theme_id,
+                                   p_ne_id      => p_ne_id);
+  END IF;
 
 END;
 
