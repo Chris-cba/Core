@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.4   Jun 22 2010 17:04:54   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.5   Jul 07 2010 15:32:52   gjohnson  $
 --       Module Name      : $Workfile:   doc_bundle_loader.pkb  $
---       Date into PVCS   : $Date:   Jun 22 2010 17:04:54  $
---       Date fetched Out : $Modtime:   Jun 22 2010 17:04:08  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Jul 07 2010 15:32:52  $
+--       Date fetched Out : $Modtime:   Jul 07 2010 15:31:00  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $';
 
   g_package_name CONSTANT varchar2(30) := 'doc_bundle_loader';
   
@@ -621,7 +621,7 @@ BEGIN
                                     , error_text      => l_error_text
                                     );
 
-              IF l_tab_c1(d).dbfr_doc_id IS NOT NULL AND (l_tab_c1(d).dbfr_gateway_table_name IS NOT NULL OR l_tab_c1(d).dbfr_rec_id IS NOT NULL) THEN
+              IF l_tab_c1(d).dbfr_doc_id IS NOT NULL AND l_error_no IS NULL AND (l_tab_c1(d).dbfr_gateway_table_name IS NOT NULL OR l_tab_c1(d).dbfr_rec_id IS NOT NULL) THEN
               
               
                 doc_api.create_doc_assoc
