@@ -2,11 +2,11 @@ CREATE OR REPLACE package body nm3dynsql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.5   17 Jun 2010 16:26:12   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.6   07 Jul 2010 16:28:18   ptanava  $
 --       Module Name      : $Workfile:   nm3dynsql.pkb  $
---       Date into PVCS   : $Date:   17 Jun 2010 16:26:12  $
---       Date fetched Out : $Modtime:   17 Jun 2010 16:25:42  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   07 Jul 2010 16:28:18  $
+--       Date fetched Out : $Modtime:   07 Jul 2010 16:19:56  $
+--       PVCS Version     : $Revision:   2.6  $
 --       Based on sccs version :
 --
 --
@@ -30,9 +30,11 @@ CREATE OR REPLACE package body nm3dynsql as
   27.05.10  RC Task 0109651 - comment out line to restrict query to only live elements (ecdm log 726355)
   17.06.10  PT task 0109816: in sql_route_connectivity() further replacing m.nm_begin_mp and m.nm_end_mp with those of d.begin_mp and d.end_mp
                 to avoid expanding datum lengths
+  07.07.10  PT task 0109941: in sql_route_connectivity() changed the logic of q4.chunk_no
+                to avoid gaps when connectivity works over connecting datum pieces
 */
 
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.5  $"';
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.6  $"';
   g_package_name    constant  varchar2(30) := 'nm3dynsql';
 
 
@@ -173,7 +175,8 @@ CREATE OR REPLACE package body nm3dynsql as
           'select'
     ||cr||'   q4.nm_ne_id_in'
     ||cr||'  ,q4.chunk_no'
-    ||cr||'  ,q4.chunk_seq'
+    --||cr||'  ,q4.chunk_seq'
+    ||cr||'  ,row_number() over (partition by q4.nm_ne_id_in, q4.chunk_no, q4.member_rownum order by q4.chunk_seq) chunk_seq'
     ||cr||'  ,q4.nm_ne_id_of'
     ||cr||'  ,q4.nm_begin_mp'
     ||cr||'  ,q4.nm_end_mp'
