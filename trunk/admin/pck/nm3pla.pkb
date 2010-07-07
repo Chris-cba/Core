@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.2   Jan 06 2010 16:41:34   cstrettle  $
---       Module Name      : $Workfile:   nm3pla.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:34  $
---       Date fetched Out : $Modtime:   Jan 05 2010 18:17:44  $
---       Version          : $Revision:   2.2  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkb-arc   2.3   Jul 07 2010 15:25:10   cstrettle  $
+--       Module Name      : $Workfile:   nm3pla_fix.pkb  $
+--       Date into PVCS   : $Date:   Jul 07 2010 15:25:10  $
+--       Date fetched Out : $Modtime:   Jul 07 2010 15:23:22  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.61
 ------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3pla AS
 -------------------------------------------------------------------------------------------
 -- Global variables - tree definitions etc.
    --g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"@(#)nm3pla.pkb	1.61 11/29/06"';
-   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+   g_body_sccsid     CONSTANT varchar2(2000) := '$Revision:   2.3  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2(30) := 'nm3pla';
@@ -1995,13 +1995,14 @@ FUNCTION get_connected_extent( pi_st_lref IN nm_lref,
   e_no_connectivity EXCEPTION;
 
   CURSOR c1 IS
-    SELECT ne_id, ne_length, Nm3net.get_cardinality( pi_route, ne_id) ne_cardinality
+    SELECT CONNECT_BY_ISCYCLE, ne_id, ne_length, Nm3net.get_cardinality( pi_route, ne_id) ne_cardinality
     FROM nm_elements
     WHERE NVL(ne_sub_class, '÷÷÷÷') != NVL(pi_sub_class,'÷$%^')
-    CONNECT BY PRIOR get_next_element2(pi_route, ne_id, pi_sub_class ) = ne_id
+    CONNECT BY NOCYCLE PRIOR get_next_element2(pi_route, ne_id, pi_sub_class ) = ne_id
     AND NVL(ne_sub_class, '÷÷÷÷') != NVL(pi_sub_class,'÷$%^')
     START WITH ne_id = get_next_element2(pi_route, pi_st_lref.lr_ne_id, pi_sub_class )
-    AND NVL(ne_sub_class, '÷÷÷÷') != NVL(pi_sub_class,'÷$%^');
+    AND NVL(ne_sub_class, '÷÷÷÷') != NVL(pi_sub_class,'÷$%^')
+    AND CONNECT_BY_ISCYCLE = 0;
 
   l_st_true  NUMBER := Nm3lrs.get_element_true( pi_route, pi_st_lref.lr_ne_id );
   l_end_true NUMBER := Nm3lrs.get_element_true( pi_route, pi_end_lref.lr_ne_id );
