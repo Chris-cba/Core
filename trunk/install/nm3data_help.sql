@@ -2,16 +2,16 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data_help.sql-arc   2.5   May 26 2010 10:04:18   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data_help.sql-arc   2.6   Jul 08 2010 14:20:04   malexander  $
 --       Module Name      : $Workfile:   nm3data_help.sql  $
---       Date into PVCS   : $Date:   May 26 2010 10:04:18  $
---       Date fetched Out : $Modtime:   May 26 2010 10:02:44  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Jul 08 2010 14:20:04  $
+--       Date fetched Out : $Modtime:   Jul 08 2010 14:14:08  $
+--       Version          : $Revision:   2.6  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 26-MAY-2010 10:02
+--       Generation Date  : 08-JUL-2010 14:14
 --
 --   Product metadata script
---   As at Release 4.2.1.0
+--   Re-generated to include updated HIG_WEB_CONTXT_HLP entries
 --
 --   Copyright (c) exor corporation ltd, 2010
 --
@@ -137,11 +137,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         5
-       ,'HIG'
+       ,'ENQWT'
        ,''
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm' FROM DUAL;
+       ,'/enqwt/WebHelp/enqwt.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 6;
@@ -156,11 +156,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         6
-       ,'IM'
+       ,'HAI'
        ,''
        ,''
        ,''
-       ,'/im/WebHelp/im.htm' FROM DUAL;
+       ,'/hai/WebHelp/hai.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 7;
@@ -175,11 +175,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         7
-       ,'MAI'
+       ,'HIG'
        ,''
        ,''
        ,''
-       ,'/mai/WebHelp/mai.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 8;
@@ -194,11 +194,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         8
-       ,'MRWA'
+       ,'IM'
        ,''
        ,''
        ,''
-       ,'/mrwa/WebHelp/mrwa.htm' FROM DUAL;
+       ,'/im/WebHelp/im.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 9;
@@ -213,11 +213,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         9
-       ,'NET'
+       ,'IMF'
        ,''
        ,''
        ,''
-       ,'/net/WebHelp/net.htm' FROM DUAL;
+       ,'/imf/WebHelp/imf.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 10;
@@ -232,11 +232,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         10
-       ,'NSG'
+       ,'MAI'
        ,''
        ,''
        ,''
-       ,'/nsg/WebHelp/nsg.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 11;
@@ -251,11 +251,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         11
-       ,'ENQ'
+       ,'MCP'
        ,''
        ,''
        ,''
-       ,'/pem/WebHelp/enq.htm' FROM DUAL;
+       ,'/mcp/WebHelp/mcp.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 12;
@@ -270,11 +270,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         12
-       ,'PMS'
+       ,'MRWA'
        ,''
        ,''
        ,''
-       ,'/pms/WebHelp/pms.htm' FROM DUAL;
+       ,'/mrwa/WebHelp/mrwa.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 13;
@@ -289,11 +289,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         13
-       ,'PROW'
+       ,'NET'
        ,''
        ,''
        ,''
-       ,'/prow/WebHelp/prow.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 14;
@@ -308,11 +308,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         14
-       ,'SCH'
+       ,'NSG'
        ,''
        ,''
        ,''
-       ,'/sch/WebHelp/sch.htm' FROM DUAL;
+       ,'/nsg/WebHelp/nsg.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 15;
@@ -327,11 +327,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         15
-       ,'CLM'
+       ,'ENQ'
        ,''
        ,''
        ,''
-       ,'/slm/WebHelp/clm.htm' FROM DUAL;
+       ,'/pem/WebHelp/enq.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 16;
@@ -346,11 +346,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         16
-       ,'STP'
+       ,'PLA'
        ,''
        ,''
        ,''
-       ,'/stp/WebHelp/stp.htm' FROM DUAL;
+       ,'/pla/WebHelp/pla.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 17;
@@ -365,11 +365,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         17
-       ,'STR'
+       ,'PMS'
        ,''
        ,''
        ,''
-       ,'/str/WebHelp/str.htm' FROM DUAL;
+       ,'/pms/WebHelp/pms.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 18;
@@ -384,11 +384,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         18
-       ,'SWR'
+       ,'PROW'
        ,''
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm' FROM DUAL;
+       ,'/prow/WebHelp/prow.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 19;
@@ -403,11 +403,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         19
-       ,'TM'
+       ,'SAF'
        ,''
        ,''
        ,''
-       ,'/tm/WebHelp/tm.htm' FROM DUAL;
+       ,'/saf/WebHelp/saf.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 20;
@@ -422,11 +422,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         20
-       ,'UKP'
+       ,'SCH'
        ,''
        ,''
        ,''
-       ,'/ukp/WebHelp/ukp.htm' FROM DUAL;
+       ,'/sch/WebHelp/sch.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 21;
@@ -441,11 +441,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         21
-       ,'USR'
+       ,'CLM'
        ,''
        ,''
        ,''
-       ,'/usr/WebHelp/usr.htm' FROM DUAL;
+       ,'/slm/WebHelp/clm.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 22;
@@ -460,11 +460,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         22
-       ,'WMP'
+       ,'STP'
        ,''
        ,''
        ,''
-       ,'/wmp/WebHelp/wmp.htm' FROM DUAL;
+       ,'/stp/WebHelp/stp.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 23;
@@ -479,11 +479,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         23
-       ,'ENQ'
-       ,'DOC0150'
+       ,'STR'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docenquiries__doc0150.htm' FROM DUAL;
+       ,''
+       ,'/str/WebHelp/str.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 24;
@@ -498,11 +498,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         24
-       ,'ENQ'
-       ,'DOC0166'
+       ,'SWR'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docenquiry_list__doc0166.htm' FROM DUAL;
+       ,''
+       ,'/swr/WebHelp/swr.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 25;
@@ -517,11 +517,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         25
-       ,'ENQ'
-       ,'DOC0160'
+       ,'TM'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docenquiry_details__doc0160.htm' FROM DUAL;
+       ,''
+       ,'/tm/WebHelp/tm.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 26;
@@ -536,11 +536,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         26
-       ,'ENQ'
-       ,'DOC0162'
+       ,'TMA'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docacknowledgements__doc0162.htm' FROM DUAL;
+       ,''
+       ,'/tma/WebHelp/tma.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 27;
@@ -555,11 +555,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         27
-       ,'ENQ'
-       ,'DOC0164'
+       ,'TMA_PR'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docsummary_by_status__doc0164.htm' FROM DUAL;
+       ,''
+       ,'/tma_pr/WebHelp/tma_pr.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 28;
@@ -574,11 +574,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         28
-       ,'ENQ'
-       ,'DOC0165'
+       ,'UKP'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docsummary_by_type__doc0165.htm' FROM DUAL;
+       ,''
+       ,'/ukp/WebHelp/ukp.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 29;
@@ -593,11 +593,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         29
-       ,'ENQ'
-       ,'DOC0205'
+       ,'USR'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docbatch_enquiry_printing__doc0205.htm' FROM DUAL;
+       ,''
+       ,'/usr/WebHelp/usr.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 30;
@@ -612,11 +612,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         30
-       ,'ENQ'
-       ,'DOC0167'
+       ,'WMP'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docoutstanding_enquiry_actions__doc.htm' FROM DUAL;
+       ,''
+       ,'/wmp/WebHelp/wmp.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 31;
@@ -631,11 +631,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         31
-       ,'ENQ'
-       ,'DOC0162'
+       ,'WOWT'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docacknowledgements__doc0162.htm' FROM DUAL;
+       ,''
+       ,'/wowt/WebHelp/wowt.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 32;
@@ -650,11 +650,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         32
-       ,'ENQ'
-       ,'DOC0205'
+       ,'AVM'
+       ,'VM1020'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docbatch_enquiry_printing__doc0205.htm' FROM DUAL;
+       ,'/avm/WebHelp/avm.htm#avmasset_register_types__vm1020.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 33;
@@ -669,11 +669,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         33
-       ,'HIG'
-       ,'HIG1815'
+       ,'AVM'
+       ,'VM1030'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#doccontacts__hig1815.htm' FROM DUAL;
+       ,'/avm/WebHelp/avm.htm#avmasset_registers__vm1030.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 34;
@@ -688,11 +688,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         34
-       ,'ENQ'
-       ,'DOC0150'
+       ,'AVM'
+       ,'VM1050'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docenquiries__doc0150.htm' FROM DUAL;
+       ,'/avm/WebHelp/avm.htm#avmasset_valuation_report__vm1050.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 35;
@@ -707,11 +707,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         35
-       ,'ENQ'
-       ,'DOC0160'
+       ,'AVM'
+       ,'VM1010'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docenquiry_details__doc0160.htm' FROM DUAL;
+       ,'/avm/WebHelp/avm.htm#avmasset_valuation_rule_sets__vm101.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 36;
@@ -726,11 +726,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         36
-       ,'ENQ'
-       ,'DOC0166'
+       ,'AVM'
+       ,'VM1040'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docenquiry_list__doc0166.htm' FROM DUAL;
+       ,'/avm/WebHelp/avm.htm#avmasset_valuations__vm1040.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 37;
@@ -745,11 +745,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         37
-       ,'ENQ'
-       ,'DOC0157'
+       ,'AVM'
+       ,'VM1044'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docenquiry_redirection_and_prioriti.htm' FROM DUAL;
+       ,'/avm/WebHelp/avm.htm#avmclose_valuation__vm1044.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 38;
@@ -764,11 +764,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         38
-       ,'HIG'
-       ,'DOC0156'
+       ,'AVM'
+       ,'VM1060'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docenquiry_standard_costs_doc0156.htm' FROM DUAL;
+       ,'/avm/WebHelp/avm.htm#avmvaluation_report_definitions__vm.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 39;
@@ -783,11 +783,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         39
-       ,'MAI'
-       ,'MAI1325'
+       ,'AVM'
+       ,'VM1054'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docenquirydefect_priorities__mai132.htm' FROM DUAL;
+       ,'/avm/WebHelp/avm.htm#avmvaluation_ruleset_report__vm1054.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 40;
@@ -802,11 +802,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         40
-       ,'MAI'
-       ,'MAI1320'
+       ,'ENQ'
+       ,'DOC0150'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docenquirytreatment_types__mai1320.htm' FROM DUAL;
+       ,'/doc/WebHelp/doc.htm#docenquiries__doc0150.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 41;
@@ -821,11 +821,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         41
-       ,'HIG'
-       ,'HIG1815'
+       ,'ENQ'
+       ,'DOC0166'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#doccontacts__hig1815.htm' FROM DUAL;
+       ,'/doc/WebHelp/doc.htm#docenquiry_list__doc0166.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 42;
@@ -841,10 +841,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         42
        ,'ENQ'
-       ,'DOC0167'
+       ,'DOC0160'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docoutstanding_enquiry_actions__doc.htm' FROM DUAL;
+       ,'/doc/WebHelp/doc.htm#docenquiry_details__doc0160.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 43;
@@ -860,10 +860,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         43
        ,'ENQ'
-       ,'DOC0164'
+       ,'DOC0162'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docsummary_by_status__doc0164.htm' FROM DUAL;
+       ,'/doc/WebHelp/doc.htm#docacknowledgements__doc0162.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 44;
@@ -879,10 +879,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         44
        ,'ENQ'
-       ,'DOC0165'
+       ,'DOC0164'
        ,''
        ,''
-       ,'/doc/WebHelp/doc.htm#docsummary_by_type__doc0165.htm' FROM DUAL;
+       ,'/doc/WebHelp/doc.htm#docsummary_by_status__doc0164.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 45;
@@ -897,11 +897,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         45
-       ,'HIG'
-       ,'HIG1840'
+       ,'ENQ'
+       ,'DOC0165'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higuser_preferences__hig1840.htm' FROM DUAL;
+       ,'/doc/WebHelp/doc.htm#docsummary_by_type__doc0165.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 46;
@@ -916,11 +916,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         46
-       ,'HIG'
-       ,'HIG1880'
+       ,'ENQ'
+       ,'DOC0205'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higmodules__hig1880.htm' FROM DUAL;
+       ,'/doc/WebHelp/doc.htm#docbatch_enquiry_printing__doc0205.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 47;
@@ -935,11 +935,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         47
-       ,'HIG'
-       ,'HIG9135'
+       ,'ENQ'
+       ,'DOC0167'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higproduct_option_list__hig9135.htm' FROM DUAL;
+       ,'/doc/WebHelp/doc.htm#docoutstanding_enquiry_actions__doc.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 48;
@@ -955,10 +955,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         48
        ,'HIG'
-       ,'HIG1860'
+       ,'HIG1815'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higadmin_units__hig1860.htm' FROM DUAL;
+       ,'/doc/WebHelp/doc.htm#doccontacts__hig1815.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 49;
@@ -973,11 +973,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         49
-       ,'HIG'
-       ,'HIG1833'
+       ,'ENQ'
+       ,'DOC0157'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higchange_password__hig1833.htm' FROM DUAL;
+       ,'/doc/WebHelp/doc.htm#docenquiry_redirection_and_prioriti.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 50;
@@ -993,10 +993,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         50
        ,'HIG'
-       ,'HIG2010'
+       ,'DOC0156'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higcsv_loader_destination_table__hi.htm' FROM DUAL;
+       ,'/doc/WebHelp/doc.htm#docenquiry_standard_costs_doc0156.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 51;
@@ -1011,11 +1011,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         51
-       ,'HIG'
-       ,'HIG2020'
+       ,'MAI'
+       ,'MAI1325'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higcsv_loader_file_definitions_tabl.htm' FROM DUAL;
+       ,'/doc/WebHelp/doc.htm#docenquirydefect_priorities__mai132.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 52;
@@ -1030,11 +1030,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         52
-       ,'HIG'
-       ,'HIG9120'
+       ,'MAI'
+       ,'MAI1320'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higdomains__hig9120.htm' FROM DUAL;
+       ,'/doc/WebHelp/doc.htm#docenquirytreatment_types__mai1320.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 53;
@@ -1050,10 +1050,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         53
        ,'HIG'
-       ,'HIG1807'
+       ,'HIG1840'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higlaunchpad__favourites.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higuser_preferences__hig1840.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 54;
@@ -1069,10 +1069,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         54
        ,'HIG'
-       ,'GRI0240'
+       ,'HIG1880'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higgri_module_parameters__gri0240.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higmodules__hig1880.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 55;
@@ -1088,10 +1088,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         55
        ,'HIG'
-       ,'GRI0220'
+       ,'HIG9135'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higgri_modules__gri0220.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higproduct_option_list__hig9135.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 56;
@@ -1107,10 +1107,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         56
        ,'HIG'
-       ,'GRI0250'
+       ,'HIG1860'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higgri_parameter_dependencies__gri0.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higadmin_units__hig1860.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 57;
@@ -1126,10 +1126,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         57
        ,'HIG'
-       ,'GRI0230'
+       ,'HIG1833'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higgri_parameters__gri0230.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higchange_password__hig1833.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 58;
@@ -1145,10 +1145,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         58
        ,'HIG'
-       ,'HIGWEB2030'
+       ,'HIG2010'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higloadprocess_data__higweb2030.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higcsv_loader_destination_table__hi.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 59;
@@ -1164,10 +1164,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         59
        ,'HIG'
-       ,'HIG1880'
+       ,'HIG2020'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higmodules__hig1880.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higcsv_loader_file_definitions_tabl.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 60;
@@ -1183,10 +1183,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         60
        ,'HIG'
-       ,'HIG9135'
+       ,'HIG9150'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higproduct_option_list__hig9135.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higdiscoverer_api_definition__hig91.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 61;
@@ -1202,10 +1202,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         61
        ,'HIG'
-       ,'HIG9130'
+       ,'HIG9120'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#highig9130__product_options.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higdomains__hig9120.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 62;
@@ -1221,10 +1221,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         62
        ,'HIG'
-       ,'HIG1890'
+       ,'HIG1807'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higproducts__hig1890.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higlaunchpad__favourites.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 63;
@@ -1240,10 +1240,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         63
        ,'HIG'
-       ,'HIG1850'
+       ,'GRI0240'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higreport_styles__hig1850.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higgri_module_parameters__gri0240.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 64;
@@ -1259,10 +1259,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         64
        ,'HIG'
-       ,'HIG1836'
+       ,'GRI0220'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higroles__hig1836.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higgri_modules__gri0220.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 65;
@@ -1278,10 +1278,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         65
        ,'HIG'
-       ,'GIS0010'
+       ,'GRI0250'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higthemes__gis0010.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higgri_parameter_dependencies__gri0.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 66;
@@ -1297,10 +1297,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         66
        ,'HIG'
-       ,'HIG1820'
+       ,'GRI0230'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higunits_and_conversions__hig1820.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higgri_parameters__gri0230.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 67;
@@ -1316,10 +1316,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         67
        ,'HIG'
-       ,'HIG1837'
+       ,'HIGWEB2030'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higuser_option_administration__hig1.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higloadprocess_data__higweb2030.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 68;
@@ -1335,10 +1335,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         68
        ,'HIG'
-       ,'HIG1840'
+       ,'HIG9130'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higuser_preferences__hig1840.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#highig9130__product_options.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 69;
@@ -1354,10 +1354,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         69
        ,'HIG'
-       ,'HIG1832'
+       ,'HIG1890'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higusers__hig1832.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higproducts__hig1890.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 70;
@@ -1373,10 +1373,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         70
        ,'HIG'
-       ,'HIG1836'
+       ,'HIG1850'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higroles__hig1836.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higreport_styles__hig1850.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 71;
@@ -1392,10 +1392,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         71
        ,'HIG'
-       ,'HIG9185'
+       ,'HIG1836'
        ,''
        ,''
-       ,'/hig/WebHelp/hig.htm#higv3_errors__hig9185.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higroles__hig1836.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 72;
@@ -1410,11 +1410,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         72
-       ,'NET'
-       ,'NM0700'
+       ,'HIG'
+       ,'GIS0010'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netad_types__nm0700.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higthemes__gis0010.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 73;
@@ -1429,11 +1429,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         73
-       ,'NET'
-       ,'NM0700'
+       ,'HIG'
+       ,'HIG1820'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netad_types__nm0700.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higunits_and_conversions__hig1820.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 74;
@@ -1449,10 +1449,10 @@ INSERT INTO HIG_WEB_CONTXT_HLP
 SELECT 
         74
        ,'HIG'
-       ,'HIG1860'
+       ,'HIG1837'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netadmin_units__hig1860.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higuser_option_administration__hig1.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 75;
@@ -1467,11 +1467,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         75
-       ,'AST'
-       ,'NM1861'
+       ,'HIG'
+       ,'HIG1832'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netasset_admin_unit_security_mainte.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higusers__hig1832.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 76;
@@ -1486,11 +1486,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         76
-       ,'AST'
-       ,'NM0415'
+       ,'HIG'
+       ,'HIG9185'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netasset_attribute_sets__nm0415.htm' FROM DUAL;
+       ,'/hig/WebHelp/hig.htm#higv3_errors__hig9185.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 77;
@@ -1505,11 +1505,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         77
-       ,'AST'
-       ,'NM0301'
+       ,'MAI'
+       ,'MAI2500'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netasset_domains__nm0301.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidownload_inventory_survey_data_t.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 78;
@@ -1524,11 +1524,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         78
-       ,'AST'
-       ,'NM0411'
+       ,'MAI'
+       ,'MAI2224'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netasset_exclusive_view_creation__n.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidownload_network_data_for_dcd_in.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 79;
@@ -1543,11 +1543,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         79
-       ,'AST'
-       ,'NM0510'
+       ,'MAI'
+       ,'MAI2220'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netasset_items__nm0510.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidownload_static_reference_data_f.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 80;
@@ -1562,11 +1562,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         80
-       ,'AST'
-       ,'NM0590'
+       ,'MAI'
+       ,'MAI2222'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netasset_maintenance__nm0590.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidownload_standard_item_data_for_.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 81;
@@ -1581,11 +1581,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         81
-       ,'AST'
-       ,'NM0410'
+       ,'MAI'
+       ,'MAI3863'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netasset_metamodel__nm0410.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidownload_inspections_by_assets__.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 82;
@@ -1600,11 +1600,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         82
-       ,'AST'
-       ,'NM0306'
+       ,'MAI'
+       ,'MAI3630'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netasset_xsps__nm0306.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maibudget_allocations__mai3630.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 83;
@@ -1619,11 +1619,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         83
-       ,'AST'
-       ,'NM0560'
+       ,'MAI'
+       ,'MAI2200C'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netassets_on_a_route__nm0560.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiload_bulk_inspection_dat00000088.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 84;
@@ -1638,11 +1638,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         84
-       ,'NET'
-       ,'NM0206'
+       ,'MAI'
+       ,'MAI2200D'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netclose_element__nm0206.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiload_bulk_inspection_dat00000089.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 85;
@@ -1657,11 +1657,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         85
-       ,'AST'
-       ,'NM0580'
+       ,'MAI'
+       ,'MAI2250'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netnm0580___create_mapcapture_metad.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maicorrect_inspection_load_errors__.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 86;
@@ -1676,11 +1676,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         86
-       ,'AST'
-       ,'NM0120'
+       ,'MAI'
+       ,'MAI3900'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netcreate_network_extent__nm0120.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiinspection_report__mai3900.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 87;
@@ -1695,11 +1695,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         87
-       ,'AST'
-       ,'NM0550'
+       ,'MAI'
+       ,'MAI5027'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netcross_attribute_validation_setup.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidefects_by_defect_type__mai5027.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 88;
@@ -1714,11 +1714,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         88
-       ,'AST'
-       ,'NM0575'
+       ,'MAI'
+       ,'MAI3902'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netdelete_global_assets__nm0575.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidefect_details__mai3902.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 89;
@@ -1733,11 +1733,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         89
-       ,'AST'
-       ,'NM0420'
+       ,'MAI'
+       ,'MAI3470'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netderived_asset_setup__nm0420.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidefect_details_works_order__mai3.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 90;
@@ -1752,11 +1752,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         90
-       ,'NET'
-       ,'NM0105'
+       ,'MAI'
+       ,'MAI5100'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netelements__nm0105.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidefect_details_ataglance__mai510.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 91;
@@ -1771,11 +1771,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         91
-       ,'AST'
-       ,'NM0570'
+       ,'MAI'
+       ,'MAI5125'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netfind_asset__nm0570.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidefect_details_strip_plan__mai51.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 92;
@@ -1790,11 +1790,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         92
-       ,'NET'
-       ,'NM1100'
+       ,'MAI'
+       ,'MAI3100'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netgazetteer__nm1100.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiinspection_schedules__mai3100.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 93;
@@ -1809,11 +1809,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         93
-       ,'AST'
-       ,'NM0530'
+       ,'MAI'
+       ,'MAI5025'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netglobal_asset_update__nm0530.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidetailed_inspection_work_done__m.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 94;
@@ -1828,11 +1828,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         94
-       ,'NET'
-       ,'NM0004'
+       ,'MAI'
+       ,'MAI2210'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netgroup_types__nm0004.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidefective_advisory_roadstuds__ma.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 95;
@@ -1847,11 +1847,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         95
-       ,'NET'
-       ,'NM0110'
+       ,'MAI'
+       ,'MAI3905'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netgroups_of_elements__nm0110.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#mairoadstud_defects_not_set_to_mand.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 96;
@@ -1866,11 +1866,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         96
-       ,'NET'
-       ,'NM0115'
+       ,'MAI'
+       ,'MAI2790'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netgroups_of_groups__nm0115.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiinsurance_claims__mai2790.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 97;
@@ -1885,11 +1885,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         97
-       ,'NET'
-       ,'NM3010'
+       ,'MAI'
+       ,'MAI3904'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netjob_operations__nm3010.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidefect_notices__mai3904.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 98;
@@ -1904,11 +1904,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         98
-       ,'NET'
-       ,'NM3020'
+       ,'MAI'
+       ,'MAI3912'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netjob_types__nm3020.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#mainotifiable_defects__mai3912.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 99;
@@ -1923,11 +1923,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         99
-       ,'AST'
-       ,'NM0572'
+       ,'MAI'
+       ,'MAI3916'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netlocator___nm0572.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#mainotifiable_defects_summary__mai3.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 100;
@@ -1942,11 +1942,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         100
-       ,'NET'
-       ,'NM0201'
+       ,'MAI'
+       ,'MAI3690'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netmerge_elements__nm0201.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiprint_budget_exceptions_report__.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 101;
@@ -1961,11 +1961,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         101
-       ,'AST'
-       ,'NM7055'
+       ,'MAI'
+       ,'MAI3692'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netmerge_file_extract_definition__n.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiprint_cost_code_exceptions_repor.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 102;
@@ -1980,11 +1980,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         102
-       ,'AST'
-       ,'NM7051'
+       ,'MAI'
+       ,'MAI2780'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netmerge_query_results__nm7051.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiprint_item_code_breakdowns__mai2.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 103;
@@ -1999,11 +1999,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         103
-       ,'AST'
-       ,'NM7050'
+       ,'MAI'
+       ,'MAI3980'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netmerge_query_setup__nm7050.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maicontract_details_report__mai3980.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 104;
@@ -2018,11 +2018,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         104
-       ,'AST'
-       ,'NM7053'
+       ,'MAI'
+       ,'MAI3984'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netmerge_query_defaults_nm7053.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#mailist_of_contract_rates__mai3984.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 105;
@@ -2037,11 +2037,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         105
-       ,'AST'
-       ,'NM7051'
+       ,'MAI'
+       ,'MAI3982'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netmerge_query_results__nm7051.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#mailist_of_contract_liabilities__ma.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 106;
@@ -2056,11 +2056,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         106
-       ,'AST'
-       ,'NM7050'
+       ,'MAI'
+       ,'MAI3948'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netmerge_query_setup__nm7050.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maisummary_of_expenditure_by_contra.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 107;
@@ -2075,11 +2075,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         107
-       ,'AST'
-       ,'NM7053'
+       ,'MAI'
+       ,'MAI3981'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netmerge_query_defaults_nm7053.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#mailist_of_contractors__mai3981.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 108;
@@ -2094,11 +2094,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         108
-       ,'AST'
-       ,'NM7051'
+       ,'MAI'
+       ,'MAI3954'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netmerge_query_results__nm7051.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maicontractor_performance_report__m.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 109;
@@ -2113,11 +2113,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         109
-       ,'AST'
-       ,'NM7050'
+       ,'HIG'
+       ,'Audit'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netmerge_query_setup__nm7050.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiworks_order_audit.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 110;
@@ -2132,11 +2132,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         110
-       ,'AST'
-       ,'NM7057'
+       ,'MAI'
+       ,'MAI3485'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netmerge_results_extract__nm7057.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiwork_order_unpriced__mai3485.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 111;
@@ -2151,11 +2151,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         111
-       ,'UKP'
-       ,'NET1119'
+       ,'MAI'
+       ,'MAI3480'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netnetwork_selection__net1119.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiwork_order_priced__mai3480.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 112;
@@ -2170,11 +2170,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         112
-       ,'NET'
-       ,'NM0002'
+       ,'MAI'
+       ,'MAI3800'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netnetwork_type__nm0002.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiboq_work_order_defects__mai3800.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 113;
@@ -2189,11 +2189,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         113
-       ,'NET'
-       ,'NM0500'
+       ,'MAI'
+       ,'MAI3500'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netnetwork_walker__nm0500.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiwork_order_detail__mai3500.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 114;
@@ -2208,11 +2208,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         114
-       ,'NET'
-       ,'NM0105'
+       ,'MAI'
+       ,'MAI3505'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netelements__nm0105.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiworks_order_summary__mai3505.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 115;
@@ -2227,11 +2227,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         115
-       ,'NET'
-       ,'NM0105'
+       ,'MAI'
+       ,'MAI5130'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netextend_route_at_end.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiwork_order_strip_plan__mai5130.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 116;
@@ -2246,11 +2246,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         116
-       ,'NET'
-       ,'NM0110'
+       ,'MAI'
+       ,'MAI3490'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netgroups_of_elements__nm0110.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maireview_raised_works_orders__mai3.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 117;
@@ -2265,11 +2265,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         117
-       ,'AST'
-       ,'NM0120'
+       ,'MAI'
+       ,'MAI3922'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netcreate_network_extent__nm0120.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidefects_not_yet_instructed__mai3.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 118;
@@ -2284,11 +2284,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         118
-       ,'NET'
-       ,'NM0220'
+       ,'MAI'
+       ,'MAI3920'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netreclassify_element__nm0220.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maisummary_of_defects_not_yet_instr.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 119;
@@ -2303,11 +2303,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         119
-       ,'AST'
-       ,'NM0410'
+       ,'MAI'
+       ,'MAI3924'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netasset_metamodel__nm0410.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiinstructed_work_by_status__mai39.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 120;
@@ -2322,11 +2322,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         120
-       ,'AST'
-       ,'NM0510'
+       ,'MAI'
+       ,'MAI3926'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netasset_items__nm0510.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiinstructed_defects_due_for_compl.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 121;
@@ -2341,11 +2341,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         121
-       ,'NET'
-       ,'NM1100'
+       ,'MAI'
+       ,'MAI3930'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netgazetteer__nm1100.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiinventory_updates__mai3930.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 122;
@@ -2360,11 +2360,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         122
-       ,'AST'
-       ,'NM7050'
+       ,'MAI'
+       ,'MAI3950'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netmerge_query_setup__nm7050.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiwork_for_quality_inspection__mai.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 123;
@@ -2379,11 +2379,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         123
-       ,'AST'
-       ,'NM7055'
+       ,'MAI'
+       ,'MAI3952'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netmerge_file_extract_definition__n.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiquality_inspection_performance__.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 124;
@@ -2398,11 +2398,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         124
-       ,'AST'
-       ,'NMWEB0020'
+       ,'MAI'
+       ,'MAI3956'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netweb_based_engineering_dynamic_se.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiadmin_unit_performance__mai3956.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 125;
@@ -2417,11 +2417,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         125
-       ,'NET'
-       ,'NM0001'
+       ,'MAI'
+       ,'MAI3907'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netnode_types__nm0001.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiboq_work_order_cyclic__mai3907.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 126;
@@ -2436,11 +2436,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         126
-       ,'NET'
-       ,'NM0101'
+       ,'MAI'
+       ,'MAI5032'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netnodes__nm0101.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maicyclic_maintenance_done__mai5032.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 127;
@@ -2455,11 +2455,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         127
-       ,'NET'
-       ,'NM1201'
+       ,'MAI'
+       ,'MAI3960'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netoffset_calculator__nm1201.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maicyclic_maintenance_schedules__ma.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 128;
@@ -2474,11 +2474,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         128
-       ,'AST'
-       ,'NM7041'
+       ,'MAI'
+       ,'MAI1200'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netpbi_query_results__nm7041.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiactivities_mai1200__overview.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 129;
@@ -2493,11 +2493,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         129
-       ,'AST'
-       ,'NM7040'
+       ,'MAI'
+       ,'MAI1205'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netpbi_query_setup__nm7040.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiactivity_groups_mai1205__overvie.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 130;
@@ -2512,11 +2512,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         130
-       ,'NET'
-       ,'NM2000'
+       ,'MAI'
+       ,'MAI3632'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netrecalibrate_element__nm2000.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiasset_activities__mai3632.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 131;
@@ -2531,11 +2531,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         131
-       ,'NET'
-       ,'NM0220'
+       ,'MAI'
+       ,'MAI2775'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netreclassify_element__nm0220.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maibatch_setting_of_repair_dates__m.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 132;
@@ -2550,11 +2550,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         132
-       ,'AST'
-       ,'NM0511'
+       ,'MAI'
+       ,'MAI3884'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netnm0511__reconcile_map_capture_lo.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maibulk_update_of_contract_items__m.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 133;
@@ -2569,11 +2569,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         133
-       ,'NET'
-       ,'NM0202'
+       ,'MAI'
+       ,'MAI3610'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netreplace_element__nm0202.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maicancel_works_orders__mai3610.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 134;
@@ -2588,11 +2588,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         134
-       ,'NET'
-       ,'NM3030'
+       ,'MAI'
+       ,'MAI3881'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netroad_construction_operations_lay.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maicontractors__mai3881.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 135;
@@ -2607,11 +2607,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         135
-       ,'HIG'
-       ,'HIG1836'
+       ,'MAI'
+       ,'MAI3880'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netroles__hig1836.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maicontracts__mai3880.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 136;
@@ -2626,11 +2626,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         136
-       ,'NET'
-       ,'NM2000'
+       ,'MAI'
+       ,'MAI3882'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netrecalibrate_element__nm2000.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maicopy_a_contract__mai3882.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 137;
@@ -2645,11 +2645,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         137
-       ,'NET'
-       ,'NM1200'
+       ,'MAI'
+       ,'MAI2312'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netslk_calculator__nm1200.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maicopymove_inventory__mai2312.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 138;
@@ -2664,11 +2664,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         138
-       ,'NET'
-       ,'NM0200'
+       ,'MAI'
+       ,'MAI3844'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netsplit_element__nm0200.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maicost_centre_codes__mai3844.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 139;
@@ -2683,11 +2683,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         139
-       ,'NET'
-       ,'NM0207'
+       ,'MAI'
+       ,'MAI3628'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netundo_close__nm0207.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#mairelated_maintenance_activities__.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 140;
@@ -2702,11 +2702,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         140
-       ,'NET'
-       ,'NM0204'
+       ,'MAI'
+       ,'MAI3862'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netundo_merge__nm0204.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maicyclic_maintenance_schedules_by_.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 141;
@@ -2721,11 +2721,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         141
-       ,'NET'
-       ,'NM0205'
+       ,'MAI'
+       ,'MAI3626'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netundo_replace__nm0205.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maicyclic_maintenance_inventory_rul.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 142;
@@ -2740,11 +2740,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         142
-       ,'NET'
-       ,'NM0203'
+       ,'MAI'
+       ,'MAI3801'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netundo_split__nm0203.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiworks_order_cyclic__mai3801.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 143;
@@ -2759,11 +2759,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         143
-       ,'HIG'
-       ,'HIG1820'
+       ,'MAI'
+       ,'MAI3440'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netunits_and_conversions__hig1820.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maivalid_for_maintenance_rules__mai.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 144;
@@ -2778,11 +2778,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         144
-       ,'HIG'
-       ,'HIG1832'
+       ,'MAI'
+       ,'MAI3804'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netusers__hig1832.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiview_cyclic_maintenance_work__ma.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 145;
@@ -2797,11 +2797,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         145
-       ,'HIG'
-       ,'HIG1836'
+       ,'MAI'
+       ,'MAI1240'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netroles__hig1836.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidefault_section_intervals__overr.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 146;
@@ -2816,11 +2816,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         146
-       ,'HIG'
-       ,'HIG1836'
+       ,'MAI'
+       ,'MAI3150'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netroles__hig1836.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidefault_treatments_mai3150__over.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 147;
@@ -2835,11 +2835,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         147
-       ,'AST'
-       ,'NMWEB0020'
+       ,'MAI'
+       ,'MAI1300'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netweb_based_engineering_dynamic_se.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidefect_control_data_mai1300__ove.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 148;
@@ -2854,11 +2854,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         148
-       ,'AST'
-       ,'NM0305'
+       ,'MAI'
+       ,'MAI3812'
        ,''
        ,''
-       ,'/net/WebHelp/net.htm#netxsp_and_reversal_rules__nm0305.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidefect_priorities_mai3812__overv.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 149;
@@ -2873,11 +2873,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         149
-       ,'NSG'
-       ,'NSG0015'
+       ,'MAI'
+       ,'MAI3910'
        ,''
        ,''
-       ,'/nsg/WebHelp/nsg.htm#nsgconsolidate_street_nodes__nsg001.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidefects_by_inspection_date__mai3.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 150;
@@ -2892,11 +2892,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         150
-       ,'NSG'
-       ,'NSG0015'
+       ,'MAI'
+       ,'MAI2470'
        ,''
        ,''
-       ,'/nsg/WebHelp/nsg.htm#nsgconsolidate_street_nodes__nsg001.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidelete_inspections_mai2470__over.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 151;
@@ -2911,11 +2911,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         151
-       ,'NSG'
-       ,'NSG0020'
+       ,'MAI'
+       ,'MAI3842'
        ,''
        ,''
-       ,'/nsg/WebHelp/nsg.htm#nsgexporting_nsg_and_asd_data.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maideselect_items_for_payment__mai3.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 152;
@@ -2930,11 +2930,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         152
-       ,'NSG'
-       ,'NSG0025'
+       ,'MAI'
+       ,'MAI3624'
        ,''
        ,''
-       ,'/nsg/WebHelp/nsg.htm#nsggenerate_asd_placements__nsg0025.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maidiscount_groups__mai3624.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 153;
@@ -2949,11 +2949,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         153
-       ,'STP'
-       ,'STP1000'
+       ,'MAI'
+       ,'MAI3664'
        ,''
        ,''
-       ,'/stp/WebHelp/stp.htm#stproad_construction_data__stp1000.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maifinancial_years__mai3664.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 154;
@@ -2968,11 +2968,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         154
-       ,'NET'
-       ,'NM3010'
+       ,'MAI'
+       ,'MAI3662'
        ,''
        ,''
-       ,'/stp/WebHelp/stp.htm#stpjob_operations__nm3010.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maigenerate_budgets_for_next_year__.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 155;
@@ -2987,11 +2987,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         155
-       ,'NET'
-       ,'NM3020'
+       ,'MAI'
+       ,'MAI3899'
        ,''
        ,''
-       ,'/stp/WebHelp/stp.htm#stpjob_types__nm3020.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maihow_to_use_inspections_by_group_.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 156;
@@ -3006,11 +3006,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         156
-       ,'STP'
-       ,'STP4400'
+       ,'MAI'
+       ,'MAI1930'
        ,''
        ,''
-       ,'/stp/WebHelp/stp.htm#stpmaintain_schemes__stp4400.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiihms_allocated_amounts__mai1930.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 157;
@@ -3025,11 +3025,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         157
-       ,'STP'
-       ,'STP0010'
+       ,'HIG'
+       ,'HIG1220'
        ,''
        ,''
-       ,'/stp/WebHelp/stp.htm#stproad_construction_attributes__st.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiinterval_codes__hig1220.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 158;
@@ -3044,11 +3044,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         158
-       ,'STP'
-       ,'STP1000'
+       ,'MAI'
+       ,'MAI3666'
        ,''
        ,''
-       ,'/stp/WebHelp/stp.htm#stproad_construction_data__stp1000.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maijob_size_codes__mai3666.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 159;
@@ -3063,11 +3063,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         159
-       ,'STP'
-       ,'STP4401'
+       ,'MAI'
+       ,'MAI3802'
        ,''
        ,''
-       ,'/stp/WebHelp/stp.htm#stpscheme_priorities__stp4401.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiworks_orders_contractor__mai3802.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 160;
@@ -3082,11 +3082,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         160
-       ,'SWR'
-       ,'SWR1450'
+       ,'MAI'
+       ,'MAI3250'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrswa_organisations__swr1450.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maimaintenance_reports__mai3250.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 161;
@@ -3101,11 +3101,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         161
-       ,'SWR'
-       ,'SWR1461'
+       ,'MAI'
+       ,'MAI2730'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_district_hierarchy__swr.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maimatch_duplicate_defects__mai2730.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 162;
@@ -3120,11 +3120,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         162
-       ,'SWR'
-       ,'SWR1471'
+       ,'MAI'
+       ,'MAI3840'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrcontact_list__swr1471.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maipayment_run__mai3840.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 163;
@@ -3139,11 +3139,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         163
-       ,'SWR'
-       ,'SWR1480'
+       ,'MAI'
+       ,'MAI3820'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrcoordination_groups__swr1480.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiquality_inspection_results__mai3.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 164;
@@ -3158,11 +3158,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         164
-       ,'SWR'
-       ,'SWR1490'
+       ,'MAI'
+       ,'MAI3940'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrstandard_text__swr1490.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiquery_payment_run_details__mai39.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 165;
@@ -3177,11 +3177,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         165
-       ,'SWR'
-       ,'SWR1451'
+       ,'MAI'
+       ,'MAI3816'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrorganisation_data_report__swr145.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#mairesponses_to_notices__ma00000380.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 166;
@@ -3196,11 +3196,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         166
-       ,'SWR'
-       ,'SWR1190'
+       ,'MAI'
+       ,'MAI3888'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_worksreinstatement_deta.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maistandard_items_mai3888__overview.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 167;
@@ -3215,11 +3215,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         167
-       ,'SWR'
-       ,'SWR1120'
+       ,'MAI'
+       ,'MAI1315'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrnotice_sentreceived__swr1120.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maitreatment_data_mai1315__overview.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 168;
@@ -3234,11 +3234,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         168
-       ,'SWR'
-       ,'SWR1380'
+       ,'MAI'
+       ,'MAI2760'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrnon_works_activity__swr1380.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiunmatch_duplicate_defects_mai276.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 169;
@@ -3253,11 +3253,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         169
-       ,'SWR'
-       ,'SWR1180'
+       ,'MAI'
+       ,'MAI3846'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmerge_unattributable_works__swr1.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maivat_rates__mai3846.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 170;
@@ -3272,11 +3272,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         170
-       ,'SWR'
-       ,'SWR1400'
+       ,'MAI'
+       ,'MAI3810'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrallocate_provisional_works__swr1.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiview_defects_by_section_mai3810.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 171;
@@ -3291,11 +3291,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         171
-       ,'SWR'
-       ,'SWR1630'
+       ,'MAI'
+       ,'MAI3803'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_section_74_charges__swr.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiworks_order_auditing_setup__mai3.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 172;
@@ -3310,11 +3310,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         172
-       ,'SWR'
-       ,'SWR1401'
+       ,'MAI'
+       ,'MAI3848'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_work_types__swr1401.htm' FROM DUAL;
+       ,'/mai/WebHelp/mai.htm#maiworks_order_authorisation__mai38.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 173;
@@ -3329,11 +3329,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         173
-       ,'SWR'
-       ,'SWR1403'
+       ,'NET'
+       ,'NM0700'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_notice_types__swr1403.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netad_types__nm0700.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 174;
@@ -3348,11 +3348,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         174
-       ,'SWR'
-       ,'SWR1519'
+       ,'AST'
+       ,'NM1861'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_notice_charges__swr1519.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netasset_admin_unit_security_mainte.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 175;
@@ -3367,11 +3367,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         175
-       ,'SWR'
-       ,'SWR1512'
+       ,'AST'
+       ,'NM0415'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_works_rules__swr1512.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netasset_attribute_sets__nm0415.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 176;
@@ -3386,11 +3386,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         176
-       ,'SWR'
-       ,'SWR1513'
+       ,'AST'
+       ,'NM0301'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_site_rules__swr1513.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netasset_domains__nm0301.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 177;
@@ -3405,11 +3405,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         177
-       ,'SWR'
-       ,'SWR1560'
+       ,'AST'
+       ,'NM0411'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_allowable_site_updates_.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netasset_exclusive_view_creation__n.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 178;
@@ -3424,11 +3424,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         178
-       ,'SWR'
-       ,'SWR1570'
+       ,'AST'
+       ,'NM0510'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_workssites_combinations.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netasset_items__nm0510.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 179;
@@ -3443,11 +3443,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         179
-       ,'SWR'
-       ,'SWR1640'
+       ,'AST'
+       ,'NM0590'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_section_74_charging_pro.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netasset_maintenance__nm0590.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 180;
@@ -3462,11 +3462,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         180
-       ,'SWR'
-       ,'SWR1070'
+       ,'AST'
+       ,'NM0410'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrquery_workssites__swr1070.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netasset_metamodel__nm0410.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 181;
@@ -3481,11 +3481,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         181
-       ,'SWR'
-       ,'SWR1189'
+       ,'AST'
+       ,'NM0306'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrquery_works_history__swr1189.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netasset_xsps__nm0306.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 182;
@@ -3500,11 +3500,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         182
-       ,'SWR'
-       ,'SWR1390'
+       ,'AST'
+       ,'NM0560'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrview_non_works_activity__swr1390.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netassets_on_a_route__nm0560.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 183;
@@ -3519,11 +3519,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         183
-       ,'SWR'
-       ,'SWR1328'
+       ,'NET'
+       ,'NM0206'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrchargeable_notices_invoice__swr1.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netclose_element__nm0206.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 184;
@@ -3538,11 +3538,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         184
-       ,'SWR'
-       ,'SWR1220'
+       ,'AST'
+       ,'NM0580'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrprint_works_details__swr1220.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netnm0580___create_mapcapture_metad.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 185;
@@ -3557,11 +3557,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         185
-       ,'SWR'
-       ,'SWR1159'
+       ,'AST'
+       ,'NM0120'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_with_a_section_74_duration.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netcreate_network_extent__nm0120.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 186;
@@ -3576,11 +3576,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         186
-       ,'SWR'
-       ,'SWR1158'
+       ,'AST'
+       ,'NM0550'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_due_a_section_74_start__sw.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netcross_attribute_validation_setup.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 187;
@@ -3595,11 +3595,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         187
-       ,'SWR'
-       ,'SWR1157'
+       ,'AST'
+       ,'NM0575'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_due_to_complete__swr1157.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netdelete_global_assets__nm0575.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 188;
@@ -3614,11 +3614,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         188
-       ,'SWR'
-       ,'SWR1650'
+       ,'AST'
+       ,'NM0420'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrsection_74_charges_invoice__swr1.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netderived_asset_setup__nm0420.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 189;
@@ -3633,11 +3633,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         189
-       ,'SWR'
-       ,'SWR1225'
+       ,'NET'
+       ,'NM0105'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrgeneric_works_report__swr1225.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netelements__nm0105.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 190;
@@ -3652,11 +3652,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         190
-       ,'SWR'
-       ,'SWR1209'
+       ,'AST'
+       ,'NM0570'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrexpiring_reinstatement_guarantee.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netfind_asset__nm0570.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 191;
@@ -3671,11 +3671,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         191
-       ,'SWR'
-       ,'SWR1212'
+       ,'NET'
+       ,'NM1100'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrinterim_reinstatements__6_months.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netgazetteer__nm1100.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 192;
@@ -3690,11 +3690,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         192
-       ,'SWR'
-       ,'SWR1156'
+       ,'AST'
+       ,'NM0530'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_history__swr1156.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netglobal_asset_update__nm0530.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 193;
@@ -3709,11 +3709,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         193
-       ,'HIG'
-       ,'HIG1807'
+       ,'NET'
+       ,'NM0004'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrnotice_analysis_report__hig1807.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netgroup_types__nm0004.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 194;
@@ -3728,11 +3728,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         194
-       ,'SWR'
-       ,'SWR1111'
+       ,'NET'
+       ,'NM0110'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_works_comments__swr1111.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netgroups_of_elements__nm0110.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 195;
@@ -3747,11 +3747,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         195
-       ,'SWR'
-       ,'SWR1112'
+       ,'NET'
+       ,'NM0115'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrcomments_sentreceived__swr1112.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netgroups_of_groups__nm0115.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 196;
@@ -3766,11 +3766,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         196
-       ,'SWR'
-       ,'SWR1250'
+       ,'NET'
+       ,'NM3010'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_inspection_details__swr.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netjob_operations__nm3010.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 197;
@@ -3785,11 +3785,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         197
-       ,'SWR'
-       ,'SWR1760'
+       ,'NET'
+       ,'NM3020'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrview_inspection_history__swr1760.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netjob_types__nm3020.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 198;
@@ -3804,11 +3804,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         198
-       ,'SWR'
-       ,'SWR1750'
+       ,'AST'
+       ,'NM0572'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrinspections_sent__received__swr1.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netlocator___nm0572.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 199;
@@ -3823,11 +3823,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         199
-       ,'SWR'
-       ,'SWR1770'
+       ,'NET'
+       ,'NM0201'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrview_inspection_defects__swr1770.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netmerge_elements__nm0201.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 200;
@@ -3842,11 +3842,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         200
-       ,'SWR'
-       ,'SWR1240'
+       ,'AST'
+       ,'NM7055'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_annual_inspection_profi.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netmerge_file_extract_definition__n.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 201;
@@ -3861,11 +3861,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         201
-       ,'SWR'
-       ,'SWR1290'
+       ,'AST'
+       ,'NM7051'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrschedule_inspections__swr1290.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netmerge_query_results__nm7051.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 202;
@@ -3880,11 +3880,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         202
-       ,'SWR'
-       ,'SWR1517'
+       ,'AST'
+       ,'NM7050'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_defect_inspection_sched.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netmerge_query_setup__nm7050.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 203;
@@ -3899,11 +3899,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         203
-       ,'SWR'
-       ,'SWR1660'
+       ,'AST'
+       ,'NM7053'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_inspection_categories__.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netmerge_query_defaults_nm7053.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 204;
@@ -3918,11 +3918,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         204
-       ,'SWR'
-       ,'SWR1670'
+       ,'AST'
+       ,'NM7057'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_sample_inspecti00000048.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netmerge_results_extract__nm7057.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 205;
@@ -3937,11 +3937,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         205
-       ,'SWR'
-       ,'SWR1680'
+       ,'UKP'
+       ,'NET1119'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_inspection_types__swr16.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netnetwork_selection__net1119.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 206;
@@ -3956,11 +3956,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         206
-       ,'SWR'
-       ,'SWR1690'
+       ,'NET'
+       ,'NM0002'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_inspection_outcomes__sw.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netnetwork_type__nm0002.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 207;
@@ -3975,11 +3975,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         207
-       ,'SWR'
-       ,'SWR1700'
+       ,'NET'
+       ,'NM0500'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_defect_notice_messages_.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netnetwork_walker__nm0500.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 208;
@@ -3994,11 +3994,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         208
-       ,'SWR'
-       ,'SWR1710'
+       ,'NET'
+       ,'NM0220'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_inspection_item_status_.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netreclassify_element__nm0220.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 209;
@@ -4013,11 +4013,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         209
-       ,'SWR'
-       ,'SWR1720'
+       ,'AST'
+       ,'NMWEB0020'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_allowable_inspection_it.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netweb_based_engineering_dynamic_se.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 210;
@@ -4032,11 +4032,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         210
-       ,'SWR'
-       ,'SWR1514'
+       ,'NET'
+       ,'NM0001'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_sample_inspecti00000054.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netnode_types__nm0001.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 211;
@@ -4051,11 +4051,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         211
-       ,'SWR'
-       ,'SWR1292'
+       ,'NET'
+       ,'NM0101'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_inspection_report__swr1292.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netnodes__nm0101.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 212;
@@ -4070,11 +4070,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         212
-       ,'SWR'
-       ,'SWR1230'
+       ,'NET'
+       ,'NM1201'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrgeneric_inspections_report__swr1.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netoffset_calculator__nm1201.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 213;
@@ -4089,11 +4089,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         213
-       ,'SWR'
-       ,'SWR1305'
+       ,'AST'
+       ,'NM7041'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrinspection_history__swr1305.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netpbi_query_results__nm7041.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 214;
@@ -4108,11 +4108,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         214
-       ,'SWR'
-       ,'SWR1255'
+       ,'AST'
+       ,'NM7040'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrannual_inspection_profile__swr12.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netpbi_query_setup__nm7040.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 215;
@@ -4127,11 +4127,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         215
-       ,'SWR'
-       ,'SWR1256'
+       ,'NET'
+       ,'NM2000'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrsample_inspections_quotas_report.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netrecalibrate_element__nm2000.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 216;
@@ -4146,11 +4146,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         216
-       ,'SWR'
-       ,'SWR1257'
+       ,'AST'
+       ,'NM0511'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrinspection_performance__swr1257.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netnm0511__reconcile_map_capture_lo.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 217;
@@ -4165,11 +4165,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         217
-       ,'SWR'
-       ,'SWR1294'
+       ,'NET'
+       ,'NM0202'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrprospective_inspections_report__.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netreplace_element__nm0202.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 218;
@@ -4184,11 +4184,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         218
-       ,'SWR'
-       ,'SWR1325'
+       ,'NET'
+       ,'NM3030'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrsample_inspection_invoice_report.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netroad_construction_operations_lay.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 219;
@@ -4203,11 +4203,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         219
-       ,'SWR'
-       ,'SWR1326'
+       ,'NET'
+       ,'NM1200'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrinspections_invoice__swr1326.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netslk_calculator__nm1200.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 220;
@@ -4222,11 +4222,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         220
-       ,'SWR'
-       ,'SWR1197'
+       ,'NET'
+       ,'NM0200'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrcoordination_planning__swr1197.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netsplit_element__nm0200.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 221;
@@ -4241,11 +4241,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         221
-       ,'SWR'
-       ,'SWR1198'
+       ,'NET'
+       ,'NM0207'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrconflicting_works__swr1198.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netundo_close__nm0207.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 222;
@@ -4260,11 +4260,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         222
-       ,'SWR'
-       ,'SWR1336'
+       ,'NET'
+       ,'NM0204'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_street_naming_authoriti.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netundo_merge__nm0204.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 223;
@@ -4279,11 +4279,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         223
-       ,'SWR'
-       ,'SWR1530'
+       ,'NET'
+       ,'NM0205'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrstreets_of_interest__swr1530.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netundo_replace__nm0205.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 224;
@@ -4298,11 +4298,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         224
-       ,'SWR'
-       ,'SWR1550'
+       ,'NET'
+       ,'NM0203'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrsoi_gazetteer_data_report__swr15.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netundo_split__nm0203.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 225;
@@ -4317,11 +4317,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         225
-       ,'SWR'
-       ,'SWR1551'
+       ,'AST'
+       ,'NM0305'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrauthority_gazetteer_data_report_.htm' FROM DUAL;
+       ,'/net/WebHelp/net.htm#netxsp_and_reversal_rules__nm0305.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 226;
@@ -4336,11 +4336,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         226
-       ,'SWR'
-       ,'SWR1601'
+       ,'NSG'
+       ,'NSG0015'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrautomatic_uploaddownload_utility.htm' FROM DUAL;
+       ,'/nsg/WebHelp/nsg.htm#nsgconsolidate_street_nodes__nsg001.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 227;
@@ -4355,11 +4355,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         227
-       ,'SWR'
-       ,'SWR1600'
+       ,'NSG'
+       ,'NSG0020'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swruploaddownload_utility__swr1600.htm' FROM DUAL;
+       ,'/nsg/WebHelp/nsg.htm#nsgexporting_nsg_and_asd_data.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 228;
@@ -4374,11 +4374,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         228
-       ,'SWR'
-       ,'SWR1605'
+       ,'NSG'
+       ,'NSG0025'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmonitor_batch_file_status__swr16.htm' FROM DUAL;
+       ,'/nsg/WebHelp/nsg.htm#nsggenerate_asd_placements__nsg0025.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 229;
@@ -4393,11 +4393,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         229
-       ,'SWR'
-       ,'SWR1602'
+       ,'STP'
+       ,'STP1000'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_automatic_batch_process.htm' FROM DUAL;
+       ,'/stp/WebHelp/stp.htm#stproad_construction_data__stp1000.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 230;
@@ -4412,11 +4412,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         230
-       ,'SWR'
-       ,'SWR1604'
+       ,'STP'
+       ,'STP4400'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_automatic_batch_operati.htm' FROM DUAL;
+       ,'/stp/WebHelp/stp.htm#stpmaintain_schemes__stp4400.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 231;
@@ -4431,11 +4431,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         231
-       ,'SWR'
-       ,'SWR1603'
+       ,'STP'
+       ,'STP0010'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_automatic_batch_rules__.htm' FROM DUAL;
+       ,'/stp/WebHelp/stp.htm#stproad_construction_attributes__st.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 232;
@@ -4450,11 +4450,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         232
-       ,'SWR'
-       ,'SWR1620'
+       ,'STP'
+       ,'STP4401'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_batch_messages__swr1620.htm' FROM DUAL;
+       ,'/stp/WebHelp/stp.htm#stpscheme_priorities__stp4401.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 233;
@@ -4469,11 +4469,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         233
-       ,'SWR'
-       ,'SWR1610'
+       ,'HIG'
+       ,'GIS'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrbatch_files_processed__swr1610.htm' FROM DUAL;
+       ,'/tm/WebHelp/tm.htm#tmdisplaying_traffic_data_on_a_map.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 234;
@@ -4488,11 +4488,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         234
-       ,'SWR'
-       ,'SWR1780'
+       ,'TMA'
+       ,'TMA2040'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrbatch_file_listing__swr1780.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpagreement_types__tma2040.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 235;
@@ -4507,11 +4507,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         235
-       ,'SWR'
-       ,'SWR1060'
+       ,'TMA'
+       ,'TMA5110'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrsystem_definitions__swr1060.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpannual_inspection_profiles__tma5.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 236;
@@ -4526,11 +4526,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         236
-       ,'SWR'
-       ,'SWR1051'
+       ,'TMA'
+       ,'TMA5530'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_user_definitions__swr10.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpautomatic_inspection_dow00000025.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 237;
@@ -4545,11 +4545,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         237
-       ,'SWR'
-       ,'SWR1500'
+       ,'TMA'
+       ,'TMA5610'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrreference_data__swr1500.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpautomatic_inspection_upload__tma.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 238;
@@ -4564,11 +4564,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         238
-       ,'SWR'
-       ,'SWR1510'
+       ,'TMA'
+       ,'TMA0010'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_interface_mappings__swr.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpcontacts__tma0010.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 239;
@@ -4583,11 +4583,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         239
-       ,'SWR'
-       ,'SWR1501'
+       ,'TMA'
+       ,'TMA7070'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrreference_data_report__swr1501.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpcoordination_planning__tma7070.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 240;
@@ -4602,11 +4602,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         240
-       ,'SWR'
-       ,'SWR1400'
+       ,'TMA'
+       ,'TMA5515'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrallocate_provisional_works__swr1.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpdcd_extract__tma5515.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 241;
@@ -4621,11 +4621,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         241
-       ,'SWR'
-       ,'SWR1255'
+       ,'TMA'
+       ,'TMA5270'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrannual_inspection_profile__swr12.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpdefect_inspection_schedules__tma.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 242;
@@ -4640,11 +4640,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         242
-       ,'SWR'
-       ,'SWR1551'
+       ,'TMA'
+       ,'TMA1070'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrauthority_gazetteer_data_report_.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpdirections_tma1070.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 243;
@@ -4659,11 +4659,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         243
-       ,'SWR'
-       ,'SWR1601'
+       ,'TMA'
+       ,'TMA1100'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrautomatic_uploaddownload_utility.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpfixed_penalty_notices__tma1100.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 244;
@@ -4678,11 +4678,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         244
-       ,'SWR'
-       ,'SWR1780'
+       ,'TMA'
+       ,'TMA3020'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrbatch_file_listing__swr1780.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpget_restrictions__tma3020.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 245;
@@ -4697,11 +4697,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         245
-       ,'SWR'
-       ,'SWR1610'
+       ,'TMA'
+       ,'TMA5510'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrbatch_files_processed__swr1610.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpinspection_batch_file_summary__t.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 246;
@@ -4716,11 +4716,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         246
-       ,'SWR'
-       ,'SWR1328'
+       ,'TMA'
+       ,'TMA5500'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrchargeable_notices_invoice__swr1.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpinspection_download__tma5500.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 247;
@@ -4735,11 +4735,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         247
-       ,'SWR'
-       ,'SWR1112'
+       ,'TMA'
+       ,'TMA5520'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrcomments_sentreceived__swr1112.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpinspection_download_to_dcd__tma5.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 248;
@@ -4754,11 +4754,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         248
-       ,'SWR'
-       ,'SWR1157'
+       ,'TMA'
+       ,'TMA6090'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_due_to_complete__swr1157.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpinspection_invoice_report__tma60.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 249;
@@ -4773,11 +4773,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         249
-       ,'SWR'
-       ,'SWR1198'
+       ,'TMA'
+       ,'TMA6050'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrconflicting_works__swr1198.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpinspection_performance_report__t.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 250;
@@ -4792,11 +4792,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         250
-       ,'SWR'
-       ,'SWR1471'
+       ,'TMA'
+       ,'TMA5300'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrcontact_list__swr1471.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpinspection_rulesets__tma5300.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 251;
@@ -4811,11 +4811,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         251
-       ,'SWR'
-       ,'SWR1480'
+       ,'TMA'
+       ,'TMA5600'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrcoordination_groups__swr1480.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpinspection_upload__tma5600.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 252;
@@ -4830,11 +4830,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         252
-       ,'SWR'
-       ,'SWR1197'
+       ,'TMA'
+       ,'TMA5620'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrcoordination_planning__swr1197.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpinspection_upload_transaction_su.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 253;
@@ -4849,11 +4849,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         253
-       ,'SWR'
-       ,'SWR1209'
+       ,'TMA'
+       ,'TMA5000'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrexpiring_reinstatement_guarantee.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpinspections__tma5000.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 254;
@@ -4868,11 +4868,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         254
-       ,'SWR'
-       ,'SWR1230'
+       ,'TMA'
+       ,'TMA5200'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrgeneric_inspections_report__swr1.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpinspections_metadata__tma5200.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 255;
@@ -4887,11 +4887,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         255
-       ,'SWR'
-       ,'SWR1225'
+       ,'TMA'
+       ,'TMA5020'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrgeneric_works_report__swr1225.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpinspections_sentreceived__tma502.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 256;
@@ -4906,11 +4906,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         256
-       ,'HIG'
-       ,'HIG1807'
+       ,'TMA'
+       ,'TMA5290'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrnotice_analysis_report__hig1807.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpinspectors__tma5290.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 257;
@@ -4925,11 +4925,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         257
-       ,'SWR'
-       ,'SWR1305'
+       ,'TMA'
+       ,'TMA7090'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrinspection_history__swr1305.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpinterim_sites_greater_than_6_mon.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 258;
@@ -4944,11 +4944,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         258
-       ,'SWR'
-       ,'SWR1257'
+       ,'TMA'
+       ,'TMA3000'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrinspection_performance__swr1257.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpmonitor_web_services_tra00000009.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 259;
@@ -4963,11 +4963,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         259
-       ,'SWR'
-       ,'SWR1326'
+       ,'NSG'
+       ,'NSG0130'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrinspections_invoice__swr1326.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpmy_districts__nsg0130.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 260;
@@ -4982,11 +4982,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         260
-       ,'SWR'
-       ,'SWR1750'
+       ,'HIG'
+       ,'HIG4025'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrinspections_sent__received__swr1.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpmy_standard_text__hig4025.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 261;
@@ -5001,11 +5001,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         261
-       ,'SWR'
-       ,'SWR1212'
+       ,'TMA'
+       ,'TMA0050'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrinterim_reinstatements__6_months.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpmy_street_groups__tma0050.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 262;
@@ -5020,11 +5020,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         262
-       ,'SWR'
-       ,'SWR1720'
+       ,'TMA'
+       ,'TMA1150'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_allowable_inspection_it.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpnon_street_works_activities__tma.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 263;
@@ -5039,11 +5039,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         263
-       ,'SWR'
-       ,'SWR1560'
+       ,'TMA'
+       ,'TMA2000'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_allowable_site_updates_.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpnotice_review_rules__tma2000.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 264;
@@ -5058,11 +5058,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         264
-       ,'SWR'
-       ,'SWR1240'
+       ,'TMA'
+       ,'TMA2010'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_annual_inspection_profi.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpnotice_types__tma2010.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 265;
@@ -5077,11 +5077,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         265
-       ,'SWR'
-       ,'SWR1604'
+       ,'TMA'
+       ,'TMA2050'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_automatic_batch_operati.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpnotice_warnings__tma2050.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 266;
@@ -5096,11 +5096,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         266
-       ,'SWR'
-       ,'SWR1602'
+       ,'TMA'
+       ,'TMA7080'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_automatic_batch_process.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpnotices_with_an_agreement__tma70.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 267;
@@ -5115,11 +5115,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         267
-       ,'SWR'
-       ,'SWR1603'
+       ,'TMA'
+       ,'TMA1001'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_automatic_batch_rules__.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpnoticing_assistant__tma1001.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 268;
@@ -5134,11 +5134,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         268
-       ,'SWR'
-       ,'SWR1620'
+       ,'TMA_PR'
+       ,'TMA2090'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_batch_messages__swr1620.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helppermit_fee_profile__tma2090.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 269;
@@ -5153,11 +5153,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         269
-       ,'SWR'
-       ,'SWR1517'
+       ,'TMA_PR'
+       ,'TMA2070'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_defect_inspection_sched.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helppermit_fees__tma2070.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 270;
@@ -5172,11 +5172,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         270
-       ,'SWR'
-       ,'SWR1700'
+       ,'TMA'
+       ,'TMA7510'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_defect_notice_messages_.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helppermit_invoice__tma7510.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 271;
@@ -5191,11 +5191,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         271
-       ,'SWR'
-       ,'SWR1461'
+       ,'TMA_PR'
+       ,'TMA2080'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_district_hierarchy__swr.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helppermit_schemes__tma2080.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 272;
@@ -5210,11 +5210,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         272
-       ,'SWR'
-       ,'SWR1660'
+       ,'TMA'
+       ,'TMA7500'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_inspection_categories__.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helppermit_status__tma7500.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 273;
@@ -5229,11 +5229,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         273
-       ,'SWR'
-       ,'SWR1250'
+       ,'TMA'
+       ,'TMA7040'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_inspection_details__swr.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpphase_confirmation_required__tma.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 274;
@@ -5248,11 +5248,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         274
-       ,'SWR'
-       ,'SWR1710'
+       ,'TMA'
+       ,'TMA7030'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_inspection_item_status_.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpphase_due_to_be_cancelled__tma70.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 275;
@@ -5267,11 +5267,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         275
-       ,'SWR'
-       ,'SWR1690'
+       ,'TMA'
+       ,'TMA7010'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_inspection_outcomes__sw.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpphase_due_to_complete__tma7010.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 276;
@@ -5286,11 +5286,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         276
-       ,'SWR'
-       ,'SWR1680'
+       ,'TMA'
+       ,'TMA7100'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_inspection_types__swr16.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpphase_with_a_section_74_charge__.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 277;
@@ -5305,11 +5305,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         277
-       ,'SWR'
-       ,'SWR1510'
+       ,'TMA'
+       ,'TMA7050'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_interface_mappings__swr.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpphase_without_a_full_registratio.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 278;
@@ -5324,11 +5324,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         278
-       ,'SWR'
-       ,'SWR1519'
+       ,'TMA'
+       ,'TMA7440'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_notice_charges__swr1519.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpprint_blank_notice_pro_forma__tm.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 279;
@@ -5343,11 +5343,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         279
-       ,'SWR'
-       ,'SWR1403'
+       ,'TMA'
+       ,'TMA7450'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_notice_types__swr1403.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpprint_blank_permit_notice_pro_fo.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 280;
@@ -5362,11 +5362,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         280
-       ,'SWR'
-       ,'SWR1670'
+       ,'TMA'
+       ,'TMA7520'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_sample_inspecti00000048.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpprint_permit_notice__tma7520.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 281;
@@ -5381,11 +5381,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         281
-       ,'SWR'
-       ,'SWR1514'
+       ,'TMA'
+       ,'TMA1010'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_sample_inspecti00000054.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpprojects__tma1010.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 282;
@@ -5400,11 +5400,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         282
-       ,'SWR'
-       ,'SWR1630'
+       ,'TMA'
+       ,'TMA1190'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_section_74_charges__swr.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpquery_fpns__tma1190.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 283;
@@ -5419,11 +5419,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         283
-       ,'SWR'
-       ,'SWR1640'
+       ,'TMA'
+       ,'TMA5030'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_section_74_charging_pro.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpquery_inspection_defects__tma503.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 284;
@@ -5438,11 +5438,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         284
-       ,'SWR'
-       ,'SWR1513'
+       ,'TMA'
+       ,'TMA1170'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_site_rules__swr1513.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpquery_non_street_works_activitie.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 285;
@@ -5457,11 +5457,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         285
-       ,'SWR'
-       ,'SWR1336'
+       ,'TMA'
+       ,'TMA1050'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_street_naming_authoriti.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpquery_overrunning_works__tma1050.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 286;
@@ -5476,11 +5476,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         286
-       ,'SWR'
-       ,'SWR1051'
+       ,'TMA'
+       ,'TMA1040'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_user_definitions__swr10.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpquery_works__tma1040.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 287;
@@ -5495,11 +5495,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         287
-       ,'SWR'
-       ,'SWR1401'
+       ,'TMA'
+       ,'TMA1110'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_work_types__swr1401.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helprestrictions__tma1110.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 288;
@@ -5514,11 +5514,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         288
-       ,'SWR'
-       ,'SWR1111'
+       ,'TMA'
+       ,'TMA1030'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_works_comments__swr1111.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpreview_notice__tma1030.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 289;
@@ -5533,11 +5533,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         289
-       ,'SWR'
-       ,'SWR1512'
+       ,'TMA'
+       ,'TMA6080'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_works_rules__swr1512.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpsample_inspection_invoice_report.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 290;
@@ -5552,11 +5552,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         290
-       ,'SWR'
-       ,'SWR1190'
+       ,'TMA'
+       ,'TMA6040'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_worksreinstatement_deta.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpsample_inspection_quota_report__.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 291;
@@ -5571,11 +5571,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         291
-       ,'SWR'
-       ,'SWR1570'
+       ,'TMA'
+       ,'TMA5100'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_workssites_combinations.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpschedule_inspections__tma5100.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 292;
@@ -5590,11 +5590,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         292
-       ,'SWR'
-       ,'SWR1180'
+       ,'TMA'
+       ,'TMA1080'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmerge_unattributable_works__swr1.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpsection_74_charges__tma1080.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 293;
@@ -5609,11 +5609,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         293
-       ,'SWR'
-       ,'SWR1605'
+       ,'TMA'
+       ,'TMA2060'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrmonitor_batch_file_status__swr16.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpsection_74_charges_profile__tma2.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 294;
@@ -5628,11 +5628,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         294
-       ,'SWR'
-       ,'SWR1380'
+       ,'TMA'
+       ,'TMA1180'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrnon_works_activity__swr1380.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpsend_all_restrictions__tma1180.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 295;
@@ -5647,11 +5647,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         295
-       ,'HIG'
-       ,'HIG1807'
+       ,'TMA'
+       ,'TMA3030'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrnotice_analysis_report__hig1807.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpsend_od_data__tma3030.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 296;
@@ -5666,11 +5666,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         296
-       ,'SWR'
-       ,'SWR1120'
+       ,'TMA'
+       ,'TMA7060'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrnotice_sentreceived__swr1120.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpsites_without_a_full_registrion_.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 297;
@@ -5685,11 +5685,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         297
-       ,'SWR'
-       ,'SWR1451'
+       ,'HIG'
+       ,'HIG4010'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrorganisation_data_report__swr145.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpstandard_text__hig4010.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 298;
@@ -5704,11 +5704,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         298
-       ,'SWR'
-       ,'SWR1220'
+       ,'HIG'
+       ,'HIG4020'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrprint_works_details__swr1220.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpstandard_text_usage__hig4020.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 299;
@@ -5723,11 +5723,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         299
-       ,'SWR'
-       ,'SWR1294'
+       ,'TMA'
+       ,'TMA2030'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrprospective_inspections_report__.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpstatus_transitions__tma2030.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 300;
@@ -5742,11 +5742,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         300
-       ,'SWR'
-       ,'SWR1189'
+       ,'TMA'
+       ,'TMA0020'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrquery_works_history__swr1189.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpstreet_groups__tma0020.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 301;
@@ -5761,11 +5761,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         301
-       ,'SWR'
-       ,'SWR1070'
+       ,'TMA'
+       ,'TMA0030'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrquery_workssites__swr1070.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpunassigned_streets__tma0030.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 302;
@@ -5780,11 +5780,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         302
-       ,'SWR'
-       ,'SWR1500'
+       ,'HIG'
+       ,'HIG1834'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrreference_data__swr1500.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpuser_contact_details__hig1834.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 303;
@@ -5799,11 +5799,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         303
-       ,'SWR'
-       ,'SWR1501'
+       ,'TMA'
+       ,'TMA0040'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrreference_data_report__swr1501.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpuser_street_groups__tma0040.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 304;
@@ -5818,11 +5818,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         304
-       ,'SWR'
-       ,'SWR1212'
+       ,'TMA'
+       ,'TMA1005'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrinterim_reinstatements__6_months.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpview_archived_workssites__tma100.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 305;
@@ -5837,11 +5837,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         305
-       ,'SWR'
-       ,'SWR1256'
+       ,'TMA'
+       ,'TMA1810'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrsample_inspections_quotas_report.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpview_notices__tma1810.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 306;
@@ -5856,11 +5856,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         306
-       ,'SWR'
-       ,'SWR1257'
+       ,'TMA'
+       ,'TMA2020'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrinspection_performance__swr1257.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpwork_categories__tma2020.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 307;
@@ -5875,11 +5875,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         307
-       ,'SWR'
-       ,'SWR1157'
+       ,'TMA'
+       ,'TMA6000'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_due_to_complete__swr1157.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpwork_inspection_report__tma6000.htm' FROM DUAL;
 --
 DELETE FROM HIG_WEB_CONTXT_HLP
  WHERE HWCH_ART_ID = 308;
@@ -5894,2367 +5894,11 @@ INSERT INTO HIG_WEB_CONTXT_HLP
        )
 SELECT 
         308
-       ,'SWR'
-       ,'SWR1780'
+       ,'TMA'
+       ,'TMA1000'
        ,''
        ,''
-       ,'/swr/WebHelp/swr.htm#swrbatch_file_listing__swr1780.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 309;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        309
-       ,'SWR'
-       ,'SWR1650'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrsection_74_charges_invoice__swr1.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 310;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        310
-       ,'SWR'
-       ,'SWR1225'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrgeneric_works_report__swr1225.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 311;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        311
-       ,'HIG'
-       ,'HIG1807'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrnotice_analysis_report__hig1807.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 312;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        312
-       ,'SWR'
-       ,'SWR1451'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrorganisation_data_report__swr145.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 313;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        313
-       ,'SWR'
-       ,'SWR1292'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_inspection_report__swr1292.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 314;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        314
-       ,'SWR'
-       ,'SWR1230'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrgeneric_inspections_report__swr1.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 315;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        315
-       ,'SWR'
-       ,'SWR1305'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrinspection_history__swr1305.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 316;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        316
-       ,'SWR'
-       ,'SWR1328'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrchargeable_notices_invoice__swr1.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 317;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        317
-       ,'SWR'
-       ,'SWR1501'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrreference_data_report__swr1501.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 318;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        318
-       ,'SWR'
-       ,'SWR1158'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_due_a_section_74_start__sw.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 319;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        319
-       ,'SWR'
-       ,'SWR1325'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrsample_inspection_invoice_report.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 320;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        320
-       ,'SWR'
-       ,'SWR1326'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrinspections_invoice__swr1326.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 321;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        321
-       ,'SWR'
-       ,'SWR1471'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrcontact_list__swr1471.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 322;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        322
-       ,'SWR'
-       ,'SWR1220'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrprint_works_details__swr1220.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 323;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        323
-       ,'SWR'
-       ,'SWR1294'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrprospective_inspections_report__.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 324;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        324
-       ,'SWR'
-       ,'SWR1550'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrsoi_gazetteer_data_report__swr15.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 325;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        325
-       ,'SWR'
-       ,'SWR1551'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrauthority_gazetteer_data_report_.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 326;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        326
-       ,'SWR'
-       ,'SWR1159'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_with_a_section_74_duration.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 327;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        327
-       ,'SWR'
-       ,'SWR1610'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrbatch_files_processed__swr1610.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 328;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        328
-       ,'SWR'
-       ,'SWR1325'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrsample_inspection_invoice_report.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 329;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        329
-       ,'SWR'
-       ,'SWR1256'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrsample_inspections_quotas_report.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 330;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        330
-       ,'SWR'
-       ,'SWR1290'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrschedule_inspections__swr1290.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 331;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        331
-       ,'SWR'
-       ,'SWR1650'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrsection_74_charges_invoice__swr1.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 332;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        332
-       ,'SWR'
-       ,'SWR1159'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_with_a_section_74_duration.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 333;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        333
-       ,'SWR'
-       ,'SWR1158'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_due_a_section_74_start__sw.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 334;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        334
-       ,'SWR'
-       ,'SWR1550'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrsoi_gazetteer_data_report__swr15.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 335;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        335
-       ,'SWR'
-       ,'SWR1490'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrstandard_text__swr1490.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 336;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        336
-       ,'SWR'
-       ,'SWR1530'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrstreets_of_interest__swr1530.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 337;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        337
-       ,'SWR'
-       ,'SWR1450'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrswa_organisations__swr1450.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 338;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        338
-       ,'SWR'
-       ,'SWR1051'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_user_definitions__swr10.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 339;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        339
-       ,'SWR'
-       ,'SWR1060'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrsystem_definitions__swr1060.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 340;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        340
-       ,'SWR'
-       ,'SWR1070'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrquery_workssites__swr1070.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 341;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        341
-       ,'SWR'
-       ,'SWR1111'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_works_comments__swr1111.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 342;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        342
-       ,'SWR'
-       ,'SWR1112'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrcomments_sentreceived__swr1112.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 343;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        343
-       ,'SWR'
-       ,'SWR1120'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrnotice_sentreceived__swr1120.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 344;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        344
-       ,'SWR'
-       ,'SWR1156'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_history__swr1156.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 345;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        345
-       ,'SWR'
-       ,'SWR1157'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_due_to_complete__swr1157.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 346;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        346
-       ,'SWR'
-       ,'SWR1158'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_due_a_section_74_start__sw.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 347;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        347
-       ,'SWR'
-       ,'SWR1159'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_with_a_section_74_duration.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 348;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        348
-       ,'SWR'
-       ,'SWR1180'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmerge_unattributable_works__swr1.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 349;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        349
-       ,'SWR'
-       ,'SWR1189'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrquery_works_history__swr1189.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 350;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        350
-       ,'SWR'
-       ,'SWR1190'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_worksreinstatement_deta.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 351;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        351
-       ,'SWR'
-       ,'SWR1197'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrcoordination_planning__swr1197.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 352;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        352
-       ,'SWR'
-       ,'SWR1198'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrconflicting_works__swr1198.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 353;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        353
-       ,'SWR'
-       ,'SWR1209'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrexpiring_reinstatement_guarantee.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 354;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        354
-       ,'SWR'
-       ,'SWR1212'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrinterim_reinstatements__6_months.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 355;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        355
-       ,'SWR'
-       ,'SWR1220'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrprint_works_details__swr1220.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 356;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        356
-       ,'SWR'
-       ,'SWR1225'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrgeneric_works_report__swr1225.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 357;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        357
-       ,'SWR'
-       ,'SWR1230'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrgeneric_inspections_report__swr1.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 358;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        358
-       ,'SWR'
-       ,'SWR1240'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_annual_inspection_profi.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 359;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        359
-       ,'SWR'
-       ,'SWR1250'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_inspection_details__swr.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 360;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        360
-       ,'SWR'
-       ,'SWR1255'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrannual_inspection_profile__swr12.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 361;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        361
-       ,'SWR'
-       ,'SWR1256'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrsample_inspections_quotas_report.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 362;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        362
-       ,'SWR'
-       ,'SWR1257'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrinspection_performance__swr1257.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 363;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        363
-       ,'SWR'
-       ,'SWR1290'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrschedule_inspections__swr1290.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 364;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        364
-       ,'SWR'
-       ,'SWR1292'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_inspection_report__swr1292.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 365;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        365
-       ,'SWR'
-       ,'SWR1294'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrprospective_inspections_report__.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 366;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        366
-       ,'SWR'
-       ,'SWR1305'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrinspection_history__swr1305.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 367;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        367
-       ,'SWR'
-       ,'SWR1325'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrsample_inspection_invoice_report.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 368;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        368
-       ,'SWR'
-       ,'SWR1326'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrinspections_invoice__swr1326.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 369;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        369
-       ,'SWR'
-       ,'SWR1328'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrchargeable_notices_invoice__swr1.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 370;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        370
-       ,'SWR'
-       ,'SWR1336'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_street_naming_authoriti.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 371;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        371
-       ,'SWR'
-       ,'SWR1380'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrnon_works_activity__swr1380.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 372;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        372
-       ,'SWR'
-       ,'SWR1390'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrview_non_works_activity__swr1390.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 373;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        373
-       ,'SWR'
-       ,'SWR1400'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrallocate_provisional_works__swr1.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 374;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        374
-       ,'SWR'
-       ,'SWR1401'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_work_types__swr1401.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 375;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        375
-       ,'SWR'
-       ,'SWR1403'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_notice_types__swr1403.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 376;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        376
-       ,'SWR'
-       ,'SWR1450'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrswa_organisations__swr1450.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 377;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        377
-       ,'SWR'
-       ,'SWR1451'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrorganisation_data_report__swr145.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 378;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        378
-       ,'SWR'
-       ,'SWR1461'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_district_hierarchy__swr.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 379;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        379
-       ,'SWR'
-       ,'SWR1471'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrcontact_list__swr1471.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 380;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        380
-       ,'SWR'
-       ,'SWR1480'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrcoordination_groups__swr1480.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 381;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        381
-       ,'SWR'
-       ,'SWR1490'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrstandard_text__swr1490.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 382;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        382
-       ,'SWR'
-       ,'SWR1500'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrreference_data__swr1500.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 383;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        383
-       ,'SWR'
-       ,'SWR1501'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrreference_data_report__swr1501.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 384;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        384
-       ,'SWR'
-       ,'SWR1510'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_interface_mappings__swr.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 385;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        385
-       ,'SWR'
-       ,'SWR1512'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_works_rules__swr1512.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 386;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        386
-       ,'SWR'
-       ,'SWR1513'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_site_rules__swr1513.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 387;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        387
-       ,'SWR'
-       ,'SWR1514'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_sample_inspecti00000054.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 388;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        388
-       ,'SWR'
-       ,'SWR1517'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_defect_inspection_sched.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 389;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        389
-       ,'SWR'
-       ,'SWR1519'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_notice_charges__swr1519.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 390;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        390
-       ,'SWR'
-       ,'SWR1530'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrstreets_of_interest__swr1530.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 391;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        391
-       ,'SWR'
-       ,'SWR1550'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrsoi_gazetteer_data_report__swr15.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 392;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        392
-       ,'SWR'
-       ,'SWR1551'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrauthority_gazetteer_data_report_.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 393;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        393
-       ,'SWR'
-       ,'SWR1560'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_allowable_site_updates_.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 394;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        394
-       ,'SWR'
-       ,'SWR1570'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_workssites_combinations.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 395;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        395
-       ,'SWR'
-       ,'SWR1600'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swruploaddownload_utility__swr1600.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 396;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        396
-       ,'SWR'
-       ,'SWR1601'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrautomatic_uploaddownload_utility.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 397;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        397
-       ,'SWR'
-       ,'SWR1602'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_automatic_batch_process.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 398;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        398
-       ,'SWR'
-       ,'SWR1603'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_automatic_batch_rules__.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 399;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        399
-       ,'SWR'
-       ,'SWR1604'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_automatic_batch_operati.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 400;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        400
-       ,'SWR'
-       ,'SWR1605'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmonitor_batch_file_status__swr16.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 401;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        401
-       ,'SWR'
-       ,'SWR1610'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrbatch_files_processed__swr1610.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 402;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        402
-       ,'SWR'
-       ,'SWR1620'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_batch_messages__swr1620.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 403;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        403
-       ,'SWR'
-       ,'SWR1630'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_section_74_charges__swr.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 404;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        404
-       ,'SWR'
-       ,'SWR1640'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_section_74_charging_pro.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 405;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        405
-       ,'SWR'
-       ,'SWR1650'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrsection_74_charges_invoice__swr1.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 406;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        406
-       ,'SWR'
-       ,'SWR1660'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_inspection_categories__.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 407;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        407
-       ,'SWR'
-       ,'SWR1670'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_sample_inspecti00000048.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 408;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        408
-       ,'SWR'
-       ,'SWR1680'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_inspection_types__swr16.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 409;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        409
-       ,'SWR'
-       ,'SWR1690'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_inspection_outcomes__sw.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 410;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        410
-       ,'SWR'
-       ,'SWR1700'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_defect_notice_messages_.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 411;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        411
-       ,'SWR'
-       ,'SWR1710'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_inspection_item_status_.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 412;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        412
-       ,'SWR'
-       ,'SWR1720'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrmaintain_allowable_inspection_it.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 413;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        413
-       ,'SWR'
-       ,'SWR1750'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrinspections_sent__received__swr1.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 414;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        414
-       ,'SWR'
-       ,'SWR1760'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrview_inspection_history__swr1760.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 415;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        415
-       ,'SWR'
-       ,'SWR1770'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrview_inspection_defects__swr1770.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 416;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        416
-       ,'SWR'
-       ,'SWR1780'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrbatch_file_listing__swr1780.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 417;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        417
-       ,'SWR'
-       ,'SWR1060'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrsystem_definitions__swr1060.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 418;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        418
-       ,'SWR'
-       ,'SWR1600'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swruploaddownload_utility__swr1600.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 419;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        419
-       ,'SWR'
-       ,'SWR1770'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrview_inspection_defects__swr1770.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 420;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        420
-       ,'SWR'
-       ,'SWR1760'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrview_inspection_history__swr1760.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 421;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        421
-       ,'SWR'
-       ,'SWR1390'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrview_non_works_activity__swr1390.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 422;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        422
-       ,'SWR'
-       ,'SWR1158'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_due_a_section_74_start__sw.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 423;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        423
-       ,'SWR'
-       ,'SWR1157'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_due_to_complete__swr1157.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 424;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        424
-       ,'SWR'
-       ,'SWR1158'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_due_a_section_74_start__sw.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 425;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        425
-       ,'SWR'
-       ,'SWR1157'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_due_to_complete__swr1157.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 426;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        426
-       ,'SWR'
-       ,'SWR1157'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_due_to_complete__swr1157.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 427;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        427
-       ,'SWR'
-       ,'SWR1158'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_due_a_section_74_start__sw.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 428;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        428
-       ,'SWR'
-       ,'SWR1156'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_history__swr1156.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 429;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        429
-       ,'SWR'
-       ,'SWR1292'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_inspection_report__swr1292.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 430;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        430
-       ,'SWR'
-       ,'SWR1159'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_with_a_section_74_duration.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 431;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        431
-       ,'SWR'
-       ,'SWR1159'
-       ,''
-       ,''
-       ,'/swr/WebHelp/swr.htm#swrworks_with_a_section_74_duration.htm' FROM DUAL;
---
-DELETE FROM HIG_WEB_CONTXT_HLP
- WHERE HWCH_ART_ID = 432;
---
-INSERT INTO HIG_WEB_CONTXT_HLP
-       (HWCH_ART_ID
-       ,HWCH_PRODUCT
-       ,HWCH_MODULE
-       ,HWCH_BLOCK
-       ,HWCH_ITEM
-       ,HWCH_HTML_STRING
-       )
-SELECT 
-        432
-       ,'HIG'
-       ,'GIS'
-       ,''
-       ,''
-       ,'/tm/WebHelp/tm.htm#tmdisplaying_traffic_data_on_a_map.htm' FROM DUAL;
+       ,'/tma/WebHelp/tma.htm#tma_helpworks__tma1000.htm' FROM DUAL;
 --
 --
 --
