@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.6   Mar 16 2009 17:43:08   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.7   Jul 13 2010 15:25:26   cstrettle  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Mar 16 2009 17:43:08  $
---       Date fetched Out : $Modtime:   Mar 16 2009 17:42:30  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Jul 13 2010 15:25:26  $
+--       Date fetched Out : $Modtime:   Jul 13 2010 15:22:34  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -1272,7 +1272,7 @@ BEGIN
             ELSIF l_data_length_tab (i) = 22
               AND l_data_precision_tab (i) IS NULL
             THEN                                   -- this is a generic number
-               l_data_type_tab (i) := 3;
+         --      l_data_type_tab (i) := 3; -- CWS 0109471 NO NEED TO CHANGE AN 8 BIT TO A 4 BIT. THIS CAUSES ISSUES
                l_data_length_tab (i) := 0;
                l_data_precision_tab (i) := 0;
             END IF;
@@ -1282,7 +1282,7 @@ BEGIN
            AND l_data_precision_tab (i) IS NULL
            AND l_data_scale_tab (i) IS NULL
          THEN                                      -- this is a generic number
-            l_data_type_tab (i) := 3;
+         --   l_data_type_tab (i) := 3; -- CWS 0109471 NO NEED TO CHANGE AN 8 BIT TO A 4 BIT. THIS CAUSES ISSUES
             l_data_length_tab (i) := 0;
             l_data_precision_tab (i) := 0;
       --
@@ -1297,7 +1297,7 @@ BEGIN
            AND nm3sde.get_sde_version = '9.1'
          THEN                                   -- this is a number with scale
           --
-            l_data_type_tab (i)      := 3;
+         --   l_data_type_tab (i)      := 3; -- CWS 0109471 NO NEED TO CHANGE AN 8 BIT TO A 4 BIT. THIS CAUSES ISSUES
             l_data_length_tab (i)    := l_data_precision_tab (i);
             l_data_precision_tab (i) := l_data_scale_tab (i);
           -- 
