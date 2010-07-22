@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE Nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkh-arc   2.2   Jan 15 2010 16:52:02   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkh-arc   2.3   Jul 22 2010 09:47:24   cstrettle  $
 --       Module Name      : $Workfile:   nm3invval.pkh  $
---       Date into PVCS   : $Date:   Jan 15 2010 16:52:02  $
---       Date fetched Out : $Modtime:   Jan 15 2010 16:44:06  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jul 22 2010 09:47:24  $
+--       Date fetched Out : $Modtime:   Jul 22 2010 09:44:52  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.13
 -------------------------------------------------------------------------
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE Nm3invval IS
 --</PACKAGE>
 --
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 --
    TYPE tab_nin IS TABLE OF nm_inv_nw%ROWTYPE INDEX BY BINARY_INTEGER;
 --
@@ -91,6 +91,11 @@ CREATE OR REPLACE PACKAGE Nm3invval IS
        );
    TYPE tab_rec_excl_check IS TABLE OF rec_excl_check INDEX BY BINARY_INTEGER;
    g_tab_rec_excl_check tab_rec_excl_check;
+--
+   TYPE rec_latest_asset_chk IS RECORD
+       (iit_ne_id             nm_inv_items.iit_ne_id%TYPE);
+   TYPE tab_rec_la_check IS TABLE OF rec_latest_asset_chk INDEX BY BINARY_INTEGER;
+   g_tab_rec_la_check tab_rec_la_check;
 --
    TYPE rec_update_au IS RECORD
        (iit_ne_id             nm_inv_items.iit_ne_id%TYPE
@@ -398,6 +403,41 @@ FUNCTION inv_type_is_parent_type (pi_inv_type nm_inv_types.nit_inv_type%TYPE) RE
 --  (or inv type has no children), otherwise returns FALSE
 --
 FUNCTION all_children_are_mandatory_at (pi_inv_type nm_inv_types.nit_inv_type%TYPE) RETURN BOOLEAN;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="check_inv_item_latest">
+--
+FUNCTION check_inv_item_latest ( pi_iit_ne_id IN nm_inv_items.iit_ne_id%TYPE)
+  RETURN BOOLEAN;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="edit_latest_asset_enabled">
+--
+FUNCTION edit_latest_asset_enabled
+  RETURN BOOLEAN;
+--
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="process_latest_asset_chk">
+--
+PROCEDURE process_latest_asset_chk;
+--
+--</PROC>
+--
+--
+----------------------------------------------------------------------------------------------
+--
+--<PROC NAME="pop_latest_asset_tab">
+--
+PROCEDURE pop_latest_asset_tab( pi_iit_ne_id IN nm_inv_items_all.iit_ne_id%TYPE);
 --
 --</PROC>
 --
