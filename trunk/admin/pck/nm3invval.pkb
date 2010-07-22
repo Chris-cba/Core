@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.9   May 05 2010 09:39:22   rcoupe  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.10   Jul 22 2010 09:27:28   cstrettle  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   May 05 2010 09:39:22  $
---       Date fetched Out : $Modtime:   May 05 2010 09:35:10  $
---       Version          : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Jul 22 2010 09:27:28  $
+--       Date fetched Out : $Modtime:   Jul 22 2010 09:25:56  $
+--       Version          : $Revision:   2.10  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.10  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -1744,5 +1744,84 @@ END all_children_are_mandatory_at;
 --
 ----------------------------------------------------------------------------------------------
 --
-END nm3invval;
+FUNCTION check_inv_item_latest ( pi_iit_ne_id IN nm_inv_items.iit_ne_id%TYPE)
+  RETURN BOOLEAN
+IS
+  l_dummy NUMBER;
+BEGIN
+  --
+  /*SELECT COUNT(*) 
+  INTO l_dummy 
+  FROM v_nm_inv_items_latest
+  WHERE niil_iit_ne_id = pi_iit_ne_id;*/
+  
+    SELECT COUNT(*) 
+    INTO l_dummy
+    FROM (SELECT  A.iit_ne_id AID
+                 ,B.iit_ne_id BID
+                 ,dense_rank()
+                  OVER (PARTITION BY B.iit_inv_type, B.iit_primary_key
+                        ORDER BY B.iit_start_date DESC) d_rank
+          FROM nm_inv_items_all a
+          , nm_inv_items_all b
+          WHERE A.iit_ne_id = pi_iit_ne_id --4999187 --5295574
+          AND A.IIT_INV_TYPE = B.IIT_INV_TYPE
+          AND A.IIT_PRIMARY_KEY = B. IIT_PRIMARY_KEY)
+   WHERE AID = BID
+   AND d_rank = 1;
+   
+  --
+  return(l_dummy > 0);
+END check_inv_item_latest;
+--
+----------------------------------------------------------------------------------------------
+--
+FUNCTION edit_latest_asset_enabled
+  RETURN BOOLEAN
+IS
+BEGIN
+RETURN (hig.get_sysopt('EDITENDDAT') = 'Y');
+END edit_latest_asset_enabled;
+--
+----------------------------------------------------------------------------------------------
+--
+PROCEDURE process_latest_asset_chk IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'process_latest_asset_chk');
+--
+   FOR i IN 1..g_tab_rec_la_check.COUNT
+   LOOP
+   --
+     IF NOT(nm3invval.check_inv_item_latest ( pi_iit_ne_id => g_tab_rec_la_check(i).iit_ne_id)) THEN
+     nm3invval.g_tab_rec_la_check.DELETE;
+     hig.raise_ner( pi_appl               => 'NET'
+                  , pi_id                 => 464);
+     END IF;
+   --
+   END LOOP;
+   nm3invval.g_tab_rec_la_check.DELETE;
+--
+   nm_debug.proc_end(g_package_name,'process_latest_asset_chk');
+--
+END process_latest_asset_chk;
+--
+----------------------------------------------------------------------------------------------
+--
+PROCEDURE pop_latest_asset_tab( pi_iit_ne_id IN nm_inv_items_all.iit_ne_id%TYPE)
+IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'pop_latest_asset_tab');
+--
+   IF UPDATING AND NM3INVVAL.EDIT_LATEST_ASSET_ENABLED THEN
+       nm3invval.g_tab_rec_la_check(nm3invval.g_tab_rec_la_check.count+1).iit_ne_id := pi_iit_ne_id;
+   END IF;
+--
+   nm_debug.proc_end(g_package_name,'pop_latest_asset_tab');
+--
+END pop_latest_asset_tab;
+----------------------------------------------------------------------------------------------
+--
+END;
 /
