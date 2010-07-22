@@ -7,11 +7,11 @@ REM SCCS ID Keyword, do no remove
 
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/higviews.sql-arc   2.2   Jul 13 2007 16:29:46   jwadsworth  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/higviews.sql-arc   2.3   Jul 22 2010 15:34:18   cstrettle  $
 --       Module Name      : $Workfile:   higviews.sql  $
---       Date into SCCS   : $Date:   Jul 13 2007 16:29:46  $
---       Date fetched Out : $Modtime:   Jul 13 2007 15:40:22  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Jul 22 2010 15:34:18  $
+--       Date fetched Out : $Modtime:   Jul 22 2010 15:30:28  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --
 rem   ------------------------------------------------------------------------------
@@ -160,82 +160,6 @@ hct_id
 FROM   hig_contacts, hig_contact_address, hig_address
 WHERE  hct_id = hca_hct_id (+)
 AND    hca_had_id = had_id (+)
-/
-
-prompt creating VIEW docs2view
-
-CREATE OR REPLACE FORCE VIEW docs2view ( doc_id, doc_title,
-doc_dcl_code, doc_dtp_code, doc_date_expires,
-doc_date_issued, doc_file, doc_reference_code,
-doc_issue_number, doc_dlc_id, doc_dlc_dmd_id,
-doc_descr, doc_user_id, doc_category, doc_admin_unit,
-doc_status_code, doc_status_date, doc_reason,
-doc_compl_type, doc_compl_source, doc_compl_ack_flag,
-doc_compl_ack_date, doc_compl_flag, doc_compl_cpr_id,
-doc_compl_user_id, doc_compl_peo_date, doc_compl_target,
-doc_compl_referred_to, doc_compl_location, doc_compl_name,
-doc_compl_address1, doc_compl_address2, doc_compl_address3,
-doc_compl_address4, doc_compl_address5, doc_compl_phone,
-doc_compl_remarks, doc_compl_action, doc_compl_complete, doc_compl_title,
-doc_compl_postcode, doc_compl_phone2, doc_compl_phone3,
-doc_compl_from, doc_compl_to, doc_compl_claim,
-doc_compl_east, doc_compl_north )
-AS SELECT DISTINCT doc_id
-,doc_title
-,doc_dcl_code
-,doc_dtp_code
-,doc_date_expires
-,doc_date_issued
-,doc_file
-,doc_reference_code
-,doc_issue_number
-,doc_dlc_id
-,doc_dlc_dmd_id
-,doc_descr
-,doc_user_id
-,doc_category
-,doc_admin_unit
-,doc_status_code
-,doc_status_date
-,doc_reason
-,doc_compl_type
-,doc_compl_source
-,doc_compl_ack_flag
-,doc_compl_ack_date
-,doc_compl_flag
-,doc_compl_cpr_id
-,doc_compl_user_id
-,doc_compl_peo_date
-,doc_compl_target
-,doc_compl_referred_to
-,doc_compl_location
-,RTRIM(hct_first_name)||' '||hct_surname
-,had_thoroughfare
-,had_dependent_locality_name
-,had_double_dep_locality_name
-,had_post_town
-,had_county
-,hct_home_phone
-,doc_compl_remarks
-,doc_compl_action
-,doc_compl_complete
-,hct_title
-,had_postcode
-,hct_work_phone
-,hct_mobile_phone
-,doc_compl_from
-,doc_compl_to
-,doc_compl_claim
-,doc_compl_east
-,doc_compl_north
-from   HIG_ADDRESS, HIG_CONTACT_ADDRESS, HIG_CONTACTS,DOC_ENQUIRY_CONTACTS, DOCS, DOC_TYPES
-WHERE hca_had_id = had_id (+)
-and    hct_id = hca_hct_id (+)
-and    dec_hct_id = hct_id (+)
-and    dec_contact (+) = 'Y'
-and    doc_id = dec_doc_id (+)
-and    doc_dtp_code = dtp_code
-and    dtp_allow_complaints = 'Y'
 /
 
 prompt creating VIEW network_node
