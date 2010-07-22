@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.10   Jul 22 2010 09:27:28   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.11   Jul 22 2010 11:20:56   cstrettle  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   Jul 22 2010 09:27:28  $
---       Date fetched Out : $Modtime:   Jul 22 2010 09:25:56  $
---       Version          : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Jul 22 2010 11:20:56  $
+--       Date fetched Out : $Modtime:   Jul 22 2010 11:19:40  $
+--       Version          : $Revision:   2.11  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.10  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.11  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -1747,14 +1747,19 @@ END all_children_are_mandatory_at;
 FUNCTION check_inv_item_latest ( pi_iit_ne_id IN nm_inv_items.iit_ne_id%TYPE)
   RETURN BOOLEAN
 IS
+-- This function checks if the ne_id of an asset passes in is the latest occurrence
+-- based on the nm_inv_type and nm_primary_key
   l_dummy NUMBER;
 BEGIN
+  -- CWS 22/07/2010 0109041
+  -- The first reference to nm_inv_items_all (A) uses the p_iit_ne_id to find the 
+  -- iit_inv_type and iit_primary_key. The second reference (B) finds all the assets that 
+  -- match these two values and rank them in start_date order. They are then compared
+  -- to make sure the entered iit_ne_id belongs to the latest version of the asset.
   --
-  /*SELECT COUNT(*) 
-  INTO l_dummy 
-  FROM v_nm_inv_items_latest
-  WHERE niil_iit_ne_id = pi_iit_ne_id;*/
-  
+  -- It was proposed originally to have a view that had the rank added to it to make
+  -- the statement simpler but that was inefficient and replaced by this solution.
+  --
     SELECT COUNT(*) 
     INTO l_dummy
     FROM (SELECT  A.iit_ne_id AID
@@ -1764,12 +1769,11 @@ BEGIN
                         ORDER BY B.iit_start_date DESC) d_rank
           FROM nm_inv_items_all a
           , nm_inv_items_all b
-          WHERE A.iit_ne_id = pi_iit_ne_id --4999187 --5295574
+          WHERE A.iit_ne_id = pi_iit_ne_id
           AND A.IIT_INV_TYPE = B.IIT_INV_TYPE
           AND A.IIT_PRIMARY_KEY = B. IIT_PRIMARY_KEY)
    WHERE AID = BID
    AND d_rank = 1;
-   
   --
   return(l_dummy > 0);
 END check_inv_item_latest;
@@ -1778,6 +1782,7 @@ END check_inv_item_latest;
 --
 FUNCTION edit_latest_asset_enabled
   RETURN BOOLEAN
+-- This function checks if the edit latest asset functionality is enabled
 IS
 BEGIN
 RETURN (hig.get_sysopt('EDITENDDAT') = 'Y');
@@ -1786,6 +1791,8 @@ END edit_latest_asset_enabled;
 ----------------------------------------------------------------------------------------------
 --
 PROCEDURE process_latest_asset_chk IS
+-- This procedure is used in a trigger to make a list of editted assets for edit
+-- latest asset validation
 BEGIN
 --
    nm_debug.proc_start(g_package_name,'process_latest_asset_chk');
@@ -1810,6 +1817,7 @@ END process_latest_asset_chk;
 --
 PROCEDURE pop_latest_asset_tab( pi_iit_ne_id IN nm_inv_items_all.iit_ne_id%TYPE)
 IS
+--This procedure is used in a trigger to validate the assets listed in process_latest_asset_chk
 BEGIN
 --
    nm_debug.proc_start(g_package_name,'pop_latest_asset_tab');
