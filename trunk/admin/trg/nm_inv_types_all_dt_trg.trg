@@ -1,20 +1,27 @@
 CREATE OR REPLACE TRIGGER NM_INV_TYPES_ALL_DT_TRG
  BEFORE INSERT
-  OR UPDATE OF NIT_START_DATE,NIT_END_DATE
- ON NM_INV_TYPES_ALL
+  OR UPDATE OF NIT_START_DATE
+             , NIT_END_DATE
+             , NIT_FOREIGN_PK_COLUMN
+             , NIT_LR_NE_COLUMN_NAME
+             , NIT_LR_ST_CHAIN
+             , NIT_LR_END_CHAIN
+ ON NM_INV_TYPES_ALL  
  FOR EACH ROW
 DECLARE
+-----------------------------------------------------------------------------
 --
---   SCCS Identifiers :-
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)nm_inv_types_all_dt_trg.trg	1.8 01/26/05
---       Module Name      : nm_inv_types_all_dt_trg.trg
---       Date into SCCS   : 05/01/26 15:27:16
---       Date fetched Out : 07/06/13 17:03:08
---       SCCS Version     : 1.8
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_types_all_dt_trg.trg-arc   2.2   Jul 23 2010 11:21:10   cstrettle  $
+--       Module Name      : $Workfile:   nm_inv_types_all_dt_trg.trg  $
+--       Date into PVCS   : $Date:   Jul 23 2010 11:21:10  $
+--       Date fetched Out : $Modtime:   Jul 23 2010 11:19:34  $
+--       Version          : $Revision:   2.2  $
+--
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+--  Copyright (c) exor corporation ltd, 2008
 -----------------------------------------------------------------------------
 --
    l_start_date DATE := :NEW.NIT_START_DATE;
@@ -122,13 +129,17 @@ BEGIN
          PROCEDURE check_exists (p_table_name VARCHAR2
                                 ,p_col_name   VARCHAR2
                                 ) IS
+            l_current_user VARCHAR2(100) := nm3get.get_hus(pi_hus_user_id => 
+                                            nm3context.get_context(nm3context.get_namespace,'USER_ID')).hus_username;
+            --
             CURSOR cs_ft_col_check (c_table_name VARCHAR2
                                    ,c_col_name   VARCHAR2
                                    ) IS
             SELECT data_type
-             FROM  all_tab_columns
-            WHERE  table_name  = c_table_name
-             AND   column_name = c_col_name;
+              FROM all_tab_columns
+             WHERE table_name  = c_table_name
+               AND column_name = c_col_name
+               AND owner = l_current_user;
             l_data_type all_tab_columns.data_type%TYPE;
          BEGIN
          
@@ -153,7 +164,6 @@ BEGIN
       --
       BEGIN
       --
-               
          check_exists (:NEW.nit_table_name, :NEW.nit_lr_ne_column_name);
          check_exists (:NEW.nit_table_name, :NEW.nit_lr_st_chain);
          check_exists (:NEW.nit_table_name, :NEW.nit_lr_end_chain);
