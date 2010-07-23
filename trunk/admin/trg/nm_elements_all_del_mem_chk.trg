@@ -17,9 +17,15 @@ DECLARE
 --    FOR EACH ROW
 --
 BEGIN
-   IF nm3ausec.do_locations_exist( :OLD.ne_id )
-    THEN
-      RAISE_APPLICATION_ERROR(-20001,'Cannot delete NM_ELEMENTS_ALL records for which NM_MEMBERS_ALL records exist');
-   END IF;
+
+  IF NOT nm3net.bypass_nm_elements_trgs THEN
+
+       IF nm3ausec.do_locations_exist( :OLD.ne_id )
+        THEN
+          RAISE_APPLICATION_ERROR(-20001,'Cannot delete NM_ELEMENTS_ALL records for which NM_MEMBERS_ALL records exist');
+       END IF;
+       
+  END IF;
+         
 END nm_elements_all_del_mem_chk;
 /

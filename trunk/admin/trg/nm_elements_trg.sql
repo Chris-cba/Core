@@ -6,11 +6,11 @@ CREATE OR REPLACE TRIGGER a_ins_nm_elements
 DECLARE
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.3   Nov 14 2007 13:59:28   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.4   Jul 23 2010 14:07:12   gjohnson  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Nov 14 2007 13:59:28  $
---       Date fetched Out : $Modtime:   Nov 14 2007 13:58:54  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Jul 23 2010 14:07:12  $
+--       Date fetched Out : $Modtime:   May 07 2010 15:18:20  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on 
 --       Based on 1.11
 --
@@ -86,11 +86,11 @@ CREATE OR REPLACE TRIGGER b_upd_nm_elements
 DECLARE
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.3   Nov 14 2007 13:59:28   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.4   Jul 23 2010 14:07:12   gjohnson  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Nov 14 2007 13:59:28  $
---       Date fetched Out : $Modtime:   Nov 14 2007 13:58:54  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Jul 23 2010 14:07:12  $
+--       Date fetched Out : $Modtime:   May 07 2010 15:18:20  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on 
 --       Based on 1.11
 --
@@ -210,11 +210,11 @@ CREATE OR REPLACE TRIGGER b_ins_nm_elements
 BEGIN
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.3   Nov 14 2007 13:59:28   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.4   Jul 23 2010 14:07:12   gjohnson  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Nov 14 2007 13:59:28  $
---       Date fetched Out : $Modtime:   Nov 14 2007 13:58:54  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Jul 23 2010 14:07:12  $
+--       Date fetched Out : $Modtime:   May 07 2010 15:18:20  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on 
 --       Based on 1.11
 --
@@ -266,11 +266,11 @@ CREATE OR REPLACE TRIGGER a_del_nm_elements
 DECLARE
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.3   Nov 14 2007 13:59:28   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.4   Jul 23 2010 14:07:12   gjohnson  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Nov 14 2007 13:59:28  $
---       Date fetched Out : $Modtime:   Nov 14 2007 13:58:54  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Jul 23 2010 14:07:12  $
+--       Date fetched Out : $Modtime:   May 07 2010 15:18:20  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on 
 --
 --     TRIGGER a_del_nm_elements
@@ -305,50 +305,56 @@ DECLARE
 
 --
 BEGIN
---
-   if :old.ne_type = 'S'  then
 
-     for irec in get_theme( :old.ne_nt_type, :old.ne_gty_group_type ) loop
 
-       begin
+  IF NOT nm3net.bypass_nm_elements_trgs THEN
 
-         begin
-
-           select referenced_name, cc.column_name
-           into l_ref_table, l_ref_column
-           from user_dependencies, user_sdo_geom_metadata t, user_constraints c, user_cons_columns cc
-           where name = irec.nth_feature_table
-           and referenced_type = 'TABLE'
-           and t.table_name = referenced_name
-           and t.table_name = c.table_name
-           and c.constraint_type = 'P'
-           and cc.constraint_name = c.constraint_name
-           and cc.table_name = t.table_name;
-
-           l_spatial_table  := l_ref_table;
-           l_spatial_pk_col := l_ref_column;
-
-         exception
-           when no_data_found then
-             l_spatial_table  := irec.nth_feature_table;
-             l_spatial_pk_col := irec.nth_feature_pk_column;
-         end;
---
-         EXECUTE IMMEDIATE 'DELETE FROM '||l_spatial_table||' WHERE '||l_spatial_pk_col||' = :ne_id' USING :OLD.ne_id;
---
-       EXCEPTION
-       WHEN no_spatial_exists
-          THEN
---
---        If -20001 is raised, then we don't particularily care, because this means that there is no
---        spatial table defined, hence we can't delete from it.
---
-          NULL;
-
-       end;
-
-     end loop;
-   end if;
+			   if :old.ne_type = 'S'  then
+			
+			     for irec in get_theme( :old.ne_nt_type, :old.ne_gty_group_type ) loop
+			
+			       begin
+			
+			         begin
+			
+			           select referenced_name, cc.column_name
+			           into l_ref_table, l_ref_column
+			           from user_dependencies, user_sdo_geom_metadata t, user_constraints c, user_cons_columns cc
+			           where name = irec.nth_feature_table
+			           and referenced_type = 'TABLE'
+			           and t.table_name = referenced_name
+			           and t.table_name = c.table_name
+			           and c.constraint_type = 'P'
+			           and cc.constraint_name = c.constraint_name
+			           and cc.table_name = t.table_name;
+			
+			           l_spatial_table  := l_ref_table;
+			           l_spatial_pk_col := l_ref_column;
+			
+			         exception
+			           when no_data_found then
+			             l_spatial_table  := irec.nth_feature_table;
+			             l_spatial_pk_col := irec.nth_feature_pk_column;
+			         end;
+			--
+			         EXECUTE IMMEDIATE 'DELETE FROM '||l_spatial_table||' WHERE '||l_spatial_pk_col||' = :ne_id' USING :OLD.ne_id;
+			--
+			       EXCEPTION
+			       WHEN no_spatial_exists
+			          THEN
+			--
+			--        If -20001 is raised, then we don't particularily care, because this means that there is no
+			--        spatial table defined, hence we can't delete from it.
+			--
+			          NULL;
+			
+			       end;
+			
+			     end loop;
+			   end if;
+			   
+  END IF;
+  			   
 end;
 /
 
@@ -362,11 +368,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.3   Nov 14 2007 13:59:28   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_elements_trg.sql-arc   2.4   Jul 23 2010 14:07:12   gjohnson  $
 --       Module Name      : $Workfile:   nm_elements_trg.sql  $
---       Date into SCCS   : $Date:   Nov 14 2007 13:59:28  $
---       Date fetched Out : $Modtime:   Nov 14 2007 13:58:54  $
---       SCCS Version     : $Revision:   2.3  $
+--       Date into SCCS   : $Date:   Jul 23 2010 14:07:12  $
+--       Date fetched Out : $Modtime:   May 07 2010 15:18:20  $
+--       SCCS Version     : $Revision:   2.4  $
 --       Based on 
 --       Based on 1.11
 --
@@ -395,37 +401,42 @@ DECLARE
    l_some_nodes boolean := FALSE;
 --
 BEGIN
---
-   FOR l_dummy IN 1..2
-    LOOP -- Dummy loop so we don't duplicate the code
---
-      IF l_node_id IS NOT NULL
-       THEN
---
-         OPEN  cs_other_usages (l_ne_id, l_node_id);
-         FETCH cs_other_usages INTO l_count;
-         CLOSE cs_other_usages;
---
-         IF l_count = 0
-          THEN
-            DELETE FROM nm_nodes
-            WHERE no_node_id = l_node_id;
-         END IF;
---
-         l_some_nodes := TRUE;
---
-      END IF;
---
-      l_node_id := :OLD.ne_no_end;
---
-   END LOOP;
---
-   IF l_some_nodes
-    THEN
-      DELETE FROM nm_node_usages_all
-      WHERE nnu_ne_id = l_ne_id;
-   END IF;
---
+
+  IF NOT nm3net.bypass_nm_elements_trgs THEN
+
+			--
+			   FOR l_dummy IN 1..2
+			    LOOP -- Dummy loop so we don't duplicate the code
+			--
+			      IF l_node_id IS NOT NULL
+			       THEN
+			--
+			         OPEN  cs_other_usages (l_ne_id, l_node_id);
+			         FETCH cs_other_usages INTO l_count;
+			         CLOSE cs_other_usages;
+			--
+			         IF l_count = 0
+			          THEN
+			            DELETE FROM nm_nodes_all
+			            WHERE no_node_id = l_node_id;
+			         END IF;
+			--
+			         l_some_nodes := TRUE;
+			--
+			      END IF;
+			--
+			      l_node_id := :OLD.ne_no_end;
+			--
+			   END LOOP;
+			--
+			   IF l_some_nodes
+			    THEN
+			      DELETE FROM nm_node_usages_all
+			      WHERE nnu_ne_id = l_ne_id;
+			   END IF;
+			--
+			
+ END IF;			
 END b_del_nm_elements;
 /
 /*<TOAD_FILE_CHUNK>*/
