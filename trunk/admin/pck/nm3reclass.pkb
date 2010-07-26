@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.6   Mar 17 2010 15:03:00   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.7   Jul 26 2010 14:45:06   cstrettle  $
 --       Module Name      : $Workfile:   nm3reclass.pkb  $
---       Date into PVCS   : $Date:   Mar 17 2010 15:03:00  $
---       Date fetched Out : $Modtime:   Mar 17 2010 12:38:20  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Jul 26 2010 14:45:06  $
+--       Date fetched Out : $Modtime:   Jul 26 2010 14:41:24  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --
 --   Author : R.A. Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';
@@ -2114,7 +2114,7 @@ l_subclass_default VARCHAR2(100) := rtrim(ltrim(NM3GET.GET_NTC( p_new_nw_type
                     ,c_new_subclass nm_elements.ne_sub_class%TYPE
                     ,c_subclass_default nm_elements.ne_sub_class%TYPE
                     ) IS
-   SELECT 'X'
+   SELECT 1
     FROM  nm_inv_items
          ,nm_inv_types nit
          ,nm_members
