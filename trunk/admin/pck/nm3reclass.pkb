@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.7   Jul 26 2010 14:45:06   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.8   Jul 26 2010 16:28:52   cstrettle  $
 --       Module Name      : $Workfile:   nm3reclass.pkb  $
---       Date into PVCS   : $Date:   Jul 26 2010 14:45:06  $
---       Date fetched Out : $Modtime:   Jul 26 2010 14:41:24  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Jul 26 2010 16:28:52  $
+--       Date fetched Out : $Modtime:   Jul 26 2010 16:27:30  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --
 --   Author : R.A. Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';
@@ -2106,12 +2106,12 @@ FUNCTION does_nt_scl_change_break_xsp (p_ne_id_of     nm_members.nm_ne_id_of%TYP
                                       ) RETURN BOOLEAN IS
 --
 l_subclass_default VARCHAR2(100) := rtrim(ltrim(NM3GET.GET_NTC( p_new_nw_type
-                                                                                   , 'NE_SUB_CLASS'
-                                                                                   , FALSE).NTC_DEFAULT,''''),'''');
+                                                              , 'NE_SUB_CLASS'
+                                                              , FALSE).NTC_DEFAULT,''''),'''');
    
-   CURSOR cs_exists (c_ne_id_of     nm_members.nm_ne_id_of%TYPE
-                    ,c_new_nw_type  xsp_restraints.xsr_nw_type%TYPE
-                    ,c_new_subclass nm_elements.ne_sub_class%TYPE
+   CURSOR cs_exists (c_ne_id_of         nm_members.nm_ne_id_of%TYPE
+                    ,c_new_nw_type      xsp_restraints.xsr_nw_type%TYPE
+                    ,c_new_subclass     nm_elements.ne_sub_class%TYPE
                     ,c_subclass_default nm_elements.ne_sub_class%TYPE
                     ) IS
    SELECT 1
@@ -2123,11 +2123,11 @@ l_subclass_default VARCHAR2(100) := rtrim(ltrim(NM3GET.GET_NTC( p_new_nw_type
     AND   iit_inv_type = nit.nit_inv_type
     AND   nit.nit_x_sect_allow_flag = 'Y'
     AND   NOT EXISTS (SELECT 1
-                                 FROM  xsp_restraints
-                                 WHERE  xsr_nw_type      = c_new_nw_type
-                                 AND   xsr_ity_inv_code = iit_inv_type
-                                 AND   xsr_scl_class    = nvl(rtrim(ltrim(c_new_subclass,''''),''''), c_subclass_default)
-                                 AND   xsr_x_sect_value = iit_x_sect
+                      FROM  xsp_restraints
+                      WHERE  xsr_nw_type      = c_new_nw_type
+                      AND   xsr_ity_inv_code = iit_inv_type
+                      AND   xsr_scl_class    = nvl(nvl(rtrim(ltrim(c_new_subclass,''''),''''), c_subclass_default), xsr_scl_class)
+                      AND   xsr_x_sect_value = iit_x_sect
                      );
    -- CWS 16/02/10 0109092 -- Not required as these values are ignored later. No message is required.
    /* OR NOT  EXISTS (SELECT 1
@@ -2145,7 +2145,7 @@ BEGIN
 --
    OPEN  cs_exists (p_ne_id_of,p_new_nw_type,p_new_subclass, l_subclass_default);
    FETCH cs_exists INTO l_dummy;
-   l_retval := cs_exists%FOUND;
+     l_retval := cs_exists%FOUND;
    CLOSE cs_exists;
 --
    Nm_Debug.proc_end(g_package_name,'does_subclass_change_break_xsp');
