@@ -2,11 +2,11 @@ CREATE OR REPLACE package body nm3dynsql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.6   07 Jul 2010 16:28:18   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.7   27 Jul 2010 14:13:36   ptanava  $
 --       Module Name      : $Workfile:   nm3dynsql.pkb  $
---       Date into PVCS   : $Date:   07 Jul 2010 16:28:18  $
---       Date fetched Out : $Modtime:   07 Jul 2010 16:19:56  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   27 Jul 2010 14:13:36  $
+--       Date fetched Out : $Modtime:   27 Jul 2010 09:26:10  $
+--       PVCS Version     : $Revision:   2.7  $
 --       Based on sccs version :
 --
 --
@@ -32,9 +32,11 @@ CREATE OR REPLACE package body nm3dynsql as
                 to avoid expanding datum lengths
   07.07.10  PT task 0109941: in sql_route_connectivity() changed the logic of q4.chunk_no
                 to avoid gaps when connectivity works over connecting datum pieces
+  27.07.10  PT task 0109941: in sql_route_connectivity() changed the logic of nm_begin_mp and nm_end_mp
+                to correctly calculate the values when connecting through datum pieces
 */
 
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.6  $"';
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.7  $"';
   g_package_name    constant  varchar2(30) := 'nm3dynsql';
 
 
@@ -176,10 +178,10 @@ CREATE OR REPLACE package body nm3dynsql as
     ||cr||'   q4.nm_ne_id_in'
     ||cr||'  ,q4.chunk_no'
     --||cr||'  ,q4.chunk_seq'
-    ||cr||'  ,row_number() over (partition by q4.nm_ne_id_in, q4.chunk_no, q4.member_rownum order by q4.chunk_seq) chunk_seq'
+    ||cr||'  ,row_number() over (partition by q4.nm_ne_id_in, q4.chunk_no order by q4.chunk_seq) chunk_seq'
     ||cr||'  ,q4.nm_ne_id_of'
-    ||cr||'  ,q4.nm_begin_mp'
-    ||cr||'  ,q4.nm_end_mp'
+    ||cr||'  ,q4.min_begin_mp nm_begin_mp'
+    ||cr||'  ,q4.max_end_mp nm_end_mp'
     ||cr||'  ,lag(q4.measure, 1, 0) over'
     ||cr||'    (partition by q4.nm_ne_id_in, q4.chunk_no order by q4.chunk_seq) measure'
     ||cr||'  ,q4.measure end_measure'
@@ -208,7 +210,9 @@ CREATE OR REPLACE package body nm3dynsql as
     ||cr||'    over (partition by q3.nm_ne_id_in, q3.chunk_no'
     ||cr||'     order by q3.chunk_seq, q3.nm_begin_mp rows unbounded preceding'
     ||cr||'   ) measure'
-    ||cr||'  ,row_number() over (partition by q3.nm_ne_id_in, q3.nm_ne_id_of order by q3.chunk_seq) member_rownum'
+    ||cr||'  ,row_number() over (partition by  q3.nm_ne_id_of, q3.nm_ne_id_in, q3.chunk_no order by q3.chunk_seq) member_rownum'
+    ||cr||'  ,min(q3.nm_begin_mp) over (partition by q3.nm_ne_id_of, q3.nm_ne_id_in, q3.chunk_no) min_begin_mp'
+    ||cr||'  ,max(q3.nm_end_mp) over (partition by q3.nm_ne_id_of, q3.nm_ne_id_in, q3.chunk_no) max_end_mp'
     ||cr||'from ('
     ||cr||'select'
     ||cr||'   q2.nm_ne_id_in'
