@@ -5,11 +5,11 @@ IS
   --
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkb-arc   2.5   May 20 2010 14:37:36   cstrettle  $
+  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkb-arc   2.6   Jul 30 2010 14:38:22   aedwards  $
   --       Module Name      : $Workfile:   doc_sdo_util.pkb  $
-  --       Date into PVCS   : $Date:   May 20 2010 14:37:36  $
-  --       Date fetched Out : $Modtime:   May 20 2010 14:36:24  $
-  --       Version          : $Revision:   2.5  $
+  --       Date into PVCS   : $Date:   Jul 30 2010 14:38:22  $
+  --       Date fetched Out : $Modtime:   Jul 30 2010 14:37:48  $
+  --       Version          : $Revision:   2.6  $
   --
   --   Author : Christopher Strettle
   --
@@ -18,7 +18,7 @@ IS
   -----------------------------------------------------------------------------
   --
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) := '$Revision:   2.6  $';
   g_package_name         CONSTANT VARCHAR2(30) := 'DOC_SDO_UTIL';
   nl                     CONSTANT VARCHAR2(5) := chr(10);
 
@@ -79,7 +79,7 @@ IS
     g_theme_functions(2).ntf_menu_option   := 'Edit Document';
     --
     g_theme_functions(3).ntf_hmo_module    := 'DOC0100';
-    g_theme_functions(3).ntf_parameter     := 'GIS_SESSION_ID';
+    g_theme_functions(3).ntf_parameter     := 'DISPLAY_DOC_ID';
     g_theme_functions(3).ntf_menu_option   := 'Display Document';
   --
   END set_theme_functions;
