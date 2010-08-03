@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.17   Jul 02 2009 16:14:28   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkb-arc   2.18   Aug 03 2010 16:25:54   aedwards  $
 --       Module Name      : $Workfile:   nm3homo.pkb  $
---       Date into PVCS   : $Date:   Jul 02 2009 16:14:28  $
---       Date fetched Out : $Modtime:   Jul 02 2009 15:32:08  $
---       PVCS Version     : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Aug 03 2010 16:25:54  $
+--       Date fetched Out : $Modtime:   Aug 03 2010 16:25:28  $
+--       PVCS Version     : $Revision:   2.18  $
 --
 --
 --   Author : Jonathan Mills
@@ -40,7 +40,7 @@ CREATE OR REPLACE PACKAGE BODY nm3homo AS
    
    -- Log 713421
    
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.17  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.18  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3homo';
@@ -1183,9 +1183,9 @@ BEGIN
                         WHEN DUP_VAL_ON_INDEX
                          THEN
                              --Log 713412:Linesh:Start
-                             hig.raise_ner(pi_appl               => 'NET'
-                                          ,pi_id                 => 104
-                                          ,pi_supplementary_info => Null);
+--                             hig.raise_ner(pi_appl               => 'NET'
+--                                          ,pi_id                 => 104
+--                                          ,pi_supplementary_info => Null);
                              --xattr_off;
                              --UPDATE NM_MEMBERS_ALL
                              --SET   nm_end_date = l_rec_nm.nm_end_date
@@ -1196,6 +1196,16 @@ BEGIN
 --                           g_homo_exc_code := -20516;
 --                           g_homo_exc_msg  := 'Inventory Locations already exist for affected inventory at this point with this start date';
 --                           RAISE g_homo_exception;
+
+                        -- Task 0109972
+                        -- Reverted this code back to how it used to be so that you can locate
+                        -- the same asset on the same day twice without failure  
+                           xattr_off;
+                           UPDATE NM_MEMBERS_ALL
+                            SET   nm_end_date = l_rec_nm.nm_end_date
+                                 ,nm_end_mp   = l_rec_nm.nm_end_mp
+                           WHERE  ROWID       = l_mem_rowid;
+                           xattr_on;
                      END;
                   END LOOP;
                END IF;
