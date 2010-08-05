@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.7   Aug 02 2010 10:21:14   cstrettle  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.8   Aug 05 2010 09:32:56   cstrettle  $
 --       Module Name      	: $Workfile:   nm3inv_view.pkb  $
---       Date into PVCS   	: $Date:   Aug 02 2010 10:21:14  $
---       Date fetched Out 	: $Modtime:   Aug 02 2010 10:17:18  $
---       PVCS Version     	: $Revision:   2.7  $
+--       Date into PVCS   	: $Date:   Aug 05 2010 09:32:56  $
+--       Date fetched Out 	: $Modtime:   Aug 02 2010 16:13:26  $
+--       PVCS Version     	: $Revision:   2.8  $
 --       Based on SCCS version 	: 1.56
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --      Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.7      $';
+   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.8      $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
 --all global package variables here
@@ -1687,13 +1687,12 @@ BEGIN
                                           ' AND b.nad_id IN (SELECT nad_id '||
                                           '                  FROM nm_nw_ad_types '||
                                           '                  WHERE nad_nt_type = '||nm3flx.string(pi_nt_type));
-      nm3ddl.append_tab_varchar(l_tab_vc, -- CWS 0110000 '                  AND nad_gty_type IS NULL '||
+      nm3ddl.append_tab_varchar(l_tab_vc, '                  AND nad_gty_type IS NULL '||
                                           '                  AND nad_primary_ad = '||nm3flx.string('Y')||')'||
                                           ' LEFT OUTER JOIN nm_inv_items_all c '||
                                           ' ON  b.nad_iit_ne_id = c.iit_ne_id ');
-      nm3ddl.append_tab_varchar(l_tab_vc, ' WHERE a.ne_nt_type = '||nm3flx.string(pi_nt_type)--||
-                                          -- CWS 0110000 ' AND a.ne_gty_group_type IS NULL '
-                                          );
+      nm3ddl.append_tab_varchar(l_tab_vc, ' WHERE a.ne_nt_type = '||nm3flx.string(pi_nt_type)||
+                                          ' AND a.ne_gty_group_type IS NULL ');
       nm3ddl.append_tab_varchar(l_tab_vc, ' WITH READ ONLY');
       nm3ddl.create_object_and_syns ('V_NM_'||pi_nt_type||'_NT',l_tab_vc);
       l_tab_vc.DELETE;
