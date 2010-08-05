@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.39   Jul 07 2010 15:34:30   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.40   Aug 05 2010 11:48:54   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jul 07 2010 15:34:30  $
---       Date fetched Out : $Modtime:   Jul 07 2010 15:33:50  $
---       PVCS Version     : $Revision:   2.39  $
+--       Date into PVCS   : $Date:   Aug 05 2010 11:48:54  $
+--       Date fetched Out : $Modtime:   Aug 05 2010 11:46:34  $
+--       PVCS Version     : $Revision:   2.40  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.39  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.40  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -29,6 +29,16 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
    SUBTYPE rec_nth  IS NM_THEMES_ALL%ROWTYPE;
    g_usgm            rec_usgm;
    g_nth             rec_nth;
+
+--
+-- Task 0109983
+-- Validate geometry - add validation errors to ignore here
+--
+   g_error_to_ignore  ptr_vc_array := ptr_vc_array ( ptr_vc_array_type (
+                                                         ptr_vc( 1, 13011 ) -- ORA-13011: value is out of range
+                                                      -- , ptr_vc( 2, 13356 ) -- ORA-13356: adjacent points are redundant
+                                                  ));
+
 --  g_body_sccsid is the SCCS ID for the package body
 --
   FUNCTION hypot
@@ -101,8 +111,9 @@ PROCEDURE add_segments_m ( p_geom1 IN OUT NOCOPY mdsys.sdo_geometry, p_geom2 IN 
                            p_conn IN BOOLEAN DEFAULT FALSE );
 --
 FUNCTION get_list(p_theme_txt IN VARCHAR2 ) RETURN nm_theme_array;
+
 --
------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --
   FUNCTION get_version RETURN VARCHAR2 IS
   BEGIN
@@ -4836,21 +4847,68 @@ BEGIN
 
 END;
 
---------------------------------------------------------------------------------------------------------------------------
+--
+--------------------------------------------------------------------------------
+--
+
+PROCEDURE evaluate_and_raise_geo_val ( pi_text IN VARCHAR2 )
+IS
+--
+  l_error_code VARCHAR2(5) := SUBSTR(pi_text,1,5);
+  l_count      NUMBER;
+--
+  FUNCTION check_for_exclusion RETURN BOOLEAN
+  IS
+  BEGIN
+    SELECT COUNT(*) INTO l_count FROM TABLE (g_error_to_ignore.pa) val
+     WHERE val.ptr_value = l_error_code;
+    RETURN (l_count!=0);
+  END;
+--
+BEGIN
+--
+  nm_debug.debug_on;
+  FOR i IN (SELECT * FROM (TABLE(g_error_to_ignore.pa)))
+  LOOP
+    nm_debug.debug('Value = ['||i.ptr_value||']');
+    nm_debug.debug('Compare with ['||l_error_code||']');
+  END LOOP;
+--
+  
+--
+  IF NOT check_for_exclusion
+  THEN
+    nm_debug.debug('Count = '||l_count);
+    hig.raise_ner( pi_appl               => 'HIG'
+                 , pi_id                 => 547
+                 , pi_supplementary_info => SQLERRM('-'||l_error_code));
+  END IF;
+--
+END evaluate_and_raise_geo_val;
+
+--
+--------------------------------------------------------------------------------
+--
 
 PROCEDURE insert_element_shape( p_layer IN NUMBER,
                                 p_ne_id IN nm_elements.ne_id%TYPE,
                                 p_geom IN mdsys.sdo_geometry ) IS
-
-cur_string VARCHAR2(2000);
-
-l_nth              NM_THEMES_ALL%ROWTYPE;
-l_length           nm_elements.ne_length%TYPE;
-l_geom             mdsys.sdo_geometry := p_geom;
-l_is_datum         BOOLEAN := Nm3net.element_is_a_datum( p_ne_id );
-
+--
+  cur_string         VARCHAR2(2000);
+  l_nth              NM_THEMES_ALL%ROWTYPE;
+  l_length           nm_elements.ne_length%TYPE;
+  l_geom             mdsys.sdo_geometry := p_geom;
+  l_is_datum         BOOLEAN := Nm3net.element_is_a_datum( p_ne_id );
+  l_validation       nm3type.max_varchar2;
+--
 BEGIN
-
+--
+  -- Task 0109983
+  -- Validate the geometry and raise error if appropriate
+  --
+  evaluate_and_raise_geo_val (validate_geometry(p_geom,p_layer,NULL));
+  --
+--
   l_nth := nm3get.get_nth( p_layer );
 
   IF l_nth.nth_base_table_theme IS NOT NULL THEN
@@ -5949,16 +6007,16 @@ END;
 --------------------------------------------------------------------------------------
 --
 
-PROCEDURE register_sdo_table_as_theme ( p_table IN VARCHAR2
-                                                              , p_theme_name IN VARCHAR2
-                                                              , p_pk_col IN VARCHAR2
-                                                              , p_fk_col IN VARCHAR2
-                                                              , p_shape_col IN VARCHAR2
-                                                              , p_tol NUMBER DEFAULT 0.005
-                                                              ,p_cre_idx IN VARCHAR2 DEFAULT 'N'
-                                                              ,p_estimate_new_tol IN VARCHAR2 DEFAULT 'N'
-                                                              ,p_override_sdo_meta IN VARCHAR2 DEFAULT 'I'
-                                                              ) IS
+PROCEDURE register_sdo_table_as_theme ( p_table             IN VARCHAR2
+                                      , p_theme_name        IN VARCHAR2
+                                      , p_pk_col            IN VARCHAR2
+                                      , p_fk_col            IN VARCHAR2
+                                      , p_shape_col         IN VARCHAR2
+                                      , p_tol                  NUMBER DEFAULT 0.005
+                                      , p_cre_idx           IN VARCHAR2 DEFAULT 'N'
+                                      , p_estimate_new_tol  IN VARCHAR2 DEFAULT 'N'
+                                      , p_override_sdo_meta IN VARCHAR2 DEFAULT 'I'
+                                      ) IS
 
 
 nth NM_THEMES_ALL%ROWTYPE;
@@ -10310,44 +10368,91 @@ END;
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --
 
-FUNCTION validate_geometry ( p_geom IN mdsys.sdo_geometry, p_nth_id IN nm_themes_all.nth_theme_id%TYPE, p_tol IN NUMBER ) RETURN VARCHAR2 IS
-l_tol     NUMBER;
-l_diminfo mdsys.sdo_dim_array;
-retval    VARCHAR2(100) := 'FALSE';
+FUNCTION validate_geometry 
+            ( p_geom   IN mdsys.sdo_geometry
+            , p_nth_id IN nm_themes_all.nth_theme_id%TYPE
+            , p_tol    IN NUMBER )
+  RETURN VARCHAR2 
+IS
+--
+  l_tol       NUMBER;
+  l_diminfo   mdsys.sdo_dim_array;
+  l_usgm      user_sdo_geom_metadata%ROWTYPE;
+  retval      VARCHAR2(100) := 'FALSE';
+  l_lrs       NUMBER;
+  l_dim       NUMBER;
+--==
+--
+--
+--
+-- -- Task 0109983
+-- -- Correct this NVL check
+--   IF NVL( l_usgm.srid, Nm3type.c_big_number ) != NVL(pi_geom.sdo_srid, Nm3type.c_big_number ) 
+--   THEN
+--     retval := '13365: Layer SRID does not match geometry SRID';
+--   ELSE
+--     IF l_lrs > 0
+--     THEN
+--        retval := sdo_lrs.validate_lrs_geometry (pi_geom, l_usgm.diminfo);
+--     ELSE
+--        retval := sdo_geom.validate_geometry_with_context (pi_geom, l_usgm.diminfo);
+--     END IF;
+--   END IF;
+--==
+--
 BEGIN
-  IF p_nth_id IS NULL AND p_tol IS NULL THEN
-      Hig.raise_ner(pi_appl                => Nm3type.c_hig
-                    ,pi_id                 => 197
-                    ,pi_sqlcode            => -20001
-                    );
-  ELSIF p_nth_id IS NOT NULL THEN
-
-    l_diminfo := get_theme_diminfo( p_nth_id );
-
- IF l_diminfo IS NOT NULL THEN
-
-      retval := substr(sdo_geom.validate_geometry_with_context( p_geom, l_diminfo ), 1, 100);
-
-    ELSE
-
-   IF p_tol IS NOT NULL THEN
-
-        retval  := substr(sdo_geom.validate_geometry_with_context( p_geom, p_tol ), 1, 100);
-
+--
+  l_dim := p_geom.get_dims ();
+  l_lrs := p_geom.get_lrs_dim ();
+--
+  IF p_nth_id IS NULL AND p_tol IS NULL 
+  THEN
+    hig.raise_ner(pi_appl    => Nm3type.c_hig
+                 ,pi_id      => 197
+                 ,pi_sqlcode => -20001 );
+--
+  ELSIF p_nth_id IS NOT NULL 
+  THEN
+--
+  --  l_diminfo := get_theme_diminfo( p_nth_id );
+    l_usgm    := get_theme_metadata( p_nth_id );
+--
+    IF l_usgm.diminfo IS NOT NULL 
+    THEN
+  --
+      IF NVL( l_usgm.srid, Nm3type.c_big_number ) != NVL(p_geom.sdo_srid, Nm3type.c_big_number ) 
+      THEN
+        retval := '13365: Layer SRID does not match geometry SRID';
       END IF;
-
+  --
+      retval := SUBSTR(sdo_geom.validate_geometry_with_context( p_geom, l_usgm.diminfo ), 1, 100);
+  --
+--      IF l_lrs > 0
+--      THEN
+--         retval := sdo_lrs.validate_lrs_geometry (p_geom, l_usgm.diminfo);
+--      ELSE
+--         retval := sdo_geom.validate_geometry_with_context (p_geom, l_usgm.diminfo);
+--      END IF;
+  --
+    ELSE
+  --
+      IF p_tol IS NOT NULL 
+      THEN
+    --
+        retval  := SUBSTR(sdo_geom.validate_geometry_with_context( p_geom, p_tol ), 1, 100);
+      END IF;
+  --
     END IF;
-
+--
   ELSE
-
-    retval  := substr(sdo_geom.validate_geometry_with_context( p_geom, p_tol ), 1, 100);
-
+  --
+    retval  := SUBSTR(sdo_geom.validate_geometry_with_context( p_geom, p_tol ), 1, 100);
+  --
   END IF;
-
+--
   RETURN retval;
-
-END;
-
+--
+END validate_geometry;
 --
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --
@@ -10476,7 +10581,8 @@ BEGIN
   RETURN retval;
 END;
 --
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------
 --
 --
 END Nm3sdo;
