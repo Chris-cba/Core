@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.9   Mar 16 2010 13:43:14   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.10   Aug 05 2010 11:48:54   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Mar 16 2010 13:43:14  $
---       Date fetched Out : $Modtime:   Mar 16 2010 13:41:40  $
---       SCCS Version     : $Revision:   2.9  $
+--       Date into SCCS   : $Date:   Aug 05 2010 11:48:54  $
+--       Date fetched Out : $Modtime:   Aug 05 2010 11:20:06  $
+--       SCCS Version     : $Revision:   2.10  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.9  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.10  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
@@ -197,26 +197,31 @@ FUNCTION validate_geometry (
 )
    RETURN VARCHAR2
 IS
-   retval    VARCHAR2 (2000)       := 'FALSE';
-   l_usgm    user_sdo_geom_metadata%ROWTYPE := Nm3sdo.get_theme_metadata(pi_nth_theme_id);
-   l_lrs     NUMBER;
-   l_dim     NUMBER;
+--   retval    VARCHAR2 (2000)       := 'FALSE';
+--   l_usgm    user_sdo_geom_metadata%ROWTYPE := Nm3sdo.get_theme_metadata(pi_nth_theme_id);
+--   l_lrs     NUMBER;
+--   l_dim     NUMBER;
 BEGIN
-   l_dim := pi_geom.get_dims ();
-   l_lrs := pi_geom.get_lrs_dim ();
-
-   IF NVL( l_usgm.srid, -999999 ) != NVL(pi_geom.sdo_srid, Nm3type.c_big_number ) THEN
-     retval := '13365: Layer SRID does not match geometry SRID';
-   ELSE
-     IF l_lrs > 0
-     THEN
-        retval := sdo_lrs.validate_lrs_geometry (pi_geom, l_usgm.diminfo);
-     ELSE
-        retval := sdo_geom.validate_geometry_with_context (pi_geom, l_usgm.diminfo);
-     END IF;
-   END IF;
-
-   RETURN retval;
+--   l_dim := pi_geom.get_dims ();
+--   l_lrs := pi_geom.get_lrs_dim ();
+--
+--   IF NVL( l_usgm.srid, Nm3type.c_big_number ) != NVL(pi_geom.sdo_srid, Nm3type.c_big_number ) THEN
+--     retval := '13365: Layer SRID does not match geometry SRID';
+--   ELSE
+--     IF l_lrs > 0
+--     THEN
+--        retval := sdo_lrs.validate_lrs_geometry (pi_geom, l_usgm.diminfo);
+--     ELSE
+--        retval := sdo_geom.validate_geometry_with_context (pi_geom, l_usgm.diminfo);
+--     END IF;
+--   END IF;
+--
+-- Task 0109983
+-- Consolidated the two validate_geometry functions into NM3SDO to prevent any
+-- circular package dependencies
+--
+   RETURN  nm3sdo.validate_geometry(pi_geom,pi_nth_theme_id,NULL);
+--
 END;
 --
 -----------------------------------------------------------------------------
@@ -581,6 +586,11 @@ IS
    l_sqlcount  PLS_INTEGER;
 BEGIN
 
+  -- Task 0109983
+  -- Validate the geometry and raise error if appropriate
+  --
+  nm3sdo.evaluate_and_raise_geo_val (nm3sdo.validate_geometry(pi_shape,l_nth.nth_theme_id,NULL));
+  --
    lstr := lstr || 'update ' || l_nth.nth_feature_table || lf;
    lstr := lstr || '   set ' || l_nth.nth_feature_shape_column || ' = :pi_shape'|| lf;
    lstr := lstr || ' where ' || l_nth.nth_feature_pk_column    || ' = :pi_pk';
