@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE Nm3sdo AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkh-arc   2.5   May 21 2010 13:55:08   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkh-arc   2.6   Aug 05 2010 11:48:54   aedwards  $
 --       Module Name      : $Workfile:   nm3sdo.pkh  $
---       Date into PVCS   : $Date:   May 21 2010 13:55:08  $
---       Date fetched Out : $Modtime:   May 21 2010 13:52:54  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Aug 05 2010 11:48:54  $
+--       Date fetched Out : $Modtime:   Aug 05 2010 11:20:18  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --   Author : Rob Coupe
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE Nm3sdo AS
 --<GLOBVAR>
 -- g_sccsid is the SCCS_ID
 -- Constants
-  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   2.5  $"';
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   2.6  $"';
   single_shape_inv   CONSTANT VARCHAR2(3)  := NVL( Hig.get_sysopt('SDOSINGSHP'), 'N');
   use_surrogate_key  CONSTANT VARCHAR2(1)  := NVL( Hig.get_sysopt('SDOSURKEY'),'N');
   def_pt_zoom        CONSTANT NUMBER       := NVL( TO_NUMBER( Hig.get_sysopt('SDOPTZOOM' )), 100);
@@ -1677,8 +1677,13 @@ FUNCTION get_shape_length ( p_geom IN mdsys.sdo_geometry, p_nth_id IN nm_themes_
 --<PROC NAME="get_srs_text">
 --Function to return srs text
 FUNCTION get_srs_text( p_theme_id IN NM_THEMES_ALL.nth_theme_id%TYPE ) RETURN cs_srs.wktext%TYPE;
------------------------------------------------------------------------------
-
+--
+--------------------------------------------------------------------------------
+--
+PROCEDURE evaluate_and_raise_geo_val ( pi_text IN VARCHAR2 );
+--
+-------------------------------------------------------------------------------
+--
 --all pragma definitions here
 --<PRAGMA>
   PRAGMA RESTRICT_REFERENCES( SET_THEME_METADATA, WNDS, TRUST );
