@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.23   Aug 05 2010 16:45:04   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.24   Aug 06 2010 09:03:46   aedwards  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Aug 05 2010 16:45:04  $
---       Date fetched Out : $Modtime:   Aug 05 2010 16:43:26  $
---       SCCS Version     : $Revision:   2.23  $
+--       Date into SCCS   : $Date:   Aug 06 2010 09:03:46  $
+--       Date fetched Out : $Modtime:   Aug 06 2010 09:01:44  $
+--       SCCS Version     : $Revision:   2.24  $
 --       Based on --
 --
 --   nm3inv package body
@@ -30,7 +30,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.23  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.24  $';
    g_package_name   CONSTANT VARCHAR2(30) := 'nm3inv';
 --
    --<USED BY validate_rec_iit>
@@ -4109,21 +4109,29 @@ End bypass_inv_items_all_trgs;
     l_quote      VARCHAR2(10) := chr(39);
     l_dummy      VARCHAR2(10) := chr(126)||chr(33)||chr(36)||chr(33)||chr(126);  
     l_sql        nm3type.max_varchar2;
-    l_asset_type nm_inv_type_attribs%ROWTYPE := nm3get.get_ita(pi_ita_inv_type=>pi_asset_type, pi_ita_attrib_name=>pi_attrib_name);
+    l_asset_type nm_inv_type_attribs%ROWTYPE;
   BEGIN
   -- Task 0109768 and 0109764
   -- Ensure formmating of Case works with single quotes (chr(39))
-    IF l_asset_type.ita_id_domain IS NULL
-    AND l_asset_type.ita_case != 'MIXED'
+    IF pi_asset_type   IS NOT NULL
+    AND pi_attrib_name IS NOT NULL
+    AND pi_value       IS NOT NULL
     THEN
-      l_sql := ' SELECT REPLACE('||get_ita_case (pi_asset_type, pi_attrib_name)
-                         ||'(REPLACE (:l_value,:l_quote,:l_dummy)),:l_dummy,:l_quote)'||
-                 ' FROM DUAL';
-  --
-      EXECUTE IMMEDIATE l_sql INTO retval
-      USING IN pi_value, IN l_quote, IN l_dummy, IN l_dummy, IN l_quote;
-    ELSE
-      retval := pi_value;
+      l_asset_type := nm3get.get_ita(pi_ita_inv_type=>pi_asset_type, pi_ita_attrib_name=>pi_attrib_name);
+    --
+      IF l_asset_type.ita_id_domain IS NULL
+      AND l_asset_type.ita_case != 'MIXED'
+      THEN
+        l_sql := ' SELECT REPLACE('||get_ita_case (pi_asset_type, pi_attrib_name)
+                           ||'(REPLACE (:l_value,:l_quote,:l_dummy)),:l_dummy,:l_quote)'||
+                   ' FROM DUAL';
+    --
+        EXECUTE IMMEDIATE l_sql INTO retval
+        USING IN pi_value, IN l_quote, IN l_dummy, IN l_dummy, IN l_quote;
+      ELSE
+        retval := pi_value;
+      END IF;
+    --
     END IF;
   --
     RETURN retval;
