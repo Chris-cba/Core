@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4210_fix2.sql-arc   3.1   Aug 09 2010 09:05:32   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4210_fix2.sql-arc   3.2   Aug 09 2010 10:06:26   malexander  $
 --       Module Name      : $Workfile:   nm_4210_fix2.sql  $
---       Date into PVCS   : $Date:   Aug 09 2010 09:05:32  $
---       Date fetched Out : $Modtime:   Aug 09 2010 09:05:20  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Aug 09 2010 10:06:26  $
+--       Date fetched Out : $Modtime:   Aug 09 2010 10:05:32  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) exor corporation ltd, 2010
@@ -126,6 +126,15 @@ PROMPT nm3undo.pkw
 --
 SET FEEDBACK ON
 start nm3undo.pkw
+SET FEEDBACK OFF
+--
+--------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT nm3inv.pkw 
+--
+SET FEEDBACK ON
+start nm3inv.pkw
 SET FEEDBACK OFF
 --
 --------------------------------------------------------------------------------
