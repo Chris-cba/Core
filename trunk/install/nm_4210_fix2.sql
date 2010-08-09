@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4210_fix2.sql-arc   3.0   Aug 04 2010 11:33:34   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4210_fix2.sql-arc   3.1   Aug 09 2010 09:05:32   malexander  $
 --       Module Name      : $Workfile:   nm_4210_fix2.sql  $
---       Date into PVCS   : $Date:   Aug 04 2010 11:33:34  $
---       Date fetched Out : $Modtime:   Aug 04 2010 11:33:10  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Aug 09 2010 09:05:32  $
+--       Date fetched Out : $Modtime:   Aug 09 2010 09:05:20  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) exor corporation ltd, 2010
@@ -31,7 +31,7 @@ set term on
 --
 -- Spool to Logfile
 --
-define logfile1='nm3_4210_fix2_1_&log_extension'
+define logfile1='nm_4210_fix2_1_&log_extension'
 spool &logfile1
 --
 --------------------------------------------------------------------------------
