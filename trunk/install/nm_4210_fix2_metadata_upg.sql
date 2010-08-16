@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4210_fix2_metadata_upg.sql-arc   1.0   Jul 30 2010 10:30:20   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4210_fix2_metadata_upg.sql-arc   1.1   Aug 16 2010 16:13:42   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm_4210_fix2_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Jul 30 2010 10:30:20  $
---       Date fetched Out : $Modtime:   Jul 30 2010 10:29:32  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Aug 16 2010 16:13:42  $
+--       Date fetched Out : $Modtime:   Aug 16 2010 16:10:52  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --------------------------------------------------------------------------------
 --
@@ -24,4 +24,36 @@ SELECT 'NET'
                        AND NER_ID = 464)
 /
 
+INSERT INTO hig_option_list (hol_id
+                            ,hol_product      
+                            ,hol_name         
+                            ,hol_remarks      
+                            ,hol_datatype     
+                            ,hol_domain
+                            ,hol_mixed_case   
+                            ,hol_user_option  
+                            ,hol_max_length)
+SELECT 'EDITENDDAT'
+     , 'NET'
+     , 'Allow Latest Asset Edit'
+     , 'If set to Y the user will be allowed to edit the latest asset even if the effective date is not today. When it is set to N then the effective date will need to be set to today for edits to take place.'
+     , 'VARCHAR2'
+     , 'Y_OR_N'
+     , 'N'
+     , 'N'
+     , '1'
+  FROM dual
+  WHERE NOT EXISTS (SELECT 'X' 
+                     FROM hig_option_list
+                    WHERE HOL_ID = 'EDITENDDAT')
+/
 
+INSERT INTO hig_option_values ( hov_id
+                              , hov_value)
+SELECT 'EDITENDDAT'
+     , 'Y'
+  FROM dual
+ WHERE NOT EXISTS (SELECT 'X' 
+                     FROM hig_option_values
+                    WHERE hov_id = 'EDITENDDAT')
+/
