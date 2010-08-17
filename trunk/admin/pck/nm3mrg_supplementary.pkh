@@ -20,7 +20,7 @@ create or replace package nm3mrg_supplementary as
 --
 --<GLOBVAR>
 --
-  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3mrg_supplementary.pkh	1.13 05/02/06"';
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.3  $';
 --  g_sccsid is the SCCS ID for the package
 --
   gc_buffer_size integer := 2000 ;
