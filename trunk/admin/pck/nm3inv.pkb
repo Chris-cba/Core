@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.24   Aug 06 2010 09:03:46   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.25   Aug 17 2010 10:19:38   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Aug 06 2010 09:03:46  $
---       Date fetched Out : $Modtime:   Aug 06 2010 09:01:44  $
---       SCCS Version     : $Revision:   2.24  $
+--       Date into SCCS   : $Date:   Aug 17 2010 10:19:38  $
+--       Date fetched Out : $Modtime:   Aug 17 2010 10:18:38  $
+--       SCCS Version     : $Revision:   2.25  $
 --       Based on --
 --
 --   nm3inv package body
@@ -30,7 +30,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.24  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.25  $';
    g_package_name   CONSTANT VARCHAR2(30) := 'nm3inv';
 --
    --<USED BY validate_rec_iit>
@@ -4117,9 +4117,13 @@ End bypass_inv_items_all_trgs;
     AND pi_attrib_name IS NOT NULL
     AND pi_value       IS NOT NULL
     THEN
-      l_asset_type := nm3get.get_ita(pi_ita_inv_type=>pi_asset_type, pi_ita_attrib_name=>pi_attrib_name);
+      l_asset_type := nm3get.get_ita
+                        ( pi_ita_inv_type    => pi_asset_type
+                        , pi_ita_attrib_name => pi_attrib_name
+                        , pi_raise_not_found => FALSE );
     --
-      IF l_asset_type.ita_id_domain IS NULL
+      IF l_asset_type.ita_inv_type IS NOT NULL
+      AND l_asset_type.ita_id_domain IS NULL
       AND l_asset_type.ita_case != 'MIXED'
       THEN
         l_sql := ' SELECT REPLACE('||get_ita_case (pi_asset_type, pi_attrib_name)
