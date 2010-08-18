@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.6   13 Aug 2009 10:44:42   kdawson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.7   Aug 18 2010 11:34:26   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3nwval.pkb  $
---       Date into PVCS   : $Date:   13 Aug 2009 10:44:42  $
---       Date fetched Out : $Modtime:   06 Aug 2009 10:22:12  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Aug 18 2010 11:34:26  $
+--       Date fetched Out : $Modtime:   Aug 18 2010 11:32:38  $
+--       PVCS Version     : $Revision:   2.7  $
 --       Based on 1.67
 --
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --      Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
@@ -2080,6 +2080,17 @@ BEGIN
                                        ,p_nm_end_mp   => l_rec_excl.nm_end_mp
                                        )
           THEN
+            -- CWS 0110052 Auto Included check added for changing existing members.
+             IF NM3NET.CHILD_AUTOINCLUDED_IN_PARENT(pi_nti_nw_parent_type => NM3GET.GET_NE(pi_ne_id =>  l_rec_excl.nm_ne_id_in).ne_nt_type
+                                                                                 ,pi_nti_nw_child_type    =>   NM3GET.GET_NE(l_rec_excl.nm_ne_id_of).ne_nt_type
+                                                                                 ) = 'Y'
+             THEN
+                  hig.raise_ner(pi_appl    => nm3type.c_net
+                                     ,pi_id      => 8
+                                     ,pi_supplementary_info => 'The member is Auto Included in a different parent group.'
+                                     );   
+             END IF;
+          
               --LS allows override of group based on the production option set
               IF hig.get_sysopt('GRPXCLOVWR') = 'Y'  -- LS based on product options exclusive grouping is allowed
               THEN
