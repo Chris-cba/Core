@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.40   Aug 05 2010 11:48:54   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.41   Aug 18 2010 11:49:22   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Aug 05 2010 11:48:54  $
---       Date fetched Out : $Modtime:   Aug 05 2010 11:46:34  $
---       PVCS Version     : $Revision:   2.40  $
+--       Date into PVCS   : $Date:   Aug 18 2010 11:49:22  $
+--       Date fetched Out : $Modtime:   Aug 18 2010 11:48:14  $
+--       PVCS Version     : $Revision:   2.41  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.40  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.41  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -4866,22 +4866,17 @@ IS
   END;
 --
 BEGIN
---
-  nm_debug.debug_on;
-  FOR i IN (SELECT * FROM (TABLE(g_error_to_ignore.pa)))
-  LOOP
-    nm_debug.debug('Value = ['||i.ptr_value||']');
-    nm_debug.debug('Compare with ['||l_error_code||']');
-  END LOOP;
---
-  
---
-  IF NOT check_for_exclusion
+-- Make sure the code is actually an oracle error code rather than TRUE!
+  IF nm3flx.is_numeric(SUBSTR(pi_text,1,5))
   THEN
-    nm_debug.debug('Count = '||l_count);
-    hig.raise_ner( pi_appl               => 'HIG'
-                 , pi_id                 => 547
-                 , pi_supplementary_info => SQLERRM('-'||l_error_code));
+  -- Raise generic Invalid Geometry error with description from error code
+  -- if it's not one of the excluded error codes
+    IF NOT check_for_exclusion
+    THEN
+      hig.raise_ner( pi_appl               => 'HIG'
+                   , pi_id                 => 547
+                   , pi_supplementary_info => SQLERRM('-'||l_error_code));
+    END IF;
   END IF;
 --
 END evaluate_and_raise_geo_val;
@@ -10587,3 +10582,5 @@ END;
 --
 END Nm3sdo;
 /
+
+
