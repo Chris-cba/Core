@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.13   06 Jul 2010 14:22:38   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.14   19 Aug 2010 16:47:26   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   06 Jul 2010 14:22:38  $
---       Date fetched Out : $Modtime:   06 Jul 2010 14:15:54  $
---       PVCS Version     : $Revision:   2.32.1.3.1.13  $
+--       Date into PVCS   : $Date:   19 Aug 2010 16:47:26  $
+--       Date fetched Out : $Modtime:   19 Aug 2010 16:46:26  $
+--       PVCS Version     : $Revision:   2.32.1.3.1.14  $
 --
 --
 --   Author : Priidu Tanava
@@ -102,6 +102,7 @@ No query types defined.
   06.07.10  PT task 0109919: in std_populate() modified the main select statement to inclde BEGIN_CONNECT and LAG_END_CONNECT
                 this fiexes a problem where homo chunks are incorreclty joined when chunk start does not equal datum segment start
                 also change in ins_splits() to adjust the inv begin end values to ensure correct NSM_BEGIN_MP and NSM_END_MP
+  17.08.10  PT task 0110097: change in load_nm_datum_criteria_tmp() to fix issue with point chunks
                     
 
   Todo: std_run without longops parameter
@@ -110,7 +111,7 @@ No query types defined.
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
         add p_group_type variable to load_group_datums() to specify driving group type when loaded group is non-linear
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.3.1.13  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.3.1.14  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -3309,15 +3310,18 @@ No query types defined.
       ||')');
     insert into nm_datum_criteria_tmp
     select distinct
-       q2.nm_ne_id_of
-      ,q2.begin_mp
-      ,q2.end_mp
-      ,case when q2.nm_ne_id_of = q2.group_id and q2.ngt_group_type is not null then
-        first_value (q2.nm_ne_id_in) over (partition by q2.nm_ne_id_of, q2.begin_mp
-           order by q2.gty_order, q2.val_count desc, q2.nm_ne_id_in)
-       when q2.nm_ne_id_of != q2.group_id then
-         q2.group_id
+       q3.nm_ne_id_of
+      ,q3.begin_mp
+      ,q3.end_mp
+      ,case when q3.nm_ne_id_of = q3.group_id and q3.ngt_group_type is not null then
+        first_value (q3.nm_ne_id_in) over (partition by q3.nm_ne_id_of, q3.begin_mp
+           order by q3.gty_order, q3.val_count desc, q3.nm_ne_id_in)
+       when q3.nm_ne_id_of != q3.group_id then
+         q3.group_id
        end group_id
+    from (
+    select
+       q2.*
     from (
     select
        m.nm_ne_id_of
@@ -3329,6 +3333,12 @@ No query types defined.
       ,nvl(m.group_id, q1.nm_ne_id_of) group_id
       ,decode(m.ne_gty_group_type, p_group_type, 1, 2) gty_order
       ,count(*) over (partition by m.nm_ne_id_in) val_count
+      ,case when q1.begin_mp = 0 and q1.end_mp = 0 then
+        lead(q1.begin_mp, 1) over (partition by q1.nm_ne_id_of order by q1.begin_mp, q1.end_mp)
+       end lead_begin
+      ,case when q1.begin_mp = q1.end_mp then
+        lag(q1.end_mp, 1) over (partition by q1.nm_ne_id_of order by q1.begin_mp, q1.end_mp)
+       end lag_end
     from (
     select
        m3.nm_ne_id_of, m3.begin_mp, m3.end_mp
@@ -3338,6 +3348,8 @@ No query types defined.
       ,m2.pos begin_mp
       ,lead(m2.pos, 1) over (partition by m2.nm_ne_id_of order by m2.pos, m2.pos2) end_mp
       ,m2.is_point
+      --,m2.pos
+      --,m2.pos2
     from (
     select distinct
        rc.nm_ne_id_of
@@ -3362,7 +3374,11 @@ No query types defined.
     on q1.nm_ne_id_of = m.nm_ne_id_of
       and q1.begin_mp between m.nm_begin_mp and m.nm_end_mp
       and q1.end_mp between m.nm_begin_mp and m.nm_end_mp
-    ) q2;
+    ) q2
+    where q2.begin_mp < q2.end_mp
+      or (q2.begin_mp = 0 and q2.lead_begin > 0)
+      or (q2.end_mp > q2.lag_end)
+    ) q3;
     p_sqlcount := sql%rowcount;
     nm3dbg.putln('ins nm_datum_criteria_tmp: '||p_sqlcount);
 
