@@ -2,11 +2,11 @@ CREATE OR REPLACE package body nm3dynsql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.7   27 Jul 2010 14:13:36   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.8   20 Aug 2010 11:11:02   ptanava  $
 --       Module Name      : $Workfile:   nm3dynsql.pkb  $
---       Date into PVCS   : $Date:   27 Jul 2010 14:13:36  $
---       Date fetched Out : $Modtime:   27 Jul 2010 09:26:10  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   20 Aug 2010 11:11:02  $
+--       Date fetched Out : $Modtime:   20 Aug 2010 11:10:36  $
+--       PVCS Version     : $Revision:   2.8  $
 --       Based on sccs version :
 --
 --
@@ -15,7 +15,7 @@ CREATE OR REPLACE package body nm3dynsql as
 --   Package for standard reusable dynamic sql
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2005
+--  Copyright (c) exor corporation ltd, 2005
 -----------------------------------------------------------------------------
 --
 /* History
@@ -34,9 +34,11 @@ CREATE OR REPLACE package body nm3dynsql as
                 to avoid gaps when connectivity works over connecting datum pieces
   27.07.10  PT task 0109941: in sql_route_connectivity() changed the logic of nm_begin_mp and nm_end_mp
                 to correctly calculate the values when connecting through datum pieces
+  13.08.10  PT task: 0110102: changed is_circular() to use with subquery logic for performance
+                in sql_route_connectivity() added connectivity check to ensure pieces of same datum are connected
 */
 
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.7  $"';
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.8  $"';
   g_package_name    constant  varchar2(30) := 'nm3dynsql';
 
 
@@ -282,8 +284,10 @@ CREATE OR REPLACE package body nm3dynsql as
     ||cr||'   when m.nm_cardinality = -1 and d.begin_mp = 0 then 1'
     ||cr||'   else null'
     ||cr||'   end end_mp_con'
-    ||cr||'  ,t.nt_length_unit nt_unit_of'
-    ||cr||'  ,t2.nt_length_unit nt_unit_in'
+    --||cr||'  ,t.nt_length_unit nt_unit_of'
+    --||cr||'  ,t2.nt_length_unit nt_unit_in'
+    ||cr||'  ,(select nt_length_unit from nm_types where nt_type = e.ne_nt_type) nt_unit_of'
+    ||cr||'  ,(select nt_length_unit from nm_types where nt_type = m.nm_obj_type) nt_unit_in'
     ||cr||'  ,e.ne_sub_class'
     ||cr||'  ,decode(e.ne_type, ''D'', null, nvl((select case when nsc_seq_no <= 2 then 1 else 2 end'
     ||cr||'    from nm_type_subclass'
@@ -294,20 +298,23 @@ CREATE OR REPLACE package body nm3dynsql as
     ||cr||'  ,nm_members_all m'
     ||cr||'  ,nm_elements_all e'
     ||cr||'  ,nm_group_types_all gt'
-    ||cr||'  ,nm_types t'
-    ||cr||'  ,nm_types t2'
+    --||cr||'  ,nm_types t'
+    --||cr||'  ,nm_types t2'
         ||l_sql_effective_date_tbl
-    ||cr||'where m.nm_ne_id_of = e.ne_id'
-    ||cr||'  and m.nm_ne_id_of = d.datum_id'
-    ||cr||'  and m.nm_ne_id_in = d.group_id'
+    ||cr||'where d.datum_id = m.nm_ne_id_of'
+    ||cr||'  and d.group_id = m.nm_ne_id_in'
+    ||cr||'  and m.nm_ne_id_of = e.ne_id'
     ||cr||'  and m.nm_obj_type = gt.ngt_group_type'
-    ||cr||'  and e.ne_nt_type = t.nt_type'
-    ||cr||'  and gt.ngt_nt_type = t2.nt_type'
+    --||cr||'  and e.ne_nt_type = t.nt_type'
+    --||cr||'  and gt.ngt_nt_type = t2.nt_type'
         ||l_sql_effective_date_join
 --  ||cr||'  and e.ne_end_date is null'  -- RAC change to allow software to work as past effective dates.
-    ||cr||'  and gt.ngt_end_date is null'
-    ||cr||'  and m.nm_type = ''G'''
-    ||cr||'  and gt.ngt_linear_flag = ''Y'''
+    --||cr||'  and gt.ngt_end_date is null'
+    --||cr||'  and m.nm_type = ''G'''
+    ||cr||'  and gt.ngt_linear_flag = ''Y''' -- only consider linear groups
+    -- join individual datum pieces
+    ||cr||'  and (d.begin_mp = m.nm_begin_mp and d.end_mp = m.nm_end_mp' -- exact match covers uncut liear chunks and detatched point sections
+    ||cr||'  or (d.begin_mp < m.nm_end_mp and d.end_mp > m.nm_begin_mp))' -- chunks smaller than in nm_members
     ||cr||') q0'
     ||cr||'order by q0.nm_seg_no, q0.nm_seq_no'
     ||cr||')'
@@ -347,8 +354,10 @@ CREATE OR REPLACE package body nm3dynsql as
     ||cr||'  and s1.row_num != s2.row_num'
     ||cr||'  and ('
     ||cr||'        ('
-    ||cr||'              s1.cd_end_node = s2.cd_start_node'
+    ||cr||'              s1.nm_ne_id_of != s2.nm_ne_id_of'
+    ||cr||'          and s1.cd_end_node = s2.cd_start_node'
     ||cr||'          and s1.end_mp_con = s2.begin_mp_con'
+    ||cr||'          and (s1.nm_ne_id_of != s2.nm_ne_id_of or s1.cd_end_mp = s2.cd_begin_mp)'
         ||l_sql_ignore_poe
     ||cr||'          and s1.single_end_node_count <= 2 and s2.single_start_node_count <= 2'
     ||cr||'          and s1.dual_end_node_count <= 2 and s2.dual_start_node_count <= 2'
@@ -377,7 +386,7 @@ CREATE OR REPLACE package body nm3dynsql as
     ||cr||') q2'
     ||cr||') q3'
     ||cr||') q4'
-    ||cr||'where q4.member_rownum = 1'
+    ||cr||'where q4.member_rownum = 1 or nm_begin_mp = nm_end_mp'
     ;
     nm3dbg.deind;
     return l_sql;
@@ -401,8 +410,7 @@ CREATE OR REPLACE package body nm3dynsql as
     -- this query tires to issue a connect by select
     --  fails if there is circluar connectivity
     --  deals gracefully with duplicate same lane connections between nodes
-    select count(*) into l_count
-    from (
+    with src as (
     select
        q4.nm_ne_id_of
       ,q4.ne_no_start, q4.ne_no_end, q4.nsc_seq_no
@@ -434,7 +442,9 @@ CREATE OR REPLACE package body nm3dynsql as
     group by
        q4.nm_ne_id_of
       ,q4.ne_no_start, q4.ne_no_end, q4.nsc_seq_no
-    ) q
+    )
+    select count(*) into l_count
+    from src q
     connect by prior q.ne_no_start = q.ne_no_end
       and q.ne_no_start != q.ne_no_end
       and (prior q.nsc_seq_no = q.nsc_seq_no
