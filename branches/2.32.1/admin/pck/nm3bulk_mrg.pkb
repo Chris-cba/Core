@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.14   20 Aug 2010 11:51:58   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.15   23 Aug 2010 14:35:10   ptanava  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   20 Aug 2010 11:51:58  $
---       Date fetched Out : $Modtime:   20 Aug 2010 11:46:12  $
---       PVCS Version     : $Revision:   2.32.1.14  $
+--       Date into PVCS   : $Date:   23 Aug 2010 14:35:10  $
+--       Date fetched Out : $Modtime:   23 Aug 2010 07:58:36  $
+--       PVCS Version     : $Revision:   2.32.1.15  $
 --
 --
 --   Author : Priidu Tanava
@@ -115,13 +115,16 @@ No query types defined.
                 this fiexes a problem where homo chunks are incorreclty joined when chunk start does not equal datum segment start
                 also change in ins_splits() to adjust the inv begin end values to ensure correct NSM_BEGIN_MP and NSM_END_MP
   17.08.10  PT task 0110100: change in load_nm_datum_criteria_tmp() to fix issue with point chunks
+  23.08.10  PT task 0110099: rewrote std_insert_invitems() to populate both ins nm_mrg_section_inv_values_all and nm_mrg_section_member_inv
+                from a single select. the value_ids are now calculated through an analytic group by instead of a join
+                this avoids an apparent oracle hash join issue when there is a large number of join columns and large data set
 
 
   Todo: load_group_datums() with begin and end parameters
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.14  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.15  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -203,6 +206,8 @@ No query types defined.
   procedure clear_datum_criteria_pre_tmp;
   procedure clear_datum_criteria_tmp;
   procedure clear_route_connectivity_tmp;
+  procedure clear_splits_tmp;
+  procedure clear_homo_chunks_tmp;
 
   procedure load_nm_datum_criteria_tmp(
      p_group_type in nm_group_types_all.ngt_group_type%type
@@ -333,8 +338,9 @@ No query types defined.
     nm3dbg.ind;
     -- nm_mrg_split_results_tmp is global temporary on commit preserve rows
     -- (implicit commit)
-    execute immediate
-      'truncate table nm_mrg_split_results_tmp';
+    --execute immediate
+    --  'truncate table nm_mrg_split_results_tmp';
+    clear_splits_tmp;
 
 
     -- effective date is used directly as bind variable in the sql
@@ -851,8 +857,9 @@ No query types defined.
 
     -- truncate (implicit commit)
     -- nm_mrg_datum_homo_chunks_tmp is global temporary on commit preserve rows
-    execute immediate
-      'truncate table nm_mrg_datum_homo_chunks_tmp';
+    --execute immediate
+    --  'truncate table nm_mrg_datum_homo_chunks_tmp';
+    clear_homo_chunks_tmp;
 
     l_cardinality := nm3sql.get_rounded_cardinality(p_splits_rowcount);
 
@@ -1850,6 +1857,17 @@ No query types defined.
       ,p_mrg_job_id     => p_mrg_job_id       -- out
     );
     nm3sql.set_longops(p_rec => p_longops_rec, p_increment => 1);
+    
+    -- remove temp segments unless #keeptmp is specified in the description
+    if instr(p_nmq_descr, '#keeptmp') > 0 then
+      null;
+    else
+      clear_datum_criteria_pre_tmp;
+      clear_datum_criteria_tmp;
+      clear_route_connectivity_tmp;
+      clear_splits_tmp;
+      clear_homo_chunks_tmp;
+    end if;
 
     nm3dbg.deind;
   exception
@@ -2282,8 +2300,8 @@ No query types defined.
         end if;
         if s_cont is not null and s_pnt is not null then
           s :=  cr||'  ,case'
-              ||cr||'   when i.nm_obj_type in ('||s_cont||') then ''C'''
-              ||cr||'   when i.nm_obj_type in ('||s_pnt||') then ''P'''
+              ||cr||'   when q4.inv_type in ('||s_cont||') then ''C'''
+              ||cr||'   when q4.inv_type in ('||s_pnt||') then ''P'''
               ||cr||'   end pnt_or_cont';
         elsif s_cont is not null then
           s := cr||'  ,''C'' pnt_or_cont';
@@ -2341,13 +2359,8 @@ No query types defined.
     nm3dbg.ind;
 
     l_splits_cardinality := nm3sql.get_rounded_cardinality(p_splits_rowcount);
-
-
-    -- the inv items insert is a 3 step process:
-    --  1) work out all the inv item values toghter with the mrg_section_id values
-    --      insert this all into a temp table (non-preserving)
-    --  2) from the temp results select and insert all distinct inv values
-    --  3) from the temp results select and insert the section members records
+    
+    
     --
     --  when handling FT tables the logic logic here is optimized for a single route
     --  there are two ways of getting FT values:
@@ -2356,25 +2369,53 @@ No query types defined.
     --  the inline selects are better for small amounts of data, joins are better for large
 
 
+    -- multi table insert from single select into both
+    --  nm_mrg_section_inv_values_all and nm_mrg_section_member_inv
+    -- the dates are inserted with default database format
 
-    -- 1. insert into the temp table
-    --      nm_mrg_section_inv_values_tmp is temporary table with on commit delete rows
-    --      don't use append hint here as the table does not preserve rows
-    --      the dates are inserted with default database format
     l_sql :=
-          'insert into nm_mrg_section_inv_values_tmp('
-    ||cr||'  nsi_mrg_section_id, nsv_mrg_job_id, nsv_value_id, nsv_inv_type, nsv_x_sect, nsv_pnt_or_cont'
+          'insert'
+    ||cr||'  when value_rownum = 1 then'
+    ||cr||'    into nm_mrg_section_inv_values_all('
+    ||cr||'      nsv_mrg_job_id, nsv_value_id, nsv_inv_type, nsv_x_sect, nsv_pnt_or_cont'
     ||cr||sql_nsv_attrib_cols(p_format => false)
-    ||cr||')'
-    ||cr||'with src as ('
+    ||cr||'    )'
+    ||cr||'    values ('
+    ||cr||'      mrg_job_id, value_id, inv_type, x_sect, pnt_or_cont'
+    ||cr||sql_nsv_attrib_cols(p_format => false)
+    ||cr||'    )'
+    ||cr||'  when section_rownum = 1 then'
+    ||cr||'    into nm_mrg_section_member_inv ('
+    ||cr||'      nsi_mrg_job_id, nsi_mrg_section_id, nsi_inv_type, nsi_x_sect, nsi_value_id'
+    ||cr||'    )'
+    ||cr||'    values ('
+    ||cr||'      mrg_job_id, mrg_section_id, inv_type, x_sect, value_id'
+    ||cr||'    )'
+    ||cr||'select'
+    ||cr||'   :p_mrg_job_id mrg_job_id'
+        ||sql_pnt_or_cont
+    ||cr||'  ,q4.*'
+    ||cr||'from ('
+    ||cr||'select'
+    ||cr||'   row_number() over (partition by q3.value_id order by 0) value_rownum'
+    ||cr||'  ,row_number() over (partition by q3.value_id, q3.mrg_section_id order by 0) section_rownum'
+    ||cr||'  ,q3.*'
+    ||cr||'from ('
+    ||cr||'select'
+    ||cr||'   dense_rank() over (order by q2.min_ne_id_in) value_id'
+    ||cr||'  ,q2.*'
+    ||cr||'from ('
+    ||cr||'select'
+    ||cr||'   min(q.nm_ne_id_in) over (partition by q.inv_type, q.x_sect'
+    ||cr||sql_nsv_attrib_cols(p_format => false)
+    ||cr||'  ) min_ne_id_in'
+    ||cr||'  ,q.*'
+    ||cr||'from ('
     ||cr||'select /*+ cardinality(t '||l_splits_cardinality||') */'
-    ||cr||'   t.nm_obj_type'
-    ||cr||'  ,i.iit_x_sect'
-    ||cr||'  ,m.nsm_mrg_section_id'
-    ||cr||'  ,m.nsm_ne_id'
-    ||cr||'  ,m.nsm_begin_mp'
-    ||cr||'  ,m.nsm_end_mp'
-        --||sql_inline_case_cols
+    ||cr||'   t.nm_obj_type inv_type'
+    ||cr||'  ,t.nm_ne_id_in'
+    ||cr||'  ,i.iit_x_sect x_sect'
+    ||cr||'  ,m.nsm_mrg_section_id mrg_section_id'
         ||sql_case_cols
     ||cr||'from'
     ||cr||'   nm_mrg_section_members m'
@@ -2388,76 +2429,14 @@ No query types defined.
     ||cr||'    or (m.nsm_end_mp = m.nsm_begin_mp and t.nm_end_mp = t.nm_begin_mp))'
     ||cr||'  and t.iit_rowid = i.rowid (+)'
         ||sql_ft_outer_joins
-    ||cr||')'
-    ||cr||'select distinct'
-    ||cr||'   m1.nsm_mrg_section_id'
-    ||cr||'  ,i3.*'
-    ||cr||'from ('
-    ||cr||'select'
-    ||cr||'  :p_mrg_job_id mrg_job_id'
-    ||cr||'  ,rownum value_id'
-    ||cr||'  ,i2.*'
-    ||cr||'from ('
-    ||cr||'select distinct'
-    ||cr||'   i.nm_obj_type'
-    ||cr||'  ,i.iit_x_sect'
-        ||sql_pnt_or_cont
-    ||cr||sql_nsv_attrib_cols(p_format => false)
-    ||cr||'from'
-    ||cr||'   src i'
-    ||cr||') i2'
-    ||cr||') i3'
-    ||cr||',('
-    ||cr||'  select'
-    ||cr||'     :p_mrg_job_id mrg_job_id'
-    ||cr||'    ,m.*'
-    ||cr||'  from src m'
-    ||cr||'  ) m1'
-    ||cr||'where i3.mrg_job_id = m1.mrg_job_id'
-    ||cr||'  and i3.nm_obj_type = m1.nm_obj_type'
-    ||cr||'  and ((i3.iit_x_sect is null and m1.iit_x_sect is null) or i3.iit_x_sect = m1.iit_x_sect)'
-        ||sql_nsv_attrib_join('i3','m1');
-    nm3dbg.putln(l_sql);
-    execute immediate l_sql using p_mrg_job_id, p_mrg_job_id, p_mrg_job_id;
-
-    nm3dbg.putln('nm_mrg_section_inv_values_tmp rowcount='||sql%rowcount);
-
-
-    -- 2. insert the item values
-    --      the dates are read out with default database format and then converted explicitly
-    l_sql :=
-      'insert into nm_mrg_section_inv_values_all('
-    ||cr||'  nsv_mrg_job_id, nsv_value_id, nsv_inv_type, nsv_x_sect, nsv_pnt_or_cont'
-    ||cr||sql_nsv_attrib_cols(p_format => false)
-    ||cr||')'
-    ||cr||'select q.nsv_mrg_job_id, q.nsv_value_id, q.nsv_inv_type, q.nsv_x_sect, q.nsv_pnt_or_cont'
-    ||cr||sql_nsv_attrib_cols(p_format => false)
-    ||cr||'from ('
-    ||cr||'select'
-    ||cr||'  nsv_mrg_job_id, nsv_value_id, nsv_inv_type, nsv_x_sect, nsv_pnt_or_cont'
-    ||cr||sql_nsv_attrib_cols(p_format => true)
-    ||cr||', row_number() over (partition by nsv_mrg_job_id, nsv_value_id order by 1) row_num'
-    ||cr||'from nm_mrg_section_inv_values_tmp'
     ||cr||') q'
-    ||cr||'where q.row_num = 1';
-
+    ||cr||') q2'
+    ||cr||') q3'
+    ||cr||') q4'
+    ||cr||'order by decode(q4.value_rownum, 1, 1), q4.mrg_section_id';
     nm3dbg.putln(l_sql);
-    execute immediate l_sql;
-
-    nm3dbg.putln('nm_mrg_section_inv_values_all rowcount='||sql%rowcount);
-
-
-
-    -- 3. insert item member records
-    insert into nm_mrg_section_member_inv (
-      nsi_mrg_job_id, nsi_mrg_section_id, nsi_inv_type, nsi_x_sect, nsi_value_id
-    )
-    select
-      nsv_mrg_job_id, nsi_mrg_section_id, nsv_inv_type, nsv_x_sect, nsv_value_id
-    from nm_mrg_section_inv_values_tmp;
-
-    nm3dbg.putln('nm_mrg_section_member_inv rowcount='||sql%rowcount);
-
+    execute immediate l_sql using p_mrg_job_id, p_mrg_job_id;
+    nm3dbg.putln('ins nm_mrg_section_inv_values_all + nm_mrg_section_member_inv: '||sql%rowcount);
 
     nm3dbg.deind;
   exception
@@ -3560,7 +3539,7 @@ No query types defined.
   is
     pragma autonomous_transaction;
   begin
-    execute immediate 'truncate table nm_datum_criteria_pre_tmp';
+    execute immediate 'truncate table nm_datum_criteria_pre_tmp drop storage';
     commit;
   exception
     when others then rollback;
@@ -3571,7 +3550,7 @@ No query types defined.
   is
     pragma autonomous_transaction;
   begin
-    execute immediate 'truncate table nm_datum_criteria_tmp';
+    execute immediate 'truncate table nm_datum_criteria_tmp drop storage';
     commit;
   exception
     when others then rollback;
@@ -3582,12 +3561,35 @@ No query types defined.
   is
     pragma autonomous_transaction;
   begin
-    execute immediate 'truncate table nm_route_connectivity_tmp';
+    execute immediate 'truncate table nm_route_connectivity_tmp drop storage';
     commit;
   exception
     when others then rollback;
     raise;
   end;
+  
+  procedure clear_splits_tmp
+  is
+    pragma autonomous_transaction;
+  begin
+    execute immediate 'truncate table nm_mrg_split_results_tmp drop storage';
+    commit;
+  exception
+    when others then rollback;
+    raise;
+  end;
+  
+  procedure clear_homo_chunks_tmp
+  is
+    pragma autonomous_transaction;
+  begin
+    execute immediate 'truncate table nm_mrg_datum_homo_chunks_tmp drop storage';
+    commit;
+  exception
+    when others then rollback;
+    raise;
+  end;
+
 
 
   -- this populates nm_datum_criteria_tmp from nm_datum_criteria_pre_tmp
