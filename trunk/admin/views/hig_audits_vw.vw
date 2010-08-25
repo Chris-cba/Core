@@ -15,17 +15,18 @@ CREATE OR REPLACE FORCE VIEW hig_audits_vw
 ,haud_username
 ,haud_terminal
 ,haud_os_user
+,haud_description
 )
 AS
 --
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_audits_vw.vw-arc   3.0   Apr 14 2010 10:45:10   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_audits_vw.vw-arc   3.1   Aug 25 2010 09:37:54   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_audits_vw.vw  $
---       Date into PVCS   : $Date:   Apr 14 2010 10:45:10  $
---       Date fetched Out : $Modtime:   Apr 14 2010 10:44:40  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Aug 25 2010 09:37:54  $
+--       Date fetched Out : $Modtime:   Aug 23 2010 10:15:28  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 -- 
@@ -44,6 +45,7 @@ SELECT  haud_id
        ,hus_name
        ,haud_terminal
        ,haud_os_user
+       ,haud_description
 FROM    hig_audits
        ,nm_inv_types
        ,nm_inv_type_attribs
