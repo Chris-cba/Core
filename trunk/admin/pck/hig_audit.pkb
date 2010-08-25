@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_audit.pkb-arc   3.3   Jun 22 2010 11:08:54   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_audit.pkb-arc   3.4   Aug 25 2010 09:37:00   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_audit.pkb  $
---       Date into PVCS   : $Date:   Jun 22 2010 11:08:54  $
---       Date fetched Out : $Modtime:   Jun 22 2010 10:23:56  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Aug 25 2010 09:37:00  $
+--       Date fetched Out : $Modtime:   Aug 23 2010 10:08:30  $
+--       Version          : $Revision:   3.4  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.3  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.4  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_audit';
   g_app_owner    CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
@@ -54,7 +54,8 @@ BEGIN
 --
 END append;
 --
-PROCEDURE trg_body (pi_operation   IN Varchar2
+PROCEDURE trg_body (pi_haut_descr  IN hig_audit_types.haut_description%TYPE
+                   ,pi_operation   IN Varchar2
                    ,pi_inv_type    IN nm_inv_types.nit_inv_type%TYPE
                    ,pi_table_name  IN hig_audits.haud_table_name%TYPE
                    ,pi_attrib_name IN hig_audits.haud_attribute_name%TYPE
@@ -65,7 +66,7 @@ BEGIN
 --
    IF pi_operation = 'Insert'
    THEN
-       append ('INSERT INTO hig_audits (haud_id,haud_nit_inv_type,haud_table_name,haud_attribute_name,haud_pk_id,haud_old_value,haud_new_value,haud_timestamp,haud_operation,haud_hus_user_id,haud_terminal,haud_os_user )');
+       append ('INSERT INTO hig_audits (haud_id,haud_nit_inv_type,haud_table_name,haud_attribute_name,haud_pk_id,haud_old_value,haud_new_value,haud_timestamp,haud_operation,haud_hus_user_id,haud_terminal,haud_os_user,haud_description )');
        append  ('Values (');
        append  ('haud_id_seq.NEXTVAL,');
        append  (''''||pi_inv_type||''',');
@@ -78,10 +79,11 @@ BEGIN
        append  ('''I'',');
        append  ('nm3user.get_user_id,');
        append  ('sys_context(''USERENV'',''TERMINAL''),');
-       append  ('sys_context(''USERENV'',''OS_USER''));');
+       append  ('sys_context(''USERENV'',''OS_USER''),');
+       append  (''''||pi_haut_descr||''');');
    ELSIF pi_operation = 'Delete'
    THEN  
-       append ('INSERT INTO hig_audits (haud_id,haud_nit_inv_type,haud_table_name,haud_attribute_name,haud_pk_id,haud_old_value,haud_new_value,haud_timestamp,haud_operation,haud_hus_user_id,haud_terminal,haud_os_user )');
+       append ('INSERT INTO hig_audits (haud_id,haud_nit_inv_type,haud_table_name,haud_attribute_name,haud_pk_id,haud_old_value,haud_new_value,haud_timestamp,haud_operation,haud_hus_user_id,haud_terminal,haud_os_user,haud_description )');
        append  ('Values (');
        append  ('haud_id_seq.NEXTVAL,');
        append  (''''||pi_inv_type||''',');
@@ -94,9 +96,10 @@ BEGIN
        append  ('''D'',');
        append  ('nm3user.get_user_id,');
        append  ('sys_context(''USERENV'',''TERMINAL''),');
-       append  ('sys_context(''USERENV'',''OS_USER''));');
+       append  ('sys_context(''USERENV'',''OS_USER''),');
+       append  (''''||pi_haut_descr||''');');
    ELSE
-       append ('INSERT INTO hig_audits (haud_id,haud_nit_inv_type,haud_table_name,haud_attribute_name,haud_pk_id,haud_old_value,haud_new_value,haud_timestamp,haud_operation,haud_hus_user_id,haud_terminal,haud_os_user )');
+       append ('INSERT INTO hig_audits (haud_id,haud_nit_inv_type,haud_table_name,haud_attribute_name,haud_pk_id,haud_old_value,haud_new_value,haud_timestamp,haud_operation,haud_hus_user_id,haud_terminal,haud_os_user,haud_description )');
        append  ('Values (');
        append  ('haud_id_seq.NEXTVAL,');
        append  (''''||pi_inv_type||''',');
@@ -115,7 +118,8 @@ BEGIN
        append  ('''U'',');
        append  ('nm3user.get_user_id,');
        append  ('sys_context(''USERENV'',''TERMINAL''),');
-       append  ('sys_context(''USERENV'',''OS_USER''));');
+       append  ('sys_context(''USERENV'',''OS_USER''),');
+       append  (''''||pi_haut_descr||''');');
    END IF;
 --
 END trg_body;
@@ -263,9 +267,9 @@ BEGIN
                         append  ('THEN');
                         IF ita.ita_format = 'DATE'
                         THEN
-                            trg_body(haua.haut_operation,l_nit_rec.nit_inv_type,haua.haut_table_name,ita.ita_attrib_name,l_nit_rec.nit_foreign_pk_column,'Y') ;
+                            trg_body(haua.haut_description,haua.haut_operation,l_nit_rec.nit_inv_type,haua.haut_table_name,ita.ita_attrib_name,l_nit_rec.nit_foreign_pk_column,'Y') ;
                         ELSE
-                            trg_body(haua.haut_operation,l_nit_rec.nit_inv_type,haua.haut_table_name,ita.ita_attrib_name,l_nit_rec.nit_foreign_pk_column) ;   
+                            trg_body(haua.haut_description,haua.haut_operation,l_nit_rec.nit_inv_type,haua.haut_table_name,ita.ita_attrib_name,l_nit_rec.nit_foreign_pk_column) ;   
                         END IF ;
                         append  ('END IF;'); 
                     END LOOP;
@@ -288,15 +292,15 @@ BEGIN
                         append  ('THEN');
                         IF haat.ita_format = 'DATE'
                         THEN
-                            trg_body(haua.haut_operation,l_nit_rec.nit_inv_type,haua.haut_table_name,haat.haat_attribute_name,l_nit_rec.nit_foreign_pk_column,'Y');
+                            trg_body(haua.haut_description,haua.haut_operation,l_nit_rec.nit_inv_type,haua.haut_table_name,haat.haat_attribute_name,l_nit_rec.nit_foreign_pk_column,'Y');
                         ELSE
-                            trg_body(haua.haut_operation,l_nit_rec.nit_inv_type,haua.haut_table_name,haat.haat_attribute_name,l_nit_rec.nit_foreign_pk_column) ;
+                            trg_body(haua.haut_description,haua.haut_operation,l_nit_rec.nit_inv_type,haua.haut_table_name,haat.haat_attribute_name,l_nit_rec.nit_foreign_pk_column) ;
                         END IF ;
                         append  ('END IF;');
                     END LOOP;
                 END IF ;
             ELSE
-                trg_body(haua.haut_operation,l_nit_rec.nit_inv_type,haua.haut_table_name,l_nit_rec.nit_foreign_pk_column,l_nit_rec.nit_foreign_pk_column) ;
+                trg_body(haua.haut_description,haua.haut_operation,l_nit_rec.nit_inv_type,haua.haut_table_name,l_nit_rec.nit_foreign_pk_column,l_nit_rec.nit_foreign_pk_column) ;
             END IF ;
             append ('END;');
         END LOOP;                
