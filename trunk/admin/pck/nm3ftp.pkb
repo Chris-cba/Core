@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.11   Aug 26 2010 14:27:54   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.12   Aug 26 2010 15:05:50   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Aug 26 2010 14:27:54  $
---       Date fetched Out : $Modtime:   Aug 26 2010 14:27:06  $
---       PVCS Version     : $Revision:   3.11  $
+--       Date into PVCS   : $Date:   Aug 26 2010 15:05:50  $
+--       Date fetched Out : $Modtime:   Aug 26 2010 15:04:36  $
+--       PVCS Version     : $Revision:   3.12  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.11  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.12  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -1612,6 +1612,13 @@ BEGIN
   nm3ftp.logout(l_conn);
   utl_tcp.close_all_connections;
   --
+EXCEPTION
+WHEN OTHERS THEN
+--
+  nm3ftp.logout(l_conn);
+  utl_tcp.close_all_connections;
+  RAISE;
+--
 END;
 --
 --------------------------------------------------------------------------------
@@ -1692,6 +1699,13 @@ BEGIN
   nm3ftp.logout(l_conn);
   utl_tcp.close_all_connections;
   --
+EXCEPTION
+WHEN OTHERS THEN
+--
+  nm3ftp.logout(l_conn);
+  utl_tcp.close_all_connections;
+  RAISE;
+--
 END;
 --
 --------------------------------------------------------------------------------
