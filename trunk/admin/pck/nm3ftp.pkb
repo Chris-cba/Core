@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.10   May 24 2010 14:36:02   gjohnson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.11   Aug 26 2010 14:27:54   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   May 24 2010 14:36:02  $
---       Date fetched Out : $Modtime:   May 24 2010 14:35:34  $
---       PVCS Version     : $Revision:   3.10  $
+--       Date into PVCS   : $Date:   Aug 26 2010 14:27:54  $
+--       Date fetched Out : $Modtime:   Aug 26 2010 14:27:06  $
+--       PVCS Version     : $Revision:   3.11  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.10  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.11  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -763,15 +763,15 @@ AS
 --      send_command (p_conn, 'NLST ' || p_dir, TRUE);
       --send_command (p_conn, 'MLSD ' || p_dir, TRUE);
       --send_command (p_conn, 'MLSD', TRUE);
-  
+      dbms_output.put_line( l_command ||' '|| p_dir);
       send_command (p_conn, l_command ||' '|| p_dir, TRUE);
-      --send_command (p_conn, 'LIST /aims/amp/in', TRUE);
+      --send_command (p_conn, 'LIST \SystemTest4210\CIM\amy\in\archive\old_files', TRUE);
 
       BEGIN
          LOOP
             l_list.EXTEND;
             l_list (l_list.LAST) := UTL_TCP.get_line (l_conn, TRUE);
-            DEBUG (l_list (l_list.LAST));
+            DEBUG ('l_list' || l_list (l_list.LAST));
 
             IF l_reply_code IS NULL
             THEN
@@ -1547,6 +1547,154 @@ END ftp_in_to_database;
 --
 --------------------------------------------------------------------------------
 --
+PROCEDURE purge_directory( pi_hfc_id     IN OUT  hig_ftp_connections.hfc_id%TYPE
+                         , pi_directory  IN      VARCHAR2
+                         , pi_wildcard   IN      VARCHAR2 DEFAULT NULL
+                         , pi_delete_dir IN      BOOLEAN  DEFAULT TRUE
+                         ) IS
+--
+  l_list     t_string_table:= t_string_table();
+  l_conn     utl_tcp.connection;
+  l_rec_hfc  hig_ftp_connections%ROWTYPE;
+  l_password VARCHAR2(100);
+  l_directory VARCHAR2(200);
+BEGIN
+  --
+  utl_tcp.close_all_connections;
+  --
+  l_rec_hfc:= get_hfc(pi_hfc_id);
+  --
+  CASE UPPER(pi_directory) 
+  WHEN 'FTPIN' THEN
+    l_directory:= l_rec_hfc.hfc_ftp_in_dir;
+  WHEN 'FTPOUT' THEN
+    l_directory:= l_rec_hfc.hfc_ftp_out_dir;
+  WHEN 'ARCHIVEIN' THEN
+    l_directory:= l_rec_hfc.hfc_ftp_arc_in_dir; 
+  WHEN 'ARCHIVEOUT' THEN
+    l_directory:= l_rec_hfc.hfc_ftp_arc_out_dir;
+  ELSE 
+    raise_application_error (-20000
+                            , 'Invalid value for pi_directory value must be ''FTPIN'', ''FTPOUT'', ''ARCHIVEIN'' OR ''ARCHIVEOUT''');
+  END CASE;
+  --
+  IF l_rec_hfc.hfc_ftp_password IS NOT NULL
+  THEN
+    l_password := get_password(pi_password_raw => l_rec_hfc.hfc_ftp_password);
+  END IF;
+  --
+  l_conn := nm3ftp.login(l_rec_hfc.hfc_ftp_host
+                        ,NVL(l_rec_hfc.hfc_ftp_port,21)
+                        ,l_rec_hfc.hfc_ftp_username
+                        ,l_password);
+  --
+  list ( p_conn  =>  l_conn
+       , p_dir   =>  l_directory
+       , p_list  => l_list 
+       , p_command => 'NLST'
+       );
+  --
+  FOR i IN 1..l_list.COUNT LOOP
+  --
+    IF l_list(i) LIKE '%' || translate(pi_wildcard, '*?', '%_') 
+    OR pi_wildcard IS NULL 
+    THEN
+      nm3ftp.delete( p_conn => l_conn
+                   , p_file => l_list(i));
+    --
+    END IF;
+  END LOOP;
+  --
+  IF pi_delete_dir THEN
+     nm3ftp.rmdir ( p_conn => l_conn
+                  , p_dir  => l_directory);
+  END IF;
+  nm3ftp.logout(l_conn);
+  utl_tcp.close_all_connections;
+  --
+END;
+--
+--------------------------------------------------------------------------------
+--
+PROCEDURE purge_directory( pi_hfc_id       IN OUT  hig_ftp_connections.hfc_id%TYPE
+                         , pi_directory    IN      VARCHAR2
+                         , pi_wildcard_tab IN      nm3type.tab_varchar30
+                         , pi_delete_dir   IN      BOOLEAN DEFAULT TRUE
+                         ) IS
+--
+  l_list     t_string_table;
+  l_conn     UTL_TCP.connection;
+  l_rec_hfc  hig_ftp_connections%ROWTYPE;
+  l_password VARCHAR2(100);
+  l_directory hig_ftp_connections.hfc_ftp_in_dir%TYPE;
+BEGIN
+  --
+  utl_tcp.close_all_connections;
+  --
+  l_rec_hfc:= get_hfc(pi_hfc_id);
+  --
+  CASE UPPER(pi_directory) 
+  WHEN 'FTPIN' THEN
+    l_directory:= l_rec_hfc.hfc_ftp_in_dir;
+  WHEN 'FTPOUT' THEN
+    l_directory:= l_rec_hfc.hfc_ftp_out_dir;
+  WHEN 'ARCHIVEIN' THEN
+    l_directory:= l_rec_hfc.hfc_ftp_arc_in_dir; 
+  WHEN 'ARCHIVEOUT' THEN
+    l_directory:= l_rec_hfc.hfc_ftp_arc_out_dir;
+  ELSE 
+    raise_application_error ( -20000
+                            , 'Invalid value for pi_directory value must be ''FTPIN'', ''FTPOUT'', ''ARCHIVEIN'' OR ''ARCHIVEOUT''');
+  END CASE;
+  --
+  IF l_rec_hfc.hfc_ftp_password IS NOT NULL
+  THEN
+    l_password := get_password(pi_password_raw => l_rec_hfc.hfc_ftp_password);
+  END IF;
+  --
+  /*
+  IF substr(l_directory, length(l_directory), 1) <> '/' THEN
+    l_directory:= l_directory || '/';
+  END IF;
+  */
+  --
+  utl_tcp.close_all_connections;
+  --
+  l_conn := nm3ftp.login(l_rec_hfc.hfc_ftp_host
+                        ,NVL(l_rec_hfc.hfc_ftp_port,21)
+                        ,l_rec_hfc.hfc_ftp_username
+                        ,l_password);
+  --
+  list ( p_conn  =>  l_conn
+       , p_dir   =>  l_directory
+       , p_list  => l_list 
+       , p_command => 'NLST'
+       );
+  --
+  FOR j IN 1..pi_wildcard_tab.COUNT LOOP
+    FOR i IN 1..l_list.COUNT LOOP
+    --
+      IF l_list(i) LIKE '%' || translate(pi_wildcard_tab(j), '*?', '%_') 
+      OR pi_wildcard_tab(j) IS NULL 
+      THEN
+        nm3ftp.delete( p_conn => l_conn
+                     , p_file => l_list(i));
+      --
+      END IF;
+    END LOOP;
+  END LOOP;
+  --
+  IF pi_delete_dir THEN
+     nm3ftp.rmdir ( p_conn => l_conn
+                  , p_dir  => l_directory);
+  END IF;
+  --
+  nm3ftp.logout(l_conn);
+  utl_tcp.close_all_connections;
+  --
+END;
+--
+--------------------------------------------------------------------------------
+--
 END nm3ftp;
 /
-

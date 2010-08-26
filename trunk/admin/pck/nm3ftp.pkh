@@ -4,15 +4,15 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkh-arc   3.4   May 24 2010 11:20:06   gjohnson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkh-arc   3.5   Aug 26 2010 14:27:54   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3ftp.pkh  $
---       Date into PVCS   : $Date:   May 24 2010 11:20:06  $
---       Date fetched Out : $Modtime:   May 24 2010 10:30:58  $
---       PVCS Version     : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Aug 26 2010 14:27:54  $
+--       Date fetched Out : $Modtime:   Aug 24 2010 10:19:24  $
+--       PVCS Version     : $Revision:   3.5  $
 --
 --------------------------------------------------------------------------------
 --
-  g_sccsid constant varchar2(30) :='"$Revision:   3.4  $"';
+  g_sccsid constant varchar2(30) :='"$Revision:   3.5  $"';
 --
 -----------------------------------------------------------------------------
 --
@@ -294,6 +294,20 @@ AS
 --
   FUNCTION format_with_separator ( pi_input IN VARCHAR2 )
   RETURN VARCHAR2;
+--
+--------------------------------------------------------------------------------
+--
+  PROCEDURE purge_directory( pi_hfc_id    IN OUT  hig_ftp_connections.hfc_id%TYPE
+                           , pi_directory IN VARCHAR2
+                           , pi_wildcard  IN VARCHAR2 DEFAULT NULL
+                           , pi_delete_dir   IN BOOLEAN DEFAULT TRUE);
+--
+--------------------------------------------------------------------------------
+--
+  PROCEDURE purge_directory( pi_hfc_id       IN OUT  hig_ftp_connections.hfc_id%TYPE
+                           , pi_directory    IN      VARCHAR2
+                           , pi_wildcard_tab IN      nm3type.tab_varchar30
+                           , pi_delete_dir   IN BOOLEAN DEFAULT TRUE);
 --
 --------------------------------------------------------------------------------
 --
