@@ -506,6 +506,42 @@ END directory_exists;
 --
 -----------------------------------------------------------------------------
 --
+FUNCTION hdir_exists(pi_dir_path IN dba_directories.directory_path%type) 
+RETURN BOOLEAN
+AS
+--
+CURSOR valid_dir_cur(p_dir_path dba_directories.directory_path%type, p_user VARCHAR2)
+IS
+  SELECT 'X'
+  FROM hig_directories
+     , dba_directories
+     , hig_directory_roles
+     , hig_user_roles
+  WHERE directory_name = hdir_name
+  AND hdr_name = hdir_name
+  AND hur_role = hdr_role
+  AND ((rtrim(ltrim(hdir_path, '/'), '/') = rtrim(ltrim(p_dir_path, '/'), '/'))
+  OR (rtrim(ltrim(hdir_path, '\'), '\') = rtrim(ltrim(p_dir_path, '\'), '\')))
+  AND hur_username =  p_user;
+  --
+  l_dummy VARCHAR2(1);
+  l_return_val BOOLEAN;
+  l_current_user VARCHAR2(100):= nm3get.get_hus(pi_hus_user_id => nm3context.get_context(nm3context.get_namespace,'USER_ID')).hus_username;
+--
+BEGIN
+  --
+  OPEN valid_dir_cur(pi_dir_path, l_current_user);
+  FETCH valid_dir_cur into l_dummy;
+  --
+  l_return_val:= valid_dir_cur%FOUND;
+  --
+  CLOSE valid_dir_cur;
+  --
+RETURN l_return_val;
+END;
+--
+-----------------------------------------------------------------------------
+--
 FUNCTION directory_write_permission(pi_directory_name IN dba_directories.DIRECTORY_NAME%TYPE) RETURN VARCHAR2 IS
 
  CURSOR c1 IS                        

@@ -159,6 +159,14 @@ FUNCTION directory_exists(pi_directory_name IN dba_directories.DIRECTORY_NAME%TY
 --
 -----------------------------------------------------------------------------
 --
+--<PROC NAME="directory_exists">
+-- Return TRUE if a given directory exists in HIG_DIRECTORIES and has a valid role for the user.
+FUNCTION hdir_exists(pi_dir_path IN dba_directories.directory_path%type) 
+RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
 --<PROC NAME="directory_read_permission">
 -- Return Y if the user has read permission on oracle directory
 FUNCTION directory_read_permission(pi_directory_name IN dba_directories.DIRECTORY_NAME%TYPE) RETURN VARCHAR2;
