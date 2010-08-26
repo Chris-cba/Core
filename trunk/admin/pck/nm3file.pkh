@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3file authid current_user AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkh-arc   2.6   May 07 2010 16:15:26   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkh-arc   2.7   Aug 26 2010 15:14:00   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3file.pkh  $
---       Date into PVCS   : $Date:   May 07 2010 16:15:26  $
---       Date fetched Out : $Modtime:   May 07 2010 16:14:46  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Aug 26 2010 15:14:00  $
+--       Date fetched Out : $Modtime:   Aug 24 2010 10:18:46  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version : 1.14
 -------------------------------------------------------------------------
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE nm3file authid current_user AS
 --<GLOBVAR>
 --
 --  g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.6  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.7  $';
 --
   c_read_mode        CONSTANT  VARCHAR2(1)    := 'R';
   c_append_mode      CONSTANT  VARCHAR2(1)    := 'A';
@@ -310,6 +310,35 @@ FUNCTION get_files_in_directory (pi_dir       IN varchar2
 -- Needs a command of the form:
 -- dbms_java.grant_permission( 'NM3', 'SYS:java.io.FilePermission', 'd:\devwork\nsg\data\*', 'delete' ) ;
 PROCEDURE delete_file (pi_dir IN varchar2, pi_file IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="del_dir">
+--Delete a system directory if it is empty
+PROCEDURE del_dir(pi_directory IN varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="purge_directory">
+-- Removes files in the folder specified. A wildcard can be added to select 
+-- certain files. pi_delete_tab (if true) will remove the folder after deletion
+-- if it is empty.
+PROCEDURE purge_directory( pi_directory_name VARCHAR2
+                         , pi_wildcard VARCHAR2 DEFAULT NULL
+                         , pi_delete_dir BOOLEAN DEFAULT TRUE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="purge_directory">
+-- Does the same as the previous procedure only you can parse an array of
+-- wildcards as a nm3type.tab_varchar30 in this one. It will delete all files 
+-- that comply with any of the wildcards
+PROCEDURE purge_directory( pi_directory_name VARCHAR2
+                         , pi_wildcard_tab nm3type.tab_varchar30
+                         , pi_delete_dir BOOLEAN DEFAULT TRUE);
 --</PROC>
 --
 -----------------------------------------------------------------------------

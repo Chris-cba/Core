@@ -1,14 +1,14 @@
-CREATE OR REPLACE PACKAGE BODY nm3file AS
+CREATE OR REPLACE PACKAGE BODY HIGHWAYS.nm3file AS
 --
 -----------------------------------------------------------------------------
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.13   Jun 11 2010 11:24:20   aedwards  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3file.pkb-arc   2.14   Aug 26 2010 15:14:00   Chris.Strettle  $
 -- Module Name : $Workfile:   nm3file.pkb  $
--- Date into PVCS : $Date:   Jun 11 2010 11:24:20  $
--- Date fetched Out : $Modtime:   Jun 10 2010 15:56:22  $
--- PVCS Version : $Revision:   2.13  $
+-- Date into PVCS : $Date:   Aug 26 2010 15:14:00  $
+-- Date fetched Out : $Modtime:   Aug 26 2010 11:57:24  $
+-- PVCS Version : $Revision:   2.14  $
 -- Based on SCCS version : 
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
 --
 --all global package variables here
 --
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.13  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.14  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3file';
@@ -30,6 +30,7 @@ CREATE OR REPLACE PACKAGE BODY nm3file AS
    c_dirrepstrn CONSTANT VARCHAR2(1) := NVL(hig.get_sysopt('DIRREPSTRN'),'\');
 --
    g_files file_list;
+--
 -----------------------------------------------------------------------------
 --
 PROCEDURE internal_write_file (LOCATION     IN     VARCHAR2
@@ -820,14 +821,98 @@ PROCEDURE delete_file (pi_dir IN varchar2, pi_file IN varchar2) IS
 l_dir varchar2(256) := pi_dir;
 BEGIN 
   nm_debug.proc_start(g_package_name,'delete_file');
-  
   -- add directory separator if needed
   IF substr(l_dir, -1, 1) != c_dirrepstrn THEN
     l_dir  := l_dir || c_dirrepstrn;
   END IF;
   
-  del_file(l_dir, pi_file);
+ -- CWS  0109786 Use utl_file instead of Java.
+  --del_file(l_dir, pi_file);
+  utl_file.fremove(l_dir, pi_file);
+  --
+  nm_debug.proc_end(g_package_name,'delete_file');
+END;
+
+PROCEDURE purge_directory( pi_directory_name VARCHAR2
+                         , pi_wildcard VARCHAR2 DEFAULT NULL
+                         , pi_delete_dir BOOLEAN DEFAULT TRUE) IS
+  l_ret_files file_list;
+  l_wildcard varchar2(100);
+  l_slash varchar2(1);
+  g_dos                   BOOLEAN        := nm3file.dos_or_unix_plaform = 'DOS';
+  g_slash                 VARCHAR2(1)    := CASE WHEN g_dos THEN '\' ELSE '/' END;
+  l_command varchar2(1000);
+  l_hig_dir hig_directories%rowtype;
+  l_directory_path VARCHAR2(100);
+  l_directory_name VARCHAR2(100);
+BEGIN
+  nm3jobs.instantiate_args;
+  --
+  -- If the wildcard does not any wildcard values add some.
+  IF pi_wildcard = translate(pi_wildcard, '%*_?', 'xxxx') and g_dos THEN
+    l_wildcard:= '*' || pi_wildcard || '*';
+  ELSIF pi_wildcard IN ('*.*', '*') OR pi_wildcard IS NULL and g_dos THEN
+    l_wildcard:= '*.**';
+  ELSE
+    l_wildcard:= pi_wildcard;
+  END IF;
+  --
+  -- If the directory given does not have any slashes then check if its and oracle dir
+  IF INSTR(pi_directory_name, g_slash) > 0 THEN
+    l_directory_path:= pi_directory_name;
+    l_directory_name:= get_oracle_directory(pi_directory_name);
+  ELSE  
+    l_hig_dir:= hig_directories_api.get( pi_hdir_name => pi_directory_name);
+    l_directory_path:= l_hig_dir.hdir_path;
+    l_directory_name:= pi_directory_name;
+  END IF;
   
+  -- Add a slash on the end of the directory 
+  IF substr(l_directory_path , length(l_directory_path), 1) <> g_slash THEN
+    l_slash:= g_slash;
+  ELSE
+    l_slash:= NULL;
+  END IF;
+  --
+  hig_svr_util.del_server_files( pi_directory => l_directory_path || l_slash
+                               , pi_wildcard  => l_wildcard
+                               );
+  --
+  IF pi_delete_dir THEN
+    -- Removes the folder on the server.
+    hig_svr_util.del_server_dir(pi_directory => l_directory_path);
+    -- Removes the hig_directory and all_directory entries
+    hig_directories_api.del(pi_hdir_name=> l_directory_name);
+  END IF;
+END;
+
+PROCEDURE purge_directory( pi_directory_name VARCHAR2
+                         , pi_wildcard_tab nm3type.tab_varchar30
+                         , pi_delete_dir BOOLEAN DEFAULT TRUE) IS
+--
+l_dir    VARCHAR2(256) := pi_directory_name;
+g_dos    BOOLEAN        := nm3file.dos_or_unix_plaform = 'DOS';
+g_slash  VARCHAR2(1)    := CASE WHEN g_dos THEN '\' ELSE '/' END;
+--
+BEGIN
+  nm_debug.proc_start(g_package_name,'delete_file');
+  --
+   FOR i IN 1..pi_wildcard_tab.COUNT LOOP
+       purge_directory( pi_directory_name => pi_directory_name
+                      , pi_wildcard       => pi_wildcard_tab(i)
+                      , pi_delete_dir     => FALSE);
+   END LOOP;
+  --
+  IF pi_delete_dir THEN
+    IF INSTR(pi_directory_name, g_slash) > 0 THEN
+      hig_svr_util.del_server_dir(pi_directory => pi_directory_name);
+      hig_directories_api.del(pi_hdir_name=> get_oracle_directory(pi_directory_name));
+    ELSE  
+      hig_svr_util.del_server_dir(pi_directory => hig_directories_api.get( pi_hdir_name => pi_directory_name).hdir_path);
+      hig_directories_api.del(pi_hdir_name=> pi_directory_name);
+    END IF;
+  END IF;
+  --
   nm_debug.proc_end(g_package_name,'delete_file');
 END;
 --
@@ -1763,4 +1848,3 @@ END external_table_record_delim;
 --
 END nm3file;
 /
-
