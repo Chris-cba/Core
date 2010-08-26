@@ -1,13 +1,13 @@
-CREATE OR REPLACE PACKAGE BODY WORCS.hig_svr_util
+CREATE OR REPLACE PACKAGE BODY hig_svr_util
 AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_svr_util.pkb-arc   2.2   Aug 26 2010 14:59:20   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_svr_util.pkb-arc   2.3   Aug 26 2010 15:22:20   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_svr_util.pkb  $
---       Date into PVCS   : $Date:   Aug 26 2010 14:59:20  $
---       Date fetched Out : $Modtime:   Aug 26 2010 14:53:08  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Aug 26 2010 15:22:20  $
+--       Date fetched Out : $Modtime:   Aug 26 2010 15:21:26  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
   g_package_name CONSTANT VARCHAR2(30)   := 'hig_svr_util';
   g_dos                   BOOLEAN        := nm3file.dos_or_unix_plaform = 'DOS';
   g_slash                 VARCHAR2(1)    := CASE WHEN g_dos THEN '\' ELSE '/' END;
