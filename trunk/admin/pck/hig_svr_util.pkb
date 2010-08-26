@@ -1,13 +1,13 @@
-CREATE OR REPLACE PACKAGE BODY hig_svr_util
+CREATE OR REPLACE PACKAGE BODY WORCS.hig_svr_util
 AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_svr_util.pkb-arc   2.1   Jul 05 2010 11:53:18   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_svr_util.pkb-arc   2.2   Aug 26 2010 14:59:20   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_svr_util.pkb  $
---       Date into PVCS   : $Date:   Jul 05 2010 11:53:18  $
---       Date fetched Out : $Modtime:   Jul 05 2010 11:52:54  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Aug 26 2010 14:59:20  $
+--       Date fetched Out : $Modtime:   Aug 26 2010 14:53:08  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
   g_package_name CONSTANT VARCHAR2(30)   := 'hig_svr_util';
   g_dos                   BOOLEAN        := nm3file.dos_or_unix_plaform = 'DOS';
   g_slash                 VARCHAR2(1)    := CASE WHEN g_dos THEN '\' ELSE '/' END;
@@ -178,6 +178,94 @@ AS
     RETURN retval;
   --
   END unzip_file;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE del_server_dir(pi_directory IN varchar2)
+AS 
+l_command varchar2(1000):= 'RMDIR ' ||pi_directory;
+shell varchar2(100);
+BEGIN
+  IF hig_directories_api.hdir_exists(pi_directory) THEN
+    IF g_dos THEN
+      nm3jobs.instantiate_args;
+      nm3jobs.add_arg('/C');
+      nm3jobs.add_arg(l_command);
+      --
+      nm3jobs.create_job( pi_job_name        => dbms_scheduler.generate_job_name 
+                        , pi_job_action      => 'C:\WINDOWS\system32\cmd.exe'
+                        , pi_job_type        => 'EXECUTABLE'
+                        , pi_repeat_interval => NULL
+                        , pi_run_synchro     => TRUE);
+    ELSE
+      nm3jobs.instantiate_args;
+      shell         := '/bin/rmdir';
+    --  nm3jobs.add_arg('-rf');
+      nm3jobs.add_arg(pi_directory);
+    --
+      nm3jobs.create_job
+        ( pi_job_name        => dbms_scheduler.generate_job_name
+        , pi_job_action      => shell
+        , pi_job_type        => 'EXECUTABLE'
+        , pi_repeat_interval => NULL
+        , pi_run_synchro     => TRUE);
+    END IF;
+  ELSE
+    HIG.RAISE_NER( pi_appl => 'HIG' 
+                 , pi_id => 536
+                 , pi_supplementary_info => 'You must add this folder to the DIRECTORIES form to carry out this action.');
+  END IF;
+END;
+
+PROCEDURE del_server_files( pi_directory IN varchar2
+                          , pi_wildcard  IN varchar2
+                          )
+AS 
+  l_command varchar2(1000):= 'DEL ' || pi_directory|| pi_wildcard;
+  shell varchar2(100);
+BEGIN
+--
+  IF hig_directories_api.hdir_exists(pi_directory) THEN
+  --
+    IF g_dos THEN
+    --
+      nm3jobs.instantiate_args;
+      nm3jobs.add_arg('/C');
+      nm3jobs.add_arg(l_command);
+      nm3jobs.add_arg('EXIT');
+      --
+      nm3jobs.create_job
+          ( pi_job_name        => dbms_scheduler.generate_job_name 
+          , pi_job_action      => 'C:\WINDOWS\system32\cmd.exe'
+          , pi_job_type        => 'EXECUTABLE'
+          , pi_repeat_interval => NULL
+          , pi_run_synchro     => TRUE);
+    ELSE
+          nm3jobs.instantiate_args;
+          shell         := '/bin/rm';
+          nm3jobs.add_arg('-f');
+          IF substr(pi_directory, length(pi_directory), 1) = '/' THEN
+            nm3jobs.add_arg(pi_directory || pi_wildcard);
+          ELSE
+            nm3jobs.add_arg(pi_directory|| '/' ||pi_wildcard);
+          END IF;
+          --
+     
+          nm3jobs.create_job
+            ( pi_job_name        => dbms_scheduler.generate_job_name
+            , pi_job_action      => shell
+            , pi_job_type        => 'EXECUTABLE'
+            , pi_repeat_interval => NULL
+            , pi_run_synchro     => TRUE);
+    END IF;
+  --
+  ELSE
+    HIG.RAISE_NER( pi_appl => 'HIG' 
+                 , pi_id => 536
+                 , pi_supplementary_info => 'You must add this folder to the DIRECTORIES form to carry out this action.');
+  END IF;
+--
+END;
 --
 -----------------------------------------------------------------------------
 --
