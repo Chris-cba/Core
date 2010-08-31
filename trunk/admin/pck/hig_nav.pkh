@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkh-arc   3.5   May 20 2010 09:44:18   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkh-arc   3.6   Aug 31 2010 14:43:50   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkh  $
---       Date into PVCS   : $Date:   May 20 2010 09:44:18  $
---       Date fetched Out : $Modtime:   May 19 2010 23:13:02  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Aug 31 2010 14:43:50  $
+--       Date fetched Out : $Modtime:   Aug 31 2010 14:32:58  $
+--       Version          : $Revision:   3.6  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.6  $';
 
   TYPE            l_tab_tab IS TABLE OF hig_navigator_type INDEX BY BINARY_INTEGER ;
   l_tab           hig_navigator_tab  := hig_navigator_tab(hig_navigator_type(Null,Null,Null,Null,Null,Null));
@@ -503,6 +503,14 @@ Return Varchar2;
 -- This function returns the wor_flag for passed wor/wol
 PROCEDURE get_top_par(pi_id    IN Varchar2
                      ,pi_alias IN Varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_road_unique">
+-- This function returns the road unique for passed road_id
+Function get_road_unique(pi_road_id nm_elements.ne_id%TYPE)
+Return Varchar2;
 --</PROC>
 --
 -----------------------------------------------------------------------------

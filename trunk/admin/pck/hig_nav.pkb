@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.13   Jun 14 2010 10:53:46   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.14   Aug 31 2010 14:43:50   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   Jun 14 2010 10:53:46  $
---       Date fetched Out : $Modtime:   Jun 14 2010 10:11:54  $
---       Version          : $Revision:   3.13  $
+--       Date into PVCS   : $Date:   Aug 31 2010 14:43:50  $
+--       Date fetched Out : $Modtime:   Aug 31 2010 14:34:22  $
+--       Version          : $Revision:   3.14  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.13  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.14  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
@@ -1879,6 +1879,20 @@ WHEN OTHERS THEN
      Return l_doc_tab;
 --         
 END get_docs_tab;
+--
+Function get_road_unique(pi_road_id nm_elements.ne_id%TYPE)
+Return Varchar2
+IS
+BEGIN
+--
+   IF pi_road_id IS NOT NULL
+   THEN
+       Return nm3get.get_ne_all(pi_road_id,False).ne_unique;
+   ELSE
+       Return Null;
+   END IF ;
+--
+END get_road_unique;
 --
 END hig_nav;
 /
