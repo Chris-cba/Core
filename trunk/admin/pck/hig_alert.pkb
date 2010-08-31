@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.10   Jun 24 2010 12:07:42   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.11   Aug 31 2010 11:32:38   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   Jun 24 2010 12:07:42  $
---       Date fetched Out : $Modtime:   Jun 24 2010 12:07:02  $
---       Version          : $Revision:   3.10  $
+--       Date into PVCS   : $Date:   Aug 31 2010 11:32:38  $
+--       Date fetched Out : $Modtime:   Aug 25 2010 11:43:52  $
+--       Version          : $Revision:   3.11  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.10  $';
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.11  $';
   g_app_owner     CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  clob;
@@ -1151,10 +1151,9 @@ BEGIN
                         AND Nvl(halt_immediate,'N') = 'N')
                       OR 
                        (    halt_alert_type ='Q'
-                        AND Nvl(halt_suspend_query,'N') = 'N')
-                        AND  ( halt_last_run_date IS NULL
-                            OR halt_last_run_date + (hsfr_interval_in_mins/(24*60)) <= Sysdate)
-                       )
+                        AND Nvl(halt_suspend_query,'N') = 'N'
+                        AND halt_next_run_date <= Sysdate 
+                      ))
              )
    LOOP
        l_time_counter_ela := FALSE ;
@@ -1250,6 +1249,7 @@ BEGIN
        THEN
            UPDATE hig_alert_types
            SET    halt_last_run_date = Sysdate
+                 ,halt_next_run_date = hig_alert.get_next_run_date(halt_frequency_id)
            WHERE  halt_id = hna.halt_id ;
            Commit ;
        END IF ;   
@@ -2111,6 +2111,57 @@ EXCEPTION
     po_error_text := sqlerrm;
     Return False; 
 END drop_trigger;
+--
+FUNCTION get_next_run_date(pi_hsfr_id IN hig_scheduling_frequencies.hsfr_frequency_id%TYPE)
+RETURN DATE
+IS
+--
+   CURSOR c_schedule_freq 
+   IS
+   SELECT *
+   FROM   hig_scheduling_frequencies
+   WHERE  hsfr_frequency_id = pi_hsfr_id;
+
+   l_hsfr_rec hig_scheduling_frequencies%ROWTYPE;
+  
+   l_next_run_date Date ;
+   l_hour          Varchar2(2);
+--
+BEGIN
+--
+   OPEN  c_schedule_freq;
+   FETCH c_schedule_freq INTO l_hsfr_rec;
+   CLOSE c_schedule_freq;
+   --
+   IF l_hsfr_rec.hsfr_interval_in_mins IS NOT NULL
+   THEN
+       l_next_run_date := Sysdate+(l_hsfr_rec.hsfr_interval_in_mins/1440) ;
+   ELSE
+       IF Lower(l_hsfr_rec.hsfr_frequency) Like 'freq=daily;%'
+       THEN
+           l_hour          := Rpad(Replace(Substr(l_hsfr_rec.hsfr_frequency,Instr(Lower(l_hsfr_rec.hsfr_frequency),'byhour=')+7,2),';'),2,'0') ;
+           l_next_run_date := To_date(To_Char(Trunc(Sysdate),'dd-mon-yyyy')||' '||l_hour||':00:00','DD-MON-YYYY HH24:MI:SS');
+           IF l_next_run_date <= Sysdate 
+           THEN
+               l_next_run_date := l_next_run_date + 1;
+           END IF;              
+       ELSIF Lower(l_hsfr_rec.hsfr_frequency) Like 'freq=hourly;%'
+       THEN
+           l_hour := To_Char(Sysdate,'HH24');
+           IF l_hour = '23'
+           THEN
+               l_hour := '00';
+               l_next_run_date := To_date(To_Char(Trunc(Sysdate),'dd-mon-yyyy')||' '||l_hour||':00:00','DD-MON-YYYY HH24:MI:SS');        
+           ELSE
+               l_hour := Rpad(l_hour+1,2,'0');
+               l_next_run_date := To_date(To_Char(Trunc(Sysdate),'dd-mon-yyyy')||' '||l_hour||':00:00','DD-MON-YYYY HH24:MI:SS');               
+           END IF ;
+       END IF ;         
+   END IF ;
+   --
+   RETURN l_next_run_date;
+--
+END get_next_run_date;
 --
 END hig_alert;
 /
