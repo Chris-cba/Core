@@ -5,11 +5,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkh-arc   3.8   May 28 2010 17:48:02   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkh-arc   3.9   Aug 31 2010 10:42:24   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_process_api.pkh  $
---       Date into PVCS   : $Date:   May 28 2010 17:48:02  $
---       Date fetched Out : $Modtime:   May 28 2010 14:28:58  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   Aug 31 2010 10:42:24  $
+--       Date fetched Out : $Modtime:   Aug 19 2010 10:00:00  $
+--       Version          : $Revision:   3.9  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -19,7 +19,7 @@ AS
 --constants
 -----------
 --g_sccsid is the SCCS ID for the package
-g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.8  $';
+g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.9  $';
   
 -----------------------------------------------------------
 -- To facilitate attributing a list of files with a process
@@ -384,7 +384,12 @@ FUNCTION  do_polling_if_requested(pi_file_type_name          IN hig_process_type
                                 , pi_remove_failed_arch      IN BOOLEAN DEFAULT FALSE) RETURN BOOLEAN;
 
 
-
+----------------------------
+-- Run a process immediately
+----------------------------
+PROCEDURE stop_process(pi_process_id IN hig_processes.hp_process_id%TYPE
+                      ,pi_reason     IN VARCHAR2);  
+--
 end hig_process_api;
 /
 

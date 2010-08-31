@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.11   Aug 02 2010 16:58:00   mhuitson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.12   Aug 31 2010 10:42:24   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Aug 02 2010 16:58:00  $
---       Date fetched Out : $Modtime:   Aug 02 2010 16:24:46  $
---       Version          : $Revision:   3.11  $
+--       Date into PVCS   : $Date:   Aug 31 2010 10:42:24  $
+--       Date fetched Out : $Modtime:   Aug 19 2010 13:06:30  $
+--       Version          : $Revision:   3.12  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.11  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.12  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -1516,6 +1516,31 @@ BEGIN
 END do_polling_if_requested;
 --
 -----------------------------------------------------------------------------
+--
+PROCEDURE stop_process(pi_process_id IN hig_processes.hp_process_id%TYPE
+                      ,pi_reason     IN VARCHAR2)
+IS
+--
+
+--
+BEGIN
+--
+   dbms_scheduler.stop_job(g_job_name_prefix||pi_process_id);
+   hig_process_api.log_it(pi_process_id    => pi_process_id
+                         ,pi_message       => 'This execution has been terminated by user '||user||' on '||To_Char(Sysdate,'dd-Mon-yyyy hh24:mi:ss')
+                         ,pi_message_type  => 'E'  
+                         ,pi_summary_flag  => 'Y' );
+   IF pi_reason IS NOT NULL
+   THEN
+       hig_process_api.log_it(pi_process_id    => pi_process_id
+                             ,pi_message       => 'Reason to terminate : '||pi_reason
+                             ,pi_summary_flag  => 'Y' );
+   END IF ;
+   hig_process_api.process_execution_end('N');
+   nm3ctx.set_context('HP_PROCESS_ID',Null);
+   nm3ctx.set_context('HPJR_RUN_SEQ',Null);
+--
+END stop_process;
 --
 END hig_process_api;
 /
