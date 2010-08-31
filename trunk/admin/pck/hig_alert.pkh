@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkh-arc   3.3   May 28 2010 10:21:14   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkh-arc   3.4   Aug 31 2010 11:32:40   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_alert.pkh  $
---       Date into PVCS   : $Date:   May 28 2010 10:21:14  $
---       Date fetched Out : $Modtime:   May 26 2010 18:06:04  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Aug 31 2010 11:32:40  $
+--       Date fetched Out : $Modtime:   Aug 24 2010 14:57:36  $
+--       Version          : $Revision:   3.4  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $'; 
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $'; 
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------
@@ -177,6 +177,14 @@ FUNCTION drop_trigger(pi_halt_id       IN  hig_alert_types.halt_id%TYPE
 -- This procedure sends batch mail
 PROCEDURE send_batch_mail(pi_halt_id         IN hig_alert_types.halt_id%TYPE
                          ,pi_recipient_email IN hig_alert_recipients.har_recipient_email%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_next_run_date">
+-- This funtions returns the next run date
+FUNCTION get_next_run_date(pi_hsfr_id IN hig_scheduling_frequencies.hsfr_frequency_id%TYPE)
+RETURN DATE;
 --</PROC>
 --
 -----------------------------------------------------------------------------
