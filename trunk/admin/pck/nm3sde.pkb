@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.7   Jul 13 2010 15:25:26   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.8   Sep 02 2010 11:00:22   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Jul 13 2010 15:25:26  $
---       Date fetched Out : $Modtime:   Jul 13 2010 15:22:34  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Sep 02 2010 11:00:22  $
+--       Date fetched Out : $Modtime:   Sep 01 2010 16:36:06  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -474,44 +474,58 @@ FUNCTION register_SRID_from_theme( p_theme_id IN nm_themes_all.nth_theme_id%TYPE
                                    p_base     IN nm_theme_array,
                                    p_srid     IN NUMBER ) RETURN NUMBER IS
 
-l_mbr     mdsys.sdo_geometry;
-
-l_sref    sref_record_t;
-
-l_base_srid NUMBER;
-
-retval NUMBER;
-
-FUNCTION get_base_srids( p_base IN nm_theme_array ) RETURN INTEGER IS
-CURSOR c1 ( c_base IN nm_theme_array ) IS
-  SELECT DISTINCT srid
-  FROM sde.layers,
-       nm_themes_all,
-       TABLE ( c_base.nta_theme_array ) b
-  WHERE nth_theme_id = b.nthe_id
-  AND   table_name = nth_feature_table
-  AND   spatial_column = nth_feature_shape_column;
-
-l_srids int_array := Nm3array.INIT_INT_ARRAY;
-
-BEGIN
-
-  OPEN c1 ( p_base );
-  FETCH c1 BULK COLLECT INTO l_srids.ia;
-  CLOSE c1;
-
-  IF l_srids.ia.LAST IS NULL OR l_srids.ia.LAST <= 0 THEN
-    retval :=  NULL;
-  ELSIF l_srids.ia.LAST > 1 THEN
-    retval := NULL;
-  ELSE
---  we have a single srid for the base layers
-    retval := l_srids.ia(1);
-  END IF;
-
-  RETURN retval;
-END;
-
+  l_mbr          mdsys.sdo_geometry;
+  l_sref         sref_record_t;
+  l_base_srid    NUMBER;
+  retval         NUMBER;
+  l_length_unit  NUMBER;
+--
+  FUNCTION get_base_srids( p_base IN nm_theme_array ) RETURN INTEGER IS
+  CURSOR c1 ( c_base IN nm_theme_array ) IS
+    SELECT DISTINCT srid
+    FROM sde.layers,
+         nm_themes_all,
+         TABLE ( c_base.nta_theme_array ) b
+    WHERE nth_theme_id = b.nthe_id
+    AND   table_name = nth_feature_table
+    AND   spatial_column = nth_feature_shape_column;
+--
+  l_srids int_array := Nm3array.INIT_INT_ARRAY;
+--
+  BEGIN
+--
+    OPEN c1 ( p_base );
+    FETCH c1 BULK COLLECT INTO l_srids.ia;
+    CLOSE c1;
+--
+    IF l_srids.ia.LAST IS NULL OR l_srids.ia.LAST <= 0 THEN
+      retval :=  NULL;
+    ELSIF l_srids.ia.LAST > 1 THEN
+      retval := NULL;
+    ELSE
+  --  we have a single srid for the base layers
+      retval := l_srids.ia(1);
+    END IF;
+--
+    RETURN retval;
+  END;
+--
+  FUNCTION get_length_unit_from_theme ( pi_nth_theme_id IN nm_themes_all.nth_theme_id%TYPE )
+    RETURN nm_units.un_unit_id%TYPE
+  IS
+    retval nm_units.un_unit_id%TYPE;
+  BEGIN
+    SELECT nt_length_unit INTO retval
+      FROM v_nm_net_themes_all
+         , nm_types 
+     WHERE vnnt_nth_theme_id = pi_nth_theme_id
+       AND vnnt_nt_type = nt_type;
+    RETURN retval;
+  EXCEPTION
+    WHEN NO_DATA_FOUND
+    THEN RETURN NULL;
+  END get_length_unit_from_theme;
+--
 BEGIN
 
    l_base_srid := get_base_srids( p_base );
@@ -536,8 +550,17 @@ BEGIN
 --   ideally, this code would look at the units of the network to set the munits - but this code is used too generically - so teh table may
 --   not be network - so rely on the global value, this defaults to 1 anyway.
 
-     IF Nm3sdo.get_theme_gtype( p_theme_id) = 3002 THEN
-        l_sref.munits        := Nm3sdm.get_global_unit_factor;
+   -- Task 0101010
+   -- Consider 3302 geometries when setting the MUnits
+
+     IF Nm3sdo.get_theme_gtype( p_theme_id) IN (3302,3002)
+     THEN
+        --l_sref.munits        := Nm3sdm.get_global_unit_factor;
+      --
+        l_length_unit := get_length_unit_from_theme ( p_theme_id );
+      --
+        l_sref.munits := POWER ( 10
+                               , nm3unit.get_rounding(nm3unit.get_tol_from_unit_mask(l_length_unit)));
      ELSE
        l_sref.munits         := 1;
      END IF;
