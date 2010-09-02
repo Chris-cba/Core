@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.36   Apr 09 2010 16:21:20   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.37   Sep 02 2010 11:39:56   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Apr 09 2010 16:21:20  $
---       Date fetched Out : $Modtime:   Apr 09 2010 16:12:06  $
---       PVCS Version     : $Revision:   2.36  $
+--       Date into PVCS   : $Date:   Sep 02 2010 11:39:56  $
+--       Date fetched Out : $Modtime:   Sep 02 2010 11:39:02  $
+--       PVCS Version     : $Revision:   2.37  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.36  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.37  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -976,10 +976,14 @@ PROCEDURE make_nt_spatial_layer
       l_layer    NUMBER;
       l_old_geom mdsys.sdo_geometry;
       l_new_geom mdsys.sdo_geometry;
+      l_length   NUMBER;
+      l_usgm     user_sdo_geom_metadata%ROWTYPE;
+      l_rec_nth  nm_themes_all%ROWTYPE;
    BEGIN
       --nm_debug.debug_on;
       --nm_debug.debug('changing shapes');
       l_layer := get_nt_theme (Nm3get.get_ne (p_ne_id).ne_nt_type);
+      l_rec_nth := nm3get.get_nth(l_layer);
 
       IF Nm3sdo.element_has_shape (l_layer, p_ne_id) = 'TRUE'
       THEN
@@ -996,11 +1000,32 @@ PROCEDURE make_nt_spatial_layer
          THEN
            l_new_geom.sdo_srid := l_old_geom.sdo_srid;
          END IF;
-
+      --
+      -- Task 0110101
+      -- Bring code across from NM3SDO insert_element_shape to validate the
+      -- length of the geometry being passed into this procedure
+      --
+         l_usgm := nm3sdo.get_usgm ( pi_table_name  => l_rec_nth.nth_feature_table
+                                   , pi_column_name => l_rec_nth.nth_feature_shape_column );
+      --
+         l_length := nm3net.get_ne_length ( p_ne_id );
+      --
+         IF NVL(sdo_lrs.geom_segment_end_measure ( l_new_geom, l_usgm.diminfo ), -9999) != l_length 
+         THEN
+            sdo_lrs.redefine_geom_segment ( l_new_geom, l_usgm.diminfo, 0, l_length );
+         END IF;
+      --
+         IF sdo_lrs.geom_segment_end_measure ( l_new_geom, l_usgm.diminfo ) != l_length
+         THEN
+           hig.raise_ner(pi_appl    => nm3type.c_hig
+                        ,pi_id      => 204
+                        ,pi_sqlcode => -20001 );
+         END IF;
+      --
+      -- Task 0110101 Done
+      --
          nm3sdo_edit.reshape ( l_layer, p_ne_id, l_new_geom );
-
-         --  nm_debug.debug_on;
-         --  nm_debug.debug('changing shapes');
+      --
          nm3sdo.change_affected_shapes (p_layer      => l_layer,
                                         p_ne_id      => p_ne_id);
       ELSE
@@ -7582,11 +7607,11 @@ end;
    */
    --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.36   Apr 09 2010 16:21:20   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.37   Sep 02 2010 11:39:56   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Apr 09 2010 16:21:20  $
---       Date fetched Out : $Modtime:   Apr 09 2010 16:12:06  $
---       PVCS Version     : $Revision:   2.36  $
+--       Date into PVCS   : $Date:   Sep 02 2010 11:39:56  $
+--       Date fetched Out : $Modtime:   Sep 02 2010 11:39:02  $
+--       PVCS Version     : $Revision:   2.37  $
 
       append ('--   PVCS Identifiers :-');
       append ('--');
