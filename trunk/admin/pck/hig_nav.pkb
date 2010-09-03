@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.14   Aug 31 2010 14:43:50   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.15   Sep 03 2010 10:02:42   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   Aug 31 2010 14:43:50  $
---       Date fetched Out : $Modtime:   Aug 31 2010 14:34:22  $
---       Version          : $Revision:   3.14  $
+--       Date into PVCS   : $Date:   Sep 03 2010 10:02:42  $
+--       Date fetched Out : $Modtime:   Sep 02 2010 15:35:52  $
+--       Version          : $Revision:   3.15  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.14  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.15  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
@@ -517,6 +517,11 @@ IS
    l_add_con Varchar2(4000) ;
    l_and_where Varchar2(20);
    l_select    Varchar2(1000);
+
+   l_invalid_table  EXCEPTION;
+   l_invalid_column EXCEPTION;
+   PRAGMA EXCEPTION_INIT(l_invalid_table,-00942);
+   PRAGMA EXCEPTION_INIT(l_invalid_column,-00904);
 BEGIN
 --    
    SELECT UPPER(hnv_child_id),upper(hnv_child_alias) 
@@ -534,6 +539,7 @@ BEGIN
                          hnv_hier_label_1,hnv_hier_label_2,hnv_hier_label_3,hnv_hier_label_4,hnv_hier_label_5,hnv_hier_label_6,hnv_hier_label_7,hnv_hier_label_8,hnv_hier_label_9,hnv_hier_label_10,hnv_hierarchy_seq
                   FROM   hig_navigator b
                   WHERE  hnv_hierarchy_type = l_hir_type
+                  AND    is_product_licensed(hnv_hpr_product) = 'Y'
                  )
              CONNECT BY PRIOR hnv_child_alias = hnv_parent_alias
              START WITH hnv_child_alias = pi_alias
@@ -546,7 +552,19 @@ BEGIN
                                 ,cnt
                                 ,'CHILD');        
 --nm_debug.debug('child '||l_sql);
-       OPEN l_r for l_sql;
+       BEGIN
+       --
+          OPEN l_r for l_sql;
+       --
+       EXCEPTION
+          WHEN l_invalid_table THEN
+          CLOSE l_r;
+          Raise_Application_Error(-20030,SQLERRM);
+          WHEN l_invalid_column THEN
+          CLOSE l_r;
+          Raise_Application_Error(-20031,SQLERRM);
+       END ;
+ 
        LOOP
 --nm_debug.debug('found ');
            FETCH l_r into l_type.data,l_type.label,l_type.icon,l_type.tab_level,l_type.parent,l_type.child ;
@@ -564,6 +582,7 @@ BEGIN
            l_tab.extend ;
            l_tab(l_tab.count) :=  l_type;
        END LOOP;
+       CLOSE l_r;
    END loop;
 END  pop_up_child;
 --
@@ -596,6 +615,11 @@ IS
    l_select    Varchar2(1000);
    l_top_id_cnt Number ;
    l_counter    Number :=0 ;
+
+   l_invalid_table  EXCEPTION;
+   l_invalid_column EXCEPTION;
+   PRAGMA EXCEPTION_INIT(l_invalid_table,-00942);
+   PRAGMA EXCEPTION_INIT(l_invalid_column,-00904);
    ---------------------------------------
    FUNCTION has_parent(pi_id Number)
    RETURN  NUMBER
@@ -653,6 +677,7 @@ BEGIN
                        SELECT hnv_hierarchy_label
                        FROM   hig_navigator 
                        WHERE  substr(UPPER(hnv_child_table),1,decode(instr(hnv_child_table,' '),0,length(hnv_child_table),instr(hnv_child_table,' ')-1)) =  pi_tab) 
+                       AND    is_product_licensed(hnv_hpr_product) = 'Y'
                        ORDER BY hnv_hierarchy_level,hnv_hierarchy_seq)
                WHERE ROWNUM = 1;  
 --nm_debug.debug('par alias '||l_chi_alias);                
@@ -662,6 +687,7 @@ BEGIN
                --INTO   l_chi_alias
                FROM   hig_navigator
                WHERE  hnv_hierarchy_type = Nvl(l_hir_type,hnv_hierarchy_type)
+               AND    is_product_licensed(hnv_hpr_product) = 'Y'
                AND    hnv_hierarchy_label IN (
                        SELECT hnv_hierarchy_label
                        FROM   hig_navigator
@@ -724,6 +750,7 @@ BEGIN
                                             hnv_hier_label_8,hnv_hier_label_9,hnv_hier_label_10,hnv_hierarchy_seq
                                      FROM   hig_navigator b
                                      WHERE  hnv_hierarchy_type = l_hir_type
+                                     AND    is_product_licensed(hnv_hpr_product) = 'Y'
                                      )
                                 CONNECT BY PRIOR hnv_child_alias =  hnv_Parent_alias
                                 START WITH hnv_child_alias = top_alias
@@ -732,7 +759,17 @@ BEGIN
 --nm_debug.debug(j.hnv_CHILD_ALIAS||','||top_alias||','||sys_context('NM3SQL','NAV_VAR1'));
                           l_sql := build_child_sql(j.hnv_CHILD_ALIAS,top_alias,sys_context('NM3SQL','NAV_VAR1'));  
 --nm_debug.debug(l_sql);
-                          OPEN l_r for l_sql;
+
+                          BEGIN    
+                             OPEN l_r for l_sql;
+                          EXCEPTION
+                              WHEN l_invalid_table THEN
+                              CLOSE l_r;
+                              Raise_Application_Error(-20030,SQLERRM);
+                              WHEN l_invalid_column THEN
+                              CLOSE l_r;
+                              Raise_Application_Error(-20031,SQLERRM);
+                          END ;
                           LOOP
                               FETCH l_r into l_type.data,l_type.label,l_type.icon,l_type.tab_level,l_type.parent,l_type.child ;
                               EXIT WHEN l_r%NOTFOUND;
@@ -747,6 +784,7 @@ BEGIN
                               l_tab.extend ;
                               l_tab(l_tab.count) :=  l_type;
                           END LOOP;
+                          CLOSE l_r;
                       END LOOP;
                   END IF ;                   
                END LOOP;
@@ -1399,124 +1437,173 @@ BEGIN
    IF  l_ita_rec.ita_query IS NOT NULL
    AND p_value IS NOT NULL
    THEN     
-       -- TASK 0109336
-       -- Added following code to avoid error column ambiguously defined when same column is repeated in the SQL statement 
-	 DECLARE
-	 --	
-         l_sql Varchar2(4000) := Upper(l_ita_rec.ita_query);
-         l_ori_sql Varchar2(4000) := l_sql ;
-         TYPE col IS TABLE OF Varchar(100) INDEX BY BINARY_INTEGER;
-         l_col_tab col;       
-         l_cnt number := 0 ;
-         l_alias Varchar2(500) ;
-         l_pos Number;
-         l_cols_tab nm3type.tab_varchar30; 
-       --   
-	 BEGIN
-	 --	 
-          l_sql := Substr(l_sql,8,Instr(l_sql,'FROM')-(1+8));
-          LOOP
-             l_cnt := l_cnt + 1;
-             l_pos := Instr(l_sql,',');
-             IF l_pos > 0 
-             THEN        
-                 l_alias  := Ltrim(substr(l_sql, 1,l_pos-1))||' ' ;
-                 IF Nvl(Length(Replace(Substr(l_alias,(Instr(l_alias,' '))),' ')),0) > 0
-                 THEN             
-                     l_col_tab(l_cnt) :=  l_alias ; 
-                 ELSE
-                     IF l_cnt = 1 
-                     THEN
-                         l_col_tab(l_cnt) := Substr(l_sql, 1,l_pos-1)||' Identifier ';
-                     ELSIF l_cnt = 2 
-                     THEN 
-                         l_col_tab(l_cnt) :=  Substr(l_sql, 1,l_pos-1)||' Description ';
-                     ELSE
-                         l_col_tab(l_cnt) :=  Substr(l_sql, 1,l_pos-1)||' Value ';
-                     END IF ;
-                 END IF ;    
-                 l_sql := Substr(l_sql,l_pos+1);
-             ELSE
-                 l_alias  := Ltrim(l_sql);
-                 IF Nvl(Length(Replace(Substr(l_alias,(Instr(l_alias,' '))),' ')),0) > 0
-                 THEN             
-                     l_col_tab(l_cnt) :=  l_alias ;--Substr(l_alias,(Instr(l_alias,' ')));
-                 ELSE
-                     IF l_cnt = 1 
-                     THEN
-                         l_col_tab(l_cnt) :=  l_sql||' Identifier ';
-                     ELSIF l_cnt = 2 
-                     THEN
-                         l_col_tab(l_cnt) :=  l_sql||' Description ';
-                     ELSE
-                        l_col_tab(l_cnt) :=  l_sql||' Value ';
-                     END IF ;               
-                 END IF  ;
-                 Exit;     
-             END IF ;
-          END LOOP ;
-          l_sql:= 'SELECT ';
-          FOR i in 1..l_col_tab.count 
-          LOOP
-              IF i = 1 
-              THEN
-                  l_sql := l_sql ||l_col_tab(i);
-              ELSIF i = 2 
-              THEN 
-                  l_sql := l_sql ||' ,'||l_col_tab(i);
+        -- TASK 0109336
+        -- Added following code to avoid error column ambiguously defined when same column is repeated in the SQL statement 
+	  DECLARE
+	  --	
+          l_sql Varchar2(4000) := v_statement;
+          l_ori_sql Varchar2(4000) := l_sql ;
+          TYPE col IS TABLE OF Varchar(100) INDEX BY BINARY_INTEGER;
+          l_col_tab col;       
+          l_cnt number := 0 ;
+          l_alias Varchar2(500) ;
+          l_pos Number;
+          l_cols_tab nm3type.tab_varchar30; 
+          l_distinct Boolean ; 
+        --   
+	  BEGIN
+	  --
+           l_distinct := Substr(Trim(Substr(Upper(l_sql),7)),1,8) Like 'DISTINCT%';
+           IF l_distinct
+           THEN
+               l_sql := Ltrim(Substr(l_sql,8));
+               l_sql  := Substr(l_sql,Instr(l_sql,' ',1,1));
+               l_sql := Substr(l_sql,1,Instr(Upper(l_sql),'FROM')-(1));
+           ELSE
+               l_sql := Substr(l_sql,8,Instr(Upper(l_sql),'FROM')-(1+8));    
+           END IF;
+           LOOP
+              l_cnt := l_cnt + 1;
+              l_pos := Instr(l_sql,',');
+              IF l_pos > 0 
+              THEN        
+                  l_alias  := Ltrim(substr(l_sql, 1,l_pos-1))||' ' ;
+                  IF Nvl(Length(Replace(Substr(l_alias,(Instr(l_alias,' '))),' ')),0) > 0
+                  THEN             
+                      l_col_tab(l_cnt) :=  l_alias ; 
+                  ELSE
+                      IF l_cnt = 1 
+                      THEN
+                          l_col_tab(l_cnt) := Substr(l_sql, 1,l_pos-1)||' Identifier ';
+                      ELSIF l_cnt = 2 
+                      THEN 
+                          l_col_tab(l_cnt) :=  Substr(l_sql, 1,l_pos-1)||' Description ';
+                      ELSE
+                          l_col_tab(l_cnt) :=  Substr(l_sql, 1,l_pos-1)||' Value ';
+                      END IF ;
+                  END IF ;    
+                  l_sql := Substr(l_sql,l_pos+1);
               ELSE
-                  l_sql := l_sql ||' ,'||l_col_tab(i);
-              END IF;
-          END LOOP;
-          v_statement := l_sql ||' '||Substr(l_ori_sql,Instr(Upper(l_ori_sql),'FROM'));
-          l_sql := 'SELECT';
-     	    --get and add columns to query
-    	    l_cols_tab := nm3flx.get_cols_from_sql(p_sql => v_statement);
-          FOR l_i IN 1..l_cols_tab.COUNT
-	    LOOP
-	        l_sql := l_sql 
-	  	 	           || Chr(10) || '  ' || l_cols_tab(l_i) || ',';
-	    END LOOP;
-          v_statement := Substr(l_sql, 1, Length(l_sql) - 1)|| Chr(10) || ' FROM'
-	 		         || Chr(10) || '  (' || v_statement  || ')' ;  
-       END ;
-       -- END TASK TASK 0109336
-       l_cols_tab := nm3flx.get_cols_from_sql(p_sql => v_statement);
-       IF NOT(l_cols_tab.EXISTS(pi_match_col))
-       THEN
-           RAISE e_match_col_not_in_query;
-        END IF;
-        --does statement contain a group by clause?
-        l_group_by_pos := INSTR(UPPER(v_statement), 'GROUP BY');
-        IF l_group_by_pos > 0
-        THEN
-            --strip group by
-            l_group_by := SUBSTR(v_statement, l_group_by_pos);
-            v_statement := SUBSTR(v_statement, 1, LENGTH(v_statement) - LENGTH(l_group_by));
-        END IF;
-        l_order_by_pos := INSTR(UPPER(v_statement), 'ORDER BY');
-        IF l_order_by_pos > 0
-        THEN
-            l_order_by := SUBSTR(v_statement, l_order_by_pos);
-            v_statement := SUBSTR(v_statement, 1, LENGTH(v_statement) - LENGTH(l_order_by));
-        END IF;
-        IF INSTR(v_statement,'1 =:x') > 0
-        THEN
-            v_statement := REPLACE(v_statement , '1 =:x', '1 =1');
-        END IF;	  
-        l_statement_b4_where_added := v_statement;
-        l_statement_has_where := INSTR(UPPER(v_statement), 'WHERE') > 0 ;
-        l_equal_test := l_cols_tab(pi_match_col) || ' = :1' ;
-        IF l_statement_has_where
-        THEN
-            v_statement := v_statement || ' AND ' || l_equal_test ;
-        ELSE
-            v_statement := v_statement || ' WHERE ' || l_equal_test ;
-        END IF;
-        IF NOT nm3flx.is_select_statement_valid(v_statement) and l_statement_has_where THEN
-            v_statement := l_statement_b4_where_added || ' WHERE ' || l_equal_test ;
-        END IF;
-        v_statement := v_statement|| ' ' || l_group_by;
+                  l_alias  := Ltrim(l_sql);
+                  IF Instr(l_alias,' ') > 0
+                  THEN  
+                      IF Nvl(Length(Replace(Substr(l_alias,(Instr(l_alias,' '))),' ')),0) > 0
+                      THEN
+                          l_col_tab(l_cnt) :=  l_alias ; --Substr(l_alias,(Instr(l_alias,' ')));
+                      ELSE
+                          l_col_tab(l_cnt) :=  l_sql||' Value ';
+                      END IF ;        
+                  ELSE
+                       l_col_tab(l_cnt) :=  l_sql||' Value ';
+                  END IF  ;
+                  Exit;     
+              END IF ;
+           END LOOP ;
+           IF l_distinct 
+           THEN
+               l_sql:= 'SELECT DISTINCT ';
+           ELSE
+               l_sql:= 'SELECT ';
+           END IF ;
+           FOR i in 1..l_col_tab.count 
+           LOOP
+               IF i = 1 
+               THEN
+                   l_sql := l_sql ||l_col_tab(i);
+               ELSIF i = 2 
+               THEN 
+                   l_sql := l_sql ||' ,'||l_col_tab(i);
+               ELSE
+                   l_sql := l_sql ||' ,'||l_col_tab(i);
+               END IF;
+           END LOOP;
+           v_statement := l_sql ||' '||Substr(l_ori_sql,Instr(Upper(l_ori_sql),'FROM'));
+           l_sql := 'SELECT';
+     	     --get and add columns to query
+    	     l_cols_tab := nm3flx.get_cols_from_sql(p_sql => v_statement);
+           FOR l_i IN 1..l_cols_tab.COUNT
+	     LOOP
+	         l_sql := l_sql 
+	    	 	           || Chr(10) || '  ' || l_cols_tab(l_i) || ',';
+	     END LOOP;
+           v_statement := Substr(l_sql, 1, Length(l_sql) - 1)|| Chr(10) || ' FROM'
+	  		         || Chr(10) || '  (' || v_statement  || ')' ;  
+        END ;
+        -- END TASK TASK 0109336
+      l_cols_tab := nm3flx.get_cols_from_sql(p_sql => v_statement);
+      IF NOT(l_cols_tab.EXISTS(pi_match_col))
+      THEN
+        RAISE e_match_col_not_in_query;
+      END IF;
+
+      --does statement contain a group by clause?
+      l_group_by_pos := INSTR(UPPER(v_statement), 'GROUP BY');
+
+      IF l_group_by_pos > 0
+      THEN
+        --strip group by
+        l_group_by := SUBSTR(v_statement, l_group_by_pos);
+
+        v_statement := SUBSTR(v_statement, 1, LENGTH(v_statement) - LENGTH(l_group_by));
+      END IF;
+
+
+-- GJ 24-MAY-2005
+-- Strip off order by as well
+--
+      --does statement contain a group by clause?
+      l_order_by_pos := INSTR(UPPER(v_statement), 'ORDER BY');
+
+      IF l_order_by_pos > 0
+      THEN
+        --strip group by
+        l_order_by := SUBSTR(v_statement, l_order_by_pos);
+
+        v_statement := SUBSTR(v_statement, 1, LENGTH(v_statement) - LENGTH(l_order_by));
+      END IF;
+
+      IF INSTR(v_statement,'1 =:x') > 0
+      THEN
+        v_statement := REPLACE(v_statement , '1 =:x', '1 =1');
+      END IF;
+	  
+	  
+      --    GJ 25-MAY-2005
+      --    found that rather complex select statements being passed in with occurrances
+      --    of 'WHERE' and 'AND' confusing the logic I've commented out
+      --    Had to work an alternative approach - kind of a 'suck it and see'
+      --    i.e. try with a 'WHERE' and if that doesn't work then try with an 'AND'
+
+      -- FJF reinstated this code to do the naive thing and then check for invalid stuff because
+      -- it was being called thousands of times and failing
+      l_statement_b4_where_added := v_statement;
+      l_statement_has_where := INSTR(UPPER(v_statement), 'WHERE') > 0 ;
+      l_equal_test := l_cols_tab(pi_match_col) || ' = :1' ;
+
+      -- If we tried an and it it failed then we must need a where after all
+      v_statement := v_statement|| ' ' || l_group_by||' '||l_order_by;
+
+      --IF l_statement_has_where
+      --THEN
+      --  v_statement := v_statement || ' AND ' || l_equal_test ;
+      --ELSE
+        v_statement := v_statement || ' WHERE ' || l_equal_test ;
+      --END IF;
+
+      IF NOT nm3flx.is_select_statement_valid(v_statement) and l_statement_has_where THEN
+        v_statement := l_statement_b4_where_added || ' WHERE ' || l_equal_test ;
+      END IF;
+
+      -- Just let it fail otherwise
+      
+      --
+      -- Assume that the restriction on column = value passed in 
+      -- will be added to the query where clause as the first part e.g. as a 'WHERE'
+      --
+	  
+--nm_debug.debug_on;
+--nm_debug.debug('v_statement='||v_statement);
+--nm_debug.debug_off;
         BEGIN
            -- Changed to use bind variable, less parsing hopefully
            OPEN cs_sql FOR v_statement USING p_value ; 
@@ -1674,6 +1761,7 @@ BEGIN
    nm3ctx.set_context('NAV_VAR2',pi_id);
    FOR i IN (SELECT  *  
              FROM    hig_navigator
+             WHERE   is_product_licensed(hnv_hpr_product) = 'Y'
              CONNECT BY  hnv_child_alias = PRIOR hnv_parent_alias
              START WITH hnv_child_alias = pi_start_alias
              ORDER BY LEVEL)
@@ -1893,6 +1981,32 @@ BEGIN
    END IF ;
 --
 END get_road_unique;
+--
+FUNCTION is_product_licensed ( pi_product varchar2 )
+RETURN VARCHAR2
+IS
+--
+   CURSOR c1 ( c_product VARCHAR2) IS
+   SELECT 1
+   FROM hig_products
+   WHERE hpr_product = c_product
+   AND hpr_key IS NOT NULL;
+
+   dummy  NUMBER ;
+   retval VARCHAR2(1) := 'Y';
+--
+BEGIN
+--
+   OPEN c1( pi_product );
+   FETCH c1 INTO dummy;
+   IF c1%NOTFOUND 
+   THEN
+       retval := 'N';
+   END IF;
+   CLOSE c1;
+   RETURN retval;
+--
+END is_product_licensed;
 --
 END hig_nav;
 /
