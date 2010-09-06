@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/Repair Shape Lengths.sql-arc   1.0   Sep 02 2010 13:35:42   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/Repair Shape Lengths.sql-arc   1.1   Sep 06 2010 17:48:16   Ade.Edwards  $
 --       Module Name      : $Workfile:   Repair Shape Lengths.sql  $
---       Date into PVCS   : $Date:   Sep 02 2010 13:35:42  $
---       Date fetched Out : $Modtime:   Sep 02 2010 12:14:06  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Sep 06 2010 17:48:16  $
+--       Date fetched Out : $Modtime:   Sep 06 2010 17:48:14  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --------------------------------------------------------------------------------
 --
@@ -25,22 +25,22 @@ BEGIN
   FOR i IN 
   (
   --
-    SELECT * FROM nm_themes_all
-     WHERE nth_base_table_theme IS NULL
-       AND EXISTS 
-         ( SELECT 'table exists' 
-             FROM user_tables
-            WHERE table_name = nth_feature_table )
-       AND EXISTS
-         ( SELECT 'is a 3302 theme'
-             FROM nm_theme_gtypes
-            WHERE ntg_gtype = 3302 
-              AND nth_theme_id = ntg_theme_id )
-       AND EXISTS
-         ( SELECT 'is a datum network theme'
-             FROM v_nm_net_themes_all
-            WHERE vnnt_nth_theme_id = nth_theme_id 
-              AND vnnt_lr_type IN ('D') )
+    SELECT *
+      FROM nm_themes_all
+     WHERE nth_theme_id IN
+              (SELECT nth_theme_id
+                 FROM nm_themes_all
+                WHERE nth_base_table_theme IS NULL
+                      AND EXISTS
+                             (SELECT 'table exists'
+                                FROM user_tables
+                               WHERE table_name = nth_feature_table)
+                      AND EXISTS
+                             (SELECT 'is a datum network theme'
+                                FROM v_nm_net_themes_all
+                               WHERE vnnt_nth_theme_id = nth_theme_id
+                                     AND vnnt_lr_type IN ('D')))
+           AND NM3SDO.GET_THEME_GTYPE (nth_theme_id) = 3302
   --
   )
   LOOP
