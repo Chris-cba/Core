@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3pla AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkh-arc   2.1   Jan 06 2010 16:41:34   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3pla.pkh-arc   2.2   Sep 06 2010 14:05:26   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3pla.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:34  $
---       Date fetched Out : $Modtime:   Jan 05 2010 11:41:24  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Sep 06 2010 14:05:26  $
+--       Date fetched Out : $Modtime:   Sep 06 2010 10:32:12  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.24
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE nm3pla AS
 --</PACKAGE>
 --all global package variables here
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 -- g_sccsid is the SCCS_ID
 --
 -- The following constants are the possible values returned by DERIVE_NE_ID_RELATION
@@ -561,6 +561,15 @@ PROCEDURE add_element_to_pl_arr (pio_pl_arr IN OUT NOCOPY nm_placement_array
 --
 -------------------------------------------------------------------------------
 --
+--<PROC NAME="check_contiguity">
+FUNCTION check_contiguity ( pi_ne_id       nm_elements.ne_id%TYPE
+                          , pi_inv_type    nm_inv_items.iit_inv_type%TYPE
+                          , pi_xsp         nm_inv_items.iit_x_sect%TYPE
+                          , pi_route_datum VARCHAR)
+RETURN BOOLEAN;
+--</PROC>
+--
+-------------------------------------------------------------------------------
 --
 --all pragma definitions here
 --<PRAGMA>
