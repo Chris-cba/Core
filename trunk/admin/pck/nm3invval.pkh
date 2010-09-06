@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE Nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkh-arc   2.4   Jul 22 2010 11:06:04   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkh-arc   2.5   Sep 06 2010 14:07:06   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3invval.pkh  $
---       Date into PVCS   : $Date:   Jul 22 2010 11:06:04  $
---       Date fetched Out : $Modtime:   Jul 22 2010 11:05:22  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Sep 06 2010 14:07:06  $
+--       Date fetched Out : $Modtime:   Sep 06 2010 10:41:58  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.13
 -------------------------------------------------------------------------
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE Nm3invval IS
 --</PACKAGE>
 --
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.5  $';
 --
    TYPE tab_nin IS TABLE OF nm_inv_nw%ROWTYPE INDEX BY BINARY_INTEGER;
 --
@@ -448,6 +448,15 @@ PROCEDURE process_latest_asset_chk;
 --
 PROCEDURE pop_latest_asset_tab( pi_iit_ne_id IN nm_inv_items_all.iit_ne_id%TYPE);
 --
+--</PROC>
+--
+----------------------------------------------------------------------------------------------
+--
+FUNCTION check_contiguity ( pi_ne_id       nm_elements.ne_id%TYPE
+                          , pi_inv_type    nm_inv_items.iit_inv_type%TYPE
+                          , pi_xsp         nm_inv_items.iit_x_sect%TYPE
+                          , pi_route_datum VARCHAR)
+RETURN BOOLEAN;
 --</PROC>
 --
 ----------------------------------------------------------------------------------------------

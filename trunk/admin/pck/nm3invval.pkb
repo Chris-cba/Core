@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.11   Jul 22 2010 11:20:56   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3invval.pkb-arc   2.12   Sep 06 2010 14:07:06   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3invval.pkb  $
---       Date into PVCS   : $Date:   Jul 22 2010 11:20:56  $
---       Date fetched Out : $Modtime:   Jul 22 2010 11:19:40  $
---       Version          : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Sep 06 2010 14:07:06  $
+--       Date fetched Out : $Modtime:   Sep 06 2010 10:41:48  $
+--       Version          : $Revision:   2.12  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3invval IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.11  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.12  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3invval';
 --
@@ -1829,7 +1829,22 @@ BEGIN
    nm_debug.proc_end(g_package_name,'pop_latest_asset_tab');
 --
 END pop_latest_asset_tab;
+--
 ----------------------------------------------------------------------------------------------
 --
-END;
+FUNCTION check_contiguity ( pi_ne_id       nm_elements.ne_id%TYPE
+                          , pi_inv_type    nm_inv_items.iit_inv_type%TYPE
+                          , pi_xsp         nm_inv_items.iit_x_sect%TYPE
+                          , pi_route_datum VARCHAR)
+  RETURN BOOLEAN
+IS
+BEGIN
+RETURN nm3pla.check_contiguity ( pi_ne_id       => pi_ne_id
+                               , pi_inv_type    => pi_inv_type
+                               , pi_xsp         => pi_xsp
+                               , pi_route_datum => pi_route_datum
+                               );
+END check_contiguity;
+
+END nm3invval;
 /
