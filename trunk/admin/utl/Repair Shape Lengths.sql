@@ -1,15 +1,4 @@
 --
---------------------------------------------------------------------------------
---   PVCS Identifiers :-
---
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/Repair Shape Lengths.sql-arc   1.1   Sep 06 2010 17:48:16   Ade.Edwards  $
---       Module Name      : $Workfile:   Repair Shape Lengths.sql  $
---       Date into PVCS   : $Date:   Sep 06 2010 17:48:16  $
---       Date fetched Out : $Modtime:   Sep 06 2010 17:48:14  $
---       PVCS Version     : $Revision:   1.1  $
---
---------------------------------------------------------------------------------
---
 
 SET SERVEROUTPUT ON
 --
@@ -59,6 +48,7 @@ BEGIN
                      ' AND column_name = '||nm3flx.string(i.nth_feature_shape_column)||nl||
                      ' AND sdo_lrs.geom_segment_end_measure('||i.nth_feature_shape_column||') != ne_length )'||nl||
       '  LOOP '||nl||
+         ' l_total := l_total+1;'||nl||
          ' l_geom := z.'|| i.nth_feature_shape_column||';'||nl||
          ' sdo_lrs.redefine_geom_segment (l_geom, z.diminfo, 0, z.ne_length );'||nl||
       '    UPDATE '||i.nth_feature_table||' SET '||i.nth_feature_shape_column||' = l_geom'||nl||
@@ -76,5 +66,4 @@ BEGIN
   dbms_output.put_line ( '# Correcting Element/Shape lengths complete - Please review and issue a COMMIT to finish');
 END;
 /
-
 
