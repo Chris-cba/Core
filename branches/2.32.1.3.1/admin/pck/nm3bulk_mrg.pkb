@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.15   23 Aug 2010 15:51:52   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.16   Sep 07 2010 14:03:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   23 Aug 2010 15:51:52  $
---       Date fetched Out : $Modtime:   20 Aug 2010 10:29:48  $
---       PVCS Version     : $Revision:   2.32.1.3.1.15  $
+--       Date into PVCS   : $Date:   Sep 07 2010 14:03:06  $
+--       Date fetched Out : $Modtime:   Sep 07 2010 14:01:44  $
+--       PVCS Version     : $Revision:   2.32.1.3.1.16  $
 --
 --
 --   Author : Priidu Tanava
@@ -113,7 +113,7 @@ No query types defined.
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
         add p_group_type variable to load_group_datums() to specify driving group type when loaded group is non-linear
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.3.1.15  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.3.1.16  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -3247,7 +3247,7 @@ No query types defined.
 
   procedure clear_datum_criteria_pre_tmp
   is
-    pragma autonomous_transaction;
+--    pragma autonomous_transaction;
   begin
     execute immediate 'truncate table nm_datum_criteria_pre_tmp drop storage';
     commit;
@@ -3258,7 +3258,7 @@ No query types defined.
 
   procedure clear_datum_criteria_tmp
   is
-    pragma autonomous_transaction;
+--    pragma autonomous_transaction;
   begin
     execute immediate 'truncate table nm_datum_criteria_tmp drop storage';
     commit;
@@ -3269,7 +3269,7 @@ No query types defined.
 
   procedure clear_route_connectivity_tmp
   is
-    pragma autonomous_transaction;
+--    pragma autonomous_transaction;
   begin
     execute immediate 'truncate table nm_route_connectivity_tmp drop storage';
     commit;
@@ -3280,7 +3280,7 @@ No query types defined.
   
   procedure clear_splits_tmp
   is
-    pragma autonomous_transaction;
+--    pragma autonomous_transaction;
   begin
     execute immediate 'truncate table nm_mrg_split_results_tmp drop storage';
     commit;
@@ -3291,7 +3291,7 @@ No query types defined.
   
   procedure clear_homo_chunks_tmp
   is
-    pragma autonomous_transaction;
+--    pragma autonomous_transaction;
   begin
     execute immediate 'truncate table nm_mrg_datum_homo_chunks_tmp drop storage';
     commit;
