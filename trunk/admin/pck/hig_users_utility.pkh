@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_users_utility.pkh-arc   3.1   May 08 2009 15:36:14   bodriscoll  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_users_utility.pkh-arc   3.2   Sep 09 2010 13:36:14   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_users_utility.pkh  $
---       Date into PVCS   : $Date:   May 08 2009 15:36:14  $
---       Date fetched Out : $Modtime:   Apr 28 2009 16:55:48  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Sep 09 2010 13:36:14  $
+--       Date fetched Out : $Modtime:   Sep 09 2010 11:27:08  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
 --</GLOBVAR>
 --
 Type l_huc_rec IS Record (
@@ -75,8 +75,8 @@ FUNCTION get_body_version RETURN varchar2;
 --</PRAGMA>
 --
 -----------------------------------------------------------------------------
-PROCEDURE upd_huc(pi_huc_rec           IN l_huc_rec
-                 ,po_error_text OUT    Varchar2 ) ;
+PROCEDURE upd_huc( pi_huc_rec           IN OUT l_huc_rec
+                 , po_error_text           OUT VARCHAR2 ) ;
 --
 FUNCTION  get_primary_contact(pi_hus_user_id hig_users.hus_user_id%TYPE)
 RETURN    hig_user_details_vw.HUD_huc_telephone_1%TYPE;
