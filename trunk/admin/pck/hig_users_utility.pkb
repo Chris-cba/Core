@@ -5,9 +5,9 @@ AS
 --
 --       PVCS id          : $Header   //vm_latest/archives/nm3/admin/pck/hig_user_utility.pkb-arc   3.0 Mar 31 2009 10:10:10   Linesh Sorathia  $
 --       Module Name      : $Workfile:   hig_users_utility.pkb  $
---       Date into PVCS   : $Date:   May 08 2009 15:36:14  $
---       Date fetched Out : $Modtime:   Apr 29 2009 10:50:22  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Sep 09 2010 13:36:16  $
+--       Date fetched Out : $Modtime:   Sep 09 2010 11:54:58  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.1  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.2  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_users_utility';
 --
@@ -37,89 +37,84 @@ END get_body_version;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE upd_huc(pi_huc_rec          IN l_huc_rec
-                 ,po_error_text OUT    Varchar2 )
+PROCEDURE upd_huc(pi_huc_rec          IN OUT l_huc_rec
+                 ,po_error_text          OUT VARCHAR2 
+                 )
 IS
 --
 BEGIN
 --
-   IF Nvl(pi_huc_rec.HUD_huc_id,0) > 0 
-   THEN
-   --
        UPDATE hig_user_contacts_all
-       SET    HUC_ADDRESS1       = pi_huc_rec.HUD_HUC_ADDRESS1,
-              HUC_ADDRESS2       = pi_huc_rec.HUD_HUC_ADDRESS2 ,
-              HUC_ADDRESS3       = pi_huc_rec.HUD_HUC_ADDRESS3,
-              HUC_ADDRESS4       = pi_huc_rec.HUD_HUC_ADDRESS4,
-              HUC_ADDRESS5       = pi_huc_rec.HUD_HUC_ADDRESS5,
-              huc_tel_type_1     = pi_huc_rec.HUD_huc_tel_type_1,
-              HUC_TELEPHONE_1    = pi_huc_rec.HUD_HUC_TELEPHONE_1,
-              huc_primary_tel_1  = pi_huc_rec.HUD_huc_primary_tel_1,
-              huc_tel_type_2     = pi_huc_rec.HUD_huc_tel_type_2,
-              HUC_TELEPHONE_2    = pi_huc_rec.HUD_HUC_TELEPHONE_2 ,
-              huc_primary_tel_2  = pi_huc_rec.HUD_huc_primary_tel_2,
-              huc_tel_type_3     = pi_huc_rec.HUD_huc_tel_type_3,
-              HUC_TELEPHONE_3    = pi_huc_rec.HUD_HUC_TELEPHONE_3,
-              huc_primary_tel_3  = pi_huc_rec.HUD_huc_primary_tel_3 ,
-              huc_tel_type_4     = pi_huc_rec.HUD_huc_tel_type4,
-              HUC_TELEPHONE_4    = pi_huc_rec.HUD_HUC_TELEPHONE_4,
-              huc_primary_tel_4  = pi_huc_rec.HUD_huc_primary_tel_4,
-              HUC_POSTCODE       = pi_huc_rec.HUD_HUC_POSTCODE,
-              HUC_DATE_MODIFIED  = sysdate,
-              HUC_MODIFIED_BY    = user
-       WHERE  huc_id             = pi_huc_rec.HUD_huc_id ;
-   ELSE
+       SET    huc_address1       = pi_huc_rec.hud_huc_address1,
+              huc_address2       = pi_huc_rec.hud_huc_address2 ,
+              huc_address3       = pi_huc_rec.hud_huc_address3,
+              huc_address4       = pi_huc_rec.hud_huc_address4,
+              huc_address5       = pi_huc_rec.hud_huc_address5,
+              huc_tel_type_1     = pi_huc_rec.hud_huc_tel_type_1,
+              huc_telephone_1    = pi_huc_rec.hud_huc_telephone_1,
+              huc_primary_tel_1  = pi_huc_rec.hud_huc_primary_tel_1,
+              huc_tel_type_2     = pi_huc_rec.hud_huc_tel_type_2,
+              huc_telephone_2    = pi_huc_rec.hud_huc_telephone_2 ,
+              huc_primary_tel_2  = pi_huc_rec.hud_huc_primary_tel_2,
+              huc_tel_type_3     = pi_huc_rec.hud_huc_tel_type_3,
+              huc_telephone_3    = pi_huc_rec.hud_huc_telephone_3,
+              huc_primary_tel_3  = pi_huc_rec.hud_huc_primary_tel_3 ,
+              huc_tel_type_4     = pi_huc_rec.hud_huc_tel_type4,
+              huc_telephone_4    = pi_huc_rec.hud_huc_telephone_4,
+              huc_primary_tel_4  = pi_huc_rec.hud_huc_primary_tel_4,
+              huc_postcode       = pi_huc_rec.hud_huc_postcode
+       WHERE  huc_id             = pi_huc_rec.hud_huc_id ;
+   --
+   IF SQL%NOTFOUND THEN
+   --
        INSERT INTO hig_user_contacts_all
-      (HUC_ID,
+      (
+       huc_id,
        huc_hus_user_id,
-       HUC_ADDRESS1,
-       HUC_ADDRESS2,
-       HUC_ADDRESS3,
-       HUC_ADDRESS4,
-       HUC_ADDRESS5,
+       huc_address1,
+       huc_address2,
+       huc_address3,
+       huc_address4,
+       huc_address5,
        huc_tel_type_1,
-       HUC_TELEPHONE_1,
+       huc_telephone_1,
        huc_primary_tel_1 ,
        huc_tel_type_2 ,
-       HUC_TELEPHONE_2,
+       huc_telephone_2,
        huc_primary_tel_2 ,
        huc_tel_type_3,
-       HUC_TELEPHONE_3,
+       huc_telephone_3,
        huc_primary_tel_3 ,
        huc_tel_type_4,
-       HUC_TELEPHONE_4,
+       huc_telephone_4,
        huc_primary_tel_4 ,
-       HUC_POSTCODE,
-       HUC_DATE_CREATED,
-       HUC_DATE_MODIFIED,
-       HUC_MODIFIED_BY,
-       HUC_CREATED_BY)
+       huc_postcode
+       )
        VALUES 
-       (hig_hus_id_seq.nextval ,
-        pi_huc_rec.HUD_hus_user_id ,
-        pi_huc_rec.HUD_HUC_ADDRESS1, 
-        pi_huc_rec.HUD_HUC_ADDRESS2, 
-        pi_huc_rec.HUD_HUC_ADDRESS3, 
-        pi_huc_rec.HUD_HUC_ADDRESS4, 
-        pi_huc_rec.HUD_HUC_ADDRESS5, 
-        pi_huc_rec.HUD_huc_tel_type_1, 
-        pi_huc_rec.HUD_HUC_TELEPHONE_1, 
-        pi_huc_rec.HUD_huc_primary_tel_1 , 
-        pi_huc_rec.HUD_huc_tel_type_2, 
-        pi_huc_rec.HUD_HUC_TELEPHONE_2, 
-        pi_huc_rec.HUD_huc_primary_tel_2 , 
-        pi_huc_rec.HUD_huc_tel_type_3, 
-        pi_huc_rec.HUD_HUC_TELEPHONE_3, 
-        pi_huc_rec.HUD_huc_primary_tel_3 , 
-        pi_huc_rec.HUD_huc_tel_type4, 
-        pi_huc_rec.HUD_HUC_TELEPHONE_4, 
-        pi_huc_rec.HUD_huc_primary_tel_4 , 
-        pi_huc_rec.HUD_HUC_POSTCODE, 
-        Sysdate, 
-        Sysdate, 
-        User, 
-        User 
-        ) ;     
+       (
+       hig_hus_id_seq.NEXTVAL,
+       pi_huc_rec.hud_hus_user_id ,
+       pi_huc_rec.hud_huc_address1, 
+       pi_huc_rec.hud_huc_address2, 
+       pi_huc_rec.hud_huc_address3, 
+       pi_huc_rec.hud_huc_address4, 
+       pi_huc_rec.hud_huc_address5, 
+       pi_huc_rec.hud_huc_tel_type_1, 
+       pi_huc_rec.hud_huc_telephone_1, 
+       pi_huc_rec.hud_huc_primary_tel_1 , 
+       pi_huc_rec.hud_huc_tel_type_2, 
+       pi_huc_rec.hud_huc_telephone_2, 
+       pi_huc_rec.hud_huc_primary_tel_2 , 
+       pi_huc_rec.hud_huc_tel_type_3, 
+       pi_huc_rec.hud_huc_telephone_3, 
+       pi_huc_rec.hud_huc_primary_tel_3 , 
+       pi_huc_rec.hud_huc_tel_type4, 
+       pi_huc_rec.hud_huc_telephone_4, 
+       pi_huc_rec.hud_huc_primary_tel_4 , 
+       pi_huc_rec.hud_huc_postcode
+       )
+       RETURNING huc_id
+       INTO pi_huc_rec.hud_huc_id;
    --
    END IF ;
 --
