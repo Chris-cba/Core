@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.8   Sep 02 2010 11:00:22   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.9   Sep 10 2010 10:42:16   ade.edwards  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Sep 02 2010 11:00:22  $
---       Date fetched Out : $Modtime:   Sep 01 2010 16:36:06  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Sep 10 2010 10:42:16  $
+--       Date fetched Out : $Modtime:   Sep 10 2010 10:41:30  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -19,12 +19,12 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --   Spatial Data Manager specific package body
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2002
+-- Copyright (c) exor corporation ltd, 2002
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -233,14 +233,14 @@ BEGIN
       Nm_Debug.DEBUG('Parent = '||p_parent_id );
       p_layer  := get_sde_layer_from_theme(p_theme_id => p_parent_id );
       p_geocol := get_geocol( l_parent.nth_feature_table, l_parent.nth_feature_shape_column );
-	  p_reg    := get_treg( l_parent.nth_feature_table );
+   p_reg    := get_treg( l_parent.nth_feature_table );
 
     EXCEPTION
       WHEN NO_DATA_FOUND THEN
        Nm_Debug.DEBUG('No parent layer');
        p_layer := generate_sde_layer_from_theme( l_theme );
 
-  	 WHEN OTHERS THEN
+    WHEN OTHERS THEN
       Nm_Debug.DEBUG('Others');
       p_layer := generate_sde_layer_from_theme( l_theme );
     END;
@@ -383,10 +383,10 @@ BEGIN
 EXCEPTION
   WHEN OTHERS THEN
     IF null_exc = 'TRUE'  THEN
-	  RETURN 0;
-	ELSE
-	  RAISE;
-	END IF;
+   RETURN 0;
+ ELSE
+   RAISE;
+ END IF;
 END;
 
 --
@@ -411,7 +411,7 @@ BEGIN
 
       Nm3sdo.set_diminfo_and_srid( l_base, l_diminfo, l_srid ); -- this guarantees that consistent base srids are in use from the Oracle perspective
 
-	ELSE
+ ELSE
 
       l_usgm := Nm3sdo.get_theme_metadata( p_nth.nth_theme_id );
 
@@ -501,7 +501,10 @@ FUNCTION register_SRID_from_theme( p_theme_id IN nm_themes_all.nth_theme_id%TYPE
     IF l_srids.ia.LAST IS NULL OR l_srids.ia.LAST <= 0 THEN
       retval :=  NULL;
     ELSIF l_srids.ia.LAST > 1 THEN
-      retval := NULL;
+      --retval := NULL;
+      -- AE use the first one from the stack otherwise it'll fail later
+      -- with unit error on 3302 asset layers.
+      retval := l_srids.ia(1);
     ELSE
   --  we have a single srid for the base layers
       retval := l_srids.ia(1);
@@ -943,10 +946,10 @@ END drop_layer;
 --
 
 FUNCTION convert_to_sde_eflag(gtype IN INTEGER, lrs_override IN VARCHAR2 DEFAULT 'Y') RETURN INTEGER IS
-   eflag	INTEGER;
-   sub_typ	INTEGER;
-   m_dim	INTEGER;
-   dim		INTEGER;
+   eflag INTEGER;
+   sub_typ INTEGER;
+   m_dim INTEGER;
+   dim  INTEGER;
 
    l_gtype  INTEGER := gtype;
 BEGIN
@@ -1066,8 +1069,8 @@ END;
 FUNCTION  get_sde_type_from_gtype( p_gtype IN INTEGER, p_allow_multi IN VARCHAR2 DEFAULT 'N') RETURN INTEGER IS
 
    rt       INTEGER;
-   dim		INTEGER;
-   res		INTEGER;
+   dim  INTEGER;
+   res  INTEGER;
 
 BEGIN
    rt := -1;
@@ -1080,28 +1083,28 @@ BEGIN
    res := Nm3sdo.get_type_from_gtype(p_gtype);
 
    IF res = 1 THEN
-     rt := 1;	-- point
+     rt := 1; -- point
      IF p_allow_multi = 'Y' THEN
        rt := 5;
      END IF;
    ELSIF res = 2 THEN
-     rt := 3;	-- linestring
+     rt := 3; -- linestring
      IF p_allow_multi = 'Y' THEN
        rt := 9; -- multilinestring
      END IF;
    ELSIF res = 3 THEN
-     rt := 5;	-- polygon
+     rt := 5; -- polygon
      IF p_allow_multi = 'Y' THEN
        rt := 11; -- multipolygon
      END IF;
    ELSIF res = 4 THEN
-     rt := 6;	-- collection
+     rt := 6; -- collection
    ELSIF res = 5 THEN
-     rt := 7;	-- multipoint
+     rt := 7; -- multipoint
    ELSIF res = 6 THEN
-     rt := 9;	-- multilinestring
+     rt := 9; -- multilinestring
    ELSIF res = 7 THEN
-     rt := 11;	-- multipolygon
+     rt := 11; -- multipolygon
    END IF;
 -- We don't want to deal with curves and the like
    RETURN rt;
@@ -1806,12 +1809,12 @@ BEGIN
 
 --     cur_str := 'select f1.'||l_reg.rowid_column||
 --                ' from '||l_nth.nth_feature_table||' f1, table ( :p_id.ia ) i where f1.'||l_nth.nth_feature_pk_column||' in '||
--- 	  		   ' ( select f2.'||l_nth.nth_feature_pk_column||' from '||l_nth.nth_feature_table||' f2 '||
--- 			   ' where f2.'||l_reg.rowid_column||' = i.column_value )';
+--         ' ( select f2.'||l_nth.nth_feature_pk_column||' from '||l_nth.nth_feature_table||' f2 '||
+--       ' where f2.'||l_reg.rowid_column||' = i.column_value )';
 
     cur_str := 'select DISTINCT f1.'||l_reg.rowid_column||
                ' from '||l_nth.nth_feature_table||' f1, '||l_nth.nth_feature_table||' f2 where f1.'||l_nth.nth_feature_pk_column||' = '||
-	  		   ' f2.'||l_nth.nth_feature_pk_column||' and f2.'||l_reg.rowid_column||' in ( '||p_id_array.array_to_list||')';
+        ' f2.'||l_nth.nth_feature_pk_column||' and f2.'||l_reg.rowid_column||' in ( '||p_id_array.array_to_list||')';
 
 
 
