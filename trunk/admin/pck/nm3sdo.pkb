@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.41   Aug 18 2010 11:49:22   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.42   Sep 10 2010 11:12:06   ade.edwards  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Aug 18 2010 11:49:22  $
---       Date fetched Out : $Modtime:   Aug 18 2010 11:48:14  $
---       PVCS Version     : $Revision:   2.41  $
+--       Date into PVCS   : $Date:   Sep 10 2010 11:12:06  $
+--       Date fetched Out : $Modtime:   Sep 10 2010 11:10:18  $
+--       PVCS Version     : $Revision:   2.42  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.41  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.42  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -38,6 +38,8 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
                                                          ptr_vc( 1, 13011 ) -- ORA-13011: value is out of range
                                                       -- , ptr_vc( 2, 13356 ) -- ORA-13356: adjacent points are redundant
                                                   ));
+
+   g_do_geom_validation        BOOLEAN :=  NVL(hig.get_user_or_sys_opt('SDOGEOMVAL'),'Y') = 'Y' ;
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -4898,12 +4900,6 @@ PROCEDURE insert_element_shape( p_layer IN NUMBER,
 --
 BEGIN
 --
-  -- Task 0109983
-  -- Validate the geometry and raise error if appropriate
-  --
-  evaluate_and_raise_geo_val (validate_geometry(p_geom,p_layer,NULL));
-  --
---
   l_nth := nm3get.get_nth( p_layer );
 
   IF l_nth.nth_base_table_theme IS NOT NULL THEN
@@ -4950,7 +4946,15 @@ BEGIN
 
 --    raise_application_error(-20001,'Lengths of element and shape are inconsistent' );
   END IF;
-
+--
+  -- Task 0109983
+  -- Validate the geometry and raise error if appropriate
+  --
+  IF g_do_geom_validation
+  THEN
+    evaluate_and_raise_geo_val (validate_geometry(p_geom,p_layer,NULL));
+  END IF;
+--
   IF use_surrogate_key = 'N' OR l_is_datum THEN
 
     cur_string := 'insert into '||g_usgm.table_name||' ( '||g_nth.nth_feature_pk_column||','||
