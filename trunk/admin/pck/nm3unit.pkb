@@ -2,11 +2,11 @@ create or replace package body nm3unit as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3unit.pkb-arc   2.1   Jan 06 2010 16:41:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3unit.pkb-arc   2.2   Sep 14 2010 17:05:54   ade.edwards  $
 --       Module Name      : $Workfile:   nm3unit.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:36  $
---       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Sep 14 2010 17:05:54  $
+--       Date fetched Out : $Modtime:   Sep 14 2010 17:04:26  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -14,9 +14,9 @@ create or replace package body nm3unit as
 --   nm3unit package
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2000
+-- Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '$Revision:   2.1  $';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3unit';
 --
@@ -423,7 +423,8 @@ BEGIN
   END IF;
 
   llog10 := LOG (10, p_tol);
-  retval := ABS (TRUNC (llog10)) + SIGN (llog10 * -1);
+  -- Task 0110157, 0110158 and 4300
+  retval := ABS (TRUNC (llog10)) + SIGN (llog10 * -1) - 1;
   RETURN retval;
 END;
 --
@@ -448,7 +449,7 @@ BEGIN
 
  RETURN(
         TO_CHAR(TO_DATE(pi_seconds_past_midnight,'SSSSS'),'HH24:MI')
-	    );
+     );
 
 END seconds_to_char_time;
 --
