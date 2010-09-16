@@ -1,13 +1,15 @@
 CREATE OR REPLACE PACKAGE BODY higgis AS
 --
---   SCCS Identifiers :-
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
 --
---       sccsid           : @(#)higgis.pkb 1.39 01/26/07
---       Module Name      : higgis.pkb
---       Date into SCCS   : 07/01/26 16:35:41
---       Date fetched Out : 07/06/13 14:10:34
---       SCCS Version     : 1.39
---
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/higgis.pkb-arc   2.3   Sep 16 2010 17:18:06   Chris.Strettle  $
+--       Module Name      : $Workfile:   higgis.pkb  $
+--       Date into PVCS   : $Date:   Sep 16 2010 17:18:06  $
+--       Date fetched Out : $Modtime:   Sep 16 2010 17:14:52  $
+--       Version          : $Revision:   2.3  $
+--       Based on SCCS version : 1.39
+-------------------------------------------------------------------------
 --   A GIS package intended to handle all GIS theme and connection information
 --
 --   Author : Rob Coupe
@@ -1273,12 +1275,18 @@ FUNCTION derive_das_table_from_gt (p_gt_table_name  gis_themes.gt_table_name%TYP
    l_retval             varchar2(30);
    l_found              boolean;
    l_rec_dgt            doc_gateways%ROWTYPE;
+   l_rec_dgs            doc_gate_syns%ROWTYPE;
    l_table_name         gis_themes.gt_table_name%TYPE;
 --
    CURSOR cs_nit (c_table varchar2) IS
    SELECT 'NM_INV_ITEMS'
-    FROM  nm_inv_types
-   WHERE  nm3inv_view.derive_inv_type_view_name(nit_inv_type) = c_table;
+     FROM  nm_inv_types
+    WHERE  nm3inv_view.derive_inv_type_view_name(nit_inv_type) = c_table;
+--
+   CURSOR cur_syn (c_table varchar2) IS
+   SELECT dgs_dgt_table_name
+     FROM  DOC_GATE_SYNS
+    WHERE  dgs_table_syn = c_table;
 --
 BEGIN
 --
@@ -1301,6 +1309,7 @@ BEGIN
        THEN
          l_retval := l_table_name;
       END IF;
+   --
 --   ELSIF 1=2 -- other product specific derivation would have to go here (in dynamic sql).
 --    THEN
 --      Null;
@@ -1308,7 +1317,23 @@ BEGIN
       l_retval := l_table_name;
    END IF;
 --
-   l_rec_dgt := nm3get.get_dgt (pi_dgt_table_name => l_retval);
+   l_rec_dgt := nm3get.get_dgt (pi_dgt_table_name => l_retval
+                               , pi_raise_not_found    => FALSE);
+--
+   IF l_rec_dgt.dgt_table_name IS NULL THEN
+     OPEN cur_syn (c_table => l_retval);
+     FETCH cur_syn INTO l_retval;
+     CLOSE cur_syn;
+   --
+     l_rec_dgt := nm3get.get_dgt ( pi_dgt_table_name => l_retval
+                                 , pi_raise_not_found    => FALSE);
+   --
+     IF l_rec_dgt.dgt_table_name IS NULL THEN
+       hig.raise_ner( pi_appl => 'NET'
+                    , pi_id => 466);
+     END IF;
+   --
+   END IF;
 --
    nm_debug.proc_end(g_package_name,'derive_das_table_from_gt');
 --
