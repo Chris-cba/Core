@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_metadata_upg.sql-arc   3.0   Sep 16 2010 15:54:18   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_metadata_upg.sql-arc   3.1   Sep 16 2010 17:42:00   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4210_nm4300_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Sep 16 2010 15:54:18  $
---       Date fetched Out : $Modtime:   Sep 16 2010 15:52:06  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Sep 16 2010 17:42:00  $
+--       Date fetched Out : $Modtime:   Sep 16 2010 17:40:52  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -228,6 +228,28 @@ UPDATE hig_navigator
 SET     hnv_hier_label_3 = 'hig_nav.concate_label(hig_nav.get_road_unique(wol_rse_he_id))'
 WHERE Upper(hnv_child_table) = 'WORK_ORDER_LINES';
 
+
+DELETE FROM hig_navigator_modules WHERE HNM_MODULE_NAME IN  ('NM0510','NM0590') ;
+
+INSERT INTO HIG_NAVIGATOR_MODULES
+   (HNM_MODULE_NAME, HNM_MODULE_PARAM, HNM_PRIMARY_MODULE, HNM_SEQUENCE, HNM_TABLE_NAME, 
+    HNM_FIELD_NAME, HNM_HIERARCHY_LABEL, HNM_DATE_CREATED, HNM_CREATED_BY, HNM_DATE_MODIFIED, 
+    HNM_MODIFIED_BY)
+ VALUES
+   ('NM0510', 'query_inv_item', 'Y', 1, NULL, 
+    NULL, 'Asset', To_Date('02/22/2010 16:53:43', 'MM/DD/YYYY HH24:MI:SS'), 'DORSET', To_Date('02/22/2010 16:53:43', 'MM/DD/YYYY HH24:MI:SS'), 
+    'DORSET');
+    
+INSERT INTO HIG_NAVIGATOR_MODULES
+   (HNM_MODULE_NAME, HNM_MODULE_PARAM, HNM_PRIMARY_MODULE, HNM_SEQUENCE, HNM_TABLE_NAME, 
+    HNM_FIELD_NAME, HNM_HIERARCHY_LABEL, HNM_DATE_CREATED, HNM_CREATED_BY, HNM_DATE_MODIFIED, 
+    HNM_MODIFIED_BY)
+ VALUES
+   ('NM0590', 'query_inv_item', 'N', 2, NULL, 
+    NULL, 'Asset', To_Date('03/30/2010 17:43:05', 'MM/DD/YYYY HH24:MI:SS'), 'DORSET', To_Date('03/30/2010 17:43:05', 'MM/DD/YYYY HH24:MI:SS'), 
+    'DORSET');
+
+
 ------------------------------------------------------------------
 
 
@@ -253,6 +275,89 @@ SET       ner_descr = 'The trigger has been dropped. Please use the Create Trigg
 WHERE  ner_id       = 527
 AND      ner_appl   = 'HIG';
 
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New Error Message
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 109750
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
+-- New Error Message for doc0120 form.
+-- 
+------------------------------------------------------------------
+INSERT INTO nm_errors
+   SELECT 'NET',
+          466,
+          NULL,
+          'Cannot find Document Gateway table or appropriate synonym.',
+          'Add the relevant table and/or synonym using the Document Gateway form (DOC0130)'
+     FROM DUAL
+    WHERE NOT EXISTS
+             (SELECT 1
+                FROM nm_errors
+               WHERE ner_appl = 'NET' AND ner_id = 466)
+/
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT ID Tool Product Option
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADE EDWARDS)
+-- ID Tool Product Option
+-- 
+------------------------------------------------------------------
+Insert Into hig_option_list( hol_id
+                           , hol_product
+                           , hol_name
+                           , hol_remarks
+                           , hol_domain
+                           , hol_datatype
+                           , hol_mixed_case
+                           , hol_user_option
+                           , hol_max_length
+                           )
+                      Select 'WEBMAPIDBF'
+                           , 'WMP'
+                           , 'ID Tool Buffer'
+                           , 'Buffer used when selecting features for the ID Tool'
+                           , Null
+                           , 'VARCHAR2'
+                           , 'N'
+                           , 'N'
+                           , 2000
+                      From   Dual
+                      Where Not Exists (Select 1
+                                        From   hig_option_list
+                                        Where  hol_id = 'WEBMAPIDBF'
+                                       );
+                                        
+
+Insert Into hig_option_values( hov_id
+                             , hov_value
+                             )
+                        Select 'WEBMAPIDBF'
+                             , '20'
+                        From   Dual
+                        Where Not Exists (Select 1
+                                          From   hig_option_values
+                                          Where  hov_id = 'WEBMAPIDBF'
+                                         );
 
 ------------------------------------------------------------------
 
