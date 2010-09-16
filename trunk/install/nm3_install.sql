@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.24   Apr 12 2010 11:21:12   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.25   Sep 16 2010 16:33:34   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Apr 12 2010 11:21:12  $
---       Date fetched Out : $Modtime:   Apr 12 2010 11:20:46  $
---       PVCS Version     : $Revision:   2.24  $
+--       Date into PVCS   : $Date:   Sep 16 2010 16:33:34  $
+--       Date fetched Out : $Modtime:   Sep 16 2010 16:32:10  $
+--       PVCS Version     : $Revision:   2.25  $
 --
 --------------------------------------------------------------------------------
 --
@@ -103,21 +103,6 @@ from dual
 SET FEEDBACK ON
 start '&&run_file'
 SET FEEDBACK OFF
-
---
----------------------------------------------------------------------------------------------------
---                        ****************   INDEXES  *******************
-SET TERM ON
-prompt Indexes...
-SET TERM OFF
-SET DEFINE ON
-select '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'nm3.ind' run_file
-from dual
-/
-SET FEEDBACK ON
-start '&&run_file'
-SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   CONSTRAINTS  *******************
@@ -127,6 +112,20 @@ SET TERM OFF
 SET DEFINE ON
 select '&exor_base'||'nm3'||'&terminator'||'install'||
         '&terminator'||'nm3.con' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   INDEXES  *******************
+SET TERM ON
+prompt Indexes...
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'nm3.ind' run_file
 from dual
 /
 SET FEEDBACK ON
@@ -537,11 +536,11 @@ SET TERM ON
 Prompt Setting The Version Number...
 SET TERM OFF
 BEGIN
-      hig2.upgrade('HIG','nm3_install.sql','Installed','4.2.1.0');
-      hig2.upgrade('NET','nm3_install.sql','Installed','4.2.1.0');
-      hig2.upgrade('DOC','nm3_install.sql','Installed','4.2.1.0');
-      hig2.upgrade('AST','nm3_install.sql','Installed','4.2.1.0');
-      hig2.upgrade('WMP','nm3_install.sql','Installed','4.2.1.0');
+      hig2.upgrade('HIG','nm3_install.sql','Installed','4.3.0.0');
+      hig2.upgrade('NET','nm3_install.sql','Installed','4.3.0.0');
+      hig2.upgrade('DOC','nm3_install.sql','Installed','4.3.0.0');
+      hig2.upgrade('AST','nm3_install.sql','Installed','4.3.0.0');
+      hig2.upgrade('WMP','nm3_install.sql','Installed','4.3.0.0');
 END;
 /
 COMMIT;
