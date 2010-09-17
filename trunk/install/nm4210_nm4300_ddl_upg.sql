@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_ddl_upg.sql-arc   3.0   Sep 16 2010 15:54:18   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_ddl_upg.sql-arc   3.1   Sep 17 2010 14:29:24   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4210_nm4300_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Sep 16 2010 15:54:18  $
---       Date fetched Out : $Modtime:   Sep 16 2010 15:52:06  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Sep 17 2010 14:29:24  $
+--       Date fetched Out : $Modtime:   Sep 17 2010 14:28:54  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -320,6 +320,42 @@ create unique index itd_itb_fk_ind on nm_inv_type_attrib_band_dets (
   itd_inv_type, itd_attrib_name, itd_itb_banding_id, itd_band_min_value, itd_band_max_value, itd_band_seq, itd_band_description
 )
 /
+
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New Table NM_DATUM_CRITERIA_PRE_TMP
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 110172
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (ADE EDWARDS)
+-- New Table NM_DATUM_CRITERIA_PRE_TMPTable
+-- 
+------------------------------------------------------------------
+CREATE GLOBAL TEMPORARY TABLE NM_DATUM_CRITERIA_PRE_TMP
+(
+  NM_NE_ID_OF        NUMBER(9),
+  NM_NE_ID_IN        NUMBER(9),
+  NM_BEGIN_MP        NUMBER,
+  NM_END_MP          NUMBER,
+  NE_GTY_GROUP_TYPE  VARCHAR2(4),
+  NGT_GROUP_TYPE     VARCHAR2(4),
+  GROUP_ID           NUMBER(9)
+)
+ON COMMIT PRESERVE ROWS
+NOCACHE;
+
+
 
 
 ------------------------------------------------------------------
