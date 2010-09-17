@@ -1,17 +1,17 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.18   Jun 09 2010 15:14:04   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.19   Sep 17 2010 14:11:00   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   Jun 09 2010 15:14:04  $
---       Date fetched Out : $Modtime:   Jun 09 2010 15:12:58  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Sep 17 2010 14:11:00  $
+--       Date fetched Out : $Modtime:   Sep 17 2010 14:10:16  $
+--       PVCS Version     : $Revision:   2.19  $
 --
 --------------------------------------------------------------------------------
 --
 
--- Generated for Oracle 10g on Wed Jun 09  15:07:30 2010 by Server Generator 10.1.2.9.28
-
+-- Generated for Oracle 10g on Fri Sep 17  12:47:39 2010 by Server Generator 10.1.2.9.28
+  
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
 CREATE INDEX DOC_FK_DLC_IND ON DOCS
@@ -538,6 +538,11 @@ CREATE INDEX HMK_HMO_FK_IND ON HIG_MODULE_KEYWORDS
  (HMK_HMO_MODULE)
 /
 
+PROMPT Creating Index 'HMLC_HMLM_FK_IND'
+CREATE INDEX HMLC_HMLM_FK_IND ON HIG_MODULE_LINK_CALLS
+ (HMLC_METHOD_ID)
+/
+
 PROMPT Creating Index 'HMR_HMO_FK_IND'
 CREATE INDEX HMR_HMO_FK_IND ON HIG_MODULE_ROLES
  (HMR_MODULE)
@@ -551,6 +556,11 @@ CREATE INDEX HMR_HRO_FK_IND ON HIG_MODULE_ROLES
 PROMPT Creating Index 'HMU_HMO_FK_IND'
 CREATE INDEX HMU_HMO_FK_IND ON HIG_MODULE_USAGES
  (HMU_MODULE)
+/
+
+PROMPT Creating Index 'HNV_HPR_FK_IND'
+CREATE INDEX HNV_HPR_FK_IND ON HIG_NAVIGATOR
+ (HNV_HPR_PRODUCT)
 /
 
 PROMPT Creating Index 'HNM_HIERARCHY_LABEL_IND'
@@ -980,10 +990,14 @@ CREATE INDEX ITB_ITA_FK_IND ON NM_INV_TYPE_ATTRIB_BANDINGS
 /
 
 PROMPT Creating Index 'ITD_ITB_FK_IND'
-CREATE INDEX ITD_ITB_FK_IND ON NM_INV_TYPE_ATTRIB_BAND_DETS
+CREATE UNIQUE INDEX ITD_ITB_FK_IND ON NM_INV_TYPE_ATTRIB_BAND_DETS
  (ITD_INV_TYPE
  ,ITD_ATTRIB_NAME
- ,ITD_ITB_BANDING_ID)
+ ,ITD_ITB_BANDING_ID
+ ,ITD_BAND_MIN_VALUE
+ ,ITD_BAND_MAX_VALUE
+ ,ITD_BAND_SEQ
+ ,ITD_BAND_DESCRIPTION)
 /
 
 PROMPT Creating Index 'ITG_NIT_FK_IND'
