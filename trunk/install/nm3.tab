@@ -1,16 +1,20 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.33   Jun 29 2010 23:23:08   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.34   Sep 17 2010 13:52:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Jun 29 2010 23:23:08  $
---       Date fetched Out : $Modtime:   Jun 29 2010 23:21:04  $
---       PVCS Version     : $Revision:   2.33  $
+--       Date into PVCS   : $Date:   Sep 17 2010 13:52:14  $
+--       Date fetched Out : $Modtime:   Sep 17 2010 13:51:16  $
+--       PVCS Version     : $Revision:   2.34  $
 --
 --------------------------------------------------------------------------------
 --
 -- Generated for Oracle 10g on Tue Jun 29  23:16:33 2010 by Server Generator 10.1.2.9.28
 
+
+
+-- Generated for Oracle 10g on Fri Sep 17  12:47:36 2010 by Server Generator 10.1.2.9.28
+ 
 
 
 PROMPT Creating Table 'ANALYSE_ALL_TABS_LOG'
@@ -1406,6 +1410,7 @@ CREATE TABLE HIG_ALERT_TYPES
  ,HALT_CREATED_BY VARCHAR2(30) NOT NULL
  ,HALT_DATE_MODIFIED DATE NOT NULL
  ,HALT_MODIFIED_BY VARCHAR2(30) NOT NULL
+ ,HALT_NEXT_RUN_DATE DATE
  )
 /
 
@@ -1458,6 +1463,9 @@ COMMENT ON COLUMN HIG_ALERT_TYPES.HALT_DATE_MODIFIED IS 'Audit details'
 /
 
 COMMENT ON COLUMN HIG_ALERT_TYPES.HALT_MODIFIED_BY IS 'Audit details'
+/
+
+COMMENT ON COLUMN HIG_ALERT_TYPES.HALT_NEXT_RUN_DATE IS 'This column holds the next run datetime for Scheduled Events'
 /
 
 PROMPT Creating Table 'HIG_ALERT_TYPE_ATTRIBUTES'
@@ -1706,6 +1714,7 @@ CREATE TABLE HIG_AUDITS
  ,HAUD_HUS_USER_ID NUMBER(9) NOT NULL
  ,HAUD_TERMINAL VARCHAR2(100)
  ,HAUD_OS_USER VARCHAR2(100)
+ ,HAUD_DESCRIPTION VARCHAR2(250)
  )
 /
 
@@ -1746,6 +1755,9 @@ COMMENT ON COLUMN HIG_AUDITS.HAUD_TERMINAL IS 'Identifies the terminal from whic
 /
 
 COMMENT ON COLUMN HIG_AUDITS.HAUD_OS_USER IS 'Identifies the operating system username under which the database operation was performed'
+/
+
+COMMENT ON COLUMN HIG_AUDITS.HAUD_DESCRIPTION IS 'This column holds the Audit Description'
 /
 
 PROMPT Creating Table 'HIG_AUDIT_ATTRIBUTES'
@@ -2558,13 +2570,29 @@ CREATE TABLE HIG_MODULE_LINKS
 PROMPT Creating Table 'HIG_MODULE_LINK_CALLS'
 CREATE TABLE HIG_MODULE_LINK_CALLS
  (HMLC_ID NUMBER(9) NOT NULL
+ ,HMLC_SEQ NUMBER(9) NOT NULL
  ,HMLC_METHOD_ID NUMBER(9) NOT NULL
  ,HMLC_PARAM_FROM_VALUE VARCHAR2(4000)
  ,HMLC_PARAM_FROM_FORMAT_MASK VARCHAR2(100)
- ,HMLC_CALLED_BLOCK_WHERE VARCHAR2(4000)
- ,HMLC_DATE_CREATED DATE NOT NULL
- ,HMLC_CREATED_BY VARCHAR2(30) NOT NULL
  )
+/
+
+COMMENT ON TABLE HIG_MODULE_LINK_CALLS IS 'Used by forms linking functionality.  Written to by calling form and then read from by called form to construct a where clause to apply to the relevant forms block.'
+/
+
+COMMENT ON COLUMN HIG_MODULE_LINK_CALLS.HMLC_ID IS 'Call ID.  Primary Key Column 1'
+/
+
+COMMENT ON COLUMN HIG_MODULE_LINK_CALLS.HMLC_SEQ IS 'Sequence Within Call.  Primary Key Column 2'
+/
+
+COMMENT ON COLUMN HIG_MODULE_LINK_CALLS.HMLC_METHOD_ID IS 'Linking Method ID'
+/
+
+COMMENT ON COLUMN HIG_MODULE_LINK_CALLS.HMLC_PARAM_FROM_VALUE IS 'Parameter From Value'
+/
+
+COMMENT ON COLUMN HIG_MODULE_LINK_CALLS.HMLC_PARAM_FROM_FORMAT_MASK IS 'Parameter From Format Mask'
 /
 
 PROMPT Creating Table 'HIG_MODULE_LINK_METHODS'
@@ -2630,6 +2658,7 @@ CREATE TABLE HIG_NAVIGATOR
  ,HNV_CREATED_BY VARCHAR2(30) NOT NULL
  ,HNV_DATE_MODIFIED DATE NOT NULL
  ,HNV_MODIFIED_BY VARCHAR2(30) NOT NULL
+ ,HNV_HPR_PRODUCT VARCHAR2(6)
  )
 /
 
@@ -2688,6 +2717,9 @@ COMMENT ON COLUMN HIG_NAVIGATOR.HNV_DATE_MODIFIED IS 'Audit details'
 /
 
 COMMENT ON COLUMN HIG_NAVIGATOR.HNV_MODIFIED_BY IS 'Audit details'
+/
+
+COMMENT ON COLUMN HIG_NAVIGATOR.HNV_HPR_PRODUCT IS 'This column will hold the Product of the table defined in the hierarchy'
 /
 
 PROMPT Creating Table 'HIG_NAVIGATOR_MODULES'
@@ -4791,6 +4823,20 @@ CREATE GLOBAL TEMPORARY TABLE NM_CREATE_GROUP_TEMP
  ,NCG_SEQ_1 NUMBER
  ,NCG_SEQ_2 NUMBER
  )
+/
+
+PROMPT Creating Table 'NM_DATUM_CRITERIA_PRE_TMP'
+CREATE GLOBAL TEMPORARY TABLE NM_DATUM_CRITERIA_PRE_TMP
+ (NM_NE_ID_OF NUMBER(9)
+ ,NM_NE_ID_IN NUMBER(9)
+ ,NM_BEGIN_MP NUMBER
+ ,NM_END_MP NUMBER
+ ,NE_GTY_GROUP_TYPE VARCHAR2(4)
+ ,NGT_GROUP_TYPE VARCHAR2(4)
+ ,GROUP_ID NUMBER(9)
+ )
+ ON COMMIT PRESERVE ROWS
+ NOCACHE
 /
 
 PROMPT Creating Table 'NM_DATUM_CRITERIA_TMP'
