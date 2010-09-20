@@ -2,16 +2,16 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.23   Jul 01 2010 09:28:06   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.24   Sep 20 2010 14:41:18   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Jul 01 2010 09:28:06  $
---       Date fetched Out : $Modtime:   Jul 01 2010 09:26:14  $
---       Version          : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   Sep 20 2010 14:41:18  $
+--       Date fetched Out : $Modtime:   Sep 20 2010 14:36:58  $
+--       Version          : $Revision:   2.24  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 01-JUL-2010 09:26
+--       Generation Date  : 20-SEP-2010 14:36
 --
 --   Product metadata script
---   As at Release 4.2.1.0
+--   As at Release 4.3.0.0
 --
 --   Copyright (c) exor corporation ltd, 2010
 --
@@ -5101,8 +5101,8 @@ INSERT INTO HIG_MODULE_BLOCKS
 SELECT 
         'HIG1505'
        ,'HAUD'
-       ,to_date('20100630130803','YYYYMMDDHH24MISS')
-       ,to_date('20100630130803','YYYYMMDDHH24MISS')
+       ,to_date('20100920141912','YYYYMMDDHH24MISS')
+       ,to_date('20100920141912','YYYYMMDDHH24MISS')
        ,'NM3_METADATA'
        ,'NM3_METADATA' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_BLOCKS
