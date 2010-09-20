@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.13   Sep 20 2010 14:22:02   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.14   Sep 20 2010 14:35:02   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Sep 20 2010 14:22:02  $
---       Date fetched Out : $Modtime:   Sep 20 2010 14:17:44  $
---       PVCS Version     : $Revision:   3.13  $
+--       Date into PVCS   : $Date:   Sep 20 2010 14:35:02  $
+--       Date fetched Out : $Modtime:   Sep 20 2010 14:34:30  $
+--       PVCS Version     : $Revision:   3.14  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.13  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.14  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -1307,10 +1307,10 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-PROCEDURE add_ftp_outcome( p_ftp_htc_id  VARCHAR2
-                         , p_ftp_type    VARCHAR2
-                         , p_ftp_filename VARCHAR2
-                         , p_ftp_outcome  VARCHAR
+PROCEDURE add_ftp_outcome( p_ftp_htc_id        VARCHAR2
+                         , p_ftp_type          VARCHAR2
+                         , p_ftp_filename      VARCHAR2
+                         , p_ftp_outcome       VARCHAR
                          , p_ftp_outcome_error VARCHAR DEFAULT NULL)
 IS
 l_oc_count NUMBER;
@@ -1346,17 +1346,10 @@ END add_ftp_outcome;
     l_conn          utl_tcp.connection;
     l_success       BOOLEAN;
   --
-
-
   BEGIN
-  /*
-  nm_debug.debug_on;
-  for i in (select column_value from table(pi_tab_ftp_connections) ) loop
-  nm_debug.debug('connection id = '||i.column_value);
-  end loop;
-  */
+  --
   g_tab_ftp_outcome.DELETE;
-
+  --
     FOR i IN (SELECT a.* 
                 FROM hig_ftp_connections a
                 , table(pi_tab_ftp_connections)  b 
@@ -1480,11 +1473,11 @@ END add_ftp_outcome;
                     p_archive_overwrite  => pi_archive_overwrite,
                     p_remove_failed_arch => pi_remove_failed_arch
                   );
-                    add_ftp_outcome( p_ftp_htc_id        => i.hfc_id
-                                   , p_ftp_type          => g_archive
-                                   , p_ftp_filename      => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f)
-                                   , p_ftp_outcome       => g_success
-                                   );
+                add_ftp_outcome( p_ftp_htc_id        => i.hfc_id
+                               , p_ftp_type          => g_archive
+                               , p_ftp_filename      => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f)
+                               , p_ftp_outcome       => g_success
+                               );
               ELSE
               --
               -- Connect to the different archive server and archive the files
@@ -1510,11 +1503,11 @@ END add_ftp_outcome;
                 --
                   nm3ftp.logout(p_conn => l_arc_conn);
                 --
-                    add_ftp_outcome( p_ftp_htc_id        => i.hfc_id
-                                   , p_ftp_type          => g_archive
-                                   , p_ftp_filename      => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f)
-                                   , p_ftp_outcome       => g_success
-                                   );
+                  add_ftp_outcome( p_ftp_htc_id        => i.hfc_id
+                                 , p_ftp_type          => g_archive
+                                 , p_ftp_filename      => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f)
+                                 , p_ftp_outcome       => g_success
+                                 );
                 EXCEPTION
                   WHEN OTHERS
                   THEN
@@ -1586,7 +1579,7 @@ END add_ftp_outcome;
       THEN
       utl_tcp.close_all_connections;
       --
-        add_ftp_outcome( p_ftp_htc_id        => 'NA' --i.hfc_id
+        add_ftp_outcome( p_ftp_htc_id        => 'NA'
                        , p_ftp_type          => 'GENERAL'
                        , p_ftp_filename      => 'NA'
                        , p_ftp_outcome       => g_fail
@@ -1617,14 +1610,13 @@ FUNCTION ftp_in_to_database
        ,hig_ftp_types b
   where b.hft_type = pi_ftp_type
     and a.hfc_hft_id = b.hft_id;
- 
 
 BEGIN
-
+--
  OPEN c_all_conns_for_type;
  FETCH c_all_conns_for_type BULK COLLECT INTO l_tab_ftp_connections;
  CLOSE c_all_conns_for_type;
-
+--
  RETURN(
         ftp_in_to_database(
                            pi_tab_ftp_connections     => l_tab_ftp_connections 
@@ -1635,8 +1627,7 @@ BEGIN
                          , pi_remove_failed_arch      => pi_remove_failed_arch 
                            )
        );
-
-
+--
 END ftp_in_to_database;
 --
 --------------------------------------------------------------------------------
@@ -1690,7 +1681,7 @@ BEGIN
   --
   FOR i IN 1..l_list.COUNT LOOP
   --
-    IF l_list(i) LIKE '%' || translate(pi_wildcard, '*?', '%_') 
+    IF l_list(i) LIKE '%' || TRANSLATE(pi_wildcard, '*?', '%_') 
     OR pi_wildcard IS NULL 
     THEN
       nm3ftp.delete( p_conn => l_conn
@@ -1775,9 +1766,10 @@ BEGIN
   FOR j IN 1..pi_wildcard_tab.COUNT LOOP
     FOR i IN 1..l_list.COUNT LOOP
     --
-      IF l_list(i) LIKE '%' || translate(pi_wildcard_tab(j), '*?', '%_') 
+      IF l_list(i) LIKE '%' || TRANSLATE(pi_wildcard_tab(j), '*?', '%_') 
       OR pi_wildcard_tab(j) IS NULL 
       THEN
+      --
         nm3ftp.delete( p_conn => l_conn
                      , p_file => l_list(i));
       --
