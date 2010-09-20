@@ -2,16 +2,16 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.15   Jun 30 2010 13:46:56   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.16   Sep 20 2010 14:41:20   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data7.sql  $
---       Date into PVCS   : $Date:   Jun 30 2010 13:46:56  $
---       Date fetched Out : $Modtime:   Jun 30 2010 13:38:20  $
---       Version          : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Sep 20 2010 14:41:20  $
+--       Date fetched Out : $Modtime:   Sep 20 2010 14:37:06  $
+--       Version          : $Revision:   2.16  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 30-JUN-2010 13:38
+--       Generation Date  : 20-SEP-2010 14:37
 --
 --   Product metadata script
---   As at Release 4.2.1.0
+--   As at Release 4.3.0.0
 --
 --   Copyright (c) exor corporation ltd, 2010
 --
@@ -5908,7 +5908,7 @@ SELECT
         'HIG'
        ,527
        ,null
-       ,'The trigger has been dropped. Please use the Create Trigger button to reflect changes made to the alert definition.'
+       ,'The trigger has been dropped. Please use the Create Trigger button to reflect changes made to the definition.'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
@@ -6251,6 +6251,24 @@ SELECT
        ,546
        ,null
        ,'Unzip failed'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 547;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,547
+       ,null
+       ,'Invalid geometry.'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
@@ -14442,6 +14460,60 @@ SELECT
        ,null
        ,'The type chosen is not allowed sub groups'
        ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 464;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,464
+       ,null
+       ,'Update is not allowed. This is not the latest occurance of the asset.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 465;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,465
+       ,null
+       ,'You cannot perform a network based query without at least the LR NE_ID column set on the asset metamodel.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 466;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,466
+       ,null
+       ,'Cannot find Document Gateway table or appropriate synonym.'
+       ,'Add the relevant table and/or synonym using the Document Gateway form (DOC0130)' FROM DUAL;
 --
 --
 --
