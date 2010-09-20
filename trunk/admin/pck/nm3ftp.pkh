@@ -4,15 +4,15 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkh-arc   3.5   Aug 26 2010 14:27:54   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkh-arc   3.6   Sep 20 2010 14:22:00   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3ftp.pkh  $
---       Date into PVCS   : $Date:   Aug 26 2010 14:27:54  $
---       Date fetched Out : $Modtime:   Aug 24 2010 10:19:24  $
---       PVCS Version     : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Sep 20 2010 14:22:00  $
+--       Date fetched Out : $Modtime:   Sep 20 2010 10:19:42  $
+--       PVCS Version     : $Revision:   3.6  $
 --
 --------------------------------------------------------------------------------
 --
-  g_sccsid constant varchar2(30) :='"$Revision:   3.5  $"';
+  g_sccsid constant varchar2(30) :='"$Revision:   3.6  $"';
 --
 -----------------------------------------------------------------------------
 --
@@ -34,6 +34,14 @@ AS
 -----------------------------------------------------------------------------
 --
    TYPE t_string_table IS TABLE OF VARCHAR2 (32767);
+   TYPE g_rec_ftp_outcome IS RECORD ( ftp_htc_id  NUMBER
+                                    , ftp_type    VARCHAR2(100)
+                                    , ftp_filename VARCHAR2(2000)
+                                    , ftp_outcome  VARCHAR(10)
+                                    , ftp_outcome_error VARCHAR(2000)
+                                    );
+   TYPE g_tab_ftp_outcome_type IS TABLE OF g_rec_ftp_outcome;
+   g_tab_ftp_outcome g_tab_ftp_outcome_type:= g_tab_ftp_outcome_type();
 --
 --------------------------------------------------------------------------------
 --
@@ -313,4 +321,3 @@ AS
 --
 END nm3ftp;
 /
-
