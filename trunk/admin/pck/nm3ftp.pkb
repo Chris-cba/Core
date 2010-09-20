@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.12   Aug 26 2010 15:05:50   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.13   Sep 20 2010 14:22:02   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Aug 26 2010 15:05:50  $
---       Date fetched Out : $Modtime:   Aug 26 2010 15:04:36  $
---       PVCS Version     : $Revision:   3.12  $
+--       Date into PVCS   : $Date:   Sep 20 2010 14:22:02  $
+--       Date fetched Out : $Modtime:   Sep 20 2010 14:17:44  $
+--       PVCS Version     : $Revision:   3.13  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.12  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.13  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -26,6 +26,10 @@ AS
    g_pad_chr                 VARCHAR2(1)    := '~';
    g_back_slash              VARCHAR2(1)    := '\';
    g_forward_slash           VARCHAR2(1)    := '/';
+   g_success                 VARCHAR2(7)    := 'SUCCESS';
+   g_fail                    VARCHAR2(4)    := 'FAIL';
+   g_main                    VARCHAR2(4)    := 'MAIN';
+   g_archive                 VARCHAR2(7)    := 'ARCHIVE';
 --
 ------------------------------------------------------------------------------
 --
@@ -1303,6 +1307,27 @@ AS
 --
 --------------------------------------------------------------------------------
 --
+PROCEDURE add_ftp_outcome( p_ftp_htc_id  VARCHAR2
+                         , p_ftp_type    VARCHAR2
+                         , p_ftp_filename VARCHAR2
+                         , p_ftp_outcome  VARCHAR
+                         , p_ftp_outcome_error VARCHAR DEFAULT NULL)
+IS
+l_oc_count NUMBER;
+BEGIN
+  l_oc_count:= g_tab_ftp_outcome.COUNT+1;
+  g_tab_ftp_outcome.EXTEND;
+--
+  g_tab_ftp_outcome(l_oc_count).ftp_htc_id        := p_ftp_htc_id;
+  g_tab_ftp_outcome(l_oc_count).ftp_type          := p_ftp_type;
+  g_tab_ftp_outcome(l_oc_count).ftp_filename      := p_ftp_filename;
+  g_tab_ftp_outcome(l_oc_count).ftp_outcome       := p_ftp_outcome;
+  g_tab_ftp_outcome(l_oc_count).ftp_outcome_error := p_ftp_outcome_error;
+--
+END add_ftp_outcome; 
+--
+--------------------------------------------------------------------------------
+--
   FUNCTION ftp_in_to_database
               ( pi_tab_ftp_connections     NM_ID_TBL 
               , pi_db_location_to_move_to  IN VARCHAR2
@@ -1311,35 +1336,37 @@ AS
               , pi_archive_overwrite       IN BOOLEAN DEFAULT FALSE
               , pi_remove_failed_arch      IN BOOLEAN DEFAULT FALSE)  RETURN nm3type.tab_varchar32767 IS
 
-    l_temp_tab     nm3type.tab_varchar32767;
-    l_files_tab    nm3type.tab_varchar32767;
-    l_retval       nm3type.tab_varchar32767;
-    l_include_file BOOLEAN; 
-    l_filename     nm3type.max_varchar2;
-    l_db_dir       VARCHAR2(50) := nm3file.get_oracle_directory(pi_path => pi_db_location_to_move_to);
-    l_password     nm3type.max_varchar2;
-    l_conn         utl_tcp.connection;
+    l_temp_tab      nm3type.tab_varchar32767;
+    l_files_tab     nm3type.tab_varchar32767;
+    l_retval        nm3type.tab_varchar32767;
+    l_include_file  BOOLEAN; 
+    l_filename      nm3type.max_varchar2;
+    l_db_dir        VARCHAR2(50) := nm3file.get_oracle_directory(pi_path => pi_db_location_to_move_to);
+    l_password      nm3type.max_varchar2;
+    l_conn          utl_tcp.connection;
+    l_success       BOOLEAN;
   --
 
 
   BEGIN
-
-/*
-nm_debug.debug_on;
-for i in (select column_value from table(pi_tab_ftp_connections) ) loop
-nm_debug.debug('connection id = '||i.column_value);
-end loop;
-*/
-
+  /*
+  nm_debug.debug_on;
+  for i in (select column_value from table(pi_tab_ftp_connections) ) loop
+  nm_debug.debug('connection id = '||i.column_value);
+  end loop;
+  */
+  g_tab_ftp_outcome.DELETE;
 
     FOR i IN (SELECT a.* 
                 FROM hig_ftp_connections a
                 , table(pi_tab_ftp_connections)  b 
-               WHERE a.hfc_id = b.column_value ) LOOP 
+               WHERE a.hfc_id = b.column_value ) 
+    LOOP 
 
     --
       l_temp_tab.DELETE;
       l_files_tab.DELETE;
+      l_success:= TRUE;
     --
       l_temp_tab := nm3ftp.list_all_files_coming_in
                         ( pi_hfc_id => i.hfc_id );
@@ -1365,7 +1392,8 @@ end loop;
         FOR e IN 1..l_temp_tab.COUNT 
         LOOP
         --
-          IF UPPER(l_temp_tab(e)) LIKE UPPER ('%'||pi_file_mask||'%')
+        -- CWS Translate added to change OS wildcards to Oracle wildcards.
+          IF UPPER(l_temp_tab(e)) LIKE UPPER ('%'||TRANSLATE(pi_file_mask, '*?', '%_')||'%')
           THEN
              l_files_tab(l_files_tab.COUNT+1) := l_temp_tab(e);
           END IF;
@@ -1381,36 +1409,53 @@ end loop;
       FOR f IN 1..l_files_tab.COUNT 
       LOOP
       --
-      --
       ------------------------------------------------------------------------
       -- Move file from ftp in to database named in pi_db_location_to_move_to 
       ------------------------------------------------------------------------
       --
-        IF i.hfc_ftp_password IS NOT NULL
-        THEN
-          l_password := get_password( pi_password_raw => i.hfc_ftp_password );
-        END IF;
-      --
-        l_conn := nm3ftp.login(i.hfc_ftp_host
-                               ,NVL(i.hfc_ftp_port,21)
-                               ,i.hfc_ftp_username
-                               ,l_password);
-      --
-        IF pi_binary
-        THEN
-          binary (p_conn => l_conn);
-        ELSE
-          ascii  (p_conn => l_conn);
-        END IF;
-      --
         BEGIN
+          IF i.hfc_ftp_password IS NOT NULL
+          THEN
+            l_password := get_password( pi_password_raw => i.hfc_ftp_password );
+          END IF;
         --
-          get (
-                p_conn        => l_conn,
-                p_from_file   => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f),
-                p_to_dir      => l_db_dir,
-                p_to_file     => l_files_tab(f)
-              );
+          l_conn := nm3ftp.login(i.hfc_ftp_host
+                                 ,NVL(i.hfc_ftp_port,21)
+                                 ,i.hfc_ftp_username
+                                 ,l_password);
+        --
+          IF pi_binary
+          THEN
+            binary (p_conn => l_conn);
+          ELSE
+            ascii  (p_conn => l_conn);
+          END IF;
+        --
+          BEGIN
+          --
+            get (
+                  p_conn        => l_conn,
+                  p_from_file   => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f),
+                  p_to_dir      => l_db_dir,
+                  p_to_file     => l_files_tab(f)
+                );
+            add_ftp_outcome( p_ftp_htc_id        => i.hfc_id
+                           , p_ftp_type          => g_main
+                           , p_ftp_filename      => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f)
+                           , p_ftp_outcome       => g_success
+                           );
+            l_success:= TRUE;
+          --
+          EXCEPTION
+          WHEN OTHERS THEN
+            add_ftp_outcome( p_ftp_htc_id        => i.hfc_id
+                           , p_ftp_type          => g_main
+                           , p_ftp_filename      => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f)
+                           , p_ftp_outcome       => g_fail
+                           , p_ftp_outcome_error => SQLERRM
+                           );
+            l_success:= FALSE;
+          END;
         --
         ------------------------------------------------------------------------
         -- Move file from ftp in to ftp archive in if 
@@ -1418,7 +1463,7 @@ end loop;
         ------------------------------------------------------------------------
         --
           BEGIN
-            IF i.hfc_ftp_arc_in_dir IS NOT NULL
+            IF i.hfc_ftp_arc_in_dir IS NOT NULL AND l_success
             THEN
             --
             -- If the Archive location is on the same server as the main connection
@@ -1435,6 +1480,11 @@ end loop;
                     p_archive_overwrite  => pi_archive_overwrite,
                     p_remove_failed_arch => pi_remove_failed_arch
                   );
+                    add_ftp_outcome( p_ftp_htc_id        => i.hfc_id
+                                   , p_ftp_type          => g_archive
+                                   , p_ftp_filename      => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f)
+                                   , p_ftp_outcome       => g_success
+                                   );
               ELSE
               --
               -- Connect to the different archive server and archive the files
@@ -1460,18 +1510,47 @@ end loop;
                 --
                   nm3ftp.logout(p_conn => l_arc_conn);
                 --
+                    add_ftp_outcome( p_ftp_htc_id        => i.hfc_id
+                                   , p_ftp_type          => g_archive
+                                   , p_ftp_filename      => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f)
+                                   , p_ftp_outcome       => g_success
+                                   );
                 EXCEPTION
                   WHEN OTHERS
                   THEN
                     nm3ftp.logout(p_conn => l_arc_conn);
                     utl_tcp.close_all_connections;
+                    --
+                    add_ftp_outcome( p_ftp_htc_id        => i.hfc_id
+                                   , p_ftp_type          => g_archive
+                                   , p_ftp_filename      => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f)
+                                   , p_ftp_outcome       => g_fail
+                                   , p_ftp_outcome_error => SQLERRM
+                                   );
+                    --
                 END;
               --
               END IF;
+              --
+            ELSIF pi_remove_failed_arch AND l_success THEN
+            --
+            nm3ftp.delete( p_conn  => l_conn
+                         , p_file  => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f)
+                         );
+            --
             END IF;
           EXCEPTION
-            WHEN OTHERS 
-            THEN utl_tcp.close_all_connections; 
+          WHEN OTHERS THEN 
+            --
+            add_ftp_outcome( p_ftp_htc_id        => i.hfc_id
+                           , p_ftp_type          => g_archive
+                           , p_ftp_filename      => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f)
+                           , p_ftp_outcome       => g_fail
+                           , p_ftp_outcome_error => SQLERRM
+                           );
+            --
+            utl_tcp.close_all_connections;
+            
           END;
         --
           utl_tcp.close_all_connections;
@@ -1483,8 +1562,15 @@ end loop;
           l_retval(l_retval.COUNT+1) := l_files_tab(f);
         --
         EXCEPTION
-          WHEN OTHERS
-          THEN utl_tcp.close_all_connections;
+          WHEN OTHERS THEN 
+          utl_tcp.close_all_connections;
+          --
+          add_ftp_outcome( p_ftp_htc_id        => i.hfc_id
+                         , p_ftp_type          => g_main
+                         , p_ftp_filename      => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f)
+                         , p_ftp_outcome       => g_fail
+                         , p_ftp_outcome_error => SQLERRM
+                         );
         --
         END;
       --
@@ -1499,6 +1585,14 @@ end loop;
     WHEN OTHERS 
       THEN
       utl_tcp.close_all_connections;
+      --
+        add_ftp_outcome( p_ftp_htc_id        => 'NA' --i.hfc_id
+                       , p_ftp_type          => 'GENERAL'
+                       , p_ftp_filename      => 'NA'
+                       , p_ftp_outcome       => g_fail
+                       , p_ftp_outcome_error => SQLERRM
+                       );
+        --
       RAISE;
   --
   END ftp_in_to_database;
@@ -1522,7 +1616,7 @@ FUNCTION ftp_in_to_database
    from hig_ftp_connections a
        ,hig_ftp_types b
   where b.hft_type = pi_ftp_type
-    and a.hfc_hft_id = b.hft_id;  
+    and a.hfc_hft_id = b.hft_id;
  
 
 BEGIN
