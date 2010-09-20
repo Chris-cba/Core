@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.11   Jun 30 2010 12:58:50   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4200_nm4210_ddl_upg.sql-arc   3.12   Sep 20 2010 10:54:34   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4200_nm4210_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Jun 30 2010 12:58:50  $
---       Date fetched Out : $Modtime:   Jun 30 2010 12:57:48  $
---       Version          : $Revision:   3.11  $
+--       Date into PVCS   : $Date:   Sep 20 2010 10:54:34  $
+--       Date fetched Out : $Modtime:   Sep 20 2010 10:53:44  $
+--       Version          : $Revision:   3.12  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -3224,14 +3224,6 @@ COMMENT ON TABLE HIG_NAVIGATOR_RESULT_TAB IS 'This is a temporary table to hold 
 /
 
 COMMENT ON COLUMN HIG_NAVIGATOR_RESULT_TAB.COL_1 IS 'Column data values returned when a query is executed'
-/
-
-Prompt Creating Type hig_navigator_tab.....
-CREATE OR REPLACE TYPE hig_navigator_tab IS TABLE OF hig_navigator_type  ;
-/
-
-Prompt Creating Type nav_id.....
-CREATE OR REPLACE TYPE nav_id IS TABLE OF Varchar2(50) ;
 /
 
 ------------------------------------------------------------------
