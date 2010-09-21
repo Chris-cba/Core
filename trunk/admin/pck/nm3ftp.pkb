@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.14   Sep 20 2010 14:35:02   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.15   Sep 21 2010 17:12:08   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Sep 20 2010 14:35:02  $
---       Date fetched Out : $Modtime:   Sep 20 2010 14:34:30  $
---       PVCS Version     : $Revision:   3.14  $
+--       Date into PVCS   : $Date:   Sep 21 2010 17:12:08  $
+--       Date fetched Out : $Modtime:   Sep 21 2010 17:07:40  $
+--       PVCS Version     : $Revision:   3.15  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.14  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.15  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -1325,6 +1325,28 @@ BEGIN
   g_tab_ftp_outcome(l_oc_count).ftp_outcome_error := p_ftp_outcome_error;
 --
 END add_ftp_outcome; 
+--
+--------------------------------------------------------------------------------
+--
+FUNCTION ftp_in_to_db_success( p_htc_id  hig_ftp_connections.hfc_id%TYPE DEFAULT NULL)
+RETURN BOOLEAN
+IS
+--
+l_return_val BOOLEAN:= TRUE;
+--
+BEGIN
+  FOR i IN 1..nm3ftp.g_tab_ftp_outcome.COUNT
+  LOOP
+  --
+    IF nm3ftp.g_tab_ftp_outcome(i).ftp_outcome = g_fail 
+    AND (p_htc_id = g_tab_ftp_outcome(i).ftp_htc_id OR p_htc_id IS NULL)
+    THEN
+      l_return_val := FALSE;
+    END IF;
+  --
+  END LOOP;
+RETURN l_return_val;
+END;
 --
 --------------------------------------------------------------------------------
 --
