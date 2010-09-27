@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.6   Sep 22 2010 14:23:30   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.7   Sep 27 2010 11:14:40   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   Sep 22 2010 14:23:30  $
---       Date fetched Out : $Modtime:   Sep 22 2010 14:22:26  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Sep 27 2010 11:14:40  $
+--       Date fetched Out : $Modtime:   Sep 27 2010 11:12:24  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -826,7 +826,8 @@ BEGIN
    IF pi_ne_type = 'G'
        AND ( pi_end_date_datums = 'Y' OR nm3net.is_nt_inclusion(pi_nt => nm3net.get_nt_type(pi_ne_id) ))
        -- CWS 0110184 Chect to see if the group type is partial before allowing the end dating of datums
-       AND nm3get.get_ngt(pi_ngt_group_type => nm3get.get_ne(pi_ne_id => pi_ne_id, pi_raise_not_found => FALSE).ne_nt_type).ngt_partial = 'N'
+       -- Change reversed out as this has not been agreed by product for 4.3
+       --AND nm3get.get_ngt(pi_ngt_group_type => nm3get.get_ne(pi_ne_id => pi_ne_id, pi_raise_not_found => FALSE).ne_nt_type).ngt_partial = 'N'
    THEN
       v_flag := TRUE;
    END IF;
