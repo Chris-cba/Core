@@ -4,11 +4,11 @@ IS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdo.pkb-arc   3.3   Jul 15 2009 10:03:10   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdo.pkb-arc   3.4   Sep 28 2010 17:54:36   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo_gdo.pkb  $
---       Date into PVCS   : $Date:   Jul 15 2009 10:03:10  $
---       Date fetched Out : $Modtime:   Jul 14 2009 14:21:18  $
---       PVCS Version     : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Sep 28 2010 17:54:36  $
+--       Date fetched Out : $Modtime:   Sep 28 2010 17:51:16  $
+--       PVCS Version     : $Revision:   3.4  $
 --
 --------------------------------------------------------------------------------
 --
@@ -18,7 +18,7 @@ IS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) :='"$Revision:   3.3  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) :='"$Revision:   3.4  $"';
   g_package_name CONSTANT VARCHAR2(30)   := 'nm3sdo_gdo';
   g_srid                  NUMBER ;
   b_srid_set              BOOLEAN := FALSE;
@@ -254,6 +254,39 @@ IS
 --
 --------------------------------------------------------------------------------
 --
+procedure insert_gdo_from_theme_array ( pi_session_id in number,
+                                                          pi_theme_name in varchar2,
+                                                          pi_list in nm_theme_list ) is
+begin 
+  execute immediate 'insert into gis_data_objects (gdo_session_id, gdo_theme_name, gdo_pk_id )'||
+                    ' select :session_id, :theme_name, a.ntd_pk_id '||
+                    ' from table ( :list.ntl_theme_list ) a '||
+                    ' group by a.ntd_pk_id ' using pi_session_id, pi_theme_name, pi_list;
+end;                    
+
+--
+--------------------------------------------------------------------------------
+--
+
+procedure insert_gdo_from_buffer ( pi_session_id in number,
+                                                     pi_theme_name in varchar2,
+                                                     pi_geometry in mdsys.sdo_geometry,
+                                                     pi_buffer in number,
+                                                     pi_sub_select_session in integer ) is
+l_list   nm_theme_list;
+l_nth  nm_themes_all%rowtype;
+begin
+  l_nth := NM3GET.GET_NTH(pi_theme_name);
+  l_list :=  nm3sdo.get_objects_in_buffer( p_nth_id =>  l_nth.nth_theme_id
+                                                          , p_geometry => pi_geometry
+                                                          , p_buffer => pi_buffer
+                                                          , p_gdo_session_id => pi_sub_select_session  );
+  
+  insert_gdo_from_theme_array( pi_session_id,pi_theme_name, l_list ); 
+
+end;
+       
+          
 BEGIN
 -- instantiate global srid
   set_srid;
