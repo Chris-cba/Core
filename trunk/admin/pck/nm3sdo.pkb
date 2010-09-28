@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.42   Sep 10 2010 11:12:06   ade.edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.43   Sep 28 2010 16:58:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Sep 10 2010 11:12:06  $
---       Date fetched Out : $Modtime:   Sep 10 2010 11:10:18  $
---       PVCS Version     : $Revision:   2.42  $
+--       Date into PVCS   : $Date:   Sep 28 2010 16:58:44  $
+--       Date fetched Out : $Modtime:   Sep 28 2010 16:56:04  $
+--       PVCS Version     : $Revision:   2.43  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.42  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.43  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -9012,7 +9012,7 @@ BEGIN
 
   IF l_nth.nth_feature_table = l_nth.nth_table_name THEN
 
-     cur_string := 'select t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', t.'||l_nth.nth_pk_column;
+     cur_string := 'select distinct t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', t.'||l_nth.nth_pk_column;
 
      IF l_get_projection THEN
 
@@ -9053,7 +9053,7 @@ BEGIN
 
   ELSIF p_nth.nth_feature_fk_column IS NOT NULL THEN
 
-     cur_string := 'select t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', f.'||l_nth.nth_feature_pk_column;
+     cur_string := 'select distinct t.'||l_nth.nth_pk_column||',t.'||SUBSTR(l_nth.nth_label_column,1,100)||', null'||', f.'||l_nth.nth_feature_pk_column;
 
      IF l_get_projection THEN
 
@@ -10331,7 +10331,9 @@ BEGIN
     curstr := 'select /*+cardinality( a '||to_char( p_ntl.ntl_theme_list.last)||') */ '||
               ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  '||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr )   '||
               ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||
-              ' where a.ntd_pk_id  = '||p_nth.nth_feature_pk_column||' order by  a.ntd_distance';
+              ' where a.ntd_pk_id  = '||p_nth.nth_feature_pk_column||
+              ' group by :new_theme, a.ntd_pk_id, a.ntd_fk_id,  '||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr '||
+              ' order by  a.ntd_distance';
 
   else
 
@@ -10349,6 +10351,7 @@ BEGIN
               ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||' f,'||p_nth.nth_table_name||' t'||
               ' where a.ntd_pk_id  = f.'||p_nth.nth_feature_pk_column||
               ' and   f.'||NVL(p_nth.nth_feature_fk_column,p_nth.nth_feature_pk_column)||' =  t.'||p_nth.nth_pk_column||
+              ' group by :new_theme, a.ntd_pk_id, a.ntd_fk_id,  '||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr '||
               ' order by  a.ntd_distance';
 
   end if;
@@ -10359,7 +10362,8 @@ BEGIN
   EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.ntl_theme_list
     --USING p_nth.nth_theme_id, p_nth.nth_theme_name, p_nth.nth_theme_name, p_ntl;
     --USING p_nth.nth_theme_id, p_nth.nth_label_column, p_nth.nth_theme_name, p_ntl;
-    USING p_nth.nth_theme_id, p_nth.nth_theme_name, p_ntl;
+    USING p_nth.nth_theme_id, p_nth.nth_theme_name, p_ntl, p_nth.nth_theme_id, p_nth.nth_theme_name;
+
   RETURN retval;
 END;
 
