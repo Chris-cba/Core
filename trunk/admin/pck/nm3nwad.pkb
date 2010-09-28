@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.10   Mar 24 2010 14:27:36   rcoupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwad.pkb-arc   2.11   Sep 28 2010 16:41:30   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3nwad.pkb  $
---       Date into PVCS   : $Date:   Mar 24 2010 14:27:36  $
---       Date fetched Out : $Modtime:   Mar 24 2010 14:26:46  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Sep 28 2010 16:41:30  $
+--       Date fetched Out : $Modtime:   Sep 28 2010 16:38:22  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --
 -- Author : A Edwards/P Stanton/G Johnson
@@ -36,7 +36,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwad AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.10  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '"$Revision:   2.11  $"';
 
   g_package_name CONSTANT VARCHAR2(30) := 'nm3nwad';
 
@@ -1197,7 +1197,7 @@ BEGIN
 --
       -- End Date orginal element link record
       Nm3nwad.end_date_nadl (pi_rec_nadl       => l_rec_nadl_prim
-	                        ,pi_effective_date => l_effective_date);
+	                          ,pi_effective_date => l_effective_date);
 
       --
       -- set start date of AD link record to be same as the inventory item which is same as element start date
@@ -1260,6 +1260,10 @@ BEGIN
          -- Build rowtype for link element 1 and insert
          l_rec_nadl_non_prim.nad_ne_id     := pi_new_ne_id1;
          l_rec_nadl_non_prim.nad_iit_ne_id := l_rec_iit_np_1.iit_ne_id;
+         -- 0108841 CWS None Primary Start date change to be greatest of iit and ne start dates.
+         -- Previously it was set to the previous records start date which resulted in trigger errors.
+         l_rec_nadl_non_prim.nad_start_date:= GREATEST( NVL(l_effective_date,TO_DATE('01/JAN/1900', 'DD/MON/YYYY')) -- element start date
+                                                      , NVL(l_rec_nadl_prim.nad_start_date,TO_DATE('01/JAN/1900', 'DD/MON/YYYY'))); -- iit start date
           Nm3nwad.ins_nadl(l_rec_nadl_non_prim);
 
          -- Build rowtype for link element 2 and insert
