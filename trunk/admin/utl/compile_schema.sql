@@ -129,9 +129,13 @@ select 'PROMPT ==================================' FROM DUAL;
 select 'PROMPT ' FROM DUAL;
 
 select 'PROMPT '||INDEX_NAME||CHR(10)||'ALTER INDEX '||INDEX_NAME||' REBUILD;' 
-from   user_indexes 
-where  index_type = 'FUNCTION-BASED NORMAL';
-
+from   user_indexes ui 
+where  index_type = 'FUNCTION-BASED NORMAL'
+and not exists (select 'against a temp table'
+                from  all_tables atb
+                where atb.owner = ui.table_owner
+                and   atb.table_name  = ui.table_name
+                and atb.temporary = 'Y'); -- do not include indexes against temp tables - thus avoiding ORA-14456: cannot rebuild index on a temporary table 
 
 
 
