@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.8   Mar 15 2010 15:16:54   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.9   Sep 29 2010 16:13:30   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Mar 15 2010 15:16:54  $
---       Date fetched Out : $Modtime:   Mar 15 2010 15:10:44  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Sep 29 2010 16:13:30  $
+--       Date fetched Out : $Modtime:   Sep 29 2010 16:00:38  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -1867,6 +1867,37 @@ END get_lref_at_node;
 --
 ------------------------------------------------------------------------------------------------
 --
+FUNCTION does_node_exist (pi_node_id  IN  nm_nodes.no_node_id%TYPE) 
+RETURN BOOLEAN
+IS
+--
+CURSOR node_cur(p_node_id  IN  nm_nodes.no_node_id%TYPE) IS
+SELECT 'X'
+-- CWS 0108841 Check was not looking a other tables that needed to be populated.
+-- This caused a SELF NULL error when splitting a route.
+/*  FROM nm_nodes
+ WHERE no_node_id = p_node_id;*/
+  FROM nm_node_usages n
+     , nm_members m
+     , nm_nodes
+ WHERE n.nnu_no_node_id = pi_node_id
+   AND nnu_ne_id = nm_ne_id_of
+   AND no_node_id = n.nnu_no_node_id;
+
+--
+  l_dummy VARCHAR2(1);
+  l_return_val BOOLEAN;
+--
+BEGIN
+  OPEN node_cur(p_node_id => pi_node_id);
+  FETCH node_cur INTO l_dummy;
+  l_return_val:= SQL%FOUND;
+  CLOSE node_cur;
+  RETURN l_return_val;
+END;
+--
+------------------------------------------------------------------------------------------------
+--
 PROCEDURE get_route_split_memberships(pi_route_ne_id             IN     nm_elements.ne_id%TYPE
                                      ,pi_non_ambig_ne_id         IN     nm_elements.ne_id%TYPE
                                      ,pi_non_ambig_split_offset  IN     NUMBER
@@ -1894,7 +1925,7 @@ BEGIN
 
  l_non_ambig_route_end_lref     := Nm3lrs.get_distinct_offset(nm_lref(pi_route_ne_id,Nm3net.get_max_slk(pi_route_ne_id)));  -- linear ref that denotes the non-ambiguous end of route
 
- IF pi_node_id IS NOT NULL THEN
+ IF does_node_exist (pi_node_id  => pi_node_id) THEN
 
 
        --Getting before lref for node split point
