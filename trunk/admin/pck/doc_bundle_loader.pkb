@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.5   Jul 07 2010 15:32:52   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.6   Oct 01 2010 14:31:56   Chris.Baugh  $
 --       Module Name      : $Workfile:   doc_bundle_loader.pkb  $
---       Date into PVCS   : $Date:   Jul 07 2010 15:32:52  $
---       Date fetched Out : $Modtime:   Jul 07 2010 15:31:00  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Oct 01 2010 14:31:56  $
+--       Date fetched Out : $Modtime:   Oct 01 2010 14:29:18  $
+--       Version          : $Revision:   3.6  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.6  $';
 
   g_package_name CONSTANT varchar2(30) := 'doc_bundle_loader';
   
@@ -292,7 +292,7 @@ EXCEPTION
 
     hig.raise_ner(pi_appl => 'HIG'
                  ,pi_id   => 546 -- Unzip Failed
-                 ,pi_supplementary_info => sqlerrm);
+                 ,pi_supplementary_info => nm3flx.parse_error_message(sqlerrm)); -- Task 0110193
 
  
  END IF;                 
