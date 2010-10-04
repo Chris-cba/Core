@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.43   Sep 28 2010 16:58:44   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.44   Oct 04 2010 15:34:50   ade.edwards  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Sep 28 2010 16:58:44  $
---       Date fetched Out : $Modtime:   Sep 28 2010 16:56:04  $
---       PVCS Version     : $Revision:   2.43  $
+--       Date into PVCS   : $Date:   Oct 04 2010 15:34:50  $
+--       Date fetched Out : $Modtime:   Oct 04 2010 15:33:34  $
+--       PVCS Version     : $Revision:   2.44  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.43  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.44  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -10183,10 +10183,13 @@ END;
 FUNCTION coalesce_nw_diminfo( p_pct_increase IN NUMBER DEFAULT 0,
                               p_tol IN NUMBER DEFAULT NULL,
                               p_m_tol IN NUMBER DEFAULT NULL ) RETURN mdsys.sdo_dim_array AS
-retval mdsys.sdo_dim_array;
-l_mbr  mdsys.sdo_geometry;
-l_tol  NUMBER := p_tol;
-l_m_tol NUMBER := p_m_tol;
+  retval mdsys.sdo_dim_array;
+  l_mbr  mdsys.sdo_geometry;
+  l_tol  NUMBER := p_tol;
+  l_m_tol NUMBER := p_m_tol;
+--
+  ex_3d_diminfo  EXCEPTION; 
+  PRAGMA         EXCEPTION_INIT(  ex_3d_diminfo,-06533 );  --ORA-06533: Subscript beyond count
 
 BEGIN
    SELECT sdo_aggr_mbr(Convert_Dim_Array_To_Mbr( Get_Theme_Diminfo(nth_theme_id)))
@@ -10236,7 +10239,10 @@ BEGIN
                mdsys.sdo_dim_element( 'M', 0, Nm3type.c_big_number, l_m_tol ));
 
    RETURN retval;
-
+EXCEPTION
+  WHEN ex_3d_diminfo
+  THEN
+    hig.raise_ner(pi_appl => nm3type.c_net, pi_id => 468 );
 END;
 --
 -------------------------------------------------------------------------------------------------------------------------------
