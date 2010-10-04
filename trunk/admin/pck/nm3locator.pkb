@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3locator AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.5  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.6  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3locator';
 
@@ -78,19 +78,14 @@ END clear_sql;
 --
 PROCEDURE debug_sql IS
 BEGIN
---  nm_debug.debug_on;
   nm_debug.debug(l_sql);
---  nm_debug.debug_off;
 END debug_sql;
 --
 -----------------------------------------------------------------------------
 --
 PROCEDURE execute_sql IS
 BEGIN
---  nm_debug.debug_on;
---  nm_debug.debug('# execute '||l_sql);
   EXECUTE IMMEDIATE l_sql;
---  nm_debug.debug('# execute done '||l_sql);
 END execute_sql;
 --
 -----------------------------------------------------------------------------
@@ -118,18 +113,17 @@ END clear_all;
 --
 PROCEDURE debug_map_table(p_only_assigned boolean) IS
 BEGIN
---  nm_debug.debug('Map Table Values');
---  nm_debug.debug('Inv_col                       ,Assigned, Ft Col                ');
---  FOR irec IN 1..g_ft_mapping.COUNT LOOP
---    IF p_only_assigned THEN
---      IF g_ft_mapping(irec).assigned THEN
---        nm_debug.debug(rpad(g_ft_mapping(irec).inv_col_name, 30)||','||RPAD(nm3flx.boolean_to_char(g_ft_mapping(irec).assigned),8)||','||g_ft_mapping(irec).ft_col_name);
---      END IF;
---    ELSE
---      nm_debug.debug(rpad(g_ft_mapping(irec).inv_col_name, 30)||','||RPAD(nm3flx.boolean_to_char(g_ft_mapping(irec).assigned),8)||','||g_ft_mapping(irec).ft_col_name);
---    END IF;
---  END LOOP;
-NULL;
+  nm_debug.debug('Map Table Values');
+  nm_debug.debug('Inv_col                       ,Assigned, Ft Col                ');
+  FOR irec IN 1..g_ft_mapping.COUNT LOOP
+    IF p_only_assigned THEN
+      IF g_ft_mapping(irec).assigned THEN
+        nm_debug.debug(rpad(g_ft_mapping(irec).inv_col_name, 30)||','||RPAD(nm3flx.boolean_to_char(g_ft_mapping(irec).assigned),8)||','||g_ft_mapping(irec).ft_col_name);
+      END IF;
+    ELSE
+      nm_debug.debug(rpad(g_ft_mapping(irec).inv_col_name, 30)||','||RPAD(nm3flx.boolean_to_char(g_ft_mapping(irec).assigned),8)||','||g_ft_mapping(irec).ft_col_name);
+    END IF;
+  END LOOP;
 END;
 --
 -----------------------------------------------------------------------------
@@ -746,7 +740,7 @@ BEGIN
     nm3locator.apply_ft_cols_to_inv_attr(pi_inv_type);
   END IF;
 
---  nm3locator.debug_map_table;
+  nm3locator.debug_map_table;
 
   add('DECLARE');
   add('');
@@ -845,9 +839,9 @@ BEGIN
   --nm_debug.debug_off;
 --
 END populate_inv_tab_from_gdo;
-----
--------------------------------------------------------------------------------
-----
+--
+-----------------------------------------------------------------------------
+--
 --PROCEDURE populate_inv_tab_from_gaz_qry(pi_ngqi_job_id IN  nm_gaz_query_item_list.ngqi_job_id%TYPE
 --                                       ,pi_inv_type    IN  nm_inv_items_all.iit_inv_type%TYPE) IS
 --
@@ -860,6 +854,10 @@ END populate_inv_tab_from_gdo;
 --  l_attrs       nm3inv.tab_nita := nm3inv.get_tab_ita_displayed(p_inv_type => pi_inv_type);
 --
 --BEGIN
+--  nm_debug.debug_on;
+--  nm_debug.debug('## Start Locator Results ');
+--  nm_debug.debug_off;
+--  
 --  nm_debug.proc_start(p_package_name   => g_package_name
 --                     ,p_procedure_name => 'populate_inv_tab_from_gaz_qry');
 --
@@ -877,8 +875,8 @@ END populate_inv_tab_from_gdo;
 --    nm3locator.apply_ft_cols_to_inv_attr(pi_inv_type);
 --  END IF;
 --
-----  nm3locator.debug_map_table;
---
+--  nm3locator.debug_map_table;
+
 --  add('DECLARE');
 --
 --  IF l_ft_inv THEN
@@ -971,17 +969,12 @@ END populate_inv_tab_from_gdo;
 --  add('  END LOOP;');
 --  add('END;');
 --
-----  debug_sql;
---
 --  nm_debug.debug_on;
---  nm_debug.debug('populate_inv_tab_from_gaz_qry start SQL');
+--  nm_debug.debug('## End Locator Results ');
 --  nm_debug.debug_off;
---
+--  
+--  debug_sql;
 --  execute_sql;
---
---  nm_debug.debug_on;
---  nm_debug.debug('populate_inv_tab_from_gaz_qry finished SQL');
---  nm_debug.debug_off;
 --
 --  nm_debug.proc_end(p_package_name   => g_package_name
 --                   ,p_procedure_name => 'populate_inv_tab_from_gaz_qry');
@@ -1045,7 +1038,6 @@ BEGIN
     add('  ,'||nm3locator.get_inv_col(l_attrs(i_attr).ita_attrib_name,nm3locator.g_is_ft));
   END LOOP;
 
---  add('  ) VALUES (');
   add('  ) ');
 
   IF l_ft_inv 
@@ -1092,8 +1084,6 @@ BEGIN
 
     l_data_source := 'nm3locator.g_inv_rec';
 
---    add('  CURSOR '||c_cursor_name||' (p_job_id IN nm_gaz_query_item_list.ngqi_job_id%TYPE) IS');
---    add('  SELECT /*+ INDEX(iit inv_items_all_pk) */ iit.* ');
     add('  SELECT ');
     add(  ''''||pi_inv_type||'''');
     FOR irec IN 1..l_fixed_cols.COUNT LOOP
@@ -1126,65 +1116,6 @@ BEGIN
 
   END IF;
 
-
---  add('  FOR irec IN '||c_cursor_name||'('||pi_ngqi_job_id||')  LOOP');
---
---  -- assign inv type
---
---  add('  INSERT INTO '||c_results_table||' (');
---  add('  iit_inv_type');
---  FOR irec IN 1..l_fixed_cols.COUNT LOOP
---    add('  ,'||l_fixed_cols(irec));
---  END LOOP;
---
---  -- assign primary key value
---  IF l_ft_inv THEN
---    add('  ,iit_primary_key');
---  ELSE
---    add('  ,iit_start_date');
---    add('  ,iit_end_date');
---    add('  ,iit_admin_unit');
---    add('  ,iit_x_sect');
---  END IF;
---
---  FOR i_attr IN 1..l_attrs.COUNT LOOP
---    -- now the attribs
---    add('  ,'||nm3locator.get_inv_col(l_attrs(i_attr).ita_attrib_name,nm3locator.g_is_ft));
---  END LOOP;
---
---  add('  ) VALUES (');
---  add(  ''''||pi_inv_type||'''');
---
---  FOR irec IN 1..l_fixed_cols.COUNT LOOP
---    add('  ,irec.'||nm3locator.get_ft_col(l_fixed_cols(irec), nm3locator.g_is_ft));
---  END LOOP;
---
---  -- assign primary key value
---  IF l_ft_inv THEN
---    add('  ,irec.'||nm3locator.get_ft_col('IIT_NE_ID', nm3locator.g_is_ft));
---  ELSE
---    add('  ,irec.iit_start_date');
---    add('  ,irec.iit_end_date');
---    add('  ,irec.iit_admin_unit');
---    add('  ,irec.iit_x_sect');
---  END IF;
---
---  FOR i_attr IN 1..l_attrs.COUNT LOOP
---    -- now the attribs
---    IF l_attrs(i_attr).ita_id_domain IS NOT NULL THEN
---      -- lookup the meaning');
---      add('  ,nm3locator.get_meaning_from_lookup('''||l_attrs(i_attr).ita_id_domain||''', irec.'||l_attrs(i_attr).ita_attrib_name||')');
---    ELSE
---      IF  l_attrs(i_attr).ita_format = 'DATE' THEN
---        add('  ,TO_CHAR(irec.'||l_attrs(i_attr).ita_attrib_name||','''||c_date_format||''')');
---      ELSE
---        add('  ,SUBSTR(irec.'||l_attrs(i_attr).ita_attrib_name||',1,80)');
---      END IF;
---    END IF;
---  END LOOP;
---
---  add('  );');
---  add('  END LOOP;');
   add('END;');
 
 --  debug_sql;
@@ -1960,7 +1891,7 @@ RETURN boolean IS
   l_tab_northings nm3type.tab_number;
   no_data EXCEPTION;
 BEGIN
---  nm_debug.debug_on;
+  nm_debug.debug_on;
   nm_debug.debug('Parameters');
   nm_debug.debug('pi_session_id : '||pi_session_id);
   OPEN get_coords(pi_session_id);
@@ -1999,7 +1930,7 @@ RETURN boolean IS
   retval  nm3sdo_gdo.tab_xys;
   no_data EXCEPTION;
 BEGIN
---  nm_debug.debug_on;
+  nm_debug.debug_on;
   nm_debug.debug('In multi coords proc');
   nm_debug.debug('Parameters');
   nm_debug.debug('pi_session_id : '||pi_session_id);
