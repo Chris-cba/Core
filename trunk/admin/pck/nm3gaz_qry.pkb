@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.7   Sep 22 2010 17:09:44   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.8   Oct 04 2010 15:09:02   ade.edwards  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Sep 22 2010 17:09:44  $
---       Date fetched Out : $Modtime:   Sep 22 2010 17:09:08  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Oct 04 2010 15:09:02  $
+--       Date fetched Out : $Modtime:   Oct 04 2010 14:50:44  $
+--       Version          : $Revision:   2.8  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -19,8 +19,8 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --
 --all global package variables here
 --
-   --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb	1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.7  $';
+   --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb 1.45 05/26/06"';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.8  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -70,6 +70,16 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
    g_qry_inv_type                 nm_inv_types.NIT_INV_TYPE%TYPE;
    g_qry_roi_type                 VARCHAR2(5);
    g_qry_roi_id                   PLS_INTEGER;
+--
+  PROCEDURE test_debug ( pi_text IN VARCHAR2 )
+  IS
+  BEGIN
+   -- nm_debug.debug_on;
+   -- nm_debug.debug(pi_text);
+  --  nm_debug.debug_off;
+    NULL;
+  END test_debug;
+--
 -----------------------------------------------------------------------------
 --
 PROCEDURE get_meaning_and_desc_from_val (pi_sql_string  IN     varchar2
@@ -306,25 +316,25 @@ BEGIN
    IF  g_area_based_query
     OR g_roi_restricted_item_query
     THEN
-	
+ 
       create_region_of_interest;
 
    --
       -- If we have point items in here AND it is a "open" query
       --  then add the node points for elements which aren't already in
       --  the temp ne
-	  
+   
       add_for_open_queries;
-	  
+   
    END IF;
 --
     IF g_area_based_query
     THEN
       -- restrict the subset for any element based deletes -
       --  these are the most efficient, because they are single table only
-	  
+   
       perform_element_based_deletes;
-	  
+   
       --
       -- May as well get rid of any DBs FROM the temp NE if we have some inventory
       --  restrictions which are not foreign table based.
@@ -336,7 +346,7 @@ BEGIN
    
        -- perform all of the inv based deletes
       perform_inv_temp_ne_creation;
-	  
+   
       --
       IF NOT g_point_inv_type_exists
         AND g_rec_ngq.ngq_open_or_closed = c_closed_query
@@ -345,13 +355,13 @@ BEGIN
          --   existence, then get rid of zero length "chunks" in the temp ne
          get_rid_of_single_points;
       END IF;
-	  
+   
       --
       -- defrag the resultant temp ne to get the nte_seq_no correct
       nm3extent.defrag_temp_extent(pi_nte_id           => g_nte_job_id
                                   ,pi_force_resequence => TRUE
                                   );
-								  
+          
    --
       IF g_nte_job_id IS NULL
       THEN
@@ -361,13 +371,13 @@ BEGIN
    ELSE
       -- This is an inventory list being returned. g_nte_job_id will
       --  contain the nm_gaz_query_inv_item_list.ngqi_job_id
-	  
+   
       g_ngqi_job_id := nm3pbi.get_job_id;
-	  
+   
       perform_item_list_retrieval;
-	  
+   
       l_retval  := g_ngqi_job_id;
-	  
+   
    END IF;
 --
    nm3user.set_effective_date (c_init_eff_date);
@@ -388,7 +398,7 @@ EXCEPTION
    WHEN others
     THEN
       nm3user.set_effective_date (c_init_eff_date);
-	  nm_debug.debug(sqlerrm);
+   nm_debug.debug(sqlerrm);
       RAISE;
 --
 END perform_query;
@@ -476,10 +486,10 @@ BEGIN
 
 --
 -- check the inv type
---	  
+--   
       check_ngqt_item_type (cs_rec_ngqt.ngqt_item_type);
-	  
-	  
+   
+   
       IF cs_rec_ngqt.ngqt_item_type_type = c_ngqt_item_type_type_ele
        THEN
          IF   l_element_restriction_index IS NOT NULL
@@ -652,6 +662,7 @@ END build_element_restriction_sql;
 --
 PROCEDURE build_inv_restriction_sql (p_ngqt_index pls_integer) IS
 --
+   l_rec_ngq  nm_gaz_query%ROWTYPE;
    l_rec_ngqt nm_gaz_query_types%ROWTYPE;
    l_rec_nit  nm_inv_types%ROWTYPE;
 --
@@ -672,6 +683,8 @@ BEGIN
    g_tab_nte_job_id(p_ngqt_index) := nm3net.get_next_nte_id;
 --
    l_rec_ngqt := g_tab_rec_ngqt(p_ngqt_index);
+--
+   l_rec_ngq  := nm3get.get_ngq(pi_ngq_id => l_rec_ngqt.ngqt_ngq_id);
 --
    l_rec_nit  := nm3get.get_nit (pi_nit_inv_type => l_rec_ngqt.ngqt_item_type);
 --
@@ -705,8 +718,8 @@ BEGIN
                        ,pi_supplementary_info => l_rec_nit.nit_inv_type
                        );
       END IF;
-	  
-	  
+   
+   
       l_ne_id_col       := c_table_alias||'.'||l_rec_nit.nit_lr_ne_column_name;
       l_begin_mp_col    := c_table_alias||'.'||l_rec_nit.nit_lr_st_chain;
       l_end_mp_col      := c_table_alias||'.'||l_rec_nit.nit_lr_end_chain;
@@ -741,41 +754,115 @@ BEGIN
       END IF;
    --
       append_both (p_ngqt_index,'        AND   '||l_ne_id_col||' = nte.nte_ne_id_of /*gj*/');
-      IF g_tab_is_point_inv(p_ngqt_index)
-       THEN
-         append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN nte.nte_begin_mp AND nte.nte_end_mp');
-      ELSE
-         append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= nte.nte_end_mp');
-         append_both (p_ngqt_index,'        AND   '||l_end_mp_col||' >= nte.nte_begin_mp');
+
+      IF l_rec_nit.nit_table_name IS NULL
+      OR (l_rec_nit.nit_table_name           IS NOT NULL
+         AND l_rec_nit.nit_lr_ne_column_name IS NOT NULL
+         AND l_rec_nit.nit_lr_st_chain       IS NOT NULL )
+      THEN
+        IF g_tab_is_point_inv(p_ngqt_index)
+        THEN
+           append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN nte.nte_begin_mp AND nte.nte_end_mp');
+        ELSE
+           append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= nte.nte_end_mp');
+           append_both (p_ngqt_index,'        AND   '||l_end_mp_col||' >= nte.nte_begin_mp');
+        END IF;
       END IF;
-   ELSE
+      
+      
+    /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                                    ABERLOUR START
+     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    */
+      /***********************************************************************
+        Code for filtering any intermiate network locations from the Source ID
+        downwards, stopping before it hits the datum locations (already dealt
+        with in the temp_extend above
+      ***********************************************************************/
+      append_list (p_ngqt_index,'     UNION ');
+      append_list (p_ngqt_index,'       SELECT '||g_package_name||'.get_g_ngqi_job_id ngqi_job_id');
+      append_list (p_ngqt_index,'             ,'||nm3flx.string(l_rec_ngqt.ngqt_item_type_type)||' ngqi_item_type_type');
+      append_list (p_ngqt_index,'             ,'||nm3flx.string(l_rec_ngqt.ngqt_item_type)||' ngqi_item_type');
+      append_list (p_ngqt_index,'             ,'||l_item_pk_col||' ngqi_item_id');
+      append_both (p_ngqt_index,'        FROM  '||l_tables||', (WITH net_members AS ');
+      append_both (p_ngqt_index,'       (');
+      append_both (p_ngqt_index,'                  SELECT -1 ');
+      append_both (p_ngqt_index,'                       , '||l_rec_ngq.ngq_source_id||'                       nte_ne_id_of ');
+      append_both (p_ngqt_index,'                       , 0                                nte_begin_mp ');
+      append_both (p_ngqt_index,'                       , nm3net.get_ne_length('||l_rec_ngq.ngq_source_id||') nte_end_mp ');
+      append_both (p_ngqt_index,'                       , 1                                nte_seq_no ');
+      append_both (p_ngqt_index,'                    FROM DUAL ');
+      append_both (p_ngqt_index,'                 UNION ');
+      append_both (p_ngqt_index,'                  SELECT level ');
+      append_both (p_ngqt_index,'                       , nm_ne_id_of                      nte_ne_id_of ');
+      append_both (p_ngqt_index,'                       , NVL(nm_slk,    nm_begin_mp)      nte_begin_mp ');
+      append_both (p_ngqt_index,'                       , NVL(nm_end_slk,nm_end_mp)        nte_end_mp');
+      append_both (p_ngqt_index,'                       , nm_seq_no                        nte_seq_no ');
+      append_both (p_ngqt_index,'                    FROM nm_members ');
+      append_both (p_ngqt_index,'                 CONNECT BY PRIOR nm_ne_id_of = nm_ne_id_in ');
+      append_both (p_ngqt_index,'                   START WITH nm_ne_id_in = '||l_rec_ngq.ngq_source_id||' ');
+      append_both (p_ngqt_index,'               ) ');
+      append_both (p_ngqt_index,'               SELECT * FROM net_members) nte ');
+      --append_both (p_ngqt_index,'       WHERE  nte.nte_job_id = '||g_package_name||'.get_g_nte_job_id');
+      append_both (p_ngqt_index,'       WHERE  1=1');
+   --
       IF l_rec_nit.nit_table_name IS NULL
        THEN
-         l_tables := c_iit;
+         -- This is standard - i.e. NOT FT inventory
+         append_both (p_ngqt_index,'        AND   '||c_table_alias||'.iit_ne_id = nm.nm_ne_id_in');
+         append_both (p_ngqt_index,'        AND    nm.nm_type = '||nm3flx.string('I')||' AND nm.nm_obj_type = '||nm3flx.string(l_rec_ngqt.ngqt_item_type));
+         append_both (p_ngqt_index,'        AND   '||c_table_alias||'.iit_inv_type||Null = '||nm3flx.string(l_rec_ngqt.ngqt_item_type)); -- Suppress index
       END IF;
-      append_list (p_ngqt_index,'        FROM  '||l_tables);
-      IF l_rec_nit.nit_table_name IS NULL
-       THEN
-         append_list (p_ngqt_index,'       WHERE  '||c_table_alias||'.iit_inv_type = '||nm3flx.string(l_rec_ngqt.ngqt_item_type));
-      ELSE
-         append_list (p_ngqt_index,'       WHERE  1=1');
+   --
+      append_both (p_ngqt_index,'        AND   '||l_ne_id_col||' = nte.nte_ne_id_of');
+    --
+      -- Task 0109984
+      -- Don't attempt to use the chainage columns if they are not set on the metamodel
+      --
+      IF l_rec_nit.nit_lr_st_chain IS NOT NULL
+      THEN
+        IF g_tab_is_point_inv(p_ngqt_index)
+        THEN
+           append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN nte.nte_begin_mp AND nte.nte_end_mp');
+         ELSE
+           append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= nte.nte_end_mp');
+           append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
+                                                         THEN l_end_mp_col
+                                                         ELSE l_begin_mp_col
+                                                       END||' >= nte.nte_begin_mp');
+        END IF;
+        -- nm_gaz_query
+        IF  l_rec_ngq.ngq_begin_mp IS NOT NULL
+        AND l_rec_ngq.ngq_end_mp   IS NOT NULL
+        THEN
+          IF g_tab_is_point_inv(p_ngqt_index)
+          THEN
+            append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN '||l_rec_ngq.ngq_begin_mp||' and '||l_rec_ngq.ngq_end_mp );
+          ELSE
+            append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= '||l_rec_ngq.ngq_end_mp);
+            append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
+                                                          THEN l_end_mp_col
+                                                          ELSE l_begin_mp_col
+                                                        END||' >= '||l_rec_ngq.ngq_begin_mp);
+          END IF;
+        END IF;
       END IF;
-   END IF;
---
-   build_flexible_where (l_rec_ngqt, p_ngqt_index);
---
--- Add Union to other potential members of common to the datums retrieved in the network query
---
-   append_list (p_ngqt_index,'     UNION ALL ');
-   append_list (p_ngqt_index,'       SELECT '||g_package_name||'.get_g_ngqi_job_id ngqi_job_id');
-   append_list (p_ngqt_index,'             ,'||nm3flx.string(l_rec_ngqt.ngqt_item_type_type)||' ngqi_item_type_type');
-   append_list (p_ngqt_index,'             ,'||nm3flx.string(l_rec_ngqt.ngqt_item_type)||' ngqi_item_type');
-   append_list (p_ngqt_index,'             ,'||l_item_pk_col||' ngqi_item_id');
---
-   IF  g_area_based_query
-    OR g_roi_restricted_item_query
-    THEN
-      append_both (p_ngqt_index,'        FROM  '||l_tables||', nm_nw_temp_extents nte , nm_members');
+      /***********************************************************************
+        Code for filtering on any Group data immediatly above the datum leve
+        that shares the same datums. This helps identify assets where the
+        ROI has been passed in as a Street (for example) and the assets are
+        located on Sections - same datums, but differnt groups
+      ***********************************************************************/
+     append_list (p_ngqt_index,'     UNION ');
+     append_list (p_ngqt_index,'       SELECT '||g_package_name||'.get_g_ngqi_job_id ngqi_job_id');
+     append_list (p_ngqt_index,'             ,'||nm3flx.string(l_rec_ngqt.ngqt_item_type_type)||' ngqi_item_type_type');
+     append_list (p_ngqt_index,'             ,'||nm3flx.string(l_rec_ngqt.ngqt_item_type)||' ngqi_item_type');
+     append_list (p_ngqt_index,'             ,'||l_item_pk_col||' ngqi_item_id');
+--  --
+--     IF  g_area_based_query
+--      OR g_roi_restricted_item_query
+--      THEN
+      append_both (p_ngqt_index,'        FROM  '||l_tables||', nm_nw_temp_extents nte , nm_members ex');
       append_both (p_ngqt_index,'       WHERE  nte.nte_job_id = '||g_package_name||'.get_g_nte_job_id');
    --
       IF l_rec_nit.nit_table_name IS NULL
@@ -787,16 +874,46 @@ BEGIN
       END IF;
    --
       --append_both (p_ngqt_index,'        AND   '||l_ne_id_col||' = nte.nte_ne_id_of /*gj*/');
-        append_both (p_ngqt_index,'        AND   nm_ne_id_of = nte_ne_id_of' );
-        append_both (p_ngqt_index,'        AND   '||l_ne_id_col ||' = nm_ne_id_in');
-      
-      IF g_tab_is_point_inv(p_ngqt_index)
-       THEN
-         append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN nm_slk AND nm_end_slk');
-      ELSE
-         append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= nm_end_slk');
-         append_both (p_ngqt_index,'        AND   '||l_end_mp_col||' >= nm_slk');
+        append_both (p_ngqt_index,'        AND   ex.nm_ne_id_of = nte_ne_id_of||null' );
+        append_both (p_ngqt_index,'        AND   '||l_ne_id_col ||' = ex.nm_ne_id_in');
+        append_both (p_ngqt_index,'        AND   ex.nm_type = ''G''');
+--
+    -- Task 0109984
+    -- Don't attempt to use the chainage columns if they are not set on the metamodel
+    --
+      IF l_rec_nit.nit_lr_st_chain IS NOT NULL
+      THEN
+        IF g_tab_is_point_inv(p_ngqt_index)
+        THEN
+           append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN ex.nm_begin_mp AND ex.nm_end_mp');
+         ELSE
+           append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= ex.nm_end_mp');
+           append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
+                                                         THEN l_end_mp_col
+                                                         ELSE l_begin_mp_col
+                                                       END||' >= ex.nm_begin_mp');
+        END IF;
+    -- nm_gaz_query
+        IF  l_rec_ngq.ngq_begin_mp IS NOT NULL
+        AND l_rec_ngq.ngq_end_mp   IS NOT NULL
+        THEN
+          IF g_tab_is_point_inv(p_ngqt_index)
+          THEN
+            append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN '||l_rec_ngq.ngq_begin_mp||' and '||l_rec_ngq.ngq_end_mp );
+          ELSE
+            append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= '||l_rec_ngq.ngq_end_mp);
+            append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
+                                                          THEN l_end_mp_col
+                                                          ELSE l_begin_mp_col
+                                                        END||' >= '||l_rec_ngq.ngq_begin_mp);
+          END IF;
+        END IF;
       END IF;
+    /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                                    ABERLOUR END
+    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    */
+    
    ELSE
       IF l_rec_nit.nit_table_name IS NULL
        THEN
@@ -812,14 +929,11 @@ BEGIN
    END IF;
 --
    build_flexible_where (l_rec_ngqt, p_ngqt_index);
--- 
 --
    append_area (p_ngqt_index,'       ORDER BY nte.nte_seq_no, '||l_begin_mp_col);
 --
    append_area (p_ngqt_index,'      ) ilv');
    append_list_end(p_ngqt_index);
-   
-
 --
 END build_inv_restriction_sql;
 --
@@ -1298,8 +1412,7 @@ END execute_sql_area;
 PROCEDURE execute_sql_item (p_index pls_integer) IS
    l_rc pls_integer;
 BEGIN
-   --nm_debug.debug_on;
-   --nm_debug.debug(g_tab_ngqt_list_sql(p_index));
+--   nm_debug.debug(g_tab_ngqt_list_sql(p_index));
    EXECUTE IMMEDIATE g_tab_ngqt_list_sql(p_index);
    l_rc := SQL%rowcount;
 --   nm_debug.debug('done :'||l_rc);
@@ -1956,19 +2069,19 @@ BEGIN
                                ||CHR(10)||'AND usr.nua_user_id = hus.hus_user_id)';
 
       IF pi_nit_category_restriction IS NOT NULL THEN
-         l_retval := l_retval||CHR(10)||'AND  nit_category = '||nm3flx.string(pi_nit_category_restriction);	  
-	  END IF;
-							   
-							   
+         l_retval := l_retval||CHR(10)||'AND  nit_category = '||nm3flx.string(pi_nit_category_restriction);   
+   END IF;
+          
+          
       IF NOT g_allow_ft_inv_types
        THEN
          l_retval := l_retval||CHR(10)||'AND  nit_table_name IS NULL';
       END IF;
-	  
-	  IF pi_exclude_off_network  
-	   THEN
+   
+   IF pi_exclude_off_network  
+    THEN
          l_retval := l_retval||CHR(10)||'AND  nm3asset.is_off_network_vc(nit_inv_type) = ''FALSE''';
-      END IF;		 	    
+      END IF;        
 
    END IF;
 
@@ -3155,7 +3268,9 @@ PROCEDURE perform_item_list_retrieval IS
 BEGIN
    FOR i IN 1..g_tab_ngqt_list_sql.COUNT
     LOOP
+      test_debug ('Executing this '|| g_tab_ngqt_list_sql(i) );
       execute_sql_item(i);
+      test_debug ('Execution complete');
    END LOOP;
 END perform_item_list_retrieval;
 --
@@ -3233,7 +3348,7 @@ BEGIN
             OR (p_ngqt_item_type_type = c_ngqt_item_type_type_inv AND NOT g_allow_inv_item_type_type);
    IF l_fail
     THEN
-	
+ 
 
       hig.raise_ner (pi_appl               => nm3type.c_net
                     ,pi_id                 => 313
@@ -3582,12 +3697,12 @@ END get_all_items_at_location;
 -- GJ to support NM0590
 -- loop through a table of inv categories and insert all types in the category
 -- into the gaz query types table
---		
+--  
 PROCEDURE add_inv_types_for_categories(pi_ngq_id              IN nm_gaz_query.ngq_id%TYPE
                                       ,pi_tab_categories      IN nm3type.tab_varchar4
                                       ,pi_exclude_off_network IN BOOLEAN DEFAULT FALSE) IS
-	
-   l_cur                 nm3type.ref_cursor;						  
+ 
+   l_cur                 nm3type.ref_cursor;        
    l_lup_meaning         nm3type.max_varchar2;
    l_lup_description     nm3type.max_varchar2;
    l_lup_value           nm3type.max_varchar2;
@@ -3598,22 +3713,22 @@ BEGIN
 
    FOR i IN 1..pi_tab_categories.COUNT
     LOOP
-	
-	 IF pi_tab_categories(i) IS NOT NULL THEN
+ 
+  IF pi_tab_categories(i) IS NOT NULL THEN
 
 --nm_debug.debug_on;
 --nm_debug.debug('SQL FOR '||pi_tab_categories(i) ||' IS '||get_ngqt_lov_sql (pi_ngqt_item_type_type          => 'I'
 --                                       ,pi_nit_category_restriction     => pi_tab_categories(i)
---	                                   ,pi_exclude_off_network          => pi_exclude_off_network));
-									   
-									   
+--                                    ,pi_exclude_off_network          => pi_exclude_off_network));
+            
+            
       OPEN  l_cur FOR get_ngqt_lov_sql (pi_ngqt_item_type_type          => 'I'
                                        ,pi_nit_category_restriction     => pi_tab_categories(i)
-	                                   ,pi_exclude_off_network          => pi_exclude_off_network);
+                                    ,pi_exclude_off_network          => pi_exclude_off_network);
       LOOP
          FETCH l_cur INTO l_lup_meaning, l_lup_description, l_lup_value;
          EXIT WHEN l_cur%NOTFOUND;
-		 l_rec_ngqt.ngqt_ngq_id         := pi_ngq_id;
+   l_rec_ngqt.ngqt_ngq_id         := pi_ngq_id;
          l_rec_ngqt.ngqt_seq_no         := nm3seq.next_ngqt_seq_no_seq;
          l_rec_ngqt.ngqt_item_type_type := 'I';  -- always 'I' for some reason and not the actual inv category type
          l_rec_ngqt.ngqt_item_type      := l_lup_value;
@@ -3621,7 +3736,7 @@ BEGIN
          nm3ins.ins_ngqt (l_rec_ngqt);
       END LOOP;
       CLOSE l_cur;
-     END IF;	  
+     END IF;   
    END LOOP;
 
 END add_inv_types_for_categories;
@@ -3889,7 +4004,7 @@ END initialise_ngqt;
 --
 FUNCTION  ngqa_for_nqt_are_valid(pi_ngqt_nqq_id IN nm_gaz_query_types.NGQT_NGQ_ID%TYPE
                                 ,pi_nqqt_seq_no IN nm_gaz_query_types.NGQT_SEQ_NO%TYPE
-								,pi_ngqt_item_type IN nm_gaz_query_types.NGQT_ITEM_TYPE%TYPE) RETURN VARCHAR2 IS
+        ,pi_ngqt_item_type IN nm_gaz_query_types.NGQT_ITEM_TYPE%TYPE) RETURN VARCHAR2 IS
 
  l_sql     varchar2(2000);
  l_meaning          varchar2(2000);
@@ -3919,14 +4034,14 @@ BEGIN
 --
  FOR i IN (select * from nm_gaz_query_attribs
            where NGQA_NGQ_ID = pi_ngqt_nqq_id 
-		   and   ngqa_ngqt_seq_no = pi_nqqt_seq_no) LOOP
-		   
+     and   ngqa_ngqt_seq_no = pi_nqqt_seq_no) LOOP
+     
   --
   -- check that the attribute that we are adding to this ngqa is an attribute in our list
   -- 
-   nm3extlov.validate_lov_value	(p_statement => l_sql
+   nm3extlov.validate_lov_value (p_statement => l_sql
                                 ,p_value     => i.ngqa_attrib_name
-                                ,p_meaning   => l_meaning	
+                                ,p_meaning   => l_meaning 
                                 ,p_id        => l_id
                                 ,pi_match_col => 3) ;
 
@@ -3936,7 +4051,7 @@ BEGIN
 
 EXCEPTION
    WHEN others THEN  -- i.e. not found
-      RETURN('N');								 
+      RETURN('N');         
  
 END ngqa_for_nqt_are_valid;
 --
@@ -3947,8 +4062,8 @@ END ngqa_for_nqt_are_valid;
 PROCEDURE simple_restriction_to_type (pi_ngq_id       IN nm_gaz_query.ngq_id%TYPE
                                      ,pi_ngqt_seq_no  IN nm_gaz_query_types.ngqt_seq_no%TYPE
                                      ,pi_attrib_name  IN nm_gaz_query_attribs.ngqa_attrib_name%TYPE
-								     ,pi_value        IN nm_gaz_query_values.ngqv_value%TYPE) IS
-									
+             ,pi_value        IN nm_gaz_query_values.ngqv_value%TYPE) IS
+         
  l_rec_ngqa nm_gaz_query_attribs%ROWTYPE;
  l_ngqa_seq_no nm_gaz_query_attribs.ngqa_seq_no%TYPE;
  l_condition   nm_gaz_query_attribs.ngqa_condition%TYPE;
@@ -3957,7 +4072,7 @@ PROCEDURE simple_restriction_to_type (pi_ngq_id       IN nm_gaz_query.ngq_id%TYP
  
  ex_invalid_column  exception;  -- insert into ngqa may be against attrib not on inv type e.g. iit_primary_key not on a ft inv type
  PRAGMA exception_init(ex_invalid_column,-20200);
- 								
+         
 BEGIN
 
   l_ngqa_seq_no := nm3seq.next_ngqa_seq_no_seq;
@@ -3990,11 +4105,11 @@ EXCEPTION
 
  WHEN ex_invalid_column THEN
     Null;
-	
+ 
  WHEN others THEN
    RAISE;
   
-END simple_restriction_to_type;									
+END simple_restriction_to_type;         
 --
 -----------------------------------------------------------------------------
 -- GJ - to support NM0590 
@@ -4010,7 +4125,7 @@ BEGIN
     simple_restriction_to_type (pi_ngq_id       => pi_ngq_id
                                ,pi_ngqt_seq_no  => i.ngqt_seq_no
                                ,pi_attrib_name  => pi_attrib_name
-	   					       ,pi_value        => pi_value);
+                ,pi_value        => pi_value);
  END LOOP;
 
 END add_restriction_to_all_types;
