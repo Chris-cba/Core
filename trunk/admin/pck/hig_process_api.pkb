@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.12   Aug 31 2010 10:42:24   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.13   Oct 04 2010 09:50:36   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Aug 31 2010 10:42:24  $
---       Date fetched Out : $Modtime:   Aug 19 2010 13:06:30  $
---       Version          : $Revision:   3.12  $
+--       Date into PVCS   : $Date:   Oct 04 2010 09:50:36  $
+--       Date fetched Out : $Modtime:   Sep 23 2010 16:10:08  $
+--       Version          : $Revision:   3.13  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,11 +17,13 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.12  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.13  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
   g_job_name_prefix varchar2(15) := 'PROCESS_';
+  
+  g_ftp_error Boolean := FALSE ;
   
   
 --
@@ -1401,7 +1403,7 @@ FUNCTION do_polling_if_requested(pi_file_type_name          IN hig_process_type_
   PROCEDURE move_files
     IS
   BEGIN
-
+    g_ftp_error := FALSE ;
     IF l_tab_ftp_connections.COUNT > 0
      THEN
         --
@@ -1414,12 +1416,33 @@ FUNCTION do_polling_if_requested(pi_file_type_name          IN hig_process_type_
                                              ,pi_binary                  => pi_binary
                                              ,pi_archive_overwrite       => pi_archive_overwrite
                                              ,pi_remove_failed_arch      => pi_remove_failed_arch);
-                                       
-          hig_process_api.log_it(pi_message => l_files.COUNT||' files found');
-
-          FOR j IN 1..l_files.count LOOP
-            lt_all_files(lt_all_files.count+1) := l_files(j);
-          END LOOP;
+          -- TASk 0110084
+          -- If any error is raised in the FTP procesing the Process outcome will be set to FAIl and error will be logged.
+          FOR i IN 1..nm3ftp.g_tab_ftp_outcome.Count 
+          LOOP
+              IF nm3ftp.g_tab_ftp_outcome(i).ftp_outcome = 'FAIL'
+              THEN
+                  g_ftp_error := TRUE ; 
+                  hig_process_api.log_it(pi_message    => 'Failed to move the data files due to the following error in FTP processing : ');
+                  hig_process_api.log_it(pi_process_id => hig_process_api.get_current_process_id
+                                        ,pi_message    => 'Failed to move the data files due to the following error in FTP processing : '||nm3ftp.g_tab_ftp_outcome(i).ftp_outcome_error
+                                        ,pi_message_type => 'E'
+                                        ,pi_summary_flag => 'Y' );
+                  hig_process_api.process_execution_end('N');   
+                  Exit;
+              END IF ;
+          END LOOP; 
+          -- TASk 0110084
+          -- Do further processing only if there are no errors in FTP processing    
+          IF NOT g_ftp_error
+          THEN                             
+              hig_process_api.log_it(pi_message => l_files.COUNT||' files found');  
+              FOR j IN 1..l_files.count LOOP
+                lt_all_files(lt_all_files.count+1) := l_files(j);
+              END LOOP;
+          ELSE
+              EXIT;
+          END IF ;  
         END LOOP;
     END IF;
   
@@ -1505,8 +1528,12 @@ BEGIN
     initialise;
   
     move_files;
-  
-    associate_files;
+   -- TASk 0110084
+   -- Do further processing only if there are no errors in FTP processing
+   IF NOT g_ftp_error
+   THEN
+       associate_files;
+   END If ;
   
   END IF;  
   
