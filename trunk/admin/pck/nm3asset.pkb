@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.13   Aug 02 2010 14:45:00   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.14   Oct 04 2010 15:10:42   ade.edwards  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Aug 02 2010 14:45:00  $
---       Date fetched Out : $Modtime:   Aug 02 2010 14:28:16  $
---       PVCS Version     : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Oct 04 2010 15:10:42  $
+--       Date fetched Out : $Modtime:   Oct 04 2010 14:53:10  $
+--       PVCS Version     : $Revision:   2.14  $
 --
 --
 --   Author : Rob Coupe
@@ -16,12 +16,12 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --   Assets package
 -- nm3inv
 -----------------------------------------------------------------------------
--- Copyright (c) exor corporation ltd, 2001
+--	Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.13  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.14  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -199,24 +199,24 @@ CURSOR c1 IS
 BEGIN
   FOR irec IN c1 LOOP
     IF irec.nar_type = 'R' THEN
-   l_ref_asset_measure := irec.nar_asset_measure;
-   l_ref_asset         := irec.nar_asset_ne_id;
-   l_ref_seg_no        := irec.nar_route_seg_no;
-   l_ref_asset_pk      := irec.nar_asset_pk;
-   l_ref_found := TRUE;
+	  l_ref_asset_measure := irec.nar_asset_measure;
+	  l_ref_asset         := irec.nar_asset_ne_id;
+	  l_ref_seg_no        := irec.nar_route_seg_no;
+	  l_ref_asset_pk      := irec.nar_asset_pk;
+	  l_ref_found := TRUE;
 
     END IF;
 --
 --  Need to set the ference of the post to itself
 --
     IF l_ref_found AND l_ref_seg_no = irec.nar_route_seg_no THEN
-   l_ref_measure := irec.nar_asset_measure - l_ref_asset_measure;
-   UPDATE nm_assets_on_route
-   SET nar_ref_post    = l_ref_asset,
-       nar_ref_measure = l_ref_measure,
-       nar_ref_pk      = l_ref_asset_pk
-   WHERE CURRENT OF c1;
- END IF;
+	  l_ref_measure := irec.nar_asset_measure - l_ref_asset_measure;
+	  UPDATE nm_assets_on_route
+	  SET nar_ref_post    = l_ref_asset,
+	      nar_ref_measure = l_ref_measure,
+	      nar_ref_pk      = l_ref_asset_pk
+	  WHERE CURRENT OF c1;
+	END IF;
   END LOOP;
 END set_nar_references;
 --
@@ -261,9 +261,9 @@ BEGIN
   SELECT   r.nm_ne_id_in, r.nm_seq_no, r.nm_seg_no, r.nm_ne_id_of, e.ne_descr, e.ne_unique,
            l1.nm_ne_id_in, l1.nm_begin_mp, NVL( l1.nm_end_mp, e.ne_length), r.nm_slk, r.nm_true,
            i1.iit_inv_type,
-    nm3unit.convert_unit (l_route_unit, g_nar_datum_unit, NVL(r.nm_true,r.nm_slk))
-         + DECODE( r.nm_cardinality, 1, (l1.nm_begin_mp - r.nm_begin_mp),
-                                 -1, (NVL( r.nm_end_mp, e.ne_length) - l1.nm_end_mp)),
+	   nm3unit.convert_unit (l_route_unit, g_nar_datum_unit, NVL(r.nm_true,r.nm_slk))
+		       + DECODE( r.nm_cardinality, 1, (l1.nm_begin_mp - r.nm_begin_mp),
+			                              -1, (NVL( r.nm_end_mp, e.ne_length) - l1.nm_end_mp)),
            it.nit_descr,
            i1.iit_primary_key, i1.iit_located_by, NULL, NULL, NULL,
            DECODE( l1.nm_obj_type, pi_ref_type, 'R', 'A' ),
@@ -373,17 +373,10 @@ BEGIN
    --  criteria which exist in the specified area
    --
 --   nm_debug.debug('nm3gaz_qry.perform_query');
---
--- Task 0109984
--- Set context variable to use tempoary extents for asset on a route idenfication
---
-   nm3ctx.set_context('USETEMPEXTENT','Y');
---
    l_ngqi_job_id := nm3gaz_qry.perform_query (pi_ngq_id         => pi_ngq_id
                                              ,pi_effective_date => pi_effective_date
                                              );
---
-   nm3ctx.set_context('USETEMPEXTENT','N');
+
 --
    -- Get the temp extent which gaz qry has just created
    l_nte_job_id   := nm3gaz_qry.get_g_nte_job_id;
@@ -793,7 +786,8 @@ BEGIN
               ||CHR(10)||'         ,'||g_package_name||'.gh_tab_narh_nm_obj_type'
               ||CHR(10)||'         ,'||g_package_name||'.gh_tab_narh_placement_begin_mp'
               ||CHR(10)||'         ,'||g_package_name||'.gh_tab_narh_placement_end_mp'
-              ||CHR(10)||'    FROM (SELECT nrw.ne_id'
+              --||CHR(10)||'    FROM (SELECT nrw.ne_id'
+              ||CHR(10)||'    FROM (SELECT * FROM  ( SELECT nrw.ne_id'
               ||CHR(10)||'                ,GREATEST(nm.'||l_rec_nit.nit_lr_st_chain||',nrw.nm_begin_mp) nm_begin_mp'
               ||CHR(10)||'                ,LEAST(nm.'||l_rec_nit.nit_lr_end_chain||',nrw.nm_end_mp)     nm_end_mp'
               ||CHR(10)||'                ,nrw.nm_seq_no'
@@ -807,13 +801,38 @@ BEGIN
               ||CHR(10)||'           AND   nm.'||l_rec_nit.nit_lr_ne_column_name||' = nrw.ne_id'
               ||CHR(10)||'           AND   nm.'||l_rec_nit.nit_lr_end_chain||' >= nrw.nm_begin_mp'
               ||CHR(10)||'           AND   nm.'||l_rec_nit.nit_lr_st_chain||' <= nrw.nm_end_mp'
-              ||CHR(10)||'          ORDER BY nrw.nm_seg_no'
-              ||CHR(10)||'                  ,nrw.nm_seq_no'
+              ||CHR(10)||'       -- '
+              --
+              -- Aberlour changes
+              -- Bring in any Groups of Datums which share the same common datums
+              -- 
+              ||CHR(10)||'         UNION '
+              ||CHR(10)||'       -- '
+              ||CHR(10)||'           SELECT ex.nm_ne_id_in ne_id '
+              ||CHR(10)||'                ,qry.'||l_rec_nit.nit_lr_st_chain||'  nm_begin_mp '
+              ||CHR(10)||'                ,qry.'||l_rec_nit.nit_lr_end_chain||' nm_end_mp '
+              ||CHR(10)||'                , ex.nm_seq_no '
+              ||CHR(10)||'                , ex.nm_seg_no '
+              ||CHR(10)||'                , ex.nm_cardinality '
+              ||CHR(10)||'                , ''I'' nm_type '
+              ||CHR(10)||'                , '||nm3flx.string(l_rec_nit.nit_inv_type)||' nm_obj_type '
+              ||CHR(10)||'             FROM '||l_rec_nit.nit_table_name||' qry, nm_nw_temp_extents nte , nm_members ex'
+              ||CHR(10)||'            WHERE  nte.nte_job_id =  nm3gaz_qry.get_g_nte_job_id'
+              ||CHR(10)||'              AND  qry.'||l_rec_nit.nit_foreign_pk_column||' = '||g_package_name||'.g_rec_ngqi.ngqi_item_id'
+              ||CHR(10)||'              AND  ex.nm_ne_id_of = nte_ne_id_of '
+              ||CHR(10)||'              AND  qry.'||l_rec_nit.nit_lr_ne_column_name||' = ex.nm_ne_id_in '
+              ||CHR(10)||'              AND  qry.'||l_rec_nit.nit_lr_end_chain||' >= ex.nm_slk'
+              ||CHR(10)||'              AND  qry.'||l_rec_nit.nit_lr_st_chain||' <= ex.nm_end_slk'
+              ||CHR(10)||'           )'
+              ||CHR(10)||' -- '
+              ||CHR(10)||'          ORDER BY nm_seg_no'
+              ||CHR(10)||'                  ,nm_seq_no'
               ||CHR(10)||'         );'
               ||CHR(10)||'END;';
 --
 --  nm_debug.debug_on;
-  nm_debug.debug(l_block);
+--  nm_debug.debug(l_block);
+--  nm_debug.debug_off;
    EXECUTE IMMEDIATE l_block;
 --
    lh_tab_narh_ne_id_of_begin     := gh_tab_narh_ne_id_of_begin;
@@ -931,12 +950,13 @@ BEGIN
 --      nm_debug.DEBUG('lf_tab_narh_begin_mp('||i||') : '||lf_tab_narh_begin_mp(i));
 --      nm_debug.DEBUG('lf_tab_narh_ne_id_of_end('||i||') : '||lf_tab_narh_ne_id_of_end(i));
 --      nm_debug.DEBUG('lf_tab_narh_end_mp('||i||') : '||lf_tab_narh_end_mp(i));
-      lf_tab_narh_placement_begin_mp(i) := get_measure_from_rescale_write (pi_ne_id      => lf_tab_narh_ne_id_of_begin(i)
-                                                                          ,pi_mp         => lf_tab_narh_begin_mp(i)
-                                                                          );
-      lf_tab_narh_placement_end_mp(i)   := get_measure_from_rescale_write (pi_ne_id      => lf_tab_narh_ne_id_of_end(i)
-                                                                          ,pi_mp         => lf_tab_narh_end_mp(i)
-                                                                          );
+        lf_tab_narh_placement_begin_mp(i) := NVL ( get_measure_from_rescale_write (pi_ne_id      => lf_tab_narh_ne_id_of_begin(i)
+                                                                                  ,pi_mp         => lf_tab_narh_begin_mp(i)
+                                                                                  )
+                                               , lf_tab_narh_begin_mp(i));
+        lf_tab_narh_placement_end_mp(i)   := NVL ( get_measure_from_rescale_write (pi_ne_id      => lf_tab_narh_ne_id_of_end(i)
+                                                                                  ,pi_mp         => lf_tab_narh_end_mp(i) )
+                                                           ,lf_tab_narh_end_mp(i)               );
 --      nm_debug.DEBUG('lf_tab_narh_placement_begin_mp('||i||') : '||lf_tab_narh_placement_begin_mp(i));
 --      nm_debug.DEBUG('lf_tab_narh_placement_end_mp('||i||') : '||lf_tab_narh_placement_end_mp(i));
       IF lf_tab_narh_placement_end_mp(i) > g_maximum_mp
@@ -2031,7 +2051,7 @@ BEGIN
        THEN
          po_flex_col_dets(i).iit_lov_sql                  := get_ial_lov_sql (po_flex_col_dets(i).ita_id_domain);
       END IF;
-   
+	  
       IF po_flex_col_dets(i).iit_meaning IS NULL
        THEN
          po_flex_col_dets(i).iit_meaning                  := po_flex_col_dets(i).iit_value;
@@ -2633,35 +2653,35 @@ BEGIN
      append ('--');
      append ('   l_found BOOLEAN;');
      append ('--');
-     
-  append ('    ex_locked exception;');
+   	 
+	 append ('    ex_locked exception;');
      append ('    PRAGMA EXCEPTION_INIT(ex_locked, -00054);');
  
      append ('BEGIN');
      append ('--');
---     append ('IF :iit_ne_id IS NOT NULL THEN');  
+--     append ('IF :iit_ne_id IS NOT NULL THEN');	 
      append ('   OPEN  cs_lock;');
      append ('   FETCH cs_lock INTO '||g_package_name||'.g_flx_lock_rowid;');
      append ('   l_found := cs_lock%FOUND;');
      append ('   CLOSE cs_lock;');
---     append ('END IF;');  
+--     append ('END IF;');	 
      append ('--');
 --     append ('   IF NOT l_found');
 --     append ('    THEN');
 --     append ('      hig.raise_ner (nm3type.c_net,328);');
 --     append ('   END IF;');
      append ('--');
-     append ('EXCEPTION');  
+     append ('EXCEPTION');	 
      append (' WHEN ex_locked THEN');
      append ('      hig.raise_ner (nm3type.c_net,328);');
      append (' WHEN others THEN');
-     append ('      RAISE_APPLICATION_ERROR(-20001,sqlerrm);');    
-      
+     append ('      RAISE_APPLICATION_ERROR(-20001,sqlerrm);');	 	 
+	 	 	 
      append ('END;');
 --nm_dbug
 --nm_debug.debug_on;
 --     nm_debug.debug(l_block);
---nm_debug.debug_off;  
+--nm_debug.debug_off;	 
      EXECUTE IMMEDIATE l_block USING pio_flex_col_dets(1).iit_ne_id;
  
 --                                    ,pio_flex_col_dets(1).iit_inv_type
@@ -2771,7 +2791,7 @@ BEGIN
                        ||CHR(10)||'END;';
 
 --nm_dbug 
---nm_debug.debug_on;        
+--nm_debug.debug_on;					   
 --     nm_debug.DEBUG('update block...');
 --     nm_debug.DEBUG(l_block);
 --     nm_debug.DEBUG(g_flx_lock_rowid);
@@ -3407,21 +3427,21 @@ BEGIN
          po_flex_col_dets(po_flex_col_dets.COUNT+1)        := l_rec_ele_flex_col_details;
          IF l_rec_ngt.ngt_linear_flag = 'Y'
           THEN
-       --
-        l_min_slk         := nm3net.get_min_slk   (g_rec_ne.ne_id);
-       l_max_slk         := nm3net.get_max_slk   (g_rec_ne.ne_id);
-       l_max_true        := nm3net.get_max_true  (g_rec_ne.ne_id);
-       l_total_route_len := nm3net.get_ne_length (g_rec_ne.ne_id);
-       --
-       IF l_rec_nt.nt_length_unit IS NOT NULL
-        THEN
-          l_route_unit   := nm3unit.get_unit_name (l_rec_nt.nt_length_unit);
-       END IF;
-       --
-       OPEN  cs_first_element (g_rec_ne.ne_id);
-       FETCH cs_first_element INTO l_datum_unit;
-       CLOSE cs_first_element;
-       --
+  	    --
+   	    l_min_slk         := nm3net.get_min_slk   (g_rec_ne.ne_id);
+  	    l_max_slk         := nm3net.get_max_slk   (g_rec_ne.ne_id);
+  	    l_max_true        := nm3net.get_max_true  (g_rec_ne.ne_id);
+  	    l_total_route_len := nm3net.get_ne_length (g_rec_ne.ne_id);
+  	    --
+  	    IF l_rec_nt.nt_length_unit IS NOT NULL
+  	     THEN
+  	       l_route_unit   := nm3unit.get_unit_name (l_rec_nt.nt_length_unit);
+  	    END IF;
+  	    --
+  	    OPEN  cs_first_element (g_rec_ne.ne_id);
+  	    FETCH cs_first_element INTO l_datum_unit;
+  	    CLOSE cs_first_element;
+  	    --
             l_rec_ele_flex_col_details.ita_attrib_name        := 'MIN_SLK';
             l_rec_ele_flex_col_details.ita_scrn_text          := 'Min SLK';
             l_rec_ele_flex_col_details.ita_view_col_name      := l_rec_ele_flex_col_details.ita_attrib_name;
@@ -3436,7 +3456,7 @@ BEGIN
             l_rec_ele_flex_col_details.iit_description        := l_route_unit;
             l_rec_ele_flex_col_details.iit_meaning            := l_rec_ele_flex_col_details.iit_value_orig;
             po_flex_col_dets(po_flex_col_dets.COUNT+1)        := l_rec_ele_flex_col_details;
-       --
+  	    --
             l_rec_ele_flex_col_details.ita_attrib_name        := 'MAX_SLK';
             l_rec_ele_flex_col_details.ita_scrn_text          := 'Max SLK';
             l_rec_ele_flex_col_details.ita_view_col_name      := l_rec_ele_flex_col_details.ita_attrib_name;
@@ -3451,7 +3471,7 @@ BEGIN
             l_rec_ele_flex_col_details.iit_description        := l_route_unit;
             l_rec_ele_flex_col_details.iit_meaning            := l_rec_ele_flex_col_details.iit_value_orig;
             po_flex_col_dets(po_flex_col_dets.COUNT+1)        := l_rec_ele_flex_col_details;
-       --
+  	    --
             l_rec_ele_flex_col_details.ita_attrib_name        := 'MAX_TRUE';
             l_rec_ele_flex_col_details.ita_scrn_text          := 'Max True';
             l_rec_ele_flex_col_details.ita_view_col_name      := l_rec_ele_flex_col_details.ita_attrib_name;
@@ -3466,7 +3486,7 @@ BEGIN
             l_rec_ele_flex_col_details.iit_description        := l_route_unit;
             l_rec_ele_flex_col_details.iit_meaning            := l_rec_ele_flex_col_details.iit_value_orig;
             po_flex_col_dets(po_flex_col_dets.COUNT+1)        := l_rec_ele_flex_col_details;
-       --
+  	    --
             l_rec_ele_flex_col_details.ita_attrib_name        := 'TOTAL_LEN';
             l_rec_ele_flex_col_details.ita_scrn_text          := 'Total Route Length';
             l_rec_ele_flex_col_details.ita_view_col_name      := l_rec_ele_flex_col_details.ita_attrib_name;
@@ -3618,7 +3638,7 @@ BEGIN
       DECLARE
          l_auto_incl_sql nm3type.max_varchar2;
          l_id               nm3type.max_varchar2;
-         l_flx_sql          nm3type.max_varchar2;   
+         l_flx_sql          nm3type.max_varchar2;		 
       BEGIN
          --
          l_rec_ele_flex_col_details.ita_attrib_name        := l_tab_ntc_column_name(i);
@@ -3628,7 +3648,7 @@ BEGIN
          l_rec_ele_flex_col_details.iit_lov_sql            := NULL;
          l_rec_ele_flex_col_details.iit_description        := NULL;
          --
-   
+		 
          l_rec_ele_flex_col_details.ita_mandatory_yn       := l_tab_ntc_mandatory(i);
          l_rec_ele_flex_col_details.ita_mandatory_asterisk := nm3flx.i_t_e (l_tab_ntc_mandatory(i)='Y',c_asterisk,NULL);
          l_rec_ele_flex_col_details.ita_format             := l_tab_ntc_column_type(i);
@@ -3662,7 +3682,7 @@ BEGIN
 --                             ,a_hco_code    => l_rec_ele_flex_col_details.iit_value_orig
 --                             ,a_hco_meaning => l_rec_ele_flex_col_details.iit_description
 --                             );
---         END IF;   
+--         END IF;		 
 
 
          l_flx_sql            := nm3flx.build_lov_sql_string (p_nt_type                    => g_rec_ne.ne_nt_type
@@ -3671,14 +3691,14 @@ BEGIN
                                                              ,p_replace_bind_variable_with => Null
                                                              );
  
-         IF l_flx_sql IS NOT NULL AND l_rec_ele_flex_col_details.iit_value_orig IS NOT NULL THEN   
-            nm3extlov.validate_lov_value (p_statement => l_flx_sql
-                                            ,p_value     => l_rec_ele_flex_col_details.iit_value_orig 
-                                            ,p_meaning   => l_rec_ele_flex_col_details.iit_description 
+         IF l_flx_sql IS NOT NULL AND l_rec_ele_flex_col_details.iit_value_orig IS NOT NULL THEN		 
+            nm3extlov.validate_lov_value	(p_statement => l_flx_sql
+                                            ,p_value     => l_rec_ele_flex_col_details.iit_value_orig	
+                                            ,p_meaning   => l_rec_ele_flex_col_details.iit_description	
                                             ,p_id        => l_id
-           ,pi_match_col => 3 ) ;
-         END IF;         
-  
+											,pi_match_col => 3 ) ;
+         END IF;									
+	 
 
          --
 
@@ -4257,7 +4277,7 @@ BEGIN
 
  RETURN(
           nm3get.get_nit_all(pi_nit_inv_type => pi_nit_inv_type).nit_category
-    );
+	   );
 
 END get_category_for_inv_type;
 --
@@ -4265,7 +4285,7 @@ END get_category_for_inv_type;
 --
 FUNCTION get_tab_icm_for_module(pi_icm_hmo_module        IN nm_inv_category_modules.icm_hmo_module%TYPE
                                ,pi_icm_updatable         IN nm_inv_category_modules.icm_hmo_module%TYPE DEFAULT NULL) RETURN nm3type.tab_varchar4 IS 
-        
+								
 
  l_retval nm3type.tab_varchar4;
  
@@ -4283,9 +4303,10 @@ BEGIN
  
  RETURN(l_retval);
 
-END get_tab_icm_for_module;        
+END get_tab_icm_for_module;								
 --
 -----------------------------------------------------------------------------
---        
+--								
 END nm3asset;
 /
+
