@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock_gen.pkb-arc   2.17   Jun 11 2010 16:24:56   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock_gen.pkb-arc   2.18   Oct 06 2010 15:32:08   mike.alexander  $
 --       Module Name      : $Workfile:   nm3lock_gen.pkb  $
---       Date into PVCS   : $Date:   Jun 11 2010 16:24:56  $
---       Date fetched Out : $Modtime:   Jun 11 2010 16:22:42  $
---       PVCS Version     : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Oct 06 2010 15:32:08  $
+--       Date fetched Out : $Modtime:   Oct 06 2010 15:20:30  $
+--       PVCS Version     : $Revision:   2.18  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.17  $"
+--   nm3get_gen body   : "$Revision:   2.18  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.17  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.18  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lock_gen';
@@ -767,7 +767,7 @@ FUNCTION lock_dec (pi_dec_hct_id        doc_enquiry_contacts.dec_hct_id%TYPE
                   ) RETURN ROWID IS
 --
    CURSOR cs_dec IS
-   SELECT /*+ INDEX (dec DEC_IND1) */ ROWID
+   SELECT /*+ INDEX (dec DEC_PK) */ ROWID
     FROM  doc_enquiry_contacts dec
    WHERE  dec.dec_hct_id = pi_dec_hct_id
     AND   dec.dec_doc_id = pi_dec_doc_id
@@ -1415,7 +1415,7 @@ FUNCTION lock_dky (pi_dky_doc_id        doc_keys.dky_doc_id%TYPE
                   ) RETURN ROWID IS
 --
    CURSOR cs_dky IS
-   SELECT /*+ INDEX (dky DKW_IND1) */ ROWID
+   SELECT /*+ INDEX (dky DKY_PK) */ ROWID
     FROM  doc_keys dky
    WHERE  dky.dky_doc_id     = pi_dky_doc_id
     AND   dky.dky_dkw_key_id = pi_dky_dkw_key_id
@@ -2895,7 +2895,7 @@ FUNCTION lock_grm (pi_grm_module        gri_modules.grm_module%TYPE
                   ) RETURN ROWID IS
 --
    CURSOR cs_grm IS
-   SELECT /*+ INDEX (grm GRM_FK_HMO_IND) */ ROWID
+   SELECT /*+ INDEX (grm GRM_PK) */ ROWID
     FROM  gri_modules grm
    WHERE  grm.grm_module = pi_grm_module
    FOR UPDATE NOWAIT;
@@ -4055,7 +4055,7 @@ FUNCTION lock_hca (pi_hca_hct_id        hig_contact_address.hca_hct_id%TYPE
                   ) RETURN ROWID IS
 --
    CURSOR cs_hca IS
-   SELECT /*+ INDEX (hca HCA_IND1) */ ROWID
+   SELECT /*+ INDEX (hca HCA_PK) */ ROWID
     FROM  hig_contact_address hca
    WHERE  hca.hca_hct_id = pi_hca_hct_id
     AND   hca.hca_had_id = pi_hca_had_id
@@ -6772,7 +6772,7 @@ FUNCTION lock_huh (pi_huh_user_id       hig_user_history.huh_user_id%TYPE
                   ) RETURN ROWID IS
 --
    CURSOR cs_huh IS
-   SELECT /*+ INDEX (huh HUH_HUS_FK_IND) */ ROWID
+   SELECT /*+ INDEX (huh HUH_PK) */ ROWID
     FROM  hig_user_history huh
    WHERE  huh.huh_user_id = pi_huh_user_id
    FOR UPDATE NOWAIT;
@@ -9958,7 +9958,7 @@ FUNCTION lock_ngit (pi_ngit_ngt_group_type nm_group_inv_types.ngit_ngt_group_typ
                    ) RETURN ROWID IS
 --
    CURSOR cs_ngit IS
-   SELECT /*+ INDEX (ngit NGIT_FK_NGT_IND) */ ROWID
+   SELECT /*+ INDEX (ngit NGIT_UK) */ ROWID
     FROM  nm_group_inv_types ngit
    WHERE  ngit.ngit_ngt_group_type = pi_ngit_ngt_group_type
    FOR UPDATE NOWAIT;
@@ -10134,7 +10134,7 @@ FUNCTION lock_ngil (pi_ngil_ne_ne_id     nm_group_inv_link.ngil_ne_ne_id%TYPE
                    ) RETURN ROWID IS
 --
    CURSOR cs_ngil IS
-   SELECT /*+ INDEX (ngil NGIL_FK_NE_IND) */ ROWID
+   SELECT /*+ INDEX (ngil NGIL_UK) */ ROWID
     FROM  nm_group_inv_link ngil
    WHERE  ngil.ngil_ne_ne_id = pi_ngil_ne_ne_id
    FOR UPDATE NOWAIT;
@@ -10310,7 +10310,7 @@ FUNCTION lock_ngil_all (pi_ngil_ne_ne_id     nm_group_inv_link_all.ngil_ne_ne_id
                        ) RETURN ROWID IS
 --
    CURSOR cs_ngil_all IS
-   SELECT /*+ INDEX (ngil_all NGIL_FK_NE_IND) */ ROWID
+   SELECT /*+ INDEX (ngil_all NGIL_UK) */ ROWID
     FROM  nm_group_inv_link_all ngil_all
    WHERE  ngil_all.ngil_ne_ne_id = pi_ngil_ne_ne_id
    FOR UPDATE NOWAIT;
