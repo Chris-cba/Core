@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.16   Sep 20 2010 14:41:20   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.17   Oct 06 2010 14:05:38   mike.alexander  $
 --       Module Name      : $Workfile:   nm3data7.sql  $
---       Date into PVCS   : $Date:   Sep 20 2010 14:41:20  $
---       Date fetched Out : $Modtime:   Sep 20 2010 14:37:06  $
---       Version          : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Oct 06 2010 14:05:38  $
+--       Date fetched Out : $Modtime:   Oct 06 2010 14:02:20  $
+--       Version          : $Revision:   2.17  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 20-SEP-2010 14:37
+--       Generation Date  : 06-OCT-2010 14:02
 --
 --   Product metadata script
 --   As at Release 4.3.0.0
@@ -14514,6 +14514,42 @@ SELECT
        ,null
        ,'Cannot find Document Gateway table or appropriate synonym.'
        ,'Add the relevant table and/or synonym using the Document Gateway form (DOC0130)' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 467;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,467
+       ,null
+       ,'The User has not been assigned the correct admin units to carry out this action.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 468;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,468
+       ,null
+       ,'Please ensure all datum networks are registered with 3D diminfo.'
+       ,'Subscript beyond count' FROM DUAL;
 --
 --
 --
