@@ -4,11 +4,11 @@ IS
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkh-arc   2.2   May 12 2010 10:03:26   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkh-arc   2.3   Oct 06 2010 17:42:16   Chris.Strettle  $
 --       Module Name      : $Workfile:   doc_sdo_util.pkh  $
---       Date into PVCS   : $Date:   May 12 2010 10:03:26  $
---       Date fetched Out : $Modtime:   May 12 2010 09:09:12  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Oct 06 2010 17:42:16  $
+--       Date fetched Out : $Modtime:   Oct 06 2010 17:38:02  $
+--       Version          : $Revision:   2.3  $
 --
 --   Author : Chris Strettle
 --
@@ -17,7 +17,7 @@ IS
 -----------------------------------------------------------------------------
 --
    --g_sccsid is the SCCS ID for the package
-   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
 --
    g_table_name          CONSTANT user_tables.table_name%TYPE       := 'DOCS';
    g_pk_column           CONSTANT user_tab_columns.column_name%TYPE := 'DOC_ID';
@@ -27,7 +27,7 @@ IS
    g_shape_col           CONSTANT user_tab_columns.column_name%TYPE := 'GEOLOC';
    g_x_column            CONSTANT user_tab_columns.column_name%TYPE := 'DOC_COMPL_EAST';
    g_y_column            CONSTANT user_tab_columns.column_name%TYPE := 'DOC_COMPL_NORTH';
-   g_restriction         CONSTANT VARCHAR2(100)                     := 'doc_sdo_util.doc_is_doc(:OLD.doc_dtp_code)';
+   g_restriction         CONSTANT VARCHAR2(100)                     := 'doc_sdo_util.doc_is_doc(:NEW.doc_dtp_code)';
    g_theme_feature_views CONSTANT VARCHAR2(30)                      := 'V_DOCUMENTS_XY_SDO';
 --   g_view_theme_name     CONSTANT nm_themes_all.nth_theme_name%TYPE := 'DOCUMENTS';
 --
