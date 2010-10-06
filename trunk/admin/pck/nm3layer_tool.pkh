@@ -3,16 +3,16 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.8   Mar 26 2010 10:11:50   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.9   Oct 06 2010 12:02:38   ade.edwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkh  $
---       Date into PVCS   : $Date:   Mar 26 2010 10:11:50  $
---       Date fetched Out : $Modtime:   Mar 25 2010 17:03:56  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Oct 06 2010 12:02:38  $
+--       Date fetched Out : $Modtime:   Oct 06 2010 12:01:24  $
+--       Version          : $Revision:   2.9  $
 --       Based on SCCS version : 1.6
 -------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.8  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.9  $';
     g_boolean               BOOLEAN        := FALSE;
     g_x_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_X';
     g_y_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_Y';
@@ -226,6 +226,14 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
             , c_label_style                VARCHAR2(500)
             );
   --
+  TYPE rec_refresh_themes
+  IS RECORD
+            (
+              c_seq                        NUMBER
+            , c_nth_theme_id               NUMBER
+            , c_text                       nm3type.max_varchar2 
+            );
+  --
   TYPE tab_usgm                     IS TABLE OF user_sdo_geom_metadata%ROWTYPE
     INDEX BY BINARY_INTEGER;
   TYPE tab_nth                      IS TABLE OF NM_THEMES_ALL%ROWTYPE
@@ -245,6 +253,8 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
   TYPE tab_msv_themes               IS TABLE OF rec_msv_themes
     INDEX BY BINARY_INTEGER;
   TYPE tab_msv_theme_details        IS TABLE OF rec_msv_theme_details
+    INDEX BY BINARY_INTEGER;
+  TYPE tab_refresh_themes           IS TABLE OF rec_refresh_themes
     INDEX BY BINARY_INTEGER;
 --</TYPES>
 
@@ -938,6 +948,71 @@ RETURN BOOLEAN;
 FUNCTION get_nsg_label(pi_nit_inv_type IN nm_inv_types.nit_inv_type%type) 
 RETURN VARCHAR2;
 --</PROC>
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE submit_job
+              ( pi_job_type IN VARCHAR2 
+              , pi_arg_1    IN VARCHAR2 DEFAULT NULL
+              , pi_arg_2    IN VARCHAR2 DEFAULT NULL
+              , pi_arg_3    IN VARCHAR2 DEFAULT NULL
+              , pi_arg_4    IN VARCHAR2 DEFAULT NULL
+              , pi_arg_5    IN VARCHAR2 DEFAULT NULL
+              , po_out_1   OUT VARCHAR2
+              , po_out_2   OUT VARCHAR2
+              );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REFRESH_SDE_METADATA">
+PROCEDURE refresh_sde_metadata 
+             ( pi_nth_theme_id  IN nm_themes_all.nth_theme_id%TYPE
+             , pi_dependency    IN VARCHAR2 DEFAULT 'ALL_DATA' );
+--
+PROCEDURE refresh_sde_metadata 
+             ( pi_nth_theme_id  IN nm_themes_all.nth_theme_id%TYPE
+             , pi_dependency    IN VARCHAR2 DEFAULT 'ALL_DATA'
+             , pi_progress_id   IN nm_progress.prg_progress_id%TYPE );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="REFRESH_SDO_METADATA">
+PROCEDURE refresh_sdo_metadata
+             ( pi_nth_theme_id  IN nm_themes_all.nth_theme_id%TYPE
+             , pi_dependency    IN VARCHAR2 DEFAULT 'ALL_DATA'
+             , pi_clone_parent  IN BOOLEAN DEFAULT TRUE);
+--
+PROCEDURE refresh_sdo_metadata
+             ( pi_nth_theme_id  IN nm_themes_all.nth_theme_id%TYPE
+             , pi_dependency    IN VARCHAR2 DEFAULT 'ALL_DATA'
+             , pi_clone_parent  IN BOOLEAN DEFAULT TRUE
+             , pi_progress_id   IN nm_progress.prg_progress_id%TYPE
+             , pi_run_sde       IN BOOLEAN DEFAULT FALSE );
+--</PROC> 
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SRID">
+FUNCTION get_srid ( pi_nth_theme_id IN nm_themes_all.nth_theme_id%TYPE )
+  RETURN INTEGER;
+--</PROC> 
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_REFRESH_THEMES">
+  PROCEDURE get_refresh_themes
+              ( pi_nth_theme_id        IN     nm_themes_all.nth_theme_id%TYPE
+              , pi_metadata_option     IN     VARCHAR2
+              , pi_dependency_option   IN     VARCHAR2
+              , po_results             IN OUT tab_refresh_themes);
+--</PROC> 
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SDE_AVAILABLE">
+  FUNCTION sde_available RETURN BOOLEAN;
+--</PROC> 
 --
 -----------------------------------------------------------------------------
 --

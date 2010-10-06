@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.17   Mar 26 2010 10:11:50   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.18   Oct 06 2010 12:02:38   ade.edwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Mar 26 2010 10:11:50  $
---       Date fetched Out : $Modtime:   Mar 25 2010 17:06:44  $
---       Version          : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Oct 06 2010 12:02:38  $
+--       Date fetched Out : $Modtime:   Oct 06 2010 12:01:10  $
+--       Version          : $Revision:   2.18  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.17  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.18  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -21,11 +21,15 @@ AS
    g_tab_usm                 tab_msv_maps;
    g_tab_ust                 tab_msv_themes;
    g_tab_ustd                tab_msv_theme_details;
-   g_xml_header              VARCHAR2 (40)
-                                  := '<?xml version="1.0" standalone="yes"?>';
+   g_xml_header              VARCHAR2 (40)         := '<?xml version="1.0" standalone="yes"?>';
    g_user_key                VARCHAR2 (50);
    g_cancel_flag             VARCHAR2 (1)          := 'N';
    g_global_boolean          BOOLEAN;
+--
+   g_metadata                nm_id_code_meaning_tbl := nm_id_code_meaning_tbl( nm_id_code_meaning_type(NULL, NULL, NULL));
+   g_usgm                    mdsys.sdo_geom_metadata_table%ROWTYPE;
+   TYPE                      tab_themes IS TABLE OF nm_themes_all%ROWTYPE INDEX BY BINARY_INTEGER;
+   g_tab_themes              tab_themes;
 --
    e_no_analyse_privs        EXCEPTION;
 --
@@ -4641,11 +4645,962 @@ BEGIN
 --
     l_return_val := NVL(l_return_val,pi_nit_inv_type);
 --
-RETURN l_return_val;
+  RETURN l_return_val;
+END get_nsg_label;
 --
 -----------------------------------------------------------------------------
 --
-END;
+--<PROC NAME="REFRESH_SDE_METADATA">
+--
+--  Task 0110146
+--  Bring SDE metadata refresh into GIS0020/GIS0010
+--  Cannot reference NM3SDE package or SDE tables directly as it will be 
+--  invalid on some systems so everything must be done dynamically.
+--
+--
+  PROCEDURE refresh_sde_metadata
+             ( pi_nth_theme_id  IN nm_themes_all.nth_theme_id%TYPE
+             , pi_dependency    IN VARCHAR2 DEFAULT 'ALL_DATA' )
+  IS
+    l_dummy  nm_progress.prg_progress_id%TYPE;
+  BEGIN
+    refresh_sde_metadata
+      ( pi_nth_theme_id  => pi_nth_theme_id
+      , pi_dependency    => pi_dependency
+      , pi_progress_id   => l_dummy 
+      );
+  END refresh_sde_metadata;
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE submit_job
+              ( pi_job_type IN VARCHAR2
+              , pi_arg_1    IN VARCHAR2  DEFAULT NULL
+              , pi_arg_2    IN VARCHAR2  DEFAULT NULL
+              , pi_arg_3    IN VARCHAR2  DEFAULT NULL
+              , pi_arg_4    IN VARCHAR2  DEFAULT NULL
+              , pi_arg_5    IN VARCHAR2  DEFAULT NULL
+              , po_out_1   OUT VARCHAR2  
+              , po_out_2   OUT VARCHAR2  
+              )
+  IS
+    l_job_name       nm3type.max_varchar2;
+    l_what           nm3type.max_varchar2;
+    l_theme_id       nm_themes_all.nth_theme_id%TYPE := pi_arg_1;
+    l_dependency     VARCHAR2(10) := pi_arg_2;
+    l_progress_id    NUMBER;
+    l_clone_parent   VARCHAR2(10) := pi_arg_3;
+    
+  BEGIN
+    IF pi_job_type = 'REFRESH_SDE'
+    THEN
+    --
+      l_job_name := dbms_scheduler.generate_job_name;
+    --
+      l_progress_id := nm3progress.get_next_progress_id;
+      po_out_1      := l_progress_id;
+    --
+      l_what := 'nm3layer_tool.refresh_sde_metadata'
+              ||  '('
+              ||   ' pi_nth_theme_id  => '||l_theme_id
+              ||   ',pi_dependency    => '||l_dependency
+              ||   ',pi_progress_id   => '||l_progress_id
+              ||  ');';
+    --
+      nm3jobs.create_job
+         ( pi_job_name         => l_job_name
+         , pi_job_action       => l_what
+         , pi_enabled          => FALSE
+         , pi_auto_drop        => FALSE );
+    --
+      dbms_scheduler.run_job
+        ( job_name            => l_job_name
+        , use_current_session => FALSE);
+    --
+    ELSIF pi_job_type = 'REFRESH_SDO'
+    THEN
+    --
+      l_job_name := dbms_scheduler.generate_job_name;
+    --
+      l_progress_id := nm3progress.get_next_progress_id;
+      po_out_1      := l_progress_id;
+    --
+      l_what := 'nm3layer_tool.refresh_sdo_metadata'
+              ||  '('
+              ||   ' pi_nth_theme_id  => '||l_theme_id
+              ||   ',pi_dependency    => '||l_dependency
+              ||   ',pi_clone_parent  => '||l_clone_parent
+              ||   ',pi_progress_id   => '||l_progress_id
+              ||  ');';
+    --
+      nm3jobs.create_job
+         ( pi_job_name         => l_job_name
+         , pi_job_action       => l_what
+         , pi_enabled          => FALSE
+         , pi_auto_drop        => FALSE );
+    --
+      dbms_scheduler.run_job
+        ( job_name            => l_job_name
+        , use_current_session => FALSE);
+    --
+    ELSIF pi_job_type = 'REFRESH_BOTH'
+    THEN
+    --
+      l_job_name := dbms_scheduler.generate_job_name;
+    --
+      l_progress_id := nm3progress.get_next_progress_id;
+      po_out_1      := l_progress_id;
+    --
+      l_what := 'nm3layer_tool.refresh_sdo_metadata'
+              ||  '('
+              ||   ' pi_nth_theme_id  => '||l_theme_id
+              ||   ',pi_dependency    => '||l_dependency
+              ||   ',pi_clone_parent  => '||l_clone_parent
+              ||   ',pi_progress_id   => '||l_progress_id
+              ||   ',pi_run_sde       => TRUE'
+              ||  ');';
+    --
+      nm3jobs.create_job
+         ( pi_job_name         => l_job_name
+         , pi_job_action       => l_what
+         , pi_enabled          => FALSE
+         , pi_auto_drop        => FALSE );
+    --
+      dbms_scheduler.run_job
+        ( job_name            => l_job_name
+        , use_current_session => FALSE);
+    END IF;
+  --
+  END submit_job; 
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE instantiate_themes ( pi_nth_theme_id  IN nm_themes_all.nth_theme_id%TYPE
+                               , pi_dependency    IN VARCHAR2 )
+  IS
+    c_dep_tab              CONSTANT VARCHAR2(10) := 'TAB';
+    c_dep_view_n_tab       CONSTANT VARCHAR2(10) := 'VIEW_N_TAB';
+    c_dep_all_data         CONSTANT VARCHAR2(10) := 'ALL_DATA';
+  BEGIN
+    --------------------------------------------------------------------------
+    -- Base table theme - regenerate the dependant layers.
+    --------------------------------------------------------------------------
+    SELECT * BULK COLLECT INTO g_tab_themes
+      FROM
+      -- Get Theme record
+      ( SELECT * FROM nm_themes_all
+         WHERE nth_theme_id = pi_nth_theme_id
+      --
+      UNION
+      -- Get any themes dependant on this one
+        SELECT * FROM nm_themes_all
+         WHERE nth_base_table_theme = pi_nth_theme_id
+     --
+     UNION
+     -- Get any dependant layers 
+        SELECT * FROM nm_themes_all
+         WHERE EXISTS
+           (SELECT 1 FROM nm_base_themes
+             WHERE nth_theme_id = nbth_theme_id
+               AND nbth_base_theme = pi_nth_theme_id ) 
+             )
+    ORDER BY nth_base_table_theme NULLS FIRST, nth_theme_id ;
+  END instantiate_themes;
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE refresh_sde_metadata 
+             ( pi_nth_theme_id  IN nm_themes_all.nth_theme_id%TYPE
+             , pi_dependency    IN VARCHAR2 DEFAULT 'ALL_DATA'
+             , pi_progress_id   IN nm_progress.prg_progress_id%TYPE)
+  IS
+    TYPE tab_nth IS TABLE OF nm_themes_all%ROWTYPE INDEX BY BINARY_INTEGER;
+    l_tab_nth                tab_nth;
+    l_sql                    nm3type.max_varchar2;
+    l_progress_id            nm_progress.prg_progress_id%TYPE;
+    l_stages                 NUMBER;
+  BEGIN
+  --
+    IF hig.get_sysopt ('REGSDELAY') != 'Y'
+    THEN
+    ---------------------------------------------------------------------------
+    -- Make sure SDE is in use on this system otherwise exit
+    ---------------------------------------------------------------------------
+      RAISE_APPLICATION_ERROR (-20101,'SDE Metadata is not used (REGSDELAY) on this system');
+    END IF;
+  --
+    
+  --
+  -----------------------------------------------------------------------------
+  -- Setup Progress Monitoring
+  -----------------------------------------------------------------------------
+  --
+    l_progress_id  := pi_progress_id;
+  --
+    l_stages := l_tab_nth.COUNT;
+  --
+    nm3progress.initialise_progress( pi_progress_id  => l_progress_id
+                                   , pi_total_stages => l_stages );
+  --
+    FOR i IN 1..l_tab_nth.COUNT
+    LOOP
+    --
+    ---------------------------------------------------------------------------
+    -- Drop the highways owner metadata
+    ---------------------------------------------------------------------------
+    --
+      nm3progress.record_progress( pi_progress_id      => l_progress_id
+                                  ,pi_force            => TRUE
+                                  ,pi_current_stage    => i
+                                  ,pi_operation        => 'Dropping SDE Metadata for '||l_tab_nth(i).nth_feature_table||' - '||USER);
+    --
+      DECLARE
+        l_sql   nm3type.max_varchar2;
+      BEGIN
+        l_sql := 'BEGIN '
+           ||lf||'  nm3sde.drop_layer_by_table '
+           ||lf||'  ( p_table  => :feature_table '
+           ||lf||'  , p_column => :shape_column ); '
+           ||lf||'EXCEPTION '
+           ||lf||'  WHEN OTHERS THEN '
+           ||lf||'  --  HIG-0254: Layer not found in SDE metadata '
+           ||lf||'  IF hig.check_last_ner(''HIG'',254) THEN NULL; '
+           ||lf||'  ELSE RAISE; '
+           ||lf||'  END IF; '
+           ||lf||'END; ';
+        EXECUTE IMMEDIATE l_sql USING IN l_tab_nth(i).nth_feature_table
+                                    , IN l_tab_nth(i).nth_feature_shape_column ;
+      END;
+    --
+    -------------------------------------------------------------------------------
+    -- Drop the subordinate user SDE metadata
+    -------------------------------------------------------------------------------
+    --
+      l_sql := 'DECLARE '
+         ||lf||'  l_total     NUMBER := 0;'
+         ||lf||'  l_current   NUMBER := 0;'
+         ||lf||'BEGIN '
+         ||lf||'  SELECT COUNT(*) INTO l_total '
+         ||lf||  '  FROM sde.layers '
+         ||lf||  ' WHERE owner != hig.get_application_owner '
+         ||lf||  '   AND table_name = :table_name '
+         ||lf||  '   AND spatial_column = :column_name; '
+         ||lf||'-- '
+         ||lf||'  FOR i IN (SELECT owner, table_name, spatial_column '
+         ||lf||            '  FROM sde.layers '
+         ||lf||            ' WHERE owner != hig.get_application_owner '
+         ||lf||            '   AND table_name = :table_name '
+         ||lf||            '   AND spatial_column = :column_name ) '
+         ||lf|| ' LOOP '
+         ||lf|| '   l_current := l_current + 1;'
+         ||lf||'-- '
+         ||lf||'    nm3progress.record_progress '
+         ||lf||     ' ( pi_progress_id      => :l_progress_id '
+         ||lf||     ' , pi_force            => TRUE '
+         ||lf||     ' , pi_current_stage    => :l '
+         ||lf||     ' , pi_operation        => ''Dropping SDE Metadata for ''||i.table_name||'' - ''||i.owner '
+         ||lf||     ' , pi_total_count      => l_total '
+         ||lf||     ' , pi_current_position => l_current); '
+         ||lf||'-- '
+         ||lf|| '   nm3sde.drop_sub_layer_by_table(p_table => i.table_name, p_column => i.spatial_column, p_owner => i.owner ); '
+         ||lf|| ' END LOOP;'
+         ||lf||'END;';
+    --
+      --nm_debug.debug_on; nm_debug.debug(l_sql);
+    --
+      EXECUTE IMMEDIATE l_sql USING IN l_tab_nth(i).nth_feature_table 
+                                  , IN l_tab_nth(i).nth_feature_shape_column
+                                  , IN l_progress_id 
+                                  , IN i;
+    --
+    -------------------------------------------------------------------------------
+    -- Re-create the Highways owner SDE metadata
+    -------------------------------------------------------------------------------
+    --
+    --
+      nm3progress.record_progress( pi_progress_id      => l_progress_id
+                                 , pi_force            => TRUE
+                                 , pi_current_stage    => i
+                                 , pi_operation        => 'Creating SDE Metadata for '||l_tab_nth(i).nth_feature_table||' - '||USER);
+    --
+      DECLARE
+        l_sql  nm3type.max_varchar2;
+      BEGIN
+        l_sql := 'BEGIN '
+           ||lf||'  nm3sde.register_sde_layer(:theme); '
+           ||lf||'END;';
+      --
+        EXECUTE IMMEDIATE l_sql USING IN l_tab_nth(i).nth_theme_id; 
+      END;
+    --
+    --Needs a commit for the second set of metadata
+    --
+      COMMIT;
+    --
+    -------------------------------------------------------------------------------
+    -- Re-create the subordinate user SDE metadata
+    -------------------------------------------------------------------------------
+    --
+      l_sql := 'DECLARE '
+         ||lf||'  l_total     NUMBER := 0;'
+         ||lf||'  l_current   NUMBER := 0;'
+         ||lf||'BEGIN '
+         ||lf||'--'
+         ||lf||'  SELECT COUNT (*) INTO l_total FROM ( '
+         ||lf||'  SELECT UNIQUE hus_username username '
+         ||lf||'    FROM hig_users, all_users, hig_user_roles '
+         ||lf||'   WHERE hus_username = username '
+         ||lf||'     AND hus_end_date IS NULL '
+         ||lf||'     AND hus_is_hig_owner_flag = ''N'' '
+         ||lf||'     AND hus_username = hur_username '
+         ||lf||'     AND EXISTS '
+         ||lf||'      ( SELECT ''has role to see theme'' '
+         ||lf||'          FROM nm_themes_all, nm_theme_roles '
+         ||lf||'         WHERE nthr_theme_id = nth_theme_id '
+         ||lf||'           AND nthr_role = hur_role '
+         ||lf||'           AND nth_theme_id = '||l_tab_nth(i).nth_theme_id||')); '
+         ||lf||'--'
+         ||lf||'  FOR i IN (SELECT UNIQUE hus_username username '
+         ||lf||'              FROM hig_users, all_users, hig_user_roles '
+         ||lf||'             WHERE hus_username = username '
+         ||lf||'               AND hus_end_date IS NULL '
+         ||lf||'               AND hus_is_hig_owner_flag = ''N'' '
+         ||lf||'               AND hus_username = hur_username '
+         ||lf||'               AND EXISTS '
+         ||lf||'                 ( SELECT ''has role to see theme'' '
+         ||lf||'                     FROM nm_themes_all, nm_theme_roles '
+         ||lf||'                    WHERE nthr_theme_id = nth_theme_id '
+         ||lf||'                      AND nthr_role = hur_role '
+         ||lf||'                      AND nth_theme_id = '||l_tab_nth(i).nth_theme_id||') '
+         ||lf||'           ) '
+         ||lf||'  LOOP '
+         ||lf|| '   l_current := l_current + 1;'
+         ||lf||'-- '
+         ||lf||'    nm3progress.record_progress '
+         ||lf||     ' ( pi_progress_id      => :l_progress_id '
+         ||lf||     ' , pi_force            => TRUE '
+         ||lf||     ' , pi_current_stage    => :l '
+         ||lf||     ' , pi_operation        => ''Creating SDE Metadata for ''||i.username  '
+         ||lf||     ' , pi_total_count      => l_total '
+         ||lf||     ' , pi_current_position => l_current); '
+         ||lf||'  -- '
+         ||lf||'    nm3sde.create_sub_sde_layer '
+         ||lf||'        ( p_theme_id => '||l_tab_nth(i).nth_theme_id
+         ||lf||'        , p_username => i.username '
+         ||lf||'        ); '
+         ||lf||'  -- '
+         ||lf||'  END LOOP; '
+         ||lf||'END;';
+    --
+      EXECUTE IMMEDIATE l_sql USING IN l_progress_id,
+                                    IN i;
+    --
+    END LOOP;
+  --
+    nm3progress.end_progress( pi_progress_id        => l_progress_id
+                            , pi_completion_message => 'End of SDE Metadata Refresh'
+                            , pi_error_message      => Null
+                            );
+  EXCEPTION
+  --
+    WHEN OTHERS 
+    THEN
+  --
+    nm3progress.end_progress( pi_progress_id        => l_progress_id
+                            , pi_completion_message => 'Error with SDE Metadata Refresh'
+                            , pi_error_message      => SQLERRM
+                            );
+  END refresh_sde_metadata;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE cache_metadata ( pi_nth_theme_id IN nm_themes_all.nth_theme_id%TYPE )
+IS
+BEGIN
+--  SELECT a.id, a.code, a.meaning
+--    FROM TABLE
+--  (SELECT CAST
+--        ( COLLECT (NM_ID_CODE_MEANING_TYPE 
+--                     (NVL(nm3layer_tool.get_srid(nth_theme_id),sdo_srid)               -- ID 
+--                     ,sdo_table_name         -- CODE   
+--                     ,sdo_column_name))        -- MEANING))
+--               AS  NM_ID_CODE_MEANING_TBL )
+--    FROM mdsys.sdo_geom_metadata_table, 
+--    (
+--      -- Get theme details
+--      SELECT * FROM nm_themes_all
+--       WHERE nth_theme_id = 750
+--      UNION
+--      -- Get any view based themes 
+--      SELECT * FROM nm_themes_all
+--       WHERE nth_base_table_theme = 750
+--      UNION
+--      -- Get any dependent themes
+--      SELECT * FROM nm_themes_all
+--       WHERE nth_theme_id IN
+--         ( SELECT nbth_theme_id
+--             FROM nm_base_themes 
+--            WHERE nbth_base_theme = 750 )
+--    )
+--  WHERE sdo_table_name = nth_feature_table
+--    AND sdo_column_name = nth_feature_shape_column
+--    AND sdo_owner = USER) a;
+--
+  SELECT * INTO g_metadata FROM (
+   SELECT CAST
+        ( COLLECT (nm_id_code_meaning_type 
+                     (NVL(nm3layer_tool.get_srid(nth_theme_id),sdo_srid) -- ID 
+                     ,sdo_table_name                                   -- CODE   
+                     ,sdo_column_name))                            -- MEANING))
+               AS  nm_id_code_meaning_tbl )
+    FROM mdsys.sdo_geom_metadata_table, 
+    (
+      -- Get theme details
+      SELECT * FROM nm_themes_all
+       WHERE nth_theme_id = pi_nth_theme_id
+      UNION
+      -- Get any view based themes 
+      SELECT * FROM nm_themes_all
+       WHERE nth_base_table_theme = pi_nth_theme_id
+      UNION
+      -- Get any dependent themes
+      SELECT * FROM nm_themes_all
+       WHERE nth_theme_id IN
+         ( SELECT nbth_theme_id
+             FROM nm_base_themes 
+            WHERE nbth_base_theme = pi_nth_theme_id )
+    )
+    WHERE sdo_table_name = nth_feature_table
+      AND sdo_column_name = nth_feature_shape_column
+      AND sdo_owner = USER ) a;
+--
+EXCEPTION
+  WHEN NO_DATA_FOUND
+  THEN NULL;
+--
+END cache_metadata;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE delete_and_cascade_usgm ( pi_nth_theme_id IN nm_themes_all.nth_theme_id%TYPE )
+IS
+BEGIN
+--
+  DELETE mdsys.sdo_geom_metadata_table
+   WHERE EXISTS
+  (
+    SELECT nth_feature_table, nth_feature_shape_column 
+      FROM
+      (
+        -- Get theme details
+        SELECT * FROM nm_themes_all
+         WHERE nth_theme_id = pi_nth_theme_id
+        UNION
+        -- Get any view based themes 
+        SELECT * FROM nm_themes_all
+         WHERE nth_base_table_theme = pi_nth_theme_id
+        UNION
+        -- Get any dependent themes
+        SELECT * FROM nm_themes_all
+         WHERE nth_theme_id IN
+           ( SELECT nbth_theme_id
+               FROM nm_base_themes 
+              WHERE nbth_base_theme = pi_nth_theme_id )
+      )
+    WHERE sdo_table_name = nth_feature_table
+      AND sdo_column_name = nth_feature_shape_column );
+--
+END delete_and_cascade_usgm;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE recalculate_usgm ( pi_nth_theme_id IN nm_themes_all.nth_theme_id%TYPE )
+IS
+--
+-- Recalculate the USGM for the Theme chosen for refresh 
+--
+  l_rec_usgm mdsys.sdo_geom_metadata_table%ROWTYPE;
+BEGIN
+--
+  WITH themes
+  AS
+    (SELECT nth_feature_table, nth_feature_shape_column
+       FROM nm_themes_all
+      WHERE nth_theme_id = pi_nth_theme_id)
+  SELECT USER
+       , nth_feature_table, nth_feature_shape_column
+       , nm3sdo.calculate_table_diminfo(nth_feature_table, nth_feature_shape_column)
+       , a.id
+    INTO l_rec_usgm
+    FROM themes
+       , TABLE (g_metadata) a
+   WHERE a.code = nth_feature_table
+     AND a.meaning = nth_feature_shape_column;
+--
+  INSERT INTO mdsys.sdo_geom_metadata_table
+    VALUES l_rec_usgm;
+--
+  g_usgm := l_rec_usgm;
+--
+EXCEPTION
+  WHEN NO_DATA_FOUND
+  THEN
+  WITH themes
+    AS
+      (SELECT nth_feature_table, nth_feature_shape_column
+         FROM nm_themes_all
+        WHERE nth_theme_id = pi_nth_theme_id)
+    SELECT USER
+         , nth_feature_table, nth_feature_shape_column
+         , nm3sdo.calculate_table_diminfo(nth_feature_table, nth_feature_shape_column)
+         , nm3layer_tool.get_srid(pi_nth_theme_id)
+      INTO l_rec_usgm
+      FROM themes;
+  --
+    INSERT INTO mdsys.sdo_geom_metadata_table
+      VALUES l_rec_usgm;
+  --
+    g_usgm := l_rec_usgm;
+END recalculate_usgm;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE build_dependant_usgm ( pi_nth_theme_id IN nm_themes_all.nth_theme_id%TYPE )
+IS
+--
+-- Clone the USGM for any dependant themes based on what has just already been calculated
+--
+  l_diminfo                    mdsys.sdo_dim_array;
+  l_2d_diminfo                 mdsys.sdo_dim_array;
+  l_srid                       NUMBER;
+  l_rec_base_nth               nm_themes_all%ROWTYPE := nm3get.get_nth(pi_nth_theme_id);
+BEGIN
+--
+  l_diminfo := g_usgm.sdo_diminfo;
+  l_srid    := g_usgm.sdo_srid;
+--
+  IF nm3sdo.get_dimension(l_diminfo) > 2
+  THEN
+     l_2d_diminfo := sdo_lrs.convert_to_std_dim_array( l_diminfo );
+  ELSE
+     l_2d_diminfo := l_diminfo;
+  END IF;
+--
+  INSERT INTO mdsys.sdo_geom_metadata_table
+  SELECT hig.get_application_owner
+       , nth_feature_table
+       , nth_feature_shape_column
+       , CASE 
+           WHEN ntg_gtype LIKE '3%'
+           THEN 
+             sdo_diminfo
+           ELSE 
+             CASE 
+               WHEN nm3sdo.get_dimension( sdo_diminfo ) = 3
+               THEN sdo_lrs.convert_to_std_dim_array( sdo_diminfo )
+               ELSE sdo_diminfo
+             END
+         END
+--       , CASE 
+--           WHEN ntg_gtype LIKE '3%'
+--           THEN l_diminfo
+--           ELSE 
+--             CASE 
+--               WHEN nm3sdo.get_dimension( l_diminfo ) = 3
+--               THEN l_2d_diminfo
+--               ELSE l_diminfo
+--             END
+--         END
+        --, DECODE ( ntg_gtype, 3302, l_diminfo, l_2d_diminfo )
+--       , l_diminfo
+       , NVL(nm3layer_tool.get_srid(nth_theme_id),l_srid)
+    FROM nm_themes_all
+       , nm_theme_gtypes
+       , (SELECT sdo_diminfo FROM mdsys.sdo_geom_metadata_table
+           WHERE sdo_owner = hig.get_application_owner
+             AND sdo_table_name = l_rec_base_nth.nth_feature_table
+             AND sdo_column_name = l_rec_base_nth.nth_feature_shape_column)
+   WHERE ntg_theme_id = nth_theme_id
+     AND nth_theme_id IN
+     (
+  --
+  -- Already populated the highways owners base table data
+  --
+  --      -- Get theme details
+  --      SELECT nth_theme_id FROM nm_themes_all
+  --       WHERE nth_theme_id = 582
+  --      UNION
+--
+  --      -- Get any view based themes
+  --
+        SELECT nth_theme_id FROM nm_themes_all
+         WHERE nth_base_table_theme = pi_nth_theme_id
+        UNION
+        -- Get any dependent themes
+        SELECT nth_theme_id FROM nm_themes_all
+         WHERE nth_theme_id IN
+           ( SELECT nbth_theme_id
+               FROM nm_base_themes 
+              WHERE nbth_base_theme = pi_nth_theme_id )
+      )
+  AND NOT EXISTS
+  ( SELECT 1 FROM mdsys.sdo_geom_metadata_table
+     WHERE sdo_owner = hig.get_application_owner
+       AND sdo_table_name = nth_feature_table
+       AND sdo_column_name = nth_feature_shape_column );
+--
+END build_dependant_usgm;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE build_subordinate_usgm ( pi_nth_theme_id IN nm_themes_all.nth_theme_id%TYPE )
+IS
+BEGIN
+--
+  INSERT INTO MDSYS.sdo_geom_metadata_table
+     SELECT hus_username, nth_feature_table, nth_feature_shape_column,sdo_diminfo, sdo_srid
+       FROM MDSYS.sdo_geom_metadata_table u,
+            (SELECT   hus_username, nth_feature_table, nth_feature_shape_column
+                 FROM 
+                 --
+                 -- Clone the highways owner metadata for base table
+                 --
+                      (SELECT hus_username, a.nth_feature_table, a.nth_feature_shape_column
+                         FROM nm_themes_all a,
+                              nm_theme_roles,
+                              hig_user_roles,
+                              hig_users,
+                              all_users
+                        WHERE nth_theme_id = pi_nth_theme_id
+                          AND nthr_theme_id = a.nth_theme_id
+                          AND nthr_role = hur_role
+                          AND hur_username = hus_username
+                          AND hus_username = username
+                          AND hus_end_date IS NULL
+                          AND hus_username != hig.get_application_owner
+                          AND NOT EXISTS (
+                                 SELECT 1
+                                   FROM MDSYS.sdo_geom_metadata_table g1
+                                  WHERE g1.sdo_owner = hus_username
+                                    AND g1.sdo_table_name = nth_feature_table
+                                    AND g1.sdo_column_name = nth_feature_shape_column)
+                 --
+                 UNION ALL
+                 --
+                 --
+                 -- Clone any highways view based metadata
+                 --
+                       SELECT hus_username, view_based.nth_feature_table, view_based.nth_feature_shape_column
+                         FROM nm_themes_all view_based,
+                              hig_users,
+                              all_users,
+                              nm_themes_all base_theme
+                        WHERE view_based.nth_base_table_theme = pi_nth_theme_id
+                          AND base_theme.nth_theme_id = view_based.nth_base_table_theme
+                          AND hus_username = username
+                          AND hus_end_date IS NULL
+                          AND hus_username != hig.get_application_owner
+                          AND NOT EXISTS (
+                                 SELECT 1
+                                   FROM MDSYS.sdo_geom_metadata_table g1
+                                  WHERE g1.sdo_owner = hus_username
+                                    AND g1.sdo_table_name = view_based.nth_feature_table
+                                    AND g1.sdo_column_name = view_based.nth_feature_shape_column)
+                 UNION ALL
+                 --
+                 --
+                 -- Clone any dependant themes related by base themes table
+                 --
+                       SELECT hus_username, nth_feature_table, nth_feature_shape_column
+                         FROM nm_themes_all,
+                              hig_users,
+                              all_users
+                        WHERE nth_theme_id IN ( SELECT nbth_theme_id
+                                                  FROM nm_base_themes 
+                                                 WHERE nbth_base_theme = pi_nth_theme_id ) 
+                          AND hus_username = username
+                          AND hus_end_date IS NULL
+                          AND hus_username != hig.get_application_owner
+                          AND NOT EXISTS (
+                                 SELECT 1
+                                   FROM MDSYS.sdo_geom_metadata_table g1
+                                  WHERE g1.sdo_owner = hus_username
+                                    AND g1.sdo_table_name = nth_feature_table
+                                    AND g1.sdo_column_name = nth_feature_shape_column)
+              )
+             GROUP BY hus_username, nth_feature_table, nth_feature_shape_column)
+      WHERE u.sdo_table_name = nth_feature_table
+        AND u.sdo_column_name = nth_feature_shape_column
+        AND u.sdo_owner = hig.get_application_owner;
+--
+END build_subordinate_usgm;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE refresh_sdo_metadata
+             ( pi_nth_theme_id  IN nm_themes_all.nth_theme_id%TYPE
+             , pi_dependency    IN VARCHAR2 DEFAULT 'ALL_DATA'
+             , pi_clone_parent  IN BOOLEAN DEFAULT TRUE )
+IS
+  l_dummy  nm_progress.prg_progress_id%TYPE;
+BEGIN
+--
+  refresh_sdo_metadata
+             ( pi_nth_theme_id  => pi_nth_theme_id
+             , pi_dependency    => pi_dependency
+             , pi_clone_parent  => pi_clone_parent
+             , pi_progress_id   => l_dummy );
+--
+END refresh_sdo_metadata;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE refresh_sdo_metadata
+             ( pi_nth_theme_id  IN nm_themes_all.nth_theme_id%TYPE
+             , pi_dependency    IN VARCHAR2 DEFAULT 'ALL_DATA'
+             , pi_clone_parent  IN BOOLEAN DEFAULT TRUE
+             , pi_progress_id   IN nm_progress.prg_progress_id%TYPE 
+             , pi_run_sde       IN BOOLEAN DEFAULT FALSE )
+IS
+  l_progress_id  nm_progress.prg_progress_id%TYPE;
+  l_stages       NUMBER;
+  l_rec_nth      nm_themes_all%ROWTYPE := nm3get.get_nth(pi_nth_theme_id=>pi_nth_theme_id);
+BEGIN
+--
+  instantiate_themes ( pi_nth_theme_id, pi_dependency );
+--
+-----------------------------------------------------------------------------
+-- Setup Progress Monitoring
+-----------------------------------------------------------------------------
+--
+  l_progress_id  := pi_progress_id;
+--
+  l_stages := 5;
+--
+  IF pi_run_sde
+  THEN
+    l_stages := l_stages + g_tab_themes.COUNT;
+  END IF;
+--
+  nm3progress.initialise_progress( pi_progress_id  => l_progress_id
+                                 , pi_total_stages => l_stages );
+--
+-----------------------------------------------------------------------------
+-- Lift all the existing metadata into memory
+-----------------------------------------------------------------------------
+--
+  nm3progress.record_progress( pi_progress_id      => l_progress_id
+                              ,pi_force            => TRUE
+                              ,pi_current_stage    => 1
+                              ,pi_operation        => 'Caching existing SDO metadata');
+--
+  cache_metadata 
+    ( pi_nth_theme_id => pi_nth_theme_id );
+--
+-----------------------------------------------------------------------------
+-- Delete and cascade the related USGM for all users and all related themes
+-----------------------------------------------------------------------------
+--
+  nm3progress.record_progress( pi_progress_id      => l_progress_id
+                              ,pi_force            => TRUE
+                              ,pi_current_stage    => 2
+                              ,pi_operation        => 'Deleting existing SDO metadata');
+--
+  delete_and_cascade_usgm 
+    ( pi_nth_theme_id => pi_nth_theme_id );
+--
+-----------------------------------------------------------------------------
+-- Recalcuate the HIGHWAYS base table SDO Metadata
+-----------------------------------------------------------------------------
+--
+  nm3progress.record_progress( pi_progress_id      => l_progress_id
+                              ,pi_force            => TRUE
+                              ,pi_current_stage    => 3
+                              ,pi_operation        => 'Calculating SDO Metadata for '
+                                                      ||l_rec_nth.nth_feature_table
+                                                      ||' - Please Wait...');
+--
+  recalculate_usgm 
+    ( pi_nth_theme_id => pi_nth_theme_id );
+--
+-----------------------------------------------------------------------------
+-- Apply new SDO metadata to all objects
+-----------------------------------------------------------------------------
+--
+  nm3progress.record_progress( pi_progress_id      => l_progress_id
+                              ,pi_force            => TRUE
+                              ,pi_current_stage    => 4
+                              ,pi_operation        => 'Applying SDO metadata to all related Themes'
+                                                      ||' - Please Wait...');
+--
+  build_dependant_usgm 
+    ( pi_nth_theme_id => pi_nth_theme_id );
+--
+-----------------------------------------------------------------------------
+-- Apply new SDO metadata to all subordinate users
+-----------------------------------------------------------------------------
+--
+  nm3progress.record_progress( pi_progress_id      => l_progress_id
+                              ,pi_force            => TRUE
+                              ,pi_current_stage    => 5
+                              ,pi_operation        => 'Applying SDO metadata to all USERS'
+                                                      ||' - Please Wait...');
+--
+--  build_subordinate_usgm 
+--    ( pi_nth_theme_id => pi_nth_theme_id );
+--
+-----------------------------------------------------------------------------
+-- Process finished
+-----------------------------------------------------------------------------
+--
+  nm3progress.end_progress( pi_progress_id        => l_progress_id
+                          , pi_completion_message => 'End of SDO Metadata Refresh'
+                          , pi_error_message      => Null
+                          );
+--
+-----------------------------------------------------------------------------
+-- Run the SDE metadata rebuild too if required
+-----------------------------------------------------------------------------
+--
+  IF pi_run_sde
+  THEN
+    refresh_sde_metadata
+      ( pi_nth_theme_id  => pi_nth_theme_id
+      , pi_dependency    => pi_dependency
+      , pi_progress_id   => l_progress_id 
+      );
+  END IF;
+--
+EXCEPTION
+  WHEN OTHERS THEN
+  --
+    nm3progress.end_progress( pi_progress_id        => l_progress_id
+                            , pi_completion_message => 'End of SDO Metadata Refresh - An Error Has Occurred'
+                            , pi_error_message      => SQLERRM
+                            );
+END refresh_sdo_metadata;
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_SRID">
+--
+FUNCTION get_srid ( pi_nth_theme_id IN nm_themes_all.nth_theme_id%TYPE )
+  RETURN INTEGER
+IS
+  l_rec_nth   nm_themes_all%ROWTYPE := nm3get.get_nth(pi_nth_theme_id    => pi_nth_theme_id
+                                                     ,pi_raise_not_found => FALSE);
+  retval      INTEGER;
+BEGIN
+  IF l_rec_nth.nth_feature_table IS NOT NULL
+  AND l_rec_nth.nth_feature_shape_column IS NOT NULL
+  THEN
+    EXECUTE IMMEDIATE 'SELECT a.'||l_rec_nth.nth_feature_shape_column||'.sdo_srid '||
+                       ' FROM '||l_rec_nth.nth_feature_table||' a '||
+                      ' WHERE ROWNUM = 1'
+       INTO retval;
+  END IF;
+  RETURN retval;
+EXCEPTION
+--  WHEN NO_DATA_FOUND
+--  THEN RETURN NULL;
+  WHEN OTHERS
+    THEN RETURN NULL;
+END get_srid;
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE get_refresh_themes
+              ( pi_nth_theme_id        IN     nm_themes_all.nth_theme_id%TYPE
+              , pi_metadata_option     IN     VARCHAR2
+              , pi_dependency_option   IN     VARCHAR2
+              , po_results             IN OUT tab_refresh_themes )
+  IS
+    l_tab_refresh_themes            tab_refresh_themes;
+  --
+    c_dep_tab              CONSTANT VARCHAR2(10) := 'TAB';
+    c_dep_view_n_tab       CONSTANT VARCHAR2(10) := 'VIEW_N_TAB';
+    c_dep_all_data         CONSTANT VARCHAR2(10) := 'ALL_DATA';
+  --
+  BEGIN
+  --
+    SELECT * BULK COLLECT INTO l_tab_refresh_themes
+      FROM
+      ( 
+        SELECT 1 seq, nth_theme_id, 'Selected Theme - '||nth_theme_name 
+          FROM nm_themes_all
+         WHERE nth_theme_id = pi_nth_theme_id
+     UNION ALL
+        -- Get any view based themes 
+        SELECT 2 seq, nth_theme_id, 'Child Theme - '||nth_theme_name 
+          FROM nm_themes_all
+         WHERE nth_base_table_theme = pi_nth_theme_id
+           AND 1 = CASE WHEN pi_dependency_option != c_dep_tab
+                        THEN 1 
+                        ELSE 2 
+                   END
+     UNION ALL
+     -- Get dependent Asset Themes
+        SELECT 3 seq, nth_theme_id, 'Dependent Asset Theme - '||nth_theme_name 
+          FROM nm_themes_all
+         WHERE nth_theme_id IN
+             ( SELECT nbth_theme_id
+                 FROM nm_base_themes 
+                WHERE nbth_base_theme = pi_nth_theme_id )
+           AND EXISTS
+             ( SELECT 1 FROM nm_inv_themes
+                WHERE nith_nth_theme_id = nth_theme_id)
+           AND 1 = CASE WHEN pi_dependency_option = c_dep_all_data
+                        THEN 1 
+                        ELSE 2
+                   END
+     UNION ALL
+     -- Get dependent Network Themes
+        SELECT 4 seq, nth_theme_id, 'Dependent Network Theme - '||nth_theme_name 
+          FROM nm_themes_all
+         WHERE nth_theme_id IN
+           ( SELECT nbth_theme_id
+               FROM nm_base_themes 
+              WHERE nbth_base_theme = pi_nth_theme_id )
+          AND EXISTS
+           ( SELECT 1 FROM v_nm_net_themes_all
+              WHERE vnnt_nth_theme_id = nth_theme_id)
+           AND 1 = CASE WHEN pi_dependency_option = c_dep_all_data
+                        THEN 1 
+                        ELSE 2
+                   END
+      UNION ALL
+     -- Get any other dependent Themes
+        SELECT 5 seq, nth_theme_id, 'Dependent - '||nth_theme_name 
+          FROM nm_themes_all
+         WHERE nth_theme_id IN
+             ( SELECT nbth_theme_id
+                 FROM nm_base_themes 
+                WHERE nbth_base_theme = pi_nth_theme_id )
+           AND NOT EXISTS
+             ( SELECT 1 FROM v_nm_net_themes_all
+                WHERE vnnt_nth_theme_id = nth_theme_id)
+           AND NOT EXISTS
+             ( SELECT 1 FROM nm_inv_themes
+                WHERE nith_nth_theme_id = nth_theme_id)
+           AND 1 = CASE WHEN pi_dependency_option = c_dep_all_data
+                        THEN 1 
+                        ELSE 2
+                   END
+      );
+    po_results := l_tab_refresh_themes;
+  --
+  END get_refresh_themes;
+--
+-----------------------------------------------------------------------------
+--
+  FUNCTION sde_available RETURN BOOLEAN
+  IS
+  BEGIN
+    RETURN (hig.get_sysopt('REGSDELAY') = 'Y');
+  END sde_available;
+--
+-----------------------------------------------------------------------------
+--
 END nm3layer_tool;
 /
 
