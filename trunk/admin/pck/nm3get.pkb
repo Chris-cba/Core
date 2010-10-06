@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkb-arc   2.17   Jun 11 2010 16:24:56   malexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkb-arc   2.18   Oct 06 2010 15:32:10   mike.alexander  $
 --       Module Name      : $Workfile:   nm3get.pkb  $
---       Date into PVCS   : $Date:   Jun 11 2010 16:24:56  $
---       Date fetched Out : $Modtime:   Jun 11 2010 16:22:42  $
---       PVCS Version     : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Oct 06 2010 15:32:10  $
+--       Date fetched Out : $Modtime:   Oct 06 2010 15:20:30  $
+--       PVCS Version     : $Revision:   2.18  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.17  $"
+--   nm3get_gen body   : "$Revision:   2.18  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.17  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.18  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3get';
@@ -415,7 +415,7 @@ FUNCTION get_dec (pi_dec_hct_id        doc_enquiry_contacts.dec_hct_id%TYPE
                  ) RETURN doc_enquiry_contacts%ROWTYPE IS
 --
    CURSOR cs_dec IS
-   SELECT /*+ INDEX (dec DEC_IND1) */ *
+   SELECT /*+ INDEX (dec DEC_PK) */ *
     FROM  doc_enquiry_contacts dec
    WHERE  dec.dec_hct_id = pi_dec_hct_id
     AND   dec.dec_doc_id = pi_dec_doc_id
@@ -742,7 +742,7 @@ FUNCTION get_dky (pi_dky_doc_id        doc_keys.dky_doc_id%TYPE
                  ) RETURN doc_keys%ROWTYPE IS
 --
    CURSOR cs_dky IS
-   SELECT /*+ INDEX (dky DKW_IND1) */ *
+   SELECT /*+ INDEX (dky DKY_PK) */ *
     FROM  doc_keys dky
    WHERE  dky.dky_doc_id     = pi_dky_doc_id
     AND   dky.dky_dkw_key_id = pi_dky_dkw_key_id;
@@ -1490,7 +1490,7 @@ FUNCTION get_grm (pi_grm_module        gri_modules.grm_module%TYPE
                  ) RETURN gri_modules%ROWTYPE IS
 --
    CURSOR cs_grm IS
-   SELECT /*+ INDEX (grm GRM_FK_HMO_IND) */ *
+   SELECT /*+ INDEX (grm GRM_PK) */ *
     FROM  gri_modules grm
    WHERE  grm.grm_module = pi_grm_module;
 --
@@ -2077,7 +2077,7 @@ FUNCTION get_hca (pi_hca_hct_id        hig_contact_address.hca_hct_id%TYPE
                  ) RETURN hig_contact_address%ROWTYPE IS
 --
    CURSOR cs_hca IS
-   SELECT /*+ INDEX (hca HCA_IND1) */ *
+   SELECT /*+ INDEX (hca HCA_PK) */ *
     FROM  hig_contact_address hca
    WHERE  hca.hca_hct_id = pi_hca_hct_id
     AND   hca.hca_had_id = pi_hca_had_id;
@@ -3450,7 +3450,7 @@ FUNCTION get_huh (pi_huh_user_id       hig_user_history.huh_user_id%TYPE
                  ) RETURN hig_user_history%ROWTYPE IS
 --
    CURSOR cs_huh IS
-   SELECT /*+ INDEX (huh HUH_HUS_FK_IND) */ *
+   SELECT /*+ INDEX (huh HUH_PK) */ *
     FROM  hig_user_history huh
    WHERE  huh.huh_user_id = pi_huh_user_id;
 --
@@ -5346,7 +5346,7 @@ FUNCTION get_ngit (pi_ngit_ngt_group_type nm_group_inv_types.ngit_ngt_group_type
                   ) RETURN nm_group_inv_types%ROWTYPE IS
 --
    CURSOR cs_ngit IS
-   SELECT /*+ INDEX (ngit NGIT_FK_NGT_IND) */ *
+   SELECT /*+ INDEX (ngit NGIT_UK) */ *
     FROM  nm_group_inv_types ngit
    WHERE  ngit.ngit_ngt_group_type = pi_ngit_ngt_group_type;
 --
@@ -5435,7 +5435,7 @@ FUNCTION get_ngil (pi_ngil_ne_ne_id     nm_group_inv_link.ngil_ne_ne_id%TYPE
                   ) RETURN nm_group_inv_link%ROWTYPE IS
 --
    CURSOR cs_ngil IS
-   SELECT /*+ INDEX (ngil NGIL_FK_NE_IND) */ *
+   SELECT /*+ INDEX (ngil NGIL_UK) */ *
     FROM  nm_group_inv_link ngil
    WHERE  ngil.ngil_ne_ne_id = pi_ngil_ne_ne_id;
 --
@@ -5524,7 +5524,7 @@ FUNCTION get_ngil_all (pi_ngil_ne_ne_id     nm_group_inv_link_all.ngil_ne_ne_id%
                       ) RETURN nm_group_inv_link_all%ROWTYPE IS
 --
    CURSOR cs_ngil_all IS
-   SELECT /*+ INDEX (ngil_all NGIL_FK_NE_IND) */ *
+   SELECT /*+ INDEX (ngil_all NGIL_UK) */ *
     FROM  nm_group_inv_link_all ngil_all
    WHERE  ngil_all.ngil_ne_ne_id = pi_ngil_ne_ne_id;
 --
