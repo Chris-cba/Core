@@ -1,16 +1,16 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.19   Sep 17 2010 14:11:00   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.20   Oct 06 2010 15:54:20   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   Sep 17 2010 14:11:00  $
---       Date fetched Out : $Modtime:   Sep 17 2010 14:10:16  $
---       PVCS Version     : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Oct 06 2010 15:54:20  $
+--       Date fetched Out : $Modtime:   Oct 06 2010 15:53:32  $
+--       PVCS Version     : $Revision:   2.20  $
 --
 --------------------------------------------------------------------------------
 --
 
--- Generated for Oracle 10g on Fri Sep 17  12:47:39 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Wed Oct 06  14:50:08 2010 by Server Generator 10.1.2.9.28
   
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
@@ -226,11 +226,6 @@ PROMPT Creating Index 'GDO_IDX'
 CREATE INDEX GDO_IDX ON GIS_DATA_OBJECTS
  (GDO_SESSION_ID
  ,GDO_PK_ID)
-/
-
-PROMPT Creating Index 'GRM_FK_HMO_IND'
-CREATE INDEX GRM_FK_HMO_IND ON GRI_MODULES
- (GRM_MODULE)
 /
 
 PROMPT Creating Index 'GMP_FK_GP_IND'
@@ -724,11 +719,6 @@ CREATE INDEX HUF_HUS_FK_IND ON HIG_USER_FAVOURITES
  (HUF_USER_ID)
 /
 
-PROMPT Creating Index 'HUH_HUS_FK_IND'
-CREATE INDEX HUH_HUS_FK_IND ON HIG_USER_HISTORY
- (HUH_USER_ID)
-/
-
 PROMPT Creating Index 'HUO_FK_HUS_IND'
 CREATE INDEX HUO_FK_HUS_IND ON HIG_USER_OPTIONS
  (HUO_HUS_USER_ID)
@@ -881,16 +871,6 @@ CREATE INDEX NGA_NSE_FK_IND ON NM_GIS_AREA_OF_INTEREST
 PROMPT Creating Index 'NGIL_FK_IIT_IND'
 CREATE INDEX NGIL_FK_IIT_IND ON NM_GROUP_INV_LINK_ALL
  (NGIL_IIT_NE_ID)
-/
-
-PROMPT Creating Index 'NGIL_FK_NE_IND'
-CREATE INDEX NGIL_FK_NE_IND ON NM_GROUP_INV_LINK_ALL
- (NGIL_NE_NE_ID)
-/
-
-PROMPT Creating Index 'NGIT_FK_NGT_IND'
-CREATE INDEX NGIT_FK_NGT_IND ON NM_GROUP_INV_TYPES
- (NGIT_NGT_GROUP_TYPE)
 /
 
 PROMPT Creating Index 'NGIT_FK_NIT_IND'
