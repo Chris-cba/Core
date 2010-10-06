@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_ddl_upg.sql-arc   3.1   Sep 17 2010 14:29:24   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_ddl_upg.sql-arc   3.2   Oct 06 2010 13:58:34   mike.alexander  $
 --       Module Name      : $Workfile:   nm4210_nm4300_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Sep 17 2010 14:29:24  $
---       Date fetched Out : $Modtime:   Sep 17 2010 14:28:54  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Oct 06 2010 13:58:34  $
+--       Date fetched Out : $Modtime:   Oct 06 2010 13:51:20  $
+--       Version          : $Revision:   3.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -358,6 +358,76 @@ NOCACHE;
 
 
 
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New FK Constraint and Index for NM_TYPES to NM_UNITS
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 109624
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (ADE EDWARDS)
+-- New FK Constraint and Index for NM_TYPES to NM_UNITS
+-- 
+------------------------------------------------------------------
+PROMPT Creating Foreign Key on 'NM_TYPES'
+ALTER TABLE NM_TYPES ADD (CONSTRAINT
+ NT_UN_FK FOREIGN KEY
+  (NT_LENGTH_UNIT) REFERENCES NM_UNITS
+  (UN_UNIT_ID))
+/
+
+PROMPT Creating Index 'NT_UN_FK_IND'
+CREATE INDEX NT_UN_FK_IND ON NM_TYPES
+ (NT_LENGTH_UNIT)
+/
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Drop docs2view view
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 109999
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
+-- View is no longer required in Core but is still needed in PEM.
+-- 
+------------------------------------------------------------------
+DECLARE
+--
+   view_exists_not   EXCEPTION;
+   PRAGMA EXCEPTION_INIT (view_exists_not, -942);
+--
+BEGIN
+--
+   IF NOT hig.is_product_licensed('ENQ')
+   THEN
+      EXECUTE IMMEDIATE 'Drop View docs2view';
+   END IF;
+--
+EXCEPTION
+   WHEN view_exists_not
+   THEN
+      NULL;
+END;
+/
 ------------------------------------------------------------------
 
 
