@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.7   Apr 14 2010 10:53:54   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/typ/nm3typ.sql-arc   2.8   Oct 07 2010 14:18:04   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   nm3typ.sql  $
---       Date into PVCS   : $Date:   Apr 14 2010 10:53:54  $
---       Date fetched Out : $Modtime:   Apr 14 2010 10:52:14  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Oct 07 2010 14:18:04  $
+--       Date fetched Out : $Modtime:   Oct 07 2010 14:17:44  $
+--       Version          : $Revision:   2.8  $
 --
 --   Product upgrade script
 --
@@ -707,6 +707,30 @@ END;
 
 BEGIN
  execute immediate ('DROP TYPE nm_ne_id_type');
+EXCEPTION
+WHEN others THEN
+  Null;
+END;
+/
+
+BEGIN
+ execute immediate ('DROP TYPE hig_navigator_tab');
+EXCEPTION
+WHEN others THEN
+  Null;
+END;
+/
+
+BEGIN
+ execute immediate ('DROP TYPE hig_navigator_type');
+EXCEPTION
+WHEN others THEN
+  Null;
+END;
+/
+
+BEGIN
+ execute immediate ('DROP TYPE nav_id');
 EXCEPTION
 WHEN others THEN
   Null;
