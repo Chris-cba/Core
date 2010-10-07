@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_ddl_upg.sql-arc   3.2   Oct 06 2010 13:58:34   mike.alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_ddl_upg.sql-arc   3.3   Oct 07 2010 09:58:14   mike.alexander  $
 --       Module Name      : $Workfile:   nm4210_nm4300_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Oct 06 2010 13:58:34  $
---       Date fetched Out : $Modtime:   Oct 06 2010 13:51:20  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Oct 07 2010 09:58:14  $
+--       Date fetched Out : $Modtime:   Oct 07 2010 09:56:38  $
+--       Version          : $Revision:   3.3  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -414,13 +414,21 @@ DECLARE
 --
    view_exists_not   EXCEPTION;
    PRAGMA EXCEPTION_INIT (view_exists_not, -942);
+   l_dummy NUMBER;
 --
+    CURSOR c1 ( c_product varchar2) IS
+    SELECT 1
+      FROM hig_products
+     WHERE hpr_product = c_product
+       AND hpr_key IS NOT NULL;
 BEGIN
 --
-   IF NOT hig.is_product_licensed('ENQ')
-   THEN
-      EXECUTE IMMEDIATE 'Drop View docs2view';
-   END IF;
+   OPEN c1('ENQ');
+   FETCH c1 INTO l_dummy;
+      IF c1%NOTFOUND THEN
+        EXECUTE IMMEDIATE 'Drop View docs2view';
+      END IF;
+   CLOSE c1;
 --
 EXCEPTION
    WHEN view_exists_not
