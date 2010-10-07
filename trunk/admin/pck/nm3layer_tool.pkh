@@ -3,16 +3,16 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.9   Oct 06 2010 12:02:38   ade.edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.10   Oct 07 2010 12:16:04   ade.edwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkh  $
---       Date into PVCS   : $Date:   Oct 06 2010 12:02:38  $
---       Date fetched Out : $Modtime:   Oct 06 2010 12:01:24  $
---       Version          : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Oct 07 2010 12:16:04  $
+--       Date fetched Out : $Modtime:   Oct 07 2010 12:14:08  $
+--       Version          : $Revision:   2.10  $
 --       Based on SCCS version : 1.6
 -------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.9  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.10  $';
     g_boolean               BOOLEAN        := FALSE;
     g_x_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_X';
     g_y_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_Y';
@@ -981,12 +981,12 @@ PROCEDURE refresh_sde_metadata
 PROCEDURE refresh_sdo_metadata
              ( pi_nth_theme_id  IN nm_themes_all.nth_theme_id%TYPE
              , pi_dependency    IN VARCHAR2 DEFAULT 'ALL_DATA'
-             , pi_clone_parent  IN BOOLEAN DEFAULT TRUE);
+             , pi_clone_parent  IN VARCHAR2 DEFAULT 'CLONE');
 --
 PROCEDURE refresh_sdo_metadata
              ( pi_nth_theme_id  IN nm_themes_all.nth_theme_id%TYPE
              , pi_dependency    IN VARCHAR2 DEFAULT 'ALL_DATA'
-             , pi_clone_parent  IN BOOLEAN DEFAULT TRUE
+             , pi_clone_parent  IN VARCHAR2 DEFAULT 'CLONE'
              , pi_progress_id   IN nm_progress.prg_progress_id%TYPE
              , pi_run_sde       IN BOOLEAN DEFAULT FALSE );
 --</PROC> 
