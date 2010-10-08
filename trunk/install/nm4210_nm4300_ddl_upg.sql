@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_ddl_upg.sql-arc   3.3   Oct 07 2010 09:58:14   mike.alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_ddl_upg.sql-arc   3.4   Oct 08 2010 12:21:28   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4210_nm4300_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Oct 07 2010 09:58:14  $
---       Date fetched Out : $Modtime:   Oct 07 2010 09:56:38  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Oct 08 2010 12:21:28  $
+--       Date fetched Out : $Modtime:   Oct 08 2010 12:19:46  $
+--       Version          : $Revision:   3.4  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -436,6 +436,181 @@ EXCEPTION
       NULL;
 END;
 /
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Consolidate erroneus indexes
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADE EDWARDS)
+-- Consolidate erroneus indexes
+-- 
+------------------------------------------------------------------
+--
+--------------------------------------
+-- GRI_MODULES
+--------------------------------------
+--
+
+PROMPT Dropping Constraint 'GRM_FK_HMO'
+Alter Table GRI_MODULES
+Drop Constraint GRM_FK_HMO
+/
+
+PROMPT Dropping Constraint 'GMP_FK_GRM'
+Alter Table GRI_MODULE_PARAMS
+Drop Constraint GMP_FK_GRM
+/
+
+PROMPT Dropping Constraint 'GSS_FK_GRM'
+Alter Table GRI_SAVED_SETS
+Drop Constraint GSS_FK_GRM
+/
+
+PROMPT Dropping Constraint 'GRM_PK'
+Alter Table GRI_MODULES
+Drop Constraint GRM_PK
+/
+
+PROMPT Dropping Index 'GRM_FK_HMO_IND'
+Drop Index GRM_FK_HMO_IND
+/
+
+PROMPT Creating Primary Key on 'GRI_MODULES'
+ALTER TABLE GRI_MODULES
+ADD (CONSTRAINT GRM_PK PRIMARY KEY 
+  (GRM_MODULE))
+/
+
+PROMPT Creating Foreign Key on 'GRI_MODULES'
+ALTER TABLE GRI_MODULES ADD (CONSTRAINT
+GRM_FK_HMO FOREIGN KEY 
+  (GRM_MODULE) REFERENCES HIG_MODULES
+  (HMO_MODULE))
+/
+
+PROMPT Creating Foreign Key on 'GRI_MODULE_PARAMS'
+ALTER TABLE GRI_MODULE_PARAMS ADD (CONSTRAINT
+GMP_FK_GRM FOREIGN KEY 
+  (GMP_MODULE) REFERENCES GRI_MODULES
+  (GRM_MODULE) ON DELETE CASCADE)
+/
+
+PROMPT Creating Foreign Key on 'GRI_SAVED_SETS'
+ALTER TABLE GRI_SAVED_SETS ADD (CONSTRAINT
+GSS_FK_GRM FOREIGN KEY 
+  (GSS_MODULE) REFERENCES GRI_MODULES
+  (GRM_MODULE) ON DELETE CASCADE DISABLE)
+/
+
+
+--
+--------------------------------------
+-- HIG_USER_HISTORY
+--------------------------------------
+--
+
+PROMPT Dropping Constraint 'HUH_PK'
+Alter Table HIG_USER_HISTORY
+Drop Constraint HUH_PK
+/
+
+PROMPT Dropping Index 'HUH_HUS_FK_IND'
+Drop Index HUH_HUS_FK_IND
+/
+
+PROMPT Creating Primary Key on 'HIG_USER_HISTORY'
+ALTER TABLE HIG_USER_HISTORY
+ADD (CONSTRAINT HUH_PK PRIMARY KEY 
+  (HUH_USER_ID))
+/
+
+--
+--------------------------------------
+-- NM_GROUP_INV_LINK_ALL
+--------------------------------------
+--
+
+PROMPT Dropping Constraint 'NGIL_PK'
+Alter Table NM_GROUP_INV_LINK_ALL
+Drop Constraint NGIL_PK
+/
+
+PROMPT Dropping Constraint 'NGIL_UK'
+Alter Table NM_GROUP_INV_LINK_ALL
+Drop Constraint NGIL_UK
+/
+
+PROMPT Dropping Index 'NGIL_FK_IIT_IND'
+Drop Index NGIL_FK_IIT_IND
+/
+
+PROMPT Dropping Index 'NGIL_FK_NE_IND'
+Drop Index NGIL_FK_NE_IND
+/
+
+PROMPT Creating Primary Key on 'NM_GROUP_INV_LINK_ALL'
+ALTER TABLE NM_GROUP_INV_LINK_ALL
+ADD (CONSTRAINT NGIL_PK PRIMARY KEY 
+  (NGIL_NE_NE_ID
+  ,NGIL_IIT_NE_ID))
+/
+
+PROMPT Creating Unique Key on 'NM_GROUP_INV_LINK_ALL'
+ALTER TABLE NM_GROUP_INV_LINK_ALL
+ADD (CONSTRAINT NGIL_UK UNIQUE 
+  (NGIL_NE_NE_ID))
+/
+
+PROMPT Creating Index 'NGIL_FK_IIT_IND'
+CREATE INDEX NGIL_FK_IIT_IND ON NM_GROUP_INV_LINK_ALL
+(NGIL_IIT_NE_ID)
+/
+
+--
+--------------------------------------
+-- NM_GROUP_INV_TYPES
+--------------------------------------
+--
+
+PROMPT Dropping Constraint 'NGIT_PK'
+Alter Table NM_GROUP_INV_TYPES
+Drop Constraint NGIT_PK
+/
+
+PROMPT Dropping Constraint 'NGIT_UK'
+Alter Table NM_GROUP_INV_TYPES
+Drop Constraint NGIT_UK
+/
+
+PROMPT Dropping Index 'NGIT_FK_NGT_IND'
+Drop Index NGIT_FK_NGT_IND
+/
+
+PROMPT Dropping Index 'NGIT_FK_NIT_IND'
+Drop Index NGIT_FK_NIT_IND
+/
+
+PROMPT Creating Primary Key on 'NM_GROUP_INV_TYPES'
+ALTER TABLE NM_GROUP_INV_TYPES
+ADD (CONSTRAINT NGIT_PK PRIMARY KEY 
+  (NGIT_NGT_GROUP_TYPE
+  ,NGIT_NIT_INV_TYPE))
+/
+
+PROMPT Creating Unique Key on 'NM_GROUP_INV_TYPES'
+ALTER TABLE NM_GROUP_INV_TYPES
+ADD (CONSTRAINT NGIT_UK UNIQUE 
+  (NGIT_NGT_GROUP_TYPE))
+/
+
+
+
+
 ------------------------------------------------------------------
 
 
