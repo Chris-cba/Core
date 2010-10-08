@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3user AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkh-arc   2.3   Jan 06 2010 16:41:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkh-arc   2.4   Oct 08 2010 16:55:42   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3user.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:36  $
---       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Oct 08 2010 16:55:42  $
+--       Date fetched Out : $Modtime:   Oct 08 2010 16:47:50  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.18
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3user AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid      CONSTANT  varchar2(2000) := '$Revision:   2.3  $';
+  g_sccsid      CONSTANT  varchar2(2000) := '$Revision:   2.4  $';
 --  g_sccsid is the SCCS ID for the package
 
   g_user_id_tab nm3type.tab_number;
@@ -377,8 +377,34 @@ FUNCTION historic_mode RETURN boolean;
 FUNCTION user_is_higowner(pi_username IN hig_users.hus_username%TYPE DEFAULT USER) RETURN BOOLEAN;
 
 FUNCTION user_is_higowner_yn(pi_username IN hig_users.hus_username%TYPE DEFAULT USER) RETURN VARCHAR2;
-
+--
 -----------------------------------------------------------------------------
+--
+--
+--<PROC NAME="get_default_temp_tablespace">
+--
+FUNCTION get_default_temp_tablespace 
+RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_default_user_tablespace">
+--
+FUNCTION get_default_user_tablespace 
+RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_default_user_profile">
+--
+FUNCTION get_default_user_profile
+RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
 --<PRAGMA>
   PRAGMA RESTRICT_REFERENCES( get_version, wnds, wnps );
   PRAGMA RESTRICT_REFERENCES( get_body_version, wnds, wnps );

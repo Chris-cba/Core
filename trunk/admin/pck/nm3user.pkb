@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3user AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkb-arc   2.3   Jan 06 2010 16:41:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3user.pkb-arc   2.4   Oct 08 2010 16:55:42   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3user.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:36  $
---       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Oct 08 2010 16:55:42  $
+--       Date fetched Out : $Modtime:   Oct 08 2010 16:47:48  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.21
 -------------------------------------------------------------------------
 --   Author : Rob Coupe
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3user AS
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.3  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.4  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name CONSTANT  varchar2(2000) := 'nm3user';
@@ -995,6 +995,104 @@ EXCEPTION
 END user_is_higowner_yn;
 --
 -----------------------------------------------------------------------------
+--
+FUNCTION get_default_temp_tablespace 
+RETURN VARCHAR2 
+IS
+  CURSOR temp_tab_space(p_tablespace_name VARCHAR2)
+  IS
+  SELECT DISTINCT tablespace_name
+  FROM dba_tablespaces
+  WHERE contents = 'TEMPORARY'
+  AND tablespace_name = p_tablespace_name;
+  --
+  retval VARCHAR2(100);
+  --
+BEGIN
+  OPEN temp_tab_space(hig.get_sysopt('TMPTBLSPCE'));
+  FETCH temp_tab_space INTO retval;
+  IF temp_tab_space%NOTFOUND THEN
+    BEGIN
+      SELECT DISTINCT tablespace_name
+      INTO retval
+      FROM dba_tablespaces
+      WHERE contents = 'TEMPORARY';
+    EXCEPTION
+      WHEN TOO_MANY_ROWS THEN
+        retval:= NULL;
+      WHEN NO_DATA_FOUND THEN
+        retval:= NULL;
+    END;
+  END IF;
+RETURN retval;
+END get_default_temp_tablespace;
+--
+FUNCTION get_default_user_tablespace 
+RETURN VARCHAR2 
+IS
+  CURSOR def_tab_space(p_tablespace_name VARCHAR2)
+  IS
+  SELECT DISTINCT tablespace_name
+  FROM user_tablespaces
+  WHERE contents = 'PERMANENT'
+  AND tablespace_name != 'HHINV_LOAD_3_SPACE'
+  AND tablespace_name = p_tablespace_name;
+--
+  retval VARCHAR2(100);
+--
+BEGIN
+--
+  OPEN def_tab_space(hig.get_sysopt('USRTBLSPCE'));
+  FETCH def_tab_space INTO retval;
+    IF def_tab_space%NOTFOUND THEN
+      BEGIN
+        SELECT DISTINCT tablespace_name
+        INTO retval
+        FROM user_tablespaces
+        WHERE contents = 'PERMANENT'
+        AND tablespace_name != 'HHINV_LOAD_3_SPACE';
+      EXCEPTION
+        WHEN TOO_MANY_ROWS THEN
+          retval:= NULL;
+        WHEN NO_DATA_FOUND THEN
+          retval:= NULL;
+      END;
+    END IF;
+  CLOSE def_tab_space;
+RETURN retval;
+--
+END get_default_user_tablespace;
+--
+FUNCTION get_default_user_profile 
+RETURN VARCHAR2 
+IS
+  CURSOR def_profile(p_profile_name VARCHAR2)
+  IS
+  SELECT distinct profile
+  FROM dba_profiles
+  WHERE profile = p_profile_name;
+--
+  retval VARCHAR2(100);
+--
+BEGIN
+  OPEN def_profile(hig.get_sysopt('USRPROFILE'));
+  FETCH def_profile INTO retval;
+    IF def_profile%NOTFOUND THEN
+      BEGIN  
+        SELECT distinct profile
+        INTO retval
+        FROM dba_profiles;
+      EXCEPTION
+        WHEN TOO_MANY_ROWS THEN
+          retval:= NULL;
+        WHEN NO_DATA_FOUND THEN
+          retval:= NULL;
+      END;
+    END IF;
+  CLOSE def_profile;
+  NULL;
+RETURN retval;
+END get_default_user_profile;
 --
 END nm3user;
 /
