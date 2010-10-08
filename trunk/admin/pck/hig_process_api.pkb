@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.13   Oct 04 2010 09:50:36   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.14   Oct 08 2010 11:43:42   graeme.johnson  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Oct 04 2010 09:50:36  $
---       Date fetched Out : $Modtime:   Sep 23 2010 16:10:08  $
---       Version          : $Revision:   3.13  $
+--       Date into PVCS   : $Date:   Oct 08 2010 11:43:42  $
+--       Date fetched Out : $Modtime:   Oct 07 2010 14:58:40  $
+--       Version          : $Revision:   3.14  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.13  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.14  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -1568,6 +1568,71 @@ BEGIN
    nm3ctx.set_context('HPJR_RUN_SEQ',Null);
 --
 END stop_process;
+--
+--
+--
+FUNCTION  valid_process_of_type_exists(pi_process_type_id IN hig_process_types.hpt_process_type_id%TYPE) RETURN BOOLEAN IS
+
+ l_count pls_integer;
+ 
+BEGIN
+
+
+ SELECT count(hp_process_type_id)
+ INTO l_count
+ FROM hig_processes
+ WHERE hp_process_type_id = pi_process_type_id
+ and exists (select 1
+             from dba_scheduler_jobs
+             where job_name = hp_job_name
+             and state in ('SCHEDULED','RUNNING'));
+
+ RETURN l_count > 0;
+ 
+END  valid_process_of_type_exists;
+--
+--
+--
+FUNCTION  valid_process_of_type_exists(pi_process_type_name IN hig_process_types.hpt_name%TYPE) RETURN BOOLEAN IS
+
+BEGIN
+
+ RETURN valid_process_of_type_exists(pi_process_type_id => hig_process_framework.get_process_type(pi_process_type_name => pi_process_type_name).hpt_process_type_id);
+
+END valid_process_of_type_exists;
+--
+--
+--
+PROCEDURE valid_process_of_type_exists(pi_process_type_id IN hig_processes.hp_process_type_id%TYPE) IS
+
+ l_hpt_rec hig_process_types%ROWTYPE;
+
+BEGIN
+
+
+ IF NOT hig_process_api.valid_process_of_type_exists(pi_process_type_id => pi_process_type_id) THEN
+ 
+   l_hpt_rec := hig_process_framework.get_process_type(pi_process_type_id => pi_process_type_id);
+
+   hig.raise_ner(pi_appl => 'HIG'
+                 , pi_id => 548 -- 'Application is not configured correctly.'
+                 , pi_supplementary_info => 'A '||chr(39)||l_hpt_rec.hpt_name||chr(39)||' process must exist and be valid.');
+
+ END IF;
+
+END valid_process_of_type_exists; 
+--
+--
+--
+PROCEDURE valid_process_of_type_exists(pi_process_type_name IN hig_process_types.hpt_name%TYPE) IS
+
+BEGIN
+
+ valid_process_of_type_exists(pi_process_type_id =>  hig_process_framework.get_process_type(pi_process_type_name => pi_process_type_name).hpt_process_type_id);
+
+END valid_process_of_type_exists;
+--
+--
 --
 END hig_process_api;
 /

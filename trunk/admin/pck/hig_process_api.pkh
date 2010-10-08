@@ -5,11 +5,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkh-arc   3.9   Aug 31 2010 10:42:24   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkh-arc   3.10   Oct 08 2010 11:43:42   graeme.johnson  $
 --       Module Name      : $Workfile:   hig_process_api.pkh  $
---       Date into PVCS   : $Date:   Aug 31 2010 10:42:24  $
---       Date fetched Out : $Modtime:   Aug 19 2010 10:00:00  $
---       Version          : $Revision:   3.9  $
+--       Date into PVCS   : $Date:   Oct 08 2010 11:43:42  $
+--       Date fetched Out : $Modtime:   Oct 07 2010 14:59:32  $
+--       Version          : $Revision:   3.10  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -19,7 +19,7 @@ AS
 --constants
 -----------
 --g_sccsid is the SCCS ID for the package
-g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.9  $';
+g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.10  $';
   
 -----------------------------------------------------------
 -- To facilitate attributing a list of files with a process
@@ -390,6 +390,15 @@ FUNCTION  do_polling_if_requested(pi_file_type_name          IN hig_process_type
 PROCEDURE stop_process(pi_process_id IN hig_processes.hp_process_id%TYPE
                       ,pi_reason     IN VARCHAR2);  
 --
+
+FUNCTION  valid_process_of_type_exists(pi_process_type_id IN hig_process_types.hpt_process_type_id%TYPE) RETURN BOOLEAN;
+
+FUNCTION  valid_process_of_type_exists(pi_process_type_name IN hig_process_types.hpt_name%TYPE) RETURN BOOLEAN; -- overload of above in case driving by hpt_name
+
+PROCEDURE valid_process_of_type_exists(pi_process_type_id IN hig_processes.hp_process_type_id%TYPE); -- calls function of same name then raises an error if function returned false
+
+PROCEDURE valid_process_of_type_exists(pi_process_type_name IN hig_process_types.hpt_name%TYPE); -- overload of above in case driving by hpt_name
+
 end hig_process_api;
 /
 
