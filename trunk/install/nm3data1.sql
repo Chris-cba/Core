@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.46   Oct 06 2010 14:05:34   mike.alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.47   Oct 11 2010 10:03:36   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Oct 06 2010 14:05:34  $
---       Date fetched Out : $Modtime:   Oct 06 2010 14:02:04  $
---       Version          : $Revision:   2.46  $
+--       Date into PVCS   : $Date:   Oct 11 2010 10:03:36  $
+--       Date fetched Out : $Modtime:   Oct 11 2010 09:59:12  $
+--       Version          : $Revision:   2.47  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 06-OCT-2010 14:01
+--       Generation Date  : 11-OCT-2010 09:59
 --
 --   Product metadata script
 --   As at Release 4.3.0.0
@@ -6551,6 +6551,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'HIG'
                     AND  NER_ID = 547);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,548
+       ,null
+       ,'Application is not configured correctly.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 548);
 --
 INSERT INTO NM_ERRORS
        (NER_APPL
