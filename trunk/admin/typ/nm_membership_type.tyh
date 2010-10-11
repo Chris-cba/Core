@@ -19,7 +19,7 @@ as object (
     NE_ID               number(9)     -- id of the route, group or datum
   , PARENT_NE_ID        number(9)     -- id of the datum or inv item driving the query
   , NE_UNIQUE           varchar2(30)  -- NM_ELEMENTS_ALL.NE_UNIQUE%type
-  , NE_DESCR            varchar2(80)  -- NM_ELEMENTS_ALL.NE_DESCR%type
+  , NE_DESCR            varchar2(240)  -- NM_ELEMENTS_ALL.NE_DESCR%type
   , NM_BEGIN_MP         number        -- NM_MEMBERS_ALL.NM_BEGIN_MP%type
   , NM_END_MP           number        -- NM_MEMBERS_ALL.NM_END_MP%type
   , NE_NT_TYPE          varchar2(4)   -- NM_ELEMENTS_ALL.NE_TYPE%type
