@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_metadata_upg.sql-arc   3.2   Oct 06 2010 13:58:32   mike.alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_metadata_upg.sql-arc   3.3   Oct 11 2010 10:07:02   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4210_nm4300_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Oct 06 2010 13:58:32  $
---       Date fetched Out : $Modtime:   Oct 06 2010 13:51:20  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Oct 11 2010 10:07:02  $
+--       Date fetched Out : $Modtime:   Oct 11 2010 09:54:34  $
+--       Version          : $Revision:   3.3  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -365,6 +365,39 @@ Insert Into hig_option_values( hov_id
                                           From   hig_option_values
                                           Where  hov_id = 'WEBMAPIDBF'
                                          );
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New Error for Framework
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 110221
+-- 
+-- TASK DETAILS
+-- TMA supporting database jobs have now been converted to run via the Process Framework in order to give visibility and also to all these processes to be easily amended, disabled, enabled.
+-- 
+-- In particular the driving requirement behind this is so that an administrator could disable the processes which send/recieve transactions whilst system maintenance and or gazetteer loading is taking place.
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (GRAEME JOHNSON)
+-- Called when checking existence of a process of a given type which is either Running or Scheduled
+-- 
+------------------------------------------------------------------
+delete from nm_errors
+where ner_appl = 'HIG'
+and ner_id = 548
+/
+
+Insert into NM_ERRORS
+   (NER_APPL, NER_ID, NER_DESCR)
+ Values
+   ('HIG', 548, 'Application is not configured correctly.');
+
 
 ------------------------------------------------------------------
 

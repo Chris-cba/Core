@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_ddl_upg.sql-arc   3.4   Oct 08 2010 12:21:28   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_ddl_upg.sql-arc   3.5   Oct 11 2010 10:07:02   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4210_nm4300_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Oct 08 2010 12:21:28  $
---       Date fetched Out : $Modtime:   Oct 08 2010 12:19:46  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Oct 11 2010 10:07:02  $
+--       Date fetched Out : $Modtime:   Oct 11 2010 09:54:34  $
+--       Version          : $Revision:   3.5  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -608,8 +608,104 @@ ADD (CONSTRAINT NGIT_UK UNIQUE
   (NGIT_NGT_GROUP_TYPE))
 /
 
+Prompt Index NGIT_FK_NIT_IND;
+CREATE INDEX NGIT_FK_NIT_IND ON NM_GROUP_INV_TYPES
+(NGIT_NIT_INV_TYPE)
+/
 
+--
+--------------------------------------
+-- DOC_ENQUIRY_CONTACTS
+--------------------------------------
+--
+PROMPT Dropping Constraint 'DEC_PK'
+Alter Table DOC_ENQUIRY_CONTACTS
+Drop Constraint Dec_Pk
+/
 
+PROMPT Dropping Index 'DEC_IND1'
+Drop Index Dec_Ind1
+/
+
+PROMPT Creating Primary Key on 'DOC_ENQUIRY_CONTACTS'
+ALTER TABLE DOC_ENQUIRY_CONTACTS
+ADD (CONSTRAINT DEC_PK PRIMARY KEY 
+  (DEC_HCT_ID
+  ,DEC_DOC_ID
+  ,DEC_TYPE))
+/
+
+PROMPT Creating Index 'DEC_IND1'
+CREATE UNIQUE INDEX DEC_IND1 ON DOC_ENQUIRY_CONTACTS
+(DEC_HCT_ID
+,DEC_TYPE
+,DEC_DOC_ID)
+/
+
+--
+--------------------------------------
+-- DOC_KEYS
+--------------------------------------
+--
+
+PROMPT Dropping Constraint 'DKY_PK'
+Alter Table DOC_KEYS
+Drop Constraint DKY_PK
+/
+
+PROMPT Dropping Index 'DKW_IND1'
+Drop Index DKW_IND1
+/
+
+PROMPT Dropping Index 'DKY_FK_DKW_IND'
+Drop Index DKY_FK_DKW_IND
+/
+
+PROMPT Creating Primary Key on 'DOC_KEYS'
+ALTER TABLE DOC_KEYS
+ADD (CONSTRAINT DKY_PK PRIMARY KEY 
+  (DKY_DOC_ID
+  ,DKY_DKW_KEY_ID))
+/
+
+PROMPT Creating Index 'DKW_IND1'
+CREATE UNIQUE INDEX DKW_IND1 ON DOC_KEYS
+(DKY_DKW_KEY_ID
+,DKY_DOC_ID)
+/
+
+PROMPT Creating Index 'DKY_FK_DKW_IND'
+CREATE INDEX DKY_FK_DKW_IND ON DOC_KEYS
+(DKY_DKW_KEY_ID)
+/
+
+--
+--------------------------------------
+-- HIG_CONTACT_ADDRESS
+--------------------------------------
+--
+
+PROMPT Dropping Constraint 'HCA_PK'
+Alter Table HIG_CONTACT_ADDRESS
+Drop Constraint HCA_PK
+/
+
+PROMPT Dropping Index 'HCA_IND1'
+Drop Index HCA_IND1
+/
+
+PROMPT Creating Primary Key on 'HIG_CONTACT_ADDRESS'
+ALTER TABLE HIG_CONTACT_ADDRESS
+ADD (CONSTRAINT HCA_PK PRIMARY KEY 
+  (HCA_HCT_ID
+  ,HCA_HAD_ID))
+/
+
+PROMPT Creating Index 'HCA_IND1'
+CREATE UNIQUE INDEX HCA_IND1 ON HIG_CONTACT_ADDRESS
+(HCA_HAD_ID
+,HCA_HCT_ID)
+/
 
 ------------------------------------------------------------------
 
