@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3locator AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.6  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.7  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3locator';
 
@@ -1551,7 +1551,7 @@ BEGIN
   -- LRM details
   IF pi_inc_lrm THEN
     add('   ,ne_unique      varchar2(30)');
-    add('   ,ne_descr       varchar2(80)');
+    add('   ,ne_descr       varchar2(240)');
     add('   ,ne_start       number');
     add('   ,ne_end         number');
     add('   ,ne_units       varchar2(20)');
