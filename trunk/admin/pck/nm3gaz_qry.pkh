@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkh-arc   2.2   Jan 06 2010 22:34:14   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkh-arc   2.3   Oct 11 2010 16:56:00   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 22:34:14  $
---       Date fetched Out : $Modtime:   Jan 06 2010 22:31:44  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Oct 11 2010 16:56:00  $
+--       Date fetched Out : $Modtime:   Oct 11 2010 15:51:36  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE nm3gaz_qry AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.2  $';
+   g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.3  $';
 --  g_sccsid is the SCCS ID for the package
 --
    c_ngqt_item_type_type_ele    CONSTANT nm_gaz_query_types.ngqt_item_type_type%TYPE := 'E';
@@ -60,7 +60,7 @@ CREATE OR REPLACE PACKAGE nm3gaz_qry AS
       ,ngqi_item_type_type  nm_gaz_query_item_list.ngqi_item_type_type%TYPE
       ,ngqi_item_type       nm_gaz_query_item_list.ngqi_item_type%TYPE
       ,iit_primary_key      nm_inv_items.iit_primary_key%TYPE
-      ,iit_descr            nm_inv_items.iit_descr%TYPE
+      ,iit_descr            nm_elements_all.ne_descr%TYPE
       );
 --
    TYPE rec_gaz_restriction IS RECORD
