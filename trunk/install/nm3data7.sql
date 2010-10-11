@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.17   Oct 06 2010 14:05:38   mike.alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.18   Oct 11 2010 10:03:34   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data7.sql  $
---       Date into PVCS   : $Date:   Oct 06 2010 14:05:38  $
---       Date fetched Out : $Modtime:   Oct 06 2010 14:02:20  $
---       Version          : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Oct 11 2010 10:03:34  $
+--       Date fetched Out : $Modtime:   Oct 11 2010 09:59:12  $
+--       Version          : $Revision:   2.18  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 06-OCT-2010 14:02
+--       Generation Date  : 11-OCT-2010 09:59
 --
 --   Product metadata script
 --   As at Release 4.3.0.0
@@ -6269,6 +6269,24 @@ SELECT
        ,547
        ,null
        ,'Invalid geometry.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 548;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,548
+       ,null
+       ,'Application is not configured correctly.'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
