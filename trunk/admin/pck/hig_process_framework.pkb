@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.4   May 26 2010 17:59:36   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.5   Oct 12 2010 09:20:20   Chris.Baugh  $
 --       Module Name      : $Workfile:   hig_process_framework.pkb  $
---       Date into PVCS   : $Date:   May 26 2010 17:59:36  $
---       Date fetched Out : $Modtime:   May 26 2010 11:58:36  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Oct 12 2010 09:20:20  $
+--       Date fetched Out : $Modtime:   Oct 11 2010 17:10:12  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
 
@@ -822,8 +822,16 @@ BEGIN
 --
  l_retval := l_retval ||'execute immediate ('||nm3flx.string(l_what)||');'||chr(10)||chr(10);
 
- l_retval := l_retval ||'  hig_process_api.process_execution_end(''Y'',null);'||chr(10);
-
+ --
+ -- Only set successful execution end if the module being executed hasn't already set 
+ -- success to N
+ --
+ l_retval := l_retval ||'  if NVL(hig_process_api.get_success_flag, ''Y'') != ''N'''||chr(10);
+ l_retval := l_retval ||'  then '||chr(10);
+ l_retval := l_retval ||'     hig_process_api.process_execution_end(''Y'',null);'||chr(10);
+ l_retval := l_retval ||'  end if;'||chr(10);
+ 
+ 
  l_retval := l_retval ||'EXCEPTION'||chr(10);
  l_retval := l_retval ||'WHEN ex_process_execution_end THEN'||chr(10);
  l_retval := l_retval ||'  Null;'||chr(10); 
