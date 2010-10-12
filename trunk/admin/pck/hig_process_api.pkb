@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.14   Oct 08 2010 11:43:42   graeme.johnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.15   Oct 12 2010 09:28:20   Chris.Baugh  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Oct 08 2010 11:43:42  $
---       Date fetched Out : $Modtime:   Oct 07 2010 14:58:40  $
---       Version          : $Revision:   3.14  $
+--       Date into PVCS   : $Date:   Oct 12 2010 09:28:20  $
+--       Date fetched Out : $Modtime:   Oct 11 2010 17:10:24  $
+--       Version          : $Revision:   3.15  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.14  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.15  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -150,6 +150,27 @@ END get_process_complete_message;
 --
 -----------------------------------------------------------------------------
 --
+PROCEDURE set_success_flag(pi_success_flag IN hig_processes.hp_success_flag%TYPE) IS
+
+BEGIN
+
+ nm3ctx.set_context(p_Attribute  => 'HP_SUCCESS_FLAG'
+                   ,p_Value      =>  pi_success_flag);
+
+END set_success_flag;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_success_flag RETURN hig_processes.hp_success_flag%TYPE IS
+
+BEGIN
+
+ RETURN(Sys_Context('NM3SQL','HP_SUCCESS_FLAG'));
+
+END get_success_flag;
+--
+-----------------------------------------------------------------------------
+--
 PROCEDURE set_current_process_id(pi_process_id IN hig_processes.hp_process_id%TYPE) IS
 
 BEGIN
@@ -252,6 +273,7 @@ BEGIN
 
 
  set_current_job_run_seq(pi_job_run_seq => l_id); 
+ set_success_flag(pi_success_flag => 'Y');
 
  --
  -- mark any input files that are attributed to this process but unattributed to a process execution
@@ -297,6 +319,10 @@ BEGIN
  
  IF l_current_job_run_seq IS NOT NULL THEN -- only bother to go ahead with sweeping things up if we've NOT binned the current execution 
 
+        --
+        -- Set execution end context
+        --
+         set_success_flag(pi_success_flag => pi_success_flag); 
 
         --
         -- 
