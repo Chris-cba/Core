@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.15   Oct 14 2010 14:23:22   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.16   Oct 14 2010 15:36:28   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data8.sql  $
---       Date into PVCS   : $Date:   Oct 14 2010 14:23:22  $
---       Date fetched Out : $Modtime:   Oct 14 2010 14:17:52  $
---       Version          : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Oct 14 2010 15:36:28  $
+--       Date fetched Out : $Modtime:   Oct 14 2010 15:34:08  $
+--       Version          : $Revision:   2.16  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 14-OCT-2010 14:17
+--       Generation Date  : 14-OCT-2010 15:34
 --
 --   Product metadata script
 --   As at Release 4.3.0.0
@@ -1331,7 +1331,7 @@ SELECT
        ,to_date('20100505173452','YYYYMMDDHH24MISS')
        ,'DORSET'
        ,'DORSET'
-       ,'select nau_unit_code,nau_name,nau_admin_unit '||CHR(10)||'  from nm_admin_units'
+       ,'select nau_unit_code,nau_name,nau_admin_unit'||CHR(10)||'  from nm_admin_units'
        ,'N'
        ,null
        ,'N'
@@ -1404,7 +1404,7 @@ SELECT
        ,to_date('20100505173539','YYYYMMDDHH24MISS')
        ,'DORSET'
        ,'DORSET'
-       ,''
+       ,'SELECT con_code,con_name,con_id'||CHR(10)||'    FROM   contracts, org_units'||CHR(10)||'    WHERE  con_contr_org_id = oun_org_id AND  oun_electronic_orders_flag = ''Y'' and oun_contractor_id IS NOT NULL'
        ,'N'
        ,null
        ,'N'
@@ -1477,7 +1477,7 @@ SELECT
        ,to_date('20100505173539','YYYYMMDDHH24MISS')
        ,'DORSET'
        ,'DORSET'
-       ,''
+       ,'SELECT con_code,con_name,con_code contract_code'||CHR(10)||'    FROM   contracts, org_units'||CHR(10)||'    WHERE  con_contr_org_id = oun_org_id AND  oun_electronic_orders_flag = ''Y'' and oun_contractor_id IS NOT NULL'
        ,'N'
        ,null
        ,'N'
@@ -1550,7 +1550,7 @@ SELECT
        ,to_date('20100505173600','YYYYMMDDHH24MISS')
        ,'DORSET'
        ,'DORSET'
-       ,''
+       ,'SELECT oun_unit_code,oun_name,oun_name'||CHR(10)||'    FROM   org_units'||CHR(10)||'    WHERE  oun_electronic_orders_flag = ''Y'' and oun_contractor_id IS NOT NULL'
        ,'N'
        ,null
        ,'N'
@@ -2061,7 +2061,7 @@ SELECT
        ,to_date('20100505173947','YYYYMMDDHH24MISS')
        ,'DORSET'
        ,'DORSET'
-       ,'SELECT '||CHR(10)||''||CHR(10)||'HPT_NAME,HPT_DESCR,HPT_PROCESS_TYPE_ID FROM HIG_PROCESS_TYPES'||CHR(10)||'ORDER BY HPT_NAME'
+       ,'SELECT HPT_NAME,HPT_DESCR,HPT_PROCESS_TYPE_ID FROM HIG_PROCESS_TYPES'||CHR(10)||'ORDER BY HPT_NAME'
        ,'N'
        ,null
        ,'N'
@@ -2134,7 +2134,7 @@ SELECT
        ,to_date('20100510141118','YYYYMMDDHH24MISS')
        ,'HIGHWAYS'
        ,'HIGHWAYS'
-       ,'SELECT HCO_CODE,HCO_MEANING,HCO_CODE '||CHR(10)||''||CHR(10)||'CODE FROM HIG_CODES WHERE '||CHR(10)||'HCO_DOMAIN = ''PROCESS_SUCCESS_FLAG'' AND HCO_CODE != ''TBD'' '||CHR(10)||'ORDER BY HCO_SEQ'
+       ,'SELECT HCO_CODE,HCO_MEANING,HCO_CODE CODE FROM HIG_CODES WHERE'||CHR(10)||'HCO_DOMAIN = ''PROCESS_SUCCESS_FLAG'' AND HCO_CODE != ''TBD'''||CHR(10)||'ORDER BY HCO_SEQ'
        ,'N'
        ,null
        ,'N'
