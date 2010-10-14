@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.16   Oct 14 2010 15:36:28   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.17   Oct 14 2010 16:35:42   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data8.sql  $
---       Date into PVCS   : $Date:   Oct 14 2010 15:36:28  $
---       Date fetched Out : $Modtime:   Oct 14 2010 15:34:08  $
---       Version          : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Oct 14 2010 16:35:42  $
+--       Date fetched Out : $Modtime:   Oct 14 2010 16:35:02  $
+--       Version          : $Revision:   2.17  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 14-OCT-2010 15:34
+--       Generation Date  : 14-OCT-2010 16:35
 --
 --   Product metadata script
 --   As at Release 4.3.0.0
@@ -1404,7 +1404,7 @@ SELECT
        ,to_date('20100505173539','YYYYMMDDHH24MISS')
        ,'DORSET'
        ,'DORSET'
-       ,'SELECT con_code,con_name,con_id'||CHR(10)||'    FROM   contracts, org_units'||CHR(10)||'    WHERE  con_contr_org_id = oun_org_id AND  oun_electronic_orders_flag = ''Y'' and oun_contractor_id IS NOT NULL'
+       ,''
        ,'N'
        ,null
        ,'N'
@@ -1477,7 +1477,7 @@ SELECT
        ,to_date('20100505173539','YYYYMMDDHH24MISS')
        ,'DORSET'
        ,'DORSET'
-       ,'SELECT con_code,con_name,con_code contract_code'||CHR(10)||'    FROM   contracts, org_units'||CHR(10)||'    WHERE  con_contr_org_id = oun_org_id AND  oun_electronic_orders_flag = ''Y'' and oun_contractor_id IS NOT NULL'
+       ,''
        ,'N'
        ,null
        ,'N'
@@ -1550,7 +1550,7 @@ SELECT
        ,to_date('20100505173600','YYYYMMDDHH24MISS')
        ,'DORSET'
        ,'DORSET'
-       ,'SELECT oun_unit_code,oun_name,oun_name'||CHR(10)||'    FROM   org_units'||CHR(10)||'    WHERE  oun_electronic_orders_flag = ''Y'' and oun_contractor_id IS NOT NULL'
+       ,''
        ,'N'
        ,null
        ,'N'
