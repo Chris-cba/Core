@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_metadata_upg.sql-arc   3.6   Oct 14 2010 15:33:14   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_metadata_upg.sql-arc   3.7   Oct 14 2010 16:32:52   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4210_nm4300_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Oct 14 2010 15:33:14  $
---       Date fetched Out : $Modtime:   Oct 14 2010 15:27:56  $
---       Version          : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   Oct 14 2010 16:32:52  $
+--       Date fetched Out : $Modtime:   Oct 14 2010 16:32:02  $
+--       Version          : $Revision:   3.7  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -544,9 +544,7 @@ Insert into NM_INV_TYPE_ATTRIBS_ALL
     'N', NULL, NULL, NULL, 'CON_ID', 
     'CON_ID', TO_DATE('05/05/2010 00:00:00', 'MM/DD/YYYY HH24:MI:SS'), NULL, 'N', NULL, 
     NULL, NULL, 'N', 'N', TO_DATE('05/05/2010 17:35:39', 'MM/DD/YYYY HH24:MI:SS'), 
-    TO_DATE('05/05/2010 17:35:39', 'MM/DD/YYYY HH24:MI:SS'), 'DORSET', 'DORSET', 'SELECT con_code,con_name,con_id
-    FROM   contracts, org_units 
-    WHERE  con_contr_org_id = oun_org_id AND  oun_electronic_orders_flag = ''Y'' and oun_contractor_id IS NOT NULL', 'N', 
+    TO_DATE('05/05/2010 17:35:39', 'MM/DD/YYYY HH24:MI:SS'), 'DORSET', 'DORSET', Null, 'N', 
     NULL, 'N', 'MIXED');
   Insert into NM_INV_TYPE_ATTRIBS_ALL
    (ITA_INV_TYPE, ITA_ATTRIB_NAME, ITA_DYNAMIC_ATTRIB, ITA_DISP_SEQ_NO, ITA_MANDATORY_YN, 
@@ -562,9 +560,7 @@ Insert into NM_INV_TYPE_ATTRIBS_ALL
     'N', NULL, NULL, NULL, 'CON_CODE', 
     'CON_CODE', TO_DATE('05/05/2010 00:00:00', 'MM/DD/YYYY HH24:MI:SS'), NULL, 'N', NULL, 
     NULL, NULL, 'N', 'N', TO_DATE('05/05/2010 17:35:39', 'MM/DD/YYYY HH24:MI:SS'), 
-    TO_DATE('05/05/2010 17:35:39', 'MM/DD/YYYY HH24:MI:SS'), 'DORSET', 'DORSET', 'SELECT con_code,con_name,con_code contract_code
-    FROM   contracts, org_units 
-    WHERE  con_contr_org_id = oun_org_id AND  oun_electronic_orders_flag = ''Y'' and oun_contractor_id IS NOT NULL', 'N', 
+    TO_DATE('05/05/2010 17:35:39', 'MM/DD/YYYY HH24:MI:SS'), 'DORSET', 'DORSET',null, 'N', 
     NULL, 'N', 'MIXED');
 Insert into NM_INV_TYPE_ATTRIBS_ALL
    (ITA_INV_TYPE, ITA_ATTRIB_NAME, ITA_DYNAMIC_ATTRIB, ITA_DISP_SEQ_NO, ITA_MANDATORY_YN, 
@@ -580,9 +576,7 @@ Insert into NM_INV_TYPE_ATTRIBS_ALL
     'N', NULL, NULL, NULL, 'CON_NAME', 
     'CON_NAME', TO_DATE('05/05/2010 00:00:00', 'MM/DD/YYYY HH24:MI:SS'), NULL, 'N', NULL, 
     NULL, NULL, 'N', 'N', TO_DATE('05/05/2010 17:36:00', 'MM/DD/YYYY HH24:MI:SS'), 
-    TO_DATE('05/05/2010 17:36:00', 'MM/DD/YYYY HH24:MI:SS'), 'DORSET', 'DORSET', 'SELECT oun_unit_code,oun_name,oun_name
-    FROM   org_units 
-    WHERE  oun_electronic_orders_flag = ''Y'' and oun_contractor_id IS NOT NULL', 'N', 
+    TO_DATE('05/05/2010 17:36:00', 'MM/DD/YYYY HH24:MI:SS'), 'DORSET', 'DORSET',null, 'N', 
     NULL, 'N', 'MIXED');
 Insert into NM_INV_TYPE_ATTRIBS_ALL
    (ITA_INV_TYPE, ITA_ATTRIB_NAME, ITA_DYNAMIC_ATTRIB, ITA_DISP_SEQ_NO, ITA_MANDATORY_YN, 
