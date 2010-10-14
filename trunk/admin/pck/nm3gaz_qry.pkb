@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.8   Oct 04 2010 15:09:02   ade.edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.9   Oct 14 2010 10:48:42   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Oct 04 2010 15:09:02  $
---       Date fetched Out : $Modtime:   Oct 04 2010 14:50:44  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Oct 14 2010 10:48:42  $
+--       Date fetched Out : $Modtime:   Oct 14 2010 10:48:06  $
+--       Version          : $Revision:   2.9  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb 1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.8  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.9  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -742,6 +742,16 @@ BEGIN
    IF  g_area_based_query
     OR g_roi_restricted_item_query
     THEN
+      -- Task 0109984
+      IF l_rec_nit.nit_lr_ne_column_name IS NULL
+      AND l_rec_nit.nit_table_name IS NOT NULL
+      THEN
+        hig.raise_ner(pi_appl               => nm3type.c_net
+                     ,pi_id                 => 465
+                     ,pi_supplementary_info => '['||l_rec_nit.nit_descr||']');
+        --RAISE_APPLICATION_ERROR(-20101,'Please ensure the LR NE_ID Column is set on the Asset metamodel for '||l_rec_nit.nit_descr); 
+      END IF;
+   --
       append_both (p_ngqt_index,'        FROM  '||l_tables||', nm_nw_temp_extents nte');
       append_both (p_ngqt_index,'       WHERE  nte.nte_job_id = '||g_package_name||'.get_g_nte_job_id');
    --
