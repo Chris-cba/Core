@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.14   Oct 06 2010 14:05:38   mike.alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.15   Oct 14 2010 14:23:22   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data8.sql  $
---       Date into PVCS   : $Date:   Oct 06 2010 14:05:38  $
---       Date fetched Out : $Modtime:   Oct 06 2010 14:02:20  $
---       Version          : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Oct 14 2010 14:23:22  $
+--       Date fetched Out : $Modtime:   Oct 14 2010 14:17:52  $
+--       Version          : $Revision:   2.15  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 06-OCT-2010 14:02
+--       Generation Date  : 14-OCT-2010 14:17
 --
 --   Product metadata script
 --   As at Release 4.3.0.0
@@ -19,6 +19,8 @@
 --   ================
 --   USER_SDO_STYLES
 --   NM_LAYER_TREE
+--   NM_INV_TYPES_ALL
+--   NM_INV_TYPE_ATTRIBS_ALL
 --
 -----------------------------------------------------------------------------
 
@@ -1157,6 +1159,1135 @@ SELECT
        ,20 FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_LAYER_TREE
                    WHERE NLTR_CHILD = 'WOL');
+--
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- NM_INV_TYPES_ALL
+--
+-- select * from nm3_metadata.nm_inv_types_all
+-- order by nit_inv_type
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT nm_inv_types_all
+SET TERM OFF
+
+INSERT INTO NM_INV_TYPES_ALL
+       (NIT_INV_TYPE
+       ,NIT_PNT_OR_CONT
+       ,NIT_X_SECT_ALLOW_FLAG
+       ,NIT_ELEC_DRAIN_CARR
+       ,NIT_CONTIGUOUS
+       ,NIT_REPLACEABLE
+       ,NIT_EXCLUSIVE
+       ,NIT_CATEGORY
+       ,NIT_DESCR
+       ,NIT_LINEAR
+       ,NIT_USE_XY
+       ,NIT_MULTIPLE_ALLOWED
+       ,NIT_END_LOC_ONLY
+       ,NIT_SCREEN_SEQ
+       ,NIT_VIEW_NAME
+       ,NIT_START_DATE
+       ,NIT_END_DATE
+       ,NIT_SHORT_DESCR
+       ,NIT_FLEX_ITEM_FLAG
+       ,NIT_TABLE_NAME
+       ,NIT_LR_NE_COLUMN_NAME
+       ,NIT_LR_ST_CHAIN
+       ,NIT_LR_END_CHAIN
+       ,NIT_ADMIN_TYPE
+       ,NIT_ICON_NAME
+       ,NIT_TOP
+       ,NIT_FOREIGN_PK_COLUMN
+       ,NIT_UPDATE_ALLOWED
+       ,NIT_DATE_CREATED
+       ,NIT_DATE_MODIFIED
+       ,NIT_MODIFIED_BY
+       ,NIT_CREATED_BY
+       ,NIT_NOTES
+       )
+SELECT 
+        'PRO$'
+       ,'P'
+       ,'N'
+       ,'C'
+       ,'N'
+       ,'N'
+       ,'N'
+       ,'A'
+       ,'Process Alerts'
+       ,'N'
+       ,'N'
+       ,'N'
+       ,'N'
+       ,null
+       ,'V_NM_PRO$'
+       ,to_date('19010101000000','YYYYMMDDHH24MISS')
+       ,null
+       ,''
+       ,'N'
+       ,'HIG_PROCESS_ALERT_LOG'
+       ,''
+       ,''
+       ,''
+       ,'EXT$'
+       ,''
+       ,'N'
+       ,'HPAL_ID'
+       ,'Y'
+       ,to_date('20101014141424','YYYYMMDDHH24MISS')
+       ,to_date('20101014141424','YYYYMMDDHH24MISS')
+       ,'NM3_METADATA'
+       ,'NM3_METADATA'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPES_ALL
+                   WHERE NIT_INV_TYPE = 'PRO$');
+--
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- NM_INV_TYPE_ATTRIBS_ALL
+--
+-- select * from nm3_metadata.nm_inv_type_attribs_all
+-- order by ita_inv_type
+--         ,ita_attrib_name
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT nm_inv_type_attribs_all
+SET TERM OFF
+
+INSERT INTO NM_INV_TYPE_ATTRIBS_ALL
+       (ITA_INV_TYPE
+       ,ITA_ATTRIB_NAME
+       ,ITA_DYNAMIC_ATTRIB
+       ,ITA_DISP_SEQ_NO
+       ,ITA_MANDATORY_YN
+       ,ITA_FORMAT
+       ,ITA_FLD_LENGTH
+       ,ITA_DEC_PLACES
+       ,ITA_SCRN_TEXT
+       ,ITA_ID_DOMAIN
+       ,ITA_VALIDATE_YN
+       ,ITA_DTP_CODE
+       ,ITA_MAX
+       ,ITA_MIN
+       ,ITA_VIEW_ATTRI
+       ,ITA_VIEW_COL_NAME
+       ,ITA_START_DATE
+       ,ITA_END_DATE
+       ,ITA_QUERYABLE
+       ,ITA_UKPMS_PARAM_NO
+       ,ITA_UNITS
+       ,ITA_FORMAT_MASK
+       ,ITA_EXCLUSIVE
+       ,ITA_KEEP_HISTORY_YN
+       ,ITA_DATE_CREATED
+       ,ITA_DATE_MODIFIED
+       ,ITA_MODIFIED_BY
+       ,ITA_CREATED_BY
+       ,ITA_QUERY
+       ,ITA_DISPLAYED
+       ,ITA_DISP_WIDTH
+       ,ITA_INSPECTABLE
+       ,ITA_CASE
+       )
+SELECT 
+        'PRO$'
+       ,'HPAL_ADMIN_UNIT'
+       ,'N'
+       ,2
+       ,'N'
+       ,'NUMBER'
+       ,9
+       ,null
+       ,'Admin Unit ID'
+       ,''
+       ,'N'
+       ,''
+       ,null
+       ,null
+       ,'ADMIN_UNIT'
+       ,'ADMIN_UNIT'
+       ,to_date('20100505000000','YYYYMMDDHH24MISS')
+       ,null
+       ,'N'
+       ,null
+       ,null
+       ,''
+       ,'N'
+       ,'N'
+       ,to_date('20100505173452','YYYYMMDDHH24MISS')
+       ,to_date('20100505173452','YYYYMMDDHH24MISS')
+       ,'DORSET'
+       ,'DORSET'
+       ,'select nau_unit_code,nau_name,nau_admin_unit '||CHR(10)||'  from nm_admin_units'
+       ,'N'
+       ,null
+       ,'N'
+       ,'UPPER' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ATTRIBS_ALL
+                   WHERE ITA_INV_TYPE = 'PRO$'
+                    AND  ITA_ATTRIB_NAME = 'HPAL_ADMIN_UNIT');
+--
+INSERT INTO NM_INV_TYPE_ATTRIBS_ALL
+       (ITA_INV_TYPE
+       ,ITA_ATTRIB_NAME
+       ,ITA_DYNAMIC_ATTRIB
+       ,ITA_DISP_SEQ_NO
+       ,ITA_MANDATORY_YN
+       ,ITA_FORMAT
+       ,ITA_FLD_LENGTH
+       ,ITA_DEC_PLACES
+       ,ITA_SCRN_TEXT
+       ,ITA_ID_DOMAIN
+       ,ITA_VALIDATE_YN
+       ,ITA_DTP_CODE
+       ,ITA_MAX
+       ,ITA_MIN
+       ,ITA_VIEW_ATTRI
+       ,ITA_VIEW_COL_NAME
+       ,ITA_START_DATE
+       ,ITA_END_DATE
+       ,ITA_QUERYABLE
+       ,ITA_UKPMS_PARAM_NO
+       ,ITA_UNITS
+       ,ITA_FORMAT_MASK
+       ,ITA_EXCLUSIVE
+       ,ITA_KEEP_HISTORY_YN
+       ,ITA_DATE_CREATED
+       ,ITA_DATE_MODIFIED
+       ,ITA_MODIFIED_BY
+       ,ITA_CREATED_BY
+       ,ITA_QUERY
+       ,ITA_DISPLAYED
+       ,ITA_DISP_WIDTH
+       ,ITA_INSPECTABLE
+       ,ITA_CASE
+       )
+SELECT 
+        'PRO$'
+       ,'HPAL_CONTRACT_ID'
+       ,'N'
+       ,3
+       ,'N'
+       ,'VARCHAR2'
+       ,10
+       ,null
+       ,'Contract ID'
+       ,''
+       ,'N'
+       ,''
+       ,null
+       ,null
+       ,'CON_ID'
+       ,'CON_ID'
+       ,to_date('20100505000000','YYYYMMDDHH24MISS')
+       ,null
+       ,'N'
+       ,null
+       ,null
+       ,''
+       ,'N'
+       ,'N'
+       ,to_date('20100505173539','YYYYMMDDHH24MISS')
+       ,to_date('20100505173539','YYYYMMDDHH24MISS')
+       ,'DORSET'
+       ,'DORSET'
+       ,''
+       ,'N'
+       ,null
+       ,'N'
+       ,'MIXED' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ATTRIBS_ALL
+                   WHERE ITA_INV_TYPE = 'PRO$'
+                    AND  ITA_ATTRIB_NAME = 'HPAL_CONTRACT_ID');
+--
+INSERT INTO NM_INV_TYPE_ATTRIBS_ALL
+       (ITA_INV_TYPE
+       ,ITA_ATTRIB_NAME
+       ,ITA_DYNAMIC_ATTRIB
+       ,ITA_DISP_SEQ_NO
+       ,ITA_MANDATORY_YN
+       ,ITA_FORMAT
+       ,ITA_FLD_LENGTH
+       ,ITA_DEC_PLACES
+       ,ITA_SCRN_TEXT
+       ,ITA_ID_DOMAIN
+       ,ITA_VALIDATE_YN
+       ,ITA_DTP_CODE
+       ,ITA_MAX
+       ,ITA_MIN
+       ,ITA_VIEW_ATTRI
+       ,ITA_VIEW_COL_NAME
+       ,ITA_START_DATE
+       ,ITA_END_DATE
+       ,ITA_QUERYABLE
+       ,ITA_UKPMS_PARAM_NO
+       ,ITA_UNITS
+       ,ITA_FORMAT_MASK
+       ,ITA_EXCLUSIVE
+       ,ITA_KEEP_HISTORY_YN
+       ,ITA_DATE_CREATED
+       ,ITA_DATE_MODIFIED
+       ,ITA_MODIFIED_BY
+       ,ITA_CREATED_BY
+       ,ITA_QUERY
+       ,ITA_DISPLAYED
+       ,ITA_DISP_WIDTH
+       ,ITA_INSPECTABLE
+       ,ITA_CASE
+       )
+SELECT 
+        'PRO$'
+       ,'HPAL_CON_CODE'
+       ,'N'
+       ,4
+       ,'N'
+       ,'VARCHAR2'
+       ,10
+       ,null
+       ,'Contract Code'
+       ,''
+       ,'N'
+       ,''
+       ,null
+       ,null
+       ,'CON_CODE'
+       ,'CON_CODE'
+       ,to_date('20100505000000','YYYYMMDDHH24MISS')
+       ,null
+       ,'N'
+       ,null
+       ,null
+       ,''
+       ,'N'
+       ,'N'
+       ,to_date('20100505173539','YYYYMMDDHH24MISS')
+       ,to_date('20100505173539','YYYYMMDDHH24MISS')
+       ,'DORSET'
+       ,'DORSET'
+       ,''
+       ,'N'
+       ,null
+       ,'N'
+       ,'MIXED' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ATTRIBS_ALL
+                   WHERE ITA_INV_TYPE = 'PRO$'
+                    AND  ITA_ATTRIB_NAME = 'HPAL_CON_CODE');
+--
+INSERT INTO NM_INV_TYPE_ATTRIBS_ALL
+       (ITA_INV_TYPE
+       ,ITA_ATTRIB_NAME
+       ,ITA_DYNAMIC_ATTRIB
+       ,ITA_DISP_SEQ_NO
+       ,ITA_MANDATORY_YN
+       ,ITA_FORMAT
+       ,ITA_FLD_LENGTH
+       ,ITA_DEC_PLACES
+       ,ITA_SCRN_TEXT
+       ,ITA_ID_DOMAIN
+       ,ITA_VALIDATE_YN
+       ,ITA_DTP_CODE
+       ,ITA_MAX
+       ,ITA_MIN
+       ,ITA_VIEW_ATTRI
+       ,ITA_VIEW_COL_NAME
+       ,ITA_START_DATE
+       ,ITA_END_DATE
+       ,ITA_QUERYABLE
+       ,ITA_UKPMS_PARAM_NO
+       ,ITA_UNITS
+       ,ITA_FORMAT_MASK
+       ,ITA_EXCLUSIVE
+       ,ITA_KEEP_HISTORY_YN
+       ,ITA_DATE_CREATED
+       ,ITA_DATE_MODIFIED
+       ,ITA_MODIFIED_BY
+       ,ITA_CREATED_BY
+       ,ITA_QUERY
+       ,ITA_DISPLAYED
+       ,ITA_DISP_WIDTH
+       ,ITA_INSPECTABLE
+       ,ITA_CASE
+       )
+SELECT 
+        'PRO$'
+       ,'HPAL_CON_NAME'
+       ,'N'
+       ,5
+       ,'N'
+       ,'VARCHAR2'
+       ,40
+       ,null
+       ,'Contractor Name'
+       ,''
+       ,'N'
+       ,''
+       ,null
+       ,null
+       ,'CON_NAME'
+       ,'CON_NAME'
+       ,to_date('20100505000000','YYYYMMDDHH24MISS')
+       ,null
+       ,'N'
+       ,null
+       ,null
+       ,''
+       ,'N'
+       ,'N'
+       ,to_date('20100505173600','YYYYMMDDHH24MISS')
+       ,to_date('20100505173600','YYYYMMDDHH24MISS')
+       ,'DORSET'
+       ,'DORSET'
+       ,''
+       ,'N'
+       ,null
+       ,'N'
+       ,'MIXED' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ATTRIBS_ALL
+                   WHERE ITA_INV_TYPE = 'PRO$'
+                    AND  ITA_ATTRIB_NAME = 'HPAL_CON_NAME');
+--
+INSERT INTO NM_INV_TYPE_ATTRIBS_ALL
+       (ITA_INV_TYPE
+       ,ITA_ATTRIB_NAME
+       ,ITA_DYNAMIC_ATTRIB
+       ,ITA_DISP_SEQ_NO
+       ,ITA_MANDATORY_YN
+       ,ITA_FORMAT
+       ,ITA_FLD_LENGTH
+       ,ITA_DEC_PLACES
+       ,ITA_SCRN_TEXT
+       ,ITA_ID_DOMAIN
+       ,ITA_VALIDATE_YN
+       ,ITA_DTP_CODE
+       ,ITA_MAX
+       ,ITA_MIN
+       ,ITA_VIEW_ATTRI
+       ,ITA_VIEW_COL_NAME
+       ,ITA_START_DATE
+       ,ITA_END_DATE
+       ,ITA_QUERYABLE
+       ,ITA_UKPMS_PARAM_NO
+       ,ITA_UNITS
+       ,ITA_FORMAT_MASK
+       ,ITA_EXCLUSIVE
+       ,ITA_KEEP_HISTORY_YN
+       ,ITA_DATE_CREATED
+       ,ITA_DATE_MODIFIED
+       ,ITA_MODIFIED_BY
+       ,ITA_CREATED_BY
+       ,ITA_QUERY
+       ,ITA_DISPLAYED
+       ,ITA_DISP_WIDTH
+       ,ITA_INSPECTABLE
+       ,ITA_CASE
+       )
+SELECT 
+        'PRO$'
+       ,'HPAL_EMAIL_BODY'
+       ,'N'
+       ,6
+       ,'N'
+       ,'VARCHAR2'
+       ,500
+       ,null
+       ,'Text 2'
+       ,''
+       ,'N'
+       ,''
+       ,null
+       ,null
+       ,'TEXT_2'
+       ,'TEXT_2'
+       ,to_date('20100505000000','YYYYMMDDHH24MISS')
+       ,null
+       ,'N'
+       ,null
+       ,null
+       ,''
+       ,'N'
+       ,'N'
+       ,to_date('20100505173636','YYYYMMDDHH24MISS')
+       ,to_date('20100505173636','YYYYMMDDHH24MISS')
+       ,'DORSET'
+       ,'DORSET'
+       ,''
+       ,'N'
+       ,null
+       ,'N'
+       ,'MIXED' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ATTRIBS_ALL
+                   WHERE ITA_INV_TYPE = 'PRO$'
+                    AND  ITA_ATTRIB_NAME = 'HPAL_EMAIL_BODY');
+--
+INSERT INTO NM_INV_TYPE_ATTRIBS_ALL
+       (ITA_INV_TYPE
+       ,ITA_ATTRIB_NAME
+       ,ITA_DYNAMIC_ATTRIB
+       ,ITA_DISP_SEQ_NO
+       ,ITA_MANDATORY_YN
+       ,ITA_FORMAT
+       ,ITA_FLD_LENGTH
+       ,ITA_DEC_PLACES
+       ,ITA_SCRN_TEXT
+       ,ITA_ID_DOMAIN
+       ,ITA_VALIDATE_YN
+       ,ITA_DTP_CODE
+       ,ITA_MAX
+       ,ITA_MIN
+       ,ITA_VIEW_ATTRI
+       ,ITA_VIEW_COL_NAME
+       ,ITA_START_DATE
+       ,ITA_END_DATE
+       ,ITA_QUERYABLE
+       ,ITA_UKPMS_PARAM_NO
+       ,ITA_UNITS
+       ,ITA_FORMAT_MASK
+       ,ITA_EXCLUSIVE
+       ,ITA_KEEP_HISTORY_YN
+       ,ITA_DATE_CREATED
+       ,ITA_DATE_MODIFIED
+       ,ITA_MODIFIED_BY
+       ,ITA_CREATED_BY
+       ,ITA_QUERY
+       ,ITA_DISPLAYED
+       ,ITA_DISP_WIDTH
+       ,ITA_INSPECTABLE
+       ,ITA_CASE
+       )
+SELECT 
+        'PRO$'
+       ,'HPAL_EMAIL_SUBJECT'
+       ,'N'
+       ,7
+       ,'N'
+       ,'VARCHAR2'
+       ,100
+       ,null
+       ,'Text 1'
+       ,''
+       ,'N'
+       ,''
+       ,null
+       ,null
+       ,'TEXT_1'
+       ,'TEXT_1'
+       ,to_date('20100505000000','YYYYMMDDHH24MISS')
+       ,null
+       ,'N'
+       ,null
+       ,null
+       ,''
+       ,'N'
+       ,'N'
+       ,to_date('20100505173702','YYYYMMDDHH24MISS')
+       ,to_date('20100505173702','YYYYMMDDHH24MISS')
+       ,'DORSET'
+       ,'DORSET'
+       ,''
+       ,'N'
+       ,null
+       ,'N'
+       ,'MIXED' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ATTRIBS_ALL
+                   WHERE ITA_INV_TYPE = 'PRO$'
+                    AND  ITA_ATTRIB_NAME = 'HPAL_EMAIL_SUBJECT');
+--
+INSERT INTO NM_INV_TYPE_ATTRIBS_ALL
+       (ITA_INV_TYPE
+       ,ITA_ATTRIB_NAME
+       ,ITA_DYNAMIC_ATTRIB
+       ,ITA_DISP_SEQ_NO
+       ,ITA_MANDATORY_YN
+       ,ITA_FORMAT
+       ,ITA_FLD_LENGTH
+       ,ITA_DEC_PLACES
+       ,ITA_SCRN_TEXT
+       ,ITA_ID_DOMAIN
+       ,ITA_VALIDATE_YN
+       ,ITA_DTP_CODE
+       ,ITA_MAX
+       ,ITA_MIN
+       ,ITA_VIEW_ATTRI
+       ,ITA_VIEW_COL_NAME
+       ,ITA_START_DATE
+       ,ITA_END_DATE
+       ,ITA_QUERYABLE
+       ,ITA_UKPMS_PARAM_NO
+       ,ITA_UNITS
+       ,ITA_FORMAT_MASK
+       ,ITA_EXCLUSIVE
+       ,ITA_KEEP_HISTORY_YN
+       ,ITA_DATE_CREATED
+       ,ITA_DATE_MODIFIED
+       ,ITA_MODIFIED_BY
+       ,ITA_CREATED_BY
+       ,ITA_QUERY
+       ,ITA_DISPLAYED
+       ,ITA_DISP_WIDTH
+       ,ITA_INSPECTABLE
+       ,ITA_CASE
+       )
+SELECT 
+        'PRO$'
+       ,'HPAL_ID'
+       ,'N'
+       ,1
+       ,'N'
+       ,'NUMBER'
+       ,38
+       ,null
+       ,'Primary Key'
+       ,''
+       ,'N'
+       ,''
+       ,null
+       ,null
+       ,'ID'
+       ,'ID'
+       ,to_date('20100505000000','YYYYMMDDHH24MISS')
+       ,null
+       ,'N'
+       ,null
+       ,null
+       ,''
+       ,'N'
+       ,'N'
+       ,to_date('20100505173432','YYYYMMDDHH24MISS')
+       ,to_date('20100505173432','YYYYMMDDHH24MISS')
+       ,'DORSET'
+       ,'DORSET'
+       ,''
+       ,'N'
+       ,null
+       ,'N'
+       ,'UPPER' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ATTRIBS_ALL
+                   WHERE ITA_INV_TYPE = 'PRO$'
+                    AND  ITA_ATTRIB_NAME = 'HPAL_ID');
+--
+INSERT INTO NM_INV_TYPE_ATTRIBS_ALL
+       (ITA_INV_TYPE
+       ,ITA_ATTRIB_NAME
+       ,ITA_DYNAMIC_ATTRIB
+       ,ITA_DISP_SEQ_NO
+       ,ITA_MANDATORY_YN
+       ,ITA_FORMAT
+       ,ITA_FLD_LENGTH
+       ,ITA_DEC_PLACES
+       ,ITA_SCRN_TEXT
+       ,ITA_ID_DOMAIN
+       ,ITA_VALIDATE_YN
+       ,ITA_DTP_CODE
+       ,ITA_MAX
+       ,ITA_MIN
+       ,ITA_VIEW_ATTRI
+       ,ITA_VIEW_COL_NAME
+       ,ITA_START_DATE
+       ,ITA_END_DATE
+       ,ITA_QUERYABLE
+       ,ITA_UKPMS_PARAM_NO
+       ,ITA_UNITS
+       ,ITA_FORMAT_MASK
+       ,ITA_EXCLUSIVE
+       ,ITA_KEEP_HISTORY_YN
+       ,ITA_DATE_CREATED
+       ,ITA_DATE_MODIFIED
+       ,ITA_MODIFIED_BY
+       ,ITA_CREATED_BY
+       ,ITA_QUERY
+       ,ITA_DISPLAYED
+       ,ITA_DISP_WIDTH
+       ,ITA_INSPECTABLE
+       ,ITA_CASE
+       )
+SELECT 
+        'PRO$'
+       ,'HPAL_INITIATED_USER'
+       ,'N'
+       ,8
+       ,'N'
+       ,'VARCHAR2'
+       ,30
+       ,null
+       ,'Initiator'
+       ,''
+       ,'N'
+       ,''
+       ,null
+       ,null
+       ,'INITIATOR'
+       ,'INITIATOR'
+       ,to_date('20100505000000','YYYYMMDDHH24MISS')
+       ,null
+       ,'N'
+       ,null
+       ,null
+       ,''
+       ,'N'
+       ,'N'
+       ,to_date('20100505173800','YYYYMMDDHH24MISS')
+       ,to_date('20100505173800','YYYYMMDDHH24MISS')
+       ,'DORSET'
+       ,'DORSET'
+       ,'SELECT hus_initials,hus_name,hus_username'||CHR(10)||'    FROM hig_users'||CHR(10)||'    WHERE hus_end_date is null'
+       ,'N'
+       ,null
+       ,'N'
+       ,'MIXED' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ATTRIBS_ALL
+                   WHERE ITA_INV_TYPE = 'PRO$'
+                    AND  ITA_ATTRIB_NAME = 'HPAL_INITIATED_USER');
+--
+INSERT INTO NM_INV_TYPE_ATTRIBS_ALL
+       (ITA_INV_TYPE
+       ,ITA_ATTRIB_NAME
+       ,ITA_DYNAMIC_ATTRIB
+       ,ITA_DISP_SEQ_NO
+       ,ITA_MANDATORY_YN
+       ,ITA_FORMAT
+       ,ITA_FLD_LENGTH
+       ,ITA_DEC_PLACES
+       ,ITA_SCRN_TEXT
+       ,ITA_ID_DOMAIN
+       ,ITA_VALIDATE_YN
+       ,ITA_DTP_CODE
+       ,ITA_MAX
+       ,ITA_MIN
+       ,ITA_VIEW_ATTRI
+       ,ITA_VIEW_COL_NAME
+       ,ITA_START_DATE
+       ,ITA_END_DATE
+       ,ITA_QUERYABLE
+       ,ITA_UKPMS_PARAM_NO
+       ,ITA_UNITS
+       ,ITA_FORMAT_MASK
+       ,ITA_EXCLUSIVE
+       ,ITA_KEEP_HISTORY_YN
+       ,ITA_DATE_CREATED
+       ,ITA_DATE_MODIFIED
+       ,ITA_MODIFIED_BY
+       ,ITA_CREATED_BY
+       ,ITA_QUERY
+       ,ITA_DISPLAYED
+       ,ITA_DISP_WIDTH
+       ,ITA_INSPECTABLE
+       ,ITA_CASE
+       )
+SELECT 
+        'PRO$'
+       ,'HPAL_JOB_RUN_SEQ'
+       ,'N'
+       ,13
+       ,'N'
+       ,'NUMBER'
+       ,38
+       ,null
+       ,'Job Run Seq'
+       ,''
+       ,'N'
+       ,''
+       ,null
+       ,null
+       ,'JOB_RUN_SEQ'
+       ,'JOB_RUN_SEQ'
+       ,to_date('20100510000000','YYYYMMDDHH24MISS')
+       ,null
+       ,'N'
+       ,null
+       ,null
+       ,''
+       ,'N'
+       ,'N'
+       ,to_date('20100510140714','YYYYMMDDHH24MISS')
+       ,to_date('20100510140714','YYYYMMDDHH24MISS')
+       ,'HIGHWAYS'
+       ,'HIGHWAYS'
+       ,''
+       ,'N'
+       ,null
+       ,'N'
+       ,'UPPER' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ATTRIBS_ALL
+                   WHERE ITA_INV_TYPE = 'PRO$'
+                    AND  ITA_ATTRIB_NAME = 'HPAL_JOB_RUN_SEQ');
+--
+INSERT INTO NM_INV_TYPE_ATTRIBS_ALL
+       (ITA_INV_TYPE
+       ,ITA_ATTRIB_NAME
+       ,ITA_DYNAMIC_ATTRIB
+       ,ITA_DISP_SEQ_NO
+       ,ITA_MANDATORY_YN
+       ,ITA_FORMAT
+       ,ITA_FLD_LENGTH
+       ,ITA_DEC_PLACES
+       ,ITA_SCRN_TEXT
+       ,ITA_ID_DOMAIN
+       ,ITA_VALIDATE_YN
+       ,ITA_DTP_CODE
+       ,ITA_MAX
+       ,ITA_MIN
+       ,ITA_VIEW_ATTRI
+       ,ITA_VIEW_COL_NAME
+       ,ITA_START_DATE
+       ,ITA_END_DATE
+       ,ITA_QUERYABLE
+       ,ITA_UKPMS_PARAM_NO
+       ,ITA_UNITS
+       ,ITA_FORMAT_MASK
+       ,ITA_EXCLUSIVE
+       ,ITA_KEEP_HISTORY_YN
+       ,ITA_DATE_CREATED
+       ,ITA_DATE_MODIFIED
+       ,ITA_MODIFIED_BY
+       ,ITA_CREATED_BY
+       ,ITA_QUERY
+       ,ITA_DISPLAYED
+       ,ITA_DISP_WIDTH
+       ,ITA_INSPECTABLE
+       ,ITA_CASE
+       )
+SELECT 
+        'PRO$'
+       ,'HPAL_PROCESS_ID'
+       ,'N'
+       ,12
+       ,'N'
+       ,'NUMBER'
+       ,38
+       ,null
+       ,'Process ID'
+       ,''
+       ,'N'
+       ,''
+       ,null
+       ,null
+       ,'Process_ID'
+       ,'Process_ID'
+       ,to_date('20100505000000','YYYYMMDDHH24MISS')
+       ,null
+       ,'N'
+       ,null
+       ,null
+       ,''
+       ,'N'
+       ,'N'
+       ,to_date('20100505174040','YYYYMMDDHH24MISS')
+       ,to_date('20100505174040','YYYYMMDDHH24MISS')
+       ,'DORSET'
+       ,'DORSET'
+       ,''
+       ,'N'
+       ,null
+       ,'N'
+       ,'MIXED' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ATTRIBS_ALL
+                   WHERE ITA_INV_TYPE = 'PRO$'
+                    AND  ITA_ATTRIB_NAME = 'HPAL_PROCESS_ID');
+--
+INSERT INTO NM_INV_TYPE_ATTRIBS_ALL
+       (ITA_INV_TYPE
+       ,ITA_ATTRIB_NAME
+       ,ITA_DYNAMIC_ATTRIB
+       ,ITA_DISP_SEQ_NO
+       ,ITA_MANDATORY_YN
+       ,ITA_FORMAT
+       ,ITA_FLD_LENGTH
+       ,ITA_DEC_PLACES
+       ,ITA_SCRN_TEXT
+       ,ITA_ID_DOMAIN
+       ,ITA_VALIDATE_YN
+       ,ITA_DTP_CODE
+       ,ITA_MAX
+       ,ITA_MIN
+       ,ITA_VIEW_ATTRI
+       ,ITA_VIEW_COL_NAME
+       ,ITA_START_DATE
+       ,ITA_END_DATE
+       ,ITA_QUERYABLE
+       ,ITA_UKPMS_PARAM_NO
+       ,ITA_UNITS
+       ,ITA_FORMAT_MASK
+       ,ITA_EXCLUSIVE
+       ,ITA_KEEP_HISTORY_YN
+       ,ITA_DATE_CREATED
+       ,ITA_DATE_MODIFIED
+       ,ITA_MODIFIED_BY
+       ,ITA_CREATED_BY
+       ,ITA_QUERY
+       ,ITA_DISPLAYED
+       ,ITA_DISP_WIDTH
+       ,ITA_INSPECTABLE
+       ,ITA_CASE
+       )
+SELECT 
+        'PRO$'
+       ,'HPAL_PROCESS_TYPE_ID'
+       ,'N'
+       ,9
+       ,'N'
+       ,'NUMBER'
+       ,38
+       ,null
+       ,'Process Type ID'
+       ,''
+       ,'N'
+       ,''
+       ,null
+       ,null
+       ,'PROCESS_TYPE'
+       ,'PROCESS_TYPE'
+       ,to_date('20100505000000','YYYYMMDDHH24MISS')
+       ,null
+       ,'N'
+       ,null
+       ,null
+       ,''
+       ,'N'
+       ,'N'
+       ,to_date('20100505173829','YYYYMMDDHH24MISS')
+       ,to_date('20100505173947','YYYYMMDDHH24MISS')
+       ,'DORSET'
+       ,'DORSET'
+       ,'SELECT '||CHR(10)||''||CHR(10)||'HPT_NAME,HPT_DESCR,HPT_PROCESS_TYPE_ID FROM HIG_PROCESS_TYPES'||CHR(10)||'ORDER BY HPT_NAME'
+       ,'N'
+       ,null
+       ,'N'
+       ,'UPPER' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ATTRIBS_ALL
+                   WHERE ITA_INV_TYPE = 'PRO$'
+                    AND  ITA_ATTRIB_NAME = 'HPAL_PROCESS_TYPE_ID');
+--
+INSERT INTO NM_INV_TYPE_ATTRIBS_ALL
+       (ITA_INV_TYPE
+       ,ITA_ATTRIB_NAME
+       ,ITA_DYNAMIC_ATTRIB
+       ,ITA_DISP_SEQ_NO
+       ,ITA_MANDATORY_YN
+       ,ITA_FORMAT
+       ,ITA_FLD_LENGTH
+       ,ITA_DEC_PLACES
+       ,ITA_SCRN_TEXT
+       ,ITA_ID_DOMAIN
+       ,ITA_VALIDATE_YN
+       ,ITA_DTP_CODE
+       ,ITA_MAX
+       ,ITA_MIN
+       ,ITA_VIEW_ATTRI
+       ,ITA_VIEW_COL_NAME
+       ,ITA_START_DATE
+       ,ITA_END_DATE
+       ,ITA_QUERYABLE
+       ,ITA_UKPMS_PARAM_NO
+       ,ITA_UNITS
+       ,ITA_FORMAT_MASK
+       ,ITA_EXCLUSIVE
+       ,ITA_KEEP_HISTORY_YN
+       ,ITA_DATE_CREATED
+       ,ITA_DATE_MODIFIED
+       ,ITA_MODIFIED_BY
+       ,ITA_CREATED_BY
+       ,ITA_QUERY
+       ,ITA_DISPLAYED
+       ,ITA_DISP_WIDTH
+       ,ITA_INSPECTABLE
+       ,ITA_CASE
+       )
+SELECT 
+        'PRO$'
+       ,'HPAL_SUCCESS_FLAG'
+       ,'N'
+       ,14
+       ,'N'
+       ,'VARCHAR2'
+       ,1
+       ,null
+       ,'Outcome'
+       ,''
+       ,'N'
+       ,''
+       ,null
+       ,null
+       ,'OUTCOME'
+       ,'OUTCOME'
+       ,to_date('20100510000000','YYYYMMDDHH24MISS')
+       ,null
+       ,'N'
+       ,null
+       ,null
+       ,''
+       ,'N'
+       ,'N'
+       ,to_date('20100510140805','YYYYMMDDHH24MISS')
+       ,to_date('20100510141118','YYYYMMDDHH24MISS')
+       ,'HIGHWAYS'
+       ,'HIGHWAYS'
+       ,'SELECT HCO_CODE,HCO_MEANING,HCO_CODE '||CHR(10)||''||CHR(10)||'CODE FROM HIG_CODES WHERE '||CHR(10)||'HCO_DOMAIN = ''PROCESS_SUCCESS_FLAG'' AND HCO_CODE != ''TBD'' '||CHR(10)||'ORDER BY HCO_SEQ'
+       ,'N'
+       ,null
+       ,'N'
+       ,'MIXED' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ATTRIBS_ALL
+                   WHERE ITA_INV_TYPE = 'PRO$'
+                    AND  ITA_ATTRIB_NAME = 'HPAL_SUCCESS_FLAG');
+--
+INSERT INTO NM_INV_TYPE_ATTRIBS_ALL
+       (ITA_INV_TYPE
+       ,ITA_ATTRIB_NAME
+       ,ITA_DYNAMIC_ATTRIB
+       ,ITA_DISP_SEQ_NO
+       ,ITA_MANDATORY_YN
+       ,ITA_FORMAT
+       ,ITA_FLD_LENGTH
+       ,ITA_DEC_PLACES
+       ,ITA_SCRN_TEXT
+       ,ITA_ID_DOMAIN
+       ,ITA_VALIDATE_YN
+       ,ITA_DTP_CODE
+       ,ITA_MAX
+       ,ITA_MIN
+       ,ITA_VIEW_ATTRI
+       ,ITA_VIEW_COL_NAME
+       ,ITA_START_DATE
+       ,ITA_END_DATE
+       ,ITA_QUERYABLE
+       ,ITA_UKPMS_PARAM_NO
+       ,ITA_UNITS
+       ,ITA_FORMAT_MASK
+       ,ITA_EXCLUSIVE
+       ,ITA_KEEP_HISTORY_YN
+       ,ITA_DATE_CREATED
+       ,ITA_DATE_MODIFIED
+       ,ITA_MODIFIED_BY
+       ,ITA_CREATED_BY
+       ,ITA_QUERY
+       ,ITA_DISPLAYED
+       ,ITA_DISP_WIDTH
+       ,ITA_INSPECTABLE
+       ,ITA_CASE
+       )
+SELECT 
+        'PRO$'
+       ,'HPAL_UNIT_CODE'
+       ,'N'
+       ,10
+       ,'N'
+       ,'VARCHAR2'
+       ,10
+       ,null
+       ,'Admin Unit Code'
+       ,''
+       ,'N'
+       ,''
+       ,null
+       ,null
+       ,'UNIT_CODE'
+       ,'UNIT_CODE'
+       ,to_date('20100505000000','YYYYMMDDHH24MISS')
+       ,null
+       ,'N'
+       ,null
+       ,null
+       ,''
+       ,'N'
+       ,'N'
+       ,to_date('20100505174040','YYYYMMDDHH24MISS')
+       ,to_date('20100505174040','YYYYMMDDHH24MISS')
+       ,'DORSET'
+       ,'DORSET'
+       ,'SELECT nau_unit_code,nau_name,nau_unit_code'||CHR(10)||'    FROM   nm_admin_units'
+       ,'N'
+       ,null
+       ,'N'
+       ,'MIXED' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ATTRIBS_ALL
+                   WHERE ITA_INV_TYPE = 'PRO$'
+                    AND  ITA_ATTRIB_NAME = 'HPAL_UNIT_CODE');
+--
+INSERT INTO NM_INV_TYPE_ATTRIBS_ALL
+       (ITA_INV_TYPE
+       ,ITA_ATTRIB_NAME
+       ,ITA_DYNAMIC_ATTRIB
+       ,ITA_DISP_SEQ_NO
+       ,ITA_MANDATORY_YN
+       ,ITA_FORMAT
+       ,ITA_FLD_LENGTH
+       ,ITA_DEC_PLACES
+       ,ITA_SCRN_TEXT
+       ,ITA_ID_DOMAIN
+       ,ITA_VALIDATE_YN
+       ,ITA_DTP_CODE
+       ,ITA_MAX
+       ,ITA_MIN
+       ,ITA_VIEW_ATTRI
+       ,ITA_VIEW_COL_NAME
+       ,ITA_START_DATE
+       ,ITA_END_DATE
+       ,ITA_QUERYABLE
+       ,ITA_UKPMS_PARAM_NO
+       ,ITA_UNITS
+       ,ITA_FORMAT_MASK
+       ,ITA_EXCLUSIVE
+       ,ITA_KEEP_HISTORY_YN
+       ,ITA_DATE_CREATED
+       ,ITA_DATE_MODIFIED
+       ,ITA_MODIFIED_BY
+       ,ITA_CREATED_BY
+       ,ITA_QUERY
+       ,ITA_DISPLAYED
+       ,ITA_DISP_WIDTH
+       ,ITA_INSPECTABLE
+       ,ITA_CASE
+       )
+SELECT 
+        'PRO$'
+       ,'HPAL_UNIT_NAME'
+       ,'N'
+       ,11
+       ,'N'
+       ,'VARCHAR2'
+       ,40
+       ,null
+       ,'Admin Unit Name'
+       ,''
+       ,'N'
+       ,''
+       ,null
+       ,null
+       ,'UNIT_NAME'
+       ,'UNIT_NAME'
+       ,to_date('20100505000000','YYYYMMDDHH24MISS')
+       ,null
+       ,'N'
+       ,null
+       ,null
+       ,''
+       ,'N'
+       ,'N'
+       ,to_date('20100505174040','YYYYMMDDHH24MISS')
+       ,to_date('20100505174040','YYYYMMDDHH24MISS')
+       ,'DORSET'
+       ,'DORSET'
+       ,'SELECT nau_unit_code,nau_name,nau_name'||CHR(10)||'    FROM   nm_admin_units'
+       ,'N'
+       ,null
+       ,'N'
+       ,'MIXED' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ATTRIBS_ALL
+                   WHERE ITA_INV_TYPE = 'PRO$'
+                    AND  ITA_ATTRIB_NAME = 'HPAL_UNIT_NAME');
 --
 --
 --
