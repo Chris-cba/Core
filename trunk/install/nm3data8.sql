@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.17   Oct 14 2010 16:35:42   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data8.sql-arc   2.18   Oct 14 2010 17:37:58   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data8.sql  $
---       Date into PVCS   : $Date:   Oct 14 2010 16:35:42  $
---       Date fetched Out : $Modtime:   Oct 14 2010 16:35:02  $
---       Version          : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Oct 14 2010 17:37:58  $
+--       Date fetched Out : $Modtime:   Oct 14 2010 17:34:52  $
+--       Version          : $Revision:   2.18  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 14-OCT-2010 16:35
+--       Generation Date  : 14-OCT-2010 17:34
 --
 --   Product metadata script
 --   As at Release 4.3.0.0
@@ -21,6 +21,7 @@
 --   NM_LAYER_TREE
 --   NM_INV_TYPES_ALL
 --   NM_INV_TYPE_ATTRIBS_ALL
+--   NM_INV_TYPE_ROLES
 --
 -----------------------------------------------------------------------------
 
@@ -2288,6 +2289,37 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ATTRIBS_ALL
                    WHERE ITA_INV_TYPE = 'PRO$'
                     AND  ITA_ATTRIB_NAME = 'HPAL_UNIT_NAME');
+--
+--
+--
+----------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------
+-- NM_INV_TYPE_ROLES
+--
+-- select * from nm3_metadata.nm_inv_type_roles
+-- order by itr_inv_type
+--         ,itr_hro_role
+--
+----------------------------------------------------------------------------------------
+
+SET TERM ON
+PROMPT nm_inv_type_roles
+SET TERM OFF
+
+INSERT INTO NM_INV_TYPE_ROLES
+       (ITR_INV_TYPE
+       ,ITR_HRO_ROLE
+       ,ITR_MODE
+       )
+SELECT 
+        'PRO$'
+       ,'HIG_USER'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_INV_TYPE_ROLES
+                   WHERE ITR_INV_TYPE = 'PRO$'
+                    AND  ITR_HRO_ROLE = 'HIG_USER');
 --
 --
 --
