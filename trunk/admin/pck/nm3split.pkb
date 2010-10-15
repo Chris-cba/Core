@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.9   Sep 29 2010 16:13:30   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.10   Oct 15 2010 13:51:00   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Sep 29 2010 16:13:30  $
---       Date fetched Out : $Modtime:   Sep 29 2010 16:00:38  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Oct 15 2010 13:51:00  $
+--       Date fetched Out : $Modtime:   Oct 15 2010 13:50:30  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -1548,7 +1548,7 @@ BEGIN
      IF Nm3net.is_nt_inclusion(pi_ne_rec.ne_nt_type) THEN
             set_output_params(Nm3type.c_net
                              ,361  -- cannot split group
-                             ,CHR(10)||'Auto-Inclusion detected betwen Network Type '||pi_ne_rec.ne_nt_type||' and datum network.');
+                             ,CHR(10)||'Auto-Inclusion detected between Network Type '||pi_ne_rec.ne_nt_type||' and datum network.');
             RETURN(FALSE);
      END IF;
 
