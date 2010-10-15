@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.33.1.1   Jul 07 2010 15:30:52   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.33.1.2   Oct 15 2010 09:51:52   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jul 07 2010 15:30:52  $
---       Date fetched Out : $Modtime:   Jul 07 2010 15:30:30  $
---       PVCS Version     : $Revision:   2.33.1.1  $
+--       Date into PVCS   : $Date:   Oct 15 2010 09:51:52  $
+--       Date fetched Out : $Modtime:   Oct 15 2010 09:51:22  $
+--       PVCS Version     : $Revision:   2.33.1.2  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.33.1.1  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.33.1.2  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -10166,7 +10166,8 @@ END;
 
 FUNCTION join_ntl_array( p_nth IN NM_THEMES_ALL%ROWTYPE, p_ntl IN nm_theme_list  ) RETURN nm_theme_list  IS
 curstr VARCHAR2(2000);
-retval nm_theme_list := Nm3array.init_nm_theme_list;
+retval  nm_theme_list := Nm3array.init_nm_theme_list;
+retval2 nm_theme_list := Nm3array.init_nm_theme_list;
 BEGIN
   --curstr := 'select nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  :new_name, a.ntd_distance, a.ntd_measure, :new_descr )   '||
 
@@ -10175,7 +10176,9 @@ BEGIN
     curstr := 'select /*+cardinality( a '||to_char( p_ntl.ntl_theme_list.last)||') */ '||
               ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  '||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr )   '||
               ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||
-              ' where a.ntd_pk_id  = '||p_nth.nth_feature_pk_column||' order by  a.ntd_distance';
+              ' where a.ntd_pk_id  = '||p_nth.nth_feature_pk_column||
+              ' group by :new_theme, a.ntd_pk_id, a.ntd_fk_id,  '||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr '||
+              ' order by  a.ntd_distance';
 
   else
 
@@ -10193,17 +10196,24 @@ BEGIN
               ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||' f,'||p_nth.nth_table_name||' t'||
               ' where a.ntd_pk_id  = f.'||p_nth.nth_feature_pk_column||
               ' and   f.'||NVL(p_nth.nth_feature_fk_column,p_nth.nth_feature_pk_column)||' =  t.'||p_nth.nth_pk_column||
+              ' group by :new_theme, a.ntd_pk_id, a.ntd_fk_id,  '||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr '||
               ' order by  a.ntd_distance';
 
   end if;
 
---  nm_debug.debug_on;
---  nm_debug.debug(curstr);
-
+  nm_debug.debug_on;
+  nm_debug.debug(curstr);
+  
   EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.ntl_theme_list
     --USING p_nth.nth_theme_id, p_nth.nth_theme_name, p_nth.nth_theme_name, p_ntl;
     --USING p_nth.nth_theme_id, p_nth.nth_label_column, p_nth.nth_theme_name, p_ntl;
-    USING p_nth.nth_theme_id, p_nth.nth_theme_name, p_ntl;
+    USING p_nth.nth_theme_id, p_nth.nth_theme_name, p_ntl, p_nth.nth_theme_id, p_nth.nth_theme_name;
+
+--  select nm_theme_detail( a.ntd_theme_id, a.ntd_pk_id, a.ntd_fk_id, a.ntd_name, a.ntd_distance, a.ntd_measure, a.ntd_descr )
+--  bulk collect into retval2.ntl_theme_list
+--  from table ( retval.ntl_theme_list ) a
+--  group by ntd_theme_id, ntd_pk_id, ntd_fk_id, ntd_name, ntd_distance, ntd_measure, ntd_descr;
+
   RETURN retval;
 END;
 
