@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.8   Mar 15 2010 16:00:40   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3merge.pkb-arc   2.9   Oct 15 2010 13:53:24   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3merge.pkb  $
---       Date into PVCS   : $Date:   Mar 15 2010 16:00:40  $
---       Date fetched Out : $Modtime:   Mar 12 2010 16:06:44  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Oct 15 2010 13:53:24  $
+--       Date fetched Out : $Modtime:   Oct 15 2010 13:52:48  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --   Author : ITurnbull
 --
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3merge IS
 --   Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
    g_package_name    CONSTANT  varchar2(30)   := 'nm3merge';
 --
@@ -1847,7 +1847,7 @@ BEGIN
   ELSIF nm3net.is_nt_inclusion(l_ne_rec_1.ne_nt_type) THEN
             set_output_params(nm3type.c_net 
                              ,363  -- cannot merge group
-                             ,CHR(10)||'Auto-Inclusion detected betwen Network Type '||l_ne_rec_1.ne_nt_type||' and datum network.');
+                             ,CHR(10)||'Auto-Inclusion detected between Network Type '||l_ne_rec_1.ne_nt_type||' and datum network.');
             RETURN(FALSE);
 
   ELSIF nm3net.element_is_a_datum(pi_ne_type  =>  l_ne_rec_1.ne_type) AND nm3net.element_is_a_datum(pi_ne_type  =>  l_ne_rec_2.ne_type) THEN	  
