@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.9   Oct 14 2010 10:48:42   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.10   Oct 18 2010 15:47:26   ade.edwards  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Oct 14 2010 10:48:42  $
---       Date fetched Out : $Modtime:   Oct 14 2010 10:48:06  $
---       Version          : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Oct 18 2010 15:47:26  $
+--       Date fetched Out : $Modtime:   Oct 18 2010 15:46:34  $
+--       Version          : $Revision:   2.10  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb 1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.9  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.10  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -763,7 +763,7 @@ BEGIN
          append_both (p_ngqt_index,'        AND   '||c_table_alias||'.iit_inv_type||Null = '||nm3flx.string(l_rec_ngqt.ngqt_item_type)); -- Suppress index
       END IF;
    --
-      append_both (p_ngqt_index,'        AND   '||l_ne_id_col||' = nte.nte_ne_id_of /*gj*/');
+      append_both (p_ngqt_index,'        AND   '||l_ne_id_col||' = nte.nte_ne_id_of||null /*gj*/');
 
       IF l_rec_nit.nit_table_name IS NULL
       OR (l_rec_nit.nit_table_name           IS NOT NULL
@@ -779,6 +779,7 @@ BEGIN
         END IF;
       END IF;
       
+      build_flexible_where (l_rec_ngqt, p_ngqt_index);
       
     /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                                     ABERLOUR START
@@ -804,10 +805,12 @@ BEGIN
       append_both (p_ngqt_index,'                    FROM DUAL ');
       append_both (p_ngqt_index,'                 UNION ');
       append_both (p_ngqt_index,'                  SELECT level ');
-      append_both (p_ngqt_index,'                       , nm_ne_id_of                      nte_ne_id_of ');
-      append_both (p_ngqt_index,'                       , NVL(nm_slk,    nm_begin_mp)      nte_begin_mp ');
-      append_both (p_ngqt_index,'                       , NVL(nm_end_slk,nm_end_mp)        nte_end_mp');
-      append_both (p_ngqt_index,'                       , nm_seq_no                        nte_seq_no ');
+      append_both (p_ngqt_index,'                       , nm_ne_id_of                       nte_ne_id_of ');
+--      append_both (p_ngqt_index,'                       , NVL(nm_slk,    nm_begin_mp)      nte_begin_mp ');
+--      append_both (p_ngqt_index,'                       , NVL(nm_end_slk,nm_end_mp)        nte_end_mp');
+      append_both (p_ngqt_index,'                       , 0                                 nte_begin_mp ');
+      append_both (p_ngqt_index,'                       , nm3net.get_ne_length(nm_ne_id_of) nte_end_mp');
+      append_both (p_ngqt_index,'                       , nm_seq_no                         nte_seq_no ');
       append_both (p_ngqt_index,'                    FROM nm_members ');
       append_both (p_ngqt_index,'                 CONNECT BY PRIOR nm_ne_id_of = nm_ne_id_in ');
       append_both (p_ngqt_index,'                   START WITH nm_ne_id_in = '||l_rec_ngq.ngq_source_id||' ');
@@ -824,7 +827,7 @@ BEGIN
          append_both (p_ngqt_index,'        AND   '||c_table_alias||'.iit_inv_type||Null = '||nm3flx.string(l_rec_ngqt.ngqt_item_type)); -- Suppress index
       END IF;
    --
-      append_both (p_ngqt_index,'        AND   '||l_ne_id_col||' = nte.nte_ne_id_of');
+      append_both (p_ngqt_index,'        AND   '||l_ne_id_col||' = nte.nte_ne_id_of||null');
     --
       -- Task 0109984
       -- Don't attempt to use the chainage columns if they are not set on the metamodel
@@ -857,6 +860,9 @@ BEGIN
           END IF;
         END IF;
       END IF;
+      
+      build_flexible_where (l_rec_ngqt, p_ngqt_index);
+      
       /***********************************************************************
         Code for filtering on any Group data immediatly above the datum leve
         that shares the same datums. This helps identify assets where the
@@ -919,6 +925,9 @@ BEGIN
           END IF;
         END IF;
       END IF;
+      
+      build_flexible_where (l_rec_ngqt, p_ngqt_index);
+      
     /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                                     ABERLOUR END
     <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -936,9 +945,10 @@ BEGIN
       ELSE
          append_list (p_ngqt_index,'       WHERE  1=1');
       END IF;
+      build_flexible_where (l_rec_ngqt, p_ngqt_index);
    END IF;
 --
-   build_flexible_where (l_rec_ngqt, p_ngqt_index);
+--   build_flexible_where (l_rec_ngqt, p_ngqt_index);
 --
    append_area (p_ngqt_index,'       ORDER BY nte.nte_seq_no, '||l_begin_mp_col);
 --
@@ -1137,9 +1147,9 @@ BEGIN
             append_all  (p_index,l_close_bracket_for_in,FALSE);
          END IF;
 --
-      NM_DEBUG.DEBUG_ON;
+--      NM_DEBUG.DEBUG_ON;
       NM_DEBUG.DEBUG(g_tab_flexible_where(p_index));
-      NM_DEBUG.DEBUG_OFF;
+--      NM_DEBUG.DEBUG_OFF;
       IF l_rec_ngqa.ngqa_attrib_name = 'IIT_PRIMARY_KEY'
          AND  NOT nm3inv.attrib_in_use(pi_inv_type => p_rec_ngqt.ngqt_item_type_type
                                        ,pi_attrib_name => 'IIT_PRIMARY_KEY')THEN
@@ -1422,10 +1432,12 @@ END execute_sql_area;
 PROCEDURE execute_sql_item (p_index pls_integer) IS
    l_rc pls_integer;
 BEGIN
+--   nm_debug.debug_on;
 --   nm_debug.debug(g_tab_ngqt_list_sql(p_index));
    EXECUTE IMMEDIATE g_tab_ngqt_list_sql(p_index);
    l_rc := SQL%rowcount;
 --   nm_debug.debug('done :'||l_rc);
+--   nm_debug.debug_off;
 END execute_sql_item;
 --
 -----------------------------------------------------------------------------

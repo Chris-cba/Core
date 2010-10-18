@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.14   Oct 04 2010 15:10:42   ade.edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.15   Oct 18 2010 15:47:26   ade.edwards  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Oct 04 2010 15:10:42  $
---       Date fetched Out : $Modtime:   Oct 04 2010 14:53:10  $
---       PVCS Version     : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Oct 18 2010 15:47:26  $
+--       Date fetched Out : $Modtime:   Oct 18 2010 15:46:26  $
+--       PVCS Version     : $Revision:   2.15  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.14  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.15  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -760,6 +760,18 @@ BEGIN
       l_nm_type                       := nm3flx.string('I');
       l_nm_obj_type                   := nm3flx.string(l_rec_nit.nit_inv_type);
    END IF;
+--
+   IF( l_rec_nit.nit_lr_ne_column_name IS NULL
+     OR  l_rec_nit.nit_lr_st_chain IS NULL )
+   THEN
+     hig.raise_ner(pi_appl               => nm3type.c_net
+                  ,pi_id                 => 465
+                  ,pi_supplementary_info => CASE WHEN l_rec_nit.nit_lr_st_chain IS NULL
+                                            THEN ' [ Start Chain Column is not defined ]'
+                                            ELSE ' [ NE Column is not defined ]'
+                                            END);
+   END IF;
+--
    g_rec_ngqi := p_rec_ngqi;
 --
    l_block :=            'BEGIN'
@@ -789,7 +801,8 @@ BEGIN
               --||CHR(10)||'    FROM (SELECT nrw.ne_id'
               ||CHR(10)||'    FROM (SELECT * FROM  ( SELECT nrw.ne_id'
               ||CHR(10)||'                ,GREATEST(nm.'||l_rec_nit.nit_lr_st_chain||',nrw.nm_begin_mp) nm_begin_mp'
-              ||CHR(10)||'                ,LEAST(nm.'||l_rec_nit.nit_lr_end_chain||',nrw.nm_end_mp)     nm_end_mp'
+              ||CHR(10)||'                ,LEAST(nm.'||NVL(l_rec_nit.nit_lr_end_chain
+                                                          ,l_rec_nit.nit_lr_st_chain)||',nrw.nm_end_mp)     nm_end_mp'
               ||CHR(10)||'                ,nrw.nm_seq_no'
               ||CHR(10)||'                ,nrw.nm_seg_no'
               ||CHR(10)||'                ,nrw.nm_cardinality'
@@ -799,7 +812,8 @@ BEGIN
               ||CHR(10)||'                ,'||l_rec_nit.nit_table_name||' nm'
               ||CHR(10)||'          WHERE  nm.'||l_rec_nit.nit_foreign_pk_column||' = '||g_package_name||'.g_rec_ngqi.ngqi_item_id'
               ||CHR(10)||'           AND   nm.'||l_rec_nit.nit_lr_ne_column_name||' = nrw.ne_id'
-              ||CHR(10)||'           AND   nm.'||l_rec_nit.nit_lr_end_chain||' >= nrw.nm_begin_mp'
+              ||CHR(10)||'           AND   nm.'||NVL(l_rec_nit.nit_lr_end_chain
+                                                    ,l_rec_nit.nit_lr_st_chain)||' >= nrw.nm_begin_mp'
               ||CHR(10)||'           AND   nm.'||l_rec_nit.nit_lr_st_chain||' <= nrw.nm_end_mp'
               ||CHR(10)||'       -- '
               --
@@ -810,7 +824,8 @@ BEGIN
               ||CHR(10)||'       -- '
               ||CHR(10)||'           SELECT ex.nm_ne_id_in ne_id '
               ||CHR(10)||'                ,qry.'||l_rec_nit.nit_lr_st_chain||'  nm_begin_mp '
-              ||CHR(10)||'                ,qry.'||l_rec_nit.nit_lr_end_chain||' nm_end_mp '
+              ||CHR(10)||'                ,qry.'||NVL(l_rec_nit.nit_lr_end_chain
+                                                     ,l_rec_nit.nit_lr_st_chain)||' nm_end_mp '
               ||CHR(10)||'                , ex.nm_seq_no '
               ||CHR(10)||'                , ex.nm_seg_no '
               ||CHR(10)||'                , ex.nm_cardinality '
@@ -821,7 +836,8 @@ BEGIN
               ||CHR(10)||'              AND  qry.'||l_rec_nit.nit_foreign_pk_column||' = '||g_package_name||'.g_rec_ngqi.ngqi_item_id'
               ||CHR(10)||'              AND  ex.nm_ne_id_of = nte_ne_id_of '
               ||CHR(10)||'              AND  qry.'||l_rec_nit.nit_lr_ne_column_name||' = ex.nm_ne_id_in '
-              ||CHR(10)||'              AND  qry.'||l_rec_nit.nit_lr_end_chain||' >= ex.nm_slk'
+              ||CHR(10)||'              AND  qry.'||NVL(l_rec_nit.nit_lr_end_chain
+                                                       ,l_rec_nit.nit_lr_st_chain)||' >= ex.nm_slk'
               ||CHR(10)||'              AND  qry.'||l_rec_nit.nit_lr_st_chain||' <= ex.nm_end_slk'
               ||CHR(10)||'           )'
               ||CHR(10)||' -- '
@@ -831,7 +847,7 @@ BEGIN
               ||CHR(10)||'END;';
 --
 --  nm_debug.debug_on;
---  nm_debug.debug(l_block);
+  nm_debug.debug(l_block);
 --  nm_debug.debug_off;
    EXECUTE IMMEDIATE l_block;
 --
@@ -2179,9 +2195,9 @@ FUNCTION is_ft_inv_type_on_network(pi_nit_rec nm_inv_types%ROWTYPE) RETURN BOOLE
 BEGIN
 
   RETURN(is_ft_inv_type(pi_nit_rec => pi_nit_rec) 
-          AND pi_nit_rec.nit_lr_ne_column_name IS NOT NULL  -- columns to associate ft inv with network are specified i.e. this is on network
-          AND pi_nit_rec.nit_lr_st_chain  IS NOT NULL
-          AND pi_nit_rec.nit_lr_end_chain  IS NOT NULL);
+          AND pi_nit_rec.nit_lr_ne_column_name IS NOT NULL);  -- columns to associate ft inv with network are specified i.e. this is on network
+          --AND pi_nit_rec.nit_lr_st_chain  IS NOT NULL );
+        --  AND pi_nit_rec.nit_lr_end_chain  IS NOT NULL);
 
 END is_ft_inv_type_on_network;
 --
@@ -2199,6 +2215,7 @@ PROCEDURE get_inv_datum_location_details (pi_iit_ne_id           IN     nm_inv_i
    l_rec_un              nm_units%ROWTYPE;
    l_rec_ne              nm_elements_all%ROWTYPE;
    l_rec_datum_loc_dets  rec_datum_loc_dets;
+   retval                tab_rec_datum_loc_dets;
 --
    l_iit_not_found       EXCEPTION;
    c_not_found_sqlcode CONSTANT pls_integer := -20500;
@@ -2235,36 +2252,62 @@ BEGIN
          l_rec_datum_loc_dets.nm_slk           := cs_rec.nm_slk;
          po_tab_datum_loc_dets(l_count)        := l_rec_datum_loc_dets;
       END LOOP;
-   ELSIF   is_ft_inv_type_on_network(pi_nit_rec => l_rec_nit) THEN     
-
+ --
+   ELSIF is_ft_inv_type_on_network(pi_nit_rec => l_rec_nit) 
+   THEN
       g_ft_pk_val := pi_iit_ne_id;
-      EXECUTE IMMEDIATE     'DECLARE'
-                 ||CHR(10)||'   CURSOR cs_ft (c_ft_pk_val NUMBER) IS'
-                 ||CHR(10)||'   SELECT *'
-                 ||CHR(10)||'    FROM  '||l_rec_nit.nit_table_name
-                 ||CHR(10)||'   WHERE  '||l_rec_nit.nit_foreign_pk_column||' = c_ft_pk_val;'
-                 ||CHR(10)||'   l_rec_ft '||l_rec_nit.nit_table_name||'%ROWTYPE;'
-                 ||CHR(10)||'   l_found  BOOLEAN;'
-                 ||CHR(10)||'   l_rec_datum_loc_dets '||g_package_name||'.rec_datum_loc_dets;'
-                 ||CHR(10)||'BEGIN'
-                 ||CHR(10)||'   OPEN  cs_ft ('||g_package_name||'.g_ft_pk_val);'
-                 ||CHR(10)||'   FETCH cs_ft INTO l_rec_ft;'
-                 ||CHR(10)||'   l_found := cs_ft%FOUND;'
-                 ||CHR(10)||'   CLOSE cs_ft;'
-                 ||CHR(10)||'   IF NOT l_found'
-                 ||CHR(10)||'    THEN'
-                 ||CHR(10)||'      hig.raise_ner (pi_appl               => nm3type.c_hig'
-                 ||CHR(10)||'                    ,pi_id                 => 67'
-                 ||CHR(10)||'                    ,pi_sqlcode            => '||c_not_found_sqlcode
-                 ||CHR(10)||'                    ,pi_supplementary_info => '||nm3flx.string(l_rec_nit.nit_table_name||'.'||l_rec_nit.nit_foreign_pk_column||'=')||'||'||g_package_name||'.g_ft_pk_val'
-                 ||CHR(10)||'                    );'
-                 ||CHR(10)||'   END IF;'
-                 ||CHR(10)||'   l_rec_datum_loc_dets.datum_ne_id      := l_rec_ft.'||l_rec_nit.nit_lr_ne_column_name||';'
-                 ||CHR(10)||'   l_rec_datum_loc_dets.nm_begin_mp      := l_rec_ft.'||l_rec_nit.nit_lr_st_chain||';'
-                 ||CHR(10)||'   l_rec_datum_loc_dets.nm_end_mp        := l_rec_ft.'||l_rec_nit.nit_lr_end_chain||';'
-                 ||CHR(10)||'   '||g_package_name||'.g_rec_datum_loc_dets := l_rec_datum_loc_dets;'
-                 ||CHR(10)||'END;';
-      po_tab_datum_loc_dets(1) := g_rec_datum_loc_dets;
+   --
+      DECLARE
+        l_sql        nm3type.max_varchar2;
+        l_pl         nm_placement_array;
+        l_ne_id      NUMBER;
+        l_st_chain   NUMBER;
+        l_end_chain  NUMBER;
+        l_rec_ne     nm_elements%ROWTYPE;
+      BEGIN
+      --
+        l_sql := 'SELECT '||l_rec_nit.nit_lr_ne_column_name
+                     ||','||NVL(l_rec_nit.nit_lr_st_chain,'NULL')
+                     ||','||NVL(NVL(l_rec_nit.nit_lr_end_chain,l_rec_nit.nit_lr_st_chain),'NULL')||
+                  ' FROM '||l_rec_nit.nit_table_name||
+                 ' WHERE '||l_rec_nit.nit_foreign_pk_column||' = :pk';
+      --
+--        nm_debug.debug_on;
+--        nm_debug.debug(l_sql);
+      --
+        EXECUTE IMMEDIATE l_sql INTO l_ne_id, l_st_chain, l_end_chain USING pi_iit_ne_id;
+      --
+        l_rec_ne := nm3get.get_ne ( pi_ne_id => l_ne_id, pi_raise_not_found => FALSE );
+      --
+      -------------------------------------------------------------
+      -- Only get sub placement for Groups (or datums, works fine)
+      -------------------------------------------------------------
+      --
+        IF l_rec_ne.ne_type IN ('S','G')
+        THEN 
+          l_sql :=  'SELECT nm3pla.get_sub_placement(nm_placement('||l_rec_nit.nit_lr_ne_column_name
+                                                              ||','||l_rec_nit.nit_lr_st_chain
+                                                              ||','||NVL(l_rec_nit.nit_lr_end_chain,l_rec_nit.nit_lr_st_chain)
+                                                              ||', NULL ) ) '
+         ||CHR(10)||'  FROM '||l_rec_nit.nit_table_name
+         ||CHR(10)||' WHERE '||l_rec_nit.nit_foreign_pk_column||' = :pk';
+        --
+          nm_debug.debug(l_sql);
+        --
+          EXECUTE IMMEDIATE l_sql INTO l_pl USING pi_iit_ne_id;
+        --
+          FOR i IN 1..l_pl.placement_count
+          LOOP
+            po_tab_datum_loc_dets(i).datum_ne_id := l_pl.get_entry(i).pl_ne_id;
+            po_tab_datum_loc_dets(i).nm_begin_mp := l_pl.get_entry(i).pl_start;
+            po_tab_datum_loc_dets(i).nm_end_mp   := l_pl.get_entry(i).pl_end;
+          END LOOP;
+        END IF;
+      --
+      EXCEPTION
+        WHEN NO_DATA_FOUND THEN NULL;
+      END;
+    --
    END IF;
 --
    l_rec_nt.nt_type         := nm3type.c_nvl;
@@ -2444,44 +2487,82 @@ FUNCTION get_foreign_placement_array (pi_iit_ne_id    IN nm_inv_items.iit_ne_id%
    l_tab_rec_datum_loc_dets tab_rec_datum_loc_dets;
    l_tab_nm_ne_id_in        nm3type.tab_number;
    l_pl_arr                 nm_placement_array := nm3pla.initialise_placement_array;
+   l_pl_datums              nm_placement_array := nm3pla.initialise_placement_array;
 BEGIN
    get_inv_datum_location_details (pi_iit_ne_id           => pi_iit_ne_id
                                   ,pi_nit_inv_type        => pi_nit_inv_type
                                   ,po_tab_datum_loc_dets  => l_tab_rec_datum_loc_dets
                                   );
-   SELECT nm_ne_id_in
-    BULK  COLLECT
-    INTO  l_tab_nm_ne_id_in
-    FROM  nm_members
-         ,nm_group_types
-   WHERE  nm_ne_id_of     = l_tab_rec_datum_loc_dets(1).datum_ne_id
-    AND   nm_type         = 'G'
-    AND   nm_obj_type     = NVL(pi_pref_lrm,nm_obj_type)
-    AND   nm_obj_type     = ngt_group_type
-    AND   ngt_linear_flag = 'Y'
-   GROUP BY nm_ne_id_in;
-   FOR i IN 1..l_tab_nm_ne_id_in.COUNT
-    LOOP
-      BEGIN
-         l_pl_arr := l_pl_arr.add_element (pl_ne_id   => l_tab_nm_ne_id_in(i)
-                                          ,pl_start   => nm3lrs.get_set_offset (p_ne_parent_id => l_tab_nm_ne_id_in(i)
-                                                                               ,p_ne_child_id  => l_tab_rec_datum_loc_dets(1).datum_ne_id
-                                                                               ,p_offset       => l_tab_rec_datum_loc_dets(1).nm_begin_mp
-                                                                               )
-                                          ,pl_end     => nm3lrs.get_set_offset (p_ne_parent_id => l_tab_nm_ne_id_in(i)
-                                                                               ,p_ne_child_id  => l_tab_rec_datum_loc_dets(1).datum_ne_id
-                                                                               ,p_offset       => l_tab_rec_datum_loc_dets(1).nm_end_mp
-                                                                               )
-                                          ,pl_measure => 0
-                                          ,pl_mrg_mem => FALSE
-                                          );
-      EXCEPTION
-         WHEN others
-          THEN
-            NULL;
-      END;
+ --
+ -- Reassemble the datum placements into a placement array and for each Linear type
+ -- get a superplacement
+ --
+   FOR i IN 1..l_tab_rec_datum_loc_dets.COUNT
+   LOOP
+     l_pl_datums := l_pl_datums.add_element
+                             ( pl_ne_id   => l_tab_rec_datum_loc_dets(i).datum_ne_id
+                             , pl_start   => l_tab_rec_datum_loc_dets(i).nm_begin_mp
+                             , pl_end     => l_tab_rec_datum_loc_dets(i).nm_end_mp
+                             , pl_mrg_mem => FALSE
+                             );
    END LOOP;
+ --
+   DECLARE
+     l_placement_array   nm_placement_array;
+   BEGIN
+     FOR i IN (SELECT nlt_gty_type 
+                 FROM nm_linear_types
+                WHERE nlt_gty_type IS NOT NULL)
+     LOOP
+       BEGIN
+         l_placement_array := nm3pla.get_super_placement(l_pl_datums, i.nlt_gty_type);
+         FOR z IN 1..l_placement_array.placement_count
+         LOOP
+           l_pl_arr := l_pl_arr.add_element 
+                                  ( pl_pl      =>  l_placement_array.get_entry(z)
+                                  , pl_mrg_mem =>  FALSE );
+         END LOOP;
+       EXCEPTION
+         WHEN OTHERS THEN NULL;
+       END;
+     END LOOP;
+   END;
+ --
    RETURN l_pl_arr;
+ --
+ --   SELECT nm_ne_id_in
+--    BULK  COLLECT
+--    INTO  l_tab_nm_ne_id_in
+--    FROM  nm_members
+--         ,nm_group_types
+--   WHERE  nm_ne_id_of     = l_tab_rec_datum_loc_dets(1).datum_ne_id
+--    AND   nm_type         = 'G'
+--    AND   nm_obj_type     = NVL(pi_pref_lrm,nm_obj_type)
+--    AND   nm_obj_type     = ngt_group_type
+--    AND   ngt_linear_flag = 'Y'
+--   GROUP BY nm_ne_id_in;
+-- --
+--   FOR i IN 1..l_tab_nm_ne_id_in.COUNT
+--    LOOP
+--      BEGIN
+--         l_pl_arr := l_pl_arr.add_element (pl_ne_id   => l_tab_nm_ne_id_in(i)
+--                                          ,pl_start   => nm3lrs.get_set_offset (p_ne_parent_id => l_tab_nm_ne_id_in(i)
+--                                                                               ,p_ne_child_id  => l_tab_rec_datum_loc_dets(1).datum_ne_id
+--                                                                               ,p_offset       => l_tab_rec_datum_loc_dets(1).nm_begin_mp
+--                                                                               )
+--                                          ,pl_end     => nm3lrs.get_set_offset (p_ne_parent_id => l_tab_nm_ne_id_in(i)
+--                                                                               ,p_ne_child_id  => l_tab_rec_datum_loc_dets(1).datum_ne_id
+--                                                                               ,p_offset       => l_tab_rec_datum_loc_dets(1).nm_end_mp
+--                                                                               )
+--                                          ,pl_measure => 0
+--                                          ,pl_mrg_mem => FALSE
+--                                          );
+--      EXCEPTION
+--         WHEN others
+--          THEN
+--            NULL;
+--      END;
+--   END LOOP;
 END get_foreign_placement_array;
 --
 -----------------------------------------------------------------------------
@@ -4024,59 +4105,89 @@ PROCEDURE get_non_linear_grp_membership (
 , pi_iit_ne_id                   IN     nm_inv_items.iit_ne_id%TYPE
 , po_tab_rec_nl_grp_membership   IN OUT nm3asset.tab_rec_nl_grp_membership )
 IS
-  --
-  -- For a given inventory item id get all of the non linear groups that it belongs to
-  --
-  CURSOR c_grp
-  IS
-      SELECT i.nm_ne_id_in iit_ne_id
-           , e.ne_id
-           , e.ne_unique
-           , e.ne_descr
-           , e.ne_gty_group_type
-           , gt.ngt_descr
-           , e.ne_nt_type
-        FROM nm_elements e
-           , nm_group_types gt
-           , nm_types t
-           , nm_members i
-           , nm_members g
-       --
-       -- Task 0109324
-       -- ECDM Log 722656
-       -- RC Rewrite where clause to work with both linear and point assets for partial groups
-       --
-       WHERE nt_type = ne_nt_type 
-         AND g.nm_ne_id_of = i.nm_ne_id_of
-         AND ( (    i.nm_begin_mp = i.nm_end_mp
-                    AND g.nm_begin_mp <= i.nm_end_mp
-                    AND g.nm_end_mp >= i.nm_begin_mp )
-                  OR (    i.nm_begin_mp < i.nm_end_mp
-                      AND g.nm_begin_mp < i.nm_end_mp
-                      AND g.nm_end_mp > i.nm_begin_mp ) )
-         AND g.nm_ne_id_in = ne_id
-         AND i.nm_ne_id_in = pi_iit_ne_id
-         AND ngt_group_type = ne_gty_group_type
-         AND nt_linear = 'N'
-    --
-    GROUP BY i.nm_ne_id_in
-           , e.ne_id
-           , e.ne_unique
-           , e.ne_descr
-           , e.ne_gty_group_type
-           , gt.ngt_descr
-           , e.ne_nt_type;
+  l_rec_nit     nm_inv_types%ROWTYPE;
+  b_join_to_mp  BOOLEAN ;
+  l_sql         nm3type.max_varchar2;
+  l_inv_members VARCHAR2(30);
+  l_inv_pk      VARCHAR2(30);
+  l_inv_ne_id   VARCHAR2(30);
+  l_inv_st_mp   VARCHAR2(30);
+  l_inv_end_mp  VARCHAR2(30);
+--
 BEGIN
+--
+  -- Task 0109984
+  -- Rewrite for FT Asset locations 
   --
-  -- ignore locations of FT inventory which does not come from memberships
-  --
-  IF NOT is_ft_inv_type ( nm3get.get_nit ( pi_iit_inv_type ) )
+--
+  l_rec_nit  := nm3get.get_nit ( pi_nit_inv_type => pi_iit_inv_type );
+--
+  IF l_rec_nit.nit_table_name IS NULL
   THEN
-    OPEN c_grp;
-    FETCH c_grp
-    BULK COLLECT INTO po_tab_rec_nl_grp_membership;
-    CLOSE c_grp;
+    l_inv_members  := 'nm_members';
+    l_inv_pk       := 'nm_ne_id_in';
+    l_inv_ne_id    := 'nm_ne_id_of';
+    l_inv_st_mp    := 'nm_begin_mp';
+    l_inv_end_mp   := 'nm_end_mp';
+    b_join_to_mp   := TRUE;
+  ELSE
+    l_inv_members  := l_rec_nit.nit_table_name;
+    l_inv_pk       := l_rec_nit.nit_foreign_pk_column;
+    l_inv_ne_id    := l_rec_nit.nit_lr_ne_column_name; 
+    l_inv_st_mp    := l_rec_nit.nit_lr_st_chain;
+    l_inv_end_mp   := NVL(l_rec_nit.nit_lr_end_chain,l_rec_nit.nit_lr_st_chain);
+    b_join_to_mp   := l_inv_st_mp IS NOT NULL;
   END IF;
+--
+  l_sql := ' SELECT i.'||l_inv_pk||' iit_ne_id '
+  ||CHR(10)||    ', e.ne_id '
+  ||CHR(10)||    ', e.ne_unique '
+  ||CHR(10)||    ', e.ne_descr '
+  ||CHR(10)||    ', e.ne_gty_group_type '
+  ||CHR(10)||    ', gt.ngt_descr '
+  ||CHR(10)||    ', e.ne_nt_type '
+  ||CHR(10)||' FROM nm_elements e '
+  ||CHR(10)||   ' , nm_group_types gt '
+  ||CHR(10)||   ' , nm_types t '
+  ||CHR(10)||   ' , '||l_inv_members||' i '
+  ||CHR(10)||   ' , nm_members g '
+  ||CHR(10)||'WHERE nt_type = ne_nt_type '
+  ||CHR(10)|| ' AND g.nm_ne_id_of = i.'||l_inv_ne_id||
+--
+  CASE 
+    WHEN b_join_to_mp
+    THEN
+      CHR(10)|| ' AND ( (    i.'||l_inv_st_mp||' = i.'||l_inv_end_mp
+    ||CHR(10)|| ' AND g.nm_begin_mp <= i.'||l_inv_st_mp
+    ||CHR(10)|| ' AND g.nm_end_mp >= i.'||l_inv_st_mp||' )'
+    ||CHR(10)|| '  OR (    i.'||l_inv_st_mp||' < i.'||l_inv_end_mp
+    ||CHR(10)||      ' AND g.nm_begin_mp < i.'||l_inv_end_mp
+    ||CHR(10)||      ' AND g.nm_end_mp > i.'||l_inv_st_mp||' ) '
+    ||CHR(10)||  ' OR 1 = CASE WHEN nm3net.get_gty_type(i.'||l_inv_ne_id||') IS NOT NULL '
+    ||CHR(10)||  '             THEN 1 '
+    ||CHR(10)||  '             ELSE 2 '
+    ||CHR(10)||  '        END ) '
+  END
+--
+  ||CHR(10)|| ' AND g.nm_ne_id_in = ne_id '
+  ||CHR(10)|| ' AND i.'||l_inv_pk||' = :pi_iit_ne_id'
+  ||CHR(10)|| ' AND ngt_group_type = ne_gty_group_type '
+  ||CHR(10)|| ' AND nt_linear = ''N'''
+  ||CHR(10)|| ' GROUP BY i.'||l_inv_pk
+  ||CHR(10)|| '        , e.ne_id '
+  ||CHR(10)|| '        , e.ne_unique '
+  ||CHR(10)|| '        , e.ne_descr '
+  ||CHR(10)|| '        , e.ne_gty_group_type '
+  ||CHR(10)|| '        , gt.ngt_descr '
+  ||CHR(10)|| '        , e.ne_nt_type '
+  ||CHR(10)|| ' ORDER BY ne_nt_Type';
+--
+--  nm_debug.debug_on;
+--  nm_debug.debug(l_sql);
+--
+  EXECUTE IMMEDIATE l_sql BULK COLLECT INTO po_tab_rec_nl_grp_membership
+    USING IN pi_iit_ne_id;
+--
 END get_non_linear_grp_membership;
 --
 -----------------------------------------------------------------------------
