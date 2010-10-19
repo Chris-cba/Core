@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.10   Oct 15 2010 13:51:00   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.11   Oct 19 2010 17:03:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Oct 15 2010 13:51:00  $
---       Date fetched Out : $Modtime:   Oct 15 2010 13:50:30  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Oct 19 2010 17:03:14  $
+--       Date fetched Out : $Modtime:   Oct 19 2010 17:00:32  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -1885,13 +1885,13 @@ SELECT 'X'
    AND no_node_id = n.nnu_no_node_id;
 
 --
-  l_dummy VARCHAR2(1);
+  l_dummy VARCHAR2(1) := 'Y';
   l_return_val BOOLEAN;
 --
 BEGIN
   OPEN node_cur(p_node_id => pi_node_id);
   FETCH node_cur INTO l_dummy;
-  l_return_val:= SQL%FOUND;
+  l_return_val:= ( l_dummy = 'X' );
   CLOSE node_cur;
   RETURN l_return_val;
 END;
