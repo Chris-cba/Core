@@ -4,17 +4,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.19   Oct 07 2010 12:16:02   ade.edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.20   Oct 19 2010 14:50:02   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Oct 07 2010 12:16:02  $
---       Date fetched Out : $Modtime:   Oct 07 2010 12:14:06  $
---       Version          : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Oct 19 2010 14:50:02  $
+--       Date fetched Out : $Modtime:   Oct 19 2010 14:49:42  $
+--       Version          : $Revision:   2.20  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.19  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.20  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -5606,3 +5606,5 @@ END get_srid;
 -----------------------------------------------------------------------------
 --
 END nm3layer_tool;
+/
+
