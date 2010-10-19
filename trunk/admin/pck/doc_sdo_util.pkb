@@ -5,11 +5,11 @@ IS
   --
   --   PVCS Identifiers :-
   --
-  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkb-arc   2.7   Aug 02 2010 09:19:08   aedwards  $
+  --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_sdo_util.pkb-arc   2.8   Oct 19 2010 16:59:20   Chris.Strettle  $
   --       Module Name      : $Workfile:   doc_sdo_util.pkb  $
-  --       Date into PVCS   : $Date:   Aug 02 2010 09:19:08  $
-  --       Date fetched Out : $Modtime:   Aug 02 2010 09:17:54  $
-  --       Version          : $Revision:   2.7  $
+  --       Date into PVCS   : $Date:   Oct 19 2010 16:59:20  $
+  --       Date fetched Out : $Modtime:   Oct 19 2010 16:50:00  $
+  --       Version          : $Revision:   2.8  $
   --
   --   Author : Christopher Strettle
   --
@@ -18,7 +18,7 @@ IS
   -----------------------------------------------------------------------------
   --
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) := '$Revision:   2.7  $';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) := '$Revision:   2.8  $';
   g_package_name         CONSTANT VARCHAR2(30) := 'DOC_SDO_UTIL';
   nl                     CONSTANT VARCHAR2(5) := chr(10);
 
@@ -156,14 +156,34 @@ IS
     l_view_theme_id        NUMBER := nm3seq.next_nth_theme_id_seq;
     l_dummy                NUMBER;
     l_doc_sdo_view_sql     nm3type.max_varchar2;
+      
+    CURSOR enq_version_cur IS
+    SELECT 1
+      FROM hig_products
+     WHERE hpr_product = 'ENQ'
+       AND ((REPLACE(hpr_version,'.',NULL) >= 4300 AND LENGTH(REPLACE(hpr_version,'.',NULL)) = 4)
+        OR  (REPLACE(hpr_version,'.',NULL) >= 43   AND LENGTH(REPLACE(hpr_version,'.',NULL)) = 2));
+
   BEGIN
     --
+    IF pi_snapping_trig = 'TRUE' 
+    AND hig.is_product_licensed('HIG') THEN
+    --
+      OPEN enq_version_cur;
+      FETCH enq_version_cur INTO l_dummy;
+      IF enq_version_cur%NOTFOUND THEN
+        CLOSE enq_version_cur;
+        hig.raise_ner('HIG', 549);
+      END IF;
+      CLOSE enq_version_cur;
+    --
+    END IF;
+    
     -- set arrays of predetermined theme names and theme functions
     set_theme_functions;
 
     --
-    IF nm3get.
-       get_nit(pi_nit_inv_type => pi_asset_type, pi_raise_not_found => FALSE).
+    IF nm3get.get_nit(pi_nit_inv_type => pi_asset_type, pi_raise_not_found => FALSE).
        nit_inv_type
          IS NULL THEN
       nm3inv.create_ft_asset_from_table(pi_table_name     => g_view_name
@@ -376,15 +396,14 @@ IS
     --
     IF pi_snapping_trig = 'TRUE' THEN
       IF hig.is_product_licensed('HIG') THEN
-        --
+      --
         EXECUTE IMMEDIATE 'BEGIN ENQ_SDO_UTIL.CHECK_OLD_ENQ_TRIGGER; END;';
       --
       END IF;
 
       --
-      nm3sdm.
-      create_nth_sdo_trigger(p_nth_theme_id   => l_theme_id
-                            ,p_restrict       => g_restriction);
+      nm3sdm.create_nth_sdo_trigger(p_nth_theme_id   => l_theme_id
+                                   ,p_restrict       => g_restriction);
     END IF;
 
     --
