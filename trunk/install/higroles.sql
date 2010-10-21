@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.6   May 21 2010 16:24:10   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.7   Oct 21 2010 15:50:48   Mike.Alexander  $
 --       Module Name      : $Workfile:   higroles.sql  $
---       Date into PVCS   : $Date:   May 21 2010 16:24:10  $
---       Date fetched Out : $Modtime:   May 21 2010 16:22:58  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Oct 21 2010 15:50:48  $
+--       Date fetched Out : $Modtime:   Oct 21 2010 15:50:18  $
+--       Version          : $Revision:   2.7  $
 --
 -------------------------------------------------------------------------
 --  Copyright (c) exor corporation ltd, 2009
@@ -74,6 +74,7 @@ GRANT DROP ANY DIRECTORY TO HIG_ADMIN;   -- Added by GJ 31-AUG-2005
 GRANT CREATE ANY DIRECTORY TO HIG_ADMIN; -- Added by GJ 31-AUG-2005
 GRANT DROP ANY SYNONYM TO hig_admin;     -- Added by GJ 17-MAY-2007 for test manager log 51489
 GRANT ANALYZE ANY TO hig_admin;          -- Added by AE 11-JAN-2010 for Task 0108303 
+GRANT CREATE ANY CLUSTER TO hig_admin;   -- Added by MA 21-OCT-2010
 
 rem --------------------------------------------------------------------------
 rem	CREATE a ROLE FOR granting TO highways users who may UPDATE core data
