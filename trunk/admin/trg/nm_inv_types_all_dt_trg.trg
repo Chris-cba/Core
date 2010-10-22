@@ -6,6 +6,8 @@ CREATE OR REPLACE TRIGGER NM_INV_TYPES_ALL_DT_TRG
              , NIT_LR_NE_COLUMN_NAME
              , NIT_LR_ST_CHAIN
              , NIT_LR_END_CHAIN
+             , NIT_CATEGORY
+             , NIT_TABLE_NAME
  ON NM_INV_TYPES_ALL  
  FOR EACH ROW
 DECLARE
@@ -13,11 +15,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_types_all_dt_trg.trg-arc   2.2   Jul 23 2010 11:21:10   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/trg/nm_inv_types_all_dt_trg.trg-arc   2.3   Oct 22 2010 13:45:52   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm_inv_types_all_dt_trg.trg  $
---       Date into PVCS   : $Date:   Jul 23 2010 11:21:10  $
---       Date fetched Out : $Modtime:   Jul 23 2010 11:19:34  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Oct 22 2010 13:45:52  $
+--       Date fetched Out : $Modtime:   Oct 22 2010 13:26:12  $
+--       Version          : $Revision:   2.3  $
 --
 --
 -----------------------------------------------------------------------------
@@ -126,11 +128,40 @@ BEGIN
       -- If this is a foreign table
       DECLARE
       --
+         FUNCTION check_table_exists (p_table_name VARCHAR2)
+         RETURN BOOLEAN
+         IS
+         l_current_user VARCHAR2(100) := HIG.GET_APPLICATION_OWNER;
+         l_dummy        VARCHAR2(1);
+         l_return_val   BOOLEAN;
+         --
+            CURSOR cs_ft_tab_check(c_table_name VARCHAR2) IS
+            SELECT 'X'
+              FROM all_tables
+             WHERE table_name  = c_table_name
+               AND owner = l_current_user
+             UNION
+            SELECT 'X'
+              FROM all_views
+             WHERE view_name  = c_table_name
+               AND owner = l_current_user;
+         BEGIN
+         --
+           OPEN  cs_ft_tab_check (p_table_name);
+           FETCH cs_ft_tab_check INTO l_dummy;
+           l_return_val:= cs_ft_tab_check%FOUND;
+           CLOSE cs_ft_tab_check;
+         --
+         RETURN l_return_val;
+         END;
+         --
          PROCEDURE check_exists (p_table_name VARCHAR2
                                 ,p_col_name   VARCHAR2
                                 ) IS
-            l_current_user VARCHAR2(100) := nm3get.get_hus(pi_hus_user_id => 
-                                            nm3context.get_context(nm3context.get_namespace,'USER_ID')).hus_username;
+          -- Checks do not take into account
+          /*  l_current_user VARCHAR2(100) := nm3get.get_hus(pi_hus_user_id => 
+                                            nm3context.get_context(nm3context.get_namespace,'USER_ID')).hus_username;*/
+             l_current_user VARCHAR2(100) := HIG.GET_APPLICATION_OWNER;
             --
             CURSOR cs_ft_col_check (c_table_name VARCHAR2
                                    ,c_col_name   VARCHAR2
@@ -164,10 +195,14 @@ BEGIN
       --
       BEGIN
       --
-         check_exists (:NEW.nit_table_name, :NEW.nit_lr_ne_column_name);
-         check_exists (:NEW.nit_table_name, :NEW.nit_lr_st_chain);
-         check_exists (:NEW.nit_table_name, :NEW.nit_lr_end_chain);
-         check_exists (:NEW.nit_table_name, :NEW.nit_foreign_pk_column);
+        IF check_table_exists (p_table_name => :NEW.nit_table_name) THEN
+        --
+           check_exists (:NEW.nit_table_name, :NEW.nit_lr_ne_column_name);
+           check_exists (:NEW.nit_table_name, :NEW.nit_lr_st_chain);
+           check_exists (:NEW.nit_table_name, :NEW.nit_lr_end_chain);
+           check_exists (:NEW.nit_table_name, :NEW.nit_foreign_pk_column);
+        --
+        END IF;
       --
       END;
    END IF;
