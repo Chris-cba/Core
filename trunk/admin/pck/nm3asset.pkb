@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.15   Oct 18 2010 15:47:26   ade.edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.16   Oct 25 2010 10:45:30   ade.edwards  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Oct 18 2010 15:47:26  $
---       Date fetched Out : $Modtime:   Oct 18 2010 15:46:26  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Oct 25 2010 10:45:30  $
+--       Date fetched Out : $Modtime:   Oct 25 2010 10:42:56  $
+--       PVCS Version     : $Revision:   2.16  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.15  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.16  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -177,6 +177,26 @@ FUNCTION get_body_version RETURN varchar2 IS
 BEGIN
    RETURN g_body_sccsid;
 END get_body_version;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION is_linear ( pi_ne_id IN nm_elements.ne_id%TYPE )
+RETURN BOOLEAN
+IS
+  l_rec_ne  nm_elements%ROWTYPE := nm3get.get_ne(pi_ne_id => pi_ne_id, pi_raise_not_found=>FALSE);
+  l_dummy   NUMBER;
+BEGIN
+  IF l_rec_ne.ne_id IS NOT NULL
+  THEN
+    SELECT COUNT(*) INTO l_dummy FROM nm_linear_types
+      WHERE nlt_nt_type = l_rec_ne.ne_nt_type
+        AND NVL(nlt_gty_type,nm3type.c_nvl) = NVL(l_rec_ne.ne_gty_group_type,NVL(nlt_gty_type,nm3type.c_nvl));
+  --
+    RETURN (l_dummy>0);
+  ELSE
+    RETURN FALSE;
+  END IF;
+END is_linear;
 --
 -----------------------------------------------------------------------------
 --
@@ -2285,23 +2305,62 @@ BEGIN
       --
         IF l_rec_ne.ne_type IN ('S','G')
         THEN 
-          l_sql :=  'SELECT nm3pla.get_sub_placement(nm_placement('||l_rec_nit.nit_lr_ne_column_name
-                                                              ||','||l_rec_nit.nit_lr_st_chain
-                                                              ||','||NVL(l_rec_nit.nit_lr_end_chain,l_rec_nit.nit_lr_st_chain)
-                                                              ||', NULL ) ) '
-         ||CHR(10)||'  FROM '||l_rec_nit.nit_table_name
-         ||CHR(10)||' WHERE '||l_rec_nit.nit_foreign_pk_column||' = :pk';
         --
-          nm_debug.debug(l_sql);
+          IF is_linear ( pi_ne_id => l_ne_id )
+          THEN
+          --
+          -- Linear Group of Sections - or a datum
+          --
+            BEGIN
+              l_sql :=  'SELECT nm3pla.get_sub_placement(nm_placement('||l_rec_nit.nit_lr_ne_column_name
+                                                                  ||','||l_rec_nit.nit_lr_st_chain
+                                                                  ||','||NVL(l_rec_nit.nit_lr_end_chain,l_rec_nit.nit_lr_st_chain)
+                                                                  ||', NULL ) ) '
+             ||CHR(10)||'  FROM '||l_rec_nit.nit_table_name
+             ||CHR(10)||' WHERE '||l_rec_nit.nit_foreign_pk_column||' = :pk';
+            --
+              nm_debug.debug(l_sql);
+            --
+              EXECUTE IMMEDIATE l_sql INTO l_pl USING pi_iit_ne_id;
+            --
+              FOR i IN 1..l_pl.placement_count
+              LOOP
+                po_tab_datum_loc_dets(i).datum_ne_id := l_pl.get_entry(i).pl_ne_id;
+                po_tab_datum_loc_dets(i).nm_begin_mp := l_pl.get_entry(i).pl_start;
+                po_tab_datum_loc_dets(i).nm_end_mp   := l_pl.get_entry(i).pl_end;
+              END LOOP;
+            EXCEPTION
+              WHEN NO_DATA_FOUND THEN NULL;
+            END;
+          --
+          ELSE
+          --
+          -- Non Linear Group - just return the datums for the whole groups memberships
+          --
+            BEGIN
+            --
+              SELECT *
+                BULK COLLECT INTO po_tab_datum_loc_dets
+                FROM (SELECT nm_ne_id_of datum_ne_id
+                            ,NULL        datum_ne_unique
+                            ,NULL        datum_ne_descr
+                            ,NULL        datum_ne_nt_type
+                            ,NULL        datum_ne_nt_descr
+                            ,NULL        datum_length_unit
+                            ,NULL        datum_length_unit_name
+                            ,nm_begin_mp nm_begin_mp
+                            ,nm_end_mp   nm_end_mp
+                            ,nm_seq_no   nm_seq_no
+                            ,nm_seg_no   nm_seg_no
+                            ,nm_true     nm_true
+                            ,nm_slk      nm_slk
+                        FROM nm_members
+                       WHERE nm_type = 'G'
+                         AND nm_ne_id_in = l_ne_id); 
+            END;
+          --
+          END IF;
         --
-          EXECUTE IMMEDIATE l_sql INTO l_pl USING pi_iit_ne_id;
-        --
-          FOR i IN 1..l_pl.placement_count
-          LOOP
-            po_tab_datum_loc_dets(i).datum_ne_id := l_pl.get_entry(i).pl_ne_id;
-            po_tab_datum_loc_dets(i).nm_begin_mp := l_pl.get_entry(i).pl_start;
-            po_tab_datum_loc_dets(i).nm_end_mp   := l_pl.get_entry(i).pl_end;
-          END LOOP;
         END IF;
       --
       EXCEPTION
@@ -2510,12 +2569,13 @@ BEGIN
    DECLARE
      l_placement_array   nm_placement_array;
    BEGIN
-     FOR i IN (SELECT nlt_gty_type 
+     FOR i IN (SELECT nlt_nt_type 
                  FROM nm_linear_types
-                WHERE nlt_gty_type IS NOT NULL)
+                WHERE nlt_gty_type IS NOT NULL
+                  AND nlt_gty_type = NVL(pi_pref_lrm,nlt_gty_type))
      LOOP
        BEGIN
-         l_placement_array := nm3pla.get_super_placement(l_pl_datums, i.nlt_gty_type);
+         l_placement_array := nm3pla.get_super_placement(l_pl_datums, i.nlt_nt_type);
          FOR z IN 1..l_placement_array.placement_count
          LOOP
            l_pl_arr := l_pl_arr.add_element 
@@ -4107,12 +4167,14 @@ PROCEDURE get_non_linear_grp_membership (
 IS
   l_rec_nit     nm_inv_types%ROWTYPE;
   b_join_to_mp  BOOLEAN ;
+  b_linear      BOOLEAN := FALSE;
   l_sql         nm3type.max_varchar2;
   l_inv_members VARCHAR2(30);
   l_inv_pk      VARCHAR2(30);
   l_inv_ne_id   VARCHAR2(30);
   l_inv_st_mp   VARCHAR2(30);
   l_inv_end_mp  VARCHAR2(30);
+  l_ne_id       NUMBER;
 --
 BEGIN
 --
@@ -4136,16 +4198,34 @@ BEGIN
     l_inv_ne_id    := l_rec_nit.nit_lr_ne_column_name; 
     l_inv_st_mp    := l_rec_nit.nit_lr_st_chain;
     l_inv_end_mp   := NVL(l_rec_nit.nit_lr_end_chain,l_rec_nit.nit_lr_st_chain);
-    b_join_to_mp   := l_inv_st_mp IS NOT NULL;
+    b_join_to_mp   := (l_inv_st_mp IS NOT NULL);
+  --
+    IF l_inv_ne_id IS NOT NULL
+    THEN
+      BEGIN
+        EXECUTE IMMEDIATE 'SELECT '||l_inv_ne_id||' FROM '||l_inv_members ||' WHERE '||l_inv_pk||' = '||pi_iit_ne_id
+           INTO l_ne_id;
+        b_linear := is_linear ( l_ne_id );
+      EXCEPTION
+        WHEN NO_DATA_FOUND THEN NULL;
+        WHEN TOO_MANY_ROWS THEN NULL;
+      END;
+    ELSE
+      -- We cannot do anything without a network reference column set
+      -- on the FT asset
+      RETURN;
+    END IF;
   END IF;
 --
-  l_sql := ' SELECT i.'||l_inv_pk||' iit_ne_id '
-  ||CHR(10)||    ', e.ne_id '
-  ||CHR(10)||    ', e.ne_unique '
-  ||CHR(10)||    ', e.ne_descr '
-  ||CHR(10)||    ', e.ne_gty_group_type '
-  ||CHR(10)||    ', gt.ngt_descr '
-  ||CHR(10)||    ', e.ne_nt_type '
+  l_sql := 'SELECT * FROM ('
+  ||CHR(10)||' SELECT '
+  ||CHR(10)||      'i.'||l_inv_pk||'     iit_ne_id '
+  ||CHR(10)||    ', e.ne_id              ne_id'
+  ||CHR(10)||    ', e.ne_unique          ne_unique'
+  ||CHR(10)||    ', e.ne_descr           ne_descr'
+  ||CHR(10)||    ', e.ne_gty_group_type  group_type'
+  ||CHR(10)||    ', gt.ngt_descr         group_descr'
+  ||CHR(10)||    ', e.ne_nt_type         nt_type'
   ||CHR(10)||' FROM nm_elements e '
   ||CHR(10)||   ' , nm_group_types gt '
   ||CHR(10)||   ' , nm_types t '
@@ -4169,21 +4249,43 @@ BEGIN
     ||CHR(10)||  '        END ) '
   END
 --
-  ||CHR(10)|| ' AND g.nm_ne_id_in = ne_id '
+  ||CHR(10)|| ' AND g.nm_ne_id_in = e.ne_id '
   ||CHR(10)|| ' AND i.'||l_inv_pk||' = :pi_iit_ne_id'
   ||CHR(10)|| ' AND ngt_group_type = ne_gty_group_type '
-  ||CHR(10)|| ' AND nt_linear = ''N'''
-  ||CHR(10)|| ' GROUP BY i.'||l_inv_pk
-  ||CHR(10)|| '        , e.ne_id '
-  ||CHR(10)|| '        , e.ne_unique '
-  ||CHR(10)|| '        , e.ne_descr '
-  ||CHR(10)|| '        , e.ne_gty_group_type '
-  ||CHR(10)|| '        , gt.ngt_descr '
-  ||CHR(10)|| '        , e.ne_nt_type '
-  ||CHR(10)|| ' ORDER BY ne_nt_Type';
+  ||CHR(10)|| ' AND nt_linear = ''N'''||
+--
+  CASE
+    WHEN NOT b_linear -- Non linear - append it's own location otherwise it won't appear anywhere else
+    AND l_rec_nit.nit_table_name IS NOT NULL
+    THEN
+       CHR(10)|| ' UNION '
+       ||CHR(10)|| ' SELECT '
+       ||CHR(10)||      '  i.'||l_inv_pk||'    iit_ne_id '
+       ||CHR(10)||      ', e.ne_id             ne_id'
+       ||CHR(10)||      ', e.ne_unique         ne_unique'
+       ||CHR(10)||      ', e.ne_descr          ne_descr'
+       ||CHR(10)||      ', e.ne_gty_group_type group_type '
+       ||CHR(10)||      ', g.ngt_descr         group_descr'
+       ||CHR(10)||      ', e.ne_nt_type        nt_type'
+       ||CHR(10)|| '   FROM nm_elements e, nm_group_types g, '||l_inv_members||' i '
+       ||CHR(10)|| '  WHERE ne_id = '||l_ne_id
+       ||CHR(10)|| '    AND ngt_group_type = ne_gty_group_type '
+       ||CHR(10)|| '    AND i.'||l_inv_pk||' = '||pi_iit_ne_id
+  END
+--
+  ||CHR(10)|| ')'
+--
+  ||CHR(10)|| ' GROUP BY iit_ne_id '
+  ||CHR(10)|| '        , ne_id '
+  ||CHR(10)|| '        , ne_unique '
+  ||CHR(10)|| '        , ne_descr '
+  ||CHR(10)|| '        , group_type '
+  ||CHR(10)|| '        , group_descr '
+  ||CHR(10)|| '        , nt_type '
+  ||CHR(10)|| ' ORDER BY nt_Type';
 --
 --  nm_debug.debug_on;
---  nm_debug.debug(l_sql);
+  nm_debug.debug(l_sql);
 --
   EXECUTE IMMEDIATE l_sql BULK COLLECT INTO po_tab_rec_nl_grp_membership
     USING IN pi_iit_ne_id;
