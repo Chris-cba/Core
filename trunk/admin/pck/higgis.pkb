@@ -3,18 +3,18 @@ CREATE OR REPLACE PACKAGE BODY higgis AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/higgis.pkb-arc   2.3   Sep 16 2010 17:18:06   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/higgis.pkb-arc   2.4   Oct 26 2010 15:33:38   ade.edwards  $
 --       Module Name      : $Workfile:   higgis.pkb  $
---       Date into PVCS   : $Date:   Sep 16 2010 17:18:06  $
---       Date fetched Out : $Modtime:   Sep 16 2010 17:14:52  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Oct 26 2010 15:33:38  $
+--       Date fetched Out : $Modtime:   Oct 26 2010 14:42:32  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.39
 -------------------------------------------------------------------------
 --   A GIS package intended to handle all GIS theme and connection information
 --
 --   Author : Rob Coupe
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '"@(#)higgis.pkb 1.39 01/26/07"';
+   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name CONSTANT varchar2(30) := 'higgis';
@@ -1558,7 +1558,9 @@ IS
          , v_nm_msv_map_def
          , gis_theme_functions
          , nm_nt_groupings
-     WHERE vnmd_name           = hig.get_sysopt('WEBMAPNAME')
+     -- Task 0110297 & 0110288
+     -- Use USER option value
+     WHERE vnmd_name           = hig.get_user_or_sys_opt('WEBMAPNAME') 
        AND nng_group_type      = cp_gty_type
        AND nng_nt_type         = vnnt_nt_type
        AND vnnt_gty_type       IS NULL
@@ -1619,7 +1621,11 @@ BEGIN
   IF b_join_to_msv
   THEN
     l_sql := l_sql
-    ||lf||'    AND vnmd_name = hig.get_sysopt (''WEBMAPNAME'') '
+    --||lf||'    AND vnmd_name = hig.get_sysopt (''WEBMAPNAME'') '
+    
+    -- Task 0110288 & 0110297
+    -- Use the USER option value if it exists
+    ||lf||'    AND vnmd_name = hig.get_user_or_sys_opt (''WEBMAPNAME'') '
     ||lf||'    AND vnnt_nth_theme_name = vnmd_theme_name ';
   END IF;
 --
@@ -1644,7 +1650,10 @@ BEGIN
      '      , v_nm_msv_map_def '||lf||
      '      , gis_theme_functions '||lf||
      '      , nm_nt_groupings '||lf||
-     '  WHERE vnmd_name           = hig.get_sysopt(''WEBMAPNAME'')'||lf||
+     -- Task 0110288 & 0110297
+     -- Use the USER option value if it exists
+     --'  WHERE vnmd_name           = hig.get_sysopt(''WEBMAPNAME'')'||lf||
+     '  WHERE vnmd_name           = hig.get_user_or_sys_opt(''WEBMAPNAME'')'||lf||
      '    AND nng_group_type      = '||nm3flx.string(l_ne.ne_gty_group_type)||lf||
      '    AND nng_nt_type         = vnnt_nt_type '||lf||
      '    AND vnnt_gty_type       IS NULL '||lf||
