@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_audit.pkb-arc   3.4   Aug 25 2010 09:37:00   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_audit.pkb-arc   3.5   Oct 26 2010 14:03:06   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_audit.pkb  $
---       Date into PVCS   : $Date:   Aug 25 2010 09:37:00  $
---       Date fetched Out : $Modtime:   Aug 23 2010 10:08:30  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Oct 26 2010 14:03:06  $
+--       Date fetched Out : $Modtime:   Oct 26 2010 13:57:40  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.4  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.5  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_audit';
   g_app_owner    CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
@@ -256,13 +256,13 @@ BEGIN
                     LOOP
                         IF ita.ita_format = 'DATE'
                         THEN
-                            append  ('IF Nvl(:OLD.'||ita.ita_attrib_name||',Trunc(Sysdate)) != '); append  ('Nvl(:NEW.'||ita.ita_attrib_name||',Trunc(Sysdate))','N');
+                            append  ('IF Nvl(:OLD.'||ita.ita_attrib_name||',Trunc(Sysdate+9999)) != '); append  ('Nvl(:NEW.'||ita.ita_attrib_name||',Trunc(Sysdate+9999))','N');
                         ELSIF ita.ita_format = 'VARCHAR2'
                         THEN
-                            append  ('IF Nvl(:OLD.'||ita.ita_attrib_name||',''0'') != '); append  ('Nvl(:NEW.'||ita.ita_attrib_name||',''0'')','N');
+                            append  ('IF Nvl(:OLD.'||ita.ita_attrib_name||',''$$$$$$$'') != '); append  ('Nvl(:NEW.'||ita.ita_attrib_name||',''$$$$$$$'')','N');
                         ELSIF ita.ita_format = 'NUMBER'
                         THEN
-                            append  ('IF Nvl(:OLD.'||ita.ita_attrib_name||',0) != '); append  ('Nvl(:NEW.'||ita.ita_attrib_name||',0)','N');                        
+                            append  ('IF Nvl(:OLD.'||ita.ita_attrib_name||',-9999999999) != '); append  ('Nvl(:NEW.'||ita.ita_attrib_name||',-9999999999)','N');                        
                         END IF ;
                         append  ('THEN');
                         IF ita.ita_format = 'DATE'
@@ -281,13 +281,13 @@ BEGIN
                     LOOP
                         IF haat.ita_format = 'DATE'
                         THEN
-                            append  ('IF Nvl(:OLD.'||haat.ita_attrib_name||',Trunc(Sysdate)) != '); append  ('Nvl(:NEW.'||haat.ita_attrib_name||',Trunc(Sysdate))','N');
+                            append  ('IF Nvl(:OLD.'||haat.ita_attrib_name||',Trunc(Sysdate+9999)) != '); append  ('Nvl(:NEW.'||haat.ita_attrib_name||',Trunc(Sysdate+9999))','N');
                         ELSIF haat.ita_format = 'VARCHAR2'
                         THEN
-                            append  ('IF Nvl(:OLD.'||haat.ita_attrib_name||',''0'') != '); append  ('Nvl(:NEW.'||haat.ita_attrib_name||',''0'')','N');
+                            append  ('IF Nvl(:OLD.'||haat.ita_attrib_name||',''$$$$$$$'') != '); append  ('Nvl(:NEW.'||haat.ita_attrib_name||',''$$$$$$$'')','N');
                         ELSIF haat.ita_format = 'NUMBER'
                         THEN
-                            append  ('IF Nvl(:OLD.'||haat.ita_attrib_name||',0) != '); append  ('Nvl(:NEW.'||haat.ita_attrib_name||',0)','N');                        
+                            append  ('IF Nvl(:OLD.'||haat.ita_attrib_name||',-9999999999) != '); append  ('Nvl(:NEW.'||haat.ita_attrib_name||',-9999999999)','N');                        
                         END IF ;
                         append  ('THEN');
                         IF haat.ita_format = 'DATE'
