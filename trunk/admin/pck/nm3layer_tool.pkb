@@ -4,17 +4,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.20   Oct 19 2010 14:50:02   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.21   Oct 26 2010 11:53:06   ade.edwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Oct 19 2010 14:50:02  $
---       Date fetched Out : $Modtime:   Oct 19 2010 14:49:42  $
---       Version          : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Oct 26 2010 11:53:06  $
+--       Date fetched Out : $Modtime:   Oct 26 2010 11:50:10  $
+--       Version          : $Revision:   2.21  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.20  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.21  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -4770,6 +4770,9 @@ END get_nsg_label;
       dbms_scheduler.run_job
         ( job_name            => l_job_name
         , use_current_session => FALSE);
+    ELSIF pi_job_type IS NULL
+    THEN
+      RAISE_APPLICATION_ERROR (-20101,'No Job Type specified!');
     END IF;
   --
   END submit_job; 
@@ -4861,8 +4864,22 @@ END get_nsg_label;
   IS
     l_rec_nth                nm_themes_all%ROWTYPE;
     l_sql                    nm3type.max_varchar2;
-    l_progress_id            nm_progress.prg_progress_id%TYPE;
+    l_progress_id            nm_progress.prg_progress_id%TYPE := pi_progress_id;
     l_stages                 NUMBER;
+  --
+    PROCEDURE record_progress   
+               ( pi_current_stage IN NUMBER
+               , pi_operation     IN VARCHAR2 )
+    IS
+    BEGIN
+      IF l_progress_id IS NOT NULL
+      THEN
+        nm3progress.record_progress( pi_progress_id      => l_progress_id
+                                    ,pi_force            => TRUE
+                                    ,pi_current_stage    => pi_current_stage
+                                    ,pi_operation        => pi_operation);
+      END IF;
+    END record_progress;
   BEGIN
   --
     IF hig.get_sysopt ('REGSDELAY') != 'Y'
@@ -4889,8 +4906,11 @@ END get_nsg_label;
   --
     l_stages := g_tab_themes.COUNT;
   --
-    nm3progress.initialise_progress( pi_progress_id  => l_progress_id
-                                   , pi_total_stages => l_stages );
+    IF l_progress_id IS NOT NULL
+    THEN
+      nm3progress.initialise_progress( pi_progress_id  => l_progress_id
+                                     , pi_total_stages => l_stages );
+    END IF;
   --
     FOR i IN 1..g_tab_themes.COUNT
     LOOP
@@ -4901,10 +4921,8 @@ END get_nsg_label;
     --
       l_rec_nth := nm3get.get_nth ( pi_nth_theme_id => g_tab_themes(i).ne_id);
     --
-      nm3progress.record_progress( pi_progress_id      => l_progress_id
-                                  ,pi_force            => TRUE
-                                  ,pi_current_stage    => i
-                                  ,pi_operation        => 'Dropping SDE Metadata for '||l_rec_nth.nth_feature_table||' - '||USER);
+      record_progress( pi_current_stage    => i
+                      ,pi_operation        => 'Dropping SDE Metadata for '||l_rec_nth.nth_feature_table||' - '||USER);
     --
       DECLARE
         l_sql   nm3type.max_varchar2;
@@ -4970,10 +4988,8 @@ END get_nsg_label;
     -------------------------------------------------------------------------------
     --
     --
-      nm3progress.record_progress( pi_progress_id      => l_progress_id
-                                 , pi_force            => TRUE
-                                 , pi_current_stage    => i
-                                 , pi_operation        => 'Creating SDE Metadata for '||l_rec_nth.nth_feature_table||' - '||USER);
+      record_progress( pi_current_stage    => i
+                     , pi_operation        => 'Creating SDE Metadata for '||l_rec_nth.nth_feature_table||' - '||USER);
     --
       DECLARE
         l_sql  nm3type.max_varchar2;
@@ -5049,19 +5065,25 @@ END get_nsg_label;
     --
     END LOOP;
   --
-    nm3progress.end_progress( pi_progress_id        => l_progress_id
-                            , pi_completion_message => 'End of SDE Metadata Refresh'
-                            , pi_error_message      => Null
-                            );
+    IF l_progress_id IS NOT NULL
+    THEN
+      nm3progress.end_progress( pi_progress_id        => l_progress_id
+                              , pi_completion_message => 'End of SDE Metadata Refresh'
+                              , pi_error_message      => Null
+                              );
+    END IF;
   EXCEPTION
   --
     WHEN OTHERS 
     THEN
   --
-    nm3progress.end_progress( pi_progress_id        => l_progress_id
-                            , pi_completion_message => 'Error with SDE Metadata Refresh'
-                            , pi_error_message      => SQLERRM
-                            );
+      IF l_progress_id IS NOT NULL
+      THEN
+        nm3progress.end_progress( pi_progress_id        => l_progress_id
+                                , pi_completion_message => 'Error with SDE Metadata Refresh'
+                                , pi_error_message      => SQLERRM
+                                );
+      END IF;
   END refresh_sde_metadata;
 --
 -----------------------------------------------------------------------------
@@ -5367,10 +5389,29 @@ PROCEDURE refresh_sdo_metadata
              , pi_progress_id   IN nm_progress.prg_progress_id%TYPE 
              , pi_run_sde       IN BOOLEAN DEFAULT FALSE )
 IS
-  l_progress_id  nm_progress.prg_progress_id%TYPE;
+  l_progress_id  nm_progress.prg_progress_id%TYPE := pi_progress_id;
   l_stages       NUMBER;
   l_rec_nth      nm_themes_all%ROWTYPE := nm3get.get_nth(pi_nth_theme_id=>pi_nth_theme_id);
+--
+  PROCEDURE record_progress   
+             ( pi_current_stage IN NUMBER
+             , pi_operation     IN VARCHAR2 )
+  IS
+  BEGIN
+    IF l_progress_id IS NOT NULL
+    THEN
+      nm3progress.record_progress( pi_progress_id      => l_progress_id
+                                  ,pi_force            => TRUE
+                                  ,pi_current_stage    => pi_current_stage
+                                  ,pi_operation        => pi_operation);
+    END IF;
+  END record_progress;
+--
 BEGIN
+--
+--  nm_debug.debug_on;
+--  nm_debug.debug(pi_nth_theme_id||':'||pi_dependency||':'||pi_clone_parent||':'||pi_progress_id);
+--  nm_debug.debug_off;
 --
   instantiate_themes ( pi_nth_theme_id, pi_dependency );
 --
@@ -5379,7 +5420,7 @@ BEGIN
 -----------------------------------------------------------------------------
 --
   l_progress_id  := pi_progress_id;
---
+  --
   l_stages := 5;
 --
   IF pi_run_sde
@@ -5387,17 +5428,18 @@ BEGIN
     l_stages := l_stages + g_tab_themes.COUNT;
   END IF;
 --
-  nm3progress.initialise_progress( pi_progress_id  => l_progress_id
-                                 , pi_total_stages => l_stages );
+  IF l_progress_id IS NOT NULL
+  THEN
+    nm3progress.initialise_progress( pi_progress_id  => l_progress_id
+                                   , pi_total_stages => l_stages );
+  END IF;
 --
 -----------------------------------------------------------------------------
 -- Lift all the existing metadata into memory
 -----------------------------------------------------------------------------
 --
-  nm3progress.record_progress( pi_progress_id      => l_progress_id
-                              ,pi_force            => TRUE
-                              ,pi_current_stage    => 1
-                              ,pi_operation        => 'Caching existing SDO metadata');
+  record_progress( pi_current_stage    => 1
+                  ,pi_operation        => 'Caching existing SDO metadata');
 --
   cache_metadata 
     ( pi_nth_theme_id => pi_nth_theme_id );
@@ -5406,10 +5448,8 @@ BEGIN
 -- Delete and cascade the related USGM for all users and all related themes
 -----------------------------------------------------------------------------
 --
-  nm3progress.record_progress( pi_progress_id      => l_progress_id
-                              ,pi_force            => TRUE
-                              ,pi_current_stage    => 2
-                              ,pi_operation        => 'Deleting existing SDO metadata');
+  record_progress( pi_current_stage    => 2
+                  ,pi_operation        => 'Deleting existing SDO metadata');
 --
   delete_and_cascade_usgm 
     ( pi_nth_theme_id => pi_nth_theme_id );
@@ -5418,12 +5458,10 @@ BEGIN
 -- Recalcuate the HIGHWAYS base table SDO Metadata
 -----------------------------------------------------------------------------
 --
-  nm3progress.record_progress( pi_progress_id      => l_progress_id
-                              ,pi_force            => TRUE
-                              ,pi_current_stage    => 3
-                              ,pi_operation        => 'Calculating SDO Metadata for '
-                                                      ||l_rec_nth.nth_feature_table
-                                                      ||' - Please Wait...');
+  record_progress( pi_current_stage    => 3
+                  ,pi_operation        => 'Calculating SDO Metadata for '
+                                         ||l_rec_nth.nth_feature_table
+                                         ||' - Please Wait...');
 --
   recalculate_usgm 
     ( pi_nth_theme_id => pi_nth_theme_id );
@@ -5432,11 +5470,9 @@ BEGIN
 -- Apply new SDO metadata to all objects
 -----------------------------------------------------------------------------
 --
-  nm3progress.record_progress( pi_progress_id      => l_progress_id
-                              ,pi_force            => TRUE
-                              ,pi_current_stage    => 4
-                              ,pi_operation        => 'Applying SDO metadata to all related Themes'
-                                                      ||' - Please Wait...');
+  record_progress( pi_current_stage    => 4
+                  ,pi_operation        => 'Applying SDO metadata to all related Themes'
+                                        ||' - Please Wait...');
 --
   build_dependant_usgm 
     ( pi_nth_theme_id => pi_nth_theme_id );
@@ -5445,11 +5481,9 @@ BEGIN
 -- Apply new SDO metadata to all subordinate users
 -----------------------------------------------------------------------------
 --
-  nm3progress.record_progress( pi_progress_id      => l_progress_id
-                              ,pi_force            => TRUE
-                              ,pi_current_stage    => 5
-                              ,pi_operation        => 'Applying SDO metadata to all USERS'
-                                                      ||' - Please Wait...');
+  record_progress( pi_current_stage    => 5
+                  ,pi_operation        => 'Applying SDO metadata to all USERS'
+                                          ||' - Please Wait...');
 --
   build_subordinate_usgm 
     ( pi_nth_theme_id => pi_nth_theme_id );
@@ -5458,10 +5492,13 @@ BEGIN
 -- Process finished
 -----------------------------------------------------------------------------
 --
-  nm3progress.end_progress( pi_progress_id        => l_progress_id
-                          , pi_completion_message => 'End of SDO Metadata Refresh'
-                          , pi_error_message      => Null
-                          );
+  IF l_progress_id IS NOT NULL
+  THEN
+    nm3progress.end_progress( pi_progress_id        => l_progress_id
+                            , pi_completion_message => 'End of SDO Metadata Refresh'
+                            , pi_error_message      => Null
+                            );
+  END IF;
 --
 -----------------------------------------------------------------------------
 -- Run the SDE metadata rebuild too if required
@@ -5478,10 +5515,13 @@ BEGIN
 EXCEPTION
   WHEN OTHERS THEN
   --
-    nm3progress.end_progress( pi_progress_id        => l_progress_id
-                            , pi_completion_message => 'End of SDO Metadata Refresh - An Error Has Occurred'
-                            , pi_error_message      => SQLERRM
-                            );
+    IF l_progress_id IS NOT NULL
+    THEN
+      nm3progress.end_progress( pi_progress_id        => l_progress_id
+                              , pi_completion_message => 'End of SDO Metadata Refresh - An Error Has Occurred'
+                              , pi_error_message      => SQLERRM
+                              );
+    END IF;
 END refresh_sdo_metadata;
 --
 -----------------------------------------------------------------------------
