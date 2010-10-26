@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.11   Aug 31 2010 11:32:38   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.12   Oct 26 2010 14:03:02   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   Aug 31 2010 11:32:38  $
---       Date fetched Out : $Modtime:   Aug 25 2010 11:43:52  $
---       Version          : $Revision:   3.11  $
+--       Date into PVCS   : $Date:   Oct 26 2010 14:03:02  $
+--       Date fetched Out : $Modtime:   Oct 26 2010 13:53:50  $
+--       Version          : $Revision:   3.12  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.11  $';
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.12  $';
   g_app_owner     CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  clob;
@@ -1908,6 +1908,7 @@ IS
    l_nit_rec        nm_inv_types%ROWTYPE;
    l_when_condition Boolean ;
    l_halt_rec       hig_alert_types%ROWTYPE;
+   l_if_or          Varchar2(10) ;
 --
 BEGIN
 --
@@ -2036,9 +2037,65 @@ BEGIN
         append ('BEGIN');
         append ('--');
         append ('   l_hal_rec.hal_halt_id := '||l_halt_rec.halt_id||';'); 
-        trg_body(l_halt_rec.halt_operation,l_halt_rec.halt_id,l_nit_rec.nit_foreign_pk_column) ;
+        IF l_halt_rec.halt_operation = 'Update'
+        THEN
+            l_cnt := 0 ;
+            IF l_tab_level
+            THEN
+                FOR ita IN (SELECT * FROM nm_inv_type_attribs WHERE ita_inv_type = l_halt_rec.halt_nit_inv_type)
+                LOOP               
+                    l_cnt :=  l_cnt + 1;
+                    IF l_cnt = 1
+                    THEN
+                        l_if_or := ' IF ';
+                    ELSE
+                        l_if_or := ' OR ';
+                    END IF ;                    
+                    IF ita.ita_format = 'DATE'
+                    THEN
+                        append  (l_if_or||' Nvl(:OLD.'||ita.ita_attrib_name||',Trunc(Sysdate+9999)) != '); append  ('Nvl(:NEW.'||ita.ita_attrib_name||',Trunc(Sysdate+9999))','N');
+                    ELSIF ita.ita_format = 'VARCHAR2'
+                    THEN
+                        append  (l_if_or||' Nvl(:OLD.'||ita.ita_attrib_name||',''$$$$$$$$$$'') != '); append  ('Nvl(:NEW.'||ita.ita_attrib_name||',''$$$$$$$$$$'')','N');
+                    ELSIF ita.ita_format = 'NUMBER'
+                    THEN
+                        append  (l_if_or||' Nvl(:OLD.'||ita.ita_attrib_name||',-999999999) != '); append  ('Nvl(:NEW.'||ita.ita_attrib_name||',-999999999)','N');                        
+                    END IF ;
+                END LOOP;
+            ELSE             
+                FOR halt IN (SELECT * FROM hig_alert_type_attributes,nm_inv_type_attribs 
+                             WHERE  hata_halt_id = pi_halt_id
+                             AND    ita_inv_type = l_halt_rec.halt_nit_inv_type
+                             AND    hata_attribute_name = ita_attrib_name)
+                LOOP
+                    l_cnt :=  l_cnt + 1;
+                    IF l_cnt = 1
+                    THEN
+                        l_if_or := ' IF ';
+                    ELSE
+                        l_if_or := ' OR ';
+                    END IF ;
+                    IF halt.ita_format = 'DATE'
+                    THEN
+                        append  (l_if_or||' Nvl(:OLD.'||halt.ita_attrib_name||',Trunc(Sysdate+9999)) != '); append  ('Nvl(:NEW.'||halt.ita_attrib_name||',Trunc(Sysdate+9999))','N');
+                    ELSIF halt.ita_format = 'VARCHAR2'
+                    THEN
+                        append  (l_if_or||' Nvl(:OLD.'||halt.ita_attrib_name||',''$$$$$$$$$$'') != '); append  ('Nvl(:NEW.'||halt.ita_attrib_name||',''$$$$$$$$$$'')','N');
+                    ELSIF halt.ita_format = 'NUMBER'
+                    THEN
+                        append  (l_if_or||' Nvl(:OLD.'||halt.ita_attrib_name||',-999999999) != '); append  ('Nvl(:NEW.'||halt.ita_attrib_name||',-999999999)','N');                        
+                    END IF ;
+                END LOOP;
+            END IF ;
+            append  ('THEN');   
+            trg_body(l_halt_rec.halt_operation,l_halt_rec.halt_id,l_nit_rec.nit_foreign_pk_column) ;
+            append  ('END IF;'); 
+        ELSE
+               trg_body(l_halt_rec.halt_operation,l_halt_rec.halt_id,l_nit_rec.nit_foreign_pk_column) ;
+        END IF ; 
         append ('END;');
         g_trigger_text := Substr(g_trigger_text,2);
+--nm_debug.debug_on;
 --nm_debug.debug(l_trigger_name);
 --nm_debug.debug(g_trigger_text);
 --nm_debug.debug(Length(g_trigger_text));
