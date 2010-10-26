@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.34   Sep 10 2010 10:41:40   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.35   Oct 26 2010 13:18:54   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Sep 10 2010 10:41:40  $
---       Date fetched Out : $Modtime:   Sep 10 2010 10:36:56  $
---       PVCS Version     : $Revision:   2.34  $
+--       Date into PVCS   : $Date:   Oct 26 2010 13:18:54  $
+--       Date fetched Out : $Modtime:   Oct 26 2010 13:12:48  $
+--       PVCS Version     : $Revision:   2.35  $
 --
 --
 --   Author : Priidu Tanava
@@ -124,7 +124,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.34  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.35  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -531,9 +531,9 @@ No query types defined.
           ||cr||'  ,null iit_rowid'
           ||cr||'  ,cast(null as date) iit_date_modified'
           ||cr||'from'
-          ||cr||'   '||t_ft(i).table_name
+          ||cr||'   '||t_ft(i).table_name ||' i '
           ||cr||'  ,nm_datum_criteria_tmp x'
-              ||sql_datum_tbl_join(t_ft(i).table_ne_column, 'where ')
+              ||sql_datum_tbl_join(t_ft(i).table_ne_column, 'where ', 'i')
               ||sql_ft_criteria(l_where_and, t_ft(i).where_sql);
 
       end if;
