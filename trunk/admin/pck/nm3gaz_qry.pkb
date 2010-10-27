@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.11   Oct 25 2010 10:49:34   ade.edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.12   Oct 27 2010 08:58:22   ade.edwards  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Oct 25 2010 10:49:34  $
---       Date fetched Out : $Modtime:   Oct 25 2010 10:48:56  $
---       Version          : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Oct 27 2010 08:58:22  $
+--       Date fetched Out : $Modtime:   Oct 27 2010 08:53:26  $
+--       Version          : $Revision:   2.12  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb 1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.11  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.12  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -901,13 +901,13 @@ BEGIN
       THEN
         IF g_tab_is_point_inv(p_ngqt_index)
         THEN
-           append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN NVL(ex.nm_slk,ex.nm_begin_mp) AND NVL(ex.nm_end_slk,ex.nm_end_mp)');
+           append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN ex.nm_slk AND ex.nm_end_slk');
          ELSE
-           append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= NVL(ex.nm_end_slk,ex.nm_end_mp)');
+           append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= ex.nm_end_slk');
            append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
                                                          THEN l_end_mp_col
                                                          ELSE l_begin_mp_col
-                                                       END||' >= NVL(ex.nm_slk,ex.nm_begin_mp)');
+                                                       END||' >= ex.nm_slk');
         END IF;
     -- nm_gaz_query
         IF  l_rec_ngq.ngq_begin_mp IS NOT NULL
