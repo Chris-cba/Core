@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm42x0_nm4300_upg.sql-arc   3.0   Sep 16 2010 15:54:18   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm42x0_nm4300_upg.sql-arc   3.1   Oct 27 2010 15:28:08   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm42x0_nm4300_upg.sql  $
---       Date into PVCS   : $Date:   Sep 16 2010 15:54:18  $
---       Date fetched Out : $Modtime:   Sep 16 2010 15:43:36  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Oct 27 2010 15:28:08  $
+--       Date fetched Out : $Modtime:   Oct 27 2010 15:27:42  $
+--       Version          : $Revision:   3.1  $
 --
 --   Product upgrade script
 --
@@ -78,6 +78,15 @@ begin
 END;
 /
 WHENEVER SQLERROR CONTINUE
+--
+---------------------------------------------------------------------------------------------------
+--    *****   Grant that is required to be able to create clusters this upg (4300) only   *****
+--        *****   Here because it was needed for 4210 (TMA) DDL but not catered for   *****
+-- 
+SET TERM ON
+PROMPT Grant Create Any Cluster
+SET TERM OFF
+  GRANT CREATE ANY CLUSTER TO hig_admin;
 --
 ---------------------------------------------------------------------------------------------------
 --                        **************** DROP POLICIES *******************
