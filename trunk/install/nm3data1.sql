@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.49   Oct 28 2010 12:26:26   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.50   Oct 28 2010 14:08:28   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Oct 28 2010 12:26:26  $
---       Date fetched Out : $Modtime:   Oct 28 2010 12:24:48  $
---       Version          : $Revision:   2.49  $
+--       Date into PVCS   : $Date:   Oct 28 2010 14:08:28  $
+--       Date fetched Out : $Modtime:   Oct 28 2010 14:06:40  $
+--       Version          : $Revision:   2.50  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 28-OCT-2010 11:30
+--       Generation Date  : 28-OCT-2010 14:06
 --
 --   Product metadata script
 --   As at Release 4.3.0.0
@@ -6308,7 +6308,7 @@ SELECT
         'HIG'
        ,533
        ,null
-       ,'You are not permitted to submit a process.  '||CHR(10)||'Review process types and process type roles using the ''Process Types'' module.'
+       ,'You are not permitted to submit a process.'||CHR(10)||'Review process types and process type roles using the ''Process Types'' module.'
        ,'' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'HIG'
@@ -14422,23 +14422,6 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'NET'
                     AND  NER_ID = 469);
---
-INSERT INTO NM_ERRORS
-       (NER_APPL
-       ,NER_ID
-       ,NER_HER_NO
-       ,NER_DESCR
-       ,NER_CAUSE
-       )
-SELECT 
-        'NET'
-       ,470
-       ,null
-       ,'No query has been provided by the calling form. Extended LOV cannot be opened'
-       ,'' FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
-                   WHERE NER_APPL = 'NET'
-                    AND  NER_ID = 470);
 --
 --
 --
