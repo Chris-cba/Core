@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.19   Oct 28 2010 11:36:36   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.20   Oct 28 2010 12:26:24   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data7.sql  $
---       Date into PVCS   : $Date:   Oct 28 2010 11:36:36  $
---       Date fetched Out : $Modtime:   Oct 28 2010 11:30:54  $
---       Version          : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Oct 28 2010 12:26:24  $
+--       Date fetched Out : $Modtime:   Oct 28 2010 12:25:20  $
+--       Version          : $Revision:   2.20  $
 --       Table Owner      : NM3_METADATA
 --       Generation Date  : 28-OCT-2010 11:30
 --
@@ -14512,7 +14512,7 @@ SELECT
         'NET'
        ,464
        ,null
-       ,'Update is not allowed. This is not the latest occurance of the asset.'
+       ,'Update is not allowed. This is not the latest occurrence of the asset.'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
