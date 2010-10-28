@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.47   Oct 11 2010 10:03:36   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data1.sql-arc   2.48   Oct 28 2010 11:33:38   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data1.sql  $
---       Date into PVCS   : $Date:   Oct 11 2010 10:03:36  $
---       Date fetched Out : $Modtime:   Oct 11 2010 09:59:12  $
---       Version          : $Revision:   2.47  $
+--       Date into PVCS   : $Date:   Oct 28 2010 11:33:38  $
+--       Date fetched Out : $Modtime:   Oct 28 2010 11:30:38  $
+--       Version          : $Revision:   2.48  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 11-OCT-2010 09:59
+--       Generation Date  : 28-OCT-2010 11:30
 --
 --   Product metadata script
 --   As at Release 4.3.0.0
@@ -6568,6 +6568,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'HIG'
                     AND  NER_ID = 548);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,549
+       ,null
+       ,'It is not possible to create a document when enquiries product is at a version before 4.3.0.0'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'HIG'
+                    AND  NER_ID = 549);
 --
 INSERT INTO NM_ERRORS
        (NER_APPL
@@ -14388,6 +14405,40 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
                    WHERE NER_APPL = 'NET'
                     AND  NER_ID = 468);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,469
+       ,null
+       ,'The selected network does not exist at this effective date.'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 469);
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,470
+       ,null
+       ,'No query has been provided by the calling form. Extended LOV cannot be opened'
+       ,'' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM NM_ERRORS
+                   WHERE NER_APPL = 'NET'
+                    AND  NER_ID = 470);
 --
 --
 --
@@ -39088,51 +39139,6 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
                    WHERE HSA_TABLE_NAME = 'NM_X_INV_CONDITIONS'
                     AND  HSA_COLUMN_NAME = 'NXIC_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
-        'TMA_CONTACTS_ALL'
-       ,'CNT_ID'
-       ,'TMA_CNT_ID_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'TMA_CONTACTS_ALL'
-                    AND  HSA_COLUMN_NAME = 'CNT_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
-        'TMA_CONTACT_ASSOCIATIONS'
-       ,'CNTA_ID'
-       ,'TMA_CNTA_ID_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'TMA_CONTACT_ASSOCIATIONS'
-                    AND  HSA_COLUMN_NAME = 'CNTA_ID');
---
-INSERT INTO HIG_SEQUENCE_ASSOCIATIONS
-       (HSA_TABLE_NAME
-       ,HSA_COLUMN_NAME
-       ,HSA_SEQUENCE_NAME
-       ,HSA_LAST_REBUILD_DATE
-       )
-SELECT 
-        'TMA_CONTACT_ROLES'
-       ,'CNTR_ROLE_ID'
-       ,'TMA_CNTR_ID_SEQ'
-       ,null FROM DUAL
- WHERE NOT EXISTS (SELECT 1 FROM HIG_SEQUENCE_ASSOCIATIONS
-                   WHERE HSA_TABLE_NAME = 'TMA_CONTACT_ROLES'
-                    AND  HSA_COLUMN_NAME = 'CNTR_ROLE_ID');
 --
 --
 --
