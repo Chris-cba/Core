@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.25   Sep 16 2010 16:33:34   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.26   Oct 28 2010 11:02:34   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Sep 16 2010 16:33:34  $
---       Date fetched Out : $Modtime:   Sep 16 2010 16:32:10  $
---       PVCS Version     : $Revision:   2.25  $
+--       Date into PVCS   : $Date:   Oct 28 2010 11:02:34  $
+--       Date fetched Out : $Modtime:   Oct 28 2010 11:02:20  $
+--       PVCS Version     : $Revision:   2.26  $
 --
 --------------------------------------------------------------------------------
 --
@@ -398,6 +398,10 @@ FROM v$instance
     ,user_users;
 
 START compile_all.sql
+--
+alter view network_node compile;
+--
+alter synonym road_seg_membs_partial compile;
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   CONTEXT   *******************
