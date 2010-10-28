@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.18   Oct 11 2010 10:03:34   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data7.sql-arc   2.19   Oct 28 2010 11:36:36   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data7.sql  $
---       Date into PVCS   : $Date:   Oct 11 2010 10:03:34  $
---       Date fetched Out : $Modtime:   Oct 11 2010 09:59:12  $
---       Version          : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Oct 28 2010 11:36:36  $
+--       Date fetched Out : $Modtime:   Oct 28 2010 11:30:54  $
+--       Version          : $Revision:   2.19  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 11-OCT-2010 09:59
+--       Generation Date  : 28-OCT-2010 11:30
 --
 --   Product metadata script
 --   As at Release 4.3.0.0
@@ -6287,6 +6287,24 @@ SELECT
        ,548
        ,null
        ,'Application is not configured correctly.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'HIG'
+  AND  NER_ID = 549;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'HIG'
+       ,549
+       ,null
+       ,'It is not possible to create a document when enquiries product is at a version before 4.3.0.0'
        ,'' FROM DUAL;
 --
 DELETE FROM NM_ERRORS
@@ -14568,6 +14586,42 @@ SELECT
        ,null
        ,'Please ensure all datum networks are registered with 3D diminfo.'
        ,'Subscript beyond count' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 469;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,469
+       ,null
+       ,'The selected network does not exist at this effective date.'
+       ,'' FROM DUAL;
+--
+DELETE FROM NM_ERRORS
+ WHERE NER_APPL = 'NET'
+  AND  NER_ID = 470;
+--
+INSERT INTO NM_ERRORS
+       (NER_APPL
+       ,NER_ID
+       ,NER_HER_NO
+       ,NER_DESCR
+       ,NER_CAUSE
+       )
+SELECT 
+        'NET'
+       ,470
+       ,null
+       ,'No query has been provided by the calling form. Extended LOV cannot be opened'
+       ,'' FROM DUAL;
 --
 --
 --
