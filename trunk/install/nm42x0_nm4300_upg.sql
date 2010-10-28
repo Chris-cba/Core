@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm42x0_nm4300_upg.sql-arc   3.1   Oct 27 2010 15:28:08   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm42x0_nm4300_upg.sql-arc   3.2   Oct 28 2010 11:01:28   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm42x0_nm4300_upg.sql  $
---       Date into PVCS   : $Date:   Oct 27 2010 15:28:08  $
---       Date fetched Out : $Modtime:   Oct 27 2010 15:27:42  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Oct 28 2010 11:01:28  $
+--       Date fetched Out : $Modtime:   Oct 28 2010 11:01:00  $
+--       Version          : $Revision:   3.2  $
 --
 --   Product upgrade script
 --
@@ -278,6 +278,10 @@ start '&run_file'
 spool &logfile2
 SET TERM ON
 start compile_all.sql
+--
+alter view network_node compile;
+--
+alter synonym road_seg_membs_partial compile;
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   CONTEXT   *******************
