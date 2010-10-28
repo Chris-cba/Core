@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_metadata_upg.sql-arc   3.8   Oct 28 2010 11:26:10   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4210_nm4300_metadata_upg.sql-arc   3.9   Oct 28 2010 11:29:14   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4210_nm4300_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Oct 28 2010 11:26:10  $
---       Date fetched Out : $Modtime:   Oct 14 2010 16:32:02  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   Oct 28 2010 11:29:14  $
+--       Date fetched Out : $Modtime:   Oct 28 2010 11:28:10  $
+--       Version          : $Revision:   3.9  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -379,7 +379,7 @@ SET TERM OFF
 -- 110221
 -- 
 -- TASK DETAILS
--- TMA supporting database jobs have now been converted to run via the Process Framework in order to give visibility and also to all these processes to be easily amended, disabled, enabled.
+-- TMA supporting database jobs have now been converted to run via the Process Framework in order to give visibility and also to allow all these processes to be easily amended, disabled, enabled.
 -- 
 -- In particular the driving requirement behind this is so that an administrator could disable the processes which send/recieve transactions whilst system maintenance and or gazetteer loading is taking place.
 -- 
@@ -1654,6 +1654,87 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM NM_CHARACTER_SET_MEMBERS
                    WHERE NCSM_NCS_CODE = 'INVALID_FOR_DDL'
                     AND  NCSM_ASCII_CHARACTER = 172);
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New error message NET 469
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 108684
+-- 
+-- TASK DETAILS
+-- Asset modules - Locating an asset on a date before the network was open now being handled with a sensible error message.
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
+-- New Error Message
+-- 
+------------------------------------------------------------------
+INSERT INTO NM_ERRORS ( NER_APPL
+                      , NER_ID
+                      , NER_DESCR)
+SELECT 'NET'
+     , 469
+     , 'The selected network does not exist at this effective date.'
+     FROM DUAL
+     WHERE NOT EXISTS (SELECT 'X' 
+                       FROM NM_ERRORS
+                       WHERE NER_APPL = 'NET'
+                       AND NER_ID = 469)
+/
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New Error Message HIG 549
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 110222
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
+-- New Error Message
+-- 
+------------------------------------------------------------------
+INSERT INTO NM_ERRORS ( NER_APPL
+                      , NER_ID
+                      , NER_DESCR)
+SELECT 'HIG'
+     , 549
+     , 'It is not possible to create a document when enquiries product is at a version before 4.3.0.0'
+     FROM DUAL
+     WHERE NOT EXISTS (SELECT 'X' 
+                       FROM NM_ERRORS
+                       WHERE NER_APPL = 'HIG'
+                       AND NER_ID = 549)
+/
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Remove redundant Hig_Sequence_Assoc records
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (MICHAEL ALEXANDER)
+-- This statement was first issued in the 4050 upgrade but not aplied to the metadata account.  It has now been applied to the metadata account and the statement re-issued to remove the obsolete metadata in respect of any occurrences of 4100 or 4200 installations of TMA (data should not have been in this account).
+-- 
+------------------------------------------------------------------
+delete from HIG_SEQUENCE_ASSOCIATIONS where HSA_SEQUENCE_NAME like 'TMA_CNT%'
+/
+
 ------------------------------------------------------------------
 
 
