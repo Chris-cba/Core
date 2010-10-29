@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.8   Aug 05 2010 09:32:56   cstrettle  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.9   Oct 29 2010 14:25:02   Chris.Strettle  $
 --       Module Name      	: $Workfile:   nm3inv_view.pkb  $
---       Date into PVCS   	: $Date:   Aug 05 2010 09:32:56  $
---       Date fetched Out 	: $Modtime:   Aug 02 2010 16:13:26  $
---       PVCS Version     	: $Revision:   2.8  $
+--       Date into PVCS   	: $Date:   Oct 29 2010 14:25:02  $
+--       Date fetched Out 	: $Modtime:   Oct 29 2010 13:38:50  $
+--       PVCS Version     	: $Revision:   2.9  $
 --       Based on SCCS version 	: 1.56
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --      Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.8      $';
+   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.9      $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
 --all global package variables here
@@ -1022,8 +1022,8 @@ PROCEDURE create_ft_inv_for_nt_type (pi_nt_type                  IN varchar2
    l_dummy            pls_integer;
 --
    l_rec_nt           nm_types%ROWTYPE;
---
    l_rec_nit          nm_inv_types%ROWTYPE;
+   l_rec_ngt          nm_group_types%ROWTYPE;
 --
    l_tab_column       nm3type.tab_varchar2000;
    l_tab_alias        nm3type.tab_varchar30;
@@ -1056,6 +1056,14 @@ PROCEDURE create_ft_inv_for_nt_type (pi_nt_type                  IN varchar2
     l_TYPE_ATTRIBS l_TYPE_ATTRIBS_TAB:= l_TYPE_ATTRIBS_TAB();
 --
     l_TYPE_ROLES l_TYPE_ROLES_TAB:= l_TYPE_ROLES_TAB();
+--
+    l_primary VARCHAR2(1);
+    l_rec_ntc2      nm_inv_type_attribs_all%ROWTYPE;
+--
+   CURSOR chk_for_primary IS
+   SELECT 'Y' FROM nm_nw_ad_types
+   WHERE nad_nt_type = pi_nt_type
+   AND nad_primary_ad = 'Y';
 --
    PROCEDURE add_data (p_col_name   varchar2
                       ,p_alias      varchar2
@@ -1157,11 +1165,9 @@ PROCEDURE create_ft_inv_for_nt_type (pi_nt_type                  IN varchar2
       l_rec_ita.ita_format_mask     := NULL;
       l_rec_ita.ita_exclusive       := 'N';
       l_rec_ita.ita_exclusive       := 'N';
-      --SSCANLON FIX LOG 709536 17JUL2007
-      --force all columns to be displayed and default the width to 1, advised by GJohnson
       l_rec_ita.ITA_DISPLAYED       := 'Y';
       l_rec_ita.ITA_DISP_WIDTH      := 1;
-      --END OF SSCANLON FIX LOG 709536 17JUL2007
+      --
       l_tab_nita (l_tab_nita.COUNT+1) := l_rec_ita;
 --
    END add_data;
@@ -1169,26 +1175,29 @@ PROCEDURE create_ft_inv_for_nt_type (pi_nt_type                  IN varchar2
 BEGIN
 --
    nm_debug.proc_start(g_package_name, 'create_ft_inv_for_nt_type');
---
-   OPEN  cs_nt (pi_nt_type);
-   FETCH cs_nt INTO l_rec_nt;
-   IF cs_nt%NOTFOUND
-    THEN
-      CLOSE cs_nt;
-      hig.raise_ner(pi_appl               => nm3type.c_net
-                   ,pi_id                 => 244
-                   ,pi_supplementary_info => pi_nt_type
-                   );
-   END IF;
-   CLOSE cs_nt;
-   IF  l_rec_nt.nt_linear != 'Y'
+   --
+   l_rec_ngt:= nm3get.get_ngt( pi_ngt_group_type => pi_nt_type
+                             , pi_raise_not_found => FALSE);
+   --
+   l_rec_nt:= nm3get.get_nt( pi_nt_type => NVL(l_rec_ngt.ngt_nt_type, pi_nt_type)
+                           , pi_raise_not_found => FALSE);
+   --
+     IF l_rec_nt.nt_type IS NULL
+      THEN
+        hig.raise_ner(pi_appl               => nm3type.c_net
+                     ,pi_id                 => 244
+                     ,pi_supplementary_info => pi_nt_type
+                     );
+     END IF;
+   --
+  /* IF  l_rec_nt.nt_linear != 'Y'
     OR l_rec_nt.nt_datum  != 'Y'
     THEN
       hig.raise_ner(pi_appl               => nm3type.c_net
                    ,pi_id                 => 245
                    ,pi_supplementary_info => NULL
                    );
-   END IF;
+   END IF;*/
 --
    OPEN  cs_lock_existing (l_inv_type);
    FETCH cs_lock_existing INTO l_nit_category;
@@ -1242,7 +1251,7 @@ BEGIN
    l_rec_nit.nit_replaceable       := 'N';
    l_rec_nit.nit_exclusive         := 'N';
    l_rec_nit.nit_category          := c_nit_category;
-   l_rec_nit.nit_descr             := SUBSTR('FT Inv for "'||l_rec_nt.nt_descr||'"',1,80);
+   l_rec_nit.nit_descr             := SUBSTR('FT Inv for "'||NVL(l_rec_ngt.ngt_descr,l_rec_nt.nt_descr)||'"',1,80);
    l_rec_nit.nit_linear            := 'N';
    l_rec_nit.nit_use_xy            := 'N';
    l_rec_nit.nit_multiple_allowed  := 'N';
@@ -1254,9 +1263,16 @@ BEGIN
    CLOSE cs_nat;
    l_rec_nit.nit_start_date        := NVL(l_rec_nit.nit_start_date,nm3user.get_effective_date);
    l_rec_nit.nit_end_date          := NULL;
-   l_rec_nit.nit_short_descr       := l_rec_nt.nt_unique;
+   l_rec_nit.nit_short_descr       := NVL(l_rec_ngt.ngt_descr, l_rec_nt.nt_unique);
    l_rec_nit.nit_flex_item_flag    := 'N';
-   l_rec_nit.nit_table_name        := derive_inv_type_view_name(l_rec_nit.nit_inv_type);
+   --
+   IF l_rec_ngt.ngt_group_type IS NULL 
+   THEN
+     l_rec_nit.nit_table_name        := derive_inv_type_view_name(pi_nt_type)||'_NT';
+   ELSE
+     l_rec_nit.nit_table_name        := derive_inv_type_view_name(pi_nt_type)||'_'|| l_rec_ngt.ngt_nt_type ||'_NT';
+   END IF;
+   --
    l_rec_nit.nit_lr_ne_column_name := 'NE_ID';
    l_rec_nit.nit_lr_st_chain       := 'NE_BEGIN_MP';
    l_rec_nit.nit_lr_end_chain      := 'NE_LENGTH';
@@ -1268,15 +1284,21 @@ BEGIN
    add_data ('NE_ID',NULL);
    add_data ('NE_ID','NE_FT_PK_COL');
    add_data ('NE_UNIQUE',NULL);
-   add_data ('TO_NUMBER(0)','NE_BEGIN_MP');
+  -- add_data ('TO_NUMBER(0)','NE_BEGIN_MP');
    add_data ('NE_LENGTH',NULL);
-   add_data ('NE_NO_START','START_NODE_ID');
-   add_data ('NE_NO_END','END_NODE_ID');
+   --
+   IF l_rec_ngt.ngt_group_type IS NULL
+   THEN
+     add_data ('NE_NO_START','START_NODE_ID');
+     add_data ('NE_NO_END','END_NODE_ID');
+   END IF;
+   --
    add_data ('NE_DESCR',NULL);
    add_data ('NE_START_DATE',NULL);
    add_data ('NE_ADMIN_UNIT',NULL);
    add_data ('SUBSTR(nm3ausec.get_nau_unit_code(NE_ADMIN_UNIT),1,10)','ADMIN_UNIT_CODE');
---
+   add_data ('NE_GTY_GROUP_TYPE',NULL);
+   --
    FOR cs_rec IN (SELECT *
                    FROM  nm_type_columns
                   WHERE  ntc_nt_type = pi_nt_type
@@ -1329,42 +1351,67 @@ BEGIN
          --
       END;
    END LOOP;
---
-   l_tab_vc.DELETE;
-   nm3ddl.append_tab_varchar(l_tab_vc,'CREATE OR REPLACE VIEW '||c_owner||'.'||l_rec_nit.nit_table_name||' AS',FALSE);
-   nm3ddl.append_tab_varchar(l_tab_vc,'SELECT ');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--');
-   nm3ddl.append_tab_varchar(l_tab_vc,'-----------------------------------------------------------------------------');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--   SCCS Identifiers :-');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--       sccsid           : @(#)nm3inv_view.pkb	1.51 06/08/04');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--       Module Name      : nm3inv_view.pkb');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--       Date into SCCS   : 04/06/08 08:24:07');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--       Date fetched Out : 04/07/15 09:43:48');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--       SCCS Version     : 1.51');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--   Author : Jonathan Mills');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--   Inventory foreign table view for NT_TYPE "'||pi_nt_type||'"');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--   Generated by '||g_package_name||' package body');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--');
-   nm3ddl.append_tab_varchar(l_tab_vc,'-----------------------------------------------------------------------------');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--      Copyright (c) exor corporation ltd, 2001');
-   nm3ddl.append_tab_varchar(l_tab_vc,'-----------------------------------------------------------------------------');
-   nm3ddl.append_tab_varchar(l_tab_vc,'--');
-   FOR i IN 1..l_tab_alias.COUNT
-    LOOP
-      nm3ddl.append_tab_varchar(l_tab_vc,l_line_begin||l_tab_column(i)||' '||l_tab_alias(i));
-      l_line_begin := '      ,';
-   END LOOP;
-   nm3ddl.append_tab_varchar(l_tab_vc,' FROM nm_elements');
-   nm3ddl.append_tab_varchar(l_tab_vc,'WHERE ne_nt_type = '||nm3flx.string(pi_nt_type));
-   nm3ddl.append_tab_varchar(l_tab_vc,' AND  ne_type    = '||nm3flx.string('S'));
-   nm3ddl.append_tab_varchar(l_tab_vc,'WITH READ ONLY');
-   nm3ddl.create_object_and_syns (l_rec_nit.nit_table_name,l_tab_vc);
-   l_tab_vc.DELETE;
+   --
+   OPEN chk_for_primary;
+   FETCH chk_for_primary INTO l_primary;
+   IF chk_for_primary%NOTFOUND THEN
+      CLOSE chk_for_primary;
+      l_primary := 'N';
+   ELSE
+      CLOSE chk_for_primary;
+      NULL;
+   END IF;
+
+   IF l_primary = 'Y' THEN
+    --  Now add the extra attribute columns
+      FOR cs_rec IN ( SELECT * FROM nm_inv_type_attribs_all
+                      WHERE ita_inv_type = (SELECT nad_inv_type FROM nm_nw_ad_types
+                                            WHERE nad_nt_type = l_rec_nt.nt_type
+                                            AND NVL(nad_gty_type, '-1') = NVL(l_rec_ngt.ngt_group_type, '-1')
+                                            AND nad_primary_ad = 'Y')
+                      ORDER BY ita_disp_seq_no
+                    )
+      LOOP
+         DECLARE
+            l_rec_ita   nm_inv_type_attribs%ROWTYPE;
+         BEGIN
+              l_rec_ita:= cs_rec;
+              --
+              l_rec_ita.ita_inv_type        := l_rec_nit.nit_inv_type;
+              l_rec_ita.ita_attrib_name     := NVL(SUBSTR(UPPER(REPLACE(cs_rec.ita_view_col_name,' ','_')),1,30),l_rec_ita.ita_attrib_name);
+              l_rec_ita.ita_dynamic_attrib  := 'N';
+              l_rec_ita.ita_disp_seq_no     := l_tab_nita.COUNT*10+10;
+              IF NOT nm3get.get_id(pi_id_domain => l_rec_ita.ita_id_domain,pi_raise_not_found => FALSE).id_start_date < l_rec_nit.nit_start_date
+              THEN
+                l_rec_ita.ita_id_domain       := NULL;
+              END IF;
+              l_rec_ita.ita_mandatory_yn    := l_rec_ntc.ntc_mandatory;
+              l_rec_ita.ita_validate_yn     := 'N';
+              l_rec_ita.ita_dtp_code        := NULL;
+              l_rec_ita.ita_view_attri      := l_rec_ita.ita_attrib_name;
+              l_rec_ita.ita_view_col_name   := l_rec_ita.ita_attrib_name;
+              l_rec_ita.ita_start_date      := l_rec_nit.nit_start_date;
+              l_rec_ita.ita_end_date        := NULL;
+              l_rec_ita.ita_queryable       := 'N';
+              l_rec_ita.ita_ukpms_param_no  := NULL;
+              l_rec_ita.ita_exclusive       := 'N';
+              l_rec_ita.ita_displayed       := 'Y';
+              l_rec_ita.ita_disp_width      := nvl(l_rec_ita.ITA_DISP_WIDTH, 10);
+              --
+              l_tab_nita (l_tab_nita.COUNT+1) := l_rec_ita;
+         END;
+         --
+      END LOOP;
+   END IF;
+   --
+   IF nm3ddl.does_object_exist(p_object_name => l_rec_nit.nit_table_name
+                              ,p_object_type => 'VIEW')
+   THEN
+   --
+     create_view_for_nt_type(pi_nt_type=> pi_nt_type);
+   --
+   END IF;
+   
    --
    nm3inv.ins_nit (l_rec_nit);
    nm3inv.ins_tab_ita (l_tab_nita);
@@ -1383,9 +1430,7 @@ END create_ft_inv_for_nt_type;
 --
 ----------------------------------------------------------------------------------------------
 --
--------------------------------------------------------------------------------------------------
-
-PROCEDURE create_view_for_nt_type (pi_nt_type  IN varchar2 ) IS
+PROCEDURE create_view_for_nt_type (pi_nt_type  IN VARCHAR2) IS
 --
    PRAGMA autonomous_transaction;
 --
@@ -1479,9 +1524,12 @@ BEGIN
    nm_debug.proc_start(g_package_name, 'create_view_for_nt_type');
 --
    add_data ('a.NE_ID',NULL);
+   add_data ('a.NE_ID','NE_FT_PK_COL');
    add_data ('a.NE_UNIQUE',NULL);
--- add_data ('TO_NUMBER(0)','NE_BEGIN_MP');
+   add_data ('TO_NUMBER(0)','NE_BEGIN_MP');
    add_data ('a.NE_LENGTH',NULL);
+   add_data ('a.NE_NO_START','START_NODE_ID');
+   add_data ('a.NE_NO_END','END_NODE_ID');
    add_data ('a.NE_DESCR',NULL);
    add_data ('a.NE_START_DATE',NULL);
    add_data ('a.NE_ADMIN_UNIT',NULL);
@@ -1632,11 +1680,11 @@ BEGIN
 
    END IF;
    --
-   IF l_rec_nt.nt_datum = 'Y' THEN
-      add_data ('NE_NO_START',NULL);
-      add_data ('NE_NO_END',NULL);
-   END IF;
---
+  /* IF l_rec_nt.nt_datum = 'Y' THEN
+      add_data ('NE_NO_START','START_NODE_ID');
+      add_data ('NE_NO_END','END_NODE_ID');
+   END IF;*/
+   --
    nm_debug.debug('CREATE OR REPLACE VIEW '||c_owner||'.'||'V_NM_'||pi_nt_type||'_NT');
    l_tab_vc.DELETE;
    nm3ddl.append_tab_varchar(l_tab_vc,'CREATE OR REPLACE VIEW '||c_owner||'.'||'V_NM_'||pi_nt_type||'_NT'||' AS',FALSE);
@@ -1800,18 +1848,22 @@ BEGIN
    nm_debug.proc_start(g_package_name, 'create_view_for_nt_type');
 --
    add_data ('a.NE_ID',NULL);
+   add_data ('a.NE_ID','NE_FT_PK_COL');
    add_data ('a.NE_UNIQUE',NULL);
--- add_data ('TO_NUMBER(0)','NE_BEGIN_MP');
+   add_data ('TO_NUMBER(0)','NE_BEGIN_MP');
    add_data ('a.NE_LENGTH',NULL);
    add_data ('a.NE_DESCR',NULL);
    add_data ('a.NE_START_DATE',NULL);
    add_data ('a.NE_ADMIN_UNIT',NULL);
    add_data ('SUBSTR(nm3ausec.get_nau_unit_code(a.NE_ADMIN_UNIT),1,10)','ADMIN_UNIT_CODE');
-
--- only use this if the NT is used as a group of sections!
-
+   -- only use this if the NT is used as a group of sections!
    add_data ('a.NE_GTY_GROUP_TYPE',NULL);
-
+   --
+ /*  IF l_rec_nt.nt_datum = 'Y' THEN
+      add_data ('NE_NO_START','START_NODE_ID');
+      add_data ('NE_NO_END','START_NODE_ID');
+   END IF;*/
+   --
    OPEN  cs_nt (pi_nt_type);
    FETCH cs_nt INTO l_rec_nt;
    IF cs_nt%NOTFOUND
@@ -1949,11 +2001,6 @@ BEGIN
 
       END;
    END LOOP;
-
-   IF l_rec_nt.nt_datum = 'Y' THEN
-      add_data ('NE_NO_START',NULL);
-      add_data ('NE_NO_END',NULL);
-   END IF;
 --
    --nm_debug.debug('CREATE OR REPLACE VIEW '||c_owner||'.'||'V_NM_'||pi_nt_type||'_'||pi_gty_type||'_NT');
    l_tab_vc.DELETE;
