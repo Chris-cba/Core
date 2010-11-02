@@ -115,6 +115,7 @@ where a.owner     = USER
                      ,'VIEW'
                      ,'TYPE'
                      ,'TYPE BODY'
+                     ,'MATERIALIZED VIEW'
                      )
  AND  object_name <> 'ORD_OBJ_BY_DEPEND'
  AND  object_name NOT LIKE 'BIN$%'
