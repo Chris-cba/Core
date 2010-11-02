@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.9   Oct 29 2010 14:25:02   Chris.Strettle  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.10   Nov 02 2010 11:46:42   Chris.Strettle  $
 --       Module Name      	: $Workfile:   nm3inv_view.pkb  $
---       Date into PVCS   	: $Date:   Oct 29 2010 14:25:02  $
---       Date fetched Out 	: $Modtime:   Oct 29 2010 13:38:50  $
---       PVCS Version     	: $Revision:   2.9  $
+--       Date into PVCS   	: $Date:   Nov 02 2010 11:46:42  $
+--       Date fetched Out 	: $Modtime:   Nov 02 2010 11:13:48  $
+--       PVCS Version     	: $Revision:   2.10  $
 --       Based on SCCS version 	: 1.56
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --      Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.9      $';
+   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.10     $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
 --all global package variables here
@@ -1404,14 +1404,19 @@ BEGIN
       END LOOP;
    END IF;
    --
-   IF nm3ddl.does_object_exist(p_object_name => l_rec_nit.nit_table_name
-                              ,p_object_type => 'VIEW')
+   IF NOT nm3ddl.does_object_exist(p_object_name => l_rec_nit.nit_table_name
+                                  ,p_object_type => 'VIEW')
    THEN
    --
-     create_view_for_nt_type(pi_nt_type=> pi_nt_type);
+     IF l_rec_ngt.ngt_group_type IS NULL 
+     THEN
+       create_view_for_nt_type (pi_nt_type);
+     ELSE
+       create_view_for_nt_type ( pi_nt_type  => l_rec_ngt.ngt_nt_type
+                               , pi_gty_type => l_rec_ngt.ngt_group_type);
+     END IF;
    --
    END IF;
-   
    --
    nm3inv.ins_nit (l_rec_nit);
    nm3inv.ins_tab_ita (l_tab_nita);
