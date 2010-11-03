@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3locator AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.7  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.8  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3locator';
 
@@ -820,7 +820,14 @@ BEGIN
       add('  ,nm3locator.get_meaning_from_lookup('''||l_attrs(i_attr).ita_id_domain||''', irec.'||l_attrs(i_attr).ita_attrib_name||')');
     ELSE
       IF  l_attrs(i_attr).ita_format = 'DATE' THEN
-        add('  ,TO_CHAR(irec.'||l_attrs(i_attr).ita_attrib_name||','''||c_date_format||''')');
+        --CWS 03/11/10
+        IF nm3flx.get_column_datatype( pi_table_name  => NVL(l_nit.nit_table_name, 'NM_INV_ITEMS_ALL')
+                                     , pi_column_name => l_attrs(i_attr).ita_attrib_name) = 'DATE'
+        THEN
+          add('  ,TO_CHAR(irec.'||l_attrs(i_attr).ita_attrib_name||','''||NVL(l_attrs(i_attr).ita_format_mask, c_date_format)||''')');
+        ELSE
+          add('  ,TO_CHAR(TO_DATE(irec.'||l_attrs(i_attr).ita_attrib_name||','''||NVL(l_attrs(i_attr).ita_format_mask, c_date_format)||'''),'''||NVL(l_attrs(i_attr).ita_format_mask, c_date_format)||''')');
+        END IF;
       ELSE
         add('  ,SUBSTR(irec.'||l_attrs(i_attr).ita_attrib_name||',1,80)');
       END IF;
@@ -1067,7 +1074,15 @@ BEGIN
         add('  ,nm3locator.get_meaning_from_lookup('''||l_attrs(i_attr).ita_id_domain||''', ft.'||l_attrs(i_attr).ita_attrib_name||')');
       ELSE
         IF  l_attrs(i_attr).ita_format = 'DATE' THEN
-          add('  ,TO_CHAR(ft.'||l_attrs(i_attr).ita_attrib_name||','''||c_date_format||''')');
+          --CWS 03/11/10
+          --add('  ,TO_CHAR(ft.'||l_attrs(i_attr).ita_attrib_name||','''||c_date_format||''')');
+          IF nm3flx.get_column_datatype(pi_table_name => l_nit.nit_table_name
+                                       ,pi_column_name => l_attrs(i_attr).ita_attrib_name) = 'DATE'
+          THEN
+            add('  ,TO_CHAR(ft.'||l_attrs(i_attr).ita_attrib_name||','''||c_date_format||''')');
+          ELSE
+            add('  ,TO_CHAR(TO_DATE(ft.'||l_attrs(i_attr).ita_attrib_name||','''||NVL(l_attrs(i_attr).ita_format_mask, c_date_format)||'''),'''||NVL(l_attrs(i_attr).ita_format_mask, c_date_format)||''')');
+          END IF;
         ELSE
           add('  ,SUBSTR(ft.'||l_attrs(i_attr).ita_attrib_name||',1,80)');
         END IF;
@@ -1101,7 +1116,15 @@ BEGIN
         add('  ,nm3locator.get_meaning_from_lookup('''||l_attrs(i_attr).ita_id_domain||''', iit.'||l_attrs(i_attr).ita_attrib_name||')');
       ELSE
         IF  l_attrs(i_attr).ita_format = 'DATE' THEN
-          add('  ,TO_CHAR(iit.'||l_attrs(i_attr).ita_attrib_name||','''||c_date_format||''')');
+          --CWS 03/11/10
+          --add('  ,TO_CHAR(iit.'||l_attrs(i_attr).ita_attrib_name||','''||c_date_format||''')');
+          IF nm3flx.get_column_datatype(pi_table_name => 'NM_INV_ITEMS'
+                                       ,pi_column_name => l_attrs(i_attr).ita_attrib_name) = 'DATE'
+          THEN
+            add('  ,TO_CHAR(iit.'||l_attrs(i_attr).ita_attrib_name||','''||NVL(l_attrs(i_attr).ita_format_mask, c_date_format)||''')');
+          ELSE
+            add('  ,TO_CHAR(TO_DATE(iit.'||l_attrs(i_attr).ita_attrib_name||','''||NVL(l_attrs(i_attr).ita_format_mask, c_date_format)||'''),'''||NVL(l_attrs(i_attr).ita_format_mask, c_date_format)||''')');
+          END IF;
         ELSE
           add('  ,SUBSTR(iit.'||l_attrs(i_attr).ita_attrib_name||',1,80)');
         END IF;
@@ -1118,8 +1141,7 @@ BEGIN
 
   add('END;');
 
---  debug_sql;
-
+--debug_sql;
 --  nm_debug.debug_on;
   nm_debug.debug('populate_inv_tab_from_gaz_qry start SQL');
 --  nm_debug.debug_off;
@@ -1324,11 +1346,19 @@ BEGIN
       ELSE
         -- no domain just get value
         IF g_inv_attrs(l_pos).ita_format = 'DATE' THEN
-          add('  nm3locator.g_attr_detail := TO_CHAR(nm3locator.g_inv_rec.'||pi_attribute||', '''||c_date_format||''');');
+          --CWS 03/11/10
+          --  add('  nm3locator.g_attr_detail := TO_CHAR(nm3locator.g_inv_rec.'||pi_attribute||', '''||c_date_format||''');');
+          IF nm3flx.get_column_datatype(pi_table_name => NVL(l_nit.nit_table_name, 'NM_INV_ITEMS_ALL')
+                                       ,pi_column_name => g_inv_attrs(l_pos).ita_attrib_name) = 'DATE'
+          THEN
+            add('  nm3locator.g_attr_detail := TO_CHAR(nm3locator.g_inv_rec.'||pi_attribute||', '''||c_date_format||''');');
+          ELSE
+            add('  nm3locator.g_attr_detail := TO_CHAR(TO_DATE(nm3locator.g_inv_rec.'||pi_attribute||', '''||c_date_format||'''), '''||c_date_format||''');');
+          END IF;
         ELSE
           -- get full value
           select_it;
-
+          --
         END IF;
       END IF;
     END IF;
