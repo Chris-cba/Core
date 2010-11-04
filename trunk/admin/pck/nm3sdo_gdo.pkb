@@ -4,11 +4,11 @@ IS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdo.pkb-arc   3.4   Sep 28 2010 17:54:36   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_gdo.pkb-arc   3.5   Nov 04 2010 11:35:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo_gdo.pkb  $
---       Date into PVCS   : $Date:   Sep 28 2010 17:54:36  $
---       Date fetched Out : $Modtime:   Sep 28 2010 17:51:16  $
---       PVCS Version     : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Nov 04 2010 11:35:58  $
+--       Date fetched Out : $Modtime:   Nov 04 2010 11:33:42  $
+--       PVCS Version     : $Revision:   3.5  $
 --
 --------------------------------------------------------------------------------
 --
@@ -18,7 +18,7 @@ IS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) :='"$Revision:   3.4  $"';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) :='"$Revision:   3.5  $"';
   g_package_name CONSTANT VARCHAR2(30)   := 'nm3sdo_gdo';
   g_srid                  NUMBER ;
   b_srid_set              BOOLEAN := FALSE;
@@ -283,6 +283,8 @@ begin
                                                           , p_gdo_session_id => pi_sub_select_session  );
   
   insert_gdo_from_theme_array( pi_session_id,pi_theme_name, l_list ); 
+
+  commit;
 
 end;
        
