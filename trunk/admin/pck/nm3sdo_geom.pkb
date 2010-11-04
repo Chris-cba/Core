@@ -5,16 +5,16 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkb-arc   1.5   Oct 22 2009 11:37:10   aedwards  $
---       Module Name      : $Workfile:   nm3sdo_geom.pkb  $
---       Date into PVCS   : $Date:   Oct 22 2009 11:37:10  $
---       Date fetched Out : $Modtime:   Oct 22 2009 11:36:04  $
---       PVCS Version     : $Revision:   1.5  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_geom.pkb-arc   1.6   Nov 04 2010 14:27:26   Rob.Coupe  $
+--       Module Name      : $Workfile:   NM3SDO_GEOM.pkb  $
+--       Date into PVCS   : $Date:   Nov 04 2010 14:27:26  $
+--       Date fetched Out : $Modtime:   Nov 04 2010 14:27:00  $
+--       PVCS Version     : $Revision:   1.6  $
 --       Based on
 --
 --------------------------------------------------------------------------------
 --
-  g_body_sccsid    CONSTANT VARCHAR2(30) :='"$Revision:   1.5  $"';
+  g_body_sccsid    CONSTANT VARCHAR2(30) :='"$Revision:   1.6  $"';
   g_tab_xys                 nm3sdo_gdo.tab_xys;
  -- g_tab_nm_coords           nm_coords_array := NEW nm_coords_array();
 --
@@ -41,6 +41,8 @@ AS
 --
 --------------------------------------------------------------------------------
 --
+function  get_tol_from_gdo(p_session_id in gis_data_objects.gdo_session_id%type) return number;
+
   FUNCTION get_version RETURN VARCHAR2 
   IS
   BEGIN
@@ -229,6 +231,8 @@ AS
     l_y           NUMBER;
     l_ord_count   NUMBER;
   --
+    l_tol  NUMBER;
+  --
     ex_no_coords               EXCEPTION;
     ex_invalid_gtype_for_gdo   EXCEPTION;
     ex_unsupported_gtype       EXCEPTION;
@@ -305,9 +309,8 @@ AS
         RAISE ex_unsupported_gtype;
       END IF;
     --
-
+     l_tol := get_tol_from_gdo( p_gdo_session_id );
     --
-
       RETURN sdo_util.rectify_geometry
              ( sdo_util.remove_duplicate_vertices
                 ( mdsys.sdo_geometry( p_gtype
@@ -315,8 +318,8 @@ AS
                                     , NULL
                                     , l_elem
                                     , l_ords )
-                , 0.0001)
-             , 0.0001);
+                , l_tol)
+             , l_tol);
 
     END IF;  
   --
@@ -388,6 +391,34 @@ AS
 --
 --------------------------------------------------------------------------------
 --
+function get_tol_from_gdo( p_session_id in gis_data_objects.gdo_session_id%type ) return number is
+ cursor c1 ( c_session_id in gis_data_objects.gdo_session_id%type ) is
+   select a.diminfo
+    from user_sdo_geom_metadata a, gis_data_objects, nm_themes_all
+    where gdo_session_id = c_session_id
+    and gdo_theme_name = nth_theme_name
+    and table_name = nth_feature_table;
+diminfo mdsys.sdo_dim_array;    
+retval number;    
+ begin
+  open c1( p_session_id );
+  fetch c1 into diminfo;
+  close c1;
+  retval := diminfo(1).sdo_tolerance ;
+  
+  if retval is null then
+    retval := g_tolerance;
+  end if;
+  return retval;
+exception
+ when no_data_found then
+   return g_tolerance;
+ when others then    
+   return g_tolerance;
+ end;
+--------------------------------------------------------------------------------
+--
+ 
 BEGIN
   g_srid := get_nw_srids;
 END nm3sdo_geom;
