@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.46   Nov 05 2010 10:10:38   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.47   Nov 08 2010 13:55:18   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Nov 05 2010 10:10:38  $
---       Date fetched Out : $Modtime:   Nov 05 2010 10:08:28  $
---       PVCS Version     : $Revision:   2.46  $
+--       Date into PVCS   : $Date:   Nov 08 2010 13:55:18  $
+--       Date fetched Out : $Modtime:   Nov 08 2010 13:54:04  $
+--       PVCS Version     : $Revision:   2.47  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.46  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.47  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -4949,11 +4949,11 @@ BEGIN
 --
   -- Task 0109983
   -- Validate the geometry and raise error if appropriate
-  --
-  IF g_do_geom_validation
-  THEN
-    evaluate_and_raise_geo_val (validate_geometry(l_geom,p_layer,NULL));
-  END IF;
+  -- (task 0109983 - after system test failure - the validation was temporarily removed)
+--  IF g_do_geom_validation
+--  THEN
+--    evaluate_and_raise_geo_val (validate_geometry(l_geom,p_layer,NULL));
+--  END IF;
 --
   IF use_surrogate_key = 'N' OR l_is_datum THEN
 
