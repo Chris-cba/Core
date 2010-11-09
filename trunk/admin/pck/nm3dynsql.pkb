@@ -2,11 +2,11 @@ CREATE OR REPLACE package body nm3dynsql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.8   20 Aug 2010 11:11:02   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.9   Nov 09 2010 15:52:46   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3dynsql.pkb  $
---       Date into PVCS   : $Date:   20 Aug 2010 11:11:02  $
---       Date fetched Out : $Modtime:   20 Aug 2010 11:10:36  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Nov 09 2010 15:52:46  $
+--       Date fetched Out : $Modtime:   Nov 09 2010 15:46:30  $
+--       PVCS Version     : $Revision:   2.9  $
 --       Based on sccs version :
 --
 --
@@ -38,7 +38,7 @@ CREATE OR REPLACE package body nm3dynsql as
                 in sql_route_connectivity() added connectivity check to ensure pieces of same datum are connected
 */
 
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.8  $"';
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.9  $"';
   g_package_name    constant  varchar2(30) := 'nm3dynsql';
 
 
@@ -287,7 +287,7 @@ CREATE OR REPLACE package body nm3dynsql as
     --||cr||'  ,t.nt_length_unit nt_unit_of'
     --||cr||'  ,t2.nt_length_unit nt_unit_in'
     ||cr||'  ,(select nt_length_unit from nm_types where nt_type = e.ne_nt_type) nt_unit_of'
-    ||cr||'  ,(select nt_length_unit from nm_types where nt_type = m.nm_obj_type) nt_unit_in'
+    ||cr||'  ,(select nt_length_unit from nm_types where nt_type = gt.ngt_nt_type) nt_unit_in'
     ||cr||'  ,e.ne_sub_class'
     ||cr||'  ,decode(e.ne_type, ''D'', null, nvl((select case when nsc_seq_no <= 2 then 1 else 2 end'
     ||cr||'    from nm_type_subclass'
