@@ -4,16 +4,16 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_process_log_v.vw-arc   3.0   Mar 29 2010 17:14:52   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_process_log_v.vw-arc   3.1   Nov 10 2010 17:10:38   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_process_log_v.vw  $
---       Date into PVCS   : $Date:   Mar 29 2010 17:14:52  $
---       Date fetched Out : $Modtime:   Mar 29 2010 17:14:16  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Nov 10 2010 17:10:38  $
+--       Date fetched Out : $Modtime:   Nov 10 2010 15:56:06  $
+--       Version          : $Revision:   3.1  $
 -------------------------------------------------------------------------
        hpl_process_id
      , hpl_job_run_seq
      , hpl_log_seq
-     , cast(hpl_timestamp as date) hpl_date
+     , cast( cast( hpl_timestamp AS TIMESTAMP WITH LOCAL TIME ZONE) AS DATE) hpl_date
      , hpl_message_type
      , (select hco_meaning
         from hig_codes
