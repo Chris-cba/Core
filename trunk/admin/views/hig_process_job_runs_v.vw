@@ -4,11 +4,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_process_job_runs_v.vw-arc   3.0   Mar 29 2010 17:14:52   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_process_job_runs_v.vw-arc   3.1   Nov 10 2010 17:11:14   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_process_job_runs_v.vw  $
---       Date into PVCS   : $Date:   Mar 29 2010 17:14:52  $
---       Date fetched Out : $Modtime:   Mar 29 2010 17:14:16  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Nov 10 2010 17:11:14  $
+--       Date fetched Out : $Modtime:   Nov 10 2010 15:50:50  $
+--       Version          : $Revision:   3.1  $
 -------------------------------------------------------------------------
        hpjr_process_id
      , hig_process_framework_utils.formatted_process_id (hpjr_process_id) hpjr_formatted_process_id
@@ -16,8 +16,8 @@ SELECT
      , hpt_name
      , hp_initiated_by_username
      , hp_initiators_ref
-     , cast(hpjr_start as date) hpjr_start_date
-     , cast(hpjr_end   as date) hpjr_end_date
+     , cast( cast( hpjr_start AS TIMESTAMP WITH LOCAL TIME ZONE) AS DATE) hpjr_start_date
+     , cast( cast( hpjr_end AS TIMESTAMP WITH LOCAL TIME ZONE) AS DATE) hpjr_end_date
      , hpjr_success_flag 
      , (select hco_meaning from hig_codes where hco_domain = 'PROCESS_SUCCESS_FLAG' and hco_code = hpjr_success_flag) hpjr_success_flag_meaning
      , hpjr_additional_info
