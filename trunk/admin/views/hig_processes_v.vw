@@ -4,11 +4,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_processes_v.vw-arc   3.1   May 21 2010 10:35:04   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_processes_v.vw-arc   3.2   Nov 10 2010 17:12:14   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_processes_v.vw  $
---       Date into PVCS   : $Date:   May 21 2010 10:35:04  $
---       Date fetched Out : $Modtime:   May 20 2010 15:06:18  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Nov 10 2010 17:12:14  $
+--       Date fetched Out : $Modtime:   Nov 10 2010 14:50:44  $
+--       Version          : $Revision:   3.2  $
 -------------------------------------------------------------------------
         hp_process_id
       , hig_process_framework_utils.formatted_process_id(hp_process_id) hp_formatted_process_id
@@ -38,9 +38,9 @@ SELECT
       ,decode(b.state,'SUCCEEDED','Completed',initcap(b.state))              hpj_job_state
       ,(select count(hpjr_process_id) from hig_process_job_runs where hpjr_process_id = hp_process_id)   hpj_run_count
       ,(select count(hpjr_process_id) from hig_process_job_runs where hpjr_process_id = hp_process_id and hpjr_success_flag = 'N')   hpj_run_failure_count
-      ,cast(b.last_start_date as date)    hpj_last_run_date
+      ,cast( cast( b.last_start_date AS TIMESTAMP WITH LOCAL TIME ZONE) AS DATE) hpj_last_run_date
       ,case when b.state = 'SCHEDULED' then 
-                 cast(b.next_run_date   as date)
+                 CAST( CAST( b.next_run_date AS TIMESTAMP WITH LOCAL TIME ZONE) AS DATE)
             else 
                  Null    
             end hpj_next_run_date 
