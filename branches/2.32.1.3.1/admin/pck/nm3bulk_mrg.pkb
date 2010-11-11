@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.16   Sep 07 2010 14:03:06   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.17   Nov 11 2010 10:59:04   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Sep 07 2010 14:03:06  $
---       Date fetched Out : $Modtime:   Sep 07 2010 14:01:44  $
---       PVCS Version     : $Revision:   2.32.1.3.1.16  $
+--       Date into PVCS   : $Date:   Nov 11 2010 10:59:04  $
+--       Date fetched Out : $Modtime:   Nov 10 2010 17:40:42  $
+--       PVCS Version     : $Revision:   2.32.1.3.1.17  $
 --
 --
 --   Author : Priidu Tanava
@@ -113,7 +113,7 @@ No query types defined.
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
         add p_group_type variable to load_group_datums() to specify driving group type when loaded group is non-linear
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.3.1.16  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.3.1.17  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -2162,9 +2162,13 @@ No query types defined.
         ||sql_ft_sources
     ||cr||'where m.nsm_mrg_job_id = :p_mrg_job_id'
     ||cr||'  and m.nsm_ne_id = t.nm_ne_id_of'
-    ||cr||'  and m.nsm_begin_mp = t.nm_begin_mp'
-    ||cr||'  and ((m.nsm_end_mp > m.nsm_begin_mp and t.nm_end_mp > t.nm_begin_mp)'
-    ||cr||'    or (m.nsm_end_mp = m.nsm_begin_mp and t.nm_end_mp = t.nm_begin_mp))'
+    ||cr||'  and ( (  (m.nsm_end_mp =  m.nsm_begin_mp)'   -- a point section 
+    ||cr||'       and (t.nm_end_mp >= m.nsm_begin_mp and t.nm_begin_mp <= m.nsm_end_mp ))'   -- include all intersecting data at a point 
+    ||cr||' or ( ( m.nsm_end_mp != m.nsm_begin_mp )  '  -- a line section 
+    ||cr||'  and (m.nsm_end_mp > t.nm_begin_mp and t.nm_end_mp > m.nsm_begin_mp)' 
+    ||cr||' and t.nm_end_mp != t.nm_begin_mp  ))'   -- exclusde all point data in the linear section  
+--    ||cr||'  and ((m.nsm_end_mp > m.nsm_begin_mp and t.nm_end_mp > t.nm_begin_mp)'
+--    ||cr||'    or (m.nsm_end_mp = m.nsm_begin_mp and t.nm_end_mp = t.nm_begin_mp))'
     ||cr||'  and t.iit_rowid = i.rowid (+)'
         ||sql_ft_outer_joins
     ||cr||') q'
