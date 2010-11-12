@@ -7,11 +7,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_points_sdo_row.trg-arc   2.1   Aug 31 2007 17:01:30   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_points_sdo_row.trg-arc   2.2   Nov 12 2010 15:31:04   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm_points_sdo_row.trg  $
---       Date into SCCS   : $Date:   Aug 31 2007 17:01:30  $
---       Date fetched Out : $Modtime:   Aug 31 2007 16:08:18  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Nov 12 2010 15:31:04  $
+--       Date fetched Out : $Modtime:   Nov 12 2010 15:22:54  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on 
 --
 -----------------------------------------------------------------------------
@@ -36,8 +36,8 @@ BEGIN
            VALUES ( :NEW.np_id,
                     mdsys.sdo_geometry( 2001, nm3sdo.get_point_srid,
                     mdsys.sdo_point_type(:NEW.np_grid_east, :NEW.np_grid_north, NULL),NULL, NULL));
-         ELSIF UPDATING AND ((:NEW.np_grid_east != :OLD.np_grid_east ) OR
-                             (:NEW.np_grid_north != :OLD.np_grid_north ))   THEN
+         ELSIF UPDATING AND ((:NEW.np_grid_east != NVL(:OLD.np_grid_east, -1) ) OR
+                             (:NEW.np_grid_north != NVL(:OLD.np_grid_north, -1) ))   THEN
            UPDATE nm_point_locations
            SET npl_location =
                     mdsys.sdo_geometry( 2001, nm3sdo.get_point_srid,
@@ -51,5 +51,5 @@ BEGIN
      END IF;
   End If;
 --
-END nm_points_sdo;
+END nm_points_sdo_row;
 /
