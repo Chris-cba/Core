@@ -163,4 +163,85 @@ BEGIN
                   WHERE NTHR_THEME_ID = theme_id AND NTHR_ROLE = 'NET_USER');
                   
 END;
+
+/
+
+DECLARE
+   CURSOR get_base_table
+   IS
+      SELECT DISTINCT nth_theme_id
+        FROM nm_themes_all,
+             nm_nw_themes,
+             nm_linear_types,
+             nm_nodes,
+             nm_types
+       WHERE     nlt_g_i_d = 'D'
+             AND nlt_id = nnth_nlt_id
+             AND nnth_nth_theme_id = nth_theme_id
+             AND no_node_type = nt_node_type
+             AND nlt_nt_type = nt_type
+             AND nth_base_table_theme IS NULL; 
+--
+   theme_id  int_array := NM3ARRAY.INIT_INT_ARRAY; 
+BEGIN
+-- first create the module metadata - first the reshape route function 
+   INSERT INTO hig_modules (hmo_module,
+                            hmo_title,
+                            hmo_filename,
+                            hmo_module_type,
+                            hmo_fastpath_opts,
+                            hmo_fastpath_invalid,
+                            hmo_use_gri,
+                            hmo_application,
+                            hmo_menu)
+      SELECT 'DATUM_START_END',
+             'Datum Start End',
+             'NM3SDO_UTIL.DATUM_START_END',
+             'PLS',
+             NULL,
+             'N',
+             'N',
+             'NET',
+             NULL
+        FROM DUAL
+       WHERE NOT EXISTS (SELECT 1
+                           FROM HIG_MODULES
+                          WHERE HMO_MODULE = 'DATUM_START_END');
+--
+   INSERT INTO hig_module_roles (hmr_module, hmr_role, hmr_mode)
+      SELECT 'DATUM_START_END', 'NET_USER', 'NORMAL'
+        FROM DUAL
+       WHERE NOT EXISTS
+                (SELECT 1
+                   FROM HIG_MODULE_ROLES
+                  WHERE HMR_MODULE = 'DATUM_START_END' AND HMR_ROLE = 'NET_USER');
+--
+   OPEN get_base_table;
+   FETCH get_base_table bulk collect into theme_id.ia;
+   CLOSE get_base_table;
+--
+   IF theme_id.ia.last IS NOT NULL THEN 
+
+     INSERT INTO NM_THEME_FUNCTIONS_ALL (ntf_nth_theme_id,
+                                       ntf_hmo_module,
+                                       ntf_parameter,
+                                       ntf_menu_option,
+                                       ntf_seen_in_gis)
+        SELECT  nth_theme_id,
+               'DATUM_START_END',
+               'GIS_SESSION_ID',
+               'Datum Start End',
+               'Y'
+           FROM table ( theme_id.ia ), nm_themes_all
+          WHERE ( nth_theme_id = column_value or
+                  nth_base_table_theme = column_value )
+          AND   NOT EXISTS
+                   (SELECT 1
+                      FROM NM_THEME_FUNCTIONS_ALL
+                     WHERE NTF_NTH_THEME_ID = nth_theme_id
+                           AND NTF_HMO_MODULE = 'DATUM_START_END');
+   END IF;
+--
+END;
+
 /
