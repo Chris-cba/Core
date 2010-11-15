@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.16   Oct 25 2010 10:45:30   ade.edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.17   Nov 15 2010 14:57:54   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Oct 25 2010 10:45:30  $
---       Date fetched Out : $Modtime:   Oct 25 2010 10:42:56  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Nov 15 2010 14:57:54  $
+--       Date fetched Out : $Modtime:   Nov 15 2010 14:56:40  $
+--       PVCS Version     : $Revision:   2.17  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.16  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.17  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -598,7 +598,13 @@ BEGIN
   IF   pi_reference_item_type_type IS NULL
   AND  pi_reference_item_type      IS NULL
   THEN
-      l_rec_ngq := nm3get.get_ngq (pi_ngq_id => pi_ngq_id);
+    l_rec_ngq := nm3get.get_ngq (pi_ngq_id => pi_ngq_id);
+  --
+    IF l_rec_ngq.ngq_source = nm3extent.c_route
+    THEN
+    --
+    -- ROI based on a ROUTE type (i.e. datum, or gos)
+    --
       OPEN  c_get_unit(l_rec_ngq.ngq_source_id);
       FETCH c_get_unit INTO l_net_unit ;
       CLOSE c_get_unit ;
@@ -610,10 +616,44 @@ BEGIN
         l_net_unit := nm3get.get_nt(pi_nt_type=>nm3net.get_datum_nt(l_rec_ngq.ngq_source_id)).nt_length_unit;
       END IF;
 
+    ELSIF l_rec_ngq.ngq_source = nm3extent.c_saved
+    THEN
+    --
+    -- ROI based on saved/temp extent - derive the units
+    --
+      DECLARE
+        CURSOR get_units
+        IS
+          SELECT UNIQUE NVL 
+                   ( nt_length_unit                                          -- Use length units from Datum/Route if populated on Network type
+                   , nm3net.get_nt_units( nm3net.get_datum_nt(ne_id) ) )     -- Or use length units from Datum network type
+            FROM nm_saved_extent_members
+               , nm_elements
+               , nm_types
+           WHERE ne_id = nsm_ne_id
+             AND ne_nt_type = nt_type
+             AND nsm_nse_id =  l_rec_ngq.ngq_source_id;
+      BEGIN
+        OPEN get_units;
+        FETCH get_units INTO l_net_unit;
+        CLOSE get_units;
+      EXCEPTION
+        WHEN OTHERS THEN NULL;
+      END;
+    --
+    END IF;
+--
+--    nm_debug.debug_on;
+--    nm_debug.debug('Units = '||l_net_unit||' for '||l_rec_ngq.ngq_source_id||' - '||l_rec_ngq.ngq_source);
+  --
+    IF l_net_unit IS NOT NULL
+    THEN
       UPDATE nm_assets_on_route_holding
-      SET   narh_end_reference_begin_mp   = narh_placement_begin_mp -  nm3unit.convert_unit (l_net_unit,  Nvl(pi_reference_units,l_net_unit),Nvl(l_rec_ngq.ngq_end_mp,0))
-           ,narh_end_reference_end_mp     = narh_placement_end_mp   -  nm3unit.convert_unit (l_net_unit,  Nvl(pi_reference_units,l_net_unit),Nvl(l_rec_ngq.ngq_end_mp,0))
+         SET narh_end_reference_begin_mp  = narh_placement_begin_mp -  nm3unit.convert_unit (l_net_unit,  Nvl(pi_reference_units,l_net_unit),Nvl(l_rec_ngq.ngq_end_mp,0))
+            ,narh_end_reference_end_mp    = narh_placement_end_mp   -  nm3unit.convert_unit (l_net_unit,  Nvl(pi_reference_units,l_net_unit),Nvl(l_rec_ngq.ngq_end_mp,0))
       WHERE  narh_job_id                  = po_return_arguments.narh_job_id;
+    END IF;
+  --
   END IF ;
   --Log 713423:Linesh:05-Mar-2009:End
 --   nm_debug.debug('Done');
