@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.17   Nov 15 2010 14:57:54   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.18   Nov 17 2010 14:15:48   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Nov 15 2010 14:57:54  $
---       Date fetched Out : $Modtime:   Nov 15 2010 14:56:40  $
---       PVCS Version     : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Nov 17 2010 14:15:48  $
+--       Date fetched Out : $Modtime:   Nov 17 2010 14:12:14  $
+--       PVCS Version     : $Revision:   2.18  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.17  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.18  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -1968,10 +1968,14 @@ BEGIN
           END;
           po_flex_col_dets(l_count).ita_format                := nm3type.c_number;
           po_flex_col_dets(l_count).ita_format_mask           := NULL;
-          po_flex_col_dets(l_count).iit_lov_sql               := nm3gaz_qry.get_ngqv_lov_sql (nm3gaz_qry.c_ngqt_item_type_type_inv
+          -- 0110010 CWS nm3gaz_qry.get_ngqv_lov_sql returned a sql statement that had incorrect aliases
+          po_flex_col_dets(l_count).iit_lov_sql               := 'SELECT To_Char(hus_user_id) lup_value,hus_username lup_meaning, hus_name lup_descr'
+                                                      ||CHR(10)||' FROM  hig_users'
+                                                      ||CHR(10)||'ORDER BY hus_name';
+                                                               /*nm3gaz_qry.get_ngqv_lov_sql (nm3gaz_qry.c_ngqt_item_type_type_inv
                                                                                              ,g_rec_iit.iit_inv_type
                                                                                              ,'IIT_PEO_INVENT_BY_ID'
-                                                                                             );
+                                                                                             );*/
         END IF;
   --
         l_data_source := g_package_name||'.g_rec_iit';
