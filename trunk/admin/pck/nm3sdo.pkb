@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.47   Nov 08 2010 13:55:18   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.48   Nov 18 2010 09:35:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Nov 08 2010 13:55:18  $
---       Date fetched Out : $Modtime:   Nov 08 2010 13:54:04  $
---       PVCS Version     : $Revision:   2.47  $
+--       Date into PVCS   : $Date:   Nov 18 2010 09:35:14  $
+--       Date fetched Out : $Modtime:   Nov 18 2010 09:19:58  $
+--       PVCS Version     : $Revision:   2.48  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.47  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.48  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -10336,10 +10336,10 @@ BEGIN
   if p_nth.nth_table_name = p_nth.nth_feature_table then
 
     curstr := 'select /*+cardinality( a '||to_char( p_ntl.ntl_theme_list.last)||') */ '||
-              ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  '||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr )   '||
-              ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||
-              ' where a.ntd_pk_id  = '||p_nth.nth_feature_pk_column||
-              ' group by :new_theme, a.ntd_pk_id, a.ntd_fk_id,  '||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr '||
+              ' nm_theme_detail( :new_theme, a.ntd_pk_id, a.ntd_fk_id,  t.'||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr )   '||
+              ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||' t '||
+              ' where a.ntd_pk_id  =  t.'||p_nth.nth_feature_pk_column||
+              ' group by :new_theme, a.ntd_pk_id, a.ntd_fk_id,  t.'||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr '||
               ' order by  a.ntd_distance';
 
   else
@@ -10358,7 +10358,7 @@ BEGIN
               ' FROM TABLE ( :p_ntl.ntl_theme_list ) a, '||p_nth.nth_feature_table||' f,'||p_nth.nth_table_name||' t'||
               ' where a.ntd_pk_id  = f.'||p_nth.nth_feature_pk_column||
               ' and   f.'||NVL(p_nth.nth_feature_fk_column,p_nth.nth_feature_pk_column)||' =  t.'||p_nth.nth_pk_column||
-              ' group by :new_theme, a.ntd_pk_id, a.ntd_fk_id,  '||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr '||
+              ' group by :new_theme, a.ntd_pk_id, a.ntd_fk_id,  t.'||p_nth.nth_label_column||', a.ntd_distance, a.ntd_measure, :new_descr '||
               ' order by  a.ntd_distance';
 
   end if;
