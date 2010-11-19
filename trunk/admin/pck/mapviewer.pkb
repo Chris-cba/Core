@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Mapviewer AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.4   Jun 28 2010 11:35:10   cbaugh  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/mapviewer.pkb-arc   2.5   Nov 19 2010 11:25:56   Rob.Coupe  $
 --       Module Name      : $Workfile:   mapviewer.pkb  $
---       Date into PVCS   : $Date:   Jun 28 2010 11:35:10  $
---       Date fetched Out : $Modtime:   Jun 23 2010 09:42:08  $
---       PVCS Version     : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Nov 19 2010 11:25:56  $
+--       Date fetched Out : $Modtime:   Nov 19 2010 11:24:00  $
+--       PVCS Version     : $Revision:   2.5  $
 
 
 --
@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BODY Mapviewer AS
 --	Copyright (c) exor corporation ltd, 2004
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(30) := '"$Revision:   2.5  $"';
 
 
 FUNCTION Get_Scale RETURN NUMBER;
@@ -411,8 +411,8 @@ END;
             '  ( mv_id, mv_feat_type, mv_geometry ) '||
             ' select '||p_id||', feat_type, shape '||
             ' from ( select decode (a.shape.sdo_gtype, 2001, '||qq||'POINT'||qq||', '||qq||'LINE'||qq||' ) feat_type,'||
-            '    sdo_aggr_union( sdoaggrtype( shape, 0.005)) shape from ( '|| p_query||') a '||
-            ' group by decode (a.shape.sdo_gtype, 2001, '||qq||'POINT'||qq||', '||qq||'LINE'||qq||' ))';
+            '     shape from ( '|| p_query||') a '||
+            ')';
 --  nm_debug.debug_on;
 --  nm_debug.debug(curstr);
     execute immediate curstr;
