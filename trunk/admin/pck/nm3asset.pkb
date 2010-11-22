@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.18   Nov 17 2010 14:15:48   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.19   Nov 22 2010 16:53:58   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Nov 17 2010 14:15:48  $
---       Date fetched Out : $Modtime:   Nov 17 2010 14:12:14  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Nov 22 2010 16:53:58  $
+--       Date fetched Out : $Modtime:   Nov 22 2010 16:23:58  $
+--       PVCS Version     : $Revision:   2.19  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.18  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.19  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -4275,7 +4275,7 @@ BEGIN
   ||CHR(10)||   ' , nm_types t '
   ||CHR(10)||   ' , '||l_inv_members||' i '
   ||CHR(10)||   ' , nm_members g '
-  ||CHR(10)||'WHERE nt_type = ne_nt_type '
+  ||CHR(10)||'WHERE t.nt_type = e.ne_nt_type '
   ||CHR(10)|| ' AND g.nm_ne_id_of = i.'||l_inv_ne_id||
 --
   CASE 
@@ -4290,13 +4290,13 @@ BEGIN
     ||CHR(10)||  ' OR 1 = CASE WHEN nm3net.get_gty_type(i.'||l_inv_ne_id||') IS NOT NULL '
     ||CHR(10)||  '             THEN 1 '
     ||CHR(10)||  '             ELSE 2 '
-    ||CHR(10)||  '        END ) '
+    ||CHR(10)||  '        END )'
   END
 --
   ||CHR(10)|| ' AND g.nm_ne_id_in = e.ne_id '
   ||CHR(10)|| ' AND i.'||l_inv_pk||' = :pi_iit_ne_id'
-  ||CHR(10)|| ' AND ngt_group_type = ne_gty_group_type '
-  ||CHR(10)|| ' AND nt_linear = ''N'''||
+  ||CHR(10)|| ' AND gt.ngt_group_type = e.ne_gty_group_type '
+  ||CHR(10)|| ' AND t.nt_linear = ''N'''||
 --
   CASE
     WHEN NOT b_linear -- Non linear - append it's own location otherwise it won't appear anywhere else
@@ -4312,8 +4312,8 @@ BEGIN
        ||CHR(10)||      ', g.ngt_descr         group_descr'
        ||CHR(10)||      ', e.ne_nt_type        nt_type'
        ||CHR(10)|| '   FROM nm_elements e, nm_group_types g, '||l_inv_members||' i '
-       ||CHR(10)|| '  WHERE ne_id = '||l_ne_id
-       ||CHR(10)|| '    AND ngt_group_type = ne_gty_group_type '
+       ||CHR(10)|| '  WHERE e.ne_id = '||l_ne_id
+       ||CHR(10)|| '    AND g.ngt_group_type = e.ne_gty_group_type '
        ||CHR(10)|| '    AND i.'||l_inv_pk||' = '||pi_iit_ne_id
   END
 --
@@ -4328,8 +4328,9 @@ BEGIN
   ||CHR(10)|| '        , nt_type '
   ||CHR(10)|| ' ORDER BY nt_Type';
 --
---  nm_debug.debug_on;
+  --nm_debug.debug_on;
   nm_debug.debug(l_sql);
+  --nm_debug.debug_on;
 --
   EXECUTE IMMEDIATE l_sql BULK COLLECT INTO po_tab_rec_nl_grp_membership
     USING IN pi_iit_ne_id;
