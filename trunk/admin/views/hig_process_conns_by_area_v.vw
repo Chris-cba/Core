@@ -4,11 +4,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_process_conns_by_area_v.vw-arc   3.1   May 26 2010 17:16:50   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_process_conns_by_area_v.vw-arc   3.2   Nov 23 2010 10:18:00   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_process_conns_by_area_v.vw  $
---       Date into PVCS   : $Date:   May 26 2010 17:16:50  $
---       Date fetched Out : $Modtime:   May 26 2010 11:38:48  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Nov 23 2010 10:18:00  $
+--       Date fetched Out : $Modtime:   Nov 23 2010 10:15:30  $
+--       Version          : $Revision:   3.2  $
 -------------------------------------------------------------------------
 --
        hptc_process_type_id
@@ -20,6 +20,7 @@ SELECT
      , hfc_name 
      , hfc_ftp_host
      , hfc_ftp_in_dir
+     , hfc_ftp_out_dir
 from  hig_process_conns_by_area    
      ,hig_ftp_connections
 where  hptc_ftp_connection_id = hfc_id
