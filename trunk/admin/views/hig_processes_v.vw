@@ -4,11 +4,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_processes_v.vw-arc   3.2   Nov 10 2010 17:12:14   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/hig_processes_v.vw-arc   3.3   Nov 23 2010 16:18:44   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_processes_v.vw  $
---       Date into PVCS   : $Date:   Nov 10 2010 17:12:14  $
---       Date fetched Out : $Modtime:   Nov 10 2010 14:50:44  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Nov 23 2010 16:18:44  $
+--       Date fetched Out : $Modtime:   Nov 23 2010 16:10:18  $
+--       Version          : $Revision:   3.3  $
 -------------------------------------------------------------------------
         hp_process_id
       , hig_process_framework_utils.formatted_process_id(hp_process_id) hp_formatted_process_id
@@ -56,10 +56,10 @@ SELECT
                   END hp_requires_attention_flag
       , hpt_internal_module hp_internal_module
       , hpt_internal_module_title hp_internal_module_title
-      , hpt_internal_module_param hp_internal_module_param                  
-from hig_processes      a
-    ,hig_process_types_restricted_v
-    ,dba_scheduler_jobs b
+      , hpt_internal_module_param hp_internal_module_param
+from  hig_processes a
+    , hig_process_types_restricted_v
+    , (select dsj.* from dba_scheduler_jobs dsj, hig_users h where owner = hus_username) b
 where a.hp_job_name = b.job_name(+) -- outer join in case dba_scheduler_jobs records has been purged
 and   hpt_process_type_id = hp_process_type_id
 /
