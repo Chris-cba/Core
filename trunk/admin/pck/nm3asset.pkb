@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.19   Nov 22 2010 16:53:58   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.20   Nov 25 2010 15:15:40   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Nov 22 2010 16:53:58  $
---       Date fetched Out : $Modtime:   Nov 22 2010 16:23:58  $
---       PVCS Version     : $Revision:   2.19  $
+--       Date into PVCS   : $Date:   Nov 25 2010 15:15:40  $
+--       Date fetched Out : $Modtime:   Nov 25 2010 15:05:26  $
+--       PVCS Version     : $Revision:   2.20  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.19  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.20  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -2279,6 +2279,7 @@ PROCEDURE get_inv_datum_location_details (pi_iit_ne_id           IN     nm_inv_i
    l_rec_un              nm_units%ROWTYPE;
    l_rec_ne              nm_elements_all%ROWTYPE;
    l_rec_datum_loc_dets  rec_datum_loc_dets;
+   l_tab_datum_loc_dets  tab_rec_datum_loc_dets;
    retval                tab_rec_datum_loc_dets;
 --
    l_iit_not_found       EXCEPTION;
@@ -2316,7 +2317,7 @@ BEGIN
          l_rec_datum_loc_dets.nm_slk           := cs_rec.nm_slk;
          po_tab_datum_loc_dets(l_count)        := l_rec_datum_loc_dets;
       END LOOP;
- --
+--
    ELSIF is_ft_inv_type_on_network(pi_nit_rec => l_rec_nit) 
    THEN
       g_ft_pk_val := pi_iit_ne_id;
@@ -2324,9 +2325,12 @@ BEGIN
       DECLARE
         l_sql        nm3type.max_varchar2;
         l_pl         nm_placement_array;
-        l_ne_id      NUMBER;
-        l_st_chain   NUMBER;
-        l_end_chain  NUMBER;
+--        l_ne_id      NUMBER;
+--        l_st_chain   NUMBER;
+--        l_end_chain  NUMBER;
+        l_ne_id      nm3type.tab_number;
+        l_st_chain   nm3type.tab_number;
+        l_end_chain  nm3type.tab_number;
         l_rec_ne     nm_elements%ROWTYPE;
       BEGIN
       --
@@ -2336,76 +2340,108 @@ BEGIN
                   ' FROM '||l_rec_nit.nit_table_name||
                  ' WHERE '||l_rec_nit.nit_foreign_pk_column||' = :pk';
       --
---        nm_debug.debug_on;
---        nm_debug.debug(l_sql);
+        EXECUTE IMMEDIATE l_sql BULK COLLECT INTO l_ne_id, l_st_chain, l_end_chain USING pi_iit_ne_id;
       --
-        EXECUTE IMMEDIATE l_sql INTO l_ne_id, l_st_chain, l_end_chain USING pi_iit_ne_id;
-      --
-        l_rec_ne := nm3get.get_ne ( pi_ne_id => l_ne_id, pi_raise_not_found => FALSE );
-      --
-      -------------------------------------------------------------
-      -- Only get sub placement for Groups (or datums, works fine)
-      -------------------------------------------------------------
-      --
-        IF l_rec_ne.ne_type IN ('S','G')
-        THEN 
+        FOR items IN 1..l_ne_id.COUNT
+        LOOP
         --
-          IF is_linear ( pi_ne_id => l_ne_id )
-          THEN
+          l_rec_ne := nm3get.get_ne ( pi_ne_id           => l_ne_id(items)
+                                    , pi_raise_not_found => FALSE );
+        --
+        -------------------------------------------------------------
+        -- Only get sub placement for Groups (or datums, works fine) nm_inv_types
+        -------------------------------------------------------------
+        --
+          IF l_rec_ne.ne_type IN ('S','G')
+          THEN 
           --
-          -- Linear Group of Sections - or a datum
-          --
-            BEGIN
-              l_sql :=  'SELECT nm3pla.get_sub_placement(nm_placement('||l_rec_nit.nit_lr_ne_column_name
-                                                                  ||','||l_rec_nit.nit_lr_st_chain
-                                                                  ||','||NVL(l_rec_nit.nit_lr_end_chain,l_rec_nit.nit_lr_st_chain)
-                                                                  ||', NULL ) ) '
-             ||CHR(10)||'  FROM '||l_rec_nit.nit_table_name
-             ||CHR(10)||' WHERE '||l_rec_nit.nit_foreign_pk_column||' = :pk';
+            IF is_linear ( pi_ne_id => l_ne_id(items) )
+            THEN
             --
-              nm_debug.debug(l_sql);
+            -- Linear Group of Sections - or a datum
             --
-              EXECUTE IMMEDIATE l_sql INTO l_pl USING pi_iit_ne_id;
+              BEGIN
+                l_sql :=  'SELECT nm3pla.get_sub_placement(nm_placement('||l_rec_nit.nit_lr_ne_column_name
+                                                                    ||','||l_rec_nit.nit_lr_st_chain
+                                                                    ||','||NVL(l_rec_nit.nit_lr_end_chain,l_rec_nit.nit_lr_st_chain)
+                                                                    ||', NULL ) ) '
+               ||CHR(10)||'  FROM '||l_rec_nit.nit_table_name
+               ||CHR(10)||' WHERE '||l_rec_nit.nit_foreign_pk_column||' = :pk'
+               ||CHR(10)||'   AND '||l_rec_nit.nit_lr_ne_column_name||' = :ne_id';
+              --
+                nm_debug.debug(l_sql);
+              --
+                EXECUTE IMMEDIATE l_sql INTO l_pl USING pi_iit_ne_id, l_ne_id(items);
+              --
+                FOR i IN 1..l_pl.placement_count
+                LOOP
+                  DECLARE
+                    l_ind NUMBER := l_tab_datum_loc_dets.COUNT+1;
+                  BEGIN
+                    l_tab_datum_loc_dets(l_ind).datum_ne_id := l_pl.get_entry(i).pl_ne_id;
+                    l_tab_datum_loc_dets(l_ind).nm_begin_mp := l_pl.get_entry(i).pl_start;
+                    l_tab_datum_loc_dets(l_ind).nm_end_mp   := l_pl.get_entry(i).pl_end;
+                  END;
+                END LOOP;
+              EXCEPTION
+                WHEN NO_DATA_FOUND THEN NULL;
+              END;
             --
-              FOR i IN 1..l_pl.placement_count
-              LOOP
-                po_tab_datum_loc_dets(i).datum_ne_id := l_pl.get_entry(i).pl_ne_id;
-                po_tab_datum_loc_dets(i).nm_begin_mp := l_pl.get_entry(i).pl_start;
-                po_tab_datum_loc_dets(i).nm_end_mp   := l_pl.get_entry(i).pl_end;
-              END LOOP;
-            EXCEPTION
-              WHEN NO_DATA_FOUND THEN NULL;
-            END;
-          --
-          ELSE
-          --
-          -- Non Linear Group - just return the datums for the whole groups memberships
-          --
-            BEGIN
+            ELSE
             --
-              SELECT *
-                BULK COLLECT INTO po_tab_datum_loc_dets
-                FROM (SELECT nm_ne_id_of datum_ne_id
-                            ,NULL        datum_ne_unique
-                            ,NULL        datum_ne_descr
-                            ,NULL        datum_ne_nt_type
-                            ,NULL        datum_ne_nt_descr
-                            ,NULL        datum_length_unit
-                            ,NULL        datum_length_unit_name
-                            ,nm_begin_mp nm_begin_mp
-                            ,nm_end_mp   nm_end_mp
-                            ,nm_seq_no   nm_seq_no
-                            ,nm_seg_no   nm_seg_no
-                            ,nm_true     nm_true
-                            ,nm_slk      nm_slk
-                        FROM nm_members
-                       WHERE nm_type = 'G'
-                         AND nm_ne_id_in = l_ne_id); 
-            END;
+            -- Non Linear Group - just return the datums for the whole groups memberships
+            --
+              BEGIN
+              --
+                SELECT *
+                  BULK COLLECT INTO l_tab_datum_loc_dets
+                  FROM (SELECT nm_ne_id_of datum_ne_id
+                              ,NULL        datum_ne_unique
+                              ,NULL        datum_ne_descr
+                              ,NULL        datum_ne_nt_type
+                              ,NULL        datum_ne_nt_descr
+                              ,NULL        datum_length_unit
+                              ,NULL        datum_length_unit_name
+                              ,nm_begin_mp nm_begin_mp
+                              ,nm_end_mp   nm_end_mp
+                              ,nm_seq_no   nm_seq_no
+                              ,nm_seg_no   nm_seg_no
+                              ,nm_true     nm_true
+                              ,nm_slk      nm_slk
+                          FROM nm_members
+                         WHERE nm_type = 'G'
+                           AND nm_ne_id_in = l_ne_id(items)); 
+              END;
+            --
+            END IF;
           --
           END IF;
         --
-        END IF;
+          DECLARE
+            l_ind NUMBER := po_tab_datum_loc_dets.COUNT+1;
+          BEGIN
+          --
+            FOR retvals IN 1..l_tab_datum_loc_dets.COUNT 
+            LOOP
+              po_tab_datum_loc_dets(l_ind).datum_ne_id             := l_tab_datum_loc_dets(retvals).datum_ne_id;
+              po_tab_datum_loc_dets(l_ind).datum_ne_unique         := l_tab_datum_loc_dets(retvals).datum_ne_unique;
+              po_tab_datum_loc_dets(l_ind).datum_ne_descr          := l_tab_datum_loc_dets(retvals).datum_ne_descr;
+              po_tab_datum_loc_dets(l_ind).datum_ne_nt_type        := l_tab_datum_loc_dets(retvals).datum_ne_nt_type;
+              po_tab_datum_loc_dets(l_ind).datum_ne_nt_descr       := l_tab_datum_loc_dets(retvals).datum_ne_nt_descr;
+              po_tab_datum_loc_dets(l_ind).datum_length_unit       := l_tab_datum_loc_dets(retvals).datum_length_unit;
+              po_tab_datum_loc_dets(l_ind).datum_length_unit_name  := l_tab_datum_loc_dets(retvals).datum_length_unit_name;
+              po_tab_datum_loc_dets(l_ind).nm_begin_mp             := l_tab_datum_loc_dets(retvals).nm_begin_mp;
+              po_tab_datum_loc_dets(l_ind).nm_end_mp               := l_tab_datum_loc_dets(retvals).nm_end_mp;
+              po_tab_datum_loc_dets(l_ind).nm_seq_no               := l_tab_datum_loc_dets(retvals).nm_seq_no;
+              po_tab_datum_loc_dets(l_ind).nm_seg_no               := l_tab_datum_loc_dets(retvals).nm_seg_no;
+              po_tab_datum_loc_dets(l_ind).nm_true                 := l_tab_datum_loc_dets(retvals).nm_true;
+              po_tab_datum_loc_dets(l_ind).nm_slk                  := l_tab_datum_loc_dets(retvals).nm_slk;
+            END LOOP;
+          --
+          END;
+          l_tab_datum_loc_dets.DELETE;
+      --
+        END LOOP;
       --
       EXCEPTION
         WHEN NO_DATA_FOUND THEN NULL;
@@ -2454,6 +2490,7 @@ EXCEPTION
       NULL;
 --
 END get_inv_datum_location_details;
+
 --
 -----------------------------------------------------------------------------
 --
