@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.15   Aug 28 2009 11:13:02   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.16   Nov 26 2010 16:36:12   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Aug 28 2009 11:13:02  $
---       Date fetched Out : $Modtime:   Aug 28 2009 11:12:30  $
---       PVCS Version     : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Nov 26 2010 16:36:12  $
+--       Date fetched Out : $Modtime:   Nov 24 2010 09:32:44  $
+--       PVCS Version     : $Revision:   2.16  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.15  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.16  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -1330,7 +1330,7 @@ BEGIN
       DBMS_SQL.CLOSE_CURSOR(c => l_cursor);
    END IF;
 
-EXCEPTION
+/*EXCEPTION
   WHEN OTHERS
   THEN
     IF DBMS_SQL.IS_OPEN(c => l_cursor)
@@ -1338,7 +1338,7 @@ EXCEPTION
       DBMS_SQL.CLOSE_CURSOR(c => l_cursor);
     END IF;
 
-    RAISE;
+    RAISE;*/
 
 END execute_tab_varchar;
 --
@@ -1475,7 +1475,7 @@ PROCEDURE create_user (p_rec_hus            IN OUT HIG_USERS%ROWTYPE
                       ||CHR(10)||'WHERE  ROWNUM = 0';
      END IF;
    END take_copy_of_table;
-
+/* CWS Pre 10.2 Versions of oracle are no longer used by us. There is no need for this check. 
    FUNCTION db_is_10gr2 RETURN boolean IS
 
      l_dummy pls_integer;
@@ -1503,7 +1503,7 @@ PROCEDURE create_user (p_rec_hus            IN OUT HIG_USERS%ROWTYPE
         RETURN FALSE;
 
    END db_is_10gr2;
-
+*/
 --
 BEGIN
   --
@@ -1574,11 +1574,13 @@ BEGIN
   IF p_temp_tablespace IS NOT NULL
    THEN
       append(' TEMPORARY TABLESPACE '||p_temp_tablespace);
-
-      IF NOT db_is_10gr2
+     -- CWS 0110443 All code is run on Oracle 11.2 now. There is no need for this code
+     -- CWS Note Oracle did not support quotas on temp table spaces after 10.1 
+     -- that is why this code is here.
+     /* IF NOT db_is_10gr2
       THEN
         append(' QUOTA UNLIMITED ON '||p_temp_tablespace);
-      END IF;
+      END IF;*/
   END IF;
   append(' QUOTA 0k on SYSTEM');
   --
