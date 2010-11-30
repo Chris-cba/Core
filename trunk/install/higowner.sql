@@ -1,5 +1,5 @@
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.11     $"';
+define sccsid = '"$Revision::   2.12     $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
@@ -56,6 +56,7 @@ DECLARE
   l_oracle10gr1 boolean;
   l_oracle10gr2 boolean;
   l_oracle11gr1 boolean;
+  l_oracle11gr2 boolean;
 --
 -------------------------------------------------------------------------------
 --
@@ -117,6 +118,22 @@ DECLARE
     THEN
       RETURN FALSE;
   END db_is_11gr1;
+--
+-------------------------------------------------------------------------------
+--
+  FUNCTION db_is_11gr2 RETURN boolean IS
+    l_dummy pls_integer;
+  BEGIN
+    SELECT 1 INTO l_dummy FROM dual
+     WHERE EXISTS
+       (SELECT 1 FROM v$version
+         WHERE UPPER(banner) LIKE '%11.2%');
+    RETURN TRUE;
+  EXCEPTION
+    WHEN no_data_found
+    THEN
+      RETURN FALSE;
+  END db_is_11gr2;
 --
 -------------------------------------------------------------------------------
 --
@@ -335,7 +352,7 @@ DECLARE
      
      -- Cannot grant quota on temporary tablespace for 10gR2
 
-    IF l_oracle10gr2 OR l_oracle11gr1 THEN
+    IF l_oracle10gr2 OR l_oracle11gr1 OR l_oracle11gr2 THEN
       EXECUTE IMMEDIATE 'CREATE USER '|| p_user
            || CHR(10) ||' IDENTIFIED BY '||p_pass
            || CHR(10) ||' DEFAULT TABLESPACE '||p_deftab
@@ -400,7 +417,7 @@ DECLARE
     EXECUTE IMMEDIATE 'GRANT DROP ANY SYNONYM TO  ' || p_user;                 -- Added by GJ 17-MAY-2007
     EXECUTE IMMEDIATE 'GRANT ANALYZE ANY TO '||p_user||' WITH ADMIN OPTION';   -- Task 0108303  - GRANT ANALYZE ANY TO hig_user/admin
   --
-    IF l_oracle9i OR l_oracle10gr1 OR l_oracle10gr2 OR l_oracle11gr1
+    IF l_oracle9i OR l_oracle10gr1 OR l_oracle10gr2 OR l_oracle11gr1 OR l_oracle11gr2
     THEN
       EXECUTE IMMEDIATE 'grant create job to  '                  || p_user || ' with admin option'; -- Added by AE - 10-07-2009
       EXECUTE IMMEDIATE 'grant execute on sys.dbms_scheduler to '|| p_user || ' with grant option'; -- Added by AE - 10-07-2009
@@ -810,6 +827,7 @@ BEGIN
   l_oracle10gr1 := db_is_10gr1;
   l_oracle10gr2 := db_is_10gr2;
   l_oracle11gr1 := db_is_11gr1;
+  l_oracle11gr2 := db_is_11gr2;
 --
   check_listener_locks;
 -- 
