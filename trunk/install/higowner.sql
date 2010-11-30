@@ -1,5 +1,5 @@
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.12     $"';
+define sccsid = '"$Revision::   2.13     $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
@@ -43,7 +43,7 @@ SET serveroutput ON
 --
 DECLARE
   p_user varchar2(100) := UPPER('&P_USER');
-  p_pass varchar2(100) := UPPER('&P_PASS');
+  p_pass varchar2(100) := '&P_PASS';
   p_deftab varchar2(100) := UPPER('&P_DEFTAB');
   p_tmptab varchar2(100) := UPPER('&P_TMPTAB');
   p_startdate varchar2(100) := UPPER('&P_STARTDATE');
