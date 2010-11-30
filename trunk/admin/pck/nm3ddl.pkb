@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.16   Nov 26 2010 16:36:12   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.17   Nov 30 2010 15:25:56   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Nov 26 2010 16:36:12  $
---       Date fetched Out : $Modtime:   Nov 24 2010 09:32:44  $
---       PVCS Version     : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Nov 30 2010 15:25:56  $
+--       Date fetched Out : $Modtime:   Nov 30 2010 15:19:22  $
+--       PVCS Version     : $Revision:   2.17  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.16  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.17  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -1661,11 +1661,8 @@ BEGIN
    THEN
       create_all_priv_syns (p_rec_hus.hus_username);
   END IF;
-
-  --
   --
   -- Create mcp metadata
-  --
   --
   IF hig.is_product_licensed('MCP')
   THEN
@@ -1674,7 +1671,7 @@ BEGIN
         'BEGIN '||
         '  nm3mcp_sde.STORE_PASSWORD(:pi_username, :pi_password); '||
         'END;'
-      USING IN upper(p_rec_hus.hus_username), IN upper(p_password);
+      USING IN upper(p_rec_hus.hus_username), IN p_password;
     EXCEPTION
       WHEN OTHERS THEN NULL;
     END;
