@@ -35,5 +35,6 @@ BEGIN
   EXECUTE IMMEDIATE 'grant select on dba_ts_quotas to system with grant option';
   EXECUTE IMMEDIATE 'grant select on dba_roles to system with grant option';
   EXECUTE IMMEDIATE 'grant select on dba_profiles to system with grant option';
+  EXECUTE IMMEDIATE 'grant execute on dbms_scheduler to system with grant option';
 END;
 /
