@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.15   Sep 03 2010 10:02:42   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.16   Dec 03 2010 09:39:42   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   Sep 03 2010 10:02:42  $
---       Date fetched Out : $Modtime:   Sep 02 2010 15:35:52  $
---       Version          : $Revision:   3.15  $
+--       Date into PVCS   : $Date:   Dec 03 2010 09:39:42  $
+--       Date fetched Out : $Modtime:   Dec 03 2010 09:36:40  $
+--       Version          : $Revision:   3.16  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.15  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.16  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
@@ -793,10 +793,10 @@ BEGIN
    END loop;
    l_cnt := 0 ;
    -- po_tab := hig_navigator_tab(hig_navigator_type(Null,Null,Null,Null,null,Null));  
-   FOR i in (SELECT x.*,level
+   FOR i in (SELECT x.parent,x.child,x.data,x.label,x.icon,level
              FROM   table(cast(get_tab(l_tab) as hig_navigator_tab)) x
-             CONNECT BY parent= prior child
-             START WITH parent IS NULL )
+             CONNECT BY x.parent= prior x.child
+             START WITH x.parent IS NULL )
    LOOP
        l_cnt := l_cnt+1;
        l_hie_type.data := i.data ;
