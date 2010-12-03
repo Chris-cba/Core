@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.16   Dec 03 2010 09:39:42   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_nav.pkb-arc   3.17   Dec 03 2010 10:56:24   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_nav.pkb  $
---       Date into PVCS   : $Date:   Dec 03 2010 09:39:42  $
---       Date fetched Out : $Modtime:   Dec 03 2010 09:36:40  $
---       Version          : $Revision:   3.16  $
+--       Date into PVCS   : $Date:   Dec 03 2010 10:56:24  $
+--       Date fetched Out : $Modtime:   Dec 03 2010 10:51:18  $
+--       Version          : $Revision:   3.17  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.16  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.17  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_nav';
   l_top_id       nav_id := nav_id(Null);
@@ -588,7 +588,7 @@ END  pop_up_child;
 --
 PROCEDURE populate_tree(--pi_id  IN  nav_id
                        pi_tab IN  Varchar2
-                     ,po_tab OUT   hig_nav.l_type_tab)
+                      ,po_tab OUT Sys_Refcursor)
 IS
 --
    l_sql       Varchar2(32767) ;
@@ -791,24 +791,13 @@ BEGIN
            END IF ;
        END IF ; -- p_id not null
    END loop;
-   l_cnt := 0 ;
-   -- po_tab := hig_navigator_tab(hig_navigator_type(Null,Null,Null,Null,null,Null));  
-   FOR i in (SELECT x.parent,x.child,x.data,x.label,x.icon,level
-             FROM   table(cast(get_tab(l_tab) as hig_navigator_tab)) x
-             CONNECT BY x.parent= prior x.child
-             START WITH x.parent IS NULL )
-   LOOP
-       l_cnt := l_cnt+1;
-       l_hie_type.data := i.data ;
-       l_hie_type.label := i.label ;
-       l_hie_type.icon := i.icon ;
-       l_hie_type.tab_level:= i.level ;--i.tab_level ;
-       l_hie_type.parent:= i.parent ;
-       l_hie_type.child := i.child ;          
-       po_tab(po_tab.Count+1) :=  l_hie_type;
-       --l_t(l_t.Count+1) :=  l_hie_type;
-       --po_tab.extend;
-   END LOOP;  
+   
+   -- Return the Hierarchy in Ref Cursor
+   OPEN po_tab FOR
+   SELECT x.parent,x.child,x.data,x.label,x.icon,level
+   FROM   table(cast(get_tab(l_tab) as hig_navigator_tab)) x
+   CONNECT BY x.parent= prior x.child
+   START WITH x.parent IS NULL ;
 END populate_tree;
 --
 PROCEDURE check_docs(pi_id         IN  Varchar2
