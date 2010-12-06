@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.15   Sep 21 2010 17:12:08   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.16   Dec 06 2010 14:49:58   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Sep 21 2010 17:12:08  $
---       Date fetched Out : $Modtime:   Sep 21 2010 17:07:40  $
---       PVCS Version     : $Revision:   3.15  $
+--       Date into PVCS   : $Date:   Dec 06 2010 14:49:58  $
+--       Date fetched Out : $Modtime:   Dec 06 2010 14:49:28  $
+--       PVCS Version     : $Revision:   3.16  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.15  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.16  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -1522,6 +1522,14 @@ END;
                              p_from_dir  => l_db_dir,
                              p_from_file => l_files_tab(f),
                              p_to_file   => format_with_separator(i.hfc_ftp_arc_in_dir)||l_files_tab(f));
+                --
+                                --
+                -- Remove the orginal files from IN folder after arching
+                --
+                -- Task 0110505
+                --
+                  nm3ftp.delete(p_conn   => l_conn
+                               ,p_file   => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f));
                 --
                   nm3ftp.logout(p_conn => l_arc_conn);
                 --
