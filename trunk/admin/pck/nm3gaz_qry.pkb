@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.13   Nov 04 2010 12:25:14   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.14   Dec 07 2010 11:04:06   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Nov 04 2010 12:25:14  $
---       Date fetched Out : $Modtime:   Nov 04 2010 12:22:14  $
---       Version          : $Revision:   2.13  $
+--       Date into PVCS   : $Date:   Dec 07 2010 11:04:06  $
+--       Date fetched Out : $Modtime:   Dec 07 2010 11:03:36  $
+--       Version          : $Revision:   2.14  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb 1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.13  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.14  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -394,12 +394,12 @@ EXCEPTION
       hig.raise_ner(pi_appl => nm3type.c_net
                    ,pi_id   => 306
                    );
-
-   WHEN others
-    THEN
-      nm3user.set_effective_date (c_init_eff_date);
-   nm_debug.debug(sqlerrm);
-      RAISE;
+--
+--   WHEN others
+--    THEN
+--      nm3user.set_effective_date (c_init_eff_date);
+--   nm_debug.debug(sqlerrm);
+--      RAISE;
 --
 END perform_query;
 --
@@ -814,6 +814,15 @@ BEGIN
         append_both (p_ngqt_index,'                       , nm3net.get_ne_length(nm_ne_id_of) nte_end_mp');
         append_both (p_ngqt_index,'                       , nm_seq_no                         nte_seq_no ');
         append_both (p_ngqt_index,'                    FROM nm_members ');
+        --
+        -- Task 0110484
+        --
+        IF l_rec_ngq.ngq_begin_mp IS NOT NULL
+        AND l_rec_ngq.ngq_end_mp IS NOT NULL
+        THEN
+          append_both (p_ngqt_index,'                   WHERE nm_slk <= '||l_rec_ngq.ngq_end_mp);
+          append_both (p_ngqt_index,'                     AND '||l_rec_ngq.ngq_begin_mp||' >= nm_end_slk');
+        END IF;
         append_both (p_ngqt_index,'                 CONNECT BY PRIOR nm_ne_id_of = nm_ne_id_in ');
         append_both (p_ngqt_index,'                   START WITH nm_ne_id_in = '||l_rec_ngq.ngq_source_id||' ');
         append_both (p_ngqt_index,'               ) ');
@@ -1436,12 +1445,12 @@ END execute_sql_area;
 PROCEDURE execute_sql_item (p_index pls_integer) IS
    l_rc pls_integer;
 BEGIN
---   nm_debug.debug_on;
-   nm_debug.debug(g_tab_ngqt_list_sql(p_index));
+   --nm_debug.debug_on;
+   --nm_debug.debug(g_tab_ngqt_list_sql(p_index));
    EXECUTE IMMEDIATE g_tab_ngqt_list_sql(p_index);
---   l_rc := SQL%rowcount;
---   nm_debug.debug('done :'||l_rc);
---   nm_debug.debug_off;
+   l_rc := SQL%rowcount;
+   --nm_debug.debug('done :'||l_rc);
+   --nm_debug.debug_off;
 END execute_sql_item;
 --
 -----------------------------------------------------------------------------
