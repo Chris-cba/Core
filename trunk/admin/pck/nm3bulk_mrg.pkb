@@ -1,14 +1,14 @@
-CREATE OR REPLACE PACKAGE BODY NM3.nm3bulk_mrg AS
+CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 -----------------------------------------------------------------------------
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.36   Nov 10 2010 17:07:30   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.37   Dec 07 2010 10:20:58   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Nov 10 2010 17:07:30  $
---       Date fetched Out : $Modtime:   Nov 10 2010 16:39:30  $
---       PVCS Version     : $Revision:   2.36  $
+--       Date into PVCS   : $Date:   Dec 07 2010 10:20:58  $
+--       Date fetched Out : $Modtime:   Dec 07 2010 10:20:22  $
+--       PVCS Version     : $Revision:   2.37  $
 --
 --
 --   Author : Priidu Tanava
@@ -124,7 +124,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.36  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.37  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
