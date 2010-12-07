@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.6   Oct 01 2010 14:31:56   Chris.Baugh  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.7   Dec 07 2010 09:25:56   Graeme.Johnson  $
 --       Module Name      : $Workfile:   doc_bundle_loader.pkb  $
---       Date into PVCS   : $Date:   Oct 01 2010 14:31:56  $
---       Date fetched Out : $Modtime:   Oct 01 2010 14:29:18  $
---       Version          : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   Dec 07 2010 09:25:56  $
+--       Date fetched Out : $Modtime:   Dec 07 2010 09:24:56  $
+--       Version          : $Revision:   3.7  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.6  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.7  $';
 
   g_package_name CONSTANT varchar2(30) := 'doc_bundle_loader';
   
@@ -371,6 +371,56 @@ EXCEPTION
    RAISE;
 
 END list_files_in_unzip_location;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE list_files_in_tab_driving_recs(pi_dbun_rec         IN doc_bundles%ROWTYPE
+                                        ,pi_tab_driving_recs IN tab_driving_recs
+                                        ,pi_oracle_directory IN hig_directories.hdir_name%TYPE) IS 
+
+
+ l_dbf_rec doc_bundle_files%ROWTYPE;
+ l_dbfr_rec doc_bundle_file_relations%ROWTYPE; 
+
+BEGIN
+
+
+ hig_process_api.log_it(pi_message         => '   Reading driving records and uploading file content' 
+                       ,pi_summary_flag    => 'N' ); 
+
+                                           
+ FOR f in 1..pi_tab_driving_recs.COUNT LOOP
+ 
+  l_dbf_rec := Null;
+  l_dbf_rec.dbf_bundle_id := pi_dbun_rec.dbun_bundle_id;
+  l_dbf_rec.dbf_filename  := pi_tab_driving_recs(f).doc_filename;
+  l_dbf_rec.dbf_file_included_with_bundle := 'Y';
+  l_dbf_rec.dbf_blob      := nm3file.file_to_blob(pi_source_dir   => pi_oracle_directory
+                                                 ,pi_source_file  => l_dbf_rec.dbf_filename); -- read in the binary
+                                                 
+                                                 
+  insert_doc_bundle_file(pi_dbf_rec => l_dbf_rec);
+
+  l_dbfr_rec := Null;
+  l_dbfr_rec.dbfr_driving_file_id      := l_dbf_rec.dbf_file_id; 
+  l_dbfr_rec.dbfr_driving_file_recno   := f;
+  l_dbfr_rec.dbfr_child_file_id        :=  l_dbf_rec.dbf_file_id;     
+  l_dbfr_rec.dbfr_doc_title            :=  pi_tab_driving_recs(f).doc_title;
+  l_dbfr_rec.dbfr_doc_descr            :=  pi_tab_driving_recs(f).doc_descr;
+  l_dbfr_rec.dbfr_doc_type             :=  pi_tab_driving_recs(f).doc_type;
+  l_dbfr_rec.dbfr_dlc_name             :=  pi_tab_driving_recs(f).doc_location_name;
+  l_dbfr_rec.dbfr_gateway_table_name   :=  pi_tab_driving_recs(f).doc_gateway_table_name;
+  l_dbfr_rec.dbfr_rec_id               :=  pi_tab_driving_recs(f).doc_rec_id;
+  l_dbfr_rec.dbfr_x_coordinate         :=  pi_tab_driving_recs(f).doc_x_coordinate;
+  l_dbfr_rec.dbfr_y_coordinate         :=  pi_tab_driving_recs(f).doc_y_coordinate;
+  
+  insert_doc_bundle_file_rel(pi_dbfr_rec  => l_dbfr_rec);
+ 
+ END LOOP;
+
+ commit;
+ 
+END list_files_in_tab_driving_recs;
 --
 -----------------------------------------------------------------------------
 --
@@ -888,39 +938,32 @@ END check_bundle_filename_unique;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION load_document_bundle(pi_filename                   IN doc_bundles.dbun_filename%TYPE
-                             ,pi_oracle_directory           IN doc_bundles.dbun_location%TYPE
-                             ,pi_process_id                 IN hig_processes.hp_process_id%TYPE) RETURN BOOLEAN IS
-
- l_dbun_rec doc_bundles%ROWTYPE;
+PROCEDURE bundle_success(pi_bundle_id IN doc_bundles.dbun_bundle_id%TYPE) IS
  
- l_retval BOOLEAN := FALSE;
- l_sqlerrm varchar2(500);  
- 
-
- 
-
- PROCEDURE bundle_success IS
- 
- BEGIN
+BEGIN
   
      UPDATE doc_bundles
      SET    dbun_success_flag = 'Y' 
            ,dbun_error_text   = Null
-     WHERE  dbun_bundle_id    =  l_dbun_rec.dbun_bundle_id;
+     WHERE  dbun_bundle_id    =  pi_bundle_id;
      
      COMMIT;          
 
- END;
+END;
+--
+-----------------------------------------------------------------------------
+-- 
+PROCEDURE bundle_failure(pi_bundle_id       IN doc_bundles.dbun_bundle_id%TYPE
+                        ,pi_bundle_filename IN doc_bundles.dbun_filename%TYPE
+                        ,pi_process_id      IN doc_bundles.dbun_process_id%TYPE
+                        ,pi_error_text      IN VARCHAR2) IS
  
- PROCEDURE bundle_failure(pi_error_text IN VARCHAR2) IS
- 
- BEGIN
+BEGIN
   
      MERGE INTO  doc_bundles a
-     USING  ( SELECT   l_dbun_rec.dbun_bundle_id dbun_bundle_id
-                     , l_dbun_rec.dbun_filename  dbun_filename
-                     , l_dbun_rec.dbun_process_id dbun_process_id
+     USING  ( SELECT   pi_bundle_id              dbun_bundle_id
+                     , pi_bundle_filename        dbun_filename
+                     , pi_process_id              dbun_process_id
                      , 'N'                       dbun_success_flag
                      , pi_error_text            dbun_error_text
               FROM dual) b
@@ -934,8 +977,20 @@ FUNCTION load_document_bundle(pi_filename                   IN doc_bundles.dbun_
      
      COMMIT;          
 
- END; 
+END; 
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION load_document_bundle(pi_filename                   IN doc_bundles.dbun_filename%TYPE
+                             ,pi_oracle_directory           IN doc_bundles.dbun_location%TYPE
+                             ,pi_process_id                 IN hig_processes.hp_process_id%TYPE) RETURN BOOLEAN IS
+
+ l_dbun_rec doc_bundles%ROWTYPE;
  
+ l_retval BOOLEAN := FALSE;
+ l_sqlerrm varchar2(500);  
+ 
+
  
 
 BEGIN
@@ -1016,14 +1071,19 @@ BEGIN
   doc_locations_api.archive_doc_bundle_files(pi_doc_bundle_id => l_dbun_rec.dbun_bundle_id);
 
 --
--- remove the unzip location and the .zip 
+-- Finalise 
 --
   IF files_processed_successfully(pi_bundle_id => l_dbun_rec.dbun_bundle_id) THEN
 
-     bundle_success;          
+     bundle_success(pi_bundle_id => l_dbun_rec.dbun_bundle_id);          
      l_retval := TRUE;
   ELSE
-     bundle_failure(pi_error_text => 'See file(s)');
+     bundle_failure(pi_error_text      => 'See file(s)'
+                   ,pi_bundle_id       => l_dbun_rec.dbun_bundle_id
+                   ,pi_bundle_filename => l_dbun_rec.dbun_filename
+                   ,pi_process_id      => l_dbun_rec.dbun_process_id);     
+     
+     
      l_retval := FALSE;
       
   END IF;
@@ -1036,11 +1096,124 @@ EXCEPTION
  WHEN others THEN
      l_sqlerrm := substr(nm3flx.parse_error_message(sqlerrm),1,500);
      rollback;
-     bundle_failure(pi_error_text => l_sqlerrm);
+
+     bundle_failure(pi_error_text      => l_sqlerrm
+                   ,pi_bundle_id       => l_dbun_rec.dbun_bundle_id
+                   ,pi_bundle_filename => l_dbun_rec.dbun_filename
+                   ,pi_process_id      => l_dbun_rec.dbun_process_id);    
+
+
      RETURN(FALSE);
   
 
 END load_document_bundle;
+-- 
+-----------------------------------------------------------------------------
+--
+FUNCTION load_document_bundle_no_zip(pi_filename                    IN doc_bundles.dbun_filename%TYPE
+                                    ,pi_tab_driving_recs            IN tab_driving_recs
+                                    ,pi_oracle_directory            IN doc_bundles.dbun_location%TYPE
+                                    ,pi_process_id                  IN hig_processes.hp_process_id%TYPE
+                                    ,po_bundle_id                   OUT doc_bundles.dbun_bundle_id%TYPE ) RETURN BOOLEAN IS
+
+ l_dbun_rec doc_bundles%ROWTYPE;
+ 
+ l_retval BOOLEAN := FALSE;
+ l_sqlerrm varchar2(500);  
+ 
+BEGIN
+
+ hig_process_api.log_it(pi_message => 'Processing '||pi_filename);
+
+--
+-- start to compose DOC_BUNDLE record type
+--
+  l_dbun_rec.dbun_filename   := pi_filename;
+  l_dbun_rec.dbun_bundle_id  := nm3ddl.sequence_nextval('dbun_bundle_id_seq');
+  l_dbun_rec.dbun_process_id := pi_process_id;
+
+--
+-- Check the integrity of the filename and if it's been submitted before then bomb out
+-- 
+  check_bundle_filename_unique(pi_filename => pi_filename); -- not trapped by unique constraint on the table cos we want to actually throw a record into the doc_bundles_table so we an have an error against it
+
+    l_dbun_rec.dbun_location   := nm3file.get_true_dir_name
+                                                             (
+                                                              pi_loc       => pi_oracle_directory
+                                                             ,pi_use_hig   => FALSE
+                                                             );
+
+
+  l_dbun_rec.dbun_unzip_location   := Null;
+
+  po_bundle_id               :=  l_dbun_rec.dbun_bundle_id;
+
+--
+-- insert DOC_BUNDLE record
+--  
+  insert_doc_bundle(pi_dbun_rec => l_dbun_rec);
+
+  COMMIT; -- let's commit the records we've created up to this point before we start to process the actual data
+
+
+--
+-- Read files in and write to DOC_BUNDLE_FILES
+--
+  list_files_in_tab_driving_recs(pi_dbun_rec         => l_dbun_rec
+                                ,pi_tab_driving_recs => pi_tab_driving_recs
+                                ,pi_oracle_directory => pi_oracle_directory);
+
+--
+-- Create DOC and DOC_ASSOC records
+--
+  create_docs_etc(pi_dbun_rec => l_dbun_rec);
+
+--
+-- Initiate a transfer
+--
+  move_files_to_destination(pi_dbun_rec => l_dbun_rec);
+
+--
+-- Archive any files
+--
+ hig_process_api.log_it(pi_message         => '   Archiving Files' 
+                       ,pi_summary_flag    => 'N' );
+
+  doc_locations_api.archive_doc_bundle_files(pi_doc_bundle_id => l_dbun_rec.dbun_bundle_id);
+
+--
+-- Finalise 
+--
+  IF files_processed_successfully(pi_bundle_id => l_dbun_rec.dbun_bundle_id) THEN
+
+     bundle_success(pi_bundle_id => l_dbun_rec.dbun_bundle_id);          
+     l_retval := TRUE;
+  ELSE
+     bundle_failure(pi_error_text      => 'See Files(s)'
+                   ,pi_bundle_id       => l_dbun_rec.dbun_bundle_id
+                   ,pi_bundle_filename => l_dbun_rec.dbun_filename
+                   ,pi_process_id      => l_dbun_rec.dbun_process_id);  
+     l_retval := FALSE;
+      
+  END IF;
+
+  
+  RETURN l_retval;
+  
+EXCEPTION
+
+ WHEN others THEN
+     l_sqlerrm := substr(nm3flx.parse_error_message(sqlerrm),1,500);
+     rollback;
+     bundle_failure(pi_error_text => l_sqlerrm
+                   ,pi_bundle_id       => l_dbun_rec.dbun_bundle_id
+                   ,pi_bundle_filename => l_dbun_rec.dbun_filename
+                   ,pi_process_id      => l_dbun_rec.dbun_process_id);  
+     
+     RETURN(FALSE);
+  
+
+END load_document_bundle_no_zip;
 -- 
 -----------------------------------------------------------------------------
 --
