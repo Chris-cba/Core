@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/Report Munits.sql-arc   1.0   Oct 25 2010 09:05:20   ade.edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/Report Munits.sql-arc   1.1   Dec 08 2010 09:39:58   Ade.Edwards  $
 --       Module Name      : $Workfile:   Report Munits.sql  $
---       Date into PVCS   : $Date:   Oct 25 2010 09:05:20  $
---       Date fetched Out : $Modtime:   Oct 25 2010 08:57:38  $
---       PVCS Version     : $Revision:   1.0  $
+--       Date into PVCS   : $Date:   Dec 08 2010 09:39:58  $
+--       Date fetched Out : $Modtime:   Dec 08 2010 09:39:10  $
+--       PVCS Version     : $Revision:   1.1  $
 --
 --------------------------------------------------------------------------------
 --
@@ -33,6 +33,7 @@ DECLARE
        AND vnnt_nth_theme_id = nth_theme_id
        AND vnnt_lr_type IN ('D','G')
        AND nt_type = vnnt_nt_type
+       AND nt_length_unit IS NOT NULL
      )
       SELECT srid
            , old_value
