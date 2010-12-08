@@ -4,16 +4,16 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.9   Jul 02 2010 11:03:26   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.10   Dec 08 2010 09:20:52   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3sdo_check.pkb  $
---       Date into PVCS   : $Date:   Jul 02 2010 11:03:26  $
---       Date fetched Out : $Modtime:   Jul 02 2010 11:02:14  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Dec 08 2010 09:20:52  $
+--       Date fetched Out : $Modtime:   Dec 08 2010 09:17:40  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --------------------------------------------------------------------------------
 --
   g_package_name          CONSTANT varchar2(30)    := 'nm3sdo_check';
-  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.9  $"';
+  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.10  $"';
   lf                      CONSTANT VARCHAR2(30)    := chr(10);
   g_write_to_file                  BOOLEAN         := FALSE;
   l_results                        nm3type.tab_varchar32767;
@@ -191,6 +191,7 @@ AS
                          AND hur_username = hus_username
                          AND hus_username = username
                          AND hus_username != hig.get_application_owner
+                         AND hus_end_date IS NULL
                          AND NOT EXISTS
                          -- Ignore the TMA Webservice schemas
                            (SELECT 1 FROM all_objects o
@@ -216,6 +217,7 @@ AS
                              nm_themes_all b
                        WHERE b.nth_theme_id = a.nth_base_table_theme
                          AND hus_username = username
+                         AND hus_end_date IS NULL
                          AND hus_username != hig.get_application_owner
                          AND NOT EXISTS
                          -- Ignore the TMA Webservice schemas
@@ -279,6 +281,7 @@ AS
        AND nthr_theme_id = nth_theme_id
        AND nthr_role = hur_role
        AND hur_username = hus_username
+       AND hus_end_date IS NULL
        AND EXISTS
          (SELECT * FROM dba_role_privs
            WHERE grantee = hus_username
