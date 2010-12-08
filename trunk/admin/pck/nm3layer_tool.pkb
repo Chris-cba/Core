@@ -4,17 +4,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.22   Dec 08 2010 09:20:56   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.23   Dec 08 2010 14:08:06   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Dec 08 2010 09:20:56  $
---       Date fetched Out : $Modtime:   Dec 08 2010 09:17:30  $
---       Version          : $Revision:   2.22  $
+--       Date into PVCS   : $Date:   Dec 08 2010 14:08:06  $
+--       Date fetched Out : $Modtime:   Dec 08 2010 14:07:18  $
+--       Version          : $Revision:   2.23  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.22  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.23  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -5320,7 +5320,7 @@ BEGIN
                                     AND g1.sdo_table_name = nth_feature_table
                                     AND g1.sdo_column_name = nth_feature_shape_column)
                  --
-                 UNION ALL
+                 UNION
                  --
                  --
                  -- Clone any highways view based metadata
@@ -5341,7 +5341,7 @@ BEGIN
                                   WHERE g1.sdo_owner = hus_username
                                     AND g1.sdo_table_name = view_based.nth_feature_table
                                     AND g1.sdo_column_name = view_based.nth_feature_shape_column)
-                 UNION ALL
+                 UNION
                  --
                  --
                  -- Clone any dependant themes related by base themes table
@@ -5356,6 +5356,37 @@ BEGIN
                           AND hus_username = username
                           AND hus_end_date IS NULL
                           AND hus_username != hig.get_application_owner
+                          AND NOT EXISTS (
+                                 SELECT 1
+                                   FROM MDSYS.sdo_geom_metadata_table g1
+                                  WHERE g1.sdo_owner = hus_username
+                                    AND g1.sdo_table_name = nth_feature_table
+                                    AND g1.sdo_column_name = nth_feature_shape_column)
+                 UNION
+                 --
+                 --
+                 --
+                       SELECT hus_username, a.nth_feature_table, a.nth_feature_shape_column
+                         FROM nm_themes_all a,
+                              nm_theme_roles,
+                              hig_user_roles,
+                              hig_users,
+                              all_users
+                        WHERE nth_theme_id = pi_nth_theme_id
+                          AND nthr_theme_id = a.nth_theme_id
+                          AND nthr_role = hur_role
+                          AND hur_username = hus_username
+                          AND hus_username = username
+                          AND hus_end_date IS NULL
+                          AND hus_username != hig.get_application_owner
+--                          AND a.nth_theme_id IN (
+--                                SELECT z.nth_base_table_theme
+--                                  FROM nm_themes_all z, nm_theme_roles
+--                                 WHERE EXISTS (SELECT 1
+--                                                 FROM hig_user_roles
+--                                                WHERE hur_username = hus_username 
+--                                                  AND hur_role = nthr_role)
+--                                   AND nthr_theme_id = z.nth_theme_id)
                           AND NOT EXISTS (
                                  SELECT 1
                                    FROM MDSYS.sdo_geom_metadata_table g1
