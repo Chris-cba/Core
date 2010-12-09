@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.15   Oct 12 2010 09:28:20   Chris.Baugh  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.16   Dec 09 2010 11:31:20   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Oct 12 2010 09:28:20  $
---       Date fetched Out : $Modtime:   Oct 11 2010 17:10:24  $
---       Version          : $Revision:   3.15  $
+--       Date into PVCS   : $Date:   Dec 09 2010 11:31:20  $
+--       Date fetched Out : $Modtime:   Dec 09 2010 11:27:44  $
+--       Version          : $Revision:   3.16  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.15  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.16  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -380,8 +380,13 @@ BEGIN
              CLOSE l_refcursor;
                  
           END IF;
-              
-          create_alert_log (pi_hpal_rec => l_hpal_rec);
+          --TASK 0110519 
+          --Raise Alert only non-polling process or the polling process has failed
+          IF  Nvl(Sys_Context('NM3SQL','HIG_POLLING_PROCESS'),'N') = 'N'
+          OR  pi_success_flag = 'N'
+          THEN          
+              create_alert_log (pi_hpal_rec => l_hpal_rec);
+          END IF ;
               
          commit;
 
@@ -1485,6 +1490,9 @@ FUNCTION do_polling_if_requested(pi_file_type_name          IN hig_process_type_
   BEGIN
   
     IF lt_all_files.COUNT > 0 THEN
+        --TASK 0110519 
+        --Set the Context flag to indicate this is polling process and has found the file 
+        nm3ctx.set_context('HIG_POLLING_PROCESS','Y');
 
         l_tab_files.DELETE;
         
