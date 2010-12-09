@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.11.1.0   Nov 18 2010 15:38:48   Chris.Baugh  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.11.1.1   Dec 09 2010 11:35:50   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Nov 18 2010 15:38:48  $
---       Date fetched Out : $Modtime:   Nov 18 2010 14:23:12  $
---       Version          : $Revision:   3.11.1.0  $
+--       Date into PVCS   : $Date:   Dec 09 2010 11:35:50  $
+--       Date fetched Out : $Modtime:   Dec 09 2010 11:34:46  $
+--       Version          : $Revision:   3.11.1.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.11.1.0  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.11.1.1  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -378,7 +378,13 @@ BEGIN
                  
           END IF;
               
-          create_alert_log (pi_hpal_rec => l_hpal_rec);
+          --TASK 0110519 
+          --Raise Alert only non-polling process or the polling process has failed
+          IF  Nvl(Sys_Context('NM3SQL','HIG_POLLING_PROCESS'),'N') = 'N'
+          OR  pi_success_flag = 'N'
+          THEN          
+              create_alert_log (pi_hpal_rec => l_hpal_rec);
+          END IF ;
               
          commit;
 
@@ -1461,6 +1467,9 @@ FUNCTION do_polling_if_requested(pi_file_type_name          IN hig_process_type_
   BEGIN
   
     IF lt_all_files.COUNT > 0 THEN
+        --TASK 0110519 
+        --Set the Context flag to indicate this is polling process and has found the file 
+        nm3ctx.set_context('HIG_POLLING_PROCESS','Y'); 
 
         l_tab_files.DELETE;
         
