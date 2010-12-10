@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.6   Jun 24 2010 12:07:44   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.7   Dec 10 2010 10:16:28   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Jun 24 2010 12:07:44  $
---       Date fetched Out : $Modtime:   Jun 24 2010 11:39:18  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Dec 10 2010 10:16:28  $
+--       Date fetched Out : $Modtime:   Dec 10 2010 10:11:52  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.6  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.7  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -1176,20 +1176,32 @@ BEGIN
    END ;
    If pi_att_file_name is not null
    THen         
-       utl_smtp.write_data( g_mail_conn, crlf ||'-------SECBOUND'|| crlf ||
-                                                'Content-Type: text/plain;'|| crlf ||
-                                               ' name='||pi_att_file_name|| crlf ||
-                                               'Content-Transfer_Encoding: 8bit'|| crlf ||
-                                               'Content-Transfer-Encoding: base64;'|| crlf ||
-                                               ' filename='||pi_att_file_name|| crlf ||crlf );
-       v_length := dbms_lob.getlength(pi_file_att);     
-       while v_offset < v_length 
-       loop
-           dbms_lob.read( pi_file_att, v_buffer_size, v_offset, v_raw );
-           utl_smtp.write_raw_data( g_mail_conn, utl_encode.base64_encode(v_raw) );
-           utl_smtp.write_data( g_mail_conn, utl_tcp.crlf );
-           v_offset := v_offset + v_buffer_size;
-       end loop ;          
+       utl_smtp.write_data( g_mail_conn, crlf ||'-------SECBOUND'|| crlf );
+       utl_smtp.write_data( g_mail_conn, 'Content-Disposition: attachment; filename="' || pi_att_file_name || '"' || crlf);
+       utl_smtp.write_data( g_mail_conn, crlf );      
+       --Task 0110530 to remove the encoding from attachment, but now only Text attachment can be send    
+       DECLARE
+       --
+          l_buffer     VARCHAR2(30000);
+          l_amount     BINARY_INTEGER := 30000;
+          l_pos        INTEGER := 1;
+          l_clob_len   INTEGER;
+          l_attachment_clob clob := nm3clob.blob_to_clob(pi_file_att);
+       --
+       BEGIN 
+       --
+          l_clob_len := DBMS_LOB.getlength (l_attachment_clob);
+          WHILE l_pos < l_clob_len
+          LOOP  
+              DBMS_LOB.READ (l_attachment_clob,l_amount,l_pos,l_buffer);
+              IF l_buffer IS NOT NULL
+              THEN
+                  utl_smtp.write_data(g_mail_conn,crlf ||l_buffer|| crlf );  -- Attachment Text 
+              END IF;
+              l_pos :=   l_pos + l_amount;   
+          END LOOP;
+       --
+       END ;          
    END IF ;
    utl_smtp.write_data( g_mail_conn,crlf ||'-------SECBOUND--' );  -- End MIME mail
    utl_smtp.write_data( g_mail_conn, utl_tcp.crlf );
