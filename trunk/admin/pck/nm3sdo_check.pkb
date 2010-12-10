@@ -4,16 +4,16 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.10   Dec 08 2010 09:20:52   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkb-arc   2.11   Dec 10 2010 09:45:34   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3sdo_check.pkb  $
---       Date into PVCS   : $Date:   Dec 08 2010 09:20:52  $
---       Date fetched Out : $Modtime:   Dec 08 2010 09:17:40  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Dec 10 2010 09:45:34  $
+--       Date fetched Out : $Modtime:   Dec 10 2010 09:44:48  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --------------------------------------------------------------------------------
 --
   g_package_name          CONSTANT varchar2(30)    := 'nm3sdo_check';
-  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.10  $"';
+  g_body_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.11  $"';
   lf                      CONSTANT VARCHAR2(30)    := chr(10);
   g_write_to_file                  BOOLEAN         := FALSE;
   l_results                        nm3type.tab_varchar32767;
@@ -726,10 +726,11 @@ AS
      WHERE NOT EXISTS (
         SELECT 1
           FROM user_tab_columns
-         WHERE table_name = nth_table_name
+         WHERE ( table_name = nth_table_name OR table_name = 'NM_INV_ITEMS_ALL' )
            AND column_name = NVL (nth_x_column, column_name))
        AND nth_x_column IS NOT NULL
-       AND nth_theme_type = 'SDO';
+       AND nth_theme_type = 'SDO'
+       AND nth_base_table_theme IS NULL;
   --
     IF l_results.COUNT = 0
     THEN
@@ -755,10 +756,11 @@ AS
      WHERE NOT EXISTS (
         SELECT 1
           FROM user_tab_columns
-         WHERE table_name = nth_table_name
+         WHERE ( table_name = nth_table_name OR table_name = 'NM_INV_ITEMS_ALL' )
            AND column_name = NVL (nth_y_column, column_name))
        AND nth_y_column IS NOT NULL
-       AND nth_theme_type = 'SDO';
+       AND nth_theme_type = 'SDO'
+       AND nth_base_table_theme IS NULL;
   --
     IF l_results.COUNT = 0
     THEN
@@ -871,10 +873,11 @@ AS
      WHERE NOT EXISTS (
         SELECT 1
           FROM user_tab_columns
-         WHERE table_name = nth_table_name
+         WHERE table_name = nth_feature_table
            AND column_name = NVL (nth_start_date_column, column_name))
        AND nth_start_date_column IS NOT NULL
-       AND nth_theme_type = 'SDO';
+       AND nth_theme_type = 'SDO'
+       AND nth_base_table_theme IS NULL;
   --
     IF l_results.COUNT = 0
     THEN
@@ -900,10 +903,11 @@ AS
      WHERE NOT EXISTS (
         SELECT 1
           FROM user_tab_columns
-         WHERE table_name = nth_table_name
+         WHERE table_name = nth_feature_table
            AND column_name = NVL (nth_end_date_column, column_name))
        AND nth_end_date_column IS NOT NULL
-       AND nth_theme_type = 'SDO';
+       AND nth_theme_type = 'SDO'
+       AND nth_base_table_theme IS NULL;
   --
     IF l_results.COUNT = 0
     THEN
