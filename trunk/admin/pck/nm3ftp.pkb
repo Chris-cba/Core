@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.16   Dec 06 2010 14:49:58   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.17   Dec 15 2010 17:00:00   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Dec 06 2010 14:49:58  $
---       Date fetched Out : $Modtime:   Dec 06 2010 14:49:28  $
---       PVCS Version     : $Revision:   3.16  $
+--       Date into PVCS   : $Date:   Dec 15 2010 17:00:00  $
+--       Date fetched Out : $Modtime:   Dec 15 2010 16:59:32  $
+--       PVCS Version     : $Revision:   3.17  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.16  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.17  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -1454,11 +1454,16 @@ END;
                   p_to_dir      => l_db_dir,
                   p_to_file     => l_files_tab(f)
                 );
-            add_ftp_outcome( p_ftp_htc_id        => i.hfc_id
+           add_ftp_outcome( p_ftp_htc_id        => i.hfc_id
                            , p_ftp_type          => g_main
                            , p_ftp_filename      => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f)
                            , p_ftp_outcome       => g_success
                            );
+          -- Task 0110503
+          -- Remove the file from the ftp location once the file is copied onto the database
+          nm3ftp.delete(p_conn   => l_conn
+                       ,p_file   => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f));
+
             l_success:= TRUE;
           --
           EXCEPTION
@@ -1488,13 +1493,11 @@ END;
               AND NVL(i.hfc_ftp_port,21)                         = NVL(i.hfc_ftp_arc_port,21)
               AND NVL(i.hfc_ftp_arc_username,i.hfc_ftp_username) = i.hfc_ftp_username
               THEN
-                rename
-                  ( p_conn               => l_conn,
-                    p_from               => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f),
-                    p_to                 => format_with_separator(i.hfc_ftp_arc_in_dir)||l_files_tab(f),
-                    p_archive_overwrite  => pi_archive_overwrite,
-                    p_remove_failed_arch => pi_remove_failed_arch
-                  );
+                  -- Replace the Rename to Put to copy the file from databse to FTP archival folder
+                  nm3ftp.put(p_conn      => l_conn,
+                             p_from_dir  => l_db_dir,
+                             p_from_file => l_files_tab(f),
+                             p_to_file   => format_with_separator(i.hfc_ftp_arc_in_dir)||l_files_tab(f));
                 add_ftp_outcome( p_ftp_htc_id        => i.hfc_id
                                , p_ftp_type          => g_archive
                                , p_ftp_filename      => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f)
@@ -1526,12 +1529,7 @@ END;
                                 --
                 -- Remove the orginal files from IN folder after arching
                 --
-                -- Task 0110505
-                --
-                  nm3ftp.delete(p_conn   => l_conn
-                               ,p_file   => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f));
-                --
-                  nm3ftp.logout(p_conn => l_arc_conn);
+                nm3ftp.logout(p_conn => l_arc_conn);
                 --
                   add_ftp_outcome( p_ftp_htc_id        => i.hfc_id
                                  , p_ftp_type          => g_archive
@@ -1555,12 +1553,6 @@ END;
               --
               END IF;
               --
-            ELSIF pi_remove_failed_arch AND l_success THEN
-            --
-            nm3ftp.delete( p_conn  => l_conn
-                         , p_file  => format_with_separator(i.hfc_ftp_in_dir)||l_files_tab(f)
-                         );
-            --
             END IF;
           EXCEPTION
           WHEN OTHERS THEN 
