@@ -1,19 +1,17 @@
---<PACKAGE>
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/ntifix.sql-arc   3.0   Dec 17 2010 14:23:38   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/utl/ntifix.sql-arc   3.1   Dec 20 2010 11:23:54   Chris.Strettle  $
 --       Module Name      : $Workfile:   ntifix.sql  $
---       Date into PVCS   : $Date:   Dec 17 2010 14:23:38  $
---       Date fetched Out : $Modtime:   Dec 17 2010 14:23:14  $
---       Version          : $Revision:   3.0  $
---       Based on SCCS version : 
+--       Date into PVCS   : $Date:   Dec 20 2010 11:23:54  $
+--       Date fetched Out : $Modtime:   Dec 20 2010 11:23:22  $
+--       Version          : $Revision:   3.1  $
+--
+--       Author: Chris Strettle 
 --
 -----------------------------------------------------------------------------
 --   Copyright (c) exor corporation ltd, 2010
 -----------------------------------------------------------------------------
-----</PACKAGE>
---<GLOBVAR>
 --
 DECLARE
    l_exception  EXCEPTION;
