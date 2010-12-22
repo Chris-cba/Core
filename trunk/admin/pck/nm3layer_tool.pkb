@@ -4,17 +4,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.23   Dec 08 2010 14:08:06   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.24   Dec 22 2010 09:55:32   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Dec 08 2010 14:08:06  $
---       Date fetched Out : $Modtime:   Dec 08 2010 14:07:18  $
---       Version          : $Revision:   2.23  $
+--       Date into PVCS   : $Date:   Dec 22 2010 09:55:32  $
+--       Date fetched Out : $Modtime:   Dec 21 2010 16:01:32  $
+--       Version          : $Revision:   2.24  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.23  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.24  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -5083,6 +5083,8 @@ END get_nsg_label;
                                 , pi_completion_message => 'Error with SDE Metadata Refresh'
                                 , pi_error_message      => SQLERRM
                                 );
+      ELSE
+        RAISE;
       END IF;
   END refresh_sde_metadata;
 --
@@ -5560,6 +5562,8 @@ EXCEPTION
                               , pi_completion_message => 'End of SDO Metadata Refresh - An Error Has Occurred'
                               , pi_error_message      => SQLERRM
                               );
+    ELSE
+      RAISE;
     END IF;
 END refresh_sdo_metadata;
 --
