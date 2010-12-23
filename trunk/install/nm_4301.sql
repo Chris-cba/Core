@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4301.sql-arc   3.0   Dec 22 2010 14:18:20   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4301.sql-arc   3.1   Dec 23 2010 10:37:02   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm_4301.sql  $
---       Date into PVCS   : $Date:   Dec 22 2010 14:18:20  $
---       Date fetched Out : $Modtime:   Dec 22 2010 14:17:54  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Dec 23 2010 10:37:02  $
+--       Date fetched Out : $Modtime:   Dec 23 2010 10:14:18  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) exor corporation ltd, 2010
@@ -32,6 +32,7 @@ set term on
 -- Spool to Logfile
 --
 define logfile1='nm_4301_1_&log_extension'
+define logfile2='nm_4301_2_&log_extension'
 spool &logfile1
 --
 --------------------------------------------------------------------------------
@@ -194,6 +195,17 @@ END;
 /
 COMMIT;
 
+--
+---------------------------------------------------------------------------------------------------
+--                        ****************   COMPILE SCHEMA   *******************
+SET TERM ON
+Prompt Creating Compiling Schema Script...
+SET TERM OFF
+SPOOL OFF
+start compile_schema.sql
+spool &logfile2
+SET TERM ON
+start compile_all.sql
 SPOOL OFF
 EXIT
 --
