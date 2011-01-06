@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4301.sql-arc   3.1   Dec 23 2010 10:37:02   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4301.sql-arc   3.2   Jan 06 2011 10:23:04   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm_4301.sql  $
---       Date into PVCS   : $Date:   Dec 23 2010 10:37:02  $
---       Date fetched Out : $Modtime:   Dec 23 2010 10:14:18  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Jan 06 2011 10:23:04  $
+--       Date fetched Out : $Modtime:   Jan 06 2011 10:22:22  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) exor corporation ltd, 2010
@@ -206,6 +206,11 @@ start compile_schema.sql
 spool &logfile2
 SET TERM ON
 start compile_all.sql
+--
+alter view network_node compile;
+--
+alter synonym road_seg_membs_partial compile;
+--
 SPOOL OFF
 EXIT
 --
