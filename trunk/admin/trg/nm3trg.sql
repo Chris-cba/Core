@@ -2,11 +2,11 @@
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.17   Jun 07 2010 15:00:42   lsorathia  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm3trg.sql-arc   2.18   Jan 14 2011 13:58:50   Chris.Baugh  $
 --       Module Name      : $Workfile:   nm3trg.sql  $
---       Date into PVCS   : $Date:   Jun 07 2010 15:00:42  $
---       Date fetched Out : $Modtime:   Jun 07 2010 15:00:10  $
---       PVCS Version     : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Jan 14 2011 13:58:50  $
+--       Date fetched Out : $Modtime:   Jan 14 2011 13:56:56  $
+--       PVCS Version     : $Revision:   2.18  $
 --
 --
 --   Author : Graeme Johnson
@@ -1898,7 +1898,17 @@ start '&run_file'
 --
 -----------------------------------------------------------------------------------------
 --
-
+SET TERM ON 
+PROMPT hig_hig_alert_recipients_a_ins.trg
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'trg'||'&terminator'||'hig_alert_recipients_a_ins.trg' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+-----------------------------------------------------------------------------------------
+--
 
 
 -- new triggers above this
