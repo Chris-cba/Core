@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE Nm3sdo AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkh-arc   2.6   Aug 05 2010 11:48:54   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkh-arc   2.7   Jan 26 2011 12:23:12   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkh  $
---       Date into PVCS   : $Date:   Aug 05 2010 11:48:54  $
---       Date fetched Out : $Modtime:   Aug 05 2010 11:20:18  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Jan 26 2011 12:23:12  $
+--       Date fetched Out : $Modtime:   Jan 26 2011 12:22:42  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --   Author : Rob Coupe
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE Nm3sdo AS
 --<GLOBVAR>
 -- g_sccsid is the SCCS_ID
 -- Constants
-  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   2.6  $"';
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   2.7  $"';
   single_shape_inv   CONSTANT VARCHAR2(3)  := NVL( Hig.get_sysopt('SDOSINGSHP'), 'N');
   use_surrogate_key  CONSTANT VARCHAR2(1)  := NVL( Hig.get_sysopt('SDOSURKEY'),'N');
   def_pt_zoom        CONSTANT NUMBER       := NVL( TO_NUMBER( Hig.get_sysopt('SDOPTZOOM' )), 100);
@@ -77,6 +77,7 @@ TYPE    nth_row_tab_type IS TABLE OF nth_row_type INDEX BY BINARY_INTEGER;
   FUNCTION get_layer_shape_column ( p_layer IN NUMBER ) RETURN VARCHAR2;
   FUNCTION get_layer_ne_column ( p_layer IN NUMBER ) RETURN VARCHAR2;
 
+  FUNCTION get_nw_srids RETURN NUMBER;
 
   FUNCTION get_nw_themes RETURN nm_theme_array;
 
