@@ -1,12 +1,12 @@
-create or replace package nm0575
+CREATE OR REPLACE package nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkh-arc   2.2   Dec 04 2007 21:23:42   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkh-arc   2.3   Jan 26 2011 13:32:14   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm0575.pkh  $
---       Date into PVCS   : $Date:   Dec 04 2007 21:23:42  $
---       Date fetched Out : $Modtime:   Dec 04 2007 21:08:38  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Jan 26 2011 13:32:14  $
+--       Date fetched Out : $Modtime:   Jan 26 2011 13:31:02  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on SCCS version : 1.2
 --
 --
@@ -15,13 +15,13 @@ AS
 --    %YourObjectName%
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+-- Copyright (c) exor corporation ltd, 2006
 -----------------------------------------------------------------------------
 
   -----------
   --constants
   -----------
-  g_sccsid CONSTANT VARCHAR2(2000) := '"$Revision:   2.2  $"';
+  g_sccsid CONSTANT VARCHAR2(2000) := '"$Revision:   2.3  $"';
   
 
 --
@@ -91,8 +91,12 @@ PROCEDURE tidy_up;
   procedure set_inv_types_tbl(p_tbl in nm_code_tbl);
   
   procedure set_xsp_changed;
-
-  
-  
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE set_partial_flag ( pi_partial_flag IN VARCHAR2 );
+--
+-----------------------------------------------------------------------------
+--
 end nm0575;
 /

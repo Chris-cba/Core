@@ -2,17 +2,17 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.6   Jun 15 2009 15:59:00   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7   Jan 26 2011 13:32:14   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Jun 15 2009 15:59:00  $
---       Date fetched Out : $Modtime:   Jun 15 2009 15:54:18  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   Jan 26 2011 13:32:14  $
+--       Date fetched Out : $Modtime:   Jan 26 2011 13:31:08  $
+--       PVCS Version     : $Revision:   2.7  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
 
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2006
+-- Copyright (c) exor corporation ltd, 2006
 -----------------------------------------------------------------------------
 
 /* History
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.6  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -39,8 +39,10 @@ AS
   g_success_message          CONSTANT nm_errors.ner_descr%TYPE :=   hig.get_ner(pi_appl => 'HIG'
                                                                                ,pi_id  => 95).ner_descr;
                                                                                
-                                                                               
-  -- PT new logic module variables                                                               
+  g_include_partial                   VARCHAR2(1) := 'Y';
+  g_cached_results                    nm_id_code_meaning_tbl := new nm_id_code_meaning_tbl ()  ;
+
+  -- PT new logic module variables
   mt_inv_categories nm_code_tbl;
   mt_inv_types      nm_code_tbl;
   m_nte_job_id      nm_nw_temp_extents.nte_job_id%type;
@@ -158,10 +160,118 @@ exception
     raise;
   
 END set_g_tab_selected_categories;
-
+--
+-----------------------------------------------------------------------------------------------------------------------
+--
+PROCEDURE cache_results
+IS
+BEGIN
+--
+  g_cached_results.DELETE;
+--
+    WITH all_data AS
+           (  SELECT nm_ne_id_in
+                   , nm_obj_type
+                   , partial
+                FROM (
+                SELECT nm_ne_id_in
+                      , nm_obj_type
+                      , max(partial) partial
+                          FROM (
+                                SELECT q2.*
+                                     , ROW_NUMBER ( ) OVER (PARTITION BY q2.nm_ne_id_in ORDER BY 1) iit_rownum
+                                     , CASE
+                                         WHEN ( keep_begin_mp  IS NOT NULL
+                                            OR  keep_end_mp    IS NOT NULL
+                                            OR  keep_begin_mp2 IS NOT NULL
+                                            OR  keep_end_mp2   IS NOT NULL )
+                                         THEN
+                                           1
+                                         ELSE
+                                           0
+                                       END partial
+                                  FROM (SELECT DISTINCT
+                                               q.iit_ne_id nm_ne_id_in
+                                             , q.nm_ne_id_of
+                                             , q.nm_begin_mp
+                                             , q.nm_end_mp
+                                             , q.nm_start_date
+                                             , q.nm_admin_unit
+                                             , q.nm_type
+                                             , q.nm_obj_type
+                                             , q.nm_cardinality
+                                             , q.nm_seq_no
+                                             , q.nm_seg_no
+                                             , q.excluded_member_count
+                                             , g.iig_parent_id
+                                             , CASE WHEN q.nm_begin_mp < q.nte_begin_mp THEN q.nm_begin_mp ELSE NULL END  keep_begin_mp
+                                             , CASE WHEN q.nm_begin_mp < q.nte_begin_mp THEN q.nte_begin_mp ELSE NULL END keep_end_mp
+                                             , CASE WHEN q.nm_end_mp > q.nte_end_mp THEN q.nte_end_mp ELSE NULL END       keep_begin_mp2
+                                             , CASE WHEN q.nm_end_mp > q.nte_end_mp THEN q.nm_end_mp ELSE NULL END        keep_end_mp2
+                                          FROM (SELECT DISTINCT
+                                                       m.*
+                                                     , te.nte_ne_id_of
+                                                     , te.nte_begin_mp
+                                                     , te.nte_end_mp
+                                                     , COUNT ( NVL2 ( te.nte_ne_id_of, NULL, 1 ) ) OVER (PARTITION BY m.iit_ne_id) excluded_member_count
+                                                  FROM (SELECT i.iit_ne_id
+                                                             , im.nm_ne_id_of
+                                                             , im.nm_begin_mp
+                                                             , im.nm_end_mp
+                                                             , im.nm_start_date
+                                                             , im.nm_admin_unit
+                                                             , im.nm_type
+                                                             , im.nm_obj_type
+                                                             , im.nm_cardinality
+                                                             , im.nm_seq_no
+                                                             , im.nm_seg_no
+                                                          FROM (  SELECT DISTINCT m.nm_ne_id_in
+                                                                    FROM nm_nw_temp_extents xe
+                                                                       , nm_members m
+                                                                   WHERE xe.nte_ne_id_of = m.nm_ne_id_of
+                                                                     AND xe.nte_job_id = m_nte_job_id
+                                                                     AND m.nm_type = 'I'
+                                                                GROUP BY m.nm_ne_id_in) em
+                                                             , nm_inv_items i
+                                                             , nm_members im
+                                                         WHERE em.nm_ne_id_in = i.iit_ne_id
+                                                           AND i.iit_ne_id = im.nm_ne_id_in
+                                                           AND i.iit_inv_type IN (SELECT COLUMN_VALUE FROM TABLE(CAST(get_inv_types_tbl AS nm_code_tbl)))
+                                                           --and i.iit_inv_type = 'SPED'
+                                                           AND ( i.iit_x_sect IS NULL
+                                                             OR  i.iit_x_sect IN (SELECT x2.xsp_value
+                                                                                    FROM nm0575_possible_xsps x2
+                                                                                   WHERE x2.xsp_selected = 'Y') )) m
+                                                     , (SELECT *
+                                                          FROM nm_nw_temp_extents
+                                                         WHERE nte_job_id = m_nte_job_id) te
+                                                 WHERE m.nm_ne_id_of = te.nte_ne_id_of(+)
+                                                   AND m.nm_begin_mp <= te.nte_end_mp(+)
+                                                   AND m.nm_end_mp >= te.nte_begin_mp(+)) q
+                                             , nm_inv_item_groupings g
+                                         WHERE q.nte_ne_id_of IS NOT NULL
+                                           AND ( q.nm_begin_mp = q.nm_end_mp
+                                             OR  ( q.nm_begin_mp < q.nte_end_mp
+                                              AND q.nm_end_mp > q.nte_begin_mp ) )
+                                           AND ( q.nte_begin_mp < q.nte_end_mp
+                                             OR  q.nm_begin_mp = q.nm_end_mp )
+                                           AND q.iit_ne_id = g.iig_parent_id(+)) q2
+                                           )
+                      GROUP BY nm_ne_id_in
+                             , nm_obj_type
+                             )
+            WHERE partial = CASE WHEN g_include_partial = 'N' THEN 0 ELSE partial END
+            GROUP BY nm_ne_id_in
+                   , nm_obj_type
+                   , partial
+                   )
+        SELECT cast ( collect (nm_id_code_meaning_type ( nm_ne_id_in, nm_obj_type, partial ) ) as  nm_id_code_meaning_tbl )
+          INTO g_cached_results
+          FROM all_data;
+END;
 
 --
------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------
 --
 
 -- this populates the nm0575_matching_records
@@ -222,42 +332,163 @@ BEGIN
       
       if g_tab_selected_categories.count > 0 then
       
-        insert into nm0575_matching_records (
-          asset_category, asset_type, asset_type_descr, asset_count
-        )
-        select
-           t.nit_category asset_category
-          ,t.nit_inv_type asset_type
-          ,t.nit_descr asset_type_descr
-          ,count(*) asset_count
-        from (
-        select
-        distinct i.iit_ne_id, i.iit_inv_type
-        from
-           nm_nw_temp_extents xe
-          ,nm_members m
-          ,nm_inv_items i
-          ,(select column_value from table(cast(get_inv_types_tbl as nm_code_tbl))) xt 
-          ,(select x2.xsp_value from nm0575_possible_xsps x2 where x2.xsp_selected = 'Y'
-            union all select '~~~~' xsp_value from dual) xs
-        where xe.nte_ne_id_of = m.nm_ne_id_of
-          and xe.nte_job_id = m_nte_job_id
-          and m.nm_begin_mp <= xe.nte_end_mp
-          and m.nm_end_mp >= xe.nte_begin_mp
-          and (m.nm_begin_mp = m.nm_end_mp or (m.nm_begin_mp < xe.nte_end_mp and m.nm_end_mp > xe.nte_begin_mp))
-          and (xe.nte_begin_mp < xe.nte_end_mp or m.nm_begin_mp = m.nm_end_mp)
-          and m.nm_ne_id_in = i.iit_ne_id
-          and i.iit_inv_type = xt.column_value
-          and nvl(i.iit_x_sect, '~~~~') = xs.xsp_value
-        ) q
-        ,nm_inv_types t
-        where q.iit_inv_type = t.nit_inv_type
-        group by
-           t.nit_category
-          ,t.nit_inv_type
-          ,t.nit_descr;
+--        insert into nm0575_matching_records (
+--          asset_category, asset_type, asset_type_descr, asset_count
+--        )
+--        select
+--           t.nit_category asset_category
+--          ,t.nit_inv_type asset_type
+--          ,t.nit_descr asset_type_descr
+--          ,count(*) asset_count
+--        from (
+--        select
+--        distinct i.iit_ne_id, i.iit_inv_type
+--        from
+--           nm_nw_temp_extents xe
+--          ,nm_members m
+--          ,nm_inv_items i
+--          ,(select column_value from table(cast(get_inv_types_tbl as nm_code_tbl))) xt 
+--          ,(select x2.xsp_value from nm0575_possible_xsps x2 where x2.xsp_selected = 'Y'
+--            union all select '~~~~' xsp_value from dual) xs
+--        where xe.nte_ne_id_of = m.nm_ne_id_of
+--          and xe.nte_job_id = m_nte_job_id
+--          and m.nm_begin_mp <= xe.nte_end_mp
+--          and m.nm_end_mp >= xe.nte_begin_mp
+--          and (m.nm_begin_mp = m.nm_end_mp or (m.nm_begin_mp < xe.nte_end_mp and m.nm_end_mp > xe.nte_begin_mp))
+--          and (xe.nte_begin_mp < xe.nte_end_mp or m.nm_begin_mp = m.nm_end_mp)
+--          and m.nm_ne_id_in = i.iit_ne_id
+--          and i.iit_inv_type = xt.column_value
+--          and nvl(i.iit_x_sect, '~~~~') = xs.xsp_value
+--        ) q
+--        ,nm_inv_types t
+--        where q.iit_inv_type = t.nit_inv_type
+--        group by
+--           t.nit_category
+--          ,t.nit_inv_type
+--          ,t.nit_descr;
+--
+--
+      INSERT INTO nm0575_matching_records ( asset_category
+                                          , asset_type
+                                          , asset_type_descr
+                                          , asset_count
+                                          , asset_wholly_enclosed 
+                                          , asset_partially_enclosed
+                                          , asset_contiguous)
+          SELECT nit_category, nm_obj_type, nit_descr, (whole+partial), whole, partial,  nit_contiguous
+          FROM (
+            WITH all_data AS
+                   (  SELECT nm_ne_id_in
+                           , nm_obj_type
+                           , partial
+                        FROM (
+                        SELECT nm_ne_id_in
+                              , nm_obj_type
+                              , max(partial) partial
+                                  FROM (
+                                        SELECT q2.*
+                                             , ROW_NUMBER ( ) OVER (PARTITION BY q2.nm_ne_id_in ORDER BY 1) iit_rownum
+                                             , CASE
+                                                 WHEN ( keep_begin_mp  IS NOT NULL
+                                                    OR  keep_end_mp    IS NOT NULL
+                                                    OR  keep_begin_mp2 IS NOT NULL
+                                                    OR  keep_end_mp2   IS NOT NULL )
+                                                 THEN
+                                                   1
+                                                 ELSE
+                                                   0
+                                               END partial
+                                          FROM (SELECT DISTINCT
+                                                       q.iit_ne_id nm_ne_id_in
+                                                     , q.nm_ne_id_of
+                                                     , q.nm_begin_mp
+                                                     , q.nm_end_mp
+                                                     , q.nm_start_date
+                                                     , q.nm_admin_unit
+                                                     , q.nm_type
+                                                     , q.nm_obj_type
+                                                     , q.nm_cardinality
+                                                     , q.nm_seq_no
+                                                     , q.nm_seg_no
+                                                     , q.excluded_member_count
+                                                     , g.iig_parent_id
+                                                     , CASE WHEN q.nm_begin_mp < q.nte_begin_mp THEN q.nm_begin_mp ELSE NULL END  keep_begin_mp
+                                                     , CASE WHEN q.nm_begin_mp < q.nte_begin_mp THEN q.nte_begin_mp ELSE NULL END keep_end_mp
+                                                     , CASE WHEN q.nm_end_mp > q.nte_end_mp THEN q.nte_end_mp ELSE NULL END       keep_begin_mp2
+                                                     , CASE WHEN q.nm_end_mp > q.nte_end_mp THEN q.nm_end_mp ELSE NULL END        keep_end_mp2
+                                                  FROM (SELECT DISTINCT
+                                                               m.*
+                                                             , te.nte_ne_id_of
+                                                             , te.nte_begin_mp
+                                                             , te.nte_end_mp
+                                                             , COUNT ( NVL2 ( te.nte_ne_id_of, NULL, 1 ) ) OVER (PARTITION BY m.iit_ne_id) excluded_member_count
+                                                          FROM (SELECT i.iit_ne_id
+                                                                     , im.nm_ne_id_of
+                                                                     , im.nm_begin_mp
+                                                                     , im.nm_end_mp
+                                                                     , im.nm_start_date
+                                                                     , im.nm_admin_unit
+                                                                     , im.nm_type
+                                                                     , im.nm_obj_type
+                                                                     , im.nm_cardinality
+                                                                     , im.nm_seq_no
+                                                                     , im.nm_seg_no
+                                                                  FROM (  SELECT DISTINCT m.nm_ne_id_in
+                                                                            FROM nm_nw_temp_extents xe
+                                                                               , nm_members m
+                                                                           WHERE xe.nte_ne_id_of = m.nm_ne_id_of
+                                                                             AND xe.nte_job_id = m_nte_job_id
+                                                                             AND m.nm_type = 'I'
+                                                                        GROUP BY m.nm_ne_id_in) em
+                                                                     , nm_inv_items i
+                                                                     , nm_members im
+                                                                 WHERE em.nm_ne_id_in = i.iit_ne_id
+                                                                   AND i.iit_ne_id = im.nm_ne_id_in
+                                                                   and i.iit_inv_type in (select column_value from table(cast(get_inv_types_tbl as nm_code_tbl)))
+                                                                   --and i.iit_inv_type = 'SPED'
+                                                                   AND ( i.iit_x_sect IS NULL
+                                                                     OR  i.iit_x_sect IN (SELECT x2.xsp_value
+                                                                                            FROM nm0575_possible_xsps x2
+                                                                                           WHERE x2.xsp_selected = 'Y') )) m
+                                                             , (SELECT *
+                                                                  FROM nm_nw_temp_extents
+                                                                 WHERE nte_job_id = m_nte_job_id) te
+                                                         WHERE m.nm_ne_id_of = te.nte_ne_id_of(+)
+                                                           AND m.nm_begin_mp <= te.nte_end_mp(+)
+                                                           AND m.nm_end_mp >= te.nte_begin_mp(+)) q
+                                                     , nm_inv_item_groupings g
+                                                 WHERE q.nte_ne_id_of IS NOT NULL
+                                                   AND ( q.nm_begin_mp = q.nm_end_mp
+                                                     OR  ( q.nm_begin_mp < q.nte_end_mp
+                                                      AND q.nm_end_mp > q.nte_begin_mp ) )
+                                                   AND ( q.nte_begin_mp < q.nte_end_mp
+                                                     OR  q.nm_begin_mp = q.nm_end_mp )
+                                                   AND q.iit_ne_id = g.iig_parent_id(+)) q2
+                                                   )
+                              GROUP BY nm_ne_id_in
+                                     , nm_obj_type
+                                     )
+                    WHERE partial = CASE WHEN g_include_partial = 'N' THEN 0 ELSE partial END
+                    GROUP BY nm_ne_id_in
+                           , nm_obj_type
+                           , partial)
+            SELECT UNIQUE nm_obj_type
+                        , nit_descr
+                        , nit_category
+                        , nit_contiguous
+                        , ( SELECT COUNT ( * ) FROM all_data b
+                             WHERE b.partial = 0
+                               AND a.nm_obj_type = b.nm_obj_type ) whole
+                        , ( SELECT COUNT ( * ) FROM all_data b
+                             WHERE b.partial = 1
+                               AND a.nm_obj_type = b.nm_obj_type ) partial
+              FROM all_data a
+                 , nm_inv_types
+             WHERE nm_obj_type = nit_inv_type
+            );
         nm3dbg.putln('insert nm0575_matching_records count: '||sql%rowcount);
         
+        cache_results;
         
       -- assets over all network
       else
@@ -268,13 +499,22 @@ BEGIN
     -- CWS 02/02/2009 log 718014 Else section added to provide a way or returning details on all assets of the id is null
     else
      insert into nm0575_matching_records (
-          asset_category, asset_type, asset_type_descr, asset_count
+            asset_category
+          , asset_type
+          , asset_type_descr
+          , asset_count
+          , asset_wholly_enclosed
+          , asset_partially_enclosed
+          , asset_contiguous
         )
         select
            t.nit_category asset_category
           ,t.nit_inv_type asset_type
           ,t.nit_descr asset_type_descr
           ,count(*) asset_count
+          ,count(*) asset_count
+          ,0
+          ,t.nit_contiguous
         from (
         select
         distinct i.iit_ne_id, i.iit_inv_type
@@ -293,7 +533,8 @@ BEGIN
         group by
            t.nit_category
           ,t.nit_inv_type
-          ,t.nit_descr;
+          ,t.nit_descr
+          ,t.nit_contiguous;
         nm3dbg.putln('insert nm0575_matching_records count: '||sql%rowcount); 
   
     end if;
@@ -401,94 +642,98 @@ BEGIN
   THEN
 --
     for r in (
+  --
       select q2.*
-        ,row_number() over (partition by q2.nm_ne_id_in order by 1) iit_rownum
-      from (
-      select distinct
-         q.iit_ne_id nm_ne_id_in
-        ,q.nm_ne_id_of
-        ,q.nm_begin_mp
-        ,q.nm_end_mp
-        ,q.nm_start_date
-        ,q.nm_admin_unit
-        ,q.nm_type
-        ,q.nm_obj_type
-        ,q.nm_cardinality
-        ,q.nm_seq_no
-        ,q.nm_seg_no
-        ,q.excluded_member_count
-        ,g.iig_parent_id
-        ,case
-         when q.nm_begin_mp < q.nte_begin_mp then q.nm_begin_mp
-         else null
-         end keep_begin_mp
-        ,case
-         when q.nm_begin_mp < q.nte_begin_mp then q.nte_begin_mp
-         else null
-         end keep_end_mp
-        ,case
-         when q.nm_end_mp > q.nte_end_mp then q.nte_end_mp
-         else null
-         end keep_begin_mp2
-        ,case
-         when q.nm_end_mp > q.nte_end_mp then q.nm_end_mp
-         else null
-         end keep_end_mp2
-      from (
-      select distinct
-         m.*
-        ,te.nte_ne_id_of
-        ,te.nte_begin_mp
-        ,te.nte_end_mp
-        ,count(nvl2(te.nte_ne_id_of, null, 1)) over (partition by m.iit_ne_id) excluded_member_count
-      from
-         (
-          select
-             i.iit_ne_id
-            ,im.nm_ne_id_of
-            ,im.nm_begin_mp
-            ,im.nm_end_mp
-            ,im.nm_start_date
-            ,im.nm_admin_unit
-            ,im.nm_type
-            ,im.nm_obj_type
-            ,im.nm_cardinality
-            ,im.nm_seq_no
-            ,im.nm_seg_no
+            ,row_number() over (partition by q2.nm_ne_id_in order by 1) iit_rownum
+          from (
+          select distinct
+             q.iit_ne_id nm_ne_id_in
+            ,q.nm_ne_id_of
+            ,q.nm_begin_mp
+            ,q.nm_end_mp
+            ,q.nm_start_date
+            ,q.nm_admin_unit
+            ,q.nm_type
+            ,q.nm_obj_type
+            ,q.nm_cardinality
+            ,q.nm_seq_no
+            ,q.nm_seg_no
+            ,q.excluded_member_count
+            ,g.iig_parent_id
+            ,case
+             when q.nm_begin_mp < q.nte_begin_mp then q.nm_begin_mp
+             else null
+             end keep_begin_mp
+            ,case
+             when q.nm_begin_mp < q.nte_begin_mp then q.nte_begin_mp
+             else null
+             end keep_end_mp
+            ,case
+             when q.nm_end_mp > q.nte_end_mp then q.nte_end_mp
+             else null
+             end keep_begin_mp2
+            ,case
+             when q.nm_end_mp > q.nte_end_mp then q.nm_end_mp
+             else null
+             end keep_end_mp2
+          from (
+          select distinct
+             m.*
+            ,te.nte_ne_id_of
+            ,te.nte_begin_mp
+            ,te.nte_end_mp
+            ,count(nvl2(te.nte_ne_id_of, null, 1)) over (partition by m.iit_ne_id) excluded_member_count
           from
-             ( 
-              select distinct m.nm_ne_id_in
+             (
+              select
+                 i.iit_ne_id
+                ,im.nm_ne_id_of
+                ,im.nm_begin_mp
+                ,im.nm_end_mp
+                ,im.nm_start_date
+                ,im.nm_admin_unit
+                ,im.nm_type
+                ,im.nm_obj_type
+                ,im.nm_cardinality
+                ,im.nm_seq_no
+                ,im.nm_seg_no
               from
-                 nm_nw_temp_extents xe
-                ,nm_members m
-              where xe.nte_ne_id_of = m.nm_ne_id_of
-                and xe.nte_job_id = m_nte_job_id
-                and m.nm_type = 'I'
-              group by m.nm_ne_id_in
-             ) em
-            ,nm_inv_items i
-            ,nm_members im
-          where em.nm_ne_id_in = i.iit_ne_id
-            and i.iit_ne_id = im.nm_ne_id_in
-            and i.iit_inv_type in (select column_value from table(cast(t_code as nm_code_tbl)))
-            and (i.iit_x_sect is null 
-              or i.iit_x_sect in (select x2.xsp_value from nm0575_possible_xsps x2 where x2.xsp_selected = 'Y'))
-         ) m
-        ,(select * from nm_nw_temp_extents where nte_job_id = m_nte_job_id) te
-      where m.nm_ne_id_of = te.nte_ne_id_of (+)
-        and m.nm_begin_mp <= te.nte_end_mp (+)
-        and m.nm_end_mp >= te.nte_begin_mp (+)
-      ) q
-      ,nm_inv_item_groupings g
-      where q.nte_ne_id_of is not null
-        and (q.nm_begin_mp = q.nm_end_mp or (q.nm_begin_mp < q.nte_end_mp and q.nm_end_mp > q.nte_begin_mp))
-        and (q.nte_begin_mp < q.nte_end_mp or q.nm_begin_mp = q.nm_end_mp)
-        and q.iit_ne_id = g.iig_parent_id (+)
-      ) q2
-    )
+                 ( 
+                  select distinct m.nm_ne_id_in
+                  from
+                     nm_nw_temp_extents xe
+                    ,nm_members m
+                  where xe.nte_ne_id_of = m.nm_ne_id_of
+                    and xe.nte_job_id = m_nte_job_id
+                    and m.nm_type = 'I'
+                  group by m.nm_ne_id_in
+                 ) em
+                ,nm_inv_items i
+                ,nm_members im
+              where em.nm_ne_id_in = i.iit_ne_id
+                and i.iit_ne_id = im.nm_ne_id_in
+                and i.iit_inv_type in (select column_value from table(cast(t_code as nm_code_tbl)))
+                and i.iit_ne_id in (select id from table(cast(g_cached_results as nm_id_code_meaning_tbl)))
+                and (i.iit_x_sect is null 
+                  or i.iit_x_sect in (select x2.xsp_value from nm0575_possible_xsps x2 where x2.xsp_selected = 'Y'))
+             ) m
+            ,(select * from nm_nw_temp_extents where nte_job_id = m_nte_job_id) te
+          where m.nm_ne_id_of = te.nte_ne_id_of (+)
+            and m.nm_begin_mp <= te.nte_end_mp (+)
+            and m.nm_end_mp >= te.nte_begin_mp (+)
+          ) q
+          ,nm_inv_item_groupings g
+          where q.nte_ne_id_of is not null
+            and (q.nm_begin_mp = q.nm_end_mp or (q.nm_begin_mp < q.nte_end_mp and q.nm_end_mp > q.nte_begin_mp))
+            and (q.nte_begin_mp < q.nte_end_mp or q.nm_begin_mp = q.nm_end_mp)
+            and q.iit_ne_id = g.iig_parent_id (+)
+            --and excluded_member_count = case when pi_process_partial = 'N' then 0 else excluded_member_count end
+          ) q2
+        )
     
     -- start of the main asset placements loop
     loop
+      --nm_debug.debug_on;
       l_main_count := l_main_count + 1;
       nm3dbg.putln(l_main_count||'=(nm_ne_id_in='||r.nm_ne_id_in
         ||', nm_ne_id_of='||r.nm_ne_id_of
@@ -501,8 +746,7 @@ BEGIN
         ||', keep_begin_mp2='||r.keep_begin_mp2
         ||', keep_end_mp2='||r.keep_end_mp2
         ||')');
-        
-         
+
       -- close the current asset placement
       close_member_record(
          p_action   => pi_action
@@ -780,25 +1024,29 @@ BEGIN
   
   -- delete
   elsif pi_action = 'D' then
-    nm_debug.debug_on;
+    --nm_debug.debug_on;
     nm_debug.debug('Delete '||t_iit_id.count||' assets' );
     nm_debug.debug('Job ID '||m_nte_job_id);
     --Log 717947:Linesh:20-Feb-2009:Start
     --added this to delete the grouping records before end dating the asset
-    forall i in 1 .. t_iit_id.count
-    delete from nm_inv_item_groupings_all g
-    where g.iig_item_id = t_iit_id(i);
-    --
-    forall i in 1 .. t_iit_id.count
-    delete from nm_inv_item_groupings_all g
-    where g.iig_Parent_id = t_iit_id(i);
-    --
-    --Log 717947:Linesh:20-Feb-2009:End
-    --
+--    forall i in 1 .. t_iit_id.count
+--    delete from nm_inv_item_groupings_all g
+--    where g.iig_item_id = t_iit_id(i);
+--    --
+--    forall i in 1 .. t_iit_id.count
+--    delete from nm_inv_item_groupings_all g
+--    where g.iig_Parent_id = t_iit_id(i);
+--    --
+--    --Log 717947:Linesh:20-Feb-2009:End
+--    --
     forall i in 1 .. t_iit_id.count
     delete from nm_inv_items_all
     where iit_ne_id = t_iit_id(i)
-      and iit_end_date is null;
+      and iit_end_date is null
+      and not exists
+        (select 1 from nm_members
+          where iit_ne_id = nm_ne_id_in
+            and nm_ne_id_in = t_iit_id(i) );
       
   end if;
   
@@ -809,15 +1057,15 @@ BEGIN
 --   raise zero_divide;
  
   nm3dbg.deind;
-exception
-  when others then
-    nm3dbg.puterr(sqlerrm||': '||g_package_name||'.process_tab_asset_types('
-      ||'pi_tab_asset_types.count='||pi_tab_asset_types.count
-      ||', pi_action='||pi_action
-      ||', pi_process_partial='||pi_process_partial
-      ||', m_nte_job_id='||m_nte_job_id
-      ||')');
-    raise;
+--exception
+--  when others then
+--    nm3dbg.puterr(sqlerrm||': '||g_package_name||'.process_tab_asset_types('
+--      ||'pi_tab_asset_types.count='||pi_tab_asset_types.count
+--      ||', pi_action='||pi_action
+--      ||', pi_process_partial='||pi_process_partial
+--      ||', m_nte_job_id='||m_nte_job_id
+--      ||')');
+--    raise;
 END;
 --
 -----------------------------------------------------------------------------
@@ -967,8 +1215,18 @@ END tidy_up;
       ||')');
     m_xsp_changed := true;
   end;
-    
+--
+-----------------------------------------------------------------------------
+--
+  PROCEDURE set_partial_flag ( pi_partial_flag IN VARCHAR2 )
+  IS
+  BEGIN
+  --
+    g_include_partial := pi_partial_flag;
+  --
+  END set_partial_flag;
+--
+-----------------------------------------------------------------------------
+--
 END nm0575;
 /
-
-
