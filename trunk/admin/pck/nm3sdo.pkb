@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.48   Nov 18 2010 09:35:14   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.49   Jan 26 2011 12:22:00   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Nov 18 2010 09:35:14  $
---       Date fetched Out : $Modtime:   Nov 18 2010 09:19:58  $
---       PVCS Version     : $Revision:   2.48  $
+--       Date into PVCS   : $Date:   Jan 26 2011 12:22:00  $
+--       Date fetched Out : $Modtime:   Jan 26 2011 12:21:30  $
+--       PVCS Version     : $Revision:   2.49  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.48  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.49  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -76,8 +76,6 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
   FUNCTION get_base_nt ( p_nlt_id IN NUMBER ) RETURN ptr_vc_array;
 
   FUNCTION Get_Ne_Shapes( p_id IN ptr_array, p_th_id IN INTEGER ) RETURN nm_geom_array;
-
-FUNCTION get_nw_srids RETURN NUMBER;
 
 FUNCTION make_tha_from_ptr  ( p_ptr IN ptr_array )                      RETURN nm_theme_array;
 FUNCTION get_distinct_ptr   (p_ptr IN ptr_array )                       RETURN ptr_array;
