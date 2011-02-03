@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.0   Jan 20 2011 10:31:44   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.1   Feb 03 2011 08:25:14   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm4300_nm4400_upg.sql  $
---       Date into PVCS   : $Date:   Jan 20 2011 10:31:44  $
---       Date fetched Out : $Modtime:   Jan 20 2011 10:26:04  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Feb 03 2011 08:25:14  $
+--       Date fetched Out : $Modtime:   Feb 03 2011 08:25:00  $
+--       Version          : $Revision:   3.1  $
 --
 --   Product upgrade script
 --
@@ -307,6 +307,13 @@ from dual
 SET FEEDBACK ON
 start &&run_file
 SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                  ****************   CREATE ACLs   *******************
+SET TERM ON
+Prompt Creating ACLs...
+SET TERM OFF
+EXECUTE nm3acl.create_standard_acls;
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   VERSION NUMBER   *******************
