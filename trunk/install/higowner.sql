@@ -1,5 +1,5 @@
 REM SCCS ID Keyword, do no remove
-define sccsid = '"$Revision::   2.13     $"';
+define sccsid = '"$Revision::   2.14     $"';
 clear screen
 -- creates the following tables
 -- HIG_USERS
@@ -419,19 +419,20 @@ DECLARE
   --
     IF l_oracle9i OR l_oracle10gr1 OR l_oracle10gr2 OR l_oracle11gr1 OR l_oracle11gr2
     THEN
-      EXECUTE IMMEDIATE 'grant create job to  '                  || p_user || ' with admin option'; -- Added by AE - 10-07-2009
-      EXECUTE IMMEDIATE 'grant execute on sys.dbms_scheduler to '|| p_user || ' with grant option'; -- Added by AE - 10-07-2009
-      EXECUTE IMMEDIATE 'grant select any dictionary to '        || p_user || ' with admin option';
-      EXECUTE IMMEDIATE 'grant execute on sys.dbms_pipe to '     || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant execute on sys.dbms_rls to '      || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant execute on sys.dbms_lock to '     || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant select on dba_sys_privs to '      || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant select on dba_users to '          || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant select on dba_role_privs to '     || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant select on dba_ts_quotas to '      || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant select on dba_tab_privs to '      || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant select on dba_roles to '          || p_user || ' with grant option';
-      EXECUTE IMMEDIATE 'grant select on dba_profiles to '       || p_user || ' with grant option';
+      EXECUTE IMMEDIATE 'grant create job to  '                          || p_user || ' with admin option'; -- Added by AE - 10-07-2009
+      EXECUTE IMMEDIATE 'grant execute on sys.dbms_scheduler to '        || p_user || ' with grant option'; -- Added by AE - 10-07-2009
+      EXECUTE IMMEDIATE 'grant select any dictionary to '                || p_user || ' with admin option';
+      EXECUTE IMMEDIATE 'grant execute on sys.dbms_pipe to '             || p_user || ' with grant option';
+      EXECUTE IMMEDIATE 'grant execute on sys.dbms_rls to '              || p_user || ' with grant option';
+      EXECUTE IMMEDIATE 'grant execute on sys.dbms_lock to '             || p_user || ' with grant option';
+      EXECUTE IMMEDIATE 'grant select on dba_sys_privs to '              || p_user || ' with grant option';
+      EXECUTE IMMEDIATE 'grant select on dba_users to '                  || p_user || ' with grant option';
+      EXECUTE IMMEDIATE 'grant select on dba_role_privs to '             || p_user || ' with grant option';
+      EXECUTE IMMEDIATE 'grant select on dba_ts_quotas to '              || p_user || ' with grant option';
+      EXECUTE IMMEDIATE 'grant select on dba_tab_privs to '              || p_user || ' with grant option';
+      EXECUTE IMMEDIATE 'grant select on dba_roles to '                  || p_user || ' with grant option';
+      EXECUTE IMMEDIATE 'grant select on dba_profiles to '               || p_user || ' with grant option';
+      EXECUTE IMMEDIATE 'grant execute on sys.dbms_network_acl_admin to '|| p_user || ' with grant option'; -- Task 0110486 - ACL for 11gr2
     END IF;
   --
   END do_grants;

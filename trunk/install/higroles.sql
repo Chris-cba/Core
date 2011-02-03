@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.7   Oct 21 2010 15:50:48   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.8   Feb 03 2011 08:48:26   Ade.Edwards  $
 --       Module Name      : $Workfile:   higroles.sql  $
---       Date into PVCS   : $Date:   Oct 21 2010 15:50:48  $
---       Date fetched Out : $Modtime:   Oct 21 2010 15:50:18  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Feb 03 2011 08:48:26  $
+--       Date fetched Out : $Modtime:   Feb 02 2011 10:06:26  $
+--       Version          : $Revision:   2.8  $
 --
 -------------------------------------------------------------------------
 --  Copyright (c) exor corporation ltd, 2009
@@ -611,7 +611,44 @@ EXCEPTION
 END;
 /
 
+-- Task 0110486
+-- FTP and EMAIL user roles for ACL access
+DECLARE
+  role_exists EXCEPTION;
+  PRAGMA EXCEPTION_INIT(role_exists, -1921); 
+BEGIN
+  BEGIN
+    EXECUTE IMMEDIATE 'CREATE ROLE FTP_USER';
+  EXCEPTION
+    WHEN role_exists
+    THEN NULL;
+  END;
+  EXECUTE IMMEDIATE 'GRANT FTP_USER to '||USER;
+  EXECUTE IMMEDIATE 'GRANT FTP_USER to '||USER||' WITH ADMIN OPTION';
+EXCEPTION
+  WHEN role_exists
+  THEN NULL;
+END;
+/
 
+
+DECLARE
+  role_exists EXCEPTION;
+  PRAGMA EXCEPTION_INIT(role_exists, -1921); 
+BEGIN
+  BEGIN
+    EXECUTE IMMEDIATE 'CREATE ROLE EMAIL_USER';
+  EXCEPTION
+    WHEN role_exists
+    THEN NULL;
+  END;
+  EXECUTE IMMEDIATE 'GRANT EMAIL_USER to '||USER;
+  EXECUTE IMMEDIATE 'GRANT EMAIL_USER to '||USER||' WITH ADMIN OPTION';
+EXCEPTION
+  WHEN role_exists
+  THEN NULL;
+END;
+/
 
 
 --
