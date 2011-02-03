@@ -36,5 +36,6 @@ BEGIN
   EXECUTE IMMEDIATE 'grant select on dba_roles to system with grant option';
   EXECUTE IMMEDIATE 'grant select on dba_profiles to system with grant option';
   EXECUTE IMMEDIATE 'grant execute on dbms_scheduler to system with grant option';
+  EXECUTE IMMEDIATE 'grant execute on dbms_network_acl_admin to system with grant option';  -- Task 0110486 - ACL in 11gr2
 END;
 /
