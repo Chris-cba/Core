@@ -1,16 +1,16 @@
 CREATE OR REPLACE TRIGGER hig_ftp_connections_b_ins_upd
- BEFORE INSERT OR UPDATE
+ BEFORE INSERT OR UPDATE OR DELETE
  ON HIG_FTP_CONNECTIONS
  FOR EACH ROW
 DECLARE
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/hig_ftp_connections_b_ins_upd.trg-arc   2.0   Apr 27 2010 13:50:34   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/hig_ftp_connections_b_ins_upd.trg-arc   2.1   Feb 03 2011 08:49:56   Ade.Edwards  $
 --       Module Name      : $Workfile:   hig_ftp_connections_b_ins_upd.trg  $
---       Date into PVCS   : $Date:   Apr 27 2010 13:50:34  $
---       Date fetched Out : $Modtime:   Apr 27 2010 13:49:48  $
---       PVCS Version     : $Revision:   2.0  $
+--       Date into PVCS   : $Date:   Feb 03 2011 08:49:56  $
+--       Date fetched Out : $Modtime:   Feb 01 2011 14:21:28  $
+--       PVCS Version     : $Revision:   2.1  $
 --
 --
 --
@@ -22,6 +22,7 @@ DECLARE
    l_user          VARCHAR2(30);
    l_forward_slash VARCHAR2(1) := '/';
    l_back_slash    VARCHAR2(1) := '\';
+   l_rec_hfc       hig_ftp_connections%ROWTYPE;
 --
   FUNCTION check_last_char ( pi_input IN VARCHAR2 )
   RETURN VARCHAR2
@@ -38,13 +39,38 @@ DECLARE
 --
 BEGIN
 --
-  :NEW.hfc_ftp_in_dir := REPLACE (check_last_char (:NEW.hfc_ftp_in_dir), l_back_slash, l_forward_slash);
+  IF NOT DELETING THEN
+    :NEW.hfc_ftp_in_dir      := REPLACE (check_last_char (:NEW.hfc_ftp_in_dir), l_back_slash, l_forward_slash);
+    :NEW.hfc_ftp_out_dir     := REPLACE (check_last_char (:NEW.hfc_ftp_out_dir), l_back_slash, l_forward_slash);
+    :NEW.hfc_ftp_arc_in_dir  := REPLACE (check_last_char (:NEW.hfc_ftp_arc_in_dir), l_back_slash, l_forward_slash);
+    :NEW.hfc_ftp_arc_out_dir := REPLACE (check_last_char (:NEW.hfc_ftp_arc_out_dir), l_back_slash, l_forward_slash);
+  END IF;
 --
-  :NEW.hfc_ftp_out_dir := REPLACE (check_last_char (:NEW.hfc_ftp_out_dir), l_back_slash, l_forward_slash);
+  l_rec_hfc.hfc_id                  := NVL (:NEW.hfc_id,:OLD.hfc_id);
+  l_rec_hfc.hfc_hft_id              := NVL (:NEW.hfc_hft_id,:OLD.hfc_hft_id);
+  l_rec_hfc.hfc_name                := NVL (:NEW.hfc_name,:OLD.hfc_name);
+  l_rec_hfc.hfc_nau_admin_unit      := NVL (:NEW.hfc_nau_admin_unit,:OLD.hfc_nau_admin_unit);
+  l_rec_hfc.hfc_nau_unit_code       := NVL (:NEW.hfc_nau_unit_code,:OLD.hfc_nau_unit_code);
+  l_rec_hfc.hfc_nau_admin_type      := NVL (:NEW.hfc_nau_admin_type,:OLD.hfc_nau_admin_type);
+  l_rec_hfc.hfc_ftp_username        := NVL (:NEW.hfc_ftp_username,:OLD.hfc_ftp_username);
+  l_rec_hfc.hfc_ftp_password        := NVL (:NEW.hfc_ftp_password,:OLD.hfc_ftp_password);
+  l_rec_hfc.hfc_ftp_host            := NVL (:NEW.hfc_ftp_host,:OLD.hfc_ftp_host);
+  l_rec_hfc.hfc_ftp_port            := NVL (:NEW.hfc_ftp_port,:OLD.hfc_ftp_port);
+  l_rec_hfc.hfc_ftp_in_dir          := NVL (:NEW.hfc_ftp_in_dir,:OLD.hfc_ftp_in_dir);
+  l_rec_hfc.hfc_ftp_out_dir         := NVL (:NEW.hfc_ftp_out_dir,:OLD.hfc_ftp_out_dir);
+  l_rec_hfc.hfc_ftp_arc_username    := NVL (:NEW.hfc_ftp_arc_username,:OLD.hfc_ftp_arc_username);
+  l_rec_hfc.hfc_ftp_arc_password    := NVL (:NEW.hfc_ftp_arc_password,:OLD.hfc_ftp_arc_password);
+  l_rec_hfc.hfc_ftp_arc_host        := NVL (:NEW.hfc_ftp_arc_host,:OLD.hfc_ftp_arc_host);
+  l_rec_hfc.hfc_ftp_arc_port        := NVL (:NEW.hfc_ftp_arc_port,:OLD.hfc_ftp_arc_port);
+  l_rec_hfc.hfc_ftp_arc_in_dir      := NVL (:NEW.hfc_ftp_arc_in_dir,:OLD.hfc_ftp_arc_in_dir);
+  l_rec_hfc.hfc_ftp_arc_out_dir     := NVL (:NEW.hfc_ftp_arc_out_dir,:OLD.hfc_ftp_arc_out_dir);
 --
-  :NEW.hfc_ftp_arc_in_dir := REPLACE (check_last_char (:NEW.hfc_ftp_arc_in_dir), l_back_slash, l_forward_slash);
---
-  :NEW.hfc_ftp_arc_out_dir := REPLACE (check_last_char (:NEW.hfc_ftp_arc_out_dir), l_back_slash, l_forward_slash);
+  nm3ftp.assess_acl ( pi_rec_hfc => l_rec_hfc
+                    , pi_mode    => CASE
+                                      WHEN INSERTING THEN nm3type.c_inserting
+                                      WHEN DELETING  THEN nm3type.c_deleting
+                                      WHEN UPDATING  THEN nm3type.c_updating
+                                    END  );
 --
 END hig_ftp_connections_b_ins_upd;
 /
