@@ -1,0 +1,297 @@
+CREATE OR REPLACE PACKAGE nm3mail AUTHID CURRENT_USER AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkh-arc   2.4   Feb 03 2011 08:45:56   Ade.Edwards  $
+--       Module Name      : $Workfile:   nm3mail.pkh  $
+--       Date into PVCS   : $Date:   Feb 03 2011 08:45:56  $
+--       Date fetched Out : $Modtime:   Feb 02 2011 09:23:42  $
+--       Version          : $Revision:   2.4  $
+--       Based on SCCS version : 1.5
+-------------------------------------------------------------------------
+--   Author : Jonathan Mills
+--
+--   nm3mail package
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2002
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--
+--<GLOBVAR>
+--
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
+--  g_sccsid is the SCCS ID for the package
+--
+   g_server_sysopt CONSTANT hig_options.hop_id%TYPE    := 'SMTPSERVER';
+   g_port_sysopt   CONSTANT hig_options.hop_id%TYPE    := 'SMTPPORT';
+   g_domain_sysopt CONSTANT hig_options.hop_id%TYPE    := 'SMTPDOMAIN';
+   --
+   g_smtp_server   CONSTANT hig_options.hop_value%TYPE := hig.get_sysopt(g_server_sysopt);
+   g_smtp_port     CONSTANT hig_options.hop_value%TYPE := hig.get_sysopt(g_port_sysopt);
+   g_smtp_domain   CONSTANT hig_options.hop_value%TYPE := hig.get_sysopt(g_domain_sysopt);
+   --
+   c_group         CONSTANT nm_mail_message_recipients.nmmr_rcpt_type%TYPE := 'GROUP';
+   c_user          CONSTANT nm_mail_message_recipients.nmmr_rcpt_type%TYPE := 'USER';
+   --
+   c_to            CONSTANT nm_mail_message_recipients.nmmr_send_type%TYPE := 'TO';
+   c_cc            CONSTANT nm_mail_message_recipients.nmmr_send_type%TYPE := 'CC';
+   c_bcc           CONSTANT nm_mail_message_recipients.nmmr_send_type%TYPE := 'BCC';
+   --
+   c_chunk_size    CONSTANT number       := 500;
+--
+   c_cr   CONSTANT  varchar2(1) := CHR(13);
+   c_lf   CONSTANT  varchar2(1) := CHR(10);
+   c_crlf CONSTANT  varchar2(2) := c_cr||c_lf;
+--
+   TYPE rec_recipient IS RECORD
+       (rcpt_id           nm_mail_message_recipients.nmmr_rcpt_id%TYPE
+       ,rcpt_type         nm_mail_message_recipients.nmmr_rcpt_type%TYPE
+       );
+   TYPE tab_recipient IS TABLE OF rec_recipient INDEX BY binary_integer;
+--
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="write_mail_complete">
+-- This procedure inserts a complete mail message into the NM_MAIL tables
+--
+PROCEDURE write_mail_complete (p_from_user        IN nm_mail_message.nmm_from_nmu_id%TYPE
+                              ,p_subject          IN nm_mail_message.nmm_subject%TYPE
+                              ,p_html_mail        IN boolean DEFAULT TRUE
+                              ,p_tab_to           IN tab_recipient
+                              ,p_tab_cc           IN tab_recipient
+                              ,p_tab_bcc          IN tab_recipient
+                              ,p_tab_message_text IN nm3type.tab_varchar32767
+                              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SEND_STORED_MAIL">
+PROCEDURE send_stored_mail;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmg_id">
+-- This function returns NMG_ID_SEQ.NEXTVAL
+--
+FUNCTION get_nmg_id RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmm_id">
+-- This function returns NMM_ID_SEQ.NEXTVAL
+--
+FUNCTION get_nmm_id RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmmt_line_id">
+-- This function returns NMMT_LINE_ID_SEQ.NEXTVAL
+--
+FUNCTION get_nmmt_line_id RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmu_id">
+-- This function returns NMU_ID_SEQ.NEXTVAL
+--
+FUNCTION get_nmu_id RETURN number;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="chunk_it">
+-- Chunk_it will take a text string and insert it into NM_MAIL_MESSAGE_TEXT in
+--  500 char chunks
+PROCEDURE chunk_it (p_nmm_id number, p_text varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="write_line">
+-- Will take a text string and insert it into NM_MAIL_MESSAGE_TEXT in
+--  500 char chunks
+PROCEDURE write_line (p_nmm_id number, p_text varchar2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmm">
+-- This procedure inserts a record into nm_mail_message
+--
+PROCEDURE ins_nmm (p_rec_nmm IN nm_mail_message%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmm">
+-- This procedure inserts record(s) into nm_mail_message_recipients
+--
+PROCEDURE ins_nmmr (p_rec_nmmr IN nm_mail_message_recipients%ROWTYPE);
+--
+PROCEDURE ins_nmmr (p_nmm_id            IN nm_mail_message.nmm_id%TYPE
+                   ,p_tab_to            IN tab_recipient
+                   ,p_tab_cc            IN tab_recipient
+                   ,p_tab_bcc           IN tab_recipient
+                   );
+--
+PROCEDURE ins_nmmr (p_nmm_id            IN nm_mail_message.nmm_id%TYPE
+                   ,p_tab_rcpt_id_to    IN nm3type.tab_number
+                   ,p_tab_rcpt_type_to  IN nm3type.tab_varchar30
+                   ,p_tab_rcpt_id_cc    IN nm3type.tab_number
+                   ,p_tab_rcpt_type_cc  IN nm3type.tab_varchar30
+                   ,p_tab_rcpt_id_bcc   IN nm3type.tab_number
+                   ,p_tab_rcpt_type_bcc IN nm3type.tab_varchar30
+                   );
+--
+PROCEDURE ins_nmmr (p_nmm_id         IN nm_mail_message.nmm_id%TYPE
+                   ,p_tab_rcpt_id    IN nm3type.tab_number
+                   ,p_tab_rcpt_type  IN nm3type.tab_varchar30
+                   ,p_tab_send_type  IN nm3type.tab_varchar30
+                   );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins_nmmt">
+-- This procedure inserts record(s) into nm_mail_message_text
+--
+PROCEDURE ins_nmmt (p_nmm_id         IN     nm_mail_message.nmm_id%TYPE
+                   ,p_nmmt_line_id   IN OUT nm_mail_message_text.nmmt_line_id%TYPE
+                   ,p_text_line      IN     varchar2
+                   );
+--
+PROCEDURE ins_nmmt (p_nmm_id         IN     nm_mail_message.nmm_id%TYPE
+                   ,p_nmmt_line_id   IN OUT nm_mail_message_text.nmmt_line_id%TYPE
+                   ,p_tab_text_line  IN     nm3type.tab_varchar32767
+                   );
+--
+PROCEDURE ins_nmmt (p_nmm_id         IN     nm_mail_message.nmm_id%TYPE
+                   ,p_tab_text_line  IN     nm3type.tab_varchar32767
+                   );
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmu">
+--  This function returns a ROWTYPE record for the NM_MAIL_USERS record specified
+--
+FUNCTION get_nmu (p_nmu_id IN nm_mail_users.nmu_id%TYPE) RETURN nm_mail_users%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="submit_send_mail_job">
+-- This procedure submits a DBMS_JOB to send the stored mail
+--
+PROCEDURE submit_send_mail_job (p_every_n_minutes number DEFAULT 10);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="send_server_file_as_email">
+-- This procedure picks up a text file from the specified server filepath
+--  and sends it. This DOES NOT send the file as an attachment, but as the body of
+--  the message
+--
+PROCEDURE send_server_file_as_email
+                              (p_from_user        IN nm_mail_message.nmm_from_nmu_id%TYPE
+                              ,p_subject          IN nm_mail_message.nmm_subject%TYPE
+                              ,p_html_mail        IN boolean DEFAULT TRUE
+                              ,p_tab_to           IN tab_recipient
+                              ,p_tab_cc           IN tab_recipient
+                              ,p_tab_bcc          IN tab_recipient
+                              ,p_file_path        IN varchar2
+                              ,p_file_name        IN varchar2
+                              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="send_url_as_email">
+-- This procedure picks up the specified URL and sends it.
+--  This DOES NOT send it as an attachment, but as the body of the message
+--
+PROCEDURE send_url_as_email
+                              (p_from_user        IN nm_mail_message.nmm_from_nmu_id%TYPE
+                              ,p_subject          IN nm_mail_message.nmm_subject%TYPE
+                              ,p_html_mail        IN boolean DEFAULT TRUE
+                              ,p_tab_to           IN tab_recipient
+                              ,p_tab_cc           IN tab_recipient
+                              ,p_tab_bcc          IN tab_recipient
+                              ,p_url              IN varchar2
+                              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_default_nmu_id">
+-- 
+-- Returns the nmu_id of the highways owner's mail user.
+--
+FUNCTION get_default_nmu_id RETURN nm_mail_users.nmu_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_current_nmu_id">
+--
+-- Returns the nmu_id of the current user's mail user.
+--
+FUNCTION get_current_nmu_id RETURN nm_mail_users.nmu_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_current_nmu_id">
+--
+-- This function send mail for passed parameters
+FUNCTION send_mail (pi_mail_from     IN  Varchar2 Default Null
+                   ,pi_recipient_to  IN  Varchar2 Default Null
+                   ,pi_recipient_cc  IN  Varchar2 Default Null
+                   ,pi_recipient_bcc IN  Varchar2 Default Null
+                   ,pi_subject       IN  Varchar2 Default Null
+                   ,pi_mailformat    IN  Varchar2 Default 'T' --T for Plain Text H for HTML 
+                   ,pi_mail_body     IN  Clob     Default Null 
+                   ,pi_att_file_name IN  Varchar2 Default Null 
+                   ,pi_file_att      IN  Blob     Default Null
+                   ,po_error_text    Out Varchar2)
+RETURN Boolean;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3mail;
+/
+
