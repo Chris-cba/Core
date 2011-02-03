@@ -1,18 +1,18 @@
-CREATE OR REPLACE PACKAGE nm3ftp
+CREATE OR REPLACE PACKAGE nm3ftp AUTHID CURRENT_USER
 AS
 --
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkh-arc   3.7   Sep 21 2010 17:12:08   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkh-arc   3.8   Feb 03 2011 08:45:56   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3ftp.pkh  $
---       Date into PVCS   : $Date:   Sep 21 2010 17:12:08  $
---       Date fetched Out : $Modtime:   Sep 21 2010 16:16:26  $
---       PVCS Version     : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   Feb 03 2011 08:45:56  $
+--       Date fetched Out : $Modtime:   Feb 02 2011 10:47:16  $
+--       PVCS Version     : $Revision:   3.8  $
 --
 --------------------------------------------------------------------------------
 --
-  g_sccsid constant varchar2(30) :='"$Revision:   3.7  $"';
+  g_sccsid constant varchar2(30) :='"$Revision:   3.8  $"';
 --
 -----------------------------------------------------------------------------
 --
@@ -324,5 +324,10 @@ AS
 --
 --------------------------------------------------------------------------------
 --
+  PROCEDURE assess_acl ( pi_rec_hfc IN hig_ftp_connections%ROWTYPE
+                       , pi_mode    IN VARCHAR2 );
+--
+--------------------------------------------------------------------------------
+--   
 END nm3ftp;
 /

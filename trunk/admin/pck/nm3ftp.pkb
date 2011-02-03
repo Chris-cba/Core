@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.17   Dec 15 2010 17:00:00   Linesh.Sorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.18   Feb 03 2011 08:45:56   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Dec 15 2010 17:00:00  $
---       Date fetched Out : $Modtime:   Dec 15 2010 16:59:32  $
---       PVCS Version     : $Revision:   3.17  $
+--       Date into PVCS   : $Date:   Feb 03 2011 08:45:56  $
+--       Date fetched Out : $Modtime:   Feb 02 2011 11:48:20  $
+--       PVCS Version     : $Revision:   3.18  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.17  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.18  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -30,6 +30,11 @@ AS
    g_fail                    VARCHAR2(4)    := 'FAIL';
    g_main                    VARCHAR2(4)    := 'MAIN';
    g_archive                 VARCHAR2(7)    := 'ARCHIVE';
+--
+-- ORA-24247: Network access denied by access control list (ACL)
+--
+   ex_acl_failure            EXCEPTION;
+   PRAGMA                    EXCEPTION_INIT(ex_acl_failure,-24247);
 --
 ------------------------------------------------------------------------------
 --
@@ -173,6 +178,9 @@ AS
       send_command (l_conn, 'USER ' || p_user);
       send_command (l_conn, 'PASS ' || p_pass);
       RETURN l_conn;
+   EXCEPTION
+     WHEN ex_acl_failure
+     THEN hig.raise_ner(nm3type.c_hig,550);
    END;
 --
 --------------------------------------------------------------------------------
@@ -211,6 +219,9 @@ AS
       l_port2 := TO_NUMBER (SUBSTR (l_reply, INSTR (l_reply, '.', 1, 5) + 1));
       l_conn := UTL_TCP.open_connection (l_host, 256 * l_port1 + l_port2);
       RETURN l_conn;
+   EXCEPTION
+     WHEN ex_acl_failure
+     THEN hig.raise_ner(nm3type.c_hig,550);
    END;
 --
 --------------------------------------------------------------------------------
@@ -1008,6 +1019,7 @@ AS
                           ||'===================================================');
     END put_sep;
   BEGIN
+  --
   --
     SELECT * INTO l_rec_hfc
       FROM hig_ftp_connections
@@ -1818,5 +1830,30 @@ END;
 --
 --------------------------------------------------------------------------------
 --
+  PROCEDURE assess_acl ( pi_rec_hfc IN hig_ftp_connections%ROWTYPE
+                       , pi_mode    IN VARCHAR2 )
+  IS
+    l_rec_hfc hig_ftp_connections%ROWTYPE := pi_rec_hfc;
+  BEGIN
+  --
+    IF ( pi_mode = nm3type.c_inserting OR pi_mode = nm3type.c_updating )
+    --
+    -- Creating/updating FTP connection
+    --
+    THEN
+      nm3acl.process_ftp_connection ( pi_rec_hfc => l_rec_hfc );
+    --
+    ELSE
+    -- 
+    -- Deleting FTP connection
+    --
+      nm3acl.remove_ftp_connection ( pi_rec_hfc => l_rec_hfc );
+    END IF;
+  --
+  END assess_acl;
+--
+--------------------------------------------------------------------------------
+--
+
 END nm3ftp;
 /

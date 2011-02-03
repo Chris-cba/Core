@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.7   Dec 10 2010 10:16:28   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.8   Feb 03 2011 08:45:56   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Dec 10 2010 10:16:28  $
---       Date fetched Out : $Modtime:   Dec 10 2010 10:11:52  $
---       Version          : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Feb 03 2011 08:45:56  $
+--       Date fetched Out : $Modtime:   Feb 02 2011 11:45:40  $
+--       Version          : $Revision:   2.8  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.7  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.8  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -33,6 +33,12 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
    c_user_id CONSTANT hig_users.hus_user_id%TYPE := nm3user.get_user_id;
 --
    g_include_sender_info_in_title CONSTANT BOOLEAN := NVL(hig.get_sysopt('SMTPAUDTIT'),'Y') = 'Y';
+--
+--
+-- ORA-24247: Network access denied by access control list (ACL)
+--
+   ex_acl_failure            EXCEPTION;
+   PRAGMA                    EXCEPTION_INIT(ex_acl_failure,-24247);
 --
 -----------------------------------------------------------------------------
 --
@@ -118,6 +124,9 @@ BEGIN
 --
    nm_debug.proc_end(g_package_name,'send_stored_mail');
 --
+EXCEPTION
+  WHEN ex_acl_failure
+  THEN hig.raise_ner(nm3type.c_hig,551);
 END send_stored_mail;
 --
 -----------------------------------------------------------------------------
@@ -277,6 +286,12 @@ BEGIN
 --
 EXCEPTION
 --
+  WHEN ex_acl_failure
+  THEN
+    utl_smtp.rset(g_mail_conn); 
+    p_rec_nmm.nmm_status := hig.get_ner(nm3type.c_hig,551).ner_descr;
+    --hig.raise_ner(nm3type.c_hig,551);
+--
    WHEN others
     THEN
       utl_smtp.rset(g_mail_conn);
@@ -377,6 +392,19 @@ BEGIN
    check_it (g_server_sysopt,g_smtp_server);
    check_it (g_port_sysopt,g_smtp_port);
    check_it (g_domain_sysopt,g_smtp_domain);
+--
+-- Task 0110486 - ensure there is an ACL for the mail server
+--
+   BEGIN
+     nm3acl.process_email_connection ( pi_smtp_server => g_smtp_server
+                                     , pi_smtp_port   => g_smtp_port
+                                     , pi_smtp_domain => g_smtp_domain );
+--   EXCEPTION
+--     WHEN OTHERS THEN NULL;
+   END;
+
+
+--
 --   IF  g_smtp_server IS NULL
 --    OR g_smtp_port   IS NULL
 --    OR g_smtp_domain IS NULL
@@ -1072,6 +1100,8 @@ IS
 --
 BEGIN
 --
+-- Task 0110486 - add check server
+   check_server;
 --dbms_output.put_line(g_smtp_server||' '||g_smtp_port||' '||g_smtp_domain);
    OPEN  cs_sender ;
    FETCH cs_sender INTO l_sender_rec;
@@ -1229,23 +1259,31 @@ BEGIN
    utl_smtp.close_data(g_mail_conn);
    RETURN  TRUE;
 EXCEPTION
-    WHEN utl_smtp.transient_error OR utl_smtp.permanent_error 
-    THEN           
-        po_error_text := sqlerrm; --'SMTP server is down or unavailable';
-        RETURN  FALSE;
-    WHEN OTHERS 
-    THEN    
-        po_error_text := SQLERRM;  
-        BEGIN
-        --
-           utl_smtp.close_data(g_mail_conn); 
-        --
-        EXCEPTION
-            WHEN OTHERS 
-            THEN
-                NULL;
-        END ;
-        RETURN  FALSE;
+--
+  WHEN ex_acl_failure
+  THEN
+    po_error_text := hig.get_ner(nm3type.c_hig,551).ner_descr;
+    --hig.raise_ner(nm3type.c_hig,551);
+    RETURN  FALSE;
+
+  WHEN utl_smtp.transient_error OR utl_smtp.permanent_error 
+  THEN           
+      po_error_text := sqlerrm; --'SMTP server is down or unavailable';
+      RETURN  FALSE;
+
+  WHEN OTHERS 
+  THEN    
+      po_error_text := SQLERRM;  
+      BEGIN
+      --
+         utl_smtp.close_data(g_mail_conn); 
+      --
+      EXCEPTION
+          WHEN OTHERS 
+          THEN
+              NULL;
+      END ;
+      RETURN  FALSE;
 --
 END send_mail;
 --
