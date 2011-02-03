@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.27   Jan 20 2011 09:48:52   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.28   Feb 03 2011 08:28:46   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Jan 20 2011 09:48:52  $
---       Date fetched Out : $Modtime:   Jan 20 2011 09:48:38  $
---       PVCS Version     : $Revision:   2.27  $
+--       Date into PVCS   : $Date:   Feb 03 2011 08:28:46  $
+--       Date fetched Out : $Modtime:   Feb 03 2011 08:28:36  $
+--       PVCS Version     : $Revision:   2.28  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) Exor Corporation Ltd, 2011
@@ -525,6 +525,18 @@ from dual
 SET FEEDBACK ON
 start '&&run_file'
 SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                  ****************   CREATE ACLs  *******************
+--
+--
+SET TERM ON
+PROMPT Create standard ACLs
+SET TERM OFF
+BEGIN
+  nm3acl.create_standard_acls;
+END;
+/
 --
 ---------------------------------------------------------------------------------------------------
 --                     ****************   RE-BUILD SEQUENCES  *******************
