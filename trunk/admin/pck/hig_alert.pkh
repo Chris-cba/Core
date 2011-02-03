@@ -1,14 +1,14 @@
-create or replace package hig_alert
+create or replace package hig_alert AUTHID CURRENT_USER
 AS
 --<PACKAGE>
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkh-arc   3.4   Aug 31 2010 11:32:40   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkh-arc   3.5   Feb 03 2011 08:47:16   Ade.Edwards  $
 --       Module Name      : $Workfile:   hig_alert.pkh  $
---       Date into PVCS   : $Date:   Aug 31 2010 11:32:40  $
---       Date fetched Out : $Modtime:   Aug 24 2010 14:57:36  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Feb 03 2011 08:47:16  $
+--       Date fetched Out : $Modtime:   Feb 02 2011 09:52:34  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $'; 
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $'; 
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------
