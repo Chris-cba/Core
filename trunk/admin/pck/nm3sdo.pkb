@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.49   Jan 26 2011 12:22:00   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.50   Feb 03 2011 11:45:36   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Jan 26 2011 12:22:00  $
---       Date fetched Out : $Modtime:   Jan 26 2011 12:21:30  $
---       PVCS Version     : $Revision:   2.49  $
+--       Date into PVCS   : $Date:   Feb 03 2011 11:45:36  $
+--       Date fetched Out : $Modtime:   Feb 03 2011 11:44:30  $
+--       PVCS Version     : $Revision:   2.50  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.49  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.50  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -1960,8 +1960,9 @@ begin
   if p_diminfo.last < 3 then
     raise_application_error( -20001, 'Invalid dimension for handling measures');
   end if;
+--task 0110661 - remove the -1 that was used as compensation for error in get_rounding
 
-  l_dp := greatest(Nm3unit.get_rounding( p_diminfo(3).sdo_tolerance ) -1, 0);
+  l_dp := greatest(Nm3unit.get_rounding( p_diminfo(3).sdo_tolerance ), 0);
 
   for i in 1..p_geom.sdo_ordinates.last loop
     if mod(i, 3) = 0 then
