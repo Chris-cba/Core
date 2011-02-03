@@ -1,13 +1,13 @@
-create or replace package nm3mail_pop as
+create or replace package nm3mail_pop AUTHID CURRENT_USER as
 --<PACKAGE>
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail_pop.pkh-arc   2.1   Jan 06 2010 16:38:42   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail_pop.pkh-arc   2.2   Feb 03 2011 08:46:26   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3mail_pop.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:42  $
---       Date fetched Out : $Modtime:   Jan 05 2010 11:46:46  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Feb 03 2011 08:46:26  $
+--       Date fetched Out : $Modtime:   Feb 02 2011 11:04:46  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -19,7 +19,7 @@ create or replace package nm3mail_pop as
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 --
    TYPE tab_nmps  IS TABLE OF nm_mail_pop_servers%ROWTYPE            INDEX BY BINARY_INTEGER;

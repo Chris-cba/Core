@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail_pop AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail_pop.pkb-arc   2.2   Jan 06 2010 16:38:42   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail_pop.pkb-arc   2.3   Feb 03 2011 08:46:26   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3mail_pop.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:42  $
---       Date fetched Out : $Modtime:   Jan 06 2010 10:49:24  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Feb 03 2011 08:46:26  $
+--       Date fetched Out : $Modtime:   Feb 02 2011 11:23:52  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail_pop AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.3  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail_pop';
@@ -42,6 +42,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail_pop AS
    g_retry_count               PLS_INTEGER;
    g_retry_limit     CONSTANT  PLS_INTEGER    := 3;
 --
+--
+-- ORA-24247: Network access denied by access control list (ACL)
+--
+   ex_acl_failure            EXCEPTION;
+   PRAGMA                    EXCEPTION_INIT(ex_acl_failure,-24247);
 -----------------------------------------------------------------------------
 --
 FUNCTION open_connection (p_remote_host VARCHAR2
@@ -682,6 +687,16 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'open_connection');
 --
+--
+-- Task 0110486 - ensure there is an ACL for the mail server
+--
+   BEGIN
+     nm3acl.process_email_connection ( pi_pop3_server => p_remote_host
+                                     , pi_pop3_port   => p_remote_port );
+--   EXCEPTION
+--     WHEN OTHERS THEN NULL;
+   END;
+--
 --   nm_debug.debug ('Opening connection for '||p_remote_host||' '||p_remote_port,4);
    l_conn := utl_tcp.open_connection (remote_host     => p_remote_host
                                      ,remote_port     => p_remote_port
@@ -701,6 +716,11 @@ BEGIN
    RETURN l_conn;
 --
 EXCEPTION
+--
+   WHEN ex_acl_failure
+    THEN
+      close_all_connections;
+      hig.raise_ner(nm3type.c_hig,551);
 --
    WHEN l_server_not_found
     THEN
