@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.25   Aug 17 2010 10:19:38   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.26   Feb 04 2011 11:20:52   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Aug 17 2010 10:19:38  $
---       Date fetched Out : $Modtime:   Aug 17 2010 10:18:38  $
---       SCCS Version     : $Revision:   2.25  $
+--       Date into SCCS   : $Date:   Feb 04 2011 11:20:52  $
+--       Date fetched Out : $Modtime:   Feb 04 2011 11:19:52  $
+--       SCCS Version     : $Revision:   2.26  $
 --       Based on --
 --
 --   nm3inv package body
@@ -30,7 +30,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.25  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.26  $';
    g_package_name   CONSTANT VARCHAR2(30) := 'nm3inv';
 --
    --<USED BY validate_rec_iit>
@@ -2065,26 +2065,26 @@ BEGIN
 
 
                IF l_bind_var IS NOT NULL THEN
- 	   		      append('--');
- 	   		      append('-- The query string for this col has a bind variable so cater for it');
- 	   		      append('--');
- 	   		      append('  '||g_package_name||'.g_ita_query := nm3inv.build_ita_lov_sql_string (pi_ita_inv_type                    => '||Nm3flx.string(cs_rec.ita_inv_type));
-                  append('                                                                      ,pi_ita_attrib_name                 => '||Nm3flx.string(cs_rec.ita_attrib_name));
-                  append('                                                                      ,pi_include_bind_variable            => FALSE');
-                  append('                                                                      ,pi_replace_bind_variable_with => '||g_package_name||'.g_rec_iit.'||REPLACE(l_bind_var,':',NULL)||');');
-                  append(' ');
-		  	   ELSE
-                        -- Task 0109336
-                        -- ITA_QUERY fails if it contains apostrophes, as the ITA_QUERY was passed as literal parameter   
-			      --append('   '||g_package_name||'.g_ita_query := '||Nm3flx.string(cs_rec.ita_query)||';');
-			      append('   '||g_package_name||'.g_ita_query := nm3get.get_ita( pi_ita_inv_type => '||Nm3flx.string(cs_rec.ita_inv_type));
-                        append('                                                      ,pi_ita_attrib_name                 => '||Nm3flx.string(cs_rec.ita_attrib_name)||').ita_query ;');
-			   END IF;
+                 append('--');
+                 append('-- The query string for this col has a bind variable so cater for it');
+                 append('--');
+                 append('  '||g_package_name||'.g_ita_query := nm3inv.build_ita_lov_sql_string (pi_ita_inv_type                    => '||Nm3flx.string(cs_rec.ita_inv_type));
+                 append('                                                                      ,pi_ita_attrib_name                 => '||Nm3flx.string(cs_rec.ita_attrib_name));
+                 append('                                                                      ,pi_include_bind_variable            => FALSE');
+                 append('                                                                      ,pi_replace_bind_variable_with => '||g_package_name||'.g_rec_iit.'||REPLACE(l_bind_var,':',NULL)||');');
+                 append(' ');
+               ELSE
+                -- Task 0109336
+                -- ITA_QUERY fails if it contains apostrophes, as the ITA_QUERY was passed as literal parameter   
+ --append('   '||g_package_name||'.g_ita_query := '||Nm3flx.string(cs_rec.ita_query)||';');
+                 append('   '||g_package_name||'.g_ita_query := nm3get.get_ita( pi_ita_inv_type => '||Nm3flx.string(cs_rec.ita_inv_type));
+                 append('                                                      ,pi_ita_attrib_name                 => '||Nm3flx.string(cs_rec.ita_attrib_name)||').ita_query ;');
+               END IF;
 
                append(' ');
                append(' ');
                append(' ');
-			   append('    nm3extlov.validate_lov_value(p_statement => '||g_package_name||'.g_ita_query');
+               append('    nm3extlov.validate_lov_value(p_statement => '||g_package_name||'.g_ita_query');
                append('                                ,p_value     => '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name);
                append('                                ,p_meaning   => l_meaning');
                append('                                ,p_id        => l_id');
@@ -2129,6 +2129,7 @@ BEGIN
          ELSIF cs_rec.ita_format = Nm3type.c_date
           AND  INSTR(cs_rec.ita_attrib_name,cs_rec.ita_format,1,1) = 0
           THEN
+         --
             append (' IF '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||' IS NOT NULL');
             append ('  THEN');
             append ('    IF hig.date_convert('||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||') IS NULL');
@@ -2136,8 +2137,11 @@ BEGIN
             append ('      l_fail_msg := '||Nm3flx.string('cannot be evaluated as a date:')||'||'||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||'; RAISE l_fail;');
             append ('    END IF;');
             append (' END IF;');
+         --
          ELSIF cs_rec.ita_format = Nm3type.c_number
           THEN
+            nm_debug.debug_on;
+            nm_debug.debug('Validating number');
             append (' IF NOT nm3flx.is_numeric('||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||') THEN');
             append ('  l_fail_msg := '||Nm3flx.string('must be numeric')||'; RAISE l_fail;');
             -- Log 702388:Linesh:11-Mar-09:Start
@@ -2161,15 +2165,20 @@ BEGIN
             --append (' ELSIF LENGTH( l_num_length ) > '||Nvl(cs_rec.ita_fld_length,22)||' THEN');
             --append ('  l_fail_msg := '||Nm3flx.string('cannot be more than precision '||cs_rec.ita_fld_length||' allowed for this column')||'; RAISE l_fail;');
             -- Log 702388:Linesh:11-Mar-09:End
-
+            append (' END IF;');
+            
+            -- Task 0110456
+            -- Rearranged the code so that this is called, it was previously incorrected nested in the IF statement above.
+            --
             IF   cs_rec.ita_max IS NOT NULL
              AND cs_rec.ita_min IS NOT NULL
              THEN
-               append (' ELSIF '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||' IS NOT NULL');
+               append (' IF '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||' IS NOT NULL');
                append ('  AND  '||g_package_name||'.g_rec_iit.'||cs_rec.ita_attrib_name||' NOT BETWEEN '||cs_rec.ita_min||' AND '||cs_rec.ita_max||' THEN');
                append ('  l_fail_msg := '||Nm3flx.string('must be between '||cs_rec.ita_min||' AND '||cs_rec.ita_max)||'; RAISE l_fail;');
+               append (' END IF;');
             END IF;
-            append (' END IF;');
+
          END IF;
 --
       END LOOP;
