@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_svr_util.pkb-arc   2.3   Aug 26 2010 15:22:20   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_svr_util.pkb-arc   2.4   Feb 04 2011 12:43:02   Ade.Edwards  $
 --       Module Name      : $Workfile:   hig_svr_util.pkb  $
---       Date into PVCS   : $Date:   Aug 26 2010 15:22:20  $
---       Date fetched Out : $Modtime:   Aug 26 2010 15:21:26  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Feb 04 2011 12:43:02  $
+--       Date fetched Out : $Modtime:   Feb 04 2011 12:42:32  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.3  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   2.4  $';
   g_package_name CONSTANT VARCHAR2(30)   := 'hig_svr_util';
   g_dos                   BOOLEAN        := nm3file.dos_or_unix_plaform = 'DOS';
   g_slash                 VARCHAR2(1)    := CASE WHEN g_dos THEN '\' ELSE '/' END;
@@ -77,6 +77,12 @@ AS
       nm3jobs.add_arg(zipfile);
       nm3jobs.add_arg('-d');
       nm3jobs.add_arg(output_dir);
+--  --
+      IF pi_logfile IS NOT NULL
+      THEN
+        nm3jobs.add_arg('>');
+        nm3jobs.add_arg(log_file);
+      END IF;
     --
     ELSE
     --
@@ -84,55 +90,85 @@ AS
     -- Unix/Linux Server
     ----------------------
     --
-      IF output_dir IS NOT NULL
-      THEN
-      --
-      -----------------------------
-      -- Create destination folder
-      -----------------------------
-      --
-        nm3jobs.instantiate_args;
-        shell         := '/bin/mkdir';
-        nm3jobs.add_arg(output_dir);
-      --
+--      IF output_dir IS NOT NULL
+--      THEN
+----      --
+--      -----------------------------
+--      -- Create destination folder
+--      -----------------------------
+--      --
+      nm3jobs.instantiate_args;
+      shell         := '/bin/mkdir';
+      nm3jobs.add_arg(output_dir);
+    --
+      BEGIN
         nm3jobs.create_job
           ( pi_job_name        => dbms_scheduler.generate_job_name
           , pi_job_action      => shell
           , pi_job_type        => 'EXECUTABLE'
           , pi_repeat_interval => NULL
           , pi_run_synchro     => TRUE);
-      --
-      ---------------------------------------
-      -- Move zip file to destination folder
-      ---------------------------------------
-      --
-        nm3jobs.instantiate_args;
-        shell         := '/bin/mv';
-        nm3jobs.add_arg(zipfile);
-        nm3jobs.add_arg(pi_dest_location||g_slash||pi_filename);
-      --
-        nm3jobs.create_job
-          ( pi_job_name        => dbms_scheduler.generate_job_name
-          , pi_job_action      => shell
-          , pi_job_type        => 'EXECUTABLE'
-          , pi_repeat_interval => NULL
-          , pi_run_synchro     => TRUE);
-      --
-        zipfile := pi_dest_location||g_slash||pi_filename;
-      --
-      END IF;
-    --
-      shell         := '/usr/bin/gunzip';
-    --
+      EXCEPTION
+      -- Dir already exists
+        WHEN OTHERS THEN NULL;
+      END;
+  --
+      nm3jobs.instantiate_args;
+      shell         := '/bin/gunzip';
+  --  zipfile := pi_dest_location||g_slash||pi_filename;
+    
       nm3jobs.add_arg(zipfile);
+     
+      BEGIN
+     -- Unzip GZ file
+        nm3jobs.create_job
+        ( pi_job_name        => dbms_scheduler.generate_job_name
+        , pi_job_action      => shell
+        , pi_job_type        => 'EXECUTABLE'
+        , pi_repeat_interval => NULL
+        , pi_run_synchro     => TRUE);
+      EXCEPTION
+      -- File already unGZ'd
+        WHEN OTHERS THEN NULL;
+      END;
+    --
+--      job_name := dbms_scheduler.generate_job_name;
+    --
+--      DECLARE
+--        l_lines      nm3type.tab_varchar32767;
+--        l_batchfile  nm3type.max_varchar2;
+--      BEGIN
+--        l_lines(1) := '#!/bin/sh';
+--        l_lines(2) := '/bin/tar -xvf '||substr(zipfile,1,(length(zipfile)-3))||' -C '||output_dir||' > '||log_file;
+--        l_batchfile := REPLACE(job_name||'.bat','$','_');
+--        nm3file.write_file( pi_location,l_batchfile, 32767, l_lines );
+--        nm3jobs.instantiate_args;
+--        nm_debug.debug_on;
+--        shell := '/bin/chmod 777 '||pi_location||g_slash||l_batchfile;
+--        nm_debug.debug(shell);
+--        nm3jobs.create_job
+--          ( pi_job_name        => job_name
+--          , pi_job_action      => shell
+--          , pi_job_type        => 'EXECUTABLE'
+--          , pi_repeat_interval => NULL
+--          , pi_run_synchro     => TRUE);
+--      END;
+      --
+      -- Run the batchfile to untar everything
+      --
+      job_name := dbms_scheduler.generate_job_name;
+      nm3jobs.instantiate_args;
+      --shell := pi_location||g_slash||REPLACE(job_name||'.bat','$','_');
+      --shell := '/bin/tar -xvf '||substr(zipfile,1,(length(zipfile)-3))||' -C '||output_dir;
+      shell := '/bin/tar';
+      nm3jobs.add_arg('-xvf');
+      nm3jobs.add_arg(substr(zipfile,1,(length(zipfile)-3)));
+      nm3jobs.add_arg('-C');
+      nm3jobs.add_arg(output_dir);
     --
     END IF;
   --
-    IF pi_logfile IS NOT NULL
-    THEN
-      nm3jobs.add_arg('>');
-      nm3jobs.add_arg(log_file);
-    END IF;
+    nm_debug.debug(shell);
   --
     nm3jobs.create_job
       ( pi_job_name        => job_name
@@ -166,12 +202,16 @@ AS
                , pi_logfile       => l_logfile
                );
   --
-    nm3file.get_file
+    BEGIN
+      nm3file.get_file
                 ( location     => pi_location
                 , filename     => l_logfile
                 , all_lines    => retval
                 , add_cr       => TRUE
                 );
+    EXCEPTION
+      WHEN OTHERS THEN NULL;
+    END;
   --
     nm_debug.proc_end(g_package_name,'unzip_file');
   --
