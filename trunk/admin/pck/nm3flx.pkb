@@ -2,15 +2,15 @@ CREATE OR REPLACE PACKAGE BODY nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.11   Feb 04 2011 11:27:04   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.12   Feb 04 2011 14:23:52   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3flx.pkb  $
---       Date into PVCS   : $Date:   Feb 04 2011 11:27:04  $
---       Date fetched Out : $Modtime:   Feb 04 2011 10:56:24  $
---       Version          : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Feb 04 2011 14:23:52  $
+--       Date fetched Out : $Modtime:   Feb 04 2011 14:21:54  $
+--       Version          : $Revision:   2.12  $
 --       Based on SCCS version : 1.47
 -------------------------------------------------------------------------
 --
-  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.11  $';
+  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.12  $';
 
    g_package_name    CONSTANT varchar2(30) := 'nm3flx';
 -- Package variables
@@ -2353,7 +2353,7 @@ BEGIN
            IF  SUBSTR(pi_password,l_count,1) = g_invalid_chars(lic)
            THEN
              l_retval := FALSE;
-             po_reason:= 'The Character ''' || g_invalid_chars(lic) || ''' cannot be used in a password.'; 
+             po_reason:= 'The character ''' || g_invalid_chars(lic) || ''' cannot be used in a password.'; 
              EXIT;
            END IF;
         END LOOP;
