@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkh-arc   2.5   Apr 09 2010 16:35:26   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkh-arc   2.6   Feb 04 2011 11:27:06   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3flx.pkh  $
---       Date into PVCS   : $Date:   Apr 09 2010 16:35:26  $
---       Date fetched Out : $Modtime:   Apr 09 2010 16:28:48  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Feb 04 2011 11:27:06  $
+--       Date fetched Out : $Modtime:   Feb 04 2011 10:24:50  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.30
 -------------------------------------------------------------------------
 --
@@ -29,6 +29,13 @@ CREATE OR REPLACE PACKAGE nm3flx IS
    g_flex_validation_exc_code  number;
    g_flex_validation_exc_msg   varchar2(2000);
 --  These are used when raising errors regarding the validation of flex values
+--
+   TYPE validtype is table of varchar2(1);
+   -- List the values that should not be allowed in a valid password.
+   g_invalid_chars CONSTANT validtype:= validtype('£');
+   -- £ Added due to what appears to be an Oracle bug in 11g. a £ can be used 
+   -- creating a password but the password is not recognised when logging on.
+--
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------
@@ -698,6 +705,19 @@ FUNCTION search_in_long( p_long           LONG
 --</PROC>
 --
 -----------------------------------------------------------------------------
+--<PROC NAME="is_string_valid_for_password">
+FUNCTION is_string_valid_for_password (pi_password IN varchar2) 
+RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="is_string_valid_for_password">
+FUNCTION is_string_valid_for_password (pi_password IN varchar2, po_reason OUT varchar2) 
+RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
 --<PRAGMA>
    PRAGMA RESTRICT_REFERENCES(get_version              ,rnds     ,wnds,wnps);
    PRAGMA RESTRICT_REFERENCES(RIGHT                    ,rnds,rnps,wnds,wnps);
