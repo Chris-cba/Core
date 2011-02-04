@@ -2,15 +2,15 @@ CREATE OR REPLACE PACKAGE BODY nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.10   Apr 26 2010 10:55:08   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.11   Feb 04 2011 11:27:04   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3flx.pkb  $
---       Date into PVCS   : $Date:   Apr 26 2010 10:55:08  $
---       Date fetched Out : $Modtime:   Apr 26 2010 10:16:00  $
---       Version          : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Feb 04 2011 11:27:04  $
+--       Date fetched Out : $Modtime:   Feb 04 2011 10:56:24  $
+--       Version          : $Revision:   2.11  $
 --       Based on SCCS version : 1.47
 -------------------------------------------------------------------------
 --
-  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.10  $';
+  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.11  $';
 
    g_package_name    CONSTANT varchar2(30) := 'nm3flx';
 -- Package variables
@@ -2314,6 +2314,59 @@ BEGIN
   --
   RETURN l_found;
 END search_in_long;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION is_string_valid_for_password (pi_password IN varchar2) 
+RETURN BOOLEAN
+IS
+--
+l_dummy VARCHAR2(2000);
+--
+BEGIN
+  RETURN is_string_valid_for_password(pi_password => pi_password, po_reason => l_dummy);
+END;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION is_string_valid_for_password (pi_password IN varchar2, po_reason OUT varchar2) 
+RETURN BOOLEAN 
+IS
+--
+   l_string_length binary_integer := LENGTH(pi_password);
+   --l_invalid_chars nm3type.tab_varchar1;
+--
+   l_retval boolean := TRUE;
+--
+BEGIN
+   -- Checks password is not too large
+   l_retval := (l_string_length BETWEEN 1 AND 30);
+   -- Check for invalid characters defined above.
+   IF NOT l_retval
+   THEN
+     po_reason:= 'Password was greater than 30 characters';
+   ELSE
+      FOR lic IN 1..g_invalid_chars.COUNT 
+      LOOP
+        FOR l_count IN 1..l_string_length
+        LOOP
+           IF  SUBSTR(pi_password,l_count,1) = g_invalid_chars(lic)
+           THEN
+             l_retval := FALSE;
+             po_reason:= 'The Character ''' || g_invalid_chars(lic) || ''' cannot be used in a password.'; 
+             EXIT;
+           END IF;
+        END LOOP;
+       --
+        IF l_retval = FALSE THEN
+          EXIT;
+        END IF;
+      END LOOP;
+   END IF;
+--
+   RETURN l_retval;
+--
+END is_string_valid_for_password;
 --
 -----------------------------------------------------------------------------
 --
