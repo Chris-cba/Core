@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.7   Dec 07 2010 09:25:56   Graeme.Johnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.8   Feb 04 2011 15:36:30   Graeme.Johnson  $
 --       Module Name      : $Workfile:   doc_bundle_loader.pkb  $
---       Date into PVCS   : $Date:   Dec 07 2010 09:25:56  $
---       Date fetched Out : $Modtime:   Dec 07 2010 09:24:56  $
---       Version          : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   Feb 04 2011 15:36:30  $
+--       Date fetched Out : $Modtime:   Feb 03 2011 16:43:08  $
+--       Version          : $Revision:   3.8  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.7  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.8  $';
 
   g_package_name CONSTANT varchar2(30) := 'doc_bundle_loader';
   
@@ -279,8 +279,6 @@ BEGIN
   set dbun_unzip_log = pi_dbun_rec.dbun_unzip_log
   where dbun_bundle_id = pi_dbun_rec.dbun_bundle_id;
   
-  commit;
-  
 EXCEPTION
 
  WHEN others THEN 
@@ -351,9 +349,13 @@ BEGIN
   l_dbf_rec.dbf_bundle_id := pi_dbun_rec.dbun_bundle_id;
   l_dbf_rec.dbf_filename  := l_list(f);
   l_dbf_rec.dbf_file_included_with_bundle := 'Y';
+
+begin
   l_dbf_rec.dbf_blob      := nm3file.file_to_blob(pi_source_dir   => l_unzip_oracle_directory
                                                  ,pi_source_file  => l_list(f));
-         
+exception
+ when others then null;
+end;         
   
   
                                               
@@ -362,8 +364,6 @@ BEGIN
  END LOOP;
 
  drop_dir_on_fly;
- 
- commit;
  
 EXCEPTION
  WHEN others THEN   
@@ -385,6 +385,13 @@ PROCEDURE list_files_in_tab_driving_recs(pi_dbun_rec         IN doc_bundles%ROWT
 BEGIN
 
 
+nm_debug.debug_on;
+nm_debug.debug('list_files-in_tab_driving_recs');
+
+nm_debug.debug('pi_tab_driving_recs.count='||pi_tab_driving_recs.count);
+nm_debug.debug('pi_oracle_directory='||pi_oracle_directory);
+
+
  hig_process_api.log_it(pi_message         => '   Reading driving records and uploading file content' 
                        ,pi_summary_flag    => 'N' ); 
 
@@ -395,8 +402,14 @@ BEGIN
   l_dbf_rec.dbf_bundle_id := pi_dbun_rec.dbun_bundle_id;
   l_dbf_rec.dbf_filename  := pi_tab_driving_recs(f).doc_filename;
   l_dbf_rec.dbf_file_included_with_bundle := 'Y';
-  l_dbf_rec.dbf_blob      := nm3file.file_to_blob(pi_source_dir   => pi_oracle_directory
-                                                 ,pi_source_file  => l_dbf_rec.dbf_filename); -- read in the binary
+
+     begin
+      l_dbf_rec.dbf_blob      := nm3file.file_to_blob(pi_source_dir   => pi_oracle_directory
+                                                     ,pi_source_file  => l_dbf_rec.dbf_filename); -- read in the binary
+    exception
+      when others then
+        null;         
+    end;                                                 
                                                  
                                                  
   insert_doc_bundle_file(pi_dbf_rec => l_dbf_rec);
@@ -418,8 +431,6 @@ BEGIN
  
  END LOOP;
 
- commit;
- 
 END list_files_in_tab_driving_recs;
 --
 -----------------------------------------------------------------------------
@@ -591,6 +602,12 @@ PROCEDURE create_docs_etc(pi_dbun_rec IN doc_bundles%ROWTYPE) IS
  SELECT a.rowid
        ,a.dbfr_doc_filename -- filename that we will be referencing in doc manager i.e. one made to be unique
        ,b.dbf_filename -- original filename
+       ,case when 
+           NVL(dbms_lob.getlength(dbf_blob),0) = 0 then
+              'N'
+           else
+              'Y'
+           end blob_is_ok
        ,a.dbfr_doc_title       
        ,a.dbfr_doc_descr
        ,a.dbfr_doc_type
@@ -626,6 +643,7 @@ PROCEDURE create_docs_etc(pi_dbun_rec IN doc_bundles%ROWTYPE) IS
  
  l_error_no   pls_integer;
  l_error_text nm3type.max_varchar2;
+ l_count      pls_integer;
  
 BEGIN
 
@@ -646,11 +664,42 @@ BEGIN
       --
       IF l_tab_c1(d).enough_attributes_supplied = 'N' THEN  
          l_tab_c1(d).dbfr_error_text := 'Gateway Table and Record ID and/or Coordinates must be supplied';
+      ELSIF l_tab_c1(d).blob_is_ok = 'N' THEN
+         l_tab_c1(d).dbfr_error_text := 'File contents could not be read or file is has a size of zero bytes';          
       ELSE
       
+             --
+             -- check existing doc assocs and see if there are any for docs that had the same (stripped down) filename as ours and same doc title
+             -- if this is the case then we can assume we've associated this binary file to the same entity before and we will reject it
+             --
+              select count(*)
+              into  l_count
+              from  docs 
+                   ,doc_assocs 
+              where das_table_name     = l_tab_c1(d).dbfr_gateway_table_name
+              and   das_rec_id         = l_tab_c1(d).dbfr_rec_id
+              and   doc_id             = das_doc_id
+              and   doc_title          = l_tab_c1(d).dbfr_doc_title
+              and   substr(doc_file,1, length(doc_id)+1) = doc_id||'_'  -- leading chars of filename of doc match the convention of doc_id_ 
+              and   substr(doc_file,length(doc_id)+2,length(doc_file)) = l_tab_c1(d).dbf_filename; -- strip off the leading chars on the filename in the database
+              
+              IF l_count > 0 THEN
+                l_tab_c1(d).dbfr_error_text := 'This document association already exists';
+              END IF;
+              
+        END IF;
+        
+        
+        IF l_tab_c1(d).dbfr_error_text IS NULL THEN
+
+
               l_tab_c1(d).dbfr_doc_id       := nm3seq.next_doc_id_seq ;
 
               l_tab_c1(d).dbfr_doc_filename := l_tab_c1(d).dbfr_doc_id ||'_'||l_tab_c1(d).dbf_filename;
+
+
+
+
 
               doc_api.create_document(
                                       ce_reference_no => l_tab_c1(d).dbfr_doc_filename
@@ -706,8 +755,6 @@ BEGIN
 
 
 
-      COMMIT;                           
-  
  END LOOP;
  
 END create_docs_etc;
@@ -752,6 +799,21 @@ PROCEDURE move_files_to_destination(pi_dbun_rec IN doc_bundles%ROWTYPE) IS
 
  TYPE t_tab_c1 IS TABLE OF c1%ROWTYPE INDEX BY BINARY_INTEGER;
  l_tab_c1 t_tab_c1;
+
+
+ CURSOR c2(cp_transfer_batch_no IN hig_file_transfer_queue.hftq_batch_no%TYPE) IS
+ SELECT dbfr.rowid
+       ,dbfr.dbfr_doc_id 
+   FROM doc_bundle_file_relations dbfr
+  WHERE dbfr_hftq_batch_no = cp_transfer_batch_no
+  AND NOT EXISTS (SELECT 'the file transfered ok'
+                    FROM hig_file_transfer_queue
+                    WHERE hftq_batch_no = dbfr_hftq_batch_no
+                      AND   hftq_destination_filename = dbfr_doc_filename
+                      AND   hftq_status = 'TRANSFER COMPLETE');
+
+ TYPE t_tab_c2 IS TABLE OF c2%ROWTYPE INDEX BY BINARY_INTEGER;
+ l_tab_c2 t_tab_c2; 
 
 
 
@@ -815,15 +877,11 @@ BEGIN
       hig_file_transfer_api.add_files_to_queue ( pi_tab_files     => l_tab_files 
                                                , po_hftq_batch_no => l_htfq_batch_no);
 
-
-      --
-      --
-      --                                       
+                                     
       hig_file_transfer_api.process_file_queue(pi_hftq_batch_no => l_htfq_batch_no);
 
       --
-      -- note that on error l_tab_c1(d).dbfr_doc_id is set back to null which is good co we don't
-      -- want to give the impression that a doc was created if it wasn't 
+      -- mark our file relations records with the identifier that will associate them the transfer batch 
       --
       FOR f IN 1..l_tab_c1.COUNT LOOP
           UPDATE doc_bundle_file_relations
@@ -832,9 +890,25 @@ BEGIN
       END LOOP;    
 
 
+     --
+     -- pick out any file relations records where the transfer failed and back out the doc and doc assoc creation i.e. if transfer fails so does the creation of the doc and doc assoc
+     --
+      OPEN c2(cp_transfer_batch_no => l_htfq_batch_no);
+      FETCH c2 BULK COLLECT INTO l_tab_c2;
+      CLOSE c2;
+      
+      FOR i IN 1..l_tab_c2.COUNT LOOP
+      
+                delete from doc_assocs where das_doc_id = l_tab_c2(i).dbfr_doc_id;
+                
+                delete from docs where doc_id = l_tab_c2(i).dbfr_doc_id;
+                
+                update doc_bundle_file_relations set dbfr_doc_id = null
+                where rowid = l_tab_c2(i).rowid;      
+      END LOOP;
+
  END IF;
  
- commit;                                         
 
 END move_files_to_destination;
 --
@@ -946,8 +1020,7 @@ BEGIN
      SET    dbun_success_flag = 'Y' 
            ,dbun_error_text   = Null
      WHERE  dbun_bundle_id    =  pi_bundle_id;
-     
-     COMMIT;          
+      
 
 END;
 --
@@ -975,8 +1048,6 @@ BEGIN
        INSERT (a.dbun_bundle_id, a.dbun_filename, a.dbun_process_id, a.dbun_success_flag, a.dbun_error_text)
        VALUES (b.dbun_bundle_id, b.dbun_filename, b.dbun_process_id, b.dbun_success_flag, b.dbun_error_text);       
      
-     COMMIT;          
-
 END; 
 --
 -----------------------------------------------------------------------------
@@ -989,9 +1060,7 @@ FUNCTION load_document_bundle(pi_filename                   IN doc_bundles.dbun_
  
  l_retval BOOLEAN := FALSE;
  l_sqlerrm varchar2(500);  
- 
 
- 
 
 BEGIN
 
@@ -1027,7 +1096,7 @@ BEGIN
 --  
   insert_doc_bundle(pi_dbun_rec => l_dbun_rec);
 
-  COMMIT; -- let's commit the records we've created up to this point before we start to process the actual data
+  COMMIT; -- let's commit the doc bundle record at very least so if things go awry we have that written away
 
 
  
@@ -1049,12 +1118,12 @@ BEGIN
   read_driving_files_in_bundle(pi_dbun_rec => l_dbun_rec);
 
 
+  COMMIT; -- again commit the records we've created up to this point before we start to process the actual data
+
 --
 -- Create DOC and DOC_ASSOC records
 --
   create_docs_etc(pi_dbun_rec => l_dbun_rec);
-
-
 
 --
 -- Initiate a transfer
@@ -1088,6 +1157,9 @@ BEGIN
       
   END IF;
   
+  COMMIT;
+  
+  
   RETURN l_retval;
   
   
@@ -1102,6 +1174,7 @@ EXCEPTION
                    ,pi_bundle_filename => l_dbun_rec.dbun_filename
                    ,pi_process_id      => l_dbun_rec.dbun_process_id);    
 
+     commit;
 
      RETURN(FALSE);
   
@@ -1153,7 +1226,7 @@ BEGIN
 --  
   insert_doc_bundle(pi_dbun_rec => l_dbun_rec);
 
-  COMMIT; -- let's commit the records we've created up to this point before we start to process the actual data
+  COMMIT; -- let's commit the doc bundle record at very least so if things go awry we have that written away
 
 
 --
@@ -1162,6 +1235,8 @@ BEGIN
   list_files_in_tab_driving_recs(pi_dbun_rec         => l_dbun_rec
                                 ,pi_tab_driving_recs => pi_tab_driving_recs
                                 ,pi_oracle_directory => pi_oracle_directory);
+
+  COMMIT; -- again commit the records we've created up to this point before we start to process the actual data
 
 --
 -- Create DOC and DOC_ASSOC records
@@ -1197,6 +1272,7 @@ BEGIN
       
   END IF;
 
+  COMMIT;
   
   RETURN l_retval;
   
@@ -1208,7 +1284,9 @@ EXCEPTION
      bundle_failure(pi_error_text => l_sqlerrm
                    ,pi_bundle_id       => l_dbun_rec.dbun_bundle_id
                    ,pi_bundle_filename => l_dbun_rec.dbun_filename
-                   ,pi_process_id      => l_dbun_rec.dbun_process_id);  
+                   ,pi_process_id      => l_dbun_rec.dbun_process_id);
+                   
+     commit;                     
      
      RETURN(FALSE);
   
