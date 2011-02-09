@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE hig_std_text AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/tma/admin/pck/hig_std_text.pkh-arc   3.2   Jan 16 2008 12:08:10   bodriscoll  $
+--       sccsid           : $Header:   //vm_latest/archives/tma/admin/pck/hig_std_text.pkh-arc   3.3   Feb 09 2011 09:28:00   Chris.Baugh  $
 --       Module Name      : $Workfile:   hig_std_text.pkh  $
---       Date into SCCS   : $Date:   Jan 16 2008 12:08:10  $
---       Date fetched Out : $Modtime:   Jan 15 2008 18:03:18  $
---       SCCS Version     : $Revision:   3.2  $
+--       Date into SCCS   : $Date:   Feb 09 2011 09:28:00  $
+--       Date fetched Out : $Modtime:   Feb 07 2011 15:43:48  $
+--       SCCS Version     : $Revision:   3.3  $
 --       Based on 
 --
 --
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE hig_std_text AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-   g_sccsid   CONSTANT varchar2(30) :='"$Revision:   3.2  $"';
+   g_sccsid   CONSTANT varchar2(30) :='"$Revision:   3.3  $"';
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------
@@ -40,6 +40,7 @@ type stdrec is record
 type stdtab is table of stdrec index by binary_integer;
 
 g_std_text        hig_standard_text.hst_text%type default null;
+g_append_std_text hig_standard_text.hst_text%type default null;
     
 --
 --------------------------------------------------------------------------------
@@ -106,6 +107,20 @@ FUNCTION get_field_desc(p_hmi_module_name in hig_module_items.hmi_module_name%ty
 --
 -----------------------------------------------------------------------------
 --
+--<PROC NAME="set_append_std_text">
+--
+PROCEDURE set_append_std_text(p_std_text  IN  hig_standard_text.hst_text%type);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<FUNC NAME="get_append_std_text">
+--
+FUNCTION get_append_std_text RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
 --<PROC NAME="set_std_text">
 --
 PROCEDURE set_std_text(p_std_text  IN  hig_standard_text.hst_text%type);
@@ -165,5 +180,5 @@ FUNCTION get_text_by_id(p_hst_text_id in hig_standard_text.hst_text_id%type)
 --
 -----------------------------------------------------------------------------
 --
-END hig_std_text;
+END hig_std_text; 
 /
