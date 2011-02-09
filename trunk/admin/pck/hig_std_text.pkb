@@ -3,11 +3,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/tma/admin/pck/hig_std_text.pkb-arc   3.2   Jan 16 2008 12:08:10   bodriscoll  $
+--       sccsid           : $Header:   //vm_latest/archives/tma/admin/pck/hig_std_text.pkb-arc   3.3   Feb 09 2011 09:28:18   Chris.Baugh  $
 --       Module Name      : $Workfile:   hig_std_text.pkb  $
---       Date into SCCS   : $Date:   Jan 16 2008 12:08:10  $
---       Date fetched Out : $Modtime:   Jan 15 2008 17:16:02  $
---       SCCS Version     : $Revision:   3.2  $
+--       Date into SCCS   : $Date:   Feb 09 2011 09:28:18  $
+--       Date fetched Out : $Modtime:   Feb 07 2011 15:43:36  $
+--       SCCS Version     : $Revision:   3.3  $
 --       Based on 
 --
 --
@@ -19,10 +19,10 @@ AS
 -----------------------------------------------------------------------------
 --    Copyright (c) exor corporation ltd, 2007
 -----------------------------------------------------------------------------
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.2  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.3  $';
    g_package_name CONSTANT varchar2(30) := 'tma_fpns_api';
 
---sccsid constant varchar2(30) :='"$Revision:   3.2  $"';
+--sccsid constant varchar2(30) :='"$Revision:   3.3  $"';
 --   g_body_sccsid is the SCCS ID for the package body
 --
 --------------------------------------------------------------------------------
@@ -228,6 +228,26 @@ BEGIN
   
 
 END;                                                                     
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="set_append_std_text">
+--
+PROCEDURE set_append_std_text(p_std_text  IN  hig_standard_text.hst_text%type) IS
+BEGIN
+    g_append_std_text := p_std_text;
+END set_append_std_text;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<FUNC NAME="get_append_std_text">
+--
+FUNCTION get_append_std_text RETURN varchar2 IS
+BEGIN
+  RETURN g_append_std_text;
+END get_append_std_text;
 --</PROC>
 --
 -----------------------------------------------------------------------------
@@ -446,5 +466,5 @@ END;
 --
 -----------------------------------------------------------------------------
 --
-END hig_std_text;
+END hig_std_text; 
 /
