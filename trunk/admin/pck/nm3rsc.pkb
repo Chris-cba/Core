@@ -3,23 +3,23 @@ CREATE OR REPLACE PACKAGE BODY nm3rsc AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.3   Jun 25 2009 14:21:26   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3rsc.pkb-arc   2.4   Feb 09 2011 09:46:58   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3rsc.pkb  $
---       Date into PVCS   : $Date:   Jun 25 2009 14:21:26  $
---       Date fetched Out : $Modtime:   Jun 25 2009 14:18:46  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   Feb 09 2011 09:46:58  $
+--       Date fetched Out : $Modtime:   Feb 09 2011 09:45:42  $
+--       PVCS Version     : $Revision:   2.4  $
 --
 --   Author : R.A. Coupe
 --
 --   Package for the rescaling and resequencing of route members
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2001
+-- Copyright (c) exor corporation ltd, 2001
 ----------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  varchar2(30) :='"$Revision:   2.4  $"';
 
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -270,9 +270,9 @@ PROCEDURE connect_route ( pi_ne_id IN nm_elements.ne_id%TYPE,
   CURSOR c1 IS
     SELECT ne_id, ne_length, LEVEL c_level, ne_sub_class, s_ne_id
     FROM nm_rescale_write
-	WHERE NVL(ne_sub_class, '1') IN ('2','1')
+ WHERE NVL(ne_sub_class, '1') IN ('2','1')
     CONNECT BY PRIOR ne_id = s_ne_id
-	AND NVL(ne_sub_class, '1') IN ('2','1')
+ AND NVL(ne_sub_class, '1') IN ('2','1')
     START WITH s_ne_id = -1
     AND NVL(ne_sub_class, '1') IN ('2','1');
 
@@ -283,11 +283,11 @@ PROCEDURE connect_route ( pi_ne_id IN nm_elements.ne_id%TYPE,
   CURSOR c2 (c_start nm_elements.ne_id%TYPE) IS
     SELECT ne_id, ne_length, LEVEL c_level, ne_sub_class, s_ne_id
     FROM nm_rescale_write
-	WHERE NVL(ne_sub_class,'3') = '3'
+ WHERE NVL(ne_sub_class,'3') = '3'
     AND connect_level IS NULL
     CONNECT BY PRIOR ne_id = s_ne_id
     AND connect_level IS NULL
-	AND NVL(ne_sub_class, '3') = '3'
+ AND NVL(ne_sub_class, '3') = '3'
     START WITH ne_id = c_start;
 
 --
@@ -297,27 +297,27 @@ PROCEDURE connect_route ( pi_ne_id IN nm_elements.ne_id%TYPE,
   CURSOR c3 IS
     SELECT w.ne_id ne_id, 0 nm_seq_no, 0 ne_length, pi_offset_st nm_true
     FROM nm_rescale_write w
-	WHERE w.ne_sub_class = '3'
-	AND   w.s_ne_id = -1
+ WHERE w.ne_sub_class = '3'
+ AND   w.s_ne_id = -1
     UNION
-	SELECT w.ne_id ne_id, r.nm_seq_no nm_seq_no, r.ne_length, r.nm_true
-	FROM nm_rescale_write w, nm_rescale_write r
-	WHERE w.ne_sub_class = '3'
-	AND   w.s_ne_id = r.ne_id
-	AND   r.ne_sub_class != '3'
-	ORDER BY 2;
+ SELECT w.ne_id ne_id, r.nm_seq_no nm_seq_no, r.ne_length, r.nm_true
+ FROM nm_rescale_write w, nm_rescale_write r
+ WHERE w.ne_sub_class = '3'
+ AND   w.s_ne_id = r.ne_id
+ AND   r.ne_sub_class != '3'
+ ORDER BY 2;
 
   CURSOR c4 IS
-	SELECT w.ne_id ne_id, r.nm_seq_no nm_seq_no, r.ne_length, r.nm_true
-	FROM nm_rescale_write w, nm_rescale_write r
-	WHERE w.s_ne_id = r.ne_id
+ SELECT w.ne_id ne_id, r.nm_seq_no nm_seq_no, r.ne_length, r.nm_true
+ FROM nm_rescale_write w, nm_rescale_write r
+ WHERE w.s_ne_id = r.ne_id
     AND   w.nm_seq_no IS NULL
-	ORDER BY 2;
+ ORDER BY 2;
 
   CURSOR c5 (c_start nm_elements.ne_id%TYPE) IS
     SELECT ne_id, ne_length, LEVEL c_level, ne_sub_class, s_ne_id
     FROM nm_rescale_write
-	WHERE nm_seq_no IS NULL
+ WHERE nm_seq_no IS NULL
     CONNECT BY PRIOR ne_id = s_ne_id
     START WITH ne_id = c_start;
 
@@ -372,10 +372,10 @@ BEGIN
                               WHERE ne_id = pi_ne_start );
       END IF;
 
-	  ELSE
+   ELSE
       nm_debug.debug('circular route with blah ' ) ;
 
-	    RAISE_APPLICATION_ERROR( -20207, 'Circular route with no start defined' );
+     RAISE_APPLICATION_ERROR( -20207, 'Circular route with no start defined' );
     END IF;
   END IF;
 
@@ -408,7 +408,7 @@ BEGIN
       WHERE ne_id = irec.ne_id;
 
       l_length  := irec.ne_length;
-	  l_saved_sub_class := irec.ne_sub_class;
+   l_saved_sub_class := irec.ne_sub_class;
 
     END LOOP;
 
@@ -420,14 +420,14 @@ BEGIN
     FOR s_rec IN c3 LOOP
 
       l_length := s_rec.ne_length;
-	  l_true   := s_rec.nm_true;
+   l_true   := s_rec.nm_true;
       l_first  := TRUE;
       l_seg_no := l_seg_no + 1;
 
       FOR r_rec IN c2( s_rec.ne_id ) LOOP
 
         l_seq_no := l_seq_no + 1;
-	    l_true   := l_true + nm3unit.convert_unit( g_datum_units, g_route_units, l_length);
+     l_true   := l_true + nm3unit.convert_unit( g_datum_units, g_route_units, l_length);
 
         UPDATE nm_rescale_write
         SET nm_true   = l_true,
@@ -449,14 +449,14 @@ BEGIN
       FOR s_rec IN c4 LOOP
 
         l_length := s_rec.ne_length;
-	    l_true   := s_rec.nm_true;
+     l_true   := s_rec.nm_true;
         l_first  := TRUE;
         l_seg_no := l_seg_no + 1;
 
         FOR r_rec IN c5( s_rec.ne_id ) LOOP
 
           l_seq_no := l_seq_no + 1;
-	      l_true   := l_true + nm3unit.convert_unit( g_route_units, g_datum_units, l_length);
+       l_true   := l_true + nm3unit.convert_unit( g_route_units, g_datum_units, l_length);
 
           UPDATE nm_rescale_write
           SET nm_true   = l_true,
@@ -508,7 +508,7 @@ BEGIN
 
         END LOOP;
 
-  	  ELSE
+     ELSE
 
         --nm_debug.debug('extent - i' );
 
@@ -531,7 +531,7 @@ BEGIN
           l_length  := irec.ne_length;
 
         END LOOP;
-  	  END IF;
+     END IF;
     ELSE
 --    rescale an inventory item - it is partial
 
@@ -557,7 +557,7 @@ BEGIN
 
       END LOOP;
 
-	END IF;
+ END IF;
 
   END IF;
 
@@ -792,7 +792,8 @@ CURSOR c1 IS
   WHERE nm_ne_id_in = pi_ne_id
   FOR UPDATE OF nm_seg_no;
 
-l_empty_flag varchar2(1);
+  l_empty_flag    varchar2(1);
+  l_shape_option  VARCHAR2(1) := NVL(hig.get_user_or_sys_opt('SDORESEQ'),'H'); 
 
 BEGIN
 
@@ -816,8 +817,25 @@ BEGIN
     END LOOP;
 
     -- AE Get a new shape for the resequenced route, with no history
-    nm3sdm.reshape_route( pi_ne_id, nm3user.get_effective_date, 'Y' );
-
+    
+    -- Task 0110688
+    -- Use shape history on a resequence based on SDORESEQ product option
+    -- 
+    IF l_shape_option NOT IN ('H'  -- Change shape with history
+                             ,'U'  -- Change shape without history
+                             ,'N'  -- No change to shape  
+                             )
+    THEN
+       -- Default to the old method of history when the option hasn't been set properly.
+       -- It will already default to 'H' if the option is null
+      l_shape_option := 'H';
+    END IF;
+  --
+    IF l_shape_option != 'N'
+    THEN
+      nm3sdm.reshape_route( pi_ne_id, nm3user.get_effective_date, CASE WHEN l_shape_option = 'H' THEN 'Y' ELSE 'N' END );
+    END IF;
+  --
   END IF;
 
 END;
@@ -1062,7 +1080,7 @@ BEGIN
   SELECT ne_id, ne_no_start, ne_no_end, ne_length,
          nm_slk, NULL, NULL, NULL, ne_nt_type,
          nm_cardinality, DECODE( g_use_sub_class, 'Y',
-		      TO_CHAR(nm3net.get_sub_class_seq( g_gty, ne_sub_class)), NULL),
+        TO_CHAR(nm3net.get_sub_class_seq( g_gty, ne_sub_class)), NULL),
          nm_begin_mp, nm_end_mp, NULL, NULL
   FROM nm_elements, nm_members
   WHERE ne_id = nm_ne_id_of
@@ -1087,7 +1105,7 @@ BEGIN
   SELECT ne_id, ne_no_start, ne_no_end, ne_length,
          nm_slk, NULL, NULL, nm_seq_no, ne_nt_type,
          nm_cardinality, DECODE( g_use_sub_class, 'Y',
-		      TO_CHAR(nm3net.get_sub_class_seq( g_gty, ne_sub_class)), NULL),
+        TO_CHAR(nm3net.get_sub_class_seq( g_gty, ne_sub_class)), NULL),
          nm_begin_mp, nm_end_mp, NULL, NULL
   FROM nm_elements, nm_members
   WHERE ne_id = nm_ne_id_of
@@ -1383,7 +1401,7 @@ BEGIN
     SELECT ne_id, ne_no_start, ne_no_end, ne_length,
            NULL, NULL, NULL, NULL, ne_nt_type,
            nte_cardinality, DECODE( g_use_sub_class, 'Y',
-  		      TO_CHAR(nm3net.get_sub_class_seq( g_gty, ne_sub_class)), NULL),
+          TO_CHAR(nm3net.get_sub_class_seq( g_gty, ne_sub_class)), NULL),
            nte_begin_mp, nte_end_mp, NULL, NULL
     FROM nm_elements, nm_nw_temp_extents
     WHERE ne_id = nte_ne_id_of
@@ -1413,7 +1431,7 @@ BEGIN
   SELECT ne_id, ne_no_start, ne_no_end, ne_length,
          NULL, NULL, NULL, NULL, ne_nt_type,
          nte_cardinality, DECODE( g_use_sub_class, 'Y',
-		      TO_CHAR(nm3net.get_sub_class_seq( g_gty, ne_sub_class)), NULL),
+        TO_CHAR(nm3net.get_sub_class_seq( g_gty, ne_sub_class)), NULL),
          nte_begin_mp, nte_end_mp, NULL, NULL
   FROM nm_elements, nm_nw_temp_extents
   WHERE ne_id = nte_ne_id_of
@@ -1496,7 +1514,7 @@ BEGIN
     SELECT ne_id, ne_no_start, ne_no_end, ne_length,
            NULL, NULL, NULL, NULL, ne_nt_type,
            nm_cardinality, DECODE( g_use_sub_class, 'Y',
-  		      TO_CHAR(nm3net.get_sub_class_seq( g_gty, ne_sub_class)), NULL),
+          TO_CHAR(nm3net.get_sub_class_seq( g_gty, ne_sub_class)), NULL),
            nte_begin_mp, nte_end_mp, NULL, NULL
     FROM nm_elements, nm_nw_temp_extents, nm_members
     WHERE ne_id = nte_ne_id_of
@@ -1528,7 +1546,7 @@ BEGIN
   SELECT ne_id, ne_no_start, ne_no_end, ne_length,
          NULL, NULL, NULL, NULL, ne_nt_type,
          nm_cardinality, DECODE( g_use_sub_class, 'Y',
-		      TO_CHAR(nm3net.get_sub_class_seq( g_gty, ne_sub_class)), NULL),
+        TO_CHAR(nm3net.get_sub_class_seq( g_gty, ne_sub_class)), NULL),
          nte_begin_mp, nte_end_mp, NULL, NULL
   FROM nm_elements, nm_nw_temp_extents, nm_members
   WHERE ne_id = nte_ne_id_of
