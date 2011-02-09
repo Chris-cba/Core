@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.18   Feb 03 2011 08:45:56   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.19   Feb 09 2011 14:41:50   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Feb 03 2011 08:45:56  $
---       Date fetched Out : $Modtime:   Feb 02 2011 11:48:20  $
---       PVCS Version     : $Revision:   3.18  $
+--       Date into PVCS   : $Date:   Feb 09 2011 14:41:50  $
+--       Date fetched Out : $Modtime:   Feb 09 2011 14:14:06  $
+--       PVCS Version     : $Revision:   3.19  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.18  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.19  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -30,6 +30,7 @@ AS
    g_fail                    VARCHAR2(4)    := 'FAIL';
    g_main                    VARCHAR2(4)    := 'MAIN';
    g_archive                 VARCHAR2(7)    := 'ARCHIVE';
+   g_list                    VARCHAR2(7)    := 'LIST';
 --
 -- ORA-24247: Network access denied by access control list (ACL)
 --
@@ -62,6 +63,27 @@ AS
       p_text  := RPAD(p_text, l_units * 8, g_pad_chr);
     END IF;
   END;
+--
+--------------------------------------------------------------------------------
+--
+PROCEDURE add_ftp_outcome( p_ftp_htc_id        VARCHAR2
+                         , p_ftp_type          VARCHAR2
+                         , p_ftp_filename      VARCHAR2
+                         , p_ftp_outcome       VARCHAR
+                         , p_ftp_outcome_error VARCHAR DEFAULT NULL)
+IS
+l_oc_count NUMBER;
+BEGIN
+  l_oc_count:= g_tab_ftp_outcome.COUNT+1;
+  g_tab_ftp_outcome.EXTEND;
+--
+  g_tab_ftp_outcome(l_oc_count).ftp_htc_id        := p_ftp_htc_id;
+  g_tab_ftp_outcome(l_oc_count).ftp_type          := p_ftp_type;
+  g_tab_ftp_outcome(l_oc_count).ftp_filename      := p_ftp_filename;
+  g_tab_ftp_outcome(l_oc_count).ftp_outcome       := p_ftp_outcome;
+  g_tab_ftp_outcome(l_oc_count).ftp_outcome_error := p_ftp_outcome_error;
+--
+END add_ftp_outcome; 
 --
 -----------------------------------------------------------------------------
 --
@@ -1260,7 +1282,15 @@ AS
   WHEN OTHERS
   THEN 
   -- If there is an error return the empty value
-  RETURN retval;
+    --
+    add_ftp_outcome( p_ftp_htc_id        => pi_hfc_id
+                   , p_ftp_type          => g_list
+                   , p_ftp_filename      => NULL
+                   , p_ftp_outcome       => g_fail
+                   , p_ftp_outcome_error => SQLERRM
+                   );
+    RETURN retval;
+  --
   END list_all_files_coming_in;
 --
 --------------------------------------------------------------------------------
@@ -1319,27 +1349,6 @@ AS
 --
 --------------------------------------------------------------------------------
 --
-PROCEDURE add_ftp_outcome( p_ftp_htc_id        VARCHAR2
-                         , p_ftp_type          VARCHAR2
-                         , p_ftp_filename      VARCHAR2
-                         , p_ftp_outcome       VARCHAR
-                         , p_ftp_outcome_error VARCHAR DEFAULT NULL)
-IS
-l_oc_count NUMBER;
-BEGIN
-  l_oc_count:= g_tab_ftp_outcome.COUNT+1;
-  g_tab_ftp_outcome.EXTEND;
---
-  g_tab_ftp_outcome(l_oc_count).ftp_htc_id        := p_ftp_htc_id;
-  g_tab_ftp_outcome(l_oc_count).ftp_type          := p_ftp_type;
-  g_tab_ftp_outcome(l_oc_count).ftp_filename      := p_ftp_filename;
-  g_tab_ftp_outcome(l_oc_count).ftp_outcome       := p_ftp_outcome;
-  g_tab_ftp_outcome(l_oc_count).ftp_outcome_error := p_ftp_outcome_error;
---
-END add_ftp_outcome; 
---
---------------------------------------------------------------------------------
---
 FUNCTION ftp_in_to_db_success( p_htc_id  hig_ftp_connections.hfc_id%TYPE DEFAULT NULL)
 RETURN BOOLEAN
 IS
@@ -1382,7 +1391,7 @@ END;
   --
   BEGIN
   --
-  g_tab_ftp_outcome.DELETE;
+    g_tab_ftp_outcome.DELETE;
   --
     FOR i IN (SELECT a.* 
                 FROM hig_ftp_connections a
