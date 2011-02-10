@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4300_fix8.sql-arc   3.0   Feb 10 2011 14:26:08   mike.alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4300_fix8.sql-arc   3.1   Feb 10 2011 16:02:28   mike.alexander  $
 --       Module Name      : $Workfile:   nm_4300_fix8.sql  $
---       Date into PVCS   : $Date:   Feb 10 2011 14:26:08  $
---       Date fetched Out : $Modtime:   Feb 10 2011 14:25:44  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Feb 10 2011 16:02:28  $
+--       Date fetched Out : $Modtime:   Feb 10 2011 16:01:46  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) exor corporation ltd, 2011
@@ -60,13 +60,23 @@ END;
 /
 
 --
--- Check that HIG has been installed @ v4.3.0.0
+-- Check that HIG has been installed @ v4.3.0.0 or v4.3.0.1
 --
-BEGIN
- hig2.product_exists_at_version (p_product        => 'HIG'
-                                ,p_VERSION        => '4.3.0.0'
-                                );
-END;
+Declare
+   l_rec_hpr    hig_products%Rowtype;
+Begin
+  --
+  -- get row from hig products for product you are checking 
+  l_rec_hpr := nm3get.get_hpr( pi_hpr_product     => 'HIG'--p_product
+                             , pi_raise_not_found => TRUE
+                             );
+  --
+  If l_rec_hpr.hpr_version Not In ('4.3.0.1','4.3.0.0')
+  Or l_rec_hpr.hpr_key Is Null 
+  Then
+    RAISE_APPLICATION_ERROR(-20000,'Installation terminated: "HIG" version 4.3.0.1 or 4.3.0.0 must be installed and licensed');
+  End If;
+End;
 /
 
 WHENEVER SQLERROR CONTINUE
