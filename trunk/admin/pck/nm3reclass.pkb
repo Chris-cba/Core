@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.8   Jul 26 2010 16:28:52   cstrettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.9   Feb 11 2011 16:44:30   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3reclass.pkb  $
---       Date into PVCS   : $Date:   Jul 26 2010 16:28:52  $
---       Date fetched Out : $Modtime:   Jul 26 2010 16:27:30  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Feb 11 2011 16:44:30  $
+--       Date fetched Out : $Modtime:   Feb 11 2011 16:43:44  $
+--       PVCS Version     : $Revision:   2.9  $
 --
 --
 --   Author : R.A. Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';
@@ -877,6 +877,31 @@ PROCEDURE reclassify_members( p_old_ne IN nm_elements%ROWTYPE,
    c_in CONSTANT VARCHAR2(2) := 'IN';
    c_of CONSTANT VARCHAR2(2) := 'OF';
 --
+   FUNCTION  is_member_gty_allowed_in_gty ( pi_ngr_child_group_type VARCHAR2
+                                          , pi_ngr_parent_group_type VARCHAR2) 
+   RETURN BOOLEAN IS
+   --
+   CURSOR ngr_cur( pi_ngr_parent_group_type VARCHAR2
+                 , pi_ngr_child_group_type VARCHAR2)
+   IS
+   SELECT 1
+   FROM nm_group_relations
+   WHERE ngr_parent_group_type = pi_ngr_parent_group_type
+   AND ngr_child_group_type = pi_ngr_child_group_type;
+   --
+   l_dummy NUMBER;
+   l_return_val BOOLEAN;
+   --
+   BEGIN
+     OPEN ngr_cur( pi_ngr_child_group_type, pi_ngr_parent_group_type);
+     FETCH ngr_cur INTO l_dummy;
+     --
+     l_return_val:= ngr_cur%FOUND;
+     --
+     CLOSE ngr_cur;
+     RETURN l_return_val;
+   END;
+--
    FUNCTION  is_auto_incl (pi_ne_nt_type_child VARCHAR2
                           ,pi_gty_group_type   VARCHAR2
                           ) RETURN BOOLEAN IS
@@ -964,19 +989,12 @@ BEGIN
 --
       IF is_inv_allowed_on_nt( l_nm_obj_type, l_nt ) THEN
 --      relocate and end-date without testing to see if inventory is needed to be end-dated
---        Nm_Debug.debug('Inv allowed on new : '||mem_rec.nm_obj_type);
-        --nm_debug.debug('**Inserting member');
         ins_member ( new_mem );
-        --nm_debug.debug('**Inserting member - Done');
         close_member( mem_rec, p_new_ne.ne_start_date );
       ELSE
 --
 --      the inventory may not be transferred
 --      now end date the original location
---
---        Nm_Debug.debug('Inv NOT allowed on new : '||mem_rec.nm_obj_type);
-----
---        Nm_Debug.debug('Inv membership now being closed');
 --
         close_member( mem_rec, p_new_ne.ne_start_date );
 --
@@ -991,59 +1009,7 @@ BEGIN
 --
       END IF;
     ELSE
-----
---    nm_debug.debug('the member is a group, test if the group may accomodate the new member and enter into');
---    the member is a group, test if the group may accomodate the new member and enter into
---    the group if allowed. if not just end date the membership of the previous.
---    if the group is linear then derive an SLK value from connectivity
---
---
---    Do not try and add new membership of the parent types, they are addressed separately,
---    just end-date the old ones.
---
---      DECLARE
---         no_inclusion EXCEPTION;
---         PRAGMA EXCEPTION_INIT(no_inclusion,-20001);
---      BEGIN
---         c_old_parent_type := nm3net.get_parent_type(p_old_ne.ne_nt_type);
---         c_new_parent_type := nm3net.get_parent_type(p_new_ne.ne_nt_type);
---      EXCEPTION
---         WHEN no_inclusion
---          THEN
---            c_old_parent_type := nm3type.c_nvl;
---            c_new_parent_type := nm3type.c_nvl;
---      END;
-----
-----      nm_debug.debug('IF '||l_nm_obj_type||' != '||c_old_parent_type||' then');
---      IF l_nm_obj_type != c_old_parent_type
---       THEN
-----         nm_debug.debug('         IF ('||c_new_parent_type||' != '||c_old_parent_type);
-----         nm_debug.debug('    AND is_member_allowed_in_gty ('||l_nm_obj_type||', '||p_new_ne.ne_nt_type||')');
-----         nm_debug.debug('   )');
-----         nm_debug.debug(' OR '||c_new_parent_type||'  = '||c_old_parent_type||'');
---         IF (c_new_parent_type != c_old_parent_type
---             AND is_member_allowed_in_gty (l_nm_obj_type, p_new_ne.ne_nt_type)
---            )
---          OR c_new_parent_type  = c_old_parent_type
---          THEN
-----
-----           add member to new group - check if linear and retrieve an SLK
-----
-----             nm_debug.debug('add member to new group - check if linear and retrieve an SLK');
---             ins_member ( new_mem );
-----
---         END IF;
-----
---     END IF;
-      -- IF old_mem was auto-inclusion then do nothing
-      --  it's either been sorted by the new auto-incl - or we don't want it any more
-      --
---      nm_debug.debug('is_auto_incl ('||p_old_ne.ne_nt_type||', '||l_nm_obj_type||') = '||nm3flx.boolean_to_char(is_auto_incl (p_old_ne.ne_nt_type,l_nm_obj_type)));
---      nm_debug.debug('is_member_allowed_in_gty ('||l_nm_obj_type||', '||p_new_ne.ne_nt_type||') = '||nm3flx.boolean_to_char(is_member_allowed_in_gty (l_nm_obj_type, p_new_ne.ne_nt_type)));
-
---     nm_debug.debug('PRE  close_member( mem_rec, p_new_ne.ne_start_date );');
       close_member( mem_rec, p_new_ne.ne_start_date );
---     nm_debug.debug('POST close_member( mem_rec, p_new_ne.ne_start_date );');
 
       IF NOT is_auto_incl (pi_ne_nt_type_child => p_old_ne.ne_nt_type
                           ,pi_gty_group_type   => l_nm_obj_type
@@ -1051,9 +1017,11 @@ BEGIN
        AND ((l_tab_mem_type(i) = c_of AND is_member_allowed_in_gty (l_nm_obj_type, p_new_ne.ne_nt_type) )
             OR
             (l_tab_mem_type(i) = c_in AND Nm3get.get_ngt (pi_ngt_group_type => p_new_ne.ne_gty_group_type).ngt_nt_type = p_new_ne.ne_nt_type)
-           )
-       THEN
-         ins_member ( new_mem );
+            -- CWS 0110555 Parent members were not being recreated during reclassify
+            OR
+            (l_tab_mem_type(i) = c_of AND is_member_gty_allowed_in_gty (l_nm_obj_type, p_new_ne.ne_gty_group_type) ))
+      THEN
+        ins_member (new_mem);
       END IF;
 --
 --
@@ -1081,9 +1049,9 @@ BEGIN
 --
 EXCEPTION
   WHEN OTHERS
-   THEN
-     Nm3ausec.set_status(Nm3type.c_on);
-     RAISE;
+  THEN
+    Nm3ausec.set_status(Nm3type.c_on);
+    RAISE;
 END reclassify_members;
 --
 ---------------------------------------------------------------------------------------------------
@@ -1677,113 +1645,107 @@ BEGIN
    --
       END LOOP;
    ELSE
---      nm_debug.debug('not an auto-inc parent');
---      nm_debug.set_level(4);
-      Nm3ausec.set_status(Nm3type.c_off);
-      reclassify_members (p_old_ne => p_old_ne
-                         ,p_new_ne => l_rec_new_ne
-                         );
-      Nm3ausec.set_status(Nm3type.c_on);
-   END IF;
 --
-   IF l_created_new_ne
-   THEN
-     ---------------------------------------------
-     --deal with any of memberships for this group
-     ---------------------------------------------
-     --create new memberships for any existing parent groups that new nt type is valid for
-      INSERT INTO NM_MEMBERS_ALL
-            (nm_ne_id_in
-            ,nm_ne_id_of
-            ,nm_type
-            ,nm_obj_type
-            ,nm_begin_mp
-            ,nm_start_date
-            ,nm_end_date
-            ,nm_end_mp
-            ,nm_slk
-            ,nm_cardinality
-            ,nm_admin_unit
-            ,nm_seq_no
-            ,nm_seg_no
-            ,nm_true
-            )
-      SELECT nm_ne_id_in
-            ,p_new_ne_id
-            ,nm_type
-            ,nm_obj_type
-            ,nm_begin_mp
-            ,p_new_ne.ne_start_date
-            ,DECODE(LEAST(NVL(p_new_ne.ne_end_date,b.big_date),NVL(nm_end_date,b.big_date))
-                   ,b.big_date,NULL
-                   ,LEAST(NVL(p_new_ne.ne_end_date,b.big_date),NVL(nm_end_date,b.big_date))
-                   )
-            ,nm_end_mp
-            ,nm_slk
-            ,nm_cardinality
-            ,nm_admin_unit
-            ,nm_seq_no
-            ,nm_seg_no
-            ,nm_true
-       FROM  nm_members
-            ,nm_group_relations
-            ,(SELECT Nm3type.get_big_date big_date FROM dual) b
-      WHERE  nm_ne_id_of           = p_old_ne.ne_id
-       AND   ngr_parent_group_type = nm_obj_type
-       AND   ngr_child_group_type  = p_new_ne.ne_gty_group_type
-       AND   NOT EXISTS (SELECT 1
-                          FROM  NM_TYPE_INCLUSION
-                               ,nm_group_types
-                         WHERE  nti_nw_child_type  = p_old_ne.ne_nt_type
-                          AND   nti_nw_parent_type = ngt_nt_type
-                          AND   ngt_group_type     = nm_obj_type
-                        );
---
-     INSERT INTO NM_MEMBER_HISTORY
-           (nmh_nm_ne_id_in
-           ,nmh_nm_ne_id_of_old
-           ,nmh_nm_ne_id_of_new
-           ,nmh_nm_begin_mp
-           ,nmh_nm_start_date
-           ,nmh_nm_type
-           ,nmh_nm_obj_type
-           ,nmh_nm_end_date
-           )
-     SELECT nm_ne_id_in
-           ,nm_ne_id_of
-           ,p_new_ne_id
-           ,nm_begin_mp
-           ,nm_start_date
-           ,nm_type
-           ,nm_obj_type
-           ,nm_end_date
-      FROM  nm_members
-           ,nm_group_relations
-     WHERE  nm_ne_id_of           = p_old_ne.ne_id
-      AND   ngr_parent_group_type = nm_obj_type
-      AND   ngr_child_group_type  = p_new_ne.ne_gty_group_type;
---
-    IF Nm3nwad.ad_data_exist (p_old_ne.ne_id )
-     THEN
-        Nm3nwad.do_ad_reclass (pi_new_ne_id => p_new_ne_id
-                              ,pi_old_ne_id => p_old_ne.ne_id 
-                			 , pi_new_ne_nt_type        => l_rec_new_ne.ne_nt_type
-                             , pi_new_ne_gty_group_type => l_rec_new_ne.ne_gty_group_type);
-							  
-    END IF;
---
-    --end date all existing of memberships for old element
-    UPDATE nm_members
-     SET   nm_end_date = p_new_ne.ne_start_date
-    WHERE  nm_ne_id_of = p_old_ne.ne_id;
-
-
-     ----------------------
-     --end date old element
-     ----------------------
-     UPDATE nm_elements
-      SET   ne_end_date = p_new_ne.ne_start_date
-     WHERE  ne_id       = p_old_ne.ne_id;
+    -- IF l_created_new_ne
+    -- THEN
+       ---------------------------------------------
+       --deal with any of memberships for this group
+       ---------------------------------------------
+       --create new memberships for any existing parent groups that new nt type is valid for
+       /* INSERT INTO NM_MEMBERS_ALL
+              (nm_ne_id_in
+              ,nm_ne_id_of
+              ,nm_type
+              ,nm_obj_type
+              ,nm_begin_mp
+              ,nm_start_date
+              ,nm_end_date
+              ,nm_end_mp
+              ,nm_slk
+              ,nm_cardinality
+              ,nm_admin_unit
+              ,nm_seq_no
+              ,nm_seg_no
+              ,nm_true
+              )
+        SELECT nm_ne_id_in
+              ,p_new_ne_id
+              ,nm_type
+              ,nm_obj_type
+              ,nm_begin_mp
+              ,p_new_ne.ne_start_date
+              ,DECODE(LEAST(NVL(p_new_ne.ne_end_date,b.big_date),NVL(nm_end_date,b.big_date))
+                     ,b.big_date,NULL
+                     ,LEAST(NVL(p_new_ne.ne_end_date,b.big_date),NVL(nm_end_date,b.big_date))
+                     )
+              ,nm_end_mp
+              ,nm_slk
+              ,nm_cardinality
+              ,nm_admin_unit
+              ,nm_seq_no
+              ,nm_seg_no
+              ,nm_true
+         FROM  nm_members
+              ,nm_group_relations
+              ,(SELECT Nm3type.get_big_date big_date FROM dual) b
+        WHERE  nm_ne_id_of           = p_old_ne.ne_id
+         AND   ngr_parent_group_type = nm_obj_type
+         AND   ngr_child_group_type  = p_new_ne.ne_gty_group_type;*/
+     --
+     --
+        Nm3ausec.set_status(Nm3type.c_off);
+        reclassify_members (p_old_ne => p_old_ne
+                           ,p_new_ne => l_rec_new_ne
+                           );
+        Nm3ausec.set_status(Nm3type.c_on);
+     --
+     -- CWS 0110555 Parent members were not being recreated during reclassify
+     /*  INSERT INTO NM_MEMBER_HISTORY
+             (nmh_nm_ne_id_in
+             ,nmh_nm_ne_id_of_old
+             ,nmh_nm_ne_id_of_new
+             ,nmh_nm_begin_mp
+             ,nmh_nm_start_date
+             ,nmh_nm_type
+             ,nmh_nm_obj_type
+             ,nmh_nm_end_date
+             )
+       SELECT nm_ne_id_in
+             ,nm_ne_id_of
+             ,p_new_ne_id
+             ,nm_begin_mp
+             ,nm_start_date
+             ,nm_type
+             ,nm_obj_type
+             ,nm_end_date
+        FROM  nm_members
+             ,nm_group_relations
+       WHERE  nm_ne_id_of           = p_old_ne.ne_id
+        AND   ngr_parent_group_type = nm_obj_type
+        AND   ngr_child_group_type  = p_new_ne.ne_gty_group_type;
+  --
+      IF Nm3nwad.ad_data_exist (p_old_ne.ne_id )
+       THEN
+          Nm3nwad.do_ad_reclass (pi_new_ne_id => p_new_ne_id
+                                ,pi_old_ne_id => p_old_ne.ne_id 
+                         , pi_new_ne_nt_type        => l_rec_new_ne.ne_nt_type
+                               , pi_new_ne_gty_group_type => l_rec_new_ne.ne_gty_group_type);
+  							  
+      END IF;
+  --
+      --end date all existing of memberships for old element
+      UPDATE nm_members
+       SET   nm_end_date = p_new_ne.ne_start_date
+      WHERE  nm_ne_id_of = p_old_ne.ne_id;
+*/
+       ----------------------
+       --end date old element
+       ----------------------
+       UPDATE nm_elements
+        SET   ne_end_date = p_new_ne.ne_start_date
+       WHERE  ne_id       = p_old_ne.ne_id;
+       
+    -- END IF;
    END IF;
 --
 --if it is not an inclusion type then just create a new group, copy elements into the new group
