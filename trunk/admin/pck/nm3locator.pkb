@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3locator AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.8  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.9  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3locator';
 
@@ -1524,6 +1524,7 @@ PROCEDURE export_results(pi_format        IN varchar2
   e_already_loaded EXCEPTION;
 --
 BEGIN
+  nm_debug.debug_on;
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'export_results');
 
@@ -1542,8 +1543,14 @@ BEGIN
     RAISE e_already_loaded;
   END IF;
 
-  l_nit   := nm3get.get_nit(g_inv_attrs(1).ita_inv_type);
-  l_attrs := nm3inv.get_tab_ita_displayed(p_inv_type => g_inv_attrs(1).ita_inv_type);
+  --l_nit   := nm3get.get_nit(g_inv_attrs(1).ita_inv_type);
+  --l_attrs := nm3inv.get_tab_ita_displayed(p_inv_type => g_inv_attrs(1).ita_inv_type);
+  --
+  -- Task 0110708
+  -- Stop the above bombing out with no_data_found if there are no flex attributes defined 
+  --
+  l_nit   := nm3get.get_nit(g_inv_type);
+  l_attrs := nm3inv.get_tab_ita_displayed(p_inv_type => g_inv_type);
   l_table_name := get_temp_table_name;
 
 
@@ -1648,8 +1655,8 @@ BEGIN
     add('   ,iit_end_date  ');
     add('   ,iit_admin_unit');
     add('   ,iit_x_sect    ');
+    add('   ,length');
   END IF;
-  add('   ,length');
 
   add('    ) VALUES (');
   IF g_is_ft THEN
@@ -1659,7 +1666,7 @@ BEGIN
     -- now the attribs'
       add('      ,l_ft.'||l_attrs(i_attr).ita_attrib_name);
     END LOOP;
-    add('    ,nm3net.get_ne_length(l_ft.'||get_ft_col('IIT_NE_ID')||')');
+ --   add('    ,nm3net.get_ne_length(l_ft.'||get_ft_col('IIT_NE_ID')||')');
   ELSE
 
     add('    nm3locator.g_inv_rec.iit_ne_id');
@@ -1695,6 +1702,23 @@ BEGIN
     add('      ELSE');
     add('        INSERT INTO '||l_table_name);
     add('        (iit_ne_id');
+    --
+    -- Insert other columns here
+    --
+    add('    ,iit_inv_type');
+    FOR i_attr IN 1..l_attrs.COUNT LOOP
+      -- now the attribs
+      add('      ,'||l_attrs(i_attr).ita_attrib_name);
+    END LOOP;
+
+    IF NOT g_is_ft THEN
+      add('   ,iit_start_date');
+      add('   ,iit_end_date  ');
+      add('   ,iit_admin_unit');
+      add('   ,iit_x_sect    ');
+      add('   ,length');
+    END IF;
+    --
     add('        ,ne_unique');
     add('        ,ne_descr');
     add('        ,ne_start');
@@ -1703,6 +1727,31 @@ BEGIN
     add('        ,ne_gty_type)');
     add('        VALUES');
     add('        (irec');
+    --
+    -- Insert other columns here
+    --
+    IF g_is_ft THEN
+      add('   ,'''||l_nit.nit_descr||'''');
+      FOR i_attr IN 1..l_attrs.COUNT LOOP
+      -- now the attribs'
+        add('      ,l_ft.'||l_attrs(i_attr).ita_attrib_name);
+      END LOOP;
+      add('    ,nm3net.get_ne_length(l_ft.'||get_ft_col('IIT_NE_ID')||')');
+    ELSE
+      add('   ,'''||l_nit.nit_descr||'''');
+      FOR i_attr IN 1..l_attrs.COUNT LOOP
+
+        add('      ,nm3locator.get_attr_detail(nm3locator.g_inv_rec.iit_inv_type,'''||get_inv_col(l_attrs(i_attr).ita_attrib_name, g_is_ft)||''')');
+      END LOOP;
+      IF NOT g_is_ft THEN
+        add('    ,nm3locator.g_inv_rec.iit_start_date');
+        add('    ,nm3locator.g_inv_rec.iit_end_date  ');
+        add('    ,nm3net.get_admin_unit_name(nm3locator.g_inv_rec.iit_admin_unit)');
+        add('    ,nm3locator.g_inv_rec.iit_x_sect    ');
+        add('    ,nm3net.get_ne_length(nm3locator.g_inv_rec.iit_ne_id)');
+      END IF;
+    END IF;
+    --
     add('        ,nm3net.get_ne_unique(l_place.pl_ne_id)');
     add('        ,nm3net.get_ne_descr(l_place.pl_ne_id)');
     add('        ,l_place.pl_start');
