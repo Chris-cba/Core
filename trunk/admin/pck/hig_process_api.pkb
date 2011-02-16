@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.16   Dec 09 2010 11:31:20   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.17   Feb 16 2011 15:58:56   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Dec 09 2010 11:31:20  $
---       Date fetched Out : $Modtime:   Dec 09 2010 11:27:44  $
---       Version          : $Revision:   3.16  $
+--       Date into PVCS   : $Date:   Feb 16 2011 15:58:56  $
+--       Date fetched Out : $Modtime:   Feb 16 2011 15:48:00  $
+--       Version          : $Revision:   3.17  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.16  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.17  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -1440,13 +1440,27 @@ FUNCTION do_polling_if_requested(pi_file_type_name          IN hig_process_type_
         --
         FOR i IN 1..lt_extensions.count LOOP
           hig_process_api.log_it(pi_message => 'Polling for files with extension *.'||lt_extensions(i)||' in '||l_tab_ftp_connections.COUNT||' locations');
+        --
+          DECLARE
+           l_subscript PLS_INTEGER;
+           l_error      varchar2(2000);
+         
+          BEGIN
+            l_files:= nm3ftp.ftp_in_to_database(pi_tab_ftp_connections     => l_tab_ftp_connections
+                                               ,pi_db_location_to_move_to  => l_file_type_rec.hptf_input_destination
+                                               ,pi_file_mask               => lt_extensions(i)
+                                               ,pi_binary                  => pi_binary
+                                               ,pi_archive_overwrite       => pi_archive_overwrite
+                                               ,pi_remove_failed_arch      => pi_remove_failed_arch);
+                                               
+          EXCEPTION 
+           WHEN others THEN
+              l_error     := SUBSTR(SQLERRM,1,2000);
+              l_subscript := nm3ftp.g_tab_ftp_outcome.COUNT+1;
 
-          l_files:= nm3ftp.ftp_in_to_database(pi_tab_ftp_connections     => l_tab_ftp_connections
-                                             ,pi_db_location_to_move_to  => l_file_type_rec.hptf_input_destination
-                                             ,pi_file_mask               => lt_extensions(i)
-                                             ,pi_binary                  => pi_binary
-                                             ,pi_archive_overwrite       => pi_archive_overwrite
-                                             ,pi_remove_failed_arch      => pi_remove_failed_arch);
+              nm3ftp.g_tab_ftp_outcome(l_subscript).ftp_outcome := l_error;
+              nm3ftp.g_tab_ftp_outcome(l_subscript).ftp_outcome:= 'FAIL';
+          END;
           -- TASk 0110084
           -- If any error is raised in the FTP procesing the Process outcome will be set to FAIl and error will be logged.
           FOR i IN 1..nm3ftp.g_tab_ftp_outcome.Count 
@@ -1464,7 +1478,7 @@ FUNCTION do_polling_if_requested(pi_file_type_name          IN hig_process_type_
               END IF ;
           END LOOP; 
           -- TASk 0110084
-          -- Do further processing only if there are no errors in FTP processing    
+          -- Do further processing only if there are no errors in FTP processing
           IF NOT g_ftp_error
           THEN                             
               hig_process_api.log_it(pi_message => l_files.COUNT||' files found');  
