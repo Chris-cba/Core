@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.14   Dec 07 2010 11:04:06   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.15   Feb 17 2011 15:40:40   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Dec 07 2010 11:04:06  $
---       Date fetched Out : $Modtime:   Dec 07 2010 11:03:36  $
---       Version          : $Revision:   2.14  $
+--       Date into PVCS   : $Date:   Feb 17 2011 15:40:40  $
+--       Date fetched Out : $Modtime:   Feb 17 2011 15:39:46  $
+--       Version          : $Revision:   2.15  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb 1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.14  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.15  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -774,8 +774,12 @@ BEGIN
         THEN
            append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN nte.nte_begin_mp AND nte.nte_end_mp');
         ELSE
-           append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= nte.nte_end_mp');
-           append_both (p_ngqt_index,'        AND   '||l_end_mp_col||' >= nte.nte_begin_mp');
+--           append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= nte.nte_end_mp');
+--           append_both (p_ngqt_index,'        AND   '||l_end_mp_col||' >= nte.nte_begin_mp');
+        -- Task 0110467
+        -- Don't include line items which just butt upto the end / start
+           append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' < nte.nte_end_mp');
+           append_both (p_ngqt_index,'        AND   '||l_end_mp_col||' > nte.nte_begin_mp');
         END IF;
       END IF;
       
@@ -820,8 +824,10 @@ BEGIN
         IF l_rec_ngq.ngq_begin_mp IS NOT NULL
         AND l_rec_ngq.ngq_end_mp IS NOT NULL
         THEN
-          append_both (p_ngqt_index,'                   WHERE nm_slk <= '||l_rec_ngq.ngq_end_mp);
-          append_both (p_ngqt_index,'                     AND '||l_rec_ngq.ngq_begin_mp||' >= nm_end_slk');
+--          append_both (p_ngqt_index,'                   WHERE nm_slk <= '||l_rec_ngq.ngq_end_mp);
+--          append_both (p_ngqt_index,'                     AND '||l_rec_ngq.ngq_begin_mp||' >= nm_end_slk');
+          append_both (p_ngqt_index,'                   WHERE nm_slk < '||l_rec_ngq.ngq_end_mp);
+          append_both (p_ngqt_index,'                     AND '||l_rec_ngq.ngq_begin_mp||' > nm_end_slk');
         END IF;
         append_both (p_ngqt_index,'                 CONNECT BY PRIOR nm_ne_id_of = nm_ne_id_in ');
         append_both (p_ngqt_index,'                   START WITH nm_ne_id_in = '||l_rec_ngq.ngq_source_id||' ');
@@ -849,11 +855,18 @@ BEGIN
           THEN
              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN nte.nte_begin_mp AND nte.nte_end_mp');
            ELSE
-             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= nte.nte_end_mp');
+--             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= nte.nte_end_mp');
+--             append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
+--                                                           THEN l_end_mp_col
+--                                                           ELSE l_begin_mp_col
+--                                                         END||' >= nte.nte_begin_mp');
+        -- Task 0110467
+        -- Don't include line items which just butt upto the end / start
+             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' < nte.nte_end_mp');
              append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
                                                            THEN l_end_mp_col
                                                            ELSE l_begin_mp_col
-                                                         END||' >= nte.nte_begin_mp');
+                                                         END||' > nte.nte_begin_mp');
           END IF;
           -- nm_gaz_query
           IF  l_rec_ngq.ngq_begin_mp IS NOT NULL
@@ -863,11 +876,18 @@ BEGIN
             THEN
               append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN '||l_rec_ngq.ngq_begin_mp||' and '||l_rec_ngq.ngq_end_mp );
             ELSE
-              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= '||l_rec_ngq.ngq_end_mp);
+--              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= '||l_rec_ngq.ngq_end_mp);
+--              append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
+--                                                            THEN l_end_mp_col
+--                                                            ELSE l_begin_mp_col
+--                                                          END||' >= '||l_rec_ngq.ngq_begin_mp);
+            -- Task 0110467
+            -- Don't include line items which just butt upto the end / start
+              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' < '||l_rec_ngq.ngq_end_mp);
               append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
                                                             THEN l_end_mp_col
                                                             ELSE l_begin_mp_col
-                                                          END||' >= '||l_rec_ngq.ngq_begin_mp);
+                                                          END||' > '||l_rec_ngq.ngq_begin_mp);
             END IF;
           END IF;
         END IF;
@@ -914,11 +934,18 @@ BEGIN
           THEN
              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN ex.nm_slk AND ex.nm_end_slk');
            ELSE
-             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= ex.nm_end_slk');
+--             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= ex.nm_end_slk');
+--             append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
+--                                                           THEN l_end_mp_col
+--                                                           ELSE l_begin_mp_col
+--                                                         END||' >= ex.nm_slk');
+            -- Task 0110467
+            -- Don't include line items which just butt upto the end / start
+             append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' < ex.nm_end_slk');
              append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
                                                            THEN l_end_mp_col
                                                            ELSE l_begin_mp_col
-                                                         END||' >= ex.nm_slk');
+                                                         END||' > ex.nm_slk');
           END IF;
       -- nm_gaz_query
           IF  l_rec_ngq.ngq_begin_mp IS NOT NULL
@@ -928,11 +955,18 @@ BEGIN
             THEN
               append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' BETWEEN '||l_rec_ngq.ngq_begin_mp||' and '||l_rec_ngq.ngq_end_mp );
             ELSE
-              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= '||l_rec_ngq.ngq_end_mp);
+--              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' <= '||l_rec_ngq.ngq_end_mp);
+--              append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
+--                                                            THEN l_end_mp_col
+--                                                            ELSE l_begin_mp_col
+--                                                          END||' >= '||l_rec_ngq.ngq_begin_mp);
+            -- Task 0110467
+            -- Don't include line items which just butt upto the end / start
+              append_both (p_ngqt_index,'        AND   '||l_begin_mp_col||' < '||l_rec_ngq.ngq_end_mp);
               append_both (p_ngqt_index,'        AND   '||CASE WHEN l_rec_nit.nit_lr_end_chain IS NOT NULL 
                                                             THEN l_end_mp_col
                                                             ELSE l_begin_mp_col
-                                                          END||' >= '||l_rec_ngq.ngq_begin_mp);
+                                                          END||' > '||l_rec_ngq.ngq_begin_mp);
             END IF;
           END IF;
         END IF;
@@ -1446,7 +1480,7 @@ PROCEDURE execute_sql_item (p_index pls_integer) IS
    l_rc pls_integer;
 BEGIN
    --nm_debug.debug_on;
-   --nm_debug.debug(g_tab_ngqt_list_sql(p_index));
+   nm_debug.debug(g_tab_ngqt_list_sql(p_index));
    EXECUTE IMMEDIATE g_tab_ngqt_list_sql(p_index);
    l_rc := SQL%rowcount;
    --nm_debug.debug('done :'||l_rc);
