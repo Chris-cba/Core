@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.5   Oct 12 2010 09:20:20   Chris.Baugh  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.6   Feb 17 2011 16:00:46   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_process_framework.pkb  $
---       Date into PVCS   : $Date:   Oct 12 2010 09:20:20  $
---       Date fetched Out : $Modtime:   Oct 11 2010 17:10:12  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Feb 17 2011 16:00:46  $
+--       Date fetched Out : $Modtime:   Feb 17 2011 15:47:46  $
+--       Version          : $Revision:   3.6  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.6  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
 
@@ -41,9 +41,9 @@ END get_body_version;
 PROCEDURE insert_process_type(pi_process_type_rec IN OUT hig_process_types%ROWTYPE) IS
 
 BEGIN
-
+--
  pi_process_type_rec.hpt_process_type_id := NVL(pi_process_type_rec.hpt_process_type_id,nm3ddl.sequence_nextval('hpt_process_type_id_seq'));
-
+--
  INSERT INTO hig_process_types
  VALUES pi_process_type_rec
  RETURNING hpt_process_type_id
@@ -59,9 +59,21 @@ BEGIN
          , hpt_polling_enabled
          , hpt_polling_ftp_type_id
          , hpt_area_type
-     INTO pi_process_type_rec;
-
-
+      INTO pi_process_type_rec.hpt_process_type_id
+         , pi_process_type_rec.hpt_name
+         , pi_process_type_rec.hpt_descr
+         , pi_process_type_rec.hpt_what_to_call
+         , pi_process_type_rec.hpt_initiation_module
+         , pi_process_type_rec.hpt_internal_module
+         , pi_process_type_rec.hpt_internal_module_param
+         , pi_process_type_rec.hpt_process_limit
+         , pi_process_type_rec.hpt_restartable
+         , pi_process_type_rec.hpt_see_in_hig2510 
+         , pi_process_type_rec.hpt_polling_enabled
+         , pi_process_type_rec.hpt_polling_ftp_type_id
+         , pi_process_type_rec.hpt_area_type
+         ;
+--
 END insert_process_type;
 --
 -----------------------------------------------------------------------------
@@ -188,7 +200,10 @@ BEGIN
          , hsfr_meaning
          , hsfr_frequency
          , hsfr_interval_in_mins
-     INTO pi_frequency_rec;
+     INTO  pi_frequency_rec.hsfr_frequency_id
+         , pi_frequency_rec.hsfr_meaning
+         , pi_frequency_rec.hsfr_frequency
+         , pi_frequency_rec.hsfr_interval_in_mins;
 
 
 END insert_scheduling_frequency;
@@ -253,11 +268,16 @@ BEGIN
 
  l_rowid := lock_scheduling_frequency(pi_frequency_id => pi_frequency_id);
 
- UPDATE hig_scheduling_frequencies SET row = pi_frequency_rec WHERE rowid = l_rowid RETURNING hsfr_frequency_id
-                                                                                            , hsfr_meaning
-                                                                                            , hsfr_frequency
-                                                                                            , hsfr_interval_in_mins
-                                                                                    INTO pi_frequency_rec;
+ UPDATE hig_scheduling_frequencies 
+    SET row = pi_frequency_rec 
+  WHERE rowid = l_rowid RETURNING hsfr_frequency_id
+                                , hsfr_meaning
+                                , hsfr_frequency
+                                , hsfr_interval_in_mins
+                             INTO pi_frequency_rec.hsfr_frequency_id
+                                , pi_frequency_rec.hsfr_meaning
+                                , pi_frequency_rec.hsfr_frequency
+                                , pi_frequency_rec.hsfr_interval_in_mins;
 
 END update_scheduling_frequency;
 --
