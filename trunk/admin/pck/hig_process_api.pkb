@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.17   Feb 16 2011 15:58:56   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.18   Feb 18 2011 11:44:14   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Feb 16 2011 15:58:56  $
---       Date fetched Out : $Modtime:   Feb 16 2011 15:48:00  $
---       Version          : $Revision:   3.17  $
+--       Date into PVCS   : $Date:   Feb 18 2011 11:44:14  $
+--       Date fetched Out : $Modtime:   Feb 18 2011 11:42:50  $
+--       Version          : $Revision:   3.18  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.17  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.18  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -1457,9 +1457,11 @@ FUNCTION do_polling_if_requested(pi_file_type_name          IN hig_process_type_
            WHEN others THEN
               l_error     := SUBSTR(SQLERRM,1,2000);
               l_subscript := nm3ftp.g_tab_ftp_outcome.COUNT+1;
-
-              nm3ftp.g_tab_ftp_outcome(l_subscript).ftp_outcome := l_error;
+              --
+              nm3ftp.g_tab_ftp_outcome.EXTEND;
               nm3ftp.g_tab_ftp_outcome(l_subscript).ftp_outcome:= 'FAIL';
+              nm3ftp.g_tab_ftp_outcome(l_subscript).ftp_outcome_error := l_error;
+              --
           END;
           -- TASk 0110084
           -- If any error is raised in the FTP procesing the Process outcome will be set to FAIl and error will be logged.
@@ -1468,7 +1470,6 @@ FUNCTION do_polling_if_requested(pi_file_type_name          IN hig_process_type_
               IF nm3ftp.g_tab_ftp_outcome(i).ftp_outcome = 'FAIL'
               THEN
                   g_ftp_error := TRUE ; 
-                  hig_process_api.log_it(pi_message    => 'Failed to move the data files due to the following error in FTP processing : ');
                   hig_process_api.log_it(pi_process_id => hig_process_api.get_current_process_id
                                         ,pi_message    => 'Failed to move the data files due to the following error in FTP processing : '||nm3ftp.g_tab_ftp_outcome(i).ftp_outcome_error
                                         ,pi_message_type => 'E'
