@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/0110688_SDORESEQ_Option.sql-arc   3.2   Feb 18 2011 11:56:52   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/0110688_SDORESEQ_Option.sql-arc   3.3   Feb 18 2011 11:57:50   Ade.Edwards  $
 --       Module Name      : $Workfile:   0110688_SDORESEQ_Option.sql  $
---       Date into PVCS   : $Date:   Feb 18 2011 11:56:52  $
---       Date fetched Out : $Modtime:   Feb 18 2011 11:56:34  $
---       PVCS Version     : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Feb 18 2011 11:57:50  $
+--       Date fetched Out : $Modtime:   Feb 18 2011 11:57:50  $
+--       PVCS Version     : $Revision:   3.3  $
 --
 --------------------------------------------------------------------------------
 --
@@ -54,7 +54,7 @@ SELECT 'SDORESEQ'
   FROM dual
   WHERE NOT EXISTS (SELECT 'X' 
                      FROM hig_option_list
-                    WHERE HOL_ID = 'USEHISTRSQ')
+                    WHERE HOL_ID = 'SDORESEQ')
 /
 
 INSERT INTO hig_option_values ( hov_id
