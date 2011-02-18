@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/0110688_SDORESEQ_Option.sql-arc   3.1   Feb 09 2011 10:29:54   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/0110688_SDORESEQ_Option.sql-arc   3.2   Feb 18 2011 11:56:52   Ade.Edwards  $
 --       Module Name      : $Workfile:   0110688_SDORESEQ_Option.sql  $
---       Date into PVCS   : $Date:   Feb 09 2011 10:29:54  $
---       Date fetched Out : $Modtime:   Feb 09 2011 10:29:06  $
---       PVCS Version     : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Feb 18 2011 11:56:52  $
+--       Date fetched Out : $Modtime:   Feb 18 2011 11:56:34  $
+--       PVCS Version     : $Revision:   3.2  $
 --
 --------------------------------------------------------------------------------
 --
@@ -40,8 +40,8 @@ INSERT INTO hig_option_list (hol_id
                             ,hol_domain
                             ,hol_datatype     
                             ,hol_mixed_case   
-                            ,hol_user_option  
-                            ,hol_max_length)
+                            ,hol_user_option  )
+                           -- ,hol_max_length)
 SELECT 'SDORESEQ'
      , 'HIG'
      , 'Shape options on resequence'
@@ -49,8 +49,8 @@ SELECT 'SDORESEQ'
      , 'SDORESEQ'
      , 'VARCHAR2'
      , 'N'
-     , 'N'
-     , '1'
+     , 'N')
+--     , '1'
   FROM dual
   WHERE NOT EXISTS (SELECT 'X' 
                      FROM hig_option_list
