@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.19   Feb 09 2011 14:41:50   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.20   Feb 18 2011 11:11:40   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Feb 09 2011 14:41:50  $
---       Date fetched Out : $Modtime:   Feb 09 2011 14:14:06  $
---       PVCS Version     : $Revision:   3.19  $
+--       Date into PVCS   : $Date:   Feb 18 2011 11:11:40  $
+--       Date fetched Out : $Modtime:   Feb 18 2011 11:09:18  $
+--       PVCS Version     : $Revision:   3.20  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.19  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.20  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -1622,7 +1622,7 @@ END;
       THEN
       utl_tcp.close_all_connections;
       --
-        add_ftp_outcome( p_ftp_htc_id        => 'NA'
+        add_ftp_outcome( p_ftp_htc_id        => -1
                        , p_ftp_type          => 'GENERAL'
                        , p_ftp_filename      => 'NA'
                        , p_ftp_outcome       => g_fail
