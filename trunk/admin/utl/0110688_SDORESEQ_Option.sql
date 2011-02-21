@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/0110688_SDORESEQ_Option.sql-arc   3.3   Feb 18 2011 11:57:50   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/0110688_SDORESEQ_Option.sql-arc   3.4   Feb 21 2011 08:31:14   Ade.Edwards  $
 --       Module Name      : $Workfile:   0110688_SDORESEQ_Option.sql  $
---       Date into PVCS   : $Date:   Feb 18 2011 11:57:50  $
---       Date fetched Out : $Modtime:   Feb 18 2011 11:57:50  $
---       PVCS Version     : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Feb 21 2011 08:31:14  $
+--       Date fetched Out : $Modtime:   Feb 21 2011 08:31:14  $
+--       PVCS Version     : $Revision:   3.4  $
 --
 --------------------------------------------------------------------------------
 --
@@ -49,7 +49,7 @@ SELECT 'SDORESEQ'
      , 'SDORESEQ'
      , 'VARCHAR2'
      , 'N'
-     , 'N')
+     , 'N'
 --     , '1'
   FROM dual
   WHERE NOT EXISTS (SELECT 'X' 
