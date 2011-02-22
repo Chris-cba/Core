@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.30   Feb 22 2011 14:50:24   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.31   Feb 22 2011 14:59:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Feb 22 2011 14:50:24  $
---       Date fetched Out : $Modtime:   Feb 22 2011 14:49:24  $
---       PVCS Version     : $Revision:   2.30  $
+--       Date into PVCS   : $Date:   Feb 22 2011 14:59:34  $
+--       Date fetched Out : $Modtime:   Feb 22 2011 14:58:50  $
+--       PVCS Version     : $Revision:   2.31  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Fri Sep 17  12:47:39 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Tue Feb 22  14:57:25 2011 by Server Generator 10.1.2.9.28
   
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -2734,12 +2734,6 @@ ALTER TABLE NM_TYPES
 
 PROMPT Creating Unique Key on 'NM_TYPE_INCLUSION'
 ALTER TABLE NM_TYPE_INCLUSION
-
-
-
-
-
-
  ADD (CONSTRAINT NTI_UK UNIQUE 
   (NTI_NW_CHILD_TYPE
   ,NTI_CHILD_COLUMN))
@@ -6888,3 +6882,5 @@ ALTER TABLE NM_X_VAL_CONDITIONS ADD (CONSTRAINT
   (NXV_RULE_ID) REFERENCES NM_X_RULES
   (NXR_RULE_ID))
 /
+
+
