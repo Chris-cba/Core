@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/2_719412_Data_Repair.sql-arc   3.0   Jan 27 2011 09:25:58   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/utl/2_719412_Data_Repair.sql-arc   3.1   Feb 22 2011 13:40:08   Ade.Edwards  $
 --       Module Name      : $Workfile:   2_719412_Data_Repair.sql  $
---       Date into PVCS   : $Date:   Jan 27 2011 09:25:58  $
---       Date fetched Out : $Modtime:   Jan 12 2011 14:31:18  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Feb 22 2011 13:40:08  $
+--       Date fetched Out : $Modtime:   Feb 22 2011 13:37:24  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --
@@ -15,7 +15,7 @@ Prompt Run Data Report .....
 
 SET SERVEROUTPUT ON FORMAT WRAPPED 
 SET PAGES 0
-SET LINES 32767
+SET LINES 2000
 
 DECLARE
 --
@@ -154,9 +154,10 @@ where nm_ne_id_in in (select iit_ne_id from nm_inv_items_all_719412);
 alter table nm_inv_items_all disable all triggers;
 
 UPDATE nm_inv_items_all
-   SET iit_start_date = (SELECT a.ne_start_date FROM nm_elements a, nw_nw_ad_link_all_719412
-                          WHERE iit_ne_id = nad_iit_ne_id
-                            AND nad_ne_id = ne_id);
+   SET iit_start_date = (SELECT a.ne_start_date FROM nm_elements_all a, nw_nw_ad_link_all_719412
+                          WHERE nad_ne_id = ne_id
+                            AND iit_ne_id = nad_iit_ne_id)
+ WHERE iit_ne_id IN (SELECT nad_iit_ne_id FROM nw_nw_ad_link_all_719412);
 
 alter table nm_inv_items_all enable all triggers;
 
@@ -166,10 +167,13 @@ alter table nm_inv_items_all enable all triggers;
 
 alter table nm_nw_ad_link_all disable all triggers;
 
-UPDATE nm_nw_ad_link_all a
-   SET nad_start_date = (SELECT a.iit_start_date FROM nm_inv_items_all a, nm_inv_items_all_719412 b
-                          WHERE a.iit_ne_id = nad_iit_ne_id
-                            AND a.iit_ne_id = b.iit_ne_id);
+UPDATE nm_nw_ad_link_all z
+   SET z.nad_start_date = (SELECT a.iit_start_date FROM nm_inv_items_all a
+                            WHERE z.nad_iit_ne_id = a.iit_ne_id)
+ WHERE EXISTS
+   (SELECT 1 FROM nw_nw_ad_link_all_719412 b
+     WHERE b.nad_iit_ne_id = z.nad_iit_ne_id
+       AND b.nad_start_date = z.nad_start_Date );
 
 alter table nm_nw_ad_link_all enable all triggers;
 
@@ -183,7 +187,7 @@ PROMPT Re-run report .....
 
 SET SERVEROUTPUT ON FORMAT WRAPPED 
 SET PAGES 0
-SET LINES 32767
+SET LINES 2000
 
 DECLARE
 --
