@@ -1,22 +1,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.34   Sep 17 2010 13:52:14   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.35   Feb 22 2011 15:04:32   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Sep 17 2010 13:52:14  $
---       Date fetched Out : $Modtime:   Sep 17 2010 13:51:16  $
---       PVCS Version     : $Revision:   2.34  $
+--       Date into PVCS   : $Date:   Feb 22 2011 15:04:32  $
+--       Date fetched Out : $Modtime:   Feb 22 2011 15:03:46  $
+--       PVCS Version     : $Revision:   2.35  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Tue Jun 29  23:16:33 2010 by Server Generator 10.1.2.9.28
-
-
-
--- Generated for Oracle 10g on Fri Sep 17  12:47:36 2010 by Server Generator 10.1.2.9.28
- 
-
-
 PROMPT Creating Table 'ANALYSE_ALL_TABS_LOG'
 CREATE TABLE ANALYSE_ALL_TABS_LOG
  (ID NUMBER NOT NULL
@@ -76,7 +68,7 @@ CREATE TABLE DOCS
  ,DOC_COMPL_TARGET DATE
  ,DOC_COMPL_COMPLETE DATE
  ,DOC_COMPL_REFERRED_TO VARCHAR2(30)
- ,DOC_COMPL_LOCATION VARCHAR2(254)
+ ,DOC_COMPL_LOCATION VARCHAR2(1000)
  ,DOC_COMPL_REMARKS VARCHAR2(254)
  ,DOC_COMPL_NORTH NUMBER
  ,DOC_COMPL_EAST NUMBER
@@ -4004,6 +3996,9 @@ CREATE GLOBAL TEMPORARY TABLE NM0575_MATCHING_RECORDS
  ,ASSET_TYPE VARCHAR2(4)
  ,ASSET_TYPE_DESCR VARCHAR2(80)
  ,ASSET_COUNT NUMBER
+ ,ASSET_CONTIGUOUS VARCHAR2(1)
+ ,ASSET_PARTIALLY_ENCLOSED NUMBER
+ ,ASSET_WHOLLY_ENCLOSED NUMBER
  )
 /
 
@@ -4114,7 +4109,7 @@ CREATE GLOBAL TEMPORARY TABLE NM_ASSETS_ON_ROUTE
  ,NAR_ROUTE_SEQ_NO NUMBER
  ,NAR_ROUTE_SEG_NO NUMBER
  ,NAR_ELEMENT_NE_ID NUMBER
- ,NAR_ELEMENT_DESCR VARCHAR2(80)
+ ,NAR_ELEMENT_DESCR VARCHAR2(240)
  ,NAR_ELEMENT_UNIQUE VARCHAR2(30)
  ,NAR_ASSET_NE_ID NUMBER
  ,NAR_ASSET_BEGIN_MP NUMBER
@@ -9734,7 +9729,7 @@ CREATE GLOBAL TEMPORARY TABLE NM_REVERSAL
  ,NE_UNIQUE VARCHAR2(30) NOT NULL
  ,NE_TYPE VARCHAR2(4) NOT NULL
  ,NE_NT_TYPE VARCHAR2(4) NOT NULL
- ,NE_DESCR VARCHAR2(80) NOT NULL
+ ,NE_DESCR VARCHAR2(240) NOT NULL
  ,NE_LENGTH NUMBER
  ,NE_ADMIN_UNIT NUMBER(9) NOT NULL
  ,NE_OWNER VARCHAR2(4)
@@ -10759,4 +10754,3 @@ CREATE TABLE REPORT_TAGS
 
 COMMENT ON TABLE REPORT_TAGS IS 'Interface table which allows reports to be driven from a GIS or a front-end form.'
 /
-
