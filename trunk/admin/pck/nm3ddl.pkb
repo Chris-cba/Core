@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.17   Nov 30 2010 15:25:56   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ddl.pkb-arc   2.18   Feb 22 2011 14:38:38   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3ddl.pkb  $
---       Date into PVCS   : $Date:   Nov 30 2010 15:25:56  $
---       Date fetched Out : $Modtime:   Nov 30 2010 15:19:22  $
---       PVCS Version     : $Revision:   2.17  $
+--       Date into PVCS   : $Date:   Feb 22 2011 14:38:38  $
+--       Date fetched Out : $Modtime:   Feb 22 2011 14:38:08  $
+--       PVCS Version     : $Revision:   2.18  $
 --       Based on SCCS Version     : 1.5
 --
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3ddl AS
 --
 --all global package variables here
 --
-   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.17  $"';
+   g_body_sccsid     constant varchar2(30) :='"$Revision:   2.18  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3ddl';
@@ -811,6 +811,23 @@ PROCEDURE change_user_password(pi_user       IN VARCHAR2
                               ) IS
 BEGIN
   exec_ddl('ALTER USER ' || pi_user || ' IDENTIFIED BY "' || pi_new_passwd||'"');
+  --
+  -- Task 0110737
+  -- Create mcp password metadata
+  --
+  IF hig.is_product_licensed('MCP')
+  THEN
+    BEGIN
+      EXECUTE IMMEDIATE
+        'BEGIN '||
+        '  nm3mcp_sde.STORE_PASSWORD(:pi_username, :pi_password); '||
+        'END;'
+      USING IN pi_user, IN pi_new_passwd;
+    EXCEPTION
+      WHEN OTHERS THEN NULL;
+    END;
+  END IF;
+--
 END;
 --
 -----------------------------------------------------------------------------
@@ -1671,7 +1688,7 @@ BEGIN
         'BEGIN '||
         '  nm3mcp_sde.STORE_PASSWORD(:pi_username, :pi_password); '||
         'END;'
-      USING IN upper(p_rec_hus.hus_username), IN p_password;
+      USING IN p_rec_hus.hus_username, IN p_password;
     EXCEPTION
       WHEN OTHERS THEN NULL;
     END;
