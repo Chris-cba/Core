@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.20   Feb 18 2011 11:11:40   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.21   Feb 22 2011 09:51:46   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Feb 18 2011 11:11:40  $
---       Date fetched Out : $Modtime:   Feb 18 2011 11:09:18  $
---       PVCS Version     : $Revision:   3.20  $
+--       Date into PVCS   : $Date:   Feb 22 2011 09:51:46  $
+--       Date fetched Out : $Modtime:   Feb 22 2011 09:51:00  $
+--       PVCS Version     : $Revision:   3.21  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.20  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.21  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -255,6 +255,9 @@ END add_ftp_outcome;
    AS
    BEGIN
       send_command (p_conn, 'QUIT', p_reply);
+      -- Task 0110724
+      -- Add close connection command to tidyup
+      utl_tcp.close_connection(p_conn);
    END;
 --
 --------------------------------------------------------------------------------
