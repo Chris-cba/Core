@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.1   Feb 03 2011 08:25:14   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.2   Feb 22 2011 15:16:06   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4300_nm4400_upg.sql  $
---       Date into PVCS   : $Date:   Feb 03 2011 08:25:14  $
---       Date fetched Out : $Modtime:   Feb 03 2011 08:25:00  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Feb 22 2011 15:16:06  $
+--       Date fetched Out : $Modtime:   Feb 22 2011 15:15:42  $
+--       Version          : $Revision:   3.2  $
 --
 --   Product upgrade script
 --
@@ -43,7 +43,8 @@ WHENEVER SQLERROR EXIT
 begin
    hig2.pre_upgrade_check (p_product               => 'HIG'
                           ,p_new_version           => '4.4.0.0'
-                          ,p_allowed_old_version_1 => '4.3.0.0'
+                          ,p_allowed_old_version_1 => '4.3.0.1'
+                          ,p_allowed_old_version_2 => '4.3.0.0' 
                           );
 END;
 /
