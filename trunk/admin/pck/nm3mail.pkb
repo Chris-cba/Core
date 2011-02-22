@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.8   Feb 03 2011 08:45:56   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.9   Feb 22 2011 09:58:04   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Feb 03 2011 08:45:56  $
---       Date fetched Out : $Modtime:   Feb 02 2011 11:45:40  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Feb 22 2011 09:58:04  $
+--       Date fetched Out : $Modtime:   Feb 22 2011 09:54:04  $
+--       Version          : $Revision:   2.9  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.8  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.9  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -126,7 +126,11 @@ BEGIN
 --
 EXCEPTION
   WHEN ex_acl_failure
-  THEN hig.raise_ner(nm3type.c_hig,551);
+  THEN utl_smtp.quit(g_mail_conn);
+       hig.raise_ner(nm3type.c_hig,551);
+  WHEN OTHERS
+  THEN utl_smtp.quit(g_mail_conn);
+       RAISE;
 END send_stored_mail;
 --
 -----------------------------------------------------------------------------
@@ -1263,12 +1267,14 @@ EXCEPTION
   WHEN ex_acl_failure
   THEN
     po_error_text := hig.get_ner(nm3type.c_hig,551).ner_descr;
+    utl_smtp.quit(g_mail_conn);
     --hig.raise_ner(nm3type.c_hig,551);
     RETURN  FALSE;
 
   WHEN utl_smtp.transient_error OR utl_smtp.permanent_error 
   THEN           
       po_error_text := sqlerrm; --'SMTP server is down or unavailable';
+      utl_smtp.quit(g_mail_conn);
       RETURN  FALSE;
 
   WHEN OTHERS 
@@ -1277,10 +1283,12 @@ EXCEPTION
       BEGIN
       --
          utl_smtp.close_data(g_mail_conn); 
+         utl_smtp.quit(g_mail_conn);
       --
       EXCEPTION
           WHEN OTHERS 
           THEN
+              utl_smtp.quit(g_mail_conn);
               NULL;
       END ;
       RETURN  FALSE;
