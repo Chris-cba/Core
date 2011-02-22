@@ -5,11 +5,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/add_policy.sql-arc   2.1   Dec 08 2008 12:15:58   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/add_policy.sql-arc   2.2   Feb 22 2011 09:19:54   Rob.Coupe  $
 --       Module Name      : $Workfile:   add_policy.sql  $
---       Date into SCCS   : $Date:   Dec 08 2008 12:15:58  $
---       Date fetched Out : $Modtime:   Dec 08 2008 12:15:02  $
---       SCCS Version     : $Revision:   2.1  $
+--       Date into SCCS   : $Date:   Feb 22 2011 09:19:54  $
+--       Date fetched Out : $Modtime:   Feb 22 2011 09:18:18  $
+--       SCCS Version     : $Revision:   2.2  $
 --       Based on SCCS Version     : 1.11
 --
 --   Create Inventory/Merge security policies
@@ -144,10 +144,13 @@ BEGIN
               ,p_statement_types => 'SELECT,INSERT,UPDATE,DELETE'
               );
 --
+--ecdm log 729856 - merge query has a conditional, multi-table insert statement which is an unsupported feature of the fgac. Disable insert predicate.
+--
    add_policy (p_policy_name     => 'MRG_SECTION_INV_VALUES_POLICY'
               ,p_object_name     => 'NM_MRG_SECTION_INV_VALUES_ALL'
               ,p_policy_function => 'nm3mrg_security.mrg_nsv_predicate'
-              ,p_statement_types => 'SELECT,INSERT,UPDATE,DELETE'
+--            ,p_statement_types => 'SELECT,INSERT,UPDATE,DELETE'
+              ,p_statement_types => 'SELECT,UPDATE,DELETE'
               );
 --
    add_policy (p_policy_name     => 'MRG_DEFAULTS_POLICY'
