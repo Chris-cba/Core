@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkb-arc   3.0   Feb 08 2011 16:37:48   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkb-arc   3.1   Feb 23 2011 11:08:48   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3acl.pkb  $
---       Date into PVCS   : $Date:   Feb 08 2011 16:37:48  $
---       Date fetched Out : $Modtime:   Feb 02 2011 15:59:48  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Feb 23 2011 11:08:48  $
+--       Date fetched Out : $Modtime:   Feb 23 2011 11:07:54  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -24,14 +24,14 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid        CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+  g_body_sccsid        CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
   g_package_name       CONSTANT varchar2(30) := 'nm3acl';
 --
   c_ftp_role           CONSTANT VARCHAR2(30) := 'FTP_USER';
   c_email_role         CONSTANT VARCHAR2(30) := 'EMAIL_USER';
 --
-  c_ftp_acl            CONSTANT VARCHAR2(30) := 'EXOR_FTP.xml';
-  c_email_acl          CONSTANT VARCHAR2(30) := 'EXOR_EMAIL.xml';
+  c_ftp_acl            CONSTANT VARCHAR2(30) := 'EXOR_'||hig.get_application_owner||'_FTP.xml';
+  c_email_acl          CONSTANT VARCHAR2(30) := 'EXOR_'||hig.get_application_owner||'_EMAIL.xml';
 --
 --ORA-31003
   ex_acl_already_exists         EXCEPTION;
@@ -163,9 +163,9 @@ BEGIN
 --
   nm_debug.proc_end(g_package_name,'create_acl');
 --
-EXCEPTION
-  WHEN ex_acl_already_exists --ORA-31003
-    THEN RAISE_APPLICATION_ERROR(-20101,'ACL ['||l_acl_name||'] already exists');
+--EXCEPTION
+--  WHEN ex_acl_already_exists --ORA-31003
+--    THEN RAISE_APPLICATION_ERROR(-20101,'ACL ['||l_acl_name||'] already exists');
 END create_acl;
 --
 -----------------------------------------------------------------------------
@@ -234,9 +234,9 @@ BEGIN
 --
   nm_debug.proc_end(g_package_name,'add_privilege');
 --
-EXCEPTION
-  WHEN ex_priv_already_exists --ORA-19279
-    THEN RAISE_APPLICATION_ERROR(-20102,'Privilege ['||pi_privilege||'] has already been granted to ACL ['||pi_acl_name||']');
+--EXCEPTION
+--  WHEN ex_priv_already_exists --ORA-19279
+--    THEN RAISE_APPLICATION_ERROR(-20102,'Privilege ['||pi_privilege||'] has already been granted to ACL ['||pi_acl_name||']');
 --
 END add_privilege;
 
