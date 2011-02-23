@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.10.1.1   Dec 15 2010 16:49:04   Linesh.Sorathia  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.10.1.2   Feb 23 2011 16:56:38   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Dec 15 2010 16:49:04  $
---       Date fetched Out : $Modtime:   Dec 15 2010 16:08:48  $
---       PVCS Version     : $Revision:   3.10.1.1  $
+--       Date into PVCS   : $Date:   Feb 23 2011 16:56:38  $
+--       Date fetched Out : $Modtime:   Feb 23 2011 16:55:40  $
+--       PVCS Version     : $Revision:   3.10.1.2  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.10.1.1  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.10.1.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -218,6 +218,7 @@ AS
    AS
    BEGIN
       send_command (p_conn, 'QUIT', p_reply);
+      utl_tcp.close_connection(p_conn);
    END;
 --
 --------------------------------------------------------------------------------
