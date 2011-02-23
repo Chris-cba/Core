@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.8   Feb 03 2011 08:48:26   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.9   Feb 23 2011 11:59:24   Chris.Strettle  $
 --       Module Name      : $Workfile:   higroles.sql  $
---       Date into PVCS   : $Date:   Feb 03 2011 08:48:26  $
---       Date fetched Out : $Modtime:   Feb 02 2011 10:06:26  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Feb 23 2011 11:59:24  $
+--       Date fetched Out : $Modtime:   Feb 23 2011 11:55:22  $
+--       Version          : $Revision:   2.9  $
 --
 -------------------------------------------------------------------------
 --  Copyright (c) exor corporation ltd, 2009
@@ -603,6 +603,7 @@ BEGIN
   END;
   EXECUTE IMMEDIATE 'GRANT CREATE ANY JOB TO PROCESS_ADMIN';
   EXECUTE IMMEDIATE 'GRANT CREATE EXTERNAL JOB TO PROCESS_ADMIN';
+  EXECUTE IMMEDIATE 'GRANT MANAGE SCHEDULER TO PROCESS_ADMIN';
   EXECUTE IMMEDIATE 'GRANT PROCESS_ADMIN to '||USER;
   EXECUTE IMMEDIATE 'GRANT PROCESS_ADMIN to '||USER||' WITH ADMIN OPTION';
 EXCEPTION
