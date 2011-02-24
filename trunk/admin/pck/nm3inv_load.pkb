@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv_Load AS
 --
 --   SCCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.5   Jan 21 2010 16:14:42   rcoupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.6   Feb 24 2011 16:09:40   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3inv_load.pkb  $
---       Date into PVCS   : $Date:   Jan 21 2010 16:14:42  $
---       Date fetched Out : $Modtime:   Jan 21 2010 16:13:14  $
---       PVCS Version     : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Feb 24 2011 16:09:40  $
+--       Date fetched Out : $Modtime:   Feb 24 2011 16:08:46  $
+--       PVCS Version     : $Revision:   2.6  $
 --
 --   Author : Jonathan Mills
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv_Load AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.5  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3inv_load';
@@ -1059,17 +1059,29 @@ PROCEDURE process_line_data
     RETURN l_retval;
   END get_tab_select_cols;
 --
+  FUNCTION get_lat_long ( pi_file_id IN number
+                        , pi_column  IN VARCHAR )
+    RETURN VARCHAR2
+  IS
+    retval VARCHAR2(100);
+  BEGIN
+    select substr(nlcd_source_col,(instr(nlcd_source_col,'.')+1),length(nlcd_source_col))
+    into   retval
+    from   NM_LOAD_FILE_COL_DESTINATIONS
+    where  nlcd_nlf_id = pi_file_id
+    and    nlcd_dest_col = pi_column;
+    RETURN retval;
+  END get_lat_long;
+--
 -------------------------------------------------------------------------------
 --
 BEGIN
 --
-  l_rec_nlf := nm3get.get_nlf(pi_nlf_unique => pi_load_file_unique||'_'||g_line_data_suffix);
+  l_rec_nlf := nm3get.get_nlf (pi_nlf_unique   => pi_load_file_unique||'_'||g_line_data_suffix);
   l_rec_nlb := nm3load.get_nlb(p_nlb_batch_no => pi_batch_no);
 --
   l_batch_no := nm3seq.next_rtg_job_id_seq;
-
 --
-
   INSERT INTO nm_load_batches(nlb_batch_no
                              ,nlb_nlf_id
                              ,nlb_filename
@@ -1128,7 +1140,9 @@ BEGIN
   l_sql_2 := l_sql_2||'SELECT '||l_batch_no||', ';
   l_sql_2 := l_sql_2 ||get_tab_select_cols(l_holding_table,'a');
   l_sql_2 := substr(l_sql_2,0,length(l_sql_2)-1);
-  l_sql_2 := l_sql_2||'  b.longitude, b.latitude ';
+  l_sql_2 := l_sql_2||' b.'||get_lat_long (l_rec_nlf.nlf_id, 'IIT_X')
+          ||', b.'||get_lat_long (l_rec_nlf.nlf_id, 'IIT_Y');
+  --l_sql_2 := l_sql_2||'  b.longitude, b.latitude ';
   l_sql_2 := l_sql_2||'  FROM '||l_holding_table||' a, '||l_holding_table||' b';
   l_sql_2 := l_sql_2||' WHERE a.'||pi_join_column||' = b.'||pi_join_column;
   l_sql_2 := l_sql_2||'   AND a.'||pi_locate_ref_column||' = ''S''';
