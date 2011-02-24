@@ -5,11 +5,11 @@ CREATE OR REPLACE PACKAGE BODY hig2 IS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/hig2.pkb-arc   2.1   Sep 26 2007 15:18:08   sscanlon  $
+--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/hig2.pkb-arc   2.2   Feb 24 2011 16:58:40   Chris.Strettle  $
 --       Module Name                : $Workfile:   hig2.pkb  $
---       Date into PVCS             : $Date:   Sep 26 2007 15:18:08  $
---       Date fetched Out           : $Modtime:   Sep 26 2007 14:12:24  $
---       PVCS Version               : $Revision:   2.1  $
+--       Date into PVCS             : $Date:   Feb 24 2011 16:58:40  $
+--       Date fetched Out           : $Modtime:   Feb 24 2011 16:55:02  $
+--       PVCS Version               : $Revision:   2.2  $
 --       Based on SCCS version      : 1.4
 --
 --
@@ -40,6 +40,11 @@ BEGIN
 END get_body_version;
 --
 -----------------------------------------------------------------------------
+--
+PROCEDURE open_form_session_check;
+--
+-----------------------------------------------------------------------------
+--
 -- Procedure to keep a log of all installations, upgrades and patches
 -- applied to each product on the system.
 PROCEDURE upgrade
@@ -145,7 +150,36 @@ BEGIN
       RAISE_APPLICATION_ERROR(-20000,'Upgrade of "'||p_product||'" from v'||l_rec_hpr.hpr_version||' to v'||p_new_version||' not allowed');
    END IF;
 --
+   IF NOT hig_process_framework.disable_check_scheduler_down
+   THEN
+     RAISE_APPLICATION_ERROR(-20000,'Upgrades are not allowed while there are processes running.Please wait for these processes to finish and restart.'); 
+   END IF;
+   --
+   open_form_session_check;
+   --
 END pre_upgrade_check;
+--
+-----------------------------------------------------------------------------
+-- This procedure checks to see if the install should be allowed to continue 
+-----------------------------------------------------------------------------
+--
+PROCEDURE pre_install_check
+IS
+BEGIN
+--
+   IF USER IN ('SYS','SYSTEM')
+    THEN
+      RAISE_APPLICATION_ERROR(-20000,'You cannot install Highways by exor as ' || USER);
+   END IF;
+--
+   IF NOT hig_process_framework.disable_check_scheduler_down
+   THEN
+      RAISE_APPLICATION_ERROR(-20000,'Install is not allowed while there are processes running.Please wait for these processes to finish and restart.');
+   END IF;
+   
+   open_form_session_check;
+--
+END pre_install_check;
 --
 -----------------------------------------------------------------------------
 -- This procedure checks to see if the install should be allowed to continue 
@@ -163,7 +197,7 @@ BEGIN
   l_rec_hpr := nm3get.get_hpr(pi_hpr_product => p_product
                              ,pi_raise_not_found => TRUE);
 
-  -- return true if product found at required version is licensed, else default value remains                                
+  -- return true if product found at required version is licensed, else default value remains
   IF p_version = l_rec_hpr.hpr_version AND l_rec_hpr.hpr_key IS NOT NULL THEN
     l_found := TRUE;
   END IF;       
@@ -190,10 +224,42 @@ BEGIN
 
 EXCEPTION
   WHEN no_data_found THEN
-      RAISE_APPLICATION_ERROR(-20001,'RDBMS version must be  at least '||pi_min_version);   
+      RAISE_APPLICATION_ERROR(-20001,'RDBMS version must be  at least '||pi_min_version);
 
 END oracle_version_check;
 
 
+PROCEDURE open_form_session_check 
+IS
+--
+ l_usernames NM3TYPE.TAB_VARCHAR80;
+ l_usercount NM3TYPE.TAB_VARCHAR80;
+--
+    CURSOR open_sess_cur IS
+    SELECT username, count (*) usercount
+      FROM v$session
+         , hig_users
+     WHERE hus_username = username 
+       AND UPPER(program) = 'FRMWEB.EXE'
+  GROUP BY username;
+--
+BEGIN
+--
+  OPEN open_sess_cur;
+  FETCH open_sess_cur BULK COLLECT INTO l_usernames, l_usercount;
+  CLOSE open_sess_cur;
+  
+  IF l_usernames.COUNT = 1
+  THEN
+    RAISE_APPLICATION_ERROR(-20001, 'The user '|| l_usernames(1) || ' currently has '|| l_usercount(1) ||' forms sessions open. You need to close these to continue.');
+  ELSIF l_usernames.COUNT > 1
+  THEN
+    RAISE_APPLICATION_ERROR(-20001, 'There are '|| l_usernames.count || ' users that have open forms sessions. You need to close these to continue.');
+  END IF;
+--
+END;   
+--
+-----------------------------------------------------------------------------
+--
 END hig2;
 /

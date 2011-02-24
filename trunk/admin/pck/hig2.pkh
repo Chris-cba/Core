@@ -3,11 +3,11 @@ create or replace package hig2 is
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/hig2.pkh-arc   2.1   Sep 26 2007 15:18:20   sscanlon  $
+--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/hig2.pkh-arc   2.2   Feb 24 2011 16:58:40   Chris.Strettle  $
 --       Module Name                : $Workfile:   hig2.pkh  $
---       Date into PVCS             : $Date:   Sep 26 2007 15:18:20  $
---       Date fetched Out           : $Modtime:   Sep 26 2007 14:06:36  $
---       PVCS Version               : $Revision:   2.1  $
+--       Date into PVCS             : $Date:   Feb 24 2011 16:58:40  $
+--       Date fetched Out           : $Modtime:   Feb 24 2011 16:55:30  $
+--       PVCS Version               : $Revision:   2.2  $
 --       Based on SCCS version      : 1.3
 --
 --
@@ -69,6 +69,11 @@ PROCEDURE pre_upgrade_check (p_product               hig_products.hpr_product%TY
 --
 -----------------------------------------------------------------------------
 --<PROC NAME="pre_install_check">
+PROCEDURE pre_install_check;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PROC NAME="--<PROC NAME="pre_install_check">
 -- This procedure checks to see if the install should be allowed to continue
 -- if this product has dependencies on another product.
 -- All products should depend on NM3 / Core.
@@ -76,14 +81,10 @@ PROCEDURE pre_upgrade_check (p_product               hig_products.hpr_product%TY
 PROCEDURE product_exists_at_version (p_product                   hig_products.hpr_product%TYPE
                                     ,p_version                   hig_products.hpr_version%TYPE
                                     );
-
 --</PROC>
 --
 -----------------------------------------------------------------------------
 PROCEDURE oracle_version_check(pi_min_version IN VARCHAR2);
-
-
-
 --
 --<PRAGMA>
    PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
