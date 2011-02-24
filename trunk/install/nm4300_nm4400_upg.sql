@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.2   Feb 22 2011 15:16:06   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.3   Feb 24 2011 16:40:26   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm4300_nm4400_upg.sql  $
---       Date into PVCS   : $Date:   Feb 22 2011 15:16:06  $
---       Date fetched Out : $Modtime:   Feb 22 2011 15:15:42  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Feb 24 2011 16:40:26  $
+--       Date fetched Out : $Modtime:   Feb 24 2011 16:37:14  $
+--       Version          : $Revision:   3.3  $
 --
 --   Product upgrade script
 --
@@ -37,6 +37,36 @@ FROM v$instance;
 SELECT 'Current version of '||hpr_product||' ' ||hpr_version
 FROM hig_products
 WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP');
+--
+----------------------------------------------------------------------------------------------------
+--        **************** RUN HIG2 IN SO NEW PRE UPDATE CHECKS CAN BE MADE   ****************
+--
+WHENEVER SQLERROR EXIT
+
+ DECLARE
+--
+ CURSOR CHECK_DOWN IS
+ (SELECT DISTINCT 'X'
+    FROM hig_processes a, dba_scheduler_jobs b, hig_users c
+   WHERE a.hp_job_name = b.job_name AND b.owner = c.hus_username AND b.state = 'RUNNING');
+--
+   L_DUMMY VARCHAR2(1);
+--
+ BEGIN
+--
+   dbms_scheduler.set_scheduler_attribute('SCHEDULER_DISABLED', 'TRUE');
+--
+   OPEN CHECK_DOWN;
+   FETCH CHECK_DOWN INTO L_DUMMY;
+   CLOSE CHECK_DOWN;
+--
+   IF L_DUMMY = 'X' THEN
+     RAISE_APPLICATION_ERROR(-20000,'Upgrade is not allowed while there are processes running.Please wait for these processes to finish and restart.');
+   END IF;
+--
+END;
+/
+--
 ---------------------------------------------------------------------------------------------------
 --                        ****************   CHECK(S)   *******************
 WHENEVER SQLERROR EXIT
