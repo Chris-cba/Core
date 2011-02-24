@@ -1,0 +1,351 @@
+CREATE OR REPLACE PACKAGE hig_process_framework AUTHID CURRENT_USER 
+AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkh-arc   3.4   Feb 24 2011 16:51:24   Chris.Strettle  $
+--       Module Name      : $Workfile:   hig_process_framework.pkh  $
+--       Date into PVCS   : $Date:   Feb 24 2011 16:51:24  $
+--       Date fetched Out : $Modtime:   Feb 24 2011 16:45:42  $
+--       Version          : $Revision:   3.4  $
+--       Based on SCCS version : 
+-------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
+
+--  
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+-------------------------------------------------
+-- This function returns the current PVCS version
+-------------------------------------------------
+FUNCTION get_version RETURN varchar2;
+--
+---------------------------------------------------------------------
+-- This function returns the current PVCS version of the package body
+---------------------------------------------------------------------
+FUNCTION get_body_version RETURN varchar2;
+
+-----------------------------------------------------------
+-- Called from HIG2500 to create a new process type record.
+-----------------------------------------------------------
+PROCEDURE insert_process_type(pi_process_type_rec IN OUT hig_process_types%ROWTYPE);
+--
+-----------------------------------------------------------------
+-- Called from HIG2500 to update an existing process type record.
+-----------------------------------------------------------------
+PROCEDURE update_process_type(pi_process_type_id  IN hig_process_types.hpt_process_type_id%TYPE
+                             ,pi_process_type_rec IN hig_process_types%ROWTYPE);
+--
+-----------------------------------------------------------------
+-- Called from HIG2500 to delete an existing process type record.
+-----------------------------------------------------------------                  
+PROCEDURE delete_process_type(pi_process_type_id            IN hig_process_types.hpt_process_type_id%TYPE);
+--
+---------------------------------------------------
+-- Called from HIG2530 to create a frequency record
+---------------------------------------------------
+PROCEDURE insert_scheduling_frequency(pi_frequency_rec IN OUT hig_scheduling_frequencies%ROWTYPE);
+--
+-------------------------------------------------------------
+-- Called from HIG2530 to update an existing frequency record
+-------------------------------------------------------------
+PROCEDURE update_scheduling_frequency(pi_frequency_id  IN hig_scheduling_frequencies.hsfr_frequency_id%TYPE
+                                     ,pi_frequency_rec    IN OUT hig_scheduling_frequencies%ROWTYPE);
+
+-------------------------------------------------------------
+-- Called from HIG2530 to delete an existing frequency record
+------------------------------------------------------------- 
+--
+PROCEDURE delete_scheduling_frequency(pi_frequency_id  IN hig_scheduling_frequencies.hsfr_frequency_id%TYPE);
+--
+--------------------------------------------------------------------
+-- Called from HIG2500 to create a new process type frequency record.
+--------------------------------------------------------------------
+PROCEDURE insert_process_type_frequency(pi_process_type_frequency_rec IN hig_process_type_frequencies%ROWTYPE);
+--
+---------------------------------------------------------------------------
+-- Called from HIG2500 to update an existing process type frequency record.
+---------------------------------------------------------------------------
+PROCEDURE update_process_type_frequency(pi_process_type_id            IN hig_process_type_frequencies.hpfr_process_type_id%TYPE
+                                       ,pi_frequency_id               IN hig_process_type_frequencies.hpfr_frequency_id%TYPE
+                                       ,pi_process_type_frequency_rec IN hig_process_type_frequencies%ROWTYPE);
+---------------------------------------------------------------------------
+-- Called from HIG2500 to delete an existing process type frequency record.
+---------------------------------------------------------------------------
+PROCEDURE delete_process_type_frequency(pi_process_type_id            IN hig_process_type_frequencies.hpfr_process_type_id%TYPE
+                                       ,pi_frequency_id               IN hig_process_type_frequencies.hpfr_frequency_id%TYPE);
+----------------------
+-- Called from HIG2500
+----------------------
+PROCEDURE insert_hptc(pi_rec IN hig_process_conns_by_area%ROWTYPE);
+--
+----------------------
+-- Called from HIG2500
+----------------------
+--
+FUNCTION lock_hptc(pi_process_type_id    IN hig_process_conns_by_area.hptc_process_type_id%TYPE
+                  ,pi_ftp_connection_id  IN hig_process_conns_by_area.hptc_ftp_connection_id%TYPE) RETURN rowid;
+--
+----------------------
+-- Called from HIG2500
+----------------------
+PROCEDURE update_hptc(pi_process_type_id    IN hig_process_conns_by_area.hptc_process_type_id%TYPE
+                     ,pi_ftp_connection_id  IN hig_process_conns_by_area.hptc_ftp_connection_id%TYPE
+                     ,pi_rec             IN hig_process_conns_by_area%ROWTYPE);
+--
+----------------------
+-- Called from HIG2500
+----------------------
+PROCEDURE delete_hptc(pi_process_type_id    IN hig_process_conns_by_area.hptc_process_type_id%TYPE
+                     ,pi_ftp_connection_id  IN hig_process_conns_by_area.hptc_ftp_connection_id%TYPE);
+--
+----------------------------------------------------------------------------------
+-- For a given process type ID this function returns the whole process type record
+----------------------------------------------------------------------------------
+FUNCTION get_process_type(pi_process_type_id IN hig_process_types.hpt_process_type_id%TYPE) RETURN hig_process_types%ROWTYPE;
+
+FUNCTION get_process_type(pi_process_type_name IN hig_process_types.hpt_name%TYPE) RETURN hig_process_types%ROWTYPE;
+--
+--------------------------------------------------------------------------------------------------------------------------------
+-- HIG2510-Submit A Process can be called directly from the launchpad/fastpath
+-- or in the guise of another module.
+-- When called as another module, the active_module forms parameter will be used to drive the identification of the process type
+-- which needs to be kicked off.
+--
+-- This function is key to linking module to process type
+--------------------------------------------------------------------------------------------------------------------------------
+FUNCTION get_process_type_from_module(pi_module IN hig_process_types.hpt_initiation_module%TYPE) RETURN hig_process_types%ROWTYPE;
+--
+------------------------------------------------------------------------
+-- For a given process ID this function returns the whole process record
+------------------------------------------------------------------------
+FUNCTION get_process(pi_process_id IN hig_processes.hp_process_id%TYPE) RETURN hig_processes%ROWTYPE;
+--
+------------------------------------------------------------------------------------------------------------------------------------------------
+-- For a given process ID this function returns a row from hig_processes_v - which is a joined view between hig_processes and dba_scheduler_jobs
+------------------------------------------------------------------------------------------------------------------------------------------------
+FUNCTION get_process_and_job(pi_process_id hig_processes.hp_process_id%TYPE) RETURN hig_processes_v%ROWTYPE;
+FUNCTION get_process_and_job(pi_job_name IN hig_processes_v.hp_job_name%TYPE) RETURN hig_processes_v%ROWTYPE;
+--
+-------------------------------------------------------------------------
+-- For a given job name this functon return the dba_scheduler_jobs record
+-------------------------------------------------------------------------
+FUNCTION get_job(pi_job_name IN dba_scheduler_jobs.job_name%TYPE) RETURN dba_scheduler_jobs%ROWTYPE;
+--
+--------------------------------------------------------------
+-- For a given file type get the hig_process_type_files record
+--------------------------------------------------------------
+FUNCTION get_process_type_file(pi_file_type_id IN hig_process_type_files.hptf_file_type_id%TYPE) RETURN hig_process_type_files%ROWTYPE;
+
+FUNCTION get_process_type_file(pi_process_type_id  IN hig_process_type_files.hptf_process_type_id%TYPE
+                              ,pi_file_type_name   IN hig_process_type_files.hptf_name%TYPE) RETURN hig_process_type_files%ROWTYPE;
+--
+------------------------------------------------------------------------
+-- For a given frequency ID return the hig_scheduling_frequencies record
+------------------------------------------------------------------------
+FUNCTION get_frequency(pi_frequency_id IN hig_scheduling_frequencies.hsfr_frequency_id%TYPE) RETURN hig_scheduling_frequencies%ROWTYPE;
+
+---------------------------------------------------------------------------------------------------
+-- Called by HIG2510-Submit a to determine which tabs are enabled/disabled for a given process type 
+---------------------------------------------------------------------------------------------------
+FUNCTION hig2510_enabled_disabled_tabs(pi_process_type_id           IN hig_process_types.hpt_process_type_id%TYPE
+                                      ,pi_user_selects_process_type IN BOOLEAN
+                                      ,pi_polling                   IN BOOLEAN                                      
+                                      ,po_process_type_rec          IN OUT hig_process_types%ROWTYPE) RETURN nm3type.tab_boolean;
+--
+-----------------------------------------------------------------------------------------------
+-- Parse the what to call pl/sql code to ensure it is valid.  Called on submission of a process
+-----------------------------------------------------------------------------------------------
+PROCEDURE parse_what (pi_what_to_call IN VARCHAR2);
+--
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Take the what to call pl/sql block add some standard code to fire before and after it.
+-- The what to call part is itself ran as dynamic sql because if the pl/sql block we is invalid when it is fired
+-- we want to make sure it falls into the exception handling we've wrapped around the call
+--
+--
+-- In the example below - the what to call started out as just 'do_mapcapture_move' - but following the call to begin_end_around_what and wrapper_around_what
+-- what's passed across when  the process is created or amended is the following....
+--
+--        DECLARE
+--          ex_process_execution_end EXCEPTION;
+--          PRAGMA exception_init(ex_process_execution_end,-20099);
+--
+--        BEGIN
+--          hig_process_api.set_current_process_id(pi_process_id => 83);
+--          hig_process_api.process_execution_start;
+--
+--        execute immediate ('BEGIN'||CHR(10)||'do_mapcapture_move;'||CHR(10)||'END;'||CHR(10)||'');
+--
+--          hig_process_api.process_execution_end('Y',null);
+--        EXCEPTION
+--        WHEN ex_process_execution_end THEN
+--          Null;
+--        WHEN others THEN
+--          hig_process_api.log_it('E',nm3flx.parse_error_message(sqlerrm));
+--          hig_process_api.process_execution_end('N',nm3flx.parse_error_message(sqlerrm));
+--        END;
+--
+--        
+--
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+FUNCTION wrapper_around_what(pi_what_to_call     IN VARCHAR2
+                            ,pi_process_id   IN hig_processes.hp_process_id%TYPE
+                            ) RETURN VARCHAR2;
+--
+---------------------------------------------------------------------------------------------------------------------------------
+-- Indicates to the end user when a job would be scheduled if they submitted it to start at the start date with a given frequency
+---------------------------------------------------------------------------------------------------------------------------------
+FUNCTION when_would_job_be_scheduled(pi_frequency         IN hig_scheduling_frequencies.hsfr_frequency%TYPE
+                                    ,pi_start_date        IN  DATE DEFAULT SYSDATE
+                                    ,pi_return_date_after IN  DATE DEFAULT SYSDATE
+                                    ) RETURN DATE;
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+-- Overload of above if driving from frequency id rather than string
+---------------------------------------------------------------------------------------------------------------------------------
+FUNCTION when_would_job_be_scheduled(pi_frequency_id      IN hig_scheduling_frequencies.hsfr_frequency_id%TYPE
+                                    ,pi_start_date        IN  DATE DEFAULT SYSDATE
+                                    ,pi_return_date_after IN  DATE DEFAULT SYSDATE
+                                    ) RETURN DATE;
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- In HIG2520-Process Monitor - when the amend process button is pressed an attempt is made to disable the process job i.e. so that it doesn't try to run whilst being amended
+-- This procedure is then called to check that the process job state is set to 'DISABLED' so the edit can go ahead 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+PROCEDURE check_process_can_be_amended(pi_process_id IN hig_processes.hp_process_id%TYPE);
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+PROCEDURE check_process_is_scheduled(pi_process_id IN hig_processes.hp_process_id%TYPE);
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+FUNCTION process_is_disabled(pi_process_id IN hig_processes.hp_process_id%TYPE) RETURN BOOLEAN;
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+PROCEDURE tab_temp_files_from_file_list;
+---------------------------------------------------------------------------------------
+-- Process jobs with a status of 'SCHEDULED' or 'FAILED' can be ran/re-ran from HIG2520
+---------------------------------------------------------------------------------------
+PROCEDURE check_process_can_run_now(pi_process_id IN hig_processes.hp_process_id%TYPE);
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+PROCEDURE migrate_candidate_process_type(pi_job_name              IN dba_scheduler_jobs.job_name%TYPE
+                                        ,pi_process_type_name     IN hig_process_types.hpt_name%TYPE
+                                        ,pi_description           IN hig_process_types.hpt_descr%TYPE
+                                        ,pi_what_to_call          IN hig_process_types.hpt_what_to_call%TYPE
+                                        ,pi_frequency_id          IN hig_scheduling_frequencies.hsfr_frequency_id%TYPE);
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+PROCEDURE initialise_hfl;
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+PROCEDURE process_type_files_wildcards(pi_process_type_id IN hig_process_types.hpt_process_type_id%TYPE
+                                      ,po_wildcards       OUT nm3type.tab_varchar80 
+                                      ,po_descriptions    OUT nm3type.tab_varchar80
+                                      );
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+FUNCTION get_file_type_from_filename(pi_process_type_id IN hig_process_types.hpt_process_type_id%TYPE
+                                    ,pi_filename        IN VARCHAR2) RETURN hig_process_type_files%ROWTYPE; 
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+FUNCTION strip_filename ( pi_full_path_and_file IN VARCHAR2 ) RETURN VARCHAR2;
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+PROCEDURE write_hfl_blob_to_file(pi_id IN hig2510_file_list.hfl_id%TYPE);
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+PROCEDURE set_hfl_flags(pi_id              IN hig2510_file_list.hfl_id%TYPE
+                       ,pi_read_flag       IN hig2510_file_list.hfl_read_flag%TYPE
+                       ,pi_error_flag      IN hig2510_file_list.hfl_error_flag%TYPE
+                       ,pi_error_text      IN VARCHAR2);
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+FUNCTION log_text_as_clob(pi_process_id            IN hig_process_log.hpl_process_id%TYPE
+                         ,pi_job_run_seq           IN hig_process_log.hpl_job_run_seq%TYPE
+                         ,pi_only_summary_messages IN varchar2) RETURN CLOB;
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+FUNCTION log_text_as_blob(pi_process_id            IN hig_process_log.hpl_process_id%TYPE
+                         ,pi_job_run_seq           IN hig_process_log.hpl_job_run_seq%TYPE
+                         ,pi_only_summary_messages IN varchar2) RETURN BLOB;
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+PROCEDURE write_log_blob_to_temp_table(pi_process_id            IN hig_process_log.hpl_process_id%TYPE
+                                      ,pi_job_run_seq           IN hig_process_log.hpl_job_run_seq%TYPE
+                                      ,pi_only_summary_messages IN varchar2) ;                     
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+FUNCTION process_execution_has_started(pi_process_id     IN hig_process_job_runs.hpjr_process_id%TYPE 
+                                      ,pi_job_run_seq    IN hig_process_job_runs.hpjr_job_run_seq%TYPE) RETURN BOOLEAN;
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+PROCEDURE process_execution_has_started(pi_process_id     IN hig_process_job_runs.hpjr_process_id%TYPE 
+                                       ,pi_job_run_seq    IN hig_process_job_runs.hpjr_job_run_seq%TYPE);
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+FUNCTION get_hpa_rec(pi_area_type IN hig_process_areas.hpa_area_type%TYPE) RETURN hig_process_areas%ROWTYPE;
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+FUNCTION area_meaning_from_id_value(pi_area_type        IN hig_process_areas.hpa_area_type%TYPE
+                                   ,pi_area_id_value    IN varchar2) RETURN varchar2;
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+FUNCTION area_visible_to_user(pi_area_type       IN hig_process_areas.hpa_area_type%TYPE
+                             ,pi_area_id_value   IN VARCHAR2) RETURN VARCHAR2;                                   
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+FUNCTION process_type_area_lov(pi_process_type_id     IN hig_process_types.hpt_process_type_id%TYPE
+                              ,pi_restricted_list     IN varchar2 DEFAULT 'N'
+                              ,pi_include_dummy       IN varchar2 DEFAULT 'N') RETURN VARCHAR2;
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+FUNCTION process_type_polling_area_lov(pi_process_type_id  IN hig_process_types.hpt_process_type_id%TYPE
+                                      ,pi_restricted_list  IN VARCHAR2 DEFAULT 'N'
+                                      ,pi_include_dummy    IN varchar2 DEFAULT 'N') RETURN VARCHAR2;
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+FUNCTION get_scheduler_state 
+RETURN VARCHAR2;
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+FUNCTION disable_check_scheduler_down
+RETURN BOOLEAN;
+END hig_process_framework;
+--
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--
+/
