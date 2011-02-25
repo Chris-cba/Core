@@ -1,0 +1,138 @@
+CREATE OR REPLACE package nm3sql as
+--
+--   PVCS Identifiers :-
+--
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sql.pkh-arc   2.2   Feb 25 2011 10:48:18   Steve.Cooper  $
+--       Module Name      : $Workfile:   nm3sql.pkh  $
+--       Date into PVCS   : $Date:   Feb 25 2011 10:48:18  $
+--       Date fetched Out : $Modtime:   Feb 24 2011 16:26:38  $
+--       PVCS Version     : $Revision:   2.2  $
+--       Based on sccs version : 
+--
+--   Author : Priidu Tanava
+--
+--   package for generic context 'sql' used to pass bind variables into views
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2005
+-----------------------------------------------------------------------------
+--
+  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+  
+  subtype id_type   is number(9);
+  subtype code_type is varchar2(80);
+  
+  type longops_rec is record (
+     rindex      pls_integer  -- system
+    ,slno        pls_integer  -- ststem
+    ,op_name     varchar2(64 byte)
+    ,context     pls_integer
+    ,sofar       number
+    ,totalwork   number
+    ,target_desc  varchar2(32 byte)
+  );
+   
+  
+  function get_version return varchar2;
+  function get_body_version return varchar2;
+    
+  function get_id_tbl return nm_id_tbl;
+  function get_id_tbl(p_id in id_type) return nm_id_tbl;
+  function get_id_tbl(p_cur in sys_refcursor) return nm_id_tbl;
+  function get_dynamic_id_tbl(p_cur in varchar2) return nm_id_tbl;
+  function get_delim_id_tbl(
+     p_string in varchar2
+    ,p_delim in varchar2
+  ) return nm_id_tbl;
+  
+  function get_id_code_tbl return nm_id_code_tbl;
+  function get_id_code_tbl(p_rec in nm_id_code_type) return nm_id_code_tbl;
+  function get_id_code_tbl(p_cur in sys_refcursor) return nm_id_code_tbl;
+  function get_dynamic_id_code_tbl(p_cur in varchar2) return nm_id_code_tbl;
+  
+  
+  
+  procedure load_id_tbl(p_tbl in nm_id_tbl);
+  procedure load_id_tbl(p_cur in sys_refcursor);
+  procedure load_dynamic_id_tbl(p_cur in varchar2);
+  procedure load_delim_id_tbl(
+     p_string in varchar2
+    ,p_delim in varchar2
+  );
+  
+  function get_code_tbl return nm_code_tbl;
+  function get_code_tbl(p_code in code_type) return nm_code_tbl;
+  function get_code_tbl(p_cur in sys_refcursor) return nm_code_tbl;
+  function get_dynamic_code_tbl(p_cur in varchar2) return nm_code_tbl;
+  function get_delim_code_tbl(
+     p_string in varchar2
+    ,p_delim in varchar2
+  ) return nm_code_tbl;
+  
+  procedure load_code_tbl(p_tbl in nm_code_tbl);
+  procedure load_code_tbl(p_cur in sys_refcursor);
+  procedure load_dynamic_code_tbl(p_cur in varchar2);
+  procedure load_delim_code_tbl(
+     p_string in varchar2
+    ,p_delim in varchar2
+  );
+  
+  procedure load_id_code_tbl(p_cur in sys_refcursor);
+  procedure load_id_code_tbl(p_tbl in nm_id_code_tbl);
+  procedure load_dynamic_id_code_tbl(p_cur in varchar2);
+  
+  
+  
+  function get_id_tbl_count return number;
+  function get_code_tbl_count return number;
+  function get_id_code_tbl_count return number;
+  
+  
+  procedure split_id_tbl(
+     p_tbl out nm_id_tbl
+    ,p_string in varchar2
+    ,p_delim in varchar2
+  );
+  --
+  procedure join_id_tbl(
+     p_string out varchar2
+    ,p_tbl in nm_id_tbl
+    ,p_delim in varchar2
+  );
+  --
+  procedure split_code_tbl(
+     p_tbl out nm_code_tbl
+    ,p_string in varchar2
+    ,p_delim in varchar2
+  );
+  --
+  procedure join_code_tbl(
+     p_string out varchar2
+    ,p_tbl in nm_code_tbl
+    ,p_delim in varchar2
+  );
+  
+  procedure join_sys_refcursor(
+     p_string out varchar2
+    ,p_cur in sys_refcursor
+    ,p_delim in varchar2
+  );
+  
+  
+  function get_rounded_cardinality(
+     p_cardinality in integer
+  ) return integer;
+  
+  
+  procedure set_longops(
+     p_rec in out longops_rec
+    ,p_increment in pls_integer
+  );
+  
+  function null_literal(
+     p_data_type in varchar2
+    ,p_format in varchar2 default null
+  ) return varchar2;
+  
+end;
+/
