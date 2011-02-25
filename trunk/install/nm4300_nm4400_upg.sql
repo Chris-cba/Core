@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.3   Feb 24 2011 16:40:26   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.4   Feb 25 2011 17:05:36   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm4300_nm4400_upg.sql  $
---       Date into PVCS   : $Date:   Feb 24 2011 16:40:26  $
---       Date fetched Out : $Modtime:   Feb 24 2011 16:37:14  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Feb 25 2011 17:05:36  $
+--       Date fetched Out : $Modtime:   Feb 25 2011 16:52:46  $
+--       Version          : $Revision:   3.4  $
 --
 --   Product upgrade script
 --
@@ -54,7 +54,15 @@ WHENEVER SQLERROR EXIT
 --
  BEGIN
 --
-   dbms_scheduler.set_scheduler_attribute('SCHEDULER_DISABLED', 'TRUE');
+   DECLARE
+     NO_PRIVS EXCEPTION;
+     PRAGMA EXCEPTION_INIT(NO_PRIVS, -27486);
+   BEGIN
+     dbms_scheduler.set_scheduler_attribute('SCHEDULER_DISABLED', 'TRUE');
+   EXCEPTION
+   WHEN NO_PRIVS THEN
+     NULL;
+   END;
 --
    OPEN CHECK_DOWN;
    FETCH CHECK_DOWN INTO L_DUMMY;
