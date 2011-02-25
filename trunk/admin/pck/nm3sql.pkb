@@ -2,11 +2,11 @@ CREATE OR REPLACE package body nm3sql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sql.pkb-arc   2.2   Sep 14 2007 17:17:24   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sql.pkb-arc   2.3   Feb 25 2011 10:50:32   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sql.pkb  $
---       Date into PVCS   : $Date:   Sep 14 2007 17:17:24  $
---       Date fetched Out : $Modtime:   Sep 14 2007 17:07:34  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Feb 25 2011 10:50:32  $
+--       Date fetched Out : $Modtime:   Feb 25 2011 10:46:28  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on sccs version : 
 --
 --   Author : Priidu Tanava
@@ -22,13 +22,11 @@ CREATE OR REPLACE package body nm3sql as
 */
 
 
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.2  $"';
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.3  $"';
   g_package_name    constant  varchar2(30) := 'nm3sql';
 
   m_date_format constant varchar2(20) := 'DD-MON-YYYY';
   m_debug constant number(1) := 3;
-  
-  MC_NAMESPACE constant varchar2(6) := 'NM_SQL';
   
   mt_id       nm_id_tbl       := new nm_id_tbl();
   mt_code     nm_code_tbl     := new nm_code_tbl();
@@ -52,38 +50,7 @@ CREATE OR REPLACE package body nm3sql as
   begin
      return g_body_sccsid;
   end;
-  
-  
-
-  
-  procedure set_context_value(p_attribute in varchar2, p_value in varchar2)
-  is
-  begin
-    dbms_session.set_context('NM_SQL', p_attribute, p_value);
-  end;
-  
-  
-  
-  procedure debug_sql_context
-  is
-    l_comma varchar2(2);
-    l_put   varchar2(1000);
-  begin
-    
-    for r in (
-      select c.attribute, c.value
-      from session_context c
-      where c.namespace = 'NM_SQL'
-      order by c.attribute
-    )
-    loop
-      l_put := l_put||l_comma||r.attribute||'='||r.value;
-      l_comma := '  ';
-    end loop;
-    nm_debug.debug('Context NM_SQL: '||l_put);
-  end;
-  
-  
+      
   -------------------------------------------------------------------------------------
   -- The table getters
   --  Note that these functions should be turned into pipelined ones
