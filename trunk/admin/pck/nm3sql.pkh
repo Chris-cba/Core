@@ -2,11 +2,11 @@ CREATE OR REPLACE package nm3sql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sql.pkh-arc   2.1   Sep 14 2007 17:17:26   ptanava  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sql.pkh-arc   2.2   Feb 25 2011 10:48:18   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3sql.pkh  $
---       Date into PVCS   : $Date:   Sep 14 2007 17:17:26  $
---       Date fetched Out : $Modtime:   Sep 14 2007 17:05:20  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Feb 25 2011 10:48:18  $
+--       Date fetched Out : $Modtime:   Feb 24 2011 16:26:38  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on sccs version : 
 --
 --   Author : Priidu Tanava
@@ -17,7 +17,7 @@ CREATE OR REPLACE package nm3sql as
 --	Copyright (c) exor corporation ltd, 2005
 -----------------------------------------------------------------------------
 --
-  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+  g_sccsid      CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
   
   subtype id_type   is number(9);
   subtype code_type is varchar2(80);
@@ -35,11 +35,7 @@ CREATE OR REPLACE package nm3sql as
   
   function get_version return varchar2;
   function get_body_version return varchar2;
-  
-  procedure set_context_value(p_attribute in varchar2, p_value in varchar2);
-  procedure debug_sql_context;
-  
-  
+    
   function get_id_tbl return nm_id_tbl;
   function get_id_tbl(p_id in id_type) return nm_id_tbl;
   function get_id_tbl(p_cur in sys_refcursor) return nm_id_tbl;
