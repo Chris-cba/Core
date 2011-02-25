@@ -2,15 +2,15 @@
 --------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/ctx/nm3ctx.sql-arc   2.2   Nov 13 2009 11:20:10   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/ctx/nm3ctx.sql-arc   2.3   Feb 25 2011 09:59:18   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3ctx.sql  $
---       Date into PVCS   : $Date:   Nov 13 2009 11:20:10  $
---       Date fetched Out : $Modtime:   Nov 13 2009 11:17:36  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   Feb 25 2011 09:59:18  $
+--       Date fetched Out : $Modtime:   Feb 25 2011 09:47:56  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 2.0
 --------------------------------------------------------------------
 -- SCCS ID -- Do NOT remove -----
-define sccsid = '$Revision:   2.2  $'
+define sccsid = '$Revision:   2.3  $'
 -------------------------------------------------------------------------
 --	Copyright (c) 1997 exor corporation.
 --
@@ -50,12 +50,6 @@ from dual
 /
 start '&run_file'
 --
-set define on
-select '&exor_base'||'nm3'||'&terminator'||'admin'||
-         '&terminator'||'ctx'||'&terminator'||'nm_sql_context.sql' run_file
-from dual
-/
-start '&run_file'
 --
 -- MRGSEC package not used any more
 --
