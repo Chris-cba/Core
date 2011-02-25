@@ -1,13 +1,24 @@
-CREATE OR REPLACE VIEW V_NM_SQL_CONTEXT
---   PVCS Identifiers :-
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_sql_context.vw-arc   2.0   Sep 19 2007 09:42:26   smarshall  $
---       Module Name      : $Workfile:   v_nm_sql_context.vw  $
---       Date into PVCS   : $Date:   Sep 19 2007 09:42:26  $
---       Date fetched Out : $Modtime:   Sep 19 2007 08:50:22  $
-(ATTRIBUTE, VALUE)
-AS 
-select c.attribute, c.value
---       PVCS Version     : $Revision:   2.0  $
-from session_context c
-where c.namespace = 'NM_SQL'
-order by c.attribute;
+Create Or Replace Force View V_Nm_Sql_Context
+(
+Attribute,
+Value
+)
+As
+Select    --
+          -------------------------------------------------------------------------
+          --   PVCS Identifiers :-
+          --
+          --       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/v_nm_sql_context.vw-arc   2.1   Feb 25 2011 10:59:16   Steve.Cooper  $
+          --       Module Name      : $Workfile:   v_nm_sql_context.vw  $
+          --       Date into PVCS   : $Date:   Feb 25 2011 10:59:16  $
+          --       Date fetched Out : $Modtime:   Feb 25 2011 10:51:54  $
+          --       Version          : $Revision:   2.1  $
+          -------------------------------------------------------------------------
+          -- 
+          sc.Attribute,
+          sc.Value
+From      Session_Context   sc
+Where     sc.Namespace      =   'NM3SQL'
+Order By  sc.Attribute
+/
+
