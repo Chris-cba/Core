@@ -1,0 +1,269 @@
+------------------------------------------------------------------
+-- nm4300_nm4400_ddl_upg.sql
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+
+--
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_ddl_upg.sql-arc   3.0   Feb 28 2011 11:54:24   Mike.Alexander  $
+--       Module Name      : $Workfile:   nm4300_nm4400_ddl_upg.sql  $
+--       Date into PVCS   : $Date:   Feb 28 2011 11:54:24  $
+--       Date fetched Out : $Modtime:   Feb 28 2011 11:54:00  $
+--       Version          : $Revision:   3.0  $
+--
+------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2010
+
+SET ECHO OFF
+SET LINESIZE 120
+SET HEADING OFF
+SET FEEDBACK OFF
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Dropping of incorrect index
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 110412
+-- 
+-- TASK DETAILS
+-- The constraints on the Type Inclusion table have been modified to allow multiple parent inclusion types.
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
+-- Table was incorrectly restricting the user to one entry per parent thing was incorrect.
+-- 
+------------------------------------------------------------------
+DECLARE
+--
+   l_exception  EXCEPTION;
+   PRAGMA EXCEPTION_INIT(l_exception,-02443);
+--
+BEGIN
+--
+EXECUTE IMMEDIATE 'ALTER TABLE NM_TYPE_INCLUSION DROP CONSTRAINT NTI_PARENT_TYPE_UK  DROP INDEX';
+--
+EXCEPTION 
+WHEN l_exception THEN
+    NULL;
+WHEN OTHERS THEN
+    RAISE;
+END;
+/
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Element Descrition field increase
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 107857
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
+-- Increase in field length for element description fields.
+-- 
+------------------------------------------------------------------
+ALTER TABLE nm_assets_on_route MODIFY
+(
+nar_element_descr VARCHAR2(240)
+)
+/
+
+ALTER TABLE nm_reversal MODIFY
+(
+ne_descr VARCHAR2(240)
+)
+/
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT DOCS.DOC_COMPL_LOCATION increase to 1000 chars
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 110415
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (CHRIS BAUGH)
+-- DOCS.DOC_COMPL_LOCATION increased to varchar2(1000)
+-- 
+------------------------------------------------------------------
+alter table docs
+modify
+( doc_compl_location   varchar2(1000)
+)
+/
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New columns for NM0575_MATCHING_RECORDS table
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADE EDWARDS)
+-- New columns for NM0575_MATCHING_RECORDS table
+-- 
+------------------------------------------------------------------
+alter table nm0575_matching_records add asset_wholly_enclosed number;
+
+alter table nm0575_matching_records add asset_partially_enclosed number;
+
+alter table nm0575_matching_records add asset_contiguous varchar2(1);
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Add new Roles for FTP and EMAIL ACL security
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 110486
+-- 
+-- TASK DETAILS
+-- Changes in Oracle 11.2  require that access control lists (ACLs) are defined for any host the database attempts to communicate with via FTP or Email protocols. Highways will now maintain an ACL for both FTP and Email, and access is given to users via two new roles, FTP_USER and EMAIL_USER. During the 4.4 upgrade, all users will be given these roles. The roles can be revoked to control usage of FTP and EMail.
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (ADE EDWARDS)
+-- Add new Roles for FTP and EMAIL ACL security
+-- 
+------------------------------------------------------------------
+-- Task 0110486
+-- FTP and EMAIL user roles for ACL access
+DECLARE
+  role_exists EXCEPTION;
+  PRAGMA EXCEPTION_INIT(role_exists, -1921); 
+BEGIN
+  BEGIN
+    EXECUTE IMMEDIATE 'CREATE ROLE FTP_USER';
+  EXCEPTION
+    WHEN role_exists
+    THEN NULL;
+  END;
+  EXECUTE IMMEDIATE 'GRANT FTP_USER to '||USER;
+  EXECUTE IMMEDIATE 'GRANT FTP_USER to '||USER||' WITH ADMIN OPTION';
+EXCEPTION
+  WHEN role_exists
+  THEN NULL;
+END;
+/
+
+
+DECLARE
+  role_exists EXCEPTION;
+  PRAGMA EXCEPTION_INIT(role_exists, -1921); 
+BEGIN
+  BEGIN
+    EXECUTE IMMEDIATE 'CREATE ROLE EMAIL_USER';
+  EXCEPTION
+    WHEN role_exists
+    THEN NULL;
+  END;
+  EXECUTE IMMEDIATE 'GRANT EMAIL_USER to '||USER;
+  EXECUTE IMMEDIATE 'GRANT EMAIL_USER to '||USER||' WITH ADMIN OPTION';
+EXCEPTION
+  WHEN role_exists
+  THEN NULL;
+END;
+/
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT New grant for PROCESS_ADMIN Role
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 109403
+-- 
+-- TASK DETAILS
+-- Introduced functionalty to allow the Process Framework to be switched off.
+-- 
+-- This is a necessity during product upgrades.
+-- 
+-- A new Form HIG2550 Process Framework Administration has been created. Also additional checks have been added to the Upgrade, Install and Compile All scripts to check for Running Processes before allowing them to run.
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
+-- New grant for PROCESS_ADMIN Role. Added to allow users to use new HIG2550 form without priv errors
+-- 
+------------------------------------------------------------------
+BEGIN
+  EXECUTE IMMEDIATE 'GRANT MANAGE SCHEDULER TO PROCESS_ADMIN';
+  EXECUTE IMMEDIATE 'GRANT MANAGE SCHEDULER TO '||USER||' with admin option';
+END;
+/
+
+BEGIN
+  FOR i IN
+    (SELECT 'GRANT MANAGE SCHEDULER TO '||username l_sql
+       FROM all_users, dba_role_privs, hig_users
+      WHERE grantee = username
+        AND granted_role IN ('PROCESS_ADMIN')
+        AND hus_username = username
+        AND hus_is_hig_owner_flag = 'N')
+  LOOP
+    EXECUTE IMMEDIATE i.l_sql;
+  END LOOP;
+END;
+/
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Remove redundant context
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (STEVEN COOPER)
+-- Remove redundant context as specified in task 110733.
+-- 
+------------------------------------------------------------------
+Declare
+  Context_Not_Exists Exception;
+  Pragma Exception_Init(Context_Not_Exists, -4043); 
+Begin
+  Begin
+    Execute Immediate 'Drop Context NM_SQL';
+  Exception
+    When Context_Not_Exists
+    Then Null;
+  End;
+End;
+/
+------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------
+-- end of script 
+------------------------------------------------------------------
+
