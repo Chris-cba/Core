@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.4   Feb 25 2011 17:05:36   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.5   Feb 28 2011 10:21:26   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm4300_nm4400_upg.sql  $
---       Date into PVCS   : $Date:   Feb 25 2011 17:05:36  $
---       Date fetched Out : $Modtime:   Feb 25 2011 16:52:46  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Feb 28 2011 10:21:26  $
+--       Date fetched Out : $Modtime:   Feb 28 2011 10:17:46  $
+--       Version          : $Revision:   3.5  $
 --
 --   Product upgrade script
 --
@@ -41,6 +41,7 @@ WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP');
 ----------------------------------------------------------------------------------------------------
 --        **************** RUN HIG2 IN SO NEW PRE UPDATE CHECKS CAN BE MADE   ****************
 --
+
 WHENEVER SQLERROR EXIT
 
  DECLARE
@@ -54,6 +55,7 @@ WHENEVER SQLERROR EXIT
 --
  BEGIN
 --
+   EXECUTE IMMEDIATE 'GRANT MANAGE SCHEDULER TO PROCESS_ADMIN';
    DECLARE
      NO_PRIVS EXCEPTION;
      PRAGMA EXCEPTION_INIT(NO_PRIVS, -27486);
