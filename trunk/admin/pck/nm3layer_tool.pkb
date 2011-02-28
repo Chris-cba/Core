@@ -1,20 +1,19 @@
-create or replace
-PACKAGE BODY nm3layer_tool
+CREATE OR REPLACE PACKAGE BODY nm3layer_tool
 AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.24   Dec 22 2010 09:55:32   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.25   Feb 28 2011 11:35:52   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Dec 22 2010 09:55:32  $
---       Date fetched Out : $Modtime:   Dec 21 2010 16:01:32  $
---       Version          : $Revision:   2.24  $
+--       Date into PVCS   : $Date:   Feb 28 2011 11:35:52  $
+--       Date fetched Out : $Modtime:   Feb 28 2011 11:35:28  $
+--       Version          : $Revision:   2.25  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.24  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.25  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -5145,7 +5144,8 @@ IS
 --
 -- Recalculate the USGM for the Theme chosen for refresh 
 --
-  l_rec_usgm mdsys.sdo_geom_metadata_table%ROWTYPE;
+  l_rec_usgm         mdsys.sdo_geom_metadata_table%ROWTYPE;
+  l_empty_diminfo    mdsys.sdo_dim_array;
 BEGIN
 --
   WITH themes
@@ -5155,13 +5155,19 @@ BEGIN
       WHERE nth_theme_id = pi_nth_theme_id)
   SELECT USER
        , nth_feature_table, nth_feature_shape_column
-       , nm3sdo.calculate_table_diminfo(nth_feature_table, nth_feature_shape_column)
+       --, nm3sdo.calculate_table_diminfo(nth_feature_table, nth_feature_shape_column)
+       , l_empty_diminfo
        , a.id
     INTO l_rec_usgm
     FROM themes
        , TABLE (g_metadata) a
    WHERE a.code = nth_feature_table
      AND a.meaning = nth_feature_shape_column;
+--
+-- Defer this so that we can re-use the l_rec_usgm if it fails
+--
+  l_rec_usgm.sdo_diminfo := nm3sdo.calculate_table_diminfo(l_rec_usgm.sdo_table_name
+                                                         , l_rec_usgm.sdo_column_name);
 --
   INSERT INTO mdsys.sdo_geom_metadata_table
     VALUES l_rec_usgm;
@@ -5187,6 +5193,31 @@ EXCEPTION
       VALUES l_rec_usgm;
   --
     g_usgm := l_rec_usgm;
+--
+  WHEN OTHERS
+  THEN
+  --
+  -- Task 0110611
+  -- Attempt to create view nm3sdo.create_layer as this will handle empty tables
+  -- by defaulting to the network extents.
+  --
+    DECLARE
+      l_gtype NUMBER;
+      l_dummy NUMBER;
+    BEGIN
+      l_gtype := nm3get.get_ntg(pi_ntg_theme_id => pi_nth_theme_id).ntg_gtype;
+    --
+      l_dummy:= nm3sdo.create_sdo_layer 
+                   ( pi_table_name  => l_rec_usgm.sdo_table_name
+                   , pi_column_name => l_rec_usgm.sdo_column_name
+                   , pi_gtype       => l_gtype);
+    --
+      SELECT * INTO g_usgm FROM mdsys.sdo_geom_metadata_table
+       WHERE sdo_owner = USER
+         AND sdo_table_name = l_rec_usgm.sdo_table_name
+         AND sdo_column_name = l_rec_usgm.sdo_column_name;
+    END;
+--
 END recalculate_usgm;
 --
 -----------------------------------------------------------------------------
