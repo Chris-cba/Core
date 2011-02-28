@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.7   Feb 24 2011 16:51:22   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.8   Feb 28 2011 10:07:54   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_process_framework.pkb  $
---       Date into PVCS   : $Date:   Feb 24 2011 16:51:22  $
---       Date fetched Out : $Modtime:   Feb 24 2011 16:41:50  $
---       Version          : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   Feb 28 2011 10:07:54  $
+--       Date fetched Out : $Modtime:   Feb 28 2011 10:01:36  $
+--       Version          : $Revision:   3.8  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.7  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.8  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
 
@@ -1642,10 +1642,16 @@ FUNCTION disable_check_scheduler_down
 RETURN BOOLEAN
 IS 
 --
+  NO_PRIVS EXCEPTION;
+  PRAGMA EXCEPTION_INIT(NO_PRIVS, -27486);
+--
 BEGIN
 --
-dbms_scheduler.set_scheduler_attribute('SCHEDULER_DISABLED', 'TRUE');
+  dbms_scheduler.set_scheduler_attribute('SCHEDULER_DISABLED', 'TRUE');
 --
+  RETURN count_running_processes = 0;
+EXCEPTION
+ WHEN NO_PRIVS THEN
   RETURN count_running_processes = 0;
 END disable_check_scheduler_down;
 --
