@@ -2,11 +2,11 @@
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.9   Feb 23 2011 11:59:24   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/higroles.sql-arc   2.10   Mar 01 2011 09:18:32   Ade.Edwards  $
 --       Module Name      : $Workfile:   higroles.sql  $
---       Date into PVCS   : $Date:   Feb 23 2011 11:59:24  $
---       Date fetched Out : $Modtime:   Feb 23 2011 11:55:22  $
---       Version          : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Mar 01 2011 09:18:32  $
+--       Date fetched Out : $Modtime:   Mar 01 2011 09:18:14  $
+--       Version          : $Revision:   2.10  $
 --
 -------------------------------------------------------------------------
 --  Copyright (c) exor corporation ltd, 2009
@@ -624,6 +624,7 @@ BEGIN
     WHEN role_exists
     THEN NULL;
   END;
+  EXECUTE IMMEDIATE 'GRANT execute on DBMS_NETWORK_ACL_ADMIN to FTP_USER';
   EXECUTE IMMEDIATE 'GRANT FTP_USER to '||USER;
   EXECUTE IMMEDIATE 'GRANT FTP_USER to '||USER||' WITH ADMIN OPTION';
 EXCEPTION
@@ -643,6 +644,7 @@ BEGIN
     WHEN role_exists
     THEN NULL;
   END;
+  EXECUTE IMMEDIATE 'GRANT execute on DBMS_NETWORK_ACL_ADMIN to EMAIL_USER';
   EXECUTE IMMEDIATE 'GRANT EMAIL_USER to '||USER;
   EXECUTE IMMEDIATE 'GRANT EMAIL_USER to '||USER||' WITH ADMIN OPTION';
 EXCEPTION
