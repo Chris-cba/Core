@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.8   Feb 28 2011 10:07:54   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.9   Mar 01 2011 17:59:18   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_process_framework.pkb  $
---       Date into PVCS   : $Date:   Feb 28 2011 10:07:54  $
---       Date fetched Out : $Modtime:   Feb 28 2011 10:01:36  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   Mar 01 2011 17:59:18  $
+--       Date fetched Out : $Modtime:   Mar 01 2011 17:55:32  $
+--       Version          : $Revision:   3.9  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.8  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.9  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
 
@@ -1652,7 +1652,17 @@ BEGIN
   RETURN count_running_processes = 0;
 EXCEPTION
  WHEN NO_PRIVS THEN
-  RETURN count_running_processes = 0;
+ --
+  BEGIN
+   RETURN count_running_processes = 0;
+  EXCEPTION
+  WHEN OTHERS THEN
+    RETURN TRUE;
+  END;
+ --  
+ WHEN OTHERS THEN
+  RETURN TRUE;
+ --
 END disable_check_scheduler_down;
 --
 END hig_process_framework;

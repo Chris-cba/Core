@@ -5,11 +5,11 @@ CREATE OR REPLACE PACKAGE BODY hig2 IS
 -----------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/hig2.pkb-arc   2.2   Feb 24 2011 16:58:40   Chris.Strettle  $
+--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/hig2.pkb-arc   2.3   Mar 01 2011 17:59:18   Chris.Strettle  $
 --       Module Name                : $Workfile:   hig2.pkb  $
---       Date into PVCS             : $Date:   Feb 24 2011 16:58:40  $
---       Date fetched Out           : $Modtime:   Feb 24 2011 16:55:02  $
---       PVCS Version               : $Revision:   2.2  $
+--       Date into PVCS             : $Date:   Mar 01 2011 17:59:18  $
+--       Date fetched Out           : $Modtime:   Mar 01 2011 09:34:42  $
+--       PVCS Version               : $Revision:   2.3  $
 --       Based on SCCS version      : 1.4
 --
 --
@@ -41,7 +41,35 @@ END get_body_version;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE open_form_session_check;
+PROCEDURE open_form_session_check 
+IS
+--
+ l_usernames NM3TYPE.TAB_VARCHAR80;
+ l_usercount NM3TYPE.TAB_VARCHAR80;
+--
+    CURSOR open_sess_cur IS
+    SELECT username, count (*) usercount
+      FROM v$session
+         , hig_users
+     WHERE hus_username = username 
+       AND UPPER(program) = 'FRMWEB.EXE'
+  GROUP BY username;
+--
+BEGIN
+--
+  OPEN open_sess_cur;
+  FETCH open_sess_cur BULK COLLECT INTO l_usernames, l_usercount;
+  CLOSE open_sess_cur;
+  
+  IF l_usernames.COUNT = 1
+  THEN
+    RAISE_APPLICATION_ERROR(-20001, 'The user '|| l_usernames(1) || ' currently has '|| l_usercount(1) ||' forms sessions open. You need to close these to continue.');
+  ELSIF l_usernames.COUNT > 1
+  THEN
+    RAISE_APPLICATION_ERROR(-20001, 'There are '|| l_usernames.count || ' users that have open forms sessions. You need to close these to continue.');
+  END IF;
+--
+END open_form_session_check; 
 --
 -----------------------------------------------------------------------------
 --
@@ -152,7 +180,7 @@ BEGIN
 --
    IF NOT hig_process_framework.disable_check_scheduler_down
    THEN
-     RAISE_APPLICATION_ERROR(-20000,'Upgrades are not allowed while there are processes running.Please wait for these processes to finish and restart.'); 
+     RAISE_APPLICATION_ERROR(-20000,'The Process Framework is shutting down but processes are still running.  Please try again later.'); 
    END IF;
    --
    open_form_session_check;
@@ -174,7 +202,7 @@ BEGIN
 --
    IF NOT hig_process_framework.disable_check_scheduler_down
    THEN
-      RAISE_APPLICATION_ERROR(-20000,'Install is not allowed while there are processes running.Please wait for these processes to finish and restart.');
+      RAISE_APPLICATION_ERROR(-20000,'The Process Framework is shutting down but processes are still running.  Please try again later.');
    END IF;
    
    open_form_session_check;
@@ -226,38 +254,7 @@ EXCEPTION
   WHEN no_data_found THEN
       RAISE_APPLICATION_ERROR(-20001,'RDBMS version must be  at least '||pi_min_version);
 
-END oracle_version_check;
-
-
-PROCEDURE open_form_session_check 
-IS
---
- l_usernames NM3TYPE.TAB_VARCHAR80;
- l_usercount NM3TYPE.TAB_VARCHAR80;
---
-    CURSOR open_sess_cur IS
-    SELECT username, count (*) usercount
-      FROM v$session
-         , hig_users
-     WHERE hus_username = username 
-       AND UPPER(program) = 'FRMWEB.EXE'
-  GROUP BY username;
---
-BEGIN
---
-  OPEN open_sess_cur;
-  FETCH open_sess_cur BULK COLLECT INTO l_usernames, l_usercount;
-  CLOSE open_sess_cur;
-  
-  IF l_usernames.COUNT = 1
-  THEN
-    RAISE_APPLICATION_ERROR(-20001, 'The user '|| l_usernames(1) || ' currently has '|| l_usercount(1) ||' forms sessions open. You need to close these to continue.');
-  ELSIF l_usernames.COUNT > 1
-  THEN
-    RAISE_APPLICATION_ERROR(-20001, 'There are '|| l_usernames.count || ' users that have open forms sessions. You need to close these to continue.');
-  END IF;
---
-END;   
+END oracle_version_check;  
 --
 -----------------------------------------------------------------------------
 --
