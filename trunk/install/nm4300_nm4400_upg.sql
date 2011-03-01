@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.5   Feb 28 2011 10:21:26   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.6   Mar 01 2011 17:59:20   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm4300_nm4400_upg.sql  $
---       Date into PVCS   : $Date:   Feb 28 2011 10:21:26  $
---       Date fetched Out : $Modtime:   Feb 28 2011 10:17:46  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Mar 01 2011 17:59:20  $
+--       Date fetched Out : $Modtime:   Mar 01 2011 14:35:20  $
+--       Version          : $Revision:   3.6  $
 --
 --   Product upgrade script
 --
@@ -39,41 +39,65 @@ FROM hig_products
 WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP');
 --
 ----------------------------------------------------------------------------------------------------
---        **************** RUN HIG2 IN SO NEW PRE UPDATE CHECKS CAN BE MADE   ****************
+--        *******************  One off code for 4400 upgrade  *******************
+--        ***  In future these checks will be done in HIG2.PRE_INSTALL_CHECK  ***
 --
 
 WHENEVER SQLERROR EXIT
 
- DECLARE
---
- CURSOR CHECK_DOWN IS
- (SELECT DISTINCT 'X'
-    FROM hig_processes a, dba_scheduler_jobs b, hig_users c
-   WHERE a.hp_job_name = b.job_name AND b.owner = c.hus_username AND b.state = 'RUNNING');
---
-   L_DUMMY VARCHAR2(1);
---
- BEGIN
---
+DECLARE
+
+ l_dummy pls_integer;
+ l_shut_down_initiated BOOLEAN := FALSE;
+ ex_exor_error EXCEPTION; 
+ PRAGMA EXCEPTION_INIT(ex_exor_error,-20099);
+
+BEGIN
+
+  BEGIN
    EXECUTE IMMEDIATE 'GRANT MANAGE SCHEDULER TO PROCESS_ADMIN';
-   DECLARE
-     NO_PRIVS EXCEPTION;
-     PRAGMA EXCEPTION_INIT(NO_PRIVS, -27486);
+  EXCEPTION
+   WHEN others THEN 
+   -- Do not raise error if the role isn't there to grant the priv to 
+     Null;
+  END;
+
    BEGIN
      dbms_scheduler.set_scheduler_attribute('SCHEDULER_DISABLED', 'TRUE');
+     l_shut_down_initiated := TRUE; 
+     -- flag up that we were able to switch off the scheduler
    EXCEPTION
-   WHEN NO_PRIVS THEN
+   WHEN others THEN 
+     -- Scheduler cannot be disabled, do not raise
      NULL;
    END;
---
-   OPEN CHECK_DOWN;
-   FETCH CHECK_DOWN INTO L_DUMMY;
-   CLOSE CHECK_DOWN;
---
-   IF L_DUMMY = 'X' THEN
-     RAISE_APPLICATION_ERROR(-20000,'Upgrade is not allowed while there are processes running.Please wait for these processes to finish and restart.');
-   END IF;
---
+ --
+ SELECT COUNT(*)
+ INTO l_dummy
+ FROM dual
+ WHERE exists (SELECT 1
+               FROM hig_processes a
+                 , dba_scheduler_jobs b
+                 , hig_users c
+               WHERE a.hp_job_name = b.job_name 
+               AND b.owner = c.hus_username 
+               AND b.state = 'RUNNING');
+ --
+  IF l_dummy = 1 THEN
+    IF l_shut_down_initiated THEN 
+     RAISE_APPLICATION_ERROR(-20099,'The Process Framework is shutting down but processes are still running.  Please try again later');
+    ELSE
+     RAISE_APPLICATION_ERROR(-20099,'The Process Framework could not be shut down and processes are still running.  Please check that you have MANAGE SCHEDULER privilege.');
+    END IF;     
+  END IF;
+
+
+EXCEPTION
+  WHEN ex_exor_error THEN
+     RAISE; 
+  WHEN others THEN
+     Null;
+
 END;
 /
 --
