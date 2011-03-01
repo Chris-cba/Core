@@ -3,18 +3,18 @@ CREATE OR REPLACE PACKAGE BODY higgis AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/higgis.pkb-arc   2.4   Oct 26 2010 15:33:38   ade.edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/higgis.pkb-arc   2.5   Mar 01 2011 09:25:34   Ade.Edwards  $
 --       Module Name      : $Workfile:   higgis.pkb  $
---       Date into PVCS   : $Date:   Oct 26 2010 15:33:38  $
---       Date fetched Out : $Modtime:   Oct 26 2010 14:42:32  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   Mar 01 2011 09:25:34  $
+--       Date fetched Out : $Modtime:   Mar 01 2011 09:24:58  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.39
 -------------------------------------------------------------------------
 --   A GIS package intended to handle all GIS theme and connection information
 --
 --   Author : Rob Coupe
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.4  $"';
+   g_body_sccsid     CONSTANT  varchar2(80) := '"$Revision:   2.5  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name CONSTANT varchar2(30) := 'higgis';
@@ -1558,7 +1558,7 @@ IS
          , v_nm_msv_map_def
          , gis_theme_functions
          , nm_nt_groupings
-     -- Task 0110297 & 0110288
+     -- Task 0110297 and 0110288
      -- Use USER option value
      WHERE vnmd_name           = hig.get_user_or_sys_opt('WEBMAPNAME') 
        AND nng_group_type      = cp_gty_type
@@ -1623,7 +1623,7 @@ BEGIN
     l_sql := l_sql
     --||lf||'    AND vnmd_name = hig.get_sysopt (''WEBMAPNAME'') '
     
-    -- Task 0110288 & 0110297
+    -- Task 0110288 and 0110297
     -- Use the USER option value if it exists
     ||lf||'    AND vnmd_name = hig.get_user_or_sys_opt (''WEBMAPNAME'') '
     ||lf||'    AND vnnt_nth_theme_name = vnmd_theme_name ';
@@ -1650,7 +1650,7 @@ BEGIN
      '      , v_nm_msv_map_def '||lf||
      '      , gis_theme_functions '||lf||
      '      , nm_nt_groupings '||lf||
-     -- Task 0110288 & 0110297
+     -- Task 0110288 and 0110297
      -- Use the USER option value if it exists
      --'  WHERE vnmd_name           = hig.get_sysopt(''WEBMAPNAME'')'||lf||
      '  WHERE vnmd_name           = hig.get_user_or_sys_opt(''WEBMAPNAME'')'||lf||
