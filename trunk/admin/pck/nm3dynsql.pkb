@@ -2,11 +2,11 @@ CREATE OR REPLACE package body nm3dynsql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.9   Nov 09 2010 15:52:46   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.10   Mar 02 2011 12:56:02   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3dynsql.pkb  $
---       Date into PVCS   : $Date:   Nov 09 2010 15:52:46  $
---       Date fetched Out : $Modtime:   Nov 09 2010 15:46:30  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Mar 02 2011 12:56:02  $
+--       Date fetched Out : $Modtime:   Feb 25 2011 11:48:18  $
+--       PVCS Version     : $Revision:   2.10  $
 --       Based on sccs version :
 --
 --
@@ -38,7 +38,7 @@ CREATE OR REPLACE package body nm3dynsql as
                 in sql_route_connectivity() added connectivity check to ensure pieces of same datum are connected
 */
 
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.9  $"';
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.10  $"';
   g_package_name    constant  varchar2(30) := 'nm3dynsql';
 
 
@@ -110,9 +110,9 @@ CREATE OR REPLACE package body nm3dynsql as
     if p_date = trunc(sysdate) then
       return p_end_date_column||' is null';
     else
-      nm3sql.set_context_value('effective_date', to_char(trunc(p_date), 'YYYYMMDD'));
-      return p_start_date_column||' <= to_date(sys_context(''nm_sql'', ''effective_date''), ''YYYYMMDD'') and '
-        ||'('||p_end_date_column||' is null or '||p_end_date_column||' > to_date(sys_context(''nm_sql'', ''effective_date''), ''YYYYMMDD''))';
+      Nm3Ctx.Set_Context('effective_date', to_char(trunc(p_date), 'YYYYMMDD'));
+      return p_start_date_column||' <= to_date(sys_context(''nm3sql'', ''effective_date''), ''YYYYMMDD'') and '
+        ||'('||p_end_date_column||' is null or '||p_end_date_column||' > to_date(sys_context(''nm3sql'', ''effective_date''), ''YYYYMMDD''))';
     end if;
   end;
 
