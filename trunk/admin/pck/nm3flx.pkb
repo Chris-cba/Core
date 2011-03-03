@@ -2,15 +2,15 @@ CREATE OR REPLACE PACKAGE BODY nm3flx IS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.12   Feb 04 2011 14:23:52   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3flx.pkb-arc   2.13   Mar 03 2011 14:08:38   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3flx.pkb  $
---       Date into PVCS   : $Date:   Feb 04 2011 14:23:52  $
---       Date fetched Out : $Modtime:   Feb 04 2011 14:21:54  $
---       Version          : $Revision:   2.12  $
+--       Date into PVCS   : $Date:   Mar 03 2011 14:08:38  $
+--       Date fetched Out : $Modtime:   Mar 03 2011 13:48:40  $
+--       Version          : $Revision:   2.13  $
 --       Based on SCCS version : 1.47
 -------------------------------------------------------------------------
 --
-  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.12  $';
+  g_body_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.13  $';
 
    g_package_name    CONSTANT varchar2(30) := 'nm3flx';
 -- Package variables
@@ -525,7 +525,7 @@ BEGIN
    --
    -- Check string length
    --
-   IF   l_rec_ntc.ntc_column_type IN ('VARCHAR2','CHAR')
+   IF   l_rec_ntc.ntc_column_type IN ('VARCHAR2','CHAR', 'NUMBER')
     AND LENGTH(po_value)          > l_rec_ntc.ntc_str_length
     THEN
 --
