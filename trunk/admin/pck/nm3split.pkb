@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.11   Oct 19 2010 17:03:14   Rob.Coupe  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3split.pkb-arc   2.12   Mar 04 2011 11:04:38   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3split.pkb  $
---       Date into PVCS   : $Date:   Oct 19 2010 17:03:14  $
---       Date fetched Out : $Modtime:   Oct 19 2010 17:00:32  $
---       PVCS Version     : $Revision:   2.11  $
+--       Date into PVCS   : $Date:   Mar 04 2011 11:04:38  $
+--       Date fetched Out : $Modtime:   Mar 04 2011 11:04:00  $
+--       PVCS Version     : $Revision:   2.12  $
 --
 --
 --   Author : ITurnbull
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3split IS
 -- 03.06.08 PT added p_no_purpose parameter throughout where node is created.
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.12  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(2000) := 'nm3split';
@@ -1913,6 +1913,54 @@ PROCEDURE get_route_split_memberships(pi_route_ne_id             IN     nm_eleme
  l_non_ambig_route_start_lref   nm_lref;  -- nm_lref is an object type
  l_non_ambig_route_end_lref     nm_lref;  -- nm_lref is an object type
 
+--
+-- Task 0110269
+-- Split fails if no node at the split point
+--
+  l_lref_1  nm_lref;
+  l_lref_2  nm_lref;
+--
+  CURSOR get_new_split_pts ( c_old_ne IN NUMBER
+                           , c_route  IN NUMBER ) IS
+    WITH elem_hist AS
+           (SELECT nm_cardinality
+                 , neh.*
+              FROM nm_members
+                 , nm_element_history neh
+             WHERE neh_ne_id_old = c_old_ne
+               AND nm_ne_id_of = neh_ne_id_new
+               AND nm_ne_id_in = c_route)
+    SELECT CASE nm_cardinality
+             WHEN 1
+             THEN
+               ( SELECT nm_lref ( neh_ne_id_new
+                                , neh_new_ne_length )
+                   FROM elem_hist
+                  WHERE neh_param_1 = 1 )
+             ELSE
+               ( SELECT nm_lref ( neh_ne_id_new
+                                , 0 )
+                   FROM elem_hist
+                  WHERE neh_param_1 = 2 )
+           END
+             start_lref
+         , CASE nm_cardinality
+             WHEN 1
+             THEN
+               ( SELECT nm_lref ( neh_ne_id_new
+                                , 0 )
+                   FROM elem_hist
+                  WHERE neh_param_1 = 2 )
+             ELSE
+               ( SELECT nm_lref ( neh_ne_id_new
+                                , neh_new_ne_length )
+                   FROM elem_hist
+                  WHERE neh_param_1 = 1 )
+           END
+             end_lref
+      FROM elem_hist
+     WHERE ROWNUM = 1;
+--
 BEGIN
 
  -- Pre-Requisites for this working
@@ -1956,20 +2004,43 @@ BEGIN
 
  ELSE
 
+--  nm_debug.debug_on;
+--  nm_debug.debug('#SPLIT : Node does not exist');
+--  nm_debug.debug('#SPLIT : pi_non_ambig_ne_id '||pi_non_ambig_ne_id);
+--  nm_debug.debug('#SPLIT : pi_route_ne_id '||pi_route_ne_id);
 
-   --Getting lref for split point
-   l_non_ambig_split_point_lref   := nm_lref(pi_non_ambig_ne_id, pi_non_ambig_split_offset);   -- linear ref that denotes the non-ambiguous split point
-
-
-   po_placement_array_left :=  Nm3pla.get_connected_extent(l_non_ambig_route_start_lref  -- from start of route
-                                                          ,l_non_ambig_split_point_lref  -- to split point
-                                                          ,pi_route_ne_id -- along route
+  --Getting lref for split point
+  l_non_ambig_split_point_lref   := nm_lref(pi_non_ambig_ne_id, pi_non_ambig_split_offset);   -- linear ref that denotes the non-ambiguous split point
+--
+  IF nm3get.get_ne ( pi_ne_id           => l_non_ambig_split_point_lref.lr_ne_id
+                   , pi_raise_not_found => FALSE).ne_id IS NULL
+  THEN
+  --
+  -- End-dated lref returned
+  --
+--    nm_debug.debug('#SPLIT : End-dated - use new code');
+    OPEN get_new_split_pts ( pi_non_ambig_ne_id, pi_route_ne_id );
+    FETCH get_new_split_pts INTO l_lref_1, l_lref_2;
+    CLOSE get_new_split_pts;
+  ELSE
+--    nm_debug.debug('#SPLIT : NOT End-dated - use old code'); 
+    l_lref_1 := l_non_ambig_split_point_lref;
+    l_lref_2 := l_non_ambig_split_point_lref;
+  END IF;
+--
+--  nm_debug.debug('#SPLIT : l_non_ambig_split_point_lref = '||l_non_ambig_split_point_lref.lr_ne_id||' - '||l_non_ambig_split_point_lref.lr_offset);
+--  nm_debug.debug('#SPLIT : l_lref_1 = '||l_lref_1.lr_ne_id||' - '||l_lref_1.lr_offset);
+--  nm_debug.debug('#SPLIT : l_non_ambig_route_start_lref= '||l_non_ambig_route_start_lref.lr_ne_id||' - '||l_non_ambig_route_start_lref.lr_offset);
+--  nm_debug.debug('#SPLIT : l_lref_2 = '||l_lref_2.lr_ne_id||' - '||l_lref_2.lr_offset);
+--
+   po_placement_array_left :=  Nm3pla.get_connected_extent(l_non_ambig_route_start_lref   -- from start of route
+                                                          ,l_lref_1                       --l_non_ambig_split_point_lref  -- to split point
+                                                          ,pi_route_ne_id                 -- along route
                                                           ,NULL);
 
-
-   po_placement_array_right :=  Nm3pla.get_connected_extent(l_non_ambig_split_point_lref  -- from split point
-                                                           ,l_non_ambig_route_end_lref  -- to end of route
-                                                           ,pi_route_ne_id -- along route
+   po_placement_array_right :=  Nm3pla.get_connected_extent(l_lref_2                      --l_non_ambig_split_point_lref  -- to split point
+                                                           ,l_non_ambig_route_end_lref    -- to end of route
+                                                           ,pi_route_ne_id                -- along route
                                                            ,NULL);
 
 
