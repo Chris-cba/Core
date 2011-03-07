@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.6   Mar 07 2011 11:01:32   Chris.Strettle  $
---       Module Name      : $Workfile:   nm3jobs.pkb  $
---       Date into PVCS   : $Date:   Mar 07 2011 11:01:32  $
---       Date fetched Out : $Modtime:   Mar 07 2011 10:03:54  $
---       PVCS Version     : $Revision:   3.6  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.7   Mar 07 2011 11:06:00   Chris.Strettle  $
+--       Module Name      : $Workfile:   nm3jobsa.pkb  $
+--       Date into PVCS   : $Date:   Mar 07 2011 11:06:00  $
+--       Date fetched Out : $Modtime:   Mar 07 2011 11:04:10  $
+--       PVCS Version     : $Revision:   3.7  $
 --
 --   NM3 DBMS_SCHEDULER wrapper
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.6  $"';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.7  $"';
   g_package_name         CONSTANT VARCHAR2(30)   := 'nm3jobs';
   ex_resource_busy                EXCEPTION;
   g_default_comment               VARCHAR2(500)  := 'Created by nm3job ';
@@ -171,11 +171,10 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
       IF pi_enabled
       THEN
       --  CWS 0109403 Change made to use nm3jobs.run_job as this has extra error trapping.
-      --  dbms_scheduler.run_job
-      --nm3jobs.run_job
-      dbms_scheduler.run_job
-          ( job_name            => pi_job_owner||'.'||pi_job_name
-          , use_current_session => pi_run_synchro);
+      --dbms_scheduler.run_job
+        nm3jobs.run_job
+          ( pi_job_name            => pi_job_owner||'.'||pi_job_name
+          , pi_use_current_session => pi_run_synchro);
       --
       END IF;
     --
