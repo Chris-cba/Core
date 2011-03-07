@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.25   Feb 28 2011 11:35:52   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.26   Mar 07 2011 11:01:32   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Feb 28 2011 11:35:52  $
---       Date fetched Out : $Modtime:   Feb 28 2011 11:35:28  $
---       Version          : $Revision:   2.25  $
+--       Date into PVCS   : $Date:   Mar 07 2011 11:01:32  $
+--       Date fetched Out : $Modtime:   Mar 07 2011 10:12:54  $
+--       Version          : $Revision:   2.26  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.25  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.26  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -4692,6 +4692,7 @@ END get_nsg_label;
     l_clone_parent   VARCHAR2(10) := pi_arg_3;
     
   BEGIN
+  --
     IF pi_job_type = 'REFRESH_SDE'
     THEN
     --
@@ -4713,9 +4714,10 @@ END get_nsg_label;
          , pi_enabled          => FALSE
          , pi_auto_drop        => FALSE );
     --
-      dbms_scheduler.run_job
-        ( job_name            => l_job_name
-        , use_current_session => FALSE);
+    -- CWS Call made to nm3job for extra validation rather than directly to dbms_scheduler
+      nm3jobs.run_job( pi_job_name  => l_job_name
+                     , pi_use_current_session => FALSE
+                     );
     --
     ELSIF pi_job_type = 'REFRESH_SDO'
     THEN
@@ -4739,9 +4741,10 @@ END get_nsg_label;
          , pi_enabled          => FALSE
          , pi_auto_drop        => FALSE );
     --
-      dbms_scheduler.run_job
-        ( job_name            => l_job_name
-        , use_current_session => FALSE);
+    --  dbms_scheduler.run_job
+    --  CWS 0109403 Change made to use nm3jobs.run_job as this has extra error trapping.
+       nm3jobs.run_job( pi_job_name            => l_job_name
+                      , pi_use_current_session => FALSE);
     --
     ELSIF pi_job_type = 'REFRESH_BOTH'
     THEN
@@ -4766,9 +4769,10 @@ END get_nsg_label;
          , pi_enabled          => FALSE
          , pi_auto_drop        => FALSE );
     --
-      dbms_scheduler.run_job
-        ( job_name            => l_job_name
-        , use_current_session => FALSE);
+      --dbms_scheduler.run_job
+      nm3jobs.run_job( pi_job_name            => l_job_name
+                     , pi_use_current_session => FALSE);
+    --
     ELSIF pi_job_type IS NULL
     THEN
       RAISE_APPLICATION_ERROR (-20101,'No Job Type specified!');

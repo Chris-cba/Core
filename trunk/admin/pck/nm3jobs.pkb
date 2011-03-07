@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.5   Jun 11 2010 12:52:20   gjohnson  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.6   Mar 07 2011 11:01:32   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3jobs.pkb  $
---       Date into PVCS   : $Date:   Jun 11 2010 12:52:20  $
---       Date fetched Out : $Modtime:   Jun 11 2010 12:51:48  $
---       PVCS Version     : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Mar 07 2011 11:01:32  $
+--       Date fetched Out : $Modtime:   Mar 07 2011 10:03:54  $
+--       PVCS Version     : $Revision:   3.6  $
 --
 --   NM3 DBMS_SCHEDULER wrapper
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.5  $"';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.6  $"';
   g_package_name         CONSTANT VARCHAR2(30)   := 'nm3jobs';
   ex_resource_busy                EXCEPTION;
   g_default_comment               VARCHAR2(500)  := 'Created by nm3job ';
@@ -107,7 +107,6 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
     
   BEGIN
   --
-  
      IF NOT nm3user.user_has_priv(pi_priv => 'CREATE JOB') THEN
 
       hig.raise_ner(pi_appl => 'HIG'
@@ -115,7 +114,6 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
                    ,pi_supplementary_info => 'Create Job'); -- You do not have privileges to perform this action
 
      END IF;
-
 
      IF pi_job_type = 'EXECUTABLE' AND NOT nm3user.user_has_priv(pi_priv => 'CREATE EXTERNAL JOB') THEN
 
@@ -125,7 +123,6 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
 
      END IF;  
 
-  
     IF l_arg_count = 0
     THEN
     --
@@ -173,8 +170,10 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
     --
       IF pi_enabled
       THEN
-      --
-        dbms_scheduler.run_job
+      --  CWS 0109403 Change made to use nm3jobs.run_job as this has extra error trapping.
+      --  dbms_scheduler.run_job
+      --nm3jobs.run_job
+      dbms_scheduler.run_job
           ( job_name            => pi_job_owner||'.'||pi_job_name
           , use_current_session => pi_run_synchro);
       --
@@ -200,10 +199,19 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   PROCEDURE run_job ( pi_job_name            IN VARCHAR2
                     , pi_use_current_session IN BOOLEAN DEFAULT TRUE )
   IS 
+  -- CWS 0109403 When Process framework is down give the user a sensible error.
+  ex_scheduler_down EXCEPTION;
+  PRAGMA EXCEPTION_INIT(ex_scheduler_down, -27492); 
   BEGIN
     dbms_scheduler.run_job
         ( job_name            => pi_job_name
         , use_current_session => pi_use_current_session);
+  EXCEPTION
+  WHEN ex_scheduler_down THEN
+  --
+    hig.raise_ner( pi_appl => 'NET'
+                 , pi_id => 556);
+  --
   END run_job;
 --
 -----------------------------------------------------------------------------
