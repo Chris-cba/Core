@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.48.1.0   Feb 03 2011 12:14:24   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.48.1.1   Mar 08 2011 17:04:52   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Feb 03 2011 12:14:24  $
---       Date fetched Out : $Modtime:   Feb 03 2011 12:12:30  $
---       PVCS Version     : $Revision:   2.48.1.0  $
+--       Date into PVCS   : $Date:   Mar 08 2011 17:04:52  $
+--       Date fetched Out : $Modtime:   Mar 08 2011 17:03:52  $
+--       PVCS Version     : $Revision:   2.48.1.1  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.48.1.0  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.48.1.1  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -1964,11 +1964,15 @@ begin
   end if;
 --Task 0110660 - remove the -1 from the result of get_rounding after the get_rounding fix has bene made
   l_dp := greatest(Nm3unit.get_rounding( p_diminfo(3).sdo_tolerance ), 0);
+--nm_debug.debug_on;
+--nm_debug.debug( 'round = '||l_dp);
 
   for i in 1..p_geom.sdo_ordinates.last loop
     if mod(i, 3) = 0 then
       begin
-        p_geom.sdo_ordinates(i) := p_start +  round( ( (p_geom.sdo_ordinates(i) - l_old_start)* l_new_length/l_old_length ), l_dp);
+        --nm_debug.debug( i||' - start = '||p_start||', ord = '||p_geom.sdo_ordinates(i)||', old-start='||l_old_start||', new-length='||l_new_length||', old_length='||l_old_length );
+        p_geom.sdo_ordinates(i) := p_start +  round( ( (p_geom.sdo_ordinates(i) - l_old_start)* l_new_length/l_old_length ), 4);
+--        p_geom.sdo_ordinates(i) := p_start +   ( (p_geom.sdo_ordinates(i) - l_old_start)* l_new_length/l_old_length );
       exception
         when divide_by_zero then
         null;  -- leave the ordinate the same
@@ -2046,7 +2050,9 @@ l_part   VARCHAR2(1);
 
 BEGIN
 
---nm_debug.debug_on;
+--  nm_debug.debug_on;
+  
+  nm_debug.debug('diminfo tol = '|| p_diminfo(3).sdo_tolerance );
 
   IF p_part IS NULL THEN
     l_part  := Nm3net.is_gty_partial( Nm3get.get_ne_all( p_ne_id ).ne_gty_group_type );
