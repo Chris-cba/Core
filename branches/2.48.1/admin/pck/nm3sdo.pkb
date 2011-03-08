@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.48.1.1   Mar 08 2011 17:04:52   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.48.1.2   Mar 08 2011 17:48:36   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Mar 08 2011 17:04:52  $
---       Date fetched Out : $Modtime:   Mar 08 2011 17:03:52  $
---       PVCS Version     : $Revision:   2.48.1.1  $
+--       Date into PVCS   : $Date:   Mar 08 2011 17:48:36  $
+--       Date fetched Out : $Modtime:   Mar 08 2011 17:47:56  $
+--       PVCS Version     : $Revision:   2.48.1.2  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.48.1.1  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.48.1.2  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -1971,7 +1971,7 @@ begin
     if mod(i, 3) = 0 then
       begin
         --nm_debug.debug( i||' - start = '||p_start||', ord = '||p_geom.sdo_ordinates(i)||', old-start='||l_old_start||', new-length='||l_new_length||', old_length='||l_old_length );
-        p_geom.sdo_ordinates(i) := p_start +  round( ( (p_geom.sdo_ordinates(i) - l_old_start)* l_new_length/l_old_length ), 4);
+        p_geom.sdo_ordinates(i) := p_start +  round( ( (p_geom.sdo_ordinates(i) - l_old_start)* l_new_length/l_old_length ), l_dp);
 --        p_geom.sdo_ordinates(i) := p_start +   ( (p_geom.sdo_ordinates(i) - l_old_start)* l_new_length/l_old_length );
       exception
         when divide_by_zero then
