@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.18   Feb 18 2011 11:44:14   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.19   Mar 08 2011 15:18:16   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Feb 18 2011 11:44:14  $
---       Date fetched Out : $Modtime:   Feb 18 2011 11:42:50  $
---       Version          : $Revision:   3.18  $
+--       Date into PVCS   : $Date:   Mar 08 2011 15:18:16  $
+--       Date fetched Out : $Modtime:   Mar 08 2011 14:26:36  $
+--       Version          : $Revision:   3.19  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.18  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.19  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -543,20 +543,19 @@ BEGIN
                                  , pi_tab_files(f).filename
                                  , pi_tab_files(f).I_or_O
                                  , pi_tab_files(f).destination
-                                 , pi_tab_files(f).destination_type                                 
+                                 , pi_tab_files(f).destination_type
                                  , pi_tab_files(f).file_type_id
                                  );
 
      IF pi_tab_files(f).destination_type = 'DATABASE_TABLE' THEN
                                  
-       INSERT into hig_process_file_blobs(hpfb_file_id               
+       INSERT into hig_process_file_blobs(hpfb_file_id
                                          ,hpfb_content)
        VALUES (l_file_id
               ,pi_tab_files(f).content);
            
-     END IF;                                                                              
-                                  
-
+     END IF;
+ --
  END LOOP;
  
  IF pi_check_file_cardinality THEN
@@ -567,7 +566,6 @@ EXCEPTION
  WHEN others THEN
    ROLLBACK;
    RAISE;  
- 
 END associate_files_with_process; 
 -- 
 -----------------------------------------------------------------------------
@@ -771,7 +769,12 @@ PROCEDURE create_and_schedule_process    (pi_process_type_id           IN hig_pr
  END;
  
 BEGIN
-
+ IF get_scheduler_state != 'UP'
+ THEN
+   hig.raise_ner( pi_appl => 'NET'
+                , pi_id   => 556
+                );
+ END IF;
 
  double_check_privs;
 
@@ -826,8 +829,7 @@ BEGIN
                                      null
                                  end
                          );
-                
-          
+--
  associate_files_with_process(pi_process_id             => po_process_id
                              ,pi_job_run_seq            => Null -- the job hasn't been executed yet so there is no record in hig_process_job_runs to relate to - process_execution_start will tie the files in when the hpjr record is created 
                              ,pi_tab_files              => g_tab_temp_files
@@ -839,30 +841,18 @@ BEGIN
                               ,pi_tab_params  => g_tab_temp_params);
 
  g_tab_temp_params.DELETE; -- clear out so next process that's submitted doesn't re-use what's in the pl/sql table
-                             
-
 --
 -- Now schedule a job for this process
 --
- 
  IF pi_frequency_id IS NOT NULL THEN
   l_frequency_rec := hig_process_framework.get_frequency(pi_frequency_id => pi_frequency_id);
  END IF;
- 
  --
  -- build up a string which will be executed by the resulting scheduled job
  --
- 
-
- 
  l_what := hig_process_framework.wrapper_around_what(pi_what_to_call => l_process_type_rec.hpt_what_to_call
                                                     ,pi_process_id    => po_process_id);
-
-
-
-
-
- 
+--
        nm3jobs.create_job(pi_job_name        => po_job_name
                         , pi_job_action      => l_what
                         , pi_repeat_interval => l_frequency_rec.hsfr_frequency
@@ -873,30 +863,23 @@ BEGIN
                         , pi_end_date        => Null
                         , pi_enabled         => FALSE
                         , pi_auto_drop       => FALSE);
-
-
-
+--
  nm3jobs.amend_job_restartable(pi_job_name => l_full_job_name
                               ,pi_value    => l_process_type_rec.hpt_restartable = 'Y');
-
-
-
+--
  IF pi_max_failures IS NOT NULL THEN
    nm3jobs.amend_job_max_failures(pi_job_name => l_full_job_name
                                  ,pi_value    => pi_max_failures);
  END IF;                                 
-
-
+--
  enable_process(pi_process_id => po_process_id);                                    
-                        
-
+--
  l_job_rec := hig_process_framework.get_job(pi_job_name =>  po_job_name);
-                         
+--
  po_scheduled_start_date := NVL(l_job_rec.last_start_date,l_job_rec.next_run_date);                       
-
+--
  commit;
- 
-
+--
 END create_and_schedule_process;                           
 --
 -----------------------------------------------------------------------------
@@ -1292,14 +1275,10 @@ PROCEDURE run_process_now(pi_process_id IN hig_processes.hp_process_id%TYPE) IS
 PRAGMA autonomous_transaction;
 
 BEGIN
-
  l_process_rec := hig_process_framework.get_process_and_job(pi_process_id => pi_process_id);
- 
  nm3jobs.run_job(pi_job_name            => l_process_rec.hp_full_job_name
                 ,pi_use_current_session => FALSE);
- 
  commit;
- 
 END run_process_now; 
 --
 -----------------------------------------------------------------------------
@@ -1681,7 +1660,66 @@ BEGIN
 
 END valid_process_of_type_exists;
 --
+-----------------------------------------------------------------------------
 --
+FUNCTION count_running_processes RETURN PLS_INTEGER IS
+--
+ l_retval pls_integer;
+--
+BEGIN
+--
+ SELECT COUNT(*)
+ INTO l_retval
+ FROM hig_processes a,
+      dba_scheduler_jobs b,
+      hig_users c
+ WHERE a.hp_job_name = b.job_name
+ AND   b.owner = c.hus_username
+ AND   b.state = 'RUNNING';
+   
+ return (l_retval);
+
+END count_running_processes;
+--
+-----------------------------------------------------------------------------
+--  
+FUNCTION get_scheduler_state RETURN VARCHAR2 IS
+
+  l_scheduler_disabled dba_scheduler_global_attribute.value%TYPE;
+  l_retval             varchar2(20);
+--
+BEGIN
+--
+ select value
+ into l_scheduler_disabled 
+ from dba_scheduler_global_attribute 
+ where attribute_name='SCHEDULER_DISABLED';
+
+ IF NVL(l_scheduler_disabled,'FALSE') = 'TRUE' THEN
+ 
+   IF count_running_processes = 0 THEN
+      l_retval := 'DOWN';
+   ELSE
+      l_retval := 'SHUTTING DOWN';
+   END IF;
+   
+ ELSE
+ 
+  l_retval := 'UP';  
+         
+ END IF;
+
+ RETURN l_retval;
+
+EXCEPTION
+  WHEN no_data_found THEN
+     RETURN('UP');
+  WHEN others THEN
+     RAISE;
+--
+END get_scheduler_state;
+--
+-----------------------------------------------------------------------------
 --
 END hig_process_api;
 /
