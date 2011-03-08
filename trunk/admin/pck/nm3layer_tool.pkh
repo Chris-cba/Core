@@ -3,16 +3,16 @@ CREATE OR REPLACE PACKAGE Nm3layer_Tool AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.10   Oct 07 2010 12:16:04   ade.edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkh-arc   2.11   Mar 08 2011 09:26:24   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkh  $
---       Date into PVCS   : $Date:   Oct 07 2010 12:16:04  $
---       Date fetched Out : $Modtime:   Oct 07 2010 12:14:08  $
---       Version          : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Mar 08 2011 09:26:24  $
+--       Date fetched Out : $Modtime:   Mar 08 2011 09:25:12  $
+--       Version          : $Revision:   2.11  $
 --       Based on SCCS version : 1.6
 -------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.10  $';
+    g_sccsid      CONSTANT  VARCHAR2(2000) := '$Revision:   2.11  $';
     g_boolean               BOOLEAN        := FALSE;
     g_x_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_X';
     g_y_column    CONSTANT  user_tab_columns.column_name%TYPE := 'IIT_Y';
@@ -927,12 +927,14 @@ FUNCTION scotland_asd_in_use RETURN BOOLEAN;
 -----------------------------------------------------------------------------
 --
 --<PROC NAME="RUN_HEALTHCHECK">
-FUNCTION run_healthcheck( pi_location IN VARCHAR2
-                                        , pi_theme_filename IN VARCHAR2
-                                        , pi_sdo_filename IN VARCHAR2
-                                        , pi_sde_filename IN VARCHAR2
-                                        , po_summary OUT VARCHAR2
-                                        ) RETURN BOOLEAN;
+  FUNCTION run_healthcheck( pi_location         IN VARCHAR2
+                          , pi_theme_filename   IN VARCHAR2
+                          , pi_sdo_filename     IN VARCHAR2
+                          , pi_sde_filename     IN VARCHAR2
+                          , pi_ignore_warnings  IN BOOLEAN DEFAULT TRUE
+                          , po_summary         OUT VARCHAR2
+                          ) 
+  RETURN BOOLEAN;
 --</PROC>
 --
 -----------------------------------------------------------------------------

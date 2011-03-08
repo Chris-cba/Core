@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.26   Mar 07 2011 11:01:32   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.27   Mar 08 2011 09:26:24   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Mar 07 2011 11:01:32  $
---       Date fetched Out : $Modtime:   Mar 07 2011 10:12:54  $
---       Version          : $Revision:   2.26  $
+--       Date into PVCS   : $Date:   Mar 08 2011 09:26:24  $
+--       Date fetched Out : $Modtime:   Mar 08 2011 09:25:06  $
+--       Version          : $Revision:   2.27  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.26  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.27  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -4558,38 +4558,40 @@ AS
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION run_healthcheck( pi_location IN VARCHAR2
-                                          , pi_theme_filename IN VARCHAR2
-                                          , pi_sdo_filename IN VARCHAR2
-                                          , pi_sde_filename IN VARCHAR2
-                                          , po_summary OUT VARCHAR2
-                                          ) RETURN BOOLEAN IS
+FUNCTION run_healthcheck( pi_location        IN VARCHAR2
+                        , pi_theme_filename  IN VARCHAR2
+                        , pi_sdo_filename    IN VARCHAR2
+                        , pi_sde_filename    IN VARCHAR2
+                        , pi_ignore_warnings IN BOOLEAN DEFAULT TRUE
+                        , po_summary        OUT VARCHAR2
+                        ) 
+RETURN BOOLEAN IS
 --
-l_success BOOLEAN:= TRUE;
+  l_success BOOLEAN:= TRUE;
+  l_supress_warnings   VARCHAR2(10) := CASE WHEN pi_ignore_warnings=TRUE THEN 'TRUE' ELSE 'FALSE' END;
 --
 BEGIN
   IF pi_location IS NOT NULL THEN
    --
      IF pi_theme_filename IS NOT NULL THEN
        BEGIN
-        
-          execute immediate 'BEGIN nm3sdo_check.run_theme_check(:pi_location, :pi_theme_filename); END;'
-          using pi_location, pi_theme_filename;
+         EXECUTE IMMEDIATE 'BEGIN nm3sdo_check.run_theme_check(:pi_location, :pi_theme_filename, '||l_supress_warnings||'); END;'
+           USING pi_location, pi_theme_filename;
          po_summary:= po_summary || pi_theme_filename || ' Created. ' || CHR (10);
        EXCEPTION WHEN OTHERS THEN
-        l_success := FALSE;
-        po_summary:= po_summary || pi_theme_filename || ' Failed. ' || SQLERRM || CHR (10);
+         l_success := FALSE;
+         po_summary:= po_summary || pi_theme_filename || ' Failed. ' || SQLERRM || CHR (10);
        END;
     END IF;
     --
     IF pi_sdo_filename IS NOT NULL THEN 
        BEGIN
-          execute immediate 'BEGIN nm3sdo_check.run_sdo_check(:pi_location, :pi_sdo_filename); END;'
-          using pi_location, pi_sdo_filename;
-          po_summary:= po_summary || pi_sdo_filename || ' Created. ' || CHR (10);
+         EXECUTE IMMEDIATE 'BEGIN nm3sdo_check.run_sdo_check(:pi_location, :pi_sdo_filename); END;'
+           USING pi_location, pi_sdo_filename;
+         po_summary:= po_summary || pi_sdo_filename || ' Created. ' || CHR (10);
        EXCEPTION WHEN OTHERS THEN
-        po_summary:= po_summary ||  pi_sdo_filename || ' Failed. ' || SQLERRM || CHR (10);
-        l_success := FALSE;
+         po_summary:= po_summary ||  pi_sdo_filename || ' Failed. ' || SQLERRM || CHR (10);
+         l_success := FALSE;
        END;
     END IF;
     
@@ -4597,8 +4599,8 @@ BEGIN
     IF pi_sde_filename IS NOT NULL THEN
        
       BEGIN
-          execute immediate 'BEGIN nm3sde_check.run_sde_check(:pi_location, :pi_sde_filename); END;'
-          using pi_location, pi_sde_filename;
+        EXECUTE IMMEDIATE 'BEGIN nm3sde_check.run_sde_check(:pi_location, :pi_sde_filename); END;'
+          USING pi_location, pi_sde_filename;
         po_summary:= po_summary || pi_sde_filename || ' Created. ' || CHR (10);
       EXCEPTION WHEN OTHERS THEN
         l_success := FALSE;
@@ -4606,14 +4608,17 @@ BEGIN
       END;
     --
     END IF;
-    
-   ELSE
+  --
+  ELSE
     l_success := FALSE;
   END IF;
-    
-RETURN l_success;
-END;
-
+--
+  RETURN l_success;
+--
+END run_healthcheck;
+--
+-----------------------------------------------------------------------------
+--
 
 FUNCTION cleanup_idx(pi_index_name IN VARCHAR2, po_error_message OUT VARCHAR2) 
 RETURN BOOLEAN AS
