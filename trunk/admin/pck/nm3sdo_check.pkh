@@ -5,11 +5,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkh-arc   2.1   Jun 25 2008 21:10:58   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_check.pkh-arc   2.2   Mar 08 2011 09:26:26   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3sdo_check.pkh  $
---       Date into PVCS   : $Date:   Jun 25 2008 21:10:58  $
---       Date fetched Out : $Modtime:   Jun 25 2008 21:10:12  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Mar 08 2011 09:26:26  $
+--       Date fetched Out : $Modtime:   Mar 08 2011 09:25:20  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --   AEdwards
 --   SDO/THEMES Metadata checker
@@ -17,7 +17,7 @@ AS
 --------------------------------------------------------------------------------
 --
 --</PACKAGE>
-  g_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.1  $"';
+  g_sccsid           CONSTANT varchar2(2000)  := '"$Revision:   2.2  $"';
 --
 --------------------------------------------------------------------------------
 --
@@ -58,8 +58,9 @@ AS
 --<PROC NAME="RUN_THEME_CHECK">
 -- This procedure calls the THEME checker
   PROCEDURE run_theme_check
-                 ( pi_location IN VARCHAR2 DEFAULT NULL
-                 , pi_filename IN VARCHAR2 DEFAULT NULL);
+                 ( pi_location         IN VARCHAR2 DEFAULT NULL
+                 , pi_filename         IN VARCHAR2 DEFAULT NULL
+                 , pi_supress_warnings IN BOOLEAN  DEFAULT FALSE );
 --</PROC>
 --
 --------------------------------------------------------------------------------
