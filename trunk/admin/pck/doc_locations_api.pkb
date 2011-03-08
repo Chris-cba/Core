@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.8   Mar 08 2011 09:36:08   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.9   Mar 08 2011 09:51:30   Ade.Edwards  $
 --       Module Name      : $Workfile:   doc_locations_api.pkb  $
---       Date into PVCS   : $Date:   Mar 08 2011 09:36:08  $
---       Date fetched Out : $Modtime:   Aug 31 2010 15:02:08  $
---       Version          : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Mar 08 2011 09:51:30  $
+--       Date fetched Out : $Modtime:   Mar 08 2011 09:50:54  $
+--       Version          : $Revision:   2.9  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.8  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.9  $';
 --
   g_package_name CONSTANT varchar2(30) := 'doc_locations_api';
 --
@@ -457,11 +457,11 @@ BEGIN
      l_tab_comments(1)  := '--';
      l_tab_comments(2)  := '--   SCCS Identifiers :-';
      l_tab_comments(3)  := '--';
-     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.8   Mar 08 2011 09:36:08   Ade.Edwards  $';
+     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.9   Mar 08 2011 09:51:30   Ade.Edwards  $';
      l_tab_comments(5)  := '--       Module Name                : $Workfile:   doc_locations_api.pkb  $';
-     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Mar 08 2011 09:36:08  $';
-     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Aug 31 2010 15:02:08  $';
-     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.8  $';
+     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Mar 08 2011 09:51:30  $';
+     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Mar 08 2011 09:50:54  $';
+     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.9  $';
      l_tab_comments(9)  := '--';
      l_tab_comments(10) := '--   table_name_WHO trigger';
      l_tab_comments(11) := '--';
@@ -1203,13 +1203,22 @@ END get_location_descr;
                                            ,pi_raise_not_found => FALSE ).hdir_url);
       IF l_url IS NOT NULL
       THEN
+      
       --
-      -- Append the trailing forward slash if not present
+      -- Task 0110777 / 0110776
+      -- Don't do this any more because some customers want a null slash - so assume the doc_location URL has it set.
       --
-        IF SUBSTR ( l_url, LENGTH (l_url),1 ) NOT IN (g_forward_slash,g_back_slash)
-        THEN
-          l_url := l_url||g_forward_slash;
-        END IF;
+--      --
+--      -- Append the trailing forward slash if not present
+--      --
+--        IF SUBSTR ( l_url, LENGTH (l_url),1 ) NOT IN (g_forward_slash,g_back_slash)
+--        THEN
+--          l_url := l_url||g_forward_slash;
+--        END IF;
+      --
+      -- Task 0110777 / 0110776 DONE
+      --
+    --
       --
         l_url := l_url||l_docs.doc_file;
       -- 
