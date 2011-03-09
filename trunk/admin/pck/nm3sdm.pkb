@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.37   Sep 02 2010 11:39:56   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.38   Mar 09 2011 13:39:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Sep 02 2010 11:39:56  $
---       Date fetched Out : $Modtime:   Sep 02 2010 11:39:02  $
---       PVCS Version     : $Revision:   2.37  $
+--       Date into PVCS   : $Date:   Mar 09 2011 13:39:24  $
+--       Date fetched Out : $Modtime:   Mar 09 2011 13:34:24  $
+--       PVCS Version     : $Revision:   2.38  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.37  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.38  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -523,6 +523,7 @@ PROCEDURE make_nt_spatial_layer
 -----------------------------------------------------------------------
       Nm3sdo.set_diminfo_and_srid( l_base_themes, l_diminfo, l_srid );
 
+      l_diminfo(3).sdo_tolerance := NM3UNIT.GET_TOL_FROM_UNIT_MASK(NM3NET.GET_NT_UNITS(l_nlt.nlt_nt_type));
       l_usgm.table_name  := l_tab;
       l_usgm.column_name := 'GEOLOC';
       l_usgm.diminfo     := l_diminfo;
@@ -7607,11 +7608,11 @@ end;
    */
    --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.37   Sep 02 2010 11:39:56   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.38   Mar 09 2011 13:39:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Sep 02 2010 11:39:56  $
---       Date fetched Out : $Modtime:   Sep 02 2010 11:39:02  $
---       PVCS Version     : $Revision:   2.37  $
+--       Date into PVCS   : $Date:   Mar 09 2011 13:39:24  $
+--       Date fetched Out : $Modtime:   Mar 09 2011 13:34:24  $
+--       PVCS Version     : $Revision:   2.38  $
 
       append ('--   PVCS Identifiers :-');
       append ('--');
