@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.48.1.2   Mar 08 2011 17:48:36   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.48.1.3   Mar 09 2011 13:48:06   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Mar 08 2011 17:48:36  $
---       Date fetched Out : $Modtime:   Mar 08 2011 17:47:56  $
---       PVCS Version     : $Revision:   2.48.1.2  $
+--       Date into PVCS   : $Date:   Mar 09 2011 13:48:06  $
+--       Date fetched Out : $Modtime:   Mar 09 2011 13:46:48  $
+--       PVCS Version     : $Revision:   2.48.1.3  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.48.1.2  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.48.1.3  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -2321,7 +2321,9 @@ BEGIN
     Nm3sdo.set_diminfo_and_srid( p_themes  => make_tha_from_ptr( l_th ),
                                  p_diminfo => l_diminfo,
               p_srid    => l_srid );
-
+    l_unit := NM3NET.GET_NT_UNITS_FROM_NE(p_ne_id);
+                                 
+    l_diminfo(3).sdo_tolerance :=  NM3UNIT.GET_TOL_FROM_UNIT_MASK(l_unit); 
     RETURN get_route_shape( p_ne_id   => p_ne_id
                         ,p_nt      => l_nt
          ,p_th      => l_th
@@ -3201,6 +3203,7 @@ BEGIN
                                  p_diminfo => l_diminfo,
                                  p_srid    => l_srid );
 
+    l_diminfo(3).sdo_tolerance := NM3UNIT.GET_TOL_FROM_UNIT_MASK(NM3NET.GET_NT_UNITS(l_nlt.nlt_nt_type));
     l_seq_str := 'select '||p_nth.nth_sequence_name||'.nextval from dual';
 
     cur_str2 := 'insert into '||p_nth.nth_feature_table||
@@ -10369,8 +10372,8 @@ BEGIN
 
   end if;
 
-  nm_debug.debug_on;
-  nm_debug.debug(curstr);
+--nm_debug.debug_on;
+--nm_debug.debug(curstr);
   
   EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.ntl_theme_list
     --USING p_nth.nth_theme_id, p_nth.nth_theme_name, p_nth.nth_theme_name, p_ntl;
