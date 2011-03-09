@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.10   Mar 08 2011 17:19:34   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sde.pkb-arc   2.11   Mar 09 2011 13:58:00   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sde.pkb  $
---       Date into PVCS   : $Date:   Mar 08 2011 17:19:34  $
---       Date fetched Out : $Modtime:   Mar 08 2011 17:13:52  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   Mar 09 2011 13:58:00  $
+--       Date fetched Out : $Modtime:   Mar 09 2011 13:56:42  $
+--       PVCS Version     : $Revision:   2.11  $
 --
 --       Based on one of many versions labeled as 1.21
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sde AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.11  $"';
    g_keyword         CONSTANT  VARCHAR2(30)   := 'SDO_GEOMETRY'; --get_keyword;
 
 
@@ -557,6 +557,14 @@ BEGIN
                l_gtype );
 
   fetch c_srid into retval;
+  if not c_srid%found then
+
+    close c_srid;
+
+    raise no_data_found;
+
+  end if;
+    
   
   close c_srid;
   
@@ -591,10 +599,11 @@ exception
 
 --   needs to retrieve the spatial reference ID for the table, possibly by entering a new SRID record.
 
-     Nm_Debug.DEBUG( 'Set the srid by origin');
-     retval := get_srid_by_origin( l_sref );
+--   Nm_Debug.DEBUG( 'Set the srid by origin');
+     
+	 retval := get_srid_by_origin( l_sref );
 
-     Nm_Debug.DEBUG('returned '||retval);
+--   Nm_Debug.DEBUG('returned '||retval);
 
      IF retval IS NULL THEN
 
@@ -604,7 +613,7 @@ exception
 
      END IF;
 
-   Nm_Debug.DEBUG('returned '||retval);
+--   Nm_Debug.DEBUG('returned '||retval);
 
    RETURN retval;
  
