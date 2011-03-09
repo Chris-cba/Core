@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.48.1.3   Mar 09 2011 13:48:06   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.48.1.4   Mar 09 2011 13:52:14   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Mar 09 2011 13:48:06  $
---       Date fetched Out : $Modtime:   Mar 09 2011 13:46:48  $
---       PVCS Version     : $Revision:   2.48.1.3  $
+--       Date into PVCS   : $Date:   Mar 09 2011 13:52:14  $
+--       Date fetched Out : $Modtime:   Mar 09 2011 13:51:46  $
+--       PVCS Version     : $Revision:   2.48.1.4  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.48.1.3  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.48.1.4  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -2308,6 +2308,8 @@ l_srid NUMBER;
 
 l_part   VARCHAR2(1) := Nm3net.is_gty_partial( Nm3get.get_ne_all( p_ne_id ).ne_gty_group_type );
 
+l_unit   nm_units.un_unit_id%type;
+
 BEGIN
 
     l_nt := get_base_nt( p_ne_id => p_ne_id );
@@ -2321,16 +2323,18 @@ BEGIN
     Nm3sdo.set_diminfo_and_srid( p_themes  => make_tha_from_ptr( l_th ),
                                  p_diminfo => l_diminfo,
               p_srid    => l_srid );
+
     l_unit := NM3NET.GET_NT_UNITS_FROM_NE(p_ne_id);
                                  
-    l_diminfo(3).sdo_tolerance :=  NM3UNIT.GET_TOL_FROM_UNIT_MASK(l_unit); 
+    l_diminfo(3).sdo_tolerance :=  NM3UNIT.GET_TOL_FROM_UNIT_MASK(l_unit);
+	
     RETURN get_route_shape( p_ne_id   => p_ne_id
-                        ,p_nt      => l_nt
-         ,p_th      => l_th
-         ,p_nth_tab => l_nth_row_tab
-         ,p_diminfo => l_diminfo
-         ,p_srid    => l_srid
-         ,p_part    => l_part );
+                           ,p_nt      => l_nt
+                           ,p_th      => l_th
+                           ,p_nth_tab => l_nth_row_tab
+                           ,p_diminfo => l_diminfo
+                           ,p_srid    => l_srid
+                           ,p_part    => l_part );
 END;
 --
 -----------------------------------------------------------------------------------------------------------------
