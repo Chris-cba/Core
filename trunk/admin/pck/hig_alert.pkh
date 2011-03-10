@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkh-arc   3.5   Feb 03 2011 08:47:16   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkh-arc   3.6   Mar 10 2011 12:27:52   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_alert.pkh  $
---       Date into PVCS   : $Date:   Feb 03 2011 08:47:16  $
---       Date fetched Out : $Modtime:   Feb 02 2011 09:52:34  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   Mar 10 2011 12:27:52  $
+--       Date fetched Out : $Modtime:   Mar 10 2011 11:14:42  $
+--       Version          : $Revision:   3.6  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $'; 
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.6  $'; 
 --</GLOBVAR>
 --
 -----------------------------------------------------------------------------
@@ -68,7 +68,7 @@ PROCEDURE create_trg_alert(pi_halt_rec     IN hig_alert_types%ROWTYPE
                           ,pi_param_9      IN Varchar2
                           ,pi_param_10     IN Varchar2
                           ,po_subject      OUT Varchar2
-                          ,po_email_body   OUT Long);
+                          ,po_email_body   OUT Clob);
 --</PROC>
 --
 -----------------------------------------------------------------------------
