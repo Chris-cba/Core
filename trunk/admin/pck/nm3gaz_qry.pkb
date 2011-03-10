@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.15   Feb 17 2011 15:40:40   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.16   Mar 10 2011 14:42:34   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Feb 17 2011 15:40:40  $
---       Date fetched Out : $Modtime:   Feb 17 2011 15:39:46  $
---       Version          : $Revision:   2.15  $
+--       Date into PVCS   : $Date:   Mar 10 2011 14:42:34  $
+--       Date fetched Out : $Modtime:   Mar 10 2011 14:41:44  $
+--       Version          : $Revision:   2.16  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb 1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.15  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.16  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -374,6 +374,12 @@ BEGIN
    
       g_ngqi_job_id := nm3pbi.get_job_id;
    
+    --
+    -- Task 0110799/0110804/0110805
+    -- Validate the query again to pick up the g_ngqi_job_id to stop performance issue looking it up 
+    --
+      validate_query (pi_ngq_id);
+    --
       perform_item_list_retrieval;
    
       l_retval  := g_ngqi_job_id;
@@ -753,7 +759,13 @@ BEGIN
       END IF;
    --
       append_both (p_ngqt_index,'        FROM  '||l_tables||', nm_nw_temp_extents nte');
-      append_both (p_ngqt_index,'       WHERE  nte.nte_job_id = '||g_package_name||'.get_g_nte_job_id');
+    --
+    -- Task 0110799
+    -- Hard bind the job_id to stop it being looked up on execution time which causes a performance issue by
+    -- forcing the use of the wrong index on some configurations.
+    --
+    --  append_both (p_ngqt_index,'       WHERE  nte.nte_job_id = '||g_package_name||'.get_g_nte_job_id');
+      append_both (p_ngqt_index,'       WHERE  nte.nte_job_id = '||NVL(nm3gaz_qry.get_g_nte_job_id,-1));
    --
       IF l_rec_nit.nit_table_name IS NULL
        THEN
@@ -910,7 +922,13 @@ BEGIN
   --      OR g_roi_restricted_item_query
   --      THEN
         append_both (p_ngqt_index,'        FROM  '||l_tables||', nm_nw_temp_extents nte , nm_members ex');
-        append_both (p_ngqt_index,'       WHERE  nte.nte_job_id = '||g_package_name||'.get_g_nte_job_id');
+        --
+        -- Task 0110799
+        -- Hard bind the job_id to stop it being looked up on execution time which causes a performance issue by
+        -- forcing the use of the wrong index on some configurations.
+        --
+        --append_both (p_ngqt_index,'       WHERE  nte.nte_job_id = '||g_package_name||'.get_g_nte_job_id');
+        append_both (p_ngqt_index,'       WHERE  nte.nte_job_id = '||NVL(nm3gaz_qry.get_g_nte_job_id,-1));
      --
         IF l_rec_nit.nit_table_name IS NULL
          THEN
