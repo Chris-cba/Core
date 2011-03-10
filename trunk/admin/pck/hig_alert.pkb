@@ -2,12 +2,12 @@ CREATE OR REPLACE PACKAGE BODY hig_alert
 AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
---
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.12   Oct 26 2010 14:03:02   Linesh.Sorathia  $
+--3
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.13   Mar 10 2011 12:27:50   Linesh.Sorathia  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   Oct 26 2010 14:03:02  $
---       Date fetched Out : $Modtime:   Oct 26 2010 13:53:50  $
---       Version          : $Revision:   3.12  $
+--       Date into PVCS   : $Date:   Mar 10 2011 12:27:50  $
+--       Date fetched Out : $Modtime:   Mar 10 2011 11:25:50  $
+--       Version          : $Revision:   3.13  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.12  $';
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.13  $';
   g_app_owner     CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  clob;
@@ -632,7 +632,7 @@ PROCEDURE create_trg_alert(pi_halt_rec     IN hig_alert_types%ROWTYPE
                           ,pi_param_9      IN Varchar2
                           ,pi_param_10     IN Varchar2
                           ,po_subject    OUT Varchar2
-                          ,po_email_body OUT Long)
+                          ,po_email_body OUT Clob)
 IS
 --
    l_bind_param1   Varchar2(1000);
@@ -645,11 +645,14 @@ IS
    l_bind_param8   Varchar2(1000);
    l_bind_param9   Varchar2(1000);
    l_bind_param10  Varchar2(1000);
-   l_email_body    Long;
-   l_subject       hig_alert_type_mail.hatm_subject%TYPE;
+   l_email_body    Clob;
+   l_subject       Clob;
    l_hatm_rec      hig_alert_type_mail%ROWTYPE;
    l_nit_rec       nm_inv_types%ROWTYPE;
-   l_har_rec       hig_alert_recipients%ROWTYPE;   
+   l_har_rec       hig_alert_recipients%ROWTYPE; 
+   l_bind_value    Varchar2(4000);  
+   l_email_body_length Binary_Integer := 4000;
+   l_subject_length    Binary_Integer := 500;
 --
 BEGIN
 --
@@ -661,70 +664,80 @@ BEGIN
        derive_meaning(pi_inv_type    => l_nit_rec.nit_inv_type
                      ,pi_attrib_name => l_hatm_rec.hatm_param_1
                      ,pi_value       => pi_param_1
-                    ,po_meaning      => l_bind_param1);
+                    ,po_meaning      => l_bind_value);
+       l_bind_param1 := Substr(l_bind_value,1,1000);
    END IF ;
    IF pi_param_2 IS NOT NULL
    THEN
        derive_meaning(pi_inv_type    => l_nit_rec.nit_inv_type
                      ,pi_attrib_name => l_hatm_rec.hatm_param_2
                      ,pi_value       => pi_param_2
-                    ,po_meaning      => l_bind_param2);
+                    ,po_meaning      => l_bind_value);
+       l_bind_param2 := Substr(l_bind_value,1,1000);
    END IF ;
    IF pi_param_3 IS NOT NULL
    THEN
        derive_meaning(pi_inv_type    => l_nit_rec.nit_inv_type
                      ,pi_attrib_name => l_hatm_rec.hatm_param_3
                      ,pi_value       => pi_param_3
-                    ,po_meaning      => l_bind_param3);
+                    ,po_meaning      => l_bind_value);
+       l_bind_param3 := Substr(l_bind_value,1,1000);
    END IF ;
    IF pi_param_4 IS NOT NULL
    THEN
        derive_meaning(pi_inv_type    => l_nit_rec.nit_inv_type
                      ,pi_attrib_name => l_hatm_rec.hatm_param_4
                      ,pi_value       => pi_param_4
-                    ,po_meaning      => l_bind_param4);
+                    ,po_meaning      => l_bind_value);
+       l_bind_param4 := Substr(l_bind_value,1,1000);
    END IF ;
    IF pi_param_5 IS NOT NULL
    THEN
        derive_meaning(pi_inv_type    => l_nit_rec.nit_inv_type
                      ,pi_attrib_name => l_hatm_rec.hatm_param_5
                      ,pi_value       => pi_param_5
-                    ,po_meaning      => l_bind_param5);
+                    ,po_meaning      => l_bind_value);
+       l_bind_param5 := Substr(l_bind_value,1,1000);
    END IF ;
    IF pi_param_6 IS NOT NULL
    THEN
        derive_meaning(pi_inv_type    => l_nit_rec.nit_inv_type
                      ,pi_attrib_name => l_hatm_rec.hatm_param_6
                      ,pi_value       => pi_param_6
-                    ,po_meaning      => l_bind_param6);
+                    ,po_meaning      => l_bind_value);
+       l_bind_param6 := Substr(l_bind_value,1,1000);
    END IF ;
    IF pi_param_7 IS NOT NULL
    THEN
        derive_meaning(pi_inv_type    => l_nit_rec.nit_inv_type
                      ,pi_attrib_name => l_hatm_rec.hatm_param_7
                      ,pi_value       => pi_param_7
-                    ,po_meaning      => l_bind_param7);
+                    ,po_meaning      => l_bind_value);
+       l_bind_param7 := Substr(l_bind_value,1,1000);
    END IF ;
    IF pi_param_8 IS NOT NULL
    THEN
        derive_meaning(pi_inv_type    => l_nit_rec.nit_inv_type
                      ,pi_attrib_name => l_hatm_rec.hatm_param_8
                      ,pi_value       => pi_param_8
-                    ,po_meaning      => l_bind_param8);
+                    ,po_meaning      => l_bind_value);
+       l_bind_param8 := Substr(l_bind_value,1,1000);
    END IF ;
    IF pi_param_9 IS NOT NULL
    THEN
        derive_meaning(pi_inv_type    => l_nit_rec.nit_inv_type
                      ,pi_attrib_name => l_hatm_rec.hatm_param_9
                      ,pi_value       => pi_param_9
-                    ,po_meaning      => l_bind_param9);
+                    ,po_meaning      => l_bind_value);
+       l_bind_param9 := Substr(l_bind_value,1,1000);
    END IF ;
    IF pi_param_10 IS NOT NULL
    THEN
        derive_meaning(pi_inv_type    => l_nit_rec.nit_inv_type
                      ,pi_attrib_name => l_hatm_rec.hatm_param_10
                      ,pi_value       => pi_param_10
-                    ,po_meaning      => l_bind_param10);
+                    ,po_meaning      => l_bind_value);
+       l_bind_param10 := Substr(l_bind_value,1,1000);
    END IF ;
    IF l_email_body LIKE '%{0}%'
    THEN
@@ -826,7 +839,7 @@ BEGIN
            l_subject := Replace(l_subject,'{0}',pi_param_1);
        END IF ;
    END IF ;
-   IF l_subject LIKE '%{1}%'
+   IF  l_subject LIKE '%{1}%'
    THEN       
        IF l_bind_param2 IS NOT NULL
        THEN  
@@ -907,8 +920,8 @@ BEGIN
            l_subject := Replace(l_subject,'{9}',pi_param_10);
        END IF ;
    END IF ;   
-   po_subject    := l_subject ;
-   po_email_body := l_email_body;   
+   DBMS_LOB.READ (l_subject,l_subject_length,1,po_subject);
+   DBMS_LOB.READ (l_email_body,l_email_body_length,1,po_email_body);
 --
 END create_trg_alert ;
 --
@@ -917,16 +930,16 @@ IS
 --
    l_bind_param_cnt Number := 0 ;
    l_bind_param_sql Varchar2(32767) ;
-   l_bind_param1    Varchar2(100);
-   l_bind_param2    Varchar2(100);
-   l_bind_param3    Varchar2(100);
-   l_bind_param4    Varchar2(100);
-   l_bind_param5    Varchar2(100);
-   l_bind_param6    Varchar2(100);
-   l_bind_param7    Varchar2(100);
-   l_bind_param8    Varchar2(100);
-   l_bind_param9    Varchar2(100);
-   l_bind_param10   Varchar2(100);
+   l_bind_param1    Varchar2(4000);
+   l_bind_param2    Varchar2(4000);
+   l_bind_param3    Varchar2(4000);
+   l_bind_param4    Varchar2(4000);
+   l_bind_param5    Varchar2(4000);
+   l_bind_param6    Varchar2(4000);
+   l_bind_param7    Varchar2(4000);
+   l_bind_param8    Varchar2(4000);
+   l_bind_param9    Varchar2(4000);
+   l_bind_param10   Varchar2(4000);
    l_ita_rec nm_inv_type_attribs%ROWTYPE; 
    TYPE l_pk_type IS TABLE OF Varchar2(100) INDEX BY BINARY_INTEGER;
    l_pk_tab l_pk_type;
@@ -937,6 +950,8 @@ IS
    l_nit_rec nm_inv_types%ROWTYPE;
    l_halt_rec hig_alert_types%ROWTYPE ;
    l_har_rec hig_alert_recipients%ROWTYPE;
+   l_bind_param   Varchar2(4000);
+   l_subject_temp Varchar2(4000);
 --
 BEGIN
 --
@@ -969,6 +984,7 @@ BEGIN
                              ,pi_attrib_name => l_hatm_rec.hatm_param_1
                              ,pi_value       => l_bind_param1
                              ,po_meaning     => l_bind_param1);
+               l_bind_param1 := Substr(l_bind_param1,1,1000);              
            END IF ;
            IF l_bind_param2 IS NOT NULL  
            THEN
@@ -976,6 +992,7 @@ BEGIN
                              ,pi_attrib_name => l_hatm_rec.hatm_param_2
                              ,pi_value       => l_bind_param2
                              ,po_meaning     => l_bind_param2);
+               l_bind_param2 := Substr(l_bind_param2,1,1000);
            END IF ;
            IF l_bind_param3 IS NOT NULL  
            THEN
@@ -983,6 +1000,7 @@ BEGIN
                              ,pi_attrib_name => l_hatm_rec.hatm_param_3
                              ,pi_value       => l_bind_param3
                              ,po_meaning     => l_bind_param3);
+               l_bind_param3 := Substr(l_bind_param3,1,1000);
            END IF ;
            IF l_bind_param4 IS NOT NULL  
            THEN
@@ -990,6 +1008,7 @@ BEGIN
                              ,pi_attrib_name => l_hatm_rec.hatm_param_4
                              ,pi_value       => l_bind_param4
                              ,po_meaning     => l_bind_param4);
+               l_bind_param4 := Substr(l_bind_param4,1,1000);
            END IF ;
            IF l_bind_param5 IS NOT NULL  
            THEN
@@ -997,6 +1016,7 @@ BEGIN
                              ,pi_attrib_name => l_hatm_rec.hatm_param_5
                              ,pi_value       => l_bind_param5
                              ,po_meaning     => l_bind_param5);
+               l_bind_param5 := Substr(l_bind_param5,1,1000);
            END IF ;
            IF l_bind_param6 IS NOT NULL  
            THEN
@@ -1004,6 +1024,7 @@ BEGIN
                              ,pi_attrib_name => l_hatm_rec.hatm_param_6
                              ,pi_value       => l_bind_param6
                              ,po_meaning     => l_bind_param6);
+               l_bind_param6 := Substr(l_bind_param6,1,1000);
            END IF ;
            IF l_bind_param7 IS NOT NULL  
            THEN
@@ -1011,6 +1032,7 @@ BEGIN
                              ,pi_attrib_name => l_hatm_rec.hatm_param_7
                              ,pi_value       => l_bind_param7
                              ,po_meaning     => l_bind_param7);
+               l_bind_param7 := Substr(l_bind_param7,1,1000);
            END IF ;
            IF l_bind_param8 IS NOT NULL  
            THEN
@@ -1018,6 +1040,7 @@ BEGIN
                              ,pi_attrib_name => l_hatm_rec.hatm_param_8
                              ,pi_value       => l_bind_param8
                              ,po_meaning     => l_bind_param8);
+               l_bind_param8 := Substr(l_bind_param8,1,1000);
            END IF ;
            IF l_bind_param9 IS NOT NULL  
            THEN
@@ -1025,6 +1048,7 @@ BEGIN
                              ,pi_attrib_name => l_hatm_rec.hatm_param_9
                              ,pi_value       => l_bind_param9
                              ,po_meaning     => l_bind_param9);
+               l_bind_param9 := Substr(l_bind_param9,1,1000);
            END IF ;
            IF l_bind_param10 IS NOT NULL  
            THEN
@@ -1032,6 +1056,7 @@ BEGIN
                              ,pi_attrib_name => l_hatm_rec.hatm_param_10
                              ,pi_value       => l_bind_param10
                              ,po_meaning     => l_bind_param10);
+               l_bind_param10 := Substr(l_bind_param10,1,1000);
            END IF ;
            l_hal_rec.hal_mail_text := l_hatm_rec.hatm_mail_text ;
            IF l_hal_rec.hal_mail_text LIKE '%{0}%'
@@ -1076,44 +1101,64 @@ BEGIN
            END IF ;
            l_hal_rec.hal_subject  := l_hatm_rec.hatm_subject ;
            IF l_hal_rec.hal_subject LIKE '%{0}%'
+           AND Nvl(Length(l_subject_temp),0) < 500
            THEN
-               l_hal_rec.hal_subject := Replace(l_hal_rec.hal_subject,'{0}',l_bind_param1);
+               l_subject_temp := Replace(l_hal_rec.hal_subject,'{0}',l_bind_param1);
+               l_hal_rec.hal_subject := Substr(l_subject_temp,1,500);
            END IF ;
            IF l_hal_rec.hal_subject LIKE '%{1}%'
+           AND Nvl(Length(l_subject_temp),0) < 500
            THEN
                l_hal_rec.hal_subject := Replace(l_hal_rec.hal_subject,'{1}',l_bind_param2);
+               l_hal_rec.hal_subject := Substr(l_subject_temp,1,500);
            END IF ;
            IF l_hal_rec.hal_subject LIKE '%{2}%'
+           AND Nvl(Length(l_subject_temp),0) < 500
            THEN
                l_hal_rec.hal_subject := Replace(l_hal_rec.hal_subject,'{2}',l_bind_param3);
+               l_hal_rec.hal_subject := Substr(l_subject_temp,1,500);
            END IF ;
            IF l_hal_rec.hal_subject LIKE '%{3}%'
+           AND Nvl(Length(l_subject_temp),0) < 500
            THEN
                l_hal_rec.hal_subject := Replace(l_hal_rec.hal_subject,'{3}',l_bind_param4);
+               l_hal_rec.hal_subject := Substr(l_subject_temp,1,500);
            END IF ;
            IF l_hal_rec.hal_subject LIKE '%{4}%'
+           AND Nvl(Length(l_subject_temp),0) < 500
            THEN
                l_hal_rec.hal_subject := Replace(l_hal_rec.hal_subject,'{4}',l_bind_param5);
+               l_hal_rec.hal_subject := Substr(l_subject_temp,1,500);
            END IF ;
            IF l_hal_rec.hal_subject LIKE '%{5}%'
+           AND Nvl(Length(l_subject_temp),0) < 500
            THEN
                l_hal_rec.hal_subject := Replace(l_hal_rec.hal_subject,'{5}',l_bind_param6);
+               l_hal_rec.hal_subject := Substr(l_subject_temp,1,500);
            END IF ;
            IF l_hal_rec.hal_subject LIKE '%{6}%'
+           AND Nvl(Length(l_subject_temp),0) < 500
            THEN
                l_hal_rec.hal_subject := Replace(l_hal_rec.hal_subject,'{6}',l_bind_param7);
+               l_hal_rec.hal_subject := Substr(l_subject_temp,1,500);
            END IF ;
            IF l_hal_rec.hal_subject LIKE '%{7}%'
+           AND Nvl(Length(l_subject_temp),0) < 500
            THEN
                l_hal_rec.hal_subject := Replace(l_hal_rec.hal_subject,'{7}',l_bind_param8);
+               l_hal_rec.hal_subject := Substr(l_subject_temp,1,500);
            END IF ;
            IF l_hal_rec.hal_subject LIKE '%8}%'
+           AND Nvl(Length(l_subject_temp),0) < 500
            THEN
                l_hal_rec.hal_subject := Replace(l_hal_rec.hal_subject,'{8}',l_bind_param9);
+               l_hal_rec.hal_subject := Substr(l_subject_temp,1,500);
            END IF ;
            IF l_hal_rec.hal_subject LIKE '%{9}%'
+           AND Nvl(Length(l_subject_temp),0) < 500
            THEN
                l_hal_rec.hal_subject := Replace(l_hal_rec.hal_subject,'{9}',l_bind_param10);
+               l_hal_rec.hal_subject := Substr(l_subject_temp,1,500);
            END IF ;
            l_hal_rec.hal_halt_id := pi_halt_rec.halt_id;
            l_hal_rec.hal_pk_id  := l_pk_tab(i);
@@ -1694,43 +1739,43 @@ BEGIN
        append ('   l_hal_rec.hal_pk_id := :NEW.'||pi_pk_col||' ;');
        IF l_hatm_rec.hatm_param_1 IS NOT NULL 
        THEN 
-           append ('    l_param_1 := :NEW.'||l_hatm_rec.hatm_param_1||';');
+           append ('    l_param_1 := Substr(:NEW.'||l_hatm_rec.hatm_param_1||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_2 IS NOT NULL 
        THEN 
-           append ('    l_param_2 := :NEW.'||l_hatm_rec.hatm_param_2||';');
+           append ('    l_param_2 := Substr(:NEW.'||l_hatm_rec.hatm_param_2||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_3 IS NOT NULL 
        THEN 
-           append ('    l_param_3 := :NEW.'||l_hatm_rec.hatm_param_3||';');
+           append ('    l_param_3 := Substr(:NEW.'||l_hatm_rec.hatm_param_3||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_4 IS NOT NULL 
        THEN 
-           append ('    l_param_4 := :NEW.'||l_hatm_rec.hatm_param_4||';');
+           append ('    l_param_4 := Substr(:NEW.'||l_hatm_rec.hatm_param_4||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_5 IS NOT NULL 
        THEN 
-           append ('    l_param_5 := :NEW.'||l_hatm_rec.hatm_param_5||';');
+           append ('    l_param_5 := Substr(:NEW.'||l_hatm_rec.hatm_param_5||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_6 IS NOT NULL 
        THEN 
-           append ('    l_param_6 := :NEW.'||l_hatm_rec.hatm_param_6||';');
+           append ('    l_param_6 := Substr(:NEW.'||l_hatm_rec.hatm_param_6||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_7 IS NOT NULL 
        THEN 
-           append ('    l_param_7 := :NEW.'||l_hatm_rec.hatm_param_7||';');
+           append ('    l_param_7 := Substr(:NEW.'||l_hatm_rec.hatm_param_7||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_8 IS NOT NULL 
        THEN 
-           append ('    l_param_8 := :NEW.'||l_hatm_rec.hatm_param_8||';');
+           append ('    l_param_8 := Substr(:NEW.'||l_hatm_rec.hatm_param_8||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_9 IS NOT NULL 
        THEN 
-           append ('    l_param_9 := :NEW.'||l_hatm_rec.hatm_param_9||';');
+           append ('    l_param_9 := Substr(:NEW.'||l_hatm_rec.hatm_param_9||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_10 IS NOT NULL 
        THEN 
-           append ('    l_param_10 := :NEW.'||l_hatm_rec.hatm_param_10||';');
+           append ('    l_param_10 := Substr(:NEW.'||l_hatm_rec.hatm_param_10||',1,1000);');
        END IF ;    
        append ('   l_halt_rec := hig_alert.get_halt('||pi_halt_id||');');       
        append ('   hig_alert.create_trg_alert(l_halt_rec,l_param_1,l_param_2,l_param_3,l_param_4,l_param_5,l_param_6,l_param_7,l_param_8,l_param_9,l_param_10,l_hal_rec.hal_subject,l_hal_rec.hal_mail_text);');
@@ -1796,43 +1841,43 @@ BEGIN
        append ('   l_hal_rec.hal_pk_id := :OLD.'||pi_pk_col||' ;');
        IF l_hatm_rec.hatm_param_1 IS NOT NULL 
        THEN 
-           append ('    l_param_1 := :OLD.'||l_hatm_rec.hatm_param_1||';');
+           append ('    l_param_1 := := Substr(:OLD.'||l_hatm_rec.hatm_param_1||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_2 IS NOT NULL 
        THEN 
-           append ('    l_param_2 := :OLD.'||l_hatm_rec.hatm_param_2||';');
+           append ('    l_param_2 := := Substr(:OLD.'||l_hatm_rec.hatm_param_2||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_3 IS NOT NULL 
        THEN 
-           append ('    l_param_3 := :OLD.'||l_hatm_rec.hatm_param_3||';');
+           append ('    l_param_3 := := Substr(:OLD.'||l_hatm_rec.hatm_param_3||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_4 IS NOT NULL 
        THEN 
-           append ('    l_param_4 := :OLD.'||l_hatm_rec.hatm_param_4||';');
+           append ('    l_param_4 := := Substr(:OLD.'||l_hatm_rec.hatm_param_4||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_5 IS NOT NULL 
        THEN 
-           append ('    l_param_5 := :OLD.'||l_hatm_rec.hatm_param_5||';');
+           append ('    l_param_5 := := Substr(:OLD.'||l_hatm_rec.hatm_param_5||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_6 IS NOT NULL 
        THEN 
-           append ('    l_param_6 := :OLD.'||l_hatm_rec.hatm_param_6||';');
+           append ('    l_param_6 := := Substr(:OLD.'||l_hatm_rec.hatm_param_6||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_7 IS NOT NULL 
        THEN 
-           append ('    l_param_7 := :OLD.'||l_hatm_rec.hatm_param_7||';');
+           append ('    l_param_7 := := Substr(:OLD.'||l_hatm_rec.hatm_param_7||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_8 IS NOT NULL 
        THEN 
-           append ('    l_param_8 := :OLD.'||l_hatm_rec.hatm_param_8||';');
+           append ('    l_param_8 := := Substr(:OLD.'||l_hatm_rec.hatm_param_8||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_9 IS NOT NULL 
        THEN 
-           append ('    l_param_9 := :OLD.'||l_hatm_rec.hatm_param_9||';');
+           append ('    l_param_9 := := Substr(:OLD.'||l_hatm_rec.hatm_param_9||',1,1000);');
        END IF ;
        IF l_hatm_rec.hatm_param_10 IS NOT NULL 
        THEN 
-           append ('    l_param_10 := :OLD.'||l_hatm_rec.hatm_param_10||';');
+           append ('    l_param_10 := Substr(:OLD.'||l_hatm_rec.hatm_param_10||',1,1000);');
        END IF ;  
        append ('   l_halt_rec := hig_alert.get_halt('||pi_halt_id||');');
        append ('   hig_alert.create_trg_alert(l_halt_rec,l_param_1,l_param_2,l_param_3,l_param_4,l_param_5,l_param_6,l_param_7,l_param_8,l_param_9,l_param_10,l_hal_rec.hal_subject,l_hal_rec.hal_mail_text);');
@@ -2033,7 +2078,7 @@ BEGIN
         append ('   l_param_9     Varchar2(1000); ');
         append ('   l_param_10    Varchar2(1000); ');
         append ('   l_subject     Varchar2(1000); ');
-        append ('   l_email_body Long; ');
+        append ('   l_email_body  Clob; ');
         append ('BEGIN');
         append ('--');
         append ('   l_hal_rec.hal_halt_id := '||l_halt_rec.halt_id||';'); 
