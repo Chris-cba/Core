@@ -21,7 +21,6 @@ WHERE EXISTS (SELECT 1
                     ,hig_user_roles
                WHERE gthr_theme_id   = gt_theme_id
                 AND  hur_username    = USER
-                AND  gthr_role       = hur_role
-                AND  hur_start_date <= nm3context.get_effective_date
+                AND  gthr_role       = hur_role 
              )
 /
