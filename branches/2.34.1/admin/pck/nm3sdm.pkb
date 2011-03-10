@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.34.1.0   Sep 02 2010 11:59:14   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.34.1.1   Mar 10 2011 12:15:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Sep 02 2010 11:59:14  $
---       Date fetched Out : $Modtime:   Sep 02 2010 11:56:56  $
---       PVCS Version     : $Revision:   2.34.1.0  $
+--       Date into PVCS   : $Date:   Mar 10 2011 12:15:02  $
+--       Date fetched Out : $Modtime:   Mar 10 2011 12:11:32  $
+--       PVCS Version     : $Revision:   2.34.1.1  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.34.1.0  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.34.1.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -5071,16 +5071,18 @@ end;
 --    ' and '||to_char(p_nm_end_mp)|| ' on '||nm3net.get_ne_unique( p_nm_ne_id_of ));
       FOR irec IN c_inv_tab (p_nm_obj_type, p_nm_ne_id_of )
       LOOP
-         upd_string :=
+          upd_string :=
                'update '
             || irec.nth_feature_table
             || ' set geoloc = :newshape, '
             || '     nm_begin_mp = :new_begin_mp,'
-            || '     nm_end_mp   = :new_end_mp '
+            || '     nm_end_mp   = :new_end_mp, '
+            || '     start_date = :new_start_date, '
+            || '     end_date   = :new_end_date '
             || '  where ne_id = :ne_id'
             || ' and ne_id_of = :ne_id_of '
             || ' and nm_begin_mp = :nm_begin_mp '
-            || ' and end_date is null';
+            || ' and start_date  = :old_start_date ';
 
          IF l_nit.nit_pnt_or_cont = 'P'
          THEN
@@ -5103,13 +5105,14 @@ end;
                      USING l_geom,
                            p_new_begin_mp,
                            p_nm_end_mp,
+                           p_new_start_date,
+                           p_nm_end_date,
                            p_nm_ne_id_in,
                            p_nm_ne_id_of,
-                           p_old_begin_mp;
+                           p_old_begin_mp,
+                           p_old_start_date;
       END LOOP;
    END;
-
-
 --
 -----------------------------------------------------------------------------
 --
