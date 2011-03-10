@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_ddl_upg.sql-arc   3.0   Feb 28 2011 11:54:24   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_ddl_upg.sql-arc   3.1   Mar 10 2011 16:18:38   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4300_nm4400_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Feb 28 2011 11:54:24  $
---       Date fetched Out : $Modtime:   Feb 28 2011 11:54:00  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Mar 10 2011 16:18:38  $
+--       Date fetched Out : $Modtime:   Mar 10 2011 15:43:34  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -62,7 +62,7 @@ END;
 
 ------------------------------------------------------------------
 SET TERM ON
-PROMPT Element Descrition field increase
+PROMPT Element Description field increase
 SET TERM OFF
 
 ------------------------------------------------------------------
@@ -164,6 +164,7 @@ BEGIN
     WHEN role_exists
     THEN NULL;
   END;
+  EXECUTE IMMEDIATE 'GRANT EXECUTE ON DBMS_NETWORK_ACL_ADMIN TO FTP_USER';
   EXECUTE IMMEDIATE 'GRANT FTP_USER to '||USER;
   EXECUTE IMMEDIATE 'GRANT FTP_USER to '||USER||' WITH ADMIN OPTION';
 EXCEPTION
@@ -183,6 +184,7 @@ BEGIN
     WHEN role_exists
     THEN NULL;
   END;
+  EXECUTE IMMEDIATE 'GRANT EXECUTE ON DBMS_NETWORK_ACL_ADMIN TO EMAIL_USER';
   EXECUTE IMMEDIATE 'GRANT EMAIL_USER to '||USER;
   EXECUTE IMMEDIATE 'GRANT EMAIL_USER to '||USER||' WITH ADMIN OPTION';
 EXCEPTION
@@ -190,6 +192,34 @@ EXCEPTION
   THEN NULL;
 END;
 /
+
+INSERT INTO hig_user_roles
+(hur_username, hur_role, hur_start_date)
+SELECT hus_username, 'FTP_USER', hus_start_date
+  FROM hig_users
+ WHERE hus_is_hig_owner_flag = 'N'
+   AND EXISTS
+   (SELECT 1 FROM all_users
+     WHERE username = hus_username)
+   AND NOT EXISTS
+   (SELECT 1 FROM hig_user_roles
+     WHERE hur_username = hus_username
+       AND hur_role = 'FTP_USER');
+       
+INSERT INTO hig_user_roles
+(hur_username, hur_role, hur_start_date)
+SELECT hus_username, 'EMAIL_USER', hus_start_date
+  FROM hig_users
+ WHERE hus_is_hig_owner_flag = 'N'
+   AND EXISTS
+   (SELECT 1 FROM all_users
+     WHERE username = hus_username)
+   AND NOT EXISTS
+   (SELECT 1 FROM hig_user_roles
+     WHERE hur_username = hus_username
+       AND hur_role = 'EMAIL_USER');
+
+
 ------------------------------------------------------------------
 
 
@@ -205,9 +235,9 @@ SET TERM OFF
 -- TASK DETAILS
 -- Introduced functionalty to allow the Process Framework to be switched off.
 -- 
--- This is a necessity during product upgrades.
+-- A new Form HIG2550 Process Framework Administration has been introduced to show the Status of the Process Framework and to allow it to be shut down/started.
 -- 
--- A new Form HIG2550 Process Framework Administration has been created. Also additional checks have been added to the Upgrade, Install and Compile All scripts to check for Running Processes before allowing them to run.
+-- Additional pre-upgrade/pre-install checks have been added to product upgrade and install scripts to shut down the framework and to ensure that there are no running processes.
 -- 
 -- 
 -- DEVELOPMENT COMMENTS (CHRIS STRETTLE)

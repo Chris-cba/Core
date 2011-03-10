@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_metadata_upg.sql-arc   3.0   Feb 28 2011 11:54:24   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_metadata_upg.sql-arc   3.1   Mar 10 2011 16:18:38   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4300_nm4400_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Feb 28 2011 11:54:24  $
---       Date fetched Out : $Modtime:   Feb 28 2011 11:54:00  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Mar 10 2011 16:18:38  $
+--       Date fetched Out : $Modtime:   Mar 10 2011 15:43:36  $
+--       Version          : $Revision:   3.1  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -167,6 +167,22 @@ SELECT 'HIG',554,NULL,'The ACL you are trying to reference does not exist',''
 -----------------------------------------------------
 -- ACL Errors finished
 -----------------------------------------------------
+-- CWS Process Framework error
+--
+INSERT INTO NM_ERRORS ( NER_APPL
+                      , NER_ID
+                      , NER_DESCR)
+SELECT 'NET'
+     , 556
+     , 'The Process Framework is shutting down/shut down. This operation is not currently permitted'
+     FROM DUAL
+     WHERE NOT EXISTS (SELECT 'X' 
+                       FROM NM_ERRORS
+                       WHERE NER_APPL = 'NET'
+                       AND NER_ID = 556)
+/
+
+
 
 ------------------------------------------------------------------
 
@@ -353,9 +369,9 @@ SET TERM OFF
 -- TASK DETAILS
 -- Introduced functionalty to allow the Process Framework to be switched off.
 -- 
--- This is a necessity during product upgrades.
+-- A new Form HIG2550 Process Framework Administration has been introduced to show the Status of the Process Framework and to allow it to be shut down/started.
 -- 
--- A new Form HIG2550 Process Framework Administration has been created. Also additional checks have been added to the Upgrade, Install and Compile All scripts to check for Running Processes before allowing them to run.
+-- Additional pre-upgrade/pre-install checks have been added to product upgrade and install scripts to shut down the framework and to ensure that there are no running processes.
 -- 
 -- 
 -- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
