@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.50   Feb 03 2011 11:45:36   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.51   Mar 14 2011 11:04:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Feb 03 2011 11:45:36  $
---       Date fetched Out : $Modtime:   Feb 03 2011 11:44:30  $
---       PVCS Version     : $Revision:   2.50  $
+--       Date into PVCS   : $Date:   Mar 14 2011 11:04:24  $
+--       Date fetched Out : $Modtime:   Mar 14 2011 10:59:10  $
+--       PVCS Version     : $Revision:   2.51  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.50  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.51  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -1477,17 +1477,55 @@ l_theme_list nm_theme_list;
 l_lref       nm_lref;
 l_geom       mdsys.sdo_geometry := get_2d_pt( p_geom );
 nerow        nm_elements%ROWTYPE;
+
+l_base_themes nm_theme_array := NM3ARRAY.INIT_NM_THEME_ARRAY;
+
 BEGIN
 
---  l_theme_list := nm3sdo.get_nw_snaps_at_xy( p_theme, p_geom );
+-- First check if there is an over-riding theme snapping rule
 
-    l_lref := get_nearest_nw_to_xy( l_geom.sdo_point.x, l_geom.sdo_point.y, get_base_themes( p_theme ) );
+    SELECT nm_theme_entry( a.nth_theme_id )
+    bulk collect
+    into l_base_themes.nta_theme_array
+    FROM NM_THEME_SNAPS, nm_themes_all b, nm_themes_all a
+    WHERE nts_theme_id = 175
+    and a.nth_theme_id = nts_snap_to
+    and b.nth_theme_id = nts_theme_id 
+    and exists ( select 1 from nm_nw_themes where nnth_nth_theme_id = a.nth_theme_id )
+    order by nts_priority;             
+
+             
+    if l_base_themes.nta_theme_array.count = 0 then
+
+      SELECT nm_theme_entry( a.nth_theme_id )
+      bulk collect
+      into l_base_themes.nta_theme_array
+      FROM NM_BASE_THEMES, nm_themes_all b, nm_themes_all a
+      WHERE nbth_theme_id = p_theme
+      and b.nth_theme_id = nbth_base_theme
+      and nvl(a.nth_base_table_theme, a.nth_theme_id) = b.nth_theme_id
+      and exists ( select 1 from nm_theme_roles where nthr_theme_id = a.nth_theme_id );
+      
+      if l_base_themes.nta_theme_array.count = 0 then
+      
+        Hig.raise_ner(pi_appl                => Nm3type.c_hig
+                    ,pi_id                 => 286
+                    ,pi_sqlcode            => -20001
+                    );
+      end if;
+
+
+    end if;
+    
+    l_lref := get_nearest_nw_to_xy( l_geom.sdo_point.x, l_geom.sdo_point.y, l_base_themes );
+    
+    nm_debug.debug('lref = '||l_lref.lr_ne_id||','||l_lref.lr_offset );
 
 --  l_lref       := nm_lref( l_theme_list.ntl_theme_list(1).ntd_pk_id, l_theme_list.ntl_theme_list(1).ntd_measure );
 
     nerow := Nm3get.get_ne( l_lref.lr_ne_id );
 
- l_lref.lr_offset := LEAST( nerow.ne_length, Nm3unit.get_formatted_value( l_lref.lr_offset, Nm3net.get_nt_units( nerow.ne_nt_type )));
+    l_lref.lr_offset := LEAST( nvl(nerow.ne_length, l_lref.lr_offset), Nm3unit.get_formatted_value( l_lref.lr_offset, Nm3net.get_nt_units( nerow.ne_nt_type )));
 
     RETURN l_lref;
 
@@ -1499,7 +1537,6 @@ EXCEPTION
                     );
 --  raise_application_error( -20001, 'No snaps at this position');
 END;
-
 --
 --------------------------------------------------------------------------------------------------------------------
 --
@@ -10362,8 +10399,8 @@ BEGIN
 
   end if;
 
-  nm_debug.debug_on;
-  nm_debug.debug(curstr);
+--nm_debug.debug_on;
+--nm_debug.debug(curstr);
   
   EXECUTE IMMEDIATE curstr BULK COLLECT INTO retval.ntl_theme_list
     --USING p_nth.nth_theme_id, p_nth.nth_theme_name, p_nth.nth_theme_name, p_ntl;
