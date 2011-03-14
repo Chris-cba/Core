@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.52   Mar 14 2011 16:00:38   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.53   Mar 14 2011 17:18:44   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Mar 14 2011 16:00:38  $
---       Date fetched Out : $Modtime:   Mar 14 2011 16:00:04  $
---       PVCS Version     : $Revision:   2.52  $
+--       Date into PVCS   : $Date:   Mar 14 2011 17:18:44  $
+--       Date fetched Out : $Modtime:   Mar 14 2011 17:17:32  $
+--       PVCS Version     : $Revision:   2.53  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.52  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.53  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -9685,8 +9685,11 @@ END;
             l_rnd := Nm3unit.get_rounding (l_sdo.diminfo (1).sdo_tolerance);
          END IF;
 
-         p_x := ROUND (l_geom.sdo_ordinates (1), l_rnd);
-         p_y := ROUND (l_geom.sdo_ordinates (2), l_rnd);
+         p_x := l_geom.sdo_ordinates (1);
+         p_y := l_geom.sdo_ordinates (2);
+		 
+--       p_x := ROUND (l_geom.sdo_ordinates (1), l_rnd);
+--       p_y := ROUND (l_geom.sdo_ordinates (2), l_rnd);
       ELSE
          p_x := NULL;
          p_y := NULL;
