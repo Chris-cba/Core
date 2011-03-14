@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.7   Mar 07 2011 11:06:00   Chris.Strettle  $
---       Module Name      : $Workfile:   nm3jobsa.pkb  $
---       Date into PVCS   : $Date:   Mar 07 2011 11:06:00  $
---       Date fetched Out : $Modtime:   Mar 07 2011 11:04:10  $
---       PVCS Version     : $Revision:   3.7  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.8   Mar 14 2011 10:18:24   Chris.Strettle  $
+--       Module Name      : $Workfile:   nm3jobs.pkb  $
+--       Date into PVCS   : $Date:   Mar 14 2011 10:18:24  $
+--       Date fetched Out : $Modtime:   Mar 14 2011 09:52:36  $
+--       PVCS Version     : $Revision:   3.8  $
 --
 --   NM3 DBMS_SCHEDULER wrapper
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.7  $"';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.8  $"';
   g_package_name         CONSTANT VARCHAR2(30)   := 'nm3jobs';
   ex_resource_busy                EXCEPTION;
   g_default_comment               VARCHAR2(500)  := 'Created by nm3job ';
@@ -208,8 +208,8 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   EXCEPTION
   WHEN ex_scheduler_down THEN
   --
-    hig.raise_ner( pi_appl => 'NET'
-                 , pi_id => 556);
+    hig.raise_ner( pi_appl => 'HIG'
+                 , pi_id => 555);
   --
   END run_job;
 --
