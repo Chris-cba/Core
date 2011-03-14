@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.19   Mar 08 2011 15:18:16   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.20   Mar 14 2011 10:17:44   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Mar 08 2011 15:18:16  $
---       Date fetched Out : $Modtime:   Mar 08 2011 14:26:36  $
---       Version          : $Revision:   3.19  $
+--       Date into PVCS   : $Date:   Mar 14 2011 10:17:44  $
+--       Date fetched Out : $Modtime:   Mar 14 2011 09:47:54  $
+--       Version          : $Revision:   3.20  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.19  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.20  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -771,8 +771,8 @@ PROCEDURE create_and_schedule_process    (pi_process_type_id           IN hig_pr
 BEGIN
  IF get_scheduler_state != 'UP'
  THEN
-   hig.raise_ner( pi_appl => 'NET'
-                , pi_id   => 556
+   hig.raise_ner( pi_appl => 'HIG'
+                , pi_id   => 555
                 );
  END IF;
 
