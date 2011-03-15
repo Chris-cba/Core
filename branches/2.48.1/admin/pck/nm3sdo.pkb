@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.48.1.6   Mar 14 2011 17:21:02   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.48.1.7   Mar 15 2011 12:12:50   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Mar 14 2011 17:21:02  $
---       Date fetched Out : $Modtime:   Mar 14 2011 17:20:06  $
---       PVCS Version     : $Revision:   2.48.1.6  $
+--       Date into PVCS   : $Date:   Mar 15 2011 12:12:50  $
+--       Date fetched Out : $Modtime:   Mar 15 2011 12:12:14  $
+--       PVCS Version     : $Revision:   2.48.1.7  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.48.1.6  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.48.1.7  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -1490,7 +1490,7 @@ BEGIN
     bulk collect
     into l_base_themes.nta_theme_array
     FROM NM_THEME_SNAPS, nm_themes_all b, nm_themes_all a
-    WHERE nts_theme_id = 175
+    WHERE nts_theme_id = p_theme
     and a.nth_theme_id = nts_snap_to
     and b.nth_theme_id = nts_theme_id 
     and exists ( select 1 from nm_nw_themes where nnth_nth_theme_id = a.nth_theme_id )
