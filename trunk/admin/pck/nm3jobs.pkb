@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.9   Mar 15 2011 11:18:04   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.10   Mar 15 2011 16:30:06   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3jobs.pkb  $
---       Date into PVCS   : $Date:   Mar 15 2011 11:18:04  $
---       Date fetched Out : $Modtime:   Mar 15 2011 11:16:22  $
---       PVCS Version     : $Revision:   3.9  $
+--       Date into PVCS   : $Date:   Mar 15 2011 16:30:06  $
+--       Date fetched Out : $Modtime:   Mar 15 2011 15:34:54  $
+--       PVCS Version     : $Revision:   3.10  $
 --
 --   NM3 DBMS_SCHEDULER wrapper
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.9  $"';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.10  $"';
   g_package_name         CONSTANT VARCHAR2(30)   := 'nm3jobs';
   ex_resource_busy                EXCEPTION;
   g_default_comment               VARCHAR2(500)  := 'Created by nm3job ';
@@ -200,7 +200,17 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   IS 
   -- CWS 0109403 When Process framework is down give the user a sensible error.
   ex_scheduler_down EXCEPTION;
-  PRAGMA EXCEPTION_INIT(ex_scheduler_down, -27492); 
+  PRAGMA EXCEPTION_INIT(ex_scheduler_down, -27492);
+  --
+  CURSOR check_up_cur
+  IS
+  SELECT 'X' 
+  FROM dba_scheduler_global_attribute 
+  WHERE attribute_name='SCHEDULER_DISABLED'
+  AND VALUE = 'TRUE';
+  --
+  l_up VARCHAR2(1);
+  --
   BEGIN
     dbms_scheduler.run_job
         ( job_name            => pi_job_name
@@ -208,12 +218,28 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   EXCEPTION
   WHEN ex_scheduler_down THEN
   --
+  OPEN check_up_cur;
+  FETCH check_up_cur INTO l_up;
+  CLOSE check_up_cur;
+  --
+  IF l_up IS NULL 
+  THEN 
     hig.raise_ner( pi_appl => 'HIG'
-                 , pi_id => 555);
+                 , pi_id   => 556
+                 , pi_supplementary_info => nm3flx.parse_error_message(SQLERRM)
+                 );
+  ELSE
+    hig.raise_ner( pi_appl => 'HIG'
+                 , pi_id   => 555
+                 );
+  END IF;
   --
   WHEN OTHERS THEN
   --
-    RAISE;
+    hig.raise_ner( pi_appl => 'HIG'
+                 , pi_id   => 556
+                 , pi_supplementary_info => nm3flx.parse_error_message(SQLERRM)
+                 );
   --
   END run_job;
 --
