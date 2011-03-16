@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.9   Feb 11 2011 16:44:30   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.10   Mar 16 2011 11:26:34   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3reclass.pkb  $
---       Date into PVCS   : $Date:   Feb 11 2011 16:44:30  $
---       Date fetched Out : $Modtime:   Feb 11 2011 16:43:44  $
---       PVCS Version     : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Mar 16 2011 11:26:34  $
+--       Date fetched Out : $Modtime:   Mar 09 2011 16:21:16  $
+--       PVCS Version     : $Revision:   2.10  $
 --
 --
 --   Author : R.A. Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.10  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';
@@ -235,47 +235,46 @@ FUNCTION can_element_be_reclassed(pi_ne_rec         IN nm_elements%ROWTYPE
 BEGIN
 
   nm_debug.proc_start(g_package_name,'can_element_be_reclassed');
-
+  --
   IF NVL(pi_effective_date,TRUNC(SYSDATE)) > TRUNC(SYSDATE) THEN
-	 set_output_params(nm3type.c_net 
-	                  ,165  
-					  ,null);  
+   set_output_params(nm3type.c_net 
+                    ,165  
+                    ,null);  
      RETURN(FALSE);					  
   END IF;
-
-  
-  IF NOT nm3user.is_user_unrestricted THEN
-	 set_output_params(nm3type.c_net 
-	                  ,174 
-					  ,null);  
-     RETURN(FALSE);					  
-  END IF;  
-  
- 
-  
+  --
+  IF  NOT nm3user.is_user_unrestricted 
+  AND NOT(nm3inv_security.can_usr_see_all_inv_on_element(pi_ne_id => pi_ne_rec.ne_id))
+  THEN
+    set_output_params( nm3type.c_net 
+                     , 172 -- 174 
+                     , NULL);  
+    RETURN(FALSE);
+  END IF;
+  --
   IF nm3net.element_has_future_dated_membs(pi_ne_id          => pi_ne_rec.ne_id
                                           ,pi_effective_date => pi_effective_date) THEN
-	 set_output_params(nm3type.c_net 
-	                  ,378  -- Element has memberships with a future start date
-					  ,null);  
+   set_output_params( nm3type.c_net 
+                    , 378  -- Element has memberships with a future start date
+                    , null);  
   
      RETURN(FALSE);
   END IF;
   --
   IF  element_has_future_dt_ad_links( pi_ne_id            =>  pi_ne_rec.ne_id
-                                                     , pi_effective_date => pi_effective_date) THEN
+                                    , pi_effective_date => pi_effective_date) THEN
      set_output_params(nm3type.c_net 
                       ,378  
                       ,'AD Links exist after the effective date.');  
-  
+  --
      RETURN(FALSE);
   END IF;
-  
+  --
   check_other_products ( p_ne_id          => pi_ne_rec.ne_id
                         ,p_effective_date => pi_effective_date
                         ,p_errors         => l_errors
                         ,p_err_text       => l_err_text
-    				    );
+                       );
 
   IF l_err_text IS NOT NULL  THEN
   	 set_output_params(nm3type.c_net 
