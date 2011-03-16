@@ -5,11 +5,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkh-arc   3.4   Apr 14 2010 15:27:20   gjohnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkh-arc   3.5   Mar 16 2011 17:34:26   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3jobs.pkh  $
---       Date into PVCS   : $Date:   Apr 14 2010 15:27:20  $
---       Date fetched Out : $Modtime:   Apr 14 2010 15:15:46  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Mar 16 2011 17:34:26  $
+--       Date fetched Out : $Modtime:   Mar 16 2011 17:31:04  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version : 1.21
 -------------------------------------------------------------------------
 --   Author : A Edwards
@@ -25,7 +25,7 @@ AS
 --<GLOBVAR>
 -- g_sccsid is the SCCS_ID
 -- Constants
-  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.4  $"';
+  g_sccsid           CONSTANT VARCHAR2(80) := '"$Revision:   3.5  $"';
 --
 -- Some invervals
 --
@@ -258,6 +258,20 @@ FUNCTION calendar_string_in_mins(pi_calendar_string  IN VARCHAR2) RETURN PLS_INT
 --</PROC>
 --
 -----------------------------------------------------------------------------
---                                 
+--            
+-- Returns UP (Scheduler Enabled), SHUTTING DOWN (Scheduler Disabled but processes are running)
+-- and DOWN (Scheduler Disabled with all processes stopped)
+--<PROC NAME="get_scheduler_state">
+FUNCTION get_scheduler_state RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="count_running_processes">
+FUNCTION count_running_processes RETURN PLS_INTEGER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
 END nm3jobs;
 /
