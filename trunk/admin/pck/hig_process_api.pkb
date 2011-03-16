@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.20   Mar 14 2011 10:17:44   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.21   Mar 16 2011 17:34:22   Chris.Strettle  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Mar 14 2011 10:17:44  $
---       Date fetched Out : $Modtime:   Mar 14 2011 09:47:54  $
---       Version          : $Revision:   3.20  $
+--       Date into PVCS   : $Date:   Mar 16 2011 17:34:22  $
+--       Date fetched Out : $Modtime:   Mar 16 2011 17:28:38  $
+--       Version          : $Revision:   3.21  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.20  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.21  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -1661,63 +1661,19 @@ BEGIN
 END valid_process_of_type_exists;
 --
 -----------------------------------------------------------------------------
---
-FUNCTION count_running_processes RETURN PLS_INTEGER IS
---
- l_retval pls_integer;
---
-BEGIN
---
- SELECT COUNT(*)
- INTO l_retval
- FROM hig_processes a,
-      dba_scheduler_jobs b,
-      hig_users c
- WHERE a.hp_job_name = b.job_name
- AND   b.owner = c.hus_username
- AND   b.state = 'RUNNING';
-   
- return (l_retval);
-
-END count_running_processes;
---
------------------------------------------------------------------------------
 --  
 FUNCTION get_scheduler_state RETURN VARCHAR2 IS
-
-  l_scheduler_disabled dba_scheduler_global_attribute.value%TYPE;
-  l_retval             varchar2(20);
 --
 BEGIN
---
- select value
- into l_scheduler_disabled 
- from dba_scheduler_global_attribute 
- where attribute_name='SCHEDULER_DISABLED';
-
- IF NVL(l_scheduler_disabled,'FALSE') = 'TRUE' THEN
- 
-   IF count_running_processes = 0 THEN
-      l_retval := 'DOWN';
-   ELSE
-      l_retval := 'SHUTTING DOWN';
-   END IF;
-   
- ELSE
- 
-  l_retval := 'UP';  
-         
- END IF;
-
- RETURN l_retval;
-
-EXCEPTION
-  WHEN no_data_found THEN
-     RETURN('UP');
-  WHEN others THEN
-     RAISE;
---
+RETURN nm3jobs.get_scheduler_state;
 END get_scheduler_state;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION count_running_processes RETURN PLS_INTEGER IS
+BEGIN
+RETURN nm3jobs.count_running_processes;
+END count_running_processes;
 --
 -----------------------------------------------------------------------------
 --
