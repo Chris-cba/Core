@@ -3,11 +3,11 @@ create or replace package nm3inv_security as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_security.pkh-arc   2.1   Jan 06 2010 16:38:28   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_security.pkh-arc   2.2   Mar 16 2011 11:19:38   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3inv_security.pkh  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:28  $
---       Date fetched Out : $Modtime:   Jan 05 2010 17:48:10  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Mar 16 2011 11:19:38  $
+--       Date fetched Out : $Modtime:   Mar 15 2011 11:04:24  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --
@@ -20,7 +20,7 @@ create or replace package nm3inv_security as
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
@@ -42,7 +42,9 @@ FUNCTION get_body_version RETURN varchar2;
 --
 --<PROC NAME="can_usr_see_all_inv_on_element">
 -- This function returns TRUE if the user can see all inventory items on the element
-FUNCTION can_usr_see_all_inv_on_element (pi_ne_id IN nm_members.nm_ne_id_of%TYPE) RETURN BOOLEAN;
+FUNCTION can_usr_see_all_inv_on_element ( pi_ne_id IN nm_members.nm_ne_id_of%TYPE
+                                        , pi_check_grandchildren BOOLEAN DEFAULT FALSE
+                                        ) RETURN BOOLEAN;
 --</PROC>
 --
 -----------------------------------------------------------------------------
