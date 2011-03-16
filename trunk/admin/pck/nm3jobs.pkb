@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.10   Mar 15 2011 16:30:06   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3jobs.pkb-arc   3.11   Mar 16 2011 17:34:24   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3jobs.pkb  $
---       Date into PVCS   : $Date:   Mar 15 2011 16:30:06  $
---       Date fetched Out : $Modtime:   Mar 15 2011 15:34:54  $
---       PVCS Version     : $Revision:   3.10  $
+--       Date into PVCS   : $Date:   Mar 16 2011 17:34:24  $
+--       Date fetched Out : $Modtime:   Mar 16 2011 17:18:00  $
+--       PVCS Version     : $Revision:   3.11  $
 --
 --   NM3 DBMS_SCHEDULER wrapper
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.10  $"';
+  g_body_sccsid          CONSTANT VARCHAR2(2000) :='"$Revision:   3.11  $"';
   g_package_name         CONSTANT VARCHAR2(30)   := 'nm3jobs';
   ex_resource_busy                EXCEPTION;
   g_default_comment               VARCHAR2(500)  := 'Created by nm3job ';
@@ -103,24 +103,23 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
               , pi_run_synchro     IN BOOLEAN   DEFAULT TRUE)
   IS
     l_arg_count NUMBER := g_args.COUNT;
-    
+    no_create_job    EXCEPTION;
+    no_create_ex_job EXCEPTION;
+    scheduler_down   EXCEPTION;
     
   BEGIN
   --
-     IF NOT nm3user.user_has_priv(pi_priv => 'CREATE JOB') THEN
-
-      hig.raise_ner(pi_appl => 'HIG'
-                   ,pi_id   => 126
-                   ,pi_supplementary_info => 'Create Job'); -- You do not have privileges to perform this action
-
+     IF get_scheduler_state != 'UP'
+     THEN
+       RAISE scheduler_down;
      END IF;
-
+     --
+     IF NOT nm3user.user_has_priv(pi_priv => 'CREATE JOB') THEN
+       RAISE no_create_job;
+     END IF;
+     --
      IF pi_job_type = 'EXECUTABLE' AND NOT nm3user.user_has_priv(pi_priv => 'CREATE EXTERNAL JOB') THEN
-
-      hig.raise_ner(pi_appl => 'HIG'
-                   ,pi_id   => 126
-                   ,pi_supplementary_info => 'Create External Job'); -- You do not have privileges to perform this action
-
+       RAISE no_create_ex_job;
      END IF;  
 
     IF l_arg_count = 0
@@ -183,6 +182,24 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
     instantiate_args;
   --
   EXCEPTION
+    WHEN scheduler_down
+    THEN 
+      hig.raise_ner( pi_appl => 'HIG'
+                    , pi_id   => 555
+                    );
+    --
+    WHEN no_create_job
+    THEN 
+          hig.raise_ner(pi_appl => 'HIG'
+                   ,pi_id   => 126
+                   ,pi_supplementary_info => 'Create Job'); -- You do not have privileges to perform this action
+    --
+    WHEN no_create_ex_job
+    THEN 
+    hig.raise_ner(pi_appl => 'HIG'
+                   ,pi_id   => 126
+                   ,pi_supplementary_info => 'Create External Job'); -- You do not have privileges to perform this action
+    --
     WHEN OTHERS 
       THEN
       instantiate_args;
@@ -202,15 +219,6 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   ex_scheduler_down EXCEPTION;
   PRAGMA EXCEPTION_INIT(ex_scheduler_down, -27492);
   --
-  CURSOR check_up_cur
-  IS
-  SELECT 'X' 
-  FROM dba_scheduler_global_attribute 
-  WHERE attribute_name='SCHEDULER_DISABLED'
-  AND VALUE = 'TRUE';
-  --
-  l_up VARCHAR2(1);
-  --
   BEGIN
     dbms_scheduler.run_job
         ( job_name            => pi_job_name
@@ -218,11 +226,7 @@ CREATE OR REPLACE PACKAGE BODY nm3jobs AS
   EXCEPTION
   WHEN ex_scheduler_down THEN
   --
-  OPEN check_up_cur;
-  FETCH check_up_cur INTO l_up;
-  CLOSE check_up_cur;
-  --
-  IF l_up IS NULL 
+  IF nm3jobs.get_scheduler_state = 'UP' 
   THEN 
     hig.raise_ner( pi_appl => 'HIG'
                  , pi_id   => 556
@@ -607,8 +611,64 @@ END calendar_string_in_mins;
 --
 -----------------------------------------------------------------------------
 --
+FUNCTION count_running_processes RETURN PLS_INTEGER IS
+--
+ l_retval pls_integer;
+--
+BEGIN
+--
+ SELECT COUNT(*)
+ INTO l_retval
+ FROM hig_processes a,
+      dba_scheduler_jobs b,
+      hig_users c
+ WHERE a.hp_job_name = b.job_name
+ AND   b.owner = c.hus_username
+ AND   b.state = 'RUNNING';
+   
+ return (l_retval);
 
+END count_running_processes;
+--
+-----------------------------------------------------------------------------
+--  
+FUNCTION get_scheduler_state RETURN VARCHAR2 IS
 
+  l_scheduler_disabled dba_scheduler_global_attribute.value%TYPE;
+  l_retval             varchar2(20);
+--
+BEGIN
+--
+ select value
+ into l_scheduler_disabled 
+ from dba_scheduler_global_attribute 
+ where attribute_name='SCHEDULER_DISABLED';
 
+ IF NVL(l_scheduler_disabled,'FALSE') = 'TRUE' THEN
+ 
+   IF count_running_processes = 0 THEN
+      l_retval := 'DOWN';
+   ELSE
+      l_retval := 'SHUTTING DOWN';
+   END IF;
+   
+ ELSE
+ 
+  l_retval := 'UP';  
+         
+ END IF;
+
+ RETURN l_retval;
+
+EXCEPTION
+  WHEN no_data_found THEN
+     RETURN('UP');
+  WHEN others THEN
+     RAISE;
+--
+END get_scheduler_state;
+--
+-----------------------------------------------------------------------------
+--
 END nm3jobs;
 /
