@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.8   Mar 16 2011 11:23:20   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.9   Mar 16 2011 13:09:50   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3nwval.pkb  $
---       Date into PVCS   : $Date:   Mar 16 2011 11:23:20  $
---       Date fetched Out : $Modtime:   Mar 09 2011 09:43:14  $
---       PVCS Version     : $Revision:   2.8  $
+--       Date into PVCS   : $Date:   Mar 16 2011 13:09:50  $
+--       Date fetched Out : $Modtime:   Mar 16 2011 13:07:34  $
+--       PVCS Version     : $Revision:   2.9  $
 --       Based on 1.67
 --
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --      Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.9  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
@@ -2387,7 +2387,9 @@ BEGIN
      AND NOT(nm3inv_security.can_usr_see_all_inv_on_element(pi_ne_id => p_ne_id_1))
      THEN
        --
-       RAISE_APPLICATION_ERROR( -20008, 'User is restricted and does not have access to all inventory on the element');
+       hig.raise_ner( pi_appl            => 'NET'
+                    , pi_id              => 172);
+       --RAISE_APPLICATION_ERROR( -20008, 'User is restricted and does not have access to all inventory on the element');
        --
      END IF;
   END IF;
