@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.7   Aug 18 2010 11:34:26   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3nwval.pkb-arc   2.8   Mar 16 2011 11:23:20   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3nwval.pkb  $
---       Date into PVCS   : $Date:   Aug 18 2010 11:34:26  $
---       Date fetched Out : $Modtime:   Aug 18 2010 11:32:38  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   Mar 16 2011 11:23:20  $
+--       Date fetched Out : $Modtime:   Mar 09 2011 09:43:14  $
+--       PVCS Version     : $Revision:   2.8  $
 --       Based on 1.67
 --
 --
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3nwval AS
 --      Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 -----------------------------------------------------------------------------
 --
@@ -2382,27 +2382,37 @@ BEGIN
     check_user_can_see_inv( p_ne_id_1, l_ne_id );
   END IF;
 --
-  IF p_operation = c_close THEN
-     Nm3user.restricted_user_check;
+  IF p_operation IN (c_close, c_unclose, c_closeroute, c_reverse, c_reclass) THEN
+     IF  NOT(nm3user.is_user_unrestricted) 
+     AND NOT(nm3inv_security.can_usr_see_all_inv_on_element(pi_ne_id => p_ne_id_1))
+     THEN
+       --
+       RAISE_APPLICATION_ERROR( -20008, 'User is restricted and does not have access to all inventory on the element');
+       --
+     END IF;
   END IF;
 --
+/*
+  IF p_operation = c_close THEN
+     --Nm3user.restricted_user_check;
+  END IF;
+    
   IF p_operation = c_unclose THEN
      Nm3user.restricted_user_check;
   END IF;
 --
   IF p_operation = c_closeroute THEN
      Nm3user.restricted_user_check;
-  END IF;
+  END IF; 
+  
+  IF p_operation = c_reverse THEN
+     Nm3user.restricted_user_check;
+  END IF;*/
 --
   IF p_operation = c_reclass THEN
 --     nm3user.restricted_user_check;
      Nm3reclass.check_element_can_be_reclassed(pi_ne_id          => p_ne_id_1
     	                                      ,pi_effective_date => p_effective_date);
-
-  END IF;
---
-  IF p_operation = c_reverse THEN
-     Nm3user.restricted_user_check;
   END IF;
 --
   Nm_Debug.proc_end(g_package_name , 'network_operations_check');
