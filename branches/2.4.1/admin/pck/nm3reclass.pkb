@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.4.1.0   Mar 18 2011 16:03:24   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3reclass.pkb-arc   2.4.1.1   Mar 18 2011 16:33:04   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3reclass.pkb  $
---       Date into PVCS   : $Date:   Mar 18 2011 16:03:24  $
---       Date fetched Out : $Modtime:   Mar 18 2011 15:32:42  $
---       PVCS Version     : $Revision:   2.4.1.0  $
+--       Date into PVCS   : $Date:   Mar 18 2011 16:33:04  $
+--       Date fetched Out : $Modtime:   Mar 18 2011 16:33:04  $
+--       PVCS Version     : $Revision:   2.4.1.1  $
 --
 --
 --   Author : R.A. Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3reclass AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4.1.0  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.4.1.1  $"';
 -- g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3reclass';
@@ -220,7 +220,7 @@ BEGIN
 
   
   IF NOT nm3user.is_user_unrestricted 
-  AND NOT(nm3inv_security.can_usr_see_all_inv_on_element(pi_ne_id => pi_ne_rec.ne_id)
+  AND NOT(nm3inv_security.can_usr_see_all_inv_on_element(pi_ne_id => pi_ne_rec.ne_id))
   THEN
 	 set_output_params(nm3type.c_net 
 	                  ,172 --174 
