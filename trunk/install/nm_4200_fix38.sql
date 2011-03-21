@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4200_fix38.sql-arc   3.0   Mar 21 2011 16:02:44   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4200_fix38.sql-arc   3.1   Mar 21 2011 16:07:24   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm_4200_fix38.sql  $
---       Date into PVCS   : $Date:   Mar 21 2011 16:02:44  $
---       Date fetched Out : $Modtime:   Mar 21 2011 16:02:22  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Mar 21 2011 16:07:24  $
+--       Date fetched Out : $Modtime:   Mar 21 2011 16:07:24  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) exor corporation ltd, 2011
@@ -98,7 +98,7 @@ PROMPT nm3nwval.pkw
 SET TERM OFF
 --
 SET FEEDBACK ON
-start nm3nmval.pkw
+start nm3nwval.pkw
 SET FEEDBACK OFF
 --
 --
