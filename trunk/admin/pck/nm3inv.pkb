@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.26   Feb 04 2011 11:20:52   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.27   Mar 22 2011 16:43:20   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Feb 04 2011 11:20:52  $
---       Date fetched Out : $Modtime:   Feb 04 2011 11:19:52  $
---       SCCS Version     : $Revision:   2.26  $
+--       Date into SCCS   : $Date:   Mar 22 2011 16:43:20  $
+--       Date fetched Out : $Modtime:   Mar 22 2011 16:42:16  $
+--       SCCS Version     : $Revision:   2.27  $
 --       Based on --
 --
 --   nm3inv package body
@@ -30,7 +30,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.26  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.27  $';
    g_package_name   CONSTANT VARCHAR2(30) := 'nm3inv';
 --
    --<USED BY validate_rec_iit>
@@ -4114,11 +4114,13 @@ End bypass_inv_items_all_trgs;
                                 , pi_value        IN  VARCHAR2 ) 
     RETURN VARCHAR2
   IS
-    retval       nm3type.max_varchar2;
-    l_quote      VARCHAR2(10) := chr(39);
-    l_dummy      VARCHAR2(10) := chr(126)||chr(33)||chr(36)||chr(33)||chr(126);  
-    l_sql        nm3type.max_varchar2;
-    l_asset_type nm_inv_type_attribs%ROWTYPE;
+    retval                 nm3type.max_varchar2;
+    l_quote                VARCHAR2(10) := chr(39);
+    l_dummy                VARCHAR2(10) := chr(126)||chr(33)||chr(36)||chr(33)||chr(126);  
+    l_sql                  nm3type.max_varchar2;
+    l_asset_type           nm_inv_type_attribs%ROWTYPE;
+    b_ignore_domains       BOOLEAN      := NVL(hig.get_sysopt('IGNDOMCASE'),'N') = 'Y';
+  --
   BEGIN
   -- Task 0109768 and 0109764
   -- Ensure formmating of Case works with single quotes (chr(39))
@@ -4132,7 +4134,13 @@ End bypass_inv_items_all_trgs;
                         , pi_raise_not_found => FALSE );
     --
       IF l_asset_type.ita_inv_type IS NOT NULL
-      AND l_asset_type.ita_id_domain IS NULL
+    --
+    -- Task 0110838
+    -- Reintroduce case based domain attributes
+      AND ( l_asset_type.ita_id_domain IS NULL 
+          OR ( NOT (b_ignore_domains) AND  l_asset_type.ita_id_domain IS NOT NULL )
+          )
+    --
       AND l_asset_type.ita_case != 'MIXED'
       THEN
         l_sql := ' SELECT REPLACE('||get_ita_case (pi_asset_type, pi_attrib_name)
@@ -4141,7 +4149,7 @@ End bypass_inv_items_all_trgs;
     --
         EXECUTE IMMEDIATE l_sql INTO retval
         USING IN pi_value, IN l_quote, IN l_dummy, IN l_dummy, IN l_quote;
-      ELSE
+      ELSE 
         retval := pi_value;
       END IF;
     --
