@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4300_fix11.sql-arc   3.0   Mar 18 2011 16:20:30   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4300_fix11.sql-arc   3.1   Mar 24 2011 14:25:04   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm_4300_fix11.sql  $
---       Date into PVCS   : $Date:   Mar 18 2011 16:20:30  $
---       Date fetched Out : $Modtime:   Mar 18 2011 16:20:04  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Mar 24 2011 14:25:04  $
+--       Date fetched Out : $Modtime:   Mar 24 2011 14:23:56  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) exor corporation ltd, 2011
@@ -81,6 +81,18 @@ End;
 
 WHENEVER SQLERROR CONTINUE
 --
+--
+--------------------------------------------------------------------------------
+-- Drop Policies
+--------------------------------------------------------------------------------
+--
+SET TERM ON 
+PROMPT drop_policy.sql
+SET TERM OFF
+--
+SET FEEDBACK ON
+start drop_policy.sql
+SET FEEDBACK OFF
 --
 --------------------------------------------------------------------------------
 -- Package Bodies
