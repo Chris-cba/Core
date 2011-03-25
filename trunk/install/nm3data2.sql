@@ -2,18 +2,18 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.27   Oct 06 2010 14:05:34   mike.alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data2.sql-arc   2.28   Mar 25 2011 09:35:30   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data2.sql  $
---       Date into PVCS   : $Date:   Oct 06 2010 14:05:34  $
---       Date fetched Out : $Modtime:   Oct 06 2010 14:02:10  $
---       Version          : $Revision:   2.27  $
+--       Date into PVCS   : $Date:   Mar 25 2011 09:35:30  $
+--       Date fetched Out : $Modtime:   Mar 25 2011 09:31:42  $
+--       Version          : $Revision:   2.28  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 06-OCT-2010 14:02
+--       Generation Date  : 25-MAR-2011 09:31
 --
 --   Product metadata script
---   As at Release 4.3.0.0
+--   As at Release 4.4.0.0
 --
---   Copyright (c) exor corporation ltd, 2010
+--   Copyright (c) exor corporation ltd, 2011
 --
 --   TABLES PROCESSED
 --   ================
@@ -81571,6 +81571,23 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
                    WHERE HSTF_PARENT = 'HIG_PROCESSES'
                     AND  HSTF_CHILD = 'HIG2530');
+--
+INSERT INTO HIG_STANDARD_FAVOURITES
+       (HSTF_PARENT
+       ,HSTF_CHILD
+       ,HSTF_DESCR
+       ,HSTF_TYPE
+       ,HSTF_ORDER
+       )
+SELECT 
+        'HIG_PROCESSES'
+       ,'HIG2550'
+       ,'Process Framework Administration'
+       ,'M'
+       ,5 FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_STANDARD_FAVOURITES
+                   WHERE HSTF_PARENT = 'HIG_PROCESSES'
+                    AND  HSTF_CHILD = 'HIG2550');
 --
 INSERT INTO HIG_STANDARD_FAVOURITES
        (HSTF_PARENT

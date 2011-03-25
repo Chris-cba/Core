@@ -2,18 +2,18 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.25   Oct 06 2010 14:05:36   mike.alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.26   Mar 25 2011 09:35:30   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Oct 06 2010 14:05:36  $
---       Date fetched Out : $Modtime:   Oct 06 2010 14:02:12  $
---       Version          : $Revision:   2.25  $
+--       Date into PVCS   : $Date:   Mar 25 2011 09:35:30  $
+--       Date fetched Out : $Modtime:   Mar 25 2011 09:31:44  $
+--       Version          : $Revision:   2.26  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 06-OCT-2010 14:02
+--       Generation Date  : 25-MAR-2011 09:31
 --
 --   Product metadata script
---   As at Release 4.3.0.0
+--   As at Release 4.4.0.0
 --
---   Copyright (c) exor corporation ltd, 2010
+--   Copyright (c) exor corporation ltd, 2011
 --
 --   TABLES PROCESSED
 --   ================
@@ -1520,6 +1520,19 @@ SELECT
  WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
                    WHERE HMR_MODULE = 'HIG2540'
                     AND  HMR_ROLE = 'PROCESS_USER');
+--
+INSERT INTO HIG_MODULE_ROLES
+       (HMR_MODULE
+       ,HMR_ROLE
+       ,HMR_MODE
+       )
+SELECT 
+        'HIG2550'
+       ,'PROCESS_ADMIN'
+       ,'NORMAL' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_ROLES
+                   WHERE HMR_MODULE = 'HIG2550'
+                    AND  HMR_ROLE = 'PROCESS_ADMIN');
 --
 INSERT INTO HIG_MODULE_ROLES
        (HMR_MODULE
@@ -4718,7 +4731,7 @@ SELECT
        ,'DOC0310'
        ,'P_PROCESS_ID'
        ,null
-       ,'Y'
+       ,'N'
        ,'Y'
        ,'Y'
        ,null
@@ -4750,7 +4763,7 @@ SELECT
        ,''
        ,''
        ,null
-       ,'Y'
+       ,'N'
        ,'Y'
        ,'N'
        ,null
@@ -5090,6 +5103,25 @@ SET TERM ON
 PROMPT hig_module_blocks
 SET TERM OFF
 
+INSERT INTO HIG_MODULE_BLOCKS
+       (HMB_MODULE_NAME
+       ,HMB_BLOCK_NAME
+       ,HMB_DATE_CREATED
+       ,HMB_DATE_MODIFIED
+       ,HMB_CREATED_BY
+       ,HMB_MODIFIED_BY
+       )
+SELECT 
+        'DOC0310'
+       ,'DOC_BUNDLES_V'
+       ,to_date('20110325090937','YYYYMMDDHH24MISS')
+       ,to_date('20110325090937','YYYYMMDDHH24MISS')
+       ,'NM3_METADATA'
+       ,'NM3_METADATA' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_MODULE_BLOCKS
+                   WHERE HMB_MODULE_NAME = 'DOC0310'
+                    AND  HMB_BLOCK_NAME = 'DOC_BUNDLES_V');
+--
 INSERT INTO HIG_MODULE_BLOCKS
        (HMB_MODULE_NAME
        ,HMB_BLOCK_NAME
