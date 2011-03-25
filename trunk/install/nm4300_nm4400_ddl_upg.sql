@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_ddl_upg.sql-arc   3.1   Mar 10 2011 16:18:38   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_ddl_upg.sql-arc   3.2   Mar 25 2011 09:08:36   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4300_nm4400_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Mar 10 2011 16:18:38  $
---       Date fetched Out : $Modtime:   Mar 10 2011 15:43:34  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Mar 25 2011 09:08:36  $
+--       Date fetched Out : $Modtime:   Mar 25 2011 09:05:32  $
+--       Version          : $Revision:   3.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -219,6 +219,29 @@ SELECT hus_username, 'EMAIL_USER', hus_start_date
      WHERE hur_username = hus_username
        AND hur_role = 'EMAIL_USER');
 
+BEGIN
+  FOR i IN
+    (SELECT 'GRANT FTP_USER TO '||username l_sql
+       FROM all_users, hig_users
+      WHERE hus_username = username
+        AND hus_is_hig_owner_flag = 'N'
+     UNION
+     SELECT 'GRANT EMAIL_USER TO '||username l_sql
+       FROM all_users, hig_users
+      WHERE hus_username = username
+        AND hus_is_hig_owner_flag = 'N'
+     UNION
+     SELECT 'GRANT EXECUTE ON DBMS_NETWORK_ACL_ADMIN TO '||username l_sql
+       FROM all_users, hig_users
+      WHERE hus_username = username
+        AND hus_is_hig_owner_flag = 'N')
+  LOOP
+    EXECUTE IMMEDIATE i.l_sql;
+  END LOOP;
+END;
+/
+
+
 
 ------------------------------------------------------------------
 
@@ -289,6 +312,30 @@ Begin
   End;
 End;
 /
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Remove Case Constraint
+SET TERM OFF
+
+------------------------------------------------------------------
+-- ASSOCIATED DEVELOPMENT TASK
+-- 110868
+-- 
+-- TASK DETAILS
+-- No details supplied
+-- 
+-- 
+-- DEVELOPMENT COMMENTS (ADE EDWARDS)
+-- Remove Case Constraint
+-- 
+------------------------------------------------------------------
+
+ALTER TABLE NM_INV_TYPE_ATTRIBS_ALL DROP CONSTRAINT ITA_CASE_CHK;
+
+
 ------------------------------------------------------------------
 
 

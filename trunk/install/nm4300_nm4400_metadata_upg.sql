@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_metadata_upg.sql-arc   3.1   Mar 10 2011 16:18:38   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_metadata_upg.sql-arc   3.2   Mar 25 2011 09:08:36   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4300_nm4400_metadata_upg.sql  $
---       Date into PVCS   : $Date:   Mar 10 2011 16:18:38  $
---       Date fetched Out : $Modtime:   Mar 10 2011 15:43:36  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   Mar 25 2011 09:08:36  $
+--       Date fetched Out : $Modtime:   Mar 25 2011 09:05:32  $
+--       Version          : $Revision:   3.2  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -172,17 +172,28 @@ SELECT 'HIG',554,NULL,'The ACL you are trying to reference does not exist',''
 INSERT INTO NM_ERRORS ( NER_APPL
                       , NER_ID
                       , NER_DESCR)
-SELECT 'NET'
-     , 556
+SELECT 'HIG'
+     , 555
      , 'The Process Framework is shutting down/shut down. This operation is not currently permitted'
      FROM DUAL
      WHERE NOT EXISTS (SELECT 'X' 
                        FROM NM_ERRORS
-                       WHERE NER_APPL = 'NET'
-                       AND NER_ID = 556)
+                       WHERE NER_APPL = 'HIG'
+                       AND NER_ID = 555)
 /
 
-
+INSERT INTO NM_ERRORS ( NER_APPL
+                      , NER_ID
+                      , NER_DESCR)
+SELECT 'HIG'
+     , 556
+     , 'Unable to execute this process'
+     FROM DUAL
+     WHERE NOT EXISTS (SELECT 'X' 
+                       FROM NM_ERRORS
+                       WHERE NER_APPL = 'HIG'
+                       AND NER_ID = 556)
+/
 
 ------------------------------------------------------------------
 
@@ -287,7 +298,8 @@ SET TERM OFF
 -- 110270
 -- 
 -- TASK DETAILS
--- No details supplied
+-- Need to associate photos (1 or more) taken by the inspector against the inspection.  Further details found in release notes.
+-- 
 -- 
 -- 
 -- DEVELOPMENT COMMENTS (BARBARA O'DRISCOLL)
