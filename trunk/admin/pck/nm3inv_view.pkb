@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.10   Nov 02 2010 11:46:42   Chris.Strettle  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.11   Mar 25 2011 15:41:58   Chris.Strettle  $
 --       Module Name      	: $Workfile:   nm3inv_view.pkb  $
---       Date into PVCS   	: $Date:   Nov 02 2010 11:46:42  $
---       Date fetched Out 	: $Modtime:   Nov 02 2010 11:13:48  $
---       PVCS Version     	: $Revision:   2.10  $
+--       Date into PVCS   	: $Date:   Mar 25 2011 15:41:58  $
+--       Date fetched Out 	: $Modtime:   Mar 23 2011 14:42:14  $
+--       PVCS Version     	: $Revision:   2.11  $
 --       Based on SCCS version 	: 1.56
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --      Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.10     $';
+   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.11     $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
 --all global package variables here
@@ -1295,6 +1295,7 @@ BEGIN
    --
    add_data ('NE_DESCR',NULL);
    add_data ('NE_START_DATE',NULL);
+   add_data ('NE_END_DATE',NULL);
    add_data ('NE_ADMIN_UNIT',NULL);
    add_data ('SUBSTR(nm3ausec.get_nau_unit_code(NE_ADMIN_UNIT),1,10)','ADMIN_UNIT_CODE');
    add_data ('NE_GTY_GROUP_TYPE',NULL);
@@ -1537,6 +1538,7 @@ BEGIN
    add_data ('a.NE_NO_END','END_NODE_ID');
    add_data ('a.NE_DESCR',NULL);
    add_data ('a.NE_START_DATE',NULL);
+   add_data ('a.NE_END_DATE',NULL);
    add_data ('a.NE_ADMIN_UNIT',NULL);
    add_data ('SUBSTR(nm3ausec.get_nau_unit_code(a.NE_ADMIN_UNIT),1,10)','ADMIN_UNIT_CODE');
 
@@ -1859,6 +1861,7 @@ BEGIN
    add_data ('a.NE_LENGTH',NULL);
    add_data ('a.NE_DESCR',NULL);
    add_data ('a.NE_START_DATE',NULL);
+   add_data ('a.NE_END_DATE',NULL);
    add_data ('a.NE_ADMIN_UNIT',NULL);
    add_data ('SUBSTR(nm3ausec.get_nau_unit_code(a.NE_ADMIN_UNIT),1,10)','ADMIN_UNIT_CODE');
    -- only use this if the NT is used as a group of sections!
