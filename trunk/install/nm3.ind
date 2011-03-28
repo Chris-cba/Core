@@ -1,16 +1,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.20   Oct 06 2010 15:54:20   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.ind-arc   2.21   Mar 28 2011 17:16:50   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3.ind  $
---       Date into PVCS   : $Date:   Oct 06 2010 15:54:20  $
---       Date fetched Out : $Modtime:   Oct 06 2010 15:53:32  $
---       PVCS Version     : $Revision:   2.20  $
+--       Date into PVCS   : $Date:   Mar 28 2011 17:16:50  $
+--       Date fetched Out : $Modtime:   Mar 28 2011 17:11:44  $
+--       PVCS Version     : $Revision:   2.21  $
 --
 --------------------------------------------------------------------------------
 --
-
--- Generated for Oracle 10g on Wed Oct 06  14:50:08 2010 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Mon Mar 28  16:43:59 2011 by Server Generator 10.1.2.9.28
   
 
 PROMPT Creating Index 'DOC_FK_DLC_IND'
@@ -732,6 +730,12 @@ CREATE INDEX HUOL_HPR_FK_IND ON HIG_USER_OPTION_LIST
 PROMPT Creating Index 'HUR_HRO_FK_IND'
 CREATE INDEX HUR_HRO_FK_IND ON HIG_USER_ROLES
  (HUR_ROLE)
+/
+
+PROMPT Creating Index 'MV_HIGHLIGHT_IND'
+CREATE INDEX MV_HIGHLIGHT_IND ON MV_HIGHLIGHT
+ (MV_ID
+ ,MV_FEAT_TYPE)
 /
 
 PROMPT Creating Index 'NM2_INV_IIT_IDX'

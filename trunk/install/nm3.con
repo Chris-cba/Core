@@ -1,15 +1,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.31   Feb 22 2011 14:59:34   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.32   Mar 28 2011 17:16:50   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Feb 22 2011 14:59:34  $
---       Date fetched Out : $Modtime:   Feb 22 2011 14:58:50  $
---       PVCS Version     : $Revision:   2.31  $
+--       Date into PVCS   : $Date:   Mar 28 2011 17:16:50  $
+--       Date fetched Out : $Modtime:   Mar 28 2011 17:09:48  $
+--       PVCS Version     : $Revision:   2.32  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Tue Feb 22  14:57:25 2011 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Mon Mar 28  16:43:59 2011 by Server Generator 10.1.2.9.28
   
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -969,13 +968,6 @@ PROMPT Creating Primary Key on 'INTERVALS'
 ALTER TABLE INTERVALS
  ADD (CONSTRAINT INT_PK PRIMARY KEY 
   (INT_CODE))
-/
-
-PROMPT Creating Primary Key on 'MV_HIGHLIGHT'
-ALTER TABLE MV_HIGHLIGHT
- ADD (CONSTRAINT MV_HIGHLIGHT_PK PRIMARY KEY 
-  (MV_ID
-  ,MV_FEAT_TYPE))
 /
 
 PROMPT Creating Primary Key on 'NM0575_EVENT_LOG'
