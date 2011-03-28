@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_inst.sql-arc   2.1   Aug 24 2009 15:47:22   malexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_inst.sql-arc   2.2   Mar 28 2011 12:25:16   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm_inst.sql  $
---       Date into PVCS   : $Date:   Aug 24 2009 15:47:22  $
---       Date fetched Out : $Modtime:   Aug 24 2009 15:46:48  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   Mar 28 2011 12:25:16  $
+--       Date fetched Out : $Modtime:   Mar 28 2011 12:24:28  $
+--       PVCS Version     : $Revision:   2.2  $
 --
 --------------------------------------------------------------------------------
 --
@@ -37,7 +37,7 @@ prompt the exor software resides (eg c:\exor\ on a client PC). If the value
 prompt entered is not correct, the process will not proceed.
 prompt There is no default value for this value.
 prompt
-prompt INPORTANT: Please ensure that the exor base value is terminated with
+prompt IMPORTANT: Please ensure that the exor base value is terminated with
 prompt the directory seperator for your operating system
 prompt (eg \ in Windows or / in UNIX).
 prompt
