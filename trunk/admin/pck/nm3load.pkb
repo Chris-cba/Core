@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3load AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3load.pkb-arc   2.5   Jan 06 2010 16:38:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3load.pkb-arc   2.6   Mar 28 2011 18:23:46   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3load.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:36  $
---       Date fetched Out : $Modtime:   Jan 06 2010 10:25:54  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   Mar 28 2011 18:23:46  $
+--       Date fetched Out : $Modtime:   Mar 28 2011 16:20:32  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.26
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3load AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3load.pkb	1.26 03/08/05"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.6  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3load';
@@ -1109,7 +1109,8 @@ PROCEDURE get_cols_to_move (pi_nlf_id          IN     nm_load_files.nlf_id%TYPE
     AND   nlcd_source_col IS NOT NULL
    ORDER BY nlcd_seq_no;
 --
-   v_tab_holding_col_prefix nm3type.tab_varchar30;
+   -- 0110869 CWS array was too small strings larger than 30 chars were being inserted.
+   v_tab_holding_col_prefix nm3type.tab_varchar80; --.tab_varchar30;
 --
    CURSOR c_check (cp_holding_col_prefix  nm_load_file_col_destinations.nlcd_source_col%TYPE) IS
    SELECT 'x'
