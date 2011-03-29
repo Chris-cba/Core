@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_ddl_upg.sql-arc   3.2   Mar 25 2011 09:08:36   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_ddl_upg.sql-arc   3.3   Mar 29 2011 09:26:46   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4300_nm4400_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Mar 25 2011 09:08:36  $
---       Date fetched Out : $Modtime:   Mar 25 2011 09:05:32  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Mar 29 2011 09:26:46  $
+--       Date fetched Out : $Modtime:   Mar 29 2011 09:25:56  $
+--       Version          : $Revision:   3.3  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -325,7 +325,7 @@ SET TERM OFF
 -- 110868
 -- 
 -- TASK DETAILS
--- No details supplied
+-- Restore Case formatting of domain controlled attributes
 -- 
 -- 
 -- DEVELOPMENT COMMENTS (ADE EDWARDS)
@@ -335,6 +335,80 @@ SET TERM OFF
 
 ALTER TABLE NM_INV_TYPE_ATTRIBS_ALL DROP CONSTRAINT ITA_CASE_CHK;
 
+
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Remove MV Highlight PK Constraint
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADE EDWARDS)
+-- Remove MV Highlight PK Constraint
+-- 
+------------------------------------------------------------------
+PROMPT Drop the Primary Key constraint
+
+DECLARE
+  ex_not_exists EXCEPTION;
+  PRAGMA EXCEPTION_INIT (ex_not_exists,-02443);
+BEGIN
+  EXECUTE IMMEDIATE 
+    'ALTER TABLE MV_HIGHLIGHT DROP CONSTRAINT MV_HIGHLIGHT_PK';
+EXCEPTION
+  WHEN ex_not_exists THEN NULL;
+END;
+/
+
+PROMPT Create a non-unique index to replace it
+
+DECLARE
+  ex_not_exists EXCEPTION;
+  PRAGMA EXCEPTION_INIT (ex_not_exists,-01418);
+BEGIN
+  EXECUTE IMMEDIATE
+    'DROP INDEX MV_HIGHLIGHT_IND';
+  EXECUTE IMMEDIATE
+    'CREATE INDEX MV_HIGHLIGHT_IND ON MV_HIGHLIGHT(MV_ID, MV_FEAT_TYPE)';
+EXCEPTION
+  WHEN ex_not_exists 
+  THEN 
+    EXECUTE IMMEDIATE
+      'CREATE INDEX MV_HIGHLIGHT_IND ON MV_HIGHLIGHT(MV_ID, MV_FEAT_TYPE)';
+END;
+/
+------------------------------------------------------------------
+
+
+------------------------------------------------------------------
+SET TERM ON
+PROMPT Remove Type Inclusion UK Constraint
+SET TERM OFF
+
+------------------------------------------------------------------
+-- 
+-- DEVELOPMENT COMMENTS (ADE EDWARDS)
+-- Remove Type Inclusion UK Constraint
+-- 
+------------------------------------------------------------------
+DECLARE
+   l_exception  EXCEPTION;
+   PRAGMA EXCEPTION_INIT(l_exception,-02443);
+--
+BEGIN
+--
+EXECUTE IMMEDIATE 'ALTER TABLE NM_TYPE_INCLUSION DROP CONSTRAINT NTI_PARENT_TYPE_UK  DROP INDEX';
+--
+EXCEPTION 
+WHEN l_exception THEN
+    NULL;
+WHEN OTHERS THEN
+    RAISE;
+END;
+/
 
 ------------------------------------------------------------------
 
