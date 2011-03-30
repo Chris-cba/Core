@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.6   Mar 01 2011 17:59:20   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.7   Mar 30 2011 16:35:12   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4300_nm4400_upg.sql  $
---       Date into PVCS   : $Date:   Mar 01 2011 17:59:20  $
---       Date fetched Out : $Modtime:   Mar 01 2011 14:35:20  $
---       Version          : $Revision:   3.6  $
+--       Date into PVCS   : $Date:   Mar 30 2011 16:35:12  $
+--       Date fetched Out : $Modtime:   Mar 30 2011 16:34:12  $
+--       Version          : $Revision:   3.7  $
 --
 --   Product upgrade script
 --
@@ -333,18 +333,19 @@ EXECUTE nm3ddl.refresh_all_synonyms;
 ---------------------------------------------------------------------------------------------------
 --                  ****************   CREATE JOBS  *******************
 --
+-- INSTRUCT USER TO RUN THIS POST UPGRADE
 --
-SET TERM ON
-PROMPT Create table maintenance Jobs
-SET TERM OFF
-SET DEFINE ON
-select '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'nm3jobs.sql' run_file
-from dual
-/
-SET FEEDBACK ON
-start '&&run_file'
-SET FEEDBACK OFF
+--SET TERM ON
+--PROMPT Create table maintenance Jobs
+--SET TERM OFF
+--SET DEFINE ON
+--select '&exor_base'||'nm3'||'&terminator'||'install'||
+--        '&terminator'||'nm3jobs.sql' run_file
+--from dual
+--/
+--SET FEEDBACK ON
+--start '&&run_file'
+--SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   ROLES   *******************
