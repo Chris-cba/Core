@@ -352,8 +352,8 @@ SELECT
 WHERE RSM_TYPE <> 'P';
 
 
-CREATE OR REPLACE FORCE VIEW gis_themes AS
-SELECT
+--CREATE OR REPLACE FORCE VIEW gis_themes AS
+--SELECT
 -----------------------------------------------------------------------------
 --   SCCS Identifiers :-
 --
@@ -368,16 +368,16 @@ SELECT
 -----------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2005
 -----------------------------------------------------------------------------
-       *
- FROM  gis_themes_all
-WHERE EXISTS (SELECT 1
-               FROM  gis_theme_roles
-                    ,hig_user_roles
-               WHERE gthr_theme_id   = gt_theme_id
-                AND  hur_username    = USER
-                AND  gthr_role       = hur_role
-                AND  hur_start_date <= nm3context.get_effective_date
-             );
+--       *
+ --FROM  gis_themes_all
+--WHERE EXISTS (SELECT 1
+--               FROM  gis_theme_roles
+--                    ,hig_user_roles
+--               WHERE gthr_theme_id   = gt_theme_id
+--                AND  hur_username    = USER
+--                AND  gthr_role       = hur_role
+--                AND  hur_start_date <= nm3context.get_effective_date
+--             );
 
 
 CREATE OR REPLACE FORCE VIEW frm50_enabled_roles
