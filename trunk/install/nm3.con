@@ -1,14 +1,14 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.32   Mar 28 2011 17:16:50   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.con-arc   2.33   Mar 31 2011 17:04:36   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.con  $
---       Date into PVCS   : $Date:   Mar 28 2011 17:16:50  $
---       Date fetched Out : $Modtime:   Mar 28 2011 17:09:48  $
---       PVCS Version     : $Revision:   2.32  $
+--       Date into PVCS   : $Date:   Mar 31 2011 17:04:36  $
+--       Date fetched Out : $Modtime:   Mar 31 2011 16:59:40  $
+--       PVCS Version     : $Revision:   2.33  $
 --
 --------------------------------------------------------------------------------
 --
--- Generated for Oracle 10g on Mon Mar 28  16:43:59 2011 by Server Generator 10.1.2.9.28
+-- Generated for Oracle 10g on Thu Mar 31  16:45:13 2011 by Server Generator 10.1.2.9.28
   
 PROMPT Creating Primary Key on 'ANALYSE_ALL_TABS_LOG'
 ALTER TABLE ANALYSE_ALL_TABS_LOG
@@ -3595,13 +3595,13 @@ ALTER TABLE NM_INV_TYPES_ALL
  
 PROMPT Creating Check Constraint on 'NM_INV_TYPE_ATTRIBS_ALL'
 ALTER TABLE NM_INV_TYPE_ATTRIBS_ALL
- ADD (CONSTRAINT ITA_CASE_CHK CHECK ((ITA_ID_DOMAIN IS NULL 
-AND ITA_CASE IN ('UPPER','LOWER', 'MIXED')) 
-OR ITA_ID_DOMAIN IS NOT NULL AND ITA_CASE IN ('UPPER')))
-/
 
-PROMPT Creating Check Constraint on 'NM_INV_TYPE_ATTRIBS_ALL'
-ALTER TABLE NM_INV_TYPE_ATTRIBS_ALL
+
+
+
+
+
+
  ADD (CONSTRAINT ITA_COL_IIT_PK_MAND_CHK CHECK (DECODE(ita_attrib_name,'IIT_PRIMARY_KEY'
  ,4,0)+DECODE(ita_mandatory_yn,'Y',1,0) IN (0,1,5)))
 /
