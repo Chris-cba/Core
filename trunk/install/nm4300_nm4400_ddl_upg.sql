@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_ddl_upg.sql-arc   3.3   Mar 29 2011 09:26:46   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_ddl_upg.sql-arc   3.4   Mar 31 2011 16:47:30   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4300_nm4400_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Mar 29 2011 09:26:46  $
---       Date fetched Out : $Modtime:   Mar 29 2011 09:25:56  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   Mar 31 2011 16:47:30  $
+--       Date fetched Out : $Modtime:   Mar 31 2011 16:46:22  $
+--       Version          : $Revision:   3.4  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -193,12 +193,24 @@ EXCEPTION
 END;
 /
 
+
+INSERT INTO HIG_ROLES
+SELECT 
+   'FTP_USER', 'HIG', 'FTP User role'
+  FROM DUAL
+ WHERE NOT EXISTS ( SELECT 1 FROM hig_roles WHERE hro_role = 'FTP_USER');
+
+INSERT INTO HIG_ROLES
+ SELECT
+   'EMAIL_USER', 'HIG', 'Email User role'
+   FROM DUAL
+ WHERE NOT EXISTS ( SELECT 1 FROM hig_roles WHERE hro_role = 'EMAIL_USER');
+
 INSERT INTO hig_user_roles
 (hur_username, hur_role, hur_start_date)
 SELECT hus_username, 'FTP_USER', hus_start_date
   FROM hig_users
- WHERE hus_is_hig_owner_flag = 'N'
-   AND EXISTS
+ WHERE EXISTS
    (SELECT 1 FROM all_users
      WHERE username = hus_username)
    AND NOT EXISTS
@@ -210,8 +222,7 @@ INSERT INTO hig_user_roles
 (hur_username, hur_role, hur_start_date)
 SELECT hus_username, 'EMAIL_USER', hus_start_date
   FROM hig_users
- WHERE hus_is_hig_owner_flag = 'N'
-   AND EXISTS
+ WHERE EXISTS
    (SELECT 1 FROM all_users
      WHERE username = hus_username)
    AND NOT EXISTS
