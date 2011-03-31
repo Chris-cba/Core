@@ -2,13 +2,13 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.26   Mar 25 2011 09:35:30   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm3data3.sql-arc   2.27   Mar 31 2011 16:44:00   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3data3.sql  $
---       Date into PVCS   : $Date:   Mar 25 2011 09:35:30  $
---       Date fetched Out : $Modtime:   Mar 25 2011 09:31:44  $
---       Version          : $Revision:   2.26  $
+--       Date into PVCS   : $Date:   Mar 31 2011 16:44:00  $
+--       Date fetched Out : $Modtime:   Mar 31 2011 16:41:24  $
+--       Version          : $Revision:   2.27  $
 --       Table Owner      : NM3_METADATA
---       Generation Date  : 25-MAR-2011 09:31
+--       Generation Date  : 31-MAR-2011 16:41
 --
 --   Product metadata script
 --   As at Release 4.4.0.0
@@ -122,6 +122,30 @@ SELECT
        ,'Document Manager Updates' FROM DUAL
  WHERE NOT EXISTS (SELECT 1 FROM HIG_ROLES
                    WHERE HRO_ROLE = 'DOC_USER');
+--
+INSERT INTO HIG_ROLES
+       (HRO_ROLE
+       ,HRO_PRODUCT
+       ,HRO_DESCR
+       )
+SELECT 
+        'EMAIL_USER'
+       ,'HIG'
+       ,'Email User role' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_ROLES
+                   WHERE HRO_ROLE = 'EMAIL_USER');
+--
+INSERT INTO HIG_ROLES
+       (HRO_ROLE
+       ,HRO_PRODUCT
+       ,HRO_DESCR
+       )
+SELECT 
+        'FTP_USER'
+       ,'HIG'
+       ,'FTP User role' FROM DUAL
+ WHERE NOT EXISTS (SELECT 1 FROM HIG_ROLES
+                   WHERE HRO_ROLE = 'FTP_USER');
 --
 INSERT INTO HIG_ROLES
        (HRO_ROLE
