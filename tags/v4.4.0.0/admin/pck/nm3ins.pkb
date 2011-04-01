@@ -1,0 +1,18794 @@
+CREATE OR REPLACE PACKAGE BODY nm3ins IS
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ins.pkb-arc   2.20   Apr 01 2011 12:51:52   Mike.Alexander  $
+--       Module Name      : $Workfile:   nm3ins.pkb  $
+--       Date into PVCS   : $Date:   Apr 01 2011 12:51:52  $
+--       Date fetched Out : $Modtime:   Mar 31 2011 16:06:26  $
+--       PVCS Version     : $Revision:   2.20  $
+--
+--
+--   Author : Jonathan Mills
+--
+--   Generated package DO NOT MODIFY
+--
+--   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
+--   nm3get_gen body   : "$Revision:   2.20  $"
+--
+-----------------------------------------------------------------------------
+--
+--	Copyright (c) exor corporation ltd, 2005
+--
+-----------------------------------------------------------------------------
+--
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.20  $"';
+--  g_body_sccsid is the SCCS ID for the package body
+--
+   g_package_name    CONSTANT  varchar2(30)   := 'nm3ins';
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_version RETURN varchar2 IS
+BEGIN
+   RETURN g_sccsid;
+END get_version;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION get_body_version RETURN varchar2 IS
+BEGIN
+   RETURN g_body_sccsid;
+END get_body_version;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_doc (p_rec_doc IN OUT docs%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_doc');
+--
+--
+   INSERT INTO docs
+            (doc_id
+            ,doc_title
+            ,doc_dcl_code
+            ,doc_dtp_code
+            ,doc_date_expires
+            ,doc_date_issued
+            ,doc_file
+            ,doc_reference_code
+            ,doc_issue_number
+            ,doc_dlc_id
+            ,doc_dlc_dmd_id
+            ,doc_descr
+            ,doc_user_id
+            ,doc_category
+            ,doc_admin_unit
+            ,doc_status_code
+            ,doc_status_date
+            ,doc_reason
+            ,doc_compl_type
+            ,doc_compl_source
+            ,doc_compl_ack_flag
+            ,doc_compl_ack_date
+            ,doc_compl_flag
+            ,doc_compl_cpr_id
+            ,doc_compl_user_id
+            ,doc_compl_peo_date
+            ,doc_compl_target
+            ,doc_compl_complete
+            ,doc_compl_referred_to
+            ,doc_compl_location
+            ,doc_compl_remarks
+            ,doc_compl_north
+            ,doc_compl_east
+            ,doc_compl_from
+            ,doc_compl_to
+            ,doc_compl_claim
+            ,doc_compl_corresp_date
+            ,doc_compl_corresp_deliv_date
+            ,doc_compl_no_of_petitioners
+            ,doc_compl_incident_date
+            ,doc_compl_police_notif_flag
+            ,doc_compl_date_police_notif
+            ,doc_compl_cause
+            ,doc_compl_injuries
+            ,doc_compl_damage
+            ,doc_compl_action
+            ,doc_compl_litigation_flag
+            ,doc_compl_litigation_reason
+            ,doc_compl_claim_no
+            ,doc_compl_determination
+            ,doc_compl_est_cost
+            ,doc_compl_adv_cost
+            ,doc_compl_act_cost
+            ,doc_compl_follow_up1
+            ,doc_compl_follow_up2
+            ,doc_compl_follow_up3
+            ,doc_compl_insurance_claim
+            ,doc_compl_summons_received
+            ,doc_compl_user_type
+            ,doc_date_time_arrived
+            ,doc_reason_for_later_arrival
+            ,doc_outcome
+            ,doc_outcome_reason
+            )
+     VALUES (p_rec_doc.doc_id
+            ,p_rec_doc.doc_title
+            ,p_rec_doc.doc_dcl_code
+            ,p_rec_doc.doc_dtp_code
+            ,p_rec_doc.doc_date_expires
+            ,p_rec_doc.doc_date_issued
+            ,p_rec_doc.doc_file
+            ,p_rec_doc.doc_reference_code
+            ,p_rec_doc.doc_issue_number
+            ,p_rec_doc.doc_dlc_id
+            ,p_rec_doc.doc_dlc_dmd_id
+            ,p_rec_doc.doc_descr
+            ,p_rec_doc.doc_user_id
+            ,p_rec_doc.doc_category
+            ,p_rec_doc.doc_admin_unit
+            ,p_rec_doc.doc_status_code
+            ,p_rec_doc.doc_status_date
+            ,p_rec_doc.doc_reason
+            ,p_rec_doc.doc_compl_type
+            ,p_rec_doc.doc_compl_source
+            ,p_rec_doc.doc_compl_ack_flag
+            ,p_rec_doc.doc_compl_ack_date
+            ,p_rec_doc.doc_compl_flag
+            ,p_rec_doc.doc_compl_cpr_id
+            ,p_rec_doc.doc_compl_user_id
+            ,p_rec_doc.doc_compl_peo_date
+            ,p_rec_doc.doc_compl_target
+            ,p_rec_doc.doc_compl_complete
+            ,p_rec_doc.doc_compl_referred_to
+            ,p_rec_doc.doc_compl_location
+            ,p_rec_doc.doc_compl_remarks
+            ,p_rec_doc.doc_compl_north
+            ,p_rec_doc.doc_compl_east
+            ,p_rec_doc.doc_compl_from
+            ,p_rec_doc.doc_compl_to
+            ,p_rec_doc.doc_compl_claim
+            ,p_rec_doc.doc_compl_corresp_date
+            ,p_rec_doc.doc_compl_corresp_deliv_date
+            ,p_rec_doc.doc_compl_no_of_petitioners
+            ,p_rec_doc.doc_compl_incident_date
+            ,p_rec_doc.doc_compl_police_notif_flag
+            ,p_rec_doc.doc_compl_date_police_notif
+            ,p_rec_doc.doc_compl_cause
+            ,p_rec_doc.doc_compl_injuries
+            ,p_rec_doc.doc_compl_damage
+            ,p_rec_doc.doc_compl_action
+            ,p_rec_doc.doc_compl_litigation_flag
+            ,p_rec_doc.doc_compl_litigation_reason
+            ,p_rec_doc.doc_compl_claim_no
+            ,p_rec_doc.doc_compl_determination
+            ,p_rec_doc.doc_compl_est_cost
+            ,p_rec_doc.doc_compl_adv_cost
+            ,p_rec_doc.doc_compl_act_cost
+            ,p_rec_doc.doc_compl_follow_up1
+            ,p_rec_doc.doc_compl_follow_up2
+            ,p_rec_doc.doc_compl_follow_up3
+            ,p_rec_doc.doc_compl_insurance_claim
+            ,p_rec_doc.doc_compl_summons_received
+            ,p_rec_doc.doc_compl_user_type
+            ,p_rec_doc.doc_date_time_arrived
+            ,p_rec_doc.doc_reason_for_later_arrival
+            ,p_rec_doc.doc_outcome
+            ,p_rec_doc.doc_outcome_reason
+            )
+   RETURNING doc_id
+            ,doc_title
+            ,doc_dcl_code
+            ,doc_dtp_code
+            ,doc_date_expires
+            ,doc_date_issued
+            ,doc_file
+            ,doc_reference_code
+            ,doc_issue_number
+            ,doc_dlc_id
+            ,doc_dlc_dmd_id
+            ,doc_descr
+            ,doc_user_id
+            ,doc_category
+            ,doc_admin_unit
+            ,doc_status_code
+            ,doc_status_date
+            ,doc_reason
+            ,doc_compl_type
+            ,doc_compl_source
+            ,doc_compl_ack_flag
+            ,doc_compl_ack_date
+            ,doc_compl_flag
+            ,doc_compl_cpr_id
+            ,doc_compl_user_id
+            ,doc_compl_peo_date
+            ,doc_compl_target
+            ,doc_compl_complete
+            ,doc_compl_referred_to
+            ,doc_compl_location
+            ,doc_compl_remarks
+            ,doc_compl_north
+            ,doc_compl_east
+            ,doc_compl_from
+            ,doc_compl_to
+            ,doc_compl_claim
+            ,doc_compl_corresp_date
+            ,doc_compl_corresp_deliv_date
+            ,doc_compl_no_of_petitioners
+            ,doc_compl_incident_date
+            ,doc_compl_police_notif_flag
+            ,doc_compl_date_police_notif
+            ,doc_compl_cause
+            ,doc_compl_injuries
+            ,doc_compl_damage
+            ,doc_compl_action
+            ,doc_compl_litigation_flag
+            ,doc_compl_litigation_reason
+            ,doc_compl_claim_no
+            ,doc_compl_determination
+            ,doc_compl_est_cost
+            ,doc_compl_adv_cost
+            ,doc_compl_act_cost
+            ,doc_compl_follow_up1
+            ,doc_compl_follow_up2
+            ,doc_compl_follow_up3
+            ,doc_compl_insurance_claim
+            ,doc_compl_summons_received
+            ,doc_compl_user_type
+            ,doc_date_time_arrived
+            ,doc_reason_for_later_arrival
+            ,doc_outcome
+            ,doc_outcome_reason
+      INTO   p_rec_doc.doc_id
+            ,p_rec_doc.doc_title
+            ,p_rec_doc.doc_dcl_code
+            ,p_rec_doc.doc_dtp_code
+            ,p_rec_doc.doc_date_expires
+            ,p_rec_doc.doc_date_issued
+            ,p_rec_doc.doc_file
+            ,p_rec_doc.doc_reference_code
+            ,p_rec_doc.doc_issue_number
+            ,p_rec_doc.doc_dlc_id
+            ,p_rec_doc.doc_dlc_dmd_id
+            ,p_rec_doc.doc_descr
+            ,p_rec_doc.doc_user_id
+            ,p_rec_doc.doc_category
+            ,p_rec_doc.doc_admin_unit
+            ,p_rec_doc.doc_status_code
+            ,p_rec_doc.doc_status_date
+            ,p_rec_doc.doc_reason
+            ,p_rec_doc.doc_compl_type
+            ,p_rec_doc.doc_compl_source
+            ,p_rec_doc.doc_compl_ack_flag
+            ,p_rec_doc.doc_compl_ack_date
+            ,p_rec_doc.doc_compl_flag
+            ,p_rec_doc.doc_compl_cpr_id
+            ,p_rec_doc.doc_compl_user_id
+            ,p_rec_doc.doc_compl_peo_date
+            ,p_rec_doc.doc_compl_target
+            ,p_rec_doc.doc_compl_complete
+            ,p_rec_doc.doc_compl_referred_to
+            ,p_rec_doc.doc_compl_location
+            ,p_rec_doc.doc_compl_remarks
+            ,p_rec_doc.doc_compl_north
+            ,p_rec_doc.doc_compl_east
+            ,p_rec_doc.doc_compl_from
+            ,p_rec_doc.doc_compl_to
+            ,p_rec_doc.doc_compl_claim
+            ,p_rec_doc.doc_compl_corresp_date
+            ,p_rec_doc.doc_compl_corresp_deliv_date
+            ,p_rec_doc.doc_compl_no_of_petitioners
+            ,p_rec_doc.doc_compl_incident_date
+            ,p_rec_doc.doc_compl_police_notif_flag
+            ,p_rec_doc.doc_compl_date_police_notif
+            ,p_rec_doc.doc_compl_cause
+            ,p_rec_doc.doc_compl_injuries
+            ,p_rec_doc.doc_compl_damage
+            ,p_rec_doc.doc_compl_action
+            ,p_rec_doc.doc_compl_litigation_flag
+            ,p_rec_doc.doc_compl_litigation_reason
+            ,p_rec_doc.doc_compl_claim_no
+            ,p_rec_doc.doc_compl_determination
+            ,p_rec_doc.doc_compl_est_cost
+            ,p_rec_doc.doc_compl_adv_cost
+            ,p_rec_doc.doc_compl_act_cost
+            ,p_rec_doc.doc_compl_follow_up1
+            ,p_rec_doc.doc_compl_follow_up2
+            ,p_rec_doc.doc_compl_follow_up3
+            ,p_rec_doc.doc_compl_insurance_claim
+            ,p_rec_doc.doc_compl_summons_received
+            ,p_rec_doc.doc_compl_user_type
+            ,p_rec_doc.doc_date_time_arrived
+            ,p_rec_doc.doc_reason_for_later_arrival
+            ,p_rec_doc.doc_outcome
+            ,p_rec_doc.doc_outcome_reason;
+--
+   nm_debug.proc_end(g_package_name,'ins_doc');
+--
+END ins_doc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dac (p_rec_dac IN OUT doc_actions%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dac');
+--
+--
+   INSERT INTO doc_actions
+            (dac_id
+            ,dac_doc_id
+            ,dac_code
+            ,dac_descr
+            ,dac_date_assigned
+            ,dac_priority_id
+            ,dac_target_date
+            ,dac_completion_date
+            ,dac_assignee
+            ,dac_status
+            ,dac_seq
+            ,dac_parallel_flag
+            ,dac_security_level
+            ,dac_outcome
+            ,dac_reference
+            ,dac_total_amount
+            )
+     VALUES (p_rec_dac.dac_id
+            ,p_rec_dac.dac_doc_id
+            ,p_rec_dac.dac_code
+            ,p_rec_dac.dac_descr
+            ,p_rec_dac.dac_date_assigned
+            ,p_rec_dac.dac_priority_id
+            ,p_rec_dac.dac_target_date
+            ,p_rec_dac.dac_completion_date
+            ,p_rec_dac.dac_assignee
+            ,p_rec_dac.dac_status
+            ,p_rec_dac.dac_seq
+            ,p_rec_dac.dac_parallel_flag
+            ,p_rec_dac.dac_security_level
+            ,p_rec_dac.dac_outcome
+            ,p_rec_dac.dac_reference
+            ,p_rec_dac.dac_total_amount
+            )
+   RETURNING dac_id
+            ,dac_doc_id
+            ,dac_code
+            ,dac_descr
+            ,dac_date_assigned
+            ,dac_priority_id
+            ,dac_target_date
+            ,dac_completion_date
+            ,dac_assignee
+            ,dac_status
+            ,dac_seq
+            ,dac_parallel_flag
+            ,dac_security_level
+            ,dac_outcome
+            ,dac_reference
+            ,dac_total_amount
+      INTO   p_rec_dac.dac_id
+            ,p_rec_dac.dac_doc_id
+            ,p_rec_dac.dac_code
+            ,p_rec_dac.dac_descr
+            ,p_rec_dac.dac_date_assigned
+            ,p_rec_dac.dac_priority_id
+            ,p_rec_dac.dac_target_date
+            ,p_rec_dac.dac_completion_date
+            ,p_rec_dac.dac_assignee
+            ,p_rec_dac.dac_status
+            ,p_rec_dac.dac_seq
+            ,p_rec_dac.dac_parallel_flag
+            ,p_rec_dac.dac_security_level
+            ,p_rec_dac.dac_outcome
+            ,p_rec_dac.dac_reference
+            ,p_rec_dac.dac_total_amount;
+--
+   nm_debug.proc_end(g_package_name,'ins_dac');
+--
+END ins_dac;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dah (p_rec_dah IN OUT doc_action_history%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dah');
+--
+--
+   INSERT INTO doc_action_history
+            (dah_dac_id
+            ,dah_code
+            ,dah_date_changed
+            ,dah_changed_by
+            ,dah_date_assigned
+            ,dah_priority_id
+            ,dah_assignee
+            ,dah_status
+            ,dah_security_level
+            ,dah_total_amount
+            ,dah_completion_date
+            ,dah_target_date
+            ,dah_outcome
+            )
+     VALUES (p_rec_dah.dah_dac_id
+            ,p_rec_dah.dah_code
+            ,p_rec_dah.dah_date_changed
+            ,p_rec_dah.dah_changed_by
+            ,p_rec_dah.dah_date_assigned
+            ,p_rec_dah.dah_priority_id
+            ,p_rec_dah.dah_assignee
+            ,p_rec_dah.dah_status
+            ,p_rec_dah.dah_security_level
+            ,p_rec_dah.dah_total_amount
+            ,p_rec_dah.dah_completion_date
+            ,p_rec_dah.dah_target_date
+            ,p_rec_dah.dah_outcome
+            )
+   RETURNING dah_dac_id
+            ,dah_code
+            ,dah_date_changed
+            ,dah_changed_by
+            ,dah_date_assigned
+            ,dah_priority_id
+            ,dah_assignee
+            ,dah_status
+            ,dah_security_level
+            ,dah_total_amount
+            ,dah_completion_date
+            ,dah_target_date
+            ,dah_outcome
+      INTO   p_rec_dah.dah_dac_id
+            ,p_rec_dah.dah_code
+            ,p_rec_dah.dah_date_changed
+            ,p_rec_dah.dah_changed_by
+            ,p_rec_dah.dah_date_assigned
+            ,p_rec_dah.dah_priority_id
+            ,p_rec_dah.dah_assignee
+            ,p_rec_dah.dah_status
+            ,p_rec_dah.dah_security_level
+            ,p_rec_dah.dah_total_amount
+            ,p_rec_dah.dah_completion_date
+            ,p_rec_dah.dah_target_date
+            ,p_rec_dah.dah_outcome;
+--
+   nm_debug.proc_end(g_package_name,'ins_dah');
+--
+END ins_dah;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_das (p_rec_das IN OUT doc_assocs%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_das');
+--
+--
+   INSERT INTO doc_assocs
+            (das_table_name
+            ,das_rec_id
+            ,das_doc_id
+            )
+     VALUES (p_rec_das.das_table_name
+            ,p_rec_das.das_rec_id
+            ,p_rec_das.das_doc_id
+            )
+   RETURNING das_table_name
+            ,das_rec_id
+            ,das_doc_id
+      INTO   p_rec_das.das_table_name
+            ,p_rec_das.das_rec_id
+            ,p_rec_das.das_doc_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_das');
+--
+END ins_das;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dcl (p_rec_dcl IN OUT doc_class%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dcl');
+--
+--
+   INSERT INTO doc_class
+            (dcl_code
+            ,dcl_name
+            ,dcl_descr
+            ,dcl_start_date
+            ,dcl_end_date
+            ,dcl_dtp_code
+            )
+     VALUES (p_rec_dcl.dcl_code
+            ,p_rec_dcl.dcl_name
+            ,p_rec_dcl.dcl_descr
+            ,p_rec_dcl.dcl_start_date
+            ,p_rec_dcl.dcl_end_date
+            ,p_rec_dcl.dcl_dtp_code
+            )
+   RETURNING dcl_code
+            ,dcl_name
+            ,dcl_descr
+            ,dcl_start_date
+            ,dcl_end_date
+            ,dcl_dtp_code
+      INTO   p_rec_dcl.dcl_code
+            ,p_rec_dcl.dcl_name
+            ,p_rec_dcl.dcl_descr
+            ,p_rec_dcl.dcl_start_date
+            ,p_rec_dcl.dcl_end_date
+            ,p_rec_dcl.dcl_dtp_code;
+--
+   nm_debug.proc_end(g_package_name,'ins_dcl');
+--
+END ins_dcl;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dcp (p_rec_dcp IN OUT doc_copies%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dcp');
+--
+--
+   INSERT INTO doc_copies
+            (dcp_doc_id
+            ,dcp_id
+            ,dcp_date_out
+            ,dcp_user_id
+            ,dcp_date_back
+            ,dcp_remarks
+            )
+     VALUES (p_rec_dcp.dcp_doc_id
+            ,p_rec_dcp.dcp_id
+            ,p_rec_dcp.dcp_date_out
+            ,p_rec_dcp.dcp_user_id
+            ,p_rec_dcp.dcp_date_back
+            ,p_rec_dcp.dcp_remarks
+            )
+   RETURNING dcp_doc_id
+            ,dcp_id
+            ,dcp_date_out
+            ,dcp_user_id
+            ,dcp_date_back
+            ,dcp_remarks
+      INTO   p_rec_dcp.dcp_doc_id
+            ,p_rec_dcp.dcp_id
+            ,p_rec_dcp.dcp_date_out
+            ,p_rec_dcp.dcp_user_id
+            ,p_rec_dcp.dcp_date_back
+            ,p_rec_dcp.dcp_remarks;
+--
+   nm_debug.proc_end(g_package_name,'ins_dcp');
+--
+END ins_dcp;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ddg (p_rec_ddg IN OUT doc_damage%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ddg');
+--
+--
+   INSERT INTO doc_damage
+            (ddg_id
+            ,ddg_doc_id
+            ,ddg_furniture_type
+            ,ddg_furniture_details
+            ,ddg_vehicle
+            ,ddg_vehicle_reg
+            ,ddg_vehicle_owner
+            )
+     VALUES (p_rec_ddg.ddg_id
+            ,p_rec_ddg.ddg_doc_id
+            ,p_rec_ddg.ddg_furniture_type
+            ,p_rec_ddg.ddg_furniture_details
+            ,p_rec_ddg.ddg_vehicle
+            ,p_rec_ddg.ddg_vehicle_reg
+            ,p_rec_ddg.ddg_vehicle_owner
+            )
+   RETURNING ddg_id
+            ,ddg_doc_id
+            ,ddg_furniture_type
+            ,ddg_furniture_details
+            ,ddg_vehicle
+            ,ddg_vehicle_reg
+            ,ddg_vehicle_owner
+      INTO   p_rec_ddg.ddg_id
+            ,p_rec_ddg.ddg_doc_id
+            ,p_rec_ddg.ddg_furniture_type
+            ,p_rec_ddg.ddg_furniture_details
+            ,p_rec_ddg.ddg_vehicle
+            ,p_rec_ddg.ddg_vehicle_reg
+            ,p_rec_ddg.ddg_vehicle_owner;
+--
+   nm_debug.proc_end(g_package_name,'ins_ddg');
+--
+END ins_ddg;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ddc (p_rec_ddc IN OUT doc_damage_costs%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ddc');
+--
+--
+   INSERT INTO doc_damage_costs
+            (ddc_id
+            ,ddc_ddg_id
+            ,ddc_type
+            ,ddc_cost
+            ,ddc_notes
+            )
+     VALUES (p_rec_ddc.ddc_id
+            ,p_rec_ddc.ddc_ddg_id
+            ,p_rec_ddc.ddc_type
+            ,p_rec_ddc.ddc_cost
+            ,p_rec_ddc.ddc_notes
+            )
+   RETURNING ddc_id
+            ,ddc_ddg_id
+            ,ddc_type
+            ,ddc_cost
+            ,ddc_notes
+      INTO   p_rec_ddc.ddc_id
+            ,p_rec_ddc.ddc_ddg_id
+            ,p_rec_ddc.ddc_type
+            ,p_rec_ddc.ddc_cost
+            ,p_rec_ddc.ddc_notes;
+--
+   nm_debug.proc_end(g_package_name,'ins_ddc');
+--
+END ins_ddc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dec (p_rec_dec IN OUT doc_enquiry_contacts%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dec');
+--
+--
+   INSERT INTO doc_enquiry_contacts
+            (dec_hct_id
+            ,dec_doc_id
+            ,dec_type
+            ,dec_ref
+            ,dec_complainant
+            ,dec_contact
+            )
+     VALUES (p_rec_dec.dec_hct_id
+            ,p_rec_dec.dec_doc_id
+            ,p_rec_dec.dec_type
+            ,p_rec_dec.dec_ref
+            ,p_rec_dec.dec_complainant
+            ,p_rec_dec.dec_contact
+            )
+   RETURNING dec_hct_id
+            ,dec_doc_id
+            ,dec_type
+            ,dec_ref
+            ,dec_complainant
+            ,dec_contact
+      INTO   p_rec_dec.dec_hct_id
+            ,p_rec_dec.dec_doc_id
+            ,p_rec_dec.dec_type
+            ,p_rec_dec.dec_ref
+            ,p_rec_dec.dec_complainant
+            ,p_rec_dec.dec_contact;
+--
+   nm_debug.proc_end(g_package_name,'ins_dec');
+--
+END ins_dec;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_det (p_rec_det IN OUT doc_enquiry_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_det');
+--
+--
+   INSERT INTO doc_enquiry_types
+            (det_dtp_code
+            ,det_dcl_code
+            ,det_code
+            ,det_name
+            ,det_descr
+            ,det_start_date
+            ,det_end_date
+            ,det_con_id
+            )
+     VALUES (p_rec_det.det_dtp_code
+            ,p_rec_det.det_dcl_code
+            ,p_rec_det.det_code
+            ,p_rec_det.det_name
+            ,p_rec_det.det_descr
+            ,p_rec_det.det_start_date
+            ,p_rec_det.det_end_date
+            ,p_rec_det.det_con_id
+            )
+   RETURNING det_dtp_code
+            ,det_dcl_code
+            ,det_code
+            ,det_name
+            ,det_descr
+            ,det_start_date
+            ,det_end_date
+            ,det_con_id
+      INTO   p_rec_det.det_dtp_code
+            ,p_rec_det.det_dcl_code
+            ,p_rec_det.det_code
+            ,p_rec_det.det_name
+            ,p_rec_det.det_descr
+            ,p_rec_det.det_start_date
+            ,p_rec_det.det_end_date
+            ,p_rec_det.det_con_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_det');
+--
+END ins_det;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dgt (p_rec_dgt IN OUT doc_gateways%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dgt');
+--
+--
+   INSERT INTO doc_gateways
+            (dgt_table_name
+            ,dgt_table_descr
+            ,dgt_pk_col_name
+            ,dgt_lov_descr_list
+            ,dgt_lov_from_list
+            ,dgt_lov_join_condition
+            ,dgt_expand_module
+            ,dgt_start_date
+            ,dgt_end_date
+            )
+     VALUES (p_rec_dgt.dgt_table_name
+            ,p_rec_dgt.dgt_table_descr
+            ,p_rec_dgt.dgt_pk_col_name
+            ,p_rec_dgt.dgt_lov_descr_list
+            ,p_rec_dgt.dgt_lov_from_list
+            ,p_rec_dgt.dgt_lov_join_condition
+            ,p_rec_dgt.dgt_expand_module
+            ,p_rec_dgt.dgt_start_date
+            ,p_rec_dgt.dgt_end_date
+            )
+   RETURNING dgt_table_name
+            ,dgt_table_descr
+            ,dgt_pk_col_name
+            ,dgt_lov_descr_list
+            ,dgt_lov_from_list
+            ,dgt_lov_join_condition
+            ,dgt_expand_module
+            ,dgt_start_date
+            ,dgt_end_date
+      INTO   p_rec_dgt.dgt_table_name
+            ,p_rec_dgt.dgt_table_descr
+            ,p_rec_dgt.dgt_pk_col_name
+            ,p_rec_dgt.dgt_lov_descr_list
+            ,p_rec_dgt.dgt_lov_from_list
+            ,p_rec_dgt.dgt_lov_join_condition
+            ,p_rec_dgt.dgt_expand_module
+            ,p_rec_dgt.dgt_start_date
+            ,p_rec_dgt.dgt_end_date;
+--
+   nm_debug.proc_end(g_package_name,'ins_dgt');
+--
+END ins_dgt;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dgs (p_rec_dgs IN OUT doc_gate_syns%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dgs');
+--
+--
+   INSERT INTO doc_gate_syns
+            (dgs_dgt_table_name
+            ,dgs_table_syn
+            )
+     VALUES (p_rec_dgs.dgs_dgt_table_name
+            ,p_rec_dgs.dgs_table_syn
+            )
+   RETURNING dgs_dgt_table_name
+            ,dgs_table_syn
+      INTO   p_rec_dgs.dgs_dgt_table_name
+            ,p_rec_dgs.dgs_table_syn;
+--
+   nm_debug.proc_end(g_package_name,'ins_dgs');
+--
+END ins_dgs;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dhi (p_rec_dhi IN OUT doc_history%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dhi');
+--
+--
+   INSERT INTO doc_history
+            (dhi_doc_id
+            ,dhi_date_changed
+            ,dhi_status_code
+            ,dhi_compl_type
+            ,dhi_compl_cpr_id
+            ,dhi_changed_by
+            ,dhi_reason
+            ,dhi_claim
+            ,dhi_dtp_code
+            ,dhi_dcl_code
+            ,dhi_corresp_date
+            ,dhi_ack_date
+            ,dhi_incident_date
+            )
+     VALUES (p_rec_dhi.dhi_doc_id
+            ,p_rec_dhi.dhi_date_changed
+            ,p_rec_dhi.dhi_status_code
+            ,p_rec_dhi.dhi_compl_type
+            ,p_rec_dhi.dhi_compl_cpr_id
+            ,p_rec_dhi.dhi_changed_by
+            ,p_rec_dhi.dhi_reason
+            ,p_rec_dhi.dhi_claim
+            ,p_rec_dhi.dhi_dtp_code
+            ,p_rec_dhi.dhi_dcl_code
+            ,p_rec_dhi.dhi_corresp_date
+            ,p_rec_dhi.dhi_ack_date
+            ,p_rec_dhi.dhi_incident_date
+            )
+   RETURNING dhi_doc_id
+            ,dhi_date_changed
+            ,dhi_status_code
+            ,dhi_compl_type
+            ,dhi_compl_cpr_id
+            ,dhi_changed_by
+            ,dhi_reason
+            ,dhi_claim
+            ,dhi_dtp_code
+            ,dhi_dcl_code
+            ,dhi_corresp_date
+            ,dhi_ack_date
+            ,dhi_incident_date
+      INTO   p_rec_dhi.dhi_doc_id
+            ,p_rec_dhi.dhi_date_changed
+            ,p_rec_dhi.dhi_status_code
+            ,p_rec_dhi.dhi_compl_type
+            ,p_rec_dhi.dhi_compl_cpr_id
+            ,p_rec_dhi.dhi_changed_by
+            ,p_rec_dhi.dhi_reason
+            ,p_rec_dhi.dhi_claim
+            ,p_rec_dhi.dhi_dtp_code
+            ,p_rec_dhi.dhi_dcl_code
+            ,p_rec_dhi.dhi_corresp_date
+            ,p_rec_dhi.dhi_ack_date
+            ,p_rec_dhi.dhi_incident_date;
+--
+   nm_debug.proc_end(g_package_name,'ins_dhi');
+--
+END ins_dhi;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dky (p_rec_dky IN OUT doc_keys%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dky');
+--
+--
+   INSERT INTO doc_keys
+            (dky_doc_id
+            ,dky_dkw_key_id
+            )
+     VALUES (p_rec_dky.dky_doc_id
+            ,p_rec_dky.dky_dkw_key_id
+            )
+   RETURNING dky_doc_id
+            ,dky_dkw_key_id
+      INTO   p_rec_dky.dky_doc_id
+            ,p_rec_dky.dky_dkw_key_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_dky');
+--
+END ins_dky;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dkw (p_rec_dkw IN OUT doc_keywords%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dkw');
+--
+--
+   INSERT INTO doc_keywords
+            (dkw_key_id
+            )
+     VALUES (p_rec_dkw.dkw_key_id
+            )
+   RETURNING dkw_key_id
+      INTO   p_rec_dkw.dkw_key_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_dkw');
+--
+END ins_dkw;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dlc (p_rec_dlc IN OUT doc_locations%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dlc');
+--
+--
+   INSERT INTO doc_locations
+            (dlc_id
+            ,dlc_name
+            ,dlc_pathname
+            ,dlc_dmd_id
+            ,dlc_descr
+            ,dlc_start_date
+            ,dlc_end_date
+            ,dlc_apps_pathname
+            ,dlc_url_pathname
+            ,dlc_location_name
+            ,dlc_location_type
+            )
+     VALUES (p_rec_dlc.dlc_id
+            ,p_rec_dlc.dlc_name
+            ,p_rec_dlc.dlc_pathname
+            ,p_rec_dlc.dlc_dmd_id
+            ,p_rec_dlc.dlc_descr
+            ,p_rec_dlc.dlc_start_date
+            ,p_rec_dlc.dlc_end_date
+            ,p_rec_dlc.dlc_apps_pathname
+            ,p_rec_dlc.dlc_url_pathname
+            ,p_rec_dlc.dlc_location_name
+            ,p_rec_dlc.dlc_location_type
+            )
+   RETURNING dlc_id
+            ,dlc_name
+            ,dlc_pathname
+            ,dlc_dmd_id
+            ,dlc_descr
+            ,dlc_start_date
+            ,dlc_end_date
+            ,dlc_apps_pathname
+            ,dlc_url_pathname
+            ,dlc_location_name
+            ,dlc_location_type
+      INTO   p_rec_dlc.dlc_id
+            ,p_rec_dlc.dlc_name
+            ,p_rec_dlc.dlc_pathname
+            ,p_rec_dlc.dlc_dmd_id
+            ,p_rec_dlc.dlc_descr
+            ,p_rec_dlc.dlc_start_date
+            ,p_rec_dlc.dlc_end_date
+            ,p_rec_dlc.dlc_apps_pathname
+            ,p_rec_dlc.dlc_url_pathname
+            ,p_rec_dlc.dlc_location_name
+            ,p_rec_dlc.dlc_location_type;
+--
+   nm_debug.proc_end(g_package_name,'ins_dlc');
+--
+END ins_dlc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dlr (p_rec_dlr IN OUT doc_lov_recs%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dlr');
+--
+--
+   INSERT INTO doc_lov_recs
+            (dlr_rec_id
+            ,dlr_rec_descr
+            ,dlr_sessionid
+            )
+     VALUES (p_rec_dlr.dlr_rec_id
+            ,p_rec_dlr.dlr_rec_descr
+            ,p_rec_dlr.dlr_sessionid
+            )
+   RETURNING dlr_rec_id
+            ,dlr_rec_descr
+            ,dlr_sessionid
+      INTO   p_rec_dlr.dlr_rec_id
+            ,p_rec_dlr.dlr_rec_descr
+            ,p_rec_dlr.dlr_sessionid;
+--
+   nm_debug.proc_end(g_package_name,'ins_dlr');
+--
+END ins_dlr;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dmd (p_rec_dmd IN OUT doc_media%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dmd');
+--
+--
+   INSERT INTO doc_media
+            (dmd_id
+            ,dmd_name
+            ,dmd_descr
+            ,dmd_display_command
+            ,dmd_scan_command
+            ,dmd_image_command1
+            ,dmd_image_command2
+            ,dmd_image_command3
+            ,dmd_image_command4
+            ,dmd_image_command5
+            ,dmd_file_extension
+            ,dmd_start_date
+            ,dmd_end_date
+            ,dmd_icon
+            )
+     VALUES (p_rec_dmd.dmd_id
+            ,p_rec_dmd.dmd_name
+            ,p_rec_dmd.dmd_descr
+            ,p_rec_dmd.dmd_display_command
+            ,p_rec_dmd.dmd_scan_command
+            ,p_rec_dmd.dmd_image_command1
+            ,p_rec_dmd.dmd_image_command2
+            ,p_rec_dmd.dmd_image_command3
+            ,p_rec_dmd.dmd_image_command4
+            ,p_rec_dmd.dmd_image_command5
+            ,p_rec_dmd.dmd_file_extension
+            ,p_rec_dmd.dmd_start_date
+            ,p_rec_dmd.dmd_end_date
+            ,p_rec_dmd.dmd_icon
+            )
+   RETURNING dmd_id
+            ,dmd_name
+            ,dmd_descr
+            ,dmd_display_command
+            ,dmd_scan_command
+            ,dmd_image_command1
+            ,dmd_image_command2
+            ,dmd_image_command3
+            ,dmd_image_command4
+            ,dmd_image_command5
+            ,dmd_file_extension
+            ,dmd_start_date
+            ,dmd_end_date
+            ,dmd_icon
+      INTO   p_rec_dmd.dmd_id
+            ,p_rec_dmd.dmd_name
+            ,p_rec_dmd.dmd_descr
+            ,p_rec_dmd.dmd_display_command
+            ,p_rec_dmd.dmd_scan_command
+            ,p_rec_dmd.dmd_image_command1
+            ,p_rec_dmd.dmd_image_command2
+            ,p_rec_dmd.dmd_image_command3
+            ,p_rec_dmd.dmd_image_command4
+            ,p_rec_dmd.dmd_image_command5
+            ,p_rec_dmd.dmd_file_extension
+            ,p_rec_dmd.dmd_start_date
+            ,p_rec_dmd.dmd_end_date
+            ,p_rec_dmd.dmd_icon;
+--
+   nm_debug.proc_end(g_package_name,'ins_dmd');
+--
+END ins_dmd;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dq (p_rec_dq IN OUT doc_query%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dq');
+--
+--
+   INSERT INTO doc_query
+            (dq_id
+            ,dq_title
+            ,dq_descr
+            ,dq_sql
+            )
+     VALUES (p_rec_dq.dq_id
+            ,p_rec_dq.dq_title
+            ,p_rec_dq.dq_descr
+            ,p_rec_dq.dq_sql
+            )
+   RETURNING dq_id
+            ,dq_title
+            ,dq_descr
+            ,dq_sql
+      INTO   p_rec_dq.dq_id
+            ,p_rec_dq.dq_title
+            ,p_rec_dq.dq_descr
+            ,p_rec_dq.dq_sql;
+--
+   nm_debug.proc_end(g_package_name,'ins_dq');
+--
+END ins_dq;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dqc (p_rec_dqc IN OUT doc_query_cols%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dqc');
+--
+--
+   INSERT INTO doc_query_cols
+            (dqc_dq_id
+            ,dqc_seq_no
+            ,dqc_column
+            ,dqc_column_alias
+            ,dqc_datatype
+            ,dqc_data_len
+            )
+     VALUES (p_rec_dqc.dqc_dq_id
+            ,p_rec_dqc.dqc_seq_no
+            ,p_rec_dqc.dqc_column
+            ,p_rec_dqc.dqc_column_alias
+            ,p_rec_dqc.dqc_datatype
+            ,p_rec_dqc.dqc_data_len
+            )
+   RETURNING dqc_dq_id
+            ,dqc_seq_no
+            ,dqc_column
+            ,dqc_column_alias
+            ,dqc_datatype
+            ,dqc_data_len
+      INTO   p_rec_dqc.dqc_dq_id
+            ,p_rec_dqc.dqc_seq_no
+            ,p_rec_dqc.dqc_column
+            ,p_rec_dqc.dqc_column_alias
+            ,p_rec_dqc.dqc_datatype
+            ,p_rec_dqc.dqc_data_len;
+--
+   nm_debug.proc_end(g_package_name,'ins_dqc');
+--
+END ins_dqc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dsa (p_rec_dsa IN OUT doc_std_actions%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dsa');
+--
+--
+   INSERT INTO doc_std_actions
+            (dsa_dtp_code
+            ,dsa_dcl_code
+            ,dsa_doc_status
+            ,dsa_doc_type
+            ,dsa_code
+            ,dsa_descr
+            ,dsa_priority_id
+            ,dsa_status
+            ,dsa_default_assignee
+            ,dsa_seq
+            ,dsa_parallel_flag
+            ,dsa_security_level
+            ,dsa_amount
+            )
+     VALUES (p_rec_dsa.dsa_dtp_code
+            ,p_rec_dsa.dsa_dcl_code
+            ,p_rec_dsa.dsa_doc_status
+            ,p_rec_dsa.dsa_doc_type
+            ,p_rec_dsa.dsa_code
+            ,p_rec_dsa.dsa_descr
+            ,p_rec_dsa.dsa_priority_id
+            ,p_rec_dsa.dsa_status
+            ,p_rec_dsa.dsa_default_assignee
+            ,p_rec_dsa.dsa_seq
+            ,p_rec_dsa.dsa_parallel_flag
+            ,p_rec_dsa.dsa_security_level
+            ,p_rec_dsa.dsa_amount
+            )
+   RETURNING dsa_dtp_code
+            ,dsa_dcl_code
+            ,dsa_doc_status
+            ,dsa_doc_type
+            ,dsa_code
+            ,dsa_descr
+            ,dsa_priority_id
+            ,dsa_status
+            ,dsa_default_assignee
+            ,dsa_seq
+            ,dsa_parallel_flag
+            ,dsa_security_level
+            ,dsa_amount
+      INTO   p_rec_dsa.dsa_dtp_code
+            ,p_rec_dsa.dsa_dcl_code
+            ,p_rec_dsa.dsa_doc_status
+            ,p_rec_dsa.dsa_doc_type
+            ,p_rec_dsa.dsa_code
+            ,p_rec_dsa.dsa_descr
+            ,p_rec_dsa.dsa_priority_id
+            ,p_rec_dsa.dsa_status
+            ,p_rec_dsa.dsa_default_assignee
+            ,p_rec_dsa.dsa_seq
+            ,p_rec_dsa.dsa_parallel_flag
+            ,p_rec_dsa.dsa_security_level
+            ,p_rec_dsa.dsa_amount;
+--
+   nm_debug.proc_end(g_package_name,'ins_dsa');
+--
+END ins_dsa;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dsc (p_rec_dsc IN OUT doc_std_costs%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dsc');
+--
+--
+   INSERT INTO doc_std_costs
+            (dsc_type
+            ,dsc_cost
+            ,dsc_notes
+            ,dsc_from_date
+            ,dsc_to_date
+            )
+     VALUES (p_rec_dsc.dsc_type
+            ,p_rec_dsc.dsc_cost
+            ,p_rec_dsc.dsc_notes
+            ,p_rec_dsc.dsc_from_date
+            ,p_rec_dsc.dsc_to_date
+            )
+   RETURNING dsc_type
+            ,dsc_cost
+            ,dsc_notes
+            ,dsc_from_date
+            ,dsc_to_date
+      INTO   p_rec_dsc.dsc_type
+            ,p_rec_dsc.dsc_cost
+            ,p_rec_dsc.dsc_notes
+            ,p_rec_dsc.dsc_from_date
+            ,p_rec_dsc.dsc_to_date;
+--
+   nm_debug.proc_end(g_package_name,'ins_dsc');
+--
+END ins_dsc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dsy (p_rec_dsy IN OUT doc_synonyms%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dsy');
+--
+--
+   INSERT INTO doc_synonyms
+            (dsy_key_id
+            ,dsy_dkw_key_id
+            )
+     VALUES (p_rec_dsy.dsy_key_id
+            ,p_rec_dsy.dsy_dkw_key_id
+            )
+   RETURNING dsy_key_id
+            ,dsy_dkw_key_id
+      INTO   p_rec_dsy.dsy_key_id
+            ,p_rec_dsy.dsy_dkw_key_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_dsy');
+--
+END ins_dsy;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dtc (p_rec_dtc IN OUT doc_template_columns%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dtc');
+--
+--
+   INSERT INTO doc_template_columns
+            (dtc_template_name
+            ,dtc_col_name
+            ,dtc_col_type
+            ,dtc_col_alias
+            ,dtc_col_seq
+            ,dtc_used_in_proc
+            ,dtc_image_file
+            ,dtc_function
+            )
+     VALUES (p_rec_dtc.dtc_template_name
+            ,p_rec_dtc.dtc_col_name
+            ,p_rec_dtc.dtc_col_type
+            ,p_rec_dtc.dtc_col_alias
+            ,p_rec_dtc.dtc_col_seq
+            ,p_rec_dtc.dtc_used_in_proc
+            ,p_rec_dtc.dtc_image_file
+            ,p_rec_dtc.dtc_function
+            )
+   RETURNING dtc_template_name
+            ,dtc_col_name
+            ,dtc_col_type
+            ,dtc_col_alias
+            ,dtc_col_seq
+            ,dtc_used_in_proc
+            ,dtc_image_file
+            ,dtc_function
+      INTO   p_rec_dtc.dtc_template_name
+            ,p_rec_dtc.dtc_col_name
+            ,p_rec_dtc.dtc_col_type
+            ,p_rec_dtc.dtc_col_alias
+            ,p_rec_dtc.dtc_col_seq
+            ,p_rec_dtc.dtc_used_in_proc
+            ,p_rec_dtc.dtc_image_file
+            ,p_rec_dtc.dtc_function;
+--
+   nm_debug.proc_end(g_package_name,'ins_dtc');
+--
+END ins_dtc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dtg (p_rec_dtg IN OUT doc_template_gateways%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dtg');
+--
+--
+   INSERT INTO doc_template_gateways
+            (dtg_dmd_id
+            ,dtg_ole_type
+            ,dtg_table_name
+            ,dtg_template_name
+            ,dtg_dlc_id
+            ,dtg_template_descr
+            ,dtg_post_run_procedure
+            )
+     VALUES (p_rec_dtg.dtg_dmd_id
+            ,p_rec_dtg.dtg_ole_type
+            ,p_rec_dtg.dtg_table_name
+            ,p_rec_dtg.dtg_template_name
+            ,p_rec_dtg.dtg_dlc_id
+            ,p_rec_dtg.dtg_template_descr
+            ,p_rec_dtg.dtg_post_run_procedure
+            )
+   RETURNING dtg_dmd_id
+            ,dtg_ole_type
+            ,dtg_table_name
+            ,dtg_template_name
+            ,dtg_dlc_id
+            ,dtg_template_descr
+            ,dtg_post_run_procedure
+      INTO   p_rec_dtg.dtg_dmd_id
+            ,p_rec_dtg.dtg_ole_type
+            ,p_rec_dtg.dtg_table_name
+            ,p_rec_dtg.dtg_template_name
+            ,p_rec_dtg.dtg_dlc_id
+            ,p_rec_dtg.dtg_template_descr
+            ,p_rec_dtg.dtg_post_run_procedure;
+--
+   nm_debug.proc_end(g_package_name,'ins_dtg');
+--
+END ins_dtg;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dtu (p_rec_dtu IN OUT doc_template_users%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dtu');
+--
+--
+   INSERT INTO doc_template_users
+            (dtu_template_name
+            ,dtu_user_id
+            ,dtu_default_template
+            ,dtu_print_immediately
+            ,dtu_default_report_type
+            )
+     VALUES (p_rec_dtu.dtu_template_name
+            ,p_rec_dtu.dtu_user_id
+            ,p_rec_dtu.dtu_default_template
+            ,p_rec_dtu.dtu_print_immediately
+            ,p_rec_dtu.dtu_default_report_type
+            )
+   RETURNING dtu_template_name
+            ,dtu_user_id
+            ,dtu_default_template
+            ,dtu_print_immediately
+            ,dtu_default_report_type
+      INTO   p_rec_dtu.dtu_template_name
+            ,p_rec_dtu.dtu_user_id
+            ,p_rec_dtu.dtu_default_template
+            ,p_rec_dtu.dtu_print_immediately
+            ,p_rec_dtu.dtu_default_report_type;
+--
+   nm_debug.proc_end(g_package_name,'ins_dtu');
+--
+END ins_dtu;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_dtp (p_rec_dtp IN OUT doc_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_dtp');
+--
+--
+   INSERT INTO doc_types
+            (dtp_code
+            ,dtp_name
+            ,dtp_descr
+            ,dtp_allow_comments
+            ,dtp_allow_complaints
+            ,dtp_start_date
+            ,dtp_end_date
+            )
+     VALUES (p_rec_dtp.dtp_code
+            ,p_rec_dtp.dtp_name
+            ,p_rec_dtp.dtp_descr
+            ,p_rec_dtp.dtp_allow_comments
+            ,p_rec_dtp.dtp_allow_complaints
+            ,p_rec_dtp.dtp_start_date
+            ,p_rec_dtp.dtp_end_date
+            )
+   RETURNING dtp_code
+            ,dtp_name
+            ,dtp_descr
+            ,dtp_allow_comments
+            ,dtp_allow_complaints
+            ,dtp_start_date
+            ,dtp_end_date
+      INTO   p_rec_dtp.dtp_code
+            ,p_rec_dtp.dtp_name
+            ,p_rec_dtp.dtp_descr
+            ,p_rec_dtp.dtp_allow_comments
+            ,p_rec_dtp.dtp_allow_complaints
+            ,p_rec_dtp.dtp_start_date
+            ,p_rec_dtp.dtp_end_date;
+--
+   nm_debug.proc_end(g_package_name,'ins_dtp');
+--
+END ins_dtp;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_gl (p_rec_gl IN OUT gri_lov%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_gl');
+--
+--
+   INSERT INTO gri_lov
+            (gl_job_id
+            ,gl_param
+            ,gl_return
+            ,gl_descr
+            ,gl_shown
+            )
+     VALUES (p_rec_gl.gl_job_id
+            ,p_rec_gl.gl_param
+            ,p_rec_gl.gl_return
+            ,p_rec_gl.gl_descr
+            ,p_rec_gl.gl_shown
+            )
+   RETURNING gl_job_id
+            ,gl_param
+            ,gl_return
+            ,gl_descr
+            ,gl_shown
+      INTO   p_rec_gl.gl_job_id
+            ,p_rec_gl.gl_param
+            ,p_rec_gl.gl_return
+            ,p_rec_gl.gl_descr
+            ,p_rec_gl.gl_shown;
+--
+   nm_debug.proc_end(g_package_name,'ins_gl');
+--
+END ins_gl;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_grm (p_rec_grm IN OUT gri_modules%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_grm');
+--
+--
+   INSERT INTO gri_modules
+            (grm_module
+            ,grm_module_type
+            ,grm_module_path
+            ,grm_file_type
+            ,grm_tag_flag
+            ,grm_tag_table
+            ,grm_tag_column
+            ,grm_tag_where
+            ,grm_linesize
+            ,grm_pagesize
+            ,grm_pre_process
+            )
+     VALUES (p_rec_grm.grm_module
+            ,p_rec_grm.grm_module_type
+            ,p_rec_grm.grm_module_path
+            ,p_rec_grm.grm_file_type
+            ,p_rec_grm.grm_tag_flag
+            ,p_rec_grm.grm_tag_table
+            ,p_rec_grm.grm_tag_column
+            ,p_rec_grm.grm_tag_where
+            ,p_rec_grm.grm_linesize
+            ,p_rec_grm.grm_pagesize
+            ,p_rec_grm.grm_pre_process
+            )
+   RETURNING grm_module
+            ,grm_module_type
+            ,grm_module_path
+            ,grm_file_type
+            ,grm_tag_flag
+            ,grm_tag_table
+            ,grm_tag_column
+            ,grm_tag_where
+            ,grm_linesize
+            ,grm_pagesize
+            ,grm_pre_process
+      INTO   p_rec_grm.grm_module
+            ,p_rec_grm.grm_module_type
+            ,p_rec_grm.grm_module_path
+            ,p_rec_grm.grm_file_type
+            ,p_rec_grm.grm_tag_flag
+            ,p_rec_grm.grm_tag_table
+            ,p_rec_grm.grm_tag_column
+            ,p_rec_grm.grm_tag_where
+            ,p_rec_grm.grm_linesize
+            ,p_rec_grm.grm_pagesize
+            ,p_rec_grm.grm_pre_process;
+--
+   nm_debug.proc_end(g_package_name,'ins_grm');
+--
+END ins_grm;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_gmp (p_rec_gmp IN OUT gri_module_params%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_gmp');
+--
+   p_rec_gmp.gmp_allow_partial              := NVL(p_rec_gmp.gmp_allow_partial,'N' );
+--
+   INSERT INTO gri_module_params
+            (gmp_module
+            ,gmp_param
+            ,gmp_seq
+            ,gmp_param_descr
+            ,gmp_mandatory
+            ,gmp_no_allowed
+            ,gmp_where
+            ,gmp_tag_restriction
+            ,gmp_tag_where
+            ,gmp_default_table
+            ,gmp_default_column
+            ,gmp_default_where
+            ,gmp_visible
+            ,gmp_gazetteer
+            ,gmp_lov
+            ,gmp_val_global
+            ,gmp_wildcard
+            ,gmp_hint_text
+            ,gmp_allow_partial
+            ,gmp_base_table
+            ,gmp_base_table_column
+            ,gmp_operator
+            )
+     VALUES (p_rec_gmp.gmp_module
+            ,p_rec_gmp.gmp_param
+            ,p_rec_gmp.gmp_seq
+            ,p_rec_gmp.gmp_param_descr
+            ,p_rec_gmp.gmp_mandatory
+            ,p_rec_gmp.gmp_no_allowed
+            ,p_rec_gmp.gmp_where
+            ,p_rec_gmp.gmp_tag_restriction
+            ,p_rec_gmp.gmp_tag_where
+            ,p_rec_gmp.gmp_default_table
+            ,p_rec_gmp.gmp_default_column
+            ,p_rec_gmp.gmp_default_where
+            ,p_rec_gmp.gmp_visible
+            ,p_rec_gmp.gmp_gazetteer
+            ,p_rec_gmp.gmp_lov
+            ,p_rec_gmp.gmp_val_global
+            ,p_rec_gmp.gmp_wildcard
+            ,p_rec_gmp.gmp_hint_text
+            ,p_rec_gmp.gmp_allow_partial
+            ,p_rec_gmp.gmp_base_table
+            ,p_rec_gmp.gmp_base_table_column
+            ,p_rec_gmp.gmp_operator
+            )
+   RETURNING gmp_module
+            ,gmp_param
+            ,gmp_seq
+            ,gmp_param_descr
+            ,gmp_mandatory
+            ,gmp_no_allowed
+            ,gmp_where
+            ,gmp_tag_restriction
+            ,gmp_tag_where
+            ,gmp_default_table
+            ,gmp_default_column
+            ,gmp_default_where
+            ,gmp_visible
+            ,gmp_gazetteer
+            ,gmp_lov
+            ,gmp_val_global
+            ,gmp_wildcard
+            ,gmp_hint_text
+            ,gmp_allow_partial
+            ,gmp_base_table
+            ,gmp_base_table_column
+            ,gmp_operator
+      INTO   p_rec_gmp.gmp_module
+            ,p_rec_gmp.gmp_param
+            ,p_rec_gmp.gmp_seq
+            ,p_rec_gmp.gmp_param_descr
+            ,p_rec_gmp.gmp_mandatory
+            ,p_rec_gmp.gmp_no_allowed
+            ,p_rec_gmp.gmp_where
+            ,p_rec_gmp.gmp_tag_restriction
+            ,p_rec_gmp.gmp_tag_where
+            ,p_rec_gmp.gmp_default_table
+            ,p_rec_gmp.gmp_default_column
+            ,p_rec_gmp.gmp_default_where
+            ,p_rec_gmp.gmp_visible
+            ,p_rec_gmp.gmp_gazetteer
+            ,p_rec_gmp.gmp_lov
+            ,p_rec_gmp.gmp_val_global
+            ,p_rec_gmp.gmp_wildcard
+            ,p_rec_gmp.gmp_hint_text
+            ,p_rec_gmp.gmp_allow_partial
+            ,p_rec_gmp.gmp_base_table
+            ,p_rec_gmp.gmp_base_table_column
+            ,p_rec_gmp.gmp_operator;
+--
+   nm_debug.proc_end(g_package_name,'ins_gmp');
+--
+END ins_gmp;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_gp (p_rec_gp IN OUT gri_params%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_gp');
+--
+--
+   INSERT INTO gri_params
+            (gp_param
+            ,gp_param_type
+            ,gp_table
+            ,gp_column
+            ,gp_descr_column
+            ,gp_shown_column
+            ,gp_shown_type
+            ,gp_descr_type
+            ,gp_order
+            ,gp_case
+            ,gp_gaz_restriction
+            )
+     VALUES (p_rec_gp.gp_param
+            ,p_rec_gp.gp_param_type
+            ,p_rec_gp.gp_table
+            ,p_rec_gp.gp_column
+            ,p_rec_gp.gp_descr_column
+            ,p_rec_gp.gp_shown_column
+            ,p_rec_gp.gp_shown_type
+            ,p_rec_gp.gp_descr_type
+            ,p_rec_gp.gp_order
+            ,p_rec_gp.gp_case
+            ,p_rec_gp.gp_gaz_restriction
+            )
+   RETURNING gp_param
+            ,gp_param_type
+            ,gp_table
+            ,gp_column
+            ,gp_descr_column
+            ,gp_shown_column
+            ,gp_shown_type
+            ,gp_descr_type
+            ,gp_order
+            ,gp_case
+            ,gp_gaz_restriction
+      INTO   p_rec_gp.gp_param
+            ,p_rec_gp.gp_param_type
+            ,p_rec_gp.gp_table
+            ,p_rec_gp.gp_column
+            ,p_rec_gp.gp_descr_column
+            ,p_rec_gp.gp_shown_column
+            ,p_rec_gp.gp_shown_type
+            ,p_rec_gp.gp_descr_type
+            ,p_rec_gp.gp_order
+            ,p_rec_gp.gp_case
+            ,p_rec_gp.gp_gaz_restriction;
+--
+   nm_debug.proc_end(g_package_name,'ins_gp');
+--
+END ins_gp;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_gpd (p_rec_gpd IN OUT gri_param_dependencies%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_gpd');
+--
+--
+   INSERT INTO gri_param_dependencies
+            (gpd_module
+            ,gpd_dep_param
+            ,gpd_indep_param
+            )
+     VALUES (p_rec_gpd.gpd_module
+            ,p_rec_gpd.gpd_dep_param
+            ,p_rec_gpd.gpd_indep_param
+            )
+   RETURNING gpd_module
+            ,gpd_dep_param
+            ,gpd_indep_param
+      INTO   p_rec_gpd.gpd_module
+            ,p_rec_gpd.gpd_dep_param
+            ,p_rec_gpd.gpd_indep_param;
+--
+   nm_debug.proc_end(g_package_name,'ins_gpd');
+--
+END ins_gpd;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_gpl (p_rec_gpl IN OUT gri_param_lookup%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_gpl');
+--
+--
+   INSERT INTO gri_param_lookup
+            (gpl_param
+            ,gpl_value
+            ,gpl_descr
+            )
+     VALUES (p_rec_gpl.gpl_param
+            ,p_rec_gpl.gpl_value
+            ,p_rec_gpl.gpl_descr
+            )
+   RETURNING gpl_param
+            ,gpl_value
+            ,gpl_descr
+      INTO   p_rec_gpl.gpl_param
+            ,p_rec_gpl.gpl_value
+            ,p_rec_gpl.gpl_descr;
+--
+   nm_debug.proc_end(g_package_name,'ins_gpl');
+--
+END ins_gpl;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_grr (p_rec_grr IN OUT gri_report_runs%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_grr');
+--
+--
+   INSERT INTO gri_report_runs
+            (grr_job_id
+            ,grr_module
+            ,grr_username
+            ,grr_submit_date
+            ,grr_act_start_date
+            ,grr_prop_start_date
+            ,grr_end_date
+            ,grr_report_dest
+            ,grr_batch_queue
+            ,grr_entry_no
+            ,grr_error_no
+            ,grr_error_appl
+            ,grr_error_descr
+            ,grr_mode
+            )
+     VALUES (p_rec_grr.grr_job_id
+            ,p_rec_grr.grr_module
+            ,p_rec_grr.grr_username
+            ,p_rec_grr.grr_submit_date
+            ,p_rec_grr.grr_act_start_date
+            ,p_rec_grr.grr_prop_start_date
+            ,p_rec_grr.grr_end_date
+            ,p_rec_grr.grr_report_dest
+            ,p_rec_grr.grr_batch_queue
+            ,p_rec_grr.grr_entry_no
+            ,p_rec_grr.grr_error_no
+            ,p_rec_grr.grr_error_appl
+            ,p_rec_grr.grr_error_descr
+            ,p_rec_grr.grr_mode
+            )
+   RETURNING grr_job_id
+            ,grr_module
+            ,grr_username
+            ,grr_submit_date
+            ,grr_act_start_date
+            ,grr_prop_start_date
+            ,grr_end_date
+            ,grr_report_dest
+            ,grr_batch_queue
+            ,grr_entry_no
+            ,grr_error_no
+            ,grr_error_appl
+            ,grr_error_descr
+            ,grr_mode
+      INTO   p_rec_grr.grr_job_id
+            ,p_rec_grr.grr_module
+            ,p_rec_grr.grr_username
+            ,p_rec_grr.grr_submit_date
+            ,p_rec_grr.grr_act_start_date
+            ,p_rec_grr.grr_prop_start_date
+            ,p_rec_grr.grr_end_date
+            ,p_rec_grr.grr_report_dest
+            ,p_rec_grr.grr_batch_queue
+            ,p_rec_grr.grr_entry_no
+            ,p_rec_grr.grr_error_no
+            ,p_rec_grr.grr_error_appl
+            ,p_rec_grr.grr_error_descr
+            ,p_rec_grr.grr_mode;
+--
+   nm_debug.proc_end(g_package_name,'ins_grr');
+--
+END ins_grr;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_grp (p_rec_grp IN OUT gri_run_parameters%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_grp');
+--
+--
+   INSERT INTO gri_run_parameters
+            (grp_job_id
+            ,grp_seq
+            ,grp_param
+            ,grp_value
+            ,grp_visible
+            ,grp_descr
+            ,grp_shown
+            ,grp_current_lov
+            )
+     VALUES (p_rec_grp.grp_job_id
+            ,p_rec_grp.grp_seq
+            ,p_rec_grp.grp_param
+            ,p_rec_grp.grp_value
+            ,p_rec_grp.grp_visible
+            ,p_rec_grp.grp_descr
+            ,p_rec_grp.grp_shown
+            ,p_rec_grp.grp_current_lov
+            )
+   RETURNING grp_job_id
+            ,grp_seq
+            ,grp_param
+            ,grp_value
+            ,grp_visible
+            ,grp_descr
+            ,grp_shown
+            ,grp_current_lov
+      INTO   p_rec_grp.grp_job_id
+            ,p_rec_grp.grp_seq
+            ,p_rec_grp.grp_param
+            ,p_rec_grp.grp_value
+            ,p_rec_grp.grp_visible
+            ,p_rec_grp.grp_descr
+            ,p_rec_grp.grp_shown
+            ,p_rec_grp.grp_current_lov;
+--
+   nm_debug.proc_end(g_package_name,'ins_grp');
+--
+END ins_grp;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_gsp (p_rec_gsp IN OUT gri_saved_params%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_gsp');
+--
+--
+   INSERT INTO gri_saved_params
+            (gsp_gss_id
+            ,gsp_seq
+            ,gsp_param
+            ,gsp_value
+            ,gsp_visible
+            ,gsp_shown
+            ,gsp_descr
+            )
+     VALUES (p_rec_gsp.gsp_gss_id
+            ,p_rec_gsp.gsp_seq
+            ,p_rec_gsp.gsp_param
+            ,p_rec_gsp.gsp_value
+            ,p_rec_gsp.gsp_visible
+            ,p_rec_gsp.gsp_shown
+            ,p_rec_gsp.gsp_descr
+            )
+   RETURNING gsp_gss_id
+            ,gsp_seq
+            ,gsp_param
+            ,gsp_value
+            ,gsp_visible
+            ,gsp_shown
+            ,gsp_descr
+      INTO   p_rec_gsp.gsp_gss_id
+            ,p_rec_gsp.gsp_seq
+            ,p_rec_gsp.gsp_param
+            ,p_rec_gsp.gsp_value
+            ,p_rec_gsp.gsp_visible
+            ,p_rec_gsp.gsp_shown
+            ,p_rec_gsp.gsp_descr;
+--
+   nm_debug.proc_end(g_package_name,'ins_gsp');
+--
+END ins_gsp;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_gss (p_rec_gss IN OUT gri_saved_sets%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_gss');
+--
+--
+   INSERT INTO gri_saved_sets
+            (gss_id
+            ,gss_username
+            ,gss_module
+            ,gss_descr
+            )
+     VALUES (p_rec_gss.gss_id
+            ,p_rec_gss.gss_username
+            ,p_rec_gss.gss_module
+            ,p_rec_gss.gss_descr
+            )
+   RETURNING gss_id
+            ,gss_username
+            ,gss_module
+            ,gss_descr
+      INTO   p_rec_gss.gss_id
+            ,p_rec_gss.gss_username
+            ,p_rec_gss.gss_module
+            ,p_rec_gss.gss_descr;
+--
+   nm_debug.proc_end(g_package_name,'ins_gss');
+--
+END ins_gss;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_grs (p_rec_grs IN OUT gri_spool%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_grs');
+--
+--
+   INSERT INTO gri_spool
+            (grs_job_id
+            ,grs_line_no
+            ,grs_text
+            )
+     VALUES (p_rec_grs.grs_job_id
+            ,p_rec_grs.grs_line_no
+            ,p_rec_grs.grs_text
+            )
+   RETURNING grs_job_id
+            ,grs_line_no
+            ,grs_text
+      INTO   p_rec_grs.grs_job_id
+            ,p_rec_grs.grs_line_no
+            ,p_rec_grs.grs_text;
+--
+   nm_debug.proc_end(g_package_name,'ins_grs');
+--
+END ins_grs;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_had (p_rec_had IN OUT hig_address%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_had');
+--
+--
+   INSERT INTO hig_address
+            (had_id
+            ,had_department
+            ,had_po_box
+            ,had_organisation
+            ,had_sub_building_name_no
+            ,had_building_name
+            ,had_building_no
+            ,had_dependent_thoroughfare
+            ,had_thoroughfare
+            ,had_double_dep_locality_name
+            ,had_dependent_locality_name
+            ,had_post_town
+            ,had_county
+            ,had_postcode
+            ,had_osapr
+            ,had_xco
+            ,had_yco
+            ,had_notes
+            ,had_property_type
+            )
+     VALUES (p_rec_had.had_id
+            ,p_rec_had.had_department
+            ,p_rec_had.had_po_box
+            ,p_rec_had.had_organisation
+            ,p_rec_had.had_sub_building_name_no
+            ,p_rec_had.had_building_name
+            ,p_rec_had.had_building_no
+            ,p_rec_had.had_dependent_thoroughfare
+            ,p_rec_had.had_thoroughfare
+            ,p_rec_had.had_double_dep_locality_name
+            ,p_rec_had.had_dependent_locality_name
+            ,p_rec_had.had_post_town
+            ,p_rec_had.had_county
+            ,p_rec_had.had_postcode
+            ,p_rec_had.had_osapr
+            ,p_rec_had.had_xco
+            ,p_rec_had.had_yco
+            ,p_rec_had.had_notes
+            ,p_rec_had.had_property_type
+            )
+   RETURNING had_id
+            ,had_department
+            ,had_po_box
+            ,had_organisation
+            ,had_sub_building_name_no
+            ,had_building_name
+            ,had_building_no
+            ,had_dependent_thoroughfare
+            ,had_thoroughfare
+            ,had_double_dep_locality_name
+            ,had_dependent_locality_name
+            ,had_post_town
+            ,had_county
+            ,had_postcode
+            ,had_osapr
+            ,had_xco
+            ,had_yco
+            ,had_notes
+            ,had_property_type
+      INTO   p_rec_had.had_id
+            ,p_rec_had.had_department
+            ,p_rec_had.had_po_box
+            ,p_rec_had.had_organisation
+            ,p_rec_had.had_sub_building_name_no
+            ,p_rec_had.had_building_name
+            ,p_rec_had.had_building_no
+            ,p_rec_had.had_dependent_thoroughfare
+            ,p_rec_had.had_thoroughfare
+            ,p_rec_had.had_double_dep_locality_name
+            ,p_rec_had.had_dependent_locality_name
+            ,p_rec_had.had_post_town
+            ,p_rec_had.had_county
+            ,p_rec_had.had_postcode
+            ,p_rec_had.had_osapr
+            ,p_rec_had.had_xco
+            ,p_rec_had.had_yco
+            ,p_rec_had.had_notes
+            ,p_rec_had.had_property_type;
+--
+   nm_debug.proc_end(g_package_name,'ins_had');
+--
+END ins_had;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hco (p_rec_hco IN OUT hig_codes%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hco');
+--
+--
+   INSERT INTO hig_codes
+            (hco_domain
+            ,hco_code
+            ,hco_meaning
+            ,hco_system
+            ,hco_seq
+            ,hco_start_date
+            ,hco_end_date
+            )
+     VALUES (p_rec_hco.hco_domain
+            ,p_rec_hco.hco_code
+            ,p_rec_hco.hco_meaning
+            ,p_rec_hco.hco_system
+            ,p_rec_hco.hco_seq
+            ,p_rec_hco.hco_start_date
+            ,p_rec_hco.hco_end_date
+            )
+   RETURNING hco_domain
+            ,hco_code
+            ,hco_meaning
+            ,hco_system
+            ,hco_seq
+            ,hco_start_date
+            ,hco_end_date
+      INTO   p_rec_hco.hco_domain
+            ,p_rec_hco.hco_code
+            ,p_rec_hco.hco_meaning
+            ,p_rec_hco.hco_system
+            ,p_rec_hco.hco_seq
+            ,p_rec_hco.hco_start_date
+            ,p_rec_hco.hco_end_date;
+--
+   nm_debug.proc_end(g_package_name,'ins_hco');
+--
+END ins_hco;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hcl (p_rec_hcl IN OUT hig_colours%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hcl');
+--
+--
+   INSERT INTO hig_colours
+            (hcl_colour
+            ,hcl_visual_attribute
+            )
+     VALUES (p_rec_hcl.hcl_colour
+            ,p_rec_hcl.hcl_visual_attribute
+            )
+   RETURNING hcl_colour
+            ,hcl_visual_attribute
+      INTO   p_rec_hcl.hcl_colour
+            ,p_rec_hcl.hcl_visual_attribute;
+--
+   nm_debug.proc_end(g_package_name,'ins_hcl');
+--
+END ins_hcl;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hct (p_rec_hct IN OUT hig_contacts%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hct');
+--
+--
+   INSERT INTO hig_contacts
+            (hct_id
+            ,hct_org_or_person_flag
+            ,hct_vip
+            ,hct_title
+            ,hct_salutation
+            ,hct_first_name
+            ,hct_middle_initial
+            ,hct_surname
+            ,hct_organisation
+            ,hct_home_phone
+            ,hct_work_phone
+            ,hct_mobile_phone
+            ,hct_fax
+            ,hct_pager
+            ,hct_email
+            ,hct_occupation
+            ,hct_employer
+            ,hct_date_of_birth
+            ,hct_start_date
+            ,hct_end_date
+            ,hct_notes
+            )
+     VALUES (p_rec_hct.hct_id
+            ,p_rec_hct.hct_org_or_person_flag
+            ,p_rec_hct.hct_vip
+            ,p_rec_hct.hct_title
+            ,p_rec_hct.hct_salutation
+            ,p_rec_hct.hct_first_name
+            ,p_rec_hct.hct_middle_initial
+            ,p_rec_hct.hct_surname
+            ,p_rec_hct.hct_organisation
+            ,p_rec_hct.hct_home_phone
+            ,p_rec_hct.hct_work_phone
+            ,p_rec_hct.hct_mobile_phone
+            ,p_rec_hct.hct_fax
+            ,p_rec_hct.hct_pager
+            ,p_rec_hct.hct_email
+            ,p_rec_hct.hct_occupation
+            ,p_rec_hct.hct_employer
+            ,p_rec_hct.hct_date_of_birth
+            ,p_rec_hct.hct_start_date
+            ,p_rec_hct.hct_end_date
+            ,p_rec_hct.hct_notes
+            )
+   RETURNING hct_id
+            ,hct_org_or_person_flag
+            ,hct_vip
+            ,hct_title
+            ,hct_salutation
+            ,hct_first_name
+            ,hct_middle_initial
+            ,hct_surname
+            ,hct_organisation
+            ,hct_home_phone
+            ,hct_work_phone
+            ,hct_mobile_phone
+            ,hct_fax
+            ,hct_pager
+            ,hct_email
+            ,hct_occupation
+            ,hct_employer
+            ,hct_date_of_birth
+            ,hct_start_date
+            ,hct_end_date
+            ,hct_notes
+      INTO   p_rec_hct.hct_id
+            ,p_rec_hct.hct_org_or_person_flag
+            ,p_rec_hct.hct_vip
+            ,p_rec_hct.hct_title
+            ,p_rec_hct.hct_salutation
+            ,p_rec_hct.hct_first_name
+            ,p_rec_hct.hct_middle_initial
+            ,p_rec_hct.hct_surname
+            ,p_rec_hct.hct_organisation
+            ,p_rec_hct.hct_home_phone
+            ,p_rec_hct.hct_work_phone
+            ,p_rec_hct.hct_mobile_phone
+            ,p_rec_hct.hct_fax
+            ,p_rec_hct.hct_pager
+            ,p_rec_hct.hct_email
+            ,p_rec_hct.hct_occupation
+            ,p_rec_hct.hct_employer
+            ,p_rec_hct.hct_date_of_birth
+            ,p_rec_hct.hct_start_date
+            ,p_rec_hct.hct_end_date
+            ,p_rec_hct.hct_notes;
+--
+   nm_debug.proc_end(g_package_name,'ins_hct');
+--
+END ins_hct;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hca (p_rec_hca IN OUT hig_contact_address%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hca');
+--
+--
+   INSERT INTO hig_contact_address
+            (hca_hct_id
+            ,hca_had_id
+            )
+     VALUES (p_rec_hca.hca_hct_id
+            ,p_rec_hca.hca_had_id
+            )
+   RETURNING hca_hct_id
+            ,hca_had_id
+      INTO   p_rec_hca.hca_hct_id
+            ,p_rec_hca.hca_had_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_hca');
+--
+END ins_hca;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hdo (p_rec_hdo IN OUT hig_domains%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hdo');
+--
+--
+   INSERT INTO hig_domains
+            (hdo_domain
+            ,hdo_product
+            ,hdo_title
+            ,hdo_code_length
+            )
+     VALUES (p_rec_hdo.hdo_domain
+            ,p_rec_hdo.hdo_product
+            ,p_rec_hdo.hdo_title
+            ,p_rec_hdo.hdo_code_length
+            )
+   RETURNING hdo_domain
+            ,hdo_product
+            ,hdo_title
+            ,hdo_code_length
+      INTO   p_rec_hdo.hdo_domain
+            ,p_rec_hdo.hdo_product
+            ,p_rec_hdo.hdo_title
+            ,p_rec_hdo.hdo_code_length;
+--
+   nm_debug.proc_end(g_package_name,'ins_hdo');
+--
+END ins_hdo;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_her (p_rec_her IN OUT hig_errors%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_her');
+--
+--
+   INSERT INTO hig_errors
+            (her_appl
+            ,her_no
+            ,her_type
+            ,her_descr
+            ,her_action_1
+            ,her_action_2
+            ,her_action_3
+            ,her_action_4
+            ,her_action_5
+            ,her_action_6
+            ,her_action_7
+            )
+     VALUES (p_rec_her.her_appl
+            ,p_rec_her.her_no
+            ,p_rec_her.her_type
+            ,p_rec_her.her_descr
+            ,p_rec_her.her_action_1
+            ,p_rec_her.her_action_2
+            ,p_rec_her.her_action_3
+            ,p_rec_her.her_action_4
+            ,p_rec_her.her_action_5
+            ,p_rec_her.her_action_6
+            ,p_rec_her.her_action_7
+            )
+   RETURNING her_appl
+            ,her_no
+            ,her_type
+            ,her_descr
+            ,her_action_1
+            ,her_action_2
+            ,her_action_3
+            ,her_action_4
+            ,her_action_5
+            ,her_action_6
+            ,her_action_7
+      INTO   p_rec_her.her_appl
+            ,p_rec_her.her_no
+            ,p_rec_her.her_type
+            ,p_rec_her.her_descr
+            ,p_rec_her.her_action_1
+            ,p_rec_her.her_action_2
+            ,p_rec_her.her_action_3
+            ,p_rec_her.her_action_4
+            ,p_rec_her.her_action_5
+            ,p_rec_her.her_action_6
+            ,p_rec_her.her_action_7;
+--
+   nm_debug.proc_end(g_package_name,'ins_her');
+--
+END ins_her;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hht (p_rec_hht IN OUT hig_hd_join_defs%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hht');
+--
+--
+   INSERT INTO hig_hd_join_defs
+            (hht_hhu_hhm_module
+            ,hht_hhu_seq
+            ,hht_join_seq
+            ,hht_type
+            ,hht_description
+            )
+     VALUES (p_rec_hht.hht_hhu_hhm_module
+            ,p_rec_hht.hht_hhu_seq
+            ,p_rec_hht.hht_join_seq
+            ,p_rec_hht.hht_type
+            ,p_rec_hht.hht_description
+            )
+   RETURNING hht_hhu_hhm_module
+            ,hht_hhu_seq
+            ,hht_join_seq
+            ,hht_type
+            ,hht_description
+      INTO   p_rec_hht.hht_hhu_hhm_module
+            ,p_rec_hht.hht_hhu_seq
+            ,p_rec_hht.hht_join_seq
+            ,p_rec_hht.hht_type
+            ,p_rec_hht.hht_description;
+--
+   nm_debug.proc_end(g_package_name,'ins_hht');
+--
+END ins_hht;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hho (p_rec_hho IN OUT hig_hd_lookup_join_cols%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hho');
+--
+--
+   INSERT INTO hig_hd_lookup_join_cols
+            (hho_hhl_hhu_hhm_module
+            ,hho_hhl_hhu_seq
+            ,hho_hhl_join_seq
+            ,hho_parent_col
+            ,hho_lookup_col
+            ,hho_hhl_join_to_lookup
+            )
+     VALUES (p_rec_hho.hho_hhl_hhu_hhm_module
+            ,p_rec_hho.hho_hhl_hhu_seq
+            ,p_rec_hho.hho_hhl_join_seq
+            ,p_rec_hho.hho_parent_col
+            ,p_rec_hho.hho_lookup_col
+            ,p_rec_hho.hho_hhl_join_to_lookup
+            )
+   RETURNING hho_hhl_hhu_hhm_module
+            ,hho_hhl_hhu_seq
+            ,hho_hhl_join_seq
+            ,hho_parent_col
+            ,hho_lookup_col
+            ,hho_hhl_join_to_lookup
+      INTO   p_rec_hho.hho_hhl_hhu_hhm_module
+            ,p_rec_hho.hho_hhl_hhu_seq
+            ,p_rec_hho.hho_hhl_join_seq
+            ,p_rec_hho.hho_parent_col
+            ,p_rec_hho.hho_lookup_col
+            ,p_rec_hho.hho_hhl_join_to_lookup;
+--
+   nm_debug.proc_end(g_package_name,'ins_hho');
+--
+END ins_hho;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hhl (p_rec_hhl IN OUT hig_hd_lookup_join_defs%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hhl');
+--
+   p_rec_hhl.hhl_outer_join                 := NVL(p_rec_hhl.hhl_outer_join,'N' );
+--
+   INSERT INTO hig_hd_lookup_join_defs
+            (hhl_hhu_hhm_module
+            ,hhl_hhu_seq
+            ,hhl_join_seq
+            ,hhl_table_name
+            ,hhl_alias
+            ,hhl_outer_join
+            ,hhl_fixed_where_clause
+            )
+     VALUES (p_rec_hhl.hhl_hhu_hhm_module
+            ,p_rec_hhl.hhl_hhu_seq
+            ,p_rec_hhl.hhl_join_seq
+            ,p_rec_hhl.hhl_table_name
+            ,p_rec_hhl.hhl_alias
+            ,p_rec_hhl.hhl_outer_join
+            ,p_rec_hhl.hhl_fixed_where_clause
+            )
+   RETURNING hhl_hhu_hhm_module
+            ,hhl_hhu_seq
+            ,hhl_join_seq
+            ,hhl_table_name
+            ,hhl_alias
+            ,hhl_outer_join
+            ,hhl_fixed_where_clause
+      INTO   p_rec_hhl.hhl_hhu_hhm_module
+            ,p_rec_hhl.hhl_hhu_seq
+            ,p_rec_hhl.hhl_join_seq
+            ,p_rec_hhl.hhl_table_name
+            ,p_rec_hhl.hhl_alias
+            ,p_rec_hhl.hhl_outer_join
+            ,p_rec_hhl.hhl_fixed_where_clause;
+--
+   nm_debug.proc_end(g_package_name,'ins_hhl');
+--
+END ins_hhl;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hhm (p_rec_hhm IN OUT hig_hd_modules%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hhm');
+--
+--
+   INSERT INTO hig_hd_modules
+            (hhm_module
+            ,hhm_tag
+            )
+     VALUES (p_rec_hhm.hhm_module
+            ,p_rec_hhm.hhm_tag
+            )
+   RETURNING hhm_module
+            ,hhm_tag
+      INTO   p_rec_hhm.hhm_module
+            ,p_rec_hhm.hhm_tag;
+--
+   nm_debug.proc_end(g_package_name,'ins_hhm');
+--
+END ins_hhm;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hhu (p_rec_hhu IN OUT hig_hd_mod_uses%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hhu');
+--
+   p_rec_hhu.hhu_load_data                  := NVL(p_rec_hhu.hhu_load_data,'N' );
+--
+   INSERT INTO hig_hd_mod_uses
+            (hhu_hhm_module
+            ,hhu_table_name
+            ,hhu_seq
+            ,hhu_alias
+            ,hhu_parent_seq
+            ,hhu_fixed_where_clause
+            ,hhu_load_data
+            ,hhu_hint_text
+            ,hhu_tag
+            )
+     VALUES (p_rec_hhu.hhu_hhm_module
+            ,p_rec_hhu.hhu_table_name
+            ,p_rec_hhu.hhu_seq
+            ,p_rec_hhu.hhu_alias
+            ,p_rec_hhu.hhu_parent_seq
+            ,p_rec_hhu.hhu_fixed_where_clause
+            ,p_rec_hhu.hhu_load_data
+            ,p_rec_hhu.hhu_hint_text
+            ,p_rec_hhu.hhu_tag
+            )
+   RETURNING hhu_hhm_module
+            ,hhu_table_name
+            ,hhu_seq
+            ,hhu_alias
+            ,hhu_parent_seq
+            ,hhu_fixed_where_clause
+            ,hhu_load_data
+            ,hhu_hint_text
+            ,hhu_tag
+      INTO   p_rec_hhu.hhu_hhm_module
+            ,p_rec_hhu.hhu_table_name
+            ,p_rec_hhu.hhu_seq
+            ,p_rec_hhu.hhu_alias
+            ,p_rec_hhu.hhu_parent_seq
+            ,p_rec_hhu.hhu_fixed_where_clause
+            ,p_rec_hhu.hhu_load_data
+            ,p_rec_hhu.hhu_hint_text
+            ,p_rec_hhu.hhu_tag;
+--
+   nm_debug.proc_end(g_package_name,'ins_hhu');
+--
+END ins_hhu;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hhc (p_rec_hhc IN OUT hig_hd_selected_cols%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hhc');
+--
+   p_rec_hhc.hhc_summary_view               := NVL(p_rec_hhc.hhc_summary_view,'Y' );
+   p_rec_hhc.hhc_displayed                  := NVL(p_rec_hhc.hhc_displayed,'Y' );
+--
+   INSERT INTO hig_hd_selected_cols
+            (hhc_hhu_hhm_module
+            ,hhc_hhu_seq
+            ,hhc_column_seq
+            ,hhc_column_name
+            ,hhc_summary_view
+            ,hhc_displayed
+            ,hhc_alias
+            ,hhc_function
+            ,hhc_order_by_seq
+            ,hhc_unique_identifier_seq
+            ,hhc_hhl_join_seq
+            ,hhc_calc_ratio
+            ,hhc_format
+            )
+     VALUES (p_rec_hhc.hhc_hhu_hhm_module
+            ,p_rec_hhc.hhc_hhu_seq
+            ,p_rec_hhc.hhc_column_seq
+            ,p_rec_hhc.hhc_column_name
+            ,p_rec_hhc.hhc_summary_view
+            ,p_rec_hhc.hhc_displayed
+            ,p_rec_hhc.hhc_alias
+            ,p_rec_hhc.hhc_function
+            ,p_rec_hhc.hhc_order_by_seq
+            ,p_rec_hhc.hhc_unique_identifier_seq
+            ,p_rec_hhc.hhc_hhl_join_seq
+            ,p_rec_hhc.hhc_calc_ratio
+            ,p_rec_hhc.hhc_format
+            )
+   RETURNING hhc_hhu_hhm_module
+            ,hhc_hhu_seq
+            ,hhc_column_seq
+            ,hhc_column_name
+            ,hhc_summary_view
+            ,hhc_displayed
+            ,hhc_alias
+            ,hhc_function
+            ,hhc_order_by_seq
+            ,hhc_unique_identifier_seq
+            ,hhc_hhl_join_seq
+            ,hhc_calc_ratio
+            ,hhc_format
+      INTO   p_rec_hhc.hhc_hhu_hhm_module
+            ,p_rec_hhc.hhc_hhu_seq
+            ,p_rec_hhc.hhc_column_seq
+            ,p_rec_hhc.hhc_column_name
+            ,p_rec_hhc.hhc_summary_view
+            ,p_rec_hhc.hhc_displayed
+            ,p_rec_hhc.hhc_alias
+            ,p_rec_hhc.hhc_function
+            ,p_rec_hhc.hhc_order_by_seq
+            ,p_rec_hhc.hhc_unique_identifier_seq
+            ,p_rec_hhc.hhc_hhl_join_seq
+            ,p_rec_hhc.hhc_calc_ratio
+            ,p_rec_hhc.hhc_format;
+--
+   nm_debug.proc_end(g_package_name,'ins_hhc');
+--
+END ins_hhc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hhj (p_rec_hhj IN OUT hig_hd_table_join_cols%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hhj');
+--
+--
+   INSERT INTO hig_hd_table_join_cols
+            (hhj_hht_hhu_hhm_module
+            ,hhj_hht_hhu_parent_table
+            ,hhj_hht_join_seq
+            ,hhj_parent_col
+            ,hhj_hhu_child_table
+            ,hhj_child_col
+            )
+     VALUES (p_rec_hhj.hhj_hht_hhu_hhm_module
+            ,p_rec_hhj.hhj_hht_hhu_parent_table
+            ,p_rec_hhj.hhj_hht_join_seq
+            ,p_rec_hhj.hhj_parent_col
+            ,p_rec_hhj.hhj_hhu_child_table
+            ,p_rec_hhj.hhj_child_col
+            )
+   RETURNING hhj_hht_hhu_hhm_module
+            ,hhj_hht_hhu_parent_table
+            ,hhj_hht_join_seq
+            ,hhj_parent_col
+            ,hhj_hhu_child_table
+            ,hhj_child_col
+      INTO   p_rec_hhj.hhj_hht_hhu_hhm_module
+            ,p_rec_hhj.hhj_hht_hhu_parent_table
+            ,p_rec_hhj.hhj_hht_join_seq
+            ,p_rec_hhj.hhj_parent_col
+            ,p_rec_hhj.hhj_hhu_child_table
+            ,p_rec_hhj.hhj_child_col;
+--
+   nm_debug.proc_end(g_package_name,'ins_hhj');
+--
+END ins_hhj;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hho (p_rec_hho IN OUT hig_holidays%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hho');
+--
+--
+   INSERT INTO hig_holidays
+            (hho_id
+            ,hho_name
+            )
+     VALUES (p_rec_hho.hho_id
+            ,p_rec_hho.hho_name
+            )
+   RETURNING hho_id
+            ,hho_name
+      INTO   p_rec_hho.hho_id
+            ,p_rec_hho.hho_name;
+--
+   nm_debug.proc_end(g_package_name,'ins_hho');
+--
+END ins_hho;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hmo (p_rec_hmo IN OUT hig_modules%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hmo');
+--
+--
+   INSERT INTO hig_modules
+            (hmo_module
+            ,hmo_title
+            ,hmo_filename
+            ,hmo_module_type
+            ,hmo_fastpath_opts
+            ,hmo_fastpath_invalid
+            ,hmo_use_gri
+            ,hmo_application
+            ,hmo_menu
+            )
+     VALUES (p_rec_hmo.hmo_module
+            ,p_rec_hmo.hmo_title
+            ,p_rec_hmo.hmo_filename
+            ,p_rec_hmo.hmo_module_type
+            ,p_rec_hmo.hmo_fastpath_opts
+            ,p_rec_hmo.hmo_fastpath_invalid
+            ,p_rec_hmo.hmo_use_gri
+            ,p_rec_hmo.hmo_application
+            ,p_rec_hmo.hmo_menu
+            )
+   RETURNING hmo_module
+            ,hmo_title
+            ,hmo_filename
+            ,hmo_module_type
+            ,hmo_fastpath_opts
+            ,hmo_fastpath_invalid
+            ,hmo_use_gri
+            ,hmo_application
+            ,hmo_menu
+      INTO   p_rec_hmo.hmo_module
+            ,p_rec_hmo.hmo_title
+            ,p_rec_hmo.hmo_filename
+            ,p_rec_hmo.hmo_module_type
+            ,p_rec_hmo.hmo_fastpath_opts
+            ,p_rec_hmo.hmo_fastpath_invalid
+            ,p_rec_hmo.hmo_use_gri
+            ,p_rec_hmo.hmo_application
+            ,p_rec_hmo.hmo_menu;
+--
+   nm_debug.proc_end(g_package_name,'ins_hmo');
+--
+END ins_hmo;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hmh (p_rec_hmh IN OUT hig_module_history%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hmh');
+--
+--
+   INSERT INTO hig_module_history
+            (hmh_user_id
+            ,hmh_seq_no
+            ,hmh_module
+            ,hmh_used_date
+            )
+     VALUES (p_rec_hmh.hmh_user_id
+            ,p_rec_hmh.hmh_seq_no
+            ,p_rec_hmh.hmh_module
+            ,p_rec_hmh.hmh_used_date
+            )
+   RETURNING hmh_user_id
+            ,hmh_seq_no
+            ,hmh_module
+            ,hmh_used_date
+      INTO   p_rec_hmh.hmh_user_id
+            ,p_rec_hmh.hmh_seq_no
+            ,p_rec_hmh.hmh_module
+            ,p_rec_hmh.hmh_used_date;
+--
+   nm_debug.proc_end(g_package_name,'ins_hmh');
+--
+END ins_hmh;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hmk (p_rec_hmk IN OUT hig_module_keywords%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hmk');
+--
+--
+   INSERT INTO hig_module_keywords
+            (hmk_hmo_module
+            ,hmk_keyword
+            ,hmk_owner
+            )
+     VALUES (p_rec_hmk.hmk_hmo_module
+            ,p_rec_hmk.hmk_keyword
+            ,p_rec_hmk.hmk_owner
+            )
+   RETURNING hmk_hmo_module
+            ,hmk_keyword
+            ,hmk_owner
+      INTO   p_rec_hmk.hmk_hmo_module
+            ,p_rec_hmk.hmk_keyword
+            ,p_rec_hmk.hmk_owner;
+--
+   nm_debug.proc_end(g_package_name,'ins_hmk');
+--
+END ins_hmk;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hmr (p_rec_hmr IN OUT hig_module_roles%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hmr');
+--
+--
+   INSERT INTO hig_module_roles
+            (hmr_module
+            ,hmr_role
+            ,hmr_mode
+            )
+     VALUES (p_rec_hmr.hmr_module
+            ,p_rec_hmr.hmr_role
+            ,p_rec_hmr.hmr_mode
+            )
+   RETURNING hmr_module
+            ,hmr_role
+            ,hmr_mode
+      INTO   p_rec_hmr.hmr_module
+            ,p_rec_hmr.hmr_role
+            ,p_rec_hmr.hmr_mode;
+--
+   nm_debug.proc_end(g_package_name,'ins_hmr');
+--
+END ins_hmr;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hmu (p_rec_hmu IN OUT hig_module_usages%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hmu');
+--
+--
+   INSERT INTO hig_module_usages
+            (hmu_module
+            ,hmu_usage
+            ,hmu_parameter
+            )
+     VALUES (p_rec_hmu.hmu_module
+            ,p_rec_hmu.hmu_usage
+            ,p_rec_hmu.hmu_parameter
+            )
+   RETURNING hmu_module
+            ,hmu_usage
+            ,hmu_parameter
+      INTO   p_rec_hmu.hmu_module
+            ,p_rec_hmu.hmu_usage
+            ,p_rec_hmu.hmu_parameter;
+--
+   nm_debug.proc_end(g_package_name,'ins_hmu');
+--
+END ins_hmu;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hol (p_rec_hol IN OUT hig_option_list%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hol');
+--
+   p_rec_hol.hol_datatype                   := NVL(p_rec_hol.hol_datatype,'VARCHAR2' );
+   p_rec_hol.hol_mixed_case                 := NVL(p_rec_hol.hol_mixed_case,'N' );
+   p_rec_hol.hol_user_option                := NVL(p_rec_hol.hol_user_option,'N' );
+   p_rec_hol.hol_max_length                 := NVL(p_rec_hol.hol_max_length,2000 );
+--
+   INSERT INTO hig_option_list
+            (hol_id
+            ,hol_product
+            ,hol_name
+            ,hol_remarks
+            ,hol_domain
+            ,hol_datatype
+            ,hol_mixed_case
+            ,hol_user_option
+            ,hol_max_length
+            )
+     VALUES (p_rec_hol.hol_id
+            ,p_rec_hol.hol_product
+            ,p_rec_hol.hol_name
+            ,p_rec_hol.hol_remarks
+            ,p_rec_hol.hol_domain
+            ,p_rec_hol.hol_datatype
+            ,p_rec_hol.hol_mixed_case
+            ,p_rec_hol.hol_user_option
+            ,p_rec_hol.hol_max_length
+            )
+   RETURNING hol_id
+            ,hol_product
+            ,hol_name
+            ,hol_remarks
+            ,hol_domain
+            ,hol_datatype
+            ,hol_mixed_case
+            ,hol_user_option
+            ,hol_max_length
+      INTO   p_rec_hol.hol_id
+            ,p_rec_hol.hol_product
+            ,p_rec_hol.hol_name
+            ,p_rec_hol.hol_remarks
+            ,p_rec_hol.hol_domain
+            ,p_rec_hol.hol_datatype
+            ,p_rec_hol.hol_mixed_case
+            ,p_rec_hol.hol_user_option
+            ,p_rec_hol.hol_max_length;
+--
+   nm_debug.proc_end(g_package_name,'ins_hol');
+--
+END ins_hol;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hop (p_rec_hop IN OUT hig_options%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hop');
+--
+--
+   INSERT INTO hig_options
+            (hop_id
+            ,hop_product
+            ,hop_name
+            ,hop_value
+            ,hop_remarks
+            ,hop_domain
+            ,hop_datatype
+            ,hop_mixed_case
+            ,hop_max_length
+            )
+     VALUES (p_rec_hop.hop_id
+            ,p_rec_hop.hop_product
+            ,p_rec_hop.hop_name
+            ,p_rec_hop.hop_value
+            ,p_rec_hop.hop_remarks
+            ,p_rec_hop.hop_domain
+            ,p_rec_hop.hop_datatype
+            ,p_rec_hop.hop_mixed_case
+            ,p_rec_hop.hop_max_length
+            )
+   RETURNING hop_id
+            ,hop_product
+            ,hop_name
+            ,hop_value
+            ,hop_remarks
+            ,hop_domain
+            ,hop_datatype
+            ,hop_mixed_case
+            ,hop_max_length
+      INTO   p_rec_hop.hop_id
+            ,p_rec_hop.hop_product
+            ,p_rec_hop.hop_name
+            ,p_rec_hop.hop_value
+            ,p_rec_hop.hop_remarks
+            ,p_rec_hop.hop_domain
+            ,p_rec_hop.hop_datatype
+            ,p_rec_hop.hop_mixed_case
+            ,p_rec_hop.hop_max_length;
+--
+   nm_debug.proc_end(g_package_name,'ins_hop');
+--
+END ins_hop;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hov (p_rec_hov IN OUT hig_option_values%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hov');
+--
+--
+   INSERT INTO hig_option_values
+            (hov_id
+            ,hov_value
+            )
+     VALUES (p_rec_hov.hov_id
+            ,p_rec_hov.hov_value
+            )
+   RETURNING hov_id
+            ,hov_value
+      INTO   p_rec_hov.hov_id
+            ,p_rec_hov.hov_value;
+--
+   nm_debug.proc_end(g_package_name,'ins_hov');
+--
+END ins_hov;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hpr (p_rec_hpr IN OUT hig_products%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hpr');
+--
+--
+   INSERT INTO hig_products
+            (hpr_product
+            ,hpr_product_name
+            ,hpr_version
+            ,hpr_path_name
+            ,hpr_key
+            ,hpr_sequence
+            ,hpr_image
+            ,hpr_user_menu
+            ,hpr_launchpad_icon
+            ,hpr_image_type
+            )
+     VALUES (p_rec_hpr.hpr_product
+            ,p_rec_hpr.hpr_product_name
+            ,p_rec_hpr.hpr_version
+            ,p_rec_hpr.hpr_path_name
+            ,p_rec_hpr.hpr_key
+            ,p_rec_hpr.hpr_sequence
+            ,p_rec_hpr.hpr_image
+            ,p_rec_hpr.hpr_user_menu
+            ,p_rec_hpr.hpr_launchpad_icon
+            ,p_rec_hpr.hpr_image_type
+            )
+   RETURNING hpr_product
+            ,hpr_product_name
+            ,hpr_version
+            ,hpr_path_name
+            ,hpr_key
+            ,hpr_sequence
+            ,hpr_image
+            ,hpr_user_menu
+            ,hpr_launchpad_icon
+            ,hpr_image_type
+      INTO   p_rec_hpr.hpr_product
+            ,p_rec_hpr.hpr_product_name
+            ,p_rec_hpr.hpr_version
+            ,p_rec_hpr.hpr_path_name
+            ,p_rec_hpr.hpr_key
+            ,p_rec_hpr.hpr_sequence
+            ,p_rec_hpr.hpr_image
+            ,p_rec_hpr.hpr_user_menu
+            ,p_rec_hpr.hpr_launchpad_icon
+            ,p_rec_hpr.hpr_image_type;
+--
+   nm_debug.proc_end(g_package_name,'ins_hpr');
+--
+END ins_hpr;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hrs (p_rec_hrs IN OUT hig_report_styles%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hrs');
+--
+--
+   INSERT INTO hig_report_styles
+            (hrs_style_name
+            ,hrs_header_fill_colour
+            ,hrs_body_fill_colour_1
+            ,hrs_body_fill_colour_2
+            ,hrs_body_fill_colour_h
+            ,hrs_header_font_colour
+            ,hrs_body_font_colour_1
+            ,hrs_body_font_colour_2
+            ,hrs_body_font_colour_h
+            ,hrs_image_name
+            ,hrs_footer_text
+            )
+     VALUES (p_rec_hrs.hrs_style_name
+            ,p_rec_hrs.hrs_header_fill_colour
+            ,p_rec_hrs.hrs_body_fill_colour_1
+            ,p_rec_hrs.hrs_body_fill_colour_2
+            ,p_rec_hrs.hrs_body_fill_colour_h
+            ,p_rec_hrs.hrs_header_font_colour
+            ,p_rec_hrs.hrs_body_font_colour_1
+            ,p_rec_hrs.hrs_body_font_colour_2
+            ,p_rec_hrs.hrs_body_font_colour_h
+            ,p_rec_hrs.hrs_image_name
+            ,p_rec_hrs.hrs_footer_text
+            )
+   RETURNING hrs_style_name
+            ,hrs_header_fill_colour
+            ,hrs_body_fill_colour_1
+            ,hrs_body_fill_colour_2
+            ,hrs_body_fill_colour_h
+            ,hrs_header_font_colour
+            ,hrs_body_font_colour_1
+            ,hrs_body_font_colour_2
+            ,hrs_body_font_colour_h
+            ,hrs_image_name
+            ,hrs_footer_text
+      INTO   p_rec_hrs.hrs_style_name
+            ,p_rec_hrs.hrs_header_fill_colour
+            ,p_rec_hrs.hrs_body_fill_colour_1
+            ,p_rec_hrs.hrs_body_fill_colour_2
+            ,p_rec_hrs.hrs_body_fill_colour_h
+            ,p_rec_hrs.hrs_header_font_colour
+            ,p_rec_hrs.hrs_body_font_colour_1
+            ,p_rec_hrs.hrs_body_font_colour_2
+            ,p_rec_hrs.hrs_body_font_colour_h
+            ,p_rec_hrs.hrs_image_name
+            ,p_rec_hrs.hrs_footer_text;
+--
+   nm_debug.proc_end(g_package_name,'ins_hrs');
+--
+END ins_hrs;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hro (p_rec_hro IN OUT hig_roles%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hro');
+--
+--
+   INSERT INTO hig_roles
+            (hro_role
+            ,hro_product
+            ,hro_descr
+            )
+     VALUES (p_rec_hro.hro_role
+            ,p_rec_hro.hro_product
+            ,p_rec_hro.hro_descr
+            )
+   RETURNING hro_role
+            ,hro_product
+            ,hro_descr
+      INTO   p_rec_hro.hro_role
+            ,p_rec_hro.hro_product
+            ,p_rec_hro.hro_descr;
+--
+   nm_debug.proc_end(g_package_name,'ins_hro');
+--
+END ins_hro;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hsc (p_rec_hsc IN OUT hig_status_codes%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hsc');
+--
+--
+   INSERT INTO hig_status_codes
+            (hsc_domain_code
+            ,hsc_status_code
+            ,hsc_status_name
+            ,hsc_seq_no
+            ,hsc_allow_feature1
+            ,hsc_allow_feature2
+            ,hsc_allow_feature3
+            ,hsc_allow_feature4
+            ,hsc_allow_feature5
+            ,hsc_allow_feature6
+            ,hsc_allow_feature7
+            ,hsc_allow_feature8
+            ,hsc_allow_feature9
+            ,hsc_start_date
+            ,hsc_end_date
+            ,hsc_allow_feature10
+            )
+     VALUES (p_rec_hsc.hsc_domain_code
+            ,p_rec_hsc.hsc_status_code
+            ,p_rec_hsc.hsc_status_name
+            ,p_rec_hsc.hsc_seq_no
+            ,p_rec_hsc.hsc_allow_feature1
+            ,p_rec_hsc.hsc_allow_feature2
+            ,p_rec_hsc.hsc_allow_feature3
+            ,p_rec_hsc.hsc_allow_feature4
+            ,p_rec_hsc.hsc_allow_feature5
+            ,p_rec_hsc.hsc_allow_feature6
+            ,p_rec_hsc.hsc_allow_feature7
+            ,p_rec_hsc.hsc_allow_feature8
+            ,p_rec_hsc.hsc_allow_feature9
+            ,p_rec_hsc.hsc_start_date
+            ,p_rec_hsc.hsc_end_date
+            ,p_rec_hsc.hsc_allow_feature10
+            )
+   RETURNING hsc_domain_code
+            ,hsc_status_code
+            ,hsc_status_name
+            ,hsc_seq_no
+            ,hsc_allow_feature1
+            ,hsc_allow_feature2
+            ,hsc_allow_feature3
+            ,hsc_allow_feature4
+            ,hsc_allow_feature5
+            ,hsc_allow_feature6
+            ,hsc_allow_feature7
+            ,hsc_allow_feature8
+            ,hsc_allow_feature9
+            ,hsc_start_date
+            ,hsc_end_date
+            ,hsc_allow_feature10
+      INTO   p_rec_hsc.hsc_domain_code
+            ,p_rec_hsc.hsc_status_code
+            ,p_rec_hsc.hsc_status_name
+            ,p_rec_hsc.hsc_seq_no
+            ,p_rec_hsc.hsc_allow_feature1
+            ,p_rec_hsc.hsc_allow_feature2
+            ,p_rec_hsc.hsc_allow_feature3
+            ,p_rec_hsc.hsc_allow_feature4
+            ,p_rec_hsc.hsc_allow_feature5
+            ,p_rec_hsc.hsc_allow_feature6
+            ,p_rec_hsc.hsc_allow_feature7
+            ,p_rec_hsc.hsc_allow_feature8
+            ,p_rec_hsc.hsc_allow_feature9
+            ,p_rec_hsc.hsc_start_date
+            ,p_rec_hsc.hsc_end_date
+            ,p_rec_hsc.hsc_allow_feature10;
+--
+   nm_debug.proc_end(g_package_name,'ins_hsc');
+--
+END ins_hsc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hsd (p_rec_hsd IN OUT hig_status_domains%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hsd');
+--
+--
+   INSERT INTO hig_status_domains
+            (hsd_domain_code
+            ,hsd_product
+            ,hsd_description
+            ,hsd_feature1
+            ,hsd_feature2
+            ,hsd_feature3
+            ,hsd_feature4
+            ,hsd_feature5
+            ,hsd_feature6
+            ,hsd_feature7
+            ,hsd_feature8
+            ,hsd_feature9
+            ,hsd_feature10
+            )
+     VALUES (p_rec_hsd.hsd_domain_code
+            ,p_rec_hsd.hsd_product
+            ,p_rec_hsd.hsd_description
+            ,p_rec_hsd.hsd_feature1
+            ,p_rec_hsd.hsd_feature2
+            ,p_rec_hsd.hsd_feature3
+            ,p_rec_hsd.hsd_feature4
+            ,p_rec_hsd.hsd_feature5
+            ,p_rec_hsd.hsd_feature6
+            ,p_rec_hsd.hsd_feature7
+            ,p_rec_hsd.hsd_feature8
+            ,p_rec_hsd.hsd_feature9
+            ,p_rec_hsd.hsd_feature10
+            )
+   RETURNING hsd_domain_code
+            ,hsd_product
+            ,hsd_description
+            ,hsd_feature1
+            ,hsd_feature2
+            ,hsd_feature3
+            ,hsd_feature4
+            ,hsd_feature5
+            ,hsd_feature6
+            ,hsd_feature7
+            ,hsd_feature8
+            ,hsd_feature9
+            ,hsd_feature10
+      INTO   p_rec_hsd.hsd_domain_code
+            ,p_rec_hsd.hsd_product
+            ,p_rec_hsd.hsd_description
+            ,p_rec_hsd.hsd_feature1
+            ,p_rec_hsd.hsd_feature2
+            ,p_rec_hsd.hsd_feature3
+            ,p_rec_hsd.hsd_feature4
+            ,p_rec_hsd.hsd_feature5
+            ,p_rec_hsd.hsd_feature6
+            ,p_rec_hsd.hsd_feature7
+            ,p_rec_hsd.hsd_feature8
+            ,p_rec_hsd.hsd_feature9
+            ,p_rec_hsd.hsd_feature10;
+--
+   nm_debug.proc_end(g_package_name,'ins_hsd');
+--
+END ins_hsd;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hup (p_rec_hup IN OUT hig_upgrades%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hup');
+--
+--
+   INSERT INTO hig_upgrades
+            (hup_product
+            ,date_upgraded
+            ,from_version
+            ,to_version
+            ,upgrade_script
+            ,executed_by
+            ,remarks
+            )
+     VALUES (p_rec_hup.hup_product
+            ,p_rec_hup.date_upgraded
+            ,p_rec_hup.from_version
+            ,p_rec_hup.to_version
+            ,p_rec_hup.upgrade_script
+            ,p_rec_hup.executed_by
+            ,p_rec_hup.remarks
+            )
+   RETURNING hup_product
+            ,date_upgraded
+            ,from_version
+            ,to_version
+            ,upgrade_script
+            ,executed_by
+            ,remarks
+      INTO   p_rec_hup.hup_product
+            ,p_rec_hup.date_upgraded
+            ,p_rec_hup.from_version
+            ,p_rec_hup.to_version
+            ,p_rec_hup.upgrade_script
+            ,p_rec_hup.executed_by
+            ,p_rec_hup.remarks;
+--
+   nm_debug.proc_end(g_package_name,'ins_hup');
+--
+END ins_hup;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hum (p_rec_hum IN OUT hig_url_modules%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hum');
+--
+--
+   INSERT INTO hig_url_modules
+            (hum_hmo_module
+            ,hum_url
+            )
+     VALUES (p_rec_hum.hum_hmo_module
+            ,p_rec_hum.hum_url
+            )
+   RETURNING hum_hmo_module
+            ,hum_url
+      INTO   p_rec_hum.hum_hmo_module
+            ,p_rec_hum.hum_url;
+--
+   nm_debug.proc_end(g_package_name,'ins_hum');
+--
+END ins_hum;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hus (p_rec_hus IN OUT hig_users%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hus');
+--
+   p_rec_hus.hus_unrestricted               := NVL(p_rec_hus.hus_unrestricted,'N' );
+   p_rec_hus.hus_is_hig_owner_flag          := NVL(p_rec_hus.hus_is_hig_owner_flag,'N' );
+--
+   INSERT INTO hig_users
+            (hus_user_id
+            ,hus_initials
+            ,hus_name
+            ,hus_username
+            ,hus_job_title
+            ,hus_agent_code
+            ,hus_wor_flag
+            ,hus_wor_value_min
+            ,hus_wor_value_max
+            ,hus_start_date
+            ,hus_end_date
+            ,hus_unrestricted
+            ,hus_is_hig_owner_flag
+            ,hus_admin_unit
+            ,hus_wor_aur_min
+            ,hus_wor_aur_max
+            )
+     VALUES (p_rec_hus.hus_user_id
+            ,p_rec_hus.hus_initials
+            ,p_rec_hus.hus_name
+            ,p_rec_hus.hus_username
+            ,p_rec_hus.hus_job_title
+            ,p_rec_hus.hus_agent_code
+            ,p_rec_hus.hus_wor_flag
+            ,p_rec_hus.hus_wor_value_min
+            ,p_rec_hus.hus_wor_value_max
+            ,p_rec_hus.hus_start_date
+            ,p_rec_hus.hus_end_date
+            ,p_rec_hus.hus_unrestricted
+            ,p_rec_hus.hus_is_hig_owner_flag
+            ,p_rec_hus.hus_admin_unit
+            ,p_rec_hus.hus_wor_aur_min
+            ,p_rec_hus.hus_wor_aur_max
+            )
+   RETURNING hus_user_id
+            ,hus_initials
+            ,hus_name
+            ,hus_username
+            ,hus_job_title
+            ,hus_agent_code
+            ,hus_wor_flag
+            ,hus_wor_value_min
+            ,hus_wor_value_max
+            ,hus_start_date
+            ,hus_end_date
+            ,hus_unrestricted
+            ,hus_is_hig_owner_flag
+            ,hus_admin_unit
+            ,hus_wor_aur_min
+            ,hus_wor_aur_max
+      INTO   p_rec_hus.hus_user_id
+            ,p_rec_hus.hus_initials
+            ,p_rec_hus.hus_name
+            ,p_rec_hus.hus_username
+            ,p_rec_hus.hus_job_title
+            ,p_rec_hus.hus_agent_code
+            ,p_rec_hus.hus_wor_flag
+            ,p_rec_hus.hus_wor_value_min
+            ,p_rec_hus.hus_wor_value_max
+            ,p_rec_hus.hus_start_date
+            ,p_rec_hus.hus_end_date
+            ,p_rec_hus.hus_unrestricted
+            ,p_rec_hus.hus_is_hig_owner_flag
+            ,p_rec_hus.hus_admin_unit
+            ,p_rec_hus.hus_wor_aur_min
+            ,p_rec_hus.hus_wor_aur_max;
+--
+   nm_debug.proc_end(g_package_name,'ins_hus');
+--
+END ins_hus;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_huh (p_rec_huh IN OUT hig_user_history%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_huh');
+--
+--
+   INSERT INTO hig_user_history
+            (huh_user_id
+            ,huh_user_history
+            )
+     VALUES (p_rec_huh.huh_user_id
+            ,p_rec_huh.huh_user_history
+            )
+   RETURNING huh_user_id
+      INTO   p_rec_huh.huh_user_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_huh');
+--
+END ins_huh;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_huo (p_rec_huo IN OUT hig_user_options%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_huo');
+--
+--
+   INSERT INTO hig_user_options
+            (huo_hus_user_id
+            ,huo_id
+            ,huo_value
+            )
+     VALUES (p_rec_huo.huo_hus_user_id
+            ,p_rec_huo.huo_id
+            ,p_rec_huo.huo_value
+            )
+   RETURNING huo_hus_user_id
+            ,huo_id
+            ,huo_value
+      INTO   p_rec_huo.huo_hus_user_id
+            ,p_rec_huo.huo_id
+            ,p_rec_huo.huo_value;
+--
+   nm_debug.proc_end(g_package_name,'ins_huo');
+--
+END ins_huo;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_hur (p_rec_hur IN OUT hig_user_roles%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_hur');
+--
+--
+   INSERT INTO hig_user_roles
+            (hur_username
+            ,hur_role
+            ,hur_start_date
+            )
+     VALUES (p_rec_hur.hur_username
+            ,p_rec_hur.hur_role
+            ,p_rec_hur.hur_start_date
+            )
+   RETURNING hur_username
+            ,hur_role
+            ,hur_start_date
+      INTO   p_rec_hur.hur_username
+            ,p_rec_hur.hur_role
+            ,p_rec_hur.hur_start_date;
+--
+   nm_debug.proc_end(g_package_name,'ins_hur');
+--
+END ins_hur;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nag (p_rec_nag IN OUT nm_admin_groups%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nag');
+--
+--
+   INSERT INTO nm_admin_groups
+            (nag_parent_admin_unit
+            ,nag_child_admin_unit
+            ,nag_direct_link
+            )
+     VALUES (p_rec_nag.nag_parent_admin_unit
+            ,p_rec_nag.nag_child_admin_unit
+            ,p_rec_nag.nag_direct_link
+            )
+   RETURNING nag_parent_admin_unit
+            ,nag_child_admin_unit
+            ,nag_direct_link
+      INTO   p_rec_nag.nag_parent_admin_unit
+            ,p_rec_nag.nag_child_admin_unit
+            ,p_rec_nag.nag_direct_link;
+--
+   nm_debug.proc_end(g_package_name,'ins_nag');
+--
+END ins_nag;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nau (p_rec_nau IN OUT nm_admin_units%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nau');
+--
+   p_rec_nau.nau_start_date                 := NVL(p_rec_nau.nau_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_admin_units
+            (nau_admin_unit
+            ,nau_unit_code
+            ,nau_level
+            ,nau_authority_code
+            ,nau_name
+            ,nau_address1
+            ,nau_address2
+            ,nau_address3
+            ,nau_address4
+            ,nau_address5
+            ,nau_phone
+            ,nau_fax
+            ,nau_comments
+            ,nau_last_wor_no
+            ,nau_start_date
+            ,nau_end_date
+            ,nau_admin_type
+            ,nau_nsty_sub_type
+            ,nau_prefix
+            ,nau_postcode
+            ,nau_minor_undertaker
+            ,nau_tcpip
+            ,nau_domain
+            ,nau_directory
+            ,nau_external_name
+            )
+     VALUES (p_rec_nau.nau_admin_unit
+            ,p_rec_nau.nau_unit_code
+            ,p_rec_nau.nau_level
+            ,p_rec_nau.nau_authority_code
+            ,p_rec_nau.nau_name
+            ,p_rec_nau.nau_address1
+            ,p_rec_nau.nau_address2
+            ,p_rec_nau.nau_address3
+            ,p_rec_nau.nau_address4
+            ,p_rec_nau.nau_address5
+            ,p_rec_nau.nau_phone
+            ,p_rec_nau.nau_fax
+            ,p_rec_nau.nau_comments
+            ,p_rec_nau.nau_last_wor_no
+            ,p_rec_nau.nau_start_date
+            ,p_rec_nau.nau_end_date
+            ,p_rec_nau.nau_admin_type
+            ,p_rec_nau.nau_nsty_sub_type
+            ,p_rec_nau.nau_prefix
+            ,p_rec_nau.nau_postcode
+            ,p_rec_nau.nau_minor_undertaker
+            ,p_rec_nau.nau_tcpip
+            ,p_rec_nau.nau_domain
+            ,p_rec_nau.nau_directory
+            ,p_rec_nau.nau_external_name
+            );
+--
+   p_rec_nau := nm3get.get_nau
+                   (pi_nau_admin_unit    => p_rec_nau.nau_admin_unit
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_nau');
+--
+END ins_nau;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nau_all (p_rec_nau_all IN OUT nm_admin_units_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nau_all');
+--
+   p_rec_nau_all.nau_start_date                 := NVL(p_rec_nau_all.nau_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_admin_units_all
+            (nau_admin_unit
+            ,nau_unit_code
+            ,nau_level
+            ,nau_authority_code
+            ,nau_name
+            ,nau_address1
+            ,nau_address2
+            ,nau_address3
+            ,nau_address4
+            ,nau_address5
+            ,nau_phone
+            ,nau_fax
+            ,nau_comments
+            ,nau_last_wor_no
+            ,nau_start_date
+            ,nau_end_date
+            ,nau_admin_type
+            ,nau_nsty_sub_type
+            ,nau_prefix
+            ,nau_postcode
+            ,nau_minor_undertaker
+            ,nau_tcpip
+            ,nau_domain
+            ,nau_directory
+            ,nau_external_name
+            )
+     VALUES (p_rec_nau_all.nau_admin_unit
+            ,p_rec_nau_all.nau_unit_code
+            ,p_rec_nau_all.nau_level
+            ,p_rec_nau_all.nau_authority_code
+            ,p_rec_nau_all.nau_name
+            ,p_rec_nau_all.nau_address1
+            ,p_rec_nau_all.nau_address2
+            ,p_rec_nau_all.nau_address3
+            ,p_rec_nau_all.nau_address4
+            ,p_rec_nau_all.nau_address5
+            ,p_rec_nau_all.nau_phone
+            ,p_rec_nau_all.nau_fax
+            ,p_rec_nau_all.nau_comments
+            ,p_rec_nau_all.nau_last_wor_no
+            ,p_rec_nau_all.nau_start_date
+            ,p_rec_nau_all.nau_end_date
+            ,p_rec_nau_all.nau_admin_type
+            ,p_rec_nau_all.nau_nsty_sub_type
+            ,p_rec_nau_all.nau_prefix
+            ,p_rec_nau_all.nau_postcode
+            ,p_rec_nau_all.nau_minor_undertaker
+            ,p_rec_nau_all.nau_tcpip
+            ,p_rec_nau_all.nau_domain
+            ,p_rec_nau_all.nau_directory
+            ,p_rec_nau_all.nau_external_name
+            )
+   RETURNING nau_admin_unit
+            ,nau_unit_code
+            ,nau_level
+            ,nau_authority_code
+            ,nau_name
+            ,nau_address1
+            ,nau_address2
+            ,nau_address3
+            ,nau_address4
+            ,nau_address5
+            ,nau_phone
+            ,nau_fax
+            ,nau_comments
+            ,nau_last_wor_no
+            ,nau_start_date
+            ,nau_end_date
+            ,nau_admin_type
+            ,nau_nsty_sub_type
+            ,nau_prefix
+            ,nau_postcode
+            ,nau_minor_undertaker
+            ,nau_tcpip
+            ,nau_domain
+            ,nau_directory
+            ,nau_external_name
+      INTO   p_rec_nau_all.nau_admin_unit
+            ,p_rec_nau_all.nau_unit_code
+            ,p_rec_nau_all.nau_level
+            ,p_rec_nau_all.nau_authority_code
+            ,p_rec_nau_all.nau_name
+            ,p_rec_nau_all.nau_address1
+            ,p_rec_nau_all.nau_address2
+            ,p_rec_nau_all.nau_address3
+            ,p_rec_nau_all.nau_address4
+            ,p_rec_nau_all.nau_address5
+            ,p_rec_nau_all.nau_phone
+            ,p_rec_nau_all.nau_fax
+            ,p_rec_nau_all.nau_comments
+            ,p_rec_nau_all.nau_last_wor_no
+            ,p_rec_nau_all.nau_start_date
+            ,p_rec_nau_all.nau_end_date
+            ,p_rec_nau_all.nau_admin_type
+            ,p_rec_nau_all.nau_nsty_sub_type
+            ,p_rec_nau_all.nau_prefix
+            ,p_rec_nau_all.nau_postcode
+            ,p_rec_nau_all.nau_minor_undertaker
+            ,p_rec_nau_all.nau_tcpip
+            ,p_rec_nau_all.nau_domain
+            ,p_rec_nau_all.nau_directory
+            ,p_rec_nau_all.nau_external_name;
+--
+   nm_debug.proc_end(g_package_name,'ins_nau_all');
+--
+END ins_nau_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nal (p_rec_nal IN OUT nm_area_lock%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nal');
+--
+--
+   INSERT INTO nm_area_lock
+            (nal_id
+            ,nal_timestamp
+            ,nal_terminal
+            ,nal_session_id
+            ,nal_area
+            )
+     VALUES (p_rec_nal.nal_id
+            ,p_rec_nal.nal_timestamp
+            ,p_rec_nal.nal_terminal
+            ,p_rec_nal.nal_session_id
+            ,p_rec_nal.nal_area
+            )
+   RETURNING nal_id
+            ,nal_timestamp
+            ,nal_terminal
+            ,nal_session_id
+      INTO   p_rec_nal.nal_id
+            ,p_rec_nal.nal_timestamp
+            ,p_rec_nal.nal_terminal
+            ,p_rec_nal.nal_session_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_nal');
+--
+END ins_nal;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nars (p_rec_nars IN OUT nm_assets_on_route_store%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nars');
+--
+--
+   INSERT INTO nm_assets_on_route_store
+            (nars_job_id
+            ,nars_ne_id_in
+            ,nars_item_x_sect
+            ,nars_ne_id_of_begin
+            ,nars_begin_mp
+            ,nars_ne_id_of_end
+            ,nars_end_mp
+            ,nars_seq_no
+            ,nars_seg_no
+            ,nars_item_type_type
+            ,nars_item_type
+            ,nars_item_type_descr
+            ,nars_nm_type
+            ,nars_nm_obj_type
+            ,nars_placement_begin_mp
+            ,nars_placement_end_mp
+            ,nars_reference_item_id
+            ,nars_reference_item_x_sect
+            ,nars_begin_reference_begin_mp
+            ,nars_begin_reference_end_mp
+            ,nars_end_reference_begin_mp
+            ,nars_end_reference_end_mp
+            )
+     VALUES (p_rec_nars.nars_job_id
+            ,p_rec_nars.nars_ne_id_in
+            ,p_rec_nars.nars_item_x_sect
+            ,p_rec_nars.nars_ne_id_of_begin
+            ,p_rec_nars.nars_begin_mp
+            ,p_rec_nars.nars_ne_id_of_end
+            ,p_rec_nars.nars_end_mp
+            ,p_rec_nars.nars_seq_no
+            ,p_rec_nars.nars_seg_no
+            ,p_rec_nars.nars_item_type_type
+            ,p_rec_nars.nars_item_type
+            ,p_rec_nars.nars_item_type_descr
+            ,p_rec_nars.nars_nm_type
+            ,p_rec_nars.nars_nm_obj_type
+            ,p_rec_nars.nars_placement_begin_mp
+            ,p_rec_nars.nars_placement_end_mp
+            ,p_rec_nars.nars_reference_item_id
+            ,p_rec_nars.nars_reference_item_x_sect
+            ,p_rec_nars.nars_begin_reference_begin_mp
+            ,p_rec_nars.nars_begin_reference_end_mp
+            ,p_rec_nars.nars_end_reference_begin_mp
+            ,p_rec_nars.nars_end_reference_end_mp
+            )
+   RETURNING nars_job_id
+            ,nars_ne_id_in
+            ,nars_item_x_sect
+            ,nars_ne_id_of_begin
+            ,nars_begin_mp
+            ,nars_ne_id_of_end
+            ,nars_end_mp
+            ,nars_seq_no
+            ,nars_seg_no
+            ,nars_item_type_type
+            ,nars_item_type
+            ,nars_item_type_descr
+            ,nars_nm_type
+            ,nars_nm_obj_type
+            ,nars_placement_begin_mp
+            ,nars_placement_end_mp
+            ,nars_reference_item_id
+            ,nars_reference_item_x_sect
+            ,nars_begin_reference_begin_mp
+            ,nars_begin_reference_end_mp
+            ,nars_end_reference_begin_mp
+            ,nars_end_reference_end_mp
+      INTO   p_rec_nars.nars_job_id
+            ,p_rec_nars.nars_ne_id_in
+            ,p_rec_nars.nars_item_x_sect
+            ,p_rec_nars.nars_ne_id_of_begin
+            ,p_rec_nars.nars_begin_mp
+            ,p_rec_nars.nars_ne_id_of_end
+            ,p_rec_nars.nars_end_mp
+            ,p_rec_nars.nars_seq_no
+            ,p_rec_nars.nars_seg_no
+            ,p_rec_nars.nars_item_type_type
+            ,p_rec_nars.nars_item_type
+            ,p_rec_nars.nars_item_type_descr
+            ,p_rec_nars.nars_nm_type
+            ,p_rec_nars.nars_nm_obj_type
+            ,p_rec_nars.nars_placement_begin_mp
+            ,p_rec_nars.nars_placement_end_mp
+            ,p_rec_nars.nars_reference_item_id
+            ,p_rec_nars.nars_reference_item_x_sect
+            ,p_rec_nars.nars_begin_reference_begin_mp
+            ,p_rec_nars.nars_begin_reference_end_mp
+            ,p_rec_nars.nars_end_reference_begin_mp
+            ,p_rec_nars.nars_end_reference_end_mp;
+--
+   nm_debug.proc_end(g_package_name,'ins_nars');
+--
+END ins_nars;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_narsa (p_rec_narsa IN OUT nm_assets_on_route_store_att%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_narsa');
+--
+--
+   INSERT INTO nm_assets_on_route_store_att
+            (narsa_job_id
+            ,narsa_iit_ne_id
+            ,narsa_value
+            )
+     VALUES (p_rec_narsa.narsa_job_id
+            ,p_rec_narsa.narsa_iit_ne_id
+            ,p_rec_narsa.narsa_value
+            )
+   RETURNING narsa_job_id
+            ,narsa_iit_ne_id
+            ,narsa_value
+      INTO   p_rec_narsa.narsa_job_id
+            ,p_rec_narsa.narsa_iit_ne_id
+            ,p_rec_narsa.narsa_value;
+--
+   nm_debug.proc_end(g_package_name,'ins_narsa');
+--
+END ins_narsa;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_narsd (p_rec_narsd IN OUT nm_assets_on_route_store_att_d%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_narsd');
+--
+--
+   INSERT INTO nm_assets_on_route_store_att_d
+            (narsd_job_id
+            ,narsd_iit_ne_id
+            ,narsd_attrib_name
+            ,narsd_seq_no
+            ,narsd_value
+            ,narsd_scrn_text
+            )
+     VALUES (p_rec_narsd.narsd_job_id
+            ,p_rec_narsd.narsd_iit_ne_id
+            ,p_rec_narsd.narsd_attrib_name
+            ,p_rec_narsd.narsd_seq_no
+            ,p_rec_narsd.narsd_value
+            ,p_rec_narsd.narsd_scrn_text
+            )
+   RETURNING narsd_job_id
+            ,narsd_iit_ne_id
+            ,narsd_attrib_name
+            ,narsd_seq_no
+            ,narsd_value
+            ,narsd_scrn_text
+      INTO   p_rec_narsd.narsd_job_id
+            ,p_rec_narsd.narsd_iit_ne_id
+            ,p_rec_narsd.narsd_attrib_name
+            ,p_rec_narsd.narsd_seq_no
+            ,p_rec_narsd.narsd_value
+            ,p_rec_narsd.narsd_scrn_text;
+--
+   nm_debug.proc_end(g_package_name,'ins_narsd');
+--
+END ins_narsd;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_narsh (p_rec_narsh IN OUT nm_assets_on_route_store_head%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_narsh');
+--
+   p_rec_narsh.narsh_entire                   := NVL(p_rec_narsh.narsh_entire,'Y' );
+   p_rec_narsh.narsh_ref_negative             := NVL(p_rec_narsh.narsh_ref_negative,'Y' );
+--
+   INSERT INTO nm_assets_on_route_store_head
+            (narsh_job_id
+            ,narsh_effective_date
+            ,narsh_source_id
+            ,narsh_source
+            ,narsh_source_unique
+            ,narsh_source_descr
+            ,narsh_source_min_offset
+            ,narsh_source_max_offset
+            ,narsh_source_length
+            ,narsh_source_unit_id
+            ,narsh_source_unit_name
+            ,narsh_entire
+            ,narsh_begin_mp
+            ,narsh_begin_datum_ne_id
+            ,narsh_begin_datum_offset
+            ,narsh_end_mp
+            ,narsh_end_datum_ne_id
+            ,narsh_end_datum_offset
+            ,narsh_ambig_sub_class
+            ,narsh_reference_type
+            ,narsh_reference_inv_type
+            ,narsh_reference_inv_type_descr
+            ,narsh_reference_item_id
+            ,narsh_reference_item_xsp
+            ,narsh_ref_negative
+            ,narsh_un_unit_id
+            ,narsh_unit_name
+            ,narsh_nias_id
+            ,narsh_date_created
+            ,narsh_date_modified
+            ,narsh_modified_by
+            ,narsh_created_by
+            )
+     VALUES (p_rec_narsh.narsh_job_id
+            ,p_rec_narsh.narsh_effective_date
+            ,p_rec_narsh.narsh_source_id
+            ,p_rec_narsh.narsh_source
+            ,p_rec_narsh.narsh_source_unique
+            ,p_rec_narsh.narsh_source_descr
+            ,p_rec_narsh.narsh_source_min_offset
+            ,p_rec_narsh.narsh_source_max_offset
+            ,p_rec_narsh.narsh_source_length
+            ,p_rec_narsh.narsh_source_unit_id
+            ,p_rec_narsh.narsh_source_unit_name
+            ,p_rec_narsh.narsh_entire
+            ,p_rec_narsh.narsh_begin_mp
+            ,p_rec_narsh.narsh_begin_datum_ne_id
+            ,p_rec_narsh.narsh_begin_datum_offset
+            ,p_rec_narsh.narsh_end_mp
+            ,p_rec_narsh.narsh_end_datum_ne_id
+            ,p_rec_narsh.narsh_end_datum_offset
+            ,p_rec_narsh.narsh_ambig_sub_class
+            ,p_rec_narsh.narsh_reference_type
+            ,p_rec_narsh.narsh_reference_inv_type
+            ,p_rec_narsh.narsh_reference_inv_type_descr
+            ,p_rec_narsh.narsh_reference_item_id
+            ,p_rec_narsh.narsh_reference_item_xsp
+            ,p_rec_narsh.narsh_ref_negative
+            ,p_rec_narsh.narsh_un_unit_id
+            ,p_rec_narsh.narsh_unit_name
+            ,p_rec_narsh.narsh_nias_id
+            ,p_rec_narsh.narsh_date_created
+            ,p_rec_narsh.narsh_date_modified
+            ,p_rec_narsh.narsh_modified_by
+            ,p_rec_narsh.narsh_created_by
+            )
+   RETURNING narsh_job_id
+            ,narsh_effective_date
+            ,narsh_source_id
+            ,narsh_source
+            ,narsh_source_unique
+            ,narsh_source_descr
+            ,narsh_source_min_offset
+            ,narsh_source_max_offset
+            ,narsh_source_length
+            ,narsh_source_unit_id
+            ,narsh_source_unit_name
+            ,narsh_entire
+            ,narsh_begin_mp
+            ,narsh_begin_datum_ne_id
+            ,narsh_begin_datum_offset
+            ,narsh_end_mp
+            ,narsh_end_datum_ne_id
+            ,narsh_end_datum_offset
+            ,narsh_ambig_sub_class
+            ,narsh_reference_type
+            ,narsh_reference_inv_type
+            ,narsh_reference_inv_type_descr
+            ,narsh_reference_item_id
+            ,narsh_reference_item_xsp
+            ,narsh_ref_negative
+            ,narsh_un_unit_id
+            ,narsh_unit_name
+            ,narsh_nias_id
+            ,narsh_date_created
+            ,narsh_date_modified
+            ,narsh_modified_by
+            ,narsh_created_by
+      INTO   p_rec_narsh.narsh_job_id
+            ,p_rec_narsh.narsh_effective_date
+            ,p_rec_narsh.narsh_source_id
+            ,p_rec_narsh.narsh_source
+            ,p_rec_narsh.narsh_source_unique
+            ,p_rec_narsh.narsh_source_descr
+            ,p_rec_narsh.narsh_source_min_offset
+            ,p_rec_narsh.narsh_source_max_offset
+            ,p_rec_narsh.narsh_source_length
+            ,p_rec_narsh.narsh_source_unit_id
+            ,p_rec_narsh.narsh_source_unit_name
+            ,p_rec_narsh.narsh_entire
+            ,p_rec_narsh.narsh_begin_mp
+            ,p_rec_narsh.narsh_begin_datum_ne_id
+            ,p_rec_narsh.narsh_begin_datum_offset
+            ,p_rec_narsh.narsh_end_mp
+            ,p_rec_narsh.narsh_end_datum_ne_id
+            ,p_rec_narsh.narsh_end_datum_offset
+            ,p_rec_narsh.narsh_ambig_sub_class
+            ,p_rec_narsh.narsh_reference_type
+            ,p_rec_narsh.narsh_reference_inv_type
+            ,p_rec_narsh.narsh_reference_inv_type_descr
+            ,p_rec_narsh.narsh_reference_item_id
+            ,p_rec_narsh.narsh_reference_item_xsp
+            ,p_rec_narsh.narsh_ref_negative
+            ,p_rec_narsh.narsh_un_unit_id
+            ,p_rec_narsh.narsh_unit_name
+            ,p_rec_narsh.narsh_nias_id
+            ,p_rec_narsh.narsh_date_created
+            ,p_rec_narsh.narsh_date_modified
+            ,p_rec_narsh.narsh_modified_by
+            ,p_rec_narsh.narsh_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_narsh');
+--
+END ins_narsh;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_narst (p_rec_narst IN OUT nm_assets_on_route_store_total%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_narst');
+--
+--
+   INSERT INTO nm_assets_on_route_store_total
+            (narst_job_id
+            ,narst_inv_type
+            ,narst_inv_type_descr
+            ,narst_item_count
+            ,narst_total_length
+            )
+     VALUES (p_rec_narst.narst_job_id
+            ,p_rec_narst.narst_inv_type
+            ,p_rec_narst.narst_inv_type_descr
+            ,p_rec_narst.narst_item_count
+            ,p_rec_narst.narst_total_length
+            )
+   RETURNING narst_job_id
+            ,narst_inv_type
+            ,narst_inv_type_descr
+            ,narst_item_count
+            ,narst_total_length
+      INTO   p_rec_narst.narst_job_id
+            ,p_rec_narst.narst_inv_type
+            ,p_rec_narst.narst_inv_type_descr
+            ,p_rec_narst.narst_item_count
+            ,p_rec_narst.narst_total_length;
+--
+   nm_debug.proc_end(g_package_name,'ins_narst');
+--
+END ins_narst;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_naa (p_rec_naa IN OUT nm_audit_actions%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_naa');
+--
+--
+   INSERT INTO nm_audit_actions
+            (na_audit_id
+            ,na_timestamp
+            ,na_performed_by
+            ,na_session_id
+            ,na_table_name
+            ,na_audit_type
+            ,na_key_info_1
+            ,na_key_info_2
+            ,na_key_info_3
+            ,na_key_info_4
+            ,na_key_info_5
+            ,na_key_info_6
+            ,na_key_info_7
+            ,na_key_info_8
+            ,na_key_info_9
+            ,na_key_info_10
+            )
+     VALUES (p_rec_naa.na_audit_id
+            ,p_rec_naa.na_timestamp
+            ,p_rec_naa.na_performed_by
+            ,p_rec_naa.na_session_id
+            ,p_rec_naa.na_table_name
+            ,p_rec_naa.na_audit_type
+            ,p_rec_naa.na_key_info_1
+            ,p_rec_naa.na_key_info_2
+            ,p_rec_naa.na_key_info_3
+            ,p_rec_naa.na_key_info_4
+            ,p_rec_naa.na_key_info_5
+            ,p_rec_naa.na_key_info_6
+            ,p_rec_naa.na_key_info_7
+            ,p_rec_naa.na_key_info_8
+            ,p_rec_naa.na_key_info_9
+            ,p_rec_naa.na_key_info_10
+            )
+   RETURNING na_audit_id
+            ,na_timestamp
+            ,na_performed_by
+            ,na_session_id
+            ,na_table_name
+            ,na_audit_type
+            ,na_key_info_1
+            ,na_key_info_2
+            ,na_key_info_3
+            ,na_key_info_4
+            ,na_key_info_5
+            ,na_key_info_6
+            ,na_key_info_7
+            ,na_key_info_8
+            ,na_key_info_9
+            ,na_key_info_10
+      INTO   p_rec_naa.na_audit_id
+            ,p_rec_naa.na_timestamp
+            ,p_rec_naa.na_performed_by
+            ,p_rec_naa.na_session_id
+            ,p_rec_naa.na_table_name
+            ,p_rec_naa.na_audit_type
+            ,p_rec_naa.na_key_info_1
+            ,p_rec_naa.na_key_info_2
+            ,p_rec_naa.na_key_info_3
+            ,p_rec_naa.na_key_info_4
+            ,p_rec_naa.na_key_info_5
+            ,p_rec_naa.na_key_info_6
+            ,p_rec_naa.na_key_info_7
+            ,p_rec_naa.na_key_info_8
+            ,p_rec_naa.na_key_info_9
+            ,p_rec_naa.na_key_info_10;
+--
+   nm_debug.proc_end(g_package_name,'ins_naa');
+--
+END ins_naa;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nach (p_rec_nach IN OUT nm_audit_changes%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nach');
+--
+--
+   INSERT INTO nm_audit_changes
+            (nach_audit_id
+            ,nach_column_id
+            ,nach_column_name
+            ,nach_old_value
+            ,nach_new_value
+            )
+     VALUES (p_rec_nach.nach_audit_id
+            ,p_rec_nach.nach_column_id
+            ,p_rec_nach.nach_column_name
+            ,p_rec_nach.nach_old_value
+            ,p_rec_nach.nach_new_value
+            )
+   RETURNING nach_audit_id
+            ,nach_column_id
+            ,nach_column_name
+            ,nach_old_value
+            ,nach_new_value
+      INTO   p_rec_nach.nach_audit_id
+            ,p_rec_nach.nach_column_id
+            ,p_rec_nach.nach_column_name
+            ,p_rec_nach.nach_old_value
+            ,p_rec_nach.nach_new_value;
+--
+   nm_debug.proc_end(g_package_name,'ins_nach');
+--
+END ins_nach;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nac (p_rec_nac IN OUT nm_audit_columns%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nac');
+--
+--
+   INSERT INTO nm_audit_columns
+            (nac_table_name
+            ,nac_column_id
+            ,nac_column_name
+            ,nac_column_alias
+            ,nac_decode_sql
+            )
+     VALUES (p_rec_nac.nac_table_name
+            ,p_rec_nac.nac_column_id
+            ,p_rec_nac.nac_column_name
+            ,p_rec_nac.nac_column_alias
+            ,p_rec_nac.nac_decode_sql
+            )
+   RETURNING nac_table_name
+            ,nac_column_id
+            ,nac_column_name
+            ,nac_column_alias
+      INTO   p_rec_nac.nac_table_name
+            ,p_rec_nac.nac_column_id
+            ,p_rec_nac.nac_column_name
+            ,p_rec_nac.nac_column_alias;
+--
+   nm_debug.proc_end(g_package_name,'ins_nac');
+--
+END ins_nac;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nkc (p_rec_nkc IN OUT nm_audit_key_cols%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nkc');
+--
+--
+   INSERT INTO nm_audit_key_cols
+            (nkc_table_name
+            ,nkc_seq_no
+            ,nkc_column_name
+            )
+     VALUES (p_rec_nkc.nkc_table_name
+            ,p_rec_nkc.nkc_seq_no
+            ,p_rec_nkc.nkc_column_name
+            )
+   RETURNING nkc_table_name
+            ,nkc_seq_no
+            ,nkc_column_name
+      INTO   p_rec_nkc.nkc_table_name
+            ,p_rec_nkc.nkc_seq_no
+            ,p_rec_nkc.nkc_column_name;
+--
+   nm_debug.proc_end(g_package_name,'ins_nkc');
+--
+END ins_nkc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_natab (p_rec_natab IN OUT nm_audit_tables%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_natab');
+--
+--
+   INSERT INTO nm_audit_tables
+            (nat_table_name
+            ,nat_table_alias
+            ,nat_audit_insert
+            ,nat_audit_update
+            ,nat_audit_delete
+            )
+     VALUES (p_rec_natab.nat_table_name
+            ,p_rec_natab.nat_table_alias
+            ,p_rec_natab.nat_audit_insert
+            ,p_rec_natab.nat_audit_update
+            ,p_rec_natab.nat_audit_delete
+            )
+   RETURNING nat_table_name
+            ,nat_table_alias
+            ,nat_audit_insert
+            ,nat_audit_update
+            ,nat_audit_delete
+      INTO   p_rec_natab.nat_table_name
+            ,p_rec_natab.nat_table_alias
+            ,p_rec_natab.nat_audit_insert
+            ,p_rec_natab.nat_audit_update
+            ,p_rec_natab.nat_audit_delete;
+--
+   nm_debug.proc_end(g_package_name,'ins_natab');
+--
+END ins_natab;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_natmp (p_rec_natmp IN OUT nm_audit_temp%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_natmp');
+--
+   p_rec_natmp.nat_timestamp                  := NVL(p_rec_natmp.nat_timestamp,sysdate );
+   p_rec_natmp.nat_processing_status          := NVL(p_rec_natmp.nat_processing_status,0
+ );
+--
+   INSERT INTO nm_audit_temp
+            (nat_audit_id
+            ,nat_old_or_new
+            ,nat_audit_type
+            ,nat_audit_table
+            ,nat_timestamp
+            ,nat_performed_by
+            ,nat_session_id
+            ,nat_processing_status
+            ,nat_key_info_1
+            ,nat_key_info_2
+            ,nat_key_info_3
+            ,nat_key_info_4
+            ,nat_key_info_5
+            ,nat_key_info_6
+            ,nat_key_info_7
+            ,nat_key_info_8
+            ,nat_key_info_9
+            ,nat_key_info_10
+            ,nat_column_1
+            ,nat_column_2
+            ,nat_column_3
+            ,nat_column_4
+            ,nat_column_5
+            ,nat_column_6
+            ,nat_column_7
+            ,nat_column_8
+            ,nat_column_9
+            ,nat_column_10
+            ,nat_column_11
+            ,nat_column_12
+            ,nat_column_13
+            ,nat_column_14
+            ,nat_column_15
+            ,nat_column_16
+            ,nat_column_17
+            ,nat_column_18
+            ,nat_column_19
+            ,nat_column_20
+            ,nat_column_21
+            ,nat_column_22
+            ,nat_column_23
+            ,nat_column_24
+            ,nat_column_25
+            ,nat_column_26
+            ,nat_column_27
+            ,nat_column_28
+            ,nat_column_29
+            ,nat_column_30
+            ,nat_column_31
+            ,nat_column_32
+            ,nat_column_33
+            ,nat_column_34
+            ,nat_column_35
+            ,nat_column_36
+            ,nat_column_37
+            ,nat_column_38
+            ,nat_column_39
+            ,nat_column_40
+            ,nat_column_41
+            ,nat_column_42
+            ,nat_column_43
+            ,nat_column_44
+            ,nat_column_45
+            ,nat_column_46
+            ,nat_column_47
+            ,nat_column_48
+            ,nat_column_49
+            ,nat_column_50
+            ,nat_column_51
+            ,nat_column_52
+            ,nat_column_53
+            ,nat_column_54
+            ,nat_column_55
+            ,nat_column_56
+            ,nat_column_57
+            ,nat_column_58
+            ,nat_column_59
+            ,nat_column_60
+            ,nat_column_61
+            ,nat_column_62
+            ,nat_column_63
+            ,nat_column_64
+            ,nat_column_65
+            ,nat_column_66
+            ,nat_column_67
+            ,nat_column_68
+            ,nat_column_69
+            ,nat_column_70
+            ,nat_column_71
+            ,nat_column_72
+            ,nat_column_73
+            ,nat_column_74
+            ,nat_column_75
+            ,nat_column_76
+            ,nat_column_77
+            ,nat_column_78
+            ,nat_column_79
+            ,nat_column_80
+            ,nat_column_81
+            ,nat_column_82
+            ,nat_column_83
+            ,nat_column_84
+            ,nat_column_85
+            ,nat_column_86
+            ,nat_column_87
+            ,nat_column_88
+            ,nat_column_89
+            ,nat_column_90
+            ,nat_column_91
+            ,nat_column_92
+            ,nat_column_93
+            ,nat_column_94
+            ,nat_column_95
+            ,nat_column_96
+            ,nat_column_97
+            ,nat_column_98
+            ,nat_column_99
+            ,nat_column_100
+            ,nat_column_101
+            ,nat_column_102
+            ,nat_column_103
+            ,nat_column_104
+            ,nat_column_105
+            ,nat_column_106
+            ,nat_column_107
+            ,nat_column_108
+            ,nat_column_109
+            ,nat_column_110
+            ,nat_column_111
+            ,nat_column_112
+            ,nat_column_113
+            ,nat_column_114
+            ,nat_column_115
+            ,nat_column_116
+            ,nat_column_117
+            ,nat_column_118
+            ,nat_column_119
+            ,nat_column_120
+            ,nat_column_121
+            ,nat_column_122
+            ,nat_column_123
+            ,nat_column_124
+            ,nat_column_125
+            ,nat_column_126
+            ,nat_column_127
+            ,nat_column_128
+            ,nat_column_129
+            ,nat_column_130
+            ,nat_column_131
+            ,nat_column_132
+            ,nat_column_133
+            ,nat_column_134
+            ,nat_column_135
+            ,nat_column_136
+            ,nat_column_137
+            ,nat_column_138
+            ,nat_column_139
+            ,nat_column_140
+            ,nat_column_141
+            ,nat_column_142
+            ,nat_column_143
+            ,nat_column_144
+            ,nat_column_145
+            ,nat_column_146
+            ,nat_column_147
+            ,nat_column_148
+            ,nat_column_149
+            ,nat_column_150
+            ,nat_column_151
+            ,nat_column_152
+            ,nat_column_153
+            ,nat_column_154
+            ,nat_column_155
+            ,nat_column_156
+            ,nat_column_157
+            ,nat_column_158
+            ,nat_column_159
+            ,nat_column_160
+            ,nat_column_161
+            ,nat_column_162
+            ,nat_column_163
+            ,nat_column_164
+            ,nat_column_165
+            ,nat_column_166
+            ,nat_column_167
+            ,nat_column_168
+            ,nat_column_169
+            ,nat_column_170
+            ,nat_column_171
+            ,nat_column_172
+            ,nat_column_173
+            ,nat_column_174
+            ,nat_column_175
+            ,nat_column_176
+            ,nat_column_177
+            ,nat_column_178
+            ,nat_column_179
+            ,nat_column_180
+            ,nat_column_181
+            ,nat_column_182
+            ,nat_column_183
+            ,nat_column_184
+            ,nat_column_185
+            ,nat_column_186
+            ,nat_column_187
+            ,nat_column_188
+            ,nat_column_189
+            ,nat_column_190
+            ,nat_column_191
+            ,nat_column_192
+            ,nat_column_193
+            ,nat_column_194
+            ,nat_column_195
+            ,nat_column_196
+            ,nat_column_197
+            ,nat_column_198
+            ,nat_column_199
+            ,nat_column_200
+            )
+     VALUES (p_rec_natmp.nat_audit_id
+            ,p_rec_natmp.nat_old_or_new
+            ,p_rec_natmp.nat_audit_type
+            ,p_rec_natmp.nat_audit_table
+            ,p_rec_natmp.nat_timestamp
+            ,p_rec_natmp.nat_performed_by
+            ,p_rec_natmp.nat_session_id
+            ,p_rec_natmp.nat_processing_status
+            ,p_rec_natmp.nat_key_info_1
+            ,p_rec_natmp.nat_key_info_2
+            ,p_rec_natmp.nat_key_info_3
+            ,p_rec_natmp.nat_key_info_4
+            ,p_rec_natmp.nat_key_info_5
+            ,p_rec_natmp.nat_key_info_6
+            ,p_rec_natmp.nat_key_info_7
+            ,p_rec_natmp.nat_key_info_8
+            ,p_rec_natmp.nat_key_info_9
+            ,p_rec_natmp.nat_key_info_10
+            ,p_rec_natmp.nat_column_1
+            ,p_rec_natmp.nat_column_2
+            ,p_rec_natmp.nat_column_3
+            ,p_rec_natmp.nat_column_4
+            ,p_rec_natmp.nat_column_5
+            ,p_rec_natmp.nat_column_6
+            ,p_rec_natmp.nat_column_7
+            ,p_rec_natmp.nat_column_8
+            ,p_rec_natmp.nat_column_9
+            ,p_rec_natmp.nat_column_10
+            ,p_rec_natmp.nat_column_11
+            ,p_rec_natmp.nat_column_12
+            ,p_rec_natmp.nat_column_13
+            ,p_rec_natmp.nat_column_14
+            ,p_rec_natmp.nat_column_15
+            ,p_rec_natmp.nat_column_16
+            ,p_rec_natmp.nat_column_17
+            ,p_rec_natmp.nat_column_18
+            ,p_rec_natmp.nat_column_19
+            ,p_rec_natmp.nat_column_20
+            ,p_rec_natmp.nat_column_21
+            ,p_rec_natmp.nat_column_22
+            ,p_rec_natmp.nat_column_23
+            ,p_rec_natmp.nat_column_24
+            ,p_rec_natmp.nat_column_25
+            ,p_rec_natmp.nat_column_26
+            ,p_rec_natmp.nat_column_27
+            ,p_rec_natmp.nat_column_28
+            ,p_rec_natmp.nat_column_29
+            ,p_rec_natmp.nat_column_30
+            ,p_rec_natmp.nat_column_31
+            ,p_rec_natmp.nat_column_32
+            ,p_rec_natmp.nat_column_33
+            ,p_rec_natmp.nat_column_34
+            ,p_rec_natmp.nat_column_35
+            ,p_rec_natmp.nat_column_36
+            ,p_rec_natmp.nat_column_37
+            ,p_rec_natmp.nat_column_38
+            ,p_rec_natmp.nat_column_39
+            ,p_rec_natmp.nat_column_40
+            ,p_rec_natmp.nat_column_41
+            ,p_rec_natmp.nat_column_42
+            ,p_rec_natmp.nat_column_43
+            ,p_rec_natmp.nat_column_44
+            ,p_rec_natmp.nat_column_45
+            ,p_rec_natmp.nat_column_46
+            ,p_rec_natmp.nat_column_47
+            ,p_rec_natmp.nat_column_48
+            ,p_rec_natmp.nat_column_49
+            ,p_rec_natmp.nat_column_50
+            ,p_rec_natmp.nat_column_51
+            ,p_rec_natmp.nat_column_52
+            ,p_rec_natmp.nat_column_53
+            ,p_rec_natmp.nat_column_54
+            ,p_rec_natmp.nat_column_55
+            ,p_rec_natmp.nat_column_56
+            ,p_rec_natmp.nat_column_57
+            ,p_rec_natmp.nat_column_58
+            ,p_rec_natmp.nat_column_59
+            ,p_rec_natmp.nat_column_60
+            ,p_rec_natmp.nat_column_61
+            ,p_rec_natmp.nat_column_62
+            ,p_rec_natmp.nat_column_63
+            ,p_rec_natmp.nat_column_64
+            ,p_rec_natmp.nat_column_65
+            ,p_rec_natmp.nat_column_66
+            ,p_rec_natmp.nat_column_67
+            ,p_rec_natmp.nat_column_68
+            ,p_rec_natmp.nat_column_69
+            ,p_rec_natmp.nat_column_70
+            ,p_rec_natmp.nat_column_71
+            ,p_rec_natmp.nat_column_72
+            ,p_rec_natmp.nat_column_73
+            ,p_rec_natmp.nat_column_74
+            ,p_rec_natmp.nat_column_75
+            ,p_rec_natmp.nat_column_76
+            ,p_rec_natmp.nat_column_77
+            ,p_rec_natmp.nat_column_78
+            ,p_rec_natmp.nat_column_79
+            ,p_rec_natmp.nat_column_80
+            ,p_rec_natmp.nat_column_81
+            ,p_rec_natmp.nat_column_82
+            ,p_rec_natmp.nat_column_83
+            ,p_rec_natmp.nat_column_84
+            ,p_rec_natmp.nat_column_85
+            ,p_rec_natmp.nat_column_86
+            ,p_rec_natmp.nat_column_87
+            ,p_rec_natmp.nat_column_88
+            ,p_rec_natmp.nat_column_89
+            ,p_rec_natmp.nat_column_90
+            ,p_rec_natmp.nat_column_91
+            ,p_rec_natmp.nat_column_92
+            ,p_rec_natmp.nat_column_93
+            ,p_rec_natmp.nat_column_94
+            ,p_rec_natmp.nat_column_95
+            ,p_rec_natmp.nat_column_96
+            ,p_rec_natmp.nat_column_97
+            ,p_rec_natmp.nat_column_98
+            ,p_rec_natmp.nat_column_99
+            ,p_rec_natmp.nat_column_100
+            ,p_rec_natmp.nat_column_101
+            ,p_rec_natmp.nat_column_102
+            ,p_rec_natmp.nat_column_103
+            ,p_rec_natmp.nat_column_104
+            ,p_rec_natmp.nat_column_105
+            ,p_rec_natmp.nat_column_106
+            ,p_rec_natmp.nat_column_107
+            ,p_rec_natmp.nat_column_108
+            ,p_rec_natmp.nat_column_109
+            ,p_rec_natmp.nat_column_110
+            ,p_rec_natmp.nat_column_111
+            ,p_rec_natmp.nat_column_112
+            ,p_rec_natmp.nat_column_113
+            ,p_rec_natmp.nat_column_114
+            ,p_rec_natmp.nat_column_115
+            ,p_rec_natmp.nat_column_116
+            ,p_rec_natmp.nat_column_117
+            ,p_rec_natmp.nat_column_118
+            ,p_rec_natmp.nat_column_119
+            ,p_rec_natmp.nat_column_120
+            ,p_rec_natmp.nat_column_121
+            ,p_rec_natmp.nat_column_122
+            ,p_rec_natmp.nat_column_123
+            ,p_rec_natmp.nat_column_124
+            ,p_rec_natmp.nat_column_125
+            ,p_rec_natmp.nat_column_126
+            ,p_rec_natmp.nat_column_127
+            ,p_rec_natmp.nat_column_128
+            ,p_rec_natmp.nat_column_129
+            ,p_rec_natmp.nat_column_130
+            ,p_rec_natmp.nat_column_131
+            ,p_rec_natmp.nat_column_132
+            ,p_rec_natmp.nat_column_133
+            ,p_rec_natmp.nat_column_134
+            ,p_rec_natmp.nat_column_135
+            ,p_rec_natmp.nat_column_136
+            ,p_rec_natmp.nat_column_137
+            ,p_rec_natmp.nat_column_138
+            ,p_rec_natmp.nat_column_139
+            ,p_rec_natmp.nat_column_140
+            ,p_rec_natmp.nat_column_141
+            ,p_rec_natmp.nat_column_142
+            ,p_rec_natmp.nat_column_143
+            ,p_rec_natmp.nat_column_144
+            ,p_rec_natmp.nat_column_145
+            ,p_rec_natmp.nat_column_146
+            ,p_rec_natmp.nat_column_147
+            ,p_rec_natmp.nat_column_148
+            ,p_rec_natmp.nat_column_149
+            ,p_rec_natmp.nat_column_150
+            ,p_rec_natmp.nat_column_151
+            ,p_rec_natmp.nat_column_152
+            ,p_rec_natmp.nat_column_153
+            ,p_rec_natmp.nat_column_154
+            ,p_rec_natmp.nat_column_155
+            ,p_rec_natmp.nat_column_156
+            ,p_rec_natmp.nat_column_157
+            ,p_rec_natmp.nat_column_158
+            ,p_rec_natmp.nat_column_159
+            ,p_rec_natmp.nat_column_160
+            ,p_rec_natmp.nat_column_161
+            ,p_rec_natmp.nat_column_162
+            ,p_rec_natmp.nat_column_163
+            ,p_rec_natmp.nat_column_164
+            ,p_rec_natmp.nat_column_165
+            ,p_rec_natmp.nat_column_166
+            ,p_rec_natmp.nat_column_167
+            ,p_rec_natmp.nat_column_168
+            ,p_rec_natmp.nat_column_169
+            ,p_rec_natmp.nat_column_170
+            ,p_rec_natmp.nat_column_171
+            ,p_rec_natmp.nat_column_172
+            ,p_rec_natmp.nat_column_173
+            ,p_rec_natmp.nat_column_174
+            ,p_rec_natmp.nat_column_175
+            ,p_rec_natmp.nat_column_176
+            ,p_rec_natmp.nat_column_177
+            ,p_rec_natmp.nat_column_178
+            ,p_rec_natmp.nat_column_179
+            ,p_rec_natmp.nat_column_180
+            ,p_rec_natmp.nat_column_181
+            ,p_rec_natmp.nat_column_182
+            ,p_rec_natmp.nat_column_183
+            ,p_rec_natmp.nat_column_184
+            ,p_rec_natmp.nat_column_185
+            ,p_rec_natmp.nat_column_186
+            ,p_rec_natmp.nat_column_187
+            ,p_rec_natmp.nat_column_188
+            ,p_rec_natmp.nat_column_189
+            ,p_rec_natmp.nat_column_190
+            ,p_rec_natmp.nat_column_191
+            ,p_rec_natmp.nat_column_192
+            ,p_rec_natmp.nat_column_193
+            ,p_rec_natmp.nat_column_194
+            ,p_rec_natmp.nat_column_195
+            ,p_rec_natmp.nat_column_196
+            ,p_rec_natmp.nat_column_197
+            ,p_rec_natmp.nat_column_198
+            ,p_rec_natmp.nat_column_199
+            ,p_rec_natmp.nat_column_200
+            )
+   RETURNING nat_audit_id
+            ,nat_old_or_new
+            ,nat_audit_type
+            ,nat_audit_table
+            ,nat_timestamp
+            ,nat_performed_by
+            ,nat_session_id
+            ,nat_processing_status
+            ,nat_key_info_1
+            ,nat_key_info_2
+            ,nat_key_info_3
+            ,nat_key_info_4
+            ,nat_key_info_5
+            ,nat_key_info_6
+            ,nat_key_info_7
+            ,nat_key_info_8
+            ,nat_key_info_9
+            ,nat_key_info_10
+            ,nat_column_1
+            ,nat_column_2
+            ,nat_column_3
+            ,nat_column_4
+            ,nat_column_5
+            ,nat_column_6
+            ,nat_column_7
+            ,nat_column_8
+            ,nat_column_9
+            ,nat_column_10
+            ,nat_column_11
+            ,nat_column_12
+            ,nat_column_13
+            ,nat_column_14
+            ,nat_column_15
+            ,nat_column_16
+            ,nat_column_17
+            ,nat_column_18
+            ,nat_column_19
+            ,nat_column_20
+            ,nat_column_21
+            ,nat_column_22
+            ,nat_column_23
+            ,nat_column_24
+            ,nat_column_25
+            ,nat_column_26
+            ,nat_column_27
+            ,nat_column_28
+            ,nat_column_29
+            ,nat_column_30
+            ,nat_column_31
+            ,nat_column_32
+            ,nat_column_33
+            ,nat_column_34
+            ,nat_column_35
+            ,nat_column_36
+            ,nat_column_37
+            ,nat_column_38
+            ,nat_column_39
+            ,nat_column_40
+            ,nat_column_41
+            ,nat_column_42
+            ,nat_column_43
+            ,nat_column_44
+            ,nat_column_45
+            ,nat_column_46
+            ,nat_column_47
+            ,nat_column_48
+            ,nat_column_49
+            ,nat_column_50
+            ,nat_column_51
+            ,nat_column_52
+            ,nat_column_53
+            ,nat_column_54
+            ,nat_column_55
+            ,nat_column_56
+            ,nat_column_57
+            ,nat_column_58
+            ,nat_column_59
+            ,nat_column_60
+            ,nat_column_61
+            ,nat_column_62
+            ,nat_column_63
+            ,nat_column_64
+            ,nat_column_65
+            ,nat_column_66
+            ,nat_column_67
+            ,nat_column_68
+            ,nat_column_69
+            ,nat_column_70
+            ,nat_column_71
+            ,nat_column_72
+            ,nat_column_73
+            ,nat_column_74
+            ,nat_column_75
+            ,nat_column_76
+            ,nat_column_77
+            ,nat_column_78
+            ,nat_column_79
+            ,nat_column_80
+            ,nat_column_81
+            ,nat_column_82
+            ,nat_column_83
+            ,nat_column_84
+            ,nat_column_85
+            ,nat_column_86
+            ,nat_column_87
+            ,nat_column_88
+            ,nat_column_89
+            ,nat_column_90
+            ,nat_column_91
+            ,nat_column_92
+            ,nat_column_93
+            ,nat_column_94
+            ,nat_column_95
+            ,nat_column_96
+            ,nat_column_97
+            ,nat_column_98
+            ,nat_column_99
+            ,nat_column_100
+            ,nat_column_101
+            ,nat_column_102
+            ,nat_column_103
+            ,nat_column_104
+            ,nat_column_105
+            ,nat_column_106
+            ,nat_column_107
+            ,nat_column_108
+            ,nat_column_109
+            ,nat_column_110
+            ,nat_column_111
+            ,nat_column_112
+            ,nat_column_113
+            ,nat_column_114
+            ,nat_column_115
+            ,nat_column_116
+            ,nat_column_117
+            ,nat_column_118
+            ,nat_column_119
+            ,nat_column_120
+            ,nat_column_121
+            ,nat_column_122
+            ,nat_column_123
+            ,nat_column_124
+            ,nat_column_125
+            ,nat_column_126
+            ,nat_column_127
+            ,nat_column_128
+            ,nat_column_129
+            ,nat_column_130
+            ,nat_column_131
+            ,nat_column_132
+            ,nat_column_133
+            ,nat_column_134
+            ,nat_column_135
+            ,nat_column_136
+            ,nat_column_137
+            ,nat_column_138
+            ,nat_column_139
+            ,nat_column_140
+            ,nat_column_141
+            ,nat_column_142
+            ,nat_column_143
+            ,nat_column_144
+            ,nat_column_145
+            ,nat_column_146
+            ,nat_column_147
+            ,nat_column_148
+            ,nat_column_149
+            ,nat_column_150
+            ,nat_column_151
+            ,nat_column_152
+            ,nat_column_153
+            ,nat_column_154
+            ,nat_column_155
+            ,nat_column_156
+            ,nat_column_157
+            ,nat_column_158
+            ,nat_column_159
+            ,nat_column_160
+            ,nat_column_161
+            ,nat_column_162
+            ,nat_column_163
+            ,nat_column_164
+            ,nat_column_165
+            ,nat_column_166
+            ,nat_column_167
+            ,nat_column_168
+            ,nat_column_169
+            ,nat_column_170
+            ,nat_column_171
+            ,nat_column_172
+            ,nat_column_173
+            ,nat_column_174
+            ,nat_column_175
+            ,nat_column_176
+            ,nat_column_177
+            ,nat_column_178
+            ,nat_column_179
+            ,nat_column_180
+            ,nat_column_181
+            ,nat_column_182
+            ,nat_column_183
+            ,nat_column_184
+            ,nat_column_185
+            ,nat_column_186
+            ,nat_column_187
+            ,nat_column_188
+            ,nat_column_189
+            ,nat_column_190
+            ,nat_column_191
+            ,nat_column_192
+            ,nat_column_193
+            ,nat_column_194
+            ,nat_column_195
+            ,nat_column_196
+            ,nat_column_197
+            ,nat_column_198
+            ,nat_column_199
+            ,nat_column_200
+      INTO   p_rec_natmp.nat_audit_id
+            ,p_rec_natmp.nat_old_or_new
+            ,p_rec_natmp.nat_audit_type
+            ,p_rec_natmp.nat_audit_table
+            ,p_rec_natmp.nat_timestamp
+            ,p_rec_natmp.nat_performed_by
+            ,p_rec_natmp.nat_session_id
+            ,p_rec_natmp.nat_processing_status
+            ,p_rec_natmp.nat_key_info_1
+            ,p_rec_natmp.nat_key_info_2
+            ,p_rec_natmp.nat_key_info_3
+            ,p_rec_natmp.nat_key_info_4
+            ,p_rec_natmp.nat_key_info_5
+            ,p_rec_natmp.nat_key_info_6
+            ,p_rec_natmp.nat_key_info_7
+            ,p_rec_natmp.nat_key_info_8
+            ,p_rec_natmp.nat_key_info_9
+            ,p_rec_natmp.nat_key_info_10
+            ,p_rec_natmp.nat_column_1
+            ,p_rec_natmp.nat_column_2
+            ,p_rec_natmp.nat_column_3
+            ,p_rec_natmp.nat_column_4
+            ,p_rec_natmp.nat_column_5
+            ,p_rec_natmp.nat_column_6
+            ,p_rec_natmp.nat_column_7
+            ,p_rec_natmp.nat_column_8
+            ,p_rec_natmp.nat_column_9
+            ,p_rec_natmp.nat_column_10
+            ,p_rec_natmp.nat_column_11
+            ,p_rec_natmp.nat_column_12
+            ,p_rec_natmp.nat_column_13
+            ,p_rec_natmp.nat_column_14
+            ,p_rec_natmp.nat_column_15
+            ,p_rec_natmp.nat_column_16
+            ,p_rec_natmp.nat_column_17
+            ,p_rec_natmp.nat_column_18
+            ,p_rec_natmp.nat_column_19
+            ,p_rec_natmp.nat_column_20
+            ,p_rec_natmp.nat_column_21
+            ,p_rec_natmp.nat_column_22
+            ,p_rec_natmp.nat_column_23
+            ,p_rec_natmp.nat_column_24
+            ,p_rec_natmp.nat_column_25
+            ,p_rec_natmp.nat_column_26
+            ,p_rec_natmp.nat_column_27
+            ,p_rec_natmp.nat_column_28
+            ,p_rec_natmp.nat_column_29
+            ,p_rec_natmp.nat_column_30
+            ,p_rec_natmp.nat_column_31
+            ,p_rec_natmp.nat_column_32
+            ,p_rec_natmp.nat_column_33
+            ,p_rec_natmp.nat_column_34
+            ,p_rec_natmp.nat_column_35
+            ,p_rec_natmp.nat_column_36
+            ,p_rec_natmp.nat_column_37
+            ,p_rec_natmp.nat_column_38
+            ,p_rec_natmp.nat_column_39
+            ,p_rec_natmp.nat_column_40
+            ,p_rec_natmp.nat_column_41
+            ,p_rec_natmp.nat_column_42
+            ,p_rec_natmp.nat_column_43
+            ,p_rec_natmp.nat_column_44
+            ,p_rec_natmp.nat_column_45
+            ,p_rec_natmp.nat_column_46
+            ,p_rec_natmp.nat_column_47
+            ,p_rec_natmp.nat_column_48
+            ,p_rec_natmp.nat_column_49
+            ,p_rec_natmp.nat_column_50
+            ,p_rec_natmp.nat_column_51
+            ,p_rec_natmp.nat_column_52
+            ,p_rec_natmp.nat_column_53
+            ,p_rec_natmp.nat_column_54
+            ,p_rec_natmp.nat_column_55
+            ,p_rec_natmp.nat_column_56
+            ,p_rec_natmp.nat_column_57
+            ,p_rec_natmp.nat_column_58
+            ,p_rec_natmp.nat_column_59
+            ,p_rec_natmp.nat_column_60
+            ,p_rec_natmp.nat_column_61
+            ,p_rec_natmp.nat_column_62
+            ,p_rec_natmp.nat_column_63
+            ,p_rec_natmp.nat_column_64
+            ,p_rec_natmp.nat_column_65
+            ,p_rec_natmp.nat_column_66
+            ,p_rec_natmp.nat_column_67
+            ,p_rec_natmp.nat_column_68
+            ,p_rec_natmp.nat_column_69
+            ,p_rec_natmp.nat_column_70
+            ,p_rec_natmp.nat_column_71
+            ,p_rec_natmp.nat_column_72
+            ,p_rec_natmp.nat_column_73
+            ,p_rec_natmp.nat_column_74
+            ,p_rec_natmp.nat_column_75
+            ,p_rec_natmp.nat_column_76
+            ,p_rec_natmp.nat_column_77
+            ,p_rec_natmp.nat_column_78
+            ,p_rec_natmp.nat_column_79
+            ,p_rec_natmp.nat_column_80
+            ,p_rec_natmp.nat_column_81
+            ,p_rec_natmp.nat_column_82
+            ,p_rec_natmp.nat_column_83
+            ,p_rec_natmp.nat_column_84
+            ,p_rec_natmp.nat_column_85
+            ,p_rec_natmp.nat_column_86
+            ,p_rec_natmp.nat_column_87
+            ,p_rec_natmp.nat_column_88
+            ,p_rec_natmp.nat_column_89
+            ,p_rec_natmp.nat_column_90
+            ,p_rec_natmp.nat_column_91
+            ,p_rec_natmp.nat_column_92
+            ,p_rec_natmp.nat_column_93
+            ,p_rec_natmp.nat_column_94
+            ,p_rec_natmp.nat_column_95
+            ,p_rec_natmp.nat_column_96
+            ,p_rec_natmp.nat_column_97
+            ,p_rec_natmp.nat_column_98
+            ,p_rec_natmp.nat_column_99
+            ,p_rec_natmp.nat_column_100
+            ,p_rec_natmp.nat_column_101
+            ,p_rec_natmp.nat_column_102
+            ,p_rec_natmp.nat_column_103
+            ,p_rec_natmp.nat_column_104
+            ,p_rec_natmp.nat_column_105
+            ,p_rec_natmp.nat_column_106
+            ,p_rec_natmp.nat_column_107
+            ,p_rec_natmp.nat_column_108
+            ,p_rec_natmp.nat_column_109
+            ,p_rec_natmp.nat_column_110
+            ,p_rec_natmp.nat_column_111
+            ,p_rec_natmp.nat_column_112
+            ,p_rec_natmp.nat_column_113
+            ,p_rec_natmp.nat_column_114
+            ,p_rec_natmp.nat_column_115
+            ,p_rec_natmp.nat_column_116
+            ,p_rec_natmp.nat_column_117
+            ,p_rec_natmp.nat_column_118
+            ,p_rec_natmp.nat_column_119
+            ,p_rec_natmp.nat_column_120
+            ,p_rec_natmp.nat_column_121
+            ,p_rec_natmp.nat_column_122
+            ,p_rec_natmp.nat_column_123
+            ,p_rec_natmp.nat_column_124
+            ,p_rec_natmp.nat_column_125
+            ,p_rec_natmp.nat_column_126
+            ,p_rec_natmp.nat_column_127
+            ,p_rec_natmp.nat_column_128
+            ,p_rec_natmp.nat_column_129
+            ,p_rec_natmp.nat_column_130
+            ,p_rec_natmp.nat_column_131
+            ,p_rec_natmp.nat_column_132
+            ,p_rec_natmp.nat_column_133
+            ,p_rec_natmp.nat_column_134
+            ,p_rec_natmp.nat_column_135
+            ,p_rec_natmp.nat_column_136
+            ,p_rec_natmp.nat_column_137
+            ,p_rec_natmp.nat_column_138
+            ,p_rec_natmp.nat_column_139
+            ,p_rec_natmp.nat_column_140
+            ,p_rec_natmp.nat_column_141
+            ,p_rec_natmp.nat_column_142
+            ,p_rec_natmp.nat_column_143
+            ,p_rec_natmp.nat_column_144
+            ,p_rec_natmp.nat_column_145
+            ,p_rec_natmp.nat_column_146
+            ,p_rec_natmp.nat_column_147
+            ,p_rec_natmp.nat_column_148
+            ,p_rec_natmp.nat_column_149
+            ,p_rec_natmp.nat_column_150
+            ,p_rec_natmp.nat_column_151
+            ,p_rec_natmp.nat_column_152
+            ,p_rec_natmp.nat_column_153
+            ,p_rec_natmp.nat_column_154
+            ,p_rec_natmp.nat_column_155
+            ,p_rec_natmp.nat_column_156
+            ,p_rec_natmp.nat_column_157
+            ,p_rec_natmp.nat_column_158
+            ,p_rec_natmp.nat_column_159
+            ,p_rec_natmp.nat_column_160
+            ,p_rec_natmp.nat_column_161
+            ,p_rec_natmp.nat_column_162
+            ,p_rec_natmp.nat_column_163
+            ,p_rec_natmp.nat_column_164
+            ,p_rec_natmp.nat_column_165
+            ,p_rec_natmp.nat_column_166
+            ,p_rec_natmp.nat_column_167
+            ,p_rec_natmp.nat_column_168
+            ,p_rec_natmp.nat_column_169
+            ,p_rec_natmp.nat_column_170
+            ,p_rec_natmp.nat_column_171
+            ,p_rec_natmp.nat_column_172
+            ,p_rec_natmp.nat_column_173
+            ,p_rec_natmp.nat_column_174
+            ,p_rec_natmp.nat_column_175
+            ,p_rec_natmp.nat_column_176
+            ,p_rec_natmp.nat_column_177
+            ,p_rec_natmp.nat_column_178
+            ,p_rec_natmp.nat_column_179
+            ,p_rec_natmp.nat_column_180
+            ,p_rec_natmp.nat_column_181
+            ,p_rec_natmp.nat_column_182
+            ,p_rec_natmp.nat_column_183
+            ,p_rec_natmp.nat_column_184
+            ,p_rec_natmp.nat_column_185
+            ,p_rec_natmp.nat_column_186
+            ,p_rec_natmp.nat_column_187
+            ,p_rec_natmp.nat_column_188
+            ,p_rec_natmp.nat_column_189
+            ,p_rec_natmp.nat_column_190
+            ,p_rec_natmp.nat_column_191
+            ,p_rec_natmp.nat_column_192
+            ,p_rec_natmp.nat_column_193
+            ,p_rec_natmp.nat_column_194
+            ,p_rec_natmp.nat_column_195
+            ,p_rec_natmp.nat_column_196
+            ,p_rec_natmp.nat_column_197
+            ,p_rec_natmp.nat_column_198
+            ,p_rec_natmp.nat_column_199
+            ,p_rec_natmp.nat_column_200;
+--
+   nm_debug.proc_end(g_package_name,'ins_natmp');
+--
+END ins_natmp;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nat (p_rec_nat IN OUT nm_au_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nat');
+--
+--
+   INSERT INTO nm_au_types
+            (nat_admin_type
+            ,nat_descr
+            ,nat_date_created
+            ,nat_date_modified
+            ,nat_modified_by
+            ,nat_created_by
+            )
+     VALUES (p_rec_nat.nat_admin_type
+            ,p_rec_nat.nat_descr
+            ,p_rec_nat.nat_date_created
+            ,p_rec_nat.nat_date_modified
+            ,p_rec_nat.nat_modified_by
+            ,p_rec_nat.nat_created_by
+            )
+   RETURNING nat_admin_type
+            ,nat_descr
+            ,nat_date_created
+            ,nat_date_modified
+            ,nat_modified_by
+            ,nat_created_by
+      INTO   p_rec_nat.nat_admin_type
+            ,p_rec_nat.nat_descr
+            ,p_rec_nat.nat_date_created
+            ,p_rec_nat.nat_date_modified
+            ,p_rec_nat.nat_modified_by
+            ,p_rec_nat.nat_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_nat');
+--
+END ins_nat;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nsty (p_rec_nsty IN OUT nm_au_sub_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nsty');
+--
+--
+   INSERT INTO nm_au_sub_types
+            (nsty_id
+            ,nsty_nat_admin_type
+            ,nsty_sub_type
+            ,nsty_descr
+            ,nsty_parent_sub_type
+            ,nsty_ngt_group_type
+            ,nsty_date_created
+            ,nsty_date_modified
+            ,nsty_modified_by
+            ,nsty_created_by
+            )
+     VALUES (p_rec_nsty.nsty_id
+            ,p_rec_nsty.nsty_nat_admin_type
+            ,p_rec_nsty.nsty_sub_type
+            ,p_rec_nsty.nsty_descr
+            ,p_rec_nsty.nsty_parent_sub_type
+            ,p_rec_nsty.nsty_ngt_group_type
+            ,p_rec_nsty.nsty_date_created
+            ,p_rec_nsty.nsty_date_modified
+            ,p_rec_nsty.nsty_modified_by
+            ,p_rec_nsty.nsty_created_by
+            )
+   RETURNING nsty_id
+            ,nsty_nat_admin_type
+            ,nsty_sub_type
+            ,nsty_descr
+            ,nsty_parent_sub_type
+            ,nsty_ngt_group_type
+            ,nsty_date_created
+            ,nsty_date_modified
+            ,nsty_modified_by
+            ,nsty_created_by
+      INTO   p_rec_nsty.nsty_id
+            ,p_rec_nsty.nsty_nat_admin_type
+            ,p_rec_nsty.nsty_sub_type
+            ,p_rec_nsty.nsty_descr
+            ,p_rec_nsty.nsty_parent_sub_type
+            ,p_rec_nsty.nsty_ngt_group_type
+            ,p_rec_nsty.nsty_date_created
+            ,p_rec_nsty.nsty_date_modified
+            ,p_rec_nsty.nsty_modified_by
+            ,p_rec_nsty.nsty_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_nsty');
+--
+END ins_nsty;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_natg (p_rec_natg IN OUT nm_au_types_groupings%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_natg');
+--
+--
+   INSERT INTO nm_au_types_groupings
+            (natg_grouping
+            ,natg_nat_admin_type
+            )
+     VALUES (p_rec_natg.natg_grouping
+            ,p_rec_natg.natg_nat_admin_type
+            )
+   RETURNING natg_grouping
+            ,natg_nat_admin_type
+      INTO   p_rec_natg.natg_grouping
+            ,p_rec_natg.natg_nat_admin_type;
+--
+   nm_debug.proc_end(g_package_name,'ins_natg');
+--
+END ins_natg;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nd (p_rec_nd IN OUT nm_dbug%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nd');
+--
+   p_rec_nd.nd_timestamp                   := NVL(p_rec_nd.nd_timestamp,sysdate );
+   p_rec_nd.nd_session_id                  := NVL(p_rec_nd.nd_session_id,sys_context('USERENV','SESSIONID') );
+--
+   INSERT INTO nm_dbug
+            (nd_id
+            ,nd_timestamp
+            ,nd_terminal
+            ,nd_session_id
+            ,nd_level
+            ,nd_text
+            )
+     VALUES (p_rec_nd.nd_id
+            ,p_rec_nd.nd_timestamp
+            ,p_rec_nd.nd_terminal
+            ,p_rec_nd.nd_session_id
+            ,p_rec_nd.nd_level
+            ,p_rec_nd.nd_text
+            )
+   RETURNING nd_id
+            ,nd_timestamp
+            ,nd_terminal
+            ,nd_session_id
+            ,nd_level
+            ,nd_text
+      INTO   p_rec_nd.nd_id
+            ,p_rec_nd.nd_timestamp
+            ,p_rec_nd.nd_terminal
+            ,p_rec_nd.nd_session_id
+            ,p_rec_nd.nd_level
+            ,p_rec_nd.nd_text;
+--
+   nm_debug.proc_end(g_package_name,'ins_nd');
+--
+END ins_nd;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ne (p_rec_ne IN OUT nm_elements%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ne');
+--
+   p_rec_ne.ne_start_date                  := NVL(p_rec_ne.ne_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_elements
+            (ne_id
+            ,ne_unique
+            ,ne_type
+            ,ne_nt_type
+            ,ne_descr
+            ,ne_length
+            ,ne_admin_unit
+            ,ne_date_created
+            ,ne_date_modified
+            ,ne_modified_by
+            ,ne_created_by
+            ,ne_start_date
+            ,ne_end_date
+            ,ne_gty_group_type
+            ,ne_owner
+            ,ne_name_1
+            ,ne_name_2
+            ,ne_prefix
+            ,ne_number
+            ,ne_sub_type
+            ,ne_group
+            ,ne_no_start
+            ,ne_no_end
+            ,ne_sub_class
+            ,ne_nsg_ref
+            ,ne_version_no
+            )
+     VALUES (p_rec_ne.ne_id
+            ,p_rec_ne.ne_unique
+            ,p_rec_ne.ne_type
+            ,p_rec_ne.ne_nt_type
+            ,p_rec_ne.ne_descr
+            ,p_rec_ne.ne_length
+            ,p_rec_ne.ne_admin_unit
+            ,p_rec_ne.ne_date_created
+            ,p_rec_ne.ne_date_modified
+            ,p_rec_ne.ne_modified_by
+            ,p_rec_ne.ne_created_by
+            ,p_rec_ne.ne_start_date
+            ,p_rec_ne.ne_end_date
+            ,p_rec_ne.ne_gty_group_type
+            ,p_rec_ne.ne_owner
+            ,p_rec_ne.ne_name_1
+            ,p_rec_ne.ne_name_2
+            ,p_rec_ne.ne_prefix
+            ,p_rec_ne.ne_number
+            ,p_rec_ne.ne_sub_type
+            ,p_rec_ne.ne_group
+            ,p_rec_ne.ne_no_start
+            ,p_rec_ne.ne_no_end
+            ,p_rec_ne.ne_sub_class
+            ,p_rec_ne.ne_nsg_ref
+            ,p_rec_ne.ne_version_no
+            );
+--
+   p_rec_ne := nm3get.get_ne
+                   (pi_ne_id             => p_rec_ne.ne_id
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_ne');
+--
+END ins_ne;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ne_all (p_rec_ne_all IN OUT nm_elements_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ne_all');
+--
+   p_rec_ne_all.ne_start_date                  := NVL(p_rec_ne_all.ne_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_elements_all
+            (ne_id
+            ,ne_unique
+            ,ne_type
+            ,ne_nt_type
+            ,ne_descr
+            ,ne_length
+            ,ne_admin_unit
+            ,ne_date_created
+            ,ne_date_modified
+            ,ne_modified_by
+            ,ne_created_by
+            ,ne_start_date
+            ,ne_end_date
+            ,ne_gty_group_type
+            ,ne_owner
+            ,ne_name_1
+            ,ne_name_2
+            ,ne_prefix
+            ,ne_number
+            ,ne_sub_type
+            ,ne_group
+            ,ne_no_start
+            ,ne_no_end
+            ,ne_sub_class
+            ,ne_nsg_ref
+            ,ne_version_no
+            )
+     VALUES (p_rec_ne_all.ne_id
+            ,p_rec_ne_all.ne_unique
+            ,p_rec_ne_all.ne_type
+            ,p_rec_ne_all.ne_nt_type
+            ,p_rec_ne_all.ne_descr
+            ,p_rec_ne_all.ne_length
+            ,p_rec_ne_all.ne_admin_unit
+            ,p_rec_ne_all.ne_date_created
+            ,p_rec_ne_all.ne_date_modified
+            ,p_rec_ne_all.ne_modified_by
+            ,p_rec_ne_all.ne_created_by
+            ,p_rec_ne_all.ne_start_date
+            ,p_rec_ne_all.ne_end_date
+            ,p_rec_ne_all.ne_gty_group_type
+            ,p_rec_ne_all.ne_owner
+            ,p_rec_ne_all.ne_name_1
+            ,p_rec_ne_all.ne_name_2
+            ,p_rec_ne_all.ne_prefix
+            ,p_rec_ne_all.ne_number
+            ,p_rec_ne_all.ne_sub_type
+            ,p_rec_ne_all.ne_group
+            ,p_rec_ne_all.ne_no_start
+            ,p_rec_ne_all.ne_no_end
+            ,p_rec_ne_all.ne_sub_class
+            ,p_rec_ne_all.ne_nsg_ref
+            ,p_rec_ne_all.ne_version_no
+            )
+   RETURNING ne_id
+            ,ne_unique
+            ,ne_type
+            ,ne_nt_type
+            ,ne_descr
+            ,ne_length
+            ,ne_admin_unit
+            ,ne_date_created
+            ,ne_date_modified
+            ,ne_modified_by
+            ,ne_created_by
+            ,ne_start_date
+            ,ne_end_date
+            ,ne_gty_group_type
+            ,ne_owner
+            ,ne_name_1
+            ,ne_name_2
+            ,ne_prefix
+            ,ne_number
+            ,ne_sub_type
+            ,ne_group
+            ,ne_no_start
+            ,ne_no_end
+            ,ne_sub_class
+            ,ne_nsg_ref
+            ,ne_version_no
+      INTO   p_rec_ne_all.ne_id
+            ,p_rec_ne_all.ne_unique
+            ,p_rec_ne_all.ne_type
+            ,p_rec_ne_all.ne_nt_type
+            ,p_rec_ne_all.ne_descr
+            ,p_rec_ne_all.ne_length
+            ,p_rec_ne_all.ne_admin_unit
+            ,p_rec_ne_all.ne_date_created
+            ,p_rec_ne_all.ne_date_modified
+            ,p_rec_ne_all.ne_modified_by
+            ,p_rec_ne_all.ne_created_by
+            ,p_rec_ne_all.ne_start_date
+            ,p_rec_ne_all.ne_end_date
+            ,p_rec_ne_all.ne_gty_group_type
+            ,p_rec_ne_all.ne_owner
+            ,p_rec_ne_all.ne_name_1
+            ,p_rec_ne_all.ne_name_2
+            ,p_rec_ne_all.ne_prefix
+            ,p_rec_ne_all.ne_number
+            ,p_rec_ne_all.ne_sub_type
+            ,p_rec_ne_all.ne_group
+            ,p_rec_ne_all.ne_no_start
+            ,p_rec_ne_all.ne_no_end
+            ,p_rec_ne_all.ne_sub_class
+            ,p_rec_ne_all.ne_nsg_ref
+            ,p_rec_ne_all.ne_version_no;
+--
+   nm_debug.proc_end(g_package_name,'ins_ne_all');
+--
+END ins_ne_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_neh (p_rec_neh IN OUT nm_element_history%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_neh');
+--
+   p_rec_neh.neh_actioned_date              := NVL(p_rec_neh.neh_actioned_date,trunc(sysdate) );
+   p_rec_neh.neh_actioned_by                := NVL(p_rec_neh.neh_actioned_by,user );
+--
+   INSERT INTO nm_element_history
+            (neh_id
+            ,neh_ne_id_old
+            ,neh_ne_id_new
+            ,neh_operation
+            ,neh_effective_date
+            ,neh_actioned_date
+            ,neh_actioned_by
+            ,neh_old_ne_length
+            ,neh_new_ne_length
+            ,neh_param_1
+            ,neh_param_2
+            ,neh_descr
+            )
+     VALUES (p_rec_neh.neh_id
+            ,p_rec_neh.neh_ne_id_old
+            ,p_rec_neh.neh_ne_id_new
+            ,p_rec_neh.neh_operation
+            ,p_rec_neh.neh_effective_date
+            ,p_rec_neh.neh_actioned_date
+            ,p_rec_neh.neh_actioned_by
+            ,p_rec_neh.neh_old_ne_length
+            ,p_rec_neh.neh_new_ne_length
+            ,p_rec_neh.neh_param_1
+            ,p_rec_neh.neh_param_2
+            ,p_rec_neh.neh_descr
+            )
+   RETURNING neh_id
+            ,neh_ne_id_old
+            ,neh_ne_id_new
+            ,neh_operation
+            ,neh_effective_date
+            ,neh_actioned_date
+            ,neh_actioned_by
+            ,neh_old_ne_length
+            ,neh_new_ne_length
+            ,neh_param_1
+            ,neh_param_2
+            ,neh_descr
+      INTO   p_rec_neh.neh_id
+            ,p_rec_neh.neh_ne_id_old
+            ,p_rec_neh.neh_ne_id_new
+            ,p_rec_neh.neh_operation
+            ,p_rec_neh.neh_effective_date
+            ,p_rec_neh.neh_actioned_date
+            ,p_rec_neh.neh_actioned_by
+            ,p_rec_neh.neh_old_ne_length
+            ,p_rec_neh.neh_new_ne_length
+            ,p_rec_neh.neh_param_1
+            ,p_rec_neh.neh_param_2
+            ,p_rec_neh.neh_descr;
+--
+   nm_debug.proc_end(g_package_name,'ins_neh');
+--
+END ins_neh;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ner (p_rec_ner IN OUT nm_errors%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ner');
+--
+--
+   INSERT INTO nm_errors
+            (ner_appl
+            ,ner_id
+            ,ner_her_no
+            ,ner_descr
+            ,ner_cause
+            )
+     VALUES (p_rec_ner.ner_appl
+            ,p_rec_ner.ner_id
+            ,p_rec_ner.ner_her_no
+            ,p_rec_ner.ner_descr
+            ,p_rec_ner.ner_cause
+            )
+   RETURNING ner_appl
+            ,ner_id
+            ,ner_her_no
+            ,ner_descr
+            ,ner_cause
+      INTO   p_rec_ner.ner_appl
+            ,p_rec_ner.ner_id
+            ,p_rec_ner.ner_her_no
+            ,p_rec_ner.ner_descr
+            ,p_rec_ner.ner_cause;
+--
+   nm_debug.proc_end(g_package_name,'ins_ner');
+--
+END ins_ner;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nea (p_rec_nea IN OUT nm_event_alert_mails%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nea');
+--
+   p_rec_nea.nea_send_type                  := NVL(p_rec_nea.nea_send_type,'TO' );
+--
+   INSERT INTO nm_event_alert_mails
+            (nea_recipient
+            ,nea_recipient_type
+            ,nea_send_type
+            ,nea_net_type
+            ,nea_severity
+            )
+     VALUES (p_rec_nea.nea_recipient
+            ,p_rec_nea.nea_recipient_type
+            ,p_rec_nea.nea_send_type
+            ,p_rec_nea.nea_net_type
+            ,p_rec_nea.nea_severity
+            )
+   RETURNING nea_recipient
+            ,nea_recipient_type
+            ,nea_send_type
+            ,nea_net_type
+            ,nea_severity
+      INTO   p_rec_nea.nea_recipient
+            ,p_rec_nea.nea_recipient_type
+            ,p_rec_nea.nea_send_type
+            ,p_rec_nea.nea_net_type
+            ,p_rec_nea.nea_severity;
+--
+   nm_debug.proc_end(g_package_name,'ins_nea');
+--
+END ins_nea;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nel (p_rec_nel IN OUT nm_event_log%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nel');
+--
+   p_rec_nel.nel_timestamp                  := NVL(p_rec_nel.nel_timestamp,sysdate );
+   p_rec_nel.nel_session                    := NVL(p_rec_nel.nel_session,sys_context('USERENV', 'SESSIONID') );
+   p_rec_nel.nel_severity                   := NVL(p_rec_nel.nel_severity,3 );
+--
+   INSERT INTO nm_event_log
+            (nel_id
+            ,nel_net_type
+            ,nel_timestamp
+            ,nel_terminal
+            ,nel_session
+            ,nel_source
+            ,nel_event
+            ,nel_severity
+            )
+     VALUES (p_rec_nel.nel_id
+            ,p_rec_nel.nel_net_type
+            ,p_rec_nel.nel_timestamp
+            ,p_rec_nel.nel_terminal
+            ,p_rec_nel.nel_session
+            ,p_rec_nel.nel_source
+            ,p_rec_nel.nel_event
+            ,p_rec_nel.nel_severity
+            )
+   RETURNING nel_id
+            ,nel_net_type
+            ,nel_timestamp
+            ,nel_terminal
+            ,nel_session
+            ,nel_source
+            ,nel_event
+            ,nel_severity
+      INTO   p_rec_nel.nel_id
+            ,p_rec_nel.nel_net_type
+            ,p_rec_nel.nel_timestamp
+            ,p_rec_nel.nel_terminal
+            ,p_rec_nel.nel_session
+            ,p_rec_nel.nel_source
+            ,p_rec_nel.nel_event
+            ,p_rec_nel.nel_severity;
+--
+   nm_debug.proc_end(g_package_name,'ins_nel');
+--
+END ins_nel;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_net (p_rec_net IN OUT nm_event_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_net');
+--
+--
+   INSERT INTO nm_event_types
+            (net_type
+            ,net_unique
+            ,net_descr
+            )
+     VALUES (p_rec_net.net_type
+            ,p_rec_net.net_unique
+            ,p_rec_net.net_descr
+            )
+   RETURNING net_type
+            ,net_unique
+            ,net_descr
+      INTO   p_rec_net.net_type
+            ,p_rec_net.net_unique
+            ,p_rec_net.net_descr;
+--
+   nm_debug.proc_end(g_package_name,'ins_net');
+--
+END ins_net;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nfp (p_rec_nfp IN OUT nm_fill_patterns%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nfp');
+--
+--
+   INSERT INTO nm_fill_patterns
+            (nfp_id
+            ,nfp_descr
+            )
+     VALUES (p_rec_nfp.nfp_id
+            ,p_rec_nfp.nfp_descr
+            )
+   RETURNING nfp_id
+            ,nfp_descr
+      INTO   p_rec_nfp.nfp_id
+            ,p_rec_nfp.nfp_descr;
+--
+   nm_debug.proc_end(g_package_name,'ins_nfp');
+--
+END ins_nfp;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ngq (p_rec_ngq IN OUT nm_gaz_query%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ngq');
+--
+   p_rec_ngq.ngq_open_or_closed             := NVL(p_rec_ngq.ngq_open_or_closed,'C' );
+   p_rec_ngq.ngq_items_or_area              := NVL(p_rec_ngq.ngq_items_or_area,'A' );
+   p_rec_ngq.ngq_query_all_items            := NVL(p_rec_ngq.ngq_query_all_items,'N' );
+--
+   INSERT INTO nm_gaz_query
+            (ngq_id
+            ,ngq_source_id
+            ,ngq_source
+            ,ngq_open_or_closed
+            ,ngq_items_or_area
+            ,ngq_query_all_items
+            ,ngq_begin_mp
+            ,ngq_begin_datum_ne_id
+            ,ngq_begin_datum_offset
+            ,ngq_end_mp
+            ,ngq_end_datum_ne_id
+            ,ngq_end_datum_offset
+            ,ngq_ambig_sub_class
+            )
+     VALUES (p_rec_ngq.ngq_id
+            ,p_rec_ngq.ngq_source_id
+            ,p_rec_ngq.ngq_source
+            ,p_rec_ngq.ngq_open_or_closed
+            ,p_rec_ngq.ngq_items_or_area
+            ,p_rec_ngq.ngq_query_all_items
+            ,p_rec_ngq.ngq_begin_mp
+            ,p_rec_ngq.ngq_begin_datum_ne_id
+            ,p_rec_ngq.ngq_begin_datum_offset
+            ,p_rec_ngq.ngq_end_mp
+            ,p_rec_ngq.ngq_end_datum_ne_id
+            ,p_rec_ngq.ngq_end_datum_offset
+            ,p_rec_ngq.ngq_ambig_sub_class
+            )
+   RETURNING ngq_id
+            ,ngq_source_id
+            ,ngq_source
+            ,ngq_open_or_closed
+            ,ngq_items_or_area
+            ,ngq_query_all_items
+            ,ngq_begin_mp
+            ,ngq_begin_datum_ne_id
+            ,ngq_begin_datum_offset
+            ,ngq_end_mp
+            ,ngq_end_datum_ne_id
+            ,ngq_end_datum_offset
+            ,ngq_ambig_sub_class
+      INTO   p_rec_ngq.ngq_id
+            ,p_rec_ngq.ngq_source_id
+            ,p_rec_ngq.ngq_source
+            ,p_rec_ngq.ngq_open_or_closed
+            ,p_rec_ngq.ngq_items_or_area
+            ,p_rec_ngq.ngq_query_all_items
+            ,p_rec_ngq.ngq_begin_mp
+            ,p_rec_ngq.ngq_begin_datum_ne_id
+            ,p_rec_ngq.ngq_begin_datum_offset
+            ,p_rec_ngq.ngq_end_mp
+            ,p_rec_ngq.ngq_end_datum_ne_id
+            ,p_rec_ngq.ngq_end_datum_offset
+            ,p_rec_ngq.ngq_ambig_sub_class;
+--
+   nm_debug.proc_end(g_package_name,'ins_ngq');
+--
+END ins_ngq;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ngqt (p_rec_ngqt IN OUT nm_gaz_query_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ngqt');
+--
+--
+   INSERT INTO nm_gaz_query_types
+            (ngqt_ngq_id
+            ,ngqt_seq_no
+            ,ngqt_item_type_type
+            ,ngqt_item_type
+            )
+     VALUES (p_rec_ngqt.ngqt_ngq_id
+            ,p_rec_ngqt.ngqt_seq_no
+            ,p_rec_ngqt.ngqt_item_type_type
+            ,p_rec_ngqt.ngqt_item_type
+            )
+   RETURNING ngqt_ngq_id
+            ,ngqt_seq_no
+            ,ngqt_item_type_type
+            ,ngqt_item_type
+      INTO   p_rec_ngqt.ngqt_ngq_id
+            ,p_rec_ngqt.ngqt_seq_no
+            ,p_rec_ngqt.ngqt_item_type_type
+            ,p_rec_ngqt.ngqt_item_type;
+--
+   nm_debug.proc_end(g_package_name,'ins_ngqt');
+--
+END ins_ngqt;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ngqa (p_rec_ngqa IN OUT nm_gaz_query_attribs%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ngqa');
+--
+   p_rec_ngqa.ngqa_operator                  := NVL(p_rec_ngqa.ngqa_operator,'AND' );
+--
+   INSERT INTO nm_gaz_query_attribs
+            (ngqa_ngq_id
+            ,ngqa_ngqt_seq_no
+            ,ngqa_seq_no
+            ,ngqa_attrib_name
+            ,ngqa_operator
+            ,ngqa_pre_bracket
+            ,ngqa_post_bracket
+            ,ngqa_condition
+            )
+     VALUES (p_rec_ngqa.ngqa_ngq_id
+            ,p_rec_ngqa.ngqa_ngqt_seq_no
+            ,p_rec_ngqa.ngqa_seq_no
+            ,p_rec_ngqa.ngqa_attrib_name
+            ,p_rec_ngqa.ngqa_operator
+            ,p_rec_ngqa.ngqa_pre_bracket
+            ,p_rec_ngqa.ngqa_post_bracket
+            ,p_rec_ngqa.ngqa_condition
+            )
+   RETURNING ngqa_ngq_id
+            ,ngqa_ngqt_seq_no
+            ,ngqa_seq_no
+            ,ngqa_attrib_name
+            ,ngqa_operator
+            ,ngqa_pre_bracket
+            ,ngqa_post_bracket
+            ,ngqa_condition
+      INTO   p_rec_ngqa.ngqa_ngq_id
+            ,p_rec_ngqa.ngqa_ngqt_seq_no
+            ,p_rec_ngqa.ngqa_seq_no
+            ,p_rec_ngqa.ngqa_attrib_name
+            ,p_rec_ngqa.ngqa_operator
+            ,p_rec_ngqa.ngqa_pre_bracket
+            ,p_rec_ngqa.ngqa_post_bracket
+            ,p_rec_ngqa.ngqa_condition;
+--
+   nm_debug.proc_end(g_package_name,'ins_ngqa');
+--
+END ins_ngqa;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ngqv (p_rec_ngqv IN OUT nm_gaz_query_values%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ngqv');
+--
+--
+   INSERT INTO nm_gaz_query_values
+            (ngqv_ngq_id
+            ,ngqv_ngqt_seq_no
+            ,ngqv_ngqa_seq_no
+            ,ngqv_sequence
+            ,ngqv_value
+            )
+     VALUES (p_rec_ngqv.ngqv_ngq_id
+            ,p_rec_ngqv.ngqv_ngqt_seq_no
+            ,p_rec_ngqv.ngqv_ngqa_seq_no
+            ,p_rec_ngqv.ngqv_sequence
+            ,p_rec_ngqv.ngqv_value
+            )
+   RETURNING ngqv_ngq_id
+            ,ngqv_ngqt_seq_no
+            ,ngqv_ngqa_seq_no
+            ,ngqv_sequence
+            ,ngqv_value
+      INTO   p_rec_ngqv.ngqv_ngq_id
+            ,p_rec_ngqv.ngqv_ngqt_seq_no
+            ,p_rec_ngqv.ngqv_ngqa_seq_no
+            ,p_rec_ngqv.ngqv_sequence
+            ,p_rec_ngqv.ngqv_value;
+--
+   nm_debug.proc_end(g_package_name,'ins_ngqv');
+--
+END ins_ngqv;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ngit (p_rec_ngit IN OUT nm_group_inv_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ngit');
+--
+--
+   INSERT INTO nm_group_inv_types
+            (ngit_ngt_group_type
+            ,ngit_nit_inv_type
+            )
+     VALUES (p_rec_ngit.ngit_ngt_group_type
+            ,p_rec_ngit.ngit_nit_inv_type
+            )
+   RETURNING ngit_ngt_group_type
+            ,ngit_nit_inv_type
+      INTO   p_rec_ngit.ngit_ngt_group_type
+            ,p_rec_ngit.ngit_nit_inv_type;
+--
+   nm_debug.proc_end(g_package_name,'ins_ngit');
+--
+END ins_ngit;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ngil (p_rec_ngil IN OUT nm_group_inv_link%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ngil');
+--
+   p_rec_ngil.ngil_start_date                := NVL(p_rec_ngil.ngil_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_group_inv_link
+            (ngil_ne_ne_id
+            ,ngil_iit_ne_id
+            ,ngil_start_date
+            ,ngil_end_date
+            )
+     VALUES (p_rec_ngil.ngil_ne_ne_id
+            ,p_rec_ngil.ngil_iit_ne_id
+            ,p_rec_ngil.ngil_start_date
+            ,p_rec_ngil.ngil_end_date
+            );
+--
+   p_rec_ngil := nm3get.get_ngil
+                   (pi_ngil_ne_ne_id     => p_rec_ngil.ngil_ne_ne_id
+                   ,pi_ngil_iit_ne_id    => p_rec_ngil.ngil_iit_ne_id
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_ngil');
+--
+END ins_ngil;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ngil_all (p_rec_ngil_all IN OUT nm_group_inv_link_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ngil_all');
+--
+   p_rec_ngil_all.ngil_start_date                := NVL(p_rec_ngil_all.ngil_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_group_inv_link_all
+            (ngil_ne_ne_id
+            ,ngil_iit_ne_id
+            ,ngil_start_date
+            ,ngil_end_date
+            )
+     VALUES (p_rec_ngil_all.ngil_ne_ne_id
+            ,p_rec_ngil_all.ngil_iit_ne_id
+            ,p_rec_ngil_all.ngil_start_date
+            ,p_rec_ngil_all.ngil_end_date
+            )
+   RETURNING ngil_ne_ne_id
+            ,ngil_iit_ne_id
+            ,ngil_start_date
+            ,ngil_end_date
+      INTO   p_rec_ngil_all.ngil_ne_ne_id
+            ,p_rec_ngil_all.ngil_iit_ne_id
+            ,p_rec_ngil_all.ngil_start_date
+            ,p_rec_ngil_all.ngil_end_date;
+--
+   nm_debug.proc_end(g_package_name,'ins_ngil_all');
+--
+END ins_ngil_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ngr (p_rec_ngr IN OUT nm_group_relations%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ngr');
+--
+   p_rec_ngr.ngr_start_date                 := NVL(p_rec_ngr.ngr_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_group_relations
+            (ngr_parent_group_type
+            ,ngr_child_group_type
+            ,ngr_start_date
+            ,ngr_end_date
+            )
+     VALUES (p_rec_ngr.ngr_parent_group_type
+            ,p_rec_ngr.ngr_child_group_type
+            ,p_rec_ngr.ngr_start_date
+            ,p_rec_ngr.ngr_end_date
+            );
+--
+   p_rec_ngr := nm3get.get_ngr
+                   (pi_ngr_parent_group_type => p_rec_ngr.ngr_parent_group_type
+                   ,pi_ngr_child_group_type  => p_rec_ngr.ngr_child_group_type
+                   ,pi_ngr_start_date        => p_rec_ngr.ngr_start_date
+                   ,pi_raise_not_found       => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_ngr');
+--
+END ins_ngr;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ngr_all (p_rec_ngr_all IN OUT nm_group_relations_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ngr_all');
+--
+   p_rec_ngr_all.ngr_start_date                 := NVL(p_rec_ngr_all.ngr_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_group_relations_all
+            (ngr_parent_group_type
+            ,ngr_child_group_type
+            ,ngr_start_date
+            ,ngr_end_date
+            )
+     VALUES (p_rec_ngr_all.ngr_parent_group_type
+            ,p_rec_ngr_all.ngr_child_group_type
+            ,p_rec_ngr_all.ngr_start_date
+            ,p_rec_ngr_all.ngr_end_date
+            )
+   RETURNING ngr_parent_group_type
+            ,ngr_child_group_type
+            ,ngr_start_date
+            ,ngr_end_date
+      INTO   p_rec_ngr_all.ngr_parent_group_type
+            ,p_rec_ngr_all.ngr_child_group_type
+            ,p_rec_ngr_all.ngr_start_date
+            ,p_rec_ngr_all.ngr_end_date;
+--
+   nm_debug.proc_end(g_package_name,'ins_ngr_all');
+--
+END ins_ngr_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ngt (p_rec_ngt IN OUT nm_group_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ngt');
+--
+   p_rec_ngt.ngt_partial                    := NVL(p_rec_ngt.ngt_partial,'N' );
+   p_rec_ngt.ngt_start_date                 := NVL(p_rec_ngt.ngt_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_ngt.ngt_sub_group_allowed          := NVL(p_rec_ngt.ngt_sub_group_allowed,'N' );
+   p_rec_ngt.ngt_mandatory                  := NVL(p_rec_ngt.ngt_mandatory,'N' );
+   p_rec_ngt.ngt_reverse_allowed            := NVL(p_rec_ngt.ngt_reverse_allowed,'N' );
+--
+   INSERT INTO nm_group_types
+            (ngt_group_type
+            ,ngt_descr
+            ,ngt_exclusive_flag
+            ,ngt_search_group_no
+            ,ngt_linear_flag
+            ,ngt_nt_type
+            ,ngt_partial
+            ,ngt_start_date
+            ,ngt_end_date
+            ,ngt_sub_group_allowed
+            ,ngt_mandatory
+            ,ngt_reverse_allowed
+            ,ngt_icon_name
+            )
+     VALUES (p_rec_ngt.ngt_group_type
+            ,p_rec_ngt.ngt_descr
+            ,p_rec_ngt.ngt_exclusive_flag
+            ,p_rec_ngt.ngt_search_group_no
+            ,p_rec_ngt.ngt_linear_flag
+            ,p_rec_ngt.ngt_nt_type
+            ,p_rec_ngt.ngt_partial
+            ,p_rec_ngt.ngt_start_date
+            ,p_rec_ngt.ngt_end_date
+            ,p_rec_ngt.ngt_sub_group_allowed
+            ,p_rec_ngt.ngt_mandatory
+            ,p_rec_ngt.ngt_reverse_allowed
+            ,p_rec_ngt.ngt_icon_name
+            );
+--
+   p_rec_ngt := nm3get.get_ngt
+                   (pi_ngt_group_type    => p_rec_ngt.ngt_group_type
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_ngt');
+--
+END ins_ngt;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ngt_all (p_rec_ngt_all IN OUT nm_group_types_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ngt_all');
+--
+   p_rec_ngt_all.ngt_partial                    := NVL(p_rec_ngt_all.ngt_partial,'N' );
+   p_rec_ngt_all.ngt_start_date                 := NVL(p_rec_ngt_all.ngt_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_ngt_all.ngt_sub_group_allowed          := NVL(p_rec_ngt_all.ngt_sub_group_allowed,'N' );
+   p_rec_ngt_all.ngt_mandatory                  := NVL(p_rec_ngt_all.ngt_mandatory,'N' );
+   p_rec_ngt_all.ngt_reverse_allowed            := NVL(p_rec_ngt_all.ngt_reverse_allowed,'N' );
+--
+   INSERT INTO nm_group_types_all
+            (ngt_group_type
+            ,ngt_descr
+            ,ngt_exclusive_flag
+            ,ngt_search_group_no
+            ,ngt_linear_flag
+            ,ngt_nt_type
+            ,ngt_partial
+            ,ngt_start_date
+            ,ngt_end_date
+            ,ngt_sub_group_allowed
+            ,ngt_mandatory
+            ,ngt_reverse_allowed
+            ,ngt_icon_name
+            )
+     VALUES (p_rec_ngt_all.ngt_group_type
+            ,p_rec_ngt_all.ngt_descr
+            ,p_rec_ngt_all.ngt_exclusive_flag
+            ,p_rec_ngt_all.ngt_search_group_no
+            ,p_rec_ngt_all.ngt_linear_flag
+            ,p_rec_ngt_all.ngt_nt_type
+            ,p_rec_ngt_all.ngt_partial
+            ,p_rec_ngt_all.ngt_start_date
+            ,p_rec_ngt_all.ngt_end_date
+            ,p_rec_ngt_all.ngt_sub_group_allowed
+            ,p_rec_ngt_all.ngt_mandatory
+            ,p_rec_ngt_all.ngt_reverse_allowed
+            ,p_rec_ngt_all.ngt_icon_name
+            )
+   RETURNING ngt_group_type
+            ,ngt_descr
+            ,ngt_exclusive_flag
+            ,ngt_search_group_no
+            ,ngt_linear_flag
+            ,ngt_nt_type
+            ,ngt_partial
+            ,ngt_start_date
+            ,ngt_end_date
+            ,ngt_sub_group_allowed
+            ,ngt_mandatory
+            ,ngt_reverse_allowed
+            ,ngt_icon_name
+      INTO   p_rec_ngt_all.ngt_group_type
+            ,p_rec_ngt_all.ngt_descr
+            ,p_rec_ngt_all.ngt_exclusive_flag
+            ,p_rec_ngt_all.ngt_search_group_no
+            ,p_rec_ngt_all.ngt_linear_flag
+            ,p_rec_ngt_all.ngt_nt_type
+            ,p_rec_ngt_all.ngt_partial
+            ,p_rec_ngt_all.ngt_start_date
+            ,p_rec_ngt_all.ngt_end_date
+            ,p_rec_ngt_all.ngt_sub_group_allowed
+            ,p_rec_ngt_all.ngt_mandatory
+            ,p_rec_ngt_all.ngt_reverse_allowed
+            ,p_rec_ngt_all.ngt_icon_name;
+--
+   nm_debug.proc_end(g_package_name,'ins_ngt_all');
+--
+END ins_ngt_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ial (p_rec_ial IN OUT nm_inv_attri_lookup%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ial');
+--
+   p_rec_ial.ial_start_date                 := NVL(p_rec_ial.ial_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_inv_attri_lookup
+            (ial_domain
+            ,ial_value
+            ,ial_dtp_code
+            ,ial_meaning
+            ,ial_start_date
+            ,ial_end_date
+            ,ial_seq
+            ,ial_nva_id
+            ,ial_date_created
+            ,ial_date_modified
+            ,ial_modified_by
+            ,ial_created_by
+            )
+     VALUES (p_rec_ial.ial_domain
+            ,p_rec_ial.ial_value
+            ,p_rec_ial.ial_dtp_code
+            ,p_rec_ial.ial_meaning
+            ,p_rec_ial.ial_start_date
+            ,p_rec_ial.ial_end_date
+            ,p_rec_ial.ial_seq
+            ,p_rec_ial.ial_nva_id
+            ,p_rec_ial.ial_date_created
+            ,p_rec_ial.ial_date_modified
+            ,p_rec_ial.ial_modified_by
+            ,p_rec_ial.ial_created_by
+            );
+--
+   p_rec_ial := nm3get.get_ial
+                   (pi_ial_domain        => p_rec_ial.ial_domain
+                   ,pi_ial_value         => p_rec_ial.ial_value
+                   ,pi_ial_start_date    => p_rec_ial.ial_start_date
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_ial');
+--
+END ins_ial;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ial_all (p_rec_ial_all IN OUT nm_inv_attri_lookup_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ial_all');
+--
+   p_rec_ial_all.ial_start_date                 := NVL(p_rec_ial_all.ial_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_inv_attri_lookup_all
+            (ial_domain
+            ,ial_value
+            ,ial_dtp_code
+            ,ial_meaning
+            ,ial_start_date
+            ,ial_end_date
+            ,ial_seq
+            ,ial_nva_id
+            ,ial_date_created
+            ,ial_date_modified
+            ,ial_modified_by
+            ,ial_created_by
+            )
+     VALUES (p_rec_ial_all.ial_domain
+            ,p_rec_ial_all.ial_value
+            ,p_rec_ial_all.ial_dtp_code
+            ,p_rec_ial_all.ial_meaning
+            ,p_rec_ial_all.ial_start_date
+            ,p_rec_ial_all.ial_end_date
+            ,p_rec_ial_all.ial_seq
+            ,p_rec_ial_all.ial_nva_id
+            ,p_rec_ial_all.ial_date_created
+            ,p_rec_ial_all.ial_date_modified
+            ,p_rec_ial_all.ial_modified_by
+            ,p_rec_ial_all.ial_created_by
+            )
+   RETURNING ial_domain
+            ,ial_value
+            ,ial_dtp_code
+            ,ial_meaning
+            ,ial_start_date
+            ,ial_end_date
+            ,ial_seq
+            ,ial_nva_id
+            ,ial_date_created
+            ,ial_date_modified
+            ,ial_modified_by
+            ,ial_created_by
+      INTO   p_rec_ial_all.ial_domain
+            ,p_rec_ial_all.ial_value
+            ,p_rec_ial_all.ial_dtp_code
+            ,p_rec_ial_all.ial_meaning
+            ,p_rec_ial_all.ial_start_date
+            ,p_rec_ial_all.ial_end_date
+            ,p_rec_ial_all.ial_seq
+            ,p_rec_ial_all.ial_nva_id
+            ,p_rec_ial_all.ial_date_created
+            ,p_rec_ial_all.ial_date_modified
+            ,p_rec_ial_all.ial_modified_by
+            ,p_rec_ial_all.ial_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_ial_all');
+--
+END ins_ial_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nic (p_rec_nic IN OUT nm_inv_categories%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nic');
+--
+--
+   INSERT INTO nm_inv_categories
+            (nic_category
+            ,nic_descr
+            )
+     VALUES (p_rec_nic.nic_category
+            ,p_rec_nic.nic_descr
+            )
+   RETURNING nic_category
+            ,nic_descr
+      INTO   p_rec_nic.nic_category
+            ,p_rec_nic.nic_descr;
+--
+   nm_debug.proc_end(g_package_name,'ins_nic');
+--
+END ins_nic;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_icm (p_rec_icm IN OUT nm_inv_category_modules%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_icm');
+--
+   p_rec_icm.icm_updatable                  := NVL(p_rec_icm.icm_updatable,'Y' );
+--
+   INSERT INTO nm_inv_category_modules
+            (icm_nic_category
+            ,icm_hmo_module
+            ,icm_updatable
+            )
+     VALUES (p_rec_icm.icm_nic_category
+            ,p_rec_icm.icm_hmo_module
+            ,p_rec_icm.icm_updatable
+            )
+   RETURNING icm_nic_category
+            ,icm_hmo_module
+            ,icm_updatable
+      INTO   p_rec_icm.icm_nic_category
+            ,p_rec_icm.icm_hmo_module
+            ,p_rec_icm.icm_updatable;
+--
+   nm_debug.proc_end(g_package_name,'ins_icm');
+--
+END ins_icm;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_id (p_rec_id IN OUT nm_inv_domains%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_id');
+--
+   p_rec_id.id_start_date                  := NVL(p_rec_id.id_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_id.id_datatype                    := NVL(p_rec_id.id_datatype,'VARCHAR2' );
+--
+   INSERT INTO nm_inv_domains
+            (id_domain
+            ,id_title
+            ,id_start_date
+            ,id_end_date
+            ,id_datatype
+            ,id_date_created
+            ,id_date_modified
+            ,id_modified_by
+            ,id_created_by
+            )
+     VALUES (p_rec_id.id_domain
+            ,p_rec_id.id_title
+            ,p_rec_id.id_start_date
+            ,p_rec_id.id_end_date
+            ,p_rec_id.id_datatype
+            ,p_rec_id.id_date_created
+            ,p_rec_id.id_date_modified
+            ,p_rec_id.id_modified_by
+            ,p_rec_id.id_created_by
+            );
+--
+   p_rec_id := nm3get.get_id
+                   (pi_id_domain         => p_rec_id.id_domain
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_id');
+--
+END ins_id;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_id_all (p_rec_id_all IN OUT nm_inv_domains_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_id_all');
+--
+   p_rec_id_all.id_start_date                  := NVL(p_rec_id_all.id_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_id_all.id_datatype                    := NVL(p_rec_id_all.id_datatype,'VARCHAR2' );
+--
+   INSERT INTO nm_inv_domains_all
+            (id_domain
+            ,id_title
+            ,id_start_date
+            ,id_end_date
+            ,id_datatype
+            ,id_date_created
+            ,id_date_modified
+            ,id_modified_by
+            ,id_created_by
+            )
+     VALUES (p_rec_id_all.id_domain
+            ,p_rec_id_all.id_title
+            ,p_rec_id_all.id_start_date
+            ,p_rec_id_all.id_end_date
+            ,p_rec_id_all.id_datatype
+            ,p_rec_id_all.id_date_created
+            ,p_rec_id_all.id_date_modified
+            ,p_rec_id_all.id_modified_by
+            ,p_rec_id_all.id_created_by
+            )
+   RETURNING id_domain
+            ,id_title
+            ,id_start_date
+            ,id_end_date
+            ,id_datatype
+            ,id_date_created
+            ,id_date_modified
+            ,id_modified_by
+            ,id_created_by
+      INTO   p_rec_id_all.id_domain
+            ,p_rec_id_all.id_title
+            ,p_rec_id_all.id_start_date
+            ,p_rec_id_all.id_end_date
+            ,p_rec_id_all.id_datatype
+            ,p_rec_id_all.id_date_created
+            ,p_rec_id_all.id_date_modified
+            ,p_rec_id_all.id_modified_by
+            ,p_rec_id_all.id_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_id_all');
+--
+END ins_id_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_iit (p_rec_iit IN OUT nm_inv_items%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_iit');
+--
+   p_rec_iit.iit_start_date                 := NVL(p_rec_iit.iit_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_inv_items
+            (iit_ne_id
+            ,iit_inv_type
+            ,iit_primary_key
+            ,iit_start_date
+            ,iit_date_created
+            ,iit_date_modified
+            ,iit_created_by
+            ,iit_modified_by
+            ,iit_admin_unit
+            ,iit_descr
+            ,iit_end_date
+            ,iit_foreign_key
+            ,iit_located_by
+            ,iit_position
+            ,iit_x_coord
+            ,iit_y_coord
+            ,iit_num_attrib16
+            ,iit_num_attrib17
+            ,iit_num_attrib18
+            ,iit_num_attrib19
+            ,iit_num_attrib20
+            ,iit_num_attrib21
+            ,iit_num_attrib22
+            ,iit_num_attrib23
+            ,iit_num_attrib24
+            ,iit_num_attrib25
+            ,iit_chr_attrib26
+            ,iit_chr_attrib27
+            ,iit_chr_attrib28
+            ,iit_chr_attrib29
+            ,iit_chr_attrib30
+            ,iit_chr_attrib31
+            ,iit_chr_attrib32
+            ,iit_chr_attrib33
+            ,iit_chr_attrib34
+            ,iit_chr_attrib35
+            ,iit_chr_attrib36
+            ,iit_chr_attrib37
+            ,iit_chr_attrib38
+            ,iit_chr_attrib39
+            ,iit_chr_attrib40
+            ,iit_chr_attrib41
+            ,iit_chr_attrib42
+            ,iit_chr_attrib43
+            ,iit_chr_attrib44
+            ,iit_chr_attrib45
+            ,iit_chr_attrib46
+            ,iit_chr_attrib47
+            ,iit_chr_attrib48
+            ,iit_chr_attrib49
+            ,iit_chr_attrib50
+            ,iit_chr_attrib51
+            ,iit_chr_attrib52
+            ,iit_chr_attrib53
+            ,iit_chr_attrib54
+            ,iit_chr_attrib55
+            ,iit_chr_attrib56
+            ,iit_chr_attrib57
+            ,iit_chr_attrib58
+            ,iit_chr_attrib59
+            ,iit_chr_attrib60
+            ,iit_chr_attrib61
+            ,iit_chr_attrib62
+            ,iit_chr_attrib63
+            ,iit_chr_attrib64
+            ,iit_chr_attrib65
+            ,iit_chr_attrib66
+            ,iit_chr_attrib67
+            ,iit_chr_attrib68
+            ,iit_chr_attrib69
+            ,iit_chr_attrib70
+            ,iit_chr_attrib71
+            ,iit_chr_attrib72
+            ,iit_chr_attrib73
+            ,iit_chr_attrib74
+            ,iit_chr_attrib75
+            ,iit_num_attrib76
+            ,iit_num_attrib77
+            ,iit_num_attrib78
+            ,iit_num_attrib79
+            ,iit_num_attrib80
+            ,iit_num_attrib81
+            ,iit_num_attrib82
+            ,iit_num_attrib83
+            ,iit_num_attrib84
+            ,iit_num_attrib85
+            ,iit_date_attrib86
+            ,iit_date_attrib87
+            ,iit_date_attrib88
+            ,iit_date_attrib89
+            ,iit_date_attrib90
+            ,iit_date_attrib91
+            ,iit_date_attrib92
+            ,iit_date_attrib93
+            ,iit_date_attrib94
+            ,iit_date_attrib95
+            ,iit_angle
+            ,iit_angle_txt
+            ,iit_class
+            ,iit_class_txt
+            ,iit_colour
+            ,iit_colour_txt
+            ,iit_coord_flag
+            ,iit_description
+            ,iit_diagram
+            ,iit_distance
+            ,iit_end_chain
+            ,iit_gap
+            ,iit_height
+            ,iit_height_2
+            ,iit_id_code
+            ,iit_instal_date
+            ,iit_invent_date
+            ,iit_inv_ownership
+            ,iit_itemcode
+            ,iit_lco_lamp_config_id
+            ,iit_length
+            ,iit_material
+            ,iit_material_txt
+            ,iit_method
+            ,iit_method_txt
+            ,iit_note
+            ,iit_no_of_units
+            ,iit_options
+            ,iit_options_txt
+            ,iit_oun_org_id_elec_board
+            ,iit_owner
+            ,iit_owner_txt
+            ,iit_peo_invent_by_id
+            ,iit_photo
+            ,iit_power
+            ,iit_prov_flag
+            ,iit_rev_by
+            ,iit_rev_date
+            ,iit_type
+            ,iit_type_txt
+            ,iit_width
+            ,iit_xtra_char_1
+            ,iit_xtra_date_1
+            ,iit_xtra_domain_1
+            ,iit_xtra_domain_txt_1
+            ,iit_xtra_number_1
+            ,iit_x_sect
+            ,iit_det_xsp
+            ,iit_offset
+            ,iit_x
+            ,iit_y
+            ,iit_z
+            ,iit_num_attrib96
+            ,iit_num_attrib97
+            ,iit_num_attrib98
+            ,iit_num_attrib99
+            ,iit_num_attrib100
+            ,iit_num_attrib101
+            ,iit_num_attrib102
+            ,iit_num_attrib103
+            ,iit_num_attrib104
+            ,iit_num_attrib105
+            ,iit_num_attrib106
+            ,iit_num_attrib107
+            ,iit_num_attrib108
+            ,iit_num_attrib109
+            ,iit_num_attrib110
+            ,iit_num_attrib111
+            ,iit_num_attrib112
+            ,iit_num_attrib113
+            ,iit_num_attrib114
+            ,iit_num_attrib115
+            )
+     VALUES (p_rec_iit.iit_ne_id
+            ,p_rec_iit.iit_inv_type
+            ,p_rec_iit.iit_primary_key
+            ,p_rec_iit.iit_start_date
+            ,p_rec_iit.iit_date_created
+            ,p_rec_iit.iit_date_modified
+            ,p_rec_iit.iit_created_by
+            ,p_rec_iit.iit_modified_by
+            ,p_rec_iit.iit_admin_unit
+            ,p_rec_iit.iit_descr
+            ,p_rec_iit.iit_end_date
+            ,p_rec_iit.iit_foreign_key
+            ,p_rec_iit.iit_located_by
+            ,p_rec_iit.iit_position
+            ,p_rec_iit.iit_x_coord
+            ,p_rec_iit.iit_y_coord
+            ,p_rec_iit.iit_num_attrib16
+            ,p_rec_iit.iit_num_attrib17
+            ,p_rec_iit.iit_num_attrib18
+            ,p_rec_iit.iit_num_attrib19
+            ,p_rec_iit.iit_num_attrib20
+            ,p_rec_iit.iit_num_attrib21
+            ,p_rec_iit.iit_num_attrib22
+            ,p_rec_iit.iit_num_attrib23
+            ,p_rec_iit.iit_num_attrib24
+            ,p_rec_iit.iit_num_attrib25
+            ,p_rec_iit.iit_chr_attrib26
+            ,p_rec_iit.iit_chr_attrib27
+            ,p_rec_iit.iit_chr_attrib28
+            ,p_rec_iit.iit_chr_attrib29
+            ,p_rec_iit.iit_chr_attrib30
+            ,p_rec_iit.iit_chr_attrib31
+            ,p_rec_iit.iit_chr_attrib32
+            ,p_rec_iit.iit_chr_attrib33
+            ,p_rec_iit.iit_chr_attrib34
+            ,p_rec_iit.iit_chr_attrib35
+            ,p_rec_iit.iit_chr_attrib36
+            ,p_rec_iit.iit_chr_attrib37
+            ,p_rec_iit.iit_chr_attrib38
+            ,p_rec_iit.iit_chr_attrib39
+            ,p_rec_iit.iit_chr_attrib40
+            ,p_rec_iit.iit_chr_attrib41
+            ,p_rec_iit.iit_chr_attrib42
+            ,p_rec_iit.iit_chr_attrib43
+            ,p_rec_iit.iit_chr_attrib44
+            ,p_rec_iit.iit_chr_attrib45
+            ,p_rec_iit.iit_chr_attrib46
+            ,p_rec_iit.iit_chr_attrib47
+            ,p_rec_iit.iit_chr_attrib48
+            ,p_rec_iit.iit_chr_attrib49
+            ,p_rec_iit.iit_chr_attrib50
+            ,p_rec_iit.iit_chr_attrib51
+            ,p_rec_iit.iit_chr_attrib52
+            ,p_rec_iit.iit_chr_attrib53
+            ,p_rec_iit.iit_chr_attrib54
+            ,p_rec_iit.iit_chr_attrib55
+            ,p_rec_iit.iit_chr_attrib56
+            ,p_rec_iit.iit_chr_attrib57
+            ,p_rec_iit.iit_chr_attrib58
+            ,p_rec_iit.iit_chr_attrib59
+            ,p_rec_iit.iit_chr_attrib60
+            ,p_rec_iit.iit_chr_attrib61
+            ,p_rec_iit.iit_chr_attrib62
+            ,p_rec_iit.iit_chr_attrib63
+            ,p_rec_iit.iit_chr_attrib64
+            ,p_rec_iit.iit_chr_attrib65
+            ,p_rec_iit.iit_chr_attrib66
+            ,p_rec_iit.iit_chr_attrib67
+            ,p_rec_iit.iit_chr_attrib68
+            ,p_rec_iit.iit_chr_attrib69
+            ,p_rec_iit.iit_chr_attrib70
+            ,p_rec_iit.iit_chr_attrib71
+            ,p_rec_iit.iit_chr_attrib72
+            ,p_rec_iit.iit_chr_attrib73
+            ,p_rec_iit.iit_chr_attrib74
+            ,p_rec_iit.iit_chr_attrib75
+            ,p_rec_iit.iit_num_attrib76
+            ,p_rec_iit.iit_num_attrib77
+            ,p_rec_iit.iit_num_attrib78
+            ,p_rec_iit.iit_num_attrib79
+            ,p_rec_iit.iit_num_attrib80
+            ,p_rec_iit.iit_num_attrib81
+            ,p_rec_iit.iit_num_attrib82
+            ,p_rec_iit.iit_num_attrib83
+            ,p_rec_iit.iit_num_attrib84
+            ,p_rec_iit.iit_num_attrib85
+            ,p_rec_iit.iit_date_attrib86
+            ,p_rec_iit.iit_date_attrib87
+            ,p_rec_iit.iit_date_attrib88
+            ,p_rec_iit.iit_date_attrib89
+            ,p_rec_iit.iit_date_attrib90
+            ,p_rec_iit.iit_date_attrib91
+            ,p_rec_iit.iit_date_attrib92
+            ,p_rec_iit.iit_date_attrib93
+            ,p_rec_iit.iit_date_attrib94
+            ,p_rec_iit.iit_date_attrib95
+            ,p_rec_iit.iit_angle
+            ,p_rec_iit.iit_angle_txt
+            ,p_rec_iit.iit_class
+            ,p_rec_iit.iit_class_txt
+            ,p_rec_iit.iit_colour
+            ,p_rec_iit.iit_colour_txt
+            ,p_rec_iit.iit_coord_flag
+            ,p_rec_iit.iit_description
+            ,p_rec_iit.iit_diagram
+            ,p_rec_iit.iit_distance
+            ,p_rec_iit.iit_end_chain
+            ,p_rec_iit.iit_gap
+            ,p_rec_iit.iit_height
+            ,p_rec_iit.iit_height_2
+            ,p_rec_iit.iit_id_code
+            ,p_rec_iit.iit_instal_date
+            ,p_rec_iit.iit_invent_date
+            ,p_rec_iit.iit_inv_ownership
+            ,p_rec_iit.iit_itemcode
+            ,p_rec_iit.iit_lco_lamp_config_id
+            ,p_rec_iit.iit_length
+            ,p_rec_iit.iit_material
+            ,p_rec_iit.iit_material_txt
+            ,p_rec_iit.iit_method
+            ,p_rec_iit.iit_method_txt
+            ,p_rec_iit.iit_note
+            ,p_rec_iit.iit_no_of_units
+            ,p_rec_iit.iit_options
+            ,p_rec_iit.iit_options_txt
+            ,p_rec_iit.iit_oun_org_id_elec_board
+            ,p_rec_iit.iit_owner
+            ,p_rec_iit.iit_owner_txt
+            ,p_rec_iit.iit_peo_invent_by_id
+            ,p_rec_iit.iit_photo
+            ,p_rec_iit.iit_power
+            ,p_rec_iit.iit_prov_flag
+            ,p_rec_iit.iit_rev_by
+            ,p_rec_iit.iit_rev_date
+            ,p_rec_iit.iit_type
+            ,p_rec_iit.iit_type_txt
+            ,p_rec_iit.iit_width
+            ,p_rec_iit.iit_xtra_char_1
+            ,p_rec_iit.iit_xtra_date_1
+            ,p_rec_iit.iit_xtra_domain_1
+            ,p_rec_iit.iit_xtra_domain_txt_1
+            ,p_rec_iit.iit_xtra_number_1
+            ,p_rec_iit.iit_x_sect
+            ,p_rec_iit.iit_det_xsp
+            ,p_rec_iit.iit_offset
+            ,p_rec_iit.iit_x
+            ,p_rec_iit.iit_y
+            ,p_rec_iit.iit_z
+            ,p_rec_iit.iit_num_attrib96
+            ,p_rec_iit.iit_num_attrib97
+            ,p_rec_iit.iit_num_attrib98
+            ,p_rec_iit.iit_num_attrib99
+            ,p_rec_iit.iit_num_attrib100
+            ,p_rec_iit.iit_num_attrib101
+            ,p_rec_iit.iit_num_attrib102
+            ,p_rec_iit.iit_num_attrib103
+            ,p_rec_iit.iit_num_attrib104
+            ,p_rec_iit.iit_num_attrib105
+            ,p_rec_iit.iit_num_attrib106
+            ,p_rec_iit.iit_num_attrib107
+            ,p_rec_iit.iit_num_attrib108
+            ,p_rec_iit.iit_num_attrib109
+            ,p_rec_iit.iit_num_attrib110
+            ,p_rec_iit.iit_num_attrib111
+            ,p_rec_iit.iit_num_attrib112
+            ,p_rec_iit.iit_num_attrib113
+            ,p_rec_iit.iit_num_attrib114
+            ,p_rec_iit.iit_num_attrib115
+            );
+--
+   p_rec_iit := nm3get.get_iit
+                   (pi_iit_ne_id         => p_rec_iit.iit_ne_id
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_iit');
+--
+END ins_iit;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_iit_all (p_rec_iit_all IN OUT nm_inv_items_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_iit_all');
+--
+   p_rec_iit_all.iit_start_date                 := NVL(p_rec_iit_all.iit_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_inv_items_all
+            (iit_ne_id
+            ,iit_inv_type
+            ,iit_primary_key
+            ,iit_start_date
+            ,iit_date_created
+            ,iit_date_modified
+            ,iit_created_by
+            ,iit_modified_by
+            ,iit_admin_unit
+            ,iit_descr
+            ,iit_end_date
+            ,iit_foreign_key
+            ,iit_located_by
+            ,iit_position
+            ,iit_x_coord
+            ,iit_y_coord
+            ,iit_num_attrib16
+            ,iit_num_attrib17
+            ,iit_num_attrib18
+            ,iit_num_attrib19
+            ,iit_num_attrib20
+            ,iit_num_attrib21
+            ,iit_num_attrib22
+            ,iit_num_attrib23
+            ,iit_num_attrib24
+            ,iit_num_attrib25
+            ,iit_chr_attrib26
+            ,iit_chr_attrib27
+            ,iit_chr_attrib28
+            ,iit_chr_attrib29
+            ,iit_chr_attrib30
+            ,iit_chr_attrib31
+            ,iit_chr_attrib32
+            ,iit_chr_attrib33
+            ,iit_chr_attrib34
+            ,iit_chr_attrib35
+            ,iit_chr_attrib36
+            ,iit_chr_attrib37
+            ,iit_chr_attrib38
+            ,iit_chr_attrib39
+            ,iit_chr_attrib40
+            ,iit_chr_attrib41
+            ,iit_chr_attrib42
+            ,iit_chr_attrib43
+            ,iit_chr_attrib44
+            ,iit_chr_attrib45
+            ,iit_chr_attrib46
+            ,iit_chr_attrib47
+            ,iit_chr_attrib48
+            ,iit_chr_attrib49
+            ,iit_chr_attrib50
+            ,iit_chr_attrib51
+            ,iit_chr_attrib52
+            ,iit_chr_attrib53
+            ,iit_chr_attrib54
+            ,iit_chr_attrib55
+            ,iit_chr_attrib56
+            ,iit_chr_attrib57
+            ,iit_chr_attrib58
+            ,iit_chr_attrib59
+            ,iit_chr_attrib60
+            ,iit_chr_attrib61
+            ,iit_chr_attrib62
+            ,iit_chr_attrib63
+            ,iit_chr_attrib64
+            ,iit_chr_attrib65
+            ,iit_chr_attrib66
+            ,iit_chr_attrib67
+            ,iit_chr_attrib68
+            ,iit_chr_attrib69
+            ,iit_chr_attrib70
+            ,iit_chr_attrib71
+            ,iit_chr_attrib72
+            ,iit_chr_attrib73
+            ,iit_chr_attrib74
+            ,iit_chr_attrib75
+            ,iit_num_attrib76
+            ,iit_num_attrib77
+            ,iit_num_attrib78
+            ,iit_num_attrib79
+            ,iit_num_attrib80
+            ,iit_num_attrib81
+            ,iit_num_attrib82
+            ,iit_num_attrib83
+            ,iit_num_attrib84
+            ,iit_num_attrib85
+            ,iit_date_attrib86
+            ,iit_date_attrib87
+            ,iit_date_attrib88
+            ,iit_date_attrib89
+            ,iit_date_attrib90
+            ,iit_date_attrib91
+            ,iit_date_attrib92
+            ,iit_date_attrib93
+            ,iit_date_attrib94
+            ,iit_date_attrib95
+            ,iit_angle
+            ,iit_angle_txt
+            ,iit_class
+            ,iit_class_txt
+            ,iit_colour
+            ,iit_colour_txt
+            ,iit_coord_flag
+            ,iit_description
+            ,iit_diagram
+            ,iit_distance
+            ,iit_end_chain
+            ,iit_gap
+            ,iit_height
+            ,iit_height_2
+            ,iit_id_code
+            ,iit_instal_date
+            ,iit_invent_date
+            ,iit_inv_ownership
+            ,iit_itemcode
+            ,iit_lco_lamp_config_id
+            ,iit_length
+            ,iit_material
+            ,iit_material_txt
+            ,iit_method
+            ,iit_method_txt
+            ,iit_note
+            ,iit_no_of_units
+            ,iit_options
+            ,iit_options_txt
+            ,iit_oun_org_id_elec_board
+            ,iit_owner
+            ,iit_owner_txt
+            ,iit_peo_invent_by_id
+            ,iit_photo
+            ,iit_power
+            ,iit_prov_flag
+            ,iit_rev_by
+            ,iit_rev_date
+            ,iit_type
+            ,iit_type_txt
+            ,iit_width
+            ,iit_xtra_char_1
+            ,iit_xtra_date_1
+            ,iit_xtra_domain_1
+            ,iit_xtra_domain_txt_1
+            ,iit_xtra_number_1
+            ,iit_x_sect
+            ,iit_det_xsp
+            ,iit_offset
+            ,iit_x
+            ,iit_y
+            ,iit_z
+            ,iit_num_attrib96
+            ,iit_num_attrib97
+            ,iit_num_attrib98
+            ,iit_num_attrib99
+            ,iit_num_attrib100
+            ,iit_num_attrib101
+            ,iit_num_attrib102
+            ,iit_num_attrib103
+            ,iit_num_attrib104
+            ,iit_num_attrib105
+            ,iit_num_attrib106
+            ,iit_num_attrib107
+            ,iit_num_attrib108
+            ,iit_num_attrib109
+            ,iit_num_attrib110
+            ,iit_num_attrib111
+            ,iit_num_attrib112
+            ,iit_num_attrib113
+            ,iit_num_attrib114
+            ,iit_num_attrib115
+            )
+     VALUES (p_rec_iit_all.iit_ne_id
+            ,p_rec_iit_all.iit_inv_type
+            ,p_rec_iit_all.iit_primary_key
+            ,p_rec_iit_all.iit_start_date
+            ,p_rec_iit_all.iit_date_created
+            ,p_rec_iit_all.iit_date_modified
+            ,p_rec_iit_all.iit_created_by
+            ,p_rec_iit_all.iit_modified_by
+            ,p_rec_iit_all.iit_admin_unit
+            ,p_rec_iit_all.iit_descr
+            ,p_rec_iit_all.iit_end_date
+            ,p_rec_iit_all.iit_foreign_key
+            ,p_rec_iit_all.iit_located_by
+            ,p_rec_iit_all.iit_position
+            ,p_rec_iit_all.iit_x_coord
+            ,p_rec_iit_all.iit_y_coord
+            ,p_rec_iit_all.iit_num_attrib16
+            ,p_rec_iit_all.iit_num_attrib17
+            ,p_rec_iit_all.iit_num_attrib18
+            ,p_rec_iit_all.iit_num_attrib19
+            ,p_rec_iit_all.iit_num_attrib20
+            ,p_rec_iit_all.iit_num_attrib21
+            ,p_rec_iit_all.iit_num_attrib22
+            ,p_rec_iit_all.iit_num_attrib23
+            ,p_rec_iit_all.iit_num_attrib24
+            ,p_rec_iit_all.iit_num_attrib25
+            ,p_rec_iit_all.iit_chr_attrib26
+            ,p_rec_iit_all.iit_chr_attrib27
+            ,p_rec_iit_all.iit_chr_attrib28
+            ,p_rec_iit_all.iit_chr_attrib29
+            ,p_rec_iit_all.iit_chr_attrib30
+            ,p_rec_iit_all.iit_chr_attrib31
+            ,p_rec_iit_all.iit_chr_attrib32
+            ,p_rec_iit_all.iit_chr_attrib33
+            ,p_rec_iit_all.iit_chr_attrib34
+            ,p_rec_iit_all.iit_chr_attrib35
+            ,p_rec_iit_all.iit_chr_attrib36
+            ,p_rec_iit_all.iit_chr_attrib37
+            ,p_rec_iit_all.iit_chr_attrib38
+            ,p_rec_iit_all.iit_chr_attrib39
+            ,p_rec_iit_all.iit_chr_attrib40
+            ,p_rec_iit_all.iit_chr_attrib41
+            ,p_rec_iit_all.iit_chr_attrib42
+            ,p_rec_iit_all.iit_chr_attrib43
+            ,p_rec_iit_all.iit_chr_attrib44
+            ,p_rec_iit_all.iit_chr_attrib45
+            ,p_rec_iit_all.iit_chr_attrib46
+            ,p_rec_iit_all.iit_chr_attrib47
+            ,p_rec_iit_all.iit_chr_attrib48
+            ,p_rec_iit_all.iit_chr_attrib49
+            ,p_rec_iit_all.iit_chr_attrib50
+            ,p_rec_iit_all.iit_chr_attrib51
+            ,p_rec_iit_all.iit_chr_attrib52
+            ,p_rec_iit_all.iit_chr_attrib53
+            ,p_rec_iit_all.iit_chr_attrib54
+            ,p_rec_iit_all.iit_chr_attrib55
+            ,p_rec_iit_all.iit_chr_attrib56
+            ,p_rec_iit_all.iit_chr_attrib57
+            ,p_rec_iit_all.iit_chr_attrib58
+            ,p_rec_iit_all.iit_chr_attrib59
+            ,p_rec_iit_all.iit_chr_attrib60
+            ,p_rec_iit_all.iit_chr_attrib61
+            ,p_rec_iit_all.iit_chr_attrib62
+            ,p_rec_iit_all.iit_chr_attrib63
+            ,p_rec_iit_all.iit_chr_attrib64
+            ,p_rec_iit_all.iit_chr_attrib65
+            ,p_rec_iit_all.iit_chr_attrib66
+            ,p_rec_iit_all.iit_chr_attrib67
+            ,p_rec_iit_all.iit_chr_attrib68
+            ,p_rec_iit_all.iit_chr_attrib69
+            ,p_rec_iit_all.iit_chr_attrib70
+            ,p_rec_iit_all.iit_chr_attrib71
+            ,p_rec_iit_all.iit_chr_attrib72
+            ,p_rec_iit_all.iit_chr_attrib73
+            ,p_rec_iit_all.iit_chr_attrib74
+            ,p_rec_iit_all.iit_chr_attrib75
+            ,p_rec_iit_all.iit_num_attrib76
+            ,p_rec_iit_all.iit_num_attrib77
+            ,p_rec_iit_all.iit_num_attrib78
+            ,p_rec_iit_all.iit_num_attrib79
+            ,p_rec_iit_all.iit_num_attrib80
+            ,p_rec_iit_all.iit_num_attrib81
+            ,p_rec_iit_all.iit_num_attrib82
+            ,p_rec_iit_all.iit_num_attrib83
+            ,p_rec_iit_all.iit_num_attrib84
+            ,p_rec_iit_all.iit_num_attrib85
+            ,p_rec_iit_all.iit_date_attrib86
+            ,p_rec_iit_all.iit_date_attrib87
+            ,p_rec_iit_all.iit_date_attrib88
+            ,p_rec_iit_all.iit_date_attrib89
+            ,p_rec_iit_all.iit_date_attrib90
+            ,p_rec_iit_all.iit_date_attrib91
+            ,p_rec_iit_all.iit_date_attrib92
+            ,p_rec_iit_all.iit_date_attrib93
+            ,p_rec_iit_all.iit_date_attrib94
+            ,p_rec_iit_all.iit_date_attrib95
+            ,p_rec_iit_all.iit_angle
+            ,p_rec_iit_all.iit_angle_txt
+            ,p_rec_iit_all.iit_class
+            ,p_rec_iit_all.iit_class_txt
+            ,p_rec_iit_all.iit_colour
+            ,p_rec_iit_all.iit_colour_txt
+            ,p_rec_iit_all.iit_coord_flag
+            ,p_rec_iit_all.iit_description
+            ,p_rec_iit_all.iit_diagram
+            ,p_rec_iit_all.iit_distance
+            ,p_rec_iit_all.iit_end_chain
+            ,p_rec_iit_all.iit_gap
+            ,p_rec_iit_all.iit_height
+            ,p_rec_iit_all.iit_height_2
+            ,p_rec_iit_all.iit_id_code
+            ,p_rec_iit_all.iit_instal_date
+            ,p_rec_iit_all.iit_invent_date
+            ,p_rec_iit_all.iit_inv_ownership
+            ,p_rec_iit_all.iit_itemcode
+            ,p_rec_iit_all.iit_lco_lamp_config_id
+            ,p_rec_iit_all.iit_length
+            ,p_rec_iit_all.iit_material
+            ,p_rec_iit_all.iit_material_txt
+            ,p_rec_iit_all.iit_method
+            ,p_rec_iit_all.iit_method_txt
+            ,p_rec_iit_all.iit_note
+            ,p_rec_iit_all.iit_no_of_units
+            ,p_rec_iit_all.iit_options
+            ,p_rec_iit_all.iit_options_txt
+            ,p_rec_iit_all.iit_oun_org_id_elec_board
+            ,p_rec_iit_all.iit_owner
+            ,p_rec_iit_all.iit_owner_txt
+            ,p_rec_iit_all.iit_peo_invent_by_id
+            ,p_rec_iit_all.iit_photo
+            ,p_rec_iit_all.iit_power
+            ,p_rec_iit_all.iit_prov_flag
+            ,p_rec_iit_all.iit_rev_by
+            ,p_rec_iit_all.iit_rev_date
+            ,p_rec_iit_all.iit_type
+            ,p_rec_iit_all.iit_type_txt
+            ,p_rec_iit_all.iit_width
+            ,p_rec_iit_all.iit_xtra_char_1
+            ,p_rec_iit_all.iit_xtra_date_1
+            ,p_rec_iit_all.iit_xtra_domain_1
+            ,p_rec_iit_all.iit_xtra_domain_txt_1
+            ,p_rec_iit_all.iit_xtra_number_1
+            ,p_rec_iit_all.iit_x_sect
+            ,p_rec_iit_all.iit_det_xsp
+            ,p_rec_iit_all.iit_offset
+            ,p_rec_iit_all.iit_x
+            ,p_rec_iit_all.iit_y
+            ,p_rec_iit_all.iit_z
+            ,p_rec_iit_all.iit_num_attrib96
+            ,p_rec_iit_all.iit_num_attrib97
+            ,p_rec_iit_all.iit_num_attrib98
+            ,p_rec_iit_all.iit_num_attrib99
+            ,p_rec_iit_all.iit_num_attrib100
+            ,p_rec_iit_all.iit_num_attrib101
+            ,p_rec_iit_all.iit_num_attrib102
+            ,p_rec_iit_all.iit_num_attrib103
+            ,p_rec_iit_all.iit_num_attrib104
+            ,p_rec_iit_all.iit_num_attrib105
+            ,p_rec_iit_all.iit_num_attrib106
+            ,p_rec_iit_all.iit_num_attrib107
+            ,p_rec_iit_all.iit_num_attrib108
+            ,p_rec_iit_all.iit_num_attrib109
+            ,p_rec_iit_all.iit_num_attrib110
+            ,p_rec_iit_all.iit_num_attrib111
+            ,p_rec_iit_all.iit_num_attrib112
+            ,p_rec_iit_all.iit_num_attrib113
+            ,p_rec_iit_all.iit_num_attrib114
+            ,p_rec_iit_all.iit_num_attrib115
+            )
+   RETURNING iit_ne_id
+            ,iit_inv_type
+            ,iit_primary_key
+            ,iit_start_date
+            ,iit_date_created
+            ,iit_date_modified
+            ,iit_created_by
+            ,iit_modified_by
+            ,iit_admin_unit
+            ,iit_descr
+            ,iit_end_date
+            ,iit_foreign_key
+            ,iit_located_by
+            ,iit_position
+            ,iit_x_coord
+            ,iit_y_coord
+            ,iit_num_attrib16
+            ,iit_num_attrib17
+            ,iit_num_attrib18
+            ,iit_num_attrib19
+            ,iit_num_attrib20
+            ,iit_num_attrib21
+            ,iit_num_attrib22
+            ,iit_num_attrib23
+            ,iit_num_attrib24
+            ,iit_num_attrib25
+            ,iit_chr_attrib26
+            ,iit_chr_attrib27
+            ,iit_chr_attrib28
+            ,iit_chr_attrib29
+            ,iit_chr_attrib30
+            ,iit_chr_attrib31
+            ,iit_chr_attrib32
+            ,iit_chr_attrib33
+            ,iit_chr_attrib34
+            ,iit_chr_attrib35
+            ,iit_chr_attrib36
+            ,iit_chr_attrib37
+            ,iit_chr_attrib38
+            ,iit_chr_attrib39
+            ,iit_chr_attrib40
+            ,iit_chr_attrib41
+            ,iit_chr_attrib42
+            ,iit_chr_attrib43
+            ,iit_chr_attrib44
+            ,iit_chr_attrib45
+            ,iit_chr_attrib46
+            ,iit_chr_attrib47
+            ,iit_chr_attrib48
+            ,iit_chr_attrib49
+            ,iit_chr_attrib50
+            ,iit_chr_attrib51
+            ,iit_chr_attrib52
+            ,iit_chr_attrib53
+            ,iit_chr_attrib54
+            ,iit_chr_attrib55
+            ,iit_chr_attrib56
+            ,iit_chr_attrib57
+            ,iit_chr_attrib58
+            ,iit_chr_attrib59
+            ,iit_chr_attrib60
+            ,iit_chr_attrib61
+            ,iit_chr_attrib62
+            ,iit_chr_attrib63
+            ,iit_chr_attrib64
+            ,iit_chr_attrib65
+            ,iit_chr_attrib66
+            ,iit_chr_attrib67
+            ,iit_chr_attrib68
+            ,iit_chr_attrib69
+            ,iit_chr_attrib70
+            ,iit_chr_attrib71
+            ,iit_chr_attrib72
+            ,iit_chr_attrib73
+            ,iit_chr_attrib74
+            ,iit_chr_attrib75
+            ,iit_num_attrib76
+            ,iit_num_attrib77
+            ,iit_num_attrib78
+            ,iit_num_attrib79
+            ,iit_num_attrib80
+            ,iit_num_attrib81
+            ,iit_num_attrib82
+            ,iit_num_attrib83
+            ,iit_num_attrib84
+            ,iit_num_attrib85
+            ,iit_date_attrib86
+            ,iit_date_attrib87
+            ,iit_date_attrib88
+            ,iit_date_attrib89
+            ,iit_date_attrib90
+            ,iit_date_attrib91
+            ,iit_date_attrib92
+            ,iit_date_attrib93
+            ,iit_date_attrib94
+            ,iit_date_attrib95
+            ,iit_angle
+            ,iit_angle_txt
+            ,iit_class
+            ,iit_class_txt
+            ,iit_colour
+            ,iit_colour_txt
+            ,iit_coord_flag
+            ,iit_description
+            ,iit_diagram
+            ,iit_distance
+            ,iit_end_chain
+            ,iit_gap
+            ,iit_height
+            ,iit_height_2
+            ,iit_id_code
+            ,iit_instal_date
+            ,iit_invent_date
+            ,iit_inv_ownership
+            ,iit_itemcode
+            ,iit_lco_lamp_config_id
+            ,iit_length
+            ,iit_material
+            ,iit_material_txt
+            ,iit_method
+            ,iit_method_txt
+            ,iit_note
+            ,iit_no_of_units
+            ,iit_options
+            ,iit_options_txt
+            ,iit_oun_org_id_elec_board
+            ,iit_owner
+            ,iit_owner_txt
+            ,iit_peo_invent_by_id
+            ,iit_photo
+            ,iit_power
+            ,iit_prov_flag
+            ,iit_rev_by
+            ,iit_rev_date
+            ,iit_type
+            ,iit_type_txt
+            ,iit_width
+            ,iit_xtra_char_1
+            ,iit_xtra_date_1
+            ,iit_xtra_domain_1
+            ,iit_xtra_domain_txt_1
+            ,iit_xtra_number_1
+            ,iit_x_sect
+            ,iit_det_xsp
+            ,iit_offset
+            ,iit_x
+            ,iit_y
+            ,iit_z
+            ,iit_num_attrib96
+            ,iit_num_attrib97
+            ,iit_num_attrib98
+            ,iit_num_attrib99
+            ,iit_num_attrib100
+            ,iit_num_attrib101
+            ,iit_num_attrib102
+            ,iit_num_attrib103
+            ,iit_num_attrib104
+            ,iit_num_attrib105
+            ,iit_num_attrib106
+            ,iit_num_attrib107
+            ,iit_num_attrib108
+            ,iit_num_attrib109
+            ,iit_num_attrib110
+            ,iit_num_attrib111
+            ,iit_num_attrib112
+            ,iit_num_attrib113
+            ,iit_num_attrib114
+            ,iit_num_attrib115
+      INTO   p_rec_iit_all.iit_ne_id
+            ,p_rec_iit_all.iit_inv_type
+            ,p_rec_iit_all.iit_primary_key
+            ,p_rec_iit_all.iit_start_date
+            ,p_rec_iit_all.iit_date_created
+            ,p_rec_iit_all.iit_date_modified
+            ,p_rec_iit_all.iit_created_by
+            ,p_rec_iit_all.iit_modified_by
+            ,p_rec_iit_all.iit_admin_unit
+            ,p_rec_iit_all.iit_descr
+            ,p_rec_iit_all.iit_end_date
+            ,p_rec_iit_all.iit_foreign_key
+            ,p_rec_iit_all.iit_located_by
+            ,p_rec_iit_all.iit_position
+            ,p_rec_iit_all.iit_x_coord
+            ,p_rec_iit_all.iit_y_coord
+            ,p_rec_iit_all.iit_num_attrib16
+            ,p_rec_iit_all.iit_num_attrib17
+            ,p_rec_iit_all.iit_num_attrib18
+            ,p_rec_iit_all.iit_num_attrib19
+            ,p_rec_iit_all.iit_num_attrib20
+            ,p_rec_iit_all.iit_num_attrib21
+            ,p_rec_iit_all.iit_num_attrib22
+            ,p_rec_iit_all.iit_num_attrib23
+            ,p_rec_iit_all.iit_num_attrib24
+            ,p_rec_iit_all.iit_num_attrib25
+            ,p_rec_iit_all.iit_chr_attrib26
+            ,p_rec_iit_all.iit_chr_attrib27
+            ,p_rec_iit_all.iit_chr_attrib28
+            ,p_rec_iit_all.iit_chr_attrib29
+            ,p_rec_iit_all.iit_chr_attrib30
+            ,p_rec_iit_all.iit_chr_attrib31
+            ,p_rec_iit_all.iit_chr_attrib32
+            ,p_rec_iit_all.iit_chr_attrib33
+            ,p_rec_iit_all.iit_chr_attrib34
+            ,p_rec_iit_all.iit_chr_attrib35
+            ,p_rec_iit_all.iit_chr_attrib36
+            ,p_rec_iit_all.iit_chr_attrib37
+            ,p_rec_iit_all.iit_chr_attrib38
+            ,p_rec_iit_all.iit_chr_attrib39
+            ,p_rec_iit_all.iit_chr_attrib40
+            ,p_rec_iit_all.iit_chr_attrib41
+            ,p_rec_iit_all.iit_chr_attrib42
+            ,p_rec_iit_all.iit_chr_attrib43
+            ,p_rec_iit_all.iit_chr_attrib44
+            ,p_rec_iit_all.iit_chr_attrib45
+            ,p_rec_iit_all.iit_chr_attrib46
+            ,p_rec_iit_all.iit_chr_attrib47
+            ,p_rec_iit_all.iit_chr_attrib48
+            ,p_rec_iit_all.iit_chr_attrib49
+            ,p_rec_iit_all.iit_chr_attrib50
+            ,p_rec_iit_all.iit_chr_attrib51
+            ,p_rec_iit_all.iit_chr_attrib52
+            ,p_rec_iit_all.iit_chr_attrib53
+            ,p_rec_iit_all.iit_chr_attrib54
+            ,p_rec_iit_all.iit_chr_attrib55
+            ,p_rec_iit_all.iit_chr_attrib56
+            ,p_rec_iit_all.iit_chr_attrib57
+            ,p_rec_iit_all.iit_chr_attrib58
+            ,p_rec_iit_all.iit_chr_attrib59
+            ,p_rec_iit_all.iit_chr_attrib60
+            ,p_rec_iit_all.iit_chr_attrib61
+            ,p_rec_iit_all.iit_chr_attrib62
+            ,p_rec_iit_all.iit_chr_attrib63
+            ,p_rec_iit_all.iit_chr_attrib64
+            ,p_rec_iit_all.iit_chr_attrib65
+            ,p_rec_iit_all.iit_chr_attrib66
+            ,p_rec_iit_all.iit_chr_attrib67
+            ,p_rec_iit_all.iit_chr_attrib68
+            ,p_rec_iit_all.iit_chr_attrib69
+            ,p_rec_iit_all.iit_chr_attrib70
+            ,p_rec_iit_all.iit_chr_attrib71
+            ,p_rec_iit_all.iit_chr_attrib72
+            ,p_rec_iit_all.iit_chr_attrib73
+            ,p_rec_iit_all.iit_chr_attrib74
+            ,p_rec_iit_all.iit_chr_attrib75
+            ,p_rec_iit_all.iit_num_attrib76
+            ,p_rec_iit_all.iit_num_attrib77
+            ,p_rec_iit_all.iit_num_attrib78
+            ,p_rec_iit_all.iit_num_attrib79
+            ,p_rec_iit_all.iit_num_attrib80
+            ,p_rec_iit_all.iit_num_attrib81
+            ,p_rec_iit_all.iit_num_attrib82
+            ,p_rec_iit_all.iit_num_attrib83
+            ,p_rec_iit_all.iit_num_attrib84
+            ,p_rec_iit_all.iit_num_attrib85
+            ,p_rec_iit_all.iit_date_attrib86
+            ,p_rec_iit_all.iit_date_attrib87
+            ,p_rec_iit_all.iit_date_attrib88
+            ,p_rec_iit_all.iit_date_attrib89
+            ,p_rec_iit_all.iit_date_attrib90
+            ,p_rec_iit_all.iit_date_attrib91
+            ,p_rec_iit_all.iit_date_attrib92
+            ,p_rec_iit_all.iit_date_attrib93
+            ,p_rec_iit_all.iit_date_attrib94
+            ,p_rec_iit_all.iit_date_attrib95
+            ,p_rec_iit_all.iit_angle
+            ,p_rec_iit_all.iit_angle_txt
+            ,p_rec_iit_all.iit_class
+            ,p_rec_iit_all.iit_class_txt
+            ,p_rec_iit_all.iit_colour
+            ,p_rec_iit_all.iit_colour_txt
+            ,p_rec_iit_all.iit_coord_flag
+            ,p_rec_iit_all.iit_description
+            ,p_rec_iit_all.iit_diagram
+            ,p_rec_iit_all.iit_distance
+            ,p_rec_iit_all.iit_end_chain
+            ,p_rec_iit_all.iit_gap
+            ,p_rec_iit_all.iit_height
+            ,p_rec_iit_all.iit_height_2
+            ,p_rec_iit_all.iit_id_code
+            ,p_rec_iit_all.iit_instal_date
+            ,p_rec_iit_all.iit_invent_date
+            ,p_rec_iit_all.iit_inv_ownership
+            ,p_rec_iit_all.iit_itemcode
+            ,p_rec_iit_all.iit_lco_lamp_config_id
+            ,p_rec_iit_all.iit_length
+            ,p_rec_iit_all.iit_material
+            ,p_rec_iit_all.iit_material_txt
+            ,p_rec_iit_all.iit_method
+            ,p_rec_iit_all.iit_method_txt
+            ,p_rec_iit_all.iit_note
+            ,p_rec_iit_all.iit_no_of_units
+            ,p_rec_iit_all.iit_options
+            ,p_rec_iit_all.iit_options_txt
+            ,p_rec_iit_all.iit_oun_org_id_elec_board
+            ,p_rec_iit_all.iit_owner
+            ,p_rec_iit_all.iit_owner_txt
+            ,p_rec_iit_all.iit_peo_invent_by_id
+            ,p_rec_iit_all.iit_photo
+            ,p_rec_iit_all.iit_power
+            ,p_rec_iit_all.iit_prov_flag
+            ,p_rec_iit_all.iit_rev_by
+            ,p_rec_iit_all.iit_rev_date
+            ,p_rec_iit_all.iit_type
+            ,p_rec_iit_all.iit_type_txt
+            ,p_rec_iit_all.iit_width
+            ,p_rec_iit_all.iit_xtra_char_1
+            ,p_rec_iit_all.iit_xtra_date_1
+            ,p_rec_iit_all.iit_xtra_domain_1
+            ,p_rec_iit_all.iit_xtra_domain_txt_1
+            ,p_rec_iit_all.iit_xtra_number_1
+            ,p_rec_iit_all.iit_x_sect
+            ,p_rec_iit_all.iit_det_xsp
+            ,p_rec_iit_all.iit_offset
+            ,p_rec_iit_all.iit_x
+            ,p_rec_iit_all.iit_y
+            ,p_rec_iit_all.iit_z
+            ,p_rec_iit_all.iit_num_attrib96
+            ,p_rec_iit_all.iit_num_attrib97
+            ,p_rec_iit_all.iit_num_attrib98
+            ,p_rec_iit_all.iit_num_attrib99
+            ,p_rec_iit_all.iit_num_attrib100
+            ,p_rec_iit_all.iit_num_attrib101
+            ,p_rec_iit_all.iit_num_attrib102
+            ,p_rec_iit_all.iit_num_attrib103
+            ,p_rec_iit_all.iit_num_attrib104
+            ,p_rec_iit_all.iit_num_attrib105
+            ,p_rec_iit_all.iit_num_attrib106
+            ,p_rec_iit_all.iit_num_attrib107
+            ,p_rec_iit_all.iit_num_attrib108
+            ,p_rec_iit_all.iit_num_attrib109
+            ,p_rec_iit_all.iit_num_attrib110
+            ,p_rec_iit_all.iit_num_attrib111
+            ,p_rec_iit_all.iit_num_attrib112
+            ,p_rec_iit_all.iit_num_attrib113
+            ,p_rec_iit_all.iit_num_attrib114
+            ,p_rec_iit_all.iit_num_attrib115;
+--
+   nm_debug.proc_end(g_package_name,'ins_iit_all');
+--
+END ins_iit_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_iig (p_rec_iig IN OUT nm_inv_item_groupings%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_iig');
+--
+   p_rec_iig.iig_start_date                 := NVL(p_rec_iig.iig_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_inv_item_groupings
+            (iig_top_id
+            ,iig_item_id
+            ,iig_parent_id
+            ,iig_start_date
+            ,iig_end_date
+            )
+     VALUES (p_rec_iig.iig_top_id
+            ,p_rec_iig.iig_item_id
+            ,p_rec_iig.iig_parent_id
+            ,p_rec_iig.iig_start_date
+            ,p_rec_iig.iig_end_date
+            );
+--
+   p_rec_iig := nm3get.get_iig
+                   (pi_iig_item_id       => p_rec_iig.iig_item_id
+                   ,pi_iig_parent_id     => p_rec_iig.iig_parent_id
+                   ,pi_iig_start_date    => p_rec_iig.iig_start_date
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_iig');
+--
+END ins_iig;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_iig_all (p_rec_iig_all IN OUT nm_inv_item_groupings_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_iig_all');
+--
+   p_rec_iig_all.iig_start_date                 := NVL(p_rec_iig_all.iig_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_inv_item_groupings_all
+            (iig_top_id
+            ,iig_item_id
+            ,iig_parent_id
+            ,iig_start_date
+            ,iig_end_date
+            )
+     VALUES (p_rec_iig_all.iig_top_id
+            ,p_rec_iig_all.iig_item_id
+            ,p_rec_iig_all.iig_parent_id
+            ,p_rec_iig_all.iig_start_date
+            ,p_rec_iig_all.iig_end_date
+            )
+   RETURNING iig_top_id
+            ,iig_item_id
+            ,iig_parent_id
+            ,iig_start_date
+            ,iig_end_date
+      INTO   p_rec_iig_all.iig_top_id
+            ,p_rec_iig_all.iig_item_id
+            ,p_rec_iig_all.iig_parent_id
+            ,p_rec_iig_all.iig_start_date
+            ,p_rec_iig_all.iig_end_date;
+--
+   nm_debug.proc_end(g_package_name,'ins_iig_all');
+--
+END ins_iig_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nin (p_rec_nin IN OUT nm_inv_nw%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nin');
+--
+   p_rec_nin.nin_loc_mandatory              := NVL(p_rec_nin.nin_loc_mandatory,'N' );
+   p_rec_nin.nin_start_date                 := NVL(p_rec_nin.nin_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_inv_nw
+            (nin_nw_type
+            ,nin_nit_inv_code
+            ,nin_loc_mandatory
+            ,nin_start_date
+            ,nin_end_date
+            )
+     VALUES (p_rec_nin.nin_nw_type
+            ,p_rec_nin.nin_nit_inv_code
+            ,p_rec_nin.nin_loc_mandatory
+            ,p_rec_nin.nin_start_date
+            ,p_rec_nin.nin_end_date
+            );
+--
+   p_rec_nin := nm3get.get_nin
+                   (pi_nin_nit_inv_code  => p_rec_nin.nin_nit_inv_code
+                   ,pi_nin_nw_type       => p_rec_nin.nin_nw_type
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_nin');
+--
+END ins_nin;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nin_all (p_rec_nin_all IN OUT nm_inv_nw_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nin_all');
+--
+   p_rec_nin_all.nin_loc_mandatory              := NVL(p_rec_nin_all.nin_loc_mandatory,'N' );
+   p_rec_nin_all.nin_start_date                 := NVL(p_rec_nin_all.nin_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_inv_nw_all
+            (nin_nw_type
+            ,nin_nit_inv_code
+            ,nin_loc_mandatory
+            ,nin_start_date
+            ,nin_end_date
+            )
+     VALUES (p_rec_nin_all.nin_nw_type
+            ,p_rec_nin_all.nin_nit_inv_code
+            ,p_rec_nin_all.nin_loc_mandatory
+            ,p_rec_nin_all.nin_start_date
+            ,p_rec_nin_all.nin_end_date
+            )
+   RETURNING nin_nw_type
+            ,nin_nit_inv_code
+            ,nin_loc_mandatory
+            ,nin_start_date
+            ,nin_end_date
+      INTO   p_rec_nin_all.nin_nw_type
+            ,p_rec_nin_all.nin_nit_inv_code
+            ,p_rec_nin_all.nin_loc_mandatory
+            ,p_rec_nin_all.nin_start_date
+            ,p_rec_nin_all.nin_end_date;
+--
+   nm_debug.proc_end(g_package_name,'ins_nin_all');
+--
+END ins_nin_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nith (p_rec_nith IN OUT nm_inv_themes%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nith');
+--
+--
+   INSERT INTO nm_inv_themes
+            (nith_nit_id
+            ,nith_nth_theme_id
+            )
+     VALUES (p_rec_nith.nith_nit_id
+            ,p_rec_nith.nith_nth_theme_id
+            )
+   RETURNING nith_nit_id
+            ,nith_nth_theme_id
+      INTO   p_rec_nith.nith_nit_id
+            ,p_rec_nith.nith_nth_theme_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_nith');
+--
+END ins_nith;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nit (p_rec_nit IN OUT nm_inv_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nit');
+--
+   p_rec_nit.nit_use_xy                     := NVL(p_rec_nit.nit_use_xy,'N' );
+   p_rec_nit.nit_multiple_allowed           := NVL(p_rec_nit.nit_multiple_allowed,'N' );
+   p_rec_nit.nit_end_loc_only               := NVL(p_rec_nit.nit_end_loc_only,'N' );
+   p_rec_nit.nit_start_date                 := NVL(p_rec_nit.nit_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_nit.nit_top                        := NVL(p_rec_nit.nit_top,'N' );
+   p_rec_nit.nit_update_allowed             := NVL(p_rec_nit.nit_update_allowed,'Y' );
+--
+   INSERT INTO nm_inv_types
+            (nit_inv_type
+            ,nit_pnt_or_cont
+            ,nit_x_sect_allow_flag
+            ,nit_elec_drain_carr
+            ,nit_contiguous
+            ,nit_replaceable
+            ,nit_exclusive
+            ,nit_category
+            ,nit_descr
+            ,nit_linear
+            ,nit_use_xy
+            ,nit_multiple_allowed
+            ,nit_end_loc_only
+            ,nit_screen_seq
+            ,nit_view_name
+            ,nit_start_date
+            ,nit_end_date
+            ,nit_short_descr
+            ,nit_flex_item_flag
+            ,nit_table_name
+            ,nit_lr_ne_column_name
+            ,nit_lr_st_chain
+            ,nit_lr_end_chain
+            ,nit_admin_type
+            ,nit_icon_name
+            ,nit_top
+            ,nit_foreign_pk_column
+            ,nit_update_allowed
+            ,nit_date_created
+            ,nit_date_modified
+            ,nit_modified_by
+            ,nit_created_by
+            ,nit_notes
+            )
+     VALUES (p_rec_nit.nit_inv_type
+            ,p_rec_nit.nit_pnt_or_cont
+            ,p_rec_nit.nit_x_sect_allow_flag
+            ,p_rec_nit.nit_elec_drain_carr
+            ,p_rec_nit.nit_contiguous
+            ,p_rec_nit.nit_replaceable
+            ,p_rec_nit.nit_exclusive
+            ,p_rec_nit.nit_category
+            ,p_rec_nit.nit_descr
+            ,p_rec_nit.nit_linear
+            ,p_rec_nit.nit_use_xy
+            ,p_rec_nit.nit_multiple_allowed
+            ,p_rec_nit.nit_end_loc_only
+            ,p_rec_nit.nit_screen_seq
+            ,p_rec_nit.nit_view_name
+            ,p_rec_nit.nit_start_date
+            ,p_rec_nit.nit_end_date
+            ,p_rec_nit.nit_short_descr
+            ,p_rec_nit.nit_flex_item_flag
+            ,p_rec_nit.nit_table_name
+            ,p_rec_nit.nit_lr_ne_column_name
+            ,p_rec_nit.nit_lr_st_chain
+            ,p_rec_nit.nit_lr_end_chain
+            ,p_rec_nit.nit_admin_type
+            ,p_rec_nit.nit_icon_name
+            ,p_rec_nit.nit_top
+            ,p_rec_nit.nit_foreign_pk_column
+            ,p_rec_nit.nit_update_allowed
+            ,p_rec_nit.nit_date_created
+            ,p_rec_nit.nit_date_modified
+            ,p_rec_nit.nit_modified_by
+            ,p_rec_nit.nit_created_by
+            ,p_rec_nit.nit_notes
+            );
+--
+   p_rec_nit := nm3get.get_nit
+                   (pi_nit_inv_type      => p_rec_nit.nit_inv_type
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_nit');
+--
+END ins_nit;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nit_all (p_rec_nit_all IN OUT nm_inv_types_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nit_all');
+--
+   p_rec_nit_all.nit_use_xy                     := NVL(p_rec_nit_all.nit_use_xy,'N' );
+   p_rec_nit_all.nit_multiple_allowed           := NVL(p_rec_nit_all.nit_multiple_allowed,'N' );
+   p_rec_nit_all.nit_end_loc_only               := NVL(p_rec_nit_all.nit_end_loc_only,'N' );
+   p_rec_nit_all.nit_start_date                 := NVL(p_rec_nit_all.nit_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_nit_all.nit_top                        := NVL(p_rec_nit_all.nit_top,'N' );
+   p_rec_nit_all.nit_update_allowed             := NVL(p_rec_nit_all.nit_update_allowed,'Y' );
+--
+   INSERT INTO nm_inv_types_all
+            (nit_inv_type
+            ,nit_pnt_or_cont
+            ,nit_x_sect_allow_flag
+            ,nit_elec_drain_carr
+            ,nit_contiguous
+            ,nit_replaceable
+            ,nit_exclusive
+            ,nit_category
+            ,nit_descr
+            ,nit_linear
+            ,nit_use_xy
+            ,nit_multiple_allowed
+            ,nit_end_loc_only
+            ,nit_screen_seq
+            ,nit_view_name
+            ,nit_start_date
+            ,nit_end_date
+            ,nit_short_descr
+            ,nit_flex_item_flag
+            ,nit_table_name
+            ,nit_lr_ne_column_name
+            ,nit_lr_st_chain
+            ,nit_lr_end_chain
+            ,nit_admin_type
+            ,nit_icon_name
+            ,nit_top
+            ,nit_foreign_pk_column
+            ,nit_update_allowed
+            ,nit_date_created
+            ,nit_date_modified
+            ,nit_modified_by
+            ,nit_created_by
+            ,nit_notes
+            )
+     VALUES (p_rec_nit_all.nit_inv_type
+            ,p_rec_nit_all.nit_pnt_or_cont
+            ,p_rec_nit_all.nit_x_sect_allow_flag
+            ,p_rec_nit_all.nit_elec_drain_carr
+            ,p_rec_nit_all.nit_contiguous
+            ,p_rec_nit_all.nit_replaceable
+            ,p_rec_nit_all.nit_exclusive
+            ,p_rec_nit_all.nit_category
+            ,p_rec_nit_all.nit_descr
+            ,p_rec_nit_all.nit_linear
+            ,p_rec_nit_all.nit_use_xy
+            ,p_rec_nit_all.nit_multiple_allowed
+            ,p_rec_nit_all.nit_end_loc_only
+            ,p_rec_nit_all.nit_screen_seq
+            ,p_rec_nit_all.nit_view_name
+            ,p_rec_nit_all.nit_start_date
+            ,p_rec_nit_all.nit_end_date
+            ,p_rec_nit_all.nit_short_descr
+            ,p_rec_nit_all.nit_flex_item_flag
+            ,p_rec_nit_all.nit_table_name
+            ,p_rec_nit_all.nit_lr_ne_column_name
+            ,p_rec_nit_all.nit_lr_st_chain
+            ,p_rec_nit_all.nit_lr_end_chain
+            ,p_rec_nit_all.nit_admin_type
+            ,p_rec_nit_all.nit_icon_name
+            ,p_rec_nit_all.nit_top
+            ,p_rec_nit_all.nit_foreign_pk_column
+            ,p_rec_nit_all.nit_update_allowed
+            ,p_rec_nit_all.nit_date_created
+            ,p_rec_nit_all.nit_date_modified
+            ,p_rec_nit_all.nit_modified_by
+            ,p_rec_nit_all.nit_created_by
+            ,p_rec_nit_all.nit_notes
+            )
+   RETURNING nit_inv_type
+            ,nit_pnt_or_cont
+            ,nit_x_sect_allow_flag
+            ,nit_elec_drain_carr
+            ,nit_contiguous
+            ,nit_replaceable
+            ,nit_exclusive
+            ,nit_category
+            ,nit_descr
+            ,nit_linear
+            ,nit_use_xy
+            ,nit_multiple_allowed
+            ,nit_end_loc_only
+            ,nit_screen_seq
+            ,nit_view_name
+            ,nit_start_date
+            ,nit_end_date
+            ,nit_short_descr
+            ,nit_flex_item_flag
+            ,nit_table_name
+            ,nit_lr_ne_column_name
+            ,nit_lr_st_chain
+            ,nit_lr_end_chain
+            ,nit_admin_type
+            ,nit_icon_name
+            ,nit_top
+            ,nit_foreign_pk_column
+            ,nit_update_allowed
+            ,nit_date_created
+            ,nit_date_modified
+            ,nit_modified_by
+            ,nit_created_by
+            ,nit_notes
+      INTO   p_rec_nit_all.nit_inv_type
+            ,p_rec_nit_all.nit_pnt_or_cont
+            ,p_rec_nit_all.nit_x_sect_allow_flag
+            ,p_rec_nit_all.nit_elec_drain_carr
+            ,p_rec_nit_all.nit_contiguous
+            ,p_rec_nit_all.nit_replaceable
+            ,p_rec_nit_all.nit_exclusive
+            ,p_rec_nit_all.nit_category
+            ,p_rec_nit_all.nit_descr
+            ,p_rec_nit_all.nit_linear
+            ,p_rec_nit_all.nit_use_xy
+            ,p_rec_nit_all.nit_multiple_allowed
+            ,p_rec_nit_all.nit_end_loc_only
+            ,p_rec_nit_all.nit_screen_seq
+            ,p_rec_nit_all.nit_view_name
+            ,p_rec_nit_all.nit_start_date
+            ,p_rec_nit_all.nit_end_date
+            ,p_rec_nit_all.nit_short_descr
+            ,p_rec_nit_all.nit_flex_item_flag
+            ,p_rec_nit_all.nit_table_name
+            ,p_rec_nit_all.nit_lr_ne_column_name
+            ,p_rec_nit_all.nit_lr_st_chain
+            ,p_rec_nit_all.nit_lr_end_chain
+            ,p_rec_nit_all.nit_admin_type
+            ,p_rec_nit_all.nit_icon_name
+            ,p_rec_nit_all.nit_top
+            ,p_rec_nit_all.nit_foreign_pk_column
+            ,p_rec_nit_all.nit_update_allowed
+            ,p_rec_nit_all.nit_date_created
+            ,p_rec_nit_all.nit_date_modified
+            ,p_rec_nit_all.nit_modified_by
+            ,p_rec_nit_all.nit_created_by
+            ,p_rec_nit_all.nit_notes;
+--
+   nm_debug.proc_end(g_package_name,'ins_nit_all');
+--
+END ins_nit_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ita (p_rec_ita IN OUT nm_inv_type_attribs%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ita');
+--
+   p_rec_ita.ita_start_date                 := NVL(p_rec_ita.ita_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_ita.ita_queryable                  := NVL(p_rec_ita.ita_queryable,'N' );
+   p_rec_ita.ita_exclusive                  := NVL(p_rec_ita.ita_exclusive,'N' );
+   p_rec_ita.ita_keep_history_yn            := NVL(p_rec_ita.ita_keep_history_yn,'N' );
+   p_rec_ita.ita_displayed                  := NVL(p_rec_ita.ita_displayed,'Y' );
+   p_rec_ita.ita_inspectable                := NVL(p_rec_ita.ita_inspectable,'Y' );
+   p_rec_ita.ita_case                       := NVL(p_rec_ita.ita_case,'UPPER' );
+--
+   INSERT INTO nm_inv_type_attribs
+            (ita_inv_type
+            ,ita_attrib_name
+            ,ita_dynamic_attrib
+            ,ita_disp_seq_no
+            ,ita_mandatory_yn
+            ,ita_format
+            ,ita_fld_length
+            ,ita_dec_places
+            ,ita_scrn_text
+            ,ita_id_domain
+            ,ita_validate_yn
+            ,ita_dtp_code
+            ,ita_max
+            ,ita_min
+            ,ita_view_attri
+            ,ita_view_col_name
+            ,ita_start_date
+            ,ita_end_date
+            ,ita_queryable
+            ,ita_ukpms_param_no
+            ,ita_units
+            ,ita_format_mask
+            ,ita_exclusive
+            ,ita_keep_history_yn
+            ,ita_date_created
+            ,ita_date_modified
+            ,ita_modified_by
+            ,ita_created_by
+            ,ita_query
+            ,ita_displayed
+            ,ita_disp_width
+            ,ita_inspectable
+            ,ita_case
+            )
+     VALUES (p_rec_ita.ita_inv_type
+            ,p_rec_ita.ita_attrib_name
+            ,p_rec_ita.ita_dynamic_attrib
+            ,p_rec_ita.ita_disp_seq_no
+            ,p_rec_ita.ita_mandatory_yn
+            ,p_rec_ita.ita_format
+            ,p_rec_ita.ita_fld_length
+            ,p_rec_ita.ita_dec_places
+            ,p_rec_ita.ita_scrn_text
+            ,p_rec_ita.ita_id_domain
+            ,p_rec_ita.ita_validate_yn
+            ,p_rec_ita.ita_dtp_code
+            ,p_rec_ita.ita_max
+            ,p_rec_ita.ita_min
+            ,p_rec_ita.ita_view_attri
+            ,p_rec_ita.ita_view_col_name
+            ,p_rec_ita.ita_start_date
+            ,p_rec_ita.ita_end_date
+            ,p_rec_ita.ita_queryable
+            ,p_rec_ita.ita_ukpms_param_no
+            ,p_rec_ita.ita_units
+            ,p_rec_ita.ita_format_mask
+            ,p_rec_ita.ita_exclusive
+            ,p_rec_ita.ita_keep_history_yn
+            ,p_rec_ita.ita_date_created
+            ,p_rec_ita.ita_date_modified
+            ,p_rec_ita.ita_modified_by
+            ,p_rec_ita.ita_created_by
+            ,p_rec_ita.ita_query
+            ,p_rec_ita.ita_displayed
+            ,p_rec_ita.ita_disp_width
+            ,p_rec_ita.ita_inspectable
+            ,p_rec_ita.ita_case
+            );
+--
+   p_rec_ita := nm3get.get_ita
+                   (pi_ita_inv_type      => p_rec_ita.ita_inv_type
+                   ,pi_ita_attrib_name   => p_rec_ita.ita_attrib_name
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_ita');
+--
+END ins_ita;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ita_all (p_rec_ita_all IN OUT nm_inv_type_attribs_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ita_all');
+--
+   p_rec_ita_all.ita_start_date                 := NVL(p_rec_ita_all.ita_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_ita_all.ita_queryable                  := NVL(p_rec_ita_all.ita_queryable,'N' );
+   p_rec_ita_all.ita_exclusive                  := NVL(p_rec_ita_all.ita_exclusive,'N' );
+   p_rec_ita_all.ita_keep_history_yn            := NVL(p_rec_ita_all.ita_keep_history_yn,'N' );
+   p_rec_ita_all.ita_displayed                  := NVL(p_rec_ita_all.ita_displayed,'Y' );
+   p_rec_ita_all.ita_inspectable                := NVL(p_rec_ita_all.ita_inspectable,'Y' );
+   p_rec_ita_all.ita_case                       := NVL(p_rec_ita_all.ita_case,'UPPER' );
+--
+   INSERT INTO nm_inv_type_attribs_all
+            (ita_inv_type
+            ,ita_attrib_name
+            ,ita_dynamic_attrib
+            ,ita_disp_seq_no
+            ,ita_mandatory_yn
+            ,ita_format
+            ,ita_fld_length
+            ,ita_dec_places
+            ,ita_scrn_text
+            ,ita_id_domain
+            ,ita_validate_yn
+            ,ita_dtp_code
+            ,ita_max
+            ,ita_min
+            ,ita_view_attri
+            ,ita_view_col_name
+            ,ita_start_date
+            ,ita_end_date
+            ,ita_queryable
+            ,ita_ukpms_param_no
+            ,ita_units
+            ,ita_format_mask
+            ,ita_exclusive
+            ,ita_keep_history_yn
+            ,ita_date_created
+            ,ita_date_modified
+            ,ita_modified_by
+            ,ita_created_by
+            ,ita_query
+            ,ita_displayed
+            ,ita_disp_width
+            ,ita_inspectable
+            ,ita_case
+            )
+     VALUES (p_rec_ita_all.ita_inv_type
+            ,p_rec_ita_all.ita_attrib_name
+            ,p_rec_ita_all.ita_dynamic_attrib
+            ,p_rec_ita_all.ita_disp_seq_no
+            ,p_rec_ita_all.ita_mandatory_yn
+            ,p_rec_ita_all.ita_format
+            ,p_rec_ita_all.ita_fld_length
+            ,p_rec_ita_all.ita_dec_places
+            ,p_rec_ita_all.ita_scrn_text
+            ,p_rec_ita_all.ita_id_domain
+            ,p_rec_ita_all.ita_validate_yn
+            ,p_rec_ita_all.ita_dtp_code
+            ,p_rec_ita_all.ita_max
+            ,p_rec_ita_all.ita_min
+            ,p_rec_ita_all.ita_view_attri
+            ,p_rec_ita_all.ita_view_col_name
+            ,p_rec_ita_all.ita_start_date
+            ,p_rec_ita_all.ita_end_date
+            ,p_rec_ita_all.ita_queryable
+            ,p_rec_ita_all.ita_ukpms_param_no
+            ,p_rec_ita_all.ita_units
+            ,p_rec_ita_all.ita_format_mask
+            ,p_rec_ita_all.ita_exclusive
+            ,p_rec_ita_all.ita_keep_history_yn
+            ,p_rec_ita_all.ita_date_created
+            ,p_rec_ita_all.ita_date_modified
+            ,p_rec_ita_all.ita_modified_by
+            ,p_rec_ita_all.ita_created_by
+            ,p_rec_ita_all.ita_query
+            ,p_rec_ita_all.ita_displayed
+            ,p_rec_ita_all.ita_disp_width
+            ,p_rec_ita_all.ita_inspectable
+            ,p_rec_ita_all.ita_case
+            )
+   RETURNING ita_inv_type
+            ,ita_attrib_name
+            ,ita_dynamic_attrib
+            ,ita_disp_seq_no
+            ,ita_mandatory_yn
+            ,ita_format
+            ,ita_fld_length
+            ,ita_dec_places
+            ,ita_scrn_text
+            ,ita_id_domain
+            ,ita_validate_yn
+            ,ita_dtp_code
+            ,ita_max
+            ,ita_min
+            ,ita_view_attri
+            ,ita_view_col_name
+            ,ita_start_date
+            ,ita_end_date
+            ,ita_queryable
+            ,ita_ukpms_param_no
+            ,ita_units
+            ,ita_format_mask
+            ,ita_exclusive
+            ,ita_keep_history_yn
+            ,ita_date_created
+            ,ita_date_modified
+            ,ita_modified_by
+            ,ita_created_by
+            ,ita_query
+            ,ita_displayed
+            ,ita_disp_width
+            ,ita_inspectable
+            ,ita_case
+      INTO   p_rec_ita_all.ita_inv_type
+            ,p_rec_ita_all.ita_attrib_name
+            ,p_rec_ita_all.ita_dynamic_attrib
+            ,p_rec_ita_all.ita_disp_seq_no
+            ,p_rec_ita_all.ita_mandatory_yn
+            ,p_rec_ita_all.ita_format
+            ,p_rec_ita_all.ita_fld_length
+            ,p_rec_ita_all.ita_dec_places
+            ,p_rec_ita_all.ita_scrn_text
+            ,p_rec_ita_all.ita_id_domain
+            ,p_rec_ita_all.ita_validate_yn
+            ,p_rec_ita_all.ita_dtp_code
+            ,p_rec_ita_all.ita_max
+            ,p_rec_ita_all.ita_min
+            ,p_rec_ita_all.ita_view_attri
+            ,p_rec_ita_all.ita_view_col_name
+            ,p_rec_ita_all.ita_start_date
+            ,p_rec_ita_all.ita_end_date
+            ,p_rec_ita_all.ita_queryable
+            ,p_rec_ita_all.ita_ukpms_param_no
+            ,p_rec_ita_all.ita_units
+            ,p_rec_ita_all.ita_format_mask
+            ,p_rec_ita_all.ita_exclusive
+            ,p_rec_ita_all.ita_keep_history_yn
+            ,p_rec_ita_all.ita_date_created
+            ,p_rec_ita_all.ita_date_modified
+            ,p_rec_ita_all.ita_modified_by
+            ,p_rec_ita_all.ita_created_by
+            ,p_rec_ita_all.ita_query
+            ,p_rec_ita_all.ita_displayed
+            ,p_rec_ita_all.ita_disp_width
+            ,p_rec_ita_all.ita_inspectable
+            ,p_rec_ita_all.ita_case;
+--
+   nm_debug.proc_end(g_package_name,'ins_ita_all');
+--
+END ins_ita_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_itb (p_rec_itb IN OUT nm_inv_type_attrib_bandings%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_itb');
+--
+--
+   INSERT INTO nm_inv_type_attrib_bandings
+            (itb_inv_type
+            ,itb_attrib_name
+            ,itb_banding_id
+            ,itb_banding_description
+            ,itb_date_created
+            ,itb_date_modified
+            ,itb_modified_by
+            ,itb_created_by
+            )
+     VALUES (p_rec_itb.itb_inv_type
+            ,p_rec_itb.itb_attrib_name
+            ,p_rec_itb.itb_banding_id
+            ,p_rec_itb.itb_banding_description
+            ,p_rec_itb.itb_date_created
+            ,p_rec_itb.itb_date_modified
+            ,p_rec_itb.itb_modified_by
+            ,p_rec_itb.itb_created_by
+            )
+   RETURNING itb_inv_type
+            ,itb_attrib_name
+            ,itb_banding_id
+            ,itb_banding_description
+            ,itb_date_created
+            ,itb_date_modified
+            ,itb_modified_by
+            ,itb_created_by
+      INTO   p_rec_itb.itb_inv_type
+            ,p_rec_itb.itb_attrib_name
+            ,p_rec_itb.itb_banding_id
+            ,p_rec_itb.itb_banding_description
+            ,p_rec_itb.itb_date_created
+            ,p_rec_itb.itb_date_modified
+            ,p_rec_itb.itb_modified_by
+            ,p_rec_itb.itb_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_itb');
+--
+END ins_itb;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_itd (p_rec_itd IN OUT nm_inv_type_attrib_band_dets%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_itd');
+--
+--
+   INSERT INTO nm_inv_type_attrib_band_dets
+            (itd_inv_type
+            ,itd_attrib_name
+            ,itd_itb_banding_id
+            ,itd_band_seq
+            ,itd_band_min_value
+            ,itd_band_max_value
+            ,itd_band_description
+            ,itd_date_created
+            ,itd_date_modified
+            ,itd_modified_by
+            ,itd_created_by
+            )
+     VALUES (p_rec_itd.itd_inv_type
+            ,p_rec_itd.itd_attrib_name
+            ,p_rec_itd.itd_itb_banding_id
+            ,p_rec_itd.itd_band_seq
+            ,p_rec_itd.itd_band_min_value
+            ,p_rec_itd.itd_band_max_value
+            ,p_rec_itd.itd_band_description
+            ,p_rec_itd.itd_date_created
+            ,p_rec_itd.itd_date_modified
+            ,p_rec_itd.itd_modified_by
+            ,p_rec_itd.itd_created_by
+            )
+   RETURNING itd_inv_type
+            ,itd_attrib_name
+            ,itd_itb_banding_id
+            ,itd_band_seq
+            ,itd_band_min_value
+            ,itd_band_max_value
+            ,itd_band_description
+            ,itd_date_created
+            ,itd_date_modified
+            ,itd_modified_by
+            ,itd_created_by
+      INTO   p_rec_itd.itd_inv_type
+            ,p_rec_itd.itd_attrib_name
+            ,p_rec_itd.itd_itb_banding_id
+            ,p_rec_itd.itd_band_seq
+            ,p_rec_itd.itd_band_min_value
+            ,p_rec_itd.itd_band_max_value
+            ,p_rec_itd.itd_band_description
+            ,p_rec_itd.itd_date_created
+            ,p_rec_itd.itd_date_modified
+            ,p_rec_itd.itd_modified_by
+            ,p_rec_itd.itd_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_itd');
+--
+END ins_itd;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nias (p_rec_nias IN OUT nm_inv_attribute_sets%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nias');
+--
+--
+   INSERT INTO nm_inv_attribute_sets
+            (nias_id
+            ,nias_descr
+            ,nias_date_created
+            ,nias_date_modified
+            ,nias_modified_by
+            ,nias_created_by
+            )
+     VALUES (p_rec_nias.nias_id
+            ,p_rec_nias.nias_descr
+            ,p_rec_nias.nias_date_created
+            ,p_rec_nias.nias_date_modified
+            ,p_rec_nias.nias_modified_by
+            ,p_rec_nias.nias_created_by
+            )
+   RETURNING nias_id
+            ,nias_descr
+            ,nias_date_created
+            ,nias_date_modified
+            ,nias_modified_by
+            ,nias_created_by
+      INTO   p_rec_nias.nias_id
+            ,p_rec_nias.nias_descr
+            ,p_rec_nias.nias_date_created
+            ,p_rec_nias.nias_date_modified
+            ,p_rec_nias.nias_modified_by
+            ,p_rec_nias.nias_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_nias');
+--
+END ins_nias;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nsit (p_rec_nsit IN OUT nm_inv_attribute_set_inv_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nsit');
+--
+--
+   INSERT INTO nm_inv_attribute_set_inv_types
+            (nsit_nias_id
+            ,nsit_nit_inv_type
+            )
+     VALUES (p_rec_nsit.nsit_nias_id
+            ,p_rec_nsit.nsit_nit_inv_type
+            )
+   RETURNING nsit_nias_id
+            ,nsit_nit_inv_type
+      INTO   p_rec_nsit.nsit_nias_id
+            ,p_rec_nsit.nsit_nit_inv_type;
+--
+   nm_debug.proc_end(g_package_name,'ins_nsit');
+--
+END ins_nsit;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nsia (p_rec_nsia IN OUT nm_inv_attribute_set_inv_attr%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nsia');
+--
+--
+   INSERT INTO nm_inv_attribute_set_inv_attr
+            (nsia_nsit_nias_id
+            ,nsia_nsit_nit_inv_type
+            ,nsia_ita_attrib_name
+            )
+     VALUES (p_rec_nsia.nsia_nsit_nias_id
+            ,p_rec_nsia.nsia_nsit_nit_inv_type
+            ,p_rec_nsia.nsia_ita_attrib_name
+            )
+   RETURNING nsia_nsit_nias_id
+            ,nsia_nsit_nit_inv_type
+            ,nsia_ita_attrib_name
+      INTO   p_rec_nsia.nsia_nsit_nias_id
+            ,p_rec_nsia.nsia_nsit_nit_inv_type
+            ,p_rec_nsia.nsia_ita_attrib_name;
+--
+   nm_debug.proc_end(g_package_name,'ins_nsia');
+--
+END ins_nsia;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nitc (p_rec_nitc IN OUT nm_inv_type_colours%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nitc');
+--
+--
+   INSERT INTO nm_inv_type_colours
+            (col_id
+            ,ity_inv_code
+            )
+     VALUES (p_rec_nitc.col_id
+            ,p_rec_nitc.ity_inv_code
+            )
+   RETURNING col_id
+            ,ity_inv_code
+      INTO   p_rec_nitc.col_id
+            ,p_rec_nitc.ity_inv_code;
+--
+   nm_debug.proc_end(g_package_name,'ins_nitc');
+--
+END ins_nitc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_itg (p_rec_itg IN OUT nm_inv_type_groupings%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_itg');
+--
+   p_rec_itg.itg_mandatory                  := NVL(p_rec_itg.itg_mandatory,'Y' );
+   p_rec_itg.itg_start_date                 := NVL(p_rec_itg.itg_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_inv_type_groupings
+            (itg_inv_type
+            ,itg_parent_inv_type
+            ,itg_mandatory
+            ,itg_relation
+            ,itg_start_date
+            ,itg_end_date
+            ,itg_date_created
+            ,itg_date_modified
+            ,itg_modified_by
+            ,itg_created_by
+            )
+     VALUES (p_rec_itg.itg_inv_type
+            ,p_rec_itg.itg_parent_inv_type
+            ,p_rec_itg.itg_mandatory
+            ,p_rec_itg.itg_relation
+            ,p_rec_itg.itg_start_date
+            ,p_rec_itg.itg_end_date
+            ,p_rec_itg.itg_date_created
+            ,p_rec_itg.itg_date_modified
+            ,p_rec_itg.itg_modified_by
+            ,p_rec_itg.itg_created_by
+            );
+--
+   p_rec_itg := nm3get.get_itg
+                   (pi_itg_inv_type        => p_rec_itg.itg_inv_type
+                   ,pi_itg_parent_inv_type => p_rec_itg.itg_parent_inv_type
+                   ,pi_itg_start_date      => p_rec_itg.itg_start_date
+                   ,pi_raise_not_found     => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_itg');
+--
+END ins_itg;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_itg_all (p_rec_itg_all IN OUT nm_inv_type_groupings_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_itg_all');
+--
+   p_rec_itg_all.itg_mandatory                  := NVL(p_rec_itg_all.itg_mandatory,'Y' );
+   p_rec_itg_all.itg_start_date                 := NVL(p_rec_itg_all.itg_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_inv_type_groupings_all
+            (itg_inv_type
+            ,itg_parent_inv_type
+            ,itg_mandatory
+            ,itg_relation
+            ,itg_start_date
+            ,itg_end_date
+            ,itg_date_created
+            ,itg_date_modified
+            ,itg_modified_by
+            ,itg_created_by
+            )
+     VALUES (p_rec_itg_all.itg_inv_type
+            ,p_rec_itg_all.itg_parent_inv_type
+            ,p_rec_itg_all.itg_mandatory
+            ,p_rec_itg_all.itg_relation
+            ,p_rec_itg_all.itg_start_date
+            ,p_rec_itg_all.itg_end_date
+            ,p_rec_itg_all.itg_date_created
+            ,p_rec_itg_all.itg_date_modified
+            ,p_rec_itg_all.itg_modified_by
+            ,p_rec_itg_all.itg_created_by
+            )
+   RETURNING itg_inv_type
+            ,itg_parent_inv_type
+            ,itg_mandatory
+            ,itg_relation
+            ,itg_start_date
+            ,itg_end_date
+            ,itg_date_created
+            ,itg_date_modified
+            ,itg_modified_by
+            ,itg_created_by
+      INTO   p_rec_itg_all.itg_inv_type
+            ,p_rec_itg_all.itg_parent_inv_type
+            ,p_rec_itg_all.itg_mandatory
+            ,p_rec_itg_all.itg_relation
+            ,p_rec_itg_all.itg_start_date
+            ,p_rec_itg_all.itg_end_date
+            ,p_rec_itg_all.itg_date_created
+            ,p_rec_itg_all.itg_date_modified
+            ,p_rec_itg_all.itg_modified_by
+            ,p_rec_itg_all.itg_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_itg_all');
+--
+END ins_itg_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_itr (p_rec_itr IN OUT nm_inv_type_roles%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_itr');
+--
+--
+   INSERT INTO nm_inv_type_roles
+            (itr_inv_type
+            ,itr_hro_role
+            ,itr_mode
+            )
+     VALUES (p_rec_itr.itr_inv_type
+            ,p_rec_itr.itr_hro_role
+            ,p_rec_itr.itr_mode
+            )
+   RETURNING itr_inv_type
+            ,itr_hro_role
+            ,itr_mode
+      INTO   p_rec_itr.itr_inv_type
+            ,p_rec_itr.itr_hro_role
+            ,p_rec_itr.itr_mode;
+--
+   nm_debug.proc_end(g_package_name,'ins_itr');
+--
+END ins_itr;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_njc (p_rec_njc IN OUT nm_job_control%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_njc');
+--
+--
+   INSERT INTO nm_job_control
+            (njc_job_id
+            ,njc_unique
+            ,njc_njt_type
+            ,njc_job_descr
+            ,njc_status
+            ,njc_date_created
+            ,njc_date_modified
+            ,njc_created_by
+            ,njc_modified_by
+            ,njc_route_ne_id
+            ,njc_route_begin_mp
+            ,njc_route_end_mp
+            ,njc_npe_job_id
+            ,njc_effective_date
+            )
+     VALUES (p_rec_njc.njc_job_id
+            ,p_rec_njc.njc_unique
+            ,p_rec_njc.njc_njt_type
+            ,p_rec_njc.njc_job_descr
+            ,p_rec_njc.njc_status
+            ,p_rec_njc.njc_date_created
+            ,p_rec_njc.njc_date_modified
+            ,p_rec_njc.njc_created_by
+            ,p_rec_njc.njc_modified_by
+            ,p_rec_njc.njc_route_ne_id
+            ,p_rec_njc.njc_route_begin_mp
+            ,p_rec_njc.njc_route_end_mp
+            ,p_rec_njc.njc_npe_job_id
+            ,p_rec_njc.njc_effective_date
+            )
+   RETURNING njc_job_id
+            ,njc_unique
+            ,njc_njt_type
+            ,njc_job_descr
+            ,njc_status
+            ,njc_date_created
+            ,njc_date_modified
+            ,njc_created_by
+            ,njc_modified_by
+            ,njc_route_ne_id
+            ,njc_route_begin_mp
+            ,njc_route_end_mp
+            ,njc_npe_job_id
+            ,njc_effective_date
+      INTO   p_rec_njc.njc_job_id
+            ,p_rec_njc.njc_unique
+            ,p_rec_njc.njc_njt_type
+            ,p_rec_njc.njc_job_descr
+            ,p_rec_njc.njc_status
+            ,p_rec_njc.njc_date_created
+            ,p_rec_njc.njc_date_modified
+            ,p_rec_njc.njc_created_by
+            ,p_rec_njc.njc_modified_by
+            ,p_rec_njc.njc_route_ne_id
+            ,p_rec_njc.njc_route_begin_mp
+            ,p_rec_njc.njc_route_end_mp
+            ,p_rec_njc.njc_npe_job_id
+            ,p_rec_njc.njc_effective_date;
+--
+   nm_debug.proc_end(g_package_name,'ins_njc');
+--
+END ins_njc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_njo (p_rec_njo IN OUT nm_job_operations%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_njo');
+--
+--
+   INSERT INTO nm_job_operations
+            (njo_njc_job_id
+            ,njo_id
+            ,njo_nmo_operation
+            ,njo_seq
+            ,njo_status
+            ,njo_date_created
+            ,njo_date_modified
+            ,njo_created_by
+            ,njo_modified_by
+            ,njo_begin_mp
+            ,njo_end_mp
+            )
+     VALUES (p_rec_njo.njo_njc_job_id
+            ,p_rec_njo.njo_id
+            ,p_rec_njo.njo_nmo_operation
+            ,p_rec_njo.njo_seq
+            ,p_rec_njo.njo_status
+            ,p_rec_njo.njo_date_created
+            ,p_rec_njo.njo_date_modified
+            ,p_rec_njo.njo_created_by
+            ,p_rec_njo.njo_modified_by
+            ,p_rec_njo.njo_begin_mp
+            ,p_rec_njo.njo_end_mp
+            )
+   RETURNING njo_njc_job_id
+            ,njo_id
+            ,njo_nmo_operation
+            ,njo_seq
+            ,njo_status
+            ,njo_date_created
+            ,njo_date_modified
+            ,njo_created_by
+            ,njo_modified_by
+            ,njo_begin_mp
+            ,njo_end_mp
+      INTO   p_rec_njo.njo_njc_job_id
+            ,p_rec_njo.njo_id
+            ,p_rec_njo.njo_nmo_operation
+            ,p_rec_njo.njo_seq
+            ,p_rec_njo.njo_status
+            ,p_rec_njo.njo_date_created
+            ,p_rec_njo.njo_date_modified
+            ,p_rec_njo.njo_created_by
+            ,p_rec_njo.njo_modified_by
+            ,p_rec_njo.njo_begin_mp
+            ,p_rec_njo.njo_end_mp;
+--
+   nm_debug.proc_end(g_package_name,'ins_njo');
+--
+END ins_njo;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_njv (p_rec_njv IN OUT nm_job_operation_data_values%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_njv');
+--
+--
+   INSERT INTO nm_job_operation_data_values
+            (njv_njc_job_id
+            ,njv_njo_id
+            ,njv_nmo_operation
+            ,njv_nod_data_item
+            ,njv_date_created
+            ,njv_date_modified
+            ,njv_created_by
+            ,njv_modified_by
+            ,njv_value
+            )
+     VALUES (p_rec_njv.njv_njc_job_id
+            ,p_rec_njv.njv_njo_id
+            ,p_rec_njv.njv_nmo_operation
+            ,p_rec_njv.njv_nod_data_item
+            ,p_rec_njv.njv_date_created
+            ,p_rec_njv.njv_date_modified
+            ,p_rec_njv.njv_created_by
+            ,p_rec_njv.njv_modified_by
+            ,p_rec_njv.njv_value
+            )
+   RETURNING njv_njc_job_id
+            ,njv_njo_id
+            ,njv_nmo_operation
+            ,njv_nod_data_item
+            ,njv_date_created
+            ,njv_date_modified
+            ,njv_created_by
+            ,njv_modified_by
+            ,njv_value
+      INTO   p_rec_njv.njv_njc_job_id
+            ,p_rec_njv.njv_njo_id
+            ,p_rec_njv.njv_nmo_operation
+            ,p_rec_njv.njv_nod_data_item
+            ,p_rec_njv.njv_date_created
+            ,p_rec_njv.njv_date_modified
+            ,p_rec_njv.njv_created_by
+            ,p_rec_njv.njv_modified_by
+            ,p_rec_njv.njv_value;
+--
+   nm_debug.proc_end(g_package_name,'ins_njv');
+--
+END ins_njv;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_njt (p_rec_njt IN OUT nm_job_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_njt');
+--
+   p_rec_njt.njt_nw_lock                    := NVL(p_rec_njt.njt_nw_lock,'N' );
+--
+   INSERT INTO nm_job_types
+            (njt_type
+            ,njt_unique
+            ,njt_descr
+            ,njt_nw_lock
+            ,njt_inv_lock
+            ,njt_inv_type
+            )
+     VALUES (p_rec_njt.njt_type
+            ,p_rec_njt.njt_unique
+            ,p_rec_njt.njt_descr
+            ,p_rec_njt.njt_nw_lock
+            ,p_rec_njt.njt_inv_lock
+            ,p_rec_njt.njt_inv_type
+            )
+   RETURNING njt_type
+            ,njt_unique
+            ,njt_descr
+            ,njt_nw_lock
+            ,njt_inv_lock
+            ,njt_inv_type
+      INTO   p_rec_njt.njt_type
+            ,p_rec_njt.njt_unique
+            ,p_rec_njt.njt_descr
+            ,p_rec_njt.njt_nw_lock
+            ,p_rec_njt.njt_inv_lock
+            ,p_rec_njt.njt_inv_type;
+--
+   nm_debug.proc_end(g_package_name,'ins_njt');
+--
+END ins_njt;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_jto (p_rec_jto IN OUT nm_job_types_operations%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_jto');
+--
+--
+   INSERT INTO nm_job_types_operations
+            (jto_njt_type
+            ,jto_nmo_operation
+            )
+     VALUES (p_rec_jto.jto_njt_type
+            ,p_rec_jto.jto_nmo_operation
+            )
+   RETURNING jto_njt_type
+            ,jto_nmo_operation
+      INTO   p_rec_jto.jto_njt_type
+            ,p_rec_jto.jto_nmo_operation;
+--
+   nm_debug.proc_end(g_package_name,'ins_jto');
+--
+END ins_jto;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nlm (p_rec_nlm IN OUT nm_ld_mc_all_inv_tmp%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nlm');
+--
+   p_rec_nlm.nlm_error_status               := NVL(p_rec_nlm.nlm_error_status,0 );
+--
+   INSERT INTO nm_ld_mc_all_inv_tmp
+            (batch_no
+            ,record_no
+            ,nlm_error_status
+            ,nlm_action_code
+            ,iit_ne_id
+            ,iit_inv_type
+            ,iit_primary_key
+            ,iit_ne_unique
+            ,iit_ne_nt_type
+            ,ne_id
+            ,nm_start
+            ,nm_end
+            ,nau_unit_code
+            ,iit_start_date
+            ,iit_date_created
+            ,iit_date_modified
+            ,iit_created_by
+            ,iit_modified_by
+            ,iit_admin_unit
+            ,iit_descr
+            ,iit_end_date
+            ,iit_foreign_key
+            ,iit_located_by
+            ,iit_position
+            ,iit_x_coord
+            ,iit_y_coord
+            ,iit_num_attrib16
+            ,iit_num_attrib17
+            ,iit_num_attrib18
+            ,iit_num_attrib19
+            ,iit_num_attrib20
+            ,iit_num_attrib21
+            ,iit_num_attrib22
+            ,iit_num_attrib23
+            ,iit_num_attrib24
+            ,iit_num_attrib25
+            ,iit_chr_attrib26
+            ,iit_chr_attrib27
+            ,iit_chr_attrib28
+            ,iit_chr_attrib29
+            ,iit_chr_attrib30
+            ,iit_chr_attrib31
+            ,iit_chr_attrib32
+            ,iit_chr_attrib33
+            ,iit_chr_attrib34
+            ,iit_chr_attrib35
+            ,iit_chr_attrib36
+            ,iit_chr_attrib37
+            ,iit_chr_attrib38
+            ,iit_chr_attrib39
+            ,iit_chr_attrib40
+            ,iit_chr_attrib41
+            ,iit_chr_attrib42
+            ,iit_chr_attrib43
+            ,iit_chr_attrib44
+            ,iit_chr_attrib45
+            ,iit_chr_attrib46
+            ,iit_chr_attrib47
+            ,iit_chr_attrib48
+            ,iit_chr_attrib49
+            ,iit_chr_attrib50
+            ,iit_chr_attrib51
+            ,iit_chr_attrib52
+            ,iit_chr_attrib53
+            ,iit_chr_attrib54
+            ,iit_chr_attrib55
+            ,iit_chr_attrib56
+            ,iit_chr_attrib57
+            ,iit_chr_attrib58
+            ,iit_chr_attrib59
+            ,iit_chr_attrib60
+            ,iit_chr_attrib61
+            ,iit_chr_attrib62
+            ,iit_chr_attrib63
+            ,iit_chr_attrib64
+            ,iit_chr_attrib65
+            ,iit_chr_attrib66
+            ,iit_chr_attrib67
+            ,iit_chr_attrib68
+            ,iit_chr_attrib69
+            ,iit_chr_attrib70
+            ,iit_chr_attrib71
+            ,iit_chr_attrib72
+            ,iit_chr_attrib73
+            ,iit_chr_attrib74
+            ,iit_chr_attrib75
+            ,iit_num_attrib76
+            ,iit_num_attrib77
+            ,iit_num_attrib78
+            ,iit_num_attrib79
+            ,iit_num_attrib80
+            ,iit_num_attrib81
+            ,iit_num_attrib82
+            ,iit_num_attrib83
+            ,iit_num_attrib84
+            ,iit_num_attrib85
+            ,iit_date_attrib86
+            ,iit_date_attrib87
+            ,iit_date_attrib88
+            ,iit_date_attrib89
+            ,iit_date_attrib90
+            ,iit_date_attrib91
+            ,iit_date_attrib92
+            ,iit_date_attrib93
+            ,iit_date_attrib94
+            ,iit_date_attrib95
+            ,iit_angle
+            ,iit_angle_txt
+            ,iit_class
+            ,iit_class_txt
+            ,iit_colour
+            ,iit_colour_txt
+            ,iit_coord_flag
+            ,iit_description
+            ,iit_diagram
+            ,iit_distance
+            ,iit_end_chain
+            ,iit_gap
+            ,iit_height
+            ,iit_height_2
+            ,iit_id_code
+            ,iit_instal_date
+            ,iit_invent_date
+            ,iit_inv_ownership
+            ,iit_itemcode
+            ,iit_lco_lamp_config_id
+            ,iit_length
+            ,iit_material
+            ,iit_material_txt
+            ,iit_method
+            ,iit_method_txt
+            ,iit_note
+            ,iit_no_of_units
+            ,iit_options
+            ,iit_options_txt
+            ,iit_oun_org_id_elec_board
+            ,iit_owner
+            ,iit_owner_txt
+            ,iit_peo_invent_by_id
+            ,iit_photo
+            ,iit_power
+            ,iit_prov_flag
+            ,iit_rev_by
+            ,iit_rev_date
+            ,iit_type
+            ,iit_type_txt
+            ,iit_width
+            ,iit_xtra_char_1
+            ,iit_xtra_date_1
+            ,iit_xtra_domain_1
+            ,iit_xtra_domain_txt_1
+            ,iit_xtra_number_1
+            ,iit_x_sect
+            ,iit_det_xsp
+            ,iit_offset
+            ,iit_x
+            ,iit_y
+            ,iit_z
+            ,iit_num_attrib96
+            ,iit_num_attrib97
+            ,iit_num_attrib98
+            ,iit_num_attrib99
+            ,iit_num_attrib100
+            ,iit_num_attrib101
+            ,iit_num_attrib102
+            ,iit_num_attrib103
+            ,iit_num_attrib104
+            ,iit_num_attrib105
+            ,iit_num_attrib106
+            ,iit_num_attrib107
+            ,iit_num_attrib108
+            ,iit_num_attrib109
+            ,iit_num_attrib110
+            ,iit_num_attrib111
+            ,iit_num_attrib112
+            ,iit_num_attrib113
+            ,iit_num_attrib114
+            ,iit_num_attrib115
+            ,nlm_x_sect
+            ,nlm_invent_date
+            ,nlm_primary_key
+            )
+     VALUES (p_rec_nlm.batch_no
+            ,p_rec_nlm.record_no
+            ,p_rec_nlm.nlm_error_status
+            ,p_rec_nlm.nlm_action_code
+            ,p_rec_nlm.iit_ne_id
+            ,p_rec_nlm.iit_inv_type
+            ,p_rec_nlm.iit_primary_key
+            ,p_rec_nlm.iit_ne_unique
+            ,p_rec_nlm.iit_ne_nt_type
+            ,p_rec_nlm.ne_id
+            ,p_rec_nlm.nm_start
+            ,p_rec_nlm.nm_end
+            ,p_rec_nlm.nau_unit_code
+            ,p_rec_nlm.iit_start_date
+            ,p_rec_nlm.iit_date_created
+            ,p_rec_nlm.iit_date_modified
+            ,p_rec_nlm.iit_created_by
+            ,p_rec_nlm.iit_modified_by
+            ,p_rec_nlm.iit_admin_unit
+            ,p_rec_nlm.iit_descr
+            ,p_rec_nlm.iit_end_date
+            ,p_rec_nlm.iit_foreign_key
+            ,p_rec_nlm.iit_located_by
+            ,p_rec_nlm.iit_position
+            ,p_rec_nlm.iit_x_coord
+            ,p_rec_nlm.iit_y_coord
+            ,p_rec_nlm.iit_num_attrib16
+            ,p_rec_nlm.iit_num_attrib17
+            ,p_rec_nlm.iit_num_attrib18
+            ,p_rec_nlm.iit_num_attrib19
+            ,p_rec_nlm.iit_num_attrib20
+            ,p_rec_nlm.iit_num_attrib21
+            ,p_rec_nlm.iit_num_attrib22
+            ,p_rec_nlm.iit_num_attrib23
+            ,p_rec_nlm.iit_num_attrib24
+            ,p_rec_nlm.iit_num_attrib25
+            ,p_rec_nlm.iit_chr_attrib26
+            ,p_rec_nlm.iit_chr_attrib27
+            ,p_rec_nlm.iit_chr_attrib28
+            ,p_rec_nlm.iit_chr_attrib29
+            ,p_rec_nlm.iit_chr_attrib30
+            ,p_rec_nlm.iit_chr_attrib31
+            ,p_rec_nlm.iit_chr_attrib32
+            ,p_rec_nlm.iit_chr_attrib33
+            ,p_rec_nlm.iit_chr_attrib34
+            ,p_rec_nlm.iit_chr_attrib35
+            ,p_rec_nlm.iit_chr_attrib36
+            ,p_rec_nlm.iit_chr_attrib37
+            ,p_rec_nlm.iit_chr_attrib38
+            ,p_rec_nlm.iit_chr_attrib39
+            ,p_rec_nlm.iit_chr_attrib40
+            ,p_rec_nlm.iit_chr_attrib41
+            ,p_rec_nlm.iit_chr_attrib42
+            ,p_rec_nlm.iit_chr_attrib43
+            ,p_rec_nlm.iit_chr_attrib44
+            ,p_rec_nlm.iit_chr_attrib45
+            ,p_rec_nlm.iit_chr_attrib46
+            ,p_rec_nlm.iit_chr_attrib47
+            ,p_rec_nlm.iit_chr_attrib48
+            ,p_rec_nlm.iit_chr_attrib49
+            ,p_rec_nlm.iit_chr_attrib50
+            ,p_rec_nlm.iit_chr_attrib51
+            ,p_rec_nlm.iit_chr_attrib52
+            ,p_rec_nlm.iit_chr_attrib53
+            ,p_rec_nlm.iit_chr_attrib54
+            ,p_rec_nlm.iit_chr_attrib55
+            ,p_rec_nlm.iit_chr_attrib56
+            ,p_rec_nlm.iit_chr_attrib57
+            ,p_rec_nlm.iit_chr_attrib58
+            ,p_rec_nlm.iit_chr_attrib59
+            ,p_rec_nlm.iit_chr_attrib60
+            ,p_rec_nlm.iit_chr_attrib61
+            ,p_rec_nlm.iit_chr_attrib62
+            ,p_rec_nlm.iit_chr_attrib63
+            ,p_rec_nlm.iit_chr_attrib64
+            ,p_rec_nlm.iit_chr_attrib65
+            ,p_rec_nlm.iit_chr_attrib66
+            ,p_rec_nlm.iit_chr_attrib67
+            ,p_rec_nlm.iit_chr_attrib68
+            ,p_rec_nlm.iit_chr_attrib69
+            ,p_rec_nlm.iit_chr_attrib70
+            ,p_rec_nlm.iit_chr_attrib71
+            ,p_rec_nlm.iit_chr_attrib72
+            ,p_rec_nlm.iit_chr_attrib73
+            ,p_rec_nlm.iit_chr_attrib74
+            ,p_rec_nlm.iit_chr_attrib75
+            ,p_rec_nlm.iit_num_attrib76
+            ,p_rec_nlm.iit_num_attrib77
+            ,p_rec_nlm.iit_num_attrib78
+            ,p_rec_nlm.iit_num_attrib79
+            ,p_rec_nlm.iit_num_attrib80
+            ,p_rec_nlm.iit_num_attrib81
+            ,p_rec_nlm.iit_num_attrib82
+            ,p_rec_nlm.iit_num_attrib83
+            ,p_rec_nlm.iit_num_attrib84
+            ,p_rec_nlm.iit_num_attrib85
+            ,p_rec_nlm.iit_date_attrib86
+            ,p_rec_nlm.iit_date_attrib87
+            ,p_rec_nlm.iit_date_attrib88
+            ,p_rec_nlm.iit_date_attrib89
+            ,p_rec_nlm.iit_date_attrib90
+            ,p_rec_nlm.iit_date_attrib91
+            ,p_rec_nlm.iit_date_attrib92
+            ,p_rec_nlm.iit_date_attrib93
+            ,p_rec_nlm.iit_date_attrib94
+            ,p_rec_nlm.iit_date_attrib95
+            ,p_rec_nlm.iit_angle
+            ,p_rec_nlm.iit_angle_txt
+            ,p_rec_nlm.iit_class
+            ,p_rec_nlm.iit_class_txt
+            ,p_rec_nlm.iit_colour
+            ,p_rec_nlm.iit_colour_txt
+            ,p_rec_nlm.iit_coord_flag
+            ,p_rec_nlm.iit_description
+            ,p_rec_nlm.iit_diagram
+            ,p_rec_nlm.iit_distance
+            ,p_rec_nlm.iit_end_chain
+            ,p_rec_nlm.iit_gap
+            ,p_rec_nlm.iit_height
+            ,p_rec_nlm.iit_height_2
+            ,p_rec_nlm.iit_id_code
+            ,p_rec_nlm.iit_instal_date
+            ,p_rec_nlm.iit_invent_date
+            ,p_rec_nlm.iit_inv_ownership
+            ,p_rec_nlm.iit_itemcode
+            ,p_rec_nlm.iit_lco_lamp_config_id
+            ,p_rec_nlm.iit_length
+            ,p_rec_nlm.iit_material
+            ,p_rec_nlm.iit_material_txt
+            ,p_rec_nlm.iit_method
+            ,p_rec_nlm.iit_method_txt
+            ,p_rec_nlm.iit_note
+            ,p_rec_nlm.iit_no_of_units
+            ,p_rec_nlm.iit_options
+            ,p_rec_nlm.iit_options_txt
+            ,p_rec_nlm.iit_oun_org_id_elec_board
+            ,p_rec_nlm.iit_owner
+            ,p_rec_nlm.iit_owner_txt
+            ,p_rec_nlm.iit_peo_invent_by_id
+            ,p_rec_nlm.iit_photo
+            ,p_rec_nlm.iit_power
+            ,p_rec_nlm.iit_prov_flag
+            ,p_rec_nlm.iit_rev_by
+            ,p_rec_nlm.iit_rev_date
+            ,p_rec_nlm.iit_type
+            ,p_rec_nlm.iit_type_txt
+            ,p_rec_nlm.iit_width
+            ,p_rec_nlm.iit_xtra_char_1
+            ,p_rec_nlm.iit_xtra_date_1
+            ,p_rec_nlm.iit_xtra_domain_1
+            ,p_rec_nlm.iit_xtra_domain_txt_1
+            ,p_rec_nlm.iit_xtra_number_1
+            ,p_rec_nlm.iit_x_sect
+            ,p_rec_nlm.iit_det_xsp
+            ,p_rec_nlm.iit_offset
+            ,p_rec_nlm.iit_x
+            ,p_rec_nlm.iit_y
+            ,p_rec_nlm.iit_z
+            ,p_rec_nlm.iit_num_attrib96
+            ,p_rec_nlm.iit_num_attrib97
+            ,p_rec_nlm.iit_num_attrib98
+            ,p_rec_nlm.iit_num_attrib99
+            ,p_rec_nlm.iit_num_attrib100
+            ,p_rec_nlm.iit_num_attrib101
+            ,p_rec_nlm.iit_num_attrib102
+            ,p_rec_nlm.iit_num_attrib103
+            ,p_rec_nlm.iit_num_attrib104
+            ,p_rec_nlm.iit_num_attrib105
+            ,p_rec_nlm.iit_num_attrib106
+            ,p_rec_nlm.iit_num_attrib107
+            ,p_rec_nlm.iit_num_attrib108
+            ,p_rec_nlm.iit_num_attrib109
+            ,p_rec_nlm.iit_num_attrib110
+            ,p_rec_nlm.iit_num_attrib111
+            ,p_rec_nlm.iit_num_attrib112
+            ,p_rec_nlm.iit_num_attrib113
+            ,p_rec_nlm.iit_num_attrib114
+            ,p_rec_nlm.iit_num_attrib115
+            ,p_rec_nlm.nlm_x_sect
+            ,p_rec_nlm.nlm_invent_date
+            ,p_rec_nlm.nlm_primary_key
+            )
+   RETURNING batch_no
+            ,record_no
+            ,nlm_error_status
+            ,nlm_action_code
+            ,iit_ne_id
+            ,iit_inv_type
+            ,iit_primary_key
+            ,iit_ne_unique
+            ,iit_ne_nt_type
+            ,ne_id
+            ,nm_start
+            ,nm_end
+            ,nau_unit_code
+            ,iit_start_date
+            ,iit_date_created
+            ,iit_date_modified
+            ,iit_created_by
+            ,iit_modified_by
+            ,iit_admin_unit
+            ,iit_descr
+            ,iit_end_date
+            ,iit_foreign_key
+            ,iit_located_by
+            ,iit_position
+            ,iit_x_coord
+            ,iit_y_coord
+            ,iit_num_attrib16
+            ,iit_num_attrib17
+            ,iit_num_attrib18
+            ,iit_num_attrib19
+            ,iit_num_attrib20
+            ,iit_num_attrib21
+            ,iit_num_attrib22
+            ,iit_num_attrib23
+            ,iit_num_attrib24
+            ,iit_num_attrib25
+            ,iit_chr_attrib26
+            ,iit_chr_attrib27
+            ,iit_chr_attrib28
+            ,iit_chr_attrib29
+            ,iit_chr_attrib30
+            ,iit_chr_attrib31
+            ,iit_chr_attrib32
+            ,iit_chr_attrib33
+            ,iit_chr_attrib34
+            ,iit_chr_attrib35
+            ,iit_chr_attrib36
+            ,iit_chr_attrib37
+            ,iit_chr_attrib38
+            ,iit_chr_attrib39
+            ,iit_chr_attrib40
+            ,iit_chr_attrib41
+            ,iit_chr_attrib42
+            ,iit_chr_attrib43
+            ,iit_chr_attrib44
+            ,iit_chr_attrib45
+            ,iit_chr_attrib46
+            ,iit_chr_attrib47
+            ,iit_chr_attrib48
+            ,iit_chr_attrib49
+            ,iit_chr_attrib50
+            ,iit_chr_attrib51
+            ,iit_chr_attrib52
+            ,iit_chr_attrib53
+            ,iit_chr_attrib54
+            ,iit_chr_attrib55
+            ,iit_chr_attrib56
+            ,iit_chr_attrib57
+            ,iit_chr_attrib58
+            ,iit_chr_attrib59
+            ,iit_chr_attrib60
+            ,iit_chr_attrib61
+            ,iit_chr_attrib62
+            ,iit_chr_attrib63
+            ,iit_chr_attrib64
+            ,iit_chr_attrib65
+            ,iit_chr_attrib66
+            ,iit_chr_attrib67
+            ,iit_chr_attrib68
+            ,iit_chr_attrib69
+            ,iit_chr_attrib70
+            ,iit_chr_attrib71
+            ,iit_chr_attrib72
+            ,iit_chr_attrib73
+            ,iit_chr_attrib74
+            ,iit_chr_attrib75
+            ,iit_num_attrib76
+            ,iit_num_attrib77
+            ,iit_num_attrib78
+            ,iit_num_attrib79
+            ,iit_num_attrib80
+            ,iit_num_attrib81
+            ,iit_num_attrib82
+            ,iit_num_attrib83
+            ,iit_num_attrib84
+            ,iit_num_attrib85
+            ,iit_date_attrib86
+            ,iit_date_attrib87
+            ,iit_date_attrib88
+            ,iit_date_attrib89
+            ,iit_date_attrib90
+            ,iit_date_attrib91
+            ,iit_date_attrib92
+            ,iit_date_attrib93
+            ,iit_date_attrib94
+            ,iit_date_attrib95
+            ,iit_angle
+            ,iit_angle_txt
+            ,iit_class
+            ,iit_class_txt
+            ,iit_colour
+            ,iit_colour_txt
+            ,iit_coord_flag
+            ,iit_description
+            ,iit_diagram
+            ,iit_distance
+            ,iit_end_chain
+            ,iit_gap
+            ,iit_height
+            ,iit_height_2
+            ,iit_id_code
+            ,iit_instal_date
+            ,iit_invent_date
+            ,iit_inv_ownership
+            ,iit_itemcode
+            ,iit_lco_lamp_config_id
+            ,iit_length
+            ,iit_material
+            ,iit_material_txt
+            ,iit_method
+            ,iit_method_txt
+            ,iit_note
+            ,iit_no_of_units
+            ,iit_options
+            ,iit_options_txt
+            ,iit_oun_org_id_elec_board
+            ,iit_owner
+            ,iit_owner_txt
+            ,iit_peo_invent_by_id
+            ,iit_photo
+            ,iit_power
+            ,iit_prov_flag
+            ,iit_rev_by
+            ,iit_rev_date
+            ,iit_type
+            ,iit_type_txt
+            ,iit_width
+            ,iit_xtra_char_1
+            ,iit_xtra_date_1
+            ,iit_xtra_domain_1
+            ,iit_xtra_domain_txt_1
+            ,iit_xtra_number_1
+            ,iit_x_sect
+            ,iit_det_xsp
+            ,iit_offset
+            ,iit_x
+            ,iit_y
+            ,iit_z
+            ,iit_num_attrib96
+            ,iit_num_attrib97
+            ,iit_num_attrib98
+            ,iit_num_attrib99
+            ,iit_num_attrib100
+            ,iit_num_attrib101
+            ,iit_num_attrib102
+            ,iit_num_attrib103
+            ,iit_num_attrib104
+            ,iit_num_attrib105
+            ,iit_num_attrib106
+            ,iit_num_attrib107
+            ,iit_num_attrib108
+            ,iit_num_attrib109
+            ,iit_num_attrib110
+            ,iit_num_attrib111
+            ,iit_num_attrib112
+            ,iit_num_attrib113
+            ,iit_num_attrib114
+            ,iit_num_attrib115
+            ,nlm_x_sect
+            ,nlm_invent_date
+            ,nlm_primary_key
+      INTO   p_rec_nlm.batch_no
+            ,p_rec_nlm.record_no
+            ,p_rec_nlm.nlm_error_status
+            ,p_rec_nlm.nlm_action_code
+            ,p_rec_nlm.iit_ne_id
+            ,p_rec_nlm.iit_inv_type
+            ,p_rec_nlm.iit_primary_key
+            ,p_rec_nlm.iit_ne_unique
+            ,p_rec_nlm.iit_ne_nt_type
+            ,p_rec_nlm.ne_id
+            ,p_rec_nlm.nm_start
+            ,p_rec_nlm.nm_end
+            ,p_rec_nlm.nau_unit_code
+            ,p_rec_nlm.iit_start_date
+            ,p_rec_nlm.iit_date_created
+            ,p_rec_nlm.iit_date_modified
+            ,p_rec_nlm.iit_created_by
+            ,p_rec_nlm.iit_modified_by
+            ,p_rec_nlm.iit_admin_unit
+            ,p_rec_nlm.iit_descr
+            ,p_rec_nlm.iit_end_date
+            ,p_rec_nlm.iit_foreign_key
+            ,p_rec_nlm.iit_located_by
+            ,p_rec_nlm.iit_position
+            ,p_rec_nlm.iit_x_coord
+            ,p_rec_nlm.iit_y_coord
+            ,p_rec_nlm.iit_num_attrib16
+            ,p_rec_nlm.iit_num_attrib17
+            ,p_rec_nlm.iit_num_attrib18
+            ,p_rec_nlm.iit_num_attrib19
+            ,p_rec_nlm.iit_num_attrib20
+            ,p_rec_nlm.iit_num_attrib21
+            ,p_rec_nlm.iit_num_attrib22
+            ,p_rec_nlm.iit_num_attrib23
+            ,p_rec_nlm.iit_num_attrib24
+            ,p_rec_nlm.iit_num_attrib25
+            ,p_rec_nlm.iit_chr_attrib26
+            ,p_rec_nlm.iit_chr_attrib27
+            ,p_rec_nlm.iit_chr_attrib28
+            ,p_rec_nlm.iit_chr_attrib29
+            ,p_rec_nlm.iit_chr_attrib30
+            ,p_rec_nlm.iit_chr_attrib31
+            ,p_rec_nlm.iit_chr_attrib32
+            ,p_rec_nlm.iit_chr_attrib33
+            ,p_rec_nlm.iit_chr_attrib34
+            ,p_rec_nlm.iit_chr_attrib35
+            ,p_rec_nlm.iit_chr_attrib36
+            ,p_rec_nlm.iit_chr_attrib37
+            ,p_rec_nlm.iit_chr_attrib38
+            ,p_rec_nlm.iit_chr_attrib39
+            ,p_rec_nlm.iit_chr_attrib40
+            ,p_rec_nlm.iit_chr_attrib41
+            ,p_rec_nlm.iit_chr_attrib42
+            ,p_rec_nlm.iit_chr_attrib43
+            ,p_rec_nlm.iit_chr_attrib44
+            ,p_rec_nlm.iit_chr_attrib45
+            ,p_rec_nlm.iit_chr_attrib46
+            ,p_rec_nlm.iit_chr_attrib47
+            ,p_rec_nlm.iit_chr_attrib48
+            ,p_rec_nlm.iit_chr_attrib49
+            ,p_rec_nlm.iit_chr_attrib50
+            ,p_rec_nlm.iit_chr_attrib51
+            ,p_rec_nlm.iit_chr_attrib52
+            ,p_rec_nlm.iit_chr_attrib53
+            ,p_rec_nlm.iit_chr_attrib54
+            ,p_rec_nlm.iit_chr_attrib55
+            ,p_rec_nlm.iit_chr_attrib56
+            ,p_rec_nlm.iit_chr_attrib57
+            ,p_rec_nlm.iit_chr_attrib58
+            ,p_rec_nlm.iit_chr_attrib59
+            ,p_rec_nlm.iit_chr_attrib60
+            ,p_rec_nlm.iit_chr_attrib61
+            ,p_rec_nlm.iit_chr_attrib62
+            ,p_rec_nlm.iit_chr_attrib63
+            ,p_rec_nlm.iit_chr_attrib64
+            ,p_rec_nlm.iit_chr_attrib65
+            ,p_rec_nlm.iit_chr_attrib66
+            ,p_rec_nlm.iit_chr_attrib67
+            ,p_rec_nlm.iit_chr_attrib68
+            ,p_rec_nlm.iit_chr_attrib69
+            ,p_rec_nlm.iit_chr_attrib70
+            ,p_rec_nlm.iit_chr_attrib71
+            ,p_rec_nlm.iit_chr_attrib72
+            ,p_rec_nlm.iit_chr_attrib73
+            ,p_rec_nlm.iit_chr_attrib74
+            ,p_rec_nlm.iit_chr_attrib75
+            ,p_rec_nlm.iit_num_attrib76
+            ,p_rec_nlm.iit_num_attrib77
+            ,p_rec_nlm.iit_num_attrib78
+            ,p_rec_nlm.iit_num_attrib79
+            ,p_rec_nlm.iit_num_attrib80
+            ,p_rec_nlm.iit_num_attrib81
+            ,p_rec_nlm.iit_num_attrib82
+            ,p_rec_nlm.iit_num_attrib83
+            ,p_rec_nlm.iit_num_attrib84
+            ,p_rec_nlm.iit_num_attrib85
+            ,p_rec_nlm.iit_date_attrib86
+            ,p_rec_nlm.iit_date_attrib87
+            ,p_rec_nlm.iit_date_attrib88
+            ,p_rec_nlm.iit_date_attrib89
+            ,p_rec_nlm.iit_date_attrib90
+            ,p_rec_nlm.iit_date_attrib91
+            ,p_rec_nlm.iit_date_attrib92
+            ,p_rec_nlm.iit_date_attrib93
+            ,p_rec_nlm.iit_date_attrib94
+            ,p_rec_nlm.iit_date_attrib95
+            ,p_rec_nlm.iit_angle
+            ,p_rec_nlm.iit_angle_txt
+            ,p_rec_nlm.iit_class
+            ,p_rec_nlm.iit_class_txt
+            ,p_rec_nlm.iit_colour
+            ,p_rec_nlm.iit_colour_txt
+            ,p_rec_nlm.iit_coord_flag
+            ,p_rec_nlm.iit_description
+            ,p_rec_nlm.iit_diagram
+            ,p_rec_nlm.iit_distance
+            ,p_rec_nlm.iit_end_chain
+            ,p_rec_nlm.iit_gap
+            ,p_rec_nlm.iit_height
+            ,p_rec_nlm.iit_height_2
+            ,p_rec_nlm.iit_id_code
+            ,p_rec_nlm.iit_instal_date
+            ,p_rec_nlm.iit_invent_date
+            ,p_rec_nlm.iit_inv_ownership
+            ,p_rec_nlm.iit_itemcode
+            ,p_rec_nlm.iit_lco_lamp_config_id
+            ,p_rec_nlm.iit_length
+            ,p_rec_nlm.iit_material
+            ,p_rec_nlm.iit_material_txt
+            ,p_rec_nlm.iit_method
+            ,p_rec_nlm.iit_method_txt
+            ,p_rec_nlm.iit_note
+            ,p_rec_nlm.iit_no_of_units
+            ,p_rec_nlm.iit_options
+            ,p_rec_nlm.iit_options_txt
+            ,p_rec_nlm.iit_oun_org_id_elec_board
+            ,p_rec_nlm.iit_owner
+            ,p_rec_nlm.iit_owner_txt
+            ,p_rec_nlm.iit_peo_invent_by_id
+            ,p_rec_nlm.iit_photo
+            ,p_rec_nlm.iit_power
+            ,p_rec_nlm.iit_prov_flag
+            ,p_rec_nlm.iit_rev_by
+            ,p_rec_nlm.iit_rev_date
+            ,p_rec_nlm.iit_type
+            ,p_rec_nlm.iit_type_txt
+            ,p_rec_nlm.iit_width
+            ,p_rec_nlm.iit_xtra_char_1
+            ,p_rec_nlm.iit_xtra_date_1
+            ,p_rec_nlm.iit_xtra_domain_1
+            ,p_rec_nlm.iit_xtra_domain_txt_1
+            ,p_rec_nlm.iit_xtra_number_1
+            ,p_rec_nlm.iit_x_sect
+            ,p_rec_nlm.iit_det_xsp
+            ,p_rec_nlm.iit_offset
+            ,p_rec_nlm.iit_x
+            ,p_rec_nlm.iit_y
+            ,p_rec_nlm.iit_z
+            ,p_rec_nlm.iit_num_attrib96
+            ,p_rec_nlm.iit_num_attrib97
+            ,p_rec_nlm.iit_num_attrib98
+            ,p_rec_nlm.iit_num_attrib99
+            ,p_rec_nlm.iit_num_attrib100
+            ,p_rec_nlm.iit_num_attrib101
+            ,p_rec_nlm.iit_num_attrib102
+            ,p_rec_nlm.iit_num_attrib103
+            ,p_rec_nlm.iit_num_attrib104
+            ,p_rec_nlm.iit_num_attrib105
+            ,p_rec_nlm.iit_num_attrib106
+            ,p_rec_nlm.iit_num_attrib107
+            ,p_rec_nlm.iit_num_attrib108
+            ,p_rec_nlm.iit_num_attrib109
+            ,p_rec_nlm.iit_num_attrib110
+            ,p_rec_nlm.iit_num_attrib111
+            ,p_rec_nlm.iit_num_attrib112
+            ,p_rec_nlm.iit_num_attrib113
+            ,p_rec_nlm.iit_num_attrib114
+            ,p_rec_nlm.iit_num_attrib115
+            ,p_rec_nlm.nlm_x_sect
+            ,p_rec_nlm.nlm_invent_date
+            ,p_rec_nlm.nlm_primary_key;
+--
+   nm_debug.proc_end(g_package_name,'ins_nlm');
+--
+END ins_nlm;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nlt (p_rec_nlt IN OUT nm_linear_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nlt');
+--
+--
+   INSERT INTO nm_linear_types
+            (nlt_id
+            ,nlt_nt_type
+            ,nlt_gty_type
+            ,nlt_descr
+            ,nlt_seq_no
+            ,nlt_units
+            ,nlt_start_date
+            ,nlt_end_date
+            ,nlt_admin_type
+            ,nlt_g_i_d
+            )
+     VALUES (p_rec_nlt.nlt_id
+            ,p_rec_nlt.nlt_nt_type
+            ,p_rec_nlt.nlt_gty_type
+            ,p_rec_nlt.nlt_descr
+            ,p_rec_nlt.nlt_seq_no
+            ,p_rec_nlt.nlt_units
+            ,p_rec_nlt.nlt_start_date
+            ,p_rec_nlt.nlt_end_date
+            ,p_rec_nlt.nlt_admin_type
+            ,p_rec_nlt.nlt_g_i_d
+            )
+   RETURNING nlt_id
+            ,nlt_nt_type
+            ,nlt_gty_type
+            ,nlt_descr
+            ,nlt_seq_no
+            ,nlt_units
+            ,nlt_start_date
+            ,nlt_end_date
+            ,nlt_admin_type
+            ,nlt_g_i_d
+      INTO   p_rec_nlt.nlt_id
+            ,p_rec_nlt.nlt_nt_type
+            ,p_rec_nlt.nlt_gty_type
+            ,p_rec_nlt.nlt_descr
+            ,p_rec_nlt.nlt_seq_no
+            ,p_rec_nlt.nlt_units
+            ,p_rec_nlt.nlt_start_date
+            ,p_rec_nlt.nlt_end_date
+            ,p_rec_nlt.nlt_admin_type
+            ,p_rec_nlt.nlt_g_i_d;
+--
+   nm_debug.proc_end(g_package_name,'ins_nlt');
+--
+END ins_nlt;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nlb (p_rec_nlb IN OUT nm_load_batches%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nlb');
+--
+   p_rec_nlb.nlb_batch_source               := NVL(p_rec_nlb.nlb_batch_source,'S' );
+--
+   INSERT INTO nm_load_batches
+            (nlb_batch_no
+            ,nlb_nlf_id
+            ,nlb_filename
+            ,nlb_record_count
+            ,nlb_date_created
+            ,nlb_date_modified
+            ,nlb_modified_by
+            ,nlb_created_by
+            ,nlb_batch_source
+            )
+     VALUES (p_rec_nlb.nlb_batch_no
+            ,p_rec_nlb.nlb_nlf_id
+            ,p_rec_nlb.nlb_filename
+            ,p_rec_nlb.nlb_record_count
+            ,p_rec_nlb.nlb_date_created
+            ,p_rec_nlb.nlb_date_modified
+            ,p_rec_nlb.nlb_modified_by
+            ,p_rec_nlb.nlb_created_by
+            ,p_rec_nlb.nlb_batch_source
+            )
+   RETURNING nlb_batch_no
+            ,nlb_nlf_id
+            ,nlb_filename
+            ,nlb_record_count
+            ,nlb_date_created
+            ,nlb_date_modified
+            ,nlb_modified_by
+            ,nlb_created_by
+            ,nlb_batch_source
+      INTO   p_rec_nlb.nlb_batch_no
+            ,p_rec_nlb.nlb_nlf_id
+            ,p_rec_nlb.nlb_filename
+            ,p_rec_nlb.nlb_record_count
+            ,p_rec_nlb.nlb_date_created
+            ,p_rec_nlb.nlb_date_modified
+            ,p_rec_nlb.nlb_modified_by
+            ,p_rec_nlb.nlb_created_by
+            ,p_rec_nlb.nlb_batch_source;
+--
+   nm_debug.proc_end(g_package_name,'ins_nlb');
+--
+END ins_nlb;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nlbs (p_rec_nlbs IN OUT nm_load_batch_status%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nlbs');
+--
+--
+   INSERT INTO nm_load_batch_status
+            (nlbs_nlb_batch_no
+            ,nlbs_record_no
+            ,nlbs_status
+            ,nlbs_text
+            ,nlbs_input_line
+            )
+     VALUES (p_rec_nlbs.nlbs_nlb_batch_no
+            ,p_rec_nlbs.nlbs_record_no
+            ,p_rec_nlbs.nlbs_status
+            ,p_rec_nlbs.nlbs_text
+            ,p_rec_nlbs.nlbs_input_line
+            )
+   RETURNING nlbs_nlb_batch_no
+            ,nlbs_record_no
+            ,nlbs_status
+            ,nlbs_text
+      INTO   p_rec_nlbs.nlbs_nlb_batch_no
+            ,p_rec_nlbs.nlbs_record_no
+            ,p_rec_nlbs.nlbs_status
+            ,p_rec_nlbs.nlbs_text;
+--
+   nm_debug.proc_end(g_package_name,'ins_nlbs');
+--
+END ins_nlbs;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nld (p_rec_nld IN OUT nm_load_destinations%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nld');
+--
+--
+   INSERT INTO nm_load_destinations
+            (nld_id
+            ,nld_table_name
+            ,nld_table_short_name
+            ,nld_insert_proc
+            ,nld_validation_proc
+            )
+     VALUES (p_rec_nld.nld_id
+            ,p_rec_nld.nld_table_name
+            ,p_rec_nld.nld_table_short_name
+            ,p_rec_nld.nld_insert_proc
+            ,p_rec_nld.nld_validation_proc
+            )
+   RETURNING nld_id
+            ,nld_table_name
+            ,nld_table_short_name
+            ,nld_insert_proc
+            ,nld_validation_proc
+      INTO   p_rec_nld.nld_id
+            ,p_rec_nld.nld_table_name
+            ,p_rec_nld.nld_table_short_name
+            ,p_rec_nld.nld_insert_proc
+            ,p_rec_nld.nld_validation_proc;
+--
+   nm_debug.proc_end(g_package_name,'ins_nld');
+--
+END ins_nld;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nldd (p_rec_nldd IN OUT nm_load_destination_defaults%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nldd');
+--
+--
+   INSERT INTO nm_load_destination_defaults
+            (nldd_nld_id
+            ,nldd_column_name
+            ,nldd_value
+            )
+     VALUES (p_rec_nldd.nldd_nld_id
+            ,p_rec_nldd.nldd_column_name
+            ,p_rec_nldd.nldd_value
+            )
+   RETURNING nldd_nld_id
+            ,nldd_column_name
+            ,nldd_value
+      INTO   p_rec_nldd.nldd_nld_id
+            ,p_rec_nldd.nldd_column_name
+            ,p_rec_nldd.nldd_value;
+--
+   nm_debug.proc_end(g_package_name,'ins_nldd');
+--
+END ins_nldd;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nlf (p_rec_nlf IN OUT nm_load_files%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nlf');
+--
+--
+   INSERT INTO nm_load_files
+            (nlf_id
+            ,nlf_unique
+            ,nlf_descr
+            ,nlf_path
+            ,nlf_delimiter
+            ,nlf_date_format_mask
+            ,nlf_holding_table
+            )
+     VALUES (p_rec_nlf.nlf_id
+            ,p_rec_nlf.nlf_unique
+            ,p_rec_nlf.nlf_descr
+            ,p_rec_nlf.nlf_path
+            ,p_rec_nlf.nlf_delimiter
+            ,p_rec_nlf.nlf_date_format_mask
+            ,p_rec_nlf.nlf_holding_table
+            )
+   RETURNING nlf_id
+            ,nlf_unique
+            ,nlf_descr
+            ,nlf_path
+            ,nlf_delimiter
+            ,nlf_date_format_mask
+            ,nlf_holding_table
+      INTO   p_rec_nlf.nlf_id
+            ,p_rec_nlf.nlf_unique
+            ,p_rec_nlf.nlf_descr
+            ,p_rec_nlf.nlf_path
+            ,p_rec_nlf.nlf_delimiter
+            ,p_rec_nlf.nlf_date_format_mask
+            ,p_rec_nlf.nlf_holding_table;
+--
+   nm_debug.proc_end(g_package_name,'ins_nlf');
+--
+END ins_nlf;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nlfc (p_rec_nlfc IN OUT nm_load_file_cols%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nlfc');
+--
+   p_rec_nlfc.nlfc_mandatory                 := NVL(p_rec_nlfc.nlfc_mandatory,'N' );
+--
+   INSERT INTO nm_load_file_cols
+            (nlfc_nlf_id
+            ,nlfc_seq_no
+            ,nlfc_holding_col
+            ,nlfc_datatype
+            ,nlfc_varchar_size
+            ,nlfc_mandatory
+            ,nlfc_date_format_mask
+            )
+     VALUES (p_rec_nlfc.nlfc_nlf_id
+            ,p_rec_nlfc.nlfc_seq_no
+            ,p_rec_nlfc.nlfc_holding_col
+            ,p_rec_nlfc.nlfc_datatype
+            ,p_rec_nlfc.nlfc_varchar_size
+            ,p_rec_nlfc.nlfc_mandatory
+            ,p_rec_nlfc.nlfc_date_format_mask
+            )
+   RETURNING nlfc_nlf_id
+            ,nlfc_seq_no
+            ,nlfc_holding_col
+            ,nlfc_datatype
+            ,nlfc_varchar_size
+            ,nlfc_mandatory
+            ,nlfc_date_format_mask
+      INTO   p_rec_nlfc.nlfc_nlf_id
+            ,p_rec_nlfc.nlfc_seq_no
+            ,p_rec_nlfc.nlfc_holding_col
+            ,p_rec_nlfc.nlfc_datatype
+            ,p_rec_nlfc.nlfc_varchar_size
+            ,p_rec_nlfc.nlfc_mandatory
+            ,p_rec_nlfc.nlfc_date_format_mask;
+--
+   nm_debug.proc_end(g_package_name,'ins_nlfc');
+--
+END ins_nlfc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nlcd (p_rec_nlcd IN OUT nm_load_file_col_destinations%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nlcd');
+--
+--
+   INSERT INTO nm_load_file_col_destinations
+            (nlcd_nlf_id
+            ,nlcd_nld_id
+            ,nlcd_seq_no
+            ,nlcd_dest_col
+            ,nlcd_source_col
+            )
+     VALUES (p_rec_nlcd.nlcd_nlf_id
+            ,p_rec_nlcd.nlcd_nld_id
+            ,p_rec_nlcd.nlcd_seq_no
+            ,p_rec_nlcd.nlcd_dest_col
+            ,p_rec_nlcd.nlcd_source_col
+            )
+   RETURNING nlcd_nlf_id
+            ,nlcd_nld_id
+            ,nlcd_seq_no
+            ,nlcd_dest_col
+            ,nlcd_source_col
+      INTO   p_rec_nlcd.nlcd_nlf_id
+            ,p_rec_nlcd.nlcd_nld_id
+            ,p_rec_nlcd.nlcd_seq_no
+            ,p_rec_nlcd.nlcd_dest_col
+            ,p_rec_nlcd.nlcd_source_col;
+--
+   nm_debug.proc_end(g_package_name,'ins_nlcd');
+--
+END ins_nlcd;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nlfd (p_rec_nlfd IN OUT nm_load_file_destinations%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nlfd');
+--
+--
+   INSERT INTO nm_load_file_destinations
+            (nlfd_nlf_id
+            ,nlfd_nld_id
+            ,nlfd_seq
+            )
+     VALUES (p_rec_nlfd.nlfd_nlf_id
+            ,p_rec_nlfd.nlfd_nld_id
+            ,p_rec_nlfd.nlfd_seq
+            )
+   RETURNING nlfd_nlf_id
+            ,nlfd_nld_id
+            ,nlfd_seq
+      INTO   p_rec_nlfd.nlfd_nlf_id
+            ,p_rec_nlfd.nlfd_nld_id
+            ,p_rec_nlfd.nlfd_seq;
+--
+   nm_debug.proc_end(g_package_name,'ins_nlfd');
+--
+END ins_nlfd;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmg (p_rec_nmg IN OUT nm_mail_groups%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmg');
+--
+--
+   INSERT INTO nm_mail_groups
+            (nmg_id
+            ,nmg_name
+            )
+     VALUES (p_rec_nmg.nmg_id
+            ,p_rec_nmg.nmg_name
+            )
+   RETURNING nmg_id
+            ,nmg_name
+      INTO   p_rec_nmg.nmg_id
+            ,p_rec_nmg.nmg_name;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmg');
+--
+END ins_nmg;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmgm (p_rec_nmgm IN OUT nm_mail_group_membership%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmgm');
+--
+--
+   INSERT INTO nm_mail_group_membership
+            (nmgm_nmg_id
+            ,nmgm_nmu_id
+            )
+     VALUES (p_rec_nmgm.nmgm_nmg_id
+            ,p_rec_nmgm.nmgm_nmu_id
+            )
+   RETURNING nmgm_nmg_id
+            ,nmgm_nmu_id
+      INTO   p_rec_nmgm.nmgm_nmg_id
+            ,p_rec_nmgm.nmgm_nmu_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmgm');
+--
+END ins_nmgm;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmm (p_rec_nmm IN OUT nm_mail_message%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmm');
+--
+   p_rec_nmm.nmm_html                       := NVL(p_rec_nmm.nmm_html,'Y' );
+--
+   INSERT INTO nm_mail_message
+            (nmm_id
+            ,nmm_subject
+            ,nmm_status
+            ,nmm_from_nmu_id
+            ,nmm_html
+            ,nmm_date_created
+            ,nmm_date_modified
+            ,nmm_modified_by
+            ,nmm_created_by
+            )
+     VALUES (p_rec_nmm.nmm_id
+            ,p_rec_nmm.nmm_subject
+            ,p_rec_nmm.nmm_status
+            ,p_rec_nmm.nmm_from_nmu_id
+            ,p_rec_nmm.nmm_html
+            ,p_rec_nmm.nmm_date_created
+            ,p_rec_nmm.nmm_date_modified
+            ,p_rec_nmm.nmm_modified_by
+            ,p_rec_nmm.nmm_created_by
+            )
+   RETURNING nmm_id
+            ,nmm_subject
+            ,nmm_status
+            ,nmm_from_nmu_id
+            ,nmm_html
+            ,nmm_date_created
+            ,nmm_date_modified
+            ,nmm_modified_by
+            ,nmm_created_by
+      INTO   p_rec_nmm.nmm_id
+            ,p_rec_nmm.nmm_subject
+            ,p_rec_nmm.nmm_status
+            ,p_rec_nmm.nmm_from_nmu_id
+            ,p_rec_nmm.nmm_html
+            ,p_rec_nmm.nmm_date_created
+            ,p_rec_nmm.nmm_date_modified
+            ,p_rec_nmm.nmm_modified_by
+            ,p_rec_nmm.nmm_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmm');
+--
+END ins_nmm;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmmr (p_rec_nmmr IN OUT nm_mail_message_recipients%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmmr');
+--
+   p_rec_nmmr.nmmr_send_type                 := NVL(p_rec_nmmr.nmmr_send_type,'TO' );
+--
+   INSERT INTO nm_mail_message_recipients
+            (nmmr_nmm_id
+            ,nmmr_rcpt_id
+            ,nmmr_rcpt_type
+            ,nmmr_send_type
+            )
+     VALUES (p_rec_nmmr.nmmr_nmm_id
+            ,p_rec_nmmr.nmmr_rcpt_id
+            ,p_rec_nmmr.nmmr_rcpt_type
+            ,p_rec_nmmr.nmmr_send_type
+            )
+   RETURNING nmmr_nmm_id
+            ,nmmr_rcpt_id
+            ,nmmr_rcpt_type
+            ,nmmr_send_type
+      INTO   p_rec_nmmr.nmmr_nmm_id
+            ,p_rec_nmmr.nmmr_rcpt_id
+            ,p_rec_nmmr.nmmr_rcpt_type
+            ,p_rec_nmmr.nmmr_send_type;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmmr');
+--
+END ins_nmmr;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmmt (p_rec_nmmt IN OUT nm_mail_message_text%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmmt');
+--
+--
+   INSERT INTO nm_mail_message_text
+            (nmmt_nmm_id
+            ,nmmt_line_id
+            ,nmmt_text_line
+            )
+     VALUES (p_rec_nmmt.nmmt_nmm_id
+            ,p_rec_nmmt.nmmt_line_id
+            ,p_rec_nmmt.nmmt_text_line
+            )
+   RETURNING nmmt_nmm_id
+            ,nmmt_line_id
+            ,nmmt_text_line
+      INTO   p_rec_nmmt.nmmt_nmm_id
+            ,p_rec_nmmt.nmmt_line_id
+            ,p_rec_nmmt.nmmt_text_line;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmmt');
+--
+END ins_nmmt;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmu (p_rec_nmu IN OUT nm_mail_users%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmu');
+--
+--
+   INSERT INTO nm_mail_users
+            (nmu_id
+            ,nmu_name
+            ,nmu_email_address
+            ,nmu_hus_user_id
+            )
+     VALUES (p_rec_nmu.nmu_id
+            ,p_rec_nmu.nmu_name
+            ,p_rec_nmu.nmu_email_address
+            ,p_rec_nmu.nmu_hus_user_id
+            )
+   RETURNING nmu_id
+            ,nmu_name
+            ,nmu_email_address
+            ,nmu_hus_user_id
+      INTO   p_rec_nmu.nmu_id
+            ,p_rec_nmu.nmu_name
+            ,p_rec_nmu.nmu_email_address
+            ,p_rec_nmu.nmu_hus_user_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmu');
+--
+END ins_nmu;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nm (p_rec_nm IN OUT nm_members%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nm');
+--
+   p_rec_nm.nm_begin_mp                    := NVL(p_rec_nm.nm_begin_mp,0 );
+   p_rec_nm.nm_start_date                  := NVL(p_rec_nm.nm_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_nm.nm_cardinality                 := NVL(p_rec_nm.nm_cardinality,1
+ );
+--
+   INSERT INTO nm_members
+            (nm_ne_id_in
+            ,nm_ne_id_of
+            ,nm_type
+            ,nm_obj_type
+            ,nm_begin_mp
+            ,nm_start_date
+            ,nm_end_date
+            ,nm_end_mp
+            ,nm_slk
+            ,nm_cardinality
+            ,nm_admin_unit
+            ,nm_date_created
+            ,nm_date_modified
+            ,nm_modified_by
+            ,nm_created_by
+            ,nm_seq_no
+            ,nm_seg_no
+            ,nm_true
+            ,nm_end_slk
+            ,nm_end_true
+            )
+     VALUES (p_rec_nm.nm_ne_id_in
+            ,p_rec_nm.nm_ne_id_of
+            ,p_rec_nm.nm_type
+            ,p_rec_nm.nm_obj_type
+            ,p_rec_nm.nm_begin_mp
+            ,p_rec_nm.nm_start_date
+            ,p_rec_nm.nm_end_date
+            ,p_rec_nm.nm_end_mp
+            ,p_rec_nm.nm_slk
+            ,p_rec_nm.nm_cardinality
+            ,p_rec_nm.nm_admin_unit
+            ,p_rec_nm.nm_date_created
+            ,p_rec_nm.nm_date_modified
+            ,p_rec_nm.nm_modified_by
+            ,p_rec_nm.nm_created_by
+            ,p_rec_nm.nm_seq_no
+            ,p_rec_nm.nm_seg_no
+            ,p_rec_nm.nm_true
+            ,p_rec_nm.nm_end_slk
+            ,p_rec_nm.nm_end_true
+            );
+--
+   p_rec_nm := nm3get.get_nm
+                   (pi_nm_ne_id_in       => p_rec_nm.nm_ne_id_in
+                   ,pi_nm_ne_id_of       => p_rec_nm.nm_ne_id_of
+                   ,pi_nm_begin_mp       => p_rec_nm.nm_begin_mp
+                   ,pi_nm_start_date     => p_rec_nm.nm_start_date
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_nm');
+--
+END ins_nm;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nm_all (p_rec_nm_all IN OUT nm_members_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nm_all');
+--
+   p_rec_nm_all.nm_begin_mp                    := NVL(p_rec_nm_all.nm_begin_mp,0 );
+   p_rec_nm_all.nm_start_date                  := NVL(p_rec_nm_all.nm_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_nm_all.nm_cardinality                 := NVL(p_rec_nm_all.nm_cardinality,1
+ );
+--
+   INSERT INTO nm_members_all
+            (nm_ne_id_in
+            ,nm_ne_id_of
+            ,nm_type
+            ,nm_obj_type
+            ,nm_begin_mp
+            ,nm_start_date
+            ,nm_end_date
+            ,nm_end_mp
+            ,nm_slk
+            ,nm_cardinality
+            ,nm_admin_unit
+            ,nm_date_created
+            ,nm_date_modified
+            ,nm_modified_by
+            ,nm_created_by
+            ,nm_seq_no
+            ,nm_seg_no
+            ,nm_true
+            ,nm_end_slk
+            ,nm_end_true
+            )
+     VALUES (p_rec_nm_all.nm_ne_id_in
+            ,p_rec_nm_all.nm_ne_id_of
+            ,p_rec_nm_all.nm_type
+            ,p_rec_nm_all.nm_obj_type
+            ,p_rec_nm_all.nm_begin_mp
+            ,p_rec_nm_all.nm_start_date
+            ,p_rec_nm_all.nm_end_date
+            ,p_rec_nm_all.nm_end_mp
+            ,p_rec_nm_all.nm_slk
+            ,p_rec_nm_all.nm_cardinality
+            ,p_rec_nm_all.nm_admin_unit
+            ,p_rec_nm_all.nm_date_created
+            ,p_rec_nm_all.nm_date_modified
+            ,p_rec_nm_all.nm_modified_by
+            ,p_rec_nm_all.nm_created_by
+            ,p_rec_nm_all.nm_seq_no
+            ,p_rec_nm_all.nm_seg_no
+            ,p_rec_nm_all.nm_true
+            ,p_rec_nm_all.nm_end_slk
+            ,p_rec_nm_all.nm_end_true
+            )
+   RETURNING nm_ne_id_in
+            ,nm_ne_id_of
+            ,nm_type
+            ,nm_obj_type
+            ,nm_begin_mp
+            ,nm_start_date
+            ,nm_end_date
+            ,nm_end_mp
+            ,nm_slk
+            ,nm_cardinality
+            ,nm_admin_unit
+            ,nm_date_created
+            ,nm_date_modified
+            ,nm_modified_by
+            ,nm_created_by
+            ,nm_seq_no
+            ,nm_seg_no
+            ,nm_true
+            ,nm_end_slk
+            ,nm_end_true
+      INTO   p_rec_nm_all.nm_ne_id_in
+            ,p_rec_nm_all.nm_ne_id_of
+            ,p_rec_nm_all.nm_type
+            ,p_rec_nm_all.nm_obj_type
+            ,p_rec_nm_all.nm_begin_mp
+            ,p_rec_nm_all.nm_start_date
+            ,p_rec_nm_all.nm_end_date
+            ,p_rec_nm_all.nm_end_mp
+            ,p_rec_nm_all.nm_slk
+            ,p_rec_nm_all.nm_cardinality
+            ,p_rec_nm_all.nm_admin_unit
+            ,p_rec_nm_all.nm_date_created
+            ,p_rec_nm_all.nm_date_modified
+            ,p_rec_nm_all.nm_modified_by
+            ,p_rec_nm_all.nm_created_by
+            ,p_rec_nm_all.nm_seq_no
+            ,p_rec_nm_all.nm_seg_no
+            ,p_rec_nm_all.nm_true
+            ,p_rec_nm_all.nm_end_slk
+            ,p_rec_nm_all.nm_end_true;
+--
+   nm_debug.proc_end(g_package_name,'ins_nm_all');
+--
+END ins_nm_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmh (p_rec_nmh IN OUT nm_member_history%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmh');
+--
+--
+   INSERT INTO nm_member_history
+            (nmh_nm_ne_id_in
+            ,nmh_nm_ne_id_of_old
+            ,nmh_nm_ne_id_of_new
+            ,nmh_nm_begin_mp
+            ,nmh_nm_start_date
+            ,nmh_nm_type
+            ,nmh_nm_obj_type
+            ,nmh_nm_end_date
+            )
+     VALUES (p_rec_nmh.nmh_nm_ne_id_in
+            ,p_rec_nmh.nmh_nm_ne_id_of_old
+            ,p_rec_nmh.nmh_nm_ne_id_of_new
+            ,p_rec_nmh.nmh_nm_begin_mp
+            ,p_rec_nmh.nmh_nm_start_date
+            ,p_rec_nmh.nmh_nm_type
+            ,p_rec_nmh.nmh_nm_obj_type
+            ,p_rec_nmh.nmh_nm_end_date
+            )
+   RETURNING nmh_nm_ne_id_in
+            ,nmh_nm_ne_id_of_old
+            ,nmh_nm_ne_id_of_new
+            ,nmh_nm_begin_mp
+            ,nmh_nm_start_date
+            ,nmh_nm_type
+            ,nmh_nm_obj_type
+            ,nmh_nm_end_date
+      INTO   p_rec_nmh.nmh_nm_ne_id_in
+            ,p_rec_nmh.nmh_nm_ne_id_of_old
+            ,p_rec_nmh.nmh_nm_ne_id_of_new
+            ,p_rec_nmh.nmh_nm_begin_mp
+            ,p_rec_nmh.nmh_nm_start_date
+            ,p_rec_nmh.nmh_nm_type
+            ,p_rec_nmh.nmh_nm_obj_type
+            ,p_rec_nmh.nmh_nm_end_date;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmh');
+--
+END ins_nmh;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nda (p_rec_nda IN OUT nm_mrg_default_query_attribs%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nda');
+--
+--
+   INSERT INTO nm_mrg_default_query_attribs
+            (nda_seq_no
+            ,nda_attrib_name
+            ,nda_date_created
+            ,nda_date_modified
+            ,nda_modified_by
+            ,nda_created_by
+            ,nda_itb_banding_id
+            )
+     VALUES (p_rec_nda.nda_seq_no
+            ,p_rec_nda.nda_attrib_name
+            ,p_rec_nda.nda_date_created
+            ,p_rec_nda.nda_date_modified
+            ,p_rec_nda.nda_modified_by
+            ,p_rec_nda.nda_created_by
+            ,p_rec_nda.nda_itb_banding_id
+            )
+   RETURNING nda_seq_no
+            ,nda_attrib_name
+            ,nda_date_created
+            ,nda_date_modified
+            ,nda_modified_by
+            ,nda_created_by
+            ,nda_itb_banding_id
+      INTO   p_rec_nda.nda_seq_no
+            ,p_rec_nda.nda_attrib_name
+            ,p_rec_nda.nda_date_created
+            ,p_rec_nda.nda_date_modified
+            ,p_rec_nda.nda_modified_by
+            ,p_rec_nda.nda_created_by
+            ,p_rec_nda.nda_itb_banding_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_nda');
+--
+END ins_nda;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ndq (p_rec_ndq IN OUT nm_mrg_default_query_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ndq');
+--
+--
+   INSERT INTO nm_mrg_default_query_types
+            (ndq_seq_no
+            ,ndq_inv_type
+            ,ndq_x_sect
+            ,ndq_date_created
+            ,ndq_date_modified
+            ,ndq_modified_by
+            ,ndq_created_by
+            )
+     VALUES (p_rec_ndq.ndq_seq_no
+            ,p_rec_ndq.ndq_inv_type
+            ,p_rec_ndq.ndq_x_sect
+            ,p_rec_ndq.ndq_date_created
+            ,p_rec_ndq.ndq_date_modified
+            ,p_rec_ndq.ndq_modified_by
+            ,p_rec_ndq.ndq_created_by
+            );
+--
+   p_rec_ndq := nm3get.get_ndq
+                   (pi_ndq_seq_no        => p_rec_ndq.ndq_seq_no
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_ndq');
+--
+END ins_ndq;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ndq_all (p_rec_ndq_all IN OUT nm_mrg_default_query_types_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ndq_all');
+--
+--
+   INSERT INTO nm_mrg_default_query_types_all
+            (ndq_seq_no
+            ,ndq_inv_type
+            ,ndq_x_sect
+            ,ndq_date_created
+            ,ndq_date_modified
+            ,ndq_modified_by
+            ,ndq_created_by
+            )
+     VALUES (p_rec_ndq_all.ndq_seq_no
+            ,p_rec_ndq_all.ndq_inv_type
+            ,p_rec_ndq_all.ndq_x_sect
+            ,p_rec_ndq_all.ndq_date_created
+            ,p_rec_ndq_all.ndq_date_modified
+            ,p_rec_ndq_all.ndq_modified_by
+            ,p_rec_ndq_all.ndq_created_by
+            )
+   RETURNING ndq_seq_no
+            ,ndq_inv_type
+            ,ndq_x_sect
+            ,ndq_date_created
+            ,ndq_date_modified
+            ,ndq_modified_by
+            ,ndq_created_by
+      INTO   p_rec_ndq_all.ndq_seq_no
+            ,p_rec_ndq_all.ndq_inv_type
+            ,p_rec_ndq_all.ndq_x_sect
+            ,p_rec_ndq_all.ndq_date_created
+            ,p_rec_ndq_all.ndq_date_modified
+            ,p_rec_ndq_all.ndq_modified_by
+            ,p_rec_ndq_all.ndq_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_ndq_all');
+--
+END ins_ndq_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmid (p_rec_nmid IN OUT nm_mrg_inv_derivation%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmid');
+--
+--
+   INSERT INTO nm_mrg_inv_derivation
+            (nmid_nmq_id
+            ,nmid_inv_type
+            ,nmid_attrib_name
+            ,nmid_derivation
+            )
+     VALUES (p_rec_nmid.nmid_nmq_id
+            ,p_rec_nmid.nmid_inv_type
+            ,p_rec_nmid.nmid_attrib_name
+            ,p_rec_nmid.nmid_derivation
+            )
+   RETURNING nmid_nmq_id
+            ,nmid_inv_type
+            ,nmid_attrib_name
+            ,nmid_derivation
+      INTO   p_rec_nmid.nmid_nmq_id
+            ,p_rec_nmid.nmid_inv_type
+            ,p_rec_nmid.nmid_attrib_name
+            ,p_rec_nmid.nmid_derivation;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmid');
+--
+END ins_nmid;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmc (p_rec_nmc IN OUT nm_mrg_output_cols%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmc');
+--
+   p_rec_nmc.nmc_display_sign               := NVL(p_rec_nmc.nmc_display_sign,'N' );
+--
+   INSERT INTO nm_mrg_output_cols
+            (nmc_nmf_id
+            ,nmc_seq_no
+            ,nmc_length
+            ,nmc_column_name
+            ,nmc_sec_or_val
+            ,nmc_data_type
+            ,nmc_pad
+            ,nmc_dec_places
+            ,nmc_disp_dp
+            ,nmc_description
+            ,nmc_view_col_name
+            ,nmc_order_by
+            ,nmc_order_by_ord
+            ,nmc_display_sign
+            )
+     VALUES (p_rec_nmc.nmc_nmf_id
+            ,p_rec_nmc.nmc_seq_no
+            ,p_rec_nmc.nmc_length
+            ,p_rec_nmc.nmc_column_name
+            ,p_rec_nmc.nmc_sec_or_val
+            ,p_rec_nmc.nmc_data_type
+            ,p_rec_nmc.nmc_pad
+            ,p_rec_nmc.nmc_dec_places
+            ,p_rec_nmc.nmc_disp_dp
+            ,p_rec_nmc.nmc_description
+            ,p_rec_nmc.nmc_view_col_name
+            ,p_rec_nmc.nmc_order_by
+            ,p_rec_nmc.nmc_order_by_ord
+            ,p_rec_nmc.nmc_display_sign
+            )
+   RETURNING nmc_nmf_id
+            ,nmc_seq_no
+            ,nmc_length
+            ,nmc_column_name
+            ,nmc_sec_or_val
+            ,nmc_data_type
+            ,nmc_pad
+            ,nmc_dec_places
+            ,nmc_disp_dp
+            ,nmc_description
+            ,nmc_view_col_name
+            ,nmc_order_by
+            ,nmc_order_by_ord
+            ,nmc_display_sign
+      INTO   p_rec_nmc.nmc_nmf_id
+            ,p_rec_nmc.nmc_seq_no
+            ,p_rec_nmc.nmc_length
+            ,p_rec_nmc.nmc_column_name
+            ,p_rec_nmc.nmc_sec_or_val
+            ,p_rec_nmc.nmc_data_type
+            ,p_rec_nmc.nmc_pad
+            ,p_rec_nmc.nmc_dec_places
+            ,p_rec_nmc.nmc_disp_dp
+            ,p_rec_nmc.nmc_description
+            ,p_rec_nmc.nmc_view_col_name
+            ,p_rec_nmc.nmc_order_by
+            ,p_rec_nmc.nmc_order_by_ord
+            ,p_rec_nmc.nmc_display_sign;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmc');
+--
+END ins_nmc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmcd (p_rec_nmcd IN OUT nm_mrg_output_col_decode%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmcd');
+--
+--
+   INSERT INTO nm_mrg_output_col_decode
+            (nmcd_nmf_id
+            ,nmcd_nmc_seq_no
+            ,nmcd_from_value
+            ,nmcd_to_value
+            )
+     VALUES (p_rec_nmcd.nmcd_nmf_id
+            ,p_rec_nmcd.nmcd_nmc_seq_no
+            ,p_rec_nmcd.nmcd_from_value
+            ,p_rec_nmcd.nmcd_to_value
+            )
+   RETURNING nmcd_nmf_id
+            ,nmcd_nmc_seq_no
+            ,nmcd_from_value
+            ,nmcd_to_value
+      INTO   p_rec_nmcd.nmcd_nmf_id
+            ,p_rec_nmcd.nmcd_nmc_seq_no
+            ,p_rec_nmcd.nmcd_from_value
+            ,p_rec_nmcd.nmcd_to_value;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmcd');
+--
+END ins_nmcd;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmf (p_rec_nmf IN OUT nm_mrg_output_file%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmf');
+--
+   p_rec_nmf.nmf_number_lpad                := NVL(p_rec_nmf.nmf_number_lpad,'0' );
+   p_rec_nmf.nmf_date_format                := NVL(p_rec_nmf.nmf_date_format,'YYYYMMDD' );
+   p_rec_nmf.nmf_template                   := NVL(p_rec_nmf.nmf_template,'N' );
+   p_rec_nmf.nmf_append_merge_au_to_path    := NVL(p_rec_nmf.nmf_append_merge_au_to_path,'N' );
+--
+   INSERT INTO nm_mrg_output_file
+            (nmf_id
+            ,nmf_nmq_id
+            ,nmf_filename
+            ,nmf_file_path
+            ,nmf_route
+            ,nmf_datum
+            ,nmf_include_header
+            ,nmf_include_footer
+            ,nmf_date_created
+            ,nmf_date_modified
+            ,nmf_modified_by
+            ,nmf_created_by
+            ,nmf_csv
+            ,nmf_sep_char
+            ,nmf_additional_where
+            ,nmf_varchar_rpad
+            ,nmf_number_lpad
+            ,nmf_date_format
+            ,nmf_description
+            ,nmf_template
+            ,nmf_append_merge_au_to_path
+            )
+     VALUES (p_rec_nmf.nmf_id
+            ,p_rec_nmf.nmf_nmq_id
+            ,p_rec_nmf.nmf_filename
+            ,p_rec_nmf.nmf_file_path
+            ,p_rec_nmf.nmf_route
+            ,p_rec_nmf.nmf_datum
+            ,p_rec_nmf.nmf_include_header
+            ,p_rec_nmf.nmf_include_footer
+            ,p_rec_nmf.nmf_date_created
+            ,p_rec_nmf.nmf_date_modified
+            ,p_rec_nmf.nmf_modified_by
+            ,p_rec_nmf.nmf_created_by
+            ,p_rec_nmf.nmf_csv
+            ,p_rec_nmf.nmf_sep_char
+            ,p_rec_nmf.nmf_additional_where
+            ,p_rec_nmf.nmf_varchar_rpad
+            ,p_rec_nmf.nmf_number_lpad
+            ,p_rec_nmf.nmf_date_format
+            ,p_rec_nmf.nmf_description
+            ,p_rec_nmf.nmf_template
+            ,p_rec_nmf.nmf_append_merge_au_to_path
+            )
+   RETURNING nmf_id
+            ,nmf_nmq_id
+            ,nmf_filename
+            ,nmf_file_path
+            ,nmf_route
+            ,nmf_datum
+            ,nmf_include_header
+            ,nmf_include_footer
+            ,nmf_date_created
+            ,nmf_date_modified
+            ,nmf_modified_by
+            ,nmf_created_by
+            ,nmf_csv
+            ,nmf_sep_char
+            ,nmf_additional_where
+            ,nmf_varchar_rpad
+            ,nmf_number_lpad
+            ,nmf_date_format
+            ,nmf_description
+            ,nmf_template
+            ,nmf_append_merge_au_to_path
+      INTO   p_rec_nmf.nmf_id
+            ,p_rec_nmf.nmf_nmq_id
+            ,p_rec_nmf.nmf_filename
+            ,p_rec_nmf.nmf_file_path
+            ,p_rec_nmf.nmf_route
+            ,p_rec_nmf.nmf_datum
+            ,p_rec_nmf.nmf_include_header
+            ,p_rec_nmf.nmf_include_footer
+            ,p_rec_nmf.nmf_date_created
+            ,p_rec_nmf.nmf_date_modified
+            ,p_rec_nmf.nmf_modified_by
+            ,p_rec_nmf.nmf_created_by
+            ,p_rec_nmf.nmf_csv
+            ,p_rec_nmf.nmf_sep_char
+            ,p_rec_nmf.nmf_additional_where
+            ,p_rec_nmf.nmf_varchar_rpad
+            ,p_rec_nmf.nmf_number_lpad
+            ,p_rec_nmf.nmf_date_format
+            ,p_rec_nmf.nmf_description
+            ,p_rec_nmf.nmf_template
+            ,p_rec_nmf.nmf_append_merge_au_to_path;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmf');
+--
+END ins_nmf;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmq (p_rec_nmq IN OUT nm_mrg_query%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmq');
+--
+   p_rec_nmq.nmq_inner_outer_join           := NVL(p_rec_nmq.nmq_inner_outer_join,'I' );
+   p_rec_nmq.nmq_inv_type_x_sect_count      := NVL(p_rec_nmq.nmq_inv_type_x_sect_count,0 );
+   p_rec_nmq.nmq_transient_query            := NVL(p_rec_nmq.nmq_transient_query,'Y' );
+--
+   INSERT INTO nm_mrg_query
+            (nmq_id
+            ,nmq_unique
+            ,nmq_descr
+            ,nmq_inner_outer_join
+            ,nmq_date_created
+            ,nmq_date_modified
+            ,nmq_modified_by
+            ,nmq_created_by
+            ,nmq_inv_type_x_sect_count
+            ,nmq_transient_query
+            )
+     VALUES (p_rec_nmq.nmq_id
+            ,p_rec_nmq.nmq_unique
+            ,p_rec_nmq.nmq_descr
+            ,p_rec_nmq.nmq_inner_outer_join
+            ,p_rec_nmq.nmq_date_created
+            ,p_rec_nmq.nmq_date_modified
+            ,p_rec_nmq.nmq_modified_by
+            ,p_rec_nmq.nmq_created_by
+            ,p_rec_nmq.nmq_inv_type_x_sect_count
+            ,p_rec_nmq.nmq_transient_query
+            );
+--
+   p_rec_nmq := nm3get.get_nmq
+                   (pi_nmq_id            => p_rec_nmq.nmq_id
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_nmq');
+--
+END ins_nmq;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmq_all (p_rec_nmq_all IN OUT nm_mrg_query_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmq_all');
+--
+   p_rec_nmq_all.nmq_inner_outer_join           := NVL(p_rec_nmq_all.nmq_inner_outer_join,'I' );
+   p_rec_nmq_all.nmq_inv_type_x_sect_count      := NVL(p_rec_nmq_all.nmq_inv_type_x_sect_count,0 );
+   p_rec_nmq_all.nmq_transient_query            := NVL(p_rec_nmq_all.nmq_transient_query,'Y' );
+--
+   INSERT INTO nm_mrg_query_all
+            (nmq_id
+            ,nmq_unique
+            ,nmq_descr
+            ,nmq_inner_outer_join
+            ,nmq_date_created
+            ,nmq_date_modified
+            ,nmq_modified_by
+            ,nmq_created_by
+            ,nmq_inv_type_x_sect_count
+            ,nmq_transient_query
+            )
+     VALUES (p_rec_nmq_all.nmq_id
+            ,p_rec_nmq_all.nmq_unique
+            ,p_rec_nmq_all.nmq_descr
+            ,p_rec_nmq_all.nmq_inner_outer_join
+            ,p_rec_nmq_all.nmq_date_created
+            ,p_rec_nmq_all.nmq_date_modified
+            ,p_rec_nmq_all.nmq_modified_by
+            ,p_rec_nmq_all.nmq_created_by
+            ,p_rec_nmq_all.nmq_inv_type_x_sect_count
+            ,p_rec_nmq_all.nmq_transient_query
+            )
+   RETURNING nmq_id
+            ,nmq_unique
+            ,nmq_descr
+            ,nmq_inner_outer_join
+            ,nmq_date_created
+            ,nmq_date_modified
+            ,nmq_modified_by
+            ,nmq_created_by
+            ,nmq_inv_type_x_sect_count
+            ,nmq_transient_query
+      INTO   p_rec_nmq_all.nmq_id
+            ,p_rec_nmq_all.nmq_unique
+            ,p_rec_nmq_all.nmq_descr
+            ,p_rec_nmq_all.nmq_inner_outer_join
+            ,p_rec_nmq_all.nmq_date_created
+            ,p_rec_nmq_all.nmq_date_modified
+            ,p_rec_nmq_all.nmq_modified_by
+            ,p_rec_nmq_all.nmq_created_by
+            ,p_rec_nmq_all.nmq_inv_type_x_sect_count
+            ,p_rec_nmq_all.nmq_transient_query;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmq_all');
+--
+END ins_nmq_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmqa (p_rec_nmqa IN OUT nm_mrg_query_attribs%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmqa');
+--
+--
+   INSERT INTO nm_mrg_query_attribs
+            (nqa_nmq_id
+            ,nqa_nqt_seq_no
+            ,nqa_attrib_name
+            ,nqa_condition
+            ,nqa_date_created
+            ,nqa_date_modified
+            ,nqa_modified_by
+            ,nqa_created_by
+            ,nqa_itb_banding_id
+            )
+     VALUES (p_rec_nmqa.nqa_nmq_id
+            ,p_rec_nmqa.nqa_nqt_seq_no
+            ,p_rec_nmqa.nqa_attrib_name
+            ,p_rec_nmqa.nqa_condition
+            ,p_rec_nmqa.nqa_date_created
+            ,p_rec_nmqa.nqa_date_modified
+            ,p_rec_nmqa.nqa_modified_by
+            ,p_rec_nmqa.nqa_created_by
+            ,p_rec_nmqa.nqa_itb_banding_id
+            )
+   RETURNING nqa_nmq_id
+            ,nqa_nqt_seq_no
+            ,nqa_attrib_name
+            ,nqa_condition
+            ,nqa_date_created
+            ,nqa_date_modified
+            ,nqa_modified_by
+            ,nqa_created_by
+            ,nqa_itb_banding_id
+      INTO   p_rec_nmqa.nqa_nmq_id
+            ,p_rec_nmqa.nqa_nqt_seq_no
+            ,p_rec_nmqa.nqa_attrib_name
+            ,p_rec_nmqa.nqa_condition
+            ,p_rec_nmqa.nqa_date_created
+            ,p_rec_nmqa.nqa_date_modified
+            ,p_rec_nmqa.nqa_modified_by
+            ,p_rec_nmqa.nqa_created_by
+            ,p_rec_nmqa.nqa_itb_banding_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmqa');
+--
+END ins_nmqa;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmqr (p_rec_nmqr IN OUT nm_mrg_query_results%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmqr');
+--
+--
+   INSERT INTO nm_mrg_query_results
+            (nqr_mrg_job_id
+            ,nqr_nmq_id
+            ,nqr_source_id
+            ,nqr_source
+            ,nqr_description
+            ,nqr_date_created
+            ,nqr_date_modified
+            ,nqr_modified_by
+            ,nqr_created_by
+            ,nqr_mrg_section_members_count
+            ,nqr_admin_unit
+            )
+     VALUES (p_rec_nmqr.nqr_mrg_job_id
+            ,p_rec_nmqr.nqr_nmq_id
+            ,p_rec_nmqr.nqr_source_id
+            ,p_rec_nmqr.nqr_source
+            ,p_rec_nmqr.nqr_description
+            ,p_rec_nmqr.nqr_date_created
+            ,p_rec_nmqr.nqr_date_modified
+            ,p_rec_nmqr.nqr_modified_by
+            ,p_rec_nmqr.nqr_created_by
+            ,p_rec_nmqr.nqr_mrg_section_members_count
+            ,p_rec_nmqr.nqr_admin_unit
+            );
+--
+   p_rec_nmqr := nm3get.get_nmqr
+                   (pi_nqr_mrg_job_id    => p_rec_nmqr.nqr_mrg_job_id
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_nmqr');
+--
+END ins_nmqr;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmqr_all (p_rec_nmqr_all IN OUT nm_mrg_query_results_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmqr_all');
+--
+--
+   INSERT INTO nm_mrg_query_results_all
+            (nqr_mrg_job_id
+            ,nqr_nmq_id
+            ,nqr_source_id
+            ,nqr_source
+            ,nqr_description
+            ,nqr_date_created
+            ,nqr_date_modified
+            ,nqr_modified_by
+            ,nqr_created_by
+            ,nqr_mrg_section_members_count
+            ,nqr_admin_unit
+            )
+     VALUES (p_rec_nmqr_all.nqr_mrg_job_id
+            ,p_rec_nmqr_all.nqr_nmq_id
+            ,p_rec_nmqr_all.nqr_source_id
+            ,p_rec_nmqr_all.nqr_source
+            ,p_rec_nmqr_all.nqr_description
+            ,p_rec_nmqr_all.nqr_date_created
+            ,p_rec_nmqr_all.nqr_date_modified
+            ,p_rec_nmqr_all.nqr_modified_by
+            ,p_rec_nmqr_all.nqr_created_by
+            ,p_rec_nmqr_all.nqr_mrg_section_members_count
+            ,p_rec_nmqr_all.nqr_admin_unit
+            )
+   RETURNING nqr_mrg_job_id
+            ,nqr_nmq_id
+            ,nqr_source_id
+            ,nqr_source
+            ,nqr_description
+            ,nqr_date_created
+            ,nqr_date_modified
+            ,nqr_modified_by
+            ,nqr_created_by
+            ,nqr_mrg_section_members_count
+            ,nqr_admin_unit
+      INTO   p_rec_nmqr_all.nqr_mrg_job_id
+            ,p_rec_nmqr_all.nqr_nmq_id
+            ,p_rec_nmqr_all.nqr_source_id
+            ,p_rec_nmqr_all.nqr_source
+            ,p_rec_nmqr_all.nqr_description
+            ,p_rec_nmqr_all.nqr_date_created
+            ,p_rec_nmqr_all.nqr_date_modified
+            ,p_rec_nmqr_all.nqr_modified_by
+            ,p_rec_nmqr_all.nqr_created_by
+            ,p_rec_nmqr_all.nqr_mrg_section_members_count
+            ,p_rec_nmqr_all.nqr_admin_unit;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmqr_all');
+--
+END ins_nmqr_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nqro (p_rec_nqro IN OUT nm_mrg_query_roles%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nqro');
+--
+--
+   INSERT INTO nm_mrg_query_roles
+            (nqro_nmq_id
+            ,nqro_role
+            ,nqro_mode
+            )
+     VALUES (p_rec_nqro.nqro_nmq_id
+            ,p_rec_nqro.nqro_role
+            ,p_rec_nqro.nqro_mode
+            )
+   RETURNING nqro_nmq_id
+            ,nqro_role
+            ,nqro_mode
+      INTO   p_rec_nqro.nqro_nmq_id
+            ,p_rec_nqro.nqro_role
+            ,p_rec_nqro.nqro_mode;
+--
+   nm_debug.proc_end(g_package_name,'ins_nqro');
+--
+END ins_nqro;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmqt (p_rec_nmqt IN OUT nm_mrg_query_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmqt');
+--
+   p_rec_nmqt.nqt_default                    := NVL(p_rec_nmqt.nqt_default,'N' );
+--
+   INSERT INTO nm_mrg_query_types
+            (nqt_nmq_id
+            ,nqt_seq_no
+            ,nqt_inv_type
+            ,nqt_x_sect
+            ,nqt_date_created
+            ,nqt_date_modified
+            ,nqt_modified_by
+            ,nqt_created_by
+            ,nqt_default
+            )
+     VALUES (p_rec_nmqt.nqt_nmq_id
+            ,p_rec_nmqt.nqt_seq_no
+            ,p_rec_nmqt.nqt_inv_type
+            ,p_rec_nmqt.nqt_x_sect
+            ,p_rec_nmqt.nqt_date_created
+            ,p_rec_nmqt.nqt_date_modified
+            ,p_rec_nmqt.nqt_modified_by
+            ,p_rec_nmqt.nqt_created_by
+            ,p_rec_nmqt.nqt_default
+            );
+--
+   p_rec_nmqt := nm3get.get_nmqt
+                   (pi_nqt_nmq_id        => p_rec_nmqt.nqt_nmq_id
+                   ,pi_nqt_seq_no        => p_rec_nmqt.nqt_seq_no
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_nmqt');
+--
+END ins_nmqt;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmqt_all (p_rec_nmqt_all IN OUT nm_mrg_query_types_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmqt_all');
+--
+   p_rec_nmqt_all.nqt_default                    := NVL(p_rec_nmqt_all.nqt_default,'N' );
+--
+   INSERT INTO nm_mrg_query_types_all
+            (nqt_nmq_id
+            ,nqt_seq_no
+            ,nqt_inv_type
+            ,nqt_x_sect
+            ,nqt_date_created
+            ,nqt_date_modified
+            ,nqt_modified_by
+            ,nqt_created_by
+            ,nqt_default
+            )
+     VALUES (p_rec_nmqt_all.nqt_nmq_id
+            ,p_rec_nmqt_all.nqt_seq_no
+            ,p_rec_nmqt_all.nqt_inv_type
+            ,p_rec_nmqt_all.nqt_x_sect
+            ,p_rec_nmqt_all.nqt_date_created
+            ,p_rec_nmqt_all.nqt_date_modified
+            ,p_rec_nmqt_all.nqt_modified_by
+            ,p_rec_nmqt_all.nqt_created_by
+            ,p_rec_nmqt_all.nqt_default
+            )
+   RETURNING nqt_nmq_id
+            ,nqt_seq_no
+            ,nqt_inv_type
+            ,nqt_x_sect
+            ,nqt_date_created
+            ,nqt_date_modified
+            ,nqt_modified_by
+            ,nqt_created_by
+            ,nqt_default
+      INTO   p_rec_nmqt_all.nqt_nmq_id
+            ,p_rec_nmqt_all.nqt_seq_no
+            ,p_rec_nmqt_all.nqt_inv_type
+            ,p_rec_nmqt_all.nqt_x_sect
+            ,p_rec_nmqt_all.nqt_date_created
+            ,p_rec_nmqt_all.nqt_date_modified
+            ,p_rec_nmqt_all.nqt_modified_by
+            ,p_rec_nmqt_all.nqt_created_by
+            ,p_rec_nmqt_all.nqt_default;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmqt_all');
+--
+END ins_nmqt_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmqv (p_rec_nmqv IN OUT nm_mrg_query_values%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmqv');
+--
+--
+   INSERT INTO nm_mrg_query_values
+            (nqv_nmq_id
+            ,nqv_nqt_seq_no
+            ,nqv_attrib_name
+            ,nqv_sequence
+            ,nqv_value
+            ,nqv_date_created
+            ,nqv_date_modified
+            ,nqv_modified_by
+            ,nqv_created_by
+            )
+     VALUES (p_rec_nmqv.nqv_nmq_id
+            ,p_rec_nmqv.nqv_nqt_seq_no
+            ,p_rec_nmqv.nqv_attrib_name
+            ,p_rec_nmqv.nqv_sequence
+            ,p_rec_nmqv.nqv_value
+            ,p_rec_nmqv.nqv_date_created
+            ,p_rec_nmqv.nqv_date_modified
+            ,p_rec_nmqv.nqv_modified_by
+            ,p_rec_nmqv.nqv_created_by
+            )
+   RETURNING nqv_nmq_id
+            ,nqv_nqt_seq_no
+            ,nqv_attrib_name
+            ,nqv_sequence
+            ,nqv_value
+            ,nqv_date_created
+            ,nqv_date_modified
+            ,nqv_modified_by
+            ,nqv_created_by
+      INTO   p_rec_nmqv.nqv_nmq_id
+            ,p_rec_nmqv.nqv_nqt_seq_no
+            ,p_rec_nmqv.nqv_attrib_name
+            ,p_rec_nmqv.nqv_sequence
+            ,p_rec_nmqv.nqv_value
+            ,p_rec_nmqv.nqv_date_created
+            ,p_rec_nmqv.nqv_date_modified
+            ,p_rec_nmqv.nqv_modified_by
+            ,p_rec_nmqv.nqv_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmqv');
+--
+END ins_nmqv;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nms (p_rec_nms IN OUT nm_mrg_sections%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nms');
+--
+   p_rec_nms.nms_in_results                 := NVL(p_rec_nms.nms_in_results,'N' );
+--
+   INSERT INTO nm_mrg_sections
+            (nms_mrg_job_id
+            ,nms_mrg_section_id
+            ,nms_offset_ne_id
+            ,nms_begin_offset
+            ,nms_end_offset
+            ,nms_ne_id_first
+            ,nms_begin_mp_first
+            ,nms_ne_id_last
+            ,nms_end_mp_last
+            ,nms_in_results
+            ,nms_orig_sect_id
+            )
+     VALUES (p_rec_nms.nms_mrg_job_id
+            ,p_rec_nms.nms_mrg_section_id
+            ,p_rec_nms.nms_offset_ne_id
+            ,p_rec_nms.nms_begin_offset
+            ,p_rec_nms.nms_end_offset
+            ,p_rec_nms.nms_ne_id_first
+            ,p_rec_nms.nms_begin_mp_first
+            ,p_rec_nms.nms_ne_id_last
+            ,p_rec_nms.nms_end_mp_last
+            ,p_rec_nms.nms_in_results
+            ,p_rec_nms.nms_orig_sect_id
+            );
+--
+   p_rec_nms := nm3get.get_nms
+                   (pi_nms_mrg_job_id     => p_rec_nms.nms_mrg_job_id
+                   ,pi_nms_mrg_section_id => p_rec_nms.nms_mrg_section_id
+                   ,pi_raise_not_found    => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_nms');
+--
+END ins_nms;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nms_all (p_rec_nms_all IN OUT nm_mrg_sections_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nms_all');
+--
+   p_rec_nms_all.nms_in_results                 := NVL(p_rec_nms_all.nms_in_results,'N' );
+--
+   INSERT INTO nm_mrg_sections_all
+            (nms_mrg_job_id
+            ,nms_mrg_section_id
+            ,nms_offset_ne_id
+            ,nms_begin_offset
+            ,nms_end_offset
+            ,nms_ne_id_first
+            ,nms_begin_mp_first
+            ,nms_ne_id_last
+            ,nms_end_mp_last
+            ,nms_in_results
+            ,nms_orig_sect_id
+            )
+     VALUES (p_rec_nms_all.nms_mrg_job_id
+            ,p_rec_nms_all.nms_mrg_section_id
+            ,p_rec_nms_all.nms_offset_ne_id
+            ,p_rec_nms_all.nms_begin_offset
+            ,p_rec_nms_all.nms_end_offset
+            ,p_rec_nms_all.nms_ne_id_first
+            ,p_rec_nms_all.nms_begin_mp_first
+            ,p_rec_nms_all.nms_ne_id_last
+            ,p_rec_nms_all.nms_end_mp_last
+            ,p_rec_nms_all.nms_in_results
+            ,p_rec_nms_all.nms_orig_sect_id
+            )
+   RETURNING nms_mrg_job_id
+            ,nms_mrg_section_id
+            ,nms_offset_ne_id
+            ,nms_begin_offset
+            ,nms_end_offset
+            ,nms_ne_id_first
+            ,nms_begin_mp_first
+            ,nms_ne_id_last
+            ,nms_end_mp_last
+            ,nms_in_results
+            ,nms_orig_sect_id
+      INTO   p_rec_nms_all.nms_mrg_job_id
+            ,p_rec_nms_all.nms_mrg_section_id
+            ,p_rec_nms_all.nms_offset_ne_id
+            ,p_rec_nms_all.nms_begin_offset
+            ,p_rec_nms_all.nms_end_offset
+            ,p_rec_nms_all.nms_ne_id_first
+            ,p_rec_nms_all.nms_begin_mp_first
+            ,p_rec_nms_all.nms_ne_id_last
+            ,p_rec_nms_all.nms_end_mp_last
+            ,p_rec_nms_all.nms_in_results
+            ,p_rec_nms_all.nms_orig_sect_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_nms_all');
+--
+END ins_nms_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nsv (p_rec_nsv IN OUT nm_mrg_section_inv_values%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nsv');
+--
+--
+   INSERT INTO nm_mrg_section_inv_values
+            (nsv_mrg_job_id
+            ,nsv_value_id
+            ,nsv_inv_type
+            ,nsv_x_sect
+            ,nsv_pnt_or_cont
+            ,nsv_attrib1
+            ,nsv_attrib2
+            ,nsv_attrib3
+            ,nsv_attrib4
+            ,nsv_attrib5
+            ,nsv_attrib6
+            ,nsv_attrib7
+            ,nsv_attrib8
+            ,nsv_attrib9
+            ,nsv_attrib10
+            ,nsv_attrib11
+            ,nsv_attrib12
+            ,nsv_attrib13
+            ,nsv_attrib14
+            ,nsv_attrib15
+            ,nsv_attrib16
+            ,nsv_attrib17
+            ,nsv_attrib18
+            ,nsv_attrib19
+            ,nsv_attrib20
+            ,nsv_attrib21
+            ,nsv_attrib22
+            ,nsv_attrib23
+            ,nsv_attrib24
+            ,nsv_attrib25
+            ,nsv_attrib26
+            ,nsv_attrib27
+            ,nsv_attrib28
+            ,nsv_attrib29
+            ,nsv_attrib30
+            ,nsv_attrib31
+            ,nsv_attrib32
+            ,nsv_attrib33
+            ,nsv_attrib34
+            ,nsv_attrib35
+            ,nsv_attrib36
+            ,nsv_attrib37
+            ,nsv_attrib38
+            ,nsv_attrib39
+            ,nsv_attrib40
+            ,nsv_attrib41
+            ,nsv_attrib42
+            ,nsv_attrib43
+            ,nsv_attrib44
+            ,nsv_attrib45
+            ,nsv_attrib46
+            ,nsv_attrib47
+            ,nsv_attrib48
+            ,nsv_attrib49
+            ,nsv_attrib50
+            ,nsv_attrib51
+            ,nsv_attrib52
+            ,nsv_attrib53
+            ,nsv_attrib54
+            ,nsv_attrib55
+            ,nsv_attrib56
+            ,nsv_attrib57
+            ,nsv_attrib58
+            ,nsv_attrib59
+            ,nsv_attrib60
+            ,nsv_attrib61
+            ,nsv_attrib62
+            ,nsv_attrib63
+            ,nsv_attrib64
+            ,nsv_attrib65
+            ,nsv_attrib66
+            ,nsv_attrib67
+            ,nsv_attrib68
+            ,nsv_attrib69
+            ,nsv_attrib70
+            ,nsv_attrib71
+            ,nsv_attrib72
+            ,nsv_attrib73
+            ,nsv_attrib74
+            ,nsv_attrib75
+            ,nsv_attrib76
+            ,nsv_attrib77
+            ,nsv_attrib78
+            ,nsv_attrib79
+            ,nsv_attrib80
+            ,nsv_attrib81
+            ,nsv_attrib82
+            ,nsv_attrib83
+            ,nsv_attrib84
+            ,nsv_attrib85
+            ,nsv_attrib86
+            ,nsv_attrib87
+            ,nsv_attrib88
+            ,nsv_attrib89
+            ,nsv_attrib90
+            ,nsv_attrib91
+            ,nsv_attrib92
+            ,nsv_attrib93
+            ,nsv_attrib94
+            ,nsv_attrib95
+            ,nsv_attrib96
+            ,nsv_attrib97
+            ,nsv_attrib98
+            ,nsv_attrib99
+            ,nsv_attrib100
+            ,nsv_attrib101
+            ,nsv_attrib102
+            ,nsv_attrib103
+            ,nsv_attrib104
+            ,nsv_attrib105
+            ,nsv_attrib106
+            ,nsv_attrib107
+            ,nsv_attrib108
+            ,nsv_attrib109
+            ,nsv_attrib110
+            ,nsv_attrib111
+            ,nsv_attrib112
+            ,nsv_attrib113
+            ,nsv_attrib114
+            ,nsv_attrib115
+            ,nsv_attrib116
+            ,nsv_attrib117
+            ,nsv_attrib118
+            ,nsv_attrib119
+            ,nsv_attrib120
+            ,nsv_attrib121
+            ,nsv_attrib122
+            ,nsv_attrib123
+            ,nsv_attrib124
+            ,nsv_attrib125
+            ,nsv_attrib126
+            ,nsv_attrib127
+            ,nsv_attrib128
+            ,nsv_attrib129
+            ,nsv_attrib130
+            ,nsv_attrib131
+            ,nsv_attrib132
+            ,nsv_attrib133
+            ,nsv_attrib134
+            ,nsv_attrib135
+            ,nsv_attrib136
+            ,nsv_attrib137
+            ,nsv_attrib138
+            ,nsv_attrib139
+            ,nsv_attrib140
+            ,nsv_attrib141
+            ,nsv_attrib142
+            ,nsv_attrib143
+            ,nsv_attrib144
+            ,nsv_attrib145
+            ,nsv_attrib146
+            ,nsv_attrib147
+            ,nsv_attrib148
+            ,nsv_attrib149
+            ,nsv_attrib150
+            ,nsv_attrib151
+            ,nsv_attrib152
+            ,nsv_attrib153
+            ,nsv_attrib154
+            ,nsv_attrib155
+            ,nsv_attrib156
+            ,nsv_attrib157
+            ,nsv_attrib158
+            ,nsv_attrib159
+            ,nsv_attrib160
+            ,nsv_attrib161
+            ,nsv_attrib162
+            ,nsv_attrib163
+            ,nsv_attrib164
+            ,nsv_attrib165
+            ,nsv_attrib166
+            ,nsv_attrib167
+            ,nsv_attrib168
+            ,nsv_attrib169
+            ,nsv_attrib170
+            ,nsv_attrib171
+            ,nsv_attrib172
+            ,nsv_attrib173
+            ,nsv_attrib174
+            ,nsv_attrib175
+            ,nsv_attrib176
+            ,nsv_attrib177
+            ,nsv_attrib178
+            ,nsv_attrib179
+            ,nsv_attrib180
+            ,nsv_attrib181
+            ,nsv_attrib182
+            ,nsv_attrib183
+            ,nsv_attrib184
+            ,nsv_attrib185
+            ,nsv_attrib186
+            ,nsv_attrib187
+            ,nsv_attrib188
+            ,nsv_attrib189
+            ,nsv_attrib190
+            ,nsv_attrib191
+            ,nsv_attrib192
+            ,nsv_attrib193
+            ,nsv_attrib194
+            ,nsv_attrib195
+            ,nsv_attrib196
+            ,nsv_attrib197
+            ,nsv_attrib198
+            ,nsv_attrib199
+            ,nsv_attrib200
+            ,nsv_attrib201
+            ,nsv_attrib202
+            ,nsv_attrib203
+            ,nsv_attrib204
+            ,nsv_attrib205
+            ,nsv_attrib206
+            ,nsv_attrib207
+            ,nsv_attrib208
+            ,nsv_attrib209
+            ,nsv_attrib210
+            ,nsv_attrib211
+            ,nsv_attrib212
+            ,nsv_attrib213
+            ,nsv_attrib214
+            ,nsv_attrib215
+            ,nsv_attrib216
+            ,nsv_attrib217
+            ,nsv_attrib218
+            ,nsv_attrib219
+            ,nsv_attrib220
+            ,nsv_attrib221
+            ,nsv_attrib222
+            ,nsv_attrib223
+            ,nsv_attrib224
+            ,nsv_attrib225
+            ,nsv_attrib226
+            ,nsv_attrib227
+            ,nsv_attrib228
+            ,nsv_attrib229
+            ,nsv_attrib230
+            ,nsv_attrib231
+            ,nsv_attrib232
+            ,nsv_attrib233
+            ,nsv_attrib234
+            ,nsv_attrib235
+            ,nsv_attrib236
+            ,nsv_attrib237
+            ,nsv_attrib238
+            ,nsv_attrib239
+            ,nsv_attrib240
+            ,nsv_attrib241
+            ,nsv_attrib242
+            ,nsv_attrib243
+            ,nsv_attrib244
+            ,nsv_attrib245
+            ,nsv_attrib246
+            ,nsv_attrib247
+            ,nsv_attrib248
+            ,nsv_attrib249
+            ,nsv_attrib250
+            ,nsv_attrib251
+            ,nsv_attrib252
+            ,nsv_attrib253
+            ,nsv_attrib254
+            ,nsv_attrib255
+            ,nsv_attrib256
+            ,nsv_attrib257
+            ,nsv_attrib258
+            ,nsv_attrib259
+            ,nsv_attrib260
+            ,nsv_attrib261
+            ,nsv_attrib262
+            ,nsv_attrib263
+            ,nsv_attrib264
+            ,nsv_attrib265
+            ,nsv_attrib266
+            ,nsv_attrib267
+            ,nsv_attrib268
+            ,nsv_attrib269
+            ,nsv_attrib270
+            ,nsv_attrib271
+            ,nsv_attrib272
+            ,nsv_attrib273
+            ,nsv_attrib274
+            ,nsv_attrib275
+            ,nsv_attrib276
+            ,nsv_attrib277
+            ,nsv_attrib278
+            ,nsv_attrib279
+            ,nsv_attrib280
+            ,nsv_attrib281
+            ,nsv_attrib282
+            ,nsv_attrib283
+            ,nsv_attrib284
+            ,nsv_attrib285
+            ,nsv_attrib286
+            ,nsv_attrib287
+            ,nsv_attrib288
+            ,nsv_attrib289
+            ,nsv_attrib290
+            ,nsv_attrib291
+            ,nsv_attrib292
+            ,nsv_attrib293
+            ,nsv_attrib294
+            ,nsv_attrib295
+            ,nsv_attrib296
+            ,nsv_attrib297
+            ,nsv_attrib298
+            ,nsv_attrib299
+            ,nsv_attrib300
+            ,nsv_attrib301
+            ,nsv_attrib302
+            ,nsv_attrib303
+            ,nsv_attrib304
+            ,nsv_attrib305
+            ,nsv_attrib306
+            ,nsv_attrib307
+            ,nsv_attrib308
+            ,nsv_attrib309
+            ,nsv_attrib310
+            ,nsv_attrib311
+            ,nsv_attrib312
+            ,nsv_attrib313
+            ,nsv_attrib314
+            ,nsv_attrib315
+            ,nsv_attrib316
+            ,nsv_attrib317
+            ,nsv_attrib318
+            ,nsv_attrib319
+            ,nsv_attrib320
+            ,nsv_attrib321
+            ,nsv_attrib322
+            ,nsv_attrib323
+            ,nsv_attrib324
+            ,nsv_attrib325
+            ,nsv_attrib326
+            ,nsv_attrib327
+            ,nsv_attrib328
+            ,nsv_attrib329
+            ,nsv_attrib330
+            ,nsv_attrib331
+            ,nsv_attrib332
+            ,nsv_attrib333
+            ,nsv_attrib334
+            ,nsv_attrib335
+            ,nsv_attrib336
+            ,nsv_attrib337
+            ,nsv_attrib338
+            ,nsv_attrib339
+            ,nsv_attrib340
+            ,nsv_attrib341
+            ,nsv_attrib342
+            ,nsv_attrib343
+            ,nsv_attrib344
+            ,nsv_attrib345
+            ,nsv_attrib346
+            ,nsv_attrib347
+            ,nsv_attrib348
+            ,nsv_attrib349
+            ,nsv_attrib350
+            ,nsv_attrib351
+            ,nsv_attrib352
+            ,nsv_attrib353
+            ,nsv_attrib354
+            ,nsv_attrib355
+            ,nsv_attrib356
+            ,nsv_attrib357
+            ,nsv_attrib358
+            ,nsv_attrib359
+            ,nsv_attrib360
+            ,nsv_attrib361
+            ,nsv_attrib362
+            ,nsv_attrib363
+            ,nsv_attrib364
+            ,nsv_attrib365
+            ,nsv_attrib366
+            ,nsv_attrib367
+            ,nsv_attrib368
+            ,nsv_attrib369
+            ,nsv_attrib370
+            ,nsv_attrib371
+            ,nsv_attrib372
+            ,nsv_attrib373
+            ,nsv_attrib374
+            ,nsv_attrib375
+            ,nsv_attrib376
+            ,nsv_attrib377
+            ,nsv_attrib378
+            ,nsv_attrib379
+            ,nsv_attrib380
+            ,nsv_attrib381
+            ,nsv_attrib382
+            ,nsv_attrib383
+            ,nsv_attrib384
+            ,nsv_attrib385
+            ,nsv_attrib386
+            ,nsv_attrib387
+            ,nsv_attrib388
+            ,nsv_attrib389
+            ,nsv_attrib390
+            ,nsv_attrib391
+            ,nsv_attrib392
+            ,nsv_attrib393
+            ,nsv_attrib394
+            ,nsv_attrib395
+            ,nsv_attrib396
+            ,nsv_attrib397
+            ,nsv_attrib398
+            ,nsv_attrib399
+            ,nsv_attrib400
+            ,nsv_attrib401
+            ,nsv_attrib402
+            ,nsv_attrib403
+            ,nsv_attrib404
+            ,nsv_attrib405
+            ,nsv_attrib406
+            ,nsv_attrib407
+            ,nsv_attrib408
+            ,nsv_attrib409
+            ,nsv_attrib410
+            ,nsv_attrib411
+            ,nsv_attrib412
+            ,nsv_attrib413
+            ,nsv_attrib414
+            ,nsv_attrib415
+            ,nsv_attrib416
+            ,nsv_attrib417
+            ,nsv_attrib418
+            ,nsv_attrib419
+            ,nsv_attrib420
+            ,nsv_attrib421
+            ,nsv_attrib422
+            ,nsv_attrib423
+            ,nsv_attrib424
+            ,nsv_attrib425
+            ,nsv_attrib426
+            ,nsv_attrib427
+            ,nsv_attrib428
+            ,nsv_attrib429
+            ,nsv_attrib430
+            ,nsv_attrib431
+            ,nsv_attrib432
+            ,nsv_attrib433
+            ,nsv_attrib434
+            ,nsv_attrib435
+            ,nsv_attrib436
+            ,nsv_attrib437
+            ,nsv_attrib438
+            ,nsv_attrib439
+            ,nsv_attrib440
+            ,nsv_attrib441
+            ,nsv_attrib442
+            ,nsv_attrib443
+            ,nsv_attrib444
+            ,nsv_attrib445
+            ,nsv_attrib446
+            ,nsv_attrib447
+            ,nsv_attrib448
+            ,nsv_attrib449
+            ,nsv_attrib450
+            ,nsv_attrib451
+            ,nsv_attrib452
+            ,nsv_attrib453
+            ,nsv_attrib454
+            ,nsv_attrib455
+            ,nsv_attrib456
+            ,nsv_attrib457
+            ,nsv_attrib458
+            ,nsv_attrib459
+            ,nsv_attrib460
+            ,nsv_attrib461
+            ,nsv_attrib462
+            ,nsv_attrib463
+            ,nsv_attrib464
+            ,nsv_attrib465
+            ,nsv_attrib466
+            ,nsv_attrib467
+            ,nsv_attrib468
+            ,nsv_attrib469
+            ,nsv_attrib470
+            ,nsv_attrib471
+            ,nsv_attrib472
+            ,nsv_attrib473
+            ,nsv_attrib474
+            ,nsv_attrib475
+            ,nsv_attrib476
+            ,nsv_attrib477
+            ,nsv_attrib478
+            ,nsv_attrib479
+            ,nsv_attrib480
+            ,nsv_attrib481
+            ,nsv_attrib482
+            ,nsv_attrib483
+            ,nsv_attrib484
+            ,nsv_attrib485
+            ,nsv_attrib486
+            ,nsv_attrib487
+            ,nsv_attrib488
+            ,nsv_attrib489
+            ,nsv_attrib490
+            ,nsv_attrib491
+            ,nsv_attrib492
+            ,nsv_attrib493
+            ,nsv_attrib494
+            ,nsv_attrib495
+            ,nsv_attrib496
+            ,nsv_attrib497
+            ,nsv_attrib498
+            ,nsv_attrib499
+            ,nsv_attrib500
+            )
+     VALUES (p_rec_nsv.nsv_mrg_job_id
+            ,p_rec_nsv.nsv_value_id
+            ,p_rec_nsv.nsv_inv_type
+            ,p_rec_nsv.nsv_x_sect
+            ,p_rec_nsv.nsv_pnt_or_cont
+            ,p_rec_nsv.nsv_attrib1
+            ,p_rec_nsv.nsv_attrib2
+            ,p_rec_nsv.nsv_attrib3
+            ,p_rec_nsv.nsv_attrib4
+            ,p_rec_nsv.nsv_attrib5
+            ,p_rec_nsv.nsv_attrib6
+            ,p_rec_nsv.nsv_attrib7
+            ,p_rec_nsv.nsv_attrib8
+            ,p_rec_nsv.nsv_attrib9
+            ,p_rec_nsv.nsv_attrib10
+            ,p_rec_nsv.nsv_attrib11
+            ,p_rec_nsv.nsv_attrib12
+            ,p_rec_nsv.nsv_attrib13
+            ,p_rec_nsv.nsv_attrib14
+            ,p_rec_nsv.nsv_attrib15
+            ,p_rec_nsv.nsv_attrib16
+            ,p_rec_nsv.nsv_attrib17
+            ,p_rec_nsv.nsv_attrib18
+            ,p_rec_nsv.nsv_attrib19
+            ,p_rec_nsv.nsv_attrib20
+            ,p_rec_nsv.nsv_attrib21
+            ,p_rec_nsv.nsv_attrib22
+            ,p_rec_nsv.nsv_attrib23
+            ,p_rec_nsv.nsv_attrib24
+            ,p_rec_nsv.nsv_attrib25
+            ,p_rec_nsv.nsv_attrib26
+            ,p_rec_nsv.nsv_attrib27
+            ,p_rec_nsv.nsv_attrib28
+            ,p_rec_nsv.nsv_attrib29
+            ,p_rec_nsv.nsv_attrib30
+            ,p_rec_nsv.nsv_attrib31
+            ,p_rec_nsv.nsv_attrib32
+            ,p_rec_nsv.nsv_attrib33
+            ,p_rec_nsv.nsv_attrib34
+            ,p_rec_nsv.nsv_attrib35
+            ,p_rec_nsv.nsv_attrib36
+            ,p_rec_nsv.nsv_attrib37
+            ,p_rec_nsv.nsv_attrib38
+            ,p_rec_nsv.nsv_attrib39
+            ,p_rec_nsv.nsv_attrib40
+            ,p_rec_nsv.nsv_attrib41
+            ,p_rec_nsv.nsv_attrib42
+            ,p_rec_nsv.nsv_attrib43
+            ,p_rec_nsv.nsv_attrib44
+            ,p_rec_nsv.nsv_attrib45
+            ,p_rec_nsv.nsv_attrib46
+            ,p_rec_nsv.nsv_attrib47
+            ,p_rec_nsv.nsv_attrib48
+            ,p_rec_nsv.nsv_attrib49
+            ,p_rec_nsv.nsv_attrib50
+            ,p_rec_nsv.nsv_attrib51
+            ,p_rec_nsv.nsv_attrib52
+            ,p_rec_nsv.nsv_attrib53
+            ,p_rec_nsv.nsv_attrib54
+            ,p_rec_nsv.nsv_attrib55
+            ,p_rec_nsv.nsv_attrib56
+            ,p_rec_nsv.nsv_attrib57
+            ,p_rec_nsv.nsv_attrib58
+            ,p_rec_nsv.nsv_attrib59
+            ,p_rec_nsv.nsv_attrib60
+            ,p_rec_nsv.nsv_attrib61
+            ,p_rec_nsv.nsv_attrib62
+            ,p_rec_nsv.nsv_attrib63
+            ,p_rec_nsv.nsv_attrib64
+            ,p_rec_nsv.nsv_attrib65
+            ,p_rec_nsv.nsv_attrib66
+            ,p_rec_nsv.nsv_attrib67
+            ,p_rec_nsv.nsv_attrib68
+            ,p_rec_nsv.nsv_attrib69
+            ,p_rec_nsv.nsv_attrib70
+            ,p_rec_nsv.nsv_attrib71
+            ,p_rec_nsv.nsv_attrib72
+            ,p_rec_nsv.nsv_attrib73
+            ,p_rec_nsv.nsv_attrib74
+            ,p_rec_nsv.nsv_attrib75
+            ,p_rec_nsv.nsv_attrib76
+            ,p_rec_nsv.nsv_attrib77
+            ,p_rec_nsv.nsv_attrib78
+            ,p_rec_nsv.nsv_attrib79
+            ,p_rec_nsv.nsv_attrib80
+            ,p_rec_nsv.nsv_attrib81
+            ,p_rec_nsv.nsv_attrib82
+            ,p_rec_nsv.nsv_attrib83
+            ,p_rec_nsv.nsv_attrib84
+            ,p_rec_nsv.nsv_attrib85
+            ,p_rec_nsv.nsv_attrib86
+            ,p_rec_nsv.nsv_attrib87
+            ,p_rec_nsv.nsv_attrib88
+            ,p_rec_nsv.nsv_attrib89
+            ,p_rec_nsv.nsv_attrib90
+            ,p_rec_nsv.nsv_attrib91
+            ,p_rec_nsv.nsv_attrib92
+            ,p_rec_nsv.nsv_attrib93
+            ,p_rec_nsv.nsv_attrib94
+            ,p_rec_nsv.nsv_attrib95
+            ,p_rec_nsv.nsv_attrib96
+            ,p_rec_nsv.nsv_attrib97
+            ,p_rec_nsv.nsv_attrib98
+            ,p_rec_nsv.nsv_attrib99
+            ,p_rec_nsv.nsv_attrib100
+            ,p_rec_nsv.nsv_attrib101
+            ,p_rec_nsv.nsv_attrib102
+            ,p_rec_nsv.nsv_attrib103
+            ,p_rec_nsv.nsv_attrib104
+            ,p_rec_nsv.nsv_attrib105
+            ,p_rec_nsv.nsv_attrib106
+            ,p_rec_nsv.nsv_attrib107
+            ,p_rec_nsv.nsv_attrib108
+            ,p_rec_nsv.nsv_attrib109
+            ,p_rec_nsv.nsv_attrib110
+            ,p_rec_nsv.nsv_attrib111
+            ,p_rec_nsv.nsv_attrib112
+            ,p_rec_nsv.nsv_attrib113
+            ,p_rec_nsv.nsv_attrib114
+            ,p_rec_nsv.nsv_attrib115
+            ,p_rec_nsv.nsv_attrib116
+            ,p_rec_nsv.nsv_attrib117
+            ,p_rec_nsv.nsv_attrib118
+            ,p_rec_nsv.nsv_attrib119
+            ,p_rec_nsv.nsv_attrib120
+            ,p_rec_nsv.nsv_attrib121
+            ,p_rec_nsv.nsv_attrib122
+            ,p_rec_nsv.nsv_attrib123
+            ,p_rec_nsv.nsv_attrib124
+            ,p_rec_nsv.nsv_attrib125
+            ,p_rec_nsv.nsv_attrib126
+            ,p_rec_nsv.nsv_attrib127
+            ,p_rec_nsv.nsv_attrib128
+            ,p_rec_nsv.nsv_attrib129
+            ,p_rec_nsv.nsv_attrib130
+            ,p_rec_nsv.nsv_attrib131
+            ,p_rec_nsv.nsv_attrib132
+            ,p_rec_nsv.nsv_attrib133
+            ,p_rec_nsv.nsv_attrib134
+            ,p_rec_nsv.nsv_attrib135
+            ,p_rec_nsv.nsv_attrib136
+            ,p_rec_nsv.nsv_attrib137
+            ,p_rec_nsv.nsv_attrib138
+            ,p_rec_nsv.nsv_attrib139
+            ,p_rec_nsv.nsv_attrib140
+            ,p_rec_nsv.nsv_attrib141
+            ,p_rec_nsv.nsv_attrib142
+            ,p_rec_nsv.nsv_attrib143
+            ,p_rec_nsv.nsv_attrib144
+            ,p_rec_nsv.nsv_attrib145
+            ,p_rec_nsv.nsv_attrib146
+            ,p_rec_nsv.nsv_attrib147
+            ,p_rec_nsv.nsv_attrib148
+            ,p_rec_nsv.nsv_attrib149
+            ,p_rec_nsv.nsv_attrib150
+            ,p_rec_nsv.nsv_attrib151
+            ,p_rec_nsv.nsv_attrib152
+            ,p_rec_nsv.nsv_attrib153
+            ,p_rec_nsv.nsv_attrib154
+            ,p_rec_nsv.nsv_attrib155
+            ,p_rec_nsv.nsv_attrib156
+            ,p_rec_nsv.nsv_attrib157
+            ,p_rec_nsv.nsv_attrib158
+            ,p_rec_nsv.nsv_attrib159
+            ,p_rec_nsv.nsv_attrib160
+            ,p_rec_nsv.nsv_attrib161
+            ,p_rec_nsv.nsv_attrib162
+            ,p_rec_nsv.nsv_attrib163
+            ,p_rec_nsv.nsv_attrib164
+            ,p_rec_nsv.nsv_attrib165
+            ,p_rec_nsv.nsv_attrib166
+            ,p_rec_nsv.nsv_attrib167
+            ,p_rec_nsv.nsv_attrib168
+            ,p_rec_nsv.nsv_attrib169
+            ,p_rec_nsv.nsv_attrib170
+            ,p_rec_nsv.nsv_attrib171
+            ,p_rec_nsv.nsv_attrib172
+            ,p_rec_nsv.nsv_attrib173
+            ,p_rec_nsv.nsv_attrib174
+            ,p_rec_nsv.nsv_attrib175
+            ,p_rec_nsv.nsv_attrib176
+            ,p_rec_nsv.nsv_attrib177
+            ,p_rec_nsv.nsv_attrib178
+            ,p_rec_nsv.nsv_attrib179
+            ,p_rec_nsv.nsv_attrib180
+            ,p_rec_nsv.nsv_attrib181
+            ,p_rec_nsv.nsv_attrib182
+            ,p_rec_nsv.nsv_attrib183
+            ,p_rec_nsv.nsv_attrib184
+            ,p_rec_nsv.nsv_attrib185
+            ,p_rec_nsv.nsv_attrib186
+            ,p_rec_nsv.nsv_attrib187
+            ,p_rec_nsv.nsv_attrib188
+            ,p_rec_nsv.nsv_attrib189
+            ,p_rec_nsv.nsv_attrib190
+            ,p_rec_nsv.nsv_attrib191
+            ,p_rec_nsv.nsv_attrib192
+            ,p_rec_nsv.nsv_attrib193
+            ,p_rec_nsv.nsv_attrib194
+            ,p_rec_nsv.nsv_attrib195
+            ,p_rec_nsv.nsv_attrib196
+            ,p_rec_nsv.nsv_attrib197
+            ,p_rec_nsv.nsv_attrib198
+            ,p_rec_nsv.nsv_attrib199
+            ,p_rec_nsv.nsv_attrib200
+            ,p_rec_nsv.nsv_attrib201
+            ,p_rec_nsv.nsv_attrib202
+            ,p_rec_nsv.nsv_attrib203
+            ,p_rec_nsv.nsv_attrib204
+            ,p_rec_nsv.nsv_attrib205
+            ,p_rec_nsv.nsv_attrib206
+            ,p_rec_nsv.nsv_attrib207
+            ,p_rec_nsv.nsv_attrib208
+            ,p_rec_nsv.nsv_attrib209
+            ,p_rec_nsv.nsv_attrib210
+            ,p_rec_nsv.nsv_attrib211
+            ,p_rec_nsv.nsv_attrib212
+            ,p_rec_nsv.nsv_attrib213
+            ,p_rec_nsv.nsv_attrib214
+            ,p_rec_nsv.nsv_attrib215
+            ,p_rec_nsv.nsv_attrib216
+            ,p_rec_nsv.nsv_attrib217
+            ,p_rec_nsv.nsv_attrib218
+            ,p_rec_nsv.nsv_attrib219
+            ,p_rec_nsv.nsv_attrib220
+            ,p_rec_nsv.nsv_attrib221
+            ,p_rec_nsv.nsv_attrib222
+            ,p_rec_nsv.nsv_attrib223
+            ,p_rec_nsv.nsv_attrib224
+            ,p_rec_nsv.nsv_attrib225
+            ,p_rec_nsv.nsv_attrib226
+            ,p_rec_nsv.nsv_attrib227
+            ,p_rec_nsv.nsv_attrib228
+            ,p_rec_nsv.nsv_attrib229
+            ,p_rec_nsv.nsv_attrib230
+            ,p_rec_nsv.nsv_attrib231
+            ,p_rec_nsv.nsv_attrib232
+            ,p_rec_nsv.nsv_attrib233
+            ,p_rec_nsv.nsv_attrib234
+            ,p_rec_nsv.nsv_attrib235
+            ,p_rec_nsv.nsv_attrib236
+            ,p_rec_nsv.nsv_attrib237
+            ,p_rec_nsv.nsv_attrib238
+            ,p_rec_nsv.nsv_attrib239
+            ,p_rec_nsv.nsv_attrib240
+            ,p_rec_nsv.nsv_attrib241
+            ,p_rec_nsv.nsv_attrib242
+            ,p_rec_nsv.nsv_attrib243
+            ,p_rec_nsv.nsv_attrib244
+            ,p_rec_nsv.nsv_attrib245
+            ,p_rec_nsv.nsv_attrib246
+            ,p_rec_nsv.nsv_attrib247
+            ,p_rec_nsv.nsv_attrib248
+            ,p_rec_nsv.nsv_attrib249
+            ,p_rec_nsv.nsv_attrib250
+            ,p_rec_nsv.nsv_attrib251
+            ,p_rec_nsv.nsv_attrib252
+            ,p_rec_nsv.nsv_attrib253
+            ,p_rec_nsv.nsv_attrib254
+            ,p_rec_nsv.nsv_attrib255
+            ,p_rec_nsv.nsv_attrib256
+            ,p_rec_nsv.nsv_attrib257
+            ,p_rec_nsv.nsv_attrib258
+            ,p_rec_nsv.nsv_attrib259
+            ,p_rec_nsv.nsv_attrib260
+            ,p_rec_nsv.nsv_attrib261
+            ,p_rec_nsv.nsv_attrib262
+            ,p_rec_nsv.nsv_attrib263
+            ,p_rec_nsv.nsv_attrib264
+            ,p_rec_nsv.nsv_attrib265
+            ,p_rec_nsv.nsv_attrib266
+            ,p_rec_nsv.nsv_attrib267
+            ,p_rec_nsv.nsv_attrib268
+            ,p_rec_nsv.nsv_attrib269
+            ,p_rec_nsv.nsv_attrib270
+            ,p_rec_nsv.nsv_attrib271
+            ,p_rec_nsv.nsv_attrib272
+            ,p_rec_nsv.nsv_attrib273
+            ,p_rec_nsv.nsv_attrib274
+            ,p_rec_nsv.nsv_attrib275
+            ,p_rec_nsv.nsv_attrib276
+            ,p_rec_nsv.nsv_attrib277
+            ,p_rec_nsv.nsv_attrib278
+            ,p_rec_nsv.nsv_attrib279
+            ,p_rec_nsv.nsv_attrib280
+            ,p_rec_nsv.nsv_attrib281
+            ,p_rec_nsv.nsv_attrib282
+            ,p_rec_nsv.nsv_attrib283
+            ,p_rec_nsv.nsv_attrib284
+            ,p_rec_nsv.nsv_attrib285
+            ,p_rec_nsv.nsv_attrib286
+            ,p_rec_nsv.nsv_attrib287
+            ,p_rec_nsv.nsv_attrib288
+            ,p_rec_nsv.nsv_attrib289
+            ,p_rec_nsv.nsv_attrib290
+            ,p_rec_nsv.nsv_attrib291
+            ,p_rec_nsv.nsv_attrib292
+            ,p_rec_nsv.nsv_attrib293
+            ,p_rec_nsv.nsv_attrib294
+            ,p_rec_nsv.nsv_attrib295
+            ,p_rec_nsv.nsv_attrib296
+            ,p_rec_nsv.nsv_attrib297
+            ,p_rec_nsv.nsv_attrib298
+            ,p_rec_nsv.nsv_attrib299
+            ,p_rec_nsv.nsv_attrib300
+            ,p_rec_nsv.nsv_attrib301
+            ,p_rec_nsv.nsv_attrib302
+            ,p_rec_nsv.nsv_attrib303
+            ,p_rec_nsv.nsv_attrib304
+            ,p_rec_nsv.nsv_attrib305
+            ,p_rec_nsv.nsv_attrib306
+            ,p_rec_nsv.nsv_attrib307
+            ,p_rec_nsv.nsv_attrib308
+            ,p_rec_nsv.nsv_attrib309
+            ,p_rec_nsv.nsv_attrib310
+            ,p_rec_nsv.nsv_attrib311
+            ,p_rec_nsv.nsv_attrib312
+            ,p_rec_nsv.nsv_attrib313
+            ,p_rec_nsv.nsv_attrib314
+            ,p_rec_nsv.nsv_attrib315
+            ,p_rec_nsv.nsv_attrib316
+            ,p_rec_nsv.nsv_attrib317
+            ,p_rec_nsv.nsv_attrib318
+            ,p_rec_nsv.nsv_attrib319
+            ,p_rec_nsv.nsv_attrib320
+            ,p_rec_nsv.nsv_attrib321
+            ,p_rec_nsv.nsv_attrib322
+            ,p_rec_nsv.nsv_attrib323
+            ,p_rec_nsv.nsv_attrib324
+            ,p_rec_nsv.nsv_attrib325
+            ,p_rec_nsv.nsv_attrib326
+            ,p_rec_nsv.nsv_attrib327
+            ,p_rec_nsv.nsv_attrib328
+            ,p_rec_nsv.nsv_attrib329
+            ,p_rec_nsv.nsv_attrib330
+            ,p_rec_nsv.nsv_attrib331
+            ,p_rec_nsv.nsv_attrib332
+            ,p_rec_nsv.nsv_attrib333
+            ,p_rec_nsv.nsv_attrib334
+            ,p_rec_nsv.nsv_attrib335
+            ,p_rec_nsv.nsv_attrib336
+            ,p_rec_nsv.nsv_attrib337
+            ,p_rec_nsv.nsv_attrib338
+            ,p_rec_nsv.nsv_attrib339
+            ,p_rec_nsv.nsv_attrib340
+            ,p_rec_nsv.nsv_attrib341
+            ,p_rec_nsv.nsv_attrib342
+            ,p_rec_nsv.nsv_attrib343
+            ,p_rec_nsv.nsv_attrib344
+            ,p_rec_nsv.nsv_attrib345
+            ,p_rec_nsv.nsv_attrib346
+            ,p_rec_nsv.nsv_attrib347
+            ,p_rec_nsv.nsv_attrib348
+            ,p_rec_nsv.nsv_attrib349
+            ,p_rec_nsv.nsv_attrib350
+            ,p_rec_nsv.nsv_attrib351
+            ,p_rec_nsv.nsv_attrib352
+            ,p_rec_nsv.nsv_attrib353
+            ,p_rec_nsv.nsv_attrib354
+            ,p_rec_nsv.nsv_attrib355
+            ,p_rec_nsv.nsv_attrib356
+            ,p_rec_nsv.nsv_attrib357
+            ,p_rec_nsv.nsv_attrib358
+            ,p_rec_nsv.nsv_attrib359
+            ,p_rec_nsv.nsv_attrib360
+            ,p_rec_nsv.nsv_attrib361
+            ,p_rec_nsv.nsv_attrib362
+            ,p_rec_nsv.nsv_attrib363
+            ,p_rec_nsv.nsv_attrib364
+            ,p_rec_nsv.nsv_attrib365
+            ,p_rec_nsv.nsv_attrib366
+            ,p_rec_nsv.nsv_attrib367
+            ,p_rec_nsv.nsv_attrib368
+            ,p_rec_nsv.nsv_attrib369
+            ,p_rec_nsv.nsv_attrib370
+            ,p_rec_nsv.nsv_attrib371
+            ,p_rec_nsv.nsv_attrib372
+            ,p_rec_nsv.nsv_attrib373
+            ,p_rec_nsv.nsv_attrib374
+            ,p_rec_nsv.nsv_attrib375
+            ,p_rec_nsv.nsv_attrib376
+            ,p_rec_nsv.nsv_attrib377
+            ,p_rec_nsv.nsv_attrib378
+            ,p_rec_nsv.nsv_attrib379
+            ,p_rec_nsv.nsv_attrib380
+            ,p_rec_nsv.nsv_attrib381
+            ,p_rec_nsv.nsv_attrib382
+            ,p_rec_nsv.nsv_attrib383
+            ,p_rec_nsv.nsv_attrib384
+            ,p_rec_nsv.nsv_attrib385
+            ,p_rec_nsv.nsv_attrib386
+            ,p_rec_nsv.nsv_attrib387
+            ,p_rec_nsv.nsv_attrib388
+            ,p_rec_nsv.nsv_attrib389
+            ,p_rec_nsv.nsv_attrib390
+            ,p_rec_nsv.nsv_attrib391
+            ,p_rec_nsv.nsv_attrib392
+            ,p_rec_nsv.nsv_attrib393
+            ,p_rec_nsv.nsv_attrib394
+            ,p_rec_nsv.nsv_attrib395
+            ,p_rec_nsv.nsv_attrib396
+            ,p_rec_nsv.nsv_attrib397
+            ,p_rec_nsv.nsv_attrib398
+            ,p_rec_nsv.nsv_attrib399
+            ,p_rec_nsv.nsv_attrib400
+            ,p_rec_nsv.nsv_attrib401
+            ,p_rec_nsv.nsv_attrib402
+            ,p_rec_nsv.nsv_attrib403
+            ,p_rec_nsv.nsv_attrib404
+            ,p_rec_nsv.nsv_attrib405
+            ,p_rec_nsv.nsv_attrib406
+            ,p_rec_nsv.nsv_attrib407
+            ,p_rec_nsv.nsv_attrib408
+            ,p_rec_nsv.nsv_attrib409
+            ,p_rec_nsv.nsv_attrib410
+            ,p_rec_nsv.nsv_attrib411
+            ,p_rec_nsv.nsv_attrib412
+            ,p_rec_nsv.nsv_attrib413
+            ,p_rec_nsv.nsv_attrib414
+            ,p_rec_nsv.nsv_attrib415
+            ,p_rec_nsv.nsv_attrib416
+            ,p_rec_nsv.nsv_attrib417
+            ,p_rec_nsv.nsv_attrib418
+            ,p_rec_nsv.nsv_attrib419
+            ,p_rec_nsv.nsv_attrib420
+            ,p_rec_nsv.nsv_attrib421
+            ,p_rec_nsv.nsv_attrib422
+            ,p_rec_nsv.nsv_attrib423
+            ,p_rec_nsv.nsv_attrib424
+            ,p_rec_nsv.nsv_attrib425
+            ,p_rec_nsv.nsv_attrib426
+            ,p_rec_nsv.nsv_attrib427
+            ,p_rec_nsv.nsv_attrib428
+            ,p_rec_nsv.nsv_attrib429
+            ,p_rec_nsv.nsv_attrib430
+            ,p_rec_nsv.nsv_attrib431
+            ,p_rec_nsv.nsv_attrib432
+            ,p_rec_nsv.nsv_attrib433
+            ,p_rec_nsv.nsv_attrib434
+            ,p_rec_nsv.nsv_attrib435
+            ,p_rec_nsv.nsv_attrib436
+            ,p_rec_nsv.nsv_attrib437
+            ,p_rec_nsv.nsv_attrib438
+            ,p_rec_nsv.nsv_attrib439
+            ,p_rec_nsv.nsv_attrib440
+            ,p_rec_nsv.nsv_attrib441
+            ,p_rec_nsv.nsv_attrib442
+            ,p_rec_nsv.nsv_attrib443
+            ,p_rec_nsv.nsv_attrib444
+            ,p_rec_nsv.nsv_attrib445
+            ,p_rec_nsv.nsv_attrib446
+            ,p_rec_nsv.nsv_attrib447
+            ,p_rec_nsv.nsv_attrib448
+            ,p_rec_nsv.nsv_attrib449
+            ,p_rec_nsv.nsv_attrib450
+            ,p_rec_nsv.nsv_attrib451
+            ,p_rec_nsv.nsv_attrib452
+            ,p_rec_nsv.nsv_attrib453
+            ,p_rec_nsv.nsv_attrib454
+            ,p_rec_nsv.nsv_attrib455
+            ,p_rec_nsv.nsv_attrib456
+            ,p_rec_nsv.nsv_attrib457
+            ,p_rec_nsv.nsv_attrib458
+            ,p_rec_nsv.nsv_attrib459
+            ,p_rec_nsv.nsv_attrib460
+            ,p_rec_nsv.nsv_attrib461
+            ,p_rec_nsv.nsv_attrib462
+            ,p_rec_nsv.nsv_attrib463
+            ,p_rec_nsv.nsv_attrib464
+            ,p_rec_nsv.nsv_attrib465
+            ,p_rec_nsv.nsv_attrib466
+            ,p_rec_nsv.nsv_attrib467
+            ,p_rec_nsv.nsv_attrib468
+            ,p_rec_nsv.nsv_attrib469
+            ,p_rec_nsv.nsv_attrib470
+            ,p_rec_nsv.nsv_attrib471
+            ,p_rec_nsv.nsv_attrib472
+            ,p_rec_nsv.nsv_attrib473
+            ,p_rec_nsv.nsv_attrib474
+            ,p_rec_nsv.nsv_attrib475
+            ,p_rec_nsv.nsv_attrib476
+            ,p_rec_nsv.nsv_attrib477
+            ,p_rec_nsv.nsv_attrib478
+            ,p_rec_nsv.nsv_attrib479
+            ,p_rec_nsv.nsv_attrib480
+            ,p_rec_nsv.nsv_attrib481
+            ,p_rec_nsv.nsv_attrib482
+            ,p_rec_nsv.nsv_attrib483
+            ,p_rec_nsv.nsv_attrib484
+            ,p_rec_nsv.nsv_attrib485
+            ,p_rec_nsv.nsv_attrib486
+            ,p_rec_nsv.nsv_attrib487
+            ,p_rec_nsv.nsv_attrib488
+            ,p_rec_nsv.nsv_attrib489
+            ,p_rec_nsv.nsv_attrib490
+            ,p_rec_nsv.nsv_attrib491
+            ,p_rec_nsv.nsv_attrib492
+            ,p_rec_nsv.nsv_attrib493
+            ,p_rec_nsv.nsv_attrib494
+            ,p_rec_nsv.nsv_attrib495
+            ,p_rec_nsv.nsv_attrib496
+            ,p_rec_nsv.nsv_attrib497
+            ,p_rec_nsv.nsv_attrib498
+            ,p_rec_nsv.nsv_attrib499
+            ,p_rec_nsv.nsv_attrib500
+            );
+--
+   p_rec_nsv := nm3get.get_nsv
+                   (pi_nsv_mrg_job_id    => p_rec_nsv.nsv_mrg_job_id
+                   ,pi_nsv_value_id      => p_rec_nsv.nsv_value_id
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_nsv');
+--
+END ins_nsv;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nsv_all (p_rec_nsv_all IN OUT nm_mrg_section_inv_values_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nsv_all');
+--
+--
+   INSERT INTO nm_mrg_section_inv_values_all
+            (nsv_mrg_job_id
+            ,nsv_value_id
+            ,nsv_inv_type
+            ,nsv_x_sect
+            ,nsv_pnt_or_cont
+            ,nsv_attrib1
+            ,nsv_attrib2
+            ,nsv_attrib3
+            ,nsv_attrib4
+            ,nsv_attrib5
+            ,nsv_attrib6
+            ,nsv_attrib7
+            ,nsv_attrib8
+            ,nsv_attrib9
+            ,nsv_attrib10
+            ,nsv_attrib11
+            ,nsv_attrib12
+            ,nsv_attrib13
+            ,nsv_attrib14
+            ,nsv_attrib15
+            ,nsv_attrib16
+            ,nsv_attrib17
+            ,nsv_attrib18
+            ,nsv_attrib19
+            ,nsv_attrib20
+            ,nsv_attrib21
+            ,nsv_attrib22
+            ,nsv_attrib23
+            ,nsv_attrib24
+            ,nsv_attrib25
+            ,nsv_attrib26
+            ,nsv_attrib27
+            ,nsv_attrib28
+            ,nsv_attrib29
+            ,nsv_attrib30
+            ,nsv_attrib31
+            ,nsv_attrib32
+            ,nsv_attrib33
+            ,nsv_attrib34
+            ,nsv_attrib35
+            ,nsv_attrib36
+            ,nsv_attrib37
+            ,nsv_attrib38
+            ,nsv_attrib39
+            ,nsv_attrib40
+            ,nsv_attrib41
+            ,nsv_attrib42
+            ,nsv_attrib43
+            ,nsv_attrib44
+            ,nsv_attrib45
+            ,nsv_attrib46
+            ,nsv_attrib47
+            ,nsv_attrib48
+            ,nsv_attrib49
+            ,nsv_attrib50
+            ,nsv_attrib51
+            ,nsv_attrib52
+            ,nsv_attrib53
+            ,nsv_attrib54
+            ,nsv_attrib55
+            ,nsv_attrib56
+            ,nsv_attrib57
+            ,nsv_attrib58
+            ,nsv_attrib59
+            ,nsv_attrib60
+            ,nsv_attrib61
+            ,nsv_attrib62
+            ,nsv_attrib63
+            ,nsv_attrib64
+            ,nsv_attrib65
+            ,nsv_attrib66
+            ,nsv_attrib67
+            ,nsv_attrib68
+            ,nsv_attrib69
+            ,nsv_attrib70
+            ,nsv_attrib71
+            ,nsv_attrib72
+            ,nsv_attrib73
+            ,nsv_attrib74
+            ,nsv_attrib75
+            ,nsv_attrib76
+            ,nsv_attrib77
+            ,nsv_attrib78
+            ,nsv_attrib79
+            ,nsv_attrib80
+            ,nsv_attrib81
+            ,nsv_attrib82
+            ,nsv_attrib83
+            ,nsv_attrib84
+            ,nsv_attrib85
+            ,nsv_attrib86
+            ,nsv_attrib87
+            ,nsv_attrib88
+            ,nsv_attrib89
+            ,nsv_attrib90
+            ,nsv_attrib91
+            ,nsv_attrib92
+            ,nsv_attrib93
+            ,nsv_attrib94
+            ,nsv_attrib95
+            ,nsv_attrib96
+            ,nsv_attrib97
+            ,nsv_attrib98
+            ,nsv_attrib99
+            ,nsv_attrib100
+            ,nsv_attrib101
+            ,nsv_attrib102
+            ,nsv_attrib103
+            ,nsv_attrib104
+            ,nsv_attrib105
+            ,nsv_attrib106
+            ,nsv_attrib107
+            ,nsv_attrib108
+            ,nsv_attrib109
+            ,nsv_attrib110
+            ,nsv_attrib111
+            ,nsv_attrib112
+            ,nsv_attrib113
+            ,nsv_attrib114
+            ,nsv_attrib115
+            ,nsv_attrib116
+            ,nsv_attrib117
+            ,nsv_attrib118
+            ,nsv_attrib119
+            ,nsv_attrib120
+            ,nsv_attrib121
+            ,nsv_attrib122
+            ,nsv_attrib123
+            ,nsv_attrib124
+            ,nsv_attrib125
+            ,nsv_attrib126
+            ,nsv_attrib127
+            ,nsv_attrib128
+            ,nsv_attrib129
+            ,nsv_attrib130
+            ,nsv_attrib131
+            ,nsv_attrib132
+            ,nsv_attrib133
+            ,nsv_attrib134
+            ,nsv_attrib135
+            ,nsv_attrib136
+            ,nsv_attrib137
+            ,nsv_attrib138
+            ,nsv_attrib139
+            ,nsv_attrib140
+            ,nsv_attrib141
+            ,nsv_attrib142
+            ,nsv_attrib143
+            ,nsv_attrib144
+            ,nsv_attrib145
+            ,nsv_attrib146
+            ,nsv_attrib147
+            ,nsv_attrib148
+            ,nsv_attrib149
+            ,nsv_attrib150
+            ,nsv_attrib151
+            ,nsv_attrib152
+            ,nsv_attrib153
+            ,nsv_attrib154
+            ,nsv_attrib155
+            ,nsv_attrib156
+            ,nsv_attrib157
+            ,nsv_attrib158
+            ,nsv_attrib159
+            ,nsv_attrib160
+            ,nsv_attrib161
+            ,nsv_attrib162
+            ,nsv_attrib163
+            ,nsv_attrib164
+            ,nsv_attrib165
+            ,nsv_attrib166
+            ,nsv_attrib167
+            ,nsv_attrib168
+            ,nsv_attrib169
+            ,nsv_attrib170
+            ,nsv_attrib171
+            ,nsv_attrib172
+            ,nsv_attrib173
+            ,nsv_attrib174
+            ,nsv_attrib175
+            ,nsv_attrib176
+            ,nsv_attrib177
+            ,nsv_attrib178
+            ,nsv_attrib179
+            ,nsv_attrib180
+            ,nsv_attrib181
+            ,nsv_attrib182
+            ,nsv_attrib183
+            ,nsv_attrib184
+            ,nsv_attrib185
+            ,nsv_attrib186
+            ,nsv_attrib187
+            ,nsv_attrib188
+            ,nsv_attrib189
+            ,nsv_attrib190
+            ,nsv_attrib191
+            ,nsv_attrib192
+            ,nsv_attrib193
+            ,nsv_attrib194
+            ,nsv_attrib195
+            ,nsv_attrib196
+            ,nsv_attrib197
+            ,nsv_attrib198
+            ,nsv_attrib199
+            ,nsv_attrib200
+            ,nsv_attrib201
+            ,nsv_attrib202
+            ,nsv_attrib203
+            ,nsv_attrib204
+            ,nsv_attrib205
+            ,nsv_attrib206
+            ,nsv_attrib207
+            ,nsv_attrib208
+            ,nsv_attrib209
+            ,nsv_attrib210
+            ,nsv_attrib211
+            ,nsv_attrib212
+            ,nsv_attrib213
+            ,nsv_attrib214
+            ,nsv_attrib215
+            ,nsv_attrib216
+            ,nsv_attrib217
+            ,nsv_attrib218
+            ,nsv_attrib219
+            ,nsv_attrib220
+            ,nsv_attrib221
+            ,nsv_attrib222
+            ,nsv_attrib223
+            ,nsv_attrib224
+            ,nsv_attrib225
+            ,nsv_attrib226
+            ,nsv_attrib227
+            ,nsv_attrib228
+            ,nsv_attrib229
+            ,nsv_attrib230
+            ,nsv_attrib231
+            ,nsv_attrib232
+            ,nsv_attrib233
+            ,nsv_attrib234
+            ,nsv_attrib235
+            ,nsv_attrib236
+            ,nsv_attrib237
+            ,nsv_attrib238
+            ,nsv_attrib239
+            ,nsv_attrib240
+            ,nsv_attrib241
+            ,nsv_attrib242
+            ,nsv_attrib243
+            ,nsv_attrib244
+            ,nsv_attrib245
+            ,nsv_attrib246
+            ,nsv_attrib247
+            ,nsv_attrib248
+            ,nsv_attrib249
+            ,nsv_attrib250
+            ,nsv_attrib251
+            ,nsv_attrib252
+            ,nsv_attrib253
+            ,nsv_attrib254
+            ,nsv_attrib255
+            ,nsv_attrib256
+            ,nsv_attrib257
+            ,nsv_attrib258
+            ,nsv_attrib259
+            ,nsv_attrib260
+            ,nsv_attrib261
+            ,nsv_attrib262
+            ,nsv_attrib263
+            ,nsv_attrib264
+            ,nsv_attrib265
+            ,nsv_attrib266
+            ,nsv_attrib267
+            ,nsv_attrib268
+            ,nsv_attrib269
+            ,nsv_attrib270
+            ,nsv_attrib271
+            ,nsv_attrib272
+            ,nsv_attrib273
+            ,nsv_attrib274
+            ,nsv_attrib275
+            ,nsv_attrib276
+            ,nsv_attrib277
+            ,nsv_attrib278
+            ,nsv_attrib279
+            ,nsv_attrib280
+            ,nsv_attrib281
+            ,nsv_attrib282
+            ,nsv_attrib283
+            ,nsv_attrib284
+            ,nsv_attrib285
+            ,nsv_attrib286
+            ,nsv_attrib287
+            ,nsv_attrib288
+            ,nsv_attrib289
+            ,nsv_attrib290
+            ,nsv_attrib291
+            ,nsv_attrib292
+            ,nsv_attrib293
+            ,nsv_attrib294
+            ,nsv_attrib295
+            ,nsv_attrib296
+            ,nsv_attrib297
+            ,nsv_attrib298
+            ,nsv_attrib299
+            ,nsv_attrib300
+            ,nsv_attrib301
+            ,nsv_attrib302
+            ,nsv_attrib303
+            ,nsv_attrib304
+            ,nsv_attrib305
+            ,nsv_attrib306
+            ,nsv_attrib307
+            ,nsv_attrib308
+            ,nsv_attrib309
+            ,nsv_attrib310
+            ,nsv_attrib311
+            ,nsv_attrib312
+            ,nsv_attrib313
+            ,nsv_attrib314
+            ,nsv_attrib315
+            ,nsv_attrib316
+            ,nsv_attrib317
+            ,nsv_attrib318
+            ,nsv_attrib319
+            ,nsv_attrib320
+            ,nsv_attrib321
+            ,nsv_attrib322
+            ,nsv_attrib323
+            ,nsv_attrib324
+            ,nsv_attrib325
+            ,nsv_attrib326
+            ,nsv_attrib327
+            ,nsv_attrib328
+            ,nsv_attrib329
+            ,nsv_attrib330
+            ,nsv_attrib331
+            ,nsv_attrib332
+            ,nsv_attrib333
+            ,nsv_attrib334
+            ,nsv_attrib335
+            ,nsv_attrib336
+            ,nsv_attrib337
+            ,nsv_attrib338
+            ,nsv_attrib339
+            ,nsv_attrib340
+            ,nsv_attrib341
+            ,nsv_attrib342
+            ,nsv_attrib343
+            ,nsv_attrib344
+            ,nsv_attrib345
+            ,nsv_attrib346
+            ,nsv_attrib347
+            ,nsv_attrib348
+            ,nsv_attrib349
+            ,nsv_attrib350
+            ,nsv_attrib351
+            ,nsv_attrib352
+            ,nsv_attrib353
+            ,nsv_attrib354
+            ,nsv_attrib355
+            ,nsv_attrib356
+            ,nsv_attrib357
+            ,nsv_attrib358
+            ,nsv_attrib359
+            ,nsv_attrib360
+            ,nsv_attrib361
+            ,nsv_attrib362
+            ,nsv_attrib363
+            ,nsv_attrib364
+            ,nsv_attrib365
+            ,nsv_attrib366
+            ,nsv_attrib367
+            ,nsv_attrib368
+            ,nsv_attrib369
+            ,nsv_attrib370
+            ,nsv_attrib371
+            ,nsv_attrib372
+            ,nsv_attrib373
+            ,nsv_attrib374
+            ,nsv_attrib375
+            ,nsv_attrib376
+            ,nsv_attrib377
+            ,nsv_attrib378
+            ,nsv_attrib379
+            ,nsv_attrib380
+            ,nsv_attrib381
+            ,nsv_attrib382
+            ,nsv_attrib383
+            ,nsv_attrib384
+            ,nsv_attrib385
+            ,nsv_attrib386
+            ,nsv_attrib387
+            ,nsv_attrib388
+            ,nsv_attrib389
+            ,nsv_attrib390
+            ,nsv_attrib391
+            ,nsv_attrib392
+            ,nsv_attrib393
+            ,nsv_attrib394
+            ,nsv_attrib395
+            ,nsv_attrib396
+            ,nsv_attrib397
+            ,nsv_attrib398
+            ,nsv_attrib399
+            ,nsv_attrib400
+            ,nsv_attrib401
+            ,nsv_attrib402
+            ,nsv_attrib403
+            ,nsv_attrib404
+            ,nsv_attrib405
+            ,nsv_attrib406
+            ,nsv_attrib407
+            ,nsv_attrib408
+            ,nsv_attrib409
+            ,nsv_attrib410
+            ,nsv_attrib411
+            ,nsv_attrib412
+            ,nsv_attrib413
+            ,nsv_attrib414
+            ,nsv_attrib415
+            ,nsv_attrib416
+            ,nsv_attrib417
+            ,nsv_attrib418
+            ,nsv_attrib419
+            ,nsv_attrib420
+            ,nsv_attrib421
+            ,nsv_attrib422
+            ,nsv_attrib423
+            ,nsv_attrib424
+            ,nsv_attrib425
+            ,nsv_attrib426
+            ,nsv_attrib427
+            ,nsv_attrib428
+            ,nsv_attrib429
+            ,nsv_attrib430
+            ,nsv_attrib431
+            ,nsv_attrib432
+            ,nsv_attrib433
+            ,nsv_attrib434
+            ,nsv_attrib435
+            ,nsv_attrib436
+            ,nsv_attrib437
+            ,nsv_attrib438
+            ,nsv_attrib439
+            ,nsv_attrib440
+            ,nsv_attrib441
+            ,nsv_attrib442
+            ,nsv_attrib443
+            ,nsv_attrib444
+            ,nsv_attrib445
+            ,nsv_attrib446
+            ,nsv_attrib447
+            ,nsv_attrib448
+            ,nsv_attrib449
+            ,nsv_attrib450
+            ,nsv_attrib451
+            ,nsv_attrib452
+            ,nsv_attrib453
+            ,nsv_attrib454
+            ,nsv_attrib455
+            ,nsv_attrib456
+            ,nsv_attrib457
+            ,nsv_attrib458
+            ,nsv_attrib459
+            ,nsv_attrib460
+            ,nsv_attrib461
+            ,nsv_attrib462
+            ,nsv_attrib463
+            ,nsv_attrib464
+            ,nsv_attrib465
+            ,nsv_attrib466
+            ,nsv_attrib467
+            ,nsv_attrib468
+            ,nsv_attrib469
+            ,nsv_attrib470
+            ,nsv_attrib471
+            ,nsv_attrib472
+            ,nsv_attrib473
+            ,nsv_attrib474
+            ,nsv_attrib475
+            ,nsv_attrib476
+            ,nsv_attrib477
+            ,nsv_attrib478
+            ,nsv_attrib479
+            ,nsv_attrib480
+            ,nsv_attrib481
+            ,nsv_attrib482
+            ,nsv_attrib483
+            ,nsv_attrib484
+            ,nsv_attrib485
+            ,nsv_attrib486
+            ,nsv_attrib487
+            ,nsv_attrib488
+            ,nsv_attrib489
+            ,nsv_attrib490
+            ,nsv_attrib491
+            ,nsv_attrib492
+            ,nsv_attrib493
+            ,nsv_attrib494
+            ,nsv_attrib495
+            ,nsv_attrib496
+            ,nsv_attrib497
+            ,nsv_attrib498
+            ,nsv_attrib499
+            ,nsv_attrib500
+            )
+     VALUES (p_rec_nsv_all.nsv_mrg_job_id
+            ,p_rec_nsv_all.nsv_value_id
+            ,p_rec_nsv_all.nsv_inv_type
+            ,p_rec_nsv_all.nsv_x_sect
+            ,p_rec_nsv_all.nsv_pnt_or_cont
+            ,p_rec_nsv_all.nsv_attrib1
+            ,p_rec_nsv_all.nsv_attrib2
+            ,p_rec_nsv_all.nsv_attrib3
+            ,p_rec_nsv_all.nsv_attrib4
+            ,p_rec_nsv_all.nsv_attrib5
+            ,p_rec_nsv_all.nsv_attrib6
+            ,p_rec_nsv_all.nsv_attrib7
+            ,p_rec_nsv_all.nsv_attrib8
+            ,p_rec_nsv_all.nsv_attrib9
+            ,p_rec_nsv_all.nsv_attrib10
+            ,p_rec_nsv_all.nsv_attrib11
+            ,p_rec_nsv_all.nsv_attrib12
+            ,p_rec_nsv_all.nsv_attrib13
+            ,p_rec_nsv_all.nsv_attrib14
+            ,p_rec_nsv_all.nsv_attrib15
+            ,p_rec_nsv_all.nsv_attrib16
+            ,p_rec_nsv_all.nsv_attrib17
+            ,p_rec_nsv_all.nsv_attrib18
+            ,p_rec_nsv_all.nsv_attrib19
+            ,p_rec_nsv_all.nsv_attrib20
+            ,p_rec_nsv_all.nsv_attrib21
+            ,p_rec_nsv_all.nsv_attrib22
+            ,p_rec_nsv_all.nsv_attrib23
+            ,p_rec_nsv_all.nsv_attrib24
+            ,p_rec_nsv_all.nsv_attrib25
+            ,p_rec_nsv_all.nsv_attrib26
+            ,p_rec_nsv_all.nsv_attrib27
+            ,p_rec_nsv_all.nsv_attrib28
+            ,p_rec_nsv_all.nsv_attrib29
+            ,p_rec_nsv_all.nsv_attrib30
+            ,p_rec_nsv_all.nsv_attrib31
+            ,p_rec_nsv_all.nsv_attrib32
+            ,p_rec_nsv_all.nsv_attrib33
+            ,p_rec_nsv_all.nsv_attrib34
+            ,p_rec_nsv_all.nsv_attrib35
+            ,p_rec_nsv_all.nsv_attrib36
+            ,p_rec_nsv_all.nsv_attrib37
+            ,p_rec_nsv_all.nsv_attrib38
+            ,p_rec_nsv_all.nsv_attrib39
+            ,p_rec_nsv_all.nsv_attrib40
+            ,p_rec_nsv_all.nsv_attrib41
+            ,p_rec_nsv_all.nsv_attrib42
+            ,p_rec_nsv_all.nsv_attrib43
+            ,p_rec_nsv_all.nsv_attrib44
+            ,p_rec_nsv_all.nsv_attrib45
+            ,p_rec_nsv_all.nsv_attrib46
+            ,p_rec_nsv_all.nsv_attrib47
+            ,p_rec_nsv_all.nsv_attrib48
+            ,p_rec_nsv_all.nsv_attrib49
+            ,p_rec_nsv_all.nsv_attrib50
+            ,p_rec_nsv_all.nsv_attrib51
+            ,p_rec_nsv_all.nsv_attrib52
+            ,p_rec_nsv_all.nsv_attrib53
+            ,p_rec_nsv_all.nsv_attrib54
+            ,p_rec_nsv_all.nsv_attrib55
+            ,p_rec_nsv_all.nsv_attrib56
+            ,p_rec_nsv_all.nsv_attrib57
+            ,p_rec_nsv_all.nsv_attrib58
+            ,p_rec_nsv_all.nsv_attrib59
+            ,p_rec_nsv_all.nsv_attrib60
+            ,p_rec_nsv_all.nsv_attrib61
+            ,p_rec_nsv_all.nsv_attrib62
+            ,p_rec_nsv_all.nsv_attrib63
+            ,p_rec_nsv_all.nsv_attrib64
+            ,p_rec_nsv_all.nsv_attrib65
+            ,p_rec_nsv_all.nsv_attrib66
+            ,p_rec_nsv_all.nsv_attrib67
+            ,p_rec_nsv_all.nsv_attrib68
+            ,p_rec_nsv_all.nsv_attrib69
+            ,p_rec_nsv_all.nsv_attrib70
+            ,p_rec_nsv_all.nsv_attrib71
+            ,p_rec_nsv_all.nsv_attrib72
+            ,p_rec_nsv_all.nsv_attrib73
+            ,p_rec_nsv_all.nsv_attrib74
+            ,p_rec_nsv_all.nsv_attrib75
+            ,p_rec_nsv_all.nsv_attrib76
+            ,p_rec_nsv_all.nsv_attrib77
+            ,p_rec_nsv_all.nsv_attrib78
+            ,p_rec_nsv_all.nsv_attrib79
+            ,p_rec_nsv_all.nsv_attrib80
+            ,p_rec_nsv_all.nsv_attrib81
+            ,p_rec_nsv_all.nsv_attrib82
+            ,p_rec_nsv_all.nsv_attrib83
+            ,p_rec_nsv_all.nsv_attrib84
+            ,p_rec_nsv_all.nsv_attrib85
+            ,p_rec_nsv_all.nsv_attrib86
+            ,p_rec_nsv_all.nsv_attrib87
+            ,p_rec_nsv_all.nsv_attrib88
+            ,p_rec_nsv_all.nsv_attrib89
+            ,p_rec_nsv_all.nsv_attrib90
+            ,p_rec_nsv_all.nsv_attrib91
+            ,p_rec_nsv_all.nsv_attrib92
+            ,p_rec_nsv_all.nsv_attrib93
+            ,p_rec_nsv_all.nsv_attrib94
+            ,p_rec_nsv_all.nsv_attrib95
+            ,p_rec_nsv_all.nsv_attrib96
+            ,p_rec_nsv_all.nsv_attrib97
+            ,p_rec_nsv_all.nsv_attrib98
+            ,p_rec_nsv_all.nsv_attrib99
+            ,p_rec_nsv_all.nsv_attrib100
+            ,p_rec_nsv_all.nsv_attrib101
+            ,p_rec_nsv_all.nsv_attrib102
+            ,p_rec_nsv_all.nsv_attrib103
+            ,p_rec_nsv_all.nsv_attrib104
+            ,p_rec_nsv_all.nsv_attrib105
+            ,p_rec_nsv_all.nsv_attrib106
+            ,p_rec_nsv_all.nsv_attrib107
+            ,p_rec_nsv_all.nsv_attrib108
+            ,p_rec_nsv_all.nsv_attrib109
+            ,p_rec_nsv_all.nsv_attrib110
+            ,p_rec_nsv_all.nsv_attrib111
+            ,p_rec_nsv_all.nsv_attrib112
+            ,p_rec_nsv_all.nsv_attrib113
+            ,p_rec_nsv_all.nsv_attrib114
+            ,p_rec_nsv_all.nsv_attrib115
+            ,p_rec_nsv_all.nsv_attrib116
+            ,p_rec_nsv_all.nsv_attrib117
+            ,p_rec_nsv_all.nsv_attrib118
+            ,p_rec_nsv_all.nsv_attrib119
+            ,p_rec_nsv_all.nsv_attrib120
+            ,p_rec_nsv_all.nsv_attrib121
+            ,p_rec_nsv_all.nsv_attrib122
+            ,p_rec_nsv_all.nsv_attrib123
+            ,p_rec_nsv_all.nsv_attrib124
+            ,p_rec_nsv_all.nsv_attrib125
+            ,p_rec_nsv_all.nsv_attrib126
+            ,p_rec_nsv_all.nsv_attrib127
+            ,p_rec_nsv_all.nsv_attrib128
+            ,p_rec_nsv_all.nsv_attrib129
+            ,p_rec_nsv_all.nsv_attrib130
+            ,p_rec_nsv_all.nsv_attrib131
+            ,p_rec_nsv_all.nsv_attrib132
+            ,p_rec_nsv_all.nsv_attrib133
+            ,p_rec_nsv_all.nsv_attrib134
+            ,p_rec_nsv_all.nsv_attrib135
+            ,p_rec_nsv_all.nsv_attrib136
+            ,p_rec_nsv_all.nsv_attrib137
+            ,p_rec_nsv_all.nsv_attrib138
+            ,p_rec_nsv_all.nsv_attrib139
+            ,p_rec_nsv_all.nsv_attrib140
+            ,p_rec_nsv_all.nsv_attrib141
+            ,p_rec_nsv_all.nsv_attrib142
+            ,p_rec_nsv_all.nsv_attrib143
+            ,p_rec_nsv_all.nsv_attrib144
+            ,p_rec_nsv_all.nsv_attrib145
+            ,p_rec_nsv_all.nsv_attrib146
+            ,p_rec_nsv_all.nsv_attrib147
+            ,p_rec_nsv_all.nsv_attrib148
+            ,p_rec_nsv_all.nsv_attrib149
+            ,p_rec_nsv_all.nsv_attrib150
+            ,p_rec_nsv_all.nsv_attrib151
+            ,p_rec_nsv_all.nsv_attrib152
+            ,p_rec_nsv_all.nsv_attrib153
+            ,p_rec_nsv_all.nsv_attrib154
+            ,p_rec_nsv_all.nsv_attrib155
+            ,p_rec_nsv_all.nsv_attrib156
+            ,p_rec_nsv_all.nsv_attrib157
+            ,p_rec_nsv_all.nsv_attrib158
+            ,p_rec_nsv_all.nsv_attrib159
+            ,p_rec_nsv_all.nsv_attrib160
+            ,p_rec_nsv_all.nsv_attrib161
+            ,p_rec_nsv_all.nsv_attrib162
+            ,p_rec_nsv_all.nsv_attrib163
+            ,p_rec_nsv_all.nsv_attrib164
+            ,p_rec_nsv_all.nsv_attrib165
+            ,p_rec_nsv_all.nsv_attrib166
+            ,p_rec_nsv_all.nsv_attrib167
+            ,p_rec_nsv_all.nsv_attrib168
+            ,p_rec_nsv_all.nsv_attrib169
+            ,p_rec_nsv_all.nsv_attrib170
+            ,p_rec_nsv_all.nsv_attrib171
+            ,p_rec_nsv_all.nsv_attrib172
+            ,p_rec_nsv_all.nsv_attrib173
+            ,p_rec_nsv_all.nsv_attrib174
+            ,p_rec_nsv_all.nsv_attrib175
+            ,p_rec_nsv_all.nsv_attrib176
+            ,p_rec_nsv_all.nsv_attrib177
+            ,p_rec_nsv_all.nsv_attrib178
+            ,p_rec_nsv_all.nsv_attrib179
+            ,p_rec_nsv_all.nsv_attrib180
+            ,p_rec_nsv_all.nsv_attrib181
+            ,p_rec_nsv_all.nsv_attrib182
+            ,p_rec_nsv_all.nsv_attrib183
+            ,p_rec_nsv_all.nsv_attrib184
+            ,p_rec_nsv_all.nsv_attrib185
+            ,p_rec_nsv_all.nsv_attrib186
+            ,p_rec_nsv_all.nsv_attrib187
+            ,p_rec_nsv_all.nsv_attrib188
+            ,p_rec_nsv_all.nsv_attrib189
+            ,p_rec_nsv_all.nsv_attrib190
+            ,p_rec_nsv_all.nsv_attrib191
+            ,p_rec_nsv_all.nsv_attrib192
+            ,p_rec_nsv_all.nsv_attrib193
+            ,p_rec_nsv_all.nsv_attrib194
+            ,p_rec_nsv_all.nsv_attrib195
+            ,p_rec_nsv_all.nsv_attrib196
+            ,p_rec_nsv_all.nsv_attrib197
+            ,p_rec_nsv_all.nsv_attrib198
+            ,p_rec_nsv_all.nsv_attrib199
+            ,p_rec_nsv_all.nsv_attrib200
+            ,p_rec_nsv_all.nsv_attrib201
+            ,p_rec_nsv_all.nsv_attrib202
+            ,p_rec_nsv_all.nsv_attrib203
+            ,p_rec_nsv_all.nsv_attrib204
+            ,p_rec_nsv_all.nsv_attrib205
+            ,p_rec_nsv_all.nsv_attrib206
+            ,p_rec_nsv_all.nsv_attrib207
+            ,p_rec_nsv_all.nsv_attrib208
+            ,p_rec_nsv_all.nsv_attrib209
+            ,p_rec_nsv_all.nsv_attrib210
+            ,p_rec_nsv_all.nsv_attrib211
+            ,p_rec_nsv_all.nsv_attrib212
+            ,p_rec_nsv_all.nsv_attrib213
+            ,p_rec_nsv_all.nsv_attrib214
+            ,p_rec_nsv_all.nsv_attrib215
+            ,p_rec_nsv_all.nsv_attrib216
+            ,p_rec_nsv_all.nsv_attrib217
+            ,p_rec_nsv_all.nsv_attrib218
+            ,p_rec_nsv_all.nsv_attrib219
+            ,p_rec_nsv_all.nsv_attrib220
+            ,p_rec_nsv_all.nsv_attrib221
+            ,p_rec_nsv_all.nsv_attrib222
+            ,p_rec_nsv_all.nsv_attrib223
+            ,p_rec_nsv_all.nsv_attrib224
+            ,p_rec_nsv_all.nsv_attrib225
+            ,p_rec_nsv_all.nsv_attrib226
+            ,p_rec_nsv_all.nsv_attrib227
+            ,p_rec_nsv_all.nsv_attrib228
+            ,p_rec_nsv_all.nsv_attrib229
+            ,p_rec_nsv_all.nsv_attrib230
+            ,p_rec_nsv_all.nsv_attrib231
+            ,p_rec_nsv_all.nsv_attrib232
+            ,p_rec_nsv_all.nsv_attrib233
+            ,p_rec_nsv_all.nsv_attrib234
+            ,p_rec_nsv_all.nsv_attrib235
+            ,p_rec_nsv_all.nsv_attrib236
+            ,p_rec_nsv_all.nsv_attrib237
+            ,p_rec_nsv_all.nsv_attrib238
+            ,p_rec_nsv_all.nsv_attrib239
+            ,p_rec_nsv_all.nsv_attrib240
+            ,p_rec_nsv_all.nsv_attrib241
+            ,p_rec_nsv_all.nsv_attrib242
+            ,p_rec_nsv_all.nsv_attrib243
+            ,p_rec_nsv_all.nsv_attrib244
+            ,p_rec_nsv_all.nsv_attrib245
+            ,p_rec_nsv_all.nsv_attrib246
+            ,p_rec_nsv_all.nsv_attrib247
+            ,p_rec_nsv_all.nsv_attrib248
+            ,p_rec_nsv_all.nsv_attrib249
+            ,p_rec_nsv_all.nsv_attrib250
+            ,p_rec_nsv_all.nsv_attrib251
+            ,p_rec_nsv_all.nsv_attrib252
+            ,p_rec_nsv_all.nsv_attrib253
+            ,p_rec_nsv_all.nsv_attrib254
+            ,p_rec_nsv_all.nsv_attrib255
+            ,p_rec_nsv_all.nsv_attrib256
+            ,p_rec_nsv_all.nsv_attrib257
+            ,p_rec_nsv_all.nsv_attrib258
+            ,p_rec_nsv_all.nsv_attrib259
+            ,p_rec_nsv_all.nsv_attrib260
+            ,p_rec_nsv_all.nsv_attrib261
+            ,p_rec_nsv_all.nsv_attrib262
+            ,p_rec_nsv_all.nsv_attrib263
+            ,p_rec_nsv_all.nsv_attrib264
+            ,p_rec_nsv_all.nsv_attrib265
+            ,p_rec_nsv_all.nsv_attrib266
+            ,p_rec_nsv_all.nsv_attrib267
+            ,p_rec_nsv_all.nsv_attrib268
+            ,p_rec_nsv_all.nsv_attrib269
+            ,p_rec_nsv_all.nsv_attrib270
+            ,p_rec_nsv_all.nsv_attrib271
+            ,p_rec_nsv_all.nsv_attrib272
+            ,p_rec_nsv_all.nsv_attrib273
+            ,p_rec_nsv_all.nsv_attrib274
+            ,p_rec_nsv_all.nsv_attrib275
+            ,p_rec_nsv_all.nsv_attrib276
+            ,p_rec_nsv_all.nsv_attrib277
+            ,p_rec_nsv_all.nsv_attrib278
+            ,p_rec_nsv_all.nsv_attrib279
+            ,p_rec_nsv_all.nsv_attrib280
+            ,p_rec_nsv_all.nsv_attrib281
+            ,p_rec_nsv_all.nsv_attrib282
+            ,p_rec_nsv_all.nsv_attrib283
+            ,p_rec_nsv_all.nsv_attrib284
+            ,p_rec_nsv_all.nsv_attrib285
+            ,p_rec_nsv_all.nsv_attrib286
+            ,p_rec_nsv_all.nsv_attrib287
+            ,p_rec_nsv_all.nsv_attrib288
+            ,p_rec_nsv_all.nsv_attrib289
+            ,p_rec_nsv_all.nsv_attrib290
+            ,p_rec_nsv_all.nsv_attrib291
+            ,p_rec_nsv_all.nsv_attrib292
+            ,p_rec_nsv_all.nsv_attrib293
+            ,p_rec_nsv_all.nsv_attrib294
+            ,p_rec_nsv_all.nsv_attrib295
+            ,p_rec_nsv_all.nsv_attrib296
+            ,p_rec_nsv_all.nsv_attrib297
+            ,p_rec_nsv_all.nsv_attrib298
+            ,p_rec_nsv_all.nsv_attrib299
+            ,p_rec_nsv_all.nsv_attrib300
+            ,p_rec_nsv_all.nsv_attrib301
+            ,p_rec_nsv_all.nsv_attrib302
+            ,p_rec_nsv_all.nsv_attrib303
+            ,p_rec_nsv_all.nsv_attrib304
+            ,p_rec_nsv_all.nsv_attrib305
+            ,p_rec_nsv_all.nsv_attrib306
+            ,p_rec_nsv_all.nsv_attrib307
+            ,p_rec_nsv_all.nsv_attrib308
+            ,p_rec_nsv_all.nsv_attrib309
+            ,p_rec_nsv_all.nsv_attrib310
+            ,p_rec_nsv_all.nsv_attrib311
+            ,p_rec_nsv_all.nsv_attrib312
+            ,p_rec_nsv_all.nsv_attrib313
+            ,p_rec_nsv_all.nsv_attrib314
+            ,p_rec_nsv_all.nsv_attrib315
+            ,p_rec_nsv_all.nsv_attrib316
+            ,p_rec_nsv_all.nsv_attrib317
+            ,p_rec_nsv_all.nsv_attrib318
+            ,p_rec_nsv_all.nsv_attrib319
+            ,p_rec_nsv_all.nsv_attrib320
+            ,p_rec_nsv_all.nsv_attrib321
+            ,p_rec_nsv_all.nsv_attrib322
+            ,p_rec_nsv_all.nsv_attrib323
+            ,p_rec_nsv_all.nsv_attrib324
+            ,p_rec_nsv_all.nsv_attrib325
+            ,p_rec_nsv_all.nsv_attrib326
+            ,p_rec_nsv_all.nsv_attrib327
+            ,p_rec_nsv_all.nsv_attrib328
+            ,p_rec_nsv_all.nsv_attrib329
+            ,p_rec_nsv_all.nsv_attrib330
+            ,p_rec_nsv_all.nsv_attrib331
+            ,p_rec_nsv_all.nsv_attrib332
+            ,p_rec_nsv_all.nsv_attrib333
+            ,p_rec_nsv_all.nsv_attrib334
+            ,p_rec_nsv_all.nsv_attrib335
+            ,p_rec_nsv_all.nsv_attrib336
+            ,p_rec_nsv_all.nsv_attrib337
+            ,p_rec_nsv_all.nsv_attrib338
+            ,p_rec_nsv_all.nsv_attrib339
+            ,p_rec_nsv_all.nsv_attrib340
+            ,p_rec_nsv_all.nsv_attrib341
+            ,p_rec_nsv_all.nsv_attrib342
+            ,p_rec_nsv_all.nsv_attrib343
+            ,p_rec_nsv_all.nsv_attrib344
+            ,p_rec_nsv_all.nsv_attrib345
+            ,p_rec_nsv_all.nsv_attrib346
+            ,p_rec_nsv_all.nsv_attrib347
+            ,p_rec_nsv_all.nsv_attrib348
+            ,p_rec_nsv_all.nsv_attrib349
+            ,p_rec_nsv_all.nsv_attrib350
+            ,p_rec_nsv_all.nsv_attrib351
+            ,p_rec_nsv_all.nsv_attrib352
+            ,p_rec_nsv_all.nsv_attrib353
+            ,p_rec_nsv_all.nsv_attrib354
+            ,p_rec_nsv_all.nsv_attrib355
+            ,p_rec_nsv_all.nsv_attrib356
+            ,p_rec_nsv_all.nsv_attrib357
+            ,p_rec_nsv_all.nsv_attrib358
+            ,p_rec_nsv_all.nsv_attrib359
+            ,p_rec_nsv_all.nsv_attrib360
+            ,p_rec_nsv_all.nsv_attrib361
+            ,p_rec_nsv_all.nsv_attrib362
+            ,p_rec_nsv_all.nsv_attrib363
+            ,p_rec_nsv_all.nsv_attrib364
+            ,p_rec_nsv_all.nsv_attrib365
+            ,p_rec_nsv_all.nsv_attrib366
+            ,p_rec_nsv_all.nsv_attrib367
+            ,p_rec_nsv_all.nsv_attrib368
+            ,p_rec_nsv_all.nsv_attrib369
+            ,p_rec_nsv_all.nsv_attrib370
+            ,p_rec_nsv_all.nsv_attrib371
+            ,p_rec_nsv_all.nsv_attrib372
+            ,p_rec_nsv_all.nsv_attrib373
+            ,p_rec_nsv_all.nsv_attrib374
+            ,p_rec_nsv_all.nsv_attrib375
+            ,p_rec_nsv_all.nsv_attrib376
+            ,p_rec_nsv_all.nsv_attrib377
+            ,p_rec_nsv_all.nsv_attrib378
+            ,p_rec_nsv_all.nsv_attrib379
+            ,p_rec_nsv_all.nsv_attrib380
+            ,p_rec_nsv_all.nsv_attrib381
+            ,p_rec_nsv_all.nsv_attrib382
+            ,p_rec_nsv_all.nsv_attrib383
+            ,p_rec_nsv_all.nsv_attrib384
+            ,p_rec_nsv_all.nsv_attrib385
+            ,p_rec_nsv_all.nsv_attrib386
+            ,p_rec_nsv_all.nsv_attrib387
+            ,p_rec_nsv_all.nsv_attrib388
+            ,p_rec_nsv_all.nsv_attrib389
+            ,p_rec_nsv_all.nsv_attrib390
+            ,p_rec_nsv_all.nsv_attrib391
+            ,p_rec_nsv_all.nsv_attrib392
+            ,p_rec_nsv_all.nsv_attrib393
+            ,p_rec_nsv_all.nsv_attrib394
+            ,p_rec_nsv_all.nsv_attrib395
+            ,p_rec_nsv_all.nsv_attrib396
+            ,p_rec_nsv_all.nsv_attrib397
+            ,p_rec_nsv_all.nsv_attrib398
+            ,p_rec_nsv_all.nsv_attrib399
+            ,p_rec_nsv_all.nsv_attrib400
+            ,p_rec_nsv_all.nsv_attrib401
+            ,p_rec_nsv_all.nsv_attrib402
+            ,p_rec_nsv_all.nsv_attrib403
+            ,p_rec_nsv_all.nsv_attrib404
+            ,p_rec_nsv_all.nsv_attrib405
+            ,p_rec_nsv_all.nsv_attrib406
+            ,p_rec_nsv_all.nsv_attrib407
+            ,p_rec_nsv_all.nsv_attrib408
+            ,p_rec_nsv_all.nsv_attrib409
+            ,p_rec_nsv_all.nsv_attrib410
+            ,p_rec_nsv_all.nsv_attrib411
+            ,p_rec_nsv_all.nsv_attrib412
+            ,p_rec_nsv_all.nsv_attrib413
+            ,p_rec_nsv_all.nsv_attrib414
+            ,p_rec_nsv_all.nsv_attrib415
+            ,p_rec_nsv_all.nsv_attrib416
+            ,p_rec_nsv_all.nsv_attrib417
+            ,p_rec_nsv_all.nsv_attrib418
+            ,p_rec_nsv_all.nsv_attrib419
+            ,p_rec_nsv_all.nsv_attrib420
+            ,p_rec_nsv_all.nsv_attrib421
+            ,p_rec_nsv_all.nsv_attrib422
+            ,p_rec_nsv_all.nsv_attrib423
+            ,p_rec_nsv_all.nsv_attrib424
+            ,p_rec_nsv_all.nsv_attrib425
+            ,p_rec_nsv_all.nsv_attrib426
+            ,p_rec_nsv_all.nsv_attrib427
+            ,p_rec_nsv_all.nsv_attrib428
+            ,p_rec_nsv_all.nsv_attrib429
+            ,p_rec_nsv_all.nsv_attrib430
+            ,p_rec_nsv_all.nsv_attrib431
+            ,p_rec_nsv_all.nsv_attrib432
+            ,p_rec_nsv_all.nsv_attrib433
+            ,p_rec_nsv_all.nsv_attrib434
+            ,p_rec_nsv_all.nsv_attrib435
+            ,p_rec_nsv_all.nsv_attrib436
+            ,p_rec_nsv_all.nsv_attrib437
+            ,p_rec_nsv_all.nsv_attrib438
+            ,p_rec_nsv_all.nsv_attrib439
+            ,p_rec_nsv_all.nsv_attrib440
+            ,p_rec_nsv_all.nsv_attrib441
+            ,p_rec_nsv_all.nsv_attrib442
+            ,p_rec_nsv_all.nsv_attrib443
+            ,p_rec_nsv_all.nsv_attrib444
+            ,p_rec_nsv_all.nsv_attrib445
+            ,p_rec_nsv_all.nsv_attrib446
+            ,p_rec_nsv_all.nsv_attrib447
+            ,p_rec_nsv_all.nsv_attrib448
+            ,p_rec_nsv_all.nsv_attrib449
+            ,p_rec_nsv_all.nsv_attrib450
+            ,p_rec_nsv_all.nsv_attrib451
+            ,p_rec_nsv_all.nsv_attrib452
+            ,p_rec_nsv_all.nsv_attrib453
+            ,p_rec_nsv_all.nsv_attrib454
+            ,p_rec_nsv_all.nsv_attrib455
+            ,p_rec_nsv_all.nsv_attrib456
+            ,p_rec_nsv_all.nsv_attrib457
+            ,p_rec_nsv_all.nsv_attrib458
+            ,p_rec_nsv_all.nsv_attrib459
+            ,p_rec_nsv_all.nsv_attrib460
+            ,p_rec_nsv_all.nsv_attrib461
+            ,p_rec_nsv_all.nsv_attrib462
+            ,p_rec_nsv_all.nsv_attrib463
+            ,p_rec_nsv_all.nsv_attrib464
+            ,p_rec_nsv_all.nsv_attrib465
+            ,p_rec_nsv_all.nsv_attrib466
+            ,p_rec_nsv_all.nsv_attrib467
+            ,p_rec_nsv_all.nsv_attrib468
+            ,p_rec_nsv_all.nsv_attrib469
+            ,p_rec_nsv_all.nsv_attrib470
+            ,p_rec_nsv_all.nsv_attrib471
+            ,p_rec_nsv_all.nsv_attrib472
+            ,p_rec_nsv_all.nsv_attrib473
+            ,p_rec_nsv_all.nsv_attrib474
+            ,p_rec_nsv_all.nsv_attrib475
+            ,p_rec_nsv_all.nsv_attrib476
+            ,p_rec_nsv_all.nsv_attrib477
+            ,p_rec_nsv_all.nsv_attrib478
+            ,p_rec_nsv_all.nsv_attrib479
+            ,p_rec_nsv_all.nsv_attrib480
+            ,p_rec_nsv_all.nsv_attrib481
+            ,p_rec_nsv_all.nsv_attrib482
+            ,p_rec_nsv_all.nsv_attrib483
+            ,p_rec_nsv_all.nsv_attrib484
+            ,p_rec_nsv_all.nsv_attrib485
+            ,p_rec_nsv_all.nsv_attrib486
+            ,p_rec_nsv_all.nsv_attrib487
+            ,p_rec_nsv_all.nsv_attrib488
+            ,p_rec_nsv_all.nsv_attrib489
+            ,p_rec_nsv_all.nsv_attrib490
+            ,p_rec_nsv_all.nsv_attrib491
+            ,p_rec_nsv_all.nsv_attrib492
+            ,p_rec_nsv_all.nsv_attrib493
+            ,p_rec_nsv_all.nsv_attrib494
+            ,p_rec_nsv_all.nsv_attrib495
+            ,p_rec_nsv_all.nsv_attrib496
+            ,p_rec_nsv_all.nsv_attrib497
+            ,p_rec_nsv_all.nsv_attrib498
+            ,p_rec_nsv_all.nsv_attrib499
+            ,p_rec_nsv_all.nsv_attrib500
+            )
+   RETURNING nsv_mrg_job_id
+            ,nsv_value_id
+            ,nsv_inv_type
+            ,nsv_x_sect
+            ,nsv_pnt_or_cont
+            ,nsv_attrib1
+            ,nsv_attrib2
+            ,nsv_attrib3
+            ,nsv_attrib4
+            ,nsv_attrib5
+            ,nsv_attrib6
+            ,nsv_attrib7
+            ,nsv_attrib8
+            ,nsv_attrib9
+            ,nsv_attrib10
+            ,nsv_attrib11
+            ,nsv_attrib12
+            ,nsv_attrib13
+            ,nsv_attrib14
+            ,nsv_attrib15
+            ,nsv_attrib16
+            ,nsv_attrib17
+            ,nsv_attrib18
+            ,nsv_attrib19
+            ,nsv_attrib20
+            ,nsv_attrib21
+            ,nsv_attrib22
+            ,nsv_attrib23
+            ,nsv_attrib24
+            ,nsv_attrib25
+            ,nsv_attrib26
+            ,nsv_attrib27
+            ,nsv_attrib28
+            ,nsv_attrib29
+            ,nsv_attrib30
+            ,nsv_attrib31
+            ,nsv_attrib32
+            ,nsv_attrib33
+            ,nsv_attrib34
+            ,nsv_attrib35
+            ,nsv_attrib36
+            ,nsv_attrib37
+            ,nsv_attrib38
+            ,nsv_attrib39
+            ,nsv_attrib40
+            ,nsv_attrib41
+            ,nsv_attrib42
+            ,nsv_attrib43
+            ,nsv_attrib44
+            ,nsv_attrib45
+            ,nsv_attrib46
+            ,nsv_attrib47
+            ,nsv_attrib48
+            ,nsv_attrib49
+            ,nsv_attrib50
+            ,nsv_attrib51
+            ,nsv_attrib52
+            ,nsv_attrib53
+            ,nsv_attrib54
+            ,nsv_attrib55
+            ,nsv_attrib56
+            ,nsv_attrib57
+            ,nsv_attrib58
+            ,nsv_attrib59
+            ,nsv_attrib60
+            ,nsv_attrib61
+            ,nsv_attrib62
+            ,nsv_attrib63
+            ,nsv_attrib64
+            ,nsv_attrib65
+            ,nsv_attrib66
+            ,nsv_attrib67
+            ,nsv_attrib68
+            ,nsv_attrib69
+            ,nsv_attrib70
+            ,nsv_attrib71
+            ,nsv_attrib72
+            ,nsv_attrib73
+            ,nsv_attrib74
+            ,nsv_attrib75
+            ,nsv_attrib76
+            ,nsv_attrib77
+            ,nsv_attrib78
+            ,nsv_attrib79
+            ,nsv_attrib80
+            ,nsv_attrib81
+            ,nsv_attrib82
+            ,nsv_attrib83
+            ,nsv_attrib84
+            ,nsv_attrib85
+            ,nsv_attrib86
+            ,nsv_attrib87
+            ,nsv_attrib88
+            ,nsv_attrib89
+            ,nsv_attrib90
+            ,nsv_attrib91
+            ,nsv_attrib92
+            ,nsv_attrib93
+            ,nsv_attrib94
+            ,nsv_attrib95
+            ,nsv_attrib96
+            ,nsv_attrib97
+            ,nsv_attrib98
+            ,nsv_attrib99
+            ,nsv_attrib100
+            ,nsv_attrib101
+            ,nsv_attrib102
+            ,nsv_attrib103
+            ,nsv_attrib104
+            ,nsv_attrib105
+            ,nsv_attrib106
+            ,nsv_attrib107
+            ,nsv_attrib108
+            ,nsv_attrib109
+            ,nsv_attrib110
+            ,nsv_attrib111
+            ,nsv_attrib112
+            ,nsv_attrib113
+            ,nsv_attrib114
+            ,nsv_attrib115
+            ,nsv_attrib116
+            ,nsv_attrib117
+            ,nsv_attrib118
+            ,nsv_attrib119
+            ,nsv_attrib120
+            ,nsv_attrib121
+            ,nsv_attrib122
+            ,nsv_attrib123
+            ,nsv_attrib124
+            ,nsv_attrib125
+            ,nsv_attrib126
+            ,nsv_attrib127
+            ,nsv_attrib128
+            ,nsv_attrib129
+            ,nsv_attrib130
+            ,nsv_attrib131
+            ,nsv_attrib132
+            ,nsv_attrib133
+            ,nsv_attrib134
+            ,nsv_attrib135
+            ,nsv_attrib136
+            ,nsv_attrib137
+            ,nsv_attrib138
+            ,nsv_attrib139
+            ,nsv_attrib140
+            ,nsv_attrib141
+            ,nsv_attrib142
+            ,nsv_attrib143
+            ,nsv_attrib144
+            ,nsv_attrib145
+            ,nsv_attrib146
+            ,nsv_attrib147
+            ,nsv_attrib148
+            ,nsv_attrib149
+            ,nsv_attrib150
+            ,nsv_attrib151
+            ,nsv_attrib152
+            ,nsv_attrib153
+            ,nsv_attrib154
+            ,nsv_attrib155
+            ,nsv_attrib156
+            ,nsv_attrib157
+            ,nsv_attrib158
+            ,nsv_attrib159
+            ,nsv_attrib160
+            ,nsv_attrib161
+            ,nsv_attrib162
+            ,nsv_attrib163
+            ,nsv_attrib164
+            ,nsv_attrib165
+            ,nsv_attrib166
+            ,nsv_attrib167
+            ,nsv_attrib168
+            ,nsv_attrib169
+            ,nsv_attrib170
+            ,nsv_attrib171
+            ,nsv_attrib172
+            ,nsv_attrib173
+            ,nsv_attrib174
+            ,nsv_attrib175
+            ,nsv_attrib176
+            ,nsv_attrib177
+            ,nsv_attrib178
+            ,nsv_attrib179
+            ,nsv_attrib180
+            ,nsv_attrib181
+            ,nsv_attrib182
+            ,nsv_attrib183
+            ,nsv_attrib184
+            ,nsv_attrib185
+            ,nsv_attrib186
+            ,nsv_attrib187
+            ,nsv_attrib188
+            ,nsv_attrib189
+            ,nsv_attrib190
+            ,nsv_attrib191
+            ,nsv_attrib192
+            ,nsv_attrib193
+            ,nsv_attrib194
+            ,nsv_attrib195
+            ,nsv_attrib196
+            ,nsv_attrib197
+            ,nsv_attrib198
+            ,nsv_attrib199
+            ,nsv_attrib200
+            ,nsv_attrib201
+            ,nsv_attrib202
+            ,nsv_attrib203
+            ,nsv_attrib204
+            ,nsv_attrib205
+            ,nsv_attrib206
+            ,nsv_attrib207
+            ,nsv_attrib208
+            ,nsv_attrib209
+            ,nsv_attrib210
+            ,nsv_attrib211
+            ,nsv_attrib212
+            ,nsv_attrib213
+            ,nsv_attrib214
+            ,nsv_attrib215
+            ,nsv_attrib216
+            ,nsv_attrib217
+            ,nsv_attrib218
+            ,nsv_attrib219
+            ,nsv_attrib220
+            ,nsv_attrib221
+            ,nsv_attrib222
+            ,nsv_attrib223
+            ,nsv_attrib224
+            ,nsv_attrib225
+            ,nsv_attrib226
+            ,nsv_attrib227
+            ,nsv_attrib228
+            ,nsv_attrib229
+            ,nsv_attrib230
+            ,nsv_attrib231
+            ,nsv_attrib232
+            ,nsv_attrib233
+            ,nsv_attrib234
+            ,nsv_attrib235
+            ,nsv_attrib236
+            ,nsv_attrib237
+            ,nsv_attrib238
+            ,nsv_attrib239
+            ,nsv_attrib240
+            ,nsv_attrib241
+            ,nsv_attrib242
+            ,nsv_attrib243
+            ,nsv_attrib244
+            ,nsv_attrib245
+            ,nsv_attrib246
+            ,nsv_attrib247
+            ,nsv_attrib248
+            ,nsv_attrib249
+            ,nsv_attrib250
+            ,nsv_attrib251
+            ,nsv_attrib252
+            ,nsv_attrib253
+            ,nsv_attrib254
+            ,nsv_attrib255
+            ,nsv_attrib256
+            ,nsv_attrib257
+            ,nsv_attrib258
+            ,nsv_attrib259
+            ,nsv_attrib260
+            ,nsv_attrib261
+            ,nsv_attrib262
+            ,nsv_attrib263
+            ,nsv_attrib264
+            ,nsv_attrib265
+            ,nsv_attrib266
+            ,nsv_attrib267
+            ,nsv_attrib268
+            ,nsv_attrib269
+            ,nsv_attrib270
+            ,nsv_attrib271
+            ,nsv_attrib272
+            ,nsv_attrib273
+            ,nsv_attrib274
+            ,nsv_attrib275
+            ,nsv_attrib276
+            ,nsv_attrib277
+            ,nsv_attrib278
+            ,nsv_attrib279
+            ,nsv_attrib280
+            ,nsv_attrib281
+            ,nsv_attrib282
+            ,nsv_attrib283
+            ,nsv_attrib284
+            ,nsv_attrib285
+            ,nsv_attrib286
+            ,nsv_attrib287
+            ,nsv_attrib288
+            ,nsv_attrib289
+            ,nsv_attrib290
+            ,nsv_attrib291
+            ,nsv_attrib292
+            ,nsv_attrib293
+            ,nsv_attrib294
+            ,nsv_attrib295
+            ,nsv_attrib296
+            ,nsv_attrib297
+            ,nsv_attrib298
+            ,nsv_attrib299
+            ,nsv_attrib300
+            ,nsv_attrib301
+            ,nsv_attrib302
+            ,nsv_attrib303
+            ,nsv_attrib304
+            ,nsv_attrib305
+            ,nsv_attrib306
+            ,nsv_attrib307
+            ,nsv_attrib308
+            ,nsv_attrib309
+            ,nsv_attrib310
+            ,nsv_attrib311
+            ,nsv_attrib312
+            ,nsv_attrib313
+            ,nsv_attrib314
+            ,nsv_attrib315
+            ,nsv_attrib316
+            ,nsv_attrib317
+            ,nsv_attrib318
+            ,nsv_attrib319
+            ,nsv_attrib320
+            ,nsv_attrib321
+            ,nsv_attrib322
+            ,nsv_attrib323
+            ,nsv_attrib324
+            ,nsv_attrib325
+            ,nsv_attrib326
+            ,nsv_attrib327
+            ,nsv_attrib328
+            ,nsv_attrib329
+            ,nsv_attrib330
+            ,nsv_attrib331
+            ,nsv_attrib332
+            ,nsv_attrib333
+            ,nsv_attrib334
+            ,nsv_attrib335
+            ,nsv_attrib336
+            ,nsv_attrib337
+            ,nsv_attrib338
+            ,nsv_attrib339
+            ,nsv_attrib340
+            ,nsv_attrib341
+            ,nsv_attrib342
+            ,nsv_attrib343
+            ,nsv_attrib344
+            ,nsv_attrib345
+            ,nsv_attrib346
+            ,nsv_attrib347
+            ,nsv_attrib348
+            ,nsv_attrib349
+            ,nsv_attrib350
+            ,nsv_attrib351
+            ,nsv_attrib352
+            ,nsv_attrib353
+            ,nsv_attrib354
+            ,nsv_attrib355
+            ,nsv_attrib356
+            ,nsv_attrib357
+            ,nsv_attrib358
+            ,nsv_attrib359
+            ,nsv_attrib360
+            ,nsv_attrib361
+            ,nsv_attrib362
+            ,nsv_attrib363
+            ,nsv_attrib364
+            ,nsv_attrib365
+            ,nsv_attrib366
+            ,nsv_attrib367
+            ,nsv_attrib368
+            ,nsv_attrib369
+            ,nsv_attrib370
+            ,nsv_attrib371
+            ,nsv_attrib372
+            ,nsv_attrib373
+            ,nsv_attrib374
+            ,nsv_attrib375
+            ,nsv_attrib376
+            ,nsv_attrib377
+            ,nsv_attrib378
+            ,nsv_attrib379
+            ,nsv_attrib380
+            ,nsv_attrib381
+            ,nsv_attrib382
+            ,nsv_attrib383
+            ,nsv_attrib384
+            ,nsv_attrib385
+            ,nsv_attrib386
+            ,nsv_attrib387
+            ,nsv_attrib388
+            ,nsv_attrib389
+            ,nsv_attrib390
+            ,nsv_attrib391
+            ,nsv_attrib392
+            ,nsv_attrib393
+            ,nsv_attrib394
+            ,nsv_attrib395
+            ,nsv_attrib396
+            ,nsv_attrib397
+            ,nsv_attrib398
+            ,nsv_attrib399
+            ,nsv_attrib400
+            ,nsv_attrib401
+            ,nsv_attrib402
+            ,nsv_attrib403
+            ,nsv_attrib404
+            ,nsv_attrib405
+            ,nsv_attrib406
+            ,nsv_attrib407
+            ,nsv_attrib408
+            ,nsv_attrib409
+            ,nsv_attrib410
+            ,nsv_attrib411
+            ,nsv_attrib412
+            ,nsv_attrib413
+            ,nsv_attrib414
+            ,nsv_attrib415
+            ,nsv_attrib416
+            ,nsv_attrib417
+            ,nsv_attrib418
+            ,nsv_attrib419
+            ,nsv_attrib420
+            ,nsv_attrib421
+            ,nsv_attrib422
+            ,nsv_attrib423
+            ,nsv_attrib424
+            ,nsv_attrib425
+            ,nsv_attrib426
+            ,nsv_attrib427
+            ,nsv_attrib428
+            ,nsv_attrib429
+            ,nsv_attrib430
+            ,nsv_attrib431
+            ,nsv_attrib432
+            ,nsv_attrib433
+            ,nsv_attrib434
+            ,nsv_attrib435
+            ,nsv_attrib436
+            ,nsv_attrib437
+            ,nsv_attrib438
+            ,nsv_attrib439
+            ,nsv_attrib440
+            ,nsv_attrib441
+            ,nsv_attrib442
+            ,nsv_attrib443
+            ,nsv_attrib444
+            ,nsv_attrib445
+            ,nsv_attrib446
+            ,nsv_attrib447
+            ,nsv_attrib448
+            ,nsv_attrib449
+            ,nsv_attrib450
+            ,nsv_attrib451
+            ,nsv_attrib452
+            ,nsv_attrib453
+            ,nsv_attrib454
+            ,nsv_attrib455
+            ,nsv_attrib456
+            ,nsv_attrib457
+            ,nsv_attrib458
+            ,nsv_attrib459
+            ,nsv_attrib460
+            ,nsv_attrib461
+            ,nsv_attrib462
+            ,nsv_attrib463
+            ,nsv_attrib464
+            ,nsv_attrib465
+            ,nsv_attrib466
+            ,nsv_attrib467
+            ,nsv_attrib468
+            ,nsv_attrib469
+            ,nsv_attrib470
+            ,nsv_attrib471
+            ,nsv_attrib472
+            ,nsv_attrib473
+            ,nsv_attrib474
+            ,nsv_attrib475
+            ,nsv_attrib476
+            ,nsv_attrib477
+            ,nsv_attrib478
+            ,nsv_attrib479
+            ,nsv_attrib480
+            ,nsv_attrib481
+            ,nsv_attrib482
+            ,nsv_attrib483
+            ,nsv_attrib484
+            ,nsv_attrib485
+            ,nsv_attrib486
+            ,nsv_attrib487
+            ,nsv_attrib488
+            ,nsv_attrib489
+            ,nsv_attrib490
+            ,nsv_attrib491
+            ,nsv_attrib492
+            ,nsv_attrib493
+            ,nsv_attrib494
+            ,nsv_attrib495
+            ,nsv_attrib496
+            ,nsv_attrib497
+            ,nsv_attrib498
+            ,nsv_attrib499
+            ,nsv_attrib500
+      INTO   p_rec_nsv_all.nsv_mrg_job_id
+            ,p_rec_nsv_all.nsv_value_id
+            ,p_rec_nsv_all.nsv_inv_type
+            ,p_rec_nsv_all.nsv_x_sect
+            ,p_rec_nsv_all.nsv_pnt_or_cont
+            ,p_rec_nsv_all.nsv_attrib1
+            ,p_rec_nsv_all.nsv_attrib2
+            ,p_rec_nsv_all.nsv_attrib3
+            ,p_rec_nsv_all.nsv_attrib4
+            ,p_rec_nsv_all.nsv_attrib5
+            ,p_rec_nsv_all.nsv_attrib6
+            ,p_rec_nsv_all.nsv_attrib7
+            ,p_rec_nsv_all.nsv_attrib8
+            ,p_rec_nsv_all.nsv_attrib9
+            ,p_rec_nsv_all.nsv_attrib10
+            ,p_rec_nsv_all.nsv_attrib11
+            ,p_rec_nsv_all.nsv_attrib12
+            ,p_rec_nsv_all.nsv_attrib13
+            ,p_rec_nsv_all.nsv_attrib14
+            ,p_rec_nsv_all.nsv_attrib15
+            ,p_rec_nsv_all.nsv_attrib16
+            ,p_rec_nsv_all.nsv_attrib17
+            ,p_rec_nsv_all.nsv_attrib18
+            ,p_rec_nsv_all.nsv_attrib19
+            ,p_rec_nsv_all.nsv_attrib20
+            ,p_rec_nsv_all.nsv_attrib21
+            ,p_rec_nsv_all.nsv_attrib22
+            ,p_rec_nsv_all.nsv_attrib23
+            ,p_rec_nsv_all.nsv_attrib24
+            ,p_rec_nsv_all.nsv_attrib25
+            ,p_rec_nsv_all.nsv_attrib26
+            ,p_rec_nsv_all.nsv_attrib27
+            ,p_rec_nsv_all.nsv_attrib28
+            ,p_rec_nsv_all.nsv_attrib29
+            ,p_rec_nsv_all.nsv_attrib30
+            ,p_rec_nsv_all.nsv_attrib31
+            ,p_rec_nsv_all.nsv_attrib32
+            ,p_rec_nsv_all.nsv_attrib33
+            ,p_rec_nsv_all.nsv_attrib34
+            ,p_rec_nsv_all.nsv_attrib35
+            ,p_rec_nsv_all.nsv_attrib36
+            ,p_rec_nsv_all.nsv_attrib37
+            ,p_rec_nsv_all.nsv_attrib38
+            ,p_rec_nsv_all.nsv_attrib39
+            ,p_rec_nsv_all.nsv_attrib40
+            ,p_rec_nsv_all.nsv_attrib41
+            ,p_rec_nsv_all.nsv_attrib42
+            ,p_rec_nsv_all.nsv_attrib43
+            ,p_rec_nsv_all.nsv_attrib44
+            ,p_rec_nsv_all.nsv_attrib45
+            ,p_rec_nsv_all.nsv_attrib46
+            ,p_rec_nsv_all.nsv_attrib47
+            ,p_rec_nsv_all.nsv_attrib48
+            ,p_rec_nsv_all.nsv_attrib49
+            ,p_rec_nsv_all.nsv_attrib50
+            ,p_rec_nsv_all.nsv_attrib51
+            ,p_rec_nsv_all.nsv_attrib52
+            ,p_rec_nsv_all.nsv_attrib53
+            ,p_rec_nsv_all.nsv_attrib54
+            ,p_rec_nsv_all.nsv_attrib55
+            ,p_rec_nsv_all.nsv_attrib56
+            ,p_rec_nsv_all.nsv_attrib57
+            ,p_rec_nsv_all.nsv_attrib58
+            ,p_rec_nsv_all.nsv_attrib59
+            ,p_rec_nsv_all.nsv_attrib60
+            ,p_rec_nsv_all.nsv_attrib61
+            ,p_rec_nsv_all.nsv_attrib62
+            ,p_rec_nsv_all.nsv_attrib63
+            ,p_rec_nsv_all.nsv_attrib64
+            ,p_rec_nsv_all.nsv_attrib65
+            ,p_rec_nsv_all.nsv_attrib66
+            ,p_rec_nsv_all.nsv_attrib67
+            ,p_rec_nsv_all.nsv_attrib68
+            ,p_rec_nsv_all.nsv_attrib69
+            ,p_rec_nsv_all.nsv_attrib70
+            ,p_rec_nsv_all.nsv_attrib71
+            ,p_rec_nsv_all.nsv_attrib72
+            ,p_rec_nsv_all.nsv_attrib73
+            ,p_rec_nsv_all.nsv_attrib74
+            ,p_rec_nsv_all.nsv_attrib75
+            ,p_rec_nsv_all.nsv_attrib76
+            ,p_rec_nsv_all.nsv_attrib77
+            ,p_rec_nsv_all.nsv_attrib78
+            ,p_rec_nsv_all.nsv_attrib79
+            ,p_rec_nsv_all.nsv_attrib80
+            ,p_rec_nsv_all.nsv_attrib81
+            ,p_rec_nsv_all.nsv_attrib82
+            ,p_rec_nsv_all.nsv_attrib83
+            ,p_rec_nsv_all.nsv_attrib84
+            ,p_rec_nsv_all.nsv_attrib85
+            ,p_rec_nsv_all.nsv_attrib86
+            ,p_rec_nsv_all.nsv_attrib87
+            ,p_rec_nsv_all.nsv_attrib88
+            ,p_rec_nsv_all.nsv_attrib89
+            ,p_rec_nsv_all.nsv_attrib90
+            ,p_rec_nsv_all.nsv_attrib91
+            ,p_rec_nsv_all.nsv_attrib92
+            ,p_rec_nsv_all.nsv_attrib93
+            ,p_rec_nsv_all.nsv_attrib94
+            ,p_rec_nsv_all.nsv_attrib95
+            ,p_rec_nsv_all.nsv_attrib96
+            ,p_rec_nsv_all.nsv_attrib97
+            ,p_rec_nsv_all.nsv_attrib98
+            ,p_rec_nsv_all.nsv_attrib99
+            ,p_rec_nsv_all.nsv_attrib100
+            ,p_rec_nsv_all.nsv_attrib101
+            ,p_rec_nsv_all.nsv_attrib102
+            ,p_rec_nsv_all.nsv_attrib103
+            ,p_rec_nsv_all.nsv_attrib104
+            ,p_rec_nsv_all.nsv_attrib105
+            ,p_rec_nsv_all.nsv_attrib106
+            ,p_rec_nsv_all.nsv_attrib107
+            ,p_rec_nsv_all.nsv_attrib108
+            ,p_rec_nsv_all.nsv_attrib109
+            ,p_rec_nsv_all.nsv_attrib110
+            ,p_rec_nsv_all.nsv_attrib111
+            ,p_rec_nsv_all.nsv_attrib112
+            ,p_rec_nsv_all.nsv_attrib113
+            ,p_rec_nsv_all.nsv_attrib114
+            ,p_rec_nsv_all.nsv_attrib115
+            ,p_rec_nsv_all.nsv_attrib116
+            ,p_rec_nsv_all.nsv_attrib117
+            ,p_rec_nsv_all.nsv_attrib118
+            ,p_rec_nsv_all.nsv_attrib119
+            ,p_rec_nsv_all.nsv_attrib120
+            ,p_rec_nsv_all.nsv_attrib121
+            ,p_rec_nsv_all.nsv_attrib122
+            ,p_rec_nsv_all.nsv_attrib123
+            ,p_rec_nsv_all.nsv_attrib124
+            ,p_rec_nsv_all.nsv_attrib125
+            ,p_rec_nsv_all.nsv_attrib126
+            ,p_rec_nsv_all.nsv_attrib127
+            ,p_rec_nsv_all.nsv_attrib128
+            ,p_rec_nsv_all.nsv_attrib129
+            ,p_rec_nsv_all.nsv_attrib130
+            ,p_rec_nsv_all.nsv_attrib131
+            ,p_rec_nsv_all.nsv_attrib132
+            ,p_rec_nsv_all.nsv_attrib133
+            ,p_rec_nsv_all.nsv_attrib134
+            ,p_rec_nsv_all.nsv_attrib135
+            ,p_rec_nsv_all.nsv_attrib136
+            ,p_rec_nsv_all.nsv_attrib137
+            ,p_rec_nsv_all.nsv_attrib138
+            ,p_rec_nsv_all.nsv_attrib139
+            ,p_rec_nsv_all.nsv_attrib140
+            ,p_rec_nsv_all.nsv_attrib141
+            ,p_rec_nsv_all.nsv_attrib142
+            ,p_rec_nsv_all.nsv_attrib143
+            ,p_rec_nsv_all.nsv_attrib144
+            ,p_rec_nsv_all.nsv_attrib145
+            ,p_rec_nsv_all.nsv_attrib146
+            ,p_rec_nsv_all.nsv_attrib147
+            ,p_rec_nsv_all.nsv_attrib148
+            ,p_rec_nsv_all.nsv_attrib149
+            ,p_rec_nsv_all.nsv_attrib150
+            ,p_rec_nsv_all.nsv_attrib151
+            ,p_rec_nsv_all.nsv_attrib152
+            ,p_rec_nsv_all.nsv_attrib153
+            ,p_rec_nsv_all.nsv_attrib154
+            ,p_rec_nsv_all.nsv_attrib155
+            ,p_rec_nsv_all.nsv_attrib156
+            ,p_rec_nsv_all.nsv_attrib157
+            ,p_rec_nsv_all.nsv_attrib158
+            ,p_rec_nsv_all.nsv_attrib159
+            ,p_rec_nsv_all.nsv_attrib160
+            ,p_rec_nsv_all.nsv_attrib161
+            ,p_rec_nsv_all.nsv_attrib162
+            ,p_rec_nsv_all.nsv_attrib163
+            ,p_rec_nsv_all.nsv_attrib164
+            ,p_rec_nsv_all.nsv_attrib165
+            ,p_rec_nsv_all.nsv_attrib166
+            ,p_rec_nsv_all.nsv_attrib167
+            ,p_rec_nsv_all.nsv_attrib168
+            ,p_rec_nsv_all.nsv_attrib169
+            ,p_rec_nsv_all.nsv_attrib170
+            ,p_rec_nsv_all.nsv_attrib171
+            ,p_rec_nsv_all.nsv_attrib172
+            ,p_rec_nsv_all.nsv_attrib173
+            ,p_rec_nsv_all.nsv_attrib174
+            ,p_rec_nsv_all.nsv_attrib175
+            ,p_rec_nsv_all.nsv_attrib176
+            ,p_rec_nsv_all.nsv_attrib177
+            ,p_rec_nsv_all.nsv_attrib178
+            ,p_rec_nsv_all.nsv_attrib179
+            ,p_rec_nsv_all.nsv_attrib180
+            ,p_rec_nsv_all.nsv_attrib181
+            ,p_rec_nsv_all.nsv_attrib182
+            ,p_rec_nsv_all.nsv_attrib183
+            ,p_rec_nsv_all.nsv_attrib184
+            ,p_rec_nsv_all.nsv_attrib185
+            ,p_rec_nsv_all.nsv_attrib186
+            ,p_rec_nsv_all.nsv_attrib187
+            ,p_rec_nsv_all.nsv_attrib188
+            ,p_rec_nsv_all.nsv_attrib189
+            ,p_rec_nsv_all.nsv_attrib190
+            ,p_rec_nsv_all.nsv_attrib191
+            ,p_rec_nsv_all.nsv_attrib192
+            ,p_rec_nsv_all.nsv_attrib193
+            ,p_rec_nsv_all.nsv_attrib194
+            ,p_rec_nsv_all.nsv_attrib195
+            ,p_rec_nsv_all.nsv_attrib196
+            ,p_rec_nsv_all.nsv_attrib197
+            ,p_rec_nsv_all.nsv_attrib198
+            ,p_rec_nsv_all.nsv_attrib199
+            ,p_rec_nsv_all.nsv_attrib200
+            ,p_rec_nsv_all.nsv_attrib201
+            ,p_rec_nsv_all.nsv_attrib202
+            ,p_rec_nsv_all.nsv_attrib203
+            ,p_rec_nsv_all.nsv_attrib204
+            ,p_rec_nsv_all.nsv_attrib205
+            ,p_rec_nsv_all.nsv_attrib206
+            ,p_rec_nsv_all.nsv_attrib207
+            ,p_rec_nsv_all.nsv_attrib208
+            ,p_rec_nsv_all.nsv_attrib209
+            ,p_rec_nsv_all.nsv_attrib210
+            ,p_rec_nsv_all.nsv_attrib211
+            ,p_rec_nsv_all.nsv_attrib212
+            ,p_rec_nsv_all.nsv_attrib213
+            ,p_rec_nsv_all.nsv_attrib214
+            ,p_rec_nsv_all.nsv_attrib215
+            ,p_rec_nsv_all.nsv_attrib216
+            ,p_rec_nsv_all.nsv_attrib217
+            ,p_rec_nsv_all.nsv_attrib218
+            ,p_rec_nsv_all.nsv_attrib219
+            ,p_rec_nsv_all.nsv_attrib220
+            ,p_rec_nsv_all.nsv_attrib221
+            ,p_rec_nsv_all.nsv_attrib222
+            ,p_rec_nsv_all.nsv_attrib223
+            ,p_rec_nsv_all.nsv_attrib224
+            ,p_rec_nsv_all.nsv_attrib225
+            ,p_rec_nsv_all.nsv_attrib226
+            ,p_rec_nsv_all.nsv_attrib227
+            ,p_rec_nsv_all.nsv_attrib228
+            ,p_rec_nsv_all.nsv_attrib229
+            ,p_rec_nsv_all.nsv_attrib230
+            ,p_rec_nsv_all.nsv_attrib231
+            ,p_rec_nsv_all.nsv_attrib232
+            ,p_rec_nsv_all.nsv_attrib233
+            ,p_rec_nsv_all.nsv_attrib234
+            ,p_rec_nsv_all.nsv_attrib235
+            ,p_rec_nsv_all.nsv_attrib236
+            ,p_rec_nsv_all.nsv_attrib237
+            ,p_rec_nsv_all.nsv_attrib238
+            ,p_rec_nsv_all.nsv_attrib239
+            ,p_rec_nsv_all.nsv_attrib240
+            ,p_rec_nsv_all.nsv_attrib241
+            ,p_rec_nsv_all.nsv_attrib242
+            ,p_rec_nsv_all.nsv_attrib243
+            ,p_rec_nsv_all.nsv_attrib244
+            ,p_rec_nsv_all.nsv_attrib245
+            ,p_rec_nsv_all.nsv_attrib246
+            ,p_rec_nsv_all.nsv_attrib247
+            ,p_rec_nsv_all.nsv_attrib248
+            ,p_rec_nsv_all.nsv_attrib249
+            ,p_rec_nsv_all.nsv_attrib250
+            ,p_rec_nsv_all.nsv_attrib251
+            ,p_rec_nsv_all.nsv_attrib252
+            ,p_rec_nsv_all.nsv_attrib253
+            ,p_rec_nsv_all.nsv_attrib254
+            ,p_rec_nsv_all.nsv_attrib255
+            ,p_rec_nsv_all.nsv_attrib256
+            ,p_rec_nsv_all.nsv_attrib257
+            ,p_rec_nsv_all.nsv_attrib258
+            ,p_rec_nsv_all.nsv_attrib259
+            ,p_rec_nsv_all.nsv_attrib260
+            ,p_rec_nsv_all.nsv_attrib261
+            ,p_rec_nsv_all.nsv_attrib262
+            ,p_rec_nsv_all.nsv_attrib263
+            ,p_rec_nsv_all.nsv_attrib264
+            ,p_rec_nsv_all.nsv_attrib265
+            ,p_rec_nsv_all.nsv_attrib266
+            ,p_rec_nsv_all.nsv_attrib267
+            ,p_rec_nsv_all.nsv_attrib268
+            ,p_rec_nsv_all.nsv_attrib269
+            ,p_rec_nsv_all.nsv_attrib270
+            ,p_rec_nsv_all.nsv_attrib271
+            ,p_rec_nsv_all.nsv_attrib272
+            ,p_rec_nsv_all.nsv_attrib273
+            ,p_rec_nsv_all.nsv_attrib274
+            ,p_rec_nsv_all.nsv_attrib275
+            ,p_rec_nsv_all.nsv_attrib276
+            ,p_rec_nsv_all.nsv_attrib277
+            ,p_rec_nsv_all.nsv_attrib278
+            ,p_rec_nsv_all.nsv_attrib279
+            ,p_rec_nsv_all.nsv_attrib280
+            ,p_rec_nsv_all.nsv_attrib281
+            ,p_rec_nsv_all.nsv_attrib282
+            ,p_rec_nsv_all.nsv_attrib283
+            ,p_rec_nsv_all.nsv_attrib284
+            ,p_rec_nsv_all.nsv_attrib285
+            ,p_rec_nsv_all.nsv_attrib286
+            ,p_rec_nsv_all.nsv_attrib287
+            ,p_rec_nsv_all.nsv_attrib288
+            ,p_rec_nsv_all.nsv_attrib289
+            ,p_rec_nsv_all.nsv_attrib290
+            ,p_rec_nsv_all.nsv_attrib291
+            ,p_rec_nsv_all.nsv_attrib292
+            ,p_rec_nsv_all.nsv_attrib293
+            ,p_rec_nsv_all.nsv_attrib294
+            ,p_rec_nsv_all.nsv_attrib295
+            ,p_rec_nsv_all.nsv_attrib296
+            ,p_rec_nsv_all.nsv_attrib297
+            ,p_rec_nsv_all.nsv_attrib298
+            ,p_rec_nsv_all.nsv_attrib299
+            ,p_rec_nsv_all.nsv_attrib300
+            ,p_rec_nsv_all.nsv_attrib301
+            ,p_rec_nsv_all.nsv_attrib302
+            ,p_rec_nsv_all.nsv_attrib303
+            ,p_rec_nsv_all.nsv_attrib304
+            ,p_rec_nsv_all.nsv_attrib305
+            ,p_rec_nsv_all.nsv_attrib306
+            ,p_rec_nsv_all.nsv_attrib307
+            ,p_rec_nsv_all.nsv_attrib308
+            ,p_rec_nsv_all.nsv_attrib309
+            ,p_rec_nsv_all.nsv_attrib310
+            ,p_rec_nsv_all.nsv_attrib311
+            ,p_rec_nsv_all.nsv_attrib312
+            ,p_rec_nsv_all.nsv_attrib313
+            ,p_rec_nsv_all.nsv_attrib314
+            ,p_rec_nsv_all.nsv_attrib315
+            ,p_rec_nsv_all.nsv_attrib316
+            ,p_rec_nsv_all.nsv_attrib317
+            ,p_rec_nsv_all.nsv_attrib318
+            ,p_rec_nsv_all.nsv_attrib319
+            ,p_rec_nsv_all.nsv_attrib320
+            ,p_rec_nsv_all.nsv_attrib321
+            ,p_rec_nsv_all.nsv_attrib322
+            ,p_rec_nsv_all.nsv_attrib323
+            ,p_rec_nsv_all.nsv_attrib324
+            ,p_rec_nsv_all.nsv_attrib325
+            ,p_rec_nsv_all.nsv_attrib326
+            ,p_rec_nsv_all.nsv_attrib327
+            ,p_rec_nsv_all.nsv_attrib328
+            ,p_rec_nsv_all.nsv_attrib329
+            ,p_rec_nsv_all.nsv_attrib330
+            ,p_rec_nsv_all.nsv_attrib331
+            ,p_rec_nsv_all.nsv_attrib332
+            ,p_rec_nsv_all.nsv_attrib333
+            ,p_rec_nsv_all.nsv_attrib334
+            ,p_rec_nsv_all.nsv_attrib335
+            ,p_rec_nsv_all.nsv_attrib336
+            ,p_rec_nsv_all.nsv_attrib337
+            ,p_rec_nsv_all.nsv_attrib338
+            ,p_rec_nsv_all.nsv_attrib339
+            ,p_rec_nsv_all.nsv_attrib340
+            ,p_rec_nsv_all.nsv_attrib341
+            ,p_rec_nsv_all.nsv_attrib342
+            ,p_rec_nsv_all.nsv_attrib343
+            ,p_rec_nsv_all.nsv_attrib344
+            ,p_rec_nsv_all.nsv_attrib345
+            ,p_rec_nsv_all.nsv_attrib346
+            ,p_rec_nsv_all.nsv_attrib347
+            ,p_rec_nsv_all.nsv_attrib348
+            ,p_rec_nsv_all.nsv_attrib349
+            ,p_rec_nsv_all.nsv_attrib350
+            ,p_rec_nsv_all.nsv_attrib351
+            ,p_rec_nsv_all.nsv_attrib352
+            ,p_rec_nsv_all.nsv_attrib353
+            ,p_rec_nsv_all.nsv_attrib354
+            ,p_rec_nsv_all.nsv_attrib355
+            ,p_rec_nsv_all.nsv_attrib356
+            ,p_rec_nsv_all.nsv_attrib357
+            ,p_rec_nsv_all.nsv_attrib358
+            ,p_rec_nsv_all.nsv_attrib359
+            ,p_rec_nsv_all.nsv_attrib360
+            ,p_rec_nsv_all.nsv_attrib361
+            ,p_rec_nsv_all.nsv_attrib362
+            ,p_rec_nsv_all.nsv_attrib363
+            ,p_rec_nsv_all.nsv_attrib364
+            ,p_rec_nsv_all.nsv_attrib365
+            ,p_rec_nsv_all.nsv_attrib366
+            ,p_rec_nsv_all.nsv_attrib367
+            ,p_rec_nsv_all.nsv_attrib368
+            ,p_rec_nsv_all.nsv_attrib369
+            ,p_rec_nsv_all.nsv_attrib370
+            ,p_rec_nsv_all.nsv_attrib371
+            ,p_rec_nsv_all.nsv_attrib372
+            ,p_rec_nsv_all.nsv_attrib373
+            ,p_rec_nsv_all.nsv_attrib374
+            ,p_rec_nsv_all.nsv_attrib375
+            ,p_rec_nsv_all.nsv_attrib376
+            ,p_rec_nsv_all.nsv_attrib377
+            ,p_rec_nsv_all.nsv_attrib378
+            ,p_rec_nsv_all.nsv_attrib379
+            ,p_rec_nsv_all.nsv_attrib380
+            ,p_rec_nsv_all.nsv_attrib381
+            ,p_rec_nsv_all.nsv_attrib382
+            ,p_rec_nsv_all.nsv_attrib383
+            ,p_rec_nsv_all.nsv_attrib384
+            ,p_rec_nsv_all.nsv_attrib385
+            ,p_rec_nsv_all.nsv_attrib386
+            ,p_rec_nsv_all.nsv_attrib387
+            ,p_rec_nsv_all.nsv_attrib388
+            ,p_rec_nsv_all.nsv_attrib389
+            ,p_rec_nsv_all.nsv_attrib390
+            ,p_rec_nsv_all.nsv_attrib391
+            ,p_rec_nsv_all.nsv_attrib392
+            ,p_rec_nsv_all.nsv_attrib393
+            ,p_rec_nsv_all.nsv_attrib394
+            ,p_rec_nsv_all.nsv_attrib395
+            ,p_rec_nsv_all.nsv_attrib396
+            ,p_rec_nsv_all.nsv_attrib397
+            ,p_rec_nsv_all.nsv_attrib398
+            ,p_rec_nsv_all.nsv_attrib399
+            ,p_rec_nsv_all.nsv_attrib400
+            ,p_rec_nsv_all.nsv_attrib401
+            ,p_rec_nsv_all.nsv_attrib402
+            ,p_rec_nsv_all.nsv_attrib403
+            ,p_rec_nsv_all.nsv_attrib404
+            ,p_rec_nsv_all.nsv_attrib405
+            ,p_rec_nsv_all.nsv_attrib406
+            ,p_rec_nsv_all.nsv_attrib407
+            ,p_rec_nsv_all.nsv_attrib408
+            ,p_rec_nsv_all.nsv_attrib409
+            ,p_rec_nsv_all.nsv_attrib410
+            ,p_rec_nsv_all.nsv_attrib411
+            ,p_rec_nsv_all.nsv_attrib412
+            ,p_rec_nsv_all.nsv_attrib413
+            ,p_rec_nsv_all.nsv_attrib414
+            ,p_rec_nsv_all.nsv_attrib415
+            ,p_rec_nsv_all.nsv_attrib416
+            ,p_rec_nsv_all.nsv_attrib417
+            ,p_rec_nsv_all.nsv_attrib418
+            ,p_rec_nsv_all.nsv_attrib419
+            ,p_rec_nsv_all.nsv_attrib420
+            ,p_rec_nsv_all.nsv_attrib421
+            ,p_rec_nsv_all.nsv_attrib422
+            ,p_rec_nsv_all.nsv_attrib423
+            ,p_rec_nsv_all.nsv_attrib424
+            ,p_rec_nsv_all.nsv_attrib425
+            ,p_rec_nsv_all.nsv_attrib426
+            ,p_rec_nsv_all.nsv_attrib427
+            ,p_rec_nsv_all.nsv_attrib428
+            ,p_rec_nsv_all.nsv_attrib429
+            ,p_rec_nsv_all.nsv_attrib430
+            ,p_rec_nsv_all.nsv_attrib431
+            ,p_rec_nsv_all.nsv_attrib432
+            ,p_rec_nsv_all.nsv_attrib433
+            ,p_rec_nsv_all.nsv_attrib434
+            ,p_rec_nsv_all.nsv_attrib435
+            ,p_rec_nsv_all.nsv_attrib436
+            ,p_rec_nsv_all.nsv_attrib437
+            ,p_rec_nsv_all.nsv_attrib438
+            ,p_rec_nsv_all.nsv_attrib439
+            ,p_rec_nsv_all.nsv_attrib440
+            ,p_rec_nsv_all.nsv_attrib441
+            ,p_rec_nsv_all.nsv_attrib442
+            ,p_rec_nsv_all.nsv_attrib443
+            ,p_rec_nsv_all.nsv_attrib444
+            ,p_rec_nsv_all.nsv_attrib445
+            ,p_rec_nsv_all.nsv_attrib446
+            ,p_rec_nsv_all.nsv_attrib447
+            ,p_rec_nsv_all.nsv_attrib448
+            ,p_rec_nsv_all.nsv_attrib449
+            ,p_rec_nsv_all.nsv_attrib450
+            ,p_rec_nsv_all.nsv_attrib451
+            ,p_rec_nsv_all.nsv_attrib452
+            ,p_rec_nsv_all.nsv_attrib453
+            ,p_rec_nsv_all.nsv_attrib454
+            ,p_rec_nsv_all.nsv_attrib455
+            ,p_rec_nsv_all.nsv_attrib456
+            ,p_rec_nsv_all.nsv_attrib457
+            ,p_rec_nsv_all.nsv_attrib458
+            ,p_rec_nsv_all.nsv_attrib459
+            ,p_rec_nsv_all.nsv_attrib460
+            ,p_rec_nsv_all.nsv_attrib461
+            ,p_rec_nsv_all.nsv_attrib462
+            ,p_rec_nsv_all.nsv_attrib463
+            ,p_rec_nsv_all.nsv_attrib464
+            ,p_rec_nsv_all.nsv_attrib465
+            ,p_rec_nsv_all.nsv_attrib466
+            ,p_rec_nsv_all.nsv_attrib467
+            ,p_rec_nsv_all.nsv_attrib468
+            ,p_rec_nsv_all.nsv_attrib469
+            ,p_rec_nsv_all.nsv_attrib470
+            ,p_rec_nsv_all.nsv_attrib471
+            ,p_rec_nsv_all.nsv_attrib472
+            ,p_rec_nsv_all.nsv_attrib473
+            ,p_rec_nsv_all.nsv_attrib474
+            ,p_rec_nsv_all.nsv_attrib475
+            ,p_rec_nsv_all.nsv_attrib476
+            ,p_rec_nsv_all.nsv_attrib477
+            ,p_rec_nsv_all.nsv_attrib478
+            ,p_rec_nsv_all.nsv_attrib479
+            ,p_rec_nsv_all.nsv_attrib480
+            ,p_rec_nsv_all.nsv_attrib481
+            ,p_rec_nsv_all.nsv_attrib482
+            ,p_rec_nsv_all.nsv_attrib483
+            ,p_rec_nsv_all.nsv_attrib484
+            ,p_rec_nsv_all.nsv_attrib485
+            ,p_rec_nsv_all.nsv_attrib486
+            ,p_rec_nsv_all.nsv_attrib487
+            ,p_rec_nsv_all.nsv_attrib488
+            ,p_rec_nsv_all.nsv_attrib489
+            ,p_rec_nsv_all.nsv_attrib490
+            ,p_rec_nsv_all.nsv_attrib491
+            ,p_rec_nsv_all.nsv_attrib492
+            ,p_rec_nsv_all.nsv_attrib493
+            ,p_rec_nsv_all.nsv_attrib494
+            ,p_rec_nsv_all.nsv_attrib495
+            ,p_rec_nsv_all.nsv_attrib496
+            ,p_rec_nsv_all.nsv_attrib497
+            ,p_rec_nsv_all.nsv_attrib498
+            ,p_rec_nsv_all.nsv_attrib499
+            ,p_rec_nsv_all.nsv_attrib500;
+--
+   nm_debug.proc_end(g_package_name,'ins_nsv_all');
+--
+END ins_nsv_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmsm (p_rec_nmsm IN OUT nm_mrg_section_members%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmsm');
+--
+--
+   INSERT INTO nm_mrg_section_members
+            (nsm_mrg_job_id
+            ,nsm_mrg_section_id
+            ,nsm_ne_id
+            ,nsm_begin_mp
+            ,nsm_end_mp
+            ,nsm_measure
+            )
+     VALUES (p_rec_nmsm.nsm_mrg_job_id
+            ,p_rec_nmsm.nsm_mrg_section_id
+            ,p_rec_nmsm.nsm_ne_id
+            ,p_rec_nmsm.nsm_begin_mp
+            ,p_rec_nmsm.nsm_end_mp
+            ,p_rec_nmsm.nsm_measure
+            )
+   RETURNING nsm_mrg_job_id
+            ,nsm_mrg_section_id
+            ,nsm_ne_id
+            ,nsm_begin_mp
+            ,nsm_end_mp
+            ,nsm_measure
+      INTO   p_rec_nmsm.nsm_mrg_job_id
+            ,p_rec_nmsm.nsm_mrg_section_id
+            ,p_rec_nmsm.nsm_ne_id
+            ,p_rec_nmsm.nsm_begin_mp
+            ,p_rec_nmsm.nsm_end_mp
+            ,p_rec_nmsm.nsm_measure;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmsm');
+--
+END ins_nmsm;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_no (p_rec_no IN OUT nm_nodes%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_no');
+--
+   p_rec_no.no_start_date                  := NVL(p_rec_no.no_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_nodes
+            (no_node_id
+            ,no_node_name
+            ,no_start_date
+            ,no_end_date
+            ,no_np_id
+            ,no_descr
+            ,no_node_type
+            ,no_date_created
+            ,no_date_modified
+            ,no_modified_by
+            ,no_created_by
+            ,no_purpose
+            )
+     VALUES (p_rec_no.no_node_id
+            ,p_rec_no.no_node_name
+            ,p_rec_no.no_start_date
+            ,p_rec_no.no_end_date
+            ,p_rec_no.no_np_id
+            ,p_rec_no.no_descr
+            ,p_rec_no.no_node_type
+            ,p_rec_no.no_date_created
+            ,p_rec_no.no_date_modified
+            ,p_rec_no.no_modified_by
+            ,p_rec_no.no_created_by
+            ,p_rec_no.no_purpose
+            );
+--
+   p_rec_no := nm3get.get_no
+                   (pi_no_node_id        => p_rec_no.no_node_id
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_no');
+--
+END ins_no;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_no_all (p_rec_no_all IN OUT nm_nodes_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_no_all');
+--
+   p_rec_no_all.no_start_date                  := NVL(p_rec_no_all.no_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_nodes_all
+            (no_node_id
+            ,no_node_name
+            ,no_start_date
+            ,no_end_date
+            ,no_np_id
+            ,no_descr
+            ,no_node_type
+            ,no_date_created
+            ,no_date_modified
+            ,no_modified_by
+            ,no_created_by
+            ,no_purpose
+            )
+     VALUES (p_rec_no_all.no_node_id
+            ,p_rec_no_all.no_node_name
+            ,p_rec_no_all.no_start_date
+            ,p_rec_no_all.no_end_date
+            ,p_rec_no_all.no_np_id
+            ,p_rec_no_all.no_descr
+            ,p_rec_no_all.no_node_type
+            ,p_rec_no_all.no_date_created
+            ,p_rec_no_all.no_date_modified
+            ,p_rec_no_all.no_modified_by
+            ,p_rec_no_all.no_created_by
+            ,p_rec_no_all.no_purpose
+            )
+   RETURNING no_node_id
+            ,no_node_name
+            ,no_start_date
+            ,no_end_date
+            ,no_np_id
+            ,no_descr
+            ,no_node_type
+            ,no_date_created
+            ,no_date_modified
+            ,no_modified_by
+            ,no_created_by
+            ,no_purpose
+      INTO   p_rec_no_all.no_node_id
+            ,p_rec_no_all.no_node_name
+            ,p_rec_no_all.no_start_date
+            ,p_rec_no_all.no_end_date
+            ,p_rec_no_all.no_np_id
+            ,p_rec_no_all.no_descr
+            ,p_rec_no_all.no_node_type
+            ,p_rec_no_all.no_date_created
+            ,p_rec_no_all.no_date_modified
+            ,p_rec_no_all.no_modified_by
+            ,p_rec_no_all.no_created_by
+            ,p_rec_no_all.no_purpose;
+--
+   nm_debug.proc_end(g_package_name,'ins_no_all');
+--
+END ins_no_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nnt (p_rec_nnt IN OUT nm_node_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nnt');
+--
+--
+   INSERT INTO nm_node_types
+            (nnt_type
+            ,nnt_name
+            ,nnt_descr
+            ,nnt_no_name_format
+            )
+     VALUES (p_rec_nnt.nnt_type
+            ,p_rec_nnt.nnt_name
+            ,p_rec_nnt.nnt_descr
+            ,p_rec_nnt.nnt_no_name_format
+            )
+   RETURNING nnt_type
+            ,nnt_name
+            ,nnt_descr
+            ,nnt_no_name_format
+      INTO   p_rec_nnt.nnt_type
+            ,p_rec_nnt.nnt_name
+            ,p_rec_nnt.nnt_descr
+            ,p_rec_nnt.nnt_no_name_format;
+--
+   nm_debug.proc_end(g_package_name,'ins_nnt');
+--
+END ins_nnt;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nnu (p_rec_nnu IN OUT nm_node_usages%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nnu');
+--
+   p_rec_nnu.nnu_start_date                 := NVL(p_rec_nnu.nnu_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_node_usages
+            (nnu_no_node_id
+            ,nnu_ne_id
+            ,nnu_node_type
+            ,nnu_chain
+            ,nnu_leg_no
+            ,nnu_start_date
+            ,nnu_end_date
+            )
+     VALUES (p_rec_nnu.nnu_no_node_id
+            ,p_rec_nnu.nnu_ne_id
+            ,p_rec_nnu.nnu_node_type
+            ,p_rec_nnu.nnu_chain
+            ,p_rec_nnu.nnu_leg_no
+            ,p_rec_nnu.nnu_start_date
+            ,p_rec_nnu.nnu_end_date
+            );
+--
+   p_rec_nnu := nm3get.get_nnu
+                   (pi_nnu_ne_id         => p_rec_nnu.nnu_ne_id
+                   ,pi_nnu_chain         => p_rec_nnu.nnu_chain
+                   ,pi_nnu_no_node_id    => p_rec_nnu.nnu_no_node_id
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_nnu');
+--
+END ins_nnu;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nnu_all (p_rec_nnu_all IN OUT nm_node_usages_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nnu_all');
+--
+   p_rec_nnu_all.nnu_start_date                 := NVL(p_rec_nnu_all.nnu_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_node_usages_all
+            (nnu_no_node_id
+            ,nnu_ne_id
+            ,nnu_node_type
+            ,nnu_chain
+            ,nnu_leg_no
+            ,nnu_start_date
+            ,nnu_end_date
+            )
+     VALUES (p_rec_nnu_all.nnu_no_node_id
+            ,p_rec_nnu_all.nnu_ne_id
+            ,p_rec_nnu_all.nnu_node_type
+            ,p_rec_nnu_all.nnu_chain
+            ,p_rec_nnu_all.nnu_leg_no
+            ,p_rec_nnu_all.nnu_start_date
+            ,p_rec_nnu_all.nnu_end_date
+            )
+   RETURNING nnu_no_node_id
+            ,nnu_ne_id
+            ,nnu_node_type
+            ,nnu_chain
+            ,nnu_leg_no
+            ,nnu_start_date
+            ,nnu_end_date
+      INTO   p_rec_nnu_all.nnu_no_node_id
+            ,p_rec_nnu_all.nnu_ne_id
+            ,p_rec_nnu_all.nnu_node_type
+            ,p_rec_nnu_all.nnu_chain
+            ,p_rec_nnu_all.nnu_leg_no
+            ,p_rec_nnu_all.nnu_start_date
+            ,p_rec_nnu_all.nnu_end_date;
+--
+   nm_debug.proc_end(g_package_name,'ins_nnu_all');
+--
+END ins_nnu_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nng (p_rec_nng IN OUT nm_nt_groupings%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nng');
+--
+   p_rec_nng.nng_start_date                 := NVL(p_rec_nng.nng_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_nt_groupings
+            (nng_group_type
+            ,nng_nt_type
+            ,nng_start_date
+            ,nng_end_date
+            )
+     VALUES (p_rec_nng.nng_group_type
+            ,p_rec_nng.nng_nt_type
+            ,p_rec_nng.nng_start_date
+            ,p_rec_nng.nng_end_date
+            );
+--
+   p_rec_nng := nm3get.get_nng
+                   (pi_nng_group_type    => p_rec_nng.nng_group_type
+                   ,pi_nng_nt_type       => p_rec_nng.nng_nt_type
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_nng');
+--
+END ins_nng;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nng_all (p_rec_nng_all IN OUT nm_nt_groupings_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nng_all');
+--
+   p_rec_nng_all.nng_start_date                 := NVL(p_rec_nng_all.nng_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_nt_groupings_all
+            (nng_group_type
+            ,nng_nt_type
+            ,nng_start_date
+            ,nng_end_date
+            )
+     VALUES (p_rec_nng_all.nng_group_type
+            ,p_rec_nng_all.nng_nt_type
+            ,p_rec_nng_all.nng_start_date
+            ,p_rec_nng_all.nng_end_date
+            )
+   RETURNING nng_group_type
+            ,nng_nt_type
+            ,nng_start_date
+            ,nng_end_date
+      INTO   p_rec_nng_all.nng_group_type
+            ,p_rec_nng_all.nng_nt_type
+            ,p_rec_nng_all.nng_start_date
+            ,p_rec_nng_all.nng_end_date;
+--
+   nm_debug.proc_end(g_package_name,'ins_nng_all');
+--
+END ins_nng_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nad (p_rec_nad IN OUT nm_nw_ad_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nad');
+--
+--
+   INSERT INTO nm_nw_ad_types
+            (nad_id
+            ,nad_inv_type
+            ,nad_nt_type
+            ,nad_gty_type
+            ,nad_descr
+            ,nad_start_date
+            ,nad_end_date
+            ,nad_primary_ad
+            ,nad_display_order
+            ,nad_single_row
+            ,nad_mandatory
+            )
+     VALUES (p_rec_nad.nad_id
+            ,p_rec_nad.nad_inv_type
+            ,p_rec_nad.nad_nt_type
+            ,p_rec_nad.nad_gty_type
+            ,p_rec_nad.nad_descr
+            ,p_rec_nad.nad_start_date
+            ,p_rec_nad.nad_end_date
+            ,p_rec_nad.nad_primary_ad
+            ,p_rec_nad.nad_display_order
+            ,p_rec_nad.nad_single_row
+            ,p_rec_nad.nad_mandatory
+            )
+   RETURNING nad_id
+            ,nad_inv_type
+            ,nad_nt_type
+            ,nad_gty_type
+            ,nad_descr
+            ,nad_start_date
+            ,nad_end_date
+            ,nad_primary_ad
+            ,nad_display_order
+            ,nad_single_row
+            ,nad_mandatory
+      INTO   p_rec_nad.nad_id
+            ,p_rec_nad.nad_inv_type
+            ,p_rec_nad.nad_nt_type
+            ,p_rec_nad.nad_gty_type
+            ,p_rec_nad.nad_descr
+            ,p_rec_nad.nad_start_date
+            ,p_rec_nad.nad_end_date
+            ,p_rec_nad.nad_primary_ad
+            ,p_rec_nad.nad_display_order
+            ,p_rec_nad.nad_single_row
+            ,p_rec_nad.nad_mandatory;
+--
+   nm_debug.proc_end(g_package_name,'ins_nad');
+--
+END ins_nad;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_npe (p_rec_npe IN OUT nm_nw_persistent_extents%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_npe');
+--
+   p_rec_npe.npe_begin_mp                   := NVL(p_rec_npe.npe_begin_mp,0 );
+--
+   INSERT INTO nm_nw_persistent_extents
+            (npe_job_id
+            ,npe_ne_id_of
+            ,npe_begin_mp
+            ,npe_end_mp
+            ,npe_cardinality
+            ,npe_seq_no
+            ,npe_route_ne_id
+            )
+     VALUES (p_rec_npe.npe_job_id
+            ,p_rec_npe.npe_ne_id_of
+            ,p_rec_npe.npe_begin_mp
+            ,p_rec_npe.npe_end_mp
+            ,p_rec_npe.npe_cardinality
+            ,p_rec_npe.npe_seq_no
+            ,p_rec_npe.npe_route_ne_id
+            )
+   RETURNING npe_job_id
+            ,npe_ne_id_of
+            ,npe_begin_mp
+            ,npe_end_mp
+            ,npe_cardinality
+            ,npe_seq_no
+            ,npe_route_ne_id
+      INTO   p_rec_npe.npe_job_id
+            ,p_rec_npe.npe_ne_id_of
+            ,p_rec_npe.npe_begin_mp
+            ,p_rec_npe.npe_end_mp
+            ,p_rec_npe.npe_cardinality
+            ,p_rec_npe.npe_seq_no
+            ,p_rec_npe.npe_route_ne_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_npe');
+--
+END ins_npe;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nnth (p_rec_nnth IN OUT nm_nw_themes%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nnth');
+--
+--
+   INSERT INTO nm_nw_themes
+            (nnth_nlt_id
+            ,nnth_nth_theme_id
+            )
+     VALUES (p_rec_nnth.nnth_nlt_id
+            ,p_rec_nnth.nnth_nth_theme_id
+            )
+   RETURNING nnth_nlt_id
+            ,nnth_nth_theme_id
+      INTO   p_rec_nnth.nnth_nlt_id
+            ,p_rec_nnth.nnth_nth_theme_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_nnth');
+--
+END ins_nnth;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nmo (p_rec_nmo IN OUT nm_operations%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nmo');
+--
+--
+   INSERT INTO nm_operations
+            (nmo_operation
+            ,nmo_descr
+            ,nmo_proc_name
+            )
+     VALUES (p_rec_nmo.nmo_operation
+            ,p_rec_nmo.nmo_descr
+            ,p_rec_nmo.nmo_proc_name
+            )
+   RETURNING nmo_operation
+            ,nmo_descr
+            ,nmo_proc_name
+      INTO   p_rec_nmo.nmo_operation
+            ,p_rec_nmo.nmo_descr
+            ,p_rec_nmo.nmo_proc_name;
+--
+   nm_debug.proc_end(g_package_name,'ins_nmo');
+--
+END ins_nmo;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nod (p_rec_nod IN OUT nm_operation_data%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nod');
+--
+   p_rec_nod.nod_mandatory                  := NVL(p_rec_nod.nod_mandatory,'N' );
+--
+   INSERT INTO nm_operation_data
+            (nod_nmo_operation
+            ,nod_data_item
+            ,nod_data_type
+            ,nod_mandatory
+            ,nod_seq
+            ,nod_scrn_text
+            ,nod_query_sql
+            )
+     VALUES (p_rec_nod.nod_nmo_operation
+            ,p_rec_nod.nod_data_item
+            ,p_rec_nod.nod_data_type
+            ,p_rec_nod.nod_mandatory
+            ,p_rec_nod.nod_seq
+            ,p_rec_nod.nod_scrn_text
+            ,p_rec_nod.nod_query_sql
+            )
+   RETURNING nod_nmo_operation
+            ,nod_data_item
+            ,nod_data_type
+            ,nod_mandatory
+            ,nod_seq
+            ,nod_scrn_text
+            ,nod_query_sql
+      INTO   p_rec_nod.nod_nmo_operation
+            ,p_rec_nod.nod_data_item
+            ,p_rec_nod.nod_data_type
+            ,p_rec_nod.nod_mandatory
+            ,p_rec_nod.nod_seq
+            ,p_rec_nod.nod_scrn_text
+            ,p_rec_nod.nod_query_sql;
+--
+   nm_debug.proc_end(g_package_name,'ins_nod');
+--
+END ins_nod;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_npq (p_rec_npq IN OUT nm_pbi_query%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_npq');
+--
+--
+   INSERT INTO nm_pbi_query
+            (npq_id
+            ,npq_unique
+            ,npq_descr
+            ,npq_date_created
+            ,npq_date_modified
+            ,npq_modified_by
+            ,npq_created_by
+            )
+     VALUES (p_rec_npq.npq_id
+            ,p_rec_npq.npq_unique
+            ,p_rec_npq.npq_descr
+            ,p_rec_npq.npq_date_created
+            ,p_rec_npq.npq_date_modified
+            ,p_rec_npq.npq_modified_by
+            ,p_rec_npq.npq_created_by
+            )
+   RETURNING npq_id
+            ,npq_unique
+            ,npq_descr
+            ,npq_date_created
+            ,npq_date_modified
+            ,npq_modified_by
+            ,npq_created_by
+      INTO   p_rec_npq.npq_id
+            ,p_rec_npq.npq_unique
+            ,p_rec_npq.npq_descr
+            ,p_rec_npq.npq_date_created
+            ,p_rec_npq.npq_date_modified
+            ,p_rec_npq.npq_modified_by
+            ,p_rec_npq.npq_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_npq');
+--
+END ins_npq;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_npqa (p_rec_npqa IN OUT nm_pbi_query_attribs%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_npqa');
+--
+   p_rec_npqa.nqa_operator                   := NVL(p_rec_npqa.nqa_operator,'AND' );
+--
+   INSERT INTO nm_pbi_query_attribs
+            (nqa_npq_id
+            ,nqa_nqt_seq_no
+            ,nqa_seq_no
+            ,nqa_attrib_name
+            ,nqa_operator
+            ,nqa_pre_bracket
+            ,nqa_post_bracket
+            ,nqa_condition
+            )
+     VALUES (p_rec_npqa.nqa_npq_id
+            ,p_rec_npqa.nqa_nqt_seq_no
+            ,p_rec_npqa.nqa_seq_no
+            ,p_rec_npqa.nqa_attrib_name
+            ,p_rec_npqa.nqa_operator
+            ,p_rec_npqa.nqa_pre_bracket
+            ,p_rec_npqa.nqa_post_bracket
+            ,p_rec_npqa.nqa_condition
+            )
+   RETURNING nqa_npq_id
+            ,nqa_nqt_seq_no
+            ,nqa_seq_no
+            ,nqa_attrib_name
+            ,nqa_operator
+            ,nqa_pre_bracket
+            ,nqa_post_bracket
+            ,nqa_condition
+      INTO   p_rec_npqa.nqa_npq_id
+            ,p_rec_npqa.nqa_nqt_seq_no
+            ,p_rec_npqa.nqa_seq_no
+            ,p_rec_npqa.nqa_attrib_name
+            ,p_rec_npqa.nqa_operator
+            ,p_rec_npqa.nqa_pre_bracket
+            ,p_rec_npqa.nqa_post_bracket
+            ,p_rec_npqa.nqa_condition;
+--
+   nm_debug.proc_end(g_package_name,'ins_npqa');
+--
+END ins_npqa;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_npqr (p_rec_npqr IN OUT nm_pbi_query_results%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_npqr');
+--
+--
+   INSERT INTO nm_pbi_query_results
+            (nqr_npq_id
+            ,nqr_job_id
+            ,nqr_source_id
+            ,nqr_source
+            ,nqr_description
+            ,nqr_date_created
+            ,nqr_date_modified
+            ,nqr_modified_by
+            ,nqr_created_by
+            )
+     VALUES (p_rec_npqr.nqr_npq_id
+            ,p_rec_npqr.nqr_job_id
+            ,p_rec_npqr.nqr_source_id
+            ,p_rec_npqr.nqr_source
+            ,p_rec_npqr.nqr_description
+            ,p_rec_npqr.nqr_date_created
+            ,p_rec_npqr.nqr_date_modified
+            ,p_rec_npqr.nqr_modified_by
+            ,p_rec_npqr.nqr_created_by
+            )
+   RETURNING nqr_npq_id
+            ,nqr_job_id
+            ,nqr_source_id
+            ,nqr_source
+            ,nqr_description
+            ,nqr_date_created
+            ,nqr_date_modified
+            ,nqr_modified_by
+            ,nqr_created_by
+      INTO   p_rec_npqr.nqr_npq_id
+            ,p_rec_npqr.nqr_job_id
+            ,p_rec_npqr.nqr_source_id
+            ,p_rec_npqr.nqr_source
+            ,p_rec_npqr.nqr_description
+            ,p_rec_npqr.nqr_date_created
+            ,p_rec_npqr.nqr_date_modified
+            ,p_rec_npqr.nqr_modified_by
+            ,p_rec_npqr.nqr_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_npqr');
+--
+END ins_npqr;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_npqt (p_rec_npqt IN OUT nm_pbi_query_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_npqt');
+--
+--
+   INSERT INTO nm_pbi_query_types
+            (nqt_npq_id
+            ,nqt_seq_no
+            ,nqt_item_type_type
+            ,nqt_item_type
+            )
+     VALUES (p_rec_npqt.nqt_npq_id
+            ,p_rec_npqt.nqt_seq_no
+            ,p_rec_npqt.nqt_item_type_type
+            ,p_rec_npqt.nqt_item_type
+            )
+   RETURNING nqt_npq_id
+            ,nqt_seq_no
+            ,nqt_item_type_type
+            ,nqt_item_type
+      INTO   p_rec_npqt.nqt_npq_id
+            ,p_rec_npqt.nqt_seq_no
+            ,p_rec_npqt.nqt_item_type_type
+            ,p_rec_npqt.nqt_item_type;
+--
+   nm_debug.proc_end(g_package_name,'ins_npqt');
+--
+END ins_npqt;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_npqv (p_rec_npqv IN OUT nm_pbi_query_values%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_npqv');
+--
+--
+   INSERT INTO nm_pbi_query_values
+            (nqv_npq_id
+            ,nqv_nqt_seq_no
+            ,nqv_nqa_seq_no
+            ,nqv_sequence
+            ,nqv_value
+            )
+     VALUES (p_rec_npqv.nqv_npq_id
+            ,p_rec_npqv.nqv_nqt_seq_no
+            ,p_rec_npqv.nqv_nqa_seq_no
+            ,p_rec_npqv.nqv_sequence
+            ,p_rec_npqv.nqv_value
+            )
+   RETURNING nqv_npq_id
+            ,nqv_nqt_seq_no
+            ,nqv_nqa_seq_no
+            ,nqv_sequence
+            ,nqv_value
+      INTO   p_rec_npqv.nqv_npq_id
+            ,p_rec_npqv.nqv_nqt_seq_no
+            ,p_rec_npqv.nqv_nqa_seq_no
+            ,p_rec_npqv.nqv_sequence
+            ,p_rec_npqv.nqv_value;
+--
+   nm_debug.proc_end(g_package_name,'ins_npqv');
+--
+END ins_npqv;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nps (p_rec_nps IN OUT nm_pbi_sections%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nps');
+--
+--
+   INSERT INTO nm_pbi_sections
+            (nps_npq_id
+            ,nps_nqr_job_id
+            ,nps_section_id
+            ,nps_offset_ne_id
+            ,nps_begin_offset
+            ,nps_end_offset
+            ,nps_ne_id_first
+            ,nps_begin_mp_first
+            ,nps_ne_id_last
+            ,nps_end_mp_last
+            ,nps_date_created
+            ,nps_date_modified
+            ,nps_modified_by
+            ,nps_created_by
+            )
+     VALUES (p_rec_nps.nps_npq_id
+            ,p_rec_nps.nps_nqr_job_id
+            ,p_rec_nps.nps_section_id
+            ,p_rec_nps.nps_offset_ne_id
+            ,p_rec_nps.nps_begin_offset
+            ,p_rec_nps.nps_end_offset
+            ,p_rec_nps.nps_ne_id_first
+            ,p_rec_nps.nps_begin_mp_first
+            ,p_rec_nps.nps_ne_id_last
+            ,p_rec_nps.nps_end_mp_last
+            ,p_rec_nps.nps_date_created
+            ,p_rec_nps.nps_date_modified
+            ,p_rec_nps.nps_modified_by
+            ,p_rec_nps.nps_created_by
+            )
+   RETURNING nps_npq_id
+            ,nps_nqr_job_id
+            ,nps_section_id
+            ,nps_offset_ne_id
+            ,nps_begin_offset
+            ,nps_end_offset
+            ,nps_ne_id_first
+            ,nps_begin_mp_first
+            ,nps_ne_id_last
+            ,nps_end_mp_last
+            ,nps_date_created
+            ,nps_date_modified
+            ,nps_modified_by
+            ,nps_created_by
+      INTO   p_rec_nps.nps_npq_id
+            ,p_rec_nps.nps_nqr_job_id
+            ,p_rec_nps.nps_section_id
+            ,p_rec_nps.nps_offset_ne_id
+            ,p_rec_nps.nps_begin_offset
+            ,p_rec_nps.nps_end_offset
+            ,p_rec_nps.nps_ne_id_first
+            ,p_rec_nps.nps_begin_mp_first
+            ,p_rec_nps.nps_ne_id_last
+            ,p_rec_nps.nps_end_mp_last
+            ,p_rec_nps.nps_date_created
+            ,p_rec_nps.nps_date_modified
+            ,p_rec_nps.nps_modified_by
+            ,p_rec_nps.nps_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_nps');
+--
+END ins_nps;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_npsm (p_rec_npsm IN OUT nm_pbi_section_members%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_npsm');
+--
+--
+   INSERT INTO nm_pbi_section_members
+            (npm_npq_id
+            ,npm_nqr_job_id
+            ,npm_nps_section_id
+            ,npm_ne_id_of
+            ,npm_begin_mp
+            ,npm_end_mp
+            ,npm_measure
+            ,npm_date_created
+            ,npm_date_modified
+            ,npm_modified_by
+            ,npm_created_by
+            )
+     VALUES (p_rec_npsm.npm_npq_id
+            ,p_rec_npsm.npm_nqr_job_id
+            ,p_rec_npsm.npm_nps_section_id
+            ,p_rec_npsm.npm_ne_id_of
+            ,p_rec_npsm.npm_begin_mp
+            ,p_rec_npsm.npm_end_mp
+            ,p_rec_npsm.npm_measure
+            ,p_rec_npsm.npm_date_created
+            ,p_rec_npsm.npm_date_modified
+            ,p_rec_npsm.npm_modified_by
+            ,p_rec_npsm.npm_created_by
+            )
+   RETURNING npm_npq_id
+            ,npm_nqr_job_id
+            ,npm_nps_section_id
+            ,npm_ne_id_of
+            ,npm_begin_mp
+            ,npm_end_mp
+            ,npm_measure
+            ,npm_date_created
+            ,npm_date_modified
+            ,npm_modified_by
+            ,npm_created_by
+      INTO   p_rec_npsm.npm_npq_id
+            ,p_rec_npsm.npm_nqr_job_id
+            ,p_rec_npsm.npm_nps_section_id
+            ,p_rec_npsm.npm_ne_id_of
+            ,p_rec_npsm.npm_begin_mp
+            ,p_rec_npsm.npm_end_mp
+            ,p_rec_npsm.npm_measure
+            ,p_rec_npsm.npm_date_created
+            ,p_rec_npsm.npm_date_modified
+            ,p_rec_npsm.npm_modified_by
+            ,p_rec_npsm.npm_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_npsm');
+--
+END ins_npsm;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_np (p_rec_np IN OUT nm_points%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_np');
+--
+--
+   INSERT INTO nm_points
+            (np_id
+            ,np_grid_east
+            ,np_grid_north
+            ,np_descr
+            ,np_date_created
+            ,np_date_modified
+            ,np_modified_by
+            ,np_created_by
+            )
+     VALUES (p_rec_np.np_id
+            ,p_rec_np.np_grid_east
+            ,p_rec_np.np_grid_north
+            ,p_rec_np.np_descr
+            ,p_rec_np.np_date_created
+            ,p_rec_np.np_date_modified
+            ,p_rec_np.np_modified_by
+            ,p_rec_np.np_created_by
+            )
+   RETURNING np_id
+            ,np_grid_east
+            ,np_grid_north
+            ,np_descr
+            ,np_date_created
+            ,np_date_modified
+            ,np_modified_by
+            ,np_created_by
+      INTO   p_rec_np.np_id
+            ,p_rec_np.np_grid_east
+            ,p_rec_np.np_grid_north
+            ,p_rec_np.np_descr
+            ,p_rec_np.np_date_created
+            ,p_rec_np.np_date_modified
+            ,p_rec_np.np_modified_by
+            ,p_rec_np.np_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_np');
+--
+END ins_np;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nrd (p_rec_nrd IN OUT nm_reclass_details%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nrd');
+--
+   p_rec_nrd.nrd_timestamp                  := NVL(p_rec_nrd.nrd_timestamp,SYSDATE );
+--
+   INSERT INTO nm_reclass_details
+            (nrd_job_id
+            ,nrd_old_ne_id
+            ,nrd_new_ne_id
+            ,nrd_timestamp
+            )
+     VALUES (p_rec_nrd.nrd_job_id
+            ,p_rec_nrd.nrd_old_ne_id
+            ,p_rec_nrd.nrd_new_ne_id
+            ,p_rec_nrd.nrd_timestamp
+            )
+   RETURNING nrd_job_id
+            ,nrd_old_ne_id
+            ,nrd_new_ne_id
+            ,nrd_timestamp
+      INTO   p_rec_nrd.nrd_job_id
+            ,p_rec_nrd.nrd_old_ne_id
+            ,p_rec_nrd.nrd_new_ne_id
+            ,p_rec_nrd.nrd_timestamp;
+--
+   nm_debug.proc_end(g_package_name,'ins_nrd');
+--
+END ins_nrd;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nrev (p_rec_nrev IN OUT nm_reversal%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nrev');
+--
+--
+   INSERT INTO nm_reversal
+            (ne_id
+            ,ne_unique
+            ,ne_type
+            ,ne_nt_type
+            ,ne_descr
+            ,ne_length
+            ,ne_admin_unit
+            ,ne_owner
+            ,ne_name_1
+            ,ne_name_2
+            ,ne_prefix
+            ,ne_number
+            ,ne_sub_type
+            ,ne_group
+            ,ne_no_start
+            ,ne_no_end
+            ,ne_sub_class
+            ,ne_nsg_ref
+            ,ne_version_no
+            ,ne_new_id
+            ,ne_sub_class_old
+            )
+     VALUES (p_rec_nrev.ne_id
+            ,p_rec_nrev.ne_unique
+            ,p_rec_nrev.ne_type
+            ,p_rec_nrev.ne_nt_type
+            ,p_rec_nrev.ne_descr
+            ,p_rec_nrev.ne_length
+            ,p_rec_nrev.ne_admin_unit
+            ,p_rec_nrev.ne_owner
+            ,p_rec_nrev.ne_name_1
+            ,p_rec_nrev.ne_name_2
+            ,p_rec_nrev.ne_prefix
+            ,p_rec_nrev.ne_number
+            ,p_rec_nrev.ne_sub_type
+            ,p_rec_nrev.ne_group
+            ,p_rec_nrev.ne_no_start
+            ,p_rec_nrev.ne_no_end
+            ,p_rec_nrev.ne_sub_class
+            ,p_rec_nrev.ne_nsg_ref
+            ,p_rec_nrev.ne_version_no
+            ,p_rec_nrev.ne_new_id
+            ,p_rec_nrev.ne_sub_class_old
+            )
+   RETURNING ne_id
+            ,ne_unique
+            ,ne_type
+            ,ne_nt_type
+            ,ne_descr
+            ,ne_length
+            ,ne_admin_unit
+            ,ne_owner
+            ,ne_name_1
+            ,ne_name_2
+            ,ne_prefix
+            ,ne_number
+            ,ne_sub_type
+            ,ne_group
+            ,ne_no_start
+            ,ne_no_end
+            ,ne_sub_class
+            ,ne_nsg_ref
+            ,ne_version_no
+            ,ne_new_id
+            ,ne_sub_class_old
+      INTO   p_rec_nrev.ne_id
+            ,p_rec_nrev.ne_unique
+            ,p_rec_nrev.ne_type
+            ,p_rec_nrev.ne_nt_type
+            ,p_rec_nrev.ne_descr
+            ,p_rec_nrev.ne_length
+            ,p_rec_nrev.ne_admin_unit
+            ,p_rec_nrev.ne_owner
+            ,p_rec_nrev.ne_name_1
+            ,p_rec_nrev.ne_name_2
+            ,p_rec_nrev.ne_prefix
+            ,p_rec_nrev.ne_number
+            ,p_rec_nrev.ne_sub_type
+            ,p_rec_nrev.ne_group
+            ,p_rec_nrev.ne_no_start
+            ,p_rec_nrev.ne_no_end
+            ,p_rec_nrev.ne_sub_class
+            ,p_rec_nrev.ne_nsg_ref
+            ,p_rec_nrev.ne_version_no
+            ,p_rec_nrev.ne_new_id
+            ,p_rec_nrev.ne_sub_class_old;
+--
+   nm_debug.proc_end(g_package_name,'ins_nrev');
+--
+END ins_nrev;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nse (p_rec_nse IN OUT nm_saved_extents%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nse');
+--
+   p_rec_nse.nse_pbi                        := NVL(p_rec_nse.nse_pbi,'N' );
+--
+   INSERT INTO nm_saved_extents
+            (nse_id
+            ,nse_owner
+            ,nse_name
+            ,nse_descr
+            ,nse_pbi
+            ,nse_date_created
+            ,nse_date_modified
+            ,nse_modified_by
+            ,nse_created_by
+            )
+     VALUES (p_rec_nse.nse_id
+            ,p_rec_nse.nse_owner
+            ,p_rec_nse.nse_name
+            ,p_rec_nse.nse_descr
+            ,p_rec_nse.nse_pbi
+            ,p_rec_nse.nse_date_created
+            ,p_rec_nse.nse_date_modified
+            ,p_rec_nse.nse_modified_by
+            ,p_rec_nse.nse_created_by
+            )
+   RETURNING nse_id
+            ,nse_owner
+            ,nse_name
+            ,nse_descr
+            ,nse_pbi
+            ,nse_date_created
+            ,nse_date_modified
+            ,nse_modified_by
+            ,nse_created_by
+      INTO   p_rec_nse.nse_id
+            ,p_rec_nse.nse_owner
+            ,p_rec_nse.nse_name
+            ,p_rec_nse.nse_descr
+            ,p_rec_nse.nse_pbi
+            ,p_rec_nse.nse_date_created
+            ,p_rec_nse.nse_date_modified
+            ,p_rec_nse.nse_modified_by
+            ,p_rec_nse.nse_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_nse');
+--
+END ins_nse;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nsm (p_rec_nsm IN OUT nm_saved_extent_members%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nsm');
+--
+   p_rec_nsm.nsm_restrict_excl_sub_class    := NVL(p_rec_nsm.nsm_restrict_excl_sub_class,'N' );
+--
+   INSERT INTO nm_saved_extent_members
+            (nsm_nse_id
+            ,nsm_id
+            ,nsm_ne_id
+            ,nsm_begin_mp
+            ,nsm_end_mp
+            ,nsm_begin_no
+            ,nsm_end_no
+            ,nsm_begin_sect
+            ,nsm_begin_sect_offset
+            ,nsm_end_sect
+            ,nsm_end_sect_offset
+            ,nsm_seq_no
+            ,nsm_datum
+            ,nsm_date_created
+            ,nsm_date_modified
+            ,nsm_created_by
+            ,nsm_modified_by
+            ,nsm_sub_class
+            ,nsm_sub_class_excl
+            ,nsm_restrict_excl_sub_class
+            )
+     VALUES (p_rec_nsm.nsm_nse_id
+            ,p_rec_nsm.nsm_id
+            ,p_rec_nsm.nsm_ne_id
+            ,p_rec_nsm.nsm_begin_mp
+            ,p_rec_nsm.nsm_end_mp
+            ,p_rec_nsm.nsm_begin_no
+            ,p_rec_nsm.nsm_end_no
+            ,p_rec_nsm.nsm_begin_sect
+            ,p_rec_nsm.nsm_begin_sect_offset
+            ,p_rec_nsm.nsm_end_sect
+            ,p_rec_nsm.nsm_end_sect_offset
+            ,p_rec_nsm.nsm_seq_no
+            ,p_rec_nsm.nsm_datum
+            ,p_rec_nsm.nsm_date_created
+            ,p_rec_nsm.nsm_date_modified
+            ,p_rec_nsm.nsm_created_by
+            ,p_rec_nsm.nsm_modified_by
+            ,p_rec_nsm.nsm_sub_class
+            ,p_rec_nsm.nsm_sub_class_excl
+            ,p_rec_nsm.nsm_restrict_excl_sub_class
+            )
+   RETURNING nsm_nse_id
+            ,nsm_id
+            ,nsm_ne_id
+            ,nsm_begin_mp
+            ,nsm_end_mp
+            ,nsm_begin_no
+            ,nsm_end_no
+            ,nsm_begin_sect
+            ,nsm_begin_sect_offset
+            ,nsm_end_sect
+            ,nsm_end_sect_offset
+            ,nsm_seq_no
+            ,nsm_datum
+            ,nsm_date_created
+            ,nsm_date_modified
+            ,nsm_created_by
+            ,nsm_modified_by
+            ,nsm_sub_class
+            ,nsm_sub_class_excl
+            ,nsm_restrict_excl_sub_class
+      INTO   p_rec_nsm.nsm_nse_id
+            ,p_rec_nsm.nsm_id
+            ,p_rec_nsm.nsm_ne_id
+            ,p_rec_nsm.nsm_begin_mp
+            ,p_rec_nsm.nsm_end_mp
+            ,p_rec_nsm.nsm_begin_no
+            ,p_rec_nsm.nsm_end_no
+            ,p_rec_nsm.nsm_begin_sect
+            ,p_rec_nsm.nsm_begin_sect_offset
+            ,p_rec_nsm.nsm_end_sect
+            ,p_rec_nsm.nsm_end_sect_offset
+            ,p_rec_nsm.nsm_seq_no
+            ,p_rec_nsm.nsm_datum
+            ,p_rec_nsm.nsm_date_created
+            ,p_rec_nsm.nsm_date_modified
+            ,p_rec_nsm.nsm_created_by
+            ,p_rec_nsm.nsm_modified_by
+            ,p_rec_nsm.nsm_sub_class
+            ,p_rec_nsm.nsm_sub_class_excl
+            ,p_rec_nsm.nsm_restrict_excl_sub_class;
+--
+   nm_debug.proc_end(g_package_name,'ins_nsm');
+--
+END ins_nsm;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nsd (p_rec_nsd IN OUT nm_saved_extent_member_datums%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nsd');
+--
+--
+   INSERT INTO nm_saved_extent_member_datums
+            (nsd_nse_id
+            ,nsd_nsm_id
+            ,nsd_ne_id
+            ,nsd_begin_mp
+            ,nsd_end_mp
+            ,nsd_seq_no
+            ,nsd_cardinality
+            )
+     VALUES (p_rec_nsd.nsd_nse_id
+            ,p_rec_nsd.nsd_nsm_id
+            ,p_rec_nsd.nsd_ne_id
+            ,p_rec_nsd.nsd_begin_mp
+            ,p_rec_nsd.nsd_end_mp
+            ,p_rec_nsd.nsd_seq_no
+            ,p_rec_nsd.nsd_cardinality
+            )
+   RETURNING nsd_nse_id
+            ,nsd_nsm_id
+            ,nsd_ne_id
+            ,nsd_begin_mp
+            ,nsd_end_mp
+            ,nsd_seq_no
+            ,nsd_cardinality
+      INTO   p_rec_nsd.nsd_nse_id
+            ,p_rec_nsd.nsd_nsm_id
+            ,p_rec_nsd.nsd_ne_id
+            ,p_rec_nsd.nsd_begin_mp
+            ,p_rec_nsd.nsd_end_mp
+            ,p_rec_nsd.nsd_seq_no
+            ,p_rec_nsd.nsd_cardinality;
+--
+   nm_debug.proc_end(g_package_name,'ins_nsd');
+--
+END ins_nsd;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_tii (p_rec_tii IN OUT nm_temp_inv_items%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_tii');
+--
+   p_rec_tii.tii_ne_id_new                  := NVL(p_rec_tii.tii_ne_id_new,-1 );
+   p_rec_tii.tii_start_date                 := NVL(p_rec_tii.tii_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_temp_inv_items
+            (tii_njc_job_id
+            ,tii_ne_id
+            ,tii_ne_id_new
+            ,tii_inv_type
+            ,tii_primary_key_orig
+            ,tii_primary_key
+            ,tii_start_date
+            ,tii_date_created
+            ,tii_date_modified
+            ,tii_created_by
+            ,tii_modified_by
+            ,tii_admin_unit
+            ,tii_descr
+            ,tii_end_date
+            ,tii_foreign_key
+            ,tii_located_by
+            ,tii_position
+            ,tii_x_coord
+            ,tii_y_coord
+            ,tii_num_attrib16
+            ,tii_num_attrib17
+            ,tii_num_attrib18
+            ,tii_num_attrib19
+            ,tii_num_attrib20
+            ,tii_num_attrib21
+            ,tii_num_attrib22
+            ,tii_num_attrib23
+            ,tii_num_attrib24
+            ,tii_num_attrib25
+            ,tii_chr_attrib26
+            ,tii_chr_attrib27
+            ,tii_chr_attrib28
+            ,tii_chr_attrib29
+            ,tii_chr_attrib30
+            ,tii_chr_attrib31
+            ,tii_chr_attrib32
+            ,tii_chr_attrib33
+            ,tii_chr_attrib34
+            ,tii_chr_attrib35
+            ,tii_chr_attrib36
+            ,tii_chr_attrib37
+            ,tii_chr_attrib38
+            ,tii_chr_attrib39
+            ,tii_chr_attrib40
+            ,tii_chr_attrib41
+            ,tii_chr_attrib42
+            ,tii_chr_attrib43
+            ,tii_chr_attrib44
+            ,tii_chr_attrib45
+            ,tii_chr_attrib46
+            ,tii_chr_attrib47
+            ,tii_chr_attrib48
+            ,tii_chr_attrib49
+            ,tii_chr_attrib50
+            ,tii_chr_attrib51
+            ,tii_chr_attrib52
+            ,tii_chr_attrib53
+            ,tii_chr_attrib54
+            ,tii_chr_attrib55
+            ,tii_chr_attrib56
+            ,tii_chr_attrib57
+            ,tii_chr_attrib58
+            ,tii_chr_attrib59
+            ,tii_chr_attrib60
+            ,tii_chr_attrib61
+            ,tii_chr_attrib62
+            ,tii_chr_attrib63
+            ,tii_chr_attrib64
+            ,tii_chr_attrib65
+            ,tii_chr_attrib66
+            ,tii_chr_attrib67
+            ,tii_chr_attrib68
+            ,tii_chr_attrib69
+            ,tii_chr_attrib70
+            ,tii_chr_attrib71
+            ,tii_chr_attrib72
+            ,tii_chr_attrib73
+            ,tii_chr_attrib74
+            ,tii_chr_attrib75
+            ,tii_num_attrib76
+            ,tii_num_attrib77
+            ,tii_num_attrib78
+            ,tii_num_attrib79
+            ,tii_num_attrib80
+            ,tii_num_attrib81
+            ,tii_num_attrib82
+            ,tii_num_attrib83
+            ,tii_num_attrib84
+            ,tii_num_attrib85
+            ,tii_date_attrib86
+            ,tii_date_attrib87
+            ,tii_date_attrib88
+            ,tii_date_attrib89
+            ,tii_date_attrib90
+            ,tii_date_attrib91
+            ,tii_date_attrib92
+            ,tii_date_attrib93
+            ,tii_date_attrib94
+            ,tii_date_attrib95
+            ,tii_angle
+            ,tii_angle_txt
+            ,tii_class
+            ,tii_class_txt
+            ,tii_colour
+            ,tii_colour_txt
+            ,tii_coord_flag
+            ,tii_description
+            ,tii_diagram
+            ,tii_distance
+            ,tii_end_chain
+            ,tii_gap
+            ,tii_height
+            ,tii_height_2
+            ,tii_id_code
+            ,tii_instal_date
+            ,tii_invent_date
+            ,tii_inv_ownership
+            ,tii_itemcode
+            ,tii_lco_lamp_config_id
+            ,tii_length
+            ,tii_material
+            ,tii_material_txt
+            ,tii_method
+            ,tii_method_txt
+            ,tii_note
+            ,tii_no_of_units
+            ,tii_options
+            ,tii_options_txt
+            ,tii_oun_org_id_elec_board
+            ,tii_owner
+            ,tii_owner_txt
+            ,tii_peo_invent_by_id
+            ,tii_photo
+            ,tii_power
+            ,tii_prov_flag
+            ,tii_rev_by
+            ,tii_rev_date
+            ,tii_type
+            ,tii_type_txt
+            ,tii_width
+            ,tii_xtra_char_1
+            ,tii_xtra_date_1
+            ,tii_xtra_domain_1
+            ,tii_xtra_domain_txt_1
+            ,tii_xtra_number_1
+            ,tii_x_sect
+            ,tii_det_xsp
+            ,tii_offset
+            ,tii_x
+            ,tii_y
+            ,tii_z
+            ,tii_num_attrib96
+            ,tii_num_attrib97
+            ,tii_num_attrib98
+            ,tii_num_attrib99
+            ,tii_num_attrib100
+            ,tii_num_attrib101
+            ,tii_num_attrib102
+            ,tii_num_attrib103
+            ,tii_num_attrib104
+            ,tii_num_attrib105
+            ,tii_num_attrib106
+            ,tii_num_attrib107
+            ,tii_num_attrib108
+            ,tii_num_attrib109
+            ,tii_num_attrib110
+            ,tii_num_attrib111
+            ,tii_num_attrib112
+            ,tii_num_attrib113
+            ,tii_num_attrib114
+            ,tii_num_attrib115
+            )
+     VALUES (p_rec_tii.tii_njc_job_id
+            ,p_rec_tii.tii_ne_id
+            ,p_rec_tii.tii_ne_id_new
+            ,p_rec_tii.tii_inv_type
+            ,p_rec_tii.tii_primary_key_orig
+            ,p_rec_tii.tii_primary_key
+            ,p_rec_tii.tii_start_date
+            ,p_rec_tii.tii_date_created
+            ,p_rec_tii.tii_date_modified
+            ,p_rec_tii.tii_created_by
+            ,p_rec_tii.tii_modified_by
+            ,p_rec_tii.tii_admin_unit
+            ,p_rec_tii.tii_descr
+            ,p_rec_tii.tii_end_date
+            ,p_rec_tii.tii_foreign_key
+            ,p_rec_tii.tii_located_by
+            ,p_rec_tii.tii_position
+            ,p_rec_tii.tii_x_coord
+            ,p_rec_tii.tii_y_coord
+            ,p_rec_tii.tii_num_attrib16
+            ,p_rec_tii.tii_num_attrib17
+            ,p_rec_tii.tii_num_attrib18
+            ,p_rec_tii.tii_num_attrib19
+            ,p_rec_tii.tii_num_attrib20
+            ,p_rec_tii.tii_num_attrib21
+            ,p_rec_tii.tii_num_attrib22
+            ,p_rec_tii.tii_num_attrib23
+            ,p_rec_tii.tii_num_attrib24
+            ,p_rec_tii.tii_num_attrib25
+            ,p_rec_tii.tii_chr_attrib26
+            ,p_rec_tii.tii_chr_attrib27
+            ,p_rec_tii.tii_chr_attrib28
+            ,p_rec_tii.tii_chr_attrib29
+            ,p_rec_tii.tii_chr_attrib30
+            ,p_rec_tii.tii_chr_attrib31
+            ,p_rec_tii.tii_chr_attrib32
+            ,p_rec_tii.tii_chr_attrib33
+            ,p_rec_tii.tii_chr_attrib34
+            ,p_rec_tii.tii_chr_attrib35
+            ,p_rec_tii.tii_chr_attrib36
+            ,p_rec_tii.tii_chr_attrib37
+            ,p_rec_tii.tii_chr_attrib38
+            ,p_rec_tii.tii_chr_attrib39
+            ,p_rec_tii.tii_chr_attrib40
+            ,p_rec_tii.tii_chr_attrib41
+            ,p_rec_tii.tii_chr_attrib42
+            ,p_rec_tii.tii_chr_attrib43
+            ,p_rec_tii.tii_chr_attrib44
+            ,p_rec_tii.tii_chr_attrib45
+            ,p_rec_tii.tii_chr_attrib46
+            ,p_rec_tii.tii_chr_attrib47
+            ,p_rec_tii.tii_chr_attrib48
+            ,p_rec_tii.tii_chr_attrib49
+            ,p_rec_tii.tii_chr_attrib50
+            ,p_rec_tii.tii_chr_attrib51
+            ,p_rec_tii.tii_chr_attrib52
+            ,p_rec_tii.tii_chr_attrib53
+            ,p_rec_tii.tii_chr_attrib54
+            ,p_rec_tii.tii_chr_attrib55
+            ,p_rec_tii.tii_chr_attrib56
+            ,p_rec_tii.tii_chr_attrib57
+            ,p_rec_tii.tii_chr_attrib58
+            ,p_rec_tii.tii_chr_attrib59
+            ,p_rec_tii.tii_chr_attrib60
+            ,p_rec_tii.tii_chr_attrib61
+            ,p_rec_tii.tii_chr_attrib62
+            ,p_rec_tii.tii_chr_attrib63
+            ,p_rec_tii.tii_chr_attrib64
+            ,p_rec_tii.tii_chr_attrib65
+            ,p_rec_tii.tii_chr_attrib66
+            ,p_rec_tii.tii_chr_attrib67
+            ,p_rec_tii.tii_chr_attrib68
+            ,p_rec_tii.tii_chr_attrib69
+            ,p_rec_tii.tii_chr_attrib70
+            ,p_rec_tii.tii_chr_attrib71
+            ,p_rec_tii.tii_chr_attrib72
+            ,p_rec_tii.tii_chr_attrib73
+            ,p_rec_tii.tii_chr_attrib74
+            ,p_rec_tii.tii_chr_attrib75
+            ,p_rec_tii.tii_num_attrib76
+            ,p_rec_tii.tii_num_attrib77
+            ,p_rec_tii.tii_num_attrib78
+            ,p_rec_tii.tii_num_attrib79
+            ,p_rec_tii.tii_num_attrib80
+            ,p_rec_tii.tii_num_attrib81
+            ,p_rec_tii.tii_num_attrib82
+            ,p_rec_tii.tii_num_attrib83
+            ,p_rec_tii.tii_num_attrib84
+            ,p_rec_tii.tii_num_attrib85
+            ,p_rec_tii.tii_date_attrib86
+            ,p_rec_tii.tii_date_attrib87
+            ,p_rec_tii.tii_date_attrib88
+            ,p_rec_tii.tii_date_attrib89
+            ,p_rec_tii.tii_date_attrib90
+            ,p_rec_tii.tii_date_attrib91
+            ,p_rec_tii.tii_date_attrib92
+            ,p_rec_tii.tii_date_attrib93
+            ,p_rec_tii.tii_date_attrib94
+            ,p_rec_tii.tii_date_attrib95
+            ,p_rec_tii.tii_angle
+            ,p_rec_tii.tii_angle_txt
+            ,p_rec_tii.tii_class
+            ,p_rec_tii.tii_class_txt
+            ,p_rec_tii.tii_colour
+            ,p_rec_tii.tii_colour_txt
+            ,p_rec_tii.tii_coord_flag
+            ,p_rec_tii.tii_description
+            ,p_rec_tii.tii_diagram
+            ,p_rec_tii.tii_distance
+            ,p_rec_tii.tii_end_chain
+            ,p_rec_tii.tii_gap
+            ,p_rec_tii.tii_height
+            ,p_rec_tii.tii_height_2
+            ,p_rec_tii.tii_id_code
+            ,p_rec_tii.tii_instal_date
+            ,p_rec_tii.tii_invent_date
+            ,p_rec_tii.tii_inv_ownership
+            ,p_rec_tii.tii_itemcode
+            ,p_rec_tii.tii_lco_lamp_config_id
+            ,p_rec_tii.tii_length
+            ,p_rec_tii.tii_material
+            ,p_rec_tii.tii_material_txt
+            ,p_rec_tii.tii_method
+            ,p_rec_tii.tii_method_txt
+            ,p_rec_tii.tii_note
+            ,p_rec_tii.tii_no_of_units
+            ,p_rec_tii.tii_options
+            ,p_rec_tii.tii_options_txt
+            ,p_rec_tii.tii_oun_org_id_elec_board
+            ,p_rec_tii.tii_owner
+            ,p_rec_tii.tii_owner_txt
+            ,p_rec_tii.tii_peo_invent_by_id
+            ,p_rec_tii.tii_photo
+            ,p_rec_tii.tii_power
+            ,p_rec_tii.tii_prov_flag
+            ,p_rec_tii.tii_rev_by
+            ,p_rec_tii.tii_rev_date
+            ,p_rec_tii.tii_type
+            ,p_rec_tii.tii_type_txt
+            ,p_rec_tii.tii_width
+            ,p_rec_tii.tii_xtra_char_1
+            ,p_rec_tii.tii_xtra_date_1
+            ,p_rec_tii.tii_xtra_domain_1
+            ,p_rec_tii.tii_xtra_domain_txt_1
+            ,p_rec_tii.tii_xtra_number_1
+            ,p_rec_tii.tii_x_sect
+            ,p_rec_tii.tii_det_xsp
+            ,p_rec_tii.tii_offset
+            ,p_rec_tii.tii_x
+            ,p_rec_tii.tii_y
+            ,p_rec_tii.tii_z
+            ,p_rec_tii.tii_num_attrib96
+            ,p_rec_tii.tii_num_attrib97
+            ,p_rec_tii.tii_num_attrib98
+            ,p_rec_tii.tii_num_attrib99
+            ,p_rec_tii.tii_num_attrib100
+            ,p_rec_tii.tii_num_attrib101
+            ,p_rec_tii.tii_num_attrib102
+            ,p_rec_tii.tii_num_attrib103
+            ,p_rec_tii.tii_num_attrib104
+            ,p_rec_tii.tii_num_attrib105
+            ,p_rec_tii.tii_num_attrib106
+            ,p_rec_tii.tii_num_attrib107
+            ,p_rec_tii.tii_num_attrib108
+            ,p_rec_tii.tii_num_attrib109
+            ,p_rec_tii.tii_num_attrib110
+            ,p_rec_tii.tii_num_attrib111
+            ,p_rec_tii.tii_num_attrib112
+            ,p_rec_tii.tii_num_attrib113
+            ,p_rec_tii.tii_num_attrib114
+            ,p_rec_tii.tii_num_attrib115
+            )
+   RETURNING tii_njc_job_id
+            ,tii_ne_id
+            ,tii_ne_id_new
+            ,tii_inv_type
+            ,tii_primary_key_orig
+            ,tii_primary_key
+            ,tii_start_date
+            ,tii_date_created
+            ,tii_date_modified
+            ,tii_created_by
+            ,tii_modified_by
+            ,tii_admin_unit
+            ,tii_descr
+            ,tii_end_date
+            ,tii_foreign_key
+            ,tii_located_by
+            ,tii_position
+            ,tii_x_coord
+            ,tii_y_coord
+            ,tii_num_attrib16
+            ,tii_num_attrib17
+            ,tii_num_attrib18
+            ,tii_num_attrib19
+            ,tii_num_attrib20
+            ,tii_num_attrib21
+            ,tii_num_attrib22
+            ,tii_num_attrib23
+            ,tii_num_attrib24
+            ,tii_num_attrib25
+            ,tii_chr_attrib26
+            ,tii_chr_attrib27
+            ,tii_chr_attrib28
+            ,tii_chr_attrib29
+            ,tii_chr_attrib30
+            ,tii_chr_attrib31
+            ,tii_chr_attrib32
+            ,tii_chr_attrib33
+            ,tii_chr_attrib34
+            ,tii_chr_attrib35
+            ,tii_chr_attrib36
+            ,tii_chr_attrib37
+            ,tii_chr_attrib38
+            ,tii_chr_attrib39
+            ,tii_chr_attrib40
+            ,tii_chr_attrib41
+            ,tii_chr_attrib42
+            ,tii_chr_attrib43
+            ,tii_chr_attrib44
+            ,tii_chr_attrib45
+            ,tii_chr_attrib46
+            ,tii_chr_attrib47
+            ,tii_chr_attrib48
+            ,tii_chr_attrib49
+            ,tii_chr_attrib50
+            ,tii_chr_attrib51
+            ,tii_chr_attrib52
+            ,tii_chr_attrib53
+            ,tii_chr_attrib54
+            ,tii_chr_attrib55
+            ,tii_chr_attrib56
+            ,tii_chr_attrib57
+            ,tii_chr_attrib58
+            ,tii_chr_attrib59
+            ,tii_chr_attrib60
+            ,tii_chr_attrib61
+            ,tii_chr_attrib62
+            ,tii_chr_attrib63
+            ,tii_chr_attrib64
+            ,tii_chr_attrib65
+            ,tii_chr_attrib66
+            ,tii_chr_attrib67
+            ,tii_chr_attrib68
+            ,tii_chr_attrib69
+            ,tii_chr_attrib70
+            ,tii_chr_attrib71
+            ,tii_chr_attrib72
+            ,tii_chr_attrib73
+            ,tii_chr_attrib74
+            ,tii_chr_attrib75
+            ,tii_num_attrib76
+            ,tii_num_attrib77
+            ,tii_num_attrib78
+            ,tii_num_attrib79
+            ,tii_num_attrib80
+            ,tii_num_attrib81
+            ,tii_num_attrib82
+            ,tii_num_attrib83
+            ,tii_num_attrib84
+            ,tii_num_attrib85
+            ,tii_date_attrib86
+            ,tii_date_attrib87
+            ,tii_date_attrib88
+            ,tii_date_attrib89
+            ,tii_date_attrib90
+            ,tii_date_attrib91
+            ,tii_date_attrib92
+            ,tii_date_attrib93
+            ,tii_date_attrib94
+            ,tii_date_attrib95
+            ,tii_angle
+            ,tii_angle_txt
+            ,tii_class
+            ,tii_class_txt
+            ,tii_colour
+            ,tii_colour_txt
+            ,tii_coord_flag
+            ,tii_description
+            ,tii_diagram
+            ,tii_distance
+            ,tii_end_chain
+            ,tii_gap
+            ,tii_height
+            ,tii_height_2
+            ,tii_id_code
+            ,tii_instal_date
+            ,tii_invent_date
+            ,tii_inv_ownership
+            ,tii_itemcode
+            ,tii_lco_lamp_config_id
+            ,tii_length
+            ,tii_material
+            ,tii_material_txt
+            ,tii_method
+            ,tii_method_txt
+            ,tii_note
+            ,tii_no_of_units
+            ,tii_options
+            ,tii_options_txt
+            ,tii_oun_org_id_elec_board
+            ,tii_owner
+            ,tii_owner_txt
+            ,tii_peo_invent_by_id
+            ,tii_photo
+            ,tii_power
+            ,tii_prov_flag
+            ,tii_rev_by
+            ,tii_rev_date
+            ,tii_type
+            ,tii_type_txt
+            ,tii_width
+            ,tii_xtra_char_1
+            ,tii_xtra_date_1
+            ,tii_xtra_domain_1
+            ,tii_xtra_domain_txt_1
+            ,tii_xtra_number_1
+            ,tii_x_sect
+            ,tii_det_xsp
+            ,tii_offset
+            ,tii_x
+            ,tii_y
+            ,tii_z
+            ,tii_num_attrib96
+            ,tii_num_attrib97
+            ,tii_num_attrib98
+            ,tii_num_attrib99
+            ,tii_num_attrib100
+            ,tii_num_attrib101
+            ,tii_num_attrib102
+            ,tii_num_attrib103
+            ,tii_num_attrib104
+            ,tii_num_attrib105
+            ,tii_num_attrib106
+            ,tii_num_attrib107
+            ,tii_num_attrib108
+            ,tii_num_attrib109
+            ,tii_num_attrib110
+            ,tii_num_attrib111
+            ,tii_num_attrib112
+            ,tii_num_attrib113
+            ,tii_num_attrib114
+            ,tii_num_attrib115
+      INTO   p_rec_tii.tii_njc_job_id
+            ,p_rec_tii.tii_ne_id
+            ,p_rec_tii.tii_ne_id_new
+            ,p_rec_tii.tii_inv_type
+            ,p_rec_tii.tii_primary_key_orig
+            ,p_rec_tii.tii_primary_key
+            ,p_rec_tii.tii_start_date
+            ,p_rec_tii.tii_date_created
+            ,p_rec_tii.tii_date_modified
+            ,p_rec_tii.tii_created_by
+            ,p_rec_tii.tii_modified_by
+            ,p_rec_tii.tii_admin_unit
+            ,p_rec_tii.tii_descr
+            ,p_rec_tii.tii_end_date
+            ,p_rec_tii.tii_foreign_key
+            ,p_rec_tii.tii_located_by
+            ,p_rec_tii.tii_position
+            ,p_rec_tii.tii_x_coord
+            ,p_rec_tii.tii_y_coord
+            ,p_rec_tii.tii_num_attrib16
+            ,p_rec_tii.tii_num_attrib17
+            ,p_rec_tii.tii_num_attrib18
+            ,p_rec_tii.tii_num_attrib19
+            ,p_rec_tii.tii_num_attrib20
+            ,p_rec_tii.tii_num_attrib21
+            ,p_rec_tii.tii_num_attrib22
+            ,p_rec_tii.tii_num_attrib23
+            ,p_rec_tii.tii_num_attrib24
+            ,p_rec_tii.tii_num_attrib25
+            ,p_rec_tii.tii_chr_attrib26
+            ,p_rec_tii.tii_chr_attrib27
+            ,p_rec_tii.tii_chr_attrib28
+            ,p_rec_tii.tii_chr_attrib29
+            ,p_rec_tii.tii_chr_attrib30
+            ,p_rec_tii.tii_chr_attrib31
+            ,p_rec_tii.tii_chr_attrib32
+            ,p_rec_tii.tii_chr_attrib33
+            ,p_rec_tii.tii_chr_attrib34
+            ,p_rec_tii.tii_chr_attrib35
+            ,p_rec_tii.tii_chr_attrib36
+            ,p_rec_tii.tii_chr_attrib37
+            ,p_rec_tii.tii_chr_attrib38
+            ,p_rec_tii.tii_chr_attrib39
+            ,p_rec_tii.tii_chr_attrib40
+            ,p_rec_tii.tii_chr_attrib41
+            ,p_rec_tii.tii_chr_attrib42
+            ,p_rec_tii.tii_chr_attrib43
+            ,p_rec_tii.tii_chr_attrib44
+            ,p_rec_tii.tii_chr_attrib45
+            ,p_rec_tii.tii_chr_attrib46
+            ,p_rec_tii.tii_chr_attrib47
+            ,p_rec_tii.tii_chr_attrib48
+            ,p_rec_tii.tii_chr_attrib49
+            ,p_rec_tii.tii_chr_attrib50
+            ,p_rec_tii.tii_chr_attrib51
+            ,p_rec_tii.tii_chr_attrib52
+            ,p_rec_tii.tii_chr_attrib53
+            ,p_rec_tii.tii_chr_attrib54
+            ,p_rec_tii.tii_chr_attrib55
+            ,p_rec_tii.tii_chr_attrib56
+            ,p_rec_tii.tii_chr_attrib57
+            ,p_rec_tii.tii_chr_attrib58
+            ,p_rec_tii.tii_chr_attrib59
+            ,p_rec_tii.tii_chr_attrib60
+            ,p_rec_tii.tii_chr_attrib61
+            ,p_rec_tii.tii_chr_attrib62
+            ,p_rec_tii.tii_chr_attrib63
+            ,p_rec_tii.tii_chr_attrib64
+            ,p_rec_tii.tii_chr_attrib65
+            ,p_rec_tii.tii_chr_attrib66
+            ,p_rec_tii.tii_chr_attrib67
+            ,p_rec_tii.tii_chr_attrib68
+            ,p_rec_tii.tii_chr_attrib69
+            ,p_rec_tii.tii_chr_attrib70
+            ,p_rec_tii.tii_chr_attrib71
+            ,p_rec_tii.tii_chr_attrib72
+            ,p_rec_tii.tii_chr_attrib73
+            ,p_rec_tii.tii_chr_attrib74
+            ,p_rec_tii.tii_chr_attrib75
+            ,p_rec_tii.tii_num_attrib76
+            ,p_rec_tii.tii_num_attrib77
+            ,p_rec_tii.tii_num_attrib78
+            ,p_rec_tii.tii_num_attrib79
+            ,p_rec_tii.tii_num_attrib80
+            ,p_rec_tii.tii_num_attrib81
+            ,p_rec_tii.tii_num_attrib82
+            ,p_rec_tii.tii_num_attrib83
+            ,p_rec_tii.tii_num_attrib84
+            ,p_rec_tii.tii_num_attrib85
+            ,p_rec_tii.tii_date_attrib86
+            ,p_rec_tii.tii_date_attrib87
+            ,p_rec_tii.tii_date_attrib88
+            ,p_rec_tii.tii_date_attrib89
+            ,p_rec_tii.tii_date_attrib90
+            ,p_rec_tii.tii_date_attrib91
+            ,p_rec_tii.tii_date_attrib92
+            ,p_rec_tii.tii_date_attrib93
+            ,p_rec_tii.tii_date_attrib94
+            ,p_rec_tii.tii_date_attrib95
+            ,p_rec_tii.tii_angle
+            ,p_rec_tii.tii_angle_txt
+            ,p_rec_tii.tii_class
+            ,p_rec_tii.tii_class_txt
+            ,p_rec_tii.tii_colour
+            ,p_rec_tii.tii_colour_txt
+            ,p_rec_tii.tii_coord_flag
+            ,p_rec_tii.tii_description
+            ,p_rec_tii.tii_diagram
+            ,p_rec_tii.tii_distance
+            ,p_rec_tii.tii_end_chain
+            ,p_rec_tii.tii_gap
+            ,p_rec_tii.tii_height
+            ,p_rec_tii.tii_height_2
+            ,p_rec_tii.tii_id_code
+            ,p_rec_tii.tii_instal_date
+            ,p_rec_tii.tii_invent_date
+            ,p_rec_tii.tii_inv_ownership
+            ,p_rec_tii.tii_itemcode
+            ,p_rec_tii.tii_lco_lamp_config_id
+            ,p_rec_tii.tii_length
+            ,p_rec_tii.tii_material
+            ,p_rec_tii.tii_material_txt
+            ,p_rec_tii.tii_method
+            ,p_rec_tii.tii_method_txt
+            ,p_rec_tii.tii_note
+            ,p_rec_tii.tii_no_of_units
+            ,p_rec_tii.tii_options
+            ,p_rec_tii.tii_options_txt
+            ,p_rec_tii.tii_oun_org_id_elec_board
+            ,p_rec_tii.tii_owner
+            ,p_rec_tii.tii_owner_txt
+            ,p_rec_tii.tii_peo_invent_by_id
+            ,p_rec_tii.tii_photo
+            ,p_rec_tii.tii_power
+            ,p_rec_tii.tii_prov_flag
+            ,p_rec_tii.tii_rev_by
+            ,p_rec_tii.tii_rev_date
+            ,p_rec_tii.tii_type
+            ,p_rec_tii.tii_type_txt
+            ,p_rec_tii.tii_width
+            ,p_rec_tii.tii_xtra_char_1
+            ,p_rec_tii.tii_xtra_date_1
+            ,p_rec_tii.tii_xtra_domain_1
+            ,p_rec_tii.tii_xtra_domain_txt_1
+            ,p_rec_tii.tii_xtra_number_1
+            ,p_rec_tii.tii_x_sect
+            ,p_rec_tii.tii_det_xsp
+            ,p_rec_tii.tii_offset
+            ,p_rec_tii.tii_x
+            ,p_rec_tii.tii_y
+            ,p_rec_tii.tii_z
+            ,p_rec_tii.tii_num_attrib96
+            ,p_rec_tii.tii_num_attrib97
+            ,p_rec_tii.tii_num_attrib98
+            ,p_rec_tii.tii_num_attrib99
+            ,p_rec_tii.tii_num_attrib100
+            ,p_rec_tii.tii_num_attrib101
+            ,p_rec_tii.tii_num_attrib102
+            ,p_rec_tii.tii_num_attrib103
+            ,p_rec_tii.tii_num_attrib104
+            ,p_rec_tii.tii_num_attrib105
+            ,p_rec_tii.tii_num_attrib106
+            ,p_rec_tii.tii_num_attrib107
+            ,p_rec_tii.tii_num_attrib108
+            ,p_rec_tii.tii_num_attrib109
+            ,p_rec_tii.tii_num_attrib110
+            ,p_rec_tii.tii_num_attrib111
+            ,p_rec_tii.tii_num_attrib112
+            ,p_rec_tii.tii_num_attrib113
+            ,p_rec_tii.tii_num_attrib114
+            ,p_rec_tii.tii_num_attrib115;
+--
+   nm_debug.proc_end(g_package_name,'ins_tii');
+--
+END ins_tii;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_tiit (p_rec_tiit IN OUT nm_temp_inv_items_temp%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_tiit');
+--
+--
+   INSERT INTO nm_temp_inv_items_temp
+            (tii_njc_job_id
+            ,tii_ne_id
+            ,tii_ne_id_new
+            ,tii_inv_type
+            ,tii_primary_key_orig
+            ,tii_primary_key
+            ,tii_start_date
+            ,tii_date_created
+            ,tii_date_modified
+            ,tii_created_by
+            ,tii_modified_by
+            ,tii_admin_unit
+            ,tii_descr
+            ,tii_end_date
+            ,tii_foreign_key
+            ,tii_located_by
+            ,tii_position
+            ,tii_x_coord
+            ,tii_y_coord
+            ,tii_num_attrib16
+            ,tii_num_attrib17
+            ,tii_num_attrib18
+            ,tii_num_attrib19
+            ,tii_num_attrib20
+            ,tii_num_attrib21
+            ,tii_num_attrib22
+            ,tii_num_attrib23
+            ,tii_num_attrib24
+            ,tii_num_attrib25
+            ,tii_chr_attrib26
+            ,tii_chr_attrib27
+            ,tii_chr_attrib28
+            ,tii_chr_attrib29
+            ,tii_chr_attrib30
+            ,tii_chr_attrib31
+            ,tii_chr_attrib32
+            ,tii_chr_attrib33
+            ,tii_chr_attrib34
+            ,tii_chr_attrib35
+            ,tii_chr_attrib36
+            ,tii_chr_attrib37
+            ,tii_chr_attrib38
+            ,tii_chr_attrib39
+            ,tii_chr_attrib40
+            ,tii_chr_attrib41
+            ,tii_chr_attrib42
+            ,tii_chr_attrib43
+            ,tii_chr_attrib44
+            ,tii_chr_attrib45
+            ,tii_chr_attrib46
+            ,tii_chr_attrib47
+            ,tii_chr_attrib48
+            ,tii_chr_attrib49
+            ,tii_chr_attrib50
+            ,tii_chr_attrib51
+            ,tii_chr_attrib52
+            ,tii_chr_attrib53
+            ,tii_chr_attrib54
+            ,tii_chr_attrib55
+            ,tii_chr_attrib56
+            ,tii_chr_attrib57
+            ,tii_chr_attrib58
+            ,tii_chr_attrib59
+            ,tii_chr_attrib60
+            ,tii_chr_attrib61
+            ,tii_chr_attrib62
+            ,tii_chr_attrib63
+            ,tii_chr_attrib64
+            ,tii_chr_attrib65
+            ,tii_chr_attrib66
+            ,tii_chr_attrib67
+            ,tii_chr_attrib68
+            ,tii_chr_attrib69
+            ,tii_chr_attrib70
+            ,tii_chr_attrib71
+            ,tii_chr_attrib72
+            ,tii_chr_attrib73
+            ,tii_chr_attrib74
+            ,tii_chr_attrib75
+            ,tii_num_attrib76
+            ,tii_num_attrib77
+            ,tii_num_attrib78
+            ,tii_num_attrib79
+            ,tii_num_attrib80
+            ,tii_num_attrib81
+            ,tii_num_attrib82
+            ,tii_num_attrib83
+            ,tii_num_attrib84
+            ,tii_num_attrib85
+            ,tii_date_attrib86
+            ,tii_date_attrib87
+            ,tii_date_attrib88
+            ,tii_date_attrib89
+            ,tii_date_attrib90
+            ,tii_date_attrib91
+            ,tii_date_attrib92
+            ,tii_date_attrib93
+            ,tii_date_attrib94
+            ,tii_date_attrib95
+            ,tii_angle
+            ,tii_angle_txt
+            ,tii_class
+            ,tii_class_txt
+            ,tii_colour
+            ,tii_colour_txt
+            ,tii_coord_flag
+            ,tii_description
+            ,tii_diagram
+            ,tii_distance
+            ,tii_end_chain
+            ,tii_gap
+            ,tii_height
+            ,tii_height_2
+            ,tii_id_code
+            ,tii_instal_date
+            ,tii_invent_date
+            ,tii_inv_ownership
+            ,tii_itemcode
+            ,tii_lco_lamp_config_id
+            ,tii_length
+            ,tii_material
+            ,tii_material_txt
+            ,tii_method
+            ,tii_method_txt
+            ,tii_note
+            ,tii_no_of_units
+            ,tii_options
+            ,tii_options_txt
+            ,tii_oun_org_id_elec_board
+            ,tii_owner
+            ,tii_owner_txt
+            ,tii_peo_invent_by_id
+            ,tii_photo
+            ,tii_power
+            ,tii_prov_flag
+            ,tii_rev_by
+            ,tii_rev_date
+            ,tii_type
+            ,tii_type_txt
+            ,tii_width
+            ,tii_xtra_char_1
+            ,tii_xtra_date_1
+            ,tii_xtra_domain_1
+            ,tii_xtra_domain_txt_1
+            ,tii_xtra_number_1
+            ,tii_x_sect
+            ,tii_det_xsp
+            ,tii_offset
+            ,tii_x
+            ,tii_y
+            ,tii_z
+            ,tii_num_attrib96
+            ,tii_num_attrib97
+            ,tii_num_attrib98
+            ,tii_num_attrib99
+            ,tii_num_attrib100
+            ,tii_num_attrib101
+            ,tii_num_attrib102
+            ,tii_num_attrib103
+            ,tii_num_attrib104
+            ,tii_num_attrib105
+            ,tii_num_attrib106
+            ,tii_num_attrib107
+            ,tii_num_attrib108
+            ,tii_num_attrib109
+            ,tii_num_attrib110
+            ,tii_num_attrib111
+            ,tii_num_attrib112
+            ,tii_num_attrib113
+            ,tii_num_attrib114
+            ,tii_num_attrib115
+            )
+     VALUES (p_rec_tiit.tii_njc_job_id
+            ,p_rec_tiit.tii_ne_id
+            ,p_rec_tiit.tii_ne_id_new
+            ,p_rec_tiit.tii_inv_type
+            ,p_rec_tiit.tii_primary_key_orig
+            ,p_rec_tiit.tii_primary_key
+            ,p_rec_tiit.tii_start_date
+            ,p_rec_tiit.tii_date_created
+            ,p_rec_tiit.tii_date_modified
+            ,p_rec_tiit.tii_created_by
+            ,p_rec_tiit.tii_modified_by
+            ,p_rec_tiit.tii_admin_unit
+            ,p_rec_tiit.tii_descr
+            ,p_rec_tiit.tii_end_date
+            ,p_rec_tiit.tii_foreign_key
+            ,p_rec_tiit.tii_located_by
+            ,p_rec_tiit.tii_position
+            ,p_rec_tiit.tii_x_coord
+            ,p_rec_tiit.tii_y_coord
+            ,p_rec_tiit.tii_num_attrib16
+            ,p_rec_tiit.tii_num_attrib17
+            ,p_rec_tiit.tii_num_attrib18
+            ,p_rec_tiit.tii_num_attrib19
+            ,p_rec_tiit.tii_num_attrib20
+            ,p_rec_tiit.tii_num_attrib21
+            ,p_rec_tiit.tii_num_attrib22
+            ,p_rec_tiit.tii_num_attrib23
+            ,p_rec_tiit.tii_num_attrib24
+            ,p_rec_tiit.tii_num_attrib25
+            ,p_rec_tiit.tii_chr_attrib26
+            ,p_rec_tiit.tii_chr_attrib27
+            ,p_rec_tiit.tii_chr_attrib28
+            ,p_rec_tiit.tii_chr_attrib29
+            ,p_rec_tiit.tii_chr_attrib30
+            ,p_rec_tiit.tii_chr_attrib31
+            ,p_rec_tiit.tii_chr_attrib32
+            ,p_rec_tiit.tii_chr_attrib33
+            ,p_rec_tiit.tii_chr_attrib34
+            ,p_rec_tiit.tii_chr_attrib35
+            ,p_rec_tiit.tii_chr_attrib36
+            ,p_rec_tiit.tii_chr_attrib37
+            ,p_rec_tiit.tii_chr_attrib38
+            ,p_rec_tiit.tii_chr_attrib39
+            ,p_rec_tiit.tii_chr_attrib40
+            ,p_rec_tiit.tii_chr_attrib41
+            ,p_rec_tiit.tii_chr_attrib42
+            ,p_rec_tiit.tii_chr_attrib43
+            ,p_rec_tiit.tii_chr_attrib44
+            ,p_rec_tiit.tii_chr_attrib45
+            ,p_rec_tiit.tii_chr_attrib46
+            ,p_rec_tiit.tii_chr_attrib47
+            ,p_rec_tiit.tii_chr_attrib48
+            ,p_rec_tiit.tii_chr_attrib49
+            ,p_rec_tiit.tii_chr_attrib50
+            ,p_rec_tiit.tii_chr_attrib51
+            ,p_rec_tiit.tii_chr_attrib52
+            ,p_rec_tiit.tii_chr_attrib53
+            ,p_rec_tiit.tii_chr_attrib54
+            ,p_rec_tiit.tii_chr_attrib55
+            ,p_rec_tiit.tii_chr_attrib56
+            ,p_rec_tiit.tii_chr_attrib57
+            ,p_rec_tiit.tii_chr_attrib58
+            ,p_rec_tiit.tii_chr_attrib59
+            ,p_rec_tiit.tii_chr_attrib60
+            ,p_rec_tiit.tii_chr_attrib61
+            ,p_rec_tiit.tii_chr_attrib62
+            ,p_rec_tiit.tii_chr_attrib63
+            ,p_rec_tiit.tii_chr_attrib64
+            ,p_rec_tiit.tii_chr_attrib65
+            ,p_rec_tiit.tii_chr_attrib66
+            ,p_rec_tiit.tii_chr_attrib67
+            ,p_rec_tiit.tii_chr_attrib68
+            ,p_rec_tiit.tii_chr_attrib69
+            ,p_rec_tiit.tii_chr_attrib70
+            ,p_rec_tiit.tii_chr_attrib71
+            ,p_rec_tiit.tii_chr_attrib72
+            ,p_rec_tiit.tii_chr_attrib73
+            ,p_rec_tiit.tii_chr_attrib74
+            ,p_rec_tiit.tii_chr_attrib75
+            ,p_rec_tiit.tii_num_attrib76
+            ,p_rec_tiit.tii_num_attrib77
+            ,p_rec_tiit.tii_num_attrib78
+            ,p_rec_tiit.tii_num_attrib79
+            ,p_rec_tiit.tii_num_attrib80
+            ,p_rec_tiit.tii_num_attrib81
+            ,p_rec_tiit.tii_num_attrib82
+            ,p_rec_tiit.tii_num_attrib83
+            ,p_rec_tiit.tii_num_attrib84
+            ,p_rec_tiit.tii_num_attrib85
+            ,p_rec_tiit.tii_date_attrib86
+            ,p_rec_tiit.tii_date_attrib87
+            ,p_rec_tiit.tii_date_attrib88
+            ,p_rec_tiit.tii_date_attrib89
+            ,p_rec_tiit.tii_date_attrib90
+            ,p_rec_tiit.tii_date_attrib91
+            ,p_rec_tiit.tii_date_attrib92
+            ,p_rec_tiit.tii_date_attrib93
+            ,p_rec_tiit.tii_date_attrib94
+            ,p_rec_tiit.tii_date_attrib95
+            ,p_rec_tiit.tii_angle
+            ,p_rec_tiit.tii_angle_txt
+            ,p_rec_tiit.tii_class
+            ,p_rec_tiit.tii_class_txt
+            ,p_rec_tiit.tii_colour
+            ,p_rec_tiit.tii_colour_txt
+            ,p_rec_tiit.tii_coord_flag
+            ,p_rec_tiit.tii_description
+            ,p_rec_tiit.tii_diagram
+            ,p_rec_tiit.tii_distance
+            ,p_rec_tiit.tii_end_chain
+            ,p_rec_tiit.tii_gap
+            ,p_rec_tiit.tii_height
+            ,p_rec_tiit.tii_height_2
+            ,p_rec_tiit.tii_id_code
+            ,p_rec_tiit.tii_instal_date
+            ,p_rec_tiit.tii_invent_date
+            ,p_rec_tiit.tii_inv_ownership
+            ,p_rec_tiit.tii_itemcode
+            ,p_rec_tiit.tii_lco_lamp_config_id
+            ,p_rec_tiit.tii_length
+            ,p_rec_tiit.tii_material
+            ,p_rec_tiit.tii_material_txt
+            ,p_rec_tiit.tii_method
+            ,p_rec_tiit.tii_method_txt
+            ,p_rec_tiit.tii_note
+            ,p_rec_tiit.tii_no_of_units
+            ,p_rec_tiit.tii_options
+            ,p_rec_tiit.tii_options_txt
+            ,p_rec_tiit.tii_oun_org_id_elec_board
+            ,p_rec_tiit.tii_owner
+            ,p_rec_tiit.tii_owner_txt
+            ,p_rec_tiit.tii_peo_invent_by_id
+            ,p_rec_tiit.tii_photo
+            ,p_rec_tiit.tii_power
+            ,p_rec_tiit.tii_prov_flag
+            ,p_rec_tiit.tii_rev_by
+            ,p_rec_tiit.tii_rev_date
+            ,p_rec_tiit.tii_type
+            ,p_rec_tiit.tii_type_txt
+            ,p_rec_tiit.tii_width
+            ,p_rec_tiit.tii_xtra_char_1
+            ,p_rec_tiit.tii_xtra_date_1
+            ,p_rec_tiit.tii_xtra_domain_1
+            ,p_rec_tiit.tii_xtra_domain_txt_1
+            ,p_rec_tiit.tii_xtra_number_1
+            ,p_rec_tiit.tii_x_sect
+            ,p_rec_tiit.tii_det_xsp
+            ,p_rec_tiit.tii_offset
+            ,p_rec_tiit.tii_x
+            ,p_rec_tiit.tii_y
+            ,p_rec_tiit.tii_z
+            ,p_rec_tiit.tii_num_attrib96
+            ,p_rec_tiit.tii_num_attrib97
+            ,p_rec_tiit.tii_num_attrib98
+            ,p_rec_tiit.tii_num_attrib99
+            ,p_rec_tiit.tii_num_attrib100
+            ,p_rec_tiit.tii_num_attrib101
+            ,p_rec_tiit.tii_num_attrib102
+            ,p_rec_tiit.tii_num_attrib103
+            ,p_rec_tiit.tii_num_attrib104
+            ,p_rec_tiit.tii_num_attrib105
+            ,p_rec_tiit.tii_num_attrib106
+            ,p_rec_tiit.tii_num_attrib107
+            ,p_rec_tiit.tii_num_attrib108
+            ,p_rec_tiit.tii_num_attrib109
+            ,p_rec_tiit.tii_num_attrib110
+            ,p_rec_tiit.tii_num_attrib111
+            ,p_rec_tiit.tii_num_attrib112
+            ,p_rec_tiit.tii_num_attrib113
+            ,p_rec_tiit.tii_num_attrib114
+            ,p_rec_tiit.tii_num_attrib115
+            )
+   RETURNING tii_njc_job_id
+            ,tii_ne_id
+            ,tii_ne_id_new
+            ,tii_inv_type
+            ,tii_primary_key_orig
+            ,tii_primary_key
+            ,tii_start_date
+            ,tii_date_created
+            ,tii_date_modified
+            ,tii_created_by
+            ,tii_modified_by
+            ,tii_admin_unit
+            ,tii_descr
+            ,tii_end_date
+            ,tii_foreign_key
+            ,tii_located_by
+            ,tii_position
+            ,tii_x_coord
+            ,tii_y_coord
+            ,tii_num_attrib16
+            ,tii_num_attrib17
+            ,tii_num_attrib18
+            ,tii_num_attrib19
+            ,tii_num_attrib20
+            ,tii_num_attrib21
+            ,tii_num_attrib22
+            ,tii_num_attrib23
+            ,tii_num_attrib24
+            ,tii_num_attrib25
+            ,tii_chr_attrib26
+            ,tii_chr_attrib27
+            ,tii_chr_attrib28
+            ,tii_chr_attrib29
+            ,tii_chr_attrib30
+            ,tii_chr_attrib31
+            ,tii_chr_attrib32
+            ,tii_chr_attrib33
+            ,tii_chr_attrib34
+            ,tii_chr_attrib35
+            ,tii_chr_attrib36
+            ,tii_chr_attrib37
+            ,tii_chr_attrib38
+            ,tii_chr_attrib39
+            ,tii_chr_attrib40
+            ,tii_chr_attrib41
+            ,tii_chr_attrib42
+            ,tii_chr_attrib43
+            ,tii_chr_attrib44
+            ,tii_chr_attrib45
+            ,tii_chr_attrib46
+            ,tii_chr_attrib47
+            ,tii_chr_attrib48
+            ,tii_chr_attrib49
+            ,tii_chr_attrib50
+            ,tii_chr_attrib51
+            ,tii_chr_attrib52
+            ,tii_chr_attrib53
+            ,tii_chr_attrib54
+            ,tii_chr_attrib55
+            ,tii_chr_attrib56
+            ,tii_chr_attrib57
+            ,tii_chr_attrib58
+            ,tii_chr_attrib59
+            ,tii_chr_attrib60
+            ,tii_chr_attrib61
+            ,tii_chr_attrib62
+            ,tii_chr_attrib63
+            ,tii_chr_attrib64
+            ,tii_chr_attrib65
+            ,tii_chr_attrib66
+            ,tii_chr_attrib67
+            ,tii_chr_attrib68
+            ,tii_chr_attrib69
+            ,tii_chr_attrib70
+            ,tii_chr_attrib71
+            ,tii_chr_attrib72
+            ,tii_chr_attrib73
+            ,tii_chr_attrib74
+            ,tii_chr_attrib75
+            ,tii_num_attrib76
+            ,tii_num_attrib77
+            ,tii_num_attrib78
+            ,tii_num_attrib79
+            ,tii_num_attrib80
+            ,tii_num_attrib81
+            ,tii_num_attrib82
+            ,tii_num_attrib83
+            ,tii_num_attrib84
+            ,tii_num_attrib85
+            ,tii_date_attrib86
+            ,tii_date_attrib87
+            ,tii_date_attrib88
+            ,tii_date_attrib89
+            ,tii_date_attrib90
+            ,tii_date_attrib91
+            ,tii_date_attrib92
+            ,tii_date_attrib93
+            ,tii_date_attrib94
+            ,tii_date_attrib95
+            ,tii_angle
+            ,tii_angle_txt
+            ,tii_class
+            ,tii_class_txt
+            ,tii_colour
+            ,tii_colour_txt
+            ,tii_coord_flag
+            ,tii_description
+            ,tii_diagram
+            ,tii_distance
+            ,tii_end_chain
+            ,tii_gap
+            ,tii_height
+            ,tii_height_2
+            ,tii_id_code
+            ,tii_instal_date
+            ,tii_invent_date
+            ,tii_inv_ownership
+            ,tii_itemcode
+            ,tii_lco_lamp_config_id
+            ,tii_length
+            ,tii_material
+            ,tii_material_txt
+            ,tii_method
+            ,tii_method_txt
+            ,tii_note
+            ,tii_no_of_units
+            ,tii_options
+            ,tii_options_txt
+            ,tii_oun_org_id_elec_board
+            ,tii_owner
+            ,tii_owner_txt
+            ,tii_peo_invent_by_id
+            ,tii_photo
+            ,tii_power
+            ,tii_prov_flag
+            ,tii_rev_by
+            ,tii_rev_date
+            ,tii_type
+            ,tii_type_txt
+            ,tii_width
+            ,tii_xtra_char_1
+            ,tii_xtra_date_1
+            ,tii_xtra_domain_1
+            ,tii_xtra_domain_txt_1
+            ,tii_xtra_number_1
+            ,tii_x_sect
+            ,tii_det_xsp
+            ,tii_offset
+            ,tii_x
+            ,tii_y
+            ,tii_z
+            ,tii_num_attrib96
+            ,tii_num_attrib97
+            ,tii_num_attrib98
+            ,tii_num_attrib99
+            ,tii_num_attrib100
+            ,tii_num_attrib101
+            ,tii_num_attrib102
+            ,tii_num_attrib103
+            ,tii_num_attrib104
+            ,tii_num_attrib105
+            ,tii_num_attrib106
+            ,tii_num_attrib107
+            ,tii_num_attrib108
+            ,tii_num_attrib109
+            ,tii_num_attrib110
+            ,tii_num_attrib111
+            ,tii_num_attrib112
+            ,tii_num_attrib113
+            ,tii_num_attrib114
+            ,tii_num_attrib115
+      INTO   p_rec_tiit.tii_njc_job_id
+            ,p_rec_tiit.tii_ne_id
+            ,p_rec_tiit.tii_ne_id_new
+            ,p_rec_tiit.tii_inv_type
+            ,p_rec_tiit.tii_primary_key_orig
+            ,p_rec_tiit.tii_primary_key
+            ,p_rec_tiit.tii_start_date
+            ,p_rec_tiit.tii_date_created
+            ,p_rec_tiit.tii_date_modified
+            ,p_rec_tiit.tii_created_by
+            ,p_rec_tiit.tii_modified_by
+            ,p_rec_tiit.tii_admin_unit
+            ,p_rec_tiit.tii_descr
+            ,p_rec_tiit.tii_end_date
+            ,p_rec_tiit.tii_foreign_key
+            ,p_rec_tiit.tii_located_by
+            ,p_rec_tiit.tii_position
+            ,p_rec_tiit.tii_x_coord
+            ,p_rec_tiit.tii_y_coord
+            ,p_rec_tiit.tii_num_attrib16
+            ,p_rec_tiit.tii_num_attrib17
+            ,p_rec_tiit.tii_num_attrib18
+            ,p_rec_tiit.tii_num_attrib19
+            ,p_rec_tiit.tii_num_attrib20
+            ,p_rec_tiit.tii_num_attrib21
+            ,p_rec_tiit.tii_num_attrib22
+            ,p_rec_tiit.tii_num_attrib23
+            ,p_rec_tiit.tii_num_attrib24
+            ,p_rec_tiit.tii_num_attrib25
+            ,p_rec_tiit.tii_chr_attrib26
+            ,p_rec_tiit.tii_chr_attrib27
+            ,p_rec_tiit.tii_chr_attrib28
+            ,p_rec_tiit.tii_chr_attrib29
+            ,p_rec_tiit.tii_chr_attrib30
+            ,p_rec_tiit.tii_chr_attrib31
+            ,p_rec_tiit.tii_chr_attrib32
+            ,p_rec_tiit.tii_chr_attrib33
+            ,p_rec_tiit.tii_chr_attrib34
+            ,p_rec_tiit.tii_chr_attrib35
+            ,p_rec_tiit.tii_chr_attrib36
+            ,p_rec_tiit.tii_chr_attrib37
+            ,p_rec_tiit.tii_chr_attrib38
+            ,p_rec_tiit.tii_chr_attrib39
+            ,p_rec_tiit.tii_chr_attrib40
+            ,p_rec_tiit.tii_chr_attrib41
+            ,p_rec_tiit.tii_chr_attrib42
+            ,p_rec_tiit.tii_chr_attrib43
+            ,p_rec_tiit.tii_chr_attrib44
+            ,p_rec_tiit.tii_chr_attrib45
+            ,p_rec_tiit.tii_chr_attrib46
+            ,p_rec_tiit.tii_chr_attrib47
+            ,p_rec_tiit.tii_chr_attrib48
+            ,p_rec_tiit.tii_chr_attrib49
+            ,p_rec_tiit.tii_chr_attrib50
+            ,p_rec_tiit.tii_chr_attrib51
+            ,p_rec_tiit.tii_chr_attrib52
+            ,p_rec_tiit.tii_chr_attrib53
+            ,p_rec_tiit.tii_chr_attrib54
+            ,p_rec_tiit.tii_chr_attrib55
+            ,p_rec_tiit.tii_chr_attrib56
+            ,p_rec_tiit.tii_chr_attrib57
+            ,p_rec_tiit.tii_chr_attrib58
+            ,p_rec_tiit.tii_chr_attrib59
+            ,p_rec_tiit.tii_chr_attrib60
+            ,p_rec_tiit.tii_chr_attrib61
+            ,p_rec_tiit.tii_chr_attrib62
+            ,p_rec_tiit.tii_chr_attrib63
+            ,p_rec_tiit.tii_chr_attrib64
+            ,p_rec_tiit.tii_chr_attrib65
+            ,p_rec_tiit.tii_chr_attrib66
+            ,p_rec_tiit.tii_chr_attrib67
+            ,p_rec_tiit.tii_chr_attrib68
+            ,p_rec_tiit.tii_chr_attrib69
+            ,p_rec_tiit.tii_chr_attrib70
+            ,p_rec_tiit.tii_chr_attrib71
+            ,p_rec_tiit.tii_chr_attrib72
+            ,p_rec_tiit.tii_chr_attrib73
+            ,p_rec_tiit.tii_chr_attrib74
+            ,p_rec_tiit.tii_chr_attrib75
+            ,p_rec_tiit.tii_num_attrib76
+            ,p_rec_tiit.tii_num_attrib77
+            ,p_rec_tiit.tii_num_attrib78
+            ,p_rec_tiit.tii_num_attrib79
+            ,p_rec_tiit.tii_num_attrib80
+            ,p_rec_tiit.tii_num_attrib81
+            ,p_rec_tiit.tii_num_attrib82
+            ,p_rec_tiit.tii_num_attrib83
+            ,p_rec_tiit.tii_num_attrib84
+            ,p_rec_tiit.tii_num_attrib85
+            ,p_rec_tiit.tii_date_attrib86
+            ,p_rec_tiit.tii_date_attrib87
+            ,p_rec_tiit.tii_date_attrib88
+            ,p_rec_tiit.tii_date_attrib89
+            ,p_rec_tiit.tii_date_attrib90
+            ,p_rec_tiit.tii_date_attrib91
+            ,p_rec_tiit.tii_date_attrib92
+            ,p_rec_tiit.tii_date_attrib93
+            ,p_rec_tiit.tii_date_attrib94
+            ,p_rec_tiit.tii_date_attrib95
+            ,p_rec_tiit.tii_angle
+            ,p_rec_tiit.tii_angle_txt
+            ,p_rec_tiit.tii_class
+            ,p_rec_tiit.tii_class_txt
+            ,p_rec_tiit.tii_colour
+            ,p_rec_tiit.tii_colour_txt
+            ,p_rec_tiit.tii_coord_flag
+            ,p_rec_tiit.tii_description
+            ,p_rec_tiit.tii_diagram
+            ,p_rec_tiit.tii_distance
+            ,p_rec_tiit.tii_end_chain
+            ,p_rec_tiit.tii_gap
+            ,p_rec_tiit.tii_height
+            ,p_rec_tiit.tii_height_2
+            ,p_rec_tiit.tii_id_code
+            ,p_rec_tiit.tii_instal_date
+            ,p_rec_tiit.tii_invent_date
+            ,p_rec_tiit.tii_inv_ownership
+            ,p_rec_tiit.tii_itemcode
+            ,p_rec_tiit.tii_lco_lamp_config_id
+            ,p_rec_tiit.tii_length
+            ,p_rec_tiit.tii_material
+            ,p_rec_tiit.tii_material_txt
+            ,p_rec_tiit.tii_method
+            ,p_rec_tiit.tii_method_txt
+            ,p_rec_tiit.tii_note
+            ,p_rec_tiit.tii_no_of_units
+            ,p_rec_tiit.tii_options
+            ,p_rec_tiit.tii_options_txt
+            ,p_rec_tiit.tii_oun_org_id_elec_board
+            ,p_rec_tiit.tii_owner
+            ,p_rec_tiit.tii_owner_txt
+            ,p_rec_tiit.tii_peo_invent_by_id
+            ,p_rec_tiit.tii_photo
+            ,p_rec_tiit.tii_power
+            ,p_rec_tiit.tii_prov_flag
+            ,p_rec_tiit.tii_rev_by
+            ,p_rec_tiit.tii_rev_date
+            ,p_rec_tiit.tii_type
+            ,p_rec_tiit.tii_type_txt
+            ,p_rec_tiit.tii_width
+            ,p_rec_tiit.tii_xtra_char_1
+            ,p_rec_tiit.tii_xtra_date_1
+            ,p_rec_tiit.tii_xtra_domain_1
+            ,p_rec_tiit.tii_xtra_domain_txt_1
+            ,p_rec_tiit.tii_xtra_number_1
+            ,p_rec_tiit.tii_x_sect
+            ,p_rec_tiit.tii_det_xsp
+            ,p_rec_tiit.tii_offset
+            ,p_rec_tiit.tii_x
+            ,p_rec_tiit.tii_y
+            ,p_rec_tiit.tii_z
+            ,p_rec_tiit.tii_num_attrib96
+            ,p_rec_tiit.tii_num_attrib97
+            ,p_rec_tiit.tii_num_attrib98
+            ,p_rec_tiit.tii_num_attrib99
+            ,p_rec_tiit.tii_num_attrib100
+            ,p_rec_tiit.tii_num_attrib101
+            ,p_rec_tiit.tii_num_attrib102
+            ,p_rec_tiit.tii_num_attrib103
+            ,p_rec_tiit.tii_num_attrib104
+            ,p_rec_tiit.tii_num_attrib105
+            ,p_rec_tiit.tii_num_attrib106
+            ,p_rec_tiit.tii_num_attrib107
+            ,p_rec_tiit.tii_num_attrib108
+            ,p_rec_tiit.tii_num_attrib109
+            ,p_rec_tiit.tii_num_attrib110
+            ,p_rec_tiit.tii_num_attrib111
+            ,p_rec_tiit.tii_num_attrib112
+            ,p_rec_tiit.tii_num_attrib113
+            ,p_rec_tiit.tii_num_attrib114
+            ,p_rec_tiit.tii_num_attrib115;
+--
+   nm_debug.proc_end(g_package_name,'ins_tiit');
+--
+END ins_tiit;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_tim (p_rec_tim IN OUT nm_temp_inv_members%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_tim');
+--
+   p_rec_tim.tim_ne_id_in_new               := NVL(p_rec_tim.tim_ne_id_in_new,-1 );
+   p_rec_tim.tim_start_date                 := NVL(p_rec_tim.tim_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_tim.tim_cardinality                := NVL(p_rec_tim.tim_cardinality,1
+ );
+--
+   INSERT INTO nm_temp_inv_members
+            (tim_njc_job_id
+            ,tim_ne_id_in
+            ,tim_ne_id_in_new
+            ,tim_ne_id_of
+            ,tim_type
+            ,tim_obj_type
+            ,tim_start_date
+            ,tim_end_date
+            ,tim_slk
+            ,tim_cardinality
+            ,tim_admin_unit
+            ,tim_date_created
+            ,tim_date_modified
+            ,tim_modified_by
+            ,tim_created_by
+            ,tim_seq_no
+            ,tim_seg_no
+            ,tim_true
+            ,tim_extent_begin_mp
+            ,tim_extent_end_mp
+            )
+     VALUES (p_rec_tim.tim_njc_job_id
+            ,p_rec_tim.tim_ne_id_in
+            ,p_rec_tim.tim_ne_id_in_new
+            ,p_rec_tim.tim_ne_id_of
+            ,p_rec_tim.tim_type
+            ,p_rec_tim.tim_obj_type
+            ,p_rec_tim.tim_start_date
+            ,p_rec_tim.tim_end_date
+            ,p_rec_tim.tim_slk
+            ,p_rec_tim.tim_cardinality
+            ,p_rec_tim.tim_admin_unit
+            ,p_rec_tim.tim_date_created
+            ,p_rec_tim.tim_date_modified
+            ,p_rec_tim.tim_modified_by
+            ,p_rec_tim.tim_created_by
+            ,p_rec_tim.tim_seq_no
+            ,p_rec_tim.tim_seg_no
+            ,p_rec_tim.tim_true
+            ,p_rec_tim.tim_extent_begin_mp
+            ,p_rec_tim.tim_extent_end_mp
+            )
+   RETURNING tim_njc_job_id
+            ,tim_ne_id_in
+            ,tim_ne_id_in_new
+            ,tim_ne_id_of
+            ,tim_type
+            ,tim_obj_type
+            ,tim_start_date
+            ,tim_end_date
+            ,tim_slk
+            ,tim_cardinality
+            ,tim_admin_unit
+            ,tim_date_created
+            ,tim_date_modified
+            ,tim_modified_by
+            ,tim_created_by
+            ,tim_seq_no
+            ,tim_seg_no
+            ,tim_true
+            ,tim_extent_begin_mp
+            ,tim_extent_end_mp
+      INTO   p_rec_tim.tim_njc_job_id
+            ,p_rec_tim.tim_ne_id_in
+            ,p_rec_tim.tim_ne_id_in_new
+            ,p_rec_tim.tim_ne_id_of
+            ,p_rec_tim.tim_type
+            ,p_rec_tim.tim_obj_type
+            ,p_rec_tim.tim_start_date
+            ,p_rec_tim.tim_end_date
+            ,p_rec_tim.tim_slk
+            ,p_rec_tim.tim_cardinality
+            ,p_rec_tim.tim_admin_unit
+            ,p_rec_tim.tim_date_created
+            ,p_rec_tim.tim_date_modified
+            ,p_rec_tim.tim_modified_by
+            ,p_rec_tim.tim_created_by
+            ,p_rec_tim.tim_seq_no
+            ,p_rec_tim.tim_seg_no
+            ,p_rec_tim.tim_true
+            ,p_rec_tim.tim_extent_begin_mp
+            ,p_rec_tim.tim_extent_end_mp;
+--
+   nm_debug.proc_end(g_package_name,'ins_tim');
+--
+END ins_tim;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_timt (p_rec_timt IN OUT nm_temp_inv_members_temp%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_timt');
+--
+   p_rec_timt.tim_ne_id_in_new               := NVL(p_rec_timt.tim_ne_id_in_new,-1 );
+   p_rec_timt.tim_start_date                 := NVL(p_rec_timt.tim_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_timt.tim_cardinality                := NVL(p_rec_timt.tim_cardinality,1
+ );
+--
+   INSERT INTO nm_temp_inv_members_temp
+            (tim_njc_job_id
+            ,tim_ne_id_in
+            ,tim_ne_id_in_new
+            ,tim_ne_id_of
+            ,tim_type
+            ,tim_obj_type
+            ,tim_start_date
+            ,tim_end_date
+            ,tim_slk
+            ,tim_cardinality
+            ,tim_admin_unit
+            ,tim_date_created
+            ,tim_date_modified
+            ,tim_modified_by
+            ,tim_created_by
+            ,tim_seq_no
+            ,tim_seg_no
+            ,tim_true
+            ,tim_extent_begin_mp
+            ,tim_extent_end_mp
+            )
+     VALUES (p_rec_timt.tim_njc_job_id
+            ,p_rec_timt.tim_ne_id_in
+            ,p_rec_timt.tim_ne_id_in_new
+            ,p_rec_timt.tim_ne_id_of
+            ,p_rec_timt.tim_type
+            ,p_rec_timt.tim_obj_type
+            ,p_rec_timt.tim_start_date
+            ,p_rec_timt.tim_end_date
+            ,p_rec_timt.tim_slk
+            ,p_rec_timt.tim_cardinality
+            ,p_rec_timt.tim_admin_unit
+            ,p_rec_timt.tim_date_created
+            ,p_rec_timt.tim_date_modified
+            ,p_rec_timt.tim_modified_by
+            ,p_rec_timt.tim_created_by
+            ,p_rec_timt.tim_seq_no
+            ,p_rec_timt.tim_seg_no
+            ,p_rec_timt.tim_true
+            ,p_rec_timt.tim_extent_begin_mp
+            ,p_rec_timt.tim_extent_end_mp
+            )
+   RETURNING tim_njc_job_id
+            ,tim_ne_id_in
+            ,tim_ne_id_in_new
+            ,tim_ne_id_of
+            ,tim_type
+            ,tim_obj_type
+            ,tim_start_date
+            ,tim_end_date
+            ,tim_slk
+            ,tim_cardinality
+            ,tim_admin_unit
+            ,tim_date_created
+            ,tim_date_modified
+            ,tim_modified_by
+            ,tim_created_by
+            ,tim_seq_no
+            ,tim_seg_no
+            ,tim_true
+            ,tim_extent_begin_mp
+            ,tim_extent_end_mp
+      INTO   p_rec_timt.tim_njc_job_id
+            ,p_rec_timt.tim_ne_id_in
+            ,p_rec_timt.tim_ne_id_in_new
+            ,p_rec_timt.tim_ne_id_of
+            ,p_rec_timt.tim_type
+            ,p_rec_timt.tim_obj_type
+            ,p_rec_timt.tim_start_date
+            ,p_rec_timt.tim_end_date
+            ,p_rec_timt.tim_slk
+            ,p_rec_timt.tim_cardinality
+            ,p_rec_timt.tim_admin_unit
+            ,p_rec_timt.tim_date_created
+            ,p_rec_timt.tim_date_modified
+            ,p_rec_timt.tim_modified_by
+            ,p_rec_timt.tim_created_by
+            ,p_rec_timt.tim_seq_no
+            ,p_rec_timt.tim_seg_no
+            ,p_rec_timt.tim_true
+            ,p_rec_timt.tim_extent_begin_mp
+            ,p_rec_timt.tim_extent_end_mp;
+--
+   nm_debug.proc_end(g_package_name,'ins_timt');
+--
+END ins_timt;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ntn (p_rec_ntn IN OUT nm_temp_nodes%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ntn');
+--
+--
+   INSERT INTO nm_temp_nodes
+            (ntn_route_id
+            ,ntn_node_id
+            ,ntn_int_road
+            ,ntn_node_type
+            ,ntn_poe
+            ,ntn_seq
+            )
+     VALUES (p_rec_ntn.ntn_route_id
+            ,p_rec_ntn.ntn_node_id
+            ,p_rec_ntn.ntn_int_road
+            ,p_rec_ntn.ntn_node_type
+            ,p_rec_ntn.ntn_poe
+            ,p_rec_ntn.ntn_seq
+            )
+   RETURNING ntn_route_id
+            ,ntn_node_id
+            ,ntn_int_road
+            ,ntn_node_type
+            ,ntn_poe
+            ,ntn_seq
+      INTO   p_rec_ntn.ntn_route_id
+            ,p_rec_ntn.ntn_node_id
+            ,p_rec_ntn.ntn_int_road
+            ,p_rec_ntn.ntn_node_type
+            ,p_rec_ntn.ntn_poe
+            ,p_rec_ntn.ntn_seq;
+--
+   nm_debug.proc_end(g_package_name,'ins_ntn');
+--
+END ins_ntn;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nth (p_rec_nth IN OUT nm_themes_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nth');
+--
+   p_rec_nth.nth_feature_shape_column       := NVL(p_rec_nth.nth_feature_shape_column,'SHAPE'
+ );
+   p_rec_nth.nth_hpr_product                := NVL(p_rec_nth.nth_hpr_product,'NET' );
+   p_rec_nth.nth_location_updatable         := NVL(p_rec_nth.nth_location_updatable,'N' );
+   p_rec_nth.nth_theme_type                 := NVL(p_rec_nth.nth_theme_type,'LOCL'
+ );
+   p_rec_nth.nth_dependency                 := NVL(p_rec_nth.nth_dependency,'D' );
+   p_rec_nth.nth_storage                    := NVL(p_rec_nth.nth_storage,'D' );
+   p_rec_nth.nth_update_on_edit             := NVL(p_rec_nth.nth_update_on_edit,'N' );
+   p_rec_nth.nth_use_history                := NVL(p_rec_nth.nth_use_history,'N' );
+   p_rec_nth.nth_snap_to_theme              := NVL(p_rec_nth.nth_snap_to_theme,'N' );
+   p_rec_nth.nth_lref_mandatory             := NVL(p_rec_nth.nth_lref_mandatory,'N' );
+   p_rec_nth.nth_tolerance                  := NVL(p_rec_nth.nth_tolerance,10 );
+   p_rec_nth.nth_tol_units                  := NVL(p_rec_nth.nth_tol_units,1 );
+   p_rec_nth.nth_dynamic_theme              := NVL(p_rec_nth.nth_dynamic_theme,'N' );
+--
+   INSERT INTO nm_themes_all
+            (nth_theme_id
+            ,nth_theme_name
+            ,nth_table_name
+            ,nth_where
+            ,nth_pk_column
+            ,nth_label_column
+            ,nth_rse_table_name
+            ,nth_rse_fk_column
+            ,nth_st_chain_column
+            ,nth_end_chain_column
+            ,nth_x_column
+            ,nth_y_column
+            ,nth_offset_field
+            ,nth_feature_table
+            ,nth_feature_pk_column
+            ,nth_feature_fk_column
+            ,nth_xsp_column
+            ,nth_feature_shape_column
+            ,nth_hpr_product
+            ,nth_location_updatable
+            ,nth_theme_type
+            ,nth_dependency
+            ,nth_storage
+            ,nth_update_on_edit
+            ,nth_use_history
+            ,nth_start_date_column
+            ,nth_end_date_column
+            ,nth_base_table_theme
+            ,nth_sequence_name
+            ,nth_snap_to_theme
+            ,nth_lref_mandatory
+            ,nth_tolerance
+            ,nth_tol_units
+            ,nth_dynamic_theme
+            )
+     VALUES (p_rec_nth.nth_theme_id
+            ,p_rec_nth.nth_theme_name
+            ,p_rec_nth.nth_table_name
+            ,p_rec_nth.nth_where
+            ,p_rec_nth.nth_pk_column
+            ,p_rec_nth.nth_label_column
+            ,p_rec_nth.nth_rse_table_name
+            ,p_rec_nth.nth_rse_fk_column
+            ,p_rec_nth.nth_st_chain_column
+            ,p_rec_nth.nth_end_chain_column
+            ,p_rec_nth.nth_x_column
+            ,p_rec_nth.nth_y_column
+            ,p_rec_nth.nth_offset_field
+            ,p_rec_nth.nth_feature_table
+            ,p_rec_nth.nth_feature_pk_column
+            ,p_rec_nth.nth_feature_fk_column
+            ,p_rec_nth.nth_xsp_column
+            ,p_rec_nth.nth_feature_shape_column
+            ,p_rec_nth.nth_hpr_product
+            ,p_rec_nth.nth_location_updatable
+            ,p_rec_nth.nth_theme_type
+            ,p_rec_nth.nth_dependency
+            ,p_rec_nth.nth_storage
+            ,p_rec_nth.nth_update_on_edit
+            ,p_rec_nth.nth_use_history
+            ,p_rec_nth.nth_start_date_column
+            ,p_rec_nth.nth_end_date_column
+            ,p_rec_nth.nth_base_table_theme
+            ,p_rec_nth.nth_sequence_name
+            ,p_rec_nth.nth_snap_to_theme
+            ,p_rec_nth.nth_lref_mandatory
+            ,p_rec_nth.nth_tolerance
+            ,p_rec_nth.nth_tol_units
+            ,p_rec_nth.nth_dynamic_theme
+            )
+   RETURNING nth_theme_id
+            ,nth_theme_name
+            ,nth_table_name
+            ,nth_where
+            ,nth_pk_column
+            ,nth_label_column
+            ,nth_rse_table_name
+            ,nth_rse_fk_column
+            ,nth_st_chain_column
+            ,nth_end_chain_column
+            ,nth_x_column
+            ,nth_y_column
+            ,nth_offset_field
+            ,nth_feature_table
+            ,nth_feature_pk_column
+            ,nth_feature_fk_column
+            ,nth_xsp_column
+            ,nth_feature_shape_column
+            ,nth_hpr_product
+            ,nth_location_updatable
+            ,nth_theme_type
+            ,nth_dependency
+            ,nth_storage
+            ,nth_update_on_edit
+            ,nth_use_history
+            ,nth_start_date_column
+            ,nth_end_date_column
+            ,nth_base_table_theme
+            ,nth_sequence_name
+            ,nth_snap_to_theme
+            ,nth_lref_mandatory
+            ,nth_tolerance
+            ,nth_tol_units
+            ,nth_dynamic_theme
+      INTO   p_rec_nth.nth_theme_id
+            ,p_rec_nth.nth_theme_name
+            ,p_rec_nth.nth_table_name
+            ,p_rec_nth.nth_where
+            ,p_rec_nth.nth_pk_column
+            ,p_rec_nth.nth_label_column
+            ,p_rec_nth.nth_rse_table_name
+            ,p_rec_nth.nth_rse_fk_column
+            ,p_rec_nth.nth_st_chain_column
+            ,p_rec_nth.nth_end_chain_column
+            ,p_rec_nth.nth_x_column
+            ,p_rec_nth.nth_y_column
+            ,p_rec_nth.nth_offset_field
+            ,p_rec_nth.nth_feature_table
+            ,p_rec_nth.nth_feature_pk_column
+            ,p_rec_nth.nth_feature_fk_column
+            ,p_rec_nth.nth_xsp_column
+            ,p_rec_nth.nth_feature_shape_column
+            ,p_rec_nth.nth_hpr_product
+            ,p_rec_nth.nth_location_updatable
+            ,p_rec_nth.nth_theme_type
+            ,p_rec_nth.nth_dependency
+            ,p_rec_nth.nth_storage
+            ,p_rec_nth.nth_update_on_edit
+            ,p_rec_nth.nth_use_history
+            ,p_rec_nth.nth_start_date_column
+            ,p_rec_nth.nth_end_date_column
+            ,p_rec_nth.nth_base_table_theme
+            ,p_rec_nth.nth_sequence_name
+            ,p_rec_nth.nth_snap_to_theme
+            ,p_rec_nth.nth_lref_mandatory
+            ,p_rec_nth.nth_tolerance
+            ,p_rec_nth.nth_tol_units
+            ,p_rec_nth.nth_dynamic_theme;
+--
+   nm_debug.proc_end(g_package_name,'ins_nth');
+--
+END ins_nth;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ntg (p_rec_ntg IN OUT nm_theme_gtypes%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ntg');
+--
+--
+   INSERT INTO nm_theme_gtypes
+            (ntg_theme_id
+            ,ntg_gtype
+            ,ntg_seq_no
+            ,ntg_xml_url
+            )
+     VALUES (p_rec_ntg.ntg_theme_id
+            ,p_rec_ntg.ntg_gtype
+            ,p_rec_ntg.ntg_seq_no
+            ,p_rec_ntg.ntg_xml_url
+            )
+   RETURNING ntg_theme_id
+            ,ntg_gtype
+            ,ntg_seq_no
+            ,ntg_xml_url
+      INTO   p_rec_ntg.ntg_theme_id
+            ,p_rec_ntg.ntg_gtype
+            ,p_rec_ntg.ntg_seq_no
+            ,p_rec_ntg.ntg_xml_url;
+--
+   nm_debug.proc_end(g_package_name,'ins_ntg');
+--
+END ins_ntg;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ntf (p_rec_ntf IN OUT nm_theme_functions_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ntf');
+--
+   p_rec_ntf.ntf_seen_in_gis                := NVL(p_rec_ntf.ntf_seen_in_gis,'Y' );
+--
+   INSERT INTO nm_theme_functions_all
+            (ntf_nth_theme_id
+            ,ntf_hmo_module
+            ,ntf_parameter
+            ,ntf_menu_option
+            ,ntf_seen_in_gis
+            )
+     VALUES (p_rec_ntf.ntf_nth_theme_id
+            ,p_rec_ntf.ntf_hmo_module
+            ,p_rec_ntf.ntf_parameter
+            ,p_rec_ntf.ntf_menu_option
+            ,p_rec_ntf.ntf_seen_in_gis
+            )
+   RETURNING ntf_nth_theme_id
+            ,ntf_hmo_module
+            ,ntf_parameter
+            ,ntf_menu_option
+            ,ntf_seen_in_gis
+      INTO   p_rec_ntf.ntf_nth_theme_id
+            ,p_rec_ntf.ntf_hmo_module
+            ,p_rec_ntf.ntf_parameter
+            ,p_rec_ntf.ntf_menu_option
+            ,p_rec_ntf.ntf_seen_in_gis;
+--
+   nm_debug.proc_end(g_package_name,'ins_ntf');
+--
+END ins_ntf;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nthr (p_rec_nthr IN OUT nm_theme_roles%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nthr');
+--
+--
+   INSERT INTO nm_theme_roles
+            (nthr_theme_id
+            ,nthr_role
+            ,nthr_mode
+            )
+     VALUES (p_rec_nthr.nthr_theme_id
+            ,p_rec_nthr.nthr_role
+            ,p_rec_nthr.nthr_mode
+            )
+   RETURNING nthr_theme_id
+            ,nthr_role
+            ,nthr_mode
+      INTO   p_rec_nthr.nthr_theme_id
+            ,p_rec_nthr.nthr_role
+            ,p_rec_nthr.nthr_mode;
+--
+   nm_debug.proc_end(g_package_name,'ins_nthr');
+--
+END ins_nthr;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nts (p_rec_nts IN OUT nm_theme_snaps%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nts');
+--
+--
+   INSERT INTO nm_theme_snaps
+            (nts_theme_id
+            ,nts_snap_to
+            ,nts_priority
+            )
+     VALUES (p_rec_nts.nts_theme_id
+            ,p_rec_nts.nts_snap_to
+            ,p_rec_nts.nts_priority
+            )
+   RETURNING nts_theme_id
+            ,nts_snap_to
+            ,nts_priority
+      INTO   p_rec_nts.nts_theme_id
+            ,p_rec_nts.nts_snap_to
+            ,p_rec_nts.nts_priority;
+--
+   nm_debug.proc_end(g_package_name,'ins_nts');
+--
+END ins_nts;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nt (p_rec_nt IN OUT nm_types%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nt');
+--
+   p_rec_nt.nt_linear                      := NVL(p_rec_nt.nt_linear,'N' );
+   p_rec_nt.nt_datum                       := NVL(p_rec_nt.nt_datum,'N' );
+   p_rec_nt.nt_pop_unique                  := NVL(p_rec_nt.nt_pop_unique,'N' );
+--
+   INSERT INTO nm_types
+            (nt_type
+            ,nt_unique
+            ,nt_linear
+            ,nt_node_type
+            ,nt_descr
+            ,nt_admin_type
+            ,nt_length_unit
+            ,nt_datum
+            ,nt_pop_unique
+            )
+     VALUES (p_rec_nt.nt_type
+            ,p_rec_nt.nt_unique
+            ,p_rec_nt.nt_linear
+            ,p_rec_nt.nt_node_type
+            ,p_rec_nt.nt_descr
+            ,p_rec_nt.nt_admin_type
+            ,p_rec_nt.nt_length_unit
+            ,p_rec_nt.nt_datum
+            ,p_rec_nt.nt_pop_unique
+            )
+   RETURNING nt_type
+            ,nt_unique
+            ,nt_linear
+            ,nt_node_type
+            ,nt_descr
+            ,nt_admin_type
+            ,nt_length_unit
+            ,nt_datum
+            ,nt_pop_unique
+      INTO   p_rec_nt.nt_type
+            ,p_rec_nt.nt_unique
+            ,p_rec_nt.nt_linear
+            ,p_rec_nt.nt_node_type
+            ,p_rec_nt.nt_descr
+            ,p_rec_nt.nt_admin_type
+            ,p_rec_nt.nt_length_unit
+            ,p_rec_nt.nt_datum
+            ,p_rec_nt.nt_pop_unique;
+--
+   nm_debug.proc_end(g_package_name,'ins_nt');
+--
+END ins_nt;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ntc (p_rec_ntc IN OUT nm_type_columns%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ntc');
+--
+   p_rec_ntc.ntc_displayed                  := NVL(p_rec_ntc.ntc_displayed,'Y' );
+   p_rec_ntc.ntc_inherit                    := NVL(p_rec_ntc.ntc_inherit,'N' );
+   p_rec_ntc.ntc_updatable                  := NVL(p_rec_ntc.ntc_updatable,'Y' );
+--
+   INSERT INTO nm_type_columns
+            (ntc_nt_type
+            ,ntc_column_name
+            ,ntc_column_type
+            ,ntc_seq_no
+            ,ntc_displayed
+            ,ntc_str_length
+            ,ntc_mandatory
+            ,ntc_domain
+            ,ntc_query
+            ,ntc_inherit
+            ,ntc_string_start
+            ,ntc_string_end
+            ,ntc_seq_name
+            ,ntc_format
+            ,ntc_prompt
+            ,ntc_default
+            ,ntc_default_type
+            ,ntc_separator
+            ,ntc_unique_seq
+            ,ntc_unique_format
+            ,ntc_updatable
+            )
+     VALUES (p_rec_ntc.ntc_nt_type
+            ,p_rec_ntc.ntc_column_name
+            ,p_rec_ntc.ntc_column_type
+            ,p_rec_ntc.ntc_seq_no
+            ,p_rec_ntc.ntc_displayed
+            ,p_rec_ntc.ntc_str_length
+            ,p_rec_ntc.ntc_mandatory
+            ,p_rec_ntc.ntc_domain
+            ,p_rec_ntc.ntc_query
+            ,p_rec_ntc.ntc_inherit
+            ,p_rec_ntc.ntc_string_start
+            ,p_rec_ntc.ntc_string_end
+            ,p_rec_ntc.ntc_seq_name
+            ,p_rec_ntc.ntc_format
+            ,p_rec_ntc.ntc_prompt
+            ,p_rec_ntc.ntc_default
+            ,p_rec_ntc.ntc_default_type
+            ,p_rec_ntc.ntc_separator
+            ,p_rec_ntc.ntc_unique_seq
+            ,p_rec_ntc.ntc_unique_format
+            ,p_rec_ntc.ntc_updatable
+            )
+   RETURNING ntc_nt_type
+            ,ntc_column_name
+            ,ntc_column_type
+            ,ntc_seq_no
+            ,ntc_displayed
+            ,ntc_str_length
+            ,ntc_mandatory
+            ,ntc_domain
+            ,ntc_query
+            ,ntc_inherit
+            ,ntc_string_start
+            ,ntc_string_end
+            ,ntc_seq_name
+            ,ntc_format
+            ,ntc_prompt
+            ,ntc_default
+            ,ntc_default_type
+            ,ntc_separator
+            ,ntc_unique_seq
+            ,ntc_unique_format
+            ,ntc_updatable
+      INTO   p_rec_ntc.ntc_nt_type
+            ,p_rec_ntc.ntc_column_name
+            ,p_rec_ntc.ntc_column_type
+            ,p_rec_ntc.ntc_seq_no
+            ,p_rec_ntc.ntc_displayed
+            ,p_rec_ntc.ntc_str_length
+            ,p_rec_ntc.ntc_mandatory
+            ,p_rec_ntc.ntc_domain
+            ,p_rec_ntc.ntc_query
+            ,p_rec_ntc.ntc_inherit
+            ,p_rec_ntc.ntc_string_start
+            ,p_rec_ntc.ntc_string_end
+            ,p_rec_ntc.ntc_seq_name
+            ,p_rec_ntc.ntc_format
+            ,p_rec_ntc.ntc_prompt
+            ,p_rec_ntc.ntc_default
+            ,p_rec_ntc.ntc_default_type
+            ,p_rec_ntc.ntc_separator
+            ,p_rec_ntc.ntc_unique_seq
+            ,p_rec_ntc.ntc_unique_format
+            ,p_rec_ntc.ntc_updatable;
+--
+   nm_debug.proc_end(g_package_name,'ins_ntc');
+--
+END ins_ntc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nti (p_rec_nti IN OUT nm_type_inclusion%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nti');
+--
+   p_rec_nti.nti_auto_include               := NVL(p_rec_nti.nti_auto_include,'N' );
+   p_rec_nti.nti_auto_create                := NVL(p_rec_nti.nti_auto_create,'N' );
+   p_rec_nti.nti_reverse_allowed            := NVL(p_rec_nti.nti_reverse_allowed,'Y' );
+--
+   INSERT INTO nm_type_inclusion
+            (nti_nw_parent_type
+            ,nti_nw_child_type
+            ,nti_parent_column
+            ,nti_child_column
+            ,nti_auto_include
+            ,nti_auto_create
+            ,nti_reverse_allowed
+            ,nti_code_control_column
+            ,nti_group_name
+            ,nti_search
+            )
+     VALUES (p_rec_nti.nti_nw_parent_type
+            ,p_rec_nti.nti_nw_child_type
+            ,p_rec_nti.nti_parent_column
+            ,p_rec_nti.nti_child_column
+            ,p_rec_nti.nti_auto_include
+            ,p_rec_nti.nti_auto_create
+            ,p_rec_nti.nti_reverse_allowed
+            ,p_rec_nti.nti_code_control_column
+            ,p_rec_nti.nti_group_name
+            ,p_rec_nti.nti_search
+            )
+   RETURNING nti_nw_parent_type
+            ,nti_nw_child_type
+            ,nti_parent_column
+            ,nti_child_column
+            ,nti_auto_include
+            ,nti_auto_create
+            ,nti_reverse_allowed
+            ,nti_code_control_column
+            ,nti_group_name
+            ,nti_search
+      INTO   p_rec_nti.nti_nw_parent_type
+            ,p_rec_nti.nti_nw_child_type
+            ,p_rec_nti.nti_parent_column
+            ,p_rec_nti.nti_child_column
+            ,p_rec_nti.nti_auto_include
+            ,p_rec_nti.nti_auto_create
+            ,p_rec_nti.nti_reverse_allowed
+            ,p_rec_nti.nti_code_control_column
+            ,p_rec_nti.nti_group_name
+            ,p_rec_nti.nti_search;
+--
+   nm_debug.proc_end(g_package_name,'ins_nti');
+--
+END ins_nti;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ntl (p_rec_ntl IN OUT nm_type_layers%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ntl');
+--
+   p_rec_ntl.ntl_start_date                 := NVL(p_rec_ntl.ntl_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_type_layers
+            (ntl_nt_type
+            ,ntl_layer_id
+            ,ntl_start_date
+            ,ntl_end_date
+            )
+     VALUES (p_rec_ntl.ntl_nt_type
+            ,p_rec_ntl.ntl_layer_id
+            ,p_rec_ntl.ntl_start_date
+            ,p_rec_ntl.ntl_end_date
+            );
+--
+   p_rec_ntl := nm3get.get_ntl
+                   (pi_ntl_nt_type       => p_rec_ntl.ntl_nt_type
+                   ,pi_ntl_layer_id      => p_rec_ntl.ntl_layer_id
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_ntl');
+--
+END ins_ntl;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ntl_all (p_rec_ntl_all IN OUT nm_type_layers_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ntl_all');
+--
+   p_rec_ntl_all.ntl_start_date                 := NVL(p_rec_ntl_all.ntl_start_date,TO_DATE('05111605','DDMMYYYY') );
+--
+   INSERT INTO nm_type_layers_all
+            (ntl_nt_type
+            ,ntl_layer_id
+            ,ntl_start_date
+            ,ntl_end_date
+            )
+     VALUES (p_rec_ntl_all.ntl_nt_type
+            ,p_rec_ntl_all.ntl_layer_id
+            ,p_rec_ntl_all.ntl_start_date
+            ,p_rec_ntl_all.ntl_end_date
+            )
+   RETURNING ntl_nt_type
+            ,ntl_layer_id
+            ,ntl_start_date
+            ,ntl_end_date
+      INTO   p_rec_ntl_all.ntl_nt_type
+            ,p_rec_ntl_all.ntl_layer_id
+            ,p_rec_ntl_all.ntl_start_date
+            ,p_rec_ntl_all.ntl_end_date;
+--
+   nm_debug.proc_end(g_package_name,'ins_ntl_all');
+--
+END ins_ntl_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nsc (p_rec_nsc IN OUT nm_type_subclass%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nsc');
+--
+--
+   INSERT INTO nm_type_subclass
+            (nsc_nw_type
+            ,nsc_sub_class
+            ,nsc_descr
+            ,nsc_seq_no
+            )
+     VALUES (p_rec_nsc.nsc_nw_type
+            ,p_rec_nsc.nsc_sub_class
+            ,p_rec_nsc.nsc_descr
+            ,p_rec_nsc.nsc_seq_no
+            )
+   RETURNING nsc_nw_type
+            ,nsc_sub_class
+            ,nsc_descr
+            ,nsc_seq_no
+      INTO   p_rec_nsc.nsc_nw_type
+            ,p_rec_nsc.nsc_sub_class
+            ,p_rec_nsc.nsc_descr
+            ,p_rec_nsc.nsc_seq_no;
+--
+   nm_debug.proc_end(g_package_name,'ins_nsc');
+--
+END ins_nsc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nsr (p_rec_nsr IN OUT nm_type_subclass_restrictions%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nsr');
+--
+--
+   INSERT INTO nm_type_subclass_restrictions
+            (nsr_nw_type
+            ,nsr_sub_class_new
+            ,nsr_sub_class_existing
+            ,nsr_allowed
+            )
+     VALUES (p_rec_nsr.nsr_nw_type
+            ,p_rec_nsr.nsr_sub_class_new
+            ,p_rec_nsr.nsr_sub_class_existing
+            ,p_rec_nsr.nsr_allowed
+            )
+   RETURNING nsr_nw_type
+            ,nsr_sub_class_new
+            ,nsr_sub_class_existing
+            ,nsr_allowed
+      INTO   p_rec_nsr.nsr_nw_type
+            ,p_rec_nsr.nsr_sub_class_new
+            ,p_rec_nsr.nsr_sub_class_existing
+            ,p_rec_nsr.nsr_allowed;
+--
+   nm_debug.proc_end(g_package_name,'ins_nsr');
+--
+END ins_nsr;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_un (p_rec_un IN OUT nm_units%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_un');
+--
+--
+   INSERT INTO nm_units
+            (un_domain_id
+            ,un_unit_id
+            ,un_unit_name
+            ,un_format_mask
+            )
+     VALUES (p_rec_un.un_domain_id
+            ,p_rec_un.un_unit_id
+            ,p_rec_un.un_unit_name
+            ,p_rec_un.un_format_mask
+            )
+   RETURNING un_domain_id
+            ,un_unit_id
+            ,un_unit_name
+            ,un_format_mask
+      INTO   p_rec_un.un_domain_id
+            ,p_rec_un.un_unit_id
+            ,p_rec_un.un_unit_name
+            ,p_rec_un.un_format_mask;
+--
+   nm_debug.proc_end(g_package_name,'ins_un');
+--
+END ins_un;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_uc (p_rec_uc IN OUT nm_unit_conversions%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_uc');
+--
+--
+   INSERT INTO nm_unit_conversions
+            (uc_unit_id_in
+            ,uc_unit_id_out
+            ,uc_function
+            ,uc_conversion
+            ,uc_conversion_factor
+            )
+     VALUES (p_rec_uc.uc_unit_id_in
+            ,p_rec_uc.uc_unit_id_out
+            ,p_rec_uc.uc_function
+            ,p_rec_uc.uc_conversion
+            ,p_rec_uc.uc_conversion_factor
+            )
+   RETURNING uc_unit_id_in
+            ,uc_unit_id_out
+            ,uc_function
+            ,uc_conversion
+            ,uc_conversion_factor
+      INTO   p_rec_uc.uc_unit_id_in
+            ,p_rec_uc.uc_unit_id_out
+            ,p_rec_uc.uc_function
+            ,p_rec_uc.uc_conversion
+            ,p_rec_uc.uc_conversion_factor;
+--
+   nm_debug.proc_end(g_package_name,'ins_uc');
+--
+END ins_uc;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_ud (p_rec_ud IN OUT nm_unit_domains%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_ud');
+--
+--
+   INSERT INTO nm_unit_domains
+            (ud_domain_id
+            ,ud_domain_name
+            ,ud_text
+            )
+     VALUES (p_rec_ud.ud_domain_id
+            ,p_rec_ud.ud_domain_name
+            ,p_rec_ud.ud_text
+            )
+   RETURNING ud_domain_id
+            ,ud_domain_name
+            ,ud_text
+      INTO   p_rec_ud.ud_domain_id
+            ,p_rec_ud.ud_domain_name
+            ,p_rec_ud.ud_text;
+--
+   nm_debug.proc_end(g_package_name,'ins_ud');
+--
+END ins_ud;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nuf (p_rec_nuf IN OUT nm_upload_files%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nuf');
+--
+--
+   INSERT INTO nm_upload_files
+            (name
+            ,mime_type
+            ,doc_size
+            ,dad_charset
+            ,last_updated
+            ,content_type
+            ,blob_content
+            ,nuf_nufg_table_name
+            ,nuf_nufgc_column_val_1
+            ,nuf_nufgc_column_val_2
+            ,nuf_nufgc_column_val_3
+            ,nuf_nufgc_column_val_4
+            ,nuf_nufgc_column_val_5
+            )
+     VALUES (p_rec_nuf.name
+            ,p_rec_nuf.mime_type
+            ,p_rec_nuf.doc_size
+            ,p_rec_nuf.dad_charset
+            ,p_rec_nuf.last_updated
+            ,p_rec_nuf.content_type
+            ,p_rec_nuf.blob_content
+            ,p_rec_nuf.nuf_nufg_table_name
+            ,p_rec_nuf.nuf_nufgc_column_val_1
+            ,p_rec_nuf.nuf_nufgc_column_val_2
+            ,p_rec_nuf.nuf_nufgc_column_val_3
+            ,p_rec_nuf.nuf_nufgc_column_val_4
+            ,p_rec_nuf.nuf_nufgc_column_val_5
+            )
+   RETURNING name
+            ,mime_type
+            ,doc_size
+            ,dad_charset
+            ,last_updated
+            ,content_type
+            ,nuf_nufg_table_name
+            ,nuf_nufgc_column_val_1
+            ,nuf_nufgc_column_val_2
+            ,nuf_nufgc_column_val_3
+            ,nuf_nufgc_column_val_4
+            ,nuf_nufgc_column_val_5
+      INTO   p_rec_nuf.name
+            ,p_rec_nuf.mime_type
+            ,p_rec_nuf.doc_size
+            ,p_rec_nuf.dad_charset
+            ,p_rec_nuf.last_updated
+            ,p_rec_nuf.content_type
+            ,p_rec_nuf.nuf_nufg_table_name
+            ,p_rec_nuf.nuf_nufgc_column_val_1
+            ,p_rec_nuf.nuf_nufgc_column_val_2
+            ,p_rec_nuf.nuf_nufgc_column_val_3
+            ,p_rec_nuf.nuf_nufgc_column_val_4
+            ,p_rec_nuf.nuf_nufgc_column_val_5;
+--
+   nm_debug.proc_end(g_package_name,'ins_nuf');
+--
+END ins_nuf;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nufp (p_rec_nufp IN OUT nm_upload_filespart%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nufp');
+--
+--
+   INSERT INTO nm_upload_filespart
+            (document
+            ,part
+            ,uploaded
+            )
+     VALUES (p_rec_nufp.document
+            ,p_rec_nufp.part
+            ,p_rec_nufp.uploaded
+            )
+   RETURNING document
+            ,part
+            ,uploaded
+      INTO   p_rec_nufp.document
+            ,p_rec_nufp.part
+            ,p_rec_nufp.uploaded;
+--
+   nm_debug.proc_end(g_package_name,'ins_nufp');
+--
+END ins_nufp;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nua (p_rec_nua IN OUT nm_user_aus%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nua');
+--
+   p_rec_nua.nua_start_date                 := NVL(p_rec_nua.nua_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_nua.nua_mode                       := NVL(p_rec_nua.nua_mode,'NORMAL' );
+--
+   INSERT INTO nm_user_aus
+            (nua_user_id
+            ,nua_admin_unit
+            ,nua_start_date
+            ,nua_end_date
+            ,nua_mode
+            )
+     VALUES (p_rec_nua.nua_user_id
+            ,p_rec_nua.nua_admin_unit
+            ,p_rec_nua.nua_start_date
+            ,p_rec_nua.nua_end_date
+            ,p_rec_nua.nua_mode
+            );
+--
+   p_rec_nua := nm3get.get_nua
+                   (pi_nua_user_id       => p_rec_nua.nua_user_id
+                   ,pi_nua_admin_unit    => p_rec_nua.nua_admin_unit
+                   ,pi_nua_start_date    => p_rec_nua.nua_start_date
+                   ,pi_raise_not_found   => FALSE
+                   );
+--
+   nm_debug.proc_end(g_package_name,'ins_nua');
+--
+END ins_nua;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nua_all (p_rec_nua_all IN OUT nm_user_aus_all%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nua_all');
+--
+   p_rec_nua_all.nua_start_date                 := NVL(p_rec_nua_all.nua_start_date,TO_DATE('05111605','DDMMYYYY') );
+   p_rec_nua_all.nua_mode                       := NVL(p_rec_nua_all.nua_mode,'NORMAL' );
+--
+   INSERT INTO nm_user_aus_all
+            (nua_user_id
+            ,nua_admin_unit
+            ,nua_start_date
+            ,nua_end_date
+            ,nua_mode
+            )
+     VALUES (p_rec_nua_all.nua_user_id
+            ,p_rec_nua_all.nua_admin_unit
+            ,p_rec_nua_all.nua_start_date
+            ,p_rec_nua_all.nua_end_date
+            ,p_rec_nua_all.nua_mode
+            )
+   RETURNING nua_user_id
+            ,nua_admin_unit
+            ,nua_start_date
+            ,nua_end_date
+            ,nua_mode
+      INTO   p_rec_nua_all.nua_user_id
+            ,p_rec_nua_all.nua_admin_unit
+            ,p_rec_nua_all.nua_start_date
+            ,p_rec_nua_all.nua_end_date
+            ,p_rec_nua_all.nua_mode;
+--
+   nm_debug.proc_end(g_package_name,'ins_nua_all');
+--
+END ins_nua_all;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nva (p_rec_nva IN OUT nm_visual_attributes%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nva');
+--
+   p_rec_nva.nva_fg_red                     := NVL(p_rec_nva.nva_fg_red,0 );
+   p_rec_nva.nva_fg_green                   := NVL(p_rec_nva.nva_fg_green,0 );
+   p_rec_nva.nva_fg_blue                    := NVL(p_rec_nva.nva_fg_blue,0 );
+   p_rec_nva.nva_bg_red                     := NVL(p_rec_nva.nva_bg_red,0 );
+   p_rec_nva.nva_bg_green                   := NVL(p_rec_nva.nva_bg_green,0 );
+   p_rec_nva.nva_bg_blue                    := NVL(p_rec_nva.nva_bg_blue,0 );
+--
+   INSERT INTO nm_visual_attributes
+            (nva_id
+            ,nva_descr
+            ,nva_fg_red
+            ,nva_fg_green
+            ,nva_fg_blue
+            ,nva_bg_red
+            ,nva_bg_green
+            ,nva_bg_blue
+            ,nva_nfp_id
+            )
+     VALUES (p_rec_nva.nva_id
+            ,p_rec_nva.nva_descr
+            ,p_rec_nva.nva_fg_red
+            ,p_rec_nva.nva_fg_green
+            ,p_rec_nva.nva_fg_blue
+            ,p_rec_nva.nva_bg_red
+            ,p_rec_nva.nva_bg_green
+            ,p_rec_nva.nva_bg_blue
+            ,p_rec_nva.nva_nfp_id
+            )
+   RETURNING nva_id
+            ,nva_descr
+            ,nva_fg_red
+            ,nva_fg_green
+            ,nva_fg_blue
+            ,nva_bg_red
+            ,nva_bg_green
+            ,nva_bg_blue
+            ,nva_nfp_id
+      INTO   p_rec_nva.nva_id
+            ,p_rec_nva.nva_descr
+            ,p_rec_nva.nva_fg_red
+            ,p_rec_nva.nva_fg_green
+            ,p_rec_nva.nva_fg_blue
+            ,p_rec_nva.nva_bg_red
+            ,p_rec_nva.nva_bg_green
+            ,p_rec_nva.nva_bg_blue
+            ,p_rec_nva.nva_nfp_id;
+--
+   nm_debug.proc_end(g_package_name,'ins_nva');
+--
+END ins_nva;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nxf (p_rec_nxf IN OUT nm_xml_files%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nxf');
+--
+--
+   INSERT INTO nm_xml_files
+            (nxf_file_type
+            ,nxf_type
+            ,nxf_descr
+            ,nxf_doc
+            ,nxf_date_created
+            ,nxf_date_modified
+            ,nxf_modified_by
+            ,nxf_created_by
+            )
+     VALUES (p_rec_nxf.nxf_file_type
+            ,p_rec_nxf.nxf_type
+            ,p_rec_nxf.nxf_descr
+            ,p_rec_nxf.nxf_doc
+            ,p_rec_nxf.nxf_date_created
+            ,p_rec_nxf.nxf_date_modified
+            ,p_rec_nxf.nxf_modified_by
+            ,p_rec_nxf.nxf_created_by
+            )
+   RETURNING nxf_file_type
+            ,nxf_type
+            ,nxf_descr
+            ,nxf_date_created
+            ,nxf_date_modified
+            ,nxf_modified_by
+            ,nxf_created_by
+      INTO   p_rec_nxf.nxf_file_type
+            ,p_rec_nxf.nxf_type
+            ,p_rec_nxf.nxf_descr
+            ,p_rec_nxf.nxf_date_created
+            ,p_rec_nxf.nxf_date_modified
+            ,p_rec_nxf.nxf_modified_by
+            ,p_rec_nxf.nxf_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_nxf');
+--
+END ins_nxf;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nxb (p_rec_nxb IN OUT nm_xml_load_batches%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nxb');
+--
+--
+   INSERT INTO nm_xml_load_batches
+            (nxb_batch_id
+            ,nxb_type
+            ,nxb_file_type
+            ,nxb_date_created
+            ,nxb_date_modified
+            ,nxb_modified_by
+            ,nxb_created_by
+            )
+     VALUES (p_rec_nxb.nxb_batch_id
+            ,p_rec_nxb.nxb_type
+            ,p_rec_nxb.nxb_file_type
+            ,p_rec_nxb.nxb_date_created
+            ,p_rec_nxb.nxb_date_modified
+            ,p_rec_nxb.nxb_modified_by
+            ,p_rec_nxb.nxb_created_by
+            )
+   RETURNING nxb_batch_id
+            ,nxb_type
+            ,nxb_file_type
+            ,nxb_date_created
+            ,nxb_date_modified
+            ,nxb_modified_by
+            ,nxb_created_by
+      INTO   p_rec_nxb.nxb_batch_id
+            ,p_rec_nxb.nxb_type
+            ,p_rec_nxb.nxb_file_type
+            ,p_rec_nxb.nxb_date_created
+            ,p_rec_nxb.nxb_date_modified
+            ,p_rec_nxb.nxb_modified_by
+            ,p_rec_nxb.nxb_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_nxb');
+--
+END ins_nxb;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nxle (p_rec_nxle IN OUT nm_xml_load_errors%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nxle');
+--
+--
+   INSERT INTO nm_xml_load_errors
+            (nxl_batch_id
+            ,nxl_record_id
+            ,nxl_error
+            ,nxl_data
+            ,nxl_processed
+            )
+     VALUES (p_rec_nxle.nxl_batch_id
+            ,p_rec_nxle.nxl_record_id
+            ,p_rec_nxle.nxl_error
+            ,p_rec_nxle.nxl_data
+            ,p_rec_nxle.nxl_processed
+            )
+   RETURNING nxl_batch_id
+            ,nxl_record_id
+            ,nxl_error
+            ,nxl_processed
+      INTO   p_rec_nxle.nxl_batch_id
+            ,p_rec_nxle.nxl_record_id
+            ,p_rec_nxle.nxl_error
+            ,p_rec_nxle.nxl_processed;
+--
+   nm_debug.proc_end(g_package_name,'ins_nxle');
+--
+END ins_nxle;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nwx (p_rec_nwx IN OUT nm_nw_xsp%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nwx');
+--
+--
+   INSERT INTO nm_nw_xsp
+            (nwx_nw_type
+            ,nwx_x_sect
+            ,nwx_nsc_sub_class
+            ,nwx_descr
+            ,nwx_seq
+            ,nwx_offset
+            ,nwx_date_created
+            ,nwx_date_modified
+            ,nwx_modified_by
+            ,nwx_created_by
+            )
+     VALUES (p_rec_nwx.nwx_nw_type
+            ,p_rec_nwx.nwx_x_sect
+            ,p_rec_nwx.nwx_nsc_sub_class
+            ,p_rec_nwx.nwx_descr
+            ,p_rec_nwx.nwx_seq
+            ,p_rec_nwx.nwx_offset
+            ,p_rec_nwx.nwx_date_created
+            ,p_rec_nwx.nwx_date_modified
+            ,p_rec_nwx.nwx_modified_by
+            ,p_rec_nwx.nwx_created_by
+            )
+   RETURNING nwx_nw_type
+            ,nwx_x_sect
+            ,nwx_nsc_sub_class
+            ,nwx_descr
+            ,nwx_seq
+            ,nwx_offset
+            ,nwx_date_created
+            ,nwx_date_modified
+            ,nwx_modified_by
+            ,nwx_created_by
+      INTO   p_rec_nwx.nwx_nw_type
+            ,p_rec_nwx.nwx_x_sect
+            ,p_rec_nwx.nwx_nsc_sub_class
+            ,p_rec_nwx.nwx_descr
+            ,p_rec_nwx.nwx_seq
+            ,p_rec_nwx.nwx_offset
+            ,p_rec_nwx.nwx_date_created
+            ,p_rec_nwx.nwx_date_modified
+            ,p_rec_nwx.nwx_modified_by
+            ,p_rec_nwx.nwx_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_nwx');
+--
+END ins_nwx;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nxd (p_rec_nxd IN OUT nm_x_driving_conditions%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nxd');
+--
+--
+   INSERT INTO nm_x_driving_conditions
+            (nxd_rule_id
+            ,nxd_rule_seq_no
+            ,nxd_rule_type
+            ,nxd_if_condition
+            ,nxd_and_or
+            ,nxd_st_char
+            ,nxd_end_char
+            )
+     VALUES (p_rec_nxd.nxd_rule_id
+            ,p_rec_nxd.nxd_rule_seq_no
+            ,p_rec_nxd.nxd_rule_type
+            ,p_rec_nxd.nxd_if_condition
+            ,p_rec_nxd.nxd_and_or
+            ,p_rec_nxd.nxd_st_char
+            ,p_rec_nxd.nxd_end_char
+            )
+   RETURNING nxd_rule_id
+            ,nxd_rule_seq_no
+            ,nxd_rule_type
+            ,nxd_if_condition
+            ,nxd_and_or
+            ,nxd_st_char
+            ,nxd_end_char
+      INTO   p_rec_nxd.nxd_rule_id
+            ,p_rec_nxd.nxd_rule_seq_no
+            ,p_rec_nxd.nxd_rule_type
+            ,p_rec_nxd.nxd_if_condition
+            ,p_rec_nxd.nxd_and_or
+            ,p_rec_nxd.nxd_st_char
+            ,p_rec_nxd.nxd_end_char;
+--
+   nm_debug.proc_end(g_package_name,'ins_nxd');
+--
+END ins_nxd;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nxe (p_rec_nxe IN OUT nm_x_errors%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nxe');
+--
+--
+   INSERT INTO nm_x_errors
+            (nxe_id
+            ,nxe_error_text
+            ,nxe_error_class
+            )
+     VALUES (p_rec_nxe.nxe_id
+            ,p_rec_nxe.nxe_error_text
+            ,p_rec_nxe.nxe_error_class
+            )
+   RETURNING nxe_id
+            ,nxe_error_text
+            ,nxe_error_class
+      INTO   p_rec_nxe.nxe_id
+            ,p_rec_nxe.nxe_error_text
+            ,p_rec_nxe.nxe_error_class;
+--
+   nm_debug.proc_end(g_package_name,'ins_nxe');
+--
+END ins_nxe;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nxic (p_rec_nxic IN OUT nm_x_inv_conditions%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nxic');
+--
+--
+   INSERT INTO nm_x_inv_conditions
+            (nxic_id
+            ,nxic_inv_type
+            ,nxic_inv_attr
+            ,nxic_condition
+            ,nxic_value_list
+            ,nxic_column_name
+            )
+     VALUES (p_rec_nxic.nxic_id
+            ,p_rec_nxic.nxic_inv_type
+            ,p_rec_nxic.nxic_inv_attr
+            ,p_rec_nxic.nxic_condition
+            ,p_rec_nxic.nxic_value_list
+            ,p_rec_nxic.nxic_column_name
+            )
+   RETURNING nxic_id
+            ,nxic_inv_type
+            ,nxic_inv_attr
+            ,nxic_condition
+            ,nxic_value_list
+            ,nxic_column_name
+      INTO   p_rec_nxic.nxic_id
+            ,p_rec_nxic.nxic_inv_type
+            ,p_rec_nxic.nxic_inv_attr
+            ,p_rec_nxic.nxic_condition
+            ,p_rec_nxic.nxic_value_list
+            ,p_rec_nxic.nxic_column_name;
+--
+   nm_debug.proc_end(g_package_name,'ins_nxic');
+--
+END ins_nxic;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nxl (p_rec_nxl IN OUT nm_x_location_rules%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nxl');
+--
+   p_rec_nxl.nxl_existence_flag             := NVL(p_rec_nxl.nxl_existence_flag,'Y' );
+   p_rec_nxl.nxl_xsp_match                  := NVL(p_rec_nxl.nxl_xsp_match,'N' );
+--
+   INSERT INTO nm_x_location_rules
+            (nxl_rule_id
+            ,nxl_conditional
+            ,nxl_dep_type
+            ,nxl_indep_type
+            ,nxl_dep_condition
+            ,nxl_indep_condition
+            ,nxl_existence_flag
+            ,nxl_xsp_match
+            ,nxl_indep_attr
+            ,nxl_dep_attr
+            ,nxl_operator
+            )
+     VALUES (p_rec_nxl.nxl_rule_id
+            ,p_rec_nxl.nxl_conditional
+            ,p_rec_nxl.nxl_dep_type
+            ,p_rec_nxl.nxl_indep_type
+            ,p_rec_nxl.nxl_dep_condition
+            ,p_rec_nxl.nxl_indep_condition
+            ,p_rec_nxl.nxl_existence_flag
+            ,p_rec_nxl.nxl_xsp_match
+            ,p_rec_nxl.nxl_indep_attr
+            ,p_rec_nxl.nxl_dep_attr
+            ,p_rec_nxl.nxl_operator
+            )
+   RETURNING nxl_rule_id
+            ,nxl_conditional
+            ,nxl_dep_type
+            ,nxl_indep_type
+            ,nxl_dep_condition
+            ,nxl_indep_condition
+            ,nxl_existence_flag
+            ,nxl_xsp_match
+            ,nxl_indep_attr
+            ,nxl_dep_attr
+            ,nxl_operator
+      INTO   p_rec_nxl.nxl_rule_id
+            ,p_rec_nxl.nxl_conditional
+            ,p_rec_nxl.nxl_dep_type
+            ,p_rec_nxl.nxl_indep_type
+            ,p_rec_nxl.nxl_dep_condition
+            ,p_rec_nxl.nxl_indep_condition
+            ,p_rec_nxl.nxl_existence_flag
+            ,p_rec_nxl.nxl_xsp_match
+            ,p_rec_nxl.nxl_indep_attr
+            ,p_rec_nxl.nxl_dep_attr
+            ,p_rec_nxl.nxl_operator;
+--
+   nm_debug.proc_end(g_package_name,'ins_nxl');
+--
+END ins_nxl;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nxn (p_rec_nxn IN OUT nm_x_nw_rules%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nxn');
+--
+   p_rec_nxn.nxn_conditional                := NVL(p_rec_nxn.nxn_conditional,'Y' );
+   p_rec_nxn.nxn_existence_flag             := NVL(p_rec_nxn.nxn_existence_flag,'N' );
+--
+   INSERT INTO nm_x_nw_rules
+            (nxn_rule_id
+            ,nxn_conditional
+            ,nxn_dep_type
+            ,nxn_dep_attr
+            ,nxn_indep_nw_type
+            ,nxn_dep_condition
+            ,nxn_indep_condition
+            ,nxn_existence_flag
+            )
+     VALUES (p_rec_nxn.nxn_rule_id
+            ,p_rec_nxn.nxn_conditional
+            ,p_rec_nxn.nxn_dep_type
+            ,p_rec_nxn.nxn_dep_attr
+            ,p_rec_nxn.nxn_indep_nw_type
+            ,p_rec_nxn.nxn_dep_condition
+            ,p_rec_nxn.nxn_indep_condition
+            ,p_rec_nxn.nxn_existence_flag
+            )
+   RETURNING nxn_rule_id
+            ,nxn_conditional
+            ,nxn_dep_type
+            ,nxn_dep_attr
+            ,nxn_indep_nw_type
+            ,nxn_dep_condition
+            ,nxn_indep_condition
+            ,nxn_existence_flag
+      INTO   p_rec_nxn.nxn_rule_id
+            ,p_rec_nxn.nxn_conditional
+            ,p_rec_nxn.nxn_dep_type
+            ,p_rec_nxn.nxn_dep_attr
+            ,p_rec_nxn.nxn_indep_nw_type
+            ,p_rec_nxn.nxn_dep_condition
+            ,p_rec_nxn.nxn_indep_condition
+            ,p_rec_nxn.nxn_existence_flag;
+--
+   nm_debug.proc_end(g_package_name,'ins_nxn');
+--
+END ins_nxn;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nxr (p_rec_nxr IN OUT nm_x_rules%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nxr');
+--
+--
+   INSERT INTO nm_x_rules
+            (nxr_rule_id
+            ,nxr_type
+            ,nxr_error_id
+            ,nxr_seq_no
+            ,nxr_descr
+            )
+     VALUES (p_rec_nxr.nxr_rule_id
+            ,p_rec_nxr.nxr_type
+            ,p_rec_nxr.nxr_error_id
+            ,p_rec_nxr.nxr_seq_no
+            ,p_rec_nxr.nxr_descr
+            )
+   RETURNING nxr_rule_id
+            ,nxr_type
+            ,nxr_error_id
+            ,nxr_seq_no
+            ,nxr_descr
+      INTO   p_rec_nxr.nxr_rule_id
+            ,p_rec_nxr.nxr_type
+            ,p_rec_nxr.nxr_error_id
+            ,p_rec_nxr.nxr_seq_no
+            ,p_rec_nxr.nxr_descr;
+--
+   nm_debug.proc_end(g_package_name,'ins_nxr');
+--
+END ins_nxr;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_nxv (p_rec_nxv IN OUT nm_x_val_conditions%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_nxv');
+--
+--
+   INSERT INTO nm_x_val_conditions
+            (nxv_rule_id
+            ,nxv_rule_seq_no
+            ,nxv_rule_type
+            ,nxv_if_condition
+            ,nxv_and_or
+            ,nxv_st_char
+            ,nxv_end_char
+            )
+     VALUES (p_rec_nxv.nxv_rule_id
+            ,p_rec_nxv.nxv_rule_seq_no
+            ,p_rec_nxv.nxv_rule_type
+            ,p_rec_nxv.nxv_if_condition
+            ,p_rec_nxv.nxv_and_or
+            ,p_rec_nxv.nxv_st_char
+            ,p_rec_nxv.nxv_end_char
+            )
+   RETURNING nxv_rule_id
+            ,nxv_rule_seq_no
+            ,nxv_rule_type
+            ,nxv_if_condition
+            ,nxv_and_or
+            ,nxv_st_char
+            ,nxv_end_char
+      INTO   p_rec_nxv.nxv_rule_id
+            ,p_rec_nxv.nxv_rule_seq_no
+            ,p_rec_nxv.nxv_rule_type
+            ,p_rec_nxv.nxv_if_condition
+            ,p_rec_nxv.nxv_and_or
+            ,p_rec_nxv.nxv_st_char
+            ,p_rec_nxv.nxv_end_char;
+--
+   nm_debug.proc_end(g_package_name,'ins_nxv');
+--
+END ins_nxv;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_xsr (p_rec_xsr IN OUT nm_xsp_restraints%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_xsr');
+--
+--
+   INSERT INTO nm_xsp_restraints
+            (xsr_nw_type
+            ,xsr_ity_inv_code
+            ,xsr_scl_class
+            ,xsr_x_sect_value
+            ,xsr_descr
+            ,xsr_date_created
+            ,xsr_date_modified
+            ,xsr_modified_by
+            ,xsr_created_by
+            )
+     VALUES (p_rec_xsr.xsr_nw_type
+            ,p_rec_xsr.xsr_ity_inv_code
+            ,p_rec_xsr.xsr_scl_class
+            ,p_rec_xsr.xsr_x_sect_value
+            ,p_rec_xsr.xsr_descr
+            ,p_rec_xsr.xsr_date_created
+            ,p_rec_xsr.xsr_date_modified
+            ,p_rec_xsr.xsr_modified_by
+            ,p_rec_xsr.xsr_created_by
+            )
+   RETURNING xsr_nw_type
+            ,xsr_ity_inv_code
+            ,xsr_scl_class
+            ,xsr_x_sect_value
+            ,xsr_descr
+            ,xsr_date_created
+            ,xsr_date_modified
+            ,xsr_modified_by
+            ,xsr_created_by
+      INTO   p_rec_xsr.xsr_nw_type
+            ,p_rec_xsr.xsr_ity_inv_code
+            ,p_rec_xsr.xsr_scl_class
+            ,p_rec_xsr.xsr_x_sect_value
+            ,p_rec_xsr.xsr_descr
+            ,p_rec_xsr.xsr_date_created
+            ,p_rec_xsr.xsr_date_modified
+            ,p_rec_xsr.xsr_modified_by
+            ,p_rec_xsr.xsr_created_by;
+--
+   nm_debug.proc_end(g_package_name,'ins_xsr');
+--
+END ins_xsr;
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE ins_xrv (p_rec_xrv IN OUT nm_xsp_reversal%ROWTYPE) IS
+BEGIN
+--
+   nm_debug.proc_start(g_package_name,'ins_xrv');
+--
+--
+   INSERT INTO nm_xsp_reversal
+            (xrv_nw_type
+            ,xrv_old_sub_class
+            ,xrv_old_xsp
+            ,xrv_new_sub_class
+            ,xrv_new_xsp
+            ,xrv_manual_override
+            ,xrv_default_xsp
+            )
+     VALUES (p_rec_xrv.xrv_nw_type
+            ,p_rec_xrv.xrv_old_sub_class
+            ,p_rec_xrv.xrv_old_xsp
+            ,p_rec_xrv.xrv_new_sub_class
+            ,p_rec_xrv.xrv_new_xsp
+            ,p_rec_xrv.xrv_manual_override
+            ,p_rec_xrv.xrv_default_xsp
+            )
+   RETURNING xrv_nw_type
+            ,xrv_old_sub_class
+            ,xrv_old_xsp
+            ,xrv_new_sub_class
+            ,xrv_new_xsp
+            ,xrv_manual_override
+            ,xrv_default_xsp
+      INTO   p_rec_xrv.xrv_nw_type
+            ,p_rec_xrv.xrv_old_sub_class
+            ,p_rec_xrv.xrv_old_xsp
+            ,p_rec_xrv.xrv_new_sub_class
+            ,p_rec_xrv.xrv_new_xsp
+            ,p_rec_xrv.xrv_manual_override
+            ,p_rec_xrv.xrv_default_xsp;
+--
+   nm_debug.proc_end(g_package_name,'ins_xrv');
+--
+END ins_xrv;
+--
+-----------------------------------------------------------------------------
+--
+END nm3ins;
+/
