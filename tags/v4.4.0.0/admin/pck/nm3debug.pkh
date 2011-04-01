@@ -1,0 +1,1781 @@
+CREATE OR REPLACE PACKAGE nm3debug IS
+--<PACKAGE>
+--
+-----------------------------------------------------------------------------
+--
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3debug.pkh-arc   2.19   Apr 01 2011 12:51:54   Mike.Alexander  $
+--       Module Name      : $Workfile:   nm3debug.pkh  $
+--       Date into PVCS   : $Date:   Apr 01 2011 12:51:54  $
+--       Date fetched Out : $Modtime:   Mar 31 2011 16:06:26  $
+--       PVCS Version     : $Revision:   2.19  $
+--
+--
+--   Author : Jonathan Mills
+--
+--   Generated package DO NOT MODIFY
+--
+--   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
+--   nm3get_gen body   : "$Revision:   2.19  $"
+--
+-----------------------------------------------------------------------------
+--
+--	Copyright (c) exor corporation ltd, 2005
+--
+-----------------------------------------------------------------------------
+--
+--</PACKAGE>
+--<GLOBVAR>
+   g_sccsid          CONSTANT  VARCHAR2(2000) := '"$Revision:   2.19  $"';
+--  g_sccsid is the SCCS ID for the package
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_doc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_doc (pi_rec_doc docs%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dac">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dac (pi_rec_dac doc_actions%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dah">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dah (pi_rec_dah doc_action_history%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_das">
+-- Debug a ROWTYPE record
+PROCEDURE debug_das (pi_rec_das doc_assocs%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dcl">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dcl (pi_rec_dcl doc_class%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dec">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dec (pi_rec_dec doc_contact%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hct">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hct (pi_rec_hct doc_contact_address%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dcp">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dcp (pi_rec_dcp doc_copies%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ddg">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ddg (pi_rec_ddg doc_damage%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ddc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ddc (pi_rec_ddc doc_damage_costs%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dec">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dec (pi_rec_dec doc_enquiry_contacts%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_det">
+-- Debug a ROWTYPE record
+PROCEDURE debug_det (pi_rec_det doc_enquiry_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dgt">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dgt (pi_rec_dgt doc_gateways%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dgs">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dgs (pi_rec_dgs doc_gate_syns%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dhi">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dhi (pi_rec_dhi doc_history%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dky">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dky (pi_rec_dky doc_keys%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dkw">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dkw (pi_rec_dkw doc_keywords%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dlc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dlc (pi_rec_dlc doc_locations%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dlr">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dlr (pi_rec_dlr doc_lov_recs%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dmd">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dmd (pi_rec_dmd doc_media%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dq">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dq (pi_rec_dq doc_query%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dqc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dqc (pi_rec_dqc doc_query_cols%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dsa">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dsa (pi_rec_dsa doc_std_actions%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dsc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dsc (pi_rec_dsc doc_std_costs%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dsy">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dsy (pi_rec_dsy doc_synonyms%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dtc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dtc (pi_rec_dtc doc_template_columns%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dtg">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dtg (pi_rec_dtg doc_template_gateways%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dtu">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dtu (pi_rec_dtu doc_template_users%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_dtp">
+-- Debug a ROWTYPE record
+PROCEDURE debug_dtp (pi_rec_dtp doc_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_gl">
+-- Debug a ROWTYPE record
+PROCEDURE debug_gl (pi_rec_gl gri_lov%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_grm">
+-- Debug a ROWTYPE record
+PROCEDURE debug_grm (pi_rec_grm gri_modules%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_gmp">
+-- Debug a ROWTYPE record
+PROCEDURE debug_gmp (pi_rec_gmp gri_module_params%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_gp">
+-- Debug a ROWTYPE record
+PROCEDURE debug_gp (pi_rec_gp gri_params%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_gpd">
+-- Debug a ROWTYPE record
+PROCEDURE debug_gpd (pi_rec_gpd gri_param_dependencies%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_gpl">
+-- Debug a ROWTYPE record
+PROCEDURE debug_gpl (pi_rec_gpl gri_param_lookup%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_grr">
+-- Debug a ROWTYPE record
+PROCEDURE debug_grr (pi_rec_grr gri_report_runs%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_grp">
+-- Debug a ROWTYPE record
+PROCEDURE debug_grp (pi_rec_grp gri_run_parameters%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_gsp">
+-- Debug a ROWTYPE record
+PROCEDURE debug_gsp (pi_rec_gsp gri_saved_params%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_gss">
+-- Debug a ROWTYPE record
+PROCEDURE debug_gss (pi_rec_gss gri_saved_sets%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_grs">
+-- Debug a ROWTYPE record
+PROCEDURE debug_grs (pi_rec_grs gri_spool%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_had">
+-- Debug a ROWTYPE record
+PROCEDURE debug_had (pi_rec_had hig_address%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hco">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hco (pi_rec_hco hig_codes%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hcl">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hcl (pi_rec_hcl hig_colours%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hct">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hct (pi_rec_hct hig_contacts%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hca">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hca (pi_rec_hca hig_contact_address%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hdo">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hdo (pi_rec_hdo hig_domains%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_her">
+-- Debug a ROWTYPE record
+PROCEDURE debug_her (pi_rec_her hig_errors%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hht">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hht (pi_rec_hht hig_hd_join_defs%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hho">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hho (pi_rec_hho hig_hd_lookup_join_cols%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hhl">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hhl (pi_rec_hhl hig_hd_lookup_join_defs%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hhm">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hhm (pi_rec_hhm hig_hd_modules%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hhu">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hhu (pi_rec_hhu hig_hd_mod_uses%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hhc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hhc (pi_rec_hhc hig_hd_selected_cols%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hhj">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hhj (pi_rec_hhj hig_hd_table_join_cols%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hho">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hho (pi_rec_hho hig_holidays%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hmo">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hmo (pi_rec_hmo hig_modules%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hmh">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hmh (pi_rec_hmh hig_module_history%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hmk">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hmk (pi_rec_hmk hig_module_keywords%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hmr">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hmr (pi_rec_hmr hig_module_roles%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hmu">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hmu (pi_rec_hmu hig_module_usages%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hol">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hol (pi_rec_hol hig_option_list%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hop">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hop (pi_rec_hop hig_options%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hov">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hov (pi_rec_hov hig_option_values%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hpr">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hpr (pi_rec_hpr hig_products%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hrs">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hrs (pi_rec_hrs hig_report_styles%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hro">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hro (pi_rec_hro hig_roles%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hsc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hsc (pi_rec_hsc hig_status_codes%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hsd">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hsd (pi_rec_hsd hig_status_domains%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hup">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hup (pi_rec_hup hig_upgrades%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hum">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hum (pi_rec_hum hig_url_modules%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hus">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hus (pi_rec_hus hig_users%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_huh">
+-- Debug a ROWTYPE record
+PROCEDURE debug_huh (pi_rec_huh hig_user_history%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_huo">
+-- Debug a ROWTYPE record
+PROCEDURE debug_huo (pi_rec_huo hig_user_options%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_hur">
+-- Debug a ROWTYPE record
+PROCEDURE debug_hur (pi_rec_hur hig_user_roles%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nag">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nag (pi_rec_nag nm_admin_groups%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nau">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nau (pi_rec_nau nm_admin_units%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nau_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nau_all (pi_rec_nau_all nm_admin_units_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nal">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nal (pi_rec_nal nm_area_lock%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nars">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nars (pi_rec_nars nm_assets_on_route_store%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_narsa">
+-- Debug a ROWTYPE record
+PROCEDURE debug_narsa (pi_rec_narsa nm_assets_on_route_store_att%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_narsd">
+-- Debug a ROWTYPE record
+PROCEDURE debug_narsd (pi_rec_narsd nm_assets_on_route_store_att_d%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_narsh">
+-- Debug a ROWTYPE record
+PROCEDURE debug_narsh (pi_rec_narsh nm_assets_on_route_store_head%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_narst">
+-- Debug a ROWTYPE record
+PROCEDURE debug_narst (pi_rec_narst nm_assets_on_route_store_total%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_naa">
+-- Debug a ROWTYPE record
+PROCEDURE debug_naa (pi_rec_naa nm_audit_actions%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nach">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nach (pi_rec_nach nm_audit_changes%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nac">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nac (pi_rec_nac nm_audit_columns%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nkc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nkc (pi_rec_nkc nm_audit_key_cols%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_natab">
+-- Debug a ROWTYPE record
+PROCEDURE debug_natab (pi_rec_natab nm_audit_tables%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_natmp">
+-- Debug a ROWTYPE record
+PROCEDURE debug_natmp (pi_rec_natmp nm_audit_temp%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nat">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nat (pi_rec_nat nm_au_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nsty">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nsty (pi_rec_nsty nm_au_sub_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_natg">
+-- Debug a ROWTYPE record
+PROCEDURE debug_natg (pi_rec_natg nm_au_types_groupings%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nd">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nd (pi_rec_nd nm_dbug%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ne">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ne (pi_rec_ne nm_elements%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ne_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ne_all (pi_rec_ne_all nm_elements_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_neh">
+-- Debug a ROWTYPE record
+PROCEDURE debug_neh (pi_rec_neh nm_element_history%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ner">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ner (pi_rec_ner nm_errors%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nea">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nea (pi_rec_nea nm_event_alert_mails%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nel">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nel (pi_rec_nel nm_event_log%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_net">
+-- Debug a ROWTYPE record
+PROCEDURE debug_net (pi_rec_net nm_event_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nfp">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nfp (pi_rec_nfp nm_fill_patterns%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ngq">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ngq (pi_rec_ngq nm_gaz_query%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ngqt">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ngqt (pi_rec_ngqt nm_gaz_query_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ngqa">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ngqa (pi_rec_ngqa nm_gaz_query_attribs%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ngqv">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ngqv (pi_rec_ngqv nm_gaz_query_values%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ngit">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ngit (pi_rec_ngit nm_group_inv_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ngil">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ngil (pi_rec_ngil nm_group_inv_link%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ngil_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ngil_all (pi_rec_ngil_all nm_group_inv_link_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ngr">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ngr (pi_rec_ngr nm_group_relations%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ngr_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ngr_all (pi_rec_ngr_all nm_group_relations_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ngt">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ngt (pi_rec_ngt nm_group_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ngt_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ngt_all (pi_rec_ngt_all nm_group_types_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ial">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ial (pi_rec_ial nm_inv_attri_lookup%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ial_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ial_all (pi_rec_ial_all nm_inv_attri_lookup_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nic">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nic (pi_rec_nic nm_inv_categories%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_icm">
+-- Debug a ROWTYPE record
+PROCEDURE debug_icm (pi_rec_icm nm_inv_category_modules%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_id">
+-- Debug a ROWTYPE record
+PROCEDURE debug_id (pi_rec_id nm_inv_domains%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_id_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_id_all (pi_rec_id_all nm_inv_domains_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_iit">
+-- Debug a ROWTYPE record
+PROCEDURE debug_iit (pi_rec_iit nm_inv_items%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_iit_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_iit_all (pi_rec_iit_all nm_inv_items_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_iig">
+-- Debug a ROWTYPE record
+PROCEDURE debug_iig (pi_rec_iig nm_inv_item_groupings%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_iig_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_iig_all (pi_rec_iig_all nm_inv_item_groupings_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nin">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nin (pi_rec_nin nm_inv_nw%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nin_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nin_all (pi_rec_nin_all nm_inv_nw_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nith">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nith (pi_rec_nith nm_inv_themes%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nit">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nit (pi_rec_nit nm_inv_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nit_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nit_all (pi_rec_nit_all nm_inv_types_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ita">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ita (pi_rec_ita nm_inv_type_attribs%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ita_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ita_all (pi_rec_ita_all nm_inv_type_attribs_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_itb">
+-- Debug a ROWTYPE record
+PROCEDURE debug_itb (pi_rec_itb nm_inv_type_attrib_bandings%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_itd">
+-- Debug a ROWTYPE record
+PROCEDURE debug_itd (pi_rec_itd nm_inv_type_attrib_band_dets%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nias">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nias (pi_rec_nias nm_inv_attribute_sets%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nsit">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nsit (pi_rec_nsit nm_inv_attribute_set_inv_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nsia">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nsia (pi_rec_nsia nm_inv_attribute_set_inv_attr%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nitc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nitc (pi_rec_nitc nm_inv_type_colours%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_itg">
+-- Debug a ROWTYPE record
+PROCEDURE debug_itg (pi_rec_itg nm_inv_type_groupings%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_itg_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_itg_all (pi_rec_itg_all nm_inv_type_groupings_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_itr">
+-- Debug a ROWTYPE record
+PROCEDURE debug_itr (pi_rec_itr nm_inv_type_roles%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_njc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_njc (pi_rec_njc nm_job_control%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_njo">
+-- Debug a ROWTYPE record
+PROCEDURE debug_njo (pi_rec_njo nm_job_operations%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_njv">
+-- Debug a ROWTYPE record
+PROCEDURE debug_njv (pi_rec_njv nm_job_operation_data_values%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_njt">
+-- Debug a ROWTYPE record
+PROCEDURE debug_njt (pi_rec_njt nm_job_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_jto">
+-- Debug a ROWTYPE record
+PROCEDURE debug_jto (pi_rec_jto nm_job_types_operations%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nlm">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nlm (pi_rec_nlm nm_ld_mc_all_inv_tmp%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nlt">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nlt (pi_rec_nlt nm_linear_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nlb">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nlb (pi_rec_nlb nm_load_batches%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nlbs">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nlbs (pi_rec_nlbs nm_load_batch_status%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nld">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nld (pi_rec_nld nm_load_destinations%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nldd">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nldd (pi_rec_nldd nm_load_destination_defaults%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nlf">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nlf (pi_rec_nlf nm_load_files%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nlfc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nlfc (pi_rec_nlfc nm_load_file_cols%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nlcd">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nlcd (pi_rec_nlcd nm_load_file_col_destinations%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nlfd">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nlfd (pi_rec_nlfd nm_load_file_destinations%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmg">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmg (pi_rec_nmg nm_mail_groups%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmgm">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmgm (pi_rec_nmgm nm_mail_group_membership%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmm">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmm (pi_rec_nmm nm_mail_message%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmmr">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmmr (pi_rec_nmmr nm_mail_message_recipients%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmmt">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmmt (pi_rec_nmmt nm_mail_message_text%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmu">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmu (pi_rec_nmu nm_mail_users%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nm">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nm (pi_rec_nm nm_members%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nm_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nm_all (pi_rec_nm_all nm_members_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmh">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmh (pi_rec_nmh nm_member_history%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nda">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nda (pi_rec_nda nm_mrg_default_query_attribs%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ndq">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ndq (pi_rec_ndq nm_mrg_default_query_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ndq_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ndq_all (pi_rec_ndq_all nm_mrg_default_query_types_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmid">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmid (pi_rec_nmid nm_mrg_inv_derivation%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmc (pi_rec_nmc nm_mrg_output_cols%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmcd">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmcd (pi_rec_nmcd nm_mrg_output_col_decode%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmf">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmf (pi_rec_nmf nm_mrg_output_file%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmq">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmq (pi_rec_nmq nm_mrg_query%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmq_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmq_all (pi_rec_nmq_all nm_mrg_query_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmqa">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmqa (pi_rec_nmqa nm_mrg_query_attribs%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmqr">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmqr (pi_rec_nmqr nm_mrg_query_results%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmqr_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmqr_all (pi_rec_nmqr_all nm_mrg_query_results_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nqro">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nqro (pi_rec_nqro nm_mrg_query_roles%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmqt">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmqt (pi_rec_nmqt nm_mrg_query_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmqt_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmqt_all (pi_rec_nmqt_all nm_mrg_query_types_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmqv">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmqv (pi_rec_nmqv nm_mrg_query_values%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nms">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nms (pi_rec_nms nm_mrg_sections%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nms_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nms_all (pi_rec_nms_all nm_mrg_sections_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nsv">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nsv (pi_rec_nsv nm_mrg_section_inv_values%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nsv_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nsv_all (pi_rec_nsv_all nm_mrg_section_inv_values_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmsm">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmsm (pi_rec_nmsm nm_mrg_section_members%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_no">
+-- Debug a ROWTYPE record
+PROCEDURE debug_no (pi_rec_no nm_nodes%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_no_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_no_all (pi_rec_no_all nm_nodes_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nnt">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nnt (pi_rec_nnt nm_node_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nnu">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nnu (pi_rec_nnu nm_node_usages%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nnu_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nnu_all (pi_rec_nnu_all nm_node_usages_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nng">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nng (pi_rec_nng nm_nt_groupings%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nng_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nng_all (pi_rec_nng_all nm_nt_groupings_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nad">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nad (pi_rec_nad nm_nw_ad_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_npe">
+-- Debug a ROWTYPE record
+PROCEDURE debug_npe (pi_rec_npe nm_nw_persistent_extents%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nnth">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nnth (pi_rec_nnth nm_nw_themes%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nmo">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nmo (pi_rec_nmo nm_operations%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nod">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nod (pi_rec_nod nm_operation_data%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_npq">
+-- Debug a ROWTYPE record
+PROCEDURE debug_npq (pi_rec_npq nm_pbi_query%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_npqa">
+-- Debug a ROWTYPE record
+PROCEDURE debug_npqa (pi_rec_npqa nm_pbi_query_attribs%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_npqr">
+-- Debug a ROWTYPE record
+PROCEDURE debug_npqr (pi_rec_npqr nm_pbi_query_results%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_npqt">
+-- Debug a ROWTYPE record
+PROCEDURE debug_npqt (pi_rec_npqt nm_pbi_query_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_npqv">
+-- Debug a ROWTYPE record
+PROCEDURE debug_npqv (pi_rec_npqv nm_pbi_query_values%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nps">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nps (pi_rec_nps nm_pbi_sections%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_npsm">
+-- Debug a ROWTYPE record
+PROCEDURE debug_npsm (pi_rec_npsm nm_pbi_section_members%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_np">
+-- Debug a ROWTYPE record
+PROCEDURE debug_np (pi_rec_np nm_points%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nrd">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nrd (pi_rec_nrd nm_reclass_details%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nrev">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nrev (pi_rec_nrev nm_reversal%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nse">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nse (pi_rec_nse nm_saved_extents%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nsm">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nsm (pi_rec_nsm nm_saved_extent_members%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nsd">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nsd (pi_rec_nsd nm_saved_extent_member_datums%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_tii">
+-- Debug a ROWTYPE record
+PROCEDURE debug_tii (pi_rec_tii nm_temp_inv_items%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_tiit">
+-- Debug a ROWTYPE record
+PROCEDURE debug_tiit (pi_rec_tiit nm_temp_inv_items_temp%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_tim">
+-- Debug a ROWTYPE record
+PROCEDURE debug_tim (pi_rec_tim nm_temp_inv_members%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_timt">
+-- Debug a ROWTYPE record
+PROCEDURE debug_timt (pi_rec_timt nm_temp_inv_members_temp%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ntn">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ntn (pi_rec_ntn nm_temp_nodes%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nth">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nth (pi_rec_nth nm_themes_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ntg">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ntg (pi_rec_ntg nm_theme_gtypes%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ntf">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ntf (pi_rec_ntf nm_theme_functions_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nthr">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nthr (pi_rec_nthr nm_theme_roles%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nts">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nts (pi_rec_nts nm_theme_snaps%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nt">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nt (pi_rec_nt nm_types%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ntc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ntc (pi_rec_ntc nm_type_columns%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nti">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nti (pi_rec_nti nm_type_inclusion%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ntl">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ntl (pi_rec_ntl nm_type_layers%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ntl_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ntl_all (pi_rec_ntl_all nm_type_layers_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nsc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nsc (pi_rec_nsc nm_type_subclass%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nsr">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nsr (pi_rec_nsr nm_type_subclass_restrictions%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_un">
+-- Debug a ROWTYPE record
+PROCEDURE debug_un (pi_rec_un nm_units%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_uc">
+-- Debug a ROWTYPE record
+PROCEDURE debug_uc (pi_rec_uc nm_unit_conversions%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_ud">
+-- Debug a ROWTYPE record
+PROCEDURE debug_ud (pi_rec_ud nm_unit_domains%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nuf">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nuf (pi_rec_nuf nm_upload_files%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nufp">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nufp (pi_rec_nufp nm_upload_filespart%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nua">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nua (pi_rec_nua nm_user_aus%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nua_all">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nua_all (pi_rec_nua_all nm_user_aus_all%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nva">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nva (pi_rec_nva nm_visual_attributes%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nxf">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nxf (pi_rec_nxf nm_xml_files%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nxb">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nxb (pi_rec_nxb nm_xml_load_batches%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nxle">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nxle (pi_rec_nxle nm_xml_load_errors%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nwx">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nwx (pi_rec_nwx nm_nw_xsp%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nxd">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nxd (pi_rec_nxd nm_x_driving_conditions%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nxe">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nxe (pi_rec_nxe nm_x_errors%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nxic">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nxic (pi_rec_nxic nm_x_inv_conditions%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nxl">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nxl (pi_rec_nxl nm_x_location_rules%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nxn">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nxn (pi_rec_nxn nm_x_nw_rules%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nxr">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nxr (pi_rec_nxr nm_x_rules%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_nxv">
+-- Debug a ROWTYPE record
+PROCEDURE debug_nxv (pi_rec_nxv nm_x_val_conditions%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_xsr">
+-- Debug a ROWTYPE record
+PROCEDURE debug_xsr (pi_rec_xsr nm_xsp_restraints%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug_xrv">
+-- Debug a ROWTYPE record
+PROCEDURE debug_xrv (pi_rec_xrv nm_xsp_reversal%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3debug;
+/
