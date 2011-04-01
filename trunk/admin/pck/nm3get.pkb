@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkb-arc   2.18   Oct 06 2010 15:32:10   mike.alexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3get.pkb-arc   2.19   Apr 01 2011 12:51:54   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3get.pkb  $
---       Date into PVCS   : $Date:   Oct 06 2010 15:32:10  $
---       Date fetched Out : $Modtime:   Oct 06 2010 15:20:30  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Apr 01 2011 12:51:54  $
+--       Date fetched Out : $Modtime:   Mar 31 2011 16:06:26  $
+--       PVCS Version     : $Revision:   2.19  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.18  $"
+--   nm3get_gen body   : "$Revision:   2.19  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3get IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.18  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.19  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3get';
@@ -12465,49 +12465,6 @@ BEGIN
                     ,pi_supplementary_info => 'nm_type_inclusion (NTI_UK)'
                                               ||CHR(10)||'nti_nw_child_type => '||pi_nti_nw_child_type
                                               ||CHR(10)||'nti_child_column  => '||pi_nti_child_column
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'get_nti');
---
-   RETURN l_retval;
---
-END get_nti;
---
------------------------------------------------------------------------------
---
---
---   Function to get using NTI_PARENT_TYPE_UK constraint
---
-FUNCTION get_nti (pi_nti_nw_parent_type nm_type_inclusion.nti_nw_parent_type%TYPE
-                 ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
-                 ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
-                 ) RETURN nm_type_inclusion%ROWTYPE IS
---
-   CURSOR cs_nti IS
-   SELECT /*+ INDEX (nti NTI_PARENT_TYPE_UK) */ *
-    FROM  nm_type_inclusion nti
-   WHERE  nti.nti_nw_parent_type = pi_nti_nw_parent_type;
---
-   l_found  BOOLEAN;
-   l_retval nm_type_inclusion%ROWTYPE;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'get_nti');
---
-   OPEN  cs_nti;
-   FETCH cs_nti INTO l_retval;
-   l_found := cs_nti%FOUND;
-   CLOSE cs_nti;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_type_inclusion (NTI_PARENT_TYPE_UK)'
-                                              ||CHR(10)||'nti_nw_parent_type => '||pi_nti_nw_parent_type
                     );
    END IF;
 --

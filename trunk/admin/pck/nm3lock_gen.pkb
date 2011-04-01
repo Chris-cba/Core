@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock_gen.pkb-arc   2.18   Oct 06 2010 15:32:08   mike.alexander  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock_gen.pkb-arc   2.19   Apr 01 2011 12:51:54   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3lock_gen.pkb  $
---       Date into PVCS   : $Date:   Oct 06 2010 15:32:08  $
---       Date fetched Out : $Modtime:   Oct 06 2010 15:20:30  $
---       PVCS Version     : $Revision:   2.18  $
+--       Date into PVCS   : $Date:   Apr 01 2011 12:51:54  $
+--       Date fetched Out : $Modtime:   Mar 31 2011 16:06:26  $
+--       PVCS Version     : $Revision:   2.19  $
 --
 --
 --   Author : Jonathan Mills
@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --   Generated package DO NOT MODIFY
 --
 --   nm3get_gen header : "@(#)nm3get_gen.pkh	1.3 12/05/05"
---   nm3get_gen body   : "$Revision:   2.18  $"
+--   nm3get_gen body   : "$Revision:   2.19  $"
 --
 -----------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lock_gen IS
 --
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.18  $"';
+   g_body_sccsid CONSTANT  VARCHAR2(2000) := '"$Revision:   2.19  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lock_gen';
@@ -23681,91 +23681,6 @@ BEGIN
                    ,pi_nti_child_column  => pi_nti_child_column
                    ,pi_raise_not_found   => pi_raise_not_found
                    ,pi_not_found_sqlcode => pi_not_found_sqlcode
-                   );
---
-   nm_debug.proc_end(g_package_name,'lock_nti');
---
-END lock_nti;
---
------------------------------------------------------------------------------
---
---
---   Function to lock using NTI_PARENT_TYPE_UK constraint
---
-FUNCTION lock_nti (pi_nti_nw_parent_type nm_type_inclusion.nti_nw_parent_type%TYPE
-                  ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
-                  ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
-                  ,pi_locked_sqlcode     PLS_INTEGER DEFAULT -20000
-                  ) RETURN ROWID IS
---
-   CURSOR cs_nti IS
-   SELECT /*+ INDEX (nti NTI_PARENT_TYPE_UK) */ ROWID
-    FROM  nm_type_inclusion nti
-   WHERE  nti.nti_nw_parent_type = pi_nti_nw_parent_type
-   FOR UPDATE NOWAIT;
---
-   l_found         BOOLEAN;
-   l_retval        ROWID;
-   l_record_locked EXCEPTION;
-   PRAGMA EXCEPTION_INIT (l_record_locked,-54);
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_nti');
---
-   OPEN  cs_nti;
-   FETCH cs_nti INTO l_retval;
-   l_found := cs_nti%FOUND;
-   CLOSE cs_nti;
---
-   IF pi_raise_not_found AND NOT l_found
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 67
-                    ,pi_sqlcode            => pi_not_found_sqlcode
-                    ,pi_supplementary_info => 'nm_type_inclusion (NTI_PARENT_TYPE_UK)'
-                                              ||CHR(10)||'nti_nw_parent_type => '||pi_nti_nw_parent_type
-                    );
-   END IF;
---
-   nm_debug.proc_end(g_package_name,'lock_nti');
---
-   RETURN l_retval;
---
-EXCEPTION
---
-   WHEN l_record_locked
-    THEN
-      hig.raise_ner (pi_appl               => nm3type.c_hig
-                    ,pi_id                 => 33
-                    ,pi_sqlcode            => pi_locked_sqlcode
-                    ,pi_supplementary_info => 'nm_type_inclusion (NTI_PARENT_TYPE_UK)'
-                                              ||CHR(10)||'nti_nw_parent_type => '||pi_nti_nw_parent_type
-                    );
---
-END lock_nti;
---
------------------------------------------------------------------------------
---
---
---   Procedure to lock using NTI_PARENT_TYPE_UK constraint
---
-PROCEDURE lock_nti (pi_nti_nw_parent_type nm_type_inclusion.nti_nw_parent_type%TYPE
-                   ,pi_raise_not_found    BOOLEAN     DEFAULT TRUE
-                   ,pi_not_found_sqlcode  PLS_INTEGER DEFAULT -20000
-                   ,pi_locked_sqlcode     PLS_INTEGER DEFAULT -20000
-                   ) IS
---
-   l_rowid ROWID;
---
-BEGIN
---
-   nm_debug.proc_start(g_package_name,'lock_nti');
---
-   l_rowid := lock_nti
-                   (pi_nti_nw_parent_type => pi_nti_nw_parent_type
-                   ,pi_raise_not_found    => pi_raise_not_found
-                   ,pi_not_found_sqlcode  => pi_not_found_sqlcode
                    );
 --
    nm_debug.proc_end(g_package_name,'lock_nti');
