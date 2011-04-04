@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.7   Mar 30 2011 16:35:12   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.8   Apr 04 2011 14:14:22   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4300_nm4400_upg.sql  $
---       Date into PVCS   : $Date:   Mar 30 2011 16:35:12  $
---       Date fetched Out : $Modtime:   Mar 30 2011 16:34:12  $
---       Version          : $Revision:   3.7  $
+--       Date into PVCS   : $Date:   Apr 04 2011 14:14:22  $
+--       Date fetched Out : $Modtime:   Apr 04 2011 14:08:56  $
+--       Version          : $Revision:   3.8  $
 --
 --   Product upgrade script
 --
@@ -51,8 +51,23 @@ DECLARE
  l_shut_down_initiated BOOLEAN := FALSE;
  ex_exor_error EXCEPTION; 
  PRAGMA EXCEPTION_INIT(ex_exor_error,-20099);
-
+  
+ Cursor c_db_version Is
+ Select '11gr2' 
+ From   v$version
+ Where  banner Like '%11.2.0.2%';
+ --
+ l_11gr2 Varchar2(10);
 BEGIN
+
+  Open  c_db_version;
+  Fetch c_db_version Into l_11gr2;
+  Close c_db_version;
+  --
+  If l_11gr2 Is Null
+  Then
+    RAISE_APPLICATION_ERROR(-20001,'The database version does not comply with the certification matrix - contact exor support for further information');
+  End If;
 
   BEGIN
    EXECUTE IMMEDIATE 'GRANT MANAGE SCHEDULER TO PROCESS_ADMIN';
