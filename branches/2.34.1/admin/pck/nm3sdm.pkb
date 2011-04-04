@@ -5,11 +5,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.34.1.1   Mar 10 2011 12:15:02   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdm.pkb-arc   2.34.1.2   Apr 04 2011 09:34:02   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdm.pkb  $
---       Date into PVCS   : $Date:   Mar 10 2011 12:15:02  $
---       Date fetched Out : $Modtime:   Mar 10 2011 12:11:32  $
---       PVCS Version     : $Revision:   2.34.1.1  $
+--       Date into PVCS   : $Date:   Apr 04 2011 09:34:02  $
+--       Date fetched Out : $Modtime:   Apr 04 2011 09:33:20  $
+--       PVCS Version     : $Revision:   2.34.1.2  $
 --
 --   Author : R.A. Coupe
 --
@@ -21,7 +21,7 @@ AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.34.1.1  $"';
+   g_body_sccsid     CONSTANT VARCHAR2 (2000) := '"$Revision:   2.34.1.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT VARCHAR2 (30)   := 'NM3SDM';
@@ -524,6 +524,10 @@ PROCEDURE make_nt_spatial_layer
 -----------------------------------------------------------------------
       Nm3sdo.set_diminfo_and_srid( l_base_themes, l_diminfo, l_srid );
 
+	  --    RC - Task 0110810 - adjust the munits tolerance on the basis of the measure units format mask
+
+      l_diminfo(3).sdo_tolerance := NM3UNIT.GET_TOL_FROM_UNIT_MASK(NM3NET.GET_NT_UNITS(l_nlt.nlt_nt_type));
+	  
       l_usgm.table_name  := l_tab;
       l_usgm.column_name := 'GEOLOC';
       l_usgm.diminfo     := l_diminfo;
