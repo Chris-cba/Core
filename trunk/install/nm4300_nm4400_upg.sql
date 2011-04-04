@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.8   Apr 04 2011 14:14:22   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.9   Apr 04 2011 15:31:02   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4300_nm4400_upg.sql  $
---       Date into PVCS   : $Date:   Apr 04 2011 14:14:22  $
---       Date fetched Out : $Modtime:   Apr 04 2011 14:08:56  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   Apr 04 2011 15:31:02  $
+--       Date fetched Out : $Modtime:   Apr 04 2011 15:30:38  $
+--       Version          : $Revision:   3.9  $
 --
 --   Product upgrade script
 --
@@ -39,35 +39,39 @@ FROM hig_products
 WHERE hpr_product IN ('HIG','NET','DOC','AST','WMP');
 --
 ----------------------------------------------------------------------------------------------------
+--        *******************  DB VERSION CHECK  *******************
+--
+WHENEVER SQLERROR EXIT
+-- Check that the DB version is correct
+Declare
+  Cursor c_db_version Is
+  Select '11gr2' 
+  From   v$version
+  Where  banner Like '%11.2.0.2%';
+  --
+  l_11gr2 Varchar2(10);
+Begin
+   Open  c_db_version;
+   Fetch c_db_version Into l_11gr2;
+   Close c_db_version;
+   --
+   If l_11gr2 Is Null
+   Then
+    RAISE_APPLICATION_ERROR(-20001,'The database version does not comply with the certification matrix - contact exor support for further information');
+   End If;
+End;
+/
+--
+----------------------------------------------------------------------------------------------------
 --        *******************  One off code for 4400 upgrade  *******************
 --        ***  In future these checks will be done in HIG2.PRE_INSTALL_CHECK  ***
 --
-
-WHENEVER SQLERROR EXIT
-
 DECLARE
 
  l_dummy pls_integer;
  l_shut_down_initiated BOOLEAN := FALSE;
- ex_exor_error EXCEPTION; 
- PRAGMA EXCEPTION_INIT(ex_exor_error,-20099);
-  
- Cursor c_db_version Is
- Select '11gr2' 
- From   v$version
- Where  banner Like '%11.2.0.2%';
- --
- l_11gr2 Varchar2(10);
-BEGIN
 
-  Open  c_db_version;
-  Fetch c_db_version Into l_11gr2;
-  Close c_db_version;
-  --
-  If l_11gr2 Is Null
-  Then
-    RAISE_APPLICATION_ERROR(-20001,'The database version does not comply with the certification matrix - contact exor support for further information');
-  End If;
+BEGIN
 
   BEGIN
    EXECUTE IMMEDIATE 'GRANT MANAGE SCHEDULER TO PROCESS_ADMIN';
@@ -105,20 +109,12 @@ BEGIN
      RAISE_APPLICATION_ERROR(-20099,'The Process Framework could not be shut down and processes are still running.  Please check that you have MANAGE SCHEDULER privilege.');
     END IF;     
   END IF;
-
-
-EXCEPTION
-  WHEN ex_exor_error THEN
-     RAISE; 
-  WHEN others THEN
-     Null;
-
 END;
 /
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   CHECK(S)   *******************
-WHENEVER SQLERROR EXIT
+--
 begin
    hig2.pre_upgrade_check (p_product               => 'HIG'
                           ,p_new_version           => '4.4.0.0'
