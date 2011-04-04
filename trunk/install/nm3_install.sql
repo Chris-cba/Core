@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.28   Feb 03 2011 08:28:46   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.29   Apr 04 2011 14:14:20   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Feb 03 2011 08:28:46  $
---       Date fetched Out : $Modtime:   Feb 03 2011 08:28:36  $
---       PVCS Version     : $Revision:   2.28  $
+--       Date into PVCS   : $Date:   Apr 04 2011 14:14:20  $
+--       Date fetched Out : $Modtime:   Apr 04 2011 14:10:32  $
+--       PVCS Version     : $Revision:   2.29  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) Exor Corporation Ltd, 2011
@@ -54,7 +54,23 @@ DECLARE
   rc                   refcur;
   v_sql                VARCHAR2(1000);
 
+  Cursor c_db_version Is
+  Select '11gr2' 
+  From   v$version
+  Where  banner Like '%11.2.0.2%';
+  --
+  l_11gr2 Varchar2(10);
+
 BEGIN
+
+   Open  c_db_version;
+   Fetch c_db_version Into l_11gr2;
+   Close c_db_version;
+   --
+   If l_11gr2 Is Null
+   Then
+     RAISE_APPLICATION_ERROR(-20001,'The database version does not comply with the certification matrix - contact exor support for further information');
+   End If;
 
    v_sql := 'SELECT hpr_version FROM user_tables,hig_products WHERE hpr_product = ''NET'' AND   table_name = ''NM_ELEMENTS_ALL''';
    --
