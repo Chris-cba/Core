@@ -2,11 +2,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4300_fix12.sql-arc   3.0   Apr 01 2011 11:37:50   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm_4300_fix12.sql-arc   3.1   Apr 04 2011 10:56:56   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm_4300_fix12.sql  $
---       Date into PVCS   : $Date:   Apr 01 2011 11:37:50  $
---       Date fetched Out : $Modtime:   Apr 01 2011 11:37:32  $
---       PVCS Version     : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Apr 04 2011 10:56:56  $
+--       Date fetched Out : $Modtime:   Apr 04 2011 10:56:00  $
+--       PVCS Version     : $Revision:   3.1  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) exor corporation ltd, 2011
@@ -111,11 +111,11 @@ SET FEEDBACK OFF
 --------------------------------------------------------------------------------
 --
 SET TERM ON 
-PROMPT doc_bundle_files.vw
+PROMPT doc_bundle_files_v.vw
 SET TERM OFF
 --
 SET FEEDBACK ON
-start doc_bundle_files.vw
+start doc_bundle_files_v.vw
 SET FEEDBACK OFF
 --
 --------------------------------------------------------------------------------
