@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.30   Apr 04 2011 15:07:32   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.31   Apr 06 2011 16:38:22   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Apr 04 2011 15:07:32  $
---       Date fetched Out : $Modtime:   Apr 04 2011 15:07:20  $
---       PVCS Version     : $Revision:   2.30  $
+--       Date into PVCS   : $Date:   Apr 06 2011 16:38:22  $
+--       Date fetched Out : $Modtime:   Apr 06 2011 16:37:30  $
+--       PVCS Version     : $Revision:   2.31  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) Exor Corporation Ltd, 2011
@@ -48,6 +48,7 @@ WHENEVER SQLERROR EXIT
 --
 DECLARE
   l_version            VARCHAR2(10);
+  ex_already_installed EXCEPTION;
 
   TYPE                 refcur IS REF CURSOR;
   rc                   refcur;
@@ -59,6 +60,8 @@ DECLARE
   Where  banner Like '%11.2.0.2%';
   --
   l_11gr2 Varchar2(10);
+  
+  ex_incorrect_db Exception;
 
 BEGIN
    Open  c_db_version;
@@ -67,9 +70,9 @@ BEGIN
    --
    If l_11gr2 Is Null
    Then
-    RAISE_APPLICATION_ERROR(-20001,'The database version does not comply with the certification matrix - contact exor support for further information');
+     Raise ex_incorrect_db;
    End If;
-
+   --
    v_sql := 'SELECT hpr_version FROM user_tables,hig_products WHERE hpr_product = ''NET'' AND   table_name = ''NM_ELEMENTS_ALL''';
    --
    OPEN rc FOR v_sql;
@@ -77,8 +80,15 @@ BEGIN
    CLOSE rc;
 
    IF l_version IS NOT NULL THEN
-      RAISE_APPLICATION_ERROR(-20000,'NM3 version '||l_version||' already installed.');
+       RAISE ex_already_installed;
    END IF;
+EXCEPTION
+  WHEN ex_incorrect_db THEN
+    RAISE_APPLICATION_ERROR(-20000,'The database version does not comply with the certification matrix - contact exor support for further information'); 
+  WHEN ex_already_installed THEN
+    RAISE_APPLICATION_ERROR(-20001,'NM3 version '||l_version||' already installed.');
+ WHEN others THEN
+    Null;
 END;
 /
 WHENEVER SQLERROR CONTINUE
