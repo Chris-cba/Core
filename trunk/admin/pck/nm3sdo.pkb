@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 --
 ---   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.54   Mar 15 2011 12:11:22   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo.pkb-arc   2.55   Apr 07 2011 10:47:34   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3sdo.pkb  $
---       Date into PVCS   : $Date:   Mar 15 2011 12:11:22  $
---       Date fetched Out : $Modtime:   Mar 15 2011 12:10:46  $
---       PVCS Version     : $Revision:   2.54  $
+--       Date into PVCS   : $Date:   Apr 07 2011 10:47:34  $
+--       Date fetched Out : $Modtime:   Apr 07 2011 10:35:50  $
+--       PVCS Version     : $Revision:   2.55  $
 --       Based on
 
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3sdo AS
 -- Copyright (c) RAC
 -----------------------------------------------------------------------------
 
-   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.54  $"';
+   g_body_sccsid     CONSTANT VARCHAR2(2000) := '"$Revision:   2.55  $"';
    g_package_name    CONSTANT VARCHAR2 (30)  := 'NM3SDO';
    g_batch_size      INTEGER                 := NVL( TO_NUMBER(Hig.get_sysopt('SDOBATSIZE')), 10);
    g_clip_type       VARCHAR2(30)            := NVL(Hig.get_sysopt('SDOCLIPTYP'),'SDO');
@@ -290,7 +290,7 @@ BEGIN
   END LOOP;
    END IF;
 
-   SELECT sdo_aggr_mbr(Convert_Dim_Array_To_Mbr( Get_Theme_Diminfo(l.nthe_id)))
+   SELECT sdo_aggr_mbr(Convert_Dim_Array_To_Mbr( sdo_lrs.convert_to_std_dim_array(Get_Theme_Diminfo(l.nthe_id))))
    INTO l_mbr
    FROM NM_THEMES_ALL, TABLE ( p_themes.nta_theme_array ) l
    WHERE l.nthe_id = nth_theme_id;
@@ -307,8 +307,8 @@ BEGIN
    WHERE l.nthe_id = nth_theme_id;
 
    p_diminfo := mdsys.sdo_dim_array(
-                mdsys.sdo_dim_element( 'X', l_mbr.sdo_ordinates(1), l_mbr.sdo_ordinates(4), l_tol ),
-                mdsys.sdo_dim_element( 'Y', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(5), l_tol ),
+                mdsys.sdo_dim_element( 'X', l_mbr.sdo_ordinates(1), l_mbr.sdo_ordinates(3), l_tol ),
+                mdsys.sdo_dim_element( 'Y', l_mbr.sdo_ordinates(2), l_mbr.sdo_ordinates(4), l_tol ),
                 mdsys.sdo_dim_element( 'M', 0, Nm3type.c_big_number, l_m_tol ));
 
 END;
