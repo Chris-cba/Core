@@ -1,14 +1,17 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.35   Feb 22 2011 15:04:32   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3.tab-arc   2.36   Apr 07 2011 11:39:56   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3.tab  $
---       Date into PVCS   : $Date:   Feb 22 2011 15:04:32  $
---       Date fetched Out : $Modtime:   Feb 22 2011 15:03:46  $
---       PVCS Version     : $Revision:   2.35  $
+--       Date into PVCS   : $Date:   Apr 07 2011 11:39:56  $
+--       Date fetched Out : $Modtime:   Apr 07 2011 11:38:32  $
+--       PVCS Version     : $Revision:   2.36  $
 --
 --------------------------------------------------------------------------------
 --
+
+
+
 PROMPT Creating Table 'ANALYSE_ALL_TABS_LOG'
 CREATE TABLE ANALYSE_ALL_TABS_LOG
  (ID NUMBER NOT NULL
@@ -3996,9 +3999,9 @@ CREATE GLOBAL TEMPORARY TABLE NM0575_MATCHING_RECORDS
  ,ASSET_TYPE VARCHAR2(4)
  ,ASSET_TYPE_DESCR VARCHAR2(80)
  ,ASSET_COUNT NUMBER
- ,ASSET_CONTIGUOUS VARCHAR2(1)
- ,ASSET_PARTIALLY_ENCLOSED NUMBER
  ,ASSET_WHOLLY_ENCLOSED NUMBER
+ ,ASSET_PARTIALLY_ENCLOSED NUMBER
+ ,ASSET_CONTIGUOUS VARCHAR2(1)
  )
 /
 
@@ -10754,3 +10757,4 @@ CREATE TABLE REPORT_TAGS
 
 COMMENT ON TABLE REPORT_TAGS IS 'Interface table which allows reports to be driven from a GIS or a front-end form.'
 /
+
