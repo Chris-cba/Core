@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.11   Mar 25 2011 15:41:58   Chris.Strettle  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_view.pkb-arc   2.12   Apr 08 2011 10:46:54   Chris.Strettle  $
 --       Module Name      	: $Workfile:   nm3inv_view.pkb  $
---       Date into PVCS   	: $Date:   Mar 25 2011 15:41:58  $
---       Date fetched Out 	: $Modtime:   Mar 23 2011 14:42:14  $
---       PVCS Version     	: $Revision:   2.11  $
+--       Date into PVCS   	: $Date:   Apr 08 2011 10:46:54  $
+--       Date fetched Out 	: $Modtime:   Apr 08 2011 10:10:36  $
+--       PVCS Version     	: $Revision:   2.12  $
 --       Based on SCCS version 	: 1.56
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_view AS
 --      Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.11     $';
+   g_body_sccsid     CONSTANT  varchar2(80) := '$Revision::   2.12     $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
 --all global package variables here
@@ -1284,7 +1284,7 @@ BEGIN
    add_data ('NE_ID',NULL);
    add_data ('NE_ID','NE_FT_PK_COL');
    add_data ('NE_UNIQUE',NULL);
-  -- add_data ('TO_NUMBER(0)','NE_BEGIN_MP');
+   add_data ('TO_NUMBER(0)','NE_BEGIN_MP');
    add_data ('NE_LENGTH',NULL);
    --
    IF l_rec_ngt.ngt_group_type IS NULL
@@ -1405,9 +1405,9 @@ BEGIN
       END LOOP;
    END IF;
    --
-   IF NOT nm3ddl.does_object_exist(p_object_name => l_rec_nit.nit_table_name
-                                  ,p_object_type => 'VIEW')
-   THEN
+--   IF NOT nm3ddl.does_object_exist(p_object_name => l_rec_nit.nit_table_name
+--                                  ,p_object_type => 'VIEW')
+--   THEN
    --
      IF l_rec_ngt.ngt_group_type IS NULL 
      THEN
@@ -1417,7 +1417,7 @@ BEGIN
                                , pi_gty_type => l_rec_ngt.ngt_group_type);
      END IF;
    --
-   END IF;
+--   END IF;
    --
    nm3inv.ins_nit (l_rec_nit);
    nm3inv.ins_tab_ita (l_tab_nita);
