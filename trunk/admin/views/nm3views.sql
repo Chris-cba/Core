@@ -1339,7 +1339,17 @@ start '&run_file'
 --
 ----------------------------------------------------------------------------------------- 
 --
-
+SET TERM ON 
+PROMPT nm_theme_details_v.vw
+SET TERM OFF
+SET DEFINE ON 
+SELECT '&exor_base'||'nm3'||'&terminator'||'admin'||'&terminator'||'views'||'&terminator'||'nm_theme_details_v.vw' run_file 
+FROM dual 
+/ 
+start '&run_file' 
+--
+----------------------------------------------------------------------------------------- 
+--
 
 
 
