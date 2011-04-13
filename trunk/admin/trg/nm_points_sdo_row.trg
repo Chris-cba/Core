@@ -7,15 +7,15 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_points_sdo_row.trg-arc   2.2   Nov 12 2010 15:31:04   Chris.Strettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/trg/nm_points_sdo_row.trg-arc   2.3   Apr 13 2011 11:58:06   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm_points_sdo_row.trg  $
---       Date into SCCS   : $Date:   Nov 12 2010 15:31:04  $
---       Date fetched Out : $Modtime:   Nov 12 2010 15:22:54  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   Apr 13 2011 11:58:06  $
+--       Date fetched Out : $Modtime:   Apr 13 2011 11:17:42  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on 
 --
 -----------------------------------------------------------------------------
---	Copyright (c) exor corporation ltd, 2007
+--  Copyright (c) exor corporation ltd, 2007
 -----------------------------------------------------------------------------
 
 BEGIN
@@ -24,8 +24,8 @@ BEGIN
 --
   --MJA add 31-Aug-07
   --New functionality to allow override
-  If Not nm3net.bypass_nm_points_trgs
-  Then 
+  IF NOT nm3net.bypass_nm_points_trgs
+  THEN 
      IF nm3sdo.g_sdo_layer_available
      THEN
        IF :NEW.np_grid_east IS NOT NULL AND
@@ -47,9 +47,13 @@ BEGIN
            DELETE FROM nm_point_locations
            WHERE npl_id = :OLD.np_id;
          END IF;
+       ELSIF UPDATING THEN
+         UPDATE nm_point_locations
+           SET npl_location = NULL
+           WHERE npl_id = :NEW.np_id;
        END IF;
      END IF;
-  End If;
+  END IF;
 --
 END nm_points_sdo_row;
 /
