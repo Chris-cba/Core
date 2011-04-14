@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.16   Mar 10 2011 14:42:34   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3gaz_qry.pkb-arc   2.17   Apr 14 2011 10:16:48   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3gaz_qry.pkb  $
---       Date into PVCS   : $Date:   Mar 10 2011 14:42:34  $
---       Date fetched Out : $Modtime:   Mar 10 2011 14:41:44  $
---       Version          : $Revision:   2.16  $
+--       Date into PVCS   : $Date:   Apr 14 2011 10:16:48  $
+--       Date fetched Out : $Modtime:   Apr 14 2011 10:14:34  $
+--       Version          : $Revision:   2.17  $
 --       Based on SCCS version : 1.45
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3gaz_qry AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3gaz_qry.pkb 1.45 05/26/06"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.16  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.17  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3gaz_qry';
@@ -826,8 +826,10 @@ BEGIN
         append_both (p_ngqt_index,'                       , nm_ne_id_of                       nte_ne_id_of ');
   --      append_both (p_ngqt_index,'                       , NVL(nm_slk,    nm_begin_mp)      nte_begin_mp ');
   --      append_both (p_ngqt_index,'                       , NVL(nm_end_slk,nm_end_mp)        nte_end_mp');
-        append_both (p_ngqt_index,'                       , 0                                 nte_begin_mp ');
-        append_both (p_ngqt_index,'                       , nm3net.get_ne_length(nm_ne_id_of) nte_end_mp');
+        --append_both (p_ngqt_index,'                       , 0                                 nte_begin_mp ');
+--        append_both (p_ngqt_index,'                       , nm3net.get_ne_length(nm_ne_id_of) nte_end_mp');
+        append_both (p_ngqt_index,'                       , nvl(nm_begin_mp,0)                nte_begin_mp ');
+        append_both (p_ngqt_index,'                       , nvl(nm_end_mp, nm3net.get_ne_length(nm_ne_id_of)) nte_end_mp ');
         append_both (p_ngqt_index,'                       , nm_seq_no                         nte_seq_no ');
         append_both (p_ngqt_index,'                    FROM nm_members ');
         --
@@ -861,7 +863,8 @@ BEGIN
         -- Task 0109984
         -- Don't attempt to use the chainage columns if they are not set on the metamodel
         --
-        IF l_rec_nit.nit_lr_st_chain IS NOT NULL
+        --IF l_rec_nit.nit_lr_st_chain IS NOT NULL
+        IF l_begin_mp_col IS NOT NULL
         THEN
           IF g_tab_is_point_inv(p_ngqt_index)
           THEN
@@ -946,7 +949,8 @@ BEGIN
       -- Task 0109984
       -- Don't attempt to use the chainage columns if they are not set on the metamodel
       --
-        IF l_rec_nit.nit_lr_st_chain IS NOT NULL
+        --IF l_rec_nit.nit_lr_st_chain IS NOT NULL
+        IF l_begin_mp_col  IS NOT NULL
         THEN
           IF g_tab_is_point_inv(p_ngqt_index)
           THEN
@@ -1525,7 +1529,9 @@ END add_for_open_queries;
 PROCEDURE create_region_of_interest IS
 BEGIN
 --
---   nm3debug.debug_ngq(g_rec_ngq);
+   --nm_debug.debug_on;
+--
+   nm3debug.debug_ngq(g_rec_ngq);
    -- Create a temp ne for the region of interest
    IF   g_rec_ngq.ngq_begin_datum_ne_id  IS NOT NULL
     AND g_rec_ngq.ngq_begin_datum_offset IS NOT NULL
@@ -1537,7 +1543,7 @@ BEGIN
       -- If this run has been specified FROM the extent limits form then create using
       --  create_temp_ne_FROM_route
       --
---      nm_debug.debug('If this run has been specified FROM the extent limits form then create using create_temp_ne_FROM_route');
+      nm_debug.debug('If this run has been specified FROM the extent limits form then create using create_temp_ne_FROM_route');
       nm3wrap.create_temp_ne_from_route(pi_route                   => g_rec_ngq.ngq_source_id
                                        ,pi_start_ne_id             => g_rec_ngq.ngq_begin_datum_ne_id
                                        ,pi_start_offset            => g_rec_ngq.ngq_begin_datum_offset
@@ -1552,7 +1558,7 @@ BEGIN
       --
       -- Just create it normally
       --
---      nm_debug.debug('Just create it normally');
+      nm_debug.debug('Just create it normally');
       nm3extent.create_temp_ne (pi_source_id                 => g_rec_ngq.ngq_source_id
                                ,pi_source                    => g_rec_ngq.ngq_source
                                ,pi_begin_mp                  => g_rec_ngq.ngq_begin_mp
@@ -4253,7 +4259,7 @@ BEGIN
       THEN
         po_ngq_source              := nm3extent.get_saved;  -- "SAVED"
       ELSE
-        po_ngq_source              := nm3extent.get_route;  -- "ROUTE"
+        po_ngq_source               := nm3extent.get_route;  -- "ROUTE"
     END IF;
     
   END IF;            
