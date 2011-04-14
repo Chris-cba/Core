@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.7.1.0   Feb 23 2011 15:47:36   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.7.1.1   Apr 14 2011 11:15:40   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Feb 23 2011 15:47:36  $
---       Date fetched Out : $Modtime:   Feb 23 2011 15:42:06  $
---       Version          : $Revision:   2.7.1.0  $
+--       Date into PVCS   : $Date:   Apr 14 2011 11:15:40  $
+--       Date fetched Out : $Modtime:   Apr 14 2011 11:12:10  $
+--       Version          : $Revision:   2.7.1.1  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.7.1.0  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.7.1.1  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -274,6 +274,7 @@ BEGIN
 --
    --nm_debug.debug('   utl_smtp.close_data (g_mail_conn);');
    utl_smtp.close_data (g_mail_conn);
+   utl_smtp.quit(g_mail_conn);
 --
    p_rec_nmm.nmm_status := 'Sent '||TO_CHAR(SYSDATE,'DD Mon YYYY HH24:MI:SS');
 --
@@ -1231,6 +1232,7 @@ BEGIN
      END LOOP;
    END ;
    utl_smtp.close_data(g_mail_conn);
+   utl_smtp.quit(g_mail_conn);
    RETURN  TRUE;
 EXCEPTION
   WHEN utl_smtp.transient_error OR utl_smtp.permanent_error 
