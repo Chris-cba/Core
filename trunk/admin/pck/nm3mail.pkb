@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.9   Feb 22 2011 09:58:04   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail.pkb-arc   2.10   Apr 14 2011 11:10:18   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3mail.pkb  $
---       Date into PVCS   : $Date:   Feb 22 2011 09:58:04  $
---       Date fetched Out : $Modtime:   Feb 22 2011 09:54:04  $
---       Version          : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   Apr 14 2011 11:10:18  $
+--       Date fetched Out : $Modtime:   Apr 14 2011 11:09:50  $
+--       Version          : $Revision:   2.10  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.9  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.10  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail';
@@ -283,6 +283,7 @@ BEGIN
 --
    --nm_debug.debug('   utl_smtp.close_data (g_mail_conn);');
    utl_smtp.close_data (g_mail_conn);
+   utl_smtp.quit(g_mail_conn);
 --
    p_rec_nmm.nmm_status := 'Sent '||TO_CHAR(SYSDATE,'DD Mon YYYY HH24:MI:SS');
 --
@@ -292,7 +293,7 @@ EXCEPTION
 --
   WHEN ex_acl_failure
   THEN
-    utl_smtp.rset(g_mail_conn); 
+    utl_smtp.rset(g_mail_conn);
     p_rec_nmm.nmm_status := hig.get_ner(nm3type.c_hig,551).ner_descr;
     --hig.raise_ner(nm3type.c_hig,551);
 --
@@ -1070,8 +1071,8 @@ FUNCTION send_mail (pi_mail_from     IN  Varchar2 Default Null
                    ,pi_recipient_bcc IN  Varchar2 Default Null
                    ,pi_subject       IN  Varchar2 Default Null
                    ,pi_mailformat    IN  Varchar2 Default 'T' --T for Plain Text H for HTML
-                   ,pi_mail_body     IN  Clob     Default Null 
-                   ,pi_att_file_name IN  Varchar2 Default Null 
+                   ,pi_mail_body     IN  Clob     Default Null
+                   ,pi_att_file_name IN  Varchar2 Default Null
                    ,pi_file_att      IN  Blob     Default Null
                    ,po_error_text    Out Varchar2)
 RETURN Boolean
@@ -1079,24 +1080,24 @@ IS
 --
    --g_smtp_server   CONSTANT hig_options.hop_value%TYPE := 'gbexor284' ;     --hig.get_sysopt(g_server_sysopt);
    --g_smtp_port     CONSTANT hig_options.hop_value%TYPE := '25' ;            --hig.get_sysopt(g_port_sysopt);
-   --g_smtp_domain   CONSTANT hig_options.hop_value%TYPE := 'exorcorp.local' ;--hig.get_sysopt(g_domain_sysopt); 
+   --g_smtp_domain   CONSTANT hig_options.hop_value%TYPE := 'exorcorp.local' ;--hig.get_sysopt(g_domain_sysopt);
    --g_mail_conn     utl_smtp.connection;
    v_length integer := 0;
    v_buffer_size integer := 57;
    v_offset integer := 1;
-   v_raw raw(57); 
+   v_raw raw(57);
    crlf    VARCHAR2(2)  := chr(13)||chr(10);
    i       Number ;
    j       Number ;
    l_email Varchar2(500);
-   CURSOR cs_sender  
+   CURSOR cs_sender
    IS
    SELECT nmu_name||' <'||nmu_email_address||'>' sender_name
          ,nmu_email_address sender_email
    FROM  nm_mail_users
    WHERE nmu_hus_user_id = nm3user.get_user_id ;
    l_sender_rec cs_sender%ROWTYPE;
-   PROCEDURE send_header(name IN VARCHAR2, header IN VARCHAR2) 
+   PROCEDURE send_header(name IN VARCHAR2, header IN VARCHAR2)
    IS
    BEGIN
       utl_smtp.write_data(g_mail_conn, name || ': ' || header || utl_tcp.CRLF);
@@ -1107,23 +1108,25 @@ BEGIN
 -- Task 0110486 - add check server
    check_server;
 --dbms_output.put_line(g_smtp_server||' '||g_smtp_port||' '||g_smtp_domain);
+--   nm_debug.debug_on;
+   nm_debug.debug(g_smtp_server||' '||g_smtp_port||' '||g_smtp_domain);
    OPEN  cs_sender ;
    FETCH cs_sender INTO l_sender_rec;
    CLOSE cs_sender;
    g_mail_conn := utl_smtp.open_connection(g_smtp_server, g_smtp_port);
-   utl_smtp.helo(g_mail_conn, g_smtp_domain);   
+   utl_smtp.helo(g_mail_conn, g_smtp_domain);
    utl_smtp.mail(g_mail_conn, l_sender_rec.sender_email);
    IF pi_recipient_to IS NOT NULL
    THEN
        BEGIN
           i := 1;
           j := 1;
-          While Instr(pi_recipient_to,';',i) != 0 
+          While Instr(pi_recipient_to,';',i) != 0
           LOOP
               l_email := Substr(pi_recipient_to,i,Instr(pi_recipient_to,';',i)-j);
               i := Instr(pi_recipient_to,';',i)+1;
               j := i;
-              utl_smtp.rcpt(g_mail_conn, l_email); 
+              utl_smtp.rcpt(g_mail_conn, l_email);
          END LOOP;
          l_email := Substr(pi_recipient_to,i,Length(pi_recipient_to));
          utl_smtp.rcpt(g_mail_conn, l_email);
@@ -1134,12 +1137,12 @@ BEGIN
        BEGIN
           i := 1;
           j := 1;
-          While Instr(pi_recipient_cc,';',i) != 0 
+          While Instr(pi_recipient_cc,';',i) != 0
           LOOP
               l_email := Substr(pi_recipient_cc,i,Instr(pi_recipient_cc,';',i)-j);
               i := Instr(pi_recipient_cc,';',i)+1;
               j := i;
-              utl_smtp.rcpt(g_mail_conn, l_email); 
+              utl_smtp.rcpt(g_mail_conn, l_email);
          END LOOP;
          l_email := Substr(pi_recipient_cc,i,Length(pi_recipient_cc));
          utl_smtp.rcpt(g_mail_conn, l_email);
@@ -1150,12 +1153,12 @@ BEGIN
        BEGIN
           i := 1;
           j := 1;
-          While Instr(pi_recipient_bcc,';',i) != 0 
+          While Instr(pi_recipient_bcc,';',i) != 0
           LOOP
               l_email := Substr(pi_recipient_bcc,i,Instr(pi_recipient_bcc,';',i)-j);
               i := Instr(pi_recipient_bcc,';',i)+1;
               j := i;
-              utl_smtp.rcpt(g_mail_conn, l_email); 
+              utl_smtp.rcpt(g_mail_conn, l_email);
          END LOOP;
          l_email := Substr(pi_recipient_bcc,i,Length(pi_recipient_bcc));
          utl_smtp.rcpt(g_mail_conn, l_email);
@@ -1182,12 +1185,12 @@ BEGIN
 
    IF pi_mailformat = 'H'
    THEN
-       utl_smtp.write_data(g_mail_conn,'-------SECBOUND'|| crlf ||'Content-Type: text/html' || utl_tcp.crlf);  
+       utl_smtp.write_data(g_mail_conn,'-------SECBOUND'|| crlf ||'Content-Type: text/html' || utl_tcp.crlf);
    ELSE
        utl_smtp.write_data( g_mail_conn,'-------SECBOUND'|| crlf ||
-                                        'Content-Type: text/plain;'|| crlf );      
+                                        'Content-Type: text/plain;'|| crlf );
    END IF ;
-   --utl_smtp.write_data(g_mail_conn,crlf ||pi_mail_body|| crlf );  -- Message body   
+   --utl_smtp.write_data(g_mail_conn,crlf ||pi_mail_body|| crlf );  -- Message body
    DECLARE
    --
      l_buffer     VARCHAR2(30000);
@@ -1195,25 +1198,25 @@ BEGIN
      l_pos        INTEGER := 1;
      l_clob_len   INTEGER;
    --
-   BEGIN 
+   BEGIN
    --
      l_clob_len := DBMS_LOB.getlength (pi_mail_body);
      WHILE l_pos < l_clob_len
-     LOOP  
+     LOOP
          DBMS_LOB.READ (pi_mail_body,l_amount,l_pos,l_buffer);
          IF l_buffer IS NOT NULL
          THEN
              utl_smtp.write_data(g_mail_conn,crlf ||l_buffer|| crlf );  -- Message body
          END IF;
-         l_pos :=   l_pos + l_amount;   
+         l_pos :=   l_pos + l_amount;
      END LOOP;
    END ;
    If pi_att_file_name is not null
-   THen         
+   THen
        utl_smtp.write_data( g_mail_conn, crlf ||'-------SECBOUND'|| crlf );
        utl_smtp.write_data( g_mail_conn, 'Content-Disposition: attachment; filename="' || pi_att_file_name || '"' || crlf);
-       utl_smtp.write_data( g_mail_conn, crlf );      
-       --Task 0110530 to remove the encoding from attachment, but now only Text attachment can be send    
+       utl_smtp.write_data( g_mail_conn, crlf );
+       --Task 0110530 to remove the encoding from attachment, but now only Text attachment can be send
        DECLARE
        --
           l_buffer     VARCHAR2(30000);
@@ -1222,20 +1225,20 @@ BEGIN
           l_clob_len   INTEGER;
           l_attachment_clob clob := nm3clob.blob_to_clob(pi_file_att);
        --
-       BEGIN 
+       BEGIN
        --
           l_clob_len := DBMS_LOB.getlength (l_attachment_clob);
           WHILE l_pos < l_clob_len
-          LOOP  
+          LOOP
               DBMS_LOB.READ (l_attachment_clob,l_amount,l_pos,l_buffer);
               IF l_buffer IS NOT NULL
               THEN
-                  utl_smtp.write_data(g_mail_conn,crlf ||l_buffer|| crlf );  -- Attachment Text 
+                  utl_smtp.write_data(g_mail_conn,crlf ||l_buffer|| crlf );  -- Attachment Text
               END IF;
-              l_pos :=   l_pos + l_amount;   
+              l_pos :=   l_pos + l_amount;
           END LOOP;
        --
-       END ;          
+       END ;
    END IF ;
    utl_smtp.write_data( g_mail_conn,crlf ||'-------SECBOUND--' );  -- End MIME mail
    utl_smtp.write_data( g_mail_conn, utl_tcp.crlf );
@@ -1247,20 +1250,21 @@ BEGIN
      l_pos        INTEGER := 1;
      l_clob_len   INTEGER;
    --
-   BEGIN 
+   BEGIN
    --
      l_clob_len := DBMS_LOB.getlength (pi_mail_body);
      WHILE l_pos < l_clob_len
-     LOOP  
+     LOOP
          DBMS_LOB.READ (pi_mail_body,l_amount,l_pos,l_buffer);
          IF l_buffer IS NOT NULL
          THEN
              utl_smtp.write_data(g_mail_conn,crlf ||l_buffer|| crlf );  -- Message body
          END IF;
-         l_pos :=   l_pos + l_amount;   
+         l_pos :=   l_pos + l_amount;
      END LOOP;
    END ;
    utl_smtp.close_data(g_mail_conn);
+   utl_smtp.quit(g_mail_conn);
    RETURN  TRUE;
 EXCEPTION
 --
@@ -1271,22 +1275,22 @@ EXCEPTION
     --hig.raise_ner(nm3type.c_hig,551);
     RETURN  FALSE;
 
-  WHEN utl_smtp.transient_error OR utl_smtp.permanent_error 
-  THEN           
+  WHEN utl_smtp.transient_error OR utl_smtp.permanent_error
+  THEN
       po_error_text := sqlerrm; --'SMTP server is down or unavailable';
       utl_smtp.quit(g_mail_conn);
       RETURN  FALSE;
 
-  WHEN OTHERS 
-  THEN    
-      po_error_text := SQLERRM;  
+  WHEN OTHERS
+  THEN
+      po_error_text := SQLERRM;
       BEGIN
       --
-         utl_smtp.close_data(g_mail_conn); 
+         utl_smtp.close_data(g_mail_conn);
          utl_smtp.quit(g_mail_conn);
       --
       EXCEPTION
-          WHEN OTHERS 
+          WHEN OTHERS
           THEN
               utl_smtp.quit(g_mail_conn);
               NULL;
