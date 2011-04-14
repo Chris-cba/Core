@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3locator AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.9  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.10  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3locator';
 
@@ -476,20 +476,35 @@ FUNCTION get_order_by_clause RETURN varchar2 IS
   l_retval              varchar2(200);
 BEGIN
   IF g_order_by_clause IS NOT NULL THEN
-
-    CASE nm3inv.get_attrib_format(pi_inv_type => g_inv_type
-                                 ,pi_attrib_name => get_ft_col(g_order_by_clause, g_is_ft))
-      WHEN 'NUMBER' THEN
-        l_retval := 'TO_NUMBER('||g_order_by_clause||')'||nm3type.c_space||asc_or_desc||nm3type.c_space||c_nulls_last;
-      WHEN 'DATE' THEN
-        l_retval := 'TO_DATE('||g_order_by_clause||')'||nm3type.c_space||asc_or_desc||nm3type.c_space||c_nulls_last;
-      ELSE
-        l_retval := g_order_by_clause||nm3type.c_space||asc_or_desc||nm3type.c_space||c_nulls_last;
-    END CASE;
-
+  --
+    IF nm3get.get_ita( pi_ita_inv_type    => g_inv_type
+                     , pi_ita_attrib_name => get_ft_col(g_order_by_clause, g_is_ft)
+                     , pi_raise_not_found => FALSE
+                     ).ita_id_domain IS NULL
+    THEN
+    --
+      CASE nm3inv.get_attrib_format(pi_inv_type => g_inv_type
+                                   ,pi_attrib_name => get_ft_col(g_order_by_clause, g_is_ft))
+        WHEN 'NUMBER' THEN
+          l_retval := 'TO_NUMBER('||g_order_by_clause||')'||nm3type.c_space||asc_or_desc||nm3type.c_space||c_nulls_last;
+        WHEN 'DATE' THEN
+          l_retval := 'TO_DATE('||g_order_by_clause||')'||nm3type.c_space||asc_or_desc||nm3type.c_space||c_nulls_last;
+        ELSE
+          l_retval := g_order_by_clause||nm3type.c_space||asc_or_desc||nm3type.c_space||c_nulls_last;
+      END CASE;
+    --
+    ELSE
+    --
+      l_retval := g_order_by_clause||nm3type.c_space||asc_or_desc||nm3type.c_space||c_nulls_last;
+    --
+    END IF;
   ELSE
     l_retval := NULL;
   END IF;
+
+    nm_debug.debug_on;
+    nm_debug.debug('2g_inv_type: ' || g_inv_type);
+    nm_debug.debug_off;
 
   RETURN l_retval;
 END get_order_by_clause;
