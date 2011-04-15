@@ -13,9 +13,7 @@ nav_col_format,
 nav_col_seq_no,
 nav_gty_type ,
 nav_parent_type_inc,
-nav_child_type_inc,
-nav_child_col,
-nav_parent_col
+nav_child_type_inc
 )
 AS
 SELECT
@@ -24,11 +22,11 @@ SELECT
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/nm_attrib_view_vw.vw-arc   3.2   Oct 20 2009 12:07:18   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/views/nm_attrib_view_vw.vw-arc   3.3   Apr 15 2011 15:32:12   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm_attrib_view_vw.vw  $
---       Date into PVCS   : $Date:   Oct 20 2009 12:07:18  $
---       Date fetched Out : $Modtime:   Oct 20 2009 12:06:10  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   Apr 15 2011 15:32:12  $
+--       Date fetched Out : $Modtime:   Apr 15 2011 14:19:48  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 -- 
@@ -46,11 +44,7 @@ SELECT
        ntc_seq_no,
        Null ,
        nm3_bulk_attrib_upd.parent_inclusion_type(ntc_column_name,ntc_nt_type) parent_type_inc,
-       nm3_bulk_attrib_upd.child_inclusion_type(ntc_column_name,ntc_nt_type)  child_type_inc,
-       (SELECT nti_child_column FROM nm_type_inclusion WHERE  nti_nw_parent_type = ntc_nt_type 
-                                                     ) child_col,
-       (SELECT nti_parent_column FROM nm_type_inclusion WHERE  nti_nw_child_type = ntc_nt_type AND nti_child_column = ntc_column_name 
-                                                     ) parent_col
+       nm3_bulk_attrib_upd.child_inclusion_type(ntc_column_name,ntc_nt_type)  child_type_inc
 FROM   nm_type_columns ntc
 WHERE  ntc_displayed = 'Y'
 union
@@ -67,9 +61,7 @@ select 2 disp_ord,
        ita_disp_seq_no ,
        nad_gty_type   ,
        Null ,
-       Null,
-       Null,
-       Null 
+       Null
 FROM   nm_inv_type_attribs ita,nm_nw_ad_types nad
 WHERE  ita.ita_inv_type =  nad.nad_inv_type
 AND    nad_primary_ad   = 'Y'

@@ -4,11 +4,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkh-arc   3.0   Jun 01 2009 09:18:10   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3_bulk_attrib_upd.pkh-arc   3.1   Apr 15 2011 15:32:12   Chris.Strettle  $
 --       Module Name      : $Workfile:   nm3_bulk_attrib_upd.pkh  $
---       Date into PVCS   : $Date:   Jun 01 2009 09:18:10  $
---       Date fetched Out : $Modtime:   May 29 2009 16:33:14  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   Apr 15 2011 15:32:12  $
+--       Date fetched Out : $Modtime:   Apr 15 2011 14:24:18  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --</PACKAGE>
@@ -18,7 +18,7 @@ AS
   --constants
   -----------
   --g_sccsid is the SCCS ID for the package
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
   TYPE l_attrib_rec IS RECORD (nav_disp_ord        Number,
                                nav_nt_type         nm_types.nt_type%TYPE,
                                nav_inv_type        nm_inv_type_attribs.ita_inv_type%TYPE,
@@ -28,7 +28,6 @@ AS
                                nav_col_updatable   Varchar2(1),
                                nav_parent_type_inc Varchar2(1),
                                nav_child_type_inc  Varchar2(1),
-                               nav_child_col       nm_type_inclusion.nti_child_column%TYPE,
                                nav_value           Varchar2(4000)
                               );
   TYPE l_attrib_array IS TABLE OF l_attrib_rec; 
