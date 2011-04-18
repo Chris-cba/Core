@@ -8,11 +8,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_ddl_upg.sql-arc   3.4   Mar 31 2011 16:47:30   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_ddl_upg.sql-arc   3.5   Apr 18 2011 16:11:30   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm4300_nm4400_ddl_upg.sql  $
---       Date into PVCS   : $Date:   Mar 31 2011 16:47:30  $
---       Date fetched Out : $Modtime:   Mar 31 2011 16:46:22  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   Apr 18 2011 16:11:30  $
+--       Date fetched Out : $Modtime:   Apr 18 2011 16:06:12  $
+--       Version          : $Revision:   3.5  $
 --
 ------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2010
@@ -70,7 +70,7 @@ SET TERM OFF
 -- 107857
 -- 
 -- TASK DETAILS
--- No details supplied
+-- A number of changes have been made to allow a number of forms to show long element descriptions. This includes NM0105, NM0122, NM0510, NM0560, NM0590, NM1401, NM1861, NM7051 as well as others that reference these forms. This is ongoing work and a handful of modules such as reports still exhibit this problem.
 -- 
 -- 
 -- DEVELOPMENT COMMENTS (CHRIS STRETTLE)
@@ -127,11 +127,35 @@ SET TERM OFF
 -- New columns for NM0575_MATCHING_RECORDS table
 -- 
 ------------------------------------------------------------------
-alter table nm0575_matching_records add asset_wholly_enclosed number;
+Declare
+  col_exists Exception;
+  Pragma Exception_Init( col_exists, -1430);
+Begin
+  Execute Immediate 'alter table nm0575_matching_records add asset_wholly_enclosed number';
+Exception When col_exists Then
+  Null;
+End;
+/
 
-alter table nm0575_matching_records add asset_partially_enclosed number;
+Declare
+  col_exists Exception;
+  Pragma Exception_Init( col_exists, -1430);
+Begin
+  Execute Immediate 'alter table nm0575_matching_records add asset_partially_enclosed number';
+Exception When col_exists Then
+  Null;
+End;
+/
 
-alter table nm0575_matching_records add asset_contiguous varchar2(1);
+Declare
+  col_exists Exception;
+  Pragma Exception_Init( col_exists, -1430);
+Begin
+  Execute Immediate 'alter table nm0575_matching_records add asset_contiguous varchar2(1)';
+Exception When col_exists Then
+  Null;
+End;
+/
 ------------------------------------------------------------------
 
 
