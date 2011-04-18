@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.10   Aug 05 2010 11:48:54   aedwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3sdo_edit.pkb-arc   2.11   Apr 18 2011 10:38:28   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3sdo_edit.pkb  $
---       Date into SCCS   : $Date:   Aug 05 2010 11:48:54  $
---       Date fetched Out : $Modtime:   Aug 05 2010 11:20:06  $
---       SCCS Version     : $Revision:   2.10  $
+--       Date into SCCS   : $Date:   Apr 18 2011 10:38:28  $
+--       Date fetched Out : $Modtime:   Apr 18 2011 10:35:18  $
+--       SCCS Version     : $Revision:   2.11  $
 --
 --
 --  Author :  R Coupe
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3sdo_Edit AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.10  $';
+  g_body_sccsid   CONSTANT  VARCHAR2(2000)  :=  '$Revision:   2.11  $';
   g_package_name  CONSTANT  VARCHAR2(30)    :=  'nm3sdo_edit';
 --
 -----------------------------------------------------------------------------
@@ -1065,14 +1065,25 @@ BEGIN
 --                       Generate Members Locations
 -------------------------------------------------------------------------------
 --
+
+-- Task 0110967
+--  Removed the derivation of the NM_LREF in the bulk collect as it can fail if
+--  not network snaps are found. This can be an issue now that the code is correctly
+--  restricting on the Asset theme ID when finding the nearest network.
+--
+--  Performance is poor - this will be dealt with in Task 0110968 for 4.5.0.0 hopefully.
+--
+--
   IF is_located ( pi_inv_type => pi_inv_type)
   THEN
   --
     DECLARE
     --
-      TYPE rec_lrefs IS RECORD ( iit_ne_id nm_inv_items.iit_ne_id%TYPE
-                               , iit_start_date nm_inv_items.iit_start_date%TYPE
-                               , lref      nm_lref );
+      TYPE rec_lrefs IS RECORD ( iit_ne_id       nm_inv_items.iit_ne_id%TYPE
+                               , iit_start_date  nm_inv_items.iit_start_date%TYPE
+                               , iit_x           nm_inv_items.iit_x%TYPE
+                               , iit_y           nm_inv_items.iit_y%TYPE);
+                             --  , lref      nm_lref );
       TYPE tab_lrefs IS TABLE OF rec_lrefs INDEX BY BINARY_INTEGER;
     --
       l_tab_lrefs    tab_lrefs;
@@ -1080,11 +1091,14 @@ BEGIN
       count_lrefs    INTEGER := 0;
       l_unit         nm_units.un_unit_id%TYPE;
     --
+      l_lref         nm_lref;
+    --
       l_theme_list   nm_theme_array := nm3array.init_nm_theme_array;
     --
       CURSOR get_lrefs (theme_id IN NUMBER)
       IS
-        SELECT iit_ne_id, iit_start_date, nm3sdo.get_nearest_nw_to_xy(iit_x, iit_y)
+        SELECT iit_ne_id, iit_start_date, iit_x, iit_y
+--, nm3sdo.get_nearest_nw_to_xy(iit_x, iit_y)
 --        SELECT iit_ne_id
 --             , nm3sdo.get_nearest_lref
 --                   ( theme_id
@@ -1098,7 +1112,7 @@ BEGIN
          WHERE iit_inv_type = pi_inv_type
            AND iit_x IS NOT NULL
            AND NOT EXISTS
-            (SELECT 1 FROM nm_members
+            (SELECT 1 FROM nm_members_all
               WHERE iit_ne_id = nm_ne_id_in
                 AND nm_obj_type = pi_inv_type);
     --
@@ -1119,19 +1133,28 @@ BEGIN
           --
           -- This is all very slow and ineffecient - we need to re-write this in the future.
           --
+            l_lref := nm3sdo.get_nearest_lref
+                        ( l_nth.nth_theme_id
+                        , mdsys.sdo_geometry ( 2001
+                                            , l_srid
+                                            , mdsys.sdo_point_type( l_tab_lrefs(i).iit_x, l_tab_lrefs(i).iit_y, NULL)
+                                            , NULL
+                                            , NULL)
+                                             );
+          --
             l_unit := NVL(nm3get.get_nt
                              ( pi_nt_type         => nm3get.get_ne
-                                                       ( pi_ne_id            => l_tab_lrefs(i).lref.lr_ne_id
+                                                       ( pi_ne_id            => l_lref.lr_ne_id
                                                        , pi_raise_not_found  => FALSE ).ne_nt_type
                              , pi_raise_not_found => FALSE).nt_length_unit,1);
           --
-            l_tab_lrefs(i).lref.lr_offset := nm3unit.get_formatted_value(l_tab_lrefs(i).lref.lr_offset,l_unit);
+            l_lref.lr_offset := nm3unit.get_formatted_value(l_lref.lr_offset,l_unit);
           --
             nm3extent.create_temp_ne
-              ( l_tab_lrefs(i).lref.lr_ne_id
+              ( l_lref.lr_ne_id
               , nm3extent.c_route
-              , l_tab_lrefs(i).lref.lr_offset
-              , l_tab_lrefs(i).lref.lr_offset
+              , l_lref.lr_offset
+              , l_lref.lr_offset
               , g_nte_job_id );
           --
             nm3homo.homo_update
@@ -1143,7 +1166,8 @@ BEGIN
               --, p_effective_date => nm3user.get_effective_date);
           --
           EXCEPTION
-            WHEN OTHERS THEN nm_debug.debug('Locating '||SQLERRM);
+            WHEN OTHERS 
+              THEN nm_debug.debug('Locating '||SQLERRM);
           END;
         --
         END LOOP;
