@@ -18,9 +18,39 @@ FOR EACH ROW
 -----------------------------------------------------------------------------
 DECLARE
 
-l_rec_nwad NM_NW_AD_TYPEs%ROWTYPE;
+l_rec_nwad     NM_NW_AD_TYPES%ROWTYPE;
+l_has_children VARCHAR2(1);
+
+  CURSOR check_for_children_cur( p_nad_inv_type VARCHAR2
+                               , p_nad_nt_type VARCHAR2
+                               , p_nad_gty_type VARCHAR2 
+                               ) IS
+  SELECT 'Y'
+  FROM nm_nw_ad_link_all 
+  WHERE nad_nt_type = p_nad_nt_type
+  AND NVL(nad_gty_type, '-1') = NVL(p_nad_gty_type, '-1')
+  AND nad_inv_type = p_nad_inv_type
+  AND ROWNUM = 1;
 
 BEGIN
+
+  IF   UPDATING 
+  AND (:OLD.nad_inv_type <> :NEW.nad_inv_type 
+   OR  :OLD.nad_nt_type  <> :NEW.nad_nt_type 
+   OR  nvl(:OLD.nad_gty_type, '-1') <> nvl(:NEW.nad_gty_type, '-1'))
+  THEN
+  --
+    OPEN check_for_children_cur(:OLD.nad_inv_type, :OLD.nad_nt_type, :OLD.nad_gty_type);
+    FETCH check_for_children_cur INTO l_has_children;
+    CLOSE check_for_children_cur;
+    
+    IF nvl(l_has_children, 'N') = 'Y'
+    THEN
+      hig.raise_ner( 'NET'
+                   , 556);
+    END IF;
+  --
+  END IF;
 
   nm3nwad.g_tab_nadt.DELETE;
 
