@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.37   Dec 07 2010 10:20:58   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.38   Apr 21 2011 10:50:24   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Dec 07 2010 10:20:58  $
---       Date fetched Out : $Modtime:   Dec 07 2010 10:20:22  $
---       PVCS Version     : $Revision:   2.37  $
+--       Date into PVCS   : $Date:   Apr 21 2011 10:50:24  $
+--       Date fetched Out : $Modtime:   Apr 21 2011 10:47:34  $
+--       PVCS Version     : $Revision:   2.38  $
 --
 --
 --   Author : Priidu Tanava
@@ -124,7 +124,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.37  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.38  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -2432,7 +2432,7 @@ No query types defined.
     ||cr||'  ,q3.*'
     ||cr||'from ('
     ||cr||'select'
-    ||cr||'   dense_rank() over (order by q2.min_ne_id_in) value_id'
+    ||cr||'   dense_rank() over (order by q2.min_ne_id_in, q2.inv_type) value_id'
     ||cr||'  ,q2.*'
     ||cr||'from ('
     ||cr||'select'
