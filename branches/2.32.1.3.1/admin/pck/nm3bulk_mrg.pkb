@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.17   Nov 11 2010 10:59:04   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.32.1.3.1.18   Apr 21 2011 15:08:22   Rob.Coupe  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Nov 11 2010 10:59:04  $
---       Date fetched Out : $Modtime:   Nov 10 2010 17:40:42  $
---       PVCS Version     : $Revision:   2.32.1.3.1.17  $
+--       Date into PVCS   : $Date:   Apr 21 2011 15:08:22  $
+--       Date fetched Out : $Modtime:   Apr 21 2011 14:57:12  $
+--       PVCS Version     : $Revision:   2.32.1.3.1.18  $
 --
 --
 --   Author : Priidu Tanava
@@ -113,7 +113,7 @@ No query types defined.
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
         add p_group_type variable to load_group_datums() to specify driving group type when loaded group is non-linear
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.3.1.17  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.32.1.3.1.18  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -2140,7 +2140,7 @@ No query types defined.
     ||cr||'  ,q3.*'
     ||cr||'from ('
     ||cr||'select'
-    ||cr||'   dense_rank() over (order by q2.min_ne_id_in) value_id'
+    ||cr||'   dense_rank() over (order by q2.min_ne_id_in, q2.inv_type) value_id'
     ||cr||'  ,q2.*'
     ||cr||'from ('
     ||cr||'select'
