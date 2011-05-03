@@ -4,11 +4,11 @@ AS
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.21   Feb 22 2011 09:51:46   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3ftp.pkb-arc   3.22   May 03 2011 17:08:10   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3ftp.pkb  $
---       Date into PVCS   : $Date:   Feb 22 2011 09:51:46  $
---       Date fetched Out : $Modtime:   Feb 22 2011 09:51:00  $
---       PVCS Version     : $Revision:   3.21  $
+--       Date into PVCS   : $Date:   May 03 2011 17:08:10  $
+--       Date fetched Out : $Modtime:   May 03 2011 17:05:46  $
+--       PVCS Version     : $Revision:   3.22  $
 --
 --------------------------------------------------------------------------------
 --
@@ -16,7 +16,7 @@ AS
    g_binary                  BOOLEAN        := TRUE;
    g_debug                   BOOLEAN        := TRUE;
    g_convert_crlf            BOOLEAN        := TRUE;
-   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.21  $"';
+   g_body_sccsid    CONSTANT VARCHAR2(30)   :='"$Revision:   3.22  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2(30)   := 'nm3ftp';
@@ -189,20 +189,20 @@ END add_ftp_outcome;
       p_pass      IN   VARCHAR2,
       p_timeout   IN   NUMBER DEFAULT NULL
    )
-      RETURN UTL_TCP.connection
+      RETURN utl_tcp.connection
    IS
-      l_conn   UTL_TCP.connection;
+      l_conn utl_tcp.connection;
    BEGIN
+      nm3acl.process_ftp_connection(pi_host => p_host, pi_port=>p_port);
       g_reply.DELETE;
-      l_conn :=
-            UTL_TCP.open_connection (p_host, NVL(p_port,21), tx_timeout => p_timeout);
+      l_conn := utl_tcp.open_connection (p_host, NVL(p_port,21), tx_timeout => p_timeout);
       get_reply (l_conn);
       send_command (l_conn, 'USER ' || p_user);
       send_command (l_conn, 'PASS ' || p_pass);
       RETURN l_conn;
-   EXCEPTION
-     WHEN ex_acl_failure
-     THEN hig.raise_ner(nm3type.c_hig,550);
+--   EXCEPTION
+--     WHEN ex_acl_failure
+--     THEN hig.raise_ner(nm3type.c_hig,550);
    END;
 --
 --------------------------------------------------------------------------------
