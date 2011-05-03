@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkb-arc   3.1   Feb 23 2011 11:08:48   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkb-arc   3.2   May 03 2011 17:07:38   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3acl.pkb  $
---       Date into PVCS   : $Date:   Feb 23 2011 11:08:48  $
---       Date fetched Out : $Modtime:   Feb 23 2011 11:07:54  $
---       Version          : $Revision:   3.1  $
+--       Date into PVCS   : $Date:   May 03 2011 17:07:38  $
+--       Date fetched Out : $Modtime:   May 03 2011 17:04:48  $
+--       Version          : $Revision:   3.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -24,14 +24,14 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid        CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
+  g_body_sccsid        CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
   g_package_name       CONSTANT varchar2(30) := 'nm3acl';
 --
   c_ftp_role           CONSTANT VARCHAR2(30) := 'FTP_USER';
   c_email_role         CONSTANT VARCHAR2(30) := 'EMAIL_USER';
 --
-  c_ftp_acl            CONSTANT VARCHAR2(30) := 'EXOR_'||hig.get_application_owner||'_FTP.xml';
-  c_email_acl          CONSTANT VARCHAR2(30) := 'EXOR_'||hig.get_application_owner||'_EMAIL.xml';
+  c_ftp_acl                     VARCHAR2(30) := 'FTP_ACL_'||user||'.xml';
+  c_email_acl                   VARCHAR2(30) := 'EMAIL_ACL_'||user||'.xml';
 --
 --ORA-31003
   ex_acl_already_exists         EXCEPTION;
@@ -40,9 +40,14 @@ AS
 --ORA-19279: XPTY0004 - XQuery dynamic type mismatch: expected singleton sequence - got multi-item sequence
   ex_priv_already_exists        EXCEPTION;
   PRAGMA                        EXCEPTION_INIT (ex_priv_already_exists,-19279);
+--
 --ORA-31001: ACL does not exist
   ex_acl_does_not_exist         EXCEPTION;
   PRAGMA                        EXCEPTION_INIT (ex_acl_does_not_exist,-31001);
+--
+--ORA-31003: Parent /sys/acls/ already contains child entry 
+  ex_acl_child_exists           EXCEPTION;
+  PRAGMA                        EXCEPTION_INIT (ex_acl_child_exists,-31003);
 --
   ex_invalid_privilege          EXCEPTION;
 --
@@ -63,6 +68,36 @@ BEGIN
   nm_debug.proc_end(g_package_name,'get_body_version');
   RETURN g_body_sccsid;
 END get_body_version;
+--
+-----------------------------------------------------------------------------
+--
+FUNCTION user_has_access ( pi_host        IN VARCHAR2
+                         , pi_lower_port  IN VARCHAR2
+                         , pi_upper_port  IN VARCHAR2
+ )
+RETURN BOOLEAN
+IS
+  l_sql      nm3type.max_varchar2;
+  l_dummy    NUMBER;
+BEGIN
+--
+  l_sql :=         'SELECT COUNT(*) FROM user_network_acl_privileges';
+  l_sql := l_sql ||' WHERE host = :pi_host';
+  l_sql := l_sql ||'   AND status = ''GRANTED''';
+  l_sql := l_sql ||'   AND privilege = ''connect''';
+  l_sql := l_sql ||'   AND NVL(lower_port,-999) = NVL(:pi_lower_port,-999)';
+  l_sql := l_sql ||'   AND NVL(upper_port,-999) = NVL(:pi_upper_port,-999)';
+--
+  EXECUTE IMMEDIATE l_sql INTO l_dummy USING pi_host, to_number(pi_lower_port), to_number(pi_upper_port);
+--
+--  nm_debug.debug(l_sql);
+--  nm_debug.debug('Host = '||(pi_host));
+--  nm_debug.debug('Lower port = '||to_number(pi_lower_port));
+--  nm_debug.debug('Upper port = '||to_number(pi_upper_port));
+--
+  RETURN (l_dummy>0);
+--
+END user_has_access;
 --
 -----------------------------------------------------------------------------
 --
@@ -128,37 +163,89 @@ BEGIN
   --
   -- Grant both connect and resolve by default
   --
-    dbms_network_acl_admin.create_acl 
-      ( acl          => l_acl_name
-      , description  => NVL(pi_acl_descr,l_acl_name)
-      , principal    => pi_user_or_role
-      , is_grant     => pi_is_grant
-      , PRIVILEGE    => 'connect'
-      , start_date   => pi_start_date
-      , end_date     => pi_end_date);
+    BEGIN
+      nm_debug.debug('Assign priv connect to '||l_acl_name);
+      IF dbms_network_acl_admin.check_privilege(l_acl_name,user,'connect') != 1
+      THEN
+        dbms_network_acl_admin.create_acl 
+          ( acl          => l_acl_name
+          , description  => NVL(pi_acl_descr,l_acl_name)
+          , principal    => pi_user_or_role
+          , is_grant     => pi_is_grant
+          , PRIVILEGE    => 'connect'
+          , start_date   => pi_start_date
+          , end_date     => pi_end_date);
+      END IF;
+    EXCEPTION
+      WHEN ex_acl_does_not_exist
+      THEN
+        dbms_network_acl_admin.create_acl 
+          ( acl          => l_acl_name
+          , description  => NVL(pi_acl_descr,l_acl_name)
+          , principal    => pi_user_or_role
+          , is_grant     => pi_is_grant
+          , PRIVILEGE    => 'connect'
+          , start_date   => pi_start_date
+          , end_date     => pi_end_date);
+    END;
   --
-    dbms_network_acl_admin.add_privilege
-      ( acl        => l_acl_name 
-      , principal  => pi_user_or_role
-      , is_grant   => pi_is_grant
-      , privilege  => 'resolve'
---      , position   => 1
-      , start_date => pi_start_date 
-      , end_date   => pi_end_date);
+    BEGIN
+      nm_debug.debug('Assign priv resolve to '||l_acl_name);
+      IF dbms_network_acl_admin.check_privilege(l_acl_name,user,'resolve') != 1
+      THEN
+        dbms_network_acl_admin.add_privilege
+          ( acl        => l_acl_name 
+          , principal  => pi_user_or_role
+          , is_grant   => pi_is_grant
+          , privilege  => 'resolve'
+    --      , position   => 1
+          , start_date => pi_start_date 
+          , end_date   => pi_end_date);
+      END IF;
+    EXCEPTION
+      WHEN ex_acl_does_not_exist
+      THEN
+        dbms_network_acl_admin.add_privilege
+          ( acl        => l_acl_name 
+          , principal  => pi_user_or_role
+          , is_grant   => pi_is_grant
+          , privilege  => 'resolve'
+    --      , position   => 1
+          , start_date => pi_start_date 
+          , end_date   => pi_end_date);
+    END;
+  --
   ELSE
   --
   -- Or grant whatever the user has passed in
   --
     validate_privilege (pi_privilege) ;
   --
-      dbms_network_acl_admin.create_acl 
-      ( acl          => l_acl_name
-      , description  => NVL(pi_acl_descr,l_acl_name)
-      , principal    => pi_user_or_role
-      , is_grant     => pi_is_grant
-      , PRIVILEGE    => LOWER(pi_privilege)
-      , start_date   => pi_start_date
-      , end_date     => pi_end_date);
+    BEGIN
+      IF dbms_network_acl_admin.check_privilege(l_acl_name,user,'resolve') != 1
+      THEN
+        dbms_network_acl_admin.create_acl 
+          ( acl          => l_acl_name
+          , description  => NVL(pi_acl_descr,l_acl_name)
+          , principal    => pi_user_or_role
+          , is_grant     => pi_is_grant
+          , PRIVILEGE    => LOWER(pi_privilege)
+          , start_date   => pi_start_date
+          , end_date     => pi_end_date);
+      END IF;
+    EXCEPTION
+      WHEN ex_acl_does_not_exist
+      THEN
+        dbms_network_acl_admin.create_acl 
+          ( acl          => l_acl_name
+          , description  => NVL(pi_acl_descr,l_acl_name)
+          , principal    => pi_user_or_role
+          , is_grant     => pi_is_grant
+          , PRIVILEGE    => LOWER(pi_privilege)
+          , start_date   => pi_start_date
+          , end_date     => pi_end_date);
+    END;
+  --
   END IF;
 --
   nm_debug.proc_end(g_package_name,'create_acl');
@@ -194,6 +281,8 @@ IS
 BEGIN
 --
   nm_debug.proc_start(g_package_name,'assign_acl');
+--
+  nm_debug.debug('Assign : '||pi_acl_name||' - '||pi_host);
 --
   dbms_network_acl_admin.assign_acl 
     ( acl         => pi_acl_name
@@ -288,46 +377,89 @@ END unassign_acl;
 --
 -----------------------------------------------------------------------------
 --
+PROCEDURE process_ftp_connection ( pi_host IN hig_ftp_connections.hfc_ftp_host%TYPE
+                                 , pi_port IN hig_ftp_connections.hfc_ftp_port%TYPE DEFAULT NULL )
+IS
+BEGIN
+--
+  nm_debug.proc_start(g_package_name,'process_ftp_connection');
+--
+  IF NOT nm3user.user_has_role(user,c_ftp_role)
+  THEN
+  -- User does not have FTP_USER role
+    hig.raise_ner(pi_appl => nm3type.c_hig , pi_id => 550);
+  END IF;
+--
+  --nm_debug.debug_on;
+  nm_debug.debug('Checking '||pi_host||' for user '||user);
+--
+  BEGIN
+  --
+    nm_debug.debug('Create the FTP ACL for the user ');
+  --
+    create_acl 
+      ( pi_acl_name     => c_ftp_acl
+      , pi_user_or_role => USER );
+  --
+    nm_debug.debug('Assign the FTP host to the '||c_ftp_acl);
+  --
+    assign_acl
+      ( pi_acl_name   => c_ftp_acl
+      , pi_host       => pi_host );
+  END;
+--
+  COMMIT;
+--
+  nm_debug.proc_end(g_package_name,'process_ftp_connection');
+--
+END process_ftp_connection;
+--
+-----------------------------------------------------------------------------
+--
 PROCEDURE process_ftp_connection ( pi_rec_hfc IN hig_ftp_connections%ROWTYPE )
 IS
 BEGIN
 --
   nm_debug.proc_start(g_package_name,'process_ftp_connections');
 --
+  IF NOT nm3user.user_has_role(user,c_ftp_role)
+  THEN
+  -- User does not have FTP_USER role
+    hig.raise_ner(pi_appl => nm3type.c_hig , pi_id => 550);
+  END IF;
+--
   BEGIN
   --
   -- Assign the FTP host to the standard EXOR FTP ACL
   --
+    create_acl 
+      ( pi_acl_name     => c_ftp_acl
+--         , pi_user_or_role => c_ftp_role );
+      , pi_user_or_role => USER );
+
     assign_acl
       ( pi_acl_name   => c_ftp_acl
       , pi_host       => pi_rec_hfc.hfc_ftp_host );
-  EXCEPTION
-    WHEN ex_acl_does_not_exist
-    THEN
-    --
-    -- Standard EXOR_FTP ACL does not exist - create it.
-    --
-       create_acl 
-         ( pi_acl_name     => c_ftp_acl
-         , pi_user_or_role => c_ftp_role );
-    --
-       assign_acl
-         ( pi_acl_name   => c_ftp_acl
-         , pi_host       => pi_rec_hfc.hfc_ftp_host );
-    --
+  --
   END;
---
+  --
   BEGIN
   --
   -- Assign the FTP Archive host to the standard EXOR FTP ACL
   --
     IF pi_rec_hfc.hfc_ftp_arc_host IS NOT NULL
     THEN
+      create_acl 
+         ( pi_acl_name     => c_ftp_acl
+--         , pi_user_or_role => c_ftp_role );
+         , pi_user_or_role => USER );
       assign_acl
         ( pi_acl_name   => c_ftp_acl
         , pi_host       => pi_rec_hfc.hfc_ftp_arc_host );
     END IF;
   END;
+  --
+  --COMMIT;
 --
   nm_debug.proc_end(g_package_name,'process_ftp_connections');
 --
@@ -380,6 +512,12 @@ BEGIN
 --
   nm_debug.proc_start(g_package_name,'process_email_connection');
 --
+  IF NOT nm3user.user_has_role(user,c_email_role)
+  THEN
+  -- User does not have EMAIL_USER role
+    hig.raise_ner(pi_appl => nm3type.c_hig , pi_id => 551);
+  END IF;
+--
   BEGIN
   --
   -- Assign the EMAIL host to the standard EXOR MAIL ACL
@@ -397,7 +535,8 @@ BEGIN
     --
        create_acl 
          ( pi_acl_name     => c_email_acl
-         , pi_user_or_role => c_email_role );
+         --, pi_user_or_role => c_email_role );
+         , pi_user_or_role => USER );
     --
        assign_acl
          ( pi_acl_name   => c_email_acl
@@ -405,6 +544,8 @@ BEGIN
          , pi_lower_port => pi_smtp_port);
     --
   END;
+  --
+  COMMIT;
 --
   nm_debug.proc_end(g_package_name,'process_email_connection');
 --
@@ -421,6 +562,12 @@ IS
 BEGIN
 --
   nm_debug.proc_start(g_package_name,'process_email_connection');
+--
+  IF NOT nm3user.user_has_role(user,c_email_role)
+  THEN
+  -- User does not have EMAIL_USER role
+    hig.raise_ner(pi_appl => nm3type.c_hig , pi_id => 551);
+  END IF;
 --
   BEGIN
   --
@@ -439,7 +586,8 @@ BEGIN
     --
        create_acl 
          ( pi_acl_name     => c_email_acl
-         , pi_user_or_role => c_email_role );
+         --, pi_user_or_role => c_email_role );
+         , pi_user_or_role => USER );
     --
        assign_acl
          ( pi_acl_name   => c_email_acl
@@ -447,6 +595,8 @@ BEGIN
          , pi_lower_port => pi_pop3_port);
     --
   END;
+--
+  COMMIT;
 --
   nm_debug.proc_end(g_package_name,'process_email_connection');
 --
@@ -469,7 +619,7 @@ BEGIN
     BEGIN
       create_acl 
        ( pi_acl_name     => c_ftp_acl
-       , pi_user_or_role => c_ftp_role);
+       , pi_user_or_role => USER );
     EXCEPTION
       WHEN ex_acl_already_exists
         THEN NULL;
@@ -515,7 +665,7 @@ BEGIN
     BEGIN
       create_acl 
        ( pi_acl_name     => c_email_acl
-       , pi_user_or_role => c_email_role);
+       , pi_user_or_role => USER );
     EXCEPTION
       WHEN ex_acl_already_exists
         THEN NULL;
@@ -574,8 +724,17 @@ BEGIN
 --
   nm_debug.proc_start(g_package_name,'remove_standard_acls');
 --
-  nm3acl.drop_acl(c_ftp_acl);
-  nm3acl.drop_acl(c_email_acl);
+  BEGIN
+    nm3acl.drop_acl(c_ftp_acl);
+  EXCEPTION
+    WHEN ex_acl_does_not_exist THEN NULL;
+  END;
+--
+  BEGIN
+    nm3acl.drop_acl(c_email_acl);
+  EXCEPTION
+    WHEN ex_acl_does_not_exist THEN NULL;
+  END;
 --
   COMMIT;
 --
