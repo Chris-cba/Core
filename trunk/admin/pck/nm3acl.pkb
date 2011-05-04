@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkb-arc   3.2   May 03 2011 17:07:38   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkb-arc   3.3   May 04 2011 16:58:02   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3acl.pkb  $
---       Date into PVCS   : $Date:   May 03 2011 17:07:38  $
+--       Date into PVCS   : $Date:   May 04 2011 16:58:02  $
 --       Date fetched Out : $Modtime:   May 03 2011 17:04:48  $
---       Version          : $Revision:   3.2  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -24,7 +24,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid        CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
+  g_body_sccsid        CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
   g_package_name       CONSTANT varchar2(30) := 'nm3acl';
 --
   c_ftp_role           CONSTANT VARCHAR2(30) := 'FTP_USER';
