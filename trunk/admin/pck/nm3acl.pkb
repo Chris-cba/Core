@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkb-arc   3.4   May 05 2011 09:19:02   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkb-arc   3.5   May 05 2011 11:19:54   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3acl.pkb  $
---       Date into PVCS   : $Date:   May 05 2011 09:19:02  $
---       Date fetched Out : $Modtime:   May 05 2011 09:17:40  $
---       Version          : $Revision:   3.4  $
+--       Date into PVCS   : $Date:   May 05 2011 11:19:54  $
+--       Date fetched Out : $Modtime:   May 05 2011 11:18:16  $
+--       Version          : $Revision:   3.5  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -24,14 +24,14 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid        CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
+  g_body_sccsid        CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $';
   g_package_name       CONSTANT varchar2(30) := 'nm3acl';
 --
   c_ftp_role           CONSTANT VARCHAR2(30) := 'FTP_USER';
   c_email_role         CONSTANT VARCHAR2(30) := 'EMAIL_USER';
 --
-  c_ftp_acl                     VARCHAR2(30) := 'EXOR_FTP_ACL.xml';
-  c_email_acl                   VARCHAR2(30) := 'EXOR_EMAIL_ACL.xml';
+  c_ftp_acl                     VARCHAR2(30) := hig.get_application_owner||'_FTP_ACL.xml';
+  c_email_acl                   VARCHAR2(30) := hig.get_application_owner||'_EMAIL_ACL.xml';
 --
 --ORA-31003
   ex_acl_already_exists         EXCEPTION;
@@ -101,6 +101,23 @@ END user_has_access;
 --
 -----------------------------------------------------------------------------
 --
+FUNCTION check_privilege ( pi_acl_name  IN VARCHAR2
+                         , pi_user      IN VARCHAR2
+                         , pi_privilege IN VARCHAR )
+RETURN BOOLEAN
+IS
+BEGIN
+  IF dbms_network_acl_admin.check_privilege(pi_acl_name,pi_user,pi_privilege) != 1
+  OR  dbms_network_acl_admin.check_privilege(pi_acl_name,pi_user,pi_privilege) IS NULL
+    THEN RETURN FALSE;
+    ELSE RETURN TRUE;
+  END IF;
+--  RETURN ( dbms_network_acl_admin.check_privilege(pi_acl_name,pi_user,pi_privilege) = 1 
+--        OR NOT (dbms_network_acl_admin.check_privilege(pi_acl_name,pi_user,pi_privilege) IS NULL ));
+END check_privilege;
+--
+-----------------------------------------------------------------------------
+--
 PROCEDURE validate_privilege ( pi_privilege IN VARCHAR2 )
 IS
 BEGIN
@@ -166,7 +183,7 @@ BEGIN
   --
     BEGIN
       nm_debug.debug('Assign priv connect to '||l_acl_name);
-      IF dbms_network_acl_admin.check_privilege(l_acl_name,user,'connect') != 1
+      IF NOT check_privilege(l_acl_name,user,'connect')
       THEN
         dbms_network_acl_admin.create_acl 
           ( acl          => l_acl_name
@@ -192,7 +209,7 @@ BEGIN
   --
     BEGIN
       nm_debug.debug('Assign priv resolve to '||l_acl_name);
-      IF dbms_network_acl_admin.check_privilege(l_acl_name,user,'resolve') != 1
+      IF NOT check_privilege(l_acl_name,user,'resolve')
       THEN
         dbms_network_acl_admin.add_privilege
           ( acl        => l_acl_name 
@@ -223,7 +240,7 @@ BEGIN
     validate_privilege (pi_privilege) ;
   --
     BEGIN
-      IF dbms_network_acl_admin.check_privilege(l_acl_name,user,'resolve') != 1
+      IF NOT check_privilege(l_acl_name,user,'resolve')
       THEN
         dbms_network_acl_admin.create_acl 
           ( acl          => l_acl_name
@@ -324,8 +341,9 @@ BEGIN
 --
   validate_privilege (pi_privilege);
 --
-  IF dbms_network_acl_admin.check_privilege(pi_acl_name,user,pi_privilege) != 1
+  IF NOT check_privilege(pi_acl_name,user,pi_privilege)
   THEN
+    nm_debug.debug('adding privilege - '||pi_acl_name||' - '||user||' - '||pi_privilege);
     dbms_network_acl_admin.add_privilege
       ( acl        => pi_acl_name 
       , principal  => pi_user_or_role
@@ -333,6 +351,8 @@ BEGIN
       , privilege  => pi_privilege
       , start_date => pi_start_date 
       , end_date   => pi_end_date );
+  ELSE
+    nm_debug.debug('already has privilege - '||pi_acl_name||' - '||user||' - '||pi_privilege);
   END IF;
 --
   COMMIT;
