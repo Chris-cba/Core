@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkb-arc   3.3   May 04 2011 16:58:02   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkb-arc   3.4   May 05 2011 09:19:02   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3acl.pkb  $
---       Date into PVCS   : $Date:   May 04 2011 16:58:02  $
---       Date fetched Out : $Modtime:   May 03 2011 17:04:48  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   May 05 2011 09:19:02  $
+--       Date fetched Out : $Modtime:   May 05 2011 09:17:40  $
+--       Version          : $Revision:   3.4  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -24,14 +24,14 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid        CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
+  g_body_sccsid        CONSTANT VARCHAR2(2000) := '$Revision:   3.4  $';
   g_package_name       CONSTANT varchar2(30) := 'nm3acl';
 --
   c_ftp_role           CONSTANT VARCHAR2(30) := 'FTP_USER';
   c_email_role         CONSTANT VARCHAR2(30) := 'EMAIL_USER';
 --
-  c_ftp_acl                     VARCHAR2(30) := 'FTP_ACL_'||user||'.xml';
-  c_email_acl                   VARCHAR2(30) := 'EMAIL_ACL_'||user||'.xml';
+  c_ftp_acl                     VARCHAR2(30) := 'EXOR_FTP_ACL.xml';
+  c_email_acl                   VARCHAR2(30) := 'EXOR_EMAIL_ACL.xml';
 --
 --ORA-31003
   ex_acl_already_exists         EXCEPTION;
@@ -148,6 +148,7 @@ IS
 --   *                start_date.
 --
   l_acl_name    nm3type.max_varchar2;
+  PRAGMA AUTONOMOUS_TRANSACTION;
 --
 BEGIN
 --
@@ -248,6 +249,8 @@ BEGIN
   --
   END IF;
 --
+  COMMIT;
+--
   nm_debug.proc_end(g_package_name,'create_acl');
 --
 --EXCEPTION
@@ -260,11 +263,13 @@ END create_acl;
 PROCEDURE drop_acl
              ( pi_acl_name       IN VARCHAR2 )
 IS
+  PRAGMA AUTONOMOUS_TRANSACTION;
 BEGIN
 --
   nm_debug.proc_start(g_package_name,'drop_acl');
 --
   dbms_network_acl_admin.drop_acl(acl => pi_acl_name);
+  COMMIT;
 --
   nm_debug.proc_end(g_package_name,'drop_acl');
 --
@@ -278,6 +283,9 @@ PROCEDURE assign_acl
             , pi_lower_port IN NUMBER DEFAULT NULL
             , pi_upper_port IN NUMBER DEFAULT NULL )
 IS
+--
+  PRAGMA AUTONOMOUS_TRANSACTION;
+--
 BEGIN
 --
   nm_debug.proc_start(g_package_name,'assign_acl');
@@ -290,13 +298,14 @@ BEGIN
     , lower_port  => pi_lower_port
     , upper_port  => pi_upper_port ); 
 --
+  COMMIT;
+--
   nm_debug.proc_end(g_package_name,'assign_acl');
 --
 END assign_acl;
 --
 -----------------------------------------------------------------------------
 --
-
 PROCEDURE add_privilege 
              ( pi_acl_name       IN VARCHAR2
              , pi_user_or_role   IN VARCHAR2
@@ -307,19 +316,26 @@ PROCEDURE add_privilege
              )
 IS
 --
+  PRAGMA AUTONOMOUS_TRANSACTION;
+--
 BEGIN
 --
   nm_debug.proc_start(g_package_name,'add_privilege');
 --
   validate_privilege (pi_privilege);
 --
-  dbms_network_acl_admin.add_privilege
-    ( acl        => pi_acl_name 
-    , principal  => pi_user_or_role
-    , is_grant   => pi_is_grant
-    , privilege  => pi_privilege
-    , start_date => pi_start_date 
-    , end_date   => pi_end_date );
+  IF dbms_network_acl_admin.check_privilege(pi_acl_name,user,pi_privilege) != 1
+  THEN
+    dbms_network_acl_admin.add_privilege
+      ( acl        => pi_acl_name 
+      , principal  => pi_user_or_role
+      , is_grant   => pi_is_grant
+      , privilege  => pi_privilege
+      , start_date => pi_start_date 
+      , end_date   => pi_end_date );
+  END IF;
+--
+  COMMIT;
 --
   nm_debug.proc_end(g_package_name,'add_privilege');
 --
@@ -338,6 +354,7 @@ PROCEDURE delete_privilege ( pi_acl_name     IN VARCHAR2
                            , pi_privilege    IN VARCHAR2
                            , pi_is_grant     IN BOOLEAN DEFAULT TRUE )
 IS
+  PRAGMA AUTONOMOUS_TRANSACTION;
 BEGIN
 --
   nm_debug.proc_start(g_package_name,'delete_privilege');
@@ -350,6 +367,8 @@ BEGIN
     , is_grant  => pi_is_grant
     , privilege => pi_privilege );
 --
+  COMMIT;
+--
   nm_debug.proc_end(g_package_name,'delete_privilege');
 --
 END delete_privilege;
@@ -361,6 +380,7 @@ PROCEDURE unassign_acl ( pi_acl_name     IN VARCHAR2
                        , pi_lower_port   IN INTEGER DEFAULT NULL
                        , pi_upper_port   IN INTEGER DEFAULT NULL )
 IS
+  PRAGMA AUTONOMOUS_TRANSACTION;
 BEGIN
 --
   nm_debug.proc_start(g_package_name,'unassign_acl');
@@ -370,6 +390,8 @@ BEGIN
     , host       => pi_host
     , lower_port => pi_lower_port
     , upper_port => pi_upper_port );
+--
+  COMMIT;
 --
   nm_debug.proc_end(g_package_name,'unassign_acl');
 --
@@ -397,15 +419,35 @@ BEGIN
   --
     nm_debug.debug('Create the FTP ACL for the user ');
   --
-    create_acl 
-      ( pi_acl_name     => c_ftp_acl
-      , pi_user_or_role => USER );
+    add_privilege
+      ( pi_acl_name       => c_ftp_acl
+      , pi_user_or_role   => USER
+      , pi_privilege      => 'connect'
+      );
+    add_privilege
+      ( pi_acl_name       => c_ftp_acl
+      , pi_user_or_role   => USER
+      , pi_privilege      => 'resolve'
+      );
   --
     nm_debug.debug('Assign the FTP host to the '||c_ftp_acl);
   --
     assign_acl
       ( pi_acl_name   => c_ftp_acl
       , pi_host       => pi_host );
+  EXCEPTION
+    WHEN ex_acl_does_not_exist
+    THEN
+    --
+    -- Standard EXOR_EMAIL ACL does not exist - create it.
+    --
+       create_acl 
+         ( pi_acl_name     => c_ftp_acl
+         , pi_user_or_role => USER );
+    --
+       assign_acl
+         ( pi_acl_name   => c_ftp_acl
+         , pi_host       => pi_host);
   END;
 --
   COMMIT;
@@ -432,15 +474,36 @@ BEGIN
   --
   -- Assign the FTP host to the standard EXOR FTP ACL
   --
-    create_acl 
-      ( pi_acl_name     => c_ftp_acl
---         , pi_user_or_role => c_ftp_role );
-      , pi_user_or_role => USER );
+    add_privilege
+      ( pi_acl_name       => c_ftp_acl
+      , pi_user_or_role   => USER
+      , pi_privilege      => 'connect'
+      );
+    add_privilege
+      ( pi_acl_name       => c_ftp_acl
+      , pi_user_or_role   => USER
+      , pi_privilege      => 'resolve'
+      );
 
     assign_acl
       ( pi_acl_name   => c_ftp_acl
       , pi_host       => pi_rec_hfc.hfc_ftp_host );
   --
+  --
+  EXCEPTION
+    WHEN ex_acl_does_not_exist
+    THEN
+    --
+    -- Standard EXOR_EMAIL ACL does not exist - create it.
+    --
+       create_acl 
+         ( pi_acl_name     => c_ftp_acl
+         --, pi_user_or_role => c_email_role );
+         , pi_user_or_role => USER );
+    --
+       assign_acl
+         ( pi_acl_name   => c_ftp_acl
+         , pi_host       => pi_rec_hfc.hfc_ftp_host);
   END;
   --
   BEGIN
@@ -449,13 +512,19 @@ BEGIN
   --
     IF pi_rec_hfc.hfc_ftp_arc_host IS NOT NULL
     THEN
-      create_acl 
-         ( pi_acl_name     => c_ftp_acl
---         , pi_user_or_role => c_ftp_role );
-         , pi_user_or_role => USER );
+      add_privilege
+        ( pi_acl_name       => c_ftp_acl
+        , pi_user_or_role   => USER
+        , pi_privilege      => 'connect'
+        );
+      add_privilege
+        ( pi_acl_name       => c_ftp_acl
+        , pi_user_or_role   => USER
+        , pi_privilege      => 'resolve'
+        );
       assign_acl
         ( pi_acl_name   => c_ftp_acl
-        , pi_host       => pi_rec_hfc.hfc_ftp_arc_host );
+        , pi_host       => pi_rec_hfc.hfc_ftp_host );
     END IF;
   END;
   --
@@ -508,6 +577,7 @@ IS
 --
 -- Process SMTP email connections
 --
+  pragma autonomous_transaction;
 BEGIN
 --
   nm_debug.proc_start(g_package_name,'process_email_connection');
@@ -519,13 +589,29 @@ BEGIN
   END IF;
 --
   BEGIN
+--    create_acl 
+--      ( pi_acl_name     => c_email_acl
+----         , pi_user_or_role => c_ftp_role );
+--      , pi_user_or_role => USER );
   --
   -- Assign the EMAIL host to the standard EXOR MAIL ACL
+  --
+    add_privilege
+      ( pi_acl_name       => c_email_acl
+      , pi_user_or_role   => USER
+      , pi_privilege      => 'connect'
+      );
+    add_privilege
+      ( pi_acl_name       => c_email_acl
+      , pi_user_or_role   => USER
+      , pi_privilege      => 'resolve'
+      );
   --
     assign_acl
       ( pi_acl_name   => c_email_acl
       , pi_host       => pi_smtp_server 
       , pi_lower_port => pi_smtp_port);
+      
   --
   EXCEPTION
     WHEN ex_acl_does_not_exist
@@ -570,6 +656,17 @@ BEGIN
   END IF;
 --
   BEGIN
+--
+    add_privilege
+      ( pi_acl_name       => c_email_acl
+      , pi_user_or_role   => USER
+      , pi_privilege      => 'connect'
+      );
+    add_privilege
+      ( pi_acl_name       => c_email_acl
+      , pi_user_or_role   => USER
+      , pi_privilege      => 'resolve'
+      );
   --
   -- Assign the EMAIL host to the standard EXOR MAIL ACL
   --
@@ -596,7 +693,7 @@ BEGIN
     --
   END;
 --
-  COMMIT;
+  --COMMIT;
 --
   nm_debug.proc_end(g_package_name,'process_email_connection');
 --
