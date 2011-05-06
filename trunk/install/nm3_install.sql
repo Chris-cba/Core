@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.31   Apr 06 2011 16:38:22   Mike.Alexander  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.32   May 06 2011 15:12:38   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   Apr 06 2011 16:38:22  $
---       Date fetched Out : $Modtime:   Apr 06 2011 16:37:30  $
---       PVCS Version     : $Revision:   2.31  $
+--       Date into PVCS   : $Date:   May 06 2011 15:12:38  $
+--       Date fetched Out : $Modtime:   May 06 2011 15:10:46  $
+--       PVCS Version     : $Revision:   2.32  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) Exor Corporation Ltd, 2011
@@ -391,6 +391,24 @@ from dual
 SET FEEDBACK ON
 start '&&run_file'
 SET FEEDBACK OFF
+
+--
+---------------------------------------------------------------------------------------------------
+--                ****************   MERGE ANY VIEW  *******************
+--
+--
+SET TERM ON
+PROMPT Grant MERGE ANY VIEW to PUBLIC
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'mav_grant.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
+SET FEEDBACK OFF
+
 --
 ---------------------------------------------------------------------------------------------------
 --                        ****************   COMPILE SCHEMA   *******************
