@@ -3,11 +3,11 @@
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.9   Apr 04 2011 15:31:02   Mike.Alexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/install/nm4300_nm4400_upg.sql-arc   3.10   May 06 2011 15:13:50   Ade.Edwards  $
 --       Module Name      : $Workfile:   nm4300_nm4400_upg.sql  $
---       Date into PVCS   : $Date:   Apr 04 2011 15:31:02  $
---       Date fetched Out : $Modtime:   Apr 04 2011 15:30:38  $
---       Version          : $Revision:   3.9  $
+--       Date into PVCS   : $Date:   May 06 2011 15:13:50  $
+--       Date fetched Out : $Modtime:   May 06 2011 15:12:22  $
+--       Version          : $Revision:   3.10  $
 --
 --   Product upgrade script
 --
@@ -261,6 +261,22 @@ FROM dual
 /
 SET FEEDBACK ON
 start &&run_file
+SET FEEDBACK OFF
+--
+---------------------------------------------------------------------------------------------------
+--                ****************   MERGE ANY VIEW  *******************
+--
+--
+SET TERM ON
+PROMPT Grant MERGE ANY VIEW to PUBLIC
+SET TERM OFF
+SET DEFINE ON
+select '&exor_base'||'nm3'||'&terminator'||'install'||
+        '&terminator'||'mav_grant.sql' run_file
+from dual
+/
+SET FEEDBACK ON
+start '&&run_file'
 SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
