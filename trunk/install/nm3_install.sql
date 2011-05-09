@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.32   May 06 2011 15:12:38   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/install/nm3_install.sql-arc   2.33   May 09 2011 10:30:34   Mike.Alexander  $
 --       Module Name      : $Workfile:   nm3_install.sql  $
---       Date into PVCS   : $Date:   May 06 2011 15:12:38  $
---       Date fetched Out : $Modtime:   May 06 2011 15:10:46  $
---       PVCS Version     : $Revision:   2.32  $
+--       Date into PVCS   : $Date:   May 09 2011 10:30:34  $
+--       Date fetched Out : $Modtime:   May 09 2011 10:28:24  $
+--       PVCS Version     : $Revision:   2.33  $
 --
 --------------------------------------------------------------------------------
 --   Copyright (c) Exor Corporation Ltd, 2011
@@ -549,17 +549,17 @@ END;
 --                  ****************   CREATE JOBS  *******************
 --
 --
-SET TERM ON
-PROMPT Create table maintenance Jobs
-SET TERM OFF
-SET DEFINE ON
-select '&exor_base'||'nm3'||'&terminator'||'install'||
-        '&terminator'||'nm3jobs.sql' run_file
-from dual
-/
-SET FEEDBACK ON
-start '&&run_file'
-SET FEEDBACK OFF
+--SET TERM ON
+--PROMPT Create table maintenance Jobs
+--SET TERM OFF
+--SET DEFINE ON
+--select '&exor_base'||'nm3'||'&terminator'||'install'||
+--        '&terminator'||'nm3jobs.sql' run_file
+--from dual
+--/
+--SET FEEDBACK ON
+--start '&&run_file'
+--SET FEEDBACK OFF
 --
 ---------------------------------------------------------------------------------------------------
 --                  ****************   CREATE ACLs  *******************
