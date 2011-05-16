@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_qry_builder.pkb-arc   3.0   Apr 14 2010 10:42:32   malexander  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_qry_builder.pkb-arc   3.1   May 16 2011 14:42:20   Steve.Cooper  $
 --       Module Name      : $Workfile:   hig_qry_builder.pkb  $
---       Date into PVCS   : $Date:   Apr 14 2010 10:42:32  $
---       Date fetched Out : $Modtime:   Apr 14 2010 10:42:08  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:20  $
+--       Date fetched Out : $Modtime:   May 03 2011 10:59:56  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.0  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.1  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_qry_builder';
 --
@@ -145,7 +145,7 @@ IS
    SELECT 'Y'
    FROM   hig_query_types
    WHERe  Upper(hqt_name) =  Upper(pi_query_name)
-   AND    hqt_created_by = User ;
+   AND    hqt_created_by = Sys_Context('NM3_SECURITY_CTX','USERNAME') ;
 
    l_rec Varchar2(1);
 --

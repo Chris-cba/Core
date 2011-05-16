@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.10   Mar 08 2011 15:18:18   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_framework.pkb-arc   3.11   May 16 2011 14:42:20   Steve.Cooper  $
 --       Module Name      : $Workfile:   hig_process_framework.pkb  $
---       Date into PVCS   : $Date:   Mar 08 2011 15:18:18  $
---       Date fetched Out : $Modtime:   Mar 08 2011 14:03:10  $
---       Version          : $Revision:   3.10  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:20  $
+--       Date fetched Out : $Modtime:   May 03 2011 10:58:50  $
+--       Version          : $Revision:   3.11  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.10  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.11  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
 
@@ -1237,7 +1237,7 @@ FUNCTION log_text_as_clob(pi_process_id            IN hig_process_log.hpl_proces
           ||'Initiator              : '||a.hp_initiated_by_username||chr(10)
           ||'Initator Reference     : '||a.hp_initiators_ref||chr(10)
           ||'Outcome                : '||hp_success_flag_meaning||chr(10)
-          ||'Database               : '||user||chr(10)||chr(10)
+          ||'Database               : '||Sys_Context('NM3_SECURITY_CTX','USERNAME')||chr(10)||chr(10)
           ||'Timings'||chr(10)
           ||'======='||chr(10)     
           ||'Start Date             : '||hpjr_start||chr(10)

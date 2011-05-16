@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.21   Mar 16 2011 17:34:22   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_process_api.pkb-arc   3.22   May 16 2011 14:42:20   Steve.Cooper  $
 --       Module Name      : $Workfile:   hig_process_api.pkb  $
---       Date into PVCS   : $Date:   Mar 16 2011 17:34:22  $
---       Date fetched Out : $Modtime:   Mar 16 2011 17:28:38  $
---       Version          : $Revision:   3.21  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:20  $
+--       Date fetched Out : $Modtime:   Apr 21 2011 07:53:36  $
+--       Version          : $Revision:   3.22  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.21  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.22  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_process_framework';
   
@@ -728,10 +728,10 @@ END check_limit_not_reached;
 -----------------------------------------------------------------------------
 --
 PROCEDURE create_and_schedule_process    (pi_process_type_id           IN hig_processes.hp_process_type_id%TYPE
-                                        , pi_initiated_by_username     IN hig_processes.hp_initiated_by_username%TYPE DEFAULT USER
+                                        , pi_initiated_by_username     IN hig_processes.hp_initiated_by_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                                         , pi_initiated_date            IN hig_processes.hp_initiated_date%TYPE DEFAULT SYSDATE
                                         , pi_initiators_ref            IN hig_processes.hp_initiators_ref%TYPE
---                                        , pi_job_owner                 IN hig_processes.hp_job_owner%TYPE DEFAULT USER
+--                                        , pi_job_owner                 IN hig_processes.hp_job_owner%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                                         , pi_start_date                IN date
                                         , pi_frequency_id              IN hig_processes.hp_frequency_id%TYPE
                                         , pi_polling_flag              IN hig_processes.hp_polling_flag%TYPE DEFAULT 'N'
@@ -748,7 +748,7 @@ PROCEDURE create_and_schedule_process    (pi_process_type_id           IN hig_pr
  l_what             nm3type.max_varchar2;
  l_job_rec          dba_scheduler_jobs%ROWTYPE;
  l_full_job_name    hig_processes_v.hp_full_job_name%TYPE;
- l_job_owner        varchar2(30) := USER;
+ l_job_owner        varchar2(30) := Sys_Context('NM3_SECURITY_CTX','USERNAME');
  
  l_sqlerrm nm3type.max_varchar2;
  

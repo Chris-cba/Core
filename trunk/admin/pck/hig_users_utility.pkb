@@ -5,9 +5,9 @@ AS
 --
 --       PVCS id          : $Header   //vm_latest/archives/nm3/admin/pck/hig_user_utility.pkb-arc   3.0 Mar 31 2009 10:10:10   Linesh Sorathia  $
 --       Module Name      : $Workfile:   hig_users_utility.pkb  $
---       Date into PVCS   : $Date:   Sep 09 2010 13:36:16  $
---       Date fetched Out : $Modtime:   Sep 09 2010 11:54:58  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:20  $
+--       Date fetched Out : $Modtime:   May 03 2011 11:03:18  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.2  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.3  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_users_utility';
 --
@@ -147,7 +147,7 @@ BEGIN
 --
 END get_primary_contact;
 --
-FUNCTION  get_primary_contact(pi_hus_username hig_users.hus_username%TYPE DEFAULT User)
+FUNCTION  get_primary_contact(pi_hus_username hig_users.hus_username%TYPE DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME'))
 RETURN    hig_user_details_vw.HUD_huc_telephone_1%TYPE
 IS
 --

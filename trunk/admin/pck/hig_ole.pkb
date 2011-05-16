@@ -664,7 +664,7 @@ AS
                     FROM DOC_TEMPLATE_USERS, HIG_USERS
                    WHERE dtu_user_id = (SELECT hus_user_id
                                           FROM HIG_USERS
-                                         WHERE hus_username = USER));
+                                         WHERE hus_username = Sys_Context('NM3_SECURITY_CTX','USERNAME')));
 
     IF intcount > 0
     THEN

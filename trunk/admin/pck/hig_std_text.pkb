@@ -3,11 +3,11 @@ AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/tma/admin/pck/hig_std_text.pkb-arc   3.3   Feb 09 2011 09:28:18   Chris.Baugh  $
+--       sccsid           : $Header:   //vm_latest/archives/tma/admin/pck/hig_std_text.pkb-arc   3.4   May 16 2011 14:42:20   Steve.Cooper  $
 --       Module Name      : $Workfile:   hig_std_text.pkb  $
---       Date into SCCS   : $Date:   Feb 09 2011 09:28:18  $
---       Date fetched Out : $Modtime:   Feb 07 2011 15:43:36  $
---       SCCS Version     : $Revision:   3.3  $
+--       Date into SCCS   : $Date:   May 16 2011 14:42:20  $
+--       Date fetched Out : $Modtime:   May 03 2011 11:01:10  $
+--       SCCS Version     : $Revision:   3.4  $
 --       Based on 
 --
 --
@@ -19,10 +19,10 @@ AS
 -----------------------------------------------------------------------------
 --    Copyright (c) exor corporation ltd, 2007
 -----------------------------------------------------------------------------
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.3  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.4  $';
    g_package_name CONSTANT varchar2(30) := 'tma_fpns_api';
 
---sccsid constant varchar2(30) :='"$Revision:   3.3  $"';
+--sccsid constant varchar2(30) :='"$Revision:   3.4  $"';
 --   g_body_sccsid is the SCCS ID for the package body
 --
 --------------------------------------------------------------------------------
@@ -179,7 +179,7 @@ cursor get_text is
 begin
 
    select hus_user_id into l_user_id 
-   from hig_users where hus_username = (select user from dual); 
+   from hig_users where hus_username = Sys_Context('NM3_SECURITY_CTX','USERNAME'); 
    
    ind := 1;
 
@@ -432,7 +432,7 @@ Begin
     from   all_tab_cols
     where  table_name  = l_tab_name
     And    column_name = l_col_name
-    AND    owner = hig.get_application_owner;
+    AND    owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 
     return l_ret;
 
