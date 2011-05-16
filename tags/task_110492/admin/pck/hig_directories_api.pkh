@@ -1,0 +1,307 @@
+CREATE OR REPLACE PACKAGE hig_directories_api authid current_user  AS 
+--<PACKAGE>
+--
+-----------------------------------------------------------------------------
+--
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)hig_directories_api.pkh	1.5 05/04/07
+--       Module Name      : hig_directories_api.pkh
+--       Date into SCCS   : 07/05/04 11:23:59
+--       Date fetched Out : 07/06/13 14:10:19
+--       SCCS Version     : 1.5
+--
+--
+--   Author : Graeme Johnson 
+--
+-----------------------------------------------------------------------------
+--
+--	Copyright (c) exor corporation ltd, 2005
+--
+-----------------------------------------------------------------------------
+--
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)hig_directories_api.pkh	1.5 05/04/07"';
+--  g_sccsid is the SCCS ID for the package
+  gc_java_read    constant  varchar2(10) := 'read' ;
+  gc_java_write   constant  varchar2(10) := 'write' ;
+  gc_java_execute constant  varchar2(10) := 'execute' ;
+  gc_java_delete  constant  varchar2(10) := 'delete' ;
+  gc_java_priv    constant  varchar2(30) := 'java.io.FilePermission' ;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version of the package
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get">
+--
+--   Function to get using HDIR_PK constraint
+--
+FUNCTION get (pi_hdir_name         hig_directories.hdir_name%TYPE
+             ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+             ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+             ) RETURN hig_directories%ROWTYPE;
+PRAGMA RESTRICT_REFERENCES (get, WNPS, WNDS);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="del">
+--
+--   Procedure to del using HDIR_PK constraint
+--
+PROCEDURE del (pi_hdir_name         hig_directories.hdir_name%TYPE
+              ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+              ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+              ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="lock_gen">
+--
+--   Function to lock using HDIR_PK constraint
+--
+FUNCTION lock_gen (pi_hdir_name         hig_directories.hdir_name%TYPE
+                  ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                  ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                  ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                  ) RETURN ROWID;
+--
+--   Procedure to lock using HDIR_PK constraint
+--
+PROCEDURE lock_gen (pi_hdir_name         hig_directories.hdir_name%TYPE
+                   ,pi_raise_not_found   BOOLEAN     DEFAULT TRUE
+                   ,pi_not_found_sqlcode PLS_INTEGER DEFAULT -20000
+                   ,pi_locked_sqlcode    PLS_INTEGER DEFAULT -20000
+                   );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ins">
+-- Inserts record into hig_directories
+-- Returns the record as inserted - trigger modified values
+--
+PROCEDURE ins (p_rec_hdir IN OUT hig_directories%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="debug">
+-- Debug a ROWTYPE record
+PROCEDURE debug (pi_rec_hdir hig_directories%ROWTYPE,p_level PLS_INTEGER DEFAULT 3);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="enforce_protection">
+-- Prevent certain operations on hig_directories records if the HDIR_PROTECTED flag is
+-- set to appropriate value
+PROCEDURE enforce_protection(pi_hdir_rec_old IN hig_directories%ROWTYPE
+                            ,pi_hdir_rec_new IN hig_directories%ROWTYPE
+							,pi_action       IN VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="mkdir">
+-- Create an Oracle directory
+PROCEDURE mkdir(pi_replace        IN BOOLEAN DEFAULT TRUE
+               ,pi_directory_name IN hig_directories.hdir_name%TYPE
+			   ,pi_directory_path IN hig_directories.hdir_path%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="rmdir">
+-- Remove an Oracle directory
+PROCEDURE rmdir(pi_directory_name IN hig_directories.hdir_name%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="grant_role_to_directory">
+-- Given a hig_directory_role - grant the role to the directory 
+PROCEDURE grant_role_on_directory(pi_hdr_rec IN hig_directory_roles%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="revoke_role_on_directory">
+-- Given a hig_directory_role - revoke the role from the given directory 
+PROCEDURE revoke_role_on_directory(pi_hdr_rec IN hig_directory_roles%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="directory_exists">
+-- Return Y if a given hig_directory also exists as an oracle directory
+FUNCTION directory_exists(pi_directory_name IN dba_directories.DIRECTORY_NAME%TYPE
+                         ,pi_directory_path IN dba_directories.DIRECTORY_PATH%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="directory_exists">
+-- Return TRUE if a given directory exists in HIG_DIRECTORIES and has a valid role for the user.
+FUNCTION hdir_exists(pi_dir_path IN dba_directories.directory_path%type) 
+RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="directory_read_permission">
+-- Return Y if the user has read permission on oracle directory
+FUNCTION directory_read_permission(pi_directory_name IN dba_directories.DIRECTORY_NAME%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="directory_write_permission">
+-- Return Y if the user has write permission on oracle directory
+FUNCTION directory_write_permission(pi_directory_name IN dba_directories.DIRECTORY_NAME%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="directory_write_permission">
+-- Fail if you cannot write to specified directory
+PROCEDURE check_write_allowed(pi_directory_name IN dba_directories.DIRECTORY_NAME%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_read_allowed">
+-- Fail if you cannot read from specified directory
+PROCEDURE check_read_allowed(pi_directory_name IN dba_directories.DIRECTORY_NAME%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="directory_role_applied">
+-- Return Y if the directory has the given role with the expected privs i.e. read or read/write granted
+FUNCTION directory_role_applied(pi_hdr_name IN hig_directory_roles.hdr_name%TYPE
+                               ,pi_hdr_role IN hig_directory_roles.hdr_role%TYPE
+                               ,pi_hdr_mode IN hig_directory_roles.hdr_mode%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="has_java_priv">
+-- Return true if the user has the given java privilege for the path supplied
+FUNCTION has_java_priv
+  ( pi_dir_name in hig_directories.hdir_name%type
+  , pi_hdr_priv IN user_java_policy.action%TYPE
+  , pi_user     IN user_java_policy.grantee_name%TYPE default Sys_Context('NM3_SECURITY_CTX','USERNAME')
+  ) RETURN BOOLEAN ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="grant_java_priv">
+procedure grant_java_priv
+  ( pi_dir_name in hig_directories.hdir_name%type
+  , pi_hdr_priv IN user_java_policy.action%TYPE
+  , pi_user     IN user_java_policy.grantee_name%TYPE default Sys_Context('NM3_SECURITY_CTX','USERNAME')
+  ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="revoke_java_priv">
+procedure revoke_java_priv
+  ( pi_dir_name in hig_directories.hdir_name%type
+  , pi_hdr_priv IN user_java_policy.action%TYPE
+  , pi_user     IN user_java_policy.grantee_name%TYPE default Sys_Context('NM3_SECURITY_CTX','USERNAME')
+  ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="grant_all_java_priv">
+procedure grant_all_java_priv
+  ( pi_dir_name in hig_directories.hdir_name%type
+  , pi_user     IN user_java_policy.grantee_name%TYPE default Sys_Context('NM3_SECURITY_CTX','USERNAME')
+  ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="revoke_all_java_priv">
+procedure revoke_all_java_priv
+  ( pi_dir_name in hig_directories.hdir_name%type
+  , pi_user     IN user_java_policy.grantee_name%TYPE default Sys_Context('NM3_SECURITY_CTX','USERNAME')
+  ) ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_true_dir_name">
+-- get directory name for a given location - mask for same function in nm3file
+FUNCTION get_true_dir_name
+  (pi_loc       IN varchar2
+  ) RETURN varchar2  ;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_dir_name">
+FUNCTION get_dir_name(pi_loc IN varchar2) 
+  RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_constant">
+-- get the value of the named constant
+-- 
+function get_constant(p_constant_name in varchar2) return varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="revoke_all_dir_role_privs">
+PROCEDURE revoke_all_dir_role_privs(pi_name IN hig_directories.hdir_name%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="grant_all_dir_roles">
+PROCEDURE grant_all_dir_roles(pi_name IN hig_directories.hdir_name%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="rebuild_all">
+PROCEDURE rebuild_all;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, RNDS, WNPS, WNDS);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, RNDS, WNPS, WNDS);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END hig_directories_api;
+/
+
+
