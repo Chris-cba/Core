@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.8   Feb 04 2011 15:36:30   Graeme.Johnson  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_bundle_loader.pkb-arc   3.9   May 16 2011 14:40:22   Steve.Cooper  $
 --       Module Name      : $Workfile:   doc_bundle_loader.pkb  $
---       Date into PVCS   : $Date:   Feb 04 2011 15:36:30  $
---       Date fetched Out : $Modtime:   Feb 03 2011 16:43:08  $
---       Version          : $Revision:   3.8  $
+--       Date into PVCS   : $Date:   May 16 2011 14:40:22  $
+--       Date fetched Out : $Modtime:   Apr 20 2011 09:04:18  $
+--       Version          : $Revision:   3.9  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.8  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   3.9  $';
 
   g_package_name CONSTANT varchar2(30) := 'doc_bundle_loader';
   
@@ -59,8 +59,8 @@ BEGIN
    
  pi_dbun_rec.dbun_date_created   := NVL(pi_dbun_rec.dbun_date_created,sysdate);
  pi_dbun_rec.dbun_date_modified  := NVL(pi_dbun_rec.dbun_date_modified,sysdate);
- pi_dbun_rec.dbun_modified_by    := NVL(pi_dbun_rec.dbun_modified_by,user); 
- pi_dbun_rec.dbun_created_by     := NVL(pi_dbun_rec.dbun_created_by,user);
+ pi_dbun_rec.dbun_modified_by    := NVL(pi_dbun_rec.dbun_modified_by,Sys_Context('NM3_SECURITY_CTX','USERNAME')); 
+ pi_dbun_rec.dbun_created_by     := NVL(pi_dbun_rec.dbun_created_by,Sys_Context('NM3_SECURITY_CTX','USERNAME'));
 
 
  INSERT INTO doc_bundles(dbun_bundle_id
