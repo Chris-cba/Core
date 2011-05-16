@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3web IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web.pkb-arc   2.1   Dec 16 2008 11:16:44   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3web.pkb-arc   2.2   May 16 2011 14:24:12   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3web.pkb  $
---       Date into PVCS   : $Date:   Dec 16 2008 11:16:44  $
---       Date fetched Out : $Modtime:   Dec 16 2008 11:11:20  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:24:12  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 10:12:34  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on         : 1.55
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3web IS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3web';
@@ -176,7 +176,7 @@ BEGIN
 --
    FOR cs_rec IN (SELECT *
                    FROM  session_context
-                  WHERE  namespace = nm3context.g_context_namespace
+                  WHERE  namespace = 'NM3CORE'
                   ORDER BY namespace
                           ,ATTRIBUTE
                  )
@@ -721,10 +721,9 @@ BEGIN
   --get db info
   IF c_dbwintitle
    THEN
-     l_retval :=    USER
+     l_retval :=    Sys_Context('NM3_SECURITY_CTX','USERNAME')
                  || '@'
-                 || nm3context.get_context(pi_namespace => nm3context.get_namespace
-                                          ,pi_attribute => 'INSTANCE_NAME');
+                 || Sys_Context('NM3CORE','INSTANCE_NAME');
                  --|| '.'
                  --|| nm3context.get_context(pi_namespace => nm3context.get_namespace
                                           --,pi_attribute => 'HOST_NAME');
