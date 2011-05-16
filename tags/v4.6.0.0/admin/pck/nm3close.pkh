@@ -1,0 +1,175 @@
+CREATE OR REPLACE PACKAGE nm3close AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)nm3close.pkh	1.7 05/15/03
+--       Module Name      : nm3close.pkh
+--       Date into SCCS   : 03/05/15 15:45:34
+--       Date fetched Out : 07/06/13 14:11:12
+--       SCCS Version     : 1.7
+--
+--
+--   Author : I Turnbull
+--
+--   nm3close package
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2000
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid      CONSTANT  VARCHAR2(2000) := '"@(#)nm3close.pkh	1.7 05/15/03"';
+  -- constants used for multi element close
+  c_gis         CONSTANT VARCHAR2(3) := 'GIS';  -- close from gis
+  c_extent      CONSTANT VARCHAR2(3) := 'EXT';  -- close from a temp extent
+  c_route       CONSTANT VARCHAR2(3) := 'ROU';  -- close a route
+--
+--
+--  g_sccsid is the SCCS ID for the package
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_close>
+-- Close an element, Does checks and raises application errors if
+-- element cannot be closed
+-- -20001, 'USER IS RESTRICTED, Cannot CLOSE element'
+-- -20100, 'Unable TO CLOSE Element has contiguous inventry'
+-- -20110, 'Unable TO CLOSE Element it has un-replaceable inventry'
+-- -20120, 'Inv TYPE Network location IS mandatory'
+
+PROCEDURE do_close(p_ne_id          nm_elements.ne_id%TYPE
+                  ,p_effective_date DATE DEFAULT  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                  ,p_neh_descr      nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS 0108990 12/03/2010
+                  );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="gis_close_elements">
+--
+PROCEDURE gis_close_elements (p_gdo_session_id gis_data_objects.gdo_session_id%TYPE
+                             ,p_effective_date DATE DEFAULT  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                             );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="multi_element_close">
+-- close a number of different elements
+-- pi_type = nm3close.c_gis, nm3close.c_extent
+-- pi_id  = gis_session id if type is c_gis
+-- pi_id  = temp_extent id if type is c_extent
+-- pi_effective_date is the date of the close
+-- pi_close_all = for routes to close all if non-inclusion route
+-- pi_end_date_datums = whether or not to end date the datum elements that comprise a Group of Sections
+--
+PROCEDURE multi_element_close ( pi_type            VARCHAR2
+                              , pi_id              NUMBER
+                              , pi_effective_date  DATE    DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                              , pi_close_all       VARCHAR2 DEFAULT 'N'
+                              , pi_end_date_datums VARCHAR2 DEFAULT 'N'
+                              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_gis">
+-- Return the c_gis constant
+FUNCTION get_c_gis RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_extent">
+-- Return the c_extent constant
+FUNCTION get_c_extent RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_c_route">
+-- Return the c_route constant
+FUNCTION get_c_route RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="close_node">
+-- This procedure closes (end-dates) the specified node at the given effective date
+--
+PROCEDURE close_node (pi_no_node_id     nm_nodes.no_node_id%TYPE
+                     ,pi_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                     );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_element_to_be_closed">
+-- Determine whether a given element in a Group of Groups/Group of Sections hierarchy
+-- should be end dated
+--
+FUNCTION is_group_to_be_closed(pi_parent_ne_type      IN nm_elements.ne_type%TYPE
+                              ,pi_nti_nw_parent_type  IN nm_type_inclusion.nti_nw_parent_type%TYPE
+                              ,pi_nti_nw_child_type   IN nm_type_inclusion.nti_nw_child_type%TYPE
+                              ,pi_end_date_all        IN VARCHAR2 DEFAULT 'N') RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_route_membership">
+-- Populate pl/sql tables with all of the membership details below a given Group of Groups/Group of Sections
+-- element
+--
+PROCEDURE get_membership_hierarchy(pi_route_id                      IN     NM_ELEMENTS.ne_id%TYPE
+                                  ,pi_end_date_all                  IN     VARCHAR2 DEFAULT 'N'
+--                                ,pi_end_date_datums               IN     VARCHAR2 DEFAULT 'N'
+                                  ,pi_include_non_closed_nodes      IN     BOOLEAN DEFAULT FALSE
+                                  );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="datums_are_to_be_closed">
+-- If a given element is a Group of Sections and user
+-- has expicitly opted to end date datums - OR - the network
+-- type of the Group of Sections is AutoIncluded - then return TRUE
+--
+FUNCTION datums_are_to_be_closed (pi_ne_id           IN   nm_elements.ne_id%TYPE
+                                 ,pi_ne_type         IN   nm_elements.ne_type%TYPE
+                                 ,pi_end_date_datums IN   VARCHAR2) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_c_gis, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_c_extent, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_c_route, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (is_group_to_be_closed, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3close;
+/
