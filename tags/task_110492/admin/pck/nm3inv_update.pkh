@@ -1,0 +1,136 @@
+CREATE OR REPLACE PACKAGE nm3inv_update AS
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_update.pkh-arc   2.2   May 16 2011 14:44:56   Steve.Cooper  $
+--       Module Name      : $Workfile:   nm3inv_update.pkh  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:56  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 13:28:26  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.2
+-------------------------------------------------------------------------
+--   Author : Kevin Angus
+--
+--    nm3inv_update
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2002
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+
+  -----------
+  --constants
+  -----------
+  --g_sccsid is the SCCS ID for the package
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+
+  -----------
+  --variables
+  -----------
+  g_iit_rec nm_inv_items%ROWTYPE;
+
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_version">
+--
+-- This function returns the current SCCS version
+--
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_body_version">
+--
+-- This function returns the current SCCS version of the package body
+--
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="date_tracked">
+--
+-- This procedure creates a copy of the inventory over the specified extent.
+-- Any items that span the limits of the extent will be split.
+--
+-- If the the attribute pi_attrib is supplied then all of the newly copied
+-- items will have that attribute updated to pi_new_val. This update
+-- operation is therefore date tracked and so maintains the history of the
+-- attribute's values.
+--
+PROCEDURE date_tracked(pi_inv_type       IN nm_inv_types.nit_inv_type%TYPE
+                      ,pi_roi_nte_id     IN nm_nw_temp_extents.nte_job_id%TYPE
+                      ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                      );
+PROCEDURE date_tracked(pi_inv_type       IN nm_inv_types.nit_inv_type%TYPE
+                      ,pi_roi_npe_id     IN nm_nw_persistent_extents.npe_job_id%TYPE
+                      ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                      );
+PROCEDURE date_tracked(pi_inv_type       IN nm_inv_types.nit_inv_type%TYPE
+                      ,pi_roi_nte_id     IN nm_nw_temp_extents.nte_job_id%TYPE
+                      ,pi_attrib         IN nm_inv_type_attribs.ita_attrib_name%TYPE
+                      ,pi_new_val        IN varchar2
+                      ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                      );
+PROCEDURE date_tracked(pi_inv_type       IN nm_inv_types.nit_inv_type%TYPE
+                      ,pi_roi_npe_id     IN nm_nw_persistent_extents.npe_job_id%TYPE
+                      ,pi_attrib         IN nm_inv_type_attribs.ita_attrib_name%TYPE
+                      ,pi_new_val        IN varchar2
+                      ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                      );
+PROCEDURE date_tracked(pi_inv_type       IN nm_inv_types.nit_inv_type%TYPE
+                      ,pi_roi_nte_id     IN nm_nw_temp_extents.nte_job_id%TYPE
+                      ,pi_attrib         IN nm_inv_type_attribs.ita_attrib_name%TYPE
+                      ,pi_new_val        IN number
+                      ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                      );
+PROCEDURE date_tracked(pi_inv_type       IN nm_inv_types.nit_inv_type%TYPE
+                      ,pi_roi_npe_id     IN nm_nw_persistent_extents.npe_job_id%TYPE
+                      ,pi_attrib         IN nm_inv_type_attribs.ita_attrib_name%TYPE
+                      ,pi_new_val        IN number
+                      ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                      );
+PROCEDURE date_tracked(pi_inv_type       IN nm_inv_types.nit_inv_type%TYPE
+                      ,pi_roi_nte_id     IN nm_nw_temp_extents.nte_job_id%TYPE
+                      ,pi_attrib         IN nm_inv_type_attribs.ita_attrib_name%TYPE
+                      ,pi_new_val        IN date
+                      ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                      );
+PROCEDURE date_tracked(pi_inv_type       IN nm_inv_types.nit_inv_type%TYPE
+                      ,pi_roi_npe_id     IN nm_nw_persistent_extents.npe_job_id%TYPE
+                      ,pi_attrib         IN nm_inv_type_attribs.ita_attrib_name%TYPE
+                      ,pi_new_val        IN date
+                      ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                      );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="date_track_update_item">
+-- This procedure end dates the existing item and creates a new one in it's place
+--  inheriting all hierarchical children
+--
+PROCEDURE date_track_update_item (pi_iit_ne_id_old IN     nm_inv_items.iit_ne_id%TYPE
+                                 ,pio_rec_iit      IN OUT nm_inv_items%ROWTYPE
+                                 );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3inv_update;
+
+
+/
+
