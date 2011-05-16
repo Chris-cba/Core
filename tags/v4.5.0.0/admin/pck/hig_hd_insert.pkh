@@ -1,0 +1,106 @@
+CREATE OR REPLACE PACKAGE hig_hd_insert AS
+--<PACKAGE>
+--   SCCS Identifiers :-
+--
+--       sccsid           : @(#)hig_hd_insert.pkh	1.3 03/20/07
+--       Module Name      : hig_hd_insert.pkh
+--       Date into SCCS   : 07/03/20 09:29:23
+--       Date fetched Out : 07/06/13 14:10:21
+--       SCCS Version     : 1.3
+--
+--
+--   Author : D. Cope
+--
+--   Package of dynamic sql routines used in xml file insertion
+--
+-----------------------------------------------------------------------------
+--    Copyright (c) exor corporation ltd, 2003
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+  g_sccsid     CONSTANT  varchar2(2000) := '@(#)hig_hd_insert.pkh	1.3 03/20/07';
+  g_xmldomnode           xmldom.DOMNode;
+  g_xmldomdoc            xmldom.DOMDocument;
+
+--  g_sccsid is the SCCS ID for the package
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="READ_XML_FILE">
+-- This function loads and parses a given xml file, returning a pointer to
+-- the parsed xml document
+FUNCTION read_xml_file (p_dir      IN varchar2
+                       ,p_file     IN varchar2
+                       ,p_err_file IN varchar2 DEFAULT NULL) RETURN xmldom.DOMDocument;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="READ_XML_CLOB">
+-- This function loads and parses a given xml clob, returning a pointer to
+-- the parsed xml document
+FUNCTION read_xml_clob (p_clob     IN clob) RETURN xmldom.DOMDocument;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="RELEASE_DOCUMENT">
+-- This procedure should be called after all processing has been completed
+-- so that Oracle can clear up the memory associated with the xml document
+PROCEDURE release_document (p_doc    IN xmldom.DOMDocument);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_TOP_NODE">
+-- This function returns the top node of a given xml docmument
+FUNCTION get_top_node (p_doc    IN xmldom.DOMDocument
+                      ,p_tag    IN varchar2) RETURN xmldom.DOMNode;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="SELECT_NODES">
+-- This function returns a list of nodes from the start point p_node matching
+-- the path p_path
+FUNCTION select_nodes (p_node IN xmldom.DOMNode  
+                      ,p_path IN varchar2) RETURN xmldom.DOMNodeList;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VALUE">
+-- This function returns the values of the given tag element name starting at p_node
+FUNCTION get_value(p_node IN xmldom.DOMNode
+                  ,p_tag  IN varchar2) RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="INSERT_ALL_DETAILS">
+-- This functio inserts all details of the document according to the
+-- specification detailed in p_module. The number of rows inserted is returned
+FUNCTION insert_all_details (p_module          IN hig_hd_modules.hhm_module%TYPE
+                            ,p_doc             IN xmldom.DOMDocument
+                            ,p_owner           IN all_users.username%TYPE DEFAULT Sys_Context('NM3CORE','APPLICATION_OWNER')
+                            ,p_commit_per_rows IN pls_integer DEFAULT 0) RETURN pls_integer;
+--</PROC>
+--
+END Hig_Hd_Insert;
+/
