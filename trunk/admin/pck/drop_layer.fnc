@@ -3,11 +3,11 @@ CREATE OR REPLACE procedure drop_layer ( p_table in varchar2, p_column in varcha
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/drop_layer.fnc-arc   2.0   Jun 14 2007 14:59:48   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/drop_layer.fnc-arc   2.1   May 16 2011 14:41:32   Steve.Cooper  $
 --       Module Name      : $Workfile:   drop_layer.fnc  $
---       Date into SCCS   : $Date:   Jun 14 2007 14:59:48  $
---       Date fetched Out : $Modtime:   Jun 14 2007 14:59:00  $
---       SCCS Version     : $Revision:   2.0  $
+--       Date into SCCS   : $Date:   May 16 2011 14:41:32  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 08:41:18  $
+--       SCCS Version     : $Revision:   2.1  $
 --       Based on SCCS Version     : 1.1
 --
 -----------------------------------------------------------------------------
@@ -15,7 +15,7 @@ CREATE OR REPLACE procedure drop_layer ( p_table in varchar2, p_column in varcha
 -----------------------------------------------------------------------------
 cur_string varchar2(2000);
 qq         char := chr(39);
-l_owner    varchar2(30) := nm3context.get_context(nm3context.get_namespace, 'APPLICATION_OWNER');
+l_owner    varchar2(30) := Sys_Context('NM3CORE','APPLICATION_OWNER');
 
 /*
 SUBTYPE layer_record_t        IS sde.layers%ROWTYPE;

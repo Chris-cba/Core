@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.9   Mar 08 2011 09:51:30   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.10   May 16 2011 14:41:32   Steve.Cooper  $
 --       Module Name      : $Workfile:   doc_locations_api.pkb  $
---       Date into PVCS   : $Date:   Mar 08 2011 09:51:30  $
---       Date fetched Out : $Modtime:   Mar 08 2011 09:50:54  $
---       Version          : $Revision:   2.9  $
+--       Date into PVCS   : $Date:   May 16 2011 14:41:32  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 10:37:02  $
+--       Version          : $Revision:   2.10  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.9  $';
+  g_body_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.10  $';
 --
   g_package_name CONSTANT varchar2(30) := 'doc_locations_api';
 --
@@ -457,11 +457,11 @@ BEGIN
      l_tab_comments(1)  := '--';
      l_tab_comments(2)  := '--   SCCS Identifiers :-';
      l_tab_comments(3)  := '--';
-     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.9   Mar 08 2011 09:51:30   Ade.Edwards  $';
+     l_tab_comments(4)  := '--       pvcsid                     : $Header:   //vm_latest/archives/nm3/admin/pck/doc_locations_api.pkb-arc   2.10   May 16 2011 14:41:32   Steve.Cooper  $';
      l_tab_comments(5)  := '--       Module Name                : $Workfile:   doc_locations_api.pkb  $';
-     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   Mar 08 2011 09:51:30  $';
-     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Mar 08 2011 09:50:54  $';
-     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.9  $';
+     l_tab_comments(6)  := '--       Date into PVCS             : $Date:   May 16 2011 14:41:32  $';
+     l_tab_comments(7)  := '--       Date fetched Out           : $Modtime:   Apr 01 2011 10:37:02  $';
+     l_tab_comments(8)  := '--       PVCS Version               : $Revision:   2.10  $';
      l_tab_comments(9)  := '--';
      l_tab_comments(10) := '--   table_name_WHO trigger';
      l_tab_comments(11) := '--';
@@ -877,7 +877,7 @@ END get_location_descr;
   --
     l_rec_table.dftt_doc_id          := pi_rec_df.dftt_doc_id;
     l_rec_table.dftt_revision        := NVL(pi_rec_df.dftt_revision,1);
-    l_rec_table.dftt_start_date      := NVL(pi_rec_df.dftt_start_date,nm3user.get_effective_date);
+    l_rec_table.dftt_start_date      := NVL(pi_rec_df.dftt_start_date,To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'));
     l_rec_table.dftt_content         := pi_rec_df.dftt_content;
     l_rec_table.dftt_full_path       := pi_rec_df.dftt_full_path;
     l_rec_table.dftt_filename        := strip_filename(pi_rec_df.dftt_full_path);
@@ -904,7 +904,7 @@ END get_location_descr;
   --
     l_rec_table.doc_id          := pi_rec_df.doc_id;
     l_rec_table.revision        := NVL(pi_rec_df.revision,1);
-    l_rec_table.start_date      := NVL(pi_rec_df.start_date,nm3user.get_effective_date);
+    l_rec_table.start_date      := NVL(pi_rec_df.start_date,To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'));
     l_rec_table.content         := pi_rec_df.content;
     l_rec_table.full_path       := pi_rec_df.full_path;
     l_rec_table.filename        := NVL(pi_rec_df.filename, strip_filename(pi_rec_df.full_path));
