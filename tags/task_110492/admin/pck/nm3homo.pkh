@@ -1,0 +1,296 @@
+CREATE OR REPLACE PACKAGE nm3homo AS
+--<PACKAGE>
+--
+--   PVCS Identifiers :-
+--
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3homo.pkh-arc   2.3   May 16 2011 14:44:52   Steve.Cooper  $
+--       Module Name      : $Workfile:   nm3homo.pkh  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:52  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 09:24:00  $
+--       PVCS Version     : $Revision:   2.3  $
+--
+--
+--   Author : Jonathan Mills
+--
+--   Homogenous Inventory Update package
+--
+-----------------------------------------------------------------------------
+--	Copyright (c) exor corporation ltd, 2000
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+   g_sccsid      CONSTANT  VARCHAR2(2000) := '"$Revision:   2.3  $"';
+--  g_sccsid is the SCCS ID for the package
+--
+   c_contiguous_warning_code CONSTANT VARCHAR2(20) := 'CONTIGUOUS';
+--
+   g_rec_iit   NM_INV_ITEMS%ROWTYPE;
+   g_iit_ne_id NM_INV_ITEMS.iit_ne_id%TYPE;
+   g_found     BOOLEAN;
+   g_homo_touch_flag BOOLEAN := TRUE;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="HOMO_UPDATE">
+-- This procedure inserts member records for a inventory item to extend over the
+--  whole of the linear continuous Network Extent on an effective date. This will
+--  replace any existing inventory of the same INV_TYPE (+ XSP if applicable)
+--  over the specified extent
+--
+PROCEDURE homo_update (p_temp_ne_id_in  IN NUMBER
+                      ,p_iit_ne_id      IN NUMBER
+                      ,p_effective_date IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                      );
+PROCEDURE homo_update (p_temp_ne_id_in  IN     NUMBER
+                      ,p_iit_ne_id      IN     NUMBER
+                      ,p_effective_date IN     DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                      ,p_warning_code      OUT VARCHAR2
+                      ,p_warning_msg       OUT VARCHAR2
+                      );
+--<B>
+-- When calling this procedure check on return (either normal or error) that
+--  nm3user.get_effective_date is the same as the global stored in the form and
+--  reset the effective date accordingly
+--</B>
+--
+--  Possible exceptions raised are
+--  -20501, No NM_NW_TEMP_EXTENTS records found
+--  -20502, No NM_INV_ITEMS record found
+--  -20503, There are future inventory locations which would be affected
+--  -20504, Old NM_INV_ITEMS record found which overlaps new record at both
+--            beginning and end. Not allowed
+--  -20505, Inventory type "xxxx" invalid on NW_TYPE "xx"
+--  -20506, XSP not allowed for Inventory type "xxxx"
+--  -20507, XSP must be specified for Inventory type "xxxx"
+--  -20508, XSP "xxxx" is not allowed for Inventory type "xxxx" on
+--            NW_TYPE "xx", SUB_CLASS "x"
+--  -20509, No NM_INV_TYPES record found for Inventory type "xxxx"
+--  -20510, No NM_ELEMENTS record found for NE_ID "nnnnnn"
+--  -20511, There are child inventory records which would be affected
+--  -20512, Continuous Inventory Items must not be placed at a single point
+--  -20513, Inventory types not marked as "multiple allowed" must only have a single location
+--  -20514, Overlaps not allowed on inventory types which are marked as contiguous
+--  -20515, Point Inventory Items can only be placed at single points
+--  -20516, Inventory Locations already exist for affected inventory at this point with this start date
+--  -20517, Inventory Locations already exist for this item at this point with this start date
+--  -20518, Cannot locate Inventory records which are in a Child AT relationship
+--  -20519, NM_NW_TEMP_EXTENTS records with overlaps found
+--
+--  Possible Warnings returned are
+--  1. Warning Code - CONTIGUOUS
+--     Meaning      - Inventory Type is contiguous but elements exist which aren't wholly "covered" by this inv_type
+--     Warning Msg  - Consists of a list of NE_UNIQUEs which are affected in this way
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_contiguous_warning_const">
+-- This function returns the value of c_contiguous_warning_code
+FUNCTION get_contiguous_warning_const RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_seq_no_from_orig">
+--
+FUNCTION get_seq_no_from_orig (nte_ne_id_of  IN NUMBER
+                              ,nte_begin_mp  IN NUMBER
+                              ,nte_end_mp    IN NUMBER
+                              ) RETURN NUMBER;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="end_inv_location">
+-- This procedure end dates the location of the specified inventory item and
+-- any children.
+-- pi_check_for_parent should be set to TRUE far all calls.
+--
+PROCEDURE end_inv_location(pi_iit_ne_id            IN     NM_INV_ITEMS.iit_ne_id%TYPE
+                          ,pi_effective_date       IN     DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                          ,pi_check_for_parent     IN     BOOLEAN DEFAULT TRUE
+                          ,pi_ignore_item_loc_mand IN     BOOLEAN DEFAULT FALSE
+                          ,po_warning_code            OUT VARCHAR2
+                          ,po_warning_msg             OUT VARCHAR2
+                          );
+--
+-- Possible exceptions raised are:
+--
+-- -20502 No NM_INV_ITEMS record found iit_ne_id= <iit_ne_id>
+-- -20503 There are future inventory locations which would be affected.
+-- -20509 No NM_INV_TYPES record found for Inventory type "<inv_type>"
+-- -20530 Location is mandatory for this item or its children.
+-- -20531 Cannot remove inventory locations which are in a Child AT relationship
+--
+--  Possible Warnings returned are:
+--
+--  1. Warning Code - CONTIGUOUS
+--     Meaning      - Inventory Type is contiguous but elements exist which aren't wholly "covered" by this inv_type
+--     Warning Msg  -
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="end_inv_location_by_temp_ne">
+-- This procedure end dates the location within a temp ne of the specified inventory item and
+-- any children.
+-- pi_check_for_parent should be set to TRUE far all calls.
+--
+PROCEDURE end_inv_location_by_temp_ne (pi_iit_ne_id            IN     NM_INV_ITEMS.iit_ne_id%TYPE
+                                      ,pi_nte_job_id           IN     NM_NW_TEMP_EXTENTS.nte_job_id%TYPE
+                                      ,pi_effective_date       IN     DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                                      ,pi_check_for_parent     IN     BOOLEAN DEFAULT TRUE
+                                      ,pi_ignore_item_loc_mand IN     BOOLEAN DEFAULT FALSE
+                                      ,pi_leave_child_items    IN     BOOLEAN DEFAULT FALSE
+                                      ,po_warning_code            OUT VARCHAR2
+                                      ,po_warning_msg             OUT VARCHAR2
+                                      );
+--
+--  Possible Warnings returned are:
+--
+--  1. Warning Code - CONTIGUOUS
+--     Meaning      - Inventory Type is contiguous but elements exist which aren't wholly "covered" by this inv_type
+--     Warning Msg  -
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+----<PROC NAME="end_date_dependent_inventory">
+--PROCEDURE end_date_dependent_inventory (pi_iit_ne_id  IN nm_inv_items.iit_ne_id%TYPE
+--                                       ,pi_nte_job_id IN nm_nw_temp_extents.nte_job_id%TYPE
+--                                       );
+----
+----</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="future_affected_inv_exists">
+FUNCTION future_affected_inv_exists (p_nte_job_id     NM_NW_TEMP_EXTENTS.nte_job_id%TYPE
+                                    ,p_inv_type       NM_MEMBERS.nm_obj_type%TYPE
+                                    ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                                    ) RETURN BOOLEAN;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_future_affected_inv">
+FUNCTION get_future_affected_inv (p_nte_job_id     NM_NW_TEMP_EXTENTS.nte_job_id%TYPE
+                                 ,p_inv_type       NM_MEMBERS.nm_obj_type%TYPE
+                                 ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                                 ) RETURN nm3type.tab_number;
+--
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="is_affected_by_exclusivity">
+-- This function returns TRUE if the passed p_iit_ne_id is affected by
+--  the exclusivity of p_rec_iit which we have already established is located
+--   at the same location (at least partly)
+--
+FUNCTION is_affected_by_exclusivity (p_iit_ne_id NM_INV_ITEMS.iit_ne_id%TYPE
+                                    ,p_rec_iit   NM_INV_ITEMS%ROWTYPE
+                                    ,p_exclusive BOOLEAN
+                                    ,p_x_sect    BOOLEAN
+                                    ) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_temp_ne_for_pnt_or_cont">
+-- This procedure will raise an error if the passed NTE_JOB_ID is not valid
+--  for either point or continuous items
+-- i.e. is Point and temp_ne contains non-zero length records
+--   or is Cont  and temp_ne contains     zero length records
+--
+PROCEDURE check_temp_ne_for_pnt_or_cont (pi_nte_job_id  NM_NW_TEMP_EXTENTS.nte_job_id%TYPE
+                                        ,pi_pnt_or_cont NM_INV_TYPES.nit_pnt_or_cont%TYPE
+                                        );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="historic_locate_init">
+--
+-- This procedure should be called before initiating an asset location at a
+-- historic date.
+--
+PROCEDURE historic_locate_init(pi_effective_date IN date
+                              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="historic_locate_validation">
+--
+-- This procedure should be called before calling homo_update to validate
+-- the intended location for historic loading
+--
+PROCEDURE historic_locate_validation(pi_nte_job_id   IN nm_nw_temp_extents.nte_job_id%TYPE
+                                    ,pi_user_ne_id   IN nm_elements.ne_id%TYPE DEFAULT NULL
+                                    ,pi_user_ne_type IN nm_elements.ne_type%TYPE DEFAULT NULL
+                                    );
+
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="historic_locate_post">
+--
+-- This procedure should be called after calling homo_update to do any
+-- post location checks or cleanup. 
+--
+PROCEDURE historic_locate_post(pi_init_effective_date IN date
+                              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="translate_location_in_time">
+--
+-- This function applies network edits to a location to bring it up to 
+-- the specified target date.
+--
+FUNCTION translate_location_in_time(pi_job_id      IN nm_nw_temp_extents.nte_job_id%TYPE
+                                   ,pi_target_date IN date
+                                   ) RETURN nm_nw_temp_extents.nte_job_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA
+   PRAGMA RESTRICT_REFERENCES (get_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_body_version, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_contiguous_warning_const, rnds, wnps, wnds);
+   PRAGMA RESTRICT_REFERENCES (get_seq_no_from_orig,wnds,wnps);
+   PRAGMA RESTRICT_REFERENCES (future_affected_inv_exists,wnds,wnps,trust);
+   PRAGMA RESTRICT_REFERENCES (get_future_affected_inv,wnds,wnps,trust);
+
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+END nm3homo;
+/
