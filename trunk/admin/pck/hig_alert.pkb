@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --3
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.13   Mar 10 2011 12:27:50   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_alert.pkb-arc   3.14   May 16 2011 14:42:10   Steve.Cooper  $
 --       Module Name      : $Workfile:   hig_alert.pkb  $
---       Date into PVCS   : $Date:   Mar 10 2011 12:27:50  $
---       Date fetched Out : $Modtime:   Mar 10 2011 11:25:50  $
---       Version          : $Revision:   3.13  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:10  $
+--       Date fetched Out : $Modtime:   Apr 20 2011 11:26:20  $
+--       Version          : $Revision:   3.14  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,8 +17,8 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.13  $';
-  g_app_owner     CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
+  g_body_sccsid   CONSTANT varchar2(2000) := '$Revision:   3.14  $';
+
   c_date_format   CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  clob;
   --g_trigger_text1 Varchar2(32767) ;  
@@ -1990,7 +1990,7 @@ BEGIN
             WHERE  halt_id           = pi_halt_id ;
         END IF ;         
         l_nit_rec := nm3get.get_nit(l_halt_rec.halt_nit_inv_type);                          
-        append('CREATE OR REPLACE TRIGGER '||g_app_owner||'.'||l_trigger_name,'N');
+        append('CREATE OR REPLACE TRIGGER '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_trigger_name,'N');
         append('AFTER') ;
         append(l_halt_rec.halt_operation,'N');
         l_cnt := 0 ;
@@ -2175,9 +2175,9 @@ IS
 --
    CURSOR c_get_status
    IS
-   SELECT Initcap(status)
-   FROM   user_triggers
-   WHERE  trigger_name = Upper(pi_trigger_name);
+  Select  Initcap(dt.Status)
+  From    Dba_Triggers  dt
+  Where   dt.Trigger_Name   = Upper(Pi_Trigger_Name);
  
    l_status Varchar2(50);
 --

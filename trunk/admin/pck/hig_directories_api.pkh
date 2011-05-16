@@ -209,7 +209,7 @@ FUNCTION directory_role_applied(pi_hdr_name IN hig_directory_roles.hdr_name%TYPE
 FUNCTION has_java_priv
   ( pi_dir_name in hig_directories.hdir_name%type
   , pi_hdr_priv IN user_java_policy.action%TYPE
-  , pi_user     IN user_java_policy.grantee_name%TYPE default user
+  , pi_user     IN user_java_policy.grantee_name%TYPE default Sys_Context('NM3_SECURITY_CTX','USERNAME')
   ) RETURN BOOLEAN ;
 --</PROC>
 --
@@ -219,7 +219,7 @@ FUNCTION has_java_priv
 procedure grant_java_priv
   ( pi_dir_name in hig_directories.hdir_name%type
   , pi_hdr_priv IN user_java_policy.action%TYPE
-  , pi_user     IN user_java_policy.grantee_name%TYPE default user
+  , pi_user     IN user_java_policy.grantee_name%TYPE default Sys_Context('NM3_SECURITY_CTX','USERNAME')
   ) ;
 --</PROC>
 --
@@ -229,7 +229,7 @@ procedure grant_java_priv
 procedure revoke_java_priv
   ( pi_dir_name in hig_directories.hdir_name%type
   , pi_hdr_priv IN user_java_policy.action%TYPE
-  , pi_user     IN user_java_policy.grantee_name%TYPE default user
+  , pi_user     IN user_java_policy.grantee_name%TYPE default Sys_Context('NM3_SECURITY_CTX','USERNAME')
   ) ;
 --</PROC>
 --
@@ -238,7 +238,7 @@ procedure revoke_java_priv
 --<PROC NAME="grant_all_java_priv">
 procedure grant_all_java_priv
   ( pi_dir_name in hig_directories.hdir_name%type
-  , pi_user     IN user_java_policy.grantee_name%TYPE default user
+  , pi_user     IN user_java_policy.grantee_name%TYPE default Sys_Context('NM3_SECURITY_CTX','USERNAME')
   ) ;
 --</PROC>
 --
@@ -247,7 +247,7 @@ procedure grant_all_java_priv
 --<PROC NAME="revoke_all_java_priv">
 procedure revoke_all_java_priv
   ( pi_dir_name in hig_directories.hdir_name%type
-  , pi_user     IN user_java_policy.grantee_name%TYPE default user
+  , pi_user     IN user_java_policy.grantee_name%TYPE default Sys_Context('NM3_SECURITY_CTX','USERNAME')
   ) ;
 --</PROC>
 --

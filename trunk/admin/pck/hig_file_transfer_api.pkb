@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_file_transfer_api.pkb-arc   3.2   May 17 2010 15:57:46   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_file_transfer_api.pkb-arc   3.3   May 16 2011 14:42:10   Steve.Cooper  $
 --       Module Name      : $Workfile:   hig_file_transfer_api.pkb  $
---       Date into PVCS   : $Date:   May 17 2010 15:57:46  $
---       Date fetched Out : $Modtime:   May 17 2010 15:57:02  $
---       Version          : $Revision:   3.2  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:10  $
+--       Date fetched Out : $Modtime:   Apr 21 2011 07:49:02  $
+--       Version          : $Revision:   3.3  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid    CONSTANT VARCHAR2(2000) := '$Revision:   3.2  $';
+  g_body_sccsid    CONSTANT VARCHAR2(2000) := '$Revision:   3.3  $';
   g_package_name   CONSTANT varchar2(30) := 'hig_file_transfer_api';
   g_pending        CONSTANT varchar2(30) := 'PENDING';
   g_internal       CONSTANT varchar2(30) := 'INTERNAL'; 
@@ -118,7 +118,7 @@ AS
         l_tab_queue(i).hftq_batch_no             := l_hftq_batch_no;
         l_tab_queue(i).hftq_id                   := nm3ddl.sequence_nextval('hftq_id_seq');
         l_tab_queue(i).hftq_date                 := TO_DATE(TO_CHAR(SYSDATE,'DD-MON-RRRR HH24:SS:MI'),'DD-MON-RRRR HH24:SS:MI');
-        l_tab_queue(i).hftq_initiated_by         := USER;
+        l_tab_queue(i).hftq_initiated_by         := Sys_Context('NM3_SECURITY_CTX','USERNAME');
         l_tab_queue(i).hftq_direction            := NVL(pi_tab_files(i).direction,'IN');
         l_tab_queue(i).hftq_transfer_type        := NVL(pi_tab_files(i).transfer_type, g_internal);
         l_tab_queue(i).hftq_source               := pi_tab_files(i).source;

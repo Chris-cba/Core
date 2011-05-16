@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_audit.pkb-arc   3.5   Oct 26 2010 14:03:06   Linesh.Sorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_audit.pkb-arc   3.6   May 16 2011 14:42:10   Steve.Cooper  $
 --       Module Name      : $Workfile:   hig_audit.pkb  $
---       Date into PVCS   : $Date:   Oct 26 2010 14:03:06  $
---       Date fetched Out : $Modtime:   Oct 26 2010 13:57:40  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:10  $
+--       Date fetched Out : $Modtime:   Apr 20 2011 16:07:14  $
+--       Version          : $Revision:   3.6  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,10 +17,9 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.5  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.6  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_audit';
-  g_app_owner    CONSTANT  VARCHAR2(30) := hig.get_application_owner; 
   c_date_format  CONSTANT varchar2(30) := 'DD-Mon-YYYY HH24:MI:SS';
   g_trigger_text  Clob;
 --
@@ -77,7 +76,7 @@ BEGIN
        append  ('Null,');
        append  ('Sysdate,');
        append  ('''I'',');
-       append  ('nm3user.get_user_id,');
+       append  ('To_Number(Sys_Context(''NM3CORE'',''USER_ID'')),');
        append  ('sys_context(''USERENV'',''TERMINAL''),');
        append  ('sys_context(''USERENV'',''OS_USER''),');
        append  (''''||pi_haut_descr||''');');
@@ -173,7 +172,7 @@ BEGIN
                 WHERE  haut_id           = pi_haut_id ;
             END IF ;
             l_nit_rec := nm3get.get_nit(haua.haut_nit_inv_type);                          
-            append('CREATE OR REPLACE TRIGGER '||g_app_owner||'.'||l_trigger_name,'N');
+            append('CREATE OR REPLACE TRIGGER '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_trigger_name,'N');
             append('AFTER') ;
             append(haua.haut_operation,'N');
             l_cnt := 0 ;
@@ -332,27 +331,29 @@ EXCEPTION
 --
 END create_trigger;
 --
-FUNCTION get_trigger_status(pi_trigger_name hig_audit_types.haut_trigger_name%TYPE) 
-RETURN varchar2
-IS
+Function  Get_Trigger_Status  (
+                              pi_Trigger_Name  Hig_Audit_Types.Haut_Trigger_Name%Type
+                              )  Return Varchar2
+Is
+   l_Status   Dba_Triggers.Status%Type;
 --
-   CURSOR c_get_status
-   IS
-   SELECT Initcap(status)
-   FROM   user_triggers
-   WHERE  trigger_name = Upper(pi_trigger_name);
- 
-   l_status Varchar2(50);
---
-BEGIN
---
-   OPEN  c_get_status;
-   FETCH c_get_status INTO l_status;
-   CLOSE c_get_status;
+Begin
+  Begin
+    Select  Initcap(dt.Status)
+    Into    l_Status
+    From    Dba_Triggers  dt
+    Where   Owner             =   Sys_Context('NM3_SECURITY_CTX','USERNAME')
+    And     dt.Trigger_Name   =   Upper(Pi_Trigger_Name)
+    And     Rownum            =   1;
 
-   RETURN l_status ;
---
-END get_trigger_status ;
+  Exception
+    When No_Data_Found Then
+      Null;
+  End;
+  
+  Return l_Status ;
+  
+End Get_Trigger_Status;
 --
 FUNCTION drop_trigger(pi_haut_id       IN  hig_audit_types.haut_id%TYPE
                      ,pi_trigger_name IN  hig_audit_types.haut_trigger_name%TYPE

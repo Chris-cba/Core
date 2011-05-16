@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_flex_attribute.pkb-arc   3.3   Jun 28 2010 10:17:36   lsorathia  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/hig_flex_attribute.pkb-arc   3.4   May 16 2011 14:42:10   Steve.Cooper  $
 --       Module Name      : $Workfile:   hig_flex_attribute.pkb  $
---       Date into PVCS   : $Date:   Jun 28 2010 10:17:36  $
---       Date fetched Out : $Modtime:   Jun 28 2010 09:37:36  $
---       Version          : $Revision:   3.3  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:10  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 14:38:52  $
+--       Version          : $Revision:   3.4  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,7 +17,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.3  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   3.4  $';
 
   g_package_name CONSTANT varchar2(30) := 'hig_flex_attribute';
 --
@@ -278,7 +278,7 @@ BEGIN
    THEN
        BEGIN 
        --
-          l_format := Nvl(l_ita_rec.ita_format_mask,nm3user.get_user_date_mask) ;
+          l_format := Nvl(l_ita_rec.ita_format_mask,Sys_Context('NM3CORE','USER_DATE_MASK')) ;
           l_date   := To_Date(pi_attrib_data,l_format);
        --  
        EXCEPTION

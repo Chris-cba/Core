@@ -510,7 +510,7 @@ FUNCTION hdir_exists(pi_dir_path IN dba_directories.directory_path%type)
 RETURN BOOLEAN
 AS
 --
-CURSOR valid_dir_cur(p_dir_path dba_directories.directory_path%type, p_user VARCHAR2)
+CURSOR valid_dir_cur(p_dir_path dba_directories.directory_path%type)
 IS
   SELECT 'X'
   FROM hig_directories
@@ -522,15 +522,14 @@ IS
   AND hur_role = hdr_role
   AND ((rtrim(ltrim(hdir_path, '/'), '/') = rtrim(ltrim(p_dir_path, '/'), '/'))
   OR (rtrim(ltrim(hdir_path, '\'), '\') = rtrim(ltrim(p_dir_path, '\'), '\')))
-  AND hur_username =  p_user;
+  AND hur_username =  Sys_Context('NM3_SECURITY_CTX','USERNAME');
   --
   l_dummy VARCHAR2(1);
   l_return_val BOOLEAN;
-  l_current_user VARCHAR2(100):= nm3get.get_hus(pi_hus_user_id => nm3context.get_context(nm3context.get_namespace,'USER_ID')).hus_username;
 --
 BEGIN
   --
-  OPEN valid_dir_cur(pi_dir_path, l_current_user);
+  OPEN valid_dir_cur(pi_dir_path);
   FETCH valid_dir_cur into l_dummy;
   --
   l_return_val:= valid_dir_cur%FOUND;
@@ -552,7 +551,7 @@ FUNCTION directory_write_permission(pi_directory_name IN dba_directories.DIRECTO
  WHERE  atp.table_name  = pi_directory_name
  AND    atp.privilege   = 'WRITE'
  AND    atp.grantee     = hur.hur_role
- AND    hur.HUR_USERNAME = USER;
+ AND    hur.HUR_USERNAME = Sys_Context('NM3_SECURITY_CTX','USERNAME');
 
  l_dummy VARCHAR2(1);
  
@@ -579,7 +578,7 @@ FUNCTION directory_read_permission(pi_directory_name IN dba_directories.DIRECTOR
  WHERE  atp.table_name  = pi_directory_name
  AND    atp.privilege   = 'READ'
  AND    atp.grantee     = hur.hur_role
- AND    hur.HUR_USERNAME = USER;
+ AND    hur.HUR_USERNAME = Sys_Context('NM3_SECURITY_CTX','USERNAME');
 
 
  l_dummy VARCHAR2(1);
@@ -664,7 +663,7 @@ END check_read_allowed;
 FUNCTION has_java_priv
   ( pi_dir_name in hig_directories.hdir_name%type
   , pi_hdr_priv IN user_java_policy.action%TYPE
-  , pi_user     IN user_java_policy.grantee_name%TYPE default user
+  , pi_user     IN user_java_policy.grantee_name%TYPE default Sys_Context('NM3_SECURITY_CTX','USERNAME')
   ) RETURN BOOLEAN is
 l_count integer ;
 begin
@@ -688,7 +687,7 @@ end has_java_priv;
 procedure grant_java_priv
   ( pi_dir_name in hig_directories.hdir_name%type
   , pi_hdr_priv IN user_java_policy.action%TYPE
-  , pi_user     IN user_java_policy.grantee_name%TYPE default user
+  , pi_user     IN user_java_policy.grantee_name%TYPE default Sys_Context('NM3_SECURITY_CTX','USERNAME')
   ) is
 begin
   nm_debug.proc_start(g_package_name,'grant_java_priv');
@@ -702,7 +701,7 @@ end grant_java_priv;
 procedure revoke_java_priv
   ( pi_dir_name in hig_directories.hdir_name%type
   , pi_hdr_priv IN user_java_policy.action%TYPE
-  , pi_user     IN user_java_policy.grantee_name%TYPE default user
+  , pi_user     IN user_java_policy.grantee_name%TYPE default Sys_Context('NM3_SECURITY_CTX','USERNAME')
   ) 
 is begin
   nm_debug.proc_start(g_package_name,'revoke_java_priv');
@@ -732,7 +731,7 @@ end revoke_java_priv;
 --
 procedure grant_all_java_priv
   ( pi_dir_name in hig_directories.hdir_name%type
-  , pi_user     IN user_java_policy.grantee_name%TYPE default user
+  , pi_user     IN user_java_policy.grantee_name%TYPE default Sys_Context('NM3_SECURITY_CTX','USERNAME')
   ) is
 begin
   nm_debug.proc_start(g_package_name,'grant_all_java_priv');
@@ -747,7 +746,7 @@ end grant_all_java_priv;
 --
 procedure revoke_all_java_priv
   ( pi_dir_name in hig_directories.hdir_name%type
-  , pi_user     IN user_java_policy.grantee_name%TYPE default user
+  , pi_user     IN user_java_policy.grantee_name%TYPE default Sys_Context('NM3_SECURITY_CTX','USERNAME')
   ) is
 begin
   nm_debug.proc_start(g_package_name,'revoke_all_java_priv');

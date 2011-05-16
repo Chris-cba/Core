@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY exor_version IS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/exor_version.pkb-arc   2.0   Jun 14 2007 14:59:48   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/exor_version.pkb-arc   2.1   May 16 2011 14:42:10   Steve.Cooper  $
 --       Module Name      : $Workfile:   exor_version.pkb  $
---       Date into SCCS   : $Date:   Jun 14 2007 14:59:48  $
---       Date fetched Out : $Modtime:   Jun 14 2007 14:59:00  $
---       SCCS Version     : $Revision:   2.0  $
+--       Date into SCCS   : $Date:   May 16 2011 14:42:10  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 15:50:50  $
+--       SCCS Version     : $Revision:   2.1  $
 --       Based on SCCS Version     : 1.2
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY exor_version IS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(80) := '"$Revision:   2.0  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(80) := '"$Revision:   2.1  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'exor_version';
@@ -99,7 +99,7 @@ BEGIN
                         ,owner
                    FROM  all_objects
                   WHERE  object_type IN (c_package_type, c_package_body_type, c_type_body_type)
-                   AND   owner       =  hig.get_application_owner
+                   AND   owner       =  Sys_Context('NM3CORE','APPLICATION_OWNER')
                  )
     LOOP
       DECLARE
