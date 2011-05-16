@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm0575
 AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.7   Jan 26 2011 13:32:14   Ade.Edwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm0575.pkb-arc   2.8   May 16 2011 14:42:24   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm0575.pkb  $
---       Date into PVCS   : $Date:   Jan 26 2011 13:32:14  $
---       Date fetched Out : $Modtime:   Jan 26 2011 13:31:08  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:24  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 10:40:02  $
+--       PVCS Version     : $Revision:   2.8  $
 --       Based on SCCS version : 1.6
 
 --   Author : Graeme Johnson
@@ -23,7 +23,7 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.7  $"';
+  g_body_sccsid  CONSTANT varchar2(2000)  := '"$Revision:   2.8  $"';
   g_package_name CONSTANT varchar2(30)    := 'nm0575';
   
   subtype id_type is nm_members.nm_ne_id_in%type;
@@ -581,7 +581,7 @@ PROCEDURE process_tab_asset_types(pi_tab_asset_types  IN nm3type.tab_varchar4
 
   
   i binary_integer;
-  l_effective_date date := nm3user.get_effective_date;
+  l_effective_date date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
   
   t_code          nm_code_tbl := new nm_code_tbl();
   t_iit_id        nm_id_tbl := new nm_id_tbl();

@@ -57,7 +57,7 @@ BEGIN
                               'nm_admin_units au, '||
                               'nm_admin_groups nag, '||
                               'hig_users hus '||
-                        'WHERE hus.hus_username = USER '||
+                        'WHERE hus.hus_username = Sys_Context(''NM3_SECURITY_CTX'',''USERNAME'') '||
                           'AND ur.hur_role = ir.itr_hro_role '||
                           'AND ur.hur_username = hus.hus_username '||
                           'AND ir.itr_inv_type = nit_inv_type '||

@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkb-arc   3.5   May 05 2011 11:19:54   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3acl.pkb-arc   3.6   May 16 2011 14:42:24   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3acl.pkb  $
---       Date into PVCS   : $Date:   May 05 2011 11:19:54  $
---       Date fetched Out : $Modtime:   May 05 2011 11:18:16  $
---       Version          : $Revision:   3.5  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:24  $
+--       Date fetched Out : $Modtime:   May 10 2011 14:51:18  $
+--       Version          : $Revision:   3.6  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -24,14 +24,14 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid        CONSTANT VARCHAR2(2000) := '$Revision:   3.5  $';
+  g_body_sccsid        CONSTANT VARCHAR2(2000) := '$Revision:   3.6  $';
   g_package_name       CONSTANT varchar2(30) := 'nm3acl';
 --
   c_ftp_role           CONSTANT VARCHAR2(30) := 'FTP_USER';
   c_email_role         CONSTANT VARCHAR2(30) := 'EMAIL_USER';
 --
-  c_ftp_acl                     VARCHAR2(30) := hig.get_application_owner||'_FTP_ACL.xml';
-  c_email_acl                   VARCHAR2(30) := hig.get_application_owner||'_EMAIL_ACL.xml';
+  c_ftp_acl                     VARCHAR2(30) := Sys_Context('NM3CORE','APPLICATION_OWNER')||'_FTP_ACL.xml';
+  c_email_acl                   VARCHAR2(30) := Sys_Context('NM3CORE','APPLICATION_OWNER')||'_EMAIL_ACL.xml';
 --
 --ORA-31003
   ex_acl_already_exists         EXCEPTION;

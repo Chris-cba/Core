@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3api_admin_unit AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_admin_unit.pkb-arc   2.1   Jan 04 2010 11:16:58   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_admin_unit.pkb-arc   2.2   May 16 2011 14:42:24   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3api_admin_unit.pkb  $
---       Date into PVCS   : $Date:   Jan 04 2010 11:16:58  $
---       Date fetched Out : $Modtime:   Jan 04 2010 11:15:12  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:24  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 11:25:10  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --	Copyright (c) exor corporation ltd, 2004
@@ -18,7 +18,7 @@ CREATE OR REPLACE PACKAGE BODY nm3api_admin_unit AS
   --constants
   -----------
 --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
   g_package_name     CONSTANT varchar2(30) := 'nm3api_admin_unit';
   g_natg_domain      CONSTANT hig_domains.hdo_domain%TYPE := 'ADMIN TYPE GROUPINGS';
   g_natg_locked      CONSTANT hig_codes.hco_code%TYPE := 'LOCKED';
@@ -455,7 +455,7 @@ BEGIN
 
 -- set start date, if not already specified
  IF pi_nau_rec.nau_start_date IS NULL THEN
-    pi_nau_rec.nau_start_date := nm3user.get_effective_date;
+    pi_nau_rec.nau_start_date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
  END IF; 
 
 
@@ -512,7 +512,7 @@ END;
 -----------------------------------------------------------------------------
 --
 PROCEDURE end_date_admin_unit(pi_admin_unit        IN nm_admin_units.nau_admin_unit%TYPE
-                             ,pi_end_date          IN DATE     DEFAULT nm3user.get_effective_date
+                             ,pi_end_date          IN DATE     DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                              ,pi_end_date_children IN VARCHAR2 DEFAULT 'Y') IS
 	 
 BEGIN

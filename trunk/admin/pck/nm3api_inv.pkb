@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3api_inv AS
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_inv.pkb-arc   2.4   Jan 04 2010 11:29:00   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_inv.pkb-arc   2.5   May 16 2011 14:42:24   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3api_inv.pkb  $
---       Date into PVCS   : $Date:   Jan 04 2010 11:29:00  $
---       Date fetched Out : $Modtime:   Jan 04 2010 11:25:48  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:24  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 11:35:48  $
+--       Version          : $Revision:   2.5  $
 --
 --   Author : Jonathan Mills
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3api_inv AS
 --
 
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5  $';
   
 --   g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3api_inv.pkb	1.6 12/18/03"';
 --  g_body_sccsid is the SCCS ID for the package body
@@ -60,10 +60,10 @@ END get_body_version;
 --
 FUNCTION get_iit_ne_id (p_iit_primary_key IN nm_inv_items.iit_primary_key%TYPE
                        ,p_iit_inv_type    IN nm_inv_items.iit_inv_type%TYPE
-                       ,p_effective_date  IN date DEFAULT nm3user.get_effective_date
+                       ,p_effective_date  IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                        ) RETURN nm_inv_items.iit_ne_id%TYPE IS
 --
-   c_init_eff_date CONSTANT date := nm3user.get_effective_date;
+   c_init_eff_date CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    l_iit_ne_id              nm_inv_items.iit_ne_id%TYPE;
 --
 BEGIN
@@ -89,11 +89,11 @@ END get_iit_ne_id;
 --
 FUNCTION get_group_placement_for_item (p_iit_primary_key IN nm_inv_items.iit_primary_key%TYPE
                                       ,p_iit_inv_type    IN nm_inv_items.iit_inv_type%TYPE
-                                      ,p_group_type      IN nm_group_types.ngt_group_type%TYPE DEFAULT nm3user.get_preferred_lrm
-                                      ,p_effective_date  IN date                               DEFAULT nm3user.get_effective_date
+                                      ,p_group_type      IN nm_group_types.ngt_group_type%TYPE DEFAULT Sys_Context('NM3CORE','PREFERRED_LRM')
+                                      ,p_effective_date  IN date                               DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                       ) RETURN nm_placement_array IS
 --
-   c_init_eff_date CONSTANT date               := nm3user.get_effective_date;
+   c_init_eff_date CONSTANT date               := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    l_pl_arr                 nm_placement_array := nm3pla.initialise_placement_array;
    l_iit_ne_id              nm_inv_items.iit_ne_id%TYPE;
 --
@@ -124,7 +124,7 @@ END get_group_placement_for_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ) IS
 BEGIN
 --
@@ -144,7 +144,7 @@ END create_inventory_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,p_element_ne_unique  IN     nm_elements.ne_unique%TYPE
                                 ,p_element_ne_nt_type IN     nm_elements.ne_nt_type%TYPE      DEFAULT NULL
                                 ) IS
@@ -170,7 +170,7 @@ END create_inventory_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,p_element_ne_id      IN     nm_elements.ne_id%TYPE
                                 ) IS
 BEGIN
@@ -194,7 +194,7 @@ END create_inventory_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,p_element_ne_unique  IN     nm_elements.ne_unique%TYPE
                                 ,p_element_ne_nt_type IN     nm_elements.ne_nt_type%TYPE      DEFAULT NULL
                                 ,p_element_begin_mp   IN     nm_members.nm_begin_mp%TYPE
@@ -224,7 +224,7 @@ END create_inventory_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,p_element_ne_id      IN     nm_elements.ne_id%TYPE
                                 ,p_element_begin_mp   IN     nm_members.nm_begin_mp%TYPE
                                 ,p_element_end_mp     IN     nm_members.nm_end_mp%TYPE        DEFAULT NULL
@@ -253,7 +253,7 @@ END create_inventory_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,p_nse_id             IN     nm_saved_extents.nse_id%TYPE
                                 ) IS
 BEGIN
@@ -277,7 +277,7 @@ END create_inventory_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE create_inventory_item (p_rec_iit                 IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date          IN     date                          DEFAULT nm3user.get_effective_date
+                                ,p_effective_date          IN     date                          DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,p_route_ne_id             IN     nm_elements.ne_id%TYPE        DEFAULT NULL
                                 ,p_start_ne_id             IN     nm_elements.ne_id%TYPE
                                 ,p_start_offset            IN     number
@@ -313,7 +313,7 @@ END create_inventory_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE create_inventory_item (p_rec_iit                 IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date          IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,p_effective_date          IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,p_pl_arr                  IN     nm_placement_array
                                 ) IS
 BEGIN
@@ -337,7 +337,7 @@ END create_inventory_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE create_inventory_item (p_rec_iit                 IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date          IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,p_effective_date          IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,p_pl                      IN     nm_placement
                                 ) IS
 BEGIN
@@ -361,7 +361,7 @@ END create_inventory_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_append_or_replace_existing IN varchar2 DEFAULT c_replace
                       ,p_element_ne_unique          IN     nm_elements.ne_unique%TYPE
                       ,p_element_ne_nt_type         IN     nm_elements.ne_nt_type%TYPE      DEFAULT NULL
@@ -387,7 +387,7 @@ END locate_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_append_or_replace_existing IN     varchar2                         DEFAULT c_replace
                       ,p_element_ne_id              IN     nm_elements.ne_id%TYPE
                       ) IS
@@ -418,7 +418,7 @@ END locate_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_append_or_replace_existing IN     varchar2                         DEFAULT c_replace
                       ,p_element_ne_unique          IN     nm_elements.ne_unique%TYPE
                       ,p_element_ne_nt_type         IN     nm_elements.ne_nt_type%TYPE      DEFAULT NULL
@@ -426,7 +426,7 @@ PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_i
                       ,p_element_end_mp             IN     nm_members.nm_end_mp%TYPE        DEFAULT NULL
                       ) IS
 --
-   c_init_eff_date CONSTANT date := nm3user.get_effective_date;
+   c_init_eff_date CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_ne_id nm_elements.ne_id%TYPE;
 --
@@ -468,14 +468,14 @@ END locate_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_append_or_replace_existing IN     varchar2                         DEFAULT c_replace
                       ,p_element_ne_id              IN     nm_elements.ne_id%TYPE
                       ,p_element_begin_mp           IN     nm_members.nm_begin_mp%TYPE
                       ,p_element_end_mp             IN     nm_members.nm_end_mp%TYPE        DEFAULT NULL
                       ) IS
 --
-   c_init_eff_date CONSTANT date := nm3user.get_effective_date;
+   c_init_eff_date CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_nte_job_id   nm_nw_temp_extents.nte_job_id%TYPE;
 --
@@ -584,12 +584,12 @@ END locate_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_append_or_replace_existing IN     varchar2                         DEFAULT c_replace
                       ,p_nse_id                     IN     nm_saved_extents.nse_id%TYPE
                       ) IS
 --
-   c_init_eff_date CONSTANT date := nm3user.get_effective_date;
+   c_init_eff_date CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_nte_job_id   nm_nw_temp_extents.nte_job_id%TYPE;
 --
@@ -642,7 +642,7 @@ END locate_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                      ,p_effective_date             IN     date                          DEFAULT nm3user.get_effective_date
+                      ,p_effective_date             IN     date                          DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_append_or_replace_existing IN     varchar2                      DEFAULT c_replace
                       ,p_route_ne_id                IN     nm_elements.ne_id%TYPE        DEFAULT NULL
                       ,p_start_ne_id                IN     nm_elements.ne_id%TYPE
@@ -653,7 +653,7 @@ PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_i
                       ,p_restrict_excl_sub_class    IN     varchar2                      DEFAULT NULL
                       ) IS
 --
-   c_init_eff_date CONSTANT date := nm3user.get_effective_date;
+   c_init_eff_date CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_nte_job_id      nm_nw_temp_extents.nte_job_id%TYPE;
 --
@@ -702,12 +702,12 @@ END locate_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_append_or_replace_existing IN     varchar2                         DEFAULT c_replace
                       ,p_pl_arr                     IN     nm_placement_array
                       ) IS
 --
-   c_init_eff_date CONSTANT date := nm3user.get_effective_date;
+   c_init_eff_date CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_nte_job_id      nm_nw_temp_extents.nte_job_id%TYPE;
 --
@@ -742,7 +742,7 @@ END locate_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_append_or_replace_existing IN     varchar2                         DEFAULT c_replace
                       ,p_pl                         IN     nm_placement
                       ) IS
@@ -815,10 +815,10 @@ END homo_update_internal;
 -----------------------------------------------------------------------------
 --
 PROCEDURE end_date_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                        ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                        ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                         ) IS
 --
-   c_init_eff_date CONSTANT date := nm3user.get_effective_date;
+   c_init_eff_date CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
 BEGIN
 --
@@ -858,10 +858,10 @@ END end_date_item;
 -----------------------------------------------------------------------------
 --
 PROCEDURE end_date_item_location (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                                 ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                 ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                  ) IS
 --
-   c_init_eff_date CONSTANT date := nm3user.get_effective_date;
+   c_init_eff_date CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
 BEGIN
 --
@@ -894,7 +894,7 @@ END end_date_item_location;
 --
 PROCEDURE copy_item(pi_item_to_copy   IN nm_inv_items.iit_ne_id%TYPE
                    ,pi_new_pk         IN nm_inv_items.iit_primary_key%TYPE
-                   ,pi_effective_date IN date DEFAULT nm3user.get_effective_date
+                   ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                    ,pi_copy_location  IN boolean DEFAULT TRUE
                    ,pi_cascade_xsp    IN boolean DEFAULT TRUE
                    ,pi_cascade_excl   IN boolean DEFAULT TRUE
