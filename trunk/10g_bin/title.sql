@@ -8,4 +8,4 @@ FROM   hig_admin_units,
        hig_users
 WHERE
        hus_admin_unit = hau_admin_unit
-       and hus_username = :C_USER
+       and hus_username = Sys_Context('NM3_SECURITY_CTX','USERNAME')

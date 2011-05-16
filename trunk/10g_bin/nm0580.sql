@@ -19,7 +19,7 @@
 
 col spool new_value spool noprint;
 
-select higgrirp.get_module_spoolpath(&&1,user)||hig.get_sysopt('DIRSEPSTRN')||higgrirp.get_module_spoolfile(&&1) spool 
+select higgrirp.get_module_spoolpath(&&1,Sys_Context('NM3_SECURITY_CTX','USERNAME'))||hig.get_sysopt('DIRSEPSTRN')||higgrirp.get_module_spoolfile(&&1) spool 
 from dual;
 
 
