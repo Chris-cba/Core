@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY Nm3net AS
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkb-arc   2.6   Mar 22 2010 09:25:38   cstrettle  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net.pkb-arc   2.7   May 16 2011 14:45:04   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3net.pkb  $
---       Date into SCCS   : $Date:   Mar 22 2010 09:25:38  $
---       Date fetched Out : $Modtime:   Mar 22 2010 09:24:10  $
---       SCCS Version     : $Revision:   2.6  $
+--       Date into SCCS   : $Date:   May 16 2011 14:45:04  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 07:57:02  $
+--       SCCS Version     : $Revision:   2.7  $
 --       Based on 
 --
 --
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3net AS
 --              (create_or_reuse_point_and_node() also creates nodes, this sets null no_purpose)
 
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(200) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(200) := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
   g_package_name CONSTANT  VARCHAR2(30) := 'nm3net';
 --
@@ -1391,7 +1391,7 @@ BEGIN
    g_dyn_rec_ne.ne_start_date    := g_dyn_rec_ne.ne_start_date;
    IF g_dyn_rec_ne.ne_start_date IS NULL
     THEN
-      g_dyn_rec_ne.ne_start_date := Nm3user.get_effective_date;
+      g_dyn_rec_ne.ne_start_date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    END IF;
 
    --validate flex columns to handle any derived values
@@ -1792,7 +1792,7 @@ END get_element_cardinality;
                 ,p_ne_descr          IN     nm_elements.ne_descr%TYPE          DEFAULT NULL
                 ,p_ne_length         IN     nm_elements.ne_length%TYPE         DEFAULT NULL
                 ,p_ne_admin_unit     IN     nm_elements.ne_admin_unit%TYPE     DEFAULT 1
-                ,p_ne_start_date     IN     nm_elements.ne_start_date%TYPE     DEFAULT Nm3user.get_effective_date
+                ,p_ne_start_date     IN     nm_elements.ne_start_date%TYPE     DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                 ,p_ne_end_date       IN     nm_elements.ne_end_date%TYPE       DEFAULT NULL
                 ,p_ne_gty_group_type IN     nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
                 ,p_ne_no_start       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
@@ -1862,7 +1862,7 @@ PROCEDURE grp_insert_element
                 ,p_ne_descr          IN     nm_elements.ne_descr%TYPE          DEFAULT NULL
                 ,p_ne_length         IN     nm_elements.ne_length%TYPE         DEFAULT NULL
                 ,p_ne_admin_unit     IN     nm_elements.ne_admin_unit%TYPE     DEFAULT 1
-                ,p_ne_start_date     IN     nm_elements.ne_start_date%TYPE     DEFAULT Nm3user.get_effective_date
+                ,p_ne_start_date     IN     nm_elements.ne_start_date%TYPE     DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                 ,p_ne_end_date       IN     nm_elements.ne_end_date%TYPE       DEFAULT NULL
                 ,p_ne_gty_group_type IN     nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
                 ,p_ne_no_start       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
@@ -1931,7 +1931,7 @@ PROCEDURE gis_insert_element
                 ,p_ne_descr          IN     nm_elements.ne_descr%TYPE          DEFAULT NULL
                 ,p_ne_length         IN     nm_elements.ne_length%TYPE         DEFAULT NULL
                 ,p_ne_admin_unit     IN     nm_elements.ne_admin_unit%TYPE     DEFAULT 1
-                ,p_ne_start_date     IN     nm_elements.ne_start_date%TYPE     DEFAULT Nm3user.get_effective_date
+                ,p_ne_start_date     IN     nm_elements.ne_start_date%TYPE     DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                 ,p_ne_end_date       IN     nm_elements.ne_end_date%TYPE       DEFAULT NULL
                 ,p_ne_gty_group_type IN     nm_elements.ne_gty_group_type%TYPE DEFAULT NULL
                 ,p_ne_no_start       IN     nm_elements.ne_no_start%TYPE       DEFAULT NULL
@@ -3612,7 +3612,7 @@ END get_gty_nt;
 ----------------------------------------------------------------------------------
 --
 FUNCTION get_parent_route_true(pi_ne_id IN nm_elements.ne_id%TYPE
-                              ,pi_date  IN NM_MEMBERS_ALL.nm_start_date%TYPE DEFAULT Nm3context.get_effective_date
+                              ,pi_date  IN NM_MEMBERS_ALL.nm_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                               ) RETURN NM_MEMBERS_ALL.nm_true%TYPE IS
 --
 -- This procedure is used by nm0520 Inv Location History.
@@ -4675,7 +4675,7 @@ END get_id_and_unique_node_name;
 PROCEDURE create_or_reuse_point_and_node(
                                          pi_np_grid_east     IN      NM_POINTS.np_grid_east%TYPE
                                         ,pi_np_grid_north    IN      NM_POINTS.np_grid_north%TYPE
-										,pi_no_start_date    IN      nm_nodes.no_start_date%TYPE     DEFAULT Nm3user.get_effective_date
+										,pi_no_start_date    IN      nm_nodes.no_start_date%TYPE     DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
 										,pi_no_node_type     IN      nm_nodes.no_node_type%TYPE
 										,pi_node_descr       IN      nm_nodes.no_descr%TYPE          DEFAULT 'Auto-created'
 										,po_no_node_id       IN OUT  nm_nodes.no_node_id%TYPE
@@ -4935,9 +4935,9 @@ FUNCTION get_flex_cols RETURN Nm3type.tab_varchar80 IS
   SELECT column_name
   FROM   all_tab_columns
         ,HIG_CODES
-  WHERE  owner = Hig.get_application_owner
-  AND    table_name = 'NM_ELEMENTS'
-  AND    hco_domain = 'NM_ELEMENTS_COLUMNS'
+  WHERE  owner      =   Sys_Context('NM3CORE','APPLICATION_OWNER')
+  AND    table_name =   'NM_ELEMENTS'
+  AND    hco_domain =   'NM_ELEMENTS_COLUMNS'
   AND    hco_code = column_name
   ORDER BY hco_seq;
 
@@ -4961,7 +4961,7 @@ FUNCTION get_non_flex_cols RETURN Nm3type.tab_varchar80 IS
   CURSOR c1  IS
   SELECT column_name
   FROM   all_tab_columns
-  WHERE  owner = Hig.get_application_owner
+  WHERE  owner      = Sys_Context('NM3CORE','APPLICATION_OWNER')
   AND    table_name = 'NM_ELEMENTS'
   AND NOT EXISTS (SELECT 'x'
                   FROM   HIG_CODES

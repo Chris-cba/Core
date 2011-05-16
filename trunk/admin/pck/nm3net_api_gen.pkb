@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3net_api_gen AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net_api_gen.pkb-arc   2.1   Jan 06 2010 16:41:32   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3net_api_gen.pkb-arc   2.2   May 16 2011 14:45:04   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3net_api_gen.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:32  $
---       Date fetched Out : $Modtime:   Jan 06 2010 15:24:14  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:45:04  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 13:54:04  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.7
 ---------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,12 +20,10 @@ CREATE OR REPLACE PACKAGE BODY nm3net_api_gen AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.1  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.2  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3net_api_gen';
---
-   c_app_owner       CONSTANT  VARCHAR2(30)   := hig.get_application_owner;
 --
    g_tab_pkh         nm3type.tab_varchar32767;
    g_tab_pkb         nm3type.tab_varchar32767;
@@ -266,7 +264,7 @@ BEGIN
 --
    append_both('CREATE OR REPLACE PACKAGE ',FALSE);
    append_body('BODY ',FALSE);
-   append_both(c_app_owner||'.'||l_package_name||' IS',FALSE);
+   append_both(Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_package_name||' IS',FALSE);
    append_sccs(l_rec_nt);
 --
    append_head('--<PROC NAME="get_version">');
