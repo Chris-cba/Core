@@ -3,11 +3,11 @@ CREATE OR REPLACE FUNCTION chk_inv_type_valid_for_role (p_inv_type IN varchar2)
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/chk_inv_type_valid_for_role.fnc-arc   2.0   Jun 14 2007 14:59:46   smarshall  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/chk_inv_type_valid_for_role.fnc-arc   2.1   May 16 2011 14:25:52   Steve.Cooper  $
 --       Module Name      : $Workfile:   chk_inv_type_valid_for_role.fnc  $
---       Date into SCCS   : $Date:   Jun 14 2007 14:59:46  $
---       Date fetched Out : $Modtime:   Jun 14 2007 14:59:00  $
---       SCCS Version     : $Revision:   2.0  $
+--       Date into SCCS   : $Date:   May 16 2011 14:25:52  $
+--       Date fetched Out : $Modtime:   Apr 20 2011 08:41:52  $
+--       SCCS Version     : $Revision:   2.1  $
 --       Based on SCCS Version     : 1.6
 --
 --
@@ -25,12 +25,12 @@ CREATE OR REPLACE FUNCTION chk_inv_type_valid_for_role (p_inv_type IN varchar2)
          ,nm_inv_type_roles
    WHERE  itr_inv_type = p_inv_type
     AND   itr_hro_role = hur_role
-    AND   hur_username = USER;
+    AND   hur_username = Sys_Context('NM3_SECURITY_CTX','USERNAME');
     
    CURSOR cs_user_restricted IS
    SELECT hus_unrestricted
    FROM hig_users
-   WHERE hus_username = USER;
+   WHERE hus_username = Sys_Context('NM3_SECURITY_CTX','USERNAME');
     
 --
 -- Assign FALSE to the return value, then if the cursor is %NOTFOUND then
