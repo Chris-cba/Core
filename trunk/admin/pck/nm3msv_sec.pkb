@@ -3,11 +3,11 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3msv_sec.pkb-arc   3.0   Oct 02 2008 09:50:50   aedwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3msv_sec.pkb-arc   3.1   May 16 2011 14:45:02   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3msv_sec.pkb  $
---       Date into PVCS   : $Date:   Oct 02 2008 09:50:50  $
---       Date fetched Out : $Modtime:   Oct 02 2008 09:49:32  $
---       Version          : $Revision:   3.0  $
+--       Date into PVCS   : $Date:   May 16 2011 14:45:02  $
+--       Date fetched Out : $Modtime:   May 05 2011 13:31:34  $
+--       Version          : $Revision:   3.1  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -17,11 +17,9 @@ AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   3.0  $';
+  g_body_sccsid  CONSTANT VARCHAR2(2000) := '$Revision:   3.1  $';
 --
   g_package_name CONSTANT VARCHAR2(30) := 'nm3msv_sec';
---
-  l_user         CONSTANT VARCHAR2(30) := hig.get_application_owner;
 --
   c_module                hig_modules.hmo_module%TYPE := 'MAPBUILDER';
   c_role                  hig_roles.hro_role%TYPE     := 'GIS_SUPERUSER';
@@ -83,7 +81,7 @@ AS
     IF user_has_permission (pi_username)
     THEN
       INSERT INTO mdsys.sdo_maps_table
-      VALUES ( l_user
+      VALUES ( Sys_Context('NM3CORE','APPLICATION_OWNER')
              , pi_rec_usm.name
              , pi_rec_usm.description
              , pi_rec_usm.definition );
@@ -96,7 +94,7 @@ AS
   EXCEPTION
     WHEN ex_no_perm_usm
     THEN
-      RAISE_APPLICATION_ERROR (-20501, user||' does not have permission to operate on USER_SDO_MAPS');
+      RAISE_APPLICATION_ERROR (-20501, pi_username||' does not have permission to operate on USER_SDO_MAPS');
   END do_usm_ins;
 --
 -----------------------------------------------------------------------------
@@ -111,7 +109,7 @@ AS
     IF user_has_permission (pi_username)
     THEN
       DELETE mdsys.sdo_maps_table
-       WHERE sdo_owner = l_user
+       WHERE sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
          AND name = pi_rec_usm.name;
     ELSE
       RAISE ex_no_perm_usm;
@@ -122,7 +120,7 @@ AS
   EXCEPTION
     WHEN ex_no_perm_usm
     THEN
-      RAISE_APPLICATION_ERROR (-20501, user||' does not have permission to operate on USER_SDO_MAPS');
+      RAISE_APPLICATION_ERROR (-20501, pi_username||' does not have permission to operate on USER_SDO_MAPS');
   END do_usm_del;
 --
 -----------------------------------------------------------------------------
@@ -140,7 +138,7 @@ AS
          SET name        = pi_rec_usm.name
            , description = pi_rec_usm.description
            , definition  = pi_rec_usm.definition
-       WHERE sdo_owner   = l_user
+       WHERE sdo_owner   = Sys_Context('NM3CORE','APPLICATION_OWNER')
          AND name        = pi_rec_usm.name;
     ELSE
       RAISE ex_no_perm_usm;
@@ -151,7 +149,7 @@ AS
   EXCEPTION
     WHEN ex_no_perm_usm
     THEN
-      RAISE_APPLICATION_ERROR (-20501, user||' does not have permission to operate on USER_SDO_MAPS');
+      RAISE_APPLICATION_ERROR (-20501, pi_username||' does not have permission to operate on USER_SDO_MAPS');
   END do_usm_upd;
 --
 -----------------------------------------------------------------------------
@@ -170,7 +168,7 @@ AS
     IF user_has_permission (pi_username)
     THEN
       INSERT INTO mdsys.sdo_themes_table
-        VALUES ( l_user
+        VALUES ( Sys_Context('NM3CORE','APPLICATION_OWNER')
                , pi_rec_ust.name
                , pi_rec_ust.description
                , pi_rec_ust.base_table
@@ -186,7 +184,7 @@ AS
   EXCEPTION
     WHEN ex_no_perm_ust
     THEN
-      RAISE_APPLICATION_ERROR (-20502, user||' does not have permission to operate on USER_SDO_THEMES');
+      RAISE_APPLICATION_ERROR (-20502, pi_username||' does not have permission to operate on USER_SDO_THEMES');
   END do_ust_ins;
 --
 -----------------------------------------------------------------------------
@@ -201,7 +199,7 @@ AS
     IF user_has_permission (pi_username)
     THEN
       DELETE mdsys.sdo_themes_table
-       WHERE sdo_owner = l_user
+       WHERE sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
          AND name = pi_rec_ust.name;
     ELSE
       RAISE ex_no_perm_ust;
@@ -212,7 +210,7 @@ AS
   EXCEPTION
     WHEN ex_no_perm_ust
     THEN
-      RAISE_APPLICATION_ERROR (-20502, user||' does not have permission to operate on USER_SDO_THEMES');
+      RAISE_APPLICATION_ERROR (-20502, pi_username||' does not have permission to operate on USER_SDO_THEMES');
   END do_ust_del;
 --
 -----------------------------------------------------------------------------
@@ -232,7 +230,7 @@ AS
            , base_table      = pi_rec_ust.base_table
            , geometry_column = pi_rec_ust.geometry_column
            , styling_rules   = pi_rec_ust.styling_rules
-       WHERE sdo_owner       = l_user
+       WHERE sdo_owner       = Sys_Context('NM3CORE','APPLICATION_OWNER')
          AND name            = pi_rec_ust.name;
     ELSE
       RAISE ex_no_perm_ust;
@@ -243,7 +241,7 @@ AS
   EXCEPTION
     WHEN ex_no_perm_ust
     THEN
-      RAISE_APPLICATION_ERROR (-20502, user||' does not have permission to operate on USER_SDO_THEMES');
+      RAISE_APPLICATION_ERROR (-20502, pi_username||' does not have permission to operate on USER_SDO_THEMES');
   END do_ust_upd;
 --
 -----------------------------------------------------------------------------
@@ -262,7 +260,7 @@ AS
     IF user_has_permission (pi_username)
     THEN
       INSERT INTO mdsys.sdo_styles_table
-      VALUES ( l_user
+      VALUES ( Sys_Context('NM3CORE','APPLICATION_OWNER')
              , pi_rec_uss.name
              , pi_rec_uss.type
              , pi_rec_uss.description
@@ -278,7 +276,7 @@ AS
   EXCEPTION
     WHEN ex_no_perm_uss
     THEN
-      RAISE_APPLICATION_ERROR (-20503, user||' does not have permission to operate on USER_SDO_STYLES');
+      RAISE_APPLICATION_ERROR (-20503, pi_username||' does not have permission to operate on USER_SDO_STYLES');
   END do_uss_ins;
 --
 -----------------------------------------------------------------------------
@@ -293,7 +291,7 @@ AS
     IF user_has_permission (pi_username)
     THEN
       DELETE mdsys.sdo_styles_table
-       WHERE sdo_owner = l_user
+       WHERE sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
          AND name = pi_rec_uss.name;
     ELSE
       RAISE ex_no_perm_uss;
@@ -304,7 +302,7 @@ AS
   EXCEPTION
     WHEN ex_no_perm_uss
     THEN
-      RAISE_APPLICATION_ERROR (-20503, user||' does not have permission to operate on USER_SDO_STYLES');
+      RAISE_APPLICATION_ERROR (-20503, pi_username||' does not have permission to operate on USER_SDO_STYLES');
   END do_uss_del;
 --
 -----------------------------------------------------------------------------
@@ -325,7 +323,7 @@ AS
            , definition  = pi_rec_uss.definition
            , image       = pi_rec_uss.image
            , geometry    = pi_rec_uss.geometry
-       WHERE sdo_owner   = l_user
+       WHERE sdo_owner   = Sys_Context('NM3CORE','APPLICATION_OWNER')
          AND name        = pi_rec_uss.name;
     ELSE
       RAISE ex_no_perm_uss;
@@ -336,7 +334,7 @@ AS
   EXCEPTION
     WHEN ex_no_perm_uss
     THEN
-      RAISE_APPLICATION_ERROR (-20503, user||' does not have permission to operate on USER_SDO_STYLES');
+      RAISE_APPLICATION_ERROR (-20503, pi_username||' does not have permission to operate on USER_SDO_STYLES');
   END do_uss_upd;
 --
 -----------------------------------------------------------------------------

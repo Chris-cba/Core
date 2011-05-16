@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mapcapture_int AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mapcapture_int.pkb-arc   2.4   Jan 06 2010 16:38:42   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mapcapture_int.pkb-arc   2.5   May 16 2011 14:45:02   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3mapcapture_int.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:42  $
---       Date fetched Out : $Modtime:   Jan 06 2010 10:29:58  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   May 16 2011 14:45:02  $
+--       Date fetched Out : $Modtime:   Apr 04 2011 09:47:26  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.12
 -------------------------------------------------------------------------
 --   Author : Darren Cope
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mapcapture_int AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3mapcapture_int.pkb	1.12 01/08/04"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mapcapture_int';
@@ -831,7 +831,7 @@ BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
                      ,p_procedure_name => 'batch_loader');
 
-  IF hig.get_application_owner IS NULL
+  IF Sys_Context('NM3CORE','APPLICATION_OWNER') IS NULL
   THEN
     nm3context.initialise_context;
   END IF;

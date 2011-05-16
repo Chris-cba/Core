@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mrg_toolkit AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_toolkit.pkb-arc   2.1   Jan 06 2010 16:41:32   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_toolkit.pkb-arc   2.2   May 16 2011 14:45:02   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3mrg_toolkit.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:32  $
---       Date fetched Out : $Modtime:   Jan 06 2010 10:46:58  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:45:02  $
+--       Date fetched Out : $Modtime:   May 05 2011 13:26:38  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.2
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mrg_toolkit AS
 --
 --  g_body_sccsid is the SCCS ID for the package body
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mrg_toolkit';
 --
 -----------------------------------------------------------------------------
@@ -119,10 +119,10 @@ BEGIN
       -- If the user only had readonly on the
       --  query then give NORMAL to a role that the user has
       DECLARE
-         CURSOR cs_role (c_user hig_user_roles.hur_username%TYPE) IS
+         CURSOR cs_role IS
          SELECT hur_role
           FROM  hig_user_roles
-         WHERE  hur_username = USER
+         WHERE  hur_username = Sys_Context('NM3_SECURITY_CTX','USERNAME')
          ORDER BY DECODE(INSTR(hur_role,'MERGE',1,1)
                         ,0,2
                         ,1
@@ -136,7 +136,7 @@ BEGIN
          l_rec_nqro nm_mrg_query_roles%ROWTYPE;
       BEGIN
          --
-         OPEN  cs_role (USER);
+         OPEN  cs_role;
          FETCH cs_role
           INTO l_rec_nqro.nqro_role;
          l_found := cs_role%FOUND;
@@ -436,7 +436,6 @@ PROCEDURE insert_mrg_results_into_table (pi_nqr_job_id          IN nm_mrg_query_
                                         ,pi_grr_job_id_col      IN VARCHAR2                        DEFAULT NULL
                                         ) IS
 --
-   c_app_owner CONSTANT VARCHAR2(30) := hig.get_application_owner;
    l_tab_cols nm3type.tab_varchar30;
    l_insert   nm3type.max_varchar2;
 --
@@ -460,14 +459,14 @@ BEGIN
     INTO  l_tab_cols
     FROM  all_tab_columns tc1
          ,all_tab_columns tc2
-   WHERE  tc1.owner       = c_app_owner
-    AND   tc2.owner       = c_app_owner
+   WHERE  tc1.owner       = Sys_Context('NM3CORE','APPLICATION_OWNER')
+    AND   tc2.owner       = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   tc1.table_name  = pi_view_name
     AND   tc2.table_name  = pi_table_name
     AND   tc1.column_name = tc2.column_name
    ORDER BY tc1.column_id;
 --
-   append ('INSERT INTO '||c_app_owner||'.'||pi_table_name,FALSE);
+   append ('INSERT INTO '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||pi_table_name,FALSE);
    l_bracket := '(';
    FOR i IN 1..l_tab_cols.COUNT
     LOOP
@@ -493,7 +492,7 @@ BEGIN
     THEN
       append (l_bracket||pi_grr_job_id);
    END IF;
-   append (' FROM '||c_app_owner||'.'||pi_view_name);
+   append (' FROM '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||pi_view_name);
    append ('WHERE '||pi_view_mrg_job_id_col||' = '||pi_nqr_job_id);
 --   nm_debug.delete_debug(TRUE);
 --   nm_debug.debug_on;

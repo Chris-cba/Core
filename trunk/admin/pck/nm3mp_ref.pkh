@@ -78,7 +78,7 @@ FUNCTION get_temp_ne_for_refs(pi_route_id         in nm_elements.ne_id%type
 -- There are two overloads - one for continuous and one for point items.
 --
 PROCEDURE locate_asset(pi_iit_ne_id        in nm_inv_items.iit_ne_id%type
-                      ,pi_effective_date   IN DATE DEFAULT nm3user.get_effective_date
+                      ,pi_effective_date   IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,pi_route_id         in nm_elements.ne_id%type
                       ,pi_start_ref_item   in nm_inv_items.iit_ne_id%type
                       ,pi_start_ref_offset in number
@@ -86,7 +86,7 @@ PROCEDURE locate_asset(pi_iit_ne_id        in nm_inv_items.iit_ne_id%type
                       ,pi_end_ref_offset   in number
                       );
 PROCEDURE locate_asset(pi_iit_ne_id      in nm_inv_items.iit_ne_id%type
-                      ,pi_effective_date IN DATE DEFAULT nm3user.get_effective_date
+                      ,pi_effective_date IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,pi_route_id       in nm_elements.ne_id%type
                       ,pi_ref_item       in nm_inv_items.iit_ne_id%type
                       ,pi_ref_offset     in number

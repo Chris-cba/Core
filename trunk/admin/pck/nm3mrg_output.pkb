@@ -3,11 +3,11 @@ create or replace package body nm3mrg_output as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_output.pkb-arc   2.2   Jan 06 2010 16:38:44   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_output.pkb-arc   2.3   May 16 2011 14:45:02   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3mrg_output.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:44  $
---       Date fetched Out : $Modtime:   Jan 06 2010 10:47:58  $
---       Version          : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   May 16 2011 14:45:02  $
+--       Date fetched Out : $Modtime:   Apr 04 2011 09:53:32  $
+--       Version          : $Revision:   2.3  $
 --       Based on SCCS version : 1.22
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,12 +20,11 @@ create or replace package body nm3mrg_output as
 --
 --all global package variables here
 --
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.3  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3mrg_output';
 --
-   g_application_owner CONSTANT VARCHAR2(30) := hig.get_application_owner;
 --
    g_mrg_output_exception EXCEPTION;
    g_mrg_output_exc_code  NUMBER;
@@ -90,7 +89,7 @@ FUNCTION get_cols_for_query (p_nmq_id nm_mrg_query.nmq_id%TYPE) RETURN nm3type.t
    CURSOR cs_av (p_view_name VARCHAR2) IS
    SELECT column_name
     FROM  all_tab_columns
-   WHERE  owner      = g_application_owner
+   WHERE  owner      = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   table_name = p_view_name
    ORDER BY column_id;
 --
@@ -492,7 +491,7 @@ PROCEDURE dump_merge_def (p_nmq_id   IN nm_mrg_query.nmq_id%TYPE
 --
    l_filename VARCHAR2(100) := NVL(p_filename,LOWER(l_rec_nmq.nmq_unique)||'_merge_defn.sql');
 --
-   l_app_owner VARCHAR2(30) := hig.get_application_owner;
+   --l_app_owner VARCHAR2(30) := hig.get_application_owner;
 --
    c_date_format CONSTANT VARCHAR2(40) := 'DD-Mon-YYYY HH24:MI:SS';
 --
@@ -1100,7 +1099,7 @@ BEGIN
    END LOOP;
 --
    nm3ddl.delete_tab_varchar;
-   nm3ddl.append_tab_varchar('CREATE OR REPLACE VIEW '||g_application_owner||'.'||c_view_name||' AS',FALSE);
+   nm3ddl.append_tab_varchar('CREATE OR REPLACE VIEW '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||c_view_name||' AS',FALSE);
 --
    --SSCANLON FIX LOG 706744 19MAR2007
    --Field nqr_mrg_job_id needs to be aliased as nms_mrg_job_id so that the fields in the generated view
@@ -1222,13 +1221,13 @@ BEGIN
       l_no_table EXCEPTION;
       PRAGMA EXCEPTION_INIT(l_no_table,-00942);
    BEGIN
-      EXECUTE IMMEDIATE 'DROP TABLE '||g_application_owner||'.'||c_table_name;
+      EXECUTE IMMEDIATE 'DROP TABLE '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||c_table_name;
    EXCEPTION
       WHEN l_no_table THEN NULL;
    END;
 --
    nm3ddl.delete_tab_varchar;
-   nm3ddl.append_tab_varchar('CREATE GLOBAL TEMPORARY TABLE '||g_application_owner||'.'||c_table_name||' AS',FALSE);
+   nm3ddl.append_tab_varchar('CREATE GLOBAL TEMPORARY TABLE '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||c_table_name||' AS',FALSE);
    nm3ddl.append_tab_varchar('SELECT *');
    nm3ddl.append_tab_varchar(' FROM  '||c_view_name);
    nm3ddl.append_tab_varchar('WHERE  1 = 2');
@@ -1244,7 +1243,7 @@ BEGIN
          BEGIN
             l_comment := nm3flx.string(nm3flx.repl_quotes_amps_for_dyn_sql(g_rec_nmf.nmf_description));
             l_comment := SUBSTR(l_comment,1,INSTR(l_comment,CHR(39),2,1));
-            l_string  := 'COMMENT ON TABLE '||g_application_owner||'.'||p_obj_name||' IS '||l_comment;
+            l_string  := 'COMMENT ON TABLE '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||p_obj_name||' IS '||l_comment;
             EXECUTE IMMEDIATE l_string;
          EXCEPTION
             WHEN OTHERS THEN NULL;
@@ -1266,7 +1265,7 @@ BEGIN
             BEGIN
                l_comment := nm3flx.string(nm3flx.repl_quotes_amps_for_dyn_sql(l_rec_nmc.nmc_description));
                l_comment := SUBSTR(l_comment,1,INSTR(l_comment,CHR(39),2,1));
-               l_string := 'COMMENT ON COLUMN '||g_application_owner||'.'||p_obj_name||'.'||l_rec_nmc.nmc_view_col_name||' IS '||l_comment;
+               l_string := 'COMMENT ON COLUMN '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||p_obj_name||'.'||l_rec_nmc.nmc_view_col_name||' IS '||l_comment;
                EXECUTE IMMEDIATE l_string;
             EXCEPTION
                WHEN OTHERS THEN NULL;
@@ -1279,7 +1278,7 @@ BEGIN
    END LOOP;
 --
    nm3ddl.delete_tab_varchar;
-   nm3ddl.append_tab_varchar('CREATE OR REPLACE PROCEDURE '||g_application_owner||'.'||c_proc_name||' AS',FALSE);
+   nm3ddl.append_tab_varchar('CREATE OR REPLACE PROCEDURE '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||c_proc_name||' AS',FALSE);
    nm3ddl.append_tab_varchar('   l_line_txt   nm3type.max_varchar2;');
    nm3ddl.append_tab_varchar('   l_line_html  nm3type.max_varchar2;');
    nm3ddl.append_tab_varchar('   l_line_csv   nm3type.max_varchar2;');
@@ -1775,10 +1774,10 @@ PROCEDURE drop_nmf_objects (p_nmf_id nm_mrg_output_file.nmf_id%TYPE) IS
       l_not_exists2 EXCEPTION;
       PRAGMA EXCEPTION_INIT(l_not_exists2,-4043);
    BEGIN
-      EXECUTE IMMEDIATE 'DROP '||p_obj_type||' '||g_application_owner||'.'||p_obj_name;
+      EXECUTE IMMEDIATE 'DROP '||p_obj_type||' '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||p_obj_name;
       FOR cs_rec IN (SELECT *
                       FROM  all_synonyms
-                     WHERE  table_owner = g_application_owner
+                     WHERE  table_owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
                       AND   table_name  = p_obj_name
                     )
        LOOP
@@ -1972,7 +1971,7 @@ BEGIN
          ,l_tab_data_precision
          ,l_tab_data_scale
     FROM  all_tab_columns
-   WHERE  owner      = hig.get_application_owner
+   WHERE  owner      = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   table_name = c_view_name
     AND   column_name NOT IN ('NMS_MRG_JOB_ID','NQR_MRG_JOB_ID','NMS_MRG_SECTION_ID')
     AND   NOT EXISTS (SELECT 1

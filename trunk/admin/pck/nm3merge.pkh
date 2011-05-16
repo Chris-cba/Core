@@ -123,7 +123,7 @@ FUNCTION get_body_version RETURN VARCHAR2;
    PROCEDURE do_geo_merge (p_ne_id_1           IN nm_elements.ne_id%TYPE
                           ,p_ne_id_2           IN nm_elements.ne_id%TYPE
                           ,p_ne_id_new         IN nm_elements.ne_id%TYPE
-                          ,p_effective_date    IN DATE                               DEFAULT nm3user.get_effective_date
+                          ,p_effective_date    IN DATE                               DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                           ,p_merge_at_node     IN nm_elements.ne_no_start%TYPE
                           ,p_ne_unique         IN nm_elements.ne_unique%TYPE         DEFAULT NULL
                           ,p_ne_type           IN nm_elements.ne_type%TYPE           DEFAULT NULL
@@ -232,7 +232,7 @@ PROCEDURE check_elements_can_be_merged (pi_ne_id_1 IN nm_elements.ne_id%TYPE
 --
 PROCEDURE do_merge_datum_or_group (pi_ne_id_1           IN     nm_elements.ne_id%TYPE
                                   ,pi_ne_id_2           IN     nm_elements.ne_id%TYPE
-                                  ,pi_effective_date    IN     date                               DEFAULT nm3user.get_effective_date
+                                  ,pi_effective_date    IN     date                               DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                   ,pi_merge_at_node     IN     nm_elements.ne_no_start%TYPE
                                   ,pi_ne_unique         IN     nm_elements.ne_unique%TYPE         DEFAULT NULL
                                   ,pi_ne_type           IN     nm_elements.ne_type%TYPE           DEFAULT NULL

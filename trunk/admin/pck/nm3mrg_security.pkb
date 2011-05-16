@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mrg_security AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_security.pkb-arc   2.1   Jan 06 2010 16:41:32   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_security.pkb-arc   2.2   May 16 2011 14:45:02   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3mrg_security.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:41:32  $
---       Date fetched Out : $Modtime:   Jan 06 2010 10:47:20  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:45:02  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 10:09:02  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.9
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -26,19 +26,16 @@ CREATE OR REPLACE PACKAGE BODY nm3mrg_security AS
 --
 --  g_body_sccsid is the SCCS ID for the package body
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
    g_package_name    CONSTANT varchar2(30)   := 'nm3mrg_security';
 --
-   c_true            CONSTANT varchar2(4)  := nm3context.c_true;
-   c_false           CONSTANT varchar2(5)  := nm3context.c_false;
+   c_true            CONSTANT varchar2(4)  := 'TRUE';
+   c_false           CONSTANT varchar2(5)  := 'FALSE';
    c_normal          CONSTANT varchar2(6)  := 'NORMAL';
    c_true_string     CONSTANT varchar2(6)  := CHR(39)||c_true||CHR(39);
    c_false_string    CONSTANT varchar2(7)  := CHR(39)||c_false||CHR(39);
    c_normal_string   CONSTANT varchar2(8)  := CHR(39)||c_normal||CHR(39);
---
-   c_user_restricted CONSTANT boolean      := (nm3context.get_context (pi_attribute => 'UNRESTRICTED_INVENTORY') != nm3context.c_true);
-   c_username        CONSTANT VARCHAR2(30) := USER;
-   c_user_id         CONSTANT hig_users.hus_user_id%TYPE := nm3context.get_context_number (pi_attribute => 'USER_ID');
+--   
    c_mrg_au_type     CONSTANT hig_options.hop_value%TYPE := hig.get_sysopt ('MRGAUTYPE');
 --
    CURSOR cs_query_visible (c_nmq_id nm_mrg_query.nmq_id%TYPE) IS
@@ -100,7 +97,7 @@ FUNCTION mrg_nqt_predicate_read ( schema_in varchar2, name_in varchar2) RETURN v
   l_retval varchar2(2000) := NULL;
 BEGIN
 --
-    IF c_user_restricted
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'FALSE' 
      THEN
        l_retval := get_nqt_string (FALSE);
     END IF;
@@ -115,7 +112,7 @@ FUNCTION mrg_nqt_predicate_update ( schema_in varchar2, name_in varchar2) RETURN
   l_retval varchar2(2000) := NULL;
 BEGIN
 --
-    IF c_user_restricted
+    IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'FALSE' 
      THEN
        l_retval := get_nqt_string (TRUE);
     END IF;
@@ -129,14 +126,13 @@ END mrg_nqt_predicate_update;
 FUNCTION get_query_mode (pi_nmq_id nm_mrg_query.nmq_id%TYPE) RETURN varchar2 IS
 --
    CURSOR cs_mode (c_nmq_id nm_mrg_query.nmq_id%TYPE
-                  ,c_user   hig_user_roles.hur_username%TYPE
                   ) IS
    SELECT /*+ INDEX (nqro nqro_pk) */ nqro.nqro_mode
     FROM  nm_mrg_query_roles nqro
          ,hig_user_roles     hur
    WHERE  nqro.nqro_nmq_id = c_nmq_id
     AND   nqro.nqro_role   = hur.hur_role
-    AND   hur.hur_username = c_user
+    AND   hur.hur_username = Sys_Context('NM3_SECURITY_CTX','USERNAME')
    ORDER BY nqro.nqro_mode;
 --
    l_retval nm_mrg_query_roles.nqro_mode%TYPE;
@@ -152,7 +148,7 @@ BEGIN
    ELSE
 --      IF c_user_restricted
 --       THEN
-         OPEN  cs_mode (pi_nmq_id,c_username);
+         OPEN  cs_mode (pi_nmq_id);
          FETCH cs_mode INTO l_retval;
          IF cs_mode%NOTFOUND
           THEN
@@ -249,7 +245,7 @@ FUNCTION mrg_nqr_predicate (schema_in varchar2, name_in varchar2) RETURN varchar
    l_retval varchar2(2000) := NULL;
 BEGIN
 --
-   IF c_user_restricted
+   IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'FALSE' 
     THEN
       l_retval := 'EXISTS (SELECT 1 FROM nm_mrg_query_executable WHERE nmq_id = nqr_nmq_id)'
        ||CHR(10)||' AND '||g_package_name||'.au_can_be_seen (nqr_admin_unit) = '||c_true_string;
@@ -264,7 +260,7 @@ END mrg_nqr_predicate;
 FUNCTION mrg_nms_predicate (schema_in varchar2, name_in varchar2) RETURN varchar2 IS
    l_retval varchar2(2000) := NULL;
 BEGIN
-   IF c_user_restricted
+   IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'FALSE' 
     THEN
       l_retval := g_package_name||'.results_can_be_seen (nms_mrg_job_id) = '||c_true_string;
    END IF;
@@ -276,7 +272,7 @@ END mrg_nms_predicate;
 FUNCTION mrg_nsv_predicate (schema_in varchar2, name_in varchar2) RETURN varchar2 IS
    l_retval varchar2(2000) := NULL;
 BEGIN
-   IF c_user_restricted
+   IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'FALSE' 
     THEN
       l_retval := g_package_name||'.results_can_be_seen (nsv_mrg_job_id) = '||c_true_string;
    END IF;
@@ -381,7 +377,7 @@ FUNCTION mrg_ndq_predicate (schema_in varchar2, name_in varchar2) RETURN varchar
 --
 BEGIN
 --
-   IF c_user_restricted
+   IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'FALSE' 
     THEN
       l_retval := 'EXISTS (SELECT 1 FROM nm_inv_types WHERE nit_inv_type = ndq_inv_type)';
    END IF;
@@ -472,7 +468,7 @@ BEGIN
           FROM  nm_user_aus     nua
                ,nm_admin_groups nag
                ,nm_admin_units  nau
-         WHERE  nua.nua_user_id      = c_user_id
+         WHERE  nua.nua_user_id      = To_Number(Sys_Context('NM3CORE','USER_ID'))
           AND   nua.nua_admin_unit   = nag.nag_parent_admin_unit
           AND   nag_child_admin_unit = nau.nau_admin_unit
           AND   nau.nau_admin_type   = c_mrg_au_type;
@@ -482,7 +478,7 @@ BEGIN
           INTO  l_tab_au
           FROM  nm_user_aus     nua
                ,nm_admin_groups nag
-         WHERE  nua.nua_user_id    = c_user_id
+         WHERE  nua.nua_user_id    = To_Number(Sys_Context('NM3CORE','USER_ID'))
           AND   nua.nua_admin_unit = nag.nag_parent_admin_unit;
       END IF;
 --

@@ -1,11 +1,11 @@
 create or replace package body nm3mrg_view as
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkb-arc   2.6   30 Mar 2010 09:37:40   ptanava  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg_view.pkb-arc   2.7   May 16 2011 14:45:02   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3mrg_view.pkb  $
---       Date into PVCS   : $Date:   30 Mar 2010 09:37:40  $
---       Date fetched Out : $Modtime:   30 Mar 2010 09:32:12  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   May 16 2011 14:45:02  $
+--       Date fetched Out : $Modtime:   Apr 04 2011 09:51:06  $
+--       PVCS Version     : $Revision:   2.7  $
 --       Based on SCCS version     : 1.38
 --
 --
@@ -29,7 +29,7 @@ create or replace package body nm3mrg_view as
 */
 
 
-   g_body_sccsid      CONSTANT  VARCHAR2(200) := '"$Revision:   2.6  $"';
+   g_body_sccsid      CONSTANT  VARCHAR2(200) := '"$Revision:   2.7  $"';
    g_package_name     CONSTANT  VARCHAR2(30)  := 'nm3mrg_view';
    
    cr constant varchar2(1) := chr(10);
@@ -71,8 +71,6 @@ create or replace package body nm3mrg_view as
     AND   nsi.nsi_value_id       = nsv.nsv_value_id;
 --
    g_create_snapshot CONSTANT BOOLEAN      := FALSE;
-   c_highways_owner  CONSTANT VARCHAR2(30) := hig.get_application_owner;
---
    g_object_type     VARCHAR2(100);
    
 --
@@ -339,7 +337,7 @@ BEGIN
 
    l_sect_view_name := SUBSTR(p_view_name,1,26)||'_SEC';
    nm3ddl.delete_tab_varchar;
-   append('CREATE '||g_object_type||' '||c_highways_owner||'.'||l_sect_view_name||' AS ');
+   append('CREATE '||g_object_type||' '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_sect_view_name||' AS ');
    in_view_comment;
 
    -- PT add these wrapped here
@@ -458,7 +456,7 @@ BEGIN
    nm3ddl.delete_tab_varchar;
    
 
-   append ('CREATE '||g_object_type||' '||c_highways_owner||'.'||l_val_view_name||' AS ');
+   append ('CREATE '||g_object_type||' '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_val_view_name||' AS ');
    append ('select');
    
    --append ('SELECT /*+ INDEX (nm_mrg_query_results NMQR_NMQ_FK_IND) */');
@@ -626,7 +624,7 @@ BEGIN
 --   nm_debug.debug(' Create the V_MRG_xxxxxx_VLS snapshot');
       l_done_a_select := FALSE;
       nm3ddl.delete_tab_varchar;
-      append ('CREATE '||g_object_type||' '||c_highways_owner||'.'||l_all_val_view_name||' AS ');
+      append ('CREATE '||g_object_type||' '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_all_val_view_name||' AS ');
       
       append ('select');
       append ('   s.nms_mrg_job_id');
@@ -706,7 +704,7 @@ BEGIN
 --
    l_sec_val_view_name := SUBSTR(p_view_name,1,26)||'_SVL';
    nm3ddl.delete_tab_varchar;
-   append ('CREATE '||g_object_type||' '||c_highways_owner||'.'||l_sec_val_view_name||' AS ');
+   append ('CREATE '||g_object_type||' '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_sec_val_view_name||' AS ');
    --append ('SELECT /*+ INDEX (NM_MRG_QUERY_RESULTS NMQR_NMQ_FK_IND) */'); -- NM_MRG_SECTION_MEMBERS NMSM_PK,
    --append ('SELECT /*+ RULE */');
    append ('select');
@@ -862,7 +860,7 @@ BEGIN
 -- ####################################################################################
 --
    nm3ddl.delete_tab_varchar;
-   append ('CREATE VIEW '||c_highways_owner||'.'||p_view_name||' AS ');
+   append ('CREATE VIEW '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||p_view_name||' AS ');
    --append ('SELECT /*+ INDEX (NM_MRG_QUERY_RESULTS NMQR_NMQ_FK_IND) */'); -- NM_MRG_SECTION_MEMBERS NMSM_PK,
    append ('SELECT');
    in_view_comment;
@@ -1137,7 +1135,7 @@ PROCEDURE drop_merge_view (p_view_name VARCHAR2) IS
 --
    PRAGMA AUTONOMOUS_TRANSACTION;
 --
-   l_string VARCHAR2(100) := 'DROP '||g_object_type||' '||c_highways_owner||'.';
+   l_string VARCHAR2(100) := 'DROP '||g_object_type||' '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.';
 --
    l_tab_name nm3type.tab_varchar30;
 --
@@ -1222,9 +1220,9 @@ BEGIN
       l_all_val_view_name := SUBSTR(c_view_name,1,26)||'_VLS';
 --
       -- Obviously only refresh if this is a snapshot
-      dbms_snapshot.refresh('"'||c_highways_owner||'"."'||l_sec_view_name||'"');
-      dbms_snapshot.refresh('"'||c_highways_owner||'"."'||l_val_view_name||'"');
-      dbms_snapshot.refresh('"'||c_highways_owner||'"."'||l_all_val_view_name||'"');
+      dbms_snapshot.refresh('"'||Sys_Context('NM3CORE','APPLICATION_OWNER')||'"."'||l_sec_view_name||'"');
+      dbms_snapshot.refresh('"'||Sys_Context('NM3CORE','APPLICATION_OWNER')||'"."'||l_val_view_name||'"');
+      dbms_snapshot.refresh('"'||Sys_Context('NM3CORE','APPLICATION_OWNER')||'"."'||l_all_val_view_name||'"');
    END IF;
 --
    nm_debug.proc_end(g_package_name,'refresh_merge_results_snapshot');

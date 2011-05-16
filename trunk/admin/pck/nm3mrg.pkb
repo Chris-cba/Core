@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3mrg IS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkb-arc   2.7   12 May 2010 14:03:36   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mrg.pkb-arc   2.8   May 16 2011 14:45:02   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3mrg.pkb  $
---       Date into PVCS   : $Date:   12 May 2010 14:03:36  $
---       Date fetched Out : $Modtime:   12 May 2010 13:48:24  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   May 16 2011 14:45:02  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 14:48:46  $
+--       PVCS Version     : $Revision:   2.8  $
 --       Based on SCCS version : 1.60
 --
 --   Author : Jonathan Mills
@@ -32,7 +32,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mrg IS
                 NB! requires nm3bulk_mrg_pkh 2.7 or higher (logs 723574, 724275)
 */
 
-  g_body_sccsid   constant varchar2(200) :='"$Revision:   2.7  $"';
+  g_body_sccsid   constant varchar2(200) :='"$Revision:   2.8  $"';
   g_package_name     CONSTANT  varchar2(30)   := 'NM3MRG';
 --
   g_mrg_section_id  pls_integer;
@@ -2875,7 +2875,7 @@ BEGIN
              THEN
                l_rec_ita.ita_format_mask := nm3type.c_full_Date_time_format;
             ELSE
-               l_rec_ita.ita_format_mask := nm3user.get_user_date_mask;
+               l_rec_ita.ita_format_mask := Sys_Context('NM3CORE','USER_DATE_MASK');
             END IF;
          END IF;
       END;

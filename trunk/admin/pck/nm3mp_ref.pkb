@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mp_ref AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mp_ref.pkb-arc   2.2   Jun 10 2008 15:40:44   rcoupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mp_ref.pkb-arc   2.3   May 16 2011 14:45:02   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3mp_ref.pkb  $
---       Date into PVCS   : $Date:   Jun 10 2008 15:40:44  $
---       Date fetched Out : $Modtime:   Jun 10 2008 15:40:26  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   May 16 2011 14:45:02  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 13:52:38  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on 1.1 of sccs --
 --
 --   Author : Kevin Angus
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mp_ref AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) :='"$Revision:   2.2  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) :='"$Revision:   2.3  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3mp_ref';
 
@@ -399,7 +399,7 @@ END get_iit_by_type_and_label;
 -----------------------------------------------------------------------------
 --
 PROCEDURE locate_asset(pi_iit_ne_id        in nm_inv_items.iit_ne_id%type
-                      ,pi_effective_date   IN DATE DEFAULT nm3user.get_effective_date
+                      ,pi_effective_date   IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,pi_route_id         in nm_elements.ne_id%type
                       ,pi_start_ref_item   in nm_inv_items.iit_ne_id%type
                       ,pi_start_ref_offset in number
@@ -472,7 +472,7 @@ END locate_asset;
 -----------------------------------------------------------------------------
 --
 PROCEDURE locate_asset(pi_iit_ne_id      in nm_inv_items.iit_ne_id%type
-                      ,pi_effective_date IN DATE DEFAULT nm3user.get_effective_date
+                      ,pi_effective_date IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,pi_route_id       in nm_elements.ne_id%type
                       ,pi_ref_item       in nm_inv_items.iit_ne_id%type
                       ,pi_ref_offset     in number
