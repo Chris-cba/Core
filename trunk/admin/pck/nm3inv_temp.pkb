@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_temp AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_temp.pkb-arc   2.1   Jan 06 2010 16:38:28   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_temp.pkb-arc   2.2   May 16 2011 14:44:56   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3inv_temp.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:28  $
---       Date fetched Out : $Modtime:   Jan 06 2010 11:01:38  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:56  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 13:41:22  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.9
 -------------------------------------------------------------------------
 --
@@ -25,10 +25,8 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_temp AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
   g_package_name CONSTANT varchar2(30) := 'nm3inv_temp';
---
-   c_app_owner       CONSTANT  varchar2(30) := hig.get_application_owner;
 --
    g_tab_vc_copy_item     nm3type.tab_varchar32767;
    g_tab_vc_check_rec_tii nm3type.tab_varchar32767;
@@ -38,15 +36,14 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_temp AS
 --
    g_last_copy_children   boolean;
 --
-   CURSOR cs_cols (c_owner    varchar2
-                  ,c_table    varchar2
+   CURSOR cs_cols (c_table    varchar2
                   ,c_not_col1 varchar2 DEFAULT NULL
                   ,c_not_col2 varchar2 DEFAULT NULL
                   ,c_not_col3 varchar2 DEFAULT NULL
                   ) IS
    SELECT column_name
     FROM  all_tab_columns
-   WHERE  owner        = c_owner
+   WHERE  owner        = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   table_name   = c_table
     AND   column_name != NVL(c_not_col1,nm3type.c_nvl)
     AND   column_name != NVL(c_not_col2,nm3type.c_nvl)
@@ -164,10 +161,10 @@ PROCEDURE make_copy(pi_njc_job_id       IN nm_job_control.njc_job_id%TYPE
                    ,pi_nte_job_id       IN nm_nw_temp_extents.nte_job_id%TYPE
                    ,pi_inv_type         IN nm_inv_types.nit_inv_type%TYPE
                    ,pi_include_children IN boolean DEFAULT FALSE
-                   ,pi_effective_date   IN date    DEFAULT nm3user.get_effective_date
+                   ,pi_effective_date   IN date    DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                    ) IS
 --
-   c_init_eff_date  CONSTANT date := nm3user.get_effective_date;
+   c_init_eff_date  CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_pl_arr nm_placement_array := nm3pla.initialise_placement_array;
 --
@@ -464,7 +461,7 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'build_sql');
 --
-   OPEN  cs_cols (c_app_owner, c_tii, c_new_ne_id,c_primary_key);
+   OPEN  cs_cols (c_tii, c_new_ne_id,c_primary_key);
    FETCH cs_cols BULK COLLECT INTO l_tab_cols;
    CLOSE cs_cols;
 --
@@ -1176,7 +1173,7 @@ BEGIN
 --
    g_tab_vc_check_rec_tii.DELETE;
 --
-   OPEN  cs_cols (c_app_owner, c_tii, c_new_ne_id,c_primary_key,c_tii_ne_id);
+   OPEN  cs_cols (c_tii, c_new_ne_id,c_primary_key,c_tii_ne_id);
    FETCH cs_cols BULK COLLECT INTO l_tab_cols;
    CLOSE cs_cols;
 --
@@ -1465,8 +1462,7 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'build_copy_back_sql');
 --
-   OPEN  cs_cols (c_owner    => c_app_owner
-                 ,c_table    => c_iit_all
+   OPEN  cs_cols (c_table    => c_iit_all
                  ,c_not_col1 => c_iit_ne_id
                  );
    FETCH cs_cols BULK COLLECT INTO l_tab_columns;
@@ -1701,8 +1697,7 @@ BEGIN
    nm3ddl.append_tab_varchar(g_tab_vc_copy_back_inv,'         RAISE;');
    nm3ddl.append_tab_varchar(g_tab_vc_copy_back_inv,'   END;');
    --
-   OPEN  cs_cols (c_owner    => c_app_owner
-                 ,c_table    => c_iit_all
+   OPEN  cs_cols (c_table    => c_iit_all
                  ,c_not_col1 => c_iit_ne_id
                  ,c_not_col2 => c_foreign_key
                  );
@@ -1800,7 +1795,7 @@ BEGIN
          RAISE leave_it_alone;
       END IF;
    --
-      OPEN  cs_cols (c_app_owner,c_iit);
+      OPEN  cs_cols (c_iit);
       FETCH cs_cols BULK COLLECT INTO l_inv_cols_tab;
       CLOSE cs_cols;
    --
@@ -2033,8 +2028,7 @@ PROCEDURE build_compare_sql IS
    l_tab_cols nm3type.tab_varchar30;
 BEGIN
 --
-   OPEN  cs_cols (c_owner => c_app_owner
-                 ,c_table => c_iit
+   OPEN  cs_cols (c_table => c_iit
                  );
    FETCH cs_cols BULK COLLECT INTO l_tab_cols;
    CLOSE cs_cols;

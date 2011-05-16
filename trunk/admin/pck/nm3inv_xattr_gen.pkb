@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_xattr_gen AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_xattr_gen.pkb-arc   2.1   Jan 06 2010 16:38:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_xattr_gen.pkb-arc   2.2   May 16 2011 14:44:56   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3inv_xattr_gen.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:36  $
---       Date fetched Out : $Modtime:   Jan 06 2010 11:01:06  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:56  $
+--       Date fetched Out : $Modtime:   Apr 04 2011 08:10:18  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.9
 -------------------------------------------------------------------------
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_xattr_gen AS
 --
 --  g_body_sccsid is the SCCS ID for the package body
 --
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.2  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_xattr_gen';
 --
    g_tab_varchar     nm3type.tab_varchar32767;
@@ -32,7 +32,6 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_xattr_gen AS
    g_xattr_gen_exc_code  number;
    g_xattr_gen_exc_msg   varchar2(4000);
 --
-   c_app_owner CONSTANT varchar2(30) := hig.get_application_owner;
    c_p_rec_iit CONSTANT varchar2(30) := 'p_rec_iit';
 --
 -----------------------------------------------------------------------------
@@ -108,7 +107,7 @@ FUNCTION generate_single_inv_record_trg RETURN tab_ae IS
    CURSOR cs_ae IS
    SELECT *
     FROM  all_errors
-   WHERE  owner = c_app_owner
+   WHERE  owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   name  = c_xattr_validation_proc_name
    ORDER BY SEQUENCE;
 --
@@ -170,7 +169,7 @@ BEGIN
 --
    clear_tab_varchar;
 --
-   append ('CREATE OR REPLACE PROCEDURE '||c_app_owner||'.'||c_xattr_validation_proc_name||' ('||c_p_rec_iit||' IN nm_inv_items_all%ROWTYPE) IS');
+   append ('CREATE OR REPLACE PROCEDURE '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||c_xattr_validation_proc_name||' ('||c_p_rec_iit||' IN nm_inv_items_all%ROWTYPE) IS');
    append ('--');
    append ('--   SCCS Identifiers (of generating package) :-');
    append ('--');
@@ -230,7 +229,7 @@ BEGIN
    append ('--');
    append (indent(3)||'WHEN x_exception');
    append (indent(3)||' THEN');
-   append (indent(6)||'RAISE_APPLICATION_ERROR( -20760, '||c_app_owner||'.'||g_package_name||'.get_error_string(x_error_no));');
+   append (indent(6)||'RAISE_APPLICATION_ERROR( -20760, '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||g_package_name||'.get_error_string(x_error_no));');
    append ('--');
    append ('END '||c_xattr_validation_proc_name||';');
 --

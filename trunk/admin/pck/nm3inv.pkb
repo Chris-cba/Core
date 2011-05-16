@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.27   Mar 22 2011 16:43:20   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv.pkb-arc   2.28   May 16 2011 14:44:56   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3inv.pkb  $
---       Date into SCCS   : $Date:   Mar 22 2011 16:43:20  $
---       Date fetched Out : $Modtime:   Mar 22 2011 16:42:16  $
---       SCCS Version     : $Revision:   2.27  $
+--       Date into SCCS   : $Date:   May 16 2011 14:44:56  $
+--       Date fetched Out : $Modtime:   May 05 2011 08:58:12  $
+--       SCCS Version     : $Revision:   2.28  $
 --       Based on --
 --
 --   nm3inv package body
@@ -30,7 +30,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv AS
 --all global package variables here
 --
 --  g_body_sccsid is the SCCS ID for the package body
-   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.27  $';
+   g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.28  $';
    g_package_name   CONSTANT VARCHAR2(30) := 'nm3inv';
 --
    --<USED BY validate_rec_iit>
@@ -836,7 +836,7 @@ IF l_qry IS NOT NULL THEN
          -- Use the date format specified for the inv_type_attrib if there is one, otherwise
          --  use the user date mask
          --
-         l_format_mask VARCHAR2(200) := NVL(l_rec_nita.ita_format_mask, Nm3user.get_user_date_mask);
+         l_format_mask VARCHAR2(200) := NVL(l_rec_nita.ita_format_mask, Sys_Context('NM3CORE','USER_DATE_MASK'));
       BEGIN
 ----
 --         IF p_attrib_name LIKE '%DATE%'
@@ -1178,7 +1178,7 @@ BEGIN
       l_sql_string := 'select to_char('
                       ||p_attrib_name
                       ||', '
-                      ||Nm3flx.string(NVL(l_mask,Nm3user.get_user_date_mask))
+                      ||Nm3flx.string(NVL(l_mask,Sys_Context('NM3CORE','USER_DATE_MASK')))
                       ||') from nm_inv_items where iit_ne_id = :p_ne_id';
    ELSIF l_format = Nm3type.c_number
     AND  l_mask IS NOT NULL
@@ -2329,7 +2329,7 @@ BEGIN
          l_format_mask    := l_rec_ita.ita_format_mask;
       ELSIF l_rec_ita.ita_format = Nm3type.c_date
        THEN
-         l_format_mask    := Nm3user.get_user_date_mask;
+         l_format_mask    := Sys_Context('NM3CORE','USER_DATE_MASK');
       END IF;
       IF l_format_mask IS NOT NULL
        THEN
@@ -3064,13 +3064,12 @@ PROCEDURE check_inv_format_against_col (p_column_name VARCHAR2
                                        ,p_inv_type    VARCHAR2 DEFAULT NULL
                                        ) IS
 --
-   CURSOR cs_atc (p_owner  VARCHAR2
-                 ,p_table  VARCHAR2
+   CURSOR cs_atc (p_table  VARCHAR2
                  ,p_column VARCHAR2
                  ) IS
    SELECT data_type
     FROM  all_tab_columns
-   WHERE  owner       = p_owner
+   WHERE  owner       = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   table_name  = p_table
     AND   column_name = p_column;
 --
@@ -3098,8 +3097,7 @@ BEGIN
       END IF;
       l_table_name := NVL(l_table_name,'NM_INV_ITEMS_ALL');
    --
-      OPEN  cs_atc (Hig.get_application_owner
-                   ,l_table_name
+      OPEN  cs_atc (l_table_name
                    ,p_column_name
                    );
       FETCH cs_atc INTO l_data_type;
@@ -3788,7 +3786,7 @@ END process_g_tab_ita;
                , pi_lr_st_chain        IN     NM_INV_TYPES.nit_lr_st_chain%TYPE        DEFAULT NULL
                , pi_lr_end_chain       IN     NM_INV_TYPES.nit_lr_end_chain%TYPE       DEFAULT NULL
                , pi_attrib_ltrim       IN     NUMBER                                   DEFAULT 5
-               , pi_admin_type         IN     NM_INV_TYPES.nit_admin_type%TYPE         DEFAULT Nm3get.get_nau( pi_nau_admin_unit => Nm3get.get_hus(pi_hus_username=>USER).hus_admin_unit).nau_admin_type
+               , pi_admin_type         IN     NM_INV_TYPES.nit_admin_type%TYPE         DEFAULT Nm3get.get_nau( pi_nau_admin_unit => Nm3get.get_hus(pi_hus_username=>Sys_Context('NM3_SECURITY_CTX','USERNAME')).hus_admin_unit).nau_admin_type
                , pi_role               IN     NM_INV_TYPE_ROLES.itr_hro_role%TYPE      DEFAULT 'HIG_USER'
                , pi_role_mode          IN     NM_INV_TYPE_ROLES.itr_mode%TYPE          DEFAULT 'NORMAL'
                )

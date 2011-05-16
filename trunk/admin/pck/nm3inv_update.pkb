@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_update AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_update.pkb-arc   2.5   Jan 12 2010 09:46:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_update.pkb-arc   2.6   May 16 2011 14:44:56   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3inv_update.pkb  $
---       Date into PVCS   : $Date:   Jan 12 2010 09:46:36  $
---       Date fetched Out : $Modtime:   Jan 12 2010 09:39:02  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:56  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 13:29:56  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.5 
 -------------------------------------------------------------------------
 --   Author : Kevin Angus
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_update AS
   -----------
   --g_body_sccsid is the SCCS ID for the package body
   --g_body_sccsid  CONSTANT varchar2(2000) := '"@(#)nm3inv_update.pkb	1.5 04/27/06"';
-  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.5  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.6  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3inv_update';
 
@@ -51,7 +51,7 @@ END get_body_version;
 PROCEDURE do_update_over_intx(pi_old_iit_ne_id  IN nm_inv_items.iit_ne_id%TYPE
                              ,pi_new_iit_rec    IN nm_inv_items%ROWTYPE
                              ,pi_roi_nte_id     IN nm_nw_temp_extents.nte_job_id%TYPE
-                             ,pi_effective_date IN date DEFAULT nm3user.get_effective_date
+                             ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                              ) IS
 
   l_orig_loc_nte_id nm_nw_temp_extents.nte_job_id%TYPE;
@@ -121,12 +121,12 @@ PROCEDURE date_tracked_all_types(pi_inv_type       IN nm_inv_types.nit_inv_type%
                                 ,pi_new_val_char   IN varchar2 DEFAULT NULL
                                 ,pi_new_val_num    IN number DEFAULT NULL
                                 ,pi_new_val_date   IN date DEFAULT NULL
-                                ,pi_effective_date IN date DEFAULT nm3user.get_effective_date
+                                ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ) IS
 
   e_invalid_val_type EXCEPTION;
 
-  c_init_eff_date CONSTANT date := nm3user.get_effective_date;
+  c_init_eff_date CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
   c_attrib_plsql  CONSTANT nm3type.max_varchar2 :=            'BEGIN'
                                                    || c_nl || '  ' || g_package_name || '.g_iit_rec.' || pi_attrib || ' := :p_new_val;'
@@ -213,7 +213,7 @@ END date_tracked_all_types;
 --
 PROCEDURE date_tracked(pi_inv_type       IN nm_inv_types.nit_inv_type%TYPE
                       ,pi_roi_nte_id     IN nm_nw_temp_extents.nte_job_id%TYPE
-                      ,pi_effective_date IN date DEFAULT nm3user.get_effective_date
+                      ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ) IS
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
@@ -232,7 +232,7 @@ END date_tracked;
 --
 PROCEDURE date_tracked(pi_inv_type       IN nm_inv_types.nit_inv_type%TYPE
                       ,pi_roi_npe_id     IN nm_nw_persistent_extents.npe_job_id%TYPE
-                      ,pi_effective_date IN date DEFAULT nm3user.get_effective_date
+                      ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ) IS
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
@@ -253,7 +253,7 @@ PROCEDURE date_tracked(pi_inv_type       IN nm_inv_types.nit_inv_type%TYPE
                       ,pi_roi_nte_id     IN nm_nw_temp_extents.nte_job_id%TYPE
                       ,pi_attrib         IN nm_inv_type_attribs.ita_attrib_name%TYPE
                       ,pi_new_val        IN varchar2
-                      ,pi_effective_date IN date DEFAULT nm3user.get_effective_date
+                      ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ) IS
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
@@ -277,7 +277,7 @@ PROCEDURE date_tracked(pi_inv_type       IN nm_inv_types.nit_inv_type%TYPE
                       ,pi_roi_npe_id     IN nm_nw_persistent_extents.npe_job_id%TYPE
                       ,pi_attrib         IN nm_inv_type_attribs.ita_attrib_name%TYPE
                       ,pi_new_val        IN varchar2
-                      ,pi_effective_date IN date DEFAULT nm3user.get_effective_date
+                      ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ) IS
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
@@ -300,7 +300,7 @@ PROCEDURE date_tracked(pi_inv_type       IN nm_inv_types.nit_inv_type%TYPE
                       ,pi_roi_nte_id     IN nm_nw_temp_extents.nte_job_id%TYPE
                       ,pi_attrib         IN nm_inv_type_attribs.ita_attrib_name%TYPE
                       ,pi_new_val        IN number
-                      ,pi_effective_date IN date DEFAULT nm3user.get_effective_date
+                      ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ) IS
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
@@ -323,7 +323,7 @@ PROCEDURE date_tracked(pi_inv_type       IN nm_inv_types.nit_inv_type%TYPE
                       ,pi_roi_npe_id     IN nm_nw_persistent_extents.npe_job_id%TYPE
                       ,pi_attrib         IN nm_inv_type_attribs.ita_attrib_name%TYPE
                       ,pi_new_val        IN number
-                      ,pi_effective_date IN date DEFAULT nm3user.get_effective_date
+                      ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ) IS
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
@@ -346,7 +346,7 @@ PROCEDURE date_tracked(pi_inv_type       IN nm_inv_types.nit_inv_type%TYPE
                       ,pi_roi_nte_id     IN nm_nw_temp_extents.nte_job_id%TYPE
                       ,pi_attrib         IN nm_inv_type_attribs.ita_attrib_name%TYPE
                       ,pi_new_val        IN date
-                      ,pi_effective_date IN date DEFAULT nm3user.get_effective_date
+                      ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ) IS
   BEGIN
 
@@ -371,7 +371,7 @@ PROCEDURE date_tracked(pi_inv_type       IN nm_inv_types.nit_inv_type%TYPE
                       ,pi_roi_npe_id     IN nm_nw_persistent_extents.npe_job_id%TYPE
                       ,pi_attrib         IN nm_inv_type_attribs.ita_attrib_name%TYPE
                       ,pi_new_val        IN date
-                      ,pi_effective_date IN date DEFAULT nm3user.get_effective_date
+                      ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ) IS
 BEGIN
   nm_debug.proc_start(p_package_name   => g_package_name
@@ -394,7 +394,7 @@ PROCEDURE date_track_update_item (pi_iit_ne_id_old IN     nm_inv_items.iit_ne_id
                                  ,pio_rec_iit      IN OUT nm_inv_items%ROWTYPE
                                  ) IS
 --
-   c_init_eff_date CONSTANT DATE    := nm3user.get_effective_date;
+   c_init_eff_date CONSTANT DATE    := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    c_xattr_status  CONSTANT BOOLEAN := nm3inv_xattr.g_xattr_active;
 --
    l_nte_job_id             nm_nw_temp_extents.nte_job_id%TYPE;
@@ -466,7 +466,7 @@ BEGIN
     THEN
       hig.raise_ner (pi_appl               => nm3type.c_net
                     ,pi_id                 => 307
-                    ,pi_supplementary_info => to_char(pio_rec_iit.iit_start_date,nm3user.get_user_date_mask)
+                    ,pi_supplementary_info => to_char(pio_rec_iit.iit_start_date,Sys_Context('NM3CORE','USER_DATE_MASK'))
                     );
    END IF;
 --

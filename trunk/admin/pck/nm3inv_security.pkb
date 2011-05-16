@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_security AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_security.pkb-arc   2.4   Mar 16 2011 11:19:36   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_security.pkb-arc   2.5   May 16 2011 14:44:56   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3inv_security.pkb  $
---       Date into PVCS   : $Date:   Mar 16 2011 11:19:36  $
---       Date fetched Out : $Modtime:   Mar 16 2011 11:10:54  $
---       Version          : $Revision:   2.4  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:56  $
+--       Date fetched Out : $Modtime:   May 05 2011 09:14:34  $
+--       Version          : $Revision:   2.5  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --
@@ -23,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY nm3inv_security AS
 --
 --  g_body_sccsid is the SCCS ID for the package body
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.4  $';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '$Revision:   2.5  $';
    g_package_name    CONSTANT  varchar2(30)   := 'nm3inv_security';
 --
    l_dummy_package_variable number;
@@ -70,7 +70,7 @@ FUNCTION can_usr_see_all_inv_on_element ( pi_ne_id IN nm_members.nm_ne_id_of%TYP
      WHERE nua_admin_unit = nag_parent_admin_unit
        AND nua_mode = 'NORMAL'
        AND nua_user_id = hus_user_id
-       AND hus_username = USER)
+       AND hus_username = Sys_Context('NM3_SECURITY_CTX','USERNAME'))
     SELECT 1
       FROM nm_elements
      WHERE ne_id = c_ne_id_of
@@ -113,7 +113,7 @@ FUNCTION can_usr_see_all_inv_on_element ( pi_ne_id IN nm_members.nm_ne_id_of%TYP
      WHERE nua_admin_unit = nag_parent_admin_unit
        AND nua_mode = 'NORMAL'
        AND nua_user_id = hus_user_id
-       AND hus_username = USER)
+       AND hus_username = Sys_Context('NM3_SECURITY_CTX','USERNAME'))
   -- Check the users admin unit is allowed
     SELECT 1
       FROM nm_elements
@@ -139,7 +139,7 @@ FUNCTION can_usr_see_all_inv_on_element ( pi_ne_id IN nm_members.nm_ne_id_of%TYP
         WHERE hur_role = itr_hro_role
           AND b.nm_obj_type = itr_inv_type
           AND itr_mode = 'NORMAL'
-          AND hur_username = USER)
+          AND hur_username = Sys_Context('NM3_SECURITY_CTX','USERNAME'))
        AND NOT EXISTS (SELECT 'X' FROM all_visable_au WHERE nag_child_admin_unit = b.nm_admin_unit);
 --
    l_dummy  BINARY_INTEGER;
@@ -153,7 +153,7 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'can_usr_see_all_inv_on_element');
 --
-   IF nm3user.is_user_unrestricted
+   IF Sys_Context('NM3CORE','UNRESTRICTED_INVENTORY') = 'TRUE'
    THEN
       l_retval := TRUE;
    ELSIF l_ne_rec.ne_type = 'S' 

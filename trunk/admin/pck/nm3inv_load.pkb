@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv_Load AS
 --
 --   SCCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.6   Feb 24 2011 16:09:40   Ade.Edwards  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_load.pkb-arc   2.7   May 16 2011 14:44:56   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3inv_load.pkb  $
---       Date into PVCS   : $Date:   Feb 24 2011 16:09:40  $
---       Date fetched Out : $Modtime:   Feb 24 2011 16:08:46  $
---       PVCS Version     : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:56  $
+--       Date fetched Out : $Modtime:   May 05 2011 10:49:00  $
+--       PVCS Version     : $Revision:   2.7  $
 --
 --   Author : Jonathan Mills
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY Nm3inv_Load AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.6  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3inv_load';
@@ -179,7 +179,7 @@ PROCEDURE load_or_val_ele_mp_ambig (p_rec           v_load_inv_mem_ele_mp_ambig%
                                    ,p_use_true      BOOLEAN DEFAULT FALSE
                                    ) IS
 --
-   c_init_effective_date CONSTANT date := nm3user.get_effective_date;
+   c_init_effective_date CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
    l_nte_job_id   nm_nw_temp_extents.nte_job_id%TYPE;
 --
@@ -374,7 +374,7 @@ PROCEDURE load_or_val_ele_mp_excl (p_rec           v_load_inv_mem_ele_mp_excl%RO
                                   ,p_use_true      BOOLEAN DEFAULT FALSE
                                   ) IS
 --
-   c_init_effective_date CONSTANT date := nm3user.get_effective_date;
+   c_init_effective_date CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    
    l_nte_job_id   nm_nw_temp_extents.nte_job_id%TYPE;
 --
@@ -511,7 +511,7 @@ PROCEDURE load_or_val_on_element (p_rec           v_load_inv_mem_on_element%ROWT
                                  ,p_validate_only BOOLEAN
                                  ) IS
 --
-   c_init_effective_date constant date := nm3user.get_effective_date;
+   c_init_effective_date constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
    
    l_rec_ne       nm_elements%ROWTYPE;
 --
@@ -754,7 +754,7 @@ PROCEDURE load_or_validate_point_on_ele (p_rec           v_load_point_inv_mem_on
                                         ,p_validate_only BOOLEAN
                                         ) IS
 --
-   c_init_effective_date constant date := nm3user.get_effective_date; 
+   c_init_effective_date constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'); 
    
    l_rec_ne   nm_elements%ROWTYPE;
    l_rec_nte  nm_nw_temp_extents%ROWTYPE;
@@ -1031,8 +1031,8 @@ PROCEDURE process_line_data
   BEGIN
     FOR i IN 
       (SELECT column_name||', ' a
-         FROM user_tab_columns
-        WHERE table_name = pi_table
+         FROM user_tab_columns         
+        WHERE table_name  = pi_table
         ORDER BY column_id)
     LOOP
       l_retval := l_retval||i.a;
@@ -1050,8 +1050,8 @@ PROCEDURE process_line_data
     FOR i IN 
       (SELECT pi_prefix||'.'||column_name||', ' a
          FROM user_tab_columns
-        WHERE table_name = pi_table
-          AND column_name != 'BATCH_NO'
+        WHERE table_name  =   pi_table 
+          AND column_name !=  'BATCH_NO'
         ORDER BY column_id)
     LOOP
       l_retval := l_retval||i.a;
