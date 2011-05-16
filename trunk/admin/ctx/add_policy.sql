@@ -5,11 +5,11 @@ DECLARE
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/add_policy.sql-arc   2.2   Feb 22 2011 09:19:54   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/ctx/add_policy.sql-arc   2.3   May 16 2011 16:03:32   Steve.Cooper  $
 --       Module Name      : $Workfile:   add_policy.sql  $
---       Date into SCCS   : $Date:   Feb 22 2011 09:19:54  $
---       Date fetched Out : $Modtime:   Feb 22 2011 09:18:18  $
---       SCCS Version     : $Revision:   2.2  $
+--       Date into SCCS   : $Date:   May 16 2011 16:03:32  $
+--       Date fetched Out : $Modtime:   Apr 19 2011 09:06:04  $
+--       SCCS Version     : $Revision:   2.3  $
 --       Based on SCCS Version     : 1.11
 --
 --   Create Inventory/Merge security policies
@@ -26,7 +26,7 @@ DECLARE
    l_tab_enable          nm3type.tab_boolean;
    l_tab_static_policy   nm3type.tab_boolean;
    --
-   c_application_owner   CONSTANT VARCHAR2(30) := nm3context.get_context(pi_attribute=>'APPLICATION_OWNER');
+   c_application_owner   CONSTANT VARCHAR2(30) := Sys_Context('NM3CORE','APPLICATION_OWNER');
 --
    l_no_fine_grained_security EXCEPTION;
    PRAGMA EXCEPTION_INIT (l_no_fine_grained_security,-439);
