@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3api as
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api.pkh-arc   2.1   Jan 04 2010 10:58:50   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api.pkh-arc   2.2   May 16 2011 14:42:26   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3api.pkh  $
---       Date into PVCS   : $Date:   Jan 04 2010 10:58:50  $
---       Date fetched Out : $Modtime:   Jan 04 2010 10:58:16  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:26  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 11:21:20  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 
 -------------------------------------------------------------------------
 --
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE nm3api as
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+  g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 --</GLOBVAR>
 --
@@ -53,14 +53,14 @@ FUNCTION get_body_version RETURN varchar2;
 --
 FUNCTION get_ne_id (p_ne_unique      nm_elements.ne_unique%TYPE
                    ,p_ne_nt_type     nm_elements.ne_nt_type%TYPE
-                   ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                   ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                    ) RETURN nm_elements.ne_id%TYPE;
 --
 -- 2. Without specifying ne_nt_type - This will raise an error if
 --     the specified ne_unique exists on >1 network type
 --
 FUNCTION get_ne_id (p_ne_unique      nm_elements.ne_unique%TYPE
-                   ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                   ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                    ) RETURN nm_elements.ne_id%TYPE;
 --</PROC>
 --
@@ -74,20 +74,6 @@ FUNCTION get_nau_admin_unit (p_nau_unit_code  IN nm_admin_units_all.nau_unit_cod
                             ,p_nau_admin_type IN nm_admin_units_all.nau_admin_type%TYPE
                             ) RETURN nm_admin_units_all.nau_admin_unit%TYPE;
 --
---</PROC>
---
------------------------------------------------------------------------------
---
---<PROC NAME="get_effective_date">
--- This function returns the current session's effective date
-FUNCTION get_effective_date RETURN DATE;
---</PROC>
---
------------------------------------------------------------------------------
---
---<PROC NAME="set_effective_date">
--- This function sets the current session's effective date
-PROCEDURE set_effective_date (p_effective_date DATE);
 --</PROC>
 --
 -----------------------------------------------------------------------------

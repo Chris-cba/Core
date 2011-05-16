@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --   SCCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.21   Jan 04 2011 16:00:16   Ade.Edwards  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3asset.pkb-arc   2.22   May 16 2011 14:42:26   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3asset.pkb  $
---       Date into PVCS   : $Date:   Jan 04 2011 16:00:16  $
---       Date fetched Out : $Modtime:   Jan 04 2011 15:58:50  $
---       PVCS Version     : $Revision:   2.21  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:26  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 10:26:54  $
+--       PVCS Version     : $Revision:   2.22  $
 --
 --
 --   Author : Rob Coupe
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.21  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.22  $"';
    g_gos_ne_id                    nm_members_all.nm_ne_id_in%type ;
 --  g_body_sccsid is the SCCS ID for the package body
 --
@@ -29,8 +29,6 @@ CREATE OR REPLACE PACKAGE BODY nm3asset AS
 --
    g_nar_datum_unit nm_units.un_unit_id%TYPE;
    g_maximum_mp     number;
---
-   c_user_id    CONSTANT hig_users.hus_user_id%TYPE  := nm3user.get_user_id;
 --
    c_always_show_inv_pk        CONSTANT boolean := hig.get_user_or_sys_opt('SHOWINVPK') = 'Y';
    c_calculate_overlapping_inv CONSTANT boolean := hig.get_sysopt('AOREXTDINV') = 'Y';
@@ -318,7 +316,7 @@ END get_nar_datum_unit;
 -----------------------------------------------------------------------------
 --
 PROCEDURE create_asset_on_route_data (pi_ngq_id                     IN     nm_gaz_query.ngq_id%TYPE
-                                     ,pi_effective_date             IN     date                                          DEFAULT nm3user.get_effective_date
+                                     ,pi_effective_date             IN     date                                          DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                      ,pi_reference_item_type_type   IN     nm_gaz_query_types.ngqt_item_type_type%TYPE   DEFAULT NULL
                                      ,pi_reference_item_type        IN     nm_gaz_query_types.ngqt_item_type%TYPE        DEFAULT NULL
                                      ,pi_reference_item_id          IN     nm_assets_on_route_holding.narh_ne_id_in%TYPE DEFAULT NULL
@@ -327,7 +325,7 @@ PROCEDURE create_asset_on_route_data (pi_ngq_id                     IN     nm_ga
                                      ,po_return_arguments              OUT rec_aor_return_args
                                      ) IS
 --
-   c_init_eff_date CONSTANT date := nm3user.get_effective_date;
+   c_init_eff_date CONSTANT date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_ngqi_job_id  nm_gaz_query_item_list.ngqi_job_id%TYPE;
    l_nte_job_id   nm_nw_temp_extents.nte_job_id%TYPE;
@@ -1570,7 +1568,7 @@ BEGIN
    po_npq_unique := NULL;
    po_npq_descr  := NULL;
 --
-   l_useopt := hig.get_useopt (pi_huo_hus_user_id => c_user_id
+   l_useopt := hig.get_useopt (pi_huo_hus_user_id => To_Number(Sys_Context('NM3CORE','USER_ID'))
                               ,pi_huo_id          => c_default_pbi_useopt
                               );
 --
@@ -1607,7 +1605,7 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'set_user_default_pbi_query');
 --
-   hig.set_useopt (pi_huo_hus_user_id => c_user_id
+   hig.set_useopt (pi_huo_hus_user_id => To_Number(Sys_Context('NM3CORE','USER_ID'))
                   ,pi_huo_id          => c_default_pbi_useopt
                   ,pi_huo_value       => pi_npq_id
                   );
@@ -1904,7 +1902,7 @@ BEGIN
            po_flex_col_dets(l_count).ita_id_domain             := NULL;
            po_flex_col_dets(l_count).ita_mandatory_yn          := 'Y';
            po_flex_col_dets(l_count).ita_mandatory_asterisk    := c_asterisk;
-           po_flex_col_dets(l_count).iit_value                 := TO_CHAR(g_rec_iit.iit_start_date,nm3user.get_user_date_mask);
+           po_flex_col_dets(l_count).iit_value                 := TO_CHAR(g_rec_iit.iit_start_date,Sys_Context('NM3CORE','USER_DATE_MASK'));
            po_flex_col_dets(l_count).iit_description           := NULL;
            po_flex_col_dets(l_count).ita_update_allowed        := 'N';
            po_flex_col_dets(l_count).ita_format                := nm3type.c_date;
@@ -1921,7 +1919,7 @@ BEGIN
            po_flex_col_dets(l_count).ita_id_domain             := NULL;
            po_flex_col_dets(l_count).ita_mandatory_yn          := 'N';
            po_flex_col_dets(l_count).ita_mandatory_asterisk    := NULL;
-           po_flex_col_dets(l_count).iit_value                 := TO_CHAR(g_rec_iit.iit_end_date,nm3user.get_user_date_mask);
+           po_flex_col_dets(l_count).iit_value                 := TO_CHAR(g_rec_iit.iit_end_date,Sys_Context('NM3CORE','USER_DATE_MASK'));
            po_flex_col_dets(l_count).iit_description           := NULL;
            po_flex_col_dets(l_count).ita_update_allowed        := 'Y';
            po_flex_col_dets(l_count).ita_format                := nm3type.c_date;
@@ -2581,8 +2579,6 @@ PROCEDURE get_inv_route_location_details (pi_iit_ne_id           IN     nm_inv_i
 
    l_rec_nit nm_inv_types%ROWTYPE;
 
-   c_preferred_lrm CONSTANT nm_members.nm_obj_type%TYPE := nm3user.get_preferred_lrm;
-
 BEGIN
 --
    nm_debug.proc_start(g_package_name,'get_inv_route_location_details');
@@ -2594,10 +2590,10 @@ BEGIN
    IF l_rec_nit.nit_table_name IS NULL
     THEN
       l_pl_arr := nm3pla.get_connected_chunks (pi_ne_id    => pi_iit_ne_id
-                                              ,pi_obj_type => c_preferred_lrm
+                                              ,pi_obj_type => Sys_Context('NM3CORE','PREFERRED_LRM')
                                               );
       IF   l_pl_arr.is_empty
-       AND c_preferred_lrm IS NOT NULL
+       AND Sys_Context('NM3CORE','PREFERRED_LRM') IS NOT NULL
        THEN
          l_pl_arr := nm3pla.get_connected_chunks (pi_ne_id    => pi_iit_ne_id
                                                  ,pi_obj_type => NULL
@@ -2606,10 +2602,10 @@ BEGIN
    ELSIF is_ft_inv_type_on_network(pi_nit_rec => l_rec_nit) THEN  
       l_pl_arr := get_foreign_placement_array (pi_iit_ne_id    => pi_iit_ne_id
                                               ,pi_nit_inv_type => pi_nit_inv_type
-                                              ,pi_pref_lrm     => c_preferred_lrm
+                                              ,pi_pref_lrm     => Sys_Context('NM3CORE','PREFERRED_LRM')
                                               );
       IF   l_pl_arr.is_empty
-       AND c_preferred_lrm IS NOT NULL
+       AND Sys_Context('NM3CORE','PREFERRED_LRM') IS NOT NULL
        THEN
          l_pl_arr := get_foreign_placement_array (pi_iit_ne_id    => pi_iit_ne_id
                                                  ,pi_nit_inv_type => pi_nit_inv_type
@@ -3747,7 +3743,7 @@ BEGIN
       l_rec_ele_flex_col_details.ita_mandatory_asterisk := c_asterisk;
       l_rec_ele_flex_col_details.ita_format             := nm3type.c_date;
       l_rec_ele_flex_col_details.ita_format_mask        := NULL;
-      l_rec_ele_flex_col_details.iit_value_orig         := TO_CHAR(g_rec_ne.ne_start_date,nm3user.get_user_date_mask);
+      l_rec_ele_flex_col_details.iit_value_orig         := TO_CHAR(g_rec_ne.ne_start_date,Sys_Context('NM3CORE','USER_DATE_MASK'));
       l_rec_ele_flex_col_details.iit_value              := l_rec_ele_flex_col_details.iit_value_orig;
       l_rec_ele_flex_col_details.iit_description        := NULL;
       l_rec_ele_flex_col_details.iit_meaning            := l_rec_ele_flex_col_details.iit_value;
@@ -3767,7 +3763,7 @@ BEGIN
       l_rec_ele_flex_col_details.ita_mandatory_asterisk := NULL;
       l_rec_ele_flex_col_details.ita_format             := nm3type.c_date;
       l_rec_ele_flex_col_details.ita_format_mask        := NULL;
-      l_rec_ele_flex_col_details.iit_value_orig         := TO_CHAR(g_rec_ne.ne_end_date,nm3user.get_user_date_mask);
+      l_rec_ele_flex_col_details.iit_value_orig         := TO_CHAR(g_rec_ne.ne_end_date,Sys_Context('NM3CORE','USER_DATE_MASK'));
       l_rec_ele_flex_col_details.iit_value              := l_rec_ele_flex_col_details.iit_value_orig;
       l_rec_ele_flex_col_details.iit_description        := NULL;
       l_rec_ele_flex_col_details.iit_meaning            := l_rec_ele_flex_col_details.iit_value;
@@ -4080,7 +4076,7 @@ BEGIN
   END IF;
 
   l_narsh_rec.narsh_job_id                     := pi_narh_job_id;
-  l_narsh_rec.narsh_effective_date             := nm3user.get_effective_date;
+  l_narsh_rec.narsh_effective_date             := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
   l_narsh_rec.narsh_source_id                  := l_ngq_rec.ngq_source_id;
   l_narsh_rec.narsh_source                     := l_ngq_rec.ngq_source;
   l_narsh_rec.narsh_source_unique              := l_roi_details_rec.roi_name;

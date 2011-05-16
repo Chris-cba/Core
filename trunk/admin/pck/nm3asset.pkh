@@ -168,7 +168,7 @@ FUNCTION get_nar_datum_unit RETURN nm_units.un_unit_id%TYPE;
 -- This procedure creates the NM_ASSETS_ON_ROUTE_HOLDING data for a given gaz query
 --
 PROCEDURE create_asset_on_route_data (pi_ngq_id                     IN     nm_gaz_query.ngq_id%TYPE
-                                     ,pi_effective_date             IN     date                                          DEFAULT nm3user.get_effective_date
+                                     ,pi_effective_date             IN     date                                          DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                      ,pi_reference_item_type_type   IN     nm_gaz_query_types.ngqt_item_type_type%TYPE   DEFAULT NULL
                                      ,pi_reference_item_type        IN     nm_gaz_query_types.ngqt_item_type%TYPE        DEFAULT NULL
                                      ,pi_reference_item_id          IN     nm_assets_on_route_holding.narh_ne_id_in%TYPE DEFAULT NULL

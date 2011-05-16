@@ -1,11 +1,11 @@
 CREATE OR REPLACE PACKAGE BODY nm3api_net AS
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_net.pkb-arc   2.1   Jun 04 2008 13:29:32   ptanava  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_net.pkb-arc   2.2   May 16 2011 14:42:26   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3api_net.pkb  $
---       Date into PVCS   : $Date:   Jun 04 2008 13:29:32  $
---       Date fetched Out : $Modtime:   Jun 03 2008 11:51:10  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:26  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 11:29:08  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on SCCS version : 1.2
 --
 --
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3api_net AS
 
 -- 03.06.08 PT added p_no_purpose parameter to create_node() func and proc
 --
-   g_body_sccsid     CONSTANT  varchar2(200) :='"$Revision:   2.1  $"';
+   g_body_sccsid     CONSTANT  varchar2(200) :='"$Revision:   2.2  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3api_net';
@@ -43,7 +43,7 @@ END get_body_version;
 FUNCTION  create_node (p_no_node_name   IN     nm_nodes.no_node_name%TYPE   DEFAULT NULL
                       ,p_no_descr       IN     nm_nodes.no_descr%TYPE
                       ,p_no_node_type   IN     nm_nodes.no_node_type%TYPE
-                      ,p_effective_date IN     nm_nodes.no_start_date%TYPE  DEFAULT nm3user.get_effective_date
+                      ,p_effective_date IN     nm_nodes.no_start_date%TYPE  DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_np_grid_east   IN     nm_points.np_grid_east%TYPE  DEFAULT NULL
                       ,p_np_grid_north  IN     nm_points.np_grid_north%TYPE DEFAULT NULL
                       ,p_no_purpose     in     nm_nodes.no_purpose%type default null  -- PT 03.06.08
@@ -75,7 +75,7 @@ END create_node;
 PROCEDURE create_node (p_no_node_name   IN     nm_nodes.no_node_name%TYPE   DEFAULT NULL
                       ,p_no_descr       IN     nm_nodes.no_descr%TYPE
                       ,p_no_node_type   IN     nm_nodes.no_node_type%TYPE
-                      ,p_effective_date IN     nm_nodes.no_start_date%TYPE  DEFAULT nm3user.get_effective_date
+                      ,p_effective_date IN     nm_nodes.no_start_date%TYPE  DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_np_grid_east   IN     nm_points.np_grid_east%TYPE  DEFAULT NULL
                       ,p_np_grid_north  IN     nm_points.np_grid_north%TYPE DEFAULT NULL
                       ,p_no_node_id        OUT nm_nodes.no_node_id%TYPE
@@ -95,7 +95,7 @@ END create_node;
 -----------------------------------------------------------------------------
 --
 PROCEDURE create_element (p_rec_ne         IN OUT nm_elements%ROWTYPE
-                         ,p_effective_date IN     nm_elements.ne_start_date%TYPE DEFAULT nm3user.get_effective_date
+                         ,p_effective_date IN     nm_elements.ne_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                          ,p_nm_cardinality IN     nm_members.nm_cardinality%TYPE DEFAULT NULL
                          ) IS
 BEGIN
@@ -128,7 +128,7 @@ END create_element;
 PROCEDURE create_distance_break (pi_route_ne_id      IN     nm_elements.ne_id%TYPE
                                 ,pi_start_node_id    IN     nm_elements.ne_no_start%TYPE
                                 ,pi_end_node_id      IN     nm_elements.ne_no_end%TYPE
-                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,pi_length           IN     nm_elements.ne_length%TYPE     DEFAULT 0
                                 ,po_db_ne_id            OUT nm_elements.ne_id%TYPE
                                 ,po_db_ne_unique        OUT nm_elements.ne_unique%TYPE
@@ -155,7 +155,7 @@ END create_distance_break;
 PROCEDURE create_distance_break (pi_route_ne_id      IN     nm_elements.ne_id%TYPE
                                 ,pi_start_node_id    IN     nm_elements.ne_no_start%TYPE
                                 ,pi_end_node_id      IN     nm_elements.ne_no_end%TYPE
-                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,pi_length           IN     nm_elements.ne_length%TYPE     DEFAULT 0
                                 ) IS
 --
@@ -180,7 +180,7 @@ END create_distance_break;
 FUNCTION  create_distance_break (pi_route_ne_id      IN     nm_elements.ne_id%TYPE
                                 ,pi_start_node_id    IN     nm_elements.ne_no_start%TYPE
                                 ,pi_end_node_id      IN     nm_elements.ne_no_end%TYPE
-                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,pi_length           IN     nm_elements.ne_length%TYPE     DEFAULT 0
                                 ) RETURN nm_elements.ne_id%TYPE IS
 --
@@ -208,7 +208,7 @@ PROCEDURE create_distance_break (pi_route_ne_unique  IN     nm_elements.ne_uniqu
                                 ,pi_route_ne_nt_type IN     nm_elements.ne_nt_type%TYPE    DEFAULT NULL
                                 ,pi_start_node_id    IN     nm_elements.ne_no_start%TYPE
                                 ,pi_end_node_id      IN     nm_elements.ne_no_end%TYPE
-                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,pi_length           IN     nm_elements.ne_length%TYPE     DEFAULT 0
                                 ,po_db_ne_id            OUT nm_elements.ne_id%TYPE
                                 ,po_db_ne_unique        OUT nm_elements.ne_unique%TYPE
@@ -237,7 +237,7 @@ PROCEDURE create_distance_break (pi_route_ne_unique  IN     nm_elements.ne_uniqu
                                 ,pi_route_ne_nt_type IN     nm_elements.ne_nt_type%TYPE    DEFAULT NULL
                                 ,pi_start_node_id    IN     nm_elements.ne_no_start%TYPE
                                 ,pi_end_node_id      IN     nm_elements.ne_no_end%TYPE
-                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,pi_length           IN     nm_elements.ne_length%TYPE     DEFAULT 0
                                 ) IS
 --
@@ -264,7 +264,7 @@ FUNCTION  create_distance_break (pi_route_ne_unique  IN     nm_elements.ne_uniqu
                                 ,pi_route_ne_nt_type IN     nm_elements.ne_nt_type%TYPE    DEFAULT NULL
                                 ,pi_start_node_id    IN     nm_elements.ne_no_start%TYPE
                                 ,pi_end_node_id      IN     nm_elements.ne_no_end%TYPE
-                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,pi_effective_date   IN     nm_elements.ne_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,pi_length           IN     nm_elements.ne_length%TYPE     DEFAULT 0
                                 ) RETURN nm_elements.ne_id%TYPE IS
 --
@@ -290,10 +290,10 @@ END create_distance_break;
 -----------------------------------------------------------------------------
 --
 PROCEDURE close_datum_element (pi_datum_ne_id     IN nm_elements.ne_id%TYPE
-                              ,pi_close_date      IN DATE DEFAULT nm3user.get_effective_date
+                              ,pi_close_date      IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                               ) IS
 --
-   c_init_eff_date CONSTANT DATE := nm3user.get_effective_date;
+   c_init_eff_date CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
 BEGIN
 --
@@ -328,11 +328,11 @@ END close_datum_element;
 -----------------------------------------------------------------------------
 --
 PROCEDURE close_group_of_elements (pi_route_ne_id     IN nm_elements.ne_id%TYPE
-                                  ,pi_close_date      IN DATE     DEFAULT nm3user.get_effective_date
+                                  ,pi_close_date      IN DATE     DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                   ,pi_close_all       IN VARCHAR2 DEFAULT 'N'
                                   ) IS
 --
-   c_init_eff_date CONSTANT DATE := nm3user.get_effective_date;
+   c_init_eff_date CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
 BEGIN
 --

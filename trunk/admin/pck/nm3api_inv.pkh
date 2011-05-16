@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE nm3api_inv AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_inv.pkh-arc   2.1   Jan 04 2010 11:29:00   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api_inv.pkh-arc   2.2   May 16 2011 14:42:26   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3api_inv.pkh  $
---       Date into PVCS   : $Date:   Jan 04 2010 11:29:00  $
---       Date fetched Out : $Modtime:   Jan 04 2010 11:26:44  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:26  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 11:31:32  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.5
 -------------------------------------------------------------------------
 --
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE nm3api_inv AS
 -----------------------------------------------------------------------------
 --</PACKAGE>
 --<GLOBVAR>
-    g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.1  $';
+    g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
 --  g_sccsid is the SCCS ID for the package
 --
    c_replace CONSTANT varchar2(7) := 'REPLACE';
@@ -55,7 +55,7 @@ FUNCTION get_body_version RETURN varchar2;
 --
 FUNCTION get_iit_ne_id (p_iit_primary_key IN nm_inv_items.iit_primary_key%TYPE
                        ,p_iit_inv_type    IN nm_inv_items.iit_inv_type%TYPE
-                       ,p_effective_date  IN date DEFAULT nm3user.get_effective_date
+                       ,p_effective_date  IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                        ) RETURN nm_inv_items.iit_ne_id%TYPE;
 --</PROC>
 --
@@ -64,8 +64,8 @@ FUNCTION get_iit_ne_id (p_iit_primary_key IN nm_inv_items.iit_primary_key%TYPE
 --<PROC NAME="get_group_placement_for_item">
 FUNCTION get_group_placement_for_item (p_iit_primary_key IN nm_inv_items.iit_primary_key%TYPE
                                       ,p_iit_inv_type    IN nm_inv_items.iit_inv_type%TYPE
-                                      ,p_group_type      IN nm_group_types.ngt_group_type%TYPE DEFAULT nm3user.get_preferred_lrm
-                                      ,p_effective_date  IN date                               DEFAULT nm3user.get_effective_date
+                                      ,p_group_type      IN nm_group_types.ngt_group_type%TYPE DEFAULT Sys_Context('NM3CORE','PREFERRED_LRM')
+                                      ,p_effective_date  IN date                               DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                       ) RETURN nm_placement_array;
 --</PROC>
 --
@@ -81,14 +81,14 @@ FUNCTION get_group_placement_for_item (p_iit_primary_key IN nm_inv_items.iit_pri
 -- 1. This procedure will create the inventory item record (not located)
 --
 PROCEDURE create_inventory_item (p_rec_iit           IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date    IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,p_effective_date    IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 );
 --
 -- 2. This procedure will create the inventory item and locate it along the entire length
 --     of the network element (only suitable for continous items) specified by NE_UNIQUE
 --
 PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,p_element_ne_unique  IN     nm_elements.ne_unique%TYPE
                                 ,p_element_ne_nt_type IN     nm_elements.ne_nt_type%TYPE      DEFAULT NULL
                                 );
@@ -97,7 +97,7 @@ PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYP
 --     of the network element (only suitable for continous items) specified by the internal NE_ID
 --
 PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,p_element_ne_id      IN     nm_elements.ne_id%TYPE
                                 );
 --
@@ -106,7 +106,7 @@ PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYP
 --    p_element_end_mp does not need to be specified for POINT inventory items
 --
 PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,p_element_ne_unique  IN     nm_elements.ne_unique%TYPE
                                 ,p_element_ne_nt_type IN     nm_elements.ne_nt_type%TYPE      DEFAULT NULL
                                 ,p_element_begin_mp   IN     nm_members.nm_begin_mp%TYPE
@@ -118,7 +118,7 @@ PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYP
 --    p_element_end_mp does not need to be specified for POINT inventory items
 --
 PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,p_element_ne_id      IN     nm_elements.ne_id%TYPE
                                 ,p_element_begin_mp   IN     nm_members.nm_begin_mp%TYPE
                                 ,p_element_end_mp     IN     nm_members.nm_end_mp%TYPE        DEFAULT NULL
@@ -128,7 +128,7 @@ PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYP
 --     area as contained within the Saved Network Extent - identified by the internal NSE_ID
 --
 PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,p_effective_date     IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,p_nse_id             IN     nm_saved_extents.nse_id%TYPE
                                 );
 --
@@ -137,7 +137,7 @@ PROCEDURE create_inventory_item (p_rec_iit            IN OUT nm_inv_items%ROWTYP
 --     p_restrict_excl_sub_class) or exclusive (pass "Y" into p_restrict_excl_sub_class)
 --
 PROCEDURE create_inventory_item (p_rec_iit                 IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date          IN     date                          DEFAULT nm3user.get_effective_date
+                                ,p_effective_date          IN     date                          DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,p_route_ne_id             IN     nm_elements.ne_id%TYPE        DEFAULT NULL
                                 ,p_start_ne_id             IN     nm_elements.ne_id%TYPE
                                 ,p_start_offset            IN     number
@@ -151,7 +151,7 @@ PROCEDURE create_inventory_item (p_rec_iit                 IN OUT nm_inv_items%R
 --     area as contained within the passed NM_PLACEMENT_ARRAY
 --
 PROCEDURE create_inventory_item (p_rec_iit                 IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date          IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,p_effective_date          IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,p_pl_arr                  IN     nm_placement_array
                                 );
 --
@@ -159,7 +159,7 @@ PROCEDURE create_inventory_item (p_rec_iit                 IN OUT nm_inv_items%R
 --     area as contained within the passed NM_PLACEMENT
 --
 PROCEDURE create_inventory_item (p_rec_iit                 IN OUT nm_inv_items%ROWTYPE
-                                ,p_effective_date          IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                ,p_effective_date          IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                 ,p_pl                      IN     nm_placement
                                 );
 --
@@ -173,7 +173,7 @@ PROCEDURE create_inventory_item (p_rec_iit                 IN OUT nm_inv_items%R
 --     of the network element (only suitable for continous items) specified by NE_UNIQUE
 --
 PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_append_or_replace_existing IN varchar2 DEFAULT c_replace
                       ,p_element_ne_unique          IN     nm_elements.ne_unique%TYPE
                       ,p_element_ne_nt_type         IN     nm_elements.ne_nt_type%TYPE      DEFAULT NULL
@@ -183,7 +183,7 @@ PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_i
 --     of the network element (only suitable for continous items) specified by the internal NE_ID
 --
 PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_append_or_replace_existing IN     varchar2                         DEFAULT c_replace
                       ,p_element_ne_id              IN     nm_elements.ne_id%TYPE
                       );
@@ -193,7 +193,7 @@ PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_i
 --    p_element_end_mp does not need to be specified for POINT inventory items
 --
 PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_append_or_replace_existing IN     varchar2                         DEFAULT c_replace
                       ,p_element_ne_unique          IN     nm_elements.ne_unique%TYPE
                       ,p_element_ne_nt_type         IN     nm_elements.ne_nt_type%TYPE      DEFAULT NULL
@@ -206,7 +206,7 @@ PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_i
 --    p_element_end_mp does not need to be specified for POINT inventory items
 --
 PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_append_or_replace_existing IN     varchar2                         DEFAULT c_replace
                       ,p_element_ne_id              IN     nm_elements.ne_id%TYPE
                       ,p_element_begin_mp           IN     nm_members.nm_begin_mp%TYPE
@@ -217,7 +217,7 @@ PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_i
 --     area as contained within the Saved Network Extent - identified by the internal NSE_ID
 --
 PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_append_or_replace_existing IN     varchar2                         DEFAULT c_replace
                       ,p_nse_id                     IN     nm_saved_extents.nse_id%TYPE
                       );
@@ -227,7 +227,7 @@ PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_i
 --     p_restrict_excl_sub_class) or exclusive (pass "Y" into p_restrict_excl_sub_class)
 --
 PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                      ,p_effective_date             IN     date                          DEFAULT nm3user.get_effective_date
+                      ,p_effective_date             IN     date                          DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_append_or_replace_existing IN     varchar2                      DEFAULT c_replace
                       ,p_route_ne_id                IN     nm_elements.ne_id%TYPE        DEFAULT NULL
                       ,p_start_ne_id                IN     nm_elements.ne_id%TYPE
@@ -242,7 +242,7 @@ PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_i
 --     area as contained within the passed NM_PLACEMENT_ARRAY
 --
 PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_append_or_replace_existing IN     varchar2                         DEFAULT c_replace
                       ,p_pl_arr                     IN     nm_placement_array
                       );
@@ -251,7 +251,7 @@ PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_i
 --     area as contained within the passed NM_PLACEMENT
 --
 PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                      ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                       ,p_append_or_replace_existing IN     varchar2                         DEFAULT c_replace
                       ,p_pl                         IN     nm_placement
                       );
@@ -263,7 +263,7 @@ PROCEDURE locate_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_i
 -- This procedure end-dates the specified inventory item on a specified date
 --
 PROCEDURE end_date_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                        ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                        ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                         );
 --</PROC>
 --
@@ -273,7 +273,7 @@ PROCEDURE end_date_item (p_iit_ne_id                  IN     nm_inv_items.iit_ne
 -- This procedure end-dates the specified inventory item's location on a specified date
 --
 PROCEDURE end_date_item_location (p_iit_ne_id                  IN     nm_inv_items.iit_ne_id%TYPE
-                                 ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT nm3user.get_effective_date
+                                 ,p_effective_date             IN     nm_inv_items.iit_start_date%TYPE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                  );
 --</PROC>
 --
@@ -301,7 +301,7 @@ PROCEDURE end_date_item_location (p_iit_ne_id                  IN     nm_inv_ite
 --
 PROCEDURE copy_item(pi_item_to_copy   IN nm_inv_items.iit_ne_id%TYPE
                    ,pi_new_pk         IN nm_inv_items.iit_primary_key%TYPE
-                   ,pi_effective_date IN date DEFAULT nm3user.get_effective_date
+                   ,pi_effective_date IN date DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                    ,pi_copy_location  IN boolean DEFAULT TRUE
                    ,pi_cascade_xsp    IN boolean DEFAULT TRUE
                    ,pi_cascade_excl   IN boolean DEFAULT TRUE

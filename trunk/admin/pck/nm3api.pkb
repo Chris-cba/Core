@@ -2,11 +2,11 @@ CREATE OR REPLACE PACKAGE BODY nm3api AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api.pkb-arc   2.1   Jan 04 2010 10:54:20   cstrettle  $
+--       pvcsid                 : $Header:   //vm_latest/archives/nm3/admin/pck/nm3api.pkb-arc   2.2   May 16 2011 14:42:26   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3api.pkb  $
---       Date into PVCS   : $Date:   Jan 04 2010 10:54:20  $
---       Date fetched Out : $Modtime:   Jan 04 2010 10:53:22  $
---       PVCS Version     : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:26  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 11:21:42  $
+--       PVCS Version     : $Revision:   2.2  $
 --       Based on SCCS version 1.5: 
 --
 --   Author : Rob Coupe
@@ -19,7 +19,7 @@ CREATE OR REPLACE PACKAGE BODY nm3api AS
 --
 --all global package variables here
 --
-   g_body_sccsid constant varchar2(30) :='"$Revision:   2.1  $"';
+   g_body_sccsid constant varchar2(30) :='"$Revision:   2.2  $"';
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3api';
 --
@@ -41,10 +41,10 @@ END get_body_version;
 --
 FUNCTION get_ne_id (p_ne_unique      nm_elements.ne_unique%TYPE
                    ,p_ne_nt_type     nm_elements.ne_nt_type%TYPE
-                   ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                   ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                    ) RETURN nm_elements.ne_id%TYPE IS
 --
-   c_eff_date CONSTANT DATE := nm3user.get_effective_date;
+   c_eff_date CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_retval            nm_elements.ne_id%TYPE;
 --
@@ -76,7 +76,7 @@ END get_ne_id;
 -----------------------------------------------------------------------------
 --
 FUNCTION get_ne_id (p_ne_unique      nm_elements.ne_unique%TYPE
-                   ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                   ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                    ) RETURN nm_elements.ne_id%TYPE IS
 BEGIN
    RETURN get_ne_id (p_ne_unique      => p_ne_unique
@@ -84,20 +84,6 @@ BEGIN
                     ,p_effective_date => p_effective_date
                     );
 END get_ne_id;
---
------------------------------------------------------------------------------
---
-FUNCTION get_effective_date RETURN DATE IS
-BEGIN
-   RETURN nm3user.get_effective_date;
-END get_effective_date;
---
------------------------------------------------------------------------------
---
-PROCEDURE set_effective_date (p_effective_date DATE) IS
-BEGIN
-   nm3user.set_effective_date (p_effective_date);
-END set_effective_date;
 --
 -----------------------------------------------------------------------------
 --

@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3audit AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3audit.pkb-arc   2.2   28 Sep 2009 09:59:04   kdawson  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3audit.pkb-arc   2.3   May 16 2011 14:42:26   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3audit.pkb  $
---       Date into PVCS   : $Date:   28 Sep 2009 09:59:04  $
---       Date fetched Out : $Modtime:   28 Sep 2009 09:57:52  $
---       PVCS Version     : $Revision:   2.2  $
+--       Date into PVCS   : $Date:   May 16 2011 14:42:26  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 16:06:20  $
+--       PVCS Version     : $Revision:   2.3  $
 --       Based on SCCS version : 
 --
 --
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3audit AS
 --	Copyright (c) exor corporation ltd, 2000
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.2  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3audit';
@@ -79,8 +79,6 @@ CREATE OR REPLACE PACKAGE BODY nm3audit AS
 --
    g_rec_old_nat    nm_audit_temp%ROWTYPE;
    g_rec_new_nat    nm_audit_temp%ROWTYPE;
---
-   g_app_owner CONSTANT  VARCHAR2(30) := hig.get_application_owner;
 --
    g_clob           clob;
 --
@@ -256,7 +254,7 @@ BEGIN
    get_key_cols (pi_table_name);
 --
    nm3clob.nullify_clob(g_clob);
-   append ('CREATE OR REPLACE TRIGGER '||g_app_owner||'.'||l_trigger_name,FALSE);
+   append ('CREATE OR REPLACE TRIGGER '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_trigger_name,FALSE);
    append ('  BEFORE ');
 --
    l_first_audit_type := TRUE;
@@ -293,7 +291,7 @@ BEGIN
       RAISE g_audit_exception;
    END IF;
 --
-   append ('  ON '||g_app_owner||'.'||LOWER(pi_table_name));
+   append ('  ON '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||LOWER(pi_table_name));
    append ('  FOR EACH ROW');
    
    IF g_tab_naw.COUNT >0 THEN
@@ -1437,12 +1435,11 @@ END ins_nach_tab;
 --
 PROCEDURE reset_nkc_to_default (pi_table_name IN user_tables.table_name%TYPE) IS
 --
-   CURSOR cs_ac (c_owner      all_tables.owner%TYPE
-                ,c_table_name user_tables.table_name%TYPE
+   CURSOR cs_ac (c_table_name user_tables.table_name%TYPE
                 ) IS
    SELECT constraint_name
     FROM  all_constraints
-   WHERE  owner      = c_owner
+   WHERE  owner      = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   table_name = c_table_name
     AND   constraint_type IN ('P','U')
    ORDER BY constraint_type ASC;
@@ -1451,7 +1448,7 @@ PROCEDURE reset_nkc_to_default (pi_table_name IN user_tables.table_name%TYPE) IS
 --
 BEGIN
 --
-   OPEN  cs_ac (g_app_owner, pi_table_name);
+   OPEN  cs_ac (pi_table_name);
    FETCH cs_ac INTO l_cons_name;
    IF cs_ac%FOUND
     THEN
@@ -1468,7 +1465,7 @@ BEGIN
             ,position
             ,column_name
        FROM  all_cons_columns
-      WHERE  owner           = g_app_owner
+      WHERE  owner           = Sys_Context('NM3CORE','APPLICATION_OWNER')
        AND   constraint_name = l_cons_name
        AND   table_name      = pi_table_name;
 --
@@ -1494,7 +1491,7 @@ BEGIN
          ,column_id
          ,column_name
     FROM  all_tab_columns
-   WHERE  owner      = g_app_owner
+   WHERE  owner      = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   table_name = pi_table_name
     AND   column_name NOT LIKE '%DATE_CREATED'
     AND   column_name NOT LIKE '%DATE_MODIFIED'
@@ -1517,12 +1514,12 @@ BEGIN
 --
    IF nm3ddl.does_object_exist(c_trigger_name,'TRIGGER')
     THEN
-      EXECUTE IMMEDIATE 'DROP TRIGGER '||g_app_owner||'.'||c_trigger_name;
+      EXECUTE IMMEDIATE 'DROP TRIGGER '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||c_trigger_name;
    END IF;
 --
    IF nm3ddl.does_object_exist(c_view_name,'VIEW')
     THEN
-      EXECUTE IMMEDIATE 'DROP VIEW '||g_app_owner||'.'||c_view_name;
+      EXECUTE IMMEDIATE 'DROP VIEW '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||c_view_name;
    END IF;
 --
 END drop_audit_trigger;
