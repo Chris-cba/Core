@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3load AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3load.pkb-arc   2.6   Mar 28 2011 18:23:46   Chris.Strettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3load.pkb-arc   2.7   May 16 2011 14:45:00   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3load.pkb  $
---       Date into PVCS   : $Date:   Mar 28 2011 18:23:46  $
---       Date fetched Out : $Modtime:   Mar 28 2011 16:20:32  $
---       Version          : $Revision:   2.6  $
+--       Date into PVCS   : $Date:   May 16 2011 14:45:00  $
+--       Date fetched Out : $Modtime:   May 05 2011 11:24:34  $
+--       Version          : $Revision:   2.7  $
 --       Based on SCCS version : 1.26
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -21,12 +21,11 @@ CREATE OR REPLACE PACKAGE BODY nm3load AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3load.pkb	1.26 03/08/05"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.6  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.7  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3load';
 --
-   c_app_owner CONSTANT varchar2(30) := hig.get_application_owner;
    c_linesize  CONSTANT pls_integer  := 32767;
 --
    c_table_short_name_prefix        varchar2(2) := 'l_';
@@ -117,12 +116,12 @@ BEGIN
                                ,p_object_type => 'TABLE'
                                )
     THEN
-      EXECUTE IMMEDIATE 'DROP TABLE '||c_app_owner||'.'||l_table_name;
+      EXECUTE IMMEDIATE 'DROP TABLE '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_table_name;
    END IF;
 --
    l_tab_rec_nlfc := get_tab_nlfc (p_nlf_id);
 --
-   append ('CREATE TABLE '||c_app_owner||'.'||l_table_name,FALSE);
+   append ('CREATE TABLE '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'.'||l_table_name,FALSE);
    append ('     (batch_no  NUMBER(9) NOT NULL');
    append ('     ,record_no NUMBER(9) NOT NULL');
    FOR i IN 1..l_tab_rec_nlfc.COUNT
@@ -1777,7 +1776,7 @@ BEGIN
          ,column_name
          ,get_column_default(p_nld_id,column_name)
     FROM  all_tab_columns
-   WHERE  owner      = c_app_owner
+   WHERE  owner      = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   table_name = l_table_name;
 --
    nm_debug.proc_end(g_package_name,'add_columns_for_destinations');
@@ -2016,8 +2015,8 @@ BEGIN
       END IF;
       add_it ('--  Path           : '||l_output_path);
    END IF;
-   add_it ('--  Extracted from : '||nm3context.get_context(pi_attribute=>'APPLICATION_OWNER')||'@'||nm3context.get_context(pi_attribute=>'INSTANCE_NAME')||'.'||nm3context.get_context(pi_attribute=>'HOST_NAME'));
-   add_it ('--  Extracted by   : '||USER);
+   add_it ('--  Extracted from : '||Sys_Context('NM3CORE','APPLICATION_OWNER')||'@'||Sys_Context('NM3CORE','INSTANCE_NAME')||'.'|| Sys_Context('NM3CORE','HOST_NAME'));
+   add_it ('--  Extracted by   : '||Sys_Context('NM3_SECURITY_CTX','USERNAME'));
    add_it ('--  At             : '||TO_CHAR(SYSDATE,nm3type.c_full_date_time_format));
 --   add_it ('--');
 --   add_it ('--  NM_LOAD_FILES record as extracted');

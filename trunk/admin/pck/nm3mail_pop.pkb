@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mail_pop AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail_pop.pkb-arc   2.3   Feb 03 2011 08:46:26   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mail_pop.pkb-arc   2.4   May 16 2011 14:45:00   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3mail_pop.pkb  $
---       Date into PVCS   : $Date:   Feb 03 2011 08:46:26  $
---       Date fetched Out : $Modtime:   Feb 02 2011 11:23:52  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   May 16 2011 14:45:00  $
+--       Date fetched Out : $Modtime:   Apr 04 2011 09:48:06  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.1
 -------------------------------------------------------------------------
 --   Author : Jonathan Mills
@@ -20,7 +20,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mail_pop AS
 --
 --all global package variables here
 --
-  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.3  $';
+  g_body_sccsid        CONSTANT varchar2(2000) := '$Revision:   2.4  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mail_pop';
@@ -32,7 +32,6 @@ CREATE OR REPLACE PACKAGE BODY nm3mail_pop AS
    g_tab_header_fields         nm3type.tab_varchar80;
 --
    c_colon           CONSTANT  VARCHAR2(1)    := ':';
-   c_app_owner       CONSTANT  VARCHAR2(30)   := hig.get_application_owner;
    
    c_failing_command CONSTANT  VARCHAR2(30)   := 'BADGER';
    
@@ -422,7 +421,7 @@ PROCEDURE validate_nmpp_procedure (pi_nmpp_procedure nm_mail_pop_processes.nmpp_
    WHERE  EXISTS (SELECT 1
                    FROM  all_arguments
                   WHERE  c_package IS NOT NULL
-                   AND   owner        = c_app_owner
+                   AND   owner        = Sys_Context('NM3CORE','APPLICATION_OWNER')
                    AND   object_name  = c_procedure
                    AND   package_name = c_package
                    AND   position     = 1
@@ -430,7 +429,7 @@ PROCEDURE validate_nmpp_procedure (pi_nmpp_procedure nm_mail_pop_processes.nmpp_
    OR     EXISTS (SELECT 1
                    FROM  all_arguments
                   WHERE  c_package IS NULL
-                   AND   owner        = c_app_owner
+                   AND   owner        = Sys_Context('NM3CORE','APPLICATION_OWNER')
                    AND   object_name  = c_procedure
                    AND   package_name IS NULL
                    AND   position     = 1

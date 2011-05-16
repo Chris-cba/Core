@@ -3,17 +3,17 @@ AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.27   Mar 08 2011 09:26:24   Ade.Edwards  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3layer_tool.pkb-arc   2.28   May 16 2011 14:45:00   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3layer_tool.pkb  $
---       Date into PVCS   : $Date:   Mar 08 2011 09:26:24  $
---       Date fetched Out : $Modtime:   Mar 08 2011 09:25:06  $
---       Version          : $Revision:   2.27  $
+--       Date into PVCS   : $Date:   May 16 2011 14:45:00  $
+--       Date fetched Out : $Modtime:   May 05 2011 11:01:06  $
+--       Version          : $Revision:   2.28  $
 --       Based on SCCS version : 1.11
 -------------------------------------------------------------------------
 --
 --all global package variables here
 --
-   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.27  $';
+   g_body_sccsid    CONSTANT VARCHAR2 (2000)       := '$Revision:   2.28  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name   CONSTANT VARCHAR2 (30)         := 'NM3LAYER_TOOL';
@@ -1023,7 +1023,7 @@ AS
                                  || lf
                                  || '    FROM sde.layers'
                                  || lf
-                                 || '   WHERE owner = user '
+                                 || '   WHERE owner = Sys_Context(''NM3_SECURITY_CTX'',''USERNAME'') '
                                  || lf
                                  || '     AND table_name = '
                                  || nm3flx.STRING (l_rec_nth.nth_feature_table)
@@ -1109,7 +1109,7 @@ AS
                                  || lf
                                  || '    FROM sde.table_registry'
                                  || lf
-                                 || '   WHERE owner = user '
+                                 || '   WHERE owner = Sys_Context(''NM3_SECURITY_CTX'',''USERNAME'') '
                                  || lf
                                  || '     AND table_name = '
                                  || nm3flx.STRING (l_rec_nth.nth_feature_table)
@@ -1196,7 +1196,7 @@ AS
                                  || lf
                                  || '    FROM sde.geometry_columns'
                                  || lf
-                                 || '   WHERE f_table_schema = user '
+                                 || '   WHERE f_table_schema = Sys_Context(''NM3_SECURITY_CTX'',''USERNAME'') '
                                  || lf
                                  || '     AND f_table_name =      '
                                  || nm3flx.STRING (l_rec_nth.nth_feature_table)
@@ -2285,7 +2285,7 @@ AS
     , pi_owner            IN   VARCHAR2 DEFAULT NULL
    )
    IS
-      l_owner   VARCHAR2 (30)    := NVL (pi_owner, hig.get_application_owner);
+      l_owner   VARCHAR2 (30)    := NVL (pi_owner, Sys_Context('NM3CORE','APPLICATION_OWNER'));
       l_sql     nm3type.max_varchar2;
    BEGIN
       --
@@ -2652,7 +2652,7 @@ AS
        -- Refresh Stats CWS 0109217
        BEGIN
          Nm3ddl.analyse_table( pi_table_name          => rec_linear.nth_feature_table
-                             , pi_schema              => hig.get_application_owner
+                             , pi_schema              => Sys_Context('NM3CORE','APPLICATION_OWNER')
                              , pi_estimate_percentage => NULL
                              , pi_auto_sample_size    => FALSE);
        EXCEPTION
@@ -2699,7 +2699,7 @@ AS
        -- Refresh Stats CWS 0109217
        BEGIN
          Nm3ddl.analyse_table( pi_table_name          => l_feature_table
-                             , pi_schema              => hig.get_application_owner
+                             , pi_schema              => Sys_Context('NM3CORE','APPLICATION_OWNER')
                              , pi_estimate_percentage => NULL
                              , pi_auto_sample_size    => FALSE);
        EXCEPTION
@@ -2802,7 +2802,7 @@ AS
          -- Refresh Stats CWS 0109217
          BEGIN
            Nm3ddl.analyse_table( pi_table_name          => l_feature_table
-                               , pi_schema              => hig.get_application_owner
+                               , pi_schema              => Sys_Context('NM3CORE','APPLICATION_OWNER')
                                , pi_estimate_percentage => NULL
                                , pi_auto_sample_size    => FALSE);
          EXCEPTION
@@ -3858,7 +3858,7 @@ AS
         CLOSE get_feature_table;
         --
         Nm3ddl.analyse_table( pi_table_name          => l_nth_feature_table
-                            , pi_schema              => hig.get_application_owner
+                            , pi_schema              => Sys_Context('NM3CORE','APPLICATION_OWNER')
                             , pi_estimate_percentage => NULL
                             , pi_auto_sample_size    => FALSE);
       EXCEPTION
@@ -4407,7 +4407,7 @@ AS
    IS
       CURSOR c_get_user_key
       IS
-         SELECT    SUBSTR (USER, 1, 25)
+         SELECT    SUBSTR (Sys_Context('NM3_SECURITY_CTX','USERNAME'), 1, 25)
                 || TO_CHAR (CURRENT_TIMESTAMP, 'DDMMYYYYHH24MISSXFF')
            FROM DUAL;
    BEGIN
@@ -4930,7 +4930,7 @@ END get_nsg_label;
       l_rec_nth := nm3get.get_nth ( pi_nth_theme_id => g_tab_themes(i).ne_id);
     --
       record_progress( pi_current_stage    => i
-                      ,pi_operation        => 'Dropping SDE Metadata for '||l_rec_nth.nth_feature_table||' - '||USER);
+                      ,pi_operation        => 'Dropping SDE Metadata for '||l_rec_nth.nth_feature_table||' - '||Sys_Context('NM3_SECURITY_CTX','USERNAME'));
     --
       DECLARE
         l_sql   nm3type.max_varchar2;
@@ -4997,7 +4997,7 @@ END get_nsg_label;
     --
     --
       record_progress( pi_current_stage    => i
-                     , pi_operation        => 'Creating SDE Metadata for '||l_rec_nth.nth_feature_table||' - '||USER);
+                     , pi_operation        => 'Creating SDE Metadata for '||l_rec_nth.nth_feature_table||' - '||Sys_Context('NM3_SECURITY_CTX','USERNAME'));
     --
       DECLARE
         l_sql  nm3type.max_varchar2;
@@ -5117,7 +5117,7 @@ BEGIN
     )
     WHERE sdo_table_name = nth_feature_table
       AND sdo_column_name = nth_feature_shape_column
-      AND sdo_owner = USER ) a;
+      AND sdo_owner = Sys_Context('NM3_SECURITY_CTX','USERNAME') ) a;
 --
 EXCEPTION
   WHEN NO_DATA_FOUND
@@ -5162,7 +5162,7 @@ BEGIN
     (SELECT nth_feature_table, nth_feature_shape_column
        FROM nm_themes_all
       WHERE nth_theme_id = pi_nth_theme_id)
-  SELECT USER
+  SELECT Sys_Context('NM3_SECURITY_CTX','USERNAME')
        , nth_feature_table, nth_feature_shape_column
        --, nm3sdo.calculate_table_diminfo(nth_feature_table, nth_feature_shape_column)
        , l_empty_diminfo
@@ -5191,7 +5191,7 @@ EXCEPTION
       (SELECT nth_feature_table, nth_feature_shape_column
          FROM nm_themes_all
         WHERE nth_theme_id = pi_nth_theme_id)
-    SELECT USER
+    SELECT Sys_Context('NM3_SECURITY_CTX','USERNAME')
          , nth_feature_table, nth_feature_shape_column
          , nm3sdo.calculate_table_diminfo(nth_feature_table, nth_feature_shape_column)
          , nm3layer_tool.get_srid(pi_nth_theme_id)
@@ -5222,7 +5222,7 @@ EXCEPTION
                    , pi_gtype       => l_gtype);
     --
       SELECT * INTO g_usgm FROM mdsys.sdo_geom_metadata_table
-       WHERE sdo_owner = USER
+       WHERE sdo_owner = Sys_Context('NM3_SECURITY_CTX','USERNAME')
          AND sdo_table_name = l_rec_usgm.sdo_table_name
          AND sdo_column_name = l_rec_usgm.sdo_column_name;
     END;
@@ -5253,7 +5253,7 @@ BEGIN
   END IF;
 --
   INSERT INTO mdsys.sdo_geom_metadata_table
-  SELECT hig.get_application_owner
+  SELECT Sys_Context('NM3CORE','APPLICATION_OWNER')
        , nth_feature_table
        , nth_feature_shape_column
        , CASE 
@@ -5283,7 +5283,7 @@ BEGIN
     FROM nm_themes_all
        , nm_theme_gtypes
        , (SELECT sdo_diminfo FROM mdsys.sdo_geom_metadata_table
-           WHERE sdo_owner = hig.get_application_owner
+           WHERE sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
              AND sdo_table_name = l_rec_base_nth.nth_feature_table
              AND sdo_column_name = l_rec_base_nth.nth_feature_shape_column)
    WHERE ntg_theme_id = nth_theme_id
@@ -5314,7 +5314,7 @@ BEGIN
       )
   AND NOT EXISTS
   ( SELECT 1 FROM mdsys.sdo_geom_metadata_table
-     WHERE sdo_owner = hig.get_application_owner
+     WHERE sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER')
        AND sdo_table_name = nth_feature_table
        AND sdo_column_name = nth_feature_shape_column );
 --
@@ -5346,7 +5346,7 @@ BEGIN
                          -- AND hur_username = hus_username
                           AND hus_username = username
                           AND hus_end_date IS NULL
-                          AND hus_username != hig.get_application_owner
+                          AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
                           AND a.nth_theme_id IN (
                                 SELECT z.nth_base_table_theme
                                   FROM nm_themes_all z, nm_theme_roles
@@ -5376,7 +5376,7 @@ BEGIN
                           AND base_theme.nth_theme_id = view_based.nth_base_table_theme
                           AND hus_username = username
                           AND hus_end_date IS NULL
-                          AND hus_username != hig.get_application_owner
+                          AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
                           AND NOT EXISTS (
                                  SELECT 1
                                    FROM MDSYS.sdo_geom_metadata_table g1
@@ -5397,7 +5397,7 @@ BEGIN
                                                  WHERE nbth_base_theme = pi_nth_theme_id ) 
                           AND hus_username = username
                           AND hus_end_date IS NULL
-                          AND hus_username != hig.get_application_owner
+                          AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
                           AND NOT EXISTS (
                                  SELECT 1
                                    FROM MDSYS.sdo_geom_metadata_table g1
@@ -5420,7 +5420,7 @@ BEGIN
                           AND hur_username = hus_username
                           AND hus_username = username
                           AND hus_end_date IS NULL
-                          AND hus_username != hig.get_application_owner
+                          AND hus_username != Sys_Context('NM3CORE','APPLICATION_OWNER')
 --                          AND a.nth_theme_id IN (
 --                                SELECT z.nth_base_table_theme
 --                                  FROM nm_themes_all z, nm_theme_roles
@@ -5439,7 +5439,7 @@ BEGIN
              GROUP BY hus_username, nth_feature_table, nth_feature_shape_column)
       WHERE u.sdo_table_name = nth_feature_table
         AND u.sdo_column_name = nth_feature_shape_column
-        AND u.sdo_owner = hig.get_application_owner;
+        AND u.sdo_owner = Sys_Context('NM3CORE','APPLICATION_OWNER');
 --
 END build_subordinate_usgm;
 --

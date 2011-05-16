@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY nm3mapcapture_ins_inv AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mapcapture_ins_inv.pkb-arc   2.5   Jan 06 2010 16:38:42   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3mapcapture_ins_inv.pkb-arc   2.6   May 16 2011 14:45:00   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3mapcapture_ins_inv.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:42  $
---       Date fetched Out : $Modtime:   Jan 06 2010 10:29:06  $
---       Version          : $Revision:   2.5  $
+--       Date into PVCS   : $Date:   May 16 2011 14:45:00  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 13:48:16  $
+--       Version          : $Revision:   2.6  $
 --       Based on SCCS version : 1.15
 -------------------------------------------------------------------------
 --   Author : Darren Cope
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3mapcapture_ins_inv AS
 --all global package variables here
 --
    --g_body_sccsid     CONSTANT  varchar2(2000) := '"@(#)nm3mapcapture_ins_inv.pkb	1.15 09/09/05"';
-   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.5  $';
+   g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.6  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3mapcapture_ins_inv';
@@ -622,7 +622,7 @@ END update_changed_attributes;
 -----------------------------------------------------------------------------
 --
 PROCEDURE ins_inv (p_inv_rec IN nm_ld_mc_all_inv_tmp%ROWTYPE) IS
-   c_eff_date CONSTANT DATE := nm3user.get_effective_date;
+   c_eff_date CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    e_inventory_changed EXCEPTION;
    l_temp_ne_id        NUMBER;
@@ -971,7 +971,7 @@ BEGIN
   
   IF p_inv_rec.iit_end_date IS NOT NULL THEN
     nm3api_inv.end_date_item(p_iit_ne_id      => g_inv.iit_ne_id
-                            ,p_effective_date => nm3user.get_effective_date);
+                            ,p_effective_date => To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'));
   END IF;
 
 -- no errors then clear the error flag

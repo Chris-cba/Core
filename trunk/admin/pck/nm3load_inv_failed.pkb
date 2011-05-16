@@ -3,11 +3,11 @@ CREATE OR REPLACE PACKAGE BODY NM3LOAD_INV_FAILED AS
 -------------------------------------------------------------------------
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3load_inv_failed.pkb-arc   2.3   Jan 06 2010 16:38:36   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3load_inv_failed.pkb-arc   2.4   May 16 2011 14:45:00   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3load_inv_failed.pkb  $
---       Date into PVCS   : $Date:   Jan 06 2010 16:38:36  $
---       Date fetched Out : $Modtime:   Jan 06 2010 10:50:32  $
---       Version          : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   May 16 2011 14:45:00  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 14:46:24  $
+--       Version          : $Revision:   2.4  $
 --       Based on SCCS version : 1.9
 -------------------------------------------------------------------------
 --   Author : Graeme Johnson
@@ -24,7 +24,7 @@ CREATE OR REPLACE PACKAGE BODY NM3LOAD_INV_FAILED AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.3  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.4  $';
   g_package_name CONSTANT varchar2(30) := 'NM3LOAD_INV_FAILED';
 --
 -----------------------------------------------------------------------------
@@ -119,7 +119,7 @@ BEGIN
       l_sql_string := 'select to_char('
                       ||p_attrib_name
                       ||', '
-                      ||nm3flx.string(NVL(l_mask,nm3user.get_user_date_mask))
+                      ||nm3flx.string(NVL(l_mask,Sys_Context('NM3CORE','USER_DATE_MASK')))
                       ||') from nm_ld_mc_all_inv_tmp'
                       ||'  where batch_no = :p_batch_no'
                       ||'  and record_no = :p_record_no';
@@ -380,8 +380,8 @@ BEGIN
       -----------------
       --
       -- get values
-      l_flex_attrib_holding := TO_CHAR(l_holding_rec.iit_start_date,nm3user.get_user_date_mask);  
-      l_flex_attrib_live    := TO_CHAR(l_live_rec.iit_start_date,nm3user.get_user_date_mask);
+      l_flex_attrib_holding := TO_CHAR(l_holding_rec.iit_start_date,Sys_Context('NM3CORE','USER_DATE_MASK'));  
+      l_flex_attrib_live    := TO_CHAR(l_live_rec.iit_start_date,Sys_Context('NM3CORE','USER_DATE_MASK'));
       --
       -- get meanings
       l_flex_attrib_meaning_holding := Null;
@@ -390,7 +390,7 @@ BEGIN
       add_conflict(p_attrib_name            => 'IIT_START_DATE'
                   ,p_attrib_screen_text     => 'Start Date'
                   ,p_attrib_format          => 'DATE'
-                  ,p_attrib_format_mask     => nm3user.get_user_date_mask
+                  ,p_attrib_format_mask     => Sys_Context('NM3CORE','USER_DATE_MASK')
                   ,p_attrib_value_holding   => l_flex_attrib_holding
                   ,p_attrib_meaning_holding => l_flex_attrib_meaning_holding
                   ,p_attrib_value_live      => l_flex_attrib_live
@@ -401,8 +401,8 @@ BEGIN
       -----------------
       --
       -- get values
-      l_flex_attrib_holding := TO_CHAR(l_holding_rec.iit_end_date,nm3user.get_user_date_mask);  
-      l_flex_attrib_live    := TO_CHAR(l_live_rec.iit_end_date,nm3user.get_user_date_mask);
+      l_flex_attrib_holding := TO_CHAR(l_holding_rec.iit_end_date,Sys_Context('NM3CORE','USER_DATE_MASK'));  
+      l_flex_attrib_live    := TO_CHAR(l_live_rec.iit_end_date,Sys_Context('NM3CORE','USER_DATE_MASK'));
       --   
       -- get meanings
       l_flex_attrib_meaning_holding := Null;
@@ -411,7 +411,7 @@ BEGIN
       add_conflict(p_attrib_name            => 'IIT_END_DATE'
                   ,p_attrib_screen_text     => 'End Date'
                   ,p_attrib_format          => 'DATE'
-                  ,p_attrib_format_mask     => nm3user.get_user_date_mask
+                  ,p_attrib_format_mask     => Sys_Context('NM3CORE','USER_DATE_MASK')
                   ,p_attrib_value_holding   => l_flex_attrib_holding
                   ,p_attrib_meaning_holding => l_flex_attrib_meaning_holding
                   ,p_attrib_value_live      => l_flex_attrib_live
@@ -499,7 +499,7 @@ BEGIN
   ELSIF pi_attrib_format = 'DATE' THEN
     
     v_sql := 'UPDATE nm_ld_mc_all_inv_tmp SET '||pi_attrib_name||' = TO_DATE('''||pi_attrib_value||''''
-              ||chr(10)||','''||NVL(pi_attrib_format_mask,nm3user.get_user_date_mask)||''')';
+              ||chr(10)||','''||NVL(pi_attrib_format_mask,Sys_Context('NM3CORE','USER_DATE_MASK'))||''')';
 
   ELSIF pi_attrib_format = 'NUMBER' THEN
 

@@ -25,13 +25,12 @@ CREATE OR REPLACE PACKAGE BODY nm3locator AS
   --constants
   -----------
   --g_body_sccsid is the SCCS ID for the package body
-  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.10  $"';
+  g_body_sccsid  CONSTANT varchar2(2000) := '"$Revision:   2.11  $"';
 
   g_package_name CONSTANT varchar2(30) := 'nm3locator';
 
   c_default_operator    CONSTANT nm_gaz_query_attribs.ngqa_operator%TYPE := nm3type.c_and_operator;
-  c_disp_units_per_char CONSTANT number := 0.1;
-  c_date_format         CONSTANT varchar2(30) := nm3context.get_context(pi_attribute => 'USER_DATE_MASK');
+  c_disp_units_per_char CONSTANT number := 0.1;  
   c_results_table       CONSTANT varchar2(30) := 'nm_locator_results';
   c_nulls_last          CONSTANT varchar2(15) := 'NULLS LAST';
 
@@ -839,9 +838,9 @@ BEGIN
         IF nm3flx.get_column_datatype( pi_table_name  => NVL(l_nit.nit_table_name, 'NM_INV_ITEMS_ALL')
                                      , pi_column_name => l_attrs(i_attr).ita_attrib_name) = 'DATE'
         THEN
-          add('  ,TO_CHAR(irec.'||l_attrs(i_attr).ita_attrib_name||','''||NVL(l_attrs(i_attr).ita_format_mask, c_date_format)||''')');
+          add('  ,TO_CHAR(irec.'||l_attrs(i_attr).ita_attrib_name||','''||NVL(l_attrs(i_attr).ita_format_mask, Sys_Context('NM3CORE','USER_DATE_MASK'))||''')');
         ELSE
-          add('  ,TO_CHAR(TO_DATE(irec.'||l_attrs(i_attr).ita_attrib_name||','''||NVL(l_attrs(i_attr).ita_format_mask, c_date_format)||'''),'''||NVL(l_attrs(i_attr).ita_format_mask, c_date_format)||''')');
+          add('  ,TO_CHAR(TO_DATE(irec.'||l_attrs(i_attr).ita_attrib_name||','''||NVL(l_attrs(i_attr).ita_format_mask, Sys_Context('NM3CORE','USER_DATE_MASK'))||'''),'''||NVL(l_attrs(i_attr).ita_format_mask, Sys_Context('NM3CORE','USER_DATE_MASK'))||''')');
         END IF;
       ELSE
         add('  ,SUBSTR(irec.'||l_attrs(i_attr).ita_attrib_name||',1,80)');
@@ -1094,9 +1093,9 @@ BEGIN
           IF nm3flx.get_column_datatype(pi_table_name => l_nit.nit_table_name
                                        ,pi_column_name => l_attrs(i_attr).ita_attrib_name) = 'DATE'
           THEN
-            add('  ,TO_CHAR(ft.'||l_attrs(i_attr).ita_attrib_name||','''||c_date_format||''')');
+            add('  ,TO_CHAR(ft.'||l_attrs(i_attr).ita_attrib_name||','''||Sys_Context('NM3CORE','USER_DATE_MASK')||''')');
           ELSE
-            add('  ,TO_CHAR(TO_DATE(ft.'||l_attrs(i_attr).ita_attrib_name||','''||NVL(l_attrs(i_attr).ita_format_mask, c_date_format)||'''),'''||NVL(l_attrs(i_attr).ita_format_mask, c_date_format)||''')');
+            add('  ,TO_CHAR(TO_DATE(ft.'||l_attrs(i_attr).ita_attrib_name||','''||NVL(l_attrs(i_attr).ita_format_mask, Sys_Context('NM3CORE','USER_DATE_MASK'))||'''),'''||NVL(l_attrs(i_attr).ita_format_mask, Sys_Context('NM3CORE','USER_DATE_MASK'))||''')');
           END IF;
         ELSE
           add('  ,SUBSTR(ft.'||l_attrs(i_attr).ita_attrib_name||',1,80)');
@@ -1136,9 +1135,9 @@ BEGIN
           IF nm3flx.get_column_datatype(pi_table_name => 'NM_INV_ITEMS'
                                        ,pi_column_name => l_attrs(i_attr).ita_attrib_name) = 'DATE'
           THEN
-            add('  ,TO_CHAR(iit.'||l_attrs(i_attr).ita_attrib_name||','''||NVL(l_attrs(i_attr).ita_format_mask, c_date_format)||''')');
+            add('  ,TO_CHAR(iit.'||l_attrs(i_attr).ita_attrib_name||','''||NVL(l_attrs(i_attr).ita_format_mask, Sys_Context('NM3CORE','USER_DATE_MASK'))||''')');
           ELSE
-            add('  ,TO_CHAR(TO_DATE(iit.'||l_attrs(i_attr).ita_attrib_name||','''||NVL(l_attrs(i_attr).ita_format_mask, c_date_format)||'''),'''||NVL(l_attrs(i_attr).ita_format_mask, c_date_format)||''')');
+            add('  ,TO_CHAR(TO_DATE(iit.'||l_attrs(i_attr).ita_attrib_name||','''||NVL(l_attrs(i_attr).ita_format_mask, Sys_Context('NM3CORE','USER_DATE_MASK'))||'''),'''||NVL(l_attrs(i_attr).ita_format_mask, Sys_Context('NM3CORE','USER_DATE_MASK'))||''')');
           END IF;
         ELSE
           add('  ,SUBSTR(iit.'||l_attrs(i_attr).ita_attrib_name||',1,80)');
@@ -1366,9 +1365,9 @@ BEGIN
           IF nm3flx.get_column_datatype(pi_table_name => NVL(l_nit.nit_table_name, 'NM_INV_ITEMS_ALL')
                                        ,pi_column_name => g_inv_attrs(l_pos).ita_attrib_name) = 'DATE'
           THEN
-            add('  nm3locator.g_attr_detail := TO_CHAR(nm3locator.g_inv_rec.'||pi_attribute||', '''||c_date_format||''');');
+            add('  nm3locator.g_attr_detail := TO_CHAR(nm3locator.g_inv_rec.'||pi_attribute||', '''||Sys_Context('NM3CORE','USER_DATE_MASK')||''');');
           ELSE
-            add('  nm3locator.g_attr_detail := TO_CHAR(TO_DATE(nm3locator.g_inv_rec.'||pi_attribute||', '''||c_date_format||'''), '''||c_date_format||''');');
+            add('  nm3locator.g_attr_detail := TO_CHAR(TO_DATE(nm3locator.g_inv_rec.'||pi_attribute||', '''||Sys_Context('NM3CORE','USER_DATE_MASK')||'''), '''||Sys_Context('NM3CORE','USER_DATE_MASK')||''');');
           END IF;
         ELSE
           -- get full value

@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3lock AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock.pkb-arc   2.3   Sep 28 2007 10:29:26   jwadsworth  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3lock.pkb-arc   2.4   May 16 2011 14:45:00   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3lock.pkb  $
---       Date into PVCS   : $Date:   Sep 28 2007 10:29:26  $
---       Date fetched Out : $Modtime:   Sep 28 2007 09:36:42  $
---       PVCS Version     : $Revision:   2.3  $
+--       Date into PVCS   : $Date:   May 16 2011 14:45:00  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 15:11:34  $
+--       PVCS Version     : $Revision:   2.4  $
 --       Based on         : 1.16
 --
 --
@@ -22,7 +22,7 @@ CREATE OR REPLACE PACKAGE BODY nm3lock AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.3  $"';
+   g_body_sccsid     CONSTANT  varchar2(2000) := '"$Revision:   2.4  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3lock';
@@ -147,7 +147,7 @@ BEGIN
      l_sql := l_sql|| 'FOR UPDATE of ne_id'; --SM 03092006 710020 added 'of ne_id' so only the nm_elements table gets locked
 --   END IF;	    
 
-  OPEN c1 FOR l_sql USING p_ne_id, Nm3user.get_user_id ; 
+  OPEN c1 FOR l_sql USING p_ne_id, To_Number(Sys_Context('NM3CORE','USER_ID')) ; 
    
   FETCH c1 INTO l_mode;
   IF c1%NOTFOUND THEN
