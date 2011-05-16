@@ -2,11 +2,11 @@ CREATE OR REPLACE package body nm3dynsql as
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.10   Mar 02 2011 12:56:02   Steve.Cooper  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dynsql.pkb-arc   2.11   May 16 2011 14:44:34   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3dynsql.pkb  $
---       Date into PVCS   : $Date:   Mar 02 2011 12:56:02  $
---       Date fetched Out : $Modtime:   Feb 25 2011 11:48:18  $
---       PVCS Version     : $Revision:   2.10  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:34  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 11:55:12  $
+--       PVCS Version     : $Revision:   2.11  $
 --       Based on sccs version :
 --
 --
@@ -38,7 +38,7 @@ CREATE OR REPLACE package body nm3dynsql as
                 in sql_route_connectivity() added connectivity check to ensure pieces of same datum are connected
 */
 
-  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.10  $"';
+  g_body_sccsid     constant  varchar2(30) := '"$Revision:   2.11  $"';
   g_package_name    constant  varchar2(30) := 'nm3dynsql';
 
 
@@ -111,8 +111,8 @@ CREATE OR REPLACE package body nm3dynsql as
       return p_end_date_column||' is null';
     else
       Nm3Ctx.Set_Context('effective_date', to_char(trunc(p_date), 'YYYYMMDD'));
-      return p_start_date_column||' <= to_date(sys_context(''nm3sql'', ''effective_date''), ''YYYYMMDD'') and '
-        ||'('||p_end_date_column||' is null or '||p_end_date_column||' > to_date(sys_context(''nm3sql'', ''effective_date''), ''YYYYMMDD''))';
+      return p_start_date_column||' <= To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY'') and '
+        ||'('||p_end_date_column||' is null or '||p_end_date_column||' > To_Date(Sys_Context(''NM3CORE'',''EFFECTIVE_DATE''),''DD-MON-YYYY''))';
     end if;
   end;
 
@@ -139,7 +139,6 @@ CREATE OR REPLACE package body nm3dynsql as
     l_cardinality     integer;
     l_sql_ignore_poe  varchar2(300);
     l_sql_route_where varchar2(300);
-    l_effective_date  date := nm3user.get_effective_date;
     l_sql_effective_date_tbl  varchar2(200);
     l_sql_effective_date_join varchar2(500);
 
@@ -163,7 +162,7 @@ CREATE OR REPLACE package body nm3dynsql as
     -- effective date
     -- (this can be skipped if the datums table has values
     --    and they can be relied on to be valid for the current effective date)
-    if l_effective_date = trunc(sysdate) then
+    if To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') = trunc(sysdate) then
       l_sql_effective_date_join :=
           cr||'  and m.nm_end_date is null'
         ||cr||'  and e.ne_end_date is null';
