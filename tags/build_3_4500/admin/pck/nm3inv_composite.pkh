@@ -1,0 +1,333 @@
+create or replace package nm3inv_composite as
+--<PACKAGE>
+-------------------------------------------------------------------------
+--   PVCS Identifiers :-
+--
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3inv_composite.pkh-arc   2.2   May 16 2011 14:44:54   Steve.Cooper  $
+--       Module Name      : $Workfile:   nm3inv_composite.pkh  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:54  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 13:16:10  $
+--       Version          : $Revision:   2.2  $
+--       Based on SCCS version : 1.1
+-------------------------------------------------------------------------
+--   Author : Jonathan Mills
+--
+--   Composite Inventory package
+--
+-----------------------------------------------------------------------------
+--   Copyright (c) exor corporation ltd, 2005
+-----------------------------------------------------------------------------
+--</PACKAGE>
+--<GLOBVAR>
+   g_sccsid CONSTANT VARCHAR2(2000) := '$Revision:   2.2  $';
+--  g_sccsid is the SCCS ID for the package
+--
+   c_composite_nic_category CONSTANT nm_inv_categories.nic_category%TYPE := 'D';
+--
+   g_block               nm3type.tab_varchar32767;
+   g_nmnd_nit_inv_type   nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE    := nm3type.c_nvl;
+   g_nms_mrg_job_id      nm_mrg_sections.nms_mrg_job_id%TYPE             := -1;
+   g_nms_mrg_section_id  nm_mrg_sections.nms_mrg_section_id%TYPE         := -1;
+   g_rec_iit             nm_inv_items%ROWTYPE;
+   g_parse_only          BOOLEAN;
+   g_nmnd_is_point       BOOLEAN;
+   g_last_update_date    DATE;
+   g_rec_nmnd            nm_mrg_nit_derivation%ROWTYPE;
+   g_where_clause_failed BOOLEAN;
+--
+   g_mrg_record_name     CONSTANT VARCHAR2(3) := 'mrg';
+   g_inv_record_name     CONSTANT VARCHAR2(3) := 'inv';
+--
+   c_bonfire_night       CONSTANT DATE        := TO_DATE('05111605','DDMMYYYY');
+--
+   g_tab_mail_text       nm3type.tab_varchar32767;
+   g_tab_error_item      nm3type.tab_varchar32767;
+   g_tab_error_locn      nm3type.tab_varchar32767;
+   g_tab_error_errm      nm3type.tab_varchar32767;
+--
+--   g_tab_done_item       nm3type.tab_varchar32767;
+--   g_tab_done_locn       nm3type.tab_varchar32767;
+--
+   g_string_temp         nm3type.max_varchar2;
+   g_rec_iit_temp        nm_inv_items%ROWTYPE;
+--
+   g_inv_count           PLS_INTEGER;
+   g_error_count         PLS_INTEGER;
+--
+--</GLOBVAR>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_VERSION">
+-- This function returns the current SCCS version
+FUNCTION get_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="GET_BODY_VERSION">
+-- This function returns the current SCCS version of the package body
+FUNCTION get_body_version RETURN varchar2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_nmnd">
+PROCEDURE check_nmnd (p_rec_nmnd nm_mrg_nit_derivation%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_no_refresh_running">
+PROCEDURE check_no_refresh_running (p_nmnd_nit_inv_type nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+PROCEDURE validate_nmnd (p_nmnd_nit_inv_type     nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
+                        ,p_check_all_mand_fields BOOLEAN DEFAULT TRUE
+                        );
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmnd">
+FUNCTION get_nmnd (pi_nmnd_nit_inv_type nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
+                  ) RETURN nm_mrg_nit_derivation%ROWTYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="nmid_b_iu_stm_trg">
+PROCEDURE nmid_b_iu_stm_trg;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="nmid_b_iu_row_trg">
+PROCEDURE nmid_b_iu_row_trg (p_rec_nmid nm_mrg_ita_derivation%ROWTYPE);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="nmid_a_iu_stm_trg">
+PROCEDURE nmid_a_iu_stm_trg;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="check_au_derivation">
+PROCEDURE check_au_derivation (pi_nmid_ita_inv_type nm_mrg_ita_derivation.nmid_ita_inv_type%TYPE
+                              ,pi_nmid_derivation   nm_mrg_ita_derivation.nmid_derivation%TYPE
+                              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_mrg_record_name">
+FUNCTION get_mrg_record_name RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_record_name">
+FUNCTION get_inv_record_name RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="refresh_nmnd">
+PROCEDURE refresh_nmnd (p_nmnd_nit_inv_type  nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
+                       ,p_effective_date     DATE    DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                       ,p_force_full_refresh BOOLEAN DEFAULT FALSE
+                       );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_union_of_nte">
+FUNCTION get_union_of_nte (p_nte_job_id_parent     nm_nw_temp_extents.nte_job_id%TYPE
+                          ,p_tab_nte_job_id_subset nm3type.tab_number
+                          ) RETURN nm_nw_temp_extents.nte_job_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_bonfire_night">
+FUNCTION get_bonfire_night RETURN DATE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_not_null">
+FUNCTION get_not_null (pi_ita_mandatory_yn VARCHAR2
+                      ,pi_atc_nullable     VARCHAR2
+                      ,pi_column_name      VARCHAR2
+                      ,pi_nit_x_sect_allow VARCHAR2
+                      ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="allowable_inv_column">
+FUNCTION allowable_inv_column (p_column VARCHAR2) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_composite_nic_category">
+FUNCTION get_composite_nic_category RETURN nm_inv_categories.nic_category%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="refresh_pending_nmnd">
+PROCEDURE refresh_pending_nmnd (p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY'));
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="refresh_nmnd_as_job">
+PROCEDURE refresh_nmnd_as_job (p_nmnd_nit_inv_type  nm_mrg_nit_derivation.nmnd_nit_inv_type%TYPE
+                              ,p_effective_date     DATE    DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
+                              ,p_force_full_refresh BOOLEAN DEFAULT FALSE
+                              );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="submit_refresh_pending_job">
+PROCEDURE submit_refresh_pending_job (p_interval_days PLS_INTEGER DEFAULT 1);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nmu_id_for_hig_owner">
+--  This function returns the NMU_ID for the mail user associated with the
+--   application owner (or null if no email account associated)
+FUNCTION get_nmu_id_for_hig_owner RETURN nm_mail_users.nmu_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="does_table_have_locks">
+--  This function returns TRUE if there are *any* locks outstanding
+--   on the specified table
+FUNCTION does_table_have_locks (p_table_name VARCHAR2) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="ensure_table_has_no_locks">
+--  This procedure raises an error if there are *any* locks outstanding
+--   on the specified table
+PROCEDURE ensure_table_has_no_locks (p_table_name VARCHAR2);
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="nmq_includes_ft_inv">
+--  This procedure returns TRUE if any of the inventory types included
+--   in the specified merge query are foreign table asset types
+FUNCTION nmq_includes_ft_inv (p_nmq_id nm_mrg_query.nmq_id%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="nmq_is_only_ft_inv">
+--  This procedure returns TRUE if *ALL* of the inventory types included
+--   in the specified merge query are foreign table asset types
+FUNCTION nmq_is_only_ft_inv (p_nmq_id nm_mrg_query.nmq_id%TYPE) RETURN BOOLEAN;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="duplicate_nte">
+--  This function duplicates a NM_NW_TEMP_EXTENTS record
+FUNCTION duplicate_nte (p_nte_job_id nm_nw_temp_extents.nte_job_id%TYPE
+                       ) RETURN nm_nw_temp_extents.nte_job_id%TYPE;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_item_detail">
+--  Returns a HTML table with the item detail (max 32k)
+FUNCTION get_item_detail (p_rec_iit nm_inv_items%ROWTYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_nms_detail">
+--  Returns a HTML table with the detail of the merge section (max 32k)
+FUNCTION get_nms_detail (p_nms_mrg_job_id     nm_mrg_sections.nms_mrg_job_id%TYPE
+                        ,p_nms_mrg_section_id nm_mrg_sections.nms_mrg_section_id%TYPE
+                        ) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_static_css_link_text">
+-- This function returns the value of the HIG_ST_CSS product option. this option
+--  is in place for sites who wish to use a static (i.e. not from within the RDBMS)
+--  CSS document.
+-- The text returned is in the format
+--  <LINK REL="STYLESHEET" HREF="\\Dachom17\iris\Public\iris.css">
+--
+FUNCTION get_static_css_link_text RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="do_static_css_link">
+PROCEDURE do_static_css_link;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_dbms_job">
+PROCEDURE create_dbms_job (pi_what              VARCHAR2
+                          ,pi_when              DATE     DEFAULT SYSDATE
+                          ,pi_next              VARCHAR2 DEFAULT Null
+                          ,pi_allow_duplicate   BOOLEAN  DEFAULT FALSE
+                          ,pi_commit_autonomous BOOLEAN  DEFAULT TRUE
+                          );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="create_job_to_run_every_n_days">
+PROCEDURE create_job_to_run_every_n_days (p_what          VARCHAR2
+                                         ,p_interval_days PLS_INTEGER DEFAULT 1
+                                         );
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_merge_view_alias">
+-- Returns the value of g_mrg_record_name
+FUNCTION get_merge_view_alias RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_inv_view_alias">
+-- Returns the value of g_inv_record_name
+FUNCTION get_inv_view_alias RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PROC NAME="get_merge_results_view">
+-- Returns the name of the V_MRG_xxxxx_SVL view which is used by composite
+FUNCTION get_merge_results_view (p_nmq_id nm_mrg_query.nmq_id%TYPE) RETURN VARCHAR2;
+--</PROC>
+--
+-----------------------------------------------------------------------------
+--
+--<PRAGMA>
+--  no pragma RESTRICT_REFERENCES. not needed in Oracle 9i +
+--</PRAGMA>
+--
+-----------------------------------------------------------------------------
+--
+end nm3inv_composite;
+/
