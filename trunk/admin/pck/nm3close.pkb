@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --   PVCS Identifiers :-
 --
---       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.7   Sep 27 2010 11:14:40   Chris.Strettle  $
+--       pvcsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3close.pkb-arc   2.8   May 16 2011 14:44:10   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3close.pkb  $
---       Date into PVCS   : $Date:   Sep 27 2010 11:14:40  $
---       Date fetched Out : $Modtime:   Sep 27 2010 11:12:24  $
---       PVCS Version     : $Revision:   2.7  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:10  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 11:50:36  $
+--       PVCS Version     : $Revision:   2.8  $
 --
 --
 --   Author : I Turnbull
@@ -21,7 +21,7 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 --
 --all global package variables here
 --
-   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.7  $"';
+   g_body_sccsid     CONSTANT  VARCHAR2(2000) := '"$Revision:   2.8  $"';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  VARCHAR2(30)   := 'nm3close';
@@ -38,12 +38,12 @@ CREATE OR REPLACE PACKAGE BODY nm3close AS
 -----------------------------------------------------------------------------
 --
 PROCEDURE gis_multi_element_close ( pi_gdo_session_id gis_data_objects.gdo_session_id%TYPE
-                                   ,pi_effective_date DATE DEFAULT nm3user.get_effective_date );
+                                   ,pi_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY') );
 --
 -----------------------------------------------------------------------------
 --
 PROCEDURE route_close ( pi_route_id            NM_ELEMENTS.ne_id%TYPE
-                       ,pi_effective_date      DATE DEFAULT nm3user.get_effective_date
+                       ,pi_effective_date      DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                        ,pi_end_date_all        VARCHAR2 DEFAULT 'N'
                        ,pi_end_date_datums     VARCHAR2 DEFAULT 'N'
                       );
@@ -51,7 +51,7 @@ PROCEDURE route_close ( pi_route_id            NM_ELEMENTS.ne_id%TYPE
 -----------------------------------------------------------------------------
 --
 PROCEDURE close_temp_extent ( pi_job_id NM_NW_TEMP_EXTENTS.nte_job_id%TYPE
-                             ,pi_effective_date DATE DEFAULT nm3user.get_effective_date
+                             ,pi_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                             );
 --
 -----------------------------------------------------------------------------
@@ -80,7 +80,7 @@ END lock_parent;
 -----------------------------------------------------------------------------
 --
 PROCEDURE insert_nm_element_history ( p_ne_id          IN NM_ELEMENTS.ne_id%TYPE
-                                    , p_effective_date IN DATE DEFAULT nm3user.get_effective_date
+                                    , p_effective_date IN DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                     , p_neh_descr      IN nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS 0108990 12/03/2010
                                     )
 IS
@@ -98,8 +98,8 @@ BEGIN
   l_rec_neh.neh_ne_id_new      := p_ne_id;
   l_rec_neh.neh_operation      := 'C';
   l_rec_neh.neh_effective_date := p_effective_date;
-  l_rec_neh.neh_actioned_date  := nm3user.get_effective_date;
-  l_rec_neh.neh_actioned_by    := USER;
+  l_rec_neh.neh_actioned_date  := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
+  l_rec_neh.neh_actioned_by    := Sys_Context('NM3_SECURITY_CTX','USERNAME');
   l_rec_neh.neh_descr          := p_neh_descr; --CWS 0108990 12/03/2010
 --
   nm3nw_edit.ins_neh(l_rec_neh); --CWS 0108990 12/03/2010
@@ -193,7 +193,7 @@ END inv_type_end_loc_only;
 -------------------------------------------------------------------------------
 ----
 PROCEDURE close_groups ( p_ne_id NM_ELEMENTS.ne_id%TYPE
-                        ,p_effective_date DATE DEFAULT nm3user.get_effective_date
+                        ,p_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                        )
 IS
 BEGIN
@@ -373,7 +373,7 @@ END check_other_products;
 ------------------------------------------------------------------------------------------------
 --
 PROCEDURE do_close(p_ne_id          NM_ELEMENTS.ne_id%TYPE
-                  ,p_effective_date DATE DEFAULT  nm3user.get_effective_date
+                  ,p_effective_date DATE DEFAULT  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                   ,p_neh_descr      nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS 0108990 12/03/2010
                   ) IS
    c_xattr_status BOOLEAN := nm3inv_xattr.g_xattr_active;
@@ -512,7 +512,7 @@ END do_close;
 -----------------------------------------------------------------------------
 --
 PROCEDURE gis_close_elements (p_gdo_session_id gis_data_objects.gdo_session_id%TYPE
-                             ,p_effective_date DATE DEFAULT  nm3user.get_effective_date
+                             ,p_effective_date DATE DEFAULT  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                              ) IS
 --
    CURSOR cs_gdo (c_session_id gis_data_objects.gdo_session_id%TYPE) IS
@@ -554,7 +554,7 @@ END gis_close_elements;
 --
 PROCEDURE multi_element_close ( pi_type             VARCHAR2
                                ,pi_id               NUMBER
-                               ,pi_effective_date   DATE DEFAULT nm3user.get_effective_date
+                               ,pi_effective_date   DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                ,pi_close_all        VARCHAR2 DEFAULT 'N'
                                ,pi_end_date_datums  VARCHAR2 DEFAULT 'N'
                               )
@@ -593,7 +593,7 @@ END multi_element_close;
 -----------------------------------------------------------------------------
 --
 PROCEDURE gis_multi_element_close ( pi_gdo_session_id gis_data_objects.gdo_session_id%TYPE
-                                   ,pi_effective_date DATE DEFAULT nm3user.get_effective_date
+                                   ,pi_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                                   )
 IS
 --
@@ -908,7 +908,7 @@ END close_element;
 --
 -----------------------------------------------------------------------------
 PROCEDURE route_close ( pi_route_id             NM_ELEMENTS.ne_id%TYPE
-                       ,pi_effective_date       DATE DEFAULT nm3user.get_effective_date
+                       ,pi_effective_date       DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                        ,pi_end_date_all         VARCHAR2 DEFAULT 'N'
                        ,pi_end_date_datums      VARCHAR2 DEFAULT 'N'
                       )
@@ -1017,7 +1017,7 @@ END route_close;
 -----------------------------------------------------------------------------
 --
 PROCEDURE close_temp_extent ( pi_job_id NM_NW_TEMP_EXTENTS.nte_job_id%TYPE
-                             ,pi_effective_date DATE DEFAULT nm3user.get_effective_date
+                             ,pi_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                             )
 IS
 --
@@ -1175,10 +1175,10 @@ END get_c_route;
 -----------------------------------------------------------------------------
 --
 PROCEDURE close_node (pi_no_node_id     nm_nodes.no_node_id%TYPE
-                     ,pi_effective_date DATE DEFAULT nm3user.get_effective_date
+                     ,pi_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                      ) IS
 --
-   c_initial_effective_date CONSTANT DATE := nm3user.get_effective_date;
+   c_initial_effective_date CONSTANT DATE := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 --
    l_no_rowid   ROWID;
 --

@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3bulk_mrg AS
 --
 --   PVCS Identifiers :-
 --
---       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.38   Apr 21 2011 10:50:24   Rob.Coupe  $
+--       sccsid           : $Header:   //vm_latest/archives/nm3/admin/pck/nm3bulk_mrg.pkb-arc   2.39   May 16 2011 14:44:10   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3bulk_mrg.pkb  $
---       Date into PVCS   : $Date:   Apr 21 2011 10:50:24  $
---       Date fetched Out : $Modtime:   Apr 21 2011 10:47:34  $
---       PVCS Version     : $Revision:   2.38  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:10  $
+--       Date fetched Out : $Modtime:   May 03 2011 11:56:52  $
+--       PVCS Version     : $Revision:   2.39  $
 --
 --
 --   Author : Priidu Tanava
@@ -124,7 +124,7 @@ No query types defined.
         add nm_route_connect_tmp_ordered view with the next schema change
         in nm3dynsql replace the use of nm3sql.set_context_value() with that of nm3ctx
 */
-  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.38  $"';
+  g_body_sccsid     constant  varchar2(40)  :='"$Revision:   2.39  $"';
   g_package_name    constant  varchar2(30)  := 'nm3bulk_mrg';
 
   cr  constant varchar2(1) := chr(10);
@@ -1120,7 +1120,7 @@ No query types defined.
     k   binary_integer := 0;
     l_where_attrib varchar2(30);
     l_nmq_inner_outer_join nm_mrg_query_all.nmq_inner_outer_join%type;
-    l_hig_owner constant varchar2(30) := hig.get_application_owner;
+    l_hig_owner constant varchar2(30) := Sys_Context('NM3CORE','APPLICATION_OWNER');
 
   begin
     nm3dbg.putln(g_package_name||'.load_attrib_metadata('
@@ -1796,7 +1796,7 @@ No query types defined.
     t_inv               ita_mapping_tbl;
     t_idt               itd_tbl;
     l_inner_join        boolean;
-    l_effective_date    constant date := nm3user.get_effective_date;
+    l_effective_date    constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
     l_splits_rowcount   integer;
     l_homo_rowcount     integer;
     l_connect_rowcount  integer;
@@ -2001,7 +2001,7 @@ No query types defined.
     i             binary_integer;
     l_splits_cardinality      integer;
     l_sql_ial_effective_date  constant varchar2(200) := nm3dynsql.sql_effective_date(
-       p_date               => nm3user.get_effective_date
+       p_date               => To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
       ,p_start_date_column  => 'ial_start_date'
       ,p_end_date_column    => 'ial_end_date'
     );
@@ -2053,7 +2053,7 @@ No query types defined.
         elsif pt_attr(i).ita_format = 'DATE' then
           s := s||cr||'  ,case t.nm_obj_type'
           ||cr||'    when '''||pt_attr(i).inv_type||''''
-          ||cr||'    then to_char('||l_inv_alias||'.'||l_attrib||', '''|| nm3user.get_user_date_mask ||''') end NSV_ATTRIB'||j;
+          ||cr||'    then to_char('||l_inv_alias||'.'||l_attrib||', '''|| Sys_Context('NM3CORE','USER_DATE_MASK') ||''') end NSV_ATTRIB'||j;
 
         -- normal attribute with banding
         elsif b is not null then
@@ -2234,7 +2234,7 @@ No query types defined.
             -- domain lookup date formatting inferred from nm3inv.get_inv_domain_meaning()
             --  (no domain lookup formatting for numbers)
             if pt_attr(i).ita_format = 'DATE' then
-              l_ita_format_mask := nvl(nm3user.get_user_date_mask, l_def_user_date_format);
+              l_ita_format_mask := nvl(Sys_Context('NM3CORE','USER_DATE_MASK'), l_def_user_date_format);
 
             end if;
 
@@ -2500,7 +2500,7 @@ No query types defined.
     l_group_type        nm_group_types.ngt_group_type%type;
     l_ne_type           nm_elements.ne_type%type;
     l_ngt_linear_flag   nm_group_types.ngt_linear_flag%type;
-    l_effective_date    constant date := nm3context.get_effective_date;
+    l_effective_date    constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
     l_group_id_linear   boolean := false;
 
   begin
@@ -2553,7 +2553,7 @@ No query types defined.
       -- p_group_type not given or not linear
       -- use PREFLRM
       if l_group_type is null then
-        l_group_type := hig.get_useopt('PREFLRM', user);
+        l_group_type := hig.get_useopt('PREFLRM', Sys_Context('NM3_SECURITY_CTX','USERNAME'));
         ensure_group_type_linear(
            p_group_type_in  => l_group_type
           ,p_group_type_out => l_group_type
@@ -2673,7 +2673,7 @@ No query types defined.
           ||cr||'    where d.nsd_nse_id = :p_nse_id'
       );
     l_group_type      nm_group_types.ngt_group_type%type;
-    l_effective_date  constant date := nm3context.get_effective_date;
+    l_effective_date  constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
   begin
     nm3dbg.putln(g_package_name||'.load_extent_datums('
@@ -2690,7 +2690,7 @@ No query types defined.
     );
     -- preferred lrm
     if l_group_type is null then
-      l_group_type := hig.get_useopt('PREFLRM', user);
+      l_group_type := hig.get_useopt('PREFLRM', Sys_Context('NM3_SECURITY_CTX','USERNAME'));
       ensure_group_type_linear(
          p_group_type_in  => l_group_type
         ,p_group_type_out => l_group_type
@@ -2745,7 +2745,7 @@ No query types defined.
         ||cr||'    where d.nte_job_id = :p_nte_job_id'
       );
     l_group_type      nm_group_types.ngt_group_type%type;
-    l_effective_date  constant date := nm3context.get_effective_date;
+    l_effective_date  constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
     l_sqlcount        pls_integer;
 
   begin
@@ -2790,7 +2790,7 @@ No query types defined.
     );
     -- preferred lrm
     if l_group_type is null then
-      l_group_type := hig.get_useopt('PREFLRM', user);
+      l_group_type := hig.get_useopt('PREFLRM', Sys_Context('NM3_SECURITY_CTX','USERNAME'));
       ensure_group_type_linear(
          p_group_type_in  => l_group_type
         ,p_group_type_out => l_group_type
@@ -2848,7 +2848,7 @@ No query types defined.
           ||cr||'      and nm_type = ''G'''
       );
     l_group_type      nm_group_types.ngt_group_type%type;
-    l_effective_date  constant date := nm3context.get_effective_date;
+    l_effective_date  constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
   begin
     nm3dbg.putln(g_package_name||'.load_group_type_datums('
@@ -2874,7 +2874,7 @@ No query types defined.
     end if;
     -- preferred lrm
     if l_group_type is null then
-      l_group_type := hig.get_useopt('PREFLRM', user);
+      l_group_type := hig.get_useopt('PREFLRM', Sys_Context('NM3_SECURITY_CTX','USERNAME'));
       ensure_group_type_linear(
          p_group_type_in  => l_group_type
         ,p_group_type_out => l_group_type
@@ -2937,7 +2937,7 @@ No query types defined.
           ||cr||'    )'
       );
     l_group_type      nm_group_types.ngt_group_type%type;
-    l_effective_date  constant date := nm3context.get_effective_date;
+    l_effective_date  constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
   begin
     nm3dbg.putln(g_package_name||'.load_nt_type_datums('
@@ -2966,7 +2966,7 @@ No query types defined.
     );
     -- preferred lrm
     if l_group_type is null then
-      l_group_type := hig.get_useopt('PREFLRM', user);
+      l_group_type := hig.get_useopt('PREFLRM', Sys_Context('NM3_SECURITY_CTX','USERNAME'));
       ensure_group_type_linear(
          p_group_type_in  => l_group_type
         ,p_group_type_out => l_group_type
@@ -3027,7 +3027,7 @@ No query types defined.
           ||cr||'    )'
       );
     l_group_type      nm_group_types.ngt_group_type%type;
-    l_effective_date  constant date := nm3context.get_effective_date;
+    l_effective_date  constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
   begin
     nm3dbg.putln(g_package_name||'.load_all_network_datums('
@@ -3044,7 +3044,7 @@ No query types defined.
     );
     -- preferred lrm
     if l_group_type is null then
-      l_group_type := hig.get_useopt('PREFLRM', user);
+      l_group_type := hig.get_useopt('PREFLRM', Sys_Context('NM3_SECURITY_CTX','USERNAME'));
       ensure_group_type_linear(
          p_group_type_in  => l_group_type
         ,p_group_type_out => l_group_type
@@ -3104,7 +3104,7 @@ No query types defined.
     l_gg_count    pls_integer;
 
     l_ne_type     nm_elements.ne_type%type;
-    l_effective_date  constant date := nm3context.get_effective_date;
+    l_effective_date  constant date := To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY');
 
   begin
     nm3dbg.putln(g_package_name||'.load_gaz_list_datums('
@@ -3123,7 +3123,7 @@ No query types defined.
     );
     -- preferred lrm
     if l_group_type is null then
-      l_group_type := hig.get_useopt('PREFLRM', user);
+      l_group_type := hig.get_useopt('PREFLRM', Sys_Context('NM3_SECURITY_CTX','USERNAME'));
       ensure_group_type_linear(
          p_group_type_in  => l_group_type
         ,p_group_type_out => l_group_type

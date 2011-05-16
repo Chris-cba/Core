@@ -1,14 +1,15 @@
-CREATE OR REPLACE PACKAGE BODY nm3context AS
+Create Or Replace Package Body Nm3Context 
+As
 --
 -----------------------------------------------------------------------------
 --
 -- PVCS Identifiers :-
 --
--- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkb-arc   2.4   Feb 05 2008 10:50:12   jwadsworth  $
+-- pvcsid : $Header:   //vm_latest/archives/nm3/admin/pck/nm3context.pkb-arc   2.5   May 16 2011 14:44:10   Steve.Cooper  $
 -- Module Name : $Workfile:   nm3context.pkb  $
--- Date into PVCS : $Date:   Feb 05 2008 10:50:12  $
--- Date fetched Out : $Modtime:   Feb 05 2008 10:40:00  $
--- PVCS Version : $Revision:   2.4  $
+-- Date into PVCS : $Date:   May 16 2011 14:44:10  $
+-- Date fetched Out : $Modtime:   Apr 01 2011 09:50:42  $
+-- PVCS Version : $Revision:   2.5  $
 -- Based on SCCS version : 
 --
 --
@@ -20,563 +21,270 @@ CREATE OR REPLACE PACKAGE BODY nm3context AS
 --	Copyright (c) exor corporation ltd, 2001
 -----------------------------------------------------------------------------
 --
-   g_body_sccsid     CONSTANT  varchar2(2000) :='"$Revision:   2.4  $"';
---  g_body_sccsid is the SCCS ID for the package body
+  g_Body_Sccsid       Constant  Varchar2(2000)  :='"$Revision:   2.5  $"';
+
+  c_True              Constant  Varchar2(5)     := 'TRUE';
+  c_False             Constant  Varchar2(5)     := 'FALSE';
 --
---all global package variables here
---
-   -- This is the date format in which dates will be stored within the context
-   --  values
-   c_date_format     CONSTANT varchar2(20) := 'DD-MON-YYYY';
---
-   TYPE tab_varchar30 IS TABLE OF varchar2(30) INDEX BY binary_integer;
-   TYPE tab_boolean   IS TABLE OF boolean      INDEX BY binary_integer;
-   g_tab_userenv_context tab_varchar30;
---
-   g_tab_context_read_only tab_boolean;
-   g_enforce_read_only     boolean := TRUE;
---
-   g_application_owner             varchar2(30);
---
-   TYPE tab_val IS TABLE OF varchar2(4000) INDEX BY binary_integer;
-   g_tab_values        tab_val;
---
-   g_context_exception EXCEPTION;
-   g_context_exc_code  number;
-   g_context_exc_msg   varchar2(4000);
---
-   g_enterprise_edn    boolean;
---
-   g_effective_date    date                  := TRUNC(SYSDATE);
-   c_eff_date_name     CONSTANT varchar2(30) := 'EFFECTIVE_DATE';
---
-   TYPE attrib_dets IS RECORD
-      (data_type       varchar2(30)
-      ,read_only       boolean
-      );
+  g_Context_Exception           Exception;
+  g_Context_Exc_Code            Number;
+  g_Context_Exc_Msg             Varchar2(4000);
+
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_user_sysopt (pi_sysopt  hig_option_values.hov_id%TYPE         DEFAULT NULL
-                         ,pi_userid  hig_user_options.huo_hus_user_id%TYPE DEFAULT NULL
-                         ,pi_useopt  hig_user_options.huo_id%TYPE          DEFAULT NULL
-                         ,pi_default varchar2                              DEFAULT NULL
-                         ) RETURN varchar2;
+Function Get_Version Return Varchar2 
+Is
+Begin
+   Return g_Sccsid;
+End Get_Version;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_attribute_details (pi_attribute IN varchar2) RETURN attrib_dets;
+Function Get_Body_Version Return Varchar2
+Is
+Begin
+   Return g_Body_Sccsid;
+End Get_Body_Version;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE check_update_allowed(pi_attribute IN varchar2);
+Function Get_User_Sysopt  (
+                          p_Sysopt  In  Hig_Option_Values.Hov_Id%Type           Default Null,
+                          p_Userid  In  Hig_User_Options.Huo_Hus_User_Id%Type   Default Null,
+                          p_Useopt  In  Hig_User_Options.Huo_Id%Type            Default Null,
+                          p_Default In  Varchar2                                Default Null
+                          ) Return Hig_Option_Values.Hov_Value%Type
+Is
+  l_Retval  Hig_Option_Values.Hov_Value%Type;
+--
+Begin 
+  Begin
+    Select  huo.Huo_Value
+    Into    l_Retval
+    From    Hig_User_Options      huo
+    Where   huo.Huo_Hus_User_Id   =   p_Userid
+    And     huo.Huo_Id            =   p_Useopt;
+  Exception 
+    When No_Data_Found Then
+      Begin
+        Select  hov.Hov_Value
+        Into    l_Retval
+        From    Hig_Option_Values hov
+        Where   hov.Hov_Id        =     p_Sysopt;
+      Exception
+        When No_Data_Found Then
+          l_Retval := p_Default;        
+      End;   
+  End;
+  
+  Return(l_Retval);
+
+End Get_User_Sysopt;
 --
 -----------------------------------------------------------------------------
 --
-PROCEDURE instantiate_data;
+Function Get_Hig_Owner Return Hig_Users.Hus_Username%Type
+Is   
+  l_Hig_Owner   Hig_Users.Hus_Username%Type;
+Begin
+  Begin
+    Select  hu.Hus_Username
+    Into    l_Hig_Owner
+    From    Hig_Users   hu
+    Where   hu.Hus_Is_Hig_Owner_Flag   = 'Y';
+  Exception
+    When No_Data_Found Then
+      Begin  
+        --Just see if we have any users at all.
+        Select  Null
+        Into    l_Hig_Owner   
+        From    Hig_Users   hu
+        Where   Rownum    =   1;
+        --If we have any users then the old logic said, this should not happen and didn't do anything.
+      Exception
+        When No_Data_Found Then
+          -- If there is no record found and there are no records in hig_users
+          --  therefore the only time this can happen is
+          --  when this runs are part of the install, so the application
+          --  owner will be the current user
+          l_Hig_Owner:=Sys_Context('NM3_SECURITY_CTX','USERNAME');
+      End;
+  End;
+  Return(l_Hig_Owner);
+End Get_Hig_Owner;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_version RETURN varchar2 IS
-BEGIN
-   RETURN g_sccsid;
-END get_version;
---
------------------------------------------------------------------------------
---
-FUNCTION get_body_version RETURN varchar2 IS
-BEGIN
-   RETURN g_body_sccsid;
-END get_body_version;
---
------------------------------------------------------------------------------
---
-procedure initialise_context
-IS
-begin
-   initialise_context(user);
-end initialise_context ;
---
------------------------------------------------------------------------------
---
-PROCEDURE initialise_context(pi_username varchar2) 
-is
-   l_user_id          hig_users.hus_user_id%TYPE;
-   l_hus_unrestricted hig_users.hus_unrestricted%TYPE;
---
-   l_unrestricted_inv varchar2(5);
-   l_unrestricted_acc varchar2(5);
-   l_user             varchar2(30) := pi_username;
---
-   CURSOR cs_inst IS
-   SELECT instance_name
-         ,host_name
-         ,VERSION
-    FROM  v$instance;
---
-   l_instance   v$instance.instance_name%TYPE;
-   l_host       v$instance.host_name%TYPE;
-   l_db_version v$instance.VERSION%TYPE;
---
-   l_enterprise_edn varchar2(5);
-   l_dummy          varchar2(1);
---
-BEGIN
---
-   g_enforce_read_only := FALSE;
-   g_tab_values.DELETE;
---
-   FOR cs_rec IN (SELECT hus_user_id
-                        ,hus_unrestricted
-                        ,DECODE(hur_role
-                               ,NULL,c_false
-                               ,c_true
-                               ) unrestricted_acc
-                  FROM   hig_users
-                        ,hig_user_roles
-                  WHERE  hus_username = l_user
-                   AND   hus_username = hur_username (+)
-                   AND   hur_role (+) = 'ACC_ADMIN'
-                 )
-    LOOP
-      -- This is declared as an in-line cursor because as this
-      --  package is declared with invoker's rights if the cursor
-      --  is defined explicitly it still executes with definer's
-      --  rights
-      l_user_id          := cs_rec.hus_user_id;
-      l_hus_unrestricted := cs_rec.hus_unrestricted;
-      l_unrestricted_acc := cs_rec.unrestricted_acc;
-   END LOOP;
---
-   IF g_enterprise_edn
-    THEN
-      l_enterprise_edn := c_true;
-   ELSE
-      l_enterprise_edn := c_false;
-   END IF;
---
-   OPEN  cs_inst;
-   FETCH cs_inst INTO l_instance
-                     ,l_host
-                     ,l_db_version;
-   CLOSE cs_inst;
---
-   IF l_user_id IS NULL
-    THEN
-      RAISE_APPLICATION_ERROR(-20001,'User not found in HIG_USERS');
-   END IF;
---
-   IF l_hus_unrestricted = 'Y'
-    THEN
-      l_unrestricted_inv := c_true;
-   ELSE
-      l_unrestricted_inv := c_false;
-   END IF;
---
--- EFFECTIVE_DATE
-   set_context (pi_attribute => g_tab_rec_context(1).attribute_name
-               ,pi_value     => g_effective_date
-               );
---
--- USER_LENGTH_UNITS
-   set_context (pi_attribute => g_tab_rec_context(2).attribute_name
-               ,pi_value     => get_user_sysopt (pi_sysopt  => 'DEFUNITID'
-                                                ,pi_userid  => l_user_id
-                                                ,pi_useopt  => 'PREFUNITS'
-                                                ,pi_default => '1'
-                                                )
-               );
---
--- USER_DATE_MASK
-   set_context (pi_attribute => g_tab_rec_context(3).attribute_name
-               ,pi_value     => get_user_sysopt (pi_userid  => l_user_id
-                                                ,pi_useopt  => 'DATE_MASK'
-                                                ,pi_default => 'DD-MON-YYYY'
-                                                )
-               );
---
--- DEFAULT_LENGTH_MASK
-   set_context (pi_attribute => g_tab_rec_context(4).attribute_name
-               ,pi_value     => '9999990.00'
-               );
---
--- USER_LENGTH_MASK
-   set_context (pi_attribute => g_tab_rec_context(5).attribute_name
-               ,pi_value     => '9999990.00'
-               );
---
--- USER_ID
-   set_context (pi_attribute => g_tab_rec_context(6).attribute_name
-               ,pi_value     => l_user_id
-               );
---
--- UNRESTRICTED_INVENTORY
-   set_context (pi_attribute => g_tab_rec_context(7).attribute_name
-               ,pi_value     => l_unrestricted_inv
-               );
---
--- APPLICATION_OWNER
-   set_context (pi_attribute => g_tab_rec_context(8).attribute_name
-               ,pi_value     => g_application_owner
-               );
---
--- UNRESTRICTED_ACCIDENTS
-   set_context (pi_attribute => g_tab_rec_context(9).attribute_name
-               ,pi_value     => l_unrestricted_acc
-               );
---
--- ENTERPRISE_EDITION
-   set_context (pi_attribute => g_tab_rec_context(10).attribute_name
-               ,pi_value     => l_enterprise_edn
-               );
---
--- INSTANCE_NAME
-   set_context (pi_attribute => g_tab_rec_context(11).attribute_name
-               ,pi_value     => l_instance
-               );
---
--- HOST_NAME
-   set_context (pi_attribute => g_tab_rec_context(12).attribute_name
-               ,pi_value     => l_host
-               );
---
--- DB_VERSION
-   set_context (pi_attribute => g_tab_rec_context(13).attribute_name
-               ,pi_value     => l_db_version
-               );
---
--- PREFERRED_LRM
-   set_context (pi_attribute => g_tab_rec_context(14).attribute_name
-               ,pi_value     => get_user_sysopt (pi_sysopt  => 'PREFLRM'
-                                                ,pi_userid  => l_user_id
-                                                ,pi_useopt  => 'PREFLRM'
-                                                )
-               );
---
--- ROI_ID
-   set_context (pi_attribute => g_tab_rec_context(15).attribute_name
-               ,pi_value     => get_user_sysopt (pi_sysopt  => NULL
-                                                ,pi_userid  => l_user_id
-                                                ,pi_useopt  => 'ROI_ID'
-                                                )
-               );
---
--- ROI_TYPE
-   set_context (pi_attribute => g_tab_rec_context(16).attribute_name
-               ,pi_value     => get_user_sysopt (pi_sysopt  => NULL
-                                                ,pi_userid  => l_user_id
-                                                ,pi_useopt  => 'ROI_TYPE'
-                                                )
-               );
-   --      
-   set_context (pi_attribute => g_tab_rec_context(17).attribute_name
-               ,pi_value     => get_user_sysopt (pi_sysopt  => NULL
-                                                ,pi_userid  => l_user_id
-                                                ,pi_useopt  => 'DEFATTRSET'
-                                                )
-               );
---
-   g_enforce_read_only := TRUE;
---
-EXCEPTION
---
-   WHEN others
-    THEN
-      g_enforce_read_only := TRUE;
-      RAISE;
---
-END initialise_context;
---
------------------------------------------------------------------------------
---
-FUNCTION get_attribute_details (pi_attribute IN varchar2) RETURN attrib_dets IS
---
-   l_retval attrib_dets;
---
-BEGIN
---
-   IF g_tab_rec_context.COUNT = 0
-    THEN
-      RAISE_APPLICATION_ERROR(-20094,'Context is not initialised');
-   END IF;
---
-   FOR l_count IN 1..g_tab_rec_context.COUNT
-    LOOP
-      IF g_tab_rec_context(l_count).attribute_name = pi_attribute
-       THEN
-         l_retval.data_type := g_tab_rec_context(l_count).data_type;
-         l_retval.read_only := g_tab_context_read_only(l_count);
-         EXIT;
-      END IF;
-   END LOOP;
---
-   IF l_retval.data_type IS NULL
-    THEN
-      RAISE_APPLICATION_ERROR(-20095,'Attribute is not specified for context');
-   END IF;
---
-   RETURN l_retval;
---
-END get_attribute_details;
---
------------------------------------------------------------------------------
---
-PROCEDURE set_context (pi_namespace IN varchar2 DEFAULT g_context_namespace
-                      ,pi_attribute IN varchar2
-                      ,pi_value     IN date
-                      ) IS
-BEGIN
---
---
-   IF    pi_namespace = g_context_namespace
-    THEN
-      IF    pi_attribute = c_eff_date_name
-       THEN
-         -- If this is the EFF_DATE then set the global value
-        g_effective_date := TRUNC(pi_value);
-      ELSIF get_attribute_details(pi_attribute).data_type != c_date_datatype
-       THEN
-         -- If this is for the default context and it isn't a date
-         RAISE_APPLICATION_ERROR(-20096,'Attribute is not specified as a date');
-      END IF;
-   END IF;
---
-   set_context (pi_namespace
-               ,pi_attribute
-               ,TO_CHAR(pi_value,c_date_format)
-               );
---
-END set_context;
---
------------------------------------------------------------------------------
---
-PROCEDURE set_context (pi_namespace IN varchar2 DEFAULT g_context_namespace
-                      ,pi_attribute IN varchar2
-                      ,pi_value     IN number
-                      ) IS
-BEGIN
---
-   IF   pi_namespace                           = g_context_namespace
-    AND get_attribute_details(pi_attribute).data_type != c_number_datatype
-    THEN
-      RAISE_APPLICATION_ERROR(-20097,'Attribute is not specified as a number');
-   END IF;
---
-   set_context (pi_namespace
-               ,pi_attribute
-               ,LTRIM(TO_CHAR(pi_value))
-               );
---
-END set_context;
---
------------------------------------------------------------------------------
---
-PROCEDURE set_context (pi_namespace IN varchar2 DEFAULT g_context_namespace
-                      ,pi_attribute IN varchar2
-                      ,pi_value     IN varchar2
-                      ) IS
-BEGIN
---
-   IF pi_namespace = g_context_namespace
-    THEN
-      check_update_allowed (pi_attribute);
-   END IF;
---
-   IF g_enterprise_edn
-    THEN
-      dbms_session.set_context(namespace => pi_namespace
-                              ,ATTRIBUTE => pi_attribute
-                              ,VALUE     => pi_value
-                              );
-   ELSE
-      IF pi_namespace = g_context_namespace
-       THEN
-         FOR i IN 1..g_tab_rec_context.COUNT
-          LOOP
-            IF g_tab_rec_context(i).attribute_name = pi_attribute
-             THEN
-               g_tab_values(i) := pi_value;
-               EXIT;
-            END IF;
-         END LOOP;
-      END IF;
-   END IF;
---
-END set_context;
---
------------------------------------------------------------------------------
---
-FUNCTION get_context (pi_namespace IN varchar2 DEFAULT g_context_namespace
-                     ,pi_attribute IN varchar2
-                     ) RETURN varchar2 IS
---
-BEGIN
---
-   IF g_enterprise_edn
-    THEN
-      RETURN sys_context(pi_namespace, pi_attribute);
-   ELSE
-      FOR i IN 1..g_tab_rec_context.COUNT
-       LOOP
-         IF g_tab_rec_context(i).attribute_name = pi_attribute
-          THEN
-            IF g_tab_values.EXISTS(i)
-             THEN
-               RETURN g_tab_values(i);
-            ELSE
-               RETURN NULL;
-            END IF;
-            EXIT;
-         END IF;
-      END LOOP;
-   END IF;
---
-END get_context;
---
------------------------------------------------------------------------------
---
-FUNCTION get_context_date (pi_namespace IN varchar2 DEFAULT g_context_namespace
-                          ,pi_attribute IN varchar2
-                          ) RETURN date IS
---
-   l_char_retval varchar2(255);
---
-BEGIN
---
-   IF   pi_namespace                           = g_context_namespace
-    AND get_attribute_details(pi_attribute).data_type != c_date_datatype
-    THEN
-      RAISE_APPLICATION_ERROR(-20096,'Attribute is not specified as a date');
-   END IF;
---
-   l_char_retval := get_context (pi_namespace, pi_attribute);
---
-   RETURN TO_DATE(l_char_retval, c_date_format);
---
-END get_context_date;
---
------------------------------------------------------------------------------
---
-FUNCTION get_context_number (pi_namespace IN varchar2 DEFAULT g_context_namespace
-                            ,pi_attribute IN varchar2
-                            ) RETURN number IS
---
-   l_char_retval varchar2(255);
---
-BEGIN
---
-   IF   pi_namespace                           = g_context_namespace
-    AND get_attribute_details(pi_attribute).data_type != c_number_datatype
-    THEN
-      RAISE_APPLICATION_ERROR(-20097,'Attribute is not specified as a number');
-   END IF;
---
-   l_char_retval := get_context (pi_namespace, pi_attribute);
---
-   RETURN TO_NUMBER(l_char_retval);
---
-END get_context_number;
---
------------------------------------------------------------------------------
---
-PROCEDURE show_context IS
---
-BEGIN
-   show_all_context (g_context_namespace);
-END show_context;
---
------------------------------------------------------------------------------
---
-PROCEDURE show_context (pi_namespace IN varchar2 DEFAULT g_context_namespace
-                       ,pi_attribute IN varchar2
-                       ) IS
-BEGIN
-   DBMS_OUTPUT.PUT_LINE(pi_namespace||'.'||pi_attribute||' : '
-                        ||get_context(pi_namespace, pi_attribute)
-                       );
-END show_context;
---
------------------------------------------------------------------------------
---
-PROCEDURE show_all_context (pi_namespace IN varchar2 DEFAULT NULL) IS
---
-   l_current_namespace    varchar2(30) := '??BADGER??';
-   l_context_values_found boolean := FALSE;
---
-   c_userenv_namespace CONSTANT varchar2(30) := 'USERENV';
-   c_null_string       CONSTANT varchar2(10) := '#Null#';
---
-BEGIN
---
-   IF g_enterprise_edn
-    THEN
-      FOR cs_rec IN (SELECT *
-                      FROM  session_context
-                     WHERE  namespace = NVL(pi_namespace,namespace)
-                     ORDER BY namespace
-                             ,ATTRIBUTE
-                    )
-       LOOP
-         IF l_current_namespace <> cs_rec.namespace
-          THEN
-            l_current_namespace := cs_rec.namespace;
-            DBMS_OUTPUT.PUT_LINE(l_current_namespace);
-            DBMS_OUTPUT.PUT_LINE(RPAD('-',LENGTH(l_current_namespace),'-'));
-         END IF;
-         DBMS_OUTPUT.PUT_LINE(RPAD(cs_rec.ATTRIBUTE,31)
-                              ||': '
-                              ||NVL(cs_rec.VALUE,c_null_string)
-                             );
-         l_context_values_found := TRUE;
-      END LOOP;
-   ELSE
---
-      IF g_tab_values.COUNT = 0
-       THEN
-         RAISE_APPLICATION_ERROR(-20094,'Context is not initialised');
-      END IF;
---
-      FOR i IN 1..g_tab_rec_context.COUNT
-       LOOP
-         IF l_current_namespace <> g_context_namespace
-          THEN
-            l_current_namespace := g_context_namespace;
-            DBMS_OUTPUT.PUT_LINE(g_context_namespace);
-            DBMS_OUTPUT.PUT_LINE(RPAD('-',LENGTH(l_current_namespace),'-'));
-         END IF;
-         DBMS_OUTPUT.PUT_LINE(RPAD(g_tab_rec_context(i).attribute_name,31)
-                              ||': '
-                              ||NVL(g_tab_values(i),c_null_string)
-                             );
-         l_context_values_found := TRUE;
-      END LOOP;
-   END IF;
---
-   IF NVL(pi_namespace,c_userenv_namespace) = c_userenv_namespace
-    AND g_enterprise_edn
-    THEN
-      l_context_values_found := TRUE;
-      DBMS_OUTPUT.PUT_LINE(c_userenv_namespace);
-      DBMS_OUTPUT.PUT_LINE(RPAD('-',LENGTH(c_userenv_namespace),'-'));
-      FOR l_count IN 1..g_tab_userenv_context.COUNT
-       LOOP
-         DBMS_OUTPUT.PUT_LINE(RPAD(g_tab_userenv_context(l_count),31)
-                              ||': '
-                              ||NVL(get_context(c_userenv_namespace
-                                               ,g_tab_userenv_context(l_count)
-                                               )
-                                    ,c_null_string
-                                    )
-                             );
-      END LOOP;
-   END IF;
---
-   IF NOT l_context_values_found
-    THEN
-      DBMS_OUTPUT.PUT_LINE('No context values found');
-   END IF;
---
-END show_all_context;
+Procedure Initialise_Context 
+Is
+   l_User_Id            Hig_Users.Hus_User_Id%Type;
+   l_Unrestricted_Inv   Varchar2(5);
+   l_Unrestricted_Acc   Varchar2(5);
+   l_Instance           V$Instance.Instance_Name%Type;
+   l_Host               V$Instance.Host_Name%Type;
+   l_Db_Version         V$Instance.Version%Type;
+   l_Enterprise_Edn     Varchar2(5);
+
+Begin
+  Begin
+    Select  Hus_User_Id,
+            Decode(Hur_Role,Null,C_False,C_True) Unrestricted_Acc,
+            Decode(Hus_Unrestricted,'Y',C_True,C_False)          
+    Into    l_User_Id,
+            l_Unrestricted_Acc,
+            l_Unrestricted_Inv
+    From    Hig_Users         hu,
+            Hig_User_Roles    hur
+    Where   hu.Hus_Username     =   Sys_Context('NM3_SECURITY_CTX','USERNAME') 
+    And     hu.Hus_Username     =   hur.Hur_Username (+)
+    And     'ACC_ADMIN'         =   hur.Hur_Role (+);
+  Exception
+    When No_Data_Found Then
+      Raise_Application_Error(-20001,'User not found in HIG_USERS');
+  End;
+
+  --
+  Begin
+    Select  c_True            
+    Into    l_Enterprise_Edn
+    From    V$Version
+    Where   (   Instr(Banner,'Enterprise Edition')  > 0
+            Or  Instr(Banner,'Personal')            > 0
+            );
+  Exception
+    When  No_Data_Found Then
+      l_Enterprise_Edn:=c_False;
+  End;
+
+  Select  Instance_Name,
+          Host_Name,
+          Version
+  Into    l_Instance,
+          l_Host,
+          l_Db_Version         
+  From    V$Instance;
+
+  nm3ctx.Set_Core_Context (
+                          p_Attribute => 'EFFECTIVE_DATE',
+                          p_Value     => To_Char(Trunc(Sysdate),'DD-MON-YYYY')
+                          );
+               
+  nm3ctx.Set_Core_Context (
+                          p_Attribute => 'USER_LENGTH_UNITS',
+                          p_Value     => get_user_sysopt  (
+                                                          p_Sysopt   =>  'DEFUNITID',
+                                                          p_Userid   =>  l_User_Id,
+                                                          p_Useopt   =>  'PREFUNITS',
+                                                          p_Default  =>  '1'
+                                                          )
+                          );               
+
+  nm3ctx.Set_Core_Context (
+                          p_Attribute => 'USER_DATE_MASK',
+                          p_Value     => get_user_sysopt  (
+                                                          p_Userid  =>  l_User_Id,
+                                                          p_Useopt  =>  'DATE_MASK',
+                                                          p_Default =>  'DD-MON-YYYY'
+                                                          )
+                          );
+
+   nm3ctx.Set_Core_Context  (
+                            p_Attribute => 'DEFAULT_LENGTH_MASK',
+                            p_Value     => '9999990.00'
+                            );
+
+   nm3ctx.Set_Core_Context  (
+                            p_Attribute => 'USER_LENGTH_MASK',
+                            p_Value     => '9999990.00'
+                            );
+
+   nm3ctx.Set_Core_Context  (
+                            p_Attribute => 'USER_ID',
+                            p_Value     => Ltrim(To_Char(l_user_id))
+                            );
+               
+   nm3ctx.Set_Core_Context  (
+                            p_Attribute => 'UNRESTRICTED_INVENTORY',
+                            p_Value     => l_unrestricted_inv
+                            );
+
+   nm3ctx.Set_Core_Context  (
+                            p_Attribute => 'APPLICATION_OWNER',
+                            p_Value     => Get_Hig_Owner
+                            );
+
+   nm3ctx.Set_Core_Context  (
+                            p_Attribute => 'UNRESTRICTED_ACCIDENTS',
+                            p_Value     => l_unrestricted_acc
+                            );
+
+   nm3ctx.Set_Core_Context  (
+                            p_Attribute => 'ENTERPRISE_EDITION',
+                            p_Value     => l_enterprise_edn
+                            );
+
+   nm3ctx.Set_Core_Context  (
+                            p_Attribute => 'INSTANCE_NAME',
+                            p_Value     => l_instance
+                            );
+  
+   nm3ctx.Set_Core_Context  (
+                            p_Attribute => 'HOST_NAME',
+                            p_Value     => l_host
+                            );
+
+   nm3ctx.Set_Core_Context  (
+                            p_Attribute => 'DB_VERSION',
+                            p_Value     => l_db_version
+                            );
+
+   nm3ctx.Set_Core_Context  (
+                            p_Attribute => 'PREFERRED_LRM',
+                            p_Value     => get_user_sysopt  (
+                                                            p_Sysopt  => 'PREFLRM',
+                                                            p_Userid  => l_user_id,
+                                                            p_Useopt  => 'PREFLRM'
+                                                            )
+                            );
+
+   nm3ctx.Set_Core_Context  (
+                            p_Attribute => 'ROI_ID',
+                            p_Value     => get_user_sysopt  (
+                                                            p_Sysopt  => NULL,
+                                                            p_Userid  => l_user_id,
+                                                            p_Useopt  => 'ROI_ID'
+                                                            )
+                            );
+
+   nm3ctx.Set_Core_Context  (
+                            p_Attribute => 'ROI_TYPE',
+                            p_Value     => get_user_sysopt  (
+                                                            p_Sysopt  => NULL,
+                                                            p_Userid  => l_user_id,
+                                                            p_Useopt  => 'ROI_TYPE'
+                                                            )
+                            );
+
+   nm3ctx.Set_Core_Context  (
+                            p_Attribute => 'DEFAULT_INV_ATTR_SET',
+                            p_Value     => get_user_sysopt  (
+                                                            p_Sysopt  => NULL,
+                                                            p_Userid  => l_user_id,
+                                                            p_Useopt  => 'DEFATTRSET'
+                                                            )
+                            );
+  --Lock down the core contexts from being changed where they are flagged as readonly.
+  Nm3Security.Lock_Core_Context;
+
+Exception
+--
+   When Others
+    Then
+      Nm3Security.Lock_Core_Context;
+      Raise;
+--
+End Initialise_Context;
 --
 -----------------------------------------------------------------------------
 --
@@ -597,7 +305,7 @@ PROCEDURE create_instantiate_user_trig (pi_new_trigger_owner IN varchar2) IS
 --
    l_dummy              varchar2(1);
 --
-   l_application_owner  varchar2(30)  := get_context(pi_attribute => 'APPLICATION_OWNER');
+   l_application_owner  varchar2(30)  := Sys_Context ('NM3CORE','APPLICATION_OWNER');
    c_inst_user CONSTANT varchar2(30) := 'INSTANTIATE_USER';
 --
    l_rec_at             all_triggers%ROWTYPE;
@@ -651,286 +359,10 @@ EXCEPTION
     THEN
       RAISE_APPLICATION_ERROR(g_context_exc_code,g_context_exc_msg);
 --
-END create_instantiate_user_trig;
+End Create_Instantiate_User_Trig;
 --
 -----------------------------------------------------------------------------
 --
-FUNCTION get_effective_date RETURN date IS
-BEGIN
 --
-   RETURN g_effective_date;
---   RETURN TO_DATE(get_context(pi_attribute => 'EFFECTIVE_DATE'),c_date_format);
---
-END get_effective_date;
---
------------------------------------------------------------------------------
---
-PROCEDURE check_update_allowed(pi_attribute IN varchar2) IS
-BEGIN
-   IF   g_enforce_read_only
-    AND get_attribute_details(pi_attribute).read_only
-    THEN
-      RAISE_APPLICATION_ERROR(-20498,'Cannot set context values for read only attributes');
-   END IF;
-END check_update_allowed;
---
------------------------------------------------------------------------------
---
-FUNCTION get_namespace RETURN varchar2 IS
--- This function returns the value of g_context_namespace
-BEGIN
-   RETURN g_context_namespace;
-END get_namespace;
---
------------------------------------------------------------------------------
---
-FUNCTION get_user_sysopt (pi_sysopt  hig_option_values.hov_id%TYPE         DEFAULT NULL
-                         ,pi_userid  hig_user_options.huo_hus_user_id%TYPE DEFAULT NULL
-                         ,pi_useopt  hig_user_options.huo_id%TYPE          DEFAULT NULL
-                         ,pi_default varchar2                              DEFAULT NULL
-                         ) RETURN varchar2 IS
---
-   CURSOR cs_useopt (c_user_id hig_user_options.huo_hus_user_id%TYPE
-                    ,c_opt_id  hig_user_options.huo_id%TYPE
-                    ) IS
-   SELECT huo_value
-    FROM  hig_user_options
-   WHERE  huo_hus_user_id = c_user_id
-    AND   huo_id          = c_opt_id;
---
-   CURSOR cs_sysopt (c_opt_id hig_option_values.hov_id%TYPE) IS
-   SELECT hov_value
-    FROM  hig_option_values
-   WHERE  hov_id   = c_opt_id;
---
-   l_found  boolean := FALSE;
-   l_retval hig_option_values.hov_value%TYPE;
---
-BEGIN
---
-   IF   pi_userid IS NOT NULL
-    AND pi_useopt IS NOT NULL
-    THEN
-      OPEN  cs_useopt (pi_userid,pi_useopt);
-      FETCH cs_useopt INTO l_retval;
-      l_found := cs_useopt%FOUND;
-      CLOSE cs_useopt;
-   END IF;
---
-   IF NOT l_found
-    THEN
---
-      IF pi_sysopt IS NOT NULL
-       THEN
-         OPEN  cs_sysopt (pi_sysopt);
-         FETCH cs_sysopt INTO l_retval;
-         l_found := cs_sysopt%FOUND;
-         CLOSE cs_sysopt;
-      END IF;
---
-      IF NOT l_found
-       THEN
-         l_retval := pi_default;
-      END IF;
---
-   END IF;
---
-   RETURN l_retval;
---
-END get_user_sysopt;
---
------------------------------------------------------------------------------
---
-PROCEDURE instantiate_data IS
---
-   CURSOR cs_hig_owner (p_flag varchar2) IS
-   SELECT hus_username
-    FROM  hig_users
-   WHERE  hus_is_hig_owner_flag = p_flag
-    OR    p_flag IS NULL;
-   l_dummy hig_users.hus_username%TYPE;
---
-   CURSOR cs_enterprise_edn IS
-   SELECT 'x'
-    FROM  v$version
-   WHERE  banner LIKE '%Enterprise Edition%'
-    OR    banner LIKE '%Personal%';
---
-BEGIN
---
-   OPEN  cs_hig_owner ('Y');
-   FETCH cs_hig_owner INTO g_application_owner;
-   IF cs_hig_owner%NOTFOUND
-    THEN
-      -- there is none with the hus_is_hig_owner_flag set to Y
-      CLOSE cs_hig_owner;
-      OPEN  cs_hig_owner (NULL);
-      FETCH cs_hig_owner INTO l_dummy;
-      IF cs_hig_owner%FOUND
-       THEN
-         NULL; -- This should never happen
-      ELSE
-         --
-         -- If there is no record found and there are no records in hig_users
-         --  therefore the only time this can happen is
-         --  when this runs are part of the install, so the application
-         --  owner will be the current user
-         --
-         g_application_owner := USER;
-      END IF;
-   END IF;
-   CLOSE cs_hig_owner;
---
-   OPEN  cs_enterprise_edn;
-   FETCH cs_enterprise_edn INTO l_dummy;
-   g_enterprise_edn := cs_enterprise_edn%FOUND;
-   CLOSE cs_enterprise_edn;
---
-   g_context_namespace := 'NM3_'||SUBSTR(g_application_owner,1,26);
---
--- Initialise the variables here to avoid any possible trouble with
---  these values not being set. Problem crept up after EXISTING_STATE_OF_PACKAGES
---  error caused this record to lose it's values
---
-   g_tab_rec_context.DELETE;
---
-   g_tab_rec_context(1).attribute_name  := c_eff_date_name;
-   g_tab_rec_context(1).data_type       := c_date_datatype;
-   g_tab_context_read_only(1)           := FALSE;
-   g_tab_rec_context(2).attribute_name  := 'USER_LENGTH_UNITS';
-   g_tab_rec_context(2).data_type       := c_number_datatype;
-   g_tab_context_read_only(2)           := FALSE;
-   g_tab_rec_context(3).attribute_name  := 'USER_DATE_MASK';
-   g_tab_rec_context(3).data_type       := c_varchar_datatype;
-   g_tab_context_read_only(3)           := FALSE;
-   g_tab_rec_context(4).attribute_name  := 'DEFAULT_LENGTH_MASK';
-   g_tab_rec_context(4).data_type       := c_varchar_datatype;
-   g_tab_context_read_only(4)           := FALSE;
-   g_tab_rec_context(5).attribute_name  := 'USER_LENGTH_MASK';
-   g_tab_rec_context(5).data_type       := c_varchar_datatype;
-   g_tab_context_read_only(5)           := FALSE;
-   g_tab_rec_context(6).attribute_name  := 'USER_ID';
-   g_tab_rec_context(6).data_type       := c_number_datatype;
-   g_tab_context_read_only(6)           := TRUE;
-   g_tab_rec_context(7).attribute_name  := 'UNRESTRICTED_INVENTORY';
-   g_tab_rec_context(7).data_type       := c_varchar_datatype;
-   g_tab_context_read_only(7)           := TRUE;
-   g_tab_rec_context(8).attribute_name  := 'APPLICATION_OWNER';
-   g_tab_rec_context(8).data_type       := c_varchar_datatype;
-   g_tab_context_read_only(8)           := TRUE;
-   g_tab_rec_context(9).attribute_name  := 'UNRESTRICTED_ACCIDENTS';
-   g_tab_rec_context(9).data_type       := c_varchar_datatype;
-   g_tab_context_read_only(9)           := TRUE;
-   g_tab_rec_context(10).attribute_name := 'ENTERPRISE_EDITION';
-   g_tab_rec_context(10).data_type      := c_varchar_datatype;
-   g_tab_context_read_only(10)          := TRUE;
-   g_tab_rec_context(11).attribute_name := 'INSTANCE_NAME';
-   g_tab_rec_context(11).data_type      := c_varchar_datatype;
-   g_tab_context_read_only(11)          := TRUE;
-   g_tab_rec_context(12).attribute_name := 'HOST_NAME';
-   g_tab_rec_context(12).data_type      := c_varchar_datatype;
-   g_tab_context_read_only(12)          := TRUE;
-   g_tab_rec_context(13).attribute_name := 'DB_VERSION';
-   g_tab_rec_context(13).data_type      := c_varchar_datatype;
-   g_tab_context_read_only(13)          := TRUE;
-   g_tab_rec_context(14).attribute_name := 'PREFERRED_LRM';
-   g_tab_rec_context(14).data_type      := c_varchar_datatype;
-   g_tab_context_read_only(14)          := FALSE;
-   g_tab_rec_context(15).attribute_name := 'ROI_ID';
-   g_tab_rec_context(15).data_type      := c_number_datatype;
-   g_tab_context_read_only(15)          := FALSE;
-   g_tab_rec_context(16).attribute_name := 'ROI_TYPE';
-   g_tab_rec_context(16).data_type      := c_varchar_datatype;
-   g_tab_context_read_only(16)          := FALSE;
-   g_tab_rec_context(17).attribute_name := 'DEFAULT_INV_ATTR_SET';
-   g_tab_rec_context(17).data_type      := c_number_datatype;
-   g_tab_context_read_only(17)          := FALSE;
---
-   g_tab_userenv_context.DELETE;
---
--- Returns the operating system identifier for the client of the current session. "Virtual" in TCP/IP.ž
-   g_tab_userenv_context(1)  := 'TERMINAL';
--- Returns the language and territory currently used by the session, along with the database
---  character set in the form: language_territory.characterset.ž
-   g_tab_userenv_context(2)  := 'LANGUAGE';
--- Returns abbreviation for the language name.ž
-   g_tab_userenv_context(3)  := 'LANG';
--- Returns auditing session identifier.ž
-   g_tab_userenv_context(4)  := 'SESSIONID';
--- Returns the instance identification number of the current instance.ž
-   g_tab_userenv_context(5)  := 'INSTANCE';
--- Returns available auditing entry identifier.ž
-   g_tab_userenv_context(6)  := 'ENTRYID';
--- Returns TRUE if you currently have the DBA role enabled and FALSE if you do not. ž
-   g_tab_userenv_context(7)  := 'ISDBA';
--- Returns up to 64 bytes of user session information that can be stored by an
---  application using the DBMS_APPLICATION_INFO package.ž
-   g_tab_userenv_context(8)  := 'CLIENT_INFO';
--- Returns the territory of the current session.ž
-   g_tab_userenv_context(9)  := 'NLS_TERRITORY';
--- Returns the currency symbol of the current session.ž
-   g_tab_userenv_context(10) := 'NLS_CURRENCY';
--- Returns the NLS calendar used for dates in the current session.ž
-   g_tab_userenv_context(11) := 'NLS_CALENDAR';
--- Returns the current date format of the current session.ž
-   g_tab_userenv_context(12) := 'NLS_DATE_FORMAT';
--- Returns the language used for expressing dates in the current session.ž
-   g_tab_userenv_context(13) := 'NLS_DATE_LANGUAGE';
--- Indicates whether the sort base is binary or linguistic.ž
-   g_tab_userenv_context(14) := 'NLS_SORT';
--- Returns the name of the user whose privilege the current session is under. Can be different from
---  SESSION_USER from within a stored procedure (such as an invoker-rights procedure).ž
-   g_tab_userenv_context(15) := 'CURRENT_USER';
--- Returns the user ID of the user whose privilege the current session is under. Can can be
---  different from SESSION_USERID from within a stored procedure (such as an invoker-rights procedure).ž
-   g_tab_userenv_context(16) := 'CURRENT_USERID';
--- Returns the database user name by which the current user is authenticated.ž
-   g_tab_userenv_context(17) := 'SESSION_USER';
--- Returns the identifier of the database user name by which the current user is authenticated.ž
-   g_tab_userenv_context(18) := 'SESSION_USERID';
--- Returns the name of the default schema being used in the current session. This can be changed
---  with an ALTER SESSION SET SCHEMA statement.ž
-   g_tab_userenv_context(19) := 'CURRENT_SCHEMA';
--- Returns the identifier of the default schema being used in the current session. This can be
---  changed with an ALTER SESSION SET SCHEMAID statement.ž
-   g_tab_userenv_context(20) := 'CURRENT_SCHEMAID';
--- Returns the name of the database user (typically middle tier) who opened the current session
---  on behalf of SESSION_USER.ž
-   g_tab_userenv_context(21) := 'PROXY_USER';
--- Returns the identifier of the database user (typically middle tier) who opened the current
---  session on behalf of SESSION_USER.ž
-   g_tab_userenv_context(22) := 'PROXY_USERID';
--- Returns the domain of the database as specified in the DB_DOMAIN initialization parameter.ž
-   g_tab_userenv_context(23) := 'DB_DOMAIN';
--- Returns the name of the database as specified in the DB_NAME initialization parameter.ž
-   g_tab_userenv_context(24) := 'DB_NAME';
--- Returns the name for the hose machine on which the database is running.ž
-   g_tab_userenv_context(25) := 'HOST';
--- Returns the operating system username of the client process that initiated the database session.ž
-   g_tab_userenv_context(26) := 'OS_USER';
--- Returns the external name of the database user.ž
-   g_tab_userenv_context(27) := 'EXTERNAL_NAME';
--- Returns the IP address of the machine from which the client is connected.ž
-   g_tab_userenv_context(28) := 'IP_ADDRESS';
--- Returns the protocol named in the connect string (PROTOCOL=protocol).ž
-   g_tab_userenv_context(29) := 'NETWORK_PROTOCOL';
--- Returns the background job ID.ž
-   g_tab_userenv_context(30) := 'BG_JOB_ID';
--- Returns the foreground job ID.ž
-   g_tab_userenv_context(31) := 'FG_JOB_ID';
--- Shows how the user was authenticated (DATABASE, OS, NETWORK, PROXY).ž
-   g_tab_userenv_context(32) := 'AUTHENTICATION_TYPE';
--- Returns the data being used to authenticate the login user. (Returns the certificate
---  content, if one exists.)
-   g_tab_userenv_context(33) := 'AUTHENTICATION_DATA';
---
-END instantiate_data;
---
------------------------------------------------------------------------------
---
-BEGIN
---
-   instantiate_data;
---
-END nm3context;
+End Nm3Context;
 /

@@ -53,7 +53,7 @@ FUNCTION get_body_version RETURN VARCHAR2;
 -- -20120, 'Inv TYPE Network location IS mandatory'
 
 PROCEDURE do_close(p_ne_id          nm_elements.ne_id%TYPE
-                  ,p_effective_date DATE DEFAULT  nm3user.get_effective_date
+                  ,p_effective_date DATE DEFAULT  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                   ,p_neh_descr      nm_element_history.neh_descr%TYPE DEFAULT NULL --CWS 0108990 12/03/2010
                   );
 --</PROC>
@@ -63,7 +63,7 @@ PROCEDURE do_close(p_ne_id          nm_elements.ne_id%TYPE
 --<PROC NAME="gis_close_elements">
 --
 PROCEDURE gis_close_elements (p_gdo_session_id gis_data_objects.gdo_session_id%TYPE
-                             ,p_effective_date DATE DEFAULT  nm3user.get_effective_date
+                             ,p_effective_date DATE DEFAULT  To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                              );
 --</PROC>
 --
@@ -84,7 +84,7 @@ PROCEDURE gis_close_elements (p_gdo_session_id gis_data_objects.gdo_session_id%T
 --
 PROCEDURE multi_element_close ( pi_type            VARCHAR2
                               , pi_id              NUMBER
-                              , pi_effective_date  DATE    DEFAULT nm3user.get_effective_date
+                              , pi_effective_date  DATE    DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                               , pi_close_all       VARCHAR2 DEFAULT 'N'
                               , pi_end_date_datums VARCHAR2 DEFAULT 'N'
                               );
@@ -117,7 +117,7 @@ FUNCTION get_c_route RETURN VARCHAR2;
 -- This procedure closes (end-dates) the specified node at the given effective date
 --
 PROCEDURE close_node (pi_no_node_id     nm_nodes.no_node_id%TYPE
-                     ,pi_effective_date DATE DEFAULT nm3user.get_effective_date
+                     ,pi_effective_date DATE DEFAULT To_Date(Sys_Context('NM3CORE','EFFECTIVE_DATE'),'DD-MON-YYYY')
                      );
 --</PROC>
 --

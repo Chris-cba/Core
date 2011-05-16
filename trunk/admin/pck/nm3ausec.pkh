@@ -144,7 +144,7 @@ PROCEDURE check_each_nm_row(p_rec IN rec_each_nm);
 --  then an exception will be raised
 --
 FUNCTION get_highest_au_of_au_type (p_au_type nm_admin_units.nau_admin_type%TYPE DEFAULT NULL
-                                   ,p_user    varchar2                           DEFAULT USER
+                                   ,p_user    varchar2                           DEFAULT Sys_Context('NM3_SECURITY_CTX','USERNAME')
                                    ,p_mode    varchar2                           DEFAULT nm3type.c_normal
                                    ) RETURN nm_admin_units.nau_admin_unit%TYPE;
 --

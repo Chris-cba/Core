@@ -4,11 +4,11 @@ CREATE OR REPLACE PACKAGE BODY nm3dbms_job AS
 --
 --   PVCS Identifiers :-
 --
---       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dbms_job.pkb-arc   2.1   Jan 04 2010 15:51:24   cstrettle  $
+--       PVCS id          : $Header:   //vm_latest/archives/nm3/admin/pck/nm3dbms_job.pkb-arc   2.2   May 16 2011 14:44:10   Steve.Cooper  $
 --       Module Name      : $Workfile:   nm3dbms_job.pkb  $
---       Date into PVCS   : $Date:   Jan 04 2010 15:51:24  $
---       Date fetched Out : $Modtime:   Jan 04 2010 15:46:10  $
---       Version          : $Revision:   2.1  $
+--       Date into PVCS   : $Date:   May 16 2011 14:44:10  $
+--       Date fetched Out : $Modtime:   Apr 01 2011 16:12:24  $
+--       Version          : $Revision:   2.2  $
 --       Based on SCCS version : 1.2
 --
 --   Author : K Angus
@@ -21,15 +21,13 @@ CREATE OR REPLACE PACKAGE BODY nm3dbms_job AS
 --
 --all global package variables here
 --
-  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.1  $';
+  g_body_sccsid  CONSTANT varchar2(2000) := '$Revision:   2.2  $';
 --  g_body_sccsid is the SCCS ID for the package body
 --
    g_package_name    CONSTANT  varchar2(30)   := 'nm3dbms_job';
 --
    c_job_processes_param CONSTANT v$parameter.name%TYPE := 'job_queue_processes';
    c_job_interval_param  CONSTANT v$parameter.name%TYPE := 'job_queue_interval';
---
-   c_app_owner           CONSTANT VARCHAR2(30)          := hig.get_application_owner;
 --
 -----------------------------------------------------------------------------
 --
@@ -110,12 +108,11 @@ END make_sure_processes_available;
 --
 FUNCTION does_job_exist_by_what (pi_what all_jobs.what%TYPE) RETURN BOOLEAN IS
 --
-   CURSOR cs_job (c_schema_user all_jobs.schema_user%TYPE
-                 ,c_what        all_jobs.what%TYPE
+   CURSOR cs_job (c_what        all_jobs.what%TYPE
                  ) IS
    SELECT *
     FROM  all_jobs
-   WHERE  schema_user = c_schema_user
+   WHERE  schema_user = Sys_Context('NM3CORE','APPLICATION_OWNER')
     AND   UPPER(what) = c_what;
 --
    l_rec_aj all_jobs%ROWTYPE;
@@ -125,7 +122,7 @@ BEGIN
 --
    nm_debug.proc_start(g_package_name,'does_job_exist_by_what');
 --
-   OPEN  cs_job (c_app_owner, UPPER(pi_what));
+   OPEN  cs_job (UPPER(pi_what));
    FETCH cs_job INTO l_rec_aj;
    l_retval := cs_job%FOUND;
    CLOSE cs_job;
